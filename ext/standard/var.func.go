@@ -204,7 +204,7 @@ func ZifVarDump(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -441,7 +441,7 @@ func ZifDebugZvalDump(executeData *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -720,7 +720,7 @@ func ZifVarExport(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			_optional = 1
@@ -1285,7 +1285,7 @@ func ZifSerialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &struc, 0)
 			break
@@ -1375,7 +1375,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &buf, &buf_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1566,7 +1566,7 @@ func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &real_usage, &_dummy, 0) == 0 {
@@ -1640,7 +1640,7 @@ func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *zend
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &real_usage, &_dummy, 0) == 0 {

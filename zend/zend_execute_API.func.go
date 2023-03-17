@@ -633,7 +633,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 
 			}
 		}
-		param = ZEND_CALL_ARG(call, i+1)
+		param = call.Arg(i + 1)
 		if must_wrap == 0 {
 			ZVAL_COPY(param, arg)
 		} else {
@@ -1153,7 +1153,7 @@ func ZendRebuildSymbolTable() *ZendArray {
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
 		var str **ZendString = ex.GetFunc().GetOpArray().GetVars()
 		var end **ZendString = str + ex.GetFunc().GetOpArray().GetLastVar()
-		var var_ *Zval = ZEND_CALL_VAR_NUM(ex, 0)
+		var var_ *Zval = ex.VarNum(0)
 		for {
 			_zendHashAppendInd(symbol_table, *str, var_)
 			str++

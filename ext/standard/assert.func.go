@@ -123,7 +123,7 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &assertion, 0)
 			_optional = 1
@@ -299,7 +299,7 @@ func ZifAssertOptions(executeData *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &what, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG

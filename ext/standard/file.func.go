@@ -146,7 +146,7 @@ func ZifFlock(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -270,7 +270,7 @@ func ZifGetMetaTags(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -495,7 +495,7 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -622,7 +622,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -837,7 +837,7 @@ func ZifFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -1002,7 +1002,7 @@ func ZifTempnam(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dir, &dir_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -1108,7 +1108,7 @@ func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -1206,7 +1206,7 @@ func ZifFclose(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1292,7 +1292,7 @@ func ZifPopen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &command, &command_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -1389,7 +1389,7 @@ func ZifPclose(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1467,7 +1467,7 @@ func ZifFeof(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1552,7 +1552,7 @@ func ZifFgets(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1672,7 +1672,7 @@ func ZifFgetc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1762,7 +1762,7 @@ func ZifFgetss(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fd, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1884,7 +1884,7 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &file_handle, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1997,7 +1997,7 @@ func ZifFwrite(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2102,7 +2102,7 @@ func ZifFflush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2182,7 +2182,7 @@ func ZifRewind(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2262,7 +2262,7 @@ func ZifFtell(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2344,7 +2344,7 @@ func ZifFseek(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2449,7 +2449,7 @@ func ZifMkdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dir, &dir_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -2545,7 +2545,7 @@ func ZifRmdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dir, &dir_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -2632,7 +2632,7 @@ func ZifReadfile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -2731,7 +2731,7 @@ func ZifUmask(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &mask, &_dummy, 0, 0) == 0 {
@@ -2812,7 +2812,7 @@ func ZifFpassthru(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2893,7 +2893,7 @@ func ZifRename(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &old_name, &old_name_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -3000,7 +3000,7 @@ func ZifUnlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -3094,7 +3094,7 @@ func PhpIfFtruncate(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fp, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3200,7 +3200,7 @@ func PhpIfFstat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fp, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3327,7 +3327,7 @@ func ZifCopy(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &source, &source_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -3507,7 +3507,7 @@ func ZifFread(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3651,7 +3651,7 @@ func ZifFputcsv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fp, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3871,7 +3871,7 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fd, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -4334,7 +4334,7 @@ func ZifRealpath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -4502,7 +4502,7 @@ func ZifFnmatch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &pattern, &pattern_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

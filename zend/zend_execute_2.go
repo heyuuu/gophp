@@ -154,11 +154,11 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zv
 	var tmp Zval
 	value = ZVAL_DEREF(value)
 	ZVAL_COPY(&tmp, value)
-	if IZendVerifyPropertyType(info, &tmp, EX_USES_STRICT_TYPES()) == 0 {
+	if IZendVerifyPropertyType(info, &tmp, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(&tmp)
 		return EG__().GetUninitializedZval()
 	}
-	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, EX_USES_STRICT_TYPES())
+	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
 }
 func ZendCheckType(
 	type_ ZendType,
@@ -212,7 +212,7 @@ func ZendCheckType(
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
 		return 0
 	} else {
-		return ZendVerifyScalarTypeHint(type_.Code(), arg, b.CondF(is_return_type != 0, func() bool { return ZEND_RET_USES_STRICT_TYPES() }, func() bool { return ZEND_ARG_USES_STRICT_TYPES() }))
+		return ZendVerifyScalarTypeHint(type_.Code(), arg, b.CondF(is_return_type != 0, func() bool { return CurrEX().IsCallUseStrictTypes() }, func() bool { return CurrEX().IsArgUseStrictTypes() }))
 	}
 }
 func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_value *Zval, cache_slot *any) int {
@@ -260,7 +260,7 @@ func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *Zval, defa
 func ZendVerifyInternalArgTypes(fbc *ZendFunction, call *ZendExecuteData) int {
 	var i uint32
 	var num_args uint32 = ZEND_CALL_NUM_ARGS(call)
-	var p *Zval = ZEND_CALL_ARG(call, 1)
+	var p *Zval = call.Arg(1)
 	var dummy_cache_slot any
 	for i = 0; i < num_args; i++ {
 		dummy_cache_slot = nil
@@ -384,7 +384,7 @@ func ZendBinaryAssignOpTypedRef(ref *ZendReference, value *Zval, opline *ZendOp,
 		return
 	}
 	ZendBinaryOp(&z_copy, ref.GetVal(), value, opline)
-	if ZendVerifyRefAssignableZval(ref, &z_copy, EX_USES_STRICT_TYPES()) != 0 {
+	if ZendVerifyRefAssignableZval(ref, &z_copy, executeData.IsCallUseStrictTypes()) != 0 {
 		ZvalPtrDtor(ref.GetVal())
 		ZVAL_COPY_VALUE(ref.GetVal(), &z_copy)
 	} else {
@@ -402,7 +402,7 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value 
 		return
 	}
 	ZendBinaryOp(&z_copy, zptr, value, opline)
-	if ZendVerifyPropertyType(prop_info, &z_copy, EX_USES_STRICT_TYPES()) != 0 {
+	if ZendVerifyPropertyType(prop_info, &z_copy, executeData.IsCallUseStrictTypes()) != 0 {
 		ZvalPtrDtor(zptr)
 		ZVAL_COPY_VALUE(zptr, &z_copy)
 	} else {

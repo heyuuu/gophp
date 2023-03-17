@@ -46,7 +46,7 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -136,7 +136,7 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -231,7 +231,7 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -351,7 +351,7 @@ func ZifLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

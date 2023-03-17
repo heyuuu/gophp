@@ -195,7 +195,7 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	variable_ptr.SetReference(ref)
 }
 func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval, value_ptr *Zval, executeData *ZendExecuteData) *Zval {
-	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, EX_USES_STRICT_TYPES()) == 0 {
+	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		return EG__().GetUninitializedZval()
 	}
 	if prop.IsReference() {
@@ -214,7 +214,7 @@ func ZendWrongAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval, opl
 	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */
 
 	value_ptr.TryAddRefcount()
-	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, EX_USES_STRICT_TYPES())
+	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
 }
 func ZendFormatType(type_ ZendType, part1 **byte, part2 **byte) {
 	if type_.AllowNull() {

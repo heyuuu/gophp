@@ -333,7 +333,7 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -546,7 +546,7 @@ func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -619,7 +619,7 @@ func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -736,7 +736,7 @@ func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -809,7 +809,7 @@ func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -907,7 +907,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &url, &url_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

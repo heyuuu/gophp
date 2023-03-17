@@ -52,26 +52,17 @@ func ZEND_ADD_CALL_FLAG(call *ZendExecuteData, flag uint32) {
 func ZEND_DEL_CALL_FLAG(call __auto__, flag uint32) {
 	ZEND_DEL_CALL_FLAG_EX(call.This.GetTypeInfo(), flag)
 }
-func ZEND_CALL_NUM_ARGS(call *ZendExecuteData) uint32        { return call.GetThis().GetNumArgs() }
-func ZEND_CALL_VAR(call *ZendExecuteData, n uint32) *Zval    { return (*Zval)((*byte)(call) + int(n)) }
-func ZEND_CALL_VAR_NUM(call *ZendExecuteData, n int) *Zval   { return call.VarNum(n) }
-func ZEND_CALL_ARG(call *ZendExecuteData, n int) *Zval       { return call.Arg(n) }
-func EX(element __auto__) __auto__                           { return executeData.element }
-func EX_CALL_INFO() uint32                                   { return ZEND_CALL_INFO(executeData) }
-func EX_CALL_KIND() int                                      { return ZEND_CALL_KIND(executeData) }
-func EX_NUM_ARGS() uint32                                    { return ZEND_CALL_NUM_ARGS(executeData) }
-func ZEND_CALL_USES_STRICT_TYPES(call *ZendExecuteData) bool { return call.IsCallUseStrictTypes() } // todo replace
-func EX_USES_STRICT_TYPES() bool {
-	return ZEND_CALL_USES_STRICT_TYPES(executeData)
-}
-func ZEND_ARG_USES_STRICT_TYPES() bool { return CurrEX().IsArgUseStrictTypes() }  // todo replace
-func ZEND_RET_USES_STRICT_TYPES() bool { return CurrEX().IsCallUseStrictTypes() } // todo replace
-func EX_VAR(n uint32) *Zval            { return ZEND_CALL_VAR(executeData, n) }
+func ZEND_CALL_NUM_ARGS(call *ZendExecuteData) uint32     { return call.GetThis().GetNumArgs() }
+func ZEND_CALL_VAR(call *ZendExecuteData, n uint32) *Zval { return (*Zval)((*byte)(call) + int(n)) }
+func EX(element __auto__) __auto__                        { return executeData.element }
+func EX_CALL_INFO() uint32                                { return ZEND_CALL_INFO(executeData) }
+func EX_NUM_ARGS() uint32                                 { return ZEND_CALL_NUM_ARGS(executeData) }
+func EX_VAR(n uint32) *Zval                               { return ZEND_CALL_VAR(executeData, n) }
 func EX_VAR_NUM(n int) *Zval {
-	return ZEND_CALL_VAR_NUM(executeData, n)
+	return executeData.VarNum(n)
 }
 func EX_VAR_TO_NUM(n uint32) __auto__ {
-	return uint32(ZEND_CALL_VAR(nil, n) - ZEND_CALL_VAR_NUM(nil, 0))
+	return uint32(ZEND_CALL_VAR(nil, n) - nil.VarNum(0))
 }
 func ZEND_OPLINE_TO_OFFSET(opline __auto__, target *byte) *byte {
 	return (*byte)(target - (*byte)(opline))
@@ -363,7 +354,7 @@ func LookupCv(name *ZendString) int {
 	var hash_value ZendUlong = name.GetHash()
 	for i < op_array.GetLastVar() {
 		if op_array.GetVars()[i].GetH() == hash_value && ZendStringEquals(op_array.GetVars()[i], name) != 0 {
-			return int(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, i)))
+			return int(ZendIntptrT(nil.VarNum(i)))
 		}
 		i++
 	}
@@ -374,7 +365,7 @@ func LookupCv(name *ZendString) int {
 		op_array.SetVars(Erealloc(op_array.GetVars(), CG__().GetContext().GetVarsSize()*b.SizeOf("zend_string *")))
 	}
 	op_array.GetVars()[i] = name.Copy()
-	return int(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, i)))
+	return int(ZendIntptrT(nil.VarNum(i)))
 }
 func ZendDelLiteral(op_array *ZendOpArray, n int) {
 	ZvalPtrDtorNogc(CT_CONSTANT_EX(op_array, n))

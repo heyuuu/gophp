@@ -20,7 +20,7 @@ func WrongParamTypeError(num int, expectedType ZendExpectedType, arg *Zval, forc
 		return
 	}
 	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, expectedType, ZendZvalTypeName(arg))
-	throwException := forceStrict || ZEND_ARG_USES_STRICT_TYPES()
+	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
 	ZendInternalTypeErrorEx(throwException, message)
 }
 
@@ -36,7 +36,7 @@ func WrongParamClassError(num int, name string, arg *Zval, forceStrict bool) {
 		return
 	}
 	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, name, ZendZvalTypeName(arg))
-	throwException := forceStrict || ZEND_ARG_USES_STRICT_TYPES()
+	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
 	ZendInternalTypeErrorEx(throwException, message)
 }
 
@@ -52,7 +52,7 @@ func WrongCallbackError(num int, error string, forceStrict bool) {
 		return
 	}
 	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
-	throwException := forceStrict || ZEND_ARG_USES_STRICT_TYPES()
+	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
 	ZendInternalTypeErrorEx(throwException, message)
 }
 
@@ -79,13 +79,13 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	*pce = ZendLookupClass(arg.GetStr())
 	if ce_base != nil {
 		if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-			ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", GetActiveCalleeName(), num, ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
+			ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", GetActiveCalleeName(), num, ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
 			*pce = nil
 			return 0
 		}
 	}
 	if (*pce) == nil {
-		ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s() expects parameter %d to be a valid class name, '%s' given", GetActiveCalleeName(), num, Z_STRVAL_P(arg))
+		ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", GetActiveCalleeName(), num, Z_STRVAL_P(arg))
 		return 0
 	}
 	return 1
@@ -99,7 +99,7 @@ func ZendParseArgBoolWeak(arg *Zval, dest *ZendBool) int {
 	return 1
 }
 func ZendParseArgBoolSlow(arg *Zval, dest *ZendBool) int {
-	if ZEND_ARG_USES_STRICT_TYPES() {
+	if CurrEX().IsArgUseStrictTypes() {
 		return 0
 	}
 	return ZendParseArgBoolWeak(arg, dest)
@@ -144,7 +144,7 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 	return 1
 }
 func ZendParseArgLongSlow(arg *Zval, dest *ZendLong) int {
-	if ZEND_ARG_USES_STRICT_TYPES() {
+	if CurrEX().IsArgUseStrictTypes() {
 		return 0
 	}
 	return ZendParseArgLongWeak(arg, dest)
@@ -181,7 +181,7 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 	return 1
 }
 func ZendParseArgLongCapSlow(arg *Zval, dest *ZendLong) int {
-	if ZEND_ARG_USES_STRICT_TYPES() {
+	if CurrEX().IsArgUseStrictTypes() {
 		return 0
 	}
 	return ZendParseArgLongCapWeak(arg, dest)
@@ -220,7 +220,7 @@ func ZendParseArgDoubleSlow(arg *Zval, dest *float64) int {
 
 		/* SSTH Exception: IS_LONG may be accepted instead as IS_DOUBLE */
 
-	} else if ZEND_ARG_USES_STRICT_TYPES() {
+	} else if CurrEX().IsArgUseStrictTypes() {
 		return 0
 	}
 	return ZendParseArgDoubleWeak(arg, dest)
@@ -262,7 +262,7 @@ func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 	return 1
 }
 func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
-	if ZEND_ARG_USES_STRICT_TYPES() {
+	if CurrEX().IsArgUseStrictTypes() {
 		return 0
 	}
 	return ZendParseArgStrWeak(arg, dest)

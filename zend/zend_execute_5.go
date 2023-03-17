@@ -298,7 +298,7 @@ func ZendArrayKeyExistsSlow(subject *Zval, key *Zval, opline *ZendOp, executeDat
 		if subject.GetTypeInfo() == IS_UNDEF {
 			ZVAL_UNDEFINED_OP2()
 		}
-		ZendInternalTypeError(EX_USES_STRICT_TYPES(), "array_key_exists() expects parameter 2 to be array, %s given", ZendGetTypeByConst(subject.GetType()))
+		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", ZendGetTypeByConst(subject.GetType()))
 		return IS_NULL
 	}
 }

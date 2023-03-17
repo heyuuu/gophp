@@ -111,7 +111,7 @@ func ZendVmStackPushCallFrame(call_info uint32, func_ *ZendFunction, num_args ui
 func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
 		var count uint32 = ZEND_CALL_NUM_ARGS(call) - call.GetFunc().GetOpArray().GetNumArgs()
-		var p *Zval = ZEND_CALL_VAR_NUM(call, call.GetFunc().GetOpArray().GetLastVar()+call.GetFunc().GetOpArray().GetT())
+		var p *Zval = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
 		for {
 			if p.IsRefcounted() {
 				var r *ZendRefcounted = p.GetCounted()
@@ -135,7 +135,7 @@ func ZendVmStackFreeExtraArgs(call *ZendExecuteData) {
 func ZendVmStackFreeArgs(call *ZendExecuteData) {
 	var num_args uint32 = ZEND_CALL_NUM_ARGS(call)
 	if num_args > 0 {
-		var p *Zval = ZEND_CALL_ARG(call, 1)
+		var p *Zval = call.Arg(1)
 		for {
 			if p.IsRefcounted() {
 				var r *ZendRefcounted = p.GetCounted()

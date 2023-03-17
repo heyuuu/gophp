@@ -224,7 +224,7 @@ func ZendParseArgZvalDeref(arg *Zval, dest **Zval, check_null int) {
 func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = ZEND_CALL_ARG(CurrEX(), 1)
+	param_ptr = CurrEX().Arg(1)
 	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
 	if param_count > arg_count {
 		return FAILURE
@@ -239,7 +239,7 @@ func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = ZEND_CALL_ARG(CurrEX(), 1)
+	param_ptr = CurrEX().Arg(1)
 	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
 	if param_count > arg_count {
 		return FAILURE
@@ -252,7 +252,7 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	return SUCCESS
 }
 func ZendWrongParamCount() {
-	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "Wrong parameter count for %s()", GetActiveCalleeName())
+	ZendInternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
 }
 func ZendGetTypeByConst(type_ ZendUchar) string {
 	switch type_ {

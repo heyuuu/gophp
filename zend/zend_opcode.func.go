@@ -557,7 +557,7 @@ func EmitLiveRangeRaw(op_array *ZendOpArray, var_num uint32, kind uint32, start 
 	op_array.SetLiveRange(Erealloc(op_array.GetLiveRange(), b.SizeOf("zend_live_range")*op_array.GetLastLiveRange()))
 	ZEND_ASSERT(start < end)
 	range_ = op_array.GetLiveRange()[op_array.GetLastLiveRange()-1]
-	range_.SetVar(uint32(intPtr(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+var_num))))
+	range_.SetVar(uint32(intPtr(nil.VarNum(op_array.GetLastVar() + var_num))))
 	range_.SetVar(range_.GetVar() | kind)
 	range_.SetStart(start)
 	range_.SetEnd(end)
@@ -668,7 +668,7 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 		 * "null" branch, and another from the start of the "non-null" branch to the
 		 * FREE opcode. */
 
-		var rt_var_num uint32 = uint32(intPtr(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+var_num)))
+		var rt_var_num uint32 = uint32(intPtr(nil.VarNum(op_array.GetLastVar() + var_num)))
 		var block_start_op *ZendOp = use_opline
 		if needs_live_range != nil && needs_live_range(op_array, orig_def_opline) == 0 {
 			return
@@ -971,15 +971,15 @@ func PassTwo(op_array *ZendOpArray) int {
 		if opline.GetOp1Type() == IS_CONST {
 			ZEND_PASS_TWO_UPDATE_CONSTANT(op_array, opline, opline.GetOp1())
 		} else if (opline.GetOp1Type() & (IS_VAR | IS_TMP_VAR)) != 0 {
-			opline.GetOp1().SetVar(uint32(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+opline.GetOp1().GetVar()))))
+			opline.GetOp1().SetVar(uint32(ZendIntptrT(nil.VarNum(op_array.GetLastVar() + opline.GetOp1().GetVar()))))
 		}
 		if opline.GetOp2Type() == IS_CONST {
 			ZEND_PASS_TWO_UPDATE_CONSTANT(op_array, opline, opline.GetOp2())
 		} else if (opline.GetOp2Type() & (IS_VAR | IS_TMP_VAR)) != 0 {
-			opline.GetOp2().SetVar(uint32(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+opline.GetOp2().GetVar()))))
+			opline.GetOp2().SetVar(uint32(ZendIntptrT(nil.VarNum(op_array.GetLastVar() + opline.GetOp2().GetVar()))))
 		}
 		if (opline.GetResultType() & (IS_VAR | IS_TMP_VAR)) != 0 {
-			opline.GetResult().SetVar(uint32(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+opline.GetResult().GetVar()))))
+			opline.GetResult().SetVar(uint32(ZendIntptrT(nil.VarNum(op_array.GetLastVar() + opline.GetResult().GetVar()))))
 		}
 		ZendVmSetOpcodeHandler(opline)
 		opline++

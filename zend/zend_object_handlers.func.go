@@ -698,7 +698,7 @@ exit:
 }
 func PropertyUsesStrictTypes() ZendBool {
 	var executeData *ZendExecuteData = CurrEX()
-	return executeData != nil && executeData.GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(CurrEX())
+	return executeData != nil && executeData.GetFunc() != nil && CurrEX().IsCallUseStrictTypes()
 }
 func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *any) *Zval {
 	var zobj *ZendObject

@@ -180,13 +180,13 @@ func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
 	}
 }
 
-func ZVAL_DEREF(z *Zval) *Zval { // todo replace
+func ZVAL_DEREF(z *Zval) *Zval {
 	if z.IsReference() {
 		return Z_REFVAL_P(z)
 	}
 	return z
 }
-func ZVAL_DEINDIRECT(z *Zval) *Zval { // todo replace
+func ZVAL_DEINDIRECT(z *Zval) *Zval {
 	if z.IsIndirect() {
 		return z.GetZv()
 	}

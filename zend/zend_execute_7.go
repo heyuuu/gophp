@@ -378,8 +378,8 @@ func ZendVmStackCopyCallFrame(call *ZendExecuteData, passed_args uint32, additio
 	*new_call = *call
 	ZEND_ADD_CALL_FLAG(new_call, ZEND_CALL_ALLOCATED)
 	if passed_args != 0 {
-		var src *Zval = ZEND_CALL_ARG(call, 1)
-		var dst *Zval = ZEND_CALL_ARG(new_call, 1)
+		var src *Zval = call.Arg(1)
+		var dst *Zval = new_call.Arg(1)
 		for {
 			ZVAL_COPY_VALUE(dst, src)
 			passed_args--

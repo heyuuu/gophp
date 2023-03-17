@@ -120,7 +120,7 @@ func zim_WeakReference_create(executeData *ZendExecuteData, return_value *Zval) 
 				_error_code = ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			Z_PARAM_PROLOGUE(0, 0)
 			if ZendParseArgObject(_arg, &referent, nil, 0) == 0 {
 				_expected_type = Z_EXPECTED_OBJECT
@@ -193,7 +193,7 @@ func zim_WeakReference_get(executeData *ZendExecuteData, return_value *Zval) {
 				_error_code = ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			break
 		}
 		if _error_code != ZPP_ERROR_OK {

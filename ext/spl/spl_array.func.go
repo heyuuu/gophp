@@ -970,7 +970,7 @@ func zim_spl_Array_setIteratorClass(executeData *zend.ZendExecuteData, return_va
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgClass(_arg, &ce_get_iterator, _i, 0) == 0 {
 				_error_code = zend.ZPP_ERROR_FAILURE

@@ -183,7 +183,7 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -315,7 +315,7 @@ func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

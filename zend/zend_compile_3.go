@@ -143,7 +143,7 @@ func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
 			ZendCompileExpr(&arg_node, arg.GetChild()[0])
 			opline = ZendEmitOp(nil, ZEND_SEND_UNPACK, &arg_node, nil)
 			opline.GetOp2().SetNum(arg_count)
-			opline.GetResult().SetVar(uint32(ZendIntptrT(ZEND_CALL_ARG(nil, arg_count))))
+			opline.GetResult().SetVar(uint32(ZendIntptrT(nil.Arg(arg_count))))
 			continue
 		}
 		if uses_arg_unpack != 0 {
@@ -254,7 +254,7 @@ func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
 		}
 		opline = ZendEmitOp(nil, opcode, &arg_node, nil)
 		opline.GetOp2().SetOplineNum(arg_num)
-		opline.GetResult().SetVar(uint32(ZendIntptrT(ZEND_CALL_ARG(nil, arg_num))))
+		opline.GetResult().SetVar(uint32(ZendIntptrT(nil.Arg(arg_num))))
 	}
 	return arg_count
 }
@@ -520,7 +520,7 @@ func ZendCompileFuncCuf(result *Znode, args *ZendAstList, lcname *ZendString) in
 		ZendCompileExpr(&arg_node, arg_ast)
 		opline = ZendEmitOp(nil, ZEND_SEND_USER, &arg_node, nil)
 		opline.GetOp2().SetNum(i)
-		opline.GetResult().SetVar(uint32(ZendIntptrT(ZEND_CALL_ARG(nil, i))))
+		opline.GetResult().SetVar(uint32(ZendIntptrT(nil.Arg(i))))
 	}
 	ZendEmitOp(result, ZEND_DO_FCALL, nil, nil)
 	return SUCCESS

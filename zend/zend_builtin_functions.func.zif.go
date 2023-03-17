@@ -1,4 +1,5 @@
-package zend 
+package zend
+
 // generate by ZifZendVersion
 var ZifZendVersionDef = DefFunc(DefFuncOpts{name: "zend_version", handler: func(executeData *ZendExecuteData, returnValue *Zval) {
 	if !executeData.CheckNumArgs(0, 0, false) {

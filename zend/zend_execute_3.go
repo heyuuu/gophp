@@ -290,7 +290,7 @@ func ZendIncdecTypedRef(ref *ZendReference, copy *Zval, opline *ZendOp, executeD
 	if var_ptr.IsDouble() && copy.IsLong() {
 		var val ZendLong = ZendThrowIncdecRefError(ref, opline)
 		var_ptr.SetLong(val)
-	} else if ZendVerifyRefAssignableZval(ref, var_ptr, EX_USES_STRICT_TYPES()) == 0 {
+	} else if ZendVerifyRefAssignableZval(ref, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(var_ptr)
 		ZVAL_COPY_VALUE(var_ptr, copy)
 		copy.SetUndef()
@@ -312,7 +312,7 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *Zval, copy *Zval,
 	if var_ptr.IsDouble() && copy.IsLong() {
 		var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
 		var_ptr.SetLong(val)
-	} else if ZendVerifyPropertyType(prop_info, var_ptr, EX_USES_STRICT_TYPES()) == 0 {
+	} else if ZendVerifyPropertyType(prop_info, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(var_ptr)
 		ZVAL_COPY_VALUE(var_ptr, copy)
 		copy.SetUndef()

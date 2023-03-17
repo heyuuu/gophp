@@ -451,5 +451,5 @@ func ZendTryAssignTypedRefEx(ref *ZendReference, val *Zval, strict ZendBool) int
 	}
 }
 func ZendTryAssignTypedRef(ref *ZendReference, val *Zval) int {
-	return ZendTryAssignTypedRefEx(ref, val, ZEND_ARG_USES_STRICT_TYPES())
+	return ZendTryAssignTypedRefEx(ref, val, CurrEX().IsArgUseStrictTypes())
 }

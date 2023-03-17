@@ -976,7 +976,7 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *Zval) {
 				_error_code = ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			Z_PARAM_PROLOGUE(0, 0)
 			ZendParseArgZvalDeref(_arg, &value, 0)
 			break
@@ -1064,7 +1064,7 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *Zval) {
 				_error_code = ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = ZEND_CALL_ARG(executeData, 0)
+			_real_arg = executeData.Arg(0)
 			Z_PARAM_PROLOGUE(0, 0)
 			ZendParseArgZvalDeref(_arg, &exception, 0)
 			break
