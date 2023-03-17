@@ -216,7 +216,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			type_spec++
 			if num_varargs > 0 {
 				*n_varargs = num_varargs
-				*varargs = ZEND_CALL_ARG(CurrEX(), i+1)
+				*varargs = CurrEX().Arg(i + 1)
 
 				/* adjust how many args we have left and restart loop */
 
@@ -228,7 +228,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 				*n_varargs = 0
 			}
 		}
-		arg = ZEND_CALL_ARG(CurrEX(), i+1)
+		arg = CurrEX().Arg(i + 1)
 		if ZendParseArg(i+1, arg, va, &type_spec, flags) == FAILURE {
 
 			/* clean up varargs array if it was used */

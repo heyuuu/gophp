@@ -278,6 +278,8 @@ const ZEND_CALL_NESTED_FUNCTION uint32 = ZEND_CALL_FUNCTION | ZEND_CALL_NESTED
 const ZEND_CALL_NESTED_CODE = ZEND_CALL_CODE | ZEND_CALL_NESTED
 const ZEND_CALL_TOP_FUNCTION = ZEND_CALL_TOP | ZEND_CALL_FUNCTION
 const ZEND_CALL_TOP_CODE = ZEND_CALL_CODE | ZEND_CALL_TOP
+
+// math.ceil(sizeof(*ZendExecuteData)/sizeof(Zval))
 const ZEND_CALL_FRAME_SLOT = int((ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_execute_data")) + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")))
 
 /* run-time jump target */
