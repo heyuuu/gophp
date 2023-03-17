@@ -34,7 +34,7 @@ func ZifEzmlmHash(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -297,7 +297,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 5
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

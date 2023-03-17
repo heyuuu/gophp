@@ -69,7 +69,7 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval, c
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -172,7 +172,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -236,7 +236,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.ZEND_NUM_ARGS() == 0 {
+	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
 			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
@@ -279,7 +279,7 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -367,7 +367,7 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -476,7 +476,7 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -540,7 +540,7 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.ZEND_NUM_ARGS() == 0 {
+	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
 			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
@@ -581,7 +581,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -645,7 +645,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.ZEND_NUM_ARGS() == 0 {
+	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
 			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
@@ -694,7 +694,7 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -849,7 +849,7 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

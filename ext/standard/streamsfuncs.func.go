@@ -27,7 +27,7 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -140,7 +140,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 6
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -288,7 +288,7 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 5
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -414,7 +414,7 @@ func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -519,7 +519,7 @@ func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *zen
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -615,7 +615,7 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -728,7 +728,7 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ze
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -841,7 +841,7 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *zend.
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -972,7 +972,7 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1077,7 +1077,7 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *zend.
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1389,7 +1389,7 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 4
 		var _max_num_args int = 5
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1684,7 +1684,7 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1759,13 +1759,13 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zcontext *zend.Zval = nil
 	var context *core.PhpStreamContext
-	if zend.ZEND_NUM_ARGS() == 2 {
+	if executeData.NumArgs() == 2 {
 		var options *zend.Zval
 		for {
 			var _flags int = 0
 			var _min_num_args int = 2
 			var _max_num_args int = 2
-			var _num_args int = zend.EX_NUM_ARGS()
+			var _num_args int = executeData.NumArgs()
 			var _i int = 0
 			var _real_arg *zend.Zval
 			var _arg *zend.Zval = nil
@@ -1855,7 +1855,7 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 			var _flags int = 0
 			var _min_num_args int = 4
 			var _max_num_args int = 4
-			var _num_args int = zend.EX_NUM_ARGS()
+			var _num_args int = executeData.NumArgs()
 			var _i int = 0
 			var _real_arg *zend.Zval
 			var _arg *zend.Zval = nil
@@ -1953,7 +1953,7 @@ func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2038,7 +2038,7 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2123,7 +2123,7 @@ func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value 
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2204,7 +2204,7 @@ func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2282,7 +2282,7 @@ func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *zen
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2376,7 +2376,7 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2528,7 +2528,7 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2624,7 +2624,7 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2726,7 +2726,7 @@ func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *zend.
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2809,12 +2809,12 @@ func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *zend.Z
 	var microseconds zend.ZendLong = 0
 	var t __struct__timeval
 	var stream *core.PhpStream
-	var argc int = zend.ZEND_NUM_ARGS()
+	var argc int = executeData.NumArgs()
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2915,7 +2915,7 @@ func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *ze
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3007,7 +3007,7 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3108,7 +3108,7 @@ func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *zen
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3204,7 +3204,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3327,7 +3327,7 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3406,7 +3406,7 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3493,7 +3493,7 @@ func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3573,7 +3573,7 @@ func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3661,7 +3661,7 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ze
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

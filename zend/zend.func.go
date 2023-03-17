@@ -9,7 +9,7 @@ import (
 )
 
 func USED_RET() bool {
-	return !(EX(prev_execute_data)) || !(ZEND_USER_CODE(EX(prev_execute_data).func_.common.type_)) || EX(prev_execute_data).opline.result_type != IS_UNUSED
+	return !(executeData.GetPrevExecuteData()) || !(ZEND_USER_CODE(executeData.GetPrevExecuteData().func_.common.type_)) || executeData.GetPrevExecuteData().opline.result_type != IS_UNUSED
 }
 func ZendBailout()             { _zendBailout(__FILE__, __LINE__) }
 func ZEND_PUTS(str string) int { return ZendWrite(str) }

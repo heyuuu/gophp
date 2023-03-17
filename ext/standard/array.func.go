@@ -449,7 +449,7 @@ func ZifKrsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -536,7 +536,7 @@ func ZifKsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -649,7 +649,7 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -771,7 +771,7 @@ func PhpNatsort(executeData *zend.ZendExecuteData, return_value *zend.Zval, fold
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -860,7 +860,7 @@ func ZifAsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -947,7 +947,7 @@ func ZifArsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1034,7 +1034,7 @@ func ZifSort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1121,7 +1121,7 @@ func ZifRsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1255,7 +1255,7 @@ func PhpUsort(executeData *zend.ZendExecuteData, return_value *zend.Zval, compar
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1399,7 +1399,7 @@ func ZifEnd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1481,7 +1481,7 @@ func ZifPrev(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1563,7 +1563,7 @@ func ZifNext(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1645,7 +1645,7 @@ func ZifReset(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1727,7 +1727,7 @@ func ZifCurrent(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1805,7 +1805,7 @@ func ZifKey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1877,7 +1877,7 @@ func ZifMin(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1986,7 +1986,7 @@ func ZifMax(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2259,7 +2259,7 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2358,7 +2358,7 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2457,7 +2457,7 @@ func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3534,7 +3534,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3615,7 +3615,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid extract type")
 		return
 	}
-	if extract_type > EXTR_SKIP && extract_type <= EXTR_PREFIX_IF_EXISTS && zend.ZEND_NUM_ARGS() < 3 {
+	if extract_type > EXTR_SKIP && extract_type <= EXTR_PREFIX_IF_EXISTS && executeData.NumArgs() < 3 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "specified extract type requires the prefix parameter")
 		return
 	}
@@ -3729,7 +3729,7 @@ func ZifCompact(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3825,7 +3825,7 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -3964,7 +3964,7 @@ func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -4062,7 +4062,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -4503,7 +4503,7 @@ func ZifShuffle(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -4741,7 +4741,7 @@ func ZifArrayPush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -4842,7 +4842,7 @@ func ZifArrayPop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -4949,7 +4949,7 @@ func ZifArrayShift(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -5122,7 +5122,7 @@ func ZifArrayUnshift(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -5249,7 +5249,7 @@ func ZifArraySplice(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -5328,10 +5328,10 @@ func ZifArraySplice(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		break
 	}
 	num_in = zend.Z_ARRVAL_P(array).GetNNumOfElements()
-	if zend.ZEND_NUM_ARGS() < 3 {
+	if executeData.NumArgs() < 3 {
 		length = num_in
 	}
-	if zend.ZEND_NUM_ARGS() == 4 {
+	if executeData.NumArgs() == 4 {
 
 		/* Make sure the last argument, if passed, is an array */
 
@@ -5390,7 +5390,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 4
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -5475,7 +5475,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* We want all entries from offset to the end if length is not passed or is null */
 
-	if zend.ZEND_NUM_ARGS() < 3 || z_length.IsType(zend.IS_NULL) {
+	if executeData.NumArgs() < 3 || z_length.IsType(zend.IS_NULL) {
 		length = num_in
 	} else {
 		length = zend.ZvalGetLong(z_length)
@@ -5721,7 +5721,7 @@ func PhpArrayReplaceWrapper(executeData *zend.ZendExecuteData, return_value *zen
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -5827,7 +5827,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *zend.
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6030,7 +6030,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6211,7 +6211,7 @@ func ZifArrayKeyFirst(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6285,7 +6285,7 @@ func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6361,7 +6361,7 @@ func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6478,7 +6478,7 @@ func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6643,7 +6643,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6814,7 +6814,7 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -6948,7 +6948,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -7138,7 +7138,7 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -7240,7 +7240,7 @@ func ZifArrayChangeKeyCase(executeData *zend.ZendExecuteData, return_value *zend
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -7354,7 +7354,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -7558,7 +7558,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *zend.
 
 	/* Get the argument count */
 
-	argc = zend.ZEND_NUM_ARGS()
+	argc = executeData.NumArgs()
 	if data_compare_type == INTERSECT_COMP_DATA_USER {
 
 		/* INTERSECT_COMP_DATA_USER - array_uintersect_assoc() */
@@ -7581,7 +7581,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *zend.
 		core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, argc)
 		return
 	}
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.FAILURE {
 		return
 	}
 	for i = 0; i < argc; i++ {
@@ -7679,11 +7679,11 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *zend.Zva
 			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
 			return
 		}
-		if zend.ZEND_NUM_ARGS() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, zend.ZEND_NUM_ARGS())
+		if executeData.NumArgs() < req_args {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == zend.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == zend.FAILURE {
 			return
 		}
 		fci_data = &fci1
@@ -7737,11 +7737,11 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *zend.Zva
 			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
 			return
 		}
-		if zend.ZEND_NUM_ARGS() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, zend.ZEND_NUM_ARGS())
+		if executeData.NumArgs() < req_args {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == zend.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == zend.FAILURE {
 			return
 		}
 	} else {
@@ -7957,22 +7957,22 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *zend.Zval,
 
 	/* Get the argument count */
 
-	argc = zend.ZEND_NUM_ARGS()
+	argc = executeData.NumArgs()
 	if data_compare_type == DIFF_COMP_DATA_USER {
 		if argc < 3 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 3 parameters are required, %d given", zend.ZEND_NUM_ARGS())
+			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 3 parameters are required, %d given", executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "+f", &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), "+f", &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.FAILURE {
 			return
 		}
 		diff_data_compare_func = ZvalUserCompare
 	} else {
 		if argc < 2 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 2 parameters are required, %d given", zend.ZEND_NUM_ARGS())
+			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "+", &args, &argc) == zend.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), "+", &args, &argc) == zend.FAILURE {
 			return
 		}
 		if data_compare_type == DIFF_COMP_DATA_INTERNAL {
@@ -8074,11 +8074,11 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *zend.Zval, be
 			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
 			return
 		}
-		if zend.ZEND_NUM_ARGS() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, zend.ZEND_NUM_ARGS())
+		if executeData.NumArgs() < req_args {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == zend.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == zend.FAILURE {
 			return
 		}
 		fci_data = &fci1
@@ -8132,11 +8132,11 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *zend.Zval, be
 			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
 			return
 		}
-		if zend.ZEND_NUM_ARGS() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, zend.ZEND_NUM_ARGS())
+		if executeData.NumArgs() < req_args {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == zend.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == zend.FAILURE {
 			return
 		}
 	} else {
@@ -8341,15 +8341,15 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var key *zend.ZendString
 	var idx zend.ZendLong
 	var dummy zend.Zval
-	if zend.ZEND_NUM_ARGS() < 2 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "at least 2 parameters are required, %d given", zend.ZEND_NUM_ARGS())
+	if executeData.NumArgs() < 2 {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
 		return
 	}
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -8628,7 +8628,7 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -8907,7 +8907,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9108,7 +9108,7 @@ func ZifArraySum(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9194,7 +9194,7 @@ func ZifArrayProduct(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9297,7 +9297,7 @@ func ZifArrayReduce(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9376,7 +9376,7 @@ func ZifArrayReduce(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		break
 	}
-	if zend.ZEND_NUM_ARGS() > 2 {
+	if executeData.NumArgs() > 2 {
 		zend.ZVAL_COPY(&result, initial)
 	} else {
 		result.SetNull()
@@ -9432,7 +9432,7 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9520,7 +9520,7 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		zend.ZendReleaseFcallInfoCache(&fci_cache)
 		return
 	}
-	if zend.ZEND_NUM_ARGS() > 1 {
+	if executeData.NumArgs() > 1 {
 		have_callback = 1
 		fci.SetNoSeparation(0)
 		fci.SetRetval(&retval)
@@ -9605,7 +9605,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9844,7 +9844,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -9944,7 +9944,7 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -10097,7 +10097,7 @@ func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

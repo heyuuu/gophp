@@ -168,19 +168,19 @@ func ZendVmStackFreeCallFrame(call *ZendExecuteData) {
 	ZendVmStackFreeCallFrameEx(ZEND_CALL_INFO(call), call)
 }
 func CACHE_ADDR(num __auto__) *any {
-	return (*any)((*byte)(EX(run_time_cache) + num))
+	return (*any)((*byte)(executeData.GetRunTimeCache() + num))
 }
 func CACHED_PTR(num __auto__) any {
-	return (*any)((*byte)(EX(run_time_cache) + num))[0]
+	return (*any)((*byte)(executeData.GetRunTimeCache() + num))[0]
 }
 func CACHE_PTR(num __auto__, ptr any) {
-	(*any)((*byte)(EX(run_time_cache) + num))[0] = ptr
+	(*any)((*byte)(executeData.GetRunTimeCache() + num))[0] = ptr
 }
 func CACHED_POLYMORPHIC_PTR(num __auto__, ce __auto__) bool {
-	return (*any)((*byte)(EX(run_time_cache) + num))[0] == any(b.CondF1(ce, func() any { return (*any)((*byte)(EX(run_time_cache) + num))[1] }, nil))
+	return (*any)((*byte)(executeData.GetRunTimeCache() + num))[0] == any(b.CondF1(ce, func() any { return (*any)((*byte)(executeData.GetRunTimeCache() + num))[1] }, nil))
 }
 func CACHE_POLYMORPHIC_PTR(num uint32, ce any, ptr any) {
-	var slot *any = (*any)((*byte)(EX(run_time_cache) + num))
+	var slot *any = (*any)((*byte)(executeData.GetRunTimeCache() + num))
 	slot[0] = ce
 	slot[1] = ptr
 }
@@ -282,7 +282,7 @@ func FREE_OP_VAR_PTR(should_free *Zval) {
 		ZvalPtrDtorNogc(should_free)
 	}
 }
-func CV_DEF_OF(i __auto__) __auto__ { return EX(func_).op_array.vars[i] }
+func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().op_array.vars[i] }
 func ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size int, page_size int) int {
 	return size + ZEND_VM_STACK_HEADER_SLOTS*b.SizeOf("zval") + (page_size-1) & ^(page_size-1)
 }
@@ -356,10 +356,10 @@ func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *Zval {
 	return EG__().GetUninitializedZval()
 }
 func _zvalUndefinedOp1(executeData *ZendExecuteData) *Zval {
-	return ZvalUndefinedCv(EX(opline).op1.var_, executeData)
+	return ZvalUndefinedCv(executeData.GetOpline().op1.var_, executeData)
 }
 func _zvalUndefinedOp2(executeData *ZendExecuteData) *Zval {
-	return ZvalUndefinedCv(EX(opline).op2.var_, executeData)
+	return ZvalUndefinedCv(executeData.GetOpline().op2.var_, executeData)
 }
 func ZVAL_UNDEFINED_OP1() *Zval { return _zvalUndefinedOp1(executeData) }
 func ZVAL_UNDEFINED_OP2() *Zval { return _zvalUndefinedOp2(executeData) }

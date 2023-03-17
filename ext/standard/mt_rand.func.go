@@ -98,7 +98,7 @@ func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -168,7 +168,7 @@ func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.ZEND_NUM_ARGS() == 0 {
+	if executeData.NumArgs() == 0 {
 		seed = GENERATE_SEED()
 	}
 	switch mode {
@@ -231,7 +231,7 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 func ZifMtRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
-	var argc int = zend.ZEND_NUM_ARGS()
+	var argc int = executeData.NumArgs()
 	if argc == 0 {
 
 		// genrand_int31 in mt19937ar.c performs a right shift
@@ -243,7 +243,7 @@ func ZifMtRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

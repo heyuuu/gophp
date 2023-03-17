@@ -510,7 +510,7 @@ func ZifUserSprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -597,7 +597,7 @@ func ZifVsprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -678,7 +678,7 @@ func ZifUserPrintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -769,7 +769,7 @@ func ZifVprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -850,7 +850,7 @@ func ZifFprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var result *zend.ZendString
-	if zend.ZEND_NUM_ARGS() < 2 {
+	if executeData.NumArgs() < 2 {
 		zend.ZendWrongParamCount()
 		return
 	}
@@ -858,7 +858,7 @@ func ZifFprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = -1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -952,7 +952,7 @@ func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var result *zend.ZendString
-	if zend.ZEND_NUM_ARGS() != 3 {
+	if executeData.NumArgs() != 3 {
 		zend.ZendWrongParamCount()
 		return
 	}
@@ -960,7 +960,7 @@ func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

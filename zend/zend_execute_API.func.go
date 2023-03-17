@@ -1175,7 +1175,7 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 	if op_array.GetLastVar() != 0 {
 		var str **ZendString = op_array.GetVars()
 		var end **ZendString = str + op_array.GetLastVar()
-		var var_ *Zval = EX_VAR_NUM(0)
+		var var_ *Zval = executeData.VarNum(0)
 		for {
 			var zv *Zval = ht.KeyFind(str.GetStr())
 			if zv != nil {
@@ -1210,7 +1210,7 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 	if op_array.GetLastVar() != 0 {
 		var str **ZendString = op_array.GetVars()
 		var end **ZendString = str + op_array.GetLastVar()
-		var var_ *Zval = EX_VAR_NUM(0)
+		var var_ *Zval = executeData.VarNum(0)
 		for {
 			if var_.IsUndef() {
 				ZendHashDel(ht, *str)
@@ -1242,7 +1242,7 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 				var end **ZendString = str + op_array.GetLastVar()
 				for {
 					if str.GetH() == h && ZendStringEqualContent(*str, name) != 0 {
-						var var_ *Zval = EX_VAR_NUM(str - op_array.GetVars())
+						var var_ *Zval = executeData.VarNum(str - op_array.GetVars())
 						ZVAL_COPY_VALUE(var_, value)
 						return SUCCESS
 					}
@@ -1280,7 +1280,7 @@ func ZendSetLocalVarStr(name string, len_ int, value *Zval, force int) int {
 				var end **ZendString = str + op_array.GetLastVar()
 				for {
 					if str.GetH() == h && str.GetLen() == len_ && memcmp(str.GetVal(), name, len_) == 0 {
-						var var_ *Zval = EX_VAR_NUM(str - op_array.GetVars())
+						var var_ *Zval = executeData.VarNum(str - op_array.GetVars())
 						ZvalPtrDtor(var_)
 						ZVAL_COPY_VALUE(var_, value)
 						return SUCCESS

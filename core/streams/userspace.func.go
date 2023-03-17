@@ -260,7 +260,7 @@ func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *z
 	var uwrap *PhpUserStreamWrapper
 	var rsrc *zend.ZendResource
 	var flags zend.ZendLong = 0
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "SS|l", &protocol, &classname, &flags) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "SS|l", &protocol, &classname, &flags) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -303,7 +303,7 @@ func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *z
 }
 func ZifStreamWrapperUnregister(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var protocol *zend.ZendString
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &protocol) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -323,7 +323,7 @@ func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *ze
 	var wrapper *core.PhpStreamWrapper
 	var global_wrapper_hash *zend.HashTable
 	var wrapper_hash *zend.HashTable
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &protocol) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}

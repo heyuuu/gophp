@@ -319,7 +319,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 		var user_caching_it_flags *zend.Zval = nil
 		mode = RIT_SELF_FIRST
 		flags = RTIT_BYPASS_KEY
-		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "o|lzl", &iterator, &flags, &user_caching_it_flags, &mode) == zend.SUCCESS {
+		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "o|lzl", &iterator, &flags, &user_caching_it_flags, &mode) == zend.SUCCESS {
 			if zend.InstanceofFunction(zend.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
@@ -343,7 +343,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 	default:
 		mode = RIT_LEAVES_ONLY
 		flags = 0
-		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "o|ll", &iterator, &mode, &flags) == zend.SUCCESS {
+		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "o|ll", &iterator, &mode, &flags) == zend.SUCCESS {
 			if zend.InstanceofFunction(zend.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
@@ -479,7 +479,7 @@ func zim_spl_RecursiveIteratorIterator_getSubIterator(executeData *zend.ZendExec
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var level zend.ZendLong = object.GetLevel()
 	var value *zend.Zval
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|l", &level) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &level) == zend.FAILURE {
 		return
 	}
 	if level < 0 || level > object.GetLevel() {
@@ -585,7 +585,7 @@ func zim_spl_RecursiveIteratorIterator_nextElement(executeData *zend.ZendExecute
 func zim_spl_RecursiveIteratorIterator_setMaxDepth(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var max_depth zend.ZendLong = -1
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|l", &max_depth) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &max_depth) == zend.FAILURE {
 		return
 	}
 	if max_depth < -1 {
@@ -747,7 +747,7 @@ func zim_spl_RecursiveTreeIterator_setPrefixPart(executeData *zend.ZendExecuteDa
 	var prefix *byte
 	var prefix_len int
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "ls", &part, &prefix, &prefix_len) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "ls", &part, &prefix, &prefix_len) == zend.FAILURE {
 		return
 	}
 	if 0 > part || part > 5 {
@@ -772,7 +772,7 @@ func zim_spl_RecursiveTreeIterator_setPostfix(executeData *zend.ZendExecuteData,
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var postfix *byte
 	var postfix_len int
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "s", &postfix, &postfix_len) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "s", &postfix, &postfix_len) == zend.FAILURE {
 		return
 	}
 	object.GetPostfix()[0].Free()
@@ -965,7 +965,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	case DIT_LimitIterator:
 		intern.SetOffset(0)
 		intern.SetCount(-1)
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O|ll", &zobject, ce_inner, intern.GetOffset(), intern.GetCount()) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(executeData.NumArgs(), "O|ll", &zobject, ce_inner, intern.GetOffset(), intern.GetCount()) == zend.FAILURE {
 			return nil
 		}
 		if intern.GetOffset() < 0 {
@@ -980,7 +980,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		fallthrough
 	case DIT_RecursiveCachingIterator:
 		var flags zend.ZendLong = CIT_CALL_TOSTRING
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O|l", &zobject, ce_inner, &flags) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(executeData.NumArgs(), "O|l", &zobject, ce_inner, &flags) == zend.FAILURE {
 			return nil
 		}
 		if SplCitCheckFlags(flags) != zend.SUCCESS {
@@ -992,12 +992,12 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	case DIT_IteratorIterator:
 		var ce_cast *zend.ZendClassEntry
 		var class_name *zend.ZendString
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O|S", &zobject, ce_inner, &class_name) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(executeData.NumArgs(), "O|S", &zobject, ce_inner, &class_name) == zend.FAILURE {
 			return nil
 		}
 		ce = zend.Z_OBJCE_P(zobject)
 		if zend.InstanceofFunction(ce, zend.ZendCeIterator) == 0 {
-			if zend.ZEND_NUM_ARGS() > 1 {
+			if executeData.NumArgs() > 1 {
 				if !(b.Assign(&ce_cast, zend.ZendLookupClass(class_name))) || zend.InstanceofFunction(ce, ce_cast) == 0 || ce_cast.GetGetIterator() == nil {
 					zend.ZendThrowException(spl_ce_LogicException, "Class to downcast to not found or not base class or does not implement Traversable", 0)
 					return nil
@@ -1031,10 +1031,10 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	case DIT_RecursiveRegexIterator:
 		var regex *zend.ZendString
 		var mode zend.ZendLong = REGIT_MODE_MATCH
-		intern.SetUseFlags(zend.ZEND_NUM_ARGS() >= 5)
+		intern.SetUseFlags(executeData.NumArgs() >= 5)
 		intern.SetURegexFlags(0)
 		intern.SetPregFlags(0)
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "OS|lll", &zobject, ce_inner, &regex, &mode, intern.GetURegexFlags(), intern.GetPregFlags()) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(executeData.NumArgs(), "OS|lll", &zobject, ce_inner, &regex, &mode, intern.GetURegexFlags(), intern.GetPregFlags()) == zend.FAILURE {
 			return nil
 		}
 		if mode < 0 || mode >= REGIT_MODE_MAX {
@@ -1061,7 +1061,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	case DIT_RecursiveCallbackFilterIterator:
 		var cfi *_spl_cbfilter_it_intern = zend.Emalloc(b.SizeOf("* cfi"))
 		cfi.GetFci().SetObject(nil)
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "Of", &zobject, ce_inner, cfi.GetFci(), cfi.GetFcc()) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(executeData.NumArgs(), "Of", &zobject, ce_inner, cfi.GetFci(), cfi.GetFcc()) == zend.FAILURE {
 			zend.Efree(cfi)
 			return nil
 		}
@@ -1072,7 +1072,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		}
 		intern.SetCbfilter(cfi)
 	default:
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O", &zobject, ce_inner) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(executeData.NumArgs(), "O", &zobject, ce_inner) == zend.FAILURE {
 			return nil
 		}
 	}
@@ -1541,7 +1541,7 @@ func zim_spl_RegexIterator_getMode(executeData *zend.ZendExecuteData, return_val
 func zim_spl_RegexIterator_setMode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
 	var mode zend.ZendLong
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &mode) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &mode) == zend.FAILURE {
 		return
 	}
 	if mode < 0 || mode >= REGIT_MODE_MAX {
@@ -1573,7 +1573,7 @@ func zim_spl_RegexIterator_getFlags(executeData *zend.ZendExecuteData, return_va
 func zim_spl_RegexIterator_setFlags(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
 	var flags zend.ZendLong
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &flags) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &flags) == zend.FAILURE {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1606,7 +1606,7 @@ func zim_spl_RegexIterator_getPregFlags(executeData *zend.ZendExecuteData, retur
 func zim_spl_RegexIterator_setPregFlags(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
 	var preg_flags zend.ZendLong
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &preg_flags) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &preg_flags) == zend.FAILURE {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1813,7 +1813,7 @@ func zim_spl_LimitIterator_next(executeData *zend.ZendExecuteData, return_value 
 func zim_spl_LimitIterator_seek(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
 	var pos zend.ZendLong
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &pos) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &pos) == zend.FAILURE {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2026,7 +2026,7 @@ func zim_spl_CachingIterator_offsetSet(executeData *zend.ZendExecuteData, return
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
 		return
 	}
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "Sz", &key, &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "Sz", &key, &value) == zend.FAILURE {
 		return
 	}
 	value.TryAddRefcount()
@@ -2046,7 +2046,7 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
 		return
 	}
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == zend.FAILURE {
 		return
 	}
 	if b.Assign(&value, intern.GetZcache().GetArr().SymtableFind(key.GetStr())) == nil {
@@ -2068,7 +2068,7 @@ func zim_spl_CachingIterator_offsetUnset(executeData *zend.ZendExecuteData, retu
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
 		return
 	}
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == zend.FAILURE {
 		return
 	}
 	intern.GetZcache().GetArr().SymtableDel(key.GetStr())
@@ -2086,7 +2086,7 @@ func zim_spl_CachingIterator_offsetExists(executeData *zend.ZendExecuteData, ret
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
 		return
 	}
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "S", &key) == zend.FAILURE {
 		return
 	}
 	zend.ZVAL_BOOL(return_value, intern.GetZcache().GetArr().SymtableExists(key.GetStr()))
@@ -2132,7 +2132,7 @@ func zim_spl_CachingIterator_setFlags(executeData *zend.ZendExecuteData, return_
 		return
 	}
 	intern = it
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &flags) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &flags) == zend.FAILURE {
 		return
 	}
 	if SplCitCheckFlags(flags) != zend.SUCCESS {
@@ -2388,7 +2388,7 @@ func zim_spl_AppendIterator_append(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	intern = it__1
-	if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "O", &it, zend.ZendCeIterator) == zend.FAILURE {
+	if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "O", &it, zend.ZendCeIterator) == zend.FAILURE {
 		return
 	}
 	if intern.GetUAppendIterator().GetFuncs().GetValid()(intern.GetUAppendIterator()) == zend.SUCCESS && SplDualItValid(intern) != zend.SUCCESS {
@@ -2580,7 +2580,7 @@ func SplIteratorToValuesApply(iter *zend.ZendObjectIterator, puser any) int {
 func ZifIteratorToArray(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
 	var use_keys zend.ZendBool = 1
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "O|b", &obj, zend.ZendCeTraversable, &use_keys) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "O|b", &obj, zend.ZendCeTraversable, &use_keys) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -2594,7 +2594,7 @@ func SplIteratorCountApply(iter *zend.ZendObjectIterator, puser any) int {
 func ZifIteratorCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
 	var count zend.ZendLong = 0
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "O", &obj, zend.ZendCeTraversable) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "O", &obj, zend.ZendCeTraversable) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -2621,7 +2621,7 @@ func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 func ZifIteratorApply(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var apply_info SplIteratorApplyInfo
 	apply_info.SetArgs(nil)
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "Of|a!", apply_info.GetObj(), zend.ZendCeTraversable, apply_info.GetFci(), apply_info.GetFcc(), apply_info.GetArgs()) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "Of|a!", apply_info.GetObj(), zend.ZendCeTraversable, apply_info.GetFci(), apply_info.GetFcc(), apply_info.GetArgs()) == zend.FAILURE {
 		return
 	}
 	apply_info.SetCount(0)

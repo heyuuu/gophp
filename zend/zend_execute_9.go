@@ -240,7 +240,7 @@ func ZendQuickCheckConstant(key *Zval, opline *ZendOp, executeData *ZendExecuteD
 	return _zendQuickGetConstant(key, 0, 1, opline, executeData)
 }
 func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION() {
-	OPLINE = EX(opline) + 1
+	OPLINE = executeData.GetOpline() + 1
 	ZEND_VM_CONTINUE()
 }
 func ZEND_VM_NEXT_OPCODE() {

@@ -18,7 +18,7 @@ const IS_CALLABLE_STRICT uint32 = IS_CALLABLE_CHECK_IS_STATIC
 //const ZEND_THIS *Zval = &(EX(This))
 
 func ZEND_THIS(executeData *ZendExecuteData) *Zval {
-	return &executeData.This
+	return executeData.GetThis()
 }
 
 /* Fast parameter parsing API */

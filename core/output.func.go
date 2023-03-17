@@ -904,7 +904,7 @@ func ZifObStart(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var output_handler *zend.Zval = nil
 	var chunk_size zend.ZendLong = 0
 	var flags zend.ZendLong = PHP_OUTPUT_HANDLER_STDFLAGS
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|zll", &output_handler, &chunk_size, &flags) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|zll", &output_handler, &chunk_size, &flags) == zend.FAILURE {
 		return
 	}
 	if chunk_size < 0 {
@@ -1043,7 +1043,7 @@ func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *zend.Zva
 }
 func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var full_status zend.ZendBool = 0
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|b", &full_status) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &full_status) == zend.FAILURE {
 		return
 	}
 	if !(OG(active)) {
@@ -1059,7 +1059,7 @@ func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 }
 func ZifObImplicitFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var flag zend.ZendLong = 1
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|l", &flag) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &flag) == zend.FAILURE {
 		return
 	}
 	PhpOutputSetImplicitFlush(flag)
@@ -1081,7 +1081,7 @@ func ZifOutputAddRewriteVar(executeData *zend.ZendExecuteData, return_value *zen
 	var value *byte
 	var name_len int
 	var value_len int
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "ss", &name, &name_len, &value, &value_len) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "ss", &name, &name_len, &value, &value_len) == zend.FAILURE {
 		return
 	}
 	if standard.PhpUrlScannerAddVar(name, name_len, value, value_len, 1) == zend.SUCCESS {

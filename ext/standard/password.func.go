@@ -348,7 +348,7 @@ func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -445,7 +445,7 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *zen
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -544,7 +544,7 @@ func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -628,7 +628,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -721,7 +721,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 }
 func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var algo *zend.ZendString
-	if zend.ZEND_NUM_ARGS() != 0 {
+	if executeData.NumArgs() != 0 {
 		zend.CheckNumArgsNoneError()
 		return
 	}

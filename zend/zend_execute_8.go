@@ -16,10 +16,10 @@ func ZendVmStackExtendCallFrame(call **ZendExecuteData, passed_args uint32, addi
 func ZendGetRunningGenerator(executeData *ZendExecuteData) *ZendGenerator {
 	/* The generator object is stored in EX(return_value) */
 
-	var generator *ZendGenerator = (*ZendGenerator)(EX(return_value))
+	var generator *ZendGenerator = (*ZendGenerator)(executeData.GetReturnValue(
 
 	/* However control may currently be delegated to another generator.
-	 * That's the one we're interested in. */
+	 * That's the one we're interested in. */))
 
 	return generator
 
@@ -27,9 +27,9 @@ func ZendGetRunningGenerator(executeData *ZendExecuteData) *ZendGenerator {
 	 * That's the one we're interested in. */
 }
 func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
-	if EX(call) {
-		var call *ZendExecuteData = EX(call)
-		var opline *ZendOp = EX(func_).op_array.opcodes + op_num
+	if executeData.GetCall() {
+		var call *ZendExecuteData = executeData.GetCall()
+		var opline *ZendOp = executeData.GetFunc().op_array.opcodes + op_num
 		var level int
 		var do_exit int
 		if opline.GetOpcode() == ZEND_INIT_FCALL || opline.GetOpcode() == ZEND_INIT_FCALL_BY_NAME || opline.GetOpcode() == ZEND_INIT_NS_FCALL_BY_NAME || opline.GetOpcode() == ZEND_INIT_DYNAMIC_CALL || opline.GetOpcode() == ZEND_INIT_USER_CALL || opline.GetOpcode() == ZEND_INIT_METHOD_CALL || opline.GetOpcode() == ZEND_INIT_STATIC_METHOD_CALL || opline.GetOpcode() == ZEND_NEW {
@@ -150,7 +150,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 					}
 				}
 			}
-			ZendVmStackFreeArgs(EX(call))
+			ZendVmStackFreeArgs(executeData.GetCall())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
 				OBJ_RELEASE(call.GetThis().GetObj())
 			}
@@ -160,9 +160,9 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 				ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 				ZendFreeTrampoline(call.GetFunc())
 			}
-			EX(call) = call.GetPrevExecuteData()
+			executeData.GetCall() = call.GetPrevExecuteData()
 			ZendVmStackFreeCallFrame(call)
-			call = EX(call)
+			call = executeData.GetCall()
 			if call == nil {
 				break
 			}
@@ -181,8 +181,8 @@ func FindLiveRange(op_array *ZendOpArray, op_num uint32, var_num uint32) *ZendLi
 }
 func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num uint32) {
 	var i int
-	for i = 0; i < EX(func_).op_array.last_live_range; i++ {
-		var range_ *ZendLiveRange = EX(func_).op_array.live_range[i]
+	for i = 0; i < executeData.GetFunc().op_array.last_live_range; i++ {
+		var range_ *ZendLiveRange = executeData.GetFunc().op_array.live_range[i]
 		if range_.GetStart() > op_num {
 
 			/* further blocks will not be relevant... */
@@ -211,9 +211,9 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_ROPE {
 					var rope **ZendString = (**ZendString)(var_)
-					var last *ZendOp = EX(func_).op_array.opcodes + op_num
+					var last *ZendOp = executeData.GetFunc().op_array.opcodes + op_num
 					for last.GetOpcode() != ZEND_ROPE_ADD && last.GetOpcode() != ZEND_ROPE_INIT || last.GetResult().GetVar() != var_num {
-						ZEND_ASSERT(last >= EX(func_).op_array.opcodes)
+						ZEND_ASSERT(last >= executeData.GetFunc().op_array.opcodes)
 						last--
 					}
 					if last.GetOpcode() == ZEND_ROPE_INIT {

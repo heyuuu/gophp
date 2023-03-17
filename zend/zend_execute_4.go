@@ -107,7 +107,7 @@ func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *Has
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			ZendRebuildSymbolTable()
 		}
-		ht = EX(symbol_table)
+		ht = executeData.GetSymbolTable()
 	}
 	return ht
 }

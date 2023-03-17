@@ -35,7 +35,7 @@ func ZifClassParents(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	var parent_class *zend.ZendClassEntry
 	var ce *zend.ZendClassEntry
 	var autoload zend.ZendBool = 1
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z|b", &obj, &autoload) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -63,7 +63,7 @@ func ZifClassImplements(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	var obj *zend.Zval
 	var autoload zend.ZendBool = 1
 	var ce *zend.ZendClassEntry
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z|b", &obj, &autoload) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -87,7 +87,7 @@ func ZifClassUses(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
 	var autoload zend.ZendBool = 1
 	var ce *zend.ZendClassEntry
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z|b", &obj, &autoload) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -216,7 +216,7 @@ func ZifSplAutoload(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 	var class_name *zend.ZendString
 	var lc_name *zend.ZendString
 	var file_exts *zend.ZendString = SPL_G(autoload_extensions)
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S|S", &class_name, &file_exts) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "S|S", &class_name, &file_exts) == zend.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -253,7 +253,7 @@ func ZifSplAutoload(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 }
 func ZifSplAutoloadExtensions(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var file_exts *zend.ZendString = nil
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|S", &file_exts) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|S", &file_exts) == zend.FAILURE {
 		return
 	}
 	if file_exts != nil {
@@ -291,7 +291,7 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	var lc_name *zend.ZendString
 	var func_name *zend.ZendString
 	var alfi *AutoloadFuncInfo
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &class_name) == zend.FAILURE || class_name.GetType() != zend.IS_STRING {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &class_name) == zend.FAILURE || class_name.GetType() != zend.IS_STRING {
 		return
 	}
 	if SPL_G(autoload_functions) {
@@ -384,10 +384,10 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *zen
 	var alfi AutoloadFuncInfo
 	var obj_ptr *zend.ZendObject
 	var fcc zend.ZendFcallInfoCache
-	if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "|zbb", &zcallable, &do_throw, &prepend) == zend.FAILURE {
+	if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == zend.FAILURE {
 		return
 	}
-	if zend.ZEND_NUM_ARGS() != 0 {
+	if executeData.NumArgs() != 0 {
 		if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_STRICT, &func_name, &fcc, &error) == 0 {
 			alfi.SetCe(fcc.GetCallingScope())
 			alfi.SetFuncPtr(fcc.GetFunctionHandler())
@@ -559,7 +559,7 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *z
 	var spl_func_ptr *zend.ZendFunction
 	var obj_ptr *zend.ZendObject
 	var fcc zend.ZendFcallInfoCache
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zcallable) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zcallable) == zend.FAILURE {
 		return
 	}
 	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &func_name, &fcc, &error) == 0 {
@@ -693,7 +693,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ze
 }
 func ZifSplObjectHash(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "o", &obj) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == zend.FAILURE {
 		return
 	}
 	return_value.SetString(PhpSplObjectHash(obj))
@@ -705,7 +705,7 @@ func ZifSplObjectId(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

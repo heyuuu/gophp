@@ -14,7 +14,7 @@ func ZendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 	return _zendGetParametersArrayEx(param_count, argument_array)
 }
 func ZendParseParametersNone() ZEND_RESULT_CODE {
-	if ZEND_NUM_ARGS() == 0 {
+	if executeData.NumArgs() == 0 {
 		return SUCCESS
 	} else {
 		CheckNumArgsNoneError()
@@ -22,7 +22,7 @@ func ZendParseParametersNone() ZEND_RESULT_CODE {
 	}
 }
 func ZendParseParametersNoneThrow() ZEND_RESULT_CODE {
-	if ZEND_NUM_ARGS() == 0 {
+	if executeData.NumArgs() == 0 {
 		return SUCCESS
 	} else {
 		CheckNumArgsNoneException()
@@ -36,7 +36,6 @@ func getThis(executeData *ZendExecuteData) *Zval {
 		return nil
 	}
 }
-func ZEND_NUM_ARGS() uint32                { return EX_NUM_ARGS() }
 func ArrayInit(arg *Zval)                  { arg.SetArray(ZendNewArray(0)) }
 func ArrayInitSize(arg *Zval, size uint32) { arg.SetArray(ZendNewArray(size)) }
 func AddAssocLong(__arg *Zval, __key string, __n ZendLong) int {

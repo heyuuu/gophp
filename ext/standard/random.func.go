@@ -70,7 +70,7 @@ func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = zend.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -199,7 +199,7 @@ func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = zend.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

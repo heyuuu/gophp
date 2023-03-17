@@ -7,9 +7,9 @@ import (
 )
 
 func ZendRethrowException(executeData *ZendExecuteData) {
-	if EX(opline).opcode != ZEND_HANDLE_EXCEPTION {
-		EG__().SetOplineBeforeException(EX(opline))
-		EX(opline) = EG__().GetExceptionOp()
+	if executeData.GetOpline().opcode != ZEND_HANDLE_EXCEPTION {
+		EG__().SetOplineBeforeException(executeData.GetOpline())
+		executeData.GetOpline() = EG__().GetExceptionOp()
 	}
 }
 func ZendImplementThrowable(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
@@ -195,15 +195,15 @@ func ZimExceptionConstruct(executeData *ZendExecuteData, return_value *Zval) {
 	var object *Zval
 	var previous *Zval = nil
 	var base_ce *ZendClassEntry
-	var argc int = ZEND_NUM_ARGS()
+	var argc int = executeData.NumArgs()
 	object = ZEND_THIS(executeData)
 	base_ce = IGetExceptionBase(object)
 	if ZendParseParametersEx(ZEND_PARSE_PARAMS_QUIET, argc, "|SlO!", &message, &code, &previous, ZendCeThrowable) == FAILURE {
 		var ce *ZendClassEntry
-		if EX(This).u1.v.type_ == IS_OBJECT {
-			ce = Z_OBJCE(EX(This))
-		} else if EX(This).GetCe() != nil {
-			ce = EX(This).GetCe()
+		if executeData.GetThis().u1.v.type_ == IS_OBJECT {
+			ce = Z_OBJCE(executeData.GetThis())
+		} else if executeData.GetThis().GetCe() != nil {
+			ce = executeData.GetThis().GetCe()
 		} else {
 			ce = base_ce
 		}
@@ -252,13 +252,13 @@ func ZimErrorExceptionConstruct(executeData *ZendExecuteData, return_value *Zval
 	var tmp Zval
 	var object *Zval
 	var previous *Zval = nil
-	var argc int = ZEND_NUM_ARGS()
+	var argc int = executeData.NumArgs()
 	if ZendParseParametersEx(ZEND_PARSE_PARAMS_QUIET, argc, "|SllSlO!", &message, &code, &severity, &filename, &lineno, &previous, ZendCeThrowable) == FAILURE {
 		var ce *ZendClassEntry
-		if EX(This).u1.v.type_ == IS_OBJECT {
-			ce = Z_OBJCE(EX(This))
-		} else if EX(This).GetCe() != nil {
-			ce = EX(This).GetCe()
+		if executeData.GetThis().u1.v.type_ == IS_OBJECT {
+			ce = Z_OBJCE(executeData.GetThis())
+		} else if executeData.GetThis().GetCe() != nil {
+			ce = executeData.GetThis().GetCe()
 		} else {
 			ce = ZendCeErrorException
 		}

@@ -420,7 +420,7 @@ func zim_spl_SplHeap_isEmpty(executeData *zend.ZendExecuteData, return_value *ze
 func zim_spl_SplHeap_insert(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplHeapObject
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &value) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
@@ -453,7 +453,7 @@ func zim_spl_SplPriorityQueue_insert(executeData *zend.ZendExecuteData, return_v
 	var priority *zend.Zval
 	var intern *SplHeapObject
 	var elem SplPqueueElem
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &data, &priority) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &data, &priority) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
@@ -506,7 +506,7 @@ func zim_spl_SplPriorityQueue_top(executeData *zend.ZendExecuteData, return_valu
 func zim_spl_SplPriorityQueue_setExtractFlags(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value zend.ZendLong
 	var intern *SplHeapObject
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &value) == zend.FAILURE {
 		return
 	}
 	value &= SPL_PQUEUE_EXTR_MASK
@@ -550,7 +550,7 @@ func zim_spl_SplHeap_isCorrupted(executeData *zend.ZendExecuteData, return_value
 func zim_spl_SplPriorityQueue_compare(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var a *zend.Zval
 	var b *zend.Zval
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &a, &b) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &a, &b) == zend.FAILURE {
 		return
 	}
 	return_value.SetLong(SplPtrHeapZvalMaxCmp(a, b, nil))
@@ -577,7 +577,7 @@ func zim_spl_SplHeap_top(executeData *zend.ZendExecuteData, return_value *zend.Z
 func zim_spl_SplMinHeap_compare(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var a *zend.Zval
 	var b *zend.Zval
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &a, &b) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &a, &b) == zend.FAILURE {
 		return
 	}
 	return_value.SetLong(SplPtrHeapZvalMinCmp(a, b, nil))
@@ -586,7 +586,7 @@ func zim_spl_SplMinHeap_compare(executeData *zend.ZendExecuteData, return_value 
 func zim_spl_SplMaxHeap_compare(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var a *zend.Zval
 	var b *zend.Zval
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &a, &b) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &a, &b) == zend.FAILURE {
 		return
 	}
 	return_value.SetLong(SplPtrHeapZvalMaxCmp(a, b, nil))

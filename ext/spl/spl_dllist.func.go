@@ -361,7 +361,7 @@ func SplDllistObjectGetGc(obj *zend.Zval, gc_data **zend.Zval, gc_data_count *in
 func zim_spl_SplDoublyLinkedList_push(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &value) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -372,7 +372,7 @@ func zim_spl_SplDoublyLinkedList_push(executeData *zend.ZendExecuteData, return_
 func zim_spl_SplDoublyLinkedList_unshift(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &value) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -456,7 +456,7 @@ func zim_spl_SplDoublyLinkedList_isEmpty(executeData *zend.ZendExecuteData, retu
 func zim_spl_SplDoublyLinkedList_setIteratorMode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value zend.ZendLong
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "l", &value) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -481,7 +481,7 @@ func zim_spl_SplDoublyLinkedList_offsetExists(executeData *zend.ZendExecuteData,
 	var zindex *zend.Zval
 	var intern *SplDllistObject
 	var index zend.ZendLong
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zindex) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -494,7 +494,7 @@ func zim_spl_SplDoublyLinkedList_offsetGet(executeData *zend.ZendExecuteData, re
 	var index zend.ZendLong
 	var intern *SplDllistObject
 	var element *SplPtrLlistElement
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zindex) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -515,7 +515,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 	var zindex *zend.Zval
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -574,7 +574,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(executeData *zend.ZendExecuteData, 
 	var intern *SplDllistObject
 	var element *SplPtrLlistElement
 	var llist *SplPtrLlist
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zindex) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -796,7 +796,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, 
 	var p *uint8
 	var s *uint8
 	var var_hash standard.PhpUnserializeDataT
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "s", &buf, &buf_len) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "s", &buf, &buf_len) == zend.FAILURE {
 		return
 	}
 	if buf_len == 0 {
@@ -877,7 +877,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 	var storage_zv *zend.Zval
 	var members_zv *zend.Zval
 	var elem *zend.Zval
-	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "h", &data) == zend.FAILURE {
+	if zend.ZendParseParametersThrow(executeData.NumArgs(), "h", &data) == zend.FAILURE {
 		return
 	}
 	flags_zv = data.IndexFindH(0)
@@ -903,7 +903,7 @@ func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_v
 	var intern *SplDllistObject
 	var element *SplPtrLlistElement
 	var index zend.ZendLong
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))

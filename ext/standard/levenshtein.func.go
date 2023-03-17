@@ -72,7 +72,7 @@ func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
 	/* not there yet */
 }
 func ZifLevenshtein(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var argc int = zend.ZEND_NUM_ARGS()
+	var argc int = executeData.NumArgs()
 	var str1 *byte
 	var str2 *byte
 	var callback_name *byte
@@ -103,7 +103,7 @@ func ZifLevenshtein(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		zend.ZendWrongParamCount()
 		return
 	}
-	if distance < 0 && zend.ZEND_NUM_ARGS() != 3 {
+	if distance < 0 && executeData.NumArgs() != 3 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Argument string(s) too long")
 	}
 	return_value.SetLong(distance)

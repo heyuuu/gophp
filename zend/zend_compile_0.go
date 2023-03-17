@@ -32,34 +32,23 @@ func OBJ_PROP_TO_NUM(offset uint32) int {
 }
 func ZEND_FN_SCOPE_NAME(function *ZendFunction) string {
 	if function != nil && function.GetScope() != nil {
-		return function.GetScope().GetName().GetVal()
+		return function.GetScope().GetName().GetStr()
 	} else {
 		return ""
 	}
 }
-func ZEND_CALL_INFO(call *ZendExecuteData) uint32 { return call.GetThis().GetTypeInfo() }
-func ZEND_CALL_KIND_EX(call_info uint32) int {
-	return call_info & (ZEND_CALL_CODE | ZEND_CALL_TOP)
-}
-func ZEND_CALL_KIND(call *ZendExecuteData) int {
-	return ZEND_CALL_KIND_EX(ZEND_CALL_INFO(call))
-}
-func ZEND_ADD_CALL_FLAG_EX(call_info uint32, flag int)    { call_info |= flag }
+func ZEND_CALL_INFO(call *ZendExecuteData) uint32         { return call.GetThis().GetTypeInfo() }
+func ZEND_ADD_CALL_FLAG_EX(call_info uint32, flag uint32) { call_info |= flag }
 func ZEND_DEL_CALL_FLAG_EX(call_info uint32, flag uint32) { call_info &= ^flag }
 func ZEND_ADD_CALL_FLAG(call *ZendExecuteData, flag uint32) {
 	ZEND_ADD_CALL_FLAG_EX(call.GetThis().GetTypeInfo(), flag)
 }
-func ZEND_DEL_CALL_FLAG(call __auto__, flag uint32) {
+func ZEND_DEL_CALL_FLAG(call *ZendExecuteData, flag uint32) {
 	ZEND_DEL_CALL_FLAG_EX(call.This.GetTypeInfo(), flag)
 }
 func ZEND_CALL_VAR(call *ZendExecuteData, n uint32) *Zval { return (*Zval)((*byte)(call) + int(n)) }
-func EX(element __auto__) __auto__                        { return executeData.element }
 func EX_CALL_INFO() uint32                                { return ZEND_CALL_INFO(executeData) }
-func EX_NUM_ARGS() uint32                                 { return executeData.NumArgs() }
 func EX_VAR(n uint32) *Zval                               { return ZEND_CALL_VAR(executeData, n) }
-func EX_VAR_NUM(n int) *Zval {
-	return executeData.VarNum(n)
-}
 func EX_VAR_TO_NUM(n uint32) __auto__ {
 	return uint32(ZEND_CALL_VAR(nil, n) - nil.VarNum(0))
 }

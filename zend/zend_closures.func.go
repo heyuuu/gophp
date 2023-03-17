@@ -13,9 +13,9 @@ func ZEND_CLOSURE_PROPERTY_ERROR() {
 	ZendThrowError(nil, "Closure object cannot have properties")
 }
 func zim_Closure___invoke(executeData *ZendExecuteData, return_value *Zval) {
-	var func_ *ZendFunction = EX(func_)
+	var func_ *ZendFunction = executeData.GetFunc()
 	var arguments *Zval = executeData.Arg(1)
-	if CallUserFunction(nil, ZEND_THIS(executeData), return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
+	if CallUserFunction(nil, ZEND_THIS(executeData), return_value, executeData.NumArgs(), arguments) == FAILURE {
 		return_value.SetFalse()
 	}
 
@@ -82,7 +82,7 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *Zval) {
 	var newobj *ZendObject
 	fci.SetParamCount(0)
 	fci.SetParams(nil)
-	if ZendParseParameters(ZEND_NUM_ARGS(), "o*", &newthis, fci.GetParams(), fci.GetParamCount()) == FAILURE {
+	if ZendParseParameters(executeData.NumArgs(), "o*", &newthis, fci.GetParams(), fci.GetParamCount()) == FAILURE {
 		return
 	}
 	closure = (*ZendClosure)(ZEND_THIS(executeData).GetObj())
@@ -154,7 +154,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *Zval) {
 	var closure *ZendClosure
 	var ce *ZendClassEntry
 	var called_scope *ZendClassEntry
-	if ZendParseMethodParameters(ZEND_NUM_ARGS(), getThis(executeData), "Oo!|z", &zclosure, ZendCeClosure, &newthis, &scope_arg) == FAILURE {
+	if ZendParseMethodParameters(executeData.NumArgs(), getThis(executeData), "Oo!|z", &zclosure, ZendCeClosure, &newthis, &scope_arg) == FAILURE {
 		return
 	}
 	closure = (*ZendClosure)(zclosure.GetObj())
@@ -197,17 +197,17 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *Zval) {
 	memset(&fcc, 0, b.SizeOf("zend_fcall_info_cache"))
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
 	fci.SetRetval(return_value)
-	if (EX(func_).internal_function.fn_flags & ZEND_ACC_STATIC) != 0 {
-		fcc.SetFunctionHandler(EX(func_).internal_function.scope.__callstatic)
+	if (executeData.GetFunc().internal_function.fn_flags & ZEND_ACC_STATIC) != 0 {
+		fcc.SetFunctionHandler(executeData.GetFunc().internal_function.scope.__callstatic)
 	} else {
-		fcc.SetFunctionHandler(EX(func_).internal_function.scope.__call)
+		fcc.SetFunctionHandler(executeData.GetFunc().internal_function.scope.__call)
 	}
 	fci.SetParams(params)
 	fci.SetParamCount(2)
-	fci.GetParams()[0].SetString(EX(func_).common.function_name)
-	if ZEND_NUM_ARGS() != 0 {
-		ArrayInitSize(fci.GetParams()[1], ZEND_NUM_ARGS())
-		ZendCopyParametersArray(ZEND_NUM_ARGS(), fci.GetParams()[1])
+	fci.GetParams()[0].SetString(executeData.GetFunc().common.function_name)
+	if executeData.NumArgs() != 0 {
+		ArrayInitSize(fci.GetParams()[1], executeData.NumArgs())
+		ZendCopyParametersArray(executeData.NumArgs(), fci.GetParams()[1])
 	} else {
 		ZVAL_EMPTY_ARRAY(fci.GetParams()[1])
 	}
@@ -265,7 +265,7 @@ func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *Zval) 
 	var callable *Zval
 	var success int
 	var error *byte = nil
-	if ZendParseParameters(ZEND_NUM_ARGS(), "z", &callable) == FAILURE {
+	if ZendParseParameters(executeData.NumArgs(), "z", &callable) == FAILURE {
 		return
 	}
 	if callable.IsObject() && InstanceofFunction(Z_OBJCE_P(callable), ZendCeClosure) != 0 {
@@ -278,7 +278,7 @@ func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *Zval) 
 
 	/* create closure as if it were called from parent scope */
 
-	EG__().SetCurrentExecuteData(EX(prev_execute_data))
+	EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 	success = ZendCreateClosureFromCallable(return_value, callable, &error)
 	EG__().SetCurrentExecuteData(executeData)
 	if success == FAILURE || error != nil {
@@ -495,10 +495,10 @@ func ZendRegisterClosureCe() {
 	ClosureHandlers.SetGetGc(ZendClosureGetGc)
 }
 func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *Zval) {
-	var closure *ZendClosure = (*ZendClosure)(ZEND_CLOSURE_OBJECT(EX(func_)))
+	var closure *ZendClosure = (*ZendClosure)(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 	closure.GetOrigInternalHandler()(executeData, return_value)
 	OBJ_RELEASE((*ZendObject)(closure))
-	EX(func_) = nil
+	executeData.GetFunc() = nil
 }
 func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, called_scope *ZendClassEntry, this_ptr *Zval) {
 	var closure *ZendClosure

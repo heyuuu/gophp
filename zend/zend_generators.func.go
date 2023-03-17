@@ -64,7 +64,7 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 	/* calculate required stack size */
 
 	used_stack = 0
-	call = EX(call)
+	call = executeData.GetCall()
 	for {
 		used_stack += ZEND_CALL_FRAME_SLOT + call.NumArgs()
 		call = call.GetPrevExecuteData()
@@ -76,7 +76,7 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 
 	/* save stack, linking frames in reverse order */
 
-	call = EX(call)
+	call = executeData.GetCall()
 	for {
 		var frame_size int = ZEND_CALL_FRAME_SLOT + call.NumArgs()
 		new_call = (*ZendExecuteData)(stack + used_stack - frame_size)
@@ -152,10 +152,10 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution ZendBool) {
 		/* Free closure object */
 
 		if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
-			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(EX(func_)))
-		}
+			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc(
 
-		/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */
+			/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */ )))
+		}
 
 		if generator.GetGcBuffer() != nil {
 			Efree(generator.GetGcBuffer())
@@ -282,7 +282,7 @@ func CalcGcBufferSize(generator *ZendGenerator) uint32 {
 	var size uint32 = 4
 	if generator.GetExecuteData() != nil {
 		var executeData *ZendExecuteData = generator.GetExecuteData()
-		var op_array *ZendOpArray = EX(func_).op_array
+		var op_array *ZendOpArray = executeData.GetFunc().op_array
 
 		/* Compiled variables */
 
@@ -293,7 +293,7 @@ func CalcGcBufferSize(generator *ZendGenerator) uint32 {
 		/* Extra args */
 
 		if (EX_CALL_INFO() & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
-			size += EX_NUM_ARGS() - op_array.GetNumArgs()
+			size += executeData.NumArgs() - op_array.GetNumArgs()
 		}
 		size += (EX_CALL_INFO() & ZEND_CALL_RELEASE_THIS) != 0
 		size += (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0
@@ -369,7 +369,7 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		*n = 0
 		return nil
 	}
-	op_array = EX(func_).op_array
+	op_array = executeData.GetFunc().op_array
 	gc_buffer_size = CalcGcBufferSize(generator)
 	if generator.GetGcBufferSize() < gc_buffer_size {
 		generator.SetGcBuffer(SafeErealloc(generator.GetGcBuffer(), b.SizeOf("zval"), gc_buffer_size, 0))
@@ -384,14 +384,14 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 	ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), generator.GetValues())
 	if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 		var i uint32
-		var num_cvs uint32 = EX(func_).op_array.last_var
+		var num_cvs uint32 = executeData.GetFunc().op_array.last_var
 		for i = 0; i < num_cvs; i++ {
-			ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), EX_VAR_NUM(i))
+			ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), executeData.VarNum(i))
 		}
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
-		var zv *Zval = EX_VAR_NUM(op_array.GetLastVar() + op_array.GetT())
-		var end *Zval = zv + (EX_NUM_ARGS() - op_array.GetNumArgs())
+		var zv *Zval = executeData.VarNum(op_array.GetLastVar() + op_array.GetT())
+		var end *Zval = zv + (executeData.NumArgs() - op_array.GetNumArgs())
 		for zv != end {
 			ZVAL_COPY_VALUE(b.PostInc(&gc_buffer), b.PostInc(&zv))
 		}
@@ -400,7 +400,7 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		b.PostInc(&gc_buffer).SetObject(executeData.GetThis().GetObj())
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
-		b.PostInc(&gc_buffer).SetObject(ZEND_CLOSURE_OBJECT(EX(func_)))
+		b.PostInc(&gc_buffer).SetObject(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 	}
 	if executeData.GetOpline() != op_array.GetOpcodes() {
 		var i uint32
@@ -948,7 +948,7 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *Zval
 		var _arg *Zval = nil
@@ -1036,7 +1036,7 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *Zval
 		var _arg *Zval = nil

@@ -8,7 +8,7 @@ import (
 
 func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	var msg *byte = nil
-	var opline *ZendOp = EX(opline)
+	var opline *ZendOp = executeData.GetOpline()
 	var end *ZendOp
 	var var_ uint32
 	if EG__().GetException() != nil {

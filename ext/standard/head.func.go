@@ -16,7 +16,7 @@ func ZifHeader(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -102,7 +102,7 @@ func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -167,7 +167,7 @@ func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		break
 	}
 	ctr.SetLineLen(uint32(len_))
-	core.SapiHeaderOp(b.Cond(zend.ZEND_NUM_ARGS() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
+	core.SapiHeaderOp(b.Cond(executeData.NumArgs() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
 }
 func PhpHeader() int {
 	if core.SapiSendHeaders() == zend.FAILURE || core.SG__().request_info.headers_only {
@@ -352,7 +352,7 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 7
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -450,7 +450,7 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if expires_or_options != nil {
 		if expires_or_options.IsType(zend.IS_ARRAY) {
-			if zend.ZEND_NUM_ARGS() > 3 {
+			if executeData.NumArgs() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
 				return
@@ -493,7 +493,7 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 7
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -591,7 +591,7 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	if expires_or_options != nil {
 		if expires_or_options.IsType(zend.IS_ARRAY) {
-			if zend.ZEND_NUM_ARGS() > 3 {
+			if executeData.NumArgs() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
 				return
@@ -629,7 +629,7 @@ func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -695,7 +695,7 @@ func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		line = core.PhpOutputGetStartLineno()
 		file = core.PhpOutputGetStartFilename()
 	}
-	switch zend.ZEND_NUM_ARGS() {
+	switch executeData.NumArgs() {
 	case 2:
 		zend.ZEND_TRY_ASSIGN_REF_LONG(arg2, line)
 		fallthrough
@@ -733,7 +733,7 @@ func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = zend.EX_NUM_ARGS()
+		var _num_args int = executeData.NumArgs()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil

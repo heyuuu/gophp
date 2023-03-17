@@ -148,7 +148,7 @@ func _getObjZvalPtr(
 ) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
-		return &(EX(This))
+		return &(executeData.GetThis())
 	}
 	return GetZvalPtr(op_type, op, should_free, type_)
 }
@@ -162,14 +162,14 @@ func _getObjZvalPtrUndef(
 ) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
-		return &(EX(This))
+		return &(executeData.GetThis())
 	}
 	return GetZvalPtrUndef(op_type, op, should_free, type_)
 }
 func _getObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, executeData *ZendExecuteData) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
-		return &(EX(This))
+		return &(executeData.GetThis())
 	}
 	return GetZvalPtrPtr(op_type, node, should_free, type_)
 }
