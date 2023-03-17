@@ -5,12 +5,13 @@ import (
 )
 
 func isArgUseStrictTypes() bool { return CurrEX().IsArgUseStrictTypes() }
+func isArgUseWeakTypes() bool   { return !CurrEX().IsArgUseStrictTypes() }
 
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
 func parseArgNull[T any]() (T, bool, bool)      { var temp T; return temp, true, true }
 func parseArgFail[T any]() (T, bool, bool)      { var temp T; return temp, false, false }
 
-func ParseArgBool(arg *Zval, checkNull bool, strict bool) (dest bool, isNull bool, ok bool) {
+func ParseArgBool(arg *Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -24,7 +25,7 @@ func ParseArgBool(arg *Zval, checkNull bool, strict bool) (dest bool, isNull boo
 	}
 
 	// weak parse
-	if !strict {
+	if isArgUseWeakTypes() {
 		dest, ok = ParseArgBoolWeak(arg)
 	}
 
@@ -38,7 +39,7 @@ func ParseArgBoolWeak(arg *Zval) (dest bool, ok bool) {
 	return false, false
 }
 
-func ParseArgLong(arg *Zval, checkNull bool, cap bool, strict bool) (dest ZendLong, isNull bool, ok bool) {
+func ParseArgLong(arg *Zval, checkNull bool, cap bool) (dest ZendLong, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -50,7 +51,7 @@ func ParseArgLong(arg *Zval, checkNull bool, cap bool, strict bool) (dest ZendLo
 	}
 
 	// weak parse
-	if !strict {
+	if isArgUseWeakTypes() {
 		dest, ok = ParseArgLongWeak(arg, cap)
 	}
 
@@ -99,7 +100,7 @@ func parseArgLongWeak_DvalToLval(dval float64, cap bool) (ZendLong, bool) {
 	}
 }
 
-func ParseArgDouble(arg *Zval, checkNull bool, strict bool) (dest float64, isNull bool, ok bool) {
+func ParseArgDouble(arg *Zval, checkNull bool) (dest float64, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -113,7 +114,7 @@ func ParseArgDouble(arg *Zval, checkNull bool, strict bool) (dest float64, isNul
 	}
 
 	// weak parse
-	if !strict {
+	if isArgUseWeakTypes() {
 		dest, ok = ParseArgDoubleWeak(arg)
 	}
 
