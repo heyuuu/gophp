@@ -3,9 +3,11 @@
 package zend
 
 import (
+	"log"
 	b "sik/builtin"
 	"sik/core"
 	. "sik/runtime/ctype"
+	"strconv"
 	"strings"
 )
 
@@ -40,13 +42,25 @@ func IsNumericStringEx(
 	allow_errors int,
 	oflow_info *int,
 ) ZendUchar {
-	if (*str) > '9' {
-		return 0
+	typ, retLval, retDval, overflowInfo := ParseNumericStrEx(b.CastStr(str, length), allow_errors)
+
+	*lval = retLval
+	if dval != nil {
+		*dval = retDval
 	}
-	return _isNumericStringEx(str, length, lval, dval, allow_errors, oflow_info)
+	if oflow_info != nil {
+		*oflow_info = overflowInfo
+	}
+	return typ
 }
 func IsNumericString(str *byte, length int, lval *ZendLong, dval *float64, allow_errors int) ZendUchar {
-	return IsNumericStringEx(str, length, lval, dval, allow_errors, nil)
+	typ, retLval, retDval, _ := ParseNumericStrEx(b.CastStr(str, length), allow_errors)
+
+	*lval = retLval
+	if dval != nil {
+		*dval = retDval
+	}
+	return typ
 }
 func ZendMemnstr(haystack *byte, needle string, needle_len int, end *byte) *byte {
 	// todo 替换
@@ -3173,151 +3187,96 @@ func IsNumericStrFunction(str *ZendString, lval *ZendLong, dval *float64) ZendUc
 	return IsNumericStringEx(str.GetVal(), str.GetLen(), lval, dval, -1, nil)
 }
 
-func _isNumericStringEx(
-	str *byte,
-	length int,
-	lval *ZendLong,
-	dval *float64,
-	allow_errors int,
-	oflow_info *int,
-) ZendUchar {
-	var ptr *byte
-	var digits int = 0
-	var dp_or_e int = 0
-	var local_dval float64 = 0.0
-	var type_ ZendUchar
-	var tmp_lval ZendUlong = 0
-	var neg int = 0
-	if length == 0 {
-		return 0
-	}
-	if oflow_info != nil {
-		*oflow_info = 0
+/**
+ * ParseNumericStrEx 尝试转换字符串为数字
+ * @param	str 		待转换的字符串
+ * @param	allowErrors 是否允许错误。可选值为 0 不允许错误; 1 允许不完全匹配; 2 不完全匹配时触发 Notice
+ * @return 	typ 		数字类型，可能值为 0, IS_LONG, IS_DOUBLE
+ * @return 	lval		数字为整数时的值，默认为 0
+ * @return 	dval		数字为浮点数时的值，默认为 0.0
+ * @return 	overflowInfo	溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
+ */
+func ParseNumericStrEx(str string, allowErrors int) (typ ZendUchar, lval ZendLong, dval float64, overflowInfo int) {
+	if len(str) == 0 {
+		return
+	} else if str[0] > '9' {
+		// fast fail. 因为 digit | space | + | - 等都小于等于 '9'
+		return
 	}
 
-	/* Skip any whitespace
-	 * This is much faster than the isspace() function */
+	/* Skip any whitespace */
+	str = strings.TrimLeft(str, " \t\n\r\v\f")
 
-	for (*str) == ' ' || (*str) == '\t' || (*str) == '\n' || (*str) == '\r' || (*str) == 'v' || (*str) == 'f' {
-		str++
-		length--
-	}
-	ptr = str
-	if (*ptr) == '-' {
-		neg = 1
-		ptr++
-	} else if (*ptr) == '+' {
-		ptr++
-	}
-	if IsDigit(*ptr) {
-
-		/* Skip any leading 0s */
-
-		for (*ptr) == '0' {
-			ptr++
-		}
-
-		/* Count the number of digits. If a decimal point/exponent is found,
-		 * it's a double. Otherwise, if there's a dval or no need to check for
-		 * a full match, stop when there are too many digits for a long */
-
-		for type_ = IS_LONG; !(digits >= MAX_LENGTH_OF_LONG && (dval != nil || allow_errors == 1)); {
-		check_digits:
-			if IsDigit(*ptr) {
-				tmp_lval = tmp_lval*10 + (*ptr) - '0'
+	// 扫描字符串，确认字符串为 整数|小数|非法字符串
+	state := 0 // 状态机: 0 未开始, 1 整数部分; 2 小数部分; 3 指数部分
+	i := 0
+	for ; i < len(str); i++ {
+		c := str[i]
+		if IsDigit(c) {
+			if state == 0 {
+				state = 1
+			}
+			continue
+		} else if c == '.' && (state == 0 || state == 1) { // 存在小数点，进入小数部分
+			state = 2
+			continue
+		} else if (c == 'e' || c == 'E') && (state == 1 || state == 2) { // e|E + (+|-)? + 数字，进入指数部分
+			ptr := i + 1
+			// 跳过符号
+			if ptr < len(str) && (str[ptr] == '+' || str[ptr] == '-') {
+				ptr++
+			}
+			// 判断是否接数字，若是则进入指数部分
+			if ptr < len(str) && IsDigit(str[ptr]) {
+				state = 3
+				i = ptr
 				continue
-			} else if (*ptr) == '.' && dp_or_e < 1 {
-				goto process_double
-			} else if ((*ptr) == 'e' || (*ptr) == 'E') && dp_or_e < 2 {
-				var e *byte = ptr + 1
-				if (*e) == '-' || (*e) == '+' {
-					e++
-					ptr = e - 1
-				}
-				if IsDigit(*e) {
-					goto process_double
-				}
 			}
-			break
-			digits++
-			ptr++
 		}
-		if digits >= MAX_LENGTH_OF_LONG {
-			if oflow_info != nil {
-				if (*str) == '-' {
-					*oflow_info = -1
-				} else {
-					*oflow_info = 1
-				}
-			}
-			dp_or_e = -1
-			goto process_double
-		}
-	} else if (*ptr) == '.' && IsDigit(ptr[1]) {
-	process_double:
-		type_ = IS_DOUBLE
-
-		/* If there's a dval, do the conversion; else continue checking
-		 * the digits if we need to check for a full match */
-
-		if dval != nil {
-			local_dval = ZendStrtod(str, &ptr)
-		} else if allow_errors != 1 && dp_or_e != -1 {
-			if b.PostInc(&(*ptr)) == '.' {
-				dp_or_e = 1
-			} else {
-				dp_or_e = 2
-			}
-			goto check_digits
-		}
-
-		/* If there's a dval, do the conversion; else continue checking
-		 * the digits if we need to check for a full match */
-
-	} else {
-		return 0
+		// 未匹配任何内容
+		break
 	}
-	if ptr != str+length {
-		if allow_errors == 0 {
-			return 0
+	// 未匹配时
+	if state == 0 {
+		return
+	}
+	// 未完成匹配时
+	if i != len(str) {
+		if allowErrors == 0 {
+			return
 		}
-		if allow_errors == -1 {
+		if allowErrors == -1 {
 			ZendError(E_NOTICE, "A non well formed numeric value encountered")
 			if EG__().GetException() != nil {
-				return 0
+				return
 			}
 		}
 	}
-	if type_ == IS_LONG {
-		if digits == MAX_LENGTH_OF_LONG-1 {
-			var cmp int = strcmp(&ptr[-digits], LongMinDigits)
-			if !(cmp < 0 || cmp == 0 && (*str) == '-') {
-				if dval != nil {
-					*dval = ZendStrtod(str, nil)
-				}
-				if oflow_info != nil {
-					if (*str) == '-' {
-						*oflow_info = -1
-					} else {
-						*oflow_info = 1
-					}
-				}
-				return IS_DOUBLE
+	// 转义匹配字符串
+	matchStr := str[:i]
+	if state == 1 {
+		// 尝试转 int，若成功直接返回
+		if len(matchStr) < MAX_LENGTH_OF_LONG {
+			tmpVal, err := strconv.Atoi(matchStr)
+			if err == nil {
+				typ, lval = IS_LONG, tmpVal
+				return
 			}
 		}
-		if lval != nil {
-			if neg != 0 {
-				tmp_lval = -tmp_lval
-			}
-			*lval = ZendLong(tmp_lval)
+		// 整数溢出, 记录溢出信息
+		if matchStr[0] == '-' {
+			overflowInfo = -1
+		} else {
+			overflowInfo = 1
 		}
-		return IS_LONG
-	} else {
-		if dval != nil {
-			*dval = local_dval
-		}
-		return IS_DOUBLE
 	}
+
+	tmpDVal, err := strconv.ParseFloat(matchStr, 64)
+	if err != nil {
+		log.Panicf("代码逻辑错误，预期为数字字符串，但转换失败了: s=%s ,err=%s", matchStr, err.Error())
+	}
+	typ, dval = IS_DOUBLE, tmpDVal
+	return
 }
 
 func ZendMemnstrExPre(td []uint, needle *byte, needle_len int, reverse int) {
