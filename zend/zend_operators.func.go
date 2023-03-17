@@ -22,7 +22,7 @@ func ZendDvalToLval(d float64) ZendLong {
 	return ZendLong(d)
 }
 func ZendDvalToLvalCap(d float64) ZendLong {
-	if !(core.ZendFinite(d)) || core.ZendIsNaN(d) {
+	if !IsFinite(d) {
 		return 0
 	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
 		if d > 0 {
@@ -40,7 +40,7 @@ func IsNumericStringEx(
 	allow_errors int,
 	oflow_info *int,
 ) ZendUchar {
-	r := ParseNumericStr(str, allow_errors)
+	r := ConvertNumericStr(str, allow_errors)
 
 	*lval = r.Lval
 	if dval != nil {
@@ -52,7 +52,7 @@ func IsNumericStringEx(
 	return r.Type
 }
 func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors int) ZendUchar {
-	r := ParseNumericStr(str, allow_errors)
+	r := ConvertNumericStr(str, allow_errors)
 
 	*lval = r.Lval
 	if dval != nil {
@@ -898,12 +898,6 @@ try_again:
 			 */
 
 			return ZendDvalToLvalCap(dval)
-
-			/* Previously we used strtol here, not is_numeric_string,
-			 * and strtol gives you LONG_MAX/_MIN on overflow.
-			 * We use use saturating conversion to emulate strtol()'s
-			 * behaviour.
-			 */
 
 		}
 		fallthrough
@@ -3182,7 +3176,7 @@ func ZendLongToStr(num ZendLong) *ZendString {
 	}
 }
 func IsNumericStrFunction(str *ZendString, lval *ZendLong, dval *float64) ZendUchar {
-	result := ParseNumericStr(str.GetStr(), -1)
+	result := ConvertNumericStr(str.GetStr(), ConvertNoticeOnErrors)
 	*lval = result.Lval
 	if dval != nil {
 		*dval = result.Dval

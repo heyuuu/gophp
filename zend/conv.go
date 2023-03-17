@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"flag"
 	"log"
 	. "sik/runtime/ctype"
 	"strconv"
@@ -8,26 +9,43 @@ import (
 )
 
 /**
- * ParseNumericStr 解析结果
+ * ConvertNumericStr 解析结果
  */
 type NumericStrResult struct {
+	Overflow uint8     // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
 	Type     ZendUchar // 数字类型，可能值为 0, IS_LONG, IS_DOUBLE
-	Lval     ZendLong  // 数字为整数时的值，其他情况为 0
+	Lval     int       // 数字为整数时的值，其他情况为 0
 	Dval     float64   // 数字为浮点数时的值，默认为 0.0
-	Overflow int       // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
 }
 
+func (r NumericStrResult) Int() (int, bool) {
+	return r.Lval, r.Type == IS_LONG
+}
+
+func (r NumericStrResult) Float() (float64, bool) {
+	return r.Dval, r.Type == IS_LONG
+}
+
+type ConvertNumericMode int
+
+const (
+	ConvertRefuseErrors     ConvertNumericMode = 0  // 不允许错误
+	ConvertContinueOnErrors ConvertNumericMode = 1  // 允许不完全匹配
+	ConvertNoticeOnErrors   ConvertNumericMode = -1 // 允许不完全匹配，不完全匹配时触发 Zend Notice (可能产生 ZendException)
+)
+
 /**
- * ParseNumericStr 尝试转换字符串为数字
- * @param	str 		待转换的字符串
- * @param	allowErrors 是否允许错误。可选值为 0 不允许错误; 1 允许不完全匹配; 2 不完全匹配时触发 Notice
+ * ConvertNumericStr 	尝试转换字符串为数字
+ * @param	str		待转换的字符串
+ * @param	mode 	是否允许错误，具体参看上方常量
  * @return 	NumericStrResult
  */
-func ParseNumericStr(str string, allowErrors int) (result NumericStrResult) {
+func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrResult) {
 	if len(str) == 0 {
 		return
 	} else if str[0] > '9' {
 		// fast fail. 因为 digit | space | + | - 等都小于等于 '9'
+		flag.Parse()
 		return
 	}
 
@@ -69,10 +87,10 @@ func ParseNumericStr(str string, allowErrors int) (result NumericStrResult) {
 	}
 	// 未完成匹配时
 	if i != len(str) {
-		if allowErrors == 0 {
+		if mode == ConvertRefuseErrors {
 			return
 		}
-		if allowErrors == -1 {
+		if mode == ConvertNoticeOnErrors {
 			ZendError(E_NOTICE, "A non well formed numeric value encountered")
 			if EG__().GetException() != nil {
 				return
@@ -103,4 +121,16 @@ func ParseNumericStr(str string, allowErrors int) (result NumericStrResult) {
 		log.Panicf("代码逻辑错误，预期为数字字符串，但转换失败了: s=%s ,err=%s", matchStr, err.Error())
 	}
 	return NumericStrResult{Type: IS_DOUBLE, Dval: dval, Overflow: overflow}
+}
+
+func ConvertNumericStrAsZval(str string, mode ConvertNumericMode) *Zval {
+	r := ConvertNumericStr(str, mode)
+	switch r.Type {
+	case IS_LONG:
+		return NewZvalLong(r.Lval)
+	case IS_DOUBLE:
+		return NewZvalDouble(r.Dval)
+	default:
+		return nil
+	}
 }

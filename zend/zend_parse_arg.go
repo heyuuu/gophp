@@ -1,14 +1,16 @@
 package zend
 
-import "math"
+import (
+	"math"
+)
 
-func isArgUseWeakTypes() bool { return !CurrEX().IsArgUseStrictTypes() }
+func isArgUseStrictTypes() bool { return CurrEX().IsArgUseStrictTypes() }
 
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
 func parseArgNull[T any]() (T, bool, bool)      { var temp T; return temp, true, true }
 func parseArgFail[T any]() (T, bool, bool)      { var temp T; return temp, false, false }
 
-func ParseArgBool(arg *Zval, checkNull bool, weak bool) (dest bool, isNull bool, ok bool) {
+func ParseArgBool(arg *Zval, checkNull bool, strict bool) (dest bool, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -22,16 +24,21 @@ func ParseArgBool(arg *Zval, checkNull bool, weak bool) (dest bool, isNull bool,
 	}
 
 	// weak parse
-	if weak {
-		if arg.GetType() <= IS_STRING {
-			return parseArgSucc(ZendIsTrueEx(arg))
-		}
+	if !strict {
+		dest, ok = ParseArgBoolWeak(arg)
 	}
 
 	return
 }
 
-func ParseArgLong(arg *Zval, checkNull bool, cap bool, weak bool) (dest ZendLong, isNull bool, ok bool) {
+func ParseArgBoolWeak(arg *Zval) (dest bool, ok bool) {
+	if arg.GetType() <= IS_STRING {
+		return ZendIsTrueEx(arg), true
+	}
+	return false, false
+}
+
+func ParseArgLong(arg *Zval, checkNull bool, cap bool, strict bool) (dest ZendLong, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -43,39 +50,100 @@ func ParseArgLong(arg *Zval, checkNull bool, cap bool, weak bool) (dest ZendLong
 	}
 
 	// weak parse
-	if weak {
-		if cap {
-			dest, ok = ParseArgLongCapWeak(arg)
-		} else {
-			dest, ok = ParseArgLongWeak(arg)
-		}
+	if !strict {
+		dest, ok = ParseArgLongWeak(arg, cap)
 	}
 
 	return
 }
 
-func ParseArgLongCapWeak(arg *Zval) (dest ZendLong, ok bool) {
+func ParseArgLongWeak(arg *Zval, cap bool) (dest ZendLong, ok bool) {
+	// 字符串类型尝试转数字
+	if arg.IsString() {
+		arg = ConvertNumericStrAsZval(arg.GetStr().GetStr(), ConvertNoticeOnErrors)
+		if arg == nil {
+			return // fail
+		}
+		if EG__().GetException() != nil {
+			return // fail
+		}
+	}
+
 	switch arg.GetType() {
 	case IS_UNDEF, IS_NULL, IS_FALSE:
-		return 0, true
+		dest = 0
 	case IS_TRUE:
-		return 1, true
+		dest = 1
 	case IS_LONG:
-		return arg.GetLval(), true
+		dest = arg.GetLval()
 	case IS_DOUBLE:
-		if math.IsNaN(arg.GetDval()) {
+		return parseArgLongWeak_DvalToLval(arg.GetDval(), cap)
+	default:
+		return // fail
+	}
+	// success
+	return dest, true
+}
+
+func parseArgLongWeak_DvalToLval(dval float64, cap bool) (ZendLong, bool) {
+	if math.IsNaN(dval) {
+		return 0, false
+	}
+	if cap {
+		return ZendDvalToLvalCap(dval), true
+	} else {
+		if !ZEND_DOUBLE_FITS_LONG(dval) {
 			return 0, false
 		}
-		return ZendDvalToLvalCap(arg.GetDval()), true
-	case IS_STRING:
-		// todo
-		return
-	default:
-		return 0, false
+		return ZendDvalToLval(dval), true
 	}
 }
 
-func ParseArgLongWeak(arg *Zval) (dest ZendLong, ok bool) {
-	// todo
+func ParseArgDouble(arg *Zval, checkNull bool, strict bool) (dest float64, isNull bool, ok bool) {
+	// check null
+	if isNull = checkNull && arg.IsNull(); isNull {
+		return
+	}
+
+	// base parse
+	if arg.IsLong() {
+		return parseArgSucc(arg.GetDval())
+	} else if arg.IsLong() {
+		return parseArgSucc(float64(arg.GetLval()))
+	}
+
+	// weak parse
+	if !strict {
+		dest, ok = ParseArgDoubleWeak(arg)
+	}
+
 	return
+}
+
+func ParseArgDoubleWeak(arg *Zval) (dest float64, ok bool) {
+	// 字符串类型尝试转数字
+	if arg.IsString() {
+		arg = ConvertNumericStrAsZval(arg.GetStr().GetStr(), ConvertNoticeOnErrors)
+		if arg == nil {
+			return // fail
+		}
+		if EG__().GetException() != nil {
+			return // fail
+		}
+	}
+
+	switch arg.GetType() {
+	case IS_UNDEF, IS_NULL, IS_FALSE:
+		dest = 0
+	case IS_TRUE:
+		dest = 1
+	case IS_LONG:
+		dest = float64(arg.GetLval())
+	case IS_DOUBLE:
+		dest = arg.GetDval()
+	default:
+		return // fail
+	}
+	// success
+	return dest, true
 }

@@ -67,7 +67,7 @@ func Z_PARAM_PROLOGUE(deref int, separate int) {
 	}
 }
 func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null int) int {
-	val, isNull, ok := ParseArgBool(arg, check_null != 0, !isArgUseWeakTypes())
+	val, isNull, ok := ParseArgBool(arg, check_null != 0, isArgUseStrictTypes())
 	*dest = intBool(val)
 	if check_null != 0 {
 		*is_null = intBool(isNull)
@@ -75,34 +75,20 @@ func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null i
 	return intBool(ok)
 }
 func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null int, cap int) int {
+	val, isNull, ok := ParseArgLong(arg, check_null != 0, cap != 0, isArgUseStrictTypes())
+	*dest = val
 	if check_null != 0 {
-		*is_null = 0
+		*is_null = intBool(isNull)
 	}
-	if arg.IsLong() {
-		*dest = arg.GetLval()
-	} else if check_null != 0 && arg.IsNull() {
-		*is_null = 1
-		*dest = 0
-	} else if cap != 0 {
-		return ZendParseArgLongCapSlow(arg, dest)
-	} else {
-		return ZendParseArgLongSlow(arg, dest)
-	}
-	return 1
+	return intBool(ok)
 }
 func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null int) int {
+	val, isNull, ok := ParseArgDouble(arg, check_null != 0, isArgUseStrictTypes())
+	*dest = val
 	if check_null != 0 {
-		*is_null = 0
+		*is_null = intBool(isNull)
 	}
-	if arg.IsDouble() {
-		*dest = arg.GetDval()
-	} else if check_null != 0 && arg.IsNull() {
-		*is_null = 1
-		*dest = 0.0
-	} else {
-		return ZendParseArgDoubleSlow(arg, dest)
-	}
-	return 1
+	return intBool(ok)
 }
 func ZendParseArgStr(arg *Zval, dest **ZendString, check_null int) int {
 	if arg.IsString() {

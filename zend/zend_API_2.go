@@ -3,7 +3,6 @@ package zend
 import (
 	"fmt"
 	b "sik/builtin"
-	"sik/core"
 )
 
 func CheckNumArgsNoneError() bool     { return CurrEX().CheckNumArgsError(0, 0) }
@@ -91,133 +90,25 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	return 1
 }
 func ZendParseArgBoolWeak(arg *Zval, dest *ZendBool) int {
-	if arg.GetType() <= IS_STRING {
-		*dest = ZendIsTrue(arg)
-	} else {
-		return 0
+	if val, ok := ParseArgBoolWeak(arg); ok {
+		*dest = intBool(val)
+		return 1
 	}
-	return 1
+	return 0
 }
 func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
-	if arg.IsDouble() {
-		if core.ZendIsNaN(arg.GetDval()) {
-			return 0
-		}
-		if !(ZEND_DOUBLE_FITS_LONG(arg.GetDval())) {
-			return 0
-		} else {
-			*dest = ZendDvalToLval(arg.GetDval())
-		}
-	} else if arg.IsString() {
-		var d float64
-		type_ := IsNumericStrFunction(arg.GetStr(), dest, &d)
-		if type_ != IS_LONG {
-			if type_ != 0 {
-				if core.ZendIsNaN(d) {
-					return 0
-				}
-				if !(ZEND_DOUBLE_FITS_LONG(d)) {
-					return 0
-				} else {
-					*dest = ZendDvalToLval(d)
-				}
-			} else {
-				return 0
-			}
-		}
-		if EG__().GetException() != nil {
-			return 0
-		}
-	} else if arg.GetType() < IS_TRUE {
-		*dest = 0
-	} else if arg.IsTrue() {
-		*dest = 1
-	} else {
-		return 0
+	if val, ok := ParseArgLongWeak(arg, false); ok {
+		*dest = val
+		return 1
 	}
-	return 1
-}
-func ZendParseArgLongSlow(arg *Zval, dest *ZendLong) int {
-	if CurrEX().IsArgUseStrictTypes() {
-		return 0
-	}
-	return ZendParseArgLongWeak(arg, dest)
-}
-func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
-	if arg.IsDouble() {
-		if core.ZendIsNaN(arg.GetDval()) {
-			return 0
-		}
-		*dest = ZendDvalToLvalCap(arg.GetDval())
-	} else if arg.IsString() {
-		var d float64
-		var type_ = IsNumericStrFunction(arg.GetStr(), dest, &d)
-		if type_ != IS_LONG {
-			if type_ != 0 {
-				if core.ZendIsNaN(d) {
-					return 0
-				}
-				*dest = ZendDvalToLvalCap(d)
-			} else {
-				return 0
-			}
-		}
-		if EG__().GetException() != nil {
-			return 0
-		}
-	} else if arg.GetType() < IS_TRUE {
-		*dest = 0
-	} else if arg.IsTrue() {
-		*dest = 1
-	} else {
-		return 0
-	}
-	return 1
-}
-func ZendParseArgLongCapSlow(arg *Zval, dest *ZendLong) int {
-	if CurrEX().IsArgUseStrictTypes() {
-		return 0
-	}
-	return ZendParseArgLongCapWeak(arg, dest)
+	return 0
 }
 func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
-	if arg.IsLong() {
-		*dest = float64(arg.GetLval())
-	} else if arg.IsString() {
-		var l ZendLong
-		var type_ = IsNumericStrFunction(arg.GetStr(), &l, dest)
-		if type_ != IS_DOUBLE {
-			if type_ != 0 {
-				*dest = float64(l)
-			} else {
-				return 0
-			}
-		}
-		if EG__().GetException() != nil {
-			return 0
-		}
-	} else if arg.GetType() < IS_TRUE {
-		*dest = 0.0
-	} else if arg.IsTrue() {
-		*dest = 1.0
-	} else {
-		return 0
+	if val, ok := ParseArgDoubleWeak(arg); ok {
+		*dest = val
+		return 1
 	}
-	return 1
-}
-func ZendParseArgDoubleSlow(arg *Zval, dest *float64) int {
-	if arg.IsLong() {
-
-		/* SSTH Exception: IS_LONG may be accepted instead as IS_DOUBLE */
-
-		*dest = float64(arg.GetLval())
-
-		/* SSTH Exception: IS_LONG may be accepted instead as IS_DOUBLE */
-
-	} else if CurrEX().IsArgUseStrictTypes() {
-		return 0
-	}
-	return ZendParseArgDoubleWeak(arg, dest)
+	return 0
 }
 
 func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
