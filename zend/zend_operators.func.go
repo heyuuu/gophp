@@ -4,6 +4,7 @@ package zend
 
 import (
 	"log"
+	"math"
 	b "sik/builtin"
 	"sik/core"
 	. "sik/runtime/ctype"
@@ -15,7 +16,7 @@ func ZEND_DOUBLE_FITS_LONG(d float64) bool {
 	return !(d >= ZEND_LONG_MAX || d < ZEND_LONG_MIN)
 }
 func ZendDvalToLval(d float64) ZendLong {
-	if !(core.ZendFinite(d)) || core.ZendIsNaN(d) {
+	if !IsFinite(d) {
 		return 0
 	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
 		return ZendDvalToLvalSlow(d)
@@ -3322,19 +3323,11 @@ func ZendMemnrstrEx(haystack *byte, needle *byte, needle_len int, end *byte) *by
 	return nil
 }
 func ZendDvalToLvalSlow(d float64) ZendLong {
-	var two_pow_64 float64 = pow(2.0, 64.0)
-	var dmod float64
-	dmod = fmod(d, two_pow_64)
-	if dmod < 0 {
-
-		/* no need to call ceil; original double must have had no
-		 * fractional part, hence dmod does not have one either */
-
-		dmod += two_pow_64
-
-		/* no need to call ceil; original double must have had no
-		 * fractional part, hence dmod does not have one either */
-
+	dmod := math.Mod(d, 1<<64)
+	if dmod > math.MaxInt {
+		dmod -= 1 << 64
+	} else if dmod < math.MinInt {
+		dmod += 1 << 64
 	}
-	return ZendLong(ZendUlong(dmod))
+	return ZendLong(dmod)
 }
