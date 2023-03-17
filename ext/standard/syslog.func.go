@@ -106,13 +106,13 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &option, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &option) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &facility, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &facility) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -207,7 +207,7 @@ func ZifSyslog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &priority, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &priority) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

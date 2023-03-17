@@ -678,7 +678,7 @@ func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sip, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sip) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1324,7 +1324,7 @@ func ZifSleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &num, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &num) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1402,7 +1402,7 @@ func ZifUsleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &num, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &num) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1481,13 +1481,13 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &tv_sec, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &tv_sec) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &tv_nsec, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &tv_nsec) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1840,7 +1840,7 @@ func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &erropt, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &erropt) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3647,7 +3647,7 @@ func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &port, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &port) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3810,7 +3810,7 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &proto, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &proto) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -4284,7 +4284,7 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &scanner_mode, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &scanner_mode) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -4397,7 +4397,7 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *zend.Zva
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &scanner_mode, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &scanner_mode) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

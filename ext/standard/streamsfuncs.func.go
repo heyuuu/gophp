@@ -57,19 +57,19 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &domain, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &domain) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &type_, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &type_) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &protocol, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &protocol) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -187,7 +187,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -329,7 +329,7 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *zend
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -658,7 +658,7 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -764,14 +764,14 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ze
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &to_read, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &to_read) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -878,13 +878,13 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *zend.
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &maxlen, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &maxlen) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &desiredpos, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &desiredpos) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1015,13 +1015,13 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *zend
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &maxlen, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &maxlen) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &pos, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &pos) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1437,14 +1437,14 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sec, &secnull, 1, 0) == 0 {
+			if !zend.ZendParseArgLong(_arg, &sec, &secnull, 1, 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &usec, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &usec) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2419,7 +2419,7 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &read_write, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &read_write) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2660,7 +2660,7 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *zend.Zval
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &max_length, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &max_length) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2850,14 +2850,14 @@ func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &seconds, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &seconds) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &microseconds, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &microseconds) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2951,7 +2951,7 @@ func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *ze
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &arg2, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &arg2) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3043,7 +3043,7 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *zend
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &csize, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &csize) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3144,7 +3144,7 @@ func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &arg2, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &arg2) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3247,7 +3247,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &cryptokind, &cryptokindnull, 1, 0) == 0 {
+			if !zend.ZendParseArgLong(_arg, &cryptokind, &cryptokindnull, 1, 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3697,7 +3697,7 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ze
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &how, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &how) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

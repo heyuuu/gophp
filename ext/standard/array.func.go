@@ -486,7 +486,7 @@ func ZifKrsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -573,7 +573,7 @@ func ZifKsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -682,7 +682,7 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &mode) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -897,7 +897,7 @@ func ZifAsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -984,7 +984,7 @@ func ZifArsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1071,7 +1071,7 @@ func ZifSort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1158,7 +1158,7 @@ func ZifRsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3571,7 +3571,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &extract_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &extract_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3855,13 +3855,13 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &start_key, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &start_key) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &num, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &num) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -5285,14 +5285,14 @@ func ZifArraySplice(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &offset) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &length, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &length) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -5426,7 +5426,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &offset) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -6984,7 +6984,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &pad_size, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &pad_size) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -7277,7 +7277,7 @@ func ZifArrayChangeKeyCase(executeData *zend.ZendExecuteData, return_value *zend
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &change_to_upper, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &change_to_upper) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -7391,7 +7391,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &sort_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -8944,7 +8944,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &num_req, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &num_req) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -9482,7 +9482,7 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &use_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &use_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -9980,7 +9980,7 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &size) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

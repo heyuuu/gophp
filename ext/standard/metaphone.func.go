@@ -52,7 +52,7 @@ func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &phones, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &phones) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

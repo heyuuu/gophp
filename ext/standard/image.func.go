@@ -905,7 +905,7 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &p_image_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &p_image_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -978,7 +978,7 @@ func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *ze
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &image_type, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &image_type) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

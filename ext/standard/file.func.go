@@ -154,7 +154,7 @@ func ZifFlock(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &operation, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &operation) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -516,13 +516,13 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *zend.Zv
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &offset) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &maxlen, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &maxlen) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -633,7 +633,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *zend.Zv
 			zend.ZendParseArgZvalDeref(_arg, &data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -846,7 +846,7 @@ func ZifFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1561,7 +1561,7 @@ func ZifFgets(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &len_, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &len_) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1771,7 +1771,7 @@ func ZifFgetss(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &bytes, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &bytes) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2012,7 +2012,7 @@ func ZifFwrite(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &maxlen, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &maxlen) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2352,14 +2352,14 @@ func ZifFseek(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &offset) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &whence, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &whence) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2458,7 +2458,7 @@ func ZifMkdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &mode) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -2734,7 +2734,7 @@ func ZifUmask(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = executeData.Arg(0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &mask, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &mask) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3102,7 +3102,7 @@ func PhpIfFtruncate(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &size) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3515,7 +3515,7 @@ func ZifFread(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &len_, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &len_) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -4517,7 +4517,7 @@ func ZifFnmatch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

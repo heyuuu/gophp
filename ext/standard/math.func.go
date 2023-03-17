@@ -457,13 +457,13 @@ func ZifRound(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &value, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &precision, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &precision) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &mode) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3091,13 +3091,13 @@ func ZifBaseConvert(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &number, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &frombase, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &frombase) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &tobase, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &tobase) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3341,7 +3341,7 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &dec, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &dec) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3524,13 +3524,13 @@ func ZifIntdiv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &dividend, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &dividend) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &divisor, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &divisor) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

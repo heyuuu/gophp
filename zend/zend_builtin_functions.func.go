@@ -400,7 +400,7 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *Zval) {
 				break
 			}
 			Z_PARAM_PROLOGUE(0, 0)
-			if ZendParseArgLong(_arg, &len_, &_dummy, 0, 0) == 0 {
+			if !ZendParseArgLong00(_arg, &len_) {
 				_expected_type = Z_EXPECTED_LONG
 				_error_code = ZPP_ERROR_WRONG_ARG
 				break
@@ -570,7 +570,7 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *Zval) {
 				break
 			}
 			Z_PARAM_PROLOGUE(0, 0)
-			if ZendParseArgLong(_arg, &len_, &_dummy, 0, 0) == 0 {
+			if !ZendParseArgLong00(_arg, &len_) {
 				_expected_type = Z_EXPECTED_LONG
 				_error_code = ZPP_ERROR_WRONG_ARG
 				break

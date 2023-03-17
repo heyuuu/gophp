@@ -74,13 +74,20 @@ func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null i
 	}
 	return intBool(ok)
 }
-func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null int, cap int) int {
+
+func ZendParseArgLong00(arg *Zval, dest *ZendLong) bool {
+	val, _, ok := ParseArgLong(arg, false, false, isArgUseStrictTypes())
+	*dest = val
+	return ok
+}
+
+func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null int, cap int) bool {
 	val, isNull, ok := ParseArgLong(arg, check_null != 0, cap != 0, isArgUseStrictTypes())
 	*dest = val
 	if is_null != nil {
 		*is_null = intBool(isNull)
 	}
-	return intBool(ok)
+	return ok
 }
 func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null int) int {
 	val, isNull, ok := ParseArgDouble(arg, check_null != 0, isArgUseStrictTypes())

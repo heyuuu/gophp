@@ -59,7 +59,7 @@ func ZifHeader(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, ctr.GetResponseCode(), &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, ctr.GetResponseCode()) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -764,7 +764,7 @@ func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *zend.Z
 			_real_arg = executeData.Arg(0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &response_code, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &response_code) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

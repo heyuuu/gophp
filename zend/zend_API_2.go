@@ -118,12 +118,6 @@ func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 	}
 	return 0
 }
-func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
-	if CurrEX().IsArgUseStrictTypes() {
-		return 0
-	}
-	return ZendParseArgStrWeak(arg, dest)
-}
 
 func ZendParseArgImpl(
 	arg_num int,
@@ -165,7 +159,7 @@ func ZendParseArgImpl_Ex(arg *Zval, va *b.VaList, spec *b.StrReader, error **byt
 		if check_null != 0 {
 			is_null = va.Pop().(*ZendBool)
 		}
-		if ZendParseArgLong(arg, p, is_null, check_null, c == 'L') == 0 {
+		if !ZendParseArgLong(arg, p, is_null, check_null, c == 'L') {
 			return "int"
 		}
 		break

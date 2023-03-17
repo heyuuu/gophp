@@ -1378,7 +1378,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *zend.Zval,
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1491,7 +1491,7 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &quote_style, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &quote_style) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1579,7 +1579,7 @@ func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &quote_style, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &quote_style) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -1723,13 +1723,13 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 			_real_arg = executeData.Arg(0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &all, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &all) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break

@@ -701,7 +701,7 @@ func ZifProcNice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = executeData.Arg(0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &pri, &_dummy, 0, 0) == 0 {
+			if !zend.ZendParseArgLong00(_arg, &pri) {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
