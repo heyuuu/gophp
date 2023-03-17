@@ -68,9 +68,7 @@ func ParseArgLongCapWeak(arg *Zval) (dest ZendLong, ok bool) {
 		}
 		return ZendDvalToLvalCap(arg.GetDval()), true
 	case IS_STRING:
-		IsNumericStrFunction(arg.)
-
-
+		// todo
 		return
 	default:
 		return 0, false
@@ -78,5 +76,6 @@ func ParseArgLongCapWeak(arg *Zval) (dest ZendLong, ok bool) {
 }
 
 func ParseArgLongWeak(arg *Zval) (dest ZendLong, ok bool) {
-
+	// todo
+	return
 }
