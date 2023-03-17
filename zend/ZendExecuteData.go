@@ -98,9 +98,9 @@ func (this *ZendExecuteData) CalleeName() string {
 func (this *ZendExecuteData) isStrictTypes() bool {
 	return this != nil && this.func_ != nil && this.func_.IsStrictTypes()
 }
-func (this *ZendExecuteData) IsCallUseStrictTypes() bool { return this.isStrictTypes() }
+func (this *ZendExecuteData) IsCallUseStrictTypes() bool { return this.isStrictTypes() } // ZEND_RET_USES_STRICT_TYPES
 func (this *ZendExecuteData) IsRetUseStrictTypes() bool  { return this.isStrictTypes() }
-func (this *ZendExecuteData) IsArgUseStrictTypes() bool  { return this.prevExecuteData.isStrictTypes() }
+func (this *ZendExecuteData) IsArgUseStrictTypes() bool  { return this.prevExecuteData.isStrictTypes() } // ZEND_ARG_USES_STRICT_TYPES
 
 func (this *ZendExecuteData) NumArgs() int { return int(this.This.GetNumArgs()) }
 func (this *ZendExecuteData) VarNum(n int) *Zval {

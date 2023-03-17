@@ -93,18 +93,56 @@ func ZendParseVaArgs_Ex(numArgs int, typeSpec string, args []any, flags int) boo
 		postVarargs = maxNumArgs - postVarargs
 		maxNumArgs = -1
 	}
+	// check num args
 	if numArgs < minNumArgs || (numArgs > maxNumArgs && maxNumArgs >= 0) {
 		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+			forceThrowException := (flags & ZEND_PARSE_PARAMS_THROW) != 0
+			CurrEX().CheckNumArgsEx(numArgs, minNumArgs, maxNumArgs, forceThrowException)
+		}
+		return false
+	}
+	argCount := CurrEX().NumArgs()
+	if numArgs > argCount {
+		ZendParseParametersDebugError("could not obtain parameters for parsing")
+		return false
+	}
 
-			CurrEX().CheckNumArgs()
+	i := 0
+	vaIndex := 0
+	typeSpecIndex := 0
+	for ; numArgs > 0; numArgs-- {
+		if typeSpec[typeSpecIndex] == '|' {
+			typeSpecIndex++
+		}
+		if typeSpec[typeSpecIndex] == '*' || typeSpec[typeSpecIndex] == '+' {
+			numVarargs := numArgs + 1 - postVarargs // todo
 
-			var active_function *ZendFunction = CurrEX().GetFunc()
-			var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-			var throwException = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
-			ZendInternalArgumentCountError(throwException, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+			/* eat up the passed in storage even if it won't be filled in with varargs */
+			varargs := args[vaIndex].(**Zval)
+			nVarargs := args[vaIndex].(*int)
+			typeSpecIndex++
+			if numVarargs > 0 {
+				*nVarargs = numVarargs
+				*varargs = CurrEX().Arg(i + 1)
+
+				/* adjust how many args we have left and restart loop */
+
+				numArgs += 1 - numVarargs
+				i += numVarargs
+				continue
+			} else {
+				*varargs = nil
+				*nVarargs = 0
+			}
 		}
 
+		arg := CurrEX().Arg(i + 1)
+		if !ZendParseArg(i+1, arg, va, typeSpec, flags) {
+
+		}
+		i++
 	}
+	return true
 }
 
 func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int {

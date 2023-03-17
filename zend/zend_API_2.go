@@ -267,6 +267,7 @@ func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
 	}
 	return ZendParseArgStrWeak(arg, dest)
 }
+
 func ZendParseArgImpl(
 	arg_num int,
 	arg *Zval,
@@ -275,8 +276,12 @@ func ZendParseArgImpl(
 	error **byte,
 	severity *int,
 ) *byte {
-	var spec_walk *byte = *spec
-	var c byte = b.PostInc(&(*spec_walk))
+	return ZendParseArgImpl_Ex(arg, va, spec, error, severity)
+}
+
+func ZendParseArgImpl_Ex(arg *Zval, va *b.VaList, spec *b.StrPtrReader, error **byte, severity *int) string {
+	specWalk := spec.Copy()
+	c := specWalk.Read()
 	var check_null int = 0
 	var separate int = 0
 	var real_arg *Zval = arg
@@ -285,25 +290,23 @@ func ZendParseArgImpl(
 
 	ZVAL_DEREF(arg)
 	for true {
-		if (*spec_walk) == '/' {
+		if specWalk.Curr() == '/' {
 			SEPARATE_ZVAL_NOREF(arg)
 			real_arg = arg
 			separate = 1
-		} else if (*spec_walk) == '!' {
+		} else if specWalk.Curr() == '!' {
 			check_null = 1
 		} else {
 			break
 		}
-		spec_walk++
+		specWalk.Next()
 	}
 	switch c {
-	case 'l':
-
-	case 'L':
-		var p *ZendLong = __va_arg(*va, (*ZendLong)(_))
+	case 'l', 'L':
+		var p = va.Pop().(*ZendLong)
 		var is_null *ZendBool = nil
 		if check_null != 0 {
-			is_null = __va_arg(*va, (*ZendBool)(_))
+			is_null = va.Pop().(*ZendBool)
 		}
 		if ZendParseArgLong(arg, p, is_null, check_null, c == 'L') == 0 {
 			return "int"
@@ -438,7 +441,7 @@ func ZendParseArgImpl(
 				*severity = E_DEPRECATED
 				ZendSpprintf(error, 0, "to be a valid callback, %s", is_callable_error)
 				Efree(is_callable_error)
-				*spec = spec_walk
+				*spec = specWalk
 				return ""
 			}
 			break
@@ -464,6 +467,6 @@ func ZendParseArgImpl(
 	default:
 		return "unknown"
 	}
-	*spec = spec_walk
+	*spec = specWalk
 	return nil
 }
