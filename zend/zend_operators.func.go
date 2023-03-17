@@ -5,6 +5,7 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
+	. "sik/runtime/ctype"
 	"strings"
 )
 
@@ -31,7 +32,6 @@ func ZendDvalToLvalCap(d float64) ZendLong {
 	}
 	return ZendLong(d)
 }
-func ZEND_IS_DIGIT(c byte) bool { return c >= '0' && c <= '9' }
 func IsNumericStringEx(
 	str *byte,
 	length int,
@@ -2820,7 +2820,8 @@ try_again:
 	}
 	return SUCCESS
 }
-func ZendIsTrue(op *Zval) int { return IZendIsTrue(op) }
+func ZendIsTrueEx(op *Zval) bool { return IZendIsTrue(op) != 0 }
+func ZendIsTrue(op *Zval) int    { return IZendIsTrue(op) }
 func ZendObjectIsTrue(op *Zval) int {
 	if Z_OBJ_HT_P(op).GetCastObject() != nil {
 		var tmp Zval
@@ -3171,6 +3172,7 @@ func ZendLongToStr(num ZendLong) *ZendString {
 func IsNumericStrFunction(str *ZendString, lval *ZendLong, dval *float64) ZendUchar {
 	return IsNumericStringEx(str.GetVal(), str.GetLen(), lval, dval, -1, nil)
 }
+
 func _isNumericStringEx(
 	str *byte,
 	length int,
@@ -3207,7 +3209,7 @@ func _isNumericStringEx(
 	} else if (*ptr) == '+' {
 		ptr++
 	}
-	if ZEND_IS_DIGIT(*ptr) {
+	if IsDigit(*ptr) {
 
 		/* Skip any leading 0s */
 
@@ -3221,7 +3223,7 @@ func _isNumericStringEx(
 
 		for type_ = IS_LONG; !(digits >= MAX_LENGTH_OF_LONG && (dval != nil || allow_errors == 1)); {
 		check_digits:
-			if ZEND_IS_DIGIT(*ptr) {
+			if IsDigit(*ptr) {
 				tmp_lval = tmp_lval*10 + (*ptr) - '0'
 				continue
 			} else if (*ptr) == '.' && dp_or_e < 1 {
@@ -3232,7 +3234,7 @@ func _isNumericStringEx(
 					e++
 					ptr = e - 1
 				}
-				if ZEND_IS_DIGIT(*e) {
+				if IsDigit(*e) {
 					goto process_double
 				}
 			}
@@ -3251,7 +3253,7 @@ func _isNumericStringEx(
 			dp_or_e = -1
 			goto process_double
 		}
-	} else if (*ptr) == '.' && ZEND_IS_DIGIT(ptr[1]) {
+	} else if (*ptr) == '.' && IsDigit(ptr[1]) {
 	process_double:
 		type_ = IS_DOUBLE
 
@@ -3317,6 +3319,7 @@ func _isNumericStringEx(
 		return IS_DOUBLE
 	}
 }
+
 func ZendMemnstrExPre(td []uint, needle *byte, needle_len int, reverse int) {
 	var i int
 	for i = 0; i < 256; i++ {

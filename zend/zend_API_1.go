@@ -67,20 +67,12 @@ func Z_PARAM_PROLOGUE(deref int, separate int) {
 	}
 }
 func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null int) int {
+	val, isNull, ok := ParseArgBool(arg, check_null != 0, !isArgUseWeakTypes())
+	*dest = intBool(val)
 	if check_null != 0 {
-		*is_null = 0
+		*is_null = intBool(isNull)
 	}
-	if arg.IsTrue() {
-		*dest = 1
-	} else if arg.IsFalse() {
-		*dest = 0
-	} else if check_null != 0 && arg.IsNull() {
-		*is_null = 1
-		*dest = 0
-	} else {
-		return ZendParseArgBoolSlow(arg, dest)
-	}
-	return 1
+	return intBool(ok)
 }
 func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null int, cap int) int {
 	if check_null != 0 {

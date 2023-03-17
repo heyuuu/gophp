@@ -52,29 +52,17 @@ func EX_VAR(n uint32) *Zval                               { return ZEND_CALL_VAR
 func EX_VAR_TO_NUM(n uint32) __auto__ {
 	return uint32(ZEND_CALL_VAR(nil, n) - nil.VarNum(0))
 }
-func ZEND_OPLINE_TO_OFFSET(opline __auto__, target *byte) *byte {
-	return (*byte)(target - (*byte)(opline))
-}
 func ZEND_OPLINE_NUM_TO_OFFSET(op_array *ZendOpArray, opline *ZendOp, opline_num uint32) *byte {
 	return (*byte)(op_array.GetOpcodes()[opline_num] - (*byte)(opline))
 }
 func ZEND_OFFSET_TO_OPLINE(base *ZendOp, offset uint32) *ZendOp {
 	return (*ZendOp)((*byte)(base) + int(offset))
 }
-func ZEND_OFFSET_TO_OPLINE_NUM(op_array __auto__, base *ZendOp, offset uint32) int {
-	return ZEND_OFFSET_TO_OPLINE(base, offset) - op_array.opcodes
-}
 func OP_JMP_ADDR(opline *ZendOp, node ZnodeOp) *ZendOp {
 	return ZEND_OFFSET_TO_OPLINE(opline, node.GetJmpOffset())
 }
-func ZEND_SET_OP_JMP_ADDR(opline __auto__, node __auto__, val *byte) {
-	node.jmp_offset = ZEND_OPLINE_TO_OFFSET(opline, val)
-}
 func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetJmpOffset(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, node.GetOplineNum()))
-}
-func ZEND_PASS_TWO_UNDO_JMP_TARGET(op_array __auto__, opline *ZendOp, node __auto__) {
-	node.opline_num = ZEND_OFFSET_TO_OPLINE_NUM(op_array, opline, node.jmp_offset)
 }
 func CT_CONSTANT_EX(op_array *ZendOpArray, num *Zval) __auto__ { return op_array.GetLiterals() + num }
 func CT_CONSTANT(node ZnodeOp) __auto__ {

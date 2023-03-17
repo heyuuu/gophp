@@ -279,7 +279,7 @@ func ZendParseArgImpl(
 	return ZendParseArgImpl_Ex(arg, va, spec, error, severity)
 }
 
-func ZendParseArgImpl_Ex(arg *Zval, va *b.VaList, spec *b.StrPtrReader, error **byte, severity *int) string {
+func ZendParseArgImpl_Ex(arg *Zval, va *b.VaList, spec *b.StrReader, error **byte, severity *int) string {
 	specWalk := spec.Copy()
 	c := specWalk.Read()
 	var check_null int = 0
