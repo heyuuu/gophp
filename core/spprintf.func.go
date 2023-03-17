@@ -359,7 +359,7 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 				default:
 					goto fmt_error
 				}
-				if ZendIsnan(fp_num) {
+				if ZendIsNaN(fp_num) {
 					s = "nan"
 					s_len = 3
 				} else if ZendIsInf(fp_num) {
@@ -393,7 +393,7 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 				default:
 					goto fmt_error
 				}
-				if ZendIsnan(fp_num) {
+				if ZendIsNaN(fp_num) {
 					s = "NAN"
 					s_len = 3
 					break

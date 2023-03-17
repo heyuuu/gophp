@@ -98,15 +98,9 @@ func ZendParseArgBoolWeak(arg *Zval, dest *ZendBool) int {
 	}
 	return 1
 }
-func ZendParseArgBoolSlow(arg *Zval, dest *ZendBool) int {
-	if CurrEX().IsArgUseStrictTypes() {
-		return 0
-	}
-	return ZendParseArgBoolWeak(arg, dest)
-}
 func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 	if arg.IsDouble() {
-		if core.ZendIsnan(arg.GetDval()) {
+		if core.ZendIsNaN(arg.GetDval()) {
 			return 0
 		}
 		if !(ZEND_DOUBLE_FITS_LONG(arg.GetDval())) {
@@ -119,7 +113,7 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 		type_ := IsNumericStrFunction(arg.GetStr(), dest, &d)
 		if type_ != IS_LONG {
 			if type_ != 0 {
-				if core.ZendIsnan(d) {
+				if core.ZendIsNaN(d) {
 					return 0
 				}
 				if !(ZEND_DOUBLE_FITS_LONG(d)) {
@@ -151,7 +145,7 @@ func ZendParseArgLongSlow(arg *Zval, dest *ZendLong) int {
 }
 func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 	if arg.IsDouble() {
-		if core.ZendIsnan(arg.GetDval()) {
+		if core.ZendIsNaN(arg.GetDval()) {
 			return 0
 		}
 		*dest = ZendDvalToLvalCap(arg.GetDval())
@@ -160,7 +154,7 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 		var type_ = IsNumericStrFunction(arg.GetStr(), dest, &d)
 		if type_ != IS_LONG {
 			if type_ != 0 {
-				if core.ZendIsnan(d) {
+				if core.ZendIsNaN(d) {
 					return 0
 				}
 				*dest = ZendDvalToLvalCap(d)

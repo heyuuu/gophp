@@ -167,7 +167,7 @@ func _phpMathRound(value float64, places int, mode int) float64 {
 
 		/* couldn't convert to string and back */
 
-		if !(core.ZendFinite(tmp_value)) || core.ZendIsnan(tmp_value) {
+		if !(core.ZendFinite(tmp_value)) || core.ZendIsNaN(tmp_value) {
 			tmp_value = value
 		}
 
@@ -1696,7 +1696,7 @@ func ZifIsNan(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.ZVAL_BOOL(return_value, core.ZendIsnan(dval))
+	zend.ZVAL_BOOL(return_value, core.ZendIsNaN(dval))
 	return
 }
 func ZifPow(executeData *zend.ZendExecuteData, return_value *zend.Zval) {

@@ -189,7 +189,7 @@ func PhpSprintfAppenddouble(
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION)
 		precision = MAX_FLOAT_PRECISION
 	}
-	if core.ZendIsnan(number) {
+	if core.ZendIsNaN(number) {
 		is_negative = number < 0
 		PhpSprintfAppendstring(buffer, pos, "NaN", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return

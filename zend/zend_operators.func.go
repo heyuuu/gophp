@@ -12,10 +12,10 @@ import (
 )
 
 func ZEND_DOUBLE_FITS_LONG(d float64) bool {
-	return !(d >= float64(ZEND_LONG_MAX != 0 || d < float64(ZEND_LONG_MIN)))
+	return !(d >= ZEND_LONG_MAX || d < ZEND_LONG_MIN)
 }
 func ZendDvalToLval(d float64) ZendLong {
-	if !(core.ZendFinite(d)) || core.ZendIsnan(d) {
+	if !(core.ZendFinite(d)) || core.ZendIsNaN(d) {
 		return 0
 	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
 		return ZendDvalToLvalSlow(d)
@@ -23,7 +23,7 @@ func ZendDvalToLval(d float64) ZendLong {
 	return ZendLong(d)
 }
 func ZendDvalToLvalCap(d float64) ZendLong {
-	if !(core.ZendFinite(d)) || core.ZendIsnan(d) {
+	if !(core.ZendFinite(d)) || core.ZendIsNaN(d) {
 		return 0
 	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
 		if d > 0 {
