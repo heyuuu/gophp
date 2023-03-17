@@ -1360,7 +1360,7 @@ func ZifStrtok(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		tok = str
 	} else {
 		zend.ZvalPtrDtor(&(BG(strtok_zval)))
-		(BG(strtok_zval)).SetRawString(b.CastStr(str.GetVal(), str.GetLen()))
+		(BG(strtok_zval)).SetRawString(str.GetStr())
 		BG(strtok_string) = BG(strtok_zval).GetStr().GetVal()
 		BG(strtok_last) = BG(strtok_string)
 		BG(strtok_len) = str.GetLen()
@@ -4122,7 +4122,7 @@ func ZifUcwords(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	PhpCharmask((*uint8)(delims), delims_len, mask)
-	return_value.SetRawString(b.CastStr(str.GetVal(), str.GetLen()))
+	return_value.SetRawString(str.GetStr())
 	r = return_value.GetStr().GetVal()
 	*r = toupper(uint8(*r))
 	for r_end = r + return_value.GetStr().GetLen() - 1; r < r_end; {
@@ -5307,7 +5307,7 @@ func ZifStripcslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	return_value.SetRawString(b.CastStr(str.GetVal(), str.GetLen()))
+	return_value.SetRawString(str.GetStr())
 	PhpStripcslashes(return_value.GetStr())
 }
 func ZifStripslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -5379,7 +5379,7 @@ func ZifStripslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		break
 	}
-	return_value.SetRawString(b.CastStr(str.GetVal(), str.GetLen()))
+	return_value.SetRawString(str.GetStr())
 	PhpStripslashes(return_value.GetStr())
 }
 func PhpStripcslashes(str *zend.ZendString) {
@@ -8166,7 +8166,7 @@ func ZifStrShuffle(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	return_value.SetRawString(b.CastStr(arg.GetVal(), arg.GetLen()))
+	return_value.SetRawString(arg.GetStr())
 	if return_value.GetStr().GetLen() > 1 {
 		PhpStringShuffle(return_value.GetStr().GetVal(), zend.ZendLong(return_value.GetStr().GetLen()))
 	}

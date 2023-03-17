@@ -552,7 +552,7 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 				if fptr.GetType() == ZEND_INTERNAL_FUNCTION {
 					str.AppendString((*ArgInfo)(arg_info).Name())
 				} else {
-					str.AppendString(b.CastStr(arg_info.GetName().GetVal(), arg_info.GetName().GetLen()))
+					str.AppendString(arg_info.GetName().GetStr())
 				}
 			} else {
 				str.AppendString("param")

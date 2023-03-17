@@ -689,14 +689,14 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 	var str zend.SmartStr = zend.MakeSmartStr(0)
 	var has_next zend.Zval
 	var level int
-	str.AppendString(b.CastStr(object.GetPrefix()[0].GetS().GetVal(), object.GetPrefix()[0].GetS().GetLen()))
+	str.AppendString(object.GetPrefix()[0].GetS().GetStr())
 	for level = 0; level < object.GetLevel(); level++ {
 		zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
 		if has_next.GetType() != zend.IS_UNDEF {
 			if has_next.IsType(zend.IS_TRUE) {
-				str.AppendString(b.CastStr(object.GetPrefix()[1].GetS().GetVal(), object.GetPrefix()[1].GetS().GetLen()))
+				str.AppendString(object.GetPrefix()[1].GetS().GetStr())
 			} else {
-				str.AppendString(b.CastStr(object.GetPrefix()[2].GetS().GetVal(), object.GetPrefix()[2].GetS().GetLen()))
+				str.AppendString(object.GetPrefix()[2].GetS().GetStr())
 			}
 			zend.ZvalPtrDtor(&has_next)
 		}
@@ -704,13 +704,13 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 	zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
 	if has_next.GetType() != zend.IS_UNDEF {
 		if has_next.IsType(zend.IS_TRUE) {
-			str.AppendString(b.CastStr(object.GetPrefix()[3].GetS().GetVal(), object.GetPrefix()[3].GetS().GetLen()))
+			str.AppendString(object.GetPrefix()[3].GetS().GetStr())
 		} else {
-			str.AppendString(b.CastStr(object.GetPrefix()[4].GetS().GetVal(), object.GetPrefix()[4].GetS().GetLen()))
+			str.AppendString(object.GetPrefix()[4].GetS().GetStr())
 		}
 		zend.ZvalPtrDtor(&has_next)
 	}
-	str.AppendString(b.CastStr(object.GetPrefix()[5].GetS().GetVal(), object.GetPrefix()[5].GetS().GetLen()))
+	str.AppendString(object.GetPrefix()[5].GetS().GetStr())
 	str.ZeroTail()
 	return_value.SetString(str.GetS())
 	return

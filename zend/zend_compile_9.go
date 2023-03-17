@@ -606,7 +606,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			var c ZendUchar
 			if dim.IsLong() {
 				offset = dim.GetLval()
-			} else if dim.GetType() != IS_STRING || IsNumericString(b.CastStr(dim.GetStr().GetVal(), dim.GetStr().GetLen()), &offset, nil, 1) != IS_LONG {
+			} else if dim.GetType() != IS_STRING || IsNumericString(dim.GetStr().GetStr(), &offset, nil, 1) != IS_LONG {
 				return
 			}
 			if offset < 0 || int(offset >= container.GetStr().GetLen()) != 0 {

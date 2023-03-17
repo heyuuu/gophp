@@ -828,7 +828,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	surl.AppendString(b.CastStr(url, urllen))
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, strlen(name))
-		url_app.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		url_app.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 	} else {
 		url_app.AppendString(b.CastStrAuto(name))
@@ -836,7 +836,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	url_app.AppendByte('=')
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(value, strlen(value))
-		url_app.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		url_app.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 	} else {
 		url_app.AppendString(b.CastStrAuto(value))
@@ -973,16 +973,16 @@ func PhpUrlScannerAddVarImpl(
 	}
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, name_len)
-		sname.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		sname.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 		encoded = PhpRawUrlEncode(value, value_len)
-		svalue.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		svalue.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name), name_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
-		hname.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		hname.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(value), value_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
-		hvalue.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		hvalue.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 	} else {
 		sname.AppendString(b.CastStr(name, name_len))
@@ -1058,14 +1058,14 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 	}
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name.GetVal(), name.GetLen())
-		sname.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		sname.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name.GetVal()), name.GetLen(), 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
-		hname.AppendString(b.CastStr(encoded.GetVal(), encoded.GetLen()))
+		hname.AppendString(encoded.GetStr())
 		zend.ZendStringFree(encoded)
 	} else {
-		sname.AppendString(b.CastStr(name.GetVal(), name.GetLen()))
-		hname.AppendString(b.CastStr(name.GetVal(), name.GetLen()))
+		sname.AppendString(name.GetStr())
+		hname.AppendString(name.GetStr())
 	}
 	sname.ZeroTail()
 	hname.ZeroTail()

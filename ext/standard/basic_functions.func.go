@@ -4190,7 +4190,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(b.CastStr(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()), nil, nil, 0) == zend.IS_LONG {
+		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetStr(), nil, nil, 0) == zend.IS_LONG {
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()))
 			if b.Assign(&find_hash, arr.GetArr().IndexFindH(key)) == nil {
 				zend.ArrayInit(&hash)

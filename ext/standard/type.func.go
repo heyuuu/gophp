@@ -764,7 +764,7 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetTrue()
 		return
 	case zend.IS_STRING:
-		if zend.IsNumericString(b.CastStr(arg.GetStr().GetVal(), arg.GetStr().GetLen()), nil, nil, 0) != 0 {
+		if zend.IsNumericString(arg.GetStr().GetStr(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
 		} else {

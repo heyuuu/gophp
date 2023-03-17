@@ -466,7 +466,7 @@ try_again:
 	case IS_STRING:
 		var str *ZendString
 		str = op.GetStr()
-		if b.Assign(&(op.GetTypeInfo()), IsNumericString(b.CastStr(str.GetVal(), str.GetLen()), &(op.GetLval()), &(op.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
+		if b.Assign(&(op.GetTypeInfo()), IsNumericString(str.GetStr(), &(op.GetLval()), &(op.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
 			op.SetLong(0)
 			if silent == 0 {
 				ZendError(E_WARNING, "A non-numeric value encountered")
@@ -509,7 +509,7 @@ func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zva
 		holder.SetLong(1)
 		return holder
 	case IS_STRING:
-		if b.Assign(&(holder.GetTypeInfo()), IsNumericString(b.CastStr(op.GetStr().GetVal(), op.GetStr().GetLen()), &(holder.GetLval()), &(holder.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
+		if b.Assign(&(holder.GetTypeInfo()), IsNumericString(op.GetStr().GetStr(), &(holder.GetLval()), &(holder.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
 			holder.SetLong(0)
 			if silent == 0 {
 				ZendError(E_WARNING, "A non-numeric value encountered")
@@ -884,7 +884,7 @@ try_again:
 		var type_ ZendUchar
 		var lval ZendLong
 		var dval float64
-		if 0 == b.Assign(&type_, IsNumericString(b.CastStr(op.GetStr().GetVal(), op.GetStr().GetLen()), &lval, &dval, b.Cond(silent != 0, 1, -1))) {
+		if 0 == b.Assign(&type_, IsNumericString(op.GetStr().GetStr(), &lval, &dval, b.Cond(silent != 0, 1, -1))) {
 			if silent == 0 {
 				ZendError(E_WARNING, "A non-numeric value encountered")
 			}
@@ -2729,7 +2729,7 @@ try_again:
 	case IS_STRING:
 		var lval ZendLong
 		var dval float64
-		switch IsNumericString(b.CastStr(op1.GetStr().GetVal(), op1.GetStr().GetLen()), &lval, &dval, 0) {
+		switch IsNumericString(op1.GetStr().GetStr(), &lval, &dval, 0) {
 		case IS_LONG:
 			ZvalPtrDtorStr(op1)
 			if lval == ZEND_LONG_MAX {
@@ -2793,7 +2793,7 @@ try_again:
 			op1.SetLong(-1)
 			break
 		}
-		switch IsNumericString(b.CastStr(op1.GetStr().GetVal(), op1.GetStr().GetLen()), &lval, &dval, 0) {
+		switch IsNumericString(op1.GetStr().GetStr(), &lval, &dval, 0) {
 		case IS_LONG:
 			ZvalPtrDtorStr(op1)
 			if lval == ZEND_LONG_MIN {
@@ -3029,7 +3029,7 @@ func ZendiSmartStreq(s1 *ZendString, s2 *ZendString) int {
 	var lval2 ZendLong = 0
 	var dval1 float64 = 0.0
 	var dval2 float64 = 0.0
-	if b.Assign(&ret1, IsNumericStringEx(b.CastStr(s1.GetVal(), s1.GetLen()), &lval1, &dval1, 0, &oflow1)) && b.Assign(&ret2, IsNumericStringEx(b.CastStr(s2.GetVal(), s2.GetLen()), &lval2, &dval2, 0, &oflow2)) {
+	if b.Assign(&ret1, IsNumericStringEx(s1.GetStr(), &lval1, &dval1, 0, &oflow1)) && b.Assign(&ret2, IsNumericStringEx(s2.GetStr(), &lval2, &dval2, 0, &oflow2)) {
 		if oflow1 != 0 && oflow1 == oflow2 && dval1-dval2 == 0.0 {
 
 			/* both values are integers overflown to the same side, and the
@@ -3087,7 +3087,7 @@ func ZendiSmartStrcmp(s1 *ZendString, s2 *ZendString) int {
 	var lval2 ZendLong = 0
 	var dval1 float64 = 0.0
 	var dval2 float64 = 0.0
-	if b.Assign(&ret1, IsNumericStringEx(b.CastStr(s1.GetVal(), s1.GetLen()), &lval1, &dval1, 0, &oflow1)) && b.Assign(&ret2, IsNumericStringEx(b.CastStr(s2.GetVal(), s2.GetLen()), &lval2, &dval2, 0, &oflow2)) {
+	if b.Assign(&ret1, IsNumericStringEx(s1.GetStr(), &lval1, &dval1, 0, &oflow1)) && b.Assign(&ret2, IsNumericStringEx(s2.GetStr(), &lval2, &dval2, 0, &oflow2)) {
 		if oflow1 != 0 && oflow1 == oflow2 && dval1-dval2 == 0.0 {
 
 			/* both values are integers overflown to the same side, and the
@@ -3184,7 +3184,7 @@ func ZendLongToStr(num ZendLong) *ZendString {
 	}
 }
 func IsNumericStrFunction(str *ZendString, lval *ZendLong, dval *float64) ZendUchar {
-	return IsNumericStringEx(b.CastStr(str.GetVal(), str.GetLen()), lval, dval, -1, nil)
+	return IsNumericStringEx(str.GetStr(), lval, dval, -1, nil)
 }
 
 /**

@@ -625,7 +625,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				var _z *Zval = _p.GetVal()
 
 				val = _z
-				if val.GetType() != IS_STRING || IsNumericString(b.CastStr(val.GetStr().GetVal(), val.GetStr().GetLen()), nil, nil, 0) != 0 {
+				if val.GetType() != IS_STRING || IsNumericString(val.GetStr().GetStr(), nil, nil, 0) != 0 {
 					dst.DestroyEx()
 					ok = 0
 					break

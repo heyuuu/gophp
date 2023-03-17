@@ -594,7 +594,7 @@ func PhpStreamUrlWrapHttpEx(
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
 		}
 		req_buf.AppendString("\r\n")
-		req_buf.AppendString(b.CastStr(tmpzval.GetStr().GetVal(), tmpzval.GetStr().GetLen()))
+		req_buf.AppendString(tmpzval.GetStr().GetStr())
 	} else {
 		req_buf.AppendString("\r\n")
 	}

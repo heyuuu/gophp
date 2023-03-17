@@ -1068,7 +1068,7 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 		str.AppendLong(zv.GetLval())
 	case IS_DOUBLE:
 		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
-		str.AppendString(b.CastStr(key.GetVal(), key.GetLen()))
+		str.AppendString(key.GetStr())
 		ZendStringReleaseEx(key, 0)
 	case IS_STRING:
 		str.AppendByte('\'')
@@ -1170,7 +1170,7 @@ tail_call:
 		ZendAstExportZval(str, ZendAstGetZval(ast), priority, indent)
 	case ZEND_AST_CONSTANT:
 		var name *ZendString = ZendAstGetConstantName(ast)
-		str.AppendString(b.CastStr(name.GetVal(), name.GetLen()))
+		str.AppendString(name.GetStr())
 	case ZEND_AST_CONSTANT_CLASS:
 		str.AppendString("__CLASS__")
 	case ZEND_AST_ZNODE:
@@ -1211,7 +1211,7 @@ tail_call:
 			str.AppendByte('&')
 		}
 		if ast.GetKind() != ZEND_AST_CLOSURE && ast.GetKind() != ZEND_AST_ARROW_FUNC {
-			str.AppendString(b.CastStr(decl.GetName().GetVal(), decl.GetName().GetLen()))
+			str.AppendString(decl.GetName().GetStr())
 		}
 		str.AppendByte('(')
 		ZendAstExportEx(str, decl.GetChild()[0], 0, indent)
@@ -1256,7 +1256,7 @@ tail_call:
 			}
 			str.AppendString("class ")
 		}
-		str.AppendString(b.CastStr(decl.GetName().GetVal(), decl.GetName().GetLen()))
+		str.AppendString(decl.GetName().GetStr())
 		ZendAstExportClassNoHeader(str, decl, indent)
 		str.AppendByte('\n')
 	case ZEND_AST_ARG_LIST:
