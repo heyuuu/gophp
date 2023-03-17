@@ -77,7 +77,7 @@ func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null i
 func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null int, cap int) int {
 	val, isNull, ok := ParseArgLong(arg, check_null != 0, cap != 0, isArgUseStrictTypes())
 	*dest = val
-	if check_null != 0 {
+	if is_null != nil {
 		*is_null = intBool(isNull)
 	}
 	return intBool(ok)
@@ -85,20 +85,16 @@ func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null i
 func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null int) int {
 	val, isNull, ok := ParseArgDouble(arg, check_null != 0, isArgUseStrictTypes())
 	*dest = val
-	if check_null != 0 {
+	if is_null != nil {
 		*is_null = intBool(isNull)
 	}
 	return intBool(ok)
 }
 func ZendParseArgStr(arg *Zval, dest **ZendString, check_null int) int {
-	if arg.IsString() {
-		*dest = arg.GetStr()
-	} else if check_null != 0 && arg.IsNull() {
-		*dest = nil
-	} else {
-		return ZendParseArgStrSlow(arg, dest)
-	}
-	return 1
+	val, _, ok := ParseArgStr(arg, check_null != 0, isArgUseStrictTypes())
+	// 为空时 *dest 直接为 nil，不需单独的 is_null 字符安
+	*dest = val
+	return intBool(ok)
 }
 func ZendParseArgString(arg *Zval, dest **byte, dest_len *int, check_null int) int {
 	var str *ZendString

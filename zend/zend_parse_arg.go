@@ -147,3 +147,58 @@ func ParseArgDoubleWeak(arg *Zval) (dest float64, ok bool) {
 	// success
 	return dest, true
 }
+
+func ParseArgStr(arg *Zval, checkNull bool, strict bool) (dest *ZendString, isNull bool, ok bool) {
+	// check null
+	if isNull = checkNull && arg.IsNull(); isNull {
+		return
+	}
+
+	// base parse
+	if arg.IsString() {
+		return parseArgSucc(arg.GetStr())
+	}
+
+	// weak parse
+	if !strict {
+		dest, ok = ParseArgStrWeak(arg)
+	}
+
+	return
+}
+
+func ParseArgStrWeak(arg *Zval) (*ZendString, bool) {
+	if arg.GetType() < IS_STRING {
+		ConvertToString(arg)
+		return arg.GetStr(), true
+	} else if arg.IsString() {
+		return arg.GetStr(), true
+	} else if arg.IsObject() {
+		handlers := arg.GetObj().GetHandlers()
+		if castFunc := handlers.GetCastObject(); castFunc != nil {
+			var obj Zval
+			if castFunc(arg, &obj, IS_STRING) == SUCCESS {
+				ZvalPtrDtor(arg)
+				ZVAL_COPY_VALUE(arg, &obj)
+				return arg.GetStr(), true
+			}
+		} else if getFunc := handlers.GetGet(); getFunc != nil {
+			var rv Zval
+			var z *Zval = getFunc(arg, &rv)
+			if z.GetType() != IS_OBJECT {
+				ZvalPtrDtor(arg)
+				if z.IsString() {
+					ZVAL_COPY_VALUE(arg, z)
+				} else {
+					arg.SetString(ZvalGetStringFunc(z))
+					ZvalPtrDtor(z)
+				}
+				return arg.GetStr(), true
+			}
+			ZvalPtrDtor(z)
+		}
+		return nil, false
+	} else {
+		return nil, false
+	}
+}

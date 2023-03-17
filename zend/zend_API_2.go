@@ -112,39 +112,11 @@ func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
 }
 
 func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
-	if arg.GetType() < IS_STRING {
-		ConvertToString(arg)
-		*dest = arg.GetStr()
-	} else if arg.IsObject() {
-		if Z_OBJ_HT(*arg).GetCastObject() != nil {
-			var obj Zval
-			if Z_OBJ_HT(*arg).GetCastObject()(arg, &obj, IS_STRING) == SUCCESS {
-				ZvalPtrDtor(arg)
-				ZVAL_COPY_VALUE(arg, &obj)
-				*dest = arg.GetStr()
-				return 1
-			}
-		} else if Z_OBJ_HT(*arg).GetGet() != nil {
-			var rv Zval
-			var z *Zval = Z_OBJ_HT(*arg).GetGet()(arg, &rv)
-			if z.GetType() != IS_OBJECT {
-				ZvalPtrDtor(arg)
-				if z.IsString() {
-					ZVAL_COPY_VALUE(arg, z)
-				} else {
-					arg.SetString(ZvalGetStringFunc(z))
-					ZvalPtrDtor(z)
-				}
-				*dest = arg.GetStr()
-				return 1
-			}
-			ZvalPtrDtor(z)
-		}
-		return 0
-	} else {
-		return 0
+	if val, ok := ParseArgStrWeak(arg); ok {
+		*dest = val
+		return 1
 	}
-	return 1
+	return 0
 }
 func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
 	if CurrEX().IsArgUseStrictTypes() {
