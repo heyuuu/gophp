@@ -877,10 +877,10 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *Zval, string_name *byte
 	var retval int
 	if retval_ptr != nil {
 		pv.SetString(ZendStringAlloc(str_len+b.SizeOf("\"return ;\"")-1, 0))
-		memcpy(Z_STRVAL(pv), "return ", b.SizeOf("\"return \"")-1)
-		memcpy(Z_STRVAL(pv)+b.SizeOf("\"return \"")-1, str, str_len)
-		Z_STRVAL(pv)[Z_STRLEN(pv)-1] = ';'
-		Z_STRVAL(pv)[Z_STRLEN(pv)] = '0'
+		memcpy(pv.GetStr().GetVal(), "return ", b.SizeOf("\"return \"")-1)
+		memcpy(pv.GetStr().GetVal()+b.SizeOf("\"return \"")-1, str, str_len)
+		pv.GetStr().GetVal()[pv.GetStr().GetLen()-1] = ';'
+		pv.GetStr().GetVal()[pv.GetStr().GetLen()] = '0'
 	} else {
 		/*printf("Evaluating '%s'\n", pv.value.str.val);*/
 		pv.SetRawString(b.CastStr(str, str_len))

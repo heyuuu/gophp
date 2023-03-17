@@ -415,11 +415,11 @@ try_again:
 	if dim.GetType() != IS_LONG {
 		switch dim.GetType() {
 		case IS_STRING:
-			if IS_LONG == IsNumericString(Z_STRVAL_P(dim), Z_STRLEN_P(dim), nil, nil, -1) {
+			if IS_LONG == IsNumericString(dim.GetStr().GetVal(), dim.GetStr().GetLen(), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {
-				ZendError(E_WARNING, "Illegal string offset '%s'", Z_STRVAL_P(dim))
+				ZendError(E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
 			}
 		case IS_UNDEF:
 			ZVAL_UNDEFINED_OP2()

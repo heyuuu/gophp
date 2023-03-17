@@ -414,13 +414,13 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if zend.TryConvertToString(&retval) == 0 {
 		return -1
 	}
-	didread = zend.Z_STRLEN(retval)
+	didread = retval.GetStr().GetLen()
 	if didread > 0 {
 		if didread > count {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" read, "+zend.ZEND_LONG_FMT+" max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
 			didread = count
 		}
-		memcpy(buf, zend.Z_STRVAL(retval), didread)
+		memcpy(buf, retval.GetStr().GetVal(), didread)
 	}
 	zend.ZvalPtrDtor(&retval)
 	retval.SetUndef()
@@ -1012,7 +1012,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_FALSE && retval.GetType() != zend.IS_TRUE {
 		zend.ConvertToString(&retval)
-		core.PHP_STRLCPY(ent.GetDName(), zend.Z_STRVAL(retval), b.SizeOf("ent -> d_name"), zend.Z_STRLEN(retval))
+		core.PHP_STRLCPY(ent.GetDName(), retval.GetStr().GetVal(), b.SizeOf("ent -> d_name"), retval.GetStr().GetLen())
 		didread = b.SizeOf("php_stream_dirent")
 	} else if call_result == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_DIR_READ+" is not implemented!", us.GetWrapper().GetClassname())

@@ -418,7 +418,7 @@ try_again:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
 			if zend.ZendDeleteGlobalVariable(offset.GetStr()) != 0 {
-				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
+				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 			}
 		} else {
 			var data *zend.Zval = ht.SymtableFind(offset.GetStr().GetStr())
@@ -426,7 +426,7 @@ try_again:
 				if data.IsType(zend.IS_INDIRECT) {
 					data = data.GetZv()
 					if data.IsType(zend.IS_UNDEF) {
-						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
+						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 					} else {
 						zend.ZvalPtrDtor(data)
 						data.SetUndef()
@@ -437,10 +437,10 @@ try_again:
 						}
 					}
 				} else if ht.SymtableDel(offset.GetStr().GetStr()) == zend.FAILURE {
-					zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
+					zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 				}
 			} else {
-				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
+				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 			}
 		}
 	case zend.IS_DOUBLE:

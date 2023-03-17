@@ -79,13 +79,13 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	*pce = ZendLookupClass(arg.GetStr())
 	if ce_base != nil {
 		if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-			ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", GetActiveCalleeName(), num, ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
+			ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", GetActiveCalleeName(), num, ce_base.GetName().GetVal(), arg.GetStr().GetVal())
 			*pce = nil
 			return 0
 		}
 	}
 	if (*pce) == nil {
-		ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", GetActiveCalleeName(), num, Z_STRVAL_P(arg))
+		ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", GetActiveCalleeName(), num, arg.GetStr().GetVal())
 		return 0
 	}
 	return 1
@@ -410,13 +410,13 @@ func ZendParseArgImpl_Ex(arg *Zval, va *b.VaList, spec *b.StrReader, error **byt
 		}
 		if ce_base != nil {
 			if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-				ZendSpprintf(error, 0, "to be a class name derived from %s, '%s' given", ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
+				ZendSpprintf(error, 0, "to be a class name derived from %s, '%s' given", ce_base.GetName().GetVal(), arg.GetStr().GetVal())
 				*pce = nil
 				return ""
 			}
 		}
 		if (*pce) == nil {
-			ZendSpprintf(error, 0, "to be a valid class name, '%s' given", Z_STRVAL_P(arg))
+			ZendSpprintf(error, 0, "to be a valid class name, '%s' given", arg.GetStr().GetVal())
 			return ""
 		}
 		break

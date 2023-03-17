@@ -146,12 +146,12 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 			return
 		}
 		if PhpMailBuildHeadersCheckFieldValue(val) != zend.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), zend.Z_STRVAL_P(val))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.GetStr().GetVal())
 			return
 		}
 		s.AppendString(key.GetStr())
 		s.AppendString(": ")
-		s.AppendString(b.CastStrAuto(zend.Z_STRVAL_P(val)))
+		s.AppendString(b.CastStrAuto(val.GetStr().GetVal()))
 		s.AppendString("\r\n")
 	case zend.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)
@@ -390,7 +390,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if headers != nil {
 		switch headers.GetType() {
 		case zend.IS_STRING:
-			tmp_headers = zend.ZendStringInit(zend.Z_STRVAL_P(headers), zend.Z_STRLEN_P(headers), 0)
+			tmp_headers = zend.ZendStringInit(headers.GetStr().GetVal(), headers.GetStr().GetLen(), 0)
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = PhpTrim(tmp_headers, nil, 0, 2)
 			zend.ZendStringReleaseEx(tmp_headers, 0)

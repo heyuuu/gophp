@@ -981,18 +981,18 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			var c byte
 			var s *byte
 			var p *byte
-			if b.Assign(&p, strchr(zend.Z_STRVAL_P(hdr), ':')) {
+			if b.Assign(&p, strchr(hdr.GetStr().GetVal(), ':')) {
 				c = *p
 				*p = '0'
 				s = p + 1
 				for isspace(int(*((*uint8)(s)))) {
 					s++
 				}
-				if b.Assign(&prev_val, return_value.GetArr().KeyFind(b.CastStr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr)))) == nil {
-					zend.AddAssocStringlEx(return_value, b.CastStr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr)), b.CastStr(s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr))))
+				if b.Assign(&prev_val, return_value.GetArr().KeyFind(b.CastStr(hdr.GetStr().GetVal(), p-hdr.GetStr().GetVal()))) == nil {
+					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.GetStr().GetVal(), p-hdr.GetStr().GetVal()), b.CastStr(s, hdr.GetStr().GetLen()-(s-hdr.GetStr().GetVal())))
 				} else {
 					zend.ConvertToArray(prev_val)
-					zend.AddNextIndexStringl(prev_val, s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
+					zend.AddNextIndexStringl(prev_val, s, hdr.GetStr().GetLen()-(s-hdr.GetStr().GetVal()))
 				}
 				*p = c
 			} else {

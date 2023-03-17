@@ -1767,7 +1767,7 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			AddConfigEntries(retval.GetArr(), return_value)
 			return
 		} else {
-			return_value.SetRawString(b.CastStrAuto(zend.Z_STRVAL_P(retval)))
+			return_value.SetRawString(b.CastStrAuto(retval.GetStr().GetVal()))
 			return
 		}
 	} else {
@@ -2401,9 +2401,9 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 			var obj *zend.Zval
 			var method *zend.Zval
 			if function.IsType(zend.IS_STRING) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s() - function does not exist", zend.Z_STRVAL_P(function))
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s() - function does not exist", function.GetStr().GetVal())
 			} else if function.IsType(zend.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFindH(0)) != nil && b.Assign(&method, function.GetArr().IndexFindH(1)) != nil && obj.IsType(zend.IS_OBJECT) && method.IsType(zend.IS_STRING) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", zend.Z_OBJCE_P(obj).GetName().GetVal(), zend.Z_STRVAL_P(method))
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", zend.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call tick function")
 			}
@@ -4190,8 +4190,8 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			/* bare string - nothing to do */
 
 		}
-		if !(zend.Z_STRLEN_P(arg1) > 1 && zend.Z_STRVAL_P(arg1)[0] == '0') && zend.IsNumericString(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1), nil, nil, 0) == zend.IS_LONG {
-			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1)))
+		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetVal(), arg1.GetStr().GetLen(), nil, nil, 0) == zend.IS_LONG {
+			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()))
 			if b.Assign(&find_hash, arr.GetArr().IndexFindH(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.GetArr().IndexAddNewH(key, &hash)
@@ -4206,7 +4206,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || arg3.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(arg3) == 0 {
+		if arg3 == nil || arg3.IsType(zend.IS_STRING) && arg3.GetStr().GetLen() == 0 {
 			arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {

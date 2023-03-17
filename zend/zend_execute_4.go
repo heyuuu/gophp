@@ -155,7 +155,7 @@ func ZendUndefinedMethod(ce *ZendClassEntry, method *ZendString) {
 	ZendThrowError(nil, "Call to undefined method %s::%s()", ce.GetName().GetVal(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *Zval, function_name *Zval) {
-	ZendThrowError(nil, "Call to a member function %s() on %s", Z_STRVAL_P(function_name), ZendGetTypeByConst(object.GetType()))
+	ZendThrowError(nil, "Call to a member function %s() on %s", function_name.GetStr().GetVal(), ZendGetTypeByConst(object.GetType()))
 }
 func ZendNonStaticMethodCall(fbc *ZendFunction) {
 	if fbc.IsAllowStatic() {

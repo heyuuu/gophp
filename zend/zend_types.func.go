@@ -76,17 +76,10 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 func Z_FE_ITER_P(zval_p *Zval) uint32      { return zval_p.GetFeIterIdx() }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
 
-func GC_IS_RECURSIVE(p *HashTable) bool   { return p.IsRecursive() }
-func GC_PROTECT_RECURSION(p *HashTable)   { p.ProtectRecursive() }
-func GC_UNPROTECT_RECURSION(p *HashTable) { p.UnprotectRecursive() }
-
 func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool        { return zval_p.IsRefcounted() }
 func Z_ISREF_P(zval_p *Zval) bool                 { return zval_p.IsReference() }
 func Z_STR_P(zval_p *Zval) *ZendString            { return zval_p.GetStr() }
-func Z_STRVAL(zval Zval) []byte                   { return zval.GetStr().GetVal() }
 func Z_STRVAL_P(zval_p *Zval) []byte              { return zval_p.GetStr().GetVal() }
-func Z_STRLEN(zval Zval) int                      { return zval.GetStr().GetLen() }
-func Z_STRLEN_P(zval_p *Zval) int                 { return zval_p.GetStr().GetLen() }
 func Z_ARRVAL(zval Zval) *ZendArray               { return zval.GetArr() }
 func Z_ARRVAL_P(zval_p *Zval) *ZendArray          { return zval_p.GetArr() }
 func Z_OBJ(zval Zval) *ZendObject                 { return zval.GetObj() }

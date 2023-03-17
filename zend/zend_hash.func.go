@@ -874,7 +874,7 @@ func ZendHashCompare(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, ordere
 	 * false recursion detection.
 	 */
 
-	if GC_IS_RECURSIVE(ht1) {
+	if ht1.IsRecursive() {
 		ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 	}
 

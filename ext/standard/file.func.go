@@ -730,10 +730,10 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		zend.ConvertToStringEx(data)
 		fallthrough
 	case zend.IS_STRING:
-		if zend.Z_STRLEN_P(data) != 0 {
-			numbytes = core.PhpStreamWrite(stream, zend.Z_STRVAL_P(data), zend.Z_STRLEN_P(data))
-			if numbytes != zend.Z_STRLEN_P(data) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, zend.Z_STRLEN_P(data))
+		if data.GetStr().GetLen() != 0 {
+			numbytes = core.PhpStreamWrite(stream, data.GetStr().GetVal(), data.GetStr().GetLen())
+			if numbytes != data.GetStr().GetLen() {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.GetStr().GetLen())
 				numbytes = -1
 			}
 		}
@@ -765,9 +765,9 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		if zend.Z_OBJ_HT_P(data) != nil {
 			var out zend.Zval
 			if zend.ZendStdCastObjectTostring(data, &out, zend.IS_STRING) == zend.SUCCESS {
-				numbytes = core.PhpStreamWrite(stream, zend.Z_STRVAL(out), zend.Z_STRLEN(out))
-				if numbytes != zend.Z_STRLEN(out) {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, zend.Z_STRLEN(out))
+				numbytes = core.PhpStreamWrite(stream, out.GetStr().GetVal(), out.GetStr().GetLen())
+				if numbytes != out.GetStr().GetLen() {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.GetStr().GetLen())
 					numbytes = -1
 				}
 				zend.ZvalPtrDtorStr(&out)

@@ -129,11 +129,11 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* PHP and Zend extensions are not added into configuration hash! */
 
-		if IsSpecialSection == 0 && !(strcasecmp(zend.Z_STRVAL_P(arg1), PHP_EXTENSION_TOKEN)) {
-			extension_name = zend.Estrndup(zend.Z_STRVAL_P(arg2), zend.Z_STRLEN_P(arg2))
+		if IsSpecialSection == 0 && !(strcasecmp(arg1.GetStr().GetVal(), PHP_EXTENSION_TOKEN)) {
+			extension_name = zend.Estrndup(arg2.GetStr().GetVal(), arg2.GetStr().GetLen())
 			ExtensionLists.GetFunctions().AddElement(&extension_name)
-		} else if IsSpecialSection == 0 && !(strcasecmp(zend.Z_STRVAL_P(arg1), ZEND_EXTENSION_TOKEN)) {
-			extension_name = zend.Estrndup(zend.Z_STRVAL_P(arg2), zend.Z_STRLEN_P(arg2))
+		} else if IsSpecialSection == 0 && !(strcasecmp(arg1.GetStr().GetVal(), ZEND_EXTENSION_TOKEN)) {
+			extension_name = zend.Estrndup(arg2.GetStr().GetVal(), arg2.GetStr().GetLen())
 			ExtensionLists.GetEngine().AddElement(&extension_name)
 		} else {
 
@@ -168,7 +168,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* arg3 is possible option offset name */
 
-		if arg3 != nil && zend.Z_STRLEN_P(arg3) > 0 {
+		if arg3 != nil && arg3.GetStr().GetLen() > 0 {
 			entry = find_arr.GetArr().SymtableUpdate(arg3.GetStr().GetStr(), arg2)
 		} else {
 			entry = find_arr.GetArr().NextIndexInsert(arg2)
@@ -183,10 +183,10 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* PATH sections */
 
-		if zend.ZendBinaryStrncasecmp(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1), "PATH", b.SizeOf("\"PATH\"")-1, b.SizeOf("\"PATH\"")-1) == 0 {
-			key = zend.Z_STRVAL_P(arg1)
+		if zend.ZendBinaryStrncasecmp(arg1.GetStr().GetVal(), arg1.GetStr().GetLen(), "PATH", b.SizeOf("\"PATH\"")-1, b.SizeOf("\"PATH\"")-1) == 0 {
+			key = arg1.GetStr().GetVal()
 			key = key + b.SizeOf("\"PATH\"") - 1
-			key_len = zend.Z_STRLEN_P(arg1) - b.SizeOf("\"PATH\"") + 1
+			key_len = arg1.GetStr().GetLen() - b.SizeOf("\"PATH\"") + 1
 			IsSpecialSection = 1
 			HasPerDirConfig = 1
 
@@ -194,10 +194,10 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 			/* make the path lowercase on Windows, for case insensitivity. Does nothing for other platforms */
 
-		} else if zend.ZendBinaryStrncasecmp(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1), "HOST", b.SizeOf("\"HOST\"")-1, b.SizeOf("\"HOST\"")-1) == 0 {
-			key = zend.Z_STRVAL_P(arg1)
+		} else if zend.ZendBinaryStrncasecmp(arg1.GetStr().GetVal(), arg1.GetStr().GetLen(), "HOST", b.SizeOf("\"HOST\"")-1, b.SizeOf("\"HOST\"")-1) == 0 {
+			key = arg1.GetStr().GetVal()
 			key = key + b.SizeOf("\"HOST\"") - 1
-			key_len = zend.Z_STRLEN_P(arg1) - b.SizeOf("\"HOST\"") + 1
+			key_len = arg1.GetStr().GetLen() - b.SizeOf("\"HOST\"") + 1
 			IsSpecialSection = 1
 			HasPerHostConfig = 1
 			zend.ZendStrTolower(key, key_len)
@@ -439,7 +439,7 @@ func PhpInitConfig() int {
 		} else {
 			zend.Efree((*byte)(fh.GetFilename()))
 		}
-		PhpIniOpenedPath = zend.ZendStrndup(zend.Z_STRVAL(tmp), zend.Z_STRLEN(tmp))
+		PhpIniOpenedPath = zend.ZendStrndup(tmp.GetStr().GetVal(), tmp.GetStr().GetLen())
 	}
 
 	/* Check for PHP_INI_SCAN_DIR environment variable to override/set config file scan directory */
@@ -700,6 +700,6 @@ func CfgGetString(varname *byte, result **byte) int {
 		*result = nil
 		return zend.FAILURE
 	}
-	*result = zend.Z_STRVAL_P(tmp)
+	*result = tmp.GetStr().GetVal()
 	return zend.SUCCESS
 }

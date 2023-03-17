@@ -156,9 +156,7 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		}
 		return
 	}
-	if offset < -ZendLong(Z_STRLEN_P(str)) {
-
-		/* Error on negative offset */
+	if offset < -ZendLong(str.GetStr().GetLen()) {
 
 		ZendError(E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
 		if RETURN_VALUE_USED(opline) {
@@ -181,8 +179,8 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		c = ZendUchar(tmp.GetVal()[0])
 		ZendStringReleaseEx(tmp, 0)
 	} else {
-		string_len = Z_STRLEN_P(value)
-		c = ZendUchar(Z_STRVAL_P(value)[0])
+		string_len = value.GetStr().GetLen()
+		c = ZendUchar(value.GetStr().GetVal()[0])
 	}
 	if string_len == 0 {
 
@@ -195,25 +193,23 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		return
 	}
 	if offset < 0 {
-		offset += ZendLong(Z_STRLEN_P(str))
+		offset += ZendLong(str.GetStr().GetLen())
 	}
-	if int(offset >= Z_STRLEN_P(str)) != 0 {
+	if int(offset >= str.GetStr().GetLen()) != 0 {
 
-		/* Extend string if needed */
-
-		var old_len ZendLong = Z_STRLEN_P(str)
+		var old_len ZendLong = str.GetStr().GetLen()
 		str.SetString(ZendStringExtend(str.GetStr(), offset+1, 0))
-		memset(Z_STRVAL_P(str)+old_len, ' ', offset-old_len)
-		Z_STRVAL_P(str)[offset+1] = 0
+		memset(str.GetStr().GetVal()+old_len, ' ', offset-old_len)
+		str.GetStr().GetVal()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
-		str.SetString(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
+		str.SetString(ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		str.SetString(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
+		str.SetString(ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
 	} else {
 		ZendStringForgetHashVal(str.GetStr())
 	}
-	Z_STRVAL_P(str)[offset] = c
+	str.GetStr().GetVal()[offset] = c
 	if RETURN_VALUE_USED(opline) {
 
 		/* Return the new character */

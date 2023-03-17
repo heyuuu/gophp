@@ -254,7 +254,7 @@ func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, executeData *Z
 		ref = object
 		object = Z_REFVAL_P(object)
 	}
-	if object.GetType() > IS_FALSE && (object.GetType() != IS_STRING || Z_STRLEN_P(object) != 0) {
+	if object.GetType() > IS_FALSE && (object.GetType() != IS_STRING || object.GetStr().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var tmp_property_name *ZendString
 			var property_name *ZendString = ZvalGetTmpString(property, &tmp_property_name)

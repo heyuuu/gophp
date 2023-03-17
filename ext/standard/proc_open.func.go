@@ -578,7 +578,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	} else {
 		zend.ConvertToString(command_zv)
-		command = zend.Pestrdup(zend.Z_STRVAL_P(command_zv), is_persistent)
+		command = zend.Pestrdup(command_zv.GetStr().GetVal(), is_persistent)
 	}
 	if environment != nil {
 		env = _phpArrayToEnvp(environment, is_persistent)
@@ -630,7 +630,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Missing handle qualifier in array")
 				goto exit_fail
 			}
-			if strcmp(zend.Z_STRVAL_P(ztype), "pipe") == 0 {
+			if strcmp(ztype.GetStr().GetVal(), "pipe") == 0 {
 				var newpipe []PhpFileDescriptorT
 				var zmode *zend.Zval
 				if b.Assign(&zmode, descitem.GetArr().IndexFindH(1)) != nil {
@@ -646,7 +646,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "unable to create pipe %s", strerror(errno))
 					goto exit_fail
 				}
-				if strncmp(zend.Z_STRVAL_P(zmode), "w", 1) != 0 {
+				if strncmp(zmode.GetStr().GetVal(), "w", 1) != 0 {
 					descriptors[ndesc].SetParentend(newpipe[1])
 					descriptors[ndesc].SetChildend(newpipe[0])
 					descriptors[ndesc].SetMode(descriptors[ndesc].GetMode() | DESC_PARENT_MODE_WRITE)
@@ -659,7 +659,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				} else {
 					descriptors[ndesc].SetModeFlags(O_RDONLY)
 				}
-			} else if strcmp(zend.Z_STRVAL_P(ztype), "file") == 0 {
+			} else if strcmp(ztype.GetStr().GetVal(), "file") == 0 {
 				var zfile *zend.Zval
 				var zmode *zend.Zval
 				var fd core.PhpSocketT
@@ -684,7 +684,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 				/* try a wrapper */
 
-				stream = core.PhpStreamOpenWrapper(zend.Z_STRVAL_P(zfile), zend.Z_STRVAL_P(zmode), core.REPORT_ERRORS|core.STREAM_WILL_CAST, nil)
+				stream = core.PhpStreamOpenWrapper(zfile.GetStr().GetVal(), zmode.GetStr().GetVal(), core.REPORT_ERRORS|core.STREAM_WILL_CAST, nil)
 
 				/* force into an fd */
 
@@ -692,7 +692,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					goto exit_fail
 				}
 				descriptors[ndesc].SetChildend(fd)
-			} else if strcmp(zend.Z_STRVAL_P(ztype), "redirect") == 0 {
+			} else if strcmp(ztype.GetStr().GetVal(), "redirect") == 0 {
 				var ztarget *zend.Zval = zend.ZendHashIndexFindDeref(descitem.GetArr(), 1)
 				var target *PhpProcOpenDescriptorItem = nil
 				var childend PhpFileDescriptorT
@@ -733,18 +733,18 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					goto exit_fail
 				}
 				descriptors[ndesc].SetMode(DESC_REDIRECT)
-			} else if strcmp(zend.Z_STRVAL_P(ztype), "null") == 0 {
+			} else if strcmp(ztype.GetStr().GetVal(), "null") == 0 {
 				descriptors[ndesc].SetChildend(open("/dev/null", O_RDWR))
 				if descriptors[ndesc].GetChildend() < 0 {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to open /dev/null - %s", strerror(errno))
 					goto exit_fail
 				}
 				descriptors[ndesc].SetMode(DESC_FILE)
-			} else if strcmp(zend.Z_STRVAL_P(ztype), "pty") == 0 {
+			} else if strcmp(ztype.GetStr().GetVal(), "pty") == 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "pty pseudo terminal not supported on this system")
 				goto exit_fail
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s is not a valid descriptor spec/mode", zend.Z_STRVAL_P(ztype))
+				core.PhpErrorDocref(nil, zend.E_WARNING, "%s is not a valid descriptor spec/mode", ztype.GetStr().GetVal())
 				goto exit_fail
 			}
 		}

@@ -302,8 +302,8 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 	if zend.TryConvertToString(z_format) == 0 {
 		return nil
 	}
-	format = zend.Z_STRVAL_P(z_format)
-	format_len = zend.Z_STRLEN_P(z_format)
+	format = z_format.GetStr().GetVal()
+	format_len = z_format.GetStr().GetLen()
 	result = zend.ZendStringAlloc(size, 0)
 	currarg = 0
 	for format_len != 0 {

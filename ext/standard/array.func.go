@@ -2715,12 +2715,12 @@ func PhpValidVarName(var_name *byte, var_name_len int) int {
 	return 1
 }
 func PhpPrefixVarname(result *zend.Zval, prefix *zend.Zval, var_name *byte, var_name_len int, add_underscore zend.ZendBool) int {
-	result.SetString(zend.ZendStringAlloc(zend.Z_STRLEN_P(prefix)+b.Cond(add_underscore != 0, 1, 0)+var_name_len, 0))
-	memcpy(zend.Z_STRVAL_P(result), zend.Z_STRVAL_P(prefix), zend.Z_STRLEN_P(prefix))
+	result.SetString(zend.ZendStringAlloc(prefix.GetStr().GetLen()+b.Cond(add_underscore != 0, 1, 0)+var_name_len, 0))
+	memcpy(result.GetStr().GetVal(), prefix.GetStr().GetVal(), prefix.GetStr().GetLen())
 	if add_underscore != 0 {
-		zend.Z_STRVAL_P(result)[zend.Z_STRLEN_P(prefix)] = '_'
+		result.GetStr().GetVal()[prefix.GetStr().GetLen()] = '_'
 	}
-	memcpy(zend.Z_STRVAL_P(result)+zend.Z_STRLEN_P(prefix)+b.Cond(add_underscore != 0, 1, 0), var_name, var_name_len+1)
+	memcpy(result.GetStr().GetVal()+prefix.GetStr().GetLen()+b.Cond(add_underscore != 0, 1, 0), var_name, var_name_len+1)
 	return zend.SUCCESS
 }
 func PhpExtractRefIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.ZendLong {
@@ -2956,7 +2956,7 @@ func PhpExtractRefPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArr
 				}
 			}
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-			if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) != 0 {
+			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if zend.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
 					zend.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
@@ -3014,7 +3014,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 				}
 			}
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-			if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) != 0 {
+			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if zend.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
 					zend.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
@@ -3081,7 +3081,7 @@ func PhpExtractRefPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 			}
 		prefix:
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-			if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) != 0 {
+			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if zend.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
 					zend.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
@@ -3157,7 +3157,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 			}
 		prefix:
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-			if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) != 0 {
+			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if zend.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
 					zend.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
@@ -3224,7 +3224,7 @@ func PhpExtractRefPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, p
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			zend.ZendStringReleaseEx(str, 0)
 		}
-		if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) != 0 {
+		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if zend.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
 				zend.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
@@ -3279,7 +3279,7 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			zend.ZendStringReleaseEx(str, 0)
 		}
-		if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) != 0 {
+		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if zend.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
 				zend.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
@@ -3327,7 +3327,7 @@ func PhpExtractRefPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArra
 		if var_name != nil {
 			if PhpValidVarName(var_name.GetVal(), var_name.GetLen()) == 0 || zend.ZendStringEqualsLiteral(var_name, "this") {
 				PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-				if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) == 0 {
+				if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
 					zend.ZvalPtrDtorStr(&final_name)
 					continue
 				}
@@ -3338,7 +3338,7 @@ func PhpExtractRefPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArra
 			var str *zend.ZendString = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			zend.ZendStringReleaseEx(str, 0)
-			if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) == 0 {
+			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
 				zend.ZvalPtrDtorStr(&final_name)
 				continue
 			}
@@ -3389,7 +3389,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 		if var_name != nil {
 			if PhpValidVarName(var_name.GetVal(), var_name.GetLen()) == 0 || zend.ZendStringEqualsLiteral(var_name, "this") {
 				PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-				if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) == 0 {
+				if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
 					zend.ZvalPtrDtorStr(&final_name)
 					continue
 				}
@@ -3400,7 +3400,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 			var str *zend.ZendString = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			zend.ZendStringReleaseEx(str, 0)
-			if PhpValidVarName(zend.Z_STRVAL(final_name), zend.Z_STRLEN(final_name)) == 0 {
+			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
 				zend.ZvalPtrDtorStr(&final_name)
 				continue
 			}
@@ -3623,7 +3623,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		if zend.TryConvertToString(prefix) == 0 {
 			return
 		}
-		if zend.Z_STRLEN_P(prefix) != 0 && PhpValidVarName(zend.Z_STRVAL_P(prefix), zend.Z_STRLEN_P(prefix)) == 0 {
+		if prefix.GetStr().GetLen() != 0 && PhpValidVarName(prefix.GetStr().GetVal(), prefix.GetStr().GetLen()) == 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "prefix is not a valid identifier")
 			return
 		}
@@ -4131,7 +4131,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		if zstep.IsType(zend.IS_DOUBLE) {
 			is_step_double = 1
 		} else if zstep.IsType(zend.IS_STRING) {
-			var type_ int = zend.IsNumericString(zend.Z_STRVAL_P(zstep), zend.Z_STRLEN_P(zstep), nil, nil, 0)
+			var type_ int = zend.IsNumericString(zstep.GetStr().GetVal(), zstep.GetStr().GetLen(), nil, nil, 0)
 			if type_ == zend.IS_DOUBLE {
 				is_step_double = 1
 			}
@@ -4158,21 +4158,21 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* If the range is given as strings, generate an array of characters. */
 
-	if zlow.IsType(zend.IS_STRING) && zhigh.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(zlow) >= 1 && zend.Z_STRLEN_P(zhigh) >= 1 {
+	if zlow.IsType(zend.IS_STRING) && zhigh.IsType(zend.IS_STRING) && zlow.GetStr().GetLen() >= 1 && zhigh.GetStr().GetLen() >= 1 {
 		var type1 int
 		var type2 int
 		var low uint8
 		var high uint8
 		var lstep zend.ZendLong = zend.ZendLong(step)
-		type1 = zend.IsNumericString(zend.Z_STRVAL_P(zlow), zend.Z_STRLEN_P(zlow), nil, nil, 0)
-		type2 = zend.IsNumericString(zend.Z_STRVAL_P(zhigh), zend.Z_STRLEN_P(zhigh), nil, nil, 0)
+		type1 = zend.IsNumericString(zlow.GetStr().GetVal(), zlow.GetStr().GetLen(), nil, nil, 0)
+		type2 = zend.IsNumericString(zhigh.GetStr().GetVal(), zhigh.GetStr().GetLen(), nil, nil, 0)
 		if type1 == zend.IS_DOUBLE || type2 == zend.IS_DOUBLE || is_step_double != 0 {
 			goto double_str
 		} else if type1 == zend.IS_LONG || type2 == zend.IS_LONG {
 			goto long_str
 		}
-		low = uint8(zend.Z_STRVAL_P(zlow)[0])
-		high = uint8(zend.Z_STRVAL_P(zhigh)[0])
+		low = uint8(zlow.GetStr().GetVal()[0])
+		high = uint8(zhigh.GetStr().GetVal()[0])
 		if low > high {
 			if lstep <= 0 {
 				err = 1

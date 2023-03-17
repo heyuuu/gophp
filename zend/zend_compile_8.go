@@ -738,7 +738,7 @@ func ZendCompileEncapsList(result *Znode, ast *ZendAst) {
 		ZendCompileExpr(&elem_node, list.GetChild()[i])
 		if elem_node.GetOpType() == IS_CONST {
 			ConvertToString(elem_node.GetConstant())
-			if Z_STRLEN(elem_node.GetConstant()) == 0 {
+			if elem_node.GetConstant().GetStr().GetLen() == 0 {
 				ZvalPtrDtor(elem_node.GetConstant())
 			} else if last_const_node.GetOpType() == IS_CONST {
 				ConcatFunction(last_const_node.GetConstant(), last_const_node.GetConstant(), elem_node.GetConstant())

@@ -278,8 +278,8 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	if base == 0 || base == 2 {
-		var strval *byte = zend.Z_STRVAL_P(num)
-		var strlen int = zend.Z_STRLEN_P(num)
+		var strval *byte = num.GetStr().GetVal()
+		var strlen int = num.GetStr().GetLen()
 		for isspace(*strval) && strlen != 0 {
 			strval++
 			strlen--
@@ -316,7 +316,7 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Length of 3+ covers "0b#" and "-0b" (which results in 0) */
 
 	}
-	return_value.SetLong(zend.ZEND_STRTOL(zend.Z_STRVAL_P(num), nil, base))
+	return_value.SetLong(zend.ZEND_STRTOL(num.GetStr().GetVal(), nil, base))
 }
 func ZifFloatval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num *zend.Zval
@@ -764,7 +764,7 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetTrue()
 		return
 	case zend.IS_STRING:
-		if zend.IsNumericString(zend.Z_STRVAL_P(arg), zend.Z_STRLEN_P(arg), nil, nil, 0) != 0 {
+		if zend.IsNumericString(arg.GetStr().GetVal(), arg.GetStr().GetLen(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
 		} else {

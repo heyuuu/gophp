@@ -606,13 +606,13 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			var c ZendUchar
 			if dim.IsLong() {
 				offset = dim.GetLval()
-			} else if dim.GetType() != IS_STRING || IsNumericString(Z_STRVAL_P(dim), Z_STRLEN_P(dim), &offset, nil, 1) != IS_LONG {
+			} else if dim.GetType() != IS_STRING || IsNumericString(dim.GetStr().GetVal(), dim.GetStr().GetLen(), &offset, nil, 1) != IS_LONG {
 				return
 			}
-			if offset < 0 || int(offset >= Z_STRLEN_P(container)) != 0 {
+			if offset < 0 || int(offset >= container.GetStr().GetLen()) != 0 {
 				return
 			}
-			c = ZendUchar(Z_STRVAL_P(container)[offset])
+			c = ZendUchar(container.GetStr().GetVal()[offset])
 			result.SetInternedString(ZSTR_CHAR(c))
 		} else if container.GetType() <= IS_FALSE {
 			result.SetNull()

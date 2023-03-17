@@ -785,7 +785,7 @@ func PhpSplObjectHash(obj *zend.Zval) *zend.ZendString {
 }
 func SplBuildClassListString(entry *zend.Zval, list **byte) {
 	var res *byte
-	core.Spprintf(&res, 0, "%s, %s", *list, zend.Z_STRVAL_P(entry))
+	core.Spprintf(&res, 0, "%s, %s", *list, entry.GetStr().GetVal())
 	zend.Efree(*list)
 	*list = res
 }

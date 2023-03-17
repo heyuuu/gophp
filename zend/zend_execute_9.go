@@ -31,8 +31,8 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			}
 		} else if EG__().GetException() != nil {
 			break
-		} else if strlen(Z_STRVAL_P(inc_filename)) != Z_STRLEN_P(inc_filename) {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
+		} else if strlen(inc_filename.GetStr().GetVal()) != inc_filename.GetStr().GetLen() {
+			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.GetStr().GetVal())
 			break
 		} else {
 			*resolved_path = inc_filename.GetStr().GetStr()
@@ -54,13 +54,13 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}
 		} else {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
+			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.GetStr().GetVal())
 		}
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
-		if strlen(Z_STRVAL_P(inc_filename)) != Z_STRLEN_P(inc_filename) {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
+		if strlen(inc_filename.GetStr().GetVal()) != inc_filename.GetStr().GetLen() {
+			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.GetStr().GetVal())
 			break
 		}
 		new_op_array = CompileFilename(type_, inc_filename)
@@ -169,22 +169,18 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(ZendMemrchr(Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())), '\\', Z_STRLEN_P(RT_CONSTANT(opline, opline.GetOp2()))))
+				var actual *byte = (*byte)(ZendMemrchr(RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal(), '\\', RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()))
 				if actual == nil {
 					EX_VAR(opline.GetResult().GetVar()).SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
 				} else {
 					actual++
-					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(actual, Z_STRLEN_P(RT_CONSTANT(opline, opline.GetOp2()))-(actual-Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))))
+					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
 				}
 
-				/* non-qualified constant - allow text substitution */
-
-				ZendError(E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", Z_STRVAL_P(EX_VAR(opline.GetResult().GetVar())), Z_STRVAL_P(EX_VAR(opline.GetResult().GetVar())))
-
-				/* non-qualified constant - allow text substitution */
+				ZendError(E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal(), EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal())
 
 			} else {
-				ZendThrowError(nil, "Undefined constant '%s'", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+				ZendThrowError(nil, "Undefined constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			}
 		}
@@ -222,7 +218,7 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 					shortname_offset = 0
 					shortname_len = c.GetName().GetLen()
 				}
-				is_deprecated = memcmp(c.GetName().GetVal()+shortname_offset, Z_STRVAL_P(orig_key-1)+shortname_offset, shortname_len) != 0
+				is_deprecated = memcmp(c.GetName().GetVal()+shortname_offset, (orig_key-1).GetStr().GetVal()+shortname_offset, shortname_len) != 0
 			}
 			if is_deprecated != 0 {
 				ZendError(E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())

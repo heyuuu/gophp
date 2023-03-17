@@ -866,7 +866,7 @@ yy18:
 				zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref(nil, zend.E_WARNING, "defined (%s) but not found", zend.Z_STRVAL(user_func))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "defined (%s) but not found", user_func.GetStr().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			zend.ZvalPtrDtor(&user_func)
@@ -886,7 +886,7 @@ yy18:
 
 		BG(serialize_lock)++
 		if b.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Function %s() hasn't defined the class it was called for", zend.Z_STRVAL(user_func))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.GetStr().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}

@@ -898,7 +898,7 @@ func ZendAstVarNeedsBraces(ch byte) int {
 func ZendAstExportVar(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *Zval = ZendAstGetZval(ast)
-		if zv.IsString() && ZendAstValidVarName(Z_STRVAL_P(zv), Z_STRLEN_P(zv)) != 0 {
+		if zv.IsString() && ZendAstValidVarName(zv.GetStr().GetVal(), zv.GetStr().GetLen()) != 0 {
 			str.AppendString(zv.GetStr().GetStr())
 			return
 		}

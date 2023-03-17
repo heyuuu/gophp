@@ -165,13 +165,13 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
-		myeval = zend.Z_STRVAL_P(assertion)
+		myeval = assertion.GetStr().GetVal()
 		if ASSERTG(quiet_eval) {
 			old_error_reporting = zend.EG__().GetErrorReporting()
 			zend.EG__().SetErrorReporting(0)
 		}
 		compiled_string_description = zend.ZendMakeCompiledStringDescription("assert code")
-		if zend.ZendEvalStringl(myeval, zend.Z_STRLEN_P(assertion), &retval, compiled_string_description) == zend.FAILURE {
+		if zend.ZendEvalStringl(myeval, assertion.GetStr().GetLen(), &retval, compiled_string_description) == zend.FAILURE {
 			zend.Efree(compiled_string_description)
 			if description == nil {
 				zend.ZendThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)

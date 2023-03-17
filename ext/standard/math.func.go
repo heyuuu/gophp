@@ -2459,8 +2459,8 @@ func _phpMathBasetolong(arg *zend.Zval, base int) zend.ZendLong {
 	if arg.GetType() != zend.IS_STRING || base < 2 || base > 36 {
 		return 0
 	}
-	s = zend.Z_STRVAL_P(arg)
-	for i = zend.Z_STRLEN_P(arg); i > 0; i-- {
+	s = arg.GetStr().GetVal()
+	for i = arg.GetStr().GetLen(); i > 0; i-- {
 		*s++
 		c = (*s) - 1
 		if b.Cond(b.Cond(c >= '0' && c <= '9', c-'0', c >= 'A' && c <= 'Z'), c-'A'+10, c >= 'a' && c <= 'z') {
@@ -2494,10 +2494,8 @@ func _phpMathBasetozval(arg *zend.Zval, base int, ret *zend.Zval) int {
 	if arg.GetType() != zend.IS_STRING || base < 2 || base > 36 {
 		return zend.FAILURE
 	}
-	s = zend.Z_STRVAL_P(arg)
-	e = s + zend.Z_STRLEN_P(arg)
-
-	/* Skip leading whitespace */
+	s = arg.GetStr().GetVal()
+	e = s + arg.GetStr().GetLen()
 
 	for s < e && isspace(*s) {
 		s++

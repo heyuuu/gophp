@@ -96,7 +96,7 @@ func ZifSha1(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	} else {
 		return_value.SetString(zend.ZendStringAlloc(40, 0))
-		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 20)
+		MakeDigestEx(return_value.GetStr().GetVal(), digest, 20)
 	}
 }
 func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -198,7 +198,7 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	} else {
 		return_value.SetString(zend.ZendStringAlloc(40, 0))
-		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 20)
+		MakeDigestEx(return_value.GetStr().GetVal(), digest, 20)
 	}
 }
 func ROTATE_LEFT(x uint32, n int) int { return x<<n | x>>32 - n }

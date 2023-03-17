@@ -364,7 +364,7 @@ func TRACE_APPEND_KEY(key *ZendString) {
 			ZendError(E_WARNING, "Value for %s is no string", key.GetVal())
 			str.AppendString("[unknown]")
 		} else {
-			str.AppendString(b.CastStrAuto(Z_STRVAL_P(tmp)))
+			str.AppendString(b.CastStrAuto(tmp.GetStr().GetVal()))
 		}
 	}
 }
@@ -381,8 +381,8 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		str.AppendString("NULL, ")
 	case IS_STRING:
 		str.AppendByte('\'')
-		SmartStrAppendEscaped(str, Z_STRVAL_P(arg), b.Min(Z_STRLEN_P(arg), 15))
-		if Z_STRLEN_P(arg) > 15 {
+		SmartStrAppendEscaped(str, arg.GetStr().GetVal(), b.Min(arg.GetStr().GetLen(), 15))
+		if arg.GetStr().GetLen() > 15 {
 			str.AppendString("...', ")
 		} else {
 			str.AppendString("', ")
@@ -551,9 +551,9 @@ func zim_exception___toString(executeData *ZendExecuteData, return_value *Zval) 
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = ZendStrpprintf(0, "%s: %s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && Z_STRLEN(trace) != 0, func() []byte { return Z_STRVAL(trace) }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = ZendStrpprintf(0, "%s: %s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.GetStr().GetLen() != 0, func() []byte { return trace.GetStr().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		} else {
-			str = ZendStrpprintf(0, "%s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && Z_STRLEN(trace) != 0, func() []byte { return Z_STRVAL(trace) }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = ZendStrpprintf(0, "%s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.GetStr().GetLen() != 0, func() []byte { return trace.GetStr().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
 		ZendStringReleaseEx(prev_str, 0)
 		ZendStringReleaseEx(message, 0)

@@ -72,8 +72,8 @@ again:
 	case zend.IS_DOUBLE:
 		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
 	case zend.IS_STRING:
-		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
-		core.PHPWRITE(zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
+		core.PhpPrintf("%sstring(%zd) \"", COMMON, struc.GetStr().GetLen())
+		core.PHPWRITE(struc.GetStr().GetVal(), struc.GetStr().GetLen())
 		core.PUTS("\"\n")
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
@@ -309,8 +309,8 @@ again:
 	case zend.IS_DOUBLE:
 		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
 	case zend.IS_STRING:
-		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
-		core.PHPWRITE(zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
+		core.PhpPrintf("%sstring(%zd) \"", COMMON, struc.GetStr().GetLen())
+		core.PHPWRITE(struc.GetStr().GetVal(), struc.GetStr().GetLen())
 		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
@@ -1084,7 +1084,7 @@ again:
 		buf.AppendByte(';')
 		return
 	case zend.IS_STRING:
-		PhpVarSerializeString(buf, zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
+		PhpVarSerializeString(buf, struc.GetStr().GetVal(), struc.GetStr().GetLen())
 		return
 	case zend.IS_OBJECT:
 		var ce *zend.ZendClassEntry = zend.Z_OBJCE_P(struc)

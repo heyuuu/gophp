@@ -177,20 +177,20 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
 
-		if Z_STRVAL_P(callable)[0] == '\\' {
+		if callable.GetStr().GetVal()[0] == '\\' {
 
 			/* Skip leading \ */
 
-			ZSTR_ALLOCA_ALLOC(lmname, Z_STRLEN_P(callable)-1, use_heap)
-			ZendStrTolowerCopy(lmname.GetVal(), Z_STRVAL_P(callable)+1, Z_STRLEN_P(callable)-1)
+			ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen()-1, use_heap)
+			ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal()+1, callable.GetStr().GetLen()-1)
 			func_ = ZendFetchFunction(lmname)
 			lmname.Free()
 		} else {
 			lmname = callable.GetStr()
 			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
-				ZSTR_ALLOCA_ALLOC(lmname, Z_STRLEN_P(callable), use_heap)
-				ZendStrTolowerCopy(lmname.GetVal(), Z_STRVAL_P(callable), Z_STRLEN_P(callable))
+				ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen(), use_heap)
+				ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal(), callable.GetStr().GetLen())
 				func_ = ZendFetchFunction(lmname)
 				lmname.Free()
 			}
@@ -203,12 +203,12 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 
 	/* Split name into class/namespace and method/function names */
 
-	if b.Assign(&colon, ZendMemrchr(Z_STRVAL_P(callable), ':', Z_STRLEN_P(callable))) != nil && colon > Z_STRVAL_P(callable) && (*(colon - 1)) == ':' {
+	if b.Assign(&colon, ZendMemrchr(callable.GetStr().GetVal(), ':', callable.GetStr().GetLen())) != nil && colon > callable.GetStr().GetVal() && (*(colon - 1)) == ':' {
 		var mlen int
 		colon--
-		clen = colon - Z_STRVAL_P(callable)
-		mlen = Z_STRLEN_P(callable) - clen - 2
-		if colon == Z_STRVAL_P(callable) {
+		clen = colon - callable.GetStr().GetVal()
+		mlen = callable.GetStr().GetLen() - clen - 2
+		if colon == callable.GetStr().GetVal() {
 			if error != nil {
 				*error = Estrdup("invalid function name")
 			}
@@ -223,7 +223,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		cname = ZendStringInit(Z_STRVAL_P(callable), clen, 0)
+		cname = ZendStringInit(callable.GetStr().GetVal(), clen, 0)
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
 			ZendStringReleaseEx(cname, 0)
 			return 0
@@ -236,7 +236,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 			}
 			return 0
 		}
-		mname = ZendStringInit(Z_STRVAL_P(callable)+clen+2, mlen, 0)
+		mname = ZendStringInit(callable.GetStr().GetVal()+clen+2, mlen, 0)
 	} else if ce_org != nil {
 
 		/* Try to fetch find static method of given class. */
@@ -250,7 +250,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		/* We already checked for plain function before. */
 
 		if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
-			ZendSpprintf(error, 0, "function '%s' not found or invalid function name", Z_STRVAL_P(callable))
+			ZendSpprintf(error, 0, "function '%s' not found or invalid function name", callable.GetStr().GetVal())
 		}
 		return 0
 	}

@@ -258,8 +258,8 @@ func PhpOutputHandlerCreateUser(output_handler *zend.Zval, chunk_size int, flags
 	case zend.IS_NULL:
 		handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, chunk_size, flags)
 	case zend.IS_STRING:
-		if zend.Z_STRLEN_P(output_handler) != 0 && b.Assign(&alias, PhpOutputHandlerAlias(zend.Z_STRVAL_P(output_handler), zend.Z_STRLEN_P(output_handler))) {
-			handler = alias(zend.Z_STRVAL_P(output_handler), zend.Z_STRLEN_P(output_handler), chunk_size, flags)
+		if output_handler.GetStr().GetLen() != 0 && b.Assign(&alias, PhpOutputHandlerAlias(output_handler.GetStr().GetVal(), output_handler.GetStr().GetLen())) {
+			handler = alias(output_handler.GetStr().GetVal(), output_handler.GetStr().GetLen(), chunk_size, flags)
 			break
 		}
 		fallthrough
@@ -614,9 +614,9 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				status = PHP_OUTPUT_HANDLER_NO_DATA
 				if retval.GetType() != zend.IS_FALSE && retval.GetType() != zend.IS_TRUE {
 					zend.ConvertToStringEx(&retval)
-					if zend.Z_STRLEN(retval) != 0 {
-						context.GetOut().SetData(zend.Estrndup(zend.Z_STRVAL(retval), zend.Z_STRLEN(retval)))
-						context.GetOut().SetUsed(zend.Z_STRLEN(retval))
+					if retval.GetStr().GetLen() != 0 {
+						context.GetOut().SetData(zend.Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
+						context.GetOut().SetUsed(retval.GetStr().GetLen())
 						context.GetOut().SetFree(1)
 						status = PHP_OUTPUT_HANDLER_SUCCESS
 					}

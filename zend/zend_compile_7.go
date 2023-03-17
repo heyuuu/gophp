@@ -330,10 +330,10 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *Zval, op2 *Zval)
 	if (opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) && op1.IsString() && op2.IsString() {
 		return 0
 	}
-	if op1.IsString() && IsNumericString(Z_STRVAL_P(op1), Z_STRLEN_P(op1), nil, nil, 0) == 0 {
+	if op1.IsString() && IsNumericString(op1.GetStr().GetVal(), op1.GetStr().GetLen(), nil, nil, 0) == 0 {
 		return 1
 	}
-	if op2.IsString() && IsNumericString(Z_STRVAL_P(op2), Z_STRLEN_P(op2), nil, nil, 0) == 0 {
+	if op2.IsString() && IsNumericString(op2.GetStr().GetVal(), op2.GetStr().GetLen(), nil, nil, 0) == 0 {
 		return 1
 	}
 	return 0

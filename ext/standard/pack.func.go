@@ -234,7 +234,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					zend.Efree(formatargs)
 					return
 				}
-				arg = zend.Z_STRLEN(argv[currentarg])
+				arg = argv[currentarg].GetStr().GetLen()
 				if code == 'Z' {
 
 					/* add one because Z is always NUL-terminated:

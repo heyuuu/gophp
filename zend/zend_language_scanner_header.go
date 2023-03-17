@@ -159,7 +159,7 @@ func CompileFilename(type_ int, filename *zval) *zend_op_array {
 		ZVAL_STR(&tmp, zval_get_string(filename))
 		filename = &tmp
 	}
-	zend_stream_init_filename(&file_handle, Z_STRVAL_P(filename))
+	zend_stream_init_filename(&file_handle, filename.GetStr().GetVal())
 	retval = zend_compile_file(&file_handle, type_)
 	if retval != nil && file_handle.handle.stream.handle {
 		if !(file_handle.opened_path) {
@@ -185,13 +185,13 @@ func ZendPrepareStringForScanning(str *zval, filename *byte) int {
 
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
-	old_len = Z_STRLEN_P(str)
+	old_len = str.GetStr().GetLen()
 	Z_STR_P(str) = zend_string_extend(Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
 	Z_TYPE_INFO_P(str) = IS_STRING_EX
-	memset(Z_STRVAL_P(str)+old_len, 0, ZEND_MMAP_AHEAD+1)
+	memset(str.GetStr().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
 	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
-	buf = Z_STRVAL_P(str)
+	buf = str.GetStr().GetVal()
 	size = old_len
 	YyScanBuffer(buf, size)
 	new_compiled_filename = zend_string_init(filename, strlen(filename), 0)
@@ -211,7 +211,7 @@ func CompileString(source_string *zval, filename *byte) *zend_op_array {
 	} else {
 		ZVAL_COPY(&tmp, source_string)
 	}
-	if Z_STRLEN(tmp) == 0 {
+	if tmp.GetStr().GetLen() == 0 {
 		zval_ptr_dtor(&tmp)
 		return nil
 	}
@@ -427,9 +427,9 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 }
 
 func StripMultilineStringIndentation(zendlval *zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
-	var str *byte = Z_STRVAL_P(zendlval)
-	var end *byte = str + Z_STRLEN_P(zendlval)
-	var copy *byte = Z_STRVAL_P(zendlval)
+	var str *byte = zendlval.GetStr().GetVal()
+	var end *byte = str + zendlval.GetStr().GetLen()
+	var copy *byte = zendlval.GetStr().GetVal()
 	var newline_count int = 0
 	var newline_len int
 	var nl *byte
@@ -483,7 +483,7 @@ func StripMultilineStringIndentation(zendlval *zval, indentation int, using_spac
 		newline_count++
 	}
 	*copy = '0'
-	Z_STRLEN_P(zendlval) = copy - Z_STRVAL_P(zendlval)
+	zendlval.GetStr().GetLen() = copy - zendlval.GetStr().GetVal()
 	return 1
 error:
 	zval_ptr_dtor_str(zendlval)

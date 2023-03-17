@@ -354,7 +354,7 @@ func ZendCompileFuncStrlen(result *Znode, args *ZendAstList) int {
 	ZendCompileExpr(&arg_node, args.GetChild()[0])
 	if arg_node.GetOpType() == IS_CONST && arg_node.GetConstant().IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(Z_STRLEN(arg_node.GetConstant()))
+		result.GetConstant().SetLong(arg_node.GetConstant().GetStr().GetLen())
 		ZvalPtrDtorStr(arg_node.GetConstant())
 	} else {
 		ZendEmitOpTmp(result, ZEND_STRLEN, &arg_node, nil)
@@ -431,7 +431,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 func ZendCompileFuncOrd(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(uint8(Z_STRVAL_P(ZendAstGetZval(args.GetChild()[0]))[0]))
+		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.GetChild()[0]).GetStr().GetVal()[0]))
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -625,7 +625,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				var _z *Zval = _p.GetVal()
 
 				val = _z
-				if val.GetType() != IS_STRING || IsNumericString(Z_STRVAL_P(val), Z_STRLEN_P(val), nil, nil, 0) != 0 {
+				if val.GetType() != IS_STRING || IsNumericString(val.GetStr().GetVal(), val.GetStr().GetLen(), nil, nil, 0) != 0 {
 					dst.DestroyEx()
 					ok = 0
 					break

@@ -279,9 +279,9 @@ func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
 
 	/* convert escape sequences */
 
-	t = Z_STRVAL_P(lval)
+	t = lval.GetStr().GetVal()
 	s = t
-	end = s + Z_STRLEN_P(lval)
+	end = s + lval.GetStr().GetLen()
 	for s < end {
 		if (*s) == '\\' {
 			s++
@@ -301,7 +301,7 @@ func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
 				fallthrough
 			case '$':
 				b.PostInc(&(*t)) = *s
-				Z_STRLEN_P(lval)--
+				lval.GetStr().GetLen()--
 			default:
 				b.PostInc(&(*t)) = '\\'
 				b.PostInc(&(*t)) = *s

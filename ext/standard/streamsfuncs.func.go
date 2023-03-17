@@ -3477,7 +3477,7 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		if zend.TryConvertToString(zstream) == 0 {
 			return
 		}
-		wrapper = streams.PhpStreamLocateUrlWrapper(zend.Z_STRVAL_P(zstream), nil, 0)
+		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.GetStr().GetVal(), nil, 0)
 	}
 	if wrapper == nil {
 		return_value.SetFalse()

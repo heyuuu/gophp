@@ -114,7 +114,7 @@ func GetIntVal(op *Zval) int {
 	case IS_DOUBLE:
 		return int(op.GetDval())
 	case IS_STRING:
-		var val int = atoi(Z_STRVAL_P(op))
+		var val int = atoi(op.GetStr().GetVal())
 		ZendStringFree(op.GetStr())
 		return val
 	default:
@@ -182,16 +182,14 @@ func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 	}
-	op1_len = int(Z_STRLEN_P(op1))
+	op1_len = int(op1.GetStr().GetLen())
 	if op2.GetType() != IS_STRING {
 		ConvertToString(op2)
 	}
-	length = op1_len + int(Z_STRLEN_P(op2))
+	length = op1_len + int(op2.GetStr().GetLen())
 	result.SetString(ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
-	memcpy(Z_STRVAL_P(result)+op1_len, Z_STRVAL_P(op2), Z_STRLEN_P(op2)+1)
+	memcpy(result.GetStr().GetVal()+op1_len, op2.GetStr().GetVal(), op2.GetStr().GetLen()+1)
 }
-
-/* }}} */
 
 func ZendIniGetConstant(result *Zval, name *Zval) {
 	var c *Zval
@@ -199,7 +197,7 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 
-	if !(memchr(Z_STRVAL_P(name), ':', Z_STRLEN_P(name))) && b.Assign(&c, ZendGetConstant(name.GetStr())) != 0 {
+	if !(memchr(name.GetStr().GetVal(), ':', name.GetStr().GetLen())) && b.Assign(&c, ZendGetConstant(name.GetStr())) != 0 {
 		if c.GetType() != IS_STRING {
 			ZVAL_COPY_OR_DUP(&tmp, c)
 			if tmp.IsConstant() {
@@ -208,7 +206,7 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 			ConvertToString(&tmp)
 			c = &tmp
 		}
-		result.SetString(ZendStringInit(Z_STRVAL_P(c), Z_STRLEN_P(c), ZEND_SYSTEM_INI))
+		result.SetString(ZendStringInit(c.GetStr().GetVal(), c.GetStr().GetLen(), ZEND_SYSTEM_INI))
 		if c == &tmp {
 			ZendStringRelease(tmp.GetStr())
 		}

@@ -403,8 +403,8 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 			ZvalPtrDtor(&retval)
 			return FAILURE
 		case IS_STRING:
-			*buffer = (*uint8)(Estrndup(Z_STRVAL(retval), Z_STRLEN(retval)))
-			*buf_len = Z_STRLEN(retval)
+			*buffer = (*uint8)(Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
+			*buf_len = retval.GetStr().GetLen()
 			result = SUCCESS
 		default:
 			result = FAILURE

@@ -166,7 +166,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 						break
 					}
 				}
-				ZendErrorNoreturn(E_ERROR, "Class %s wasn't preloaded", Z_STRVAL_P(lcname))
+				ZendErrorNoreturn(E_ERROR, "Class %s wasn't preloaded", lcname.GetStr().GetVal())
 				return FAILURE
 				break
 			}
@@ -694,10 +694,10 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 			zv.SetLval(zv.GetLval() * -1)
 		}
 	} else if zv.IsString() {
-		var orig_len int = Z_STRLEN_P(zv)
+		var orig_len int = zv.GetStr().GetLen()
 		zv.SetStr(ZendStringExtend(zv.GetStr(), orig_len+1, 0))
-		memmove(Z_STRVAL_P(zv)+1, Z_STRVAL_P(zv), orig_len+1)
-		Z_STRVAL_P(zv)[0] = '-'
+		memmove(zv.GetStr().GetVal()+1, zv.GetStr().GetVal(), orig_len+1)
+		zv.GetStr().GetVal()[0] = '-'
 	} else {
 		ZEND_ASSERT(false)
 	}

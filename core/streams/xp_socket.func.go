@@ -423,7 +423,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 			zend.Efree(host)
 			return -1
 		}
-		bindto = ParseIpAddressEx(zend.Z_STRVAL_P(tmpzval), zend.Z_STRLEN_P(tmpzval), &bindport, xparam.GetWantErrortext(), xparam.GetErrorText())
+		bindto = ParseIpAddressEx(tmpzval.GetStr().GetVal(), tmpzval.GetStr().GetLen(), &bindport, xparam.GetWantErrortext(), xparam.GetErrorText())
 	}
 	if stream.GetOps() != &PhpStreamUdpSocketOps && core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "tcp_nodelay")) != nil && zend.ZendIsTrue(tmpzval) != 0 {
 		sockopts |= core.STREAM_SOCKOP_TCP_NODELAY

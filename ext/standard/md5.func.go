@@ -105,7 +105,7 @@ func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	} else {
 		return_value.SetString(zend.ZendStringAlloc(32, 0))
-		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 16)
+		MakeDigestEx(return_value.GetStr().GetVal(), digest, 16)
 	}
 }
 func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -216,7 +216,7 @@ func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	} else {
 		return_value.SetString(zend.ZendStringAlloc(32, 0))
-		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 16)
+		MakeDigestEx(return_value.GetStr().GetVal(), digest, 16)
 	}
 }
 func F(x uint32, y uint32, z uint32) int { return z ^ x&(y^z) }

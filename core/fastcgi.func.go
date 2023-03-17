@@ -619,7 +619,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 				q = q.GetListNext()
 				continue
 			}
-			zlen = uint(zend.Z_STRLEN_P(value))
+			zlen = uint(value.GetStr().GetLen())
 			if p+4+4+q.GetVarLen()+zlen >= buf+b.SizeOf("buf") {
 				break
 			}
@@ -641,7 +641,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 			}
 			memcpy(p, q.GetVar(), q.GetVarLen())
 			p += q.GetVarLen()
-			memcpy(p, zend.Z_STRVAL_P(value), zlen)
+			memcpy(p, value.GetStr().GetVal(), zlen)
 			p += zlen
 			q = q.GetListNext()
 		}

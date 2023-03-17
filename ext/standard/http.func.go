@@ -199,9 +199,9 @@ func PhpUrlEncodeHashEx(
 			case zend.IS_STRING:
 				var ekey *zend.ZendString
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
+					ekey = PhpRawUrlEncode(zdata.GetStr().GetVal(), zdata.GetStr().GetLen())
 				} else {
-					ekey = PhpUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
+					ekey = PhpUrlEncode(zdata.GetStr().GetVal(), zdata.GetStr().GetLen())
 				}
 				formstr.AppendString(ekey.GetStr())
 				zend.ZendStringFree(ekey)

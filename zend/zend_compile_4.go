@@ -624,7 +624,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		CG__().SetZendLineno(opline.GetLineno())
-		ZendErrorNoreturn(E_COMPILE_ERROR, "'goto' to undefined label '%s'", Z_STRVAL_P(label))
+		ZendErrorNoreturn(E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.GetStr().GetVal())
 	}
 	ZvalPtrDtorStr(label)
 	label.SetNull()

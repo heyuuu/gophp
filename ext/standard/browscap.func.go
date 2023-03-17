@@ -214,18 +214,18 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 
 			/* Set proper value for true/false settings */
 
-			if zend.Z_STRLEN_P(arg2) == 2 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "on", b.SizeOf("\"on\"")-1)) || zend.Z_STRLEN_P(arg2) == 3 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "yes", b.SizeOf("\"yes\"")-1)) || zend.Z_STRLEN_P(arg2) == 4 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "true", b.SizeOf("\"true\"")-1)) {
+			if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
 				new_value = zend.ZSTR_CHAR('1')
-			} else if zend.Z_STRLEN_P(arg2) == 2 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "no", b.SizeOf("\"no\"")-1)) || zend.Z_STRLEN_P(arg2) == 3 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "off", b.SizeOf("\"off\"")-1)) || zend.Z_STRLEN_P(arg2) == 4 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "none", b.SizeOf("\"none\"")-1)) || zend.Z_STRLEN_P(arg2) == 5 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "false", b.SizeOf("\"false\"")-1)) {
+			} else if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.GetStr().GetLen() == 5 && !(strncasecmp(arg2.GetStr().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = zend.ZSTR_EMPTY_ALLOC()
 			} else {
 				new_value = BrowscapInternStr(ctx, arg2.GetStr(), persistent)
 			}
-			if !(strcasecmp(zend.Z_STRVAL_P(arg1), "parent")) {
+			if !(strcasecmp(arg1.GetStr().GetVal(), "parent")) {
 
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
-				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), zend.Z_STRVAL_P(arg2))) {
+				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.GetStr().GetVal())) {
 					zend.ZendError(zend.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
 					return
 				}

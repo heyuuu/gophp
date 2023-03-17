@@ -303,7 +303,7 @@ func zend_undefined_function_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *Zval
 	function_name = RT_CONSTANT(opline, opline.GetOp2())
-	ZendThrowError(nil, "Call to undefined function %s()", Z_STRVAL_P(function_name))
+	ZendThrowError(nil, "Call to undefined function %s()", function_name.GetStr().GetVal())
 	HANDLE_EXCEPTION()
 }
 func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -3367,14 +3367,14 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *Zval
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	if value.IsString() {
-		EX_VAR(opline.GetResult().GetVar()).SetLong(Z_STRLEN_P(value))
+		EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
 		ZEND_VM_NEXT_OPCODE()
 	} else {
 		var strict ZendBool
 		if (IS_CONST&(IS_VAR|IS_CV)) != 0 && value.IsReference() {
 			value = Z_REFVAL_P(value)
 			if value.IsString() {
-				EX_VAR(opline.GetResult().GetVar()).SetLong(Z_STRLEN_P(value))
+				EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
 				ZEND_VM_NEXT_OPCODE()
 			}
 		}
@@ -4656,7 +4656,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp1())), error)
+		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			HANDLE_EXCEPTION()
@@ -4712,7 +4712,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			c = zv.GetPtr()
 			scope = executeData.GetFunc().op_array.scope
 			if ZendVerifyConstAccess(c, scope) == 0 {
-				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 				HANDLE_EXCEPTION()
 			}
@@ -4726,7 +4726,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			ZendThrowError(nil, "Undefined class constant '%s'", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+			ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -6694,7 +6694,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp1())), error)
+		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
 		Efree(error)
 		ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
@@ -8863,7 +8863,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp1())), error)
+		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			HANDLE_EXCEPTION()
@@ -11499,7 +11499,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if value.IsString() {
-		EX_VAR(opline.GetResult().GetVar()).SetLong(Z_STRLEN_P(value))
+		EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_NEXT_OPCODE()
 	} else {
@@ -11507,7 +11507,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && value.IsReference() {
 			value = Z_REFVAL_P(value)
 			if value.IsString() {
-				EX_VAR(opline.GetResult().GetVar()).SetLong(Z_STRLEN_P(value))
+				EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
 				ZvalPtrDtorNogc(free_op1)
 				ZEND_VM_NEXT_OPCODE()
 			}
@@ -15959,7 +15959,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = EX_VAR(opline.GetResult().GetVar())
 	ret.SetString(ZendStringAlloc(len_, 0))
-	target = Z_STRVAL_P(ret)
+	target = ret.GetStr().GetVal()
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		memcpy(target, rope[i].GetVal(), rope[i].GetLen())
 		target += rope[i].GetLen()
@@ -16379,7 +16379,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = EX_VAR(opline.GetResult().GetVar())
 	ret.SetString(ZendStringAlloc(len_, 0))
-	target = Z_STRVAL_P(ret)
+	target = ret.GetStr().GetVal()
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		memcpy(target, rope[i].GetVal(), rope[i].GetLen())
 		target += rope[i].GetLen()
@@ -17247,7 +17247,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = EX_VAR(opline.GetResult().GetVar())
 	ret.SetString(ZendStringAlloc(len_, 0))
-	target = Z_STRVAL_P(ret)
+	target = ret.GetStr().GetVal()
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		memcpy(target, rope[i].GetVal(), rope[i].GetLen())
 		target += rope[i].GetLen()
@@ -20669,7 +20669,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			c = zv.GetPtr()
 			scope = executeData.GetFunc().op_array.scope
 			if ZendVerifyConstAccess(c, scope) == 0 {
-				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 				HANDLE_EXCEPTION()
 			}
@@ -20683,7 +20683,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			ZendThrowError(nil, "Undefined class constant '%s'", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+			ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -27997,7 +27997,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			c = zv.GetPtr()
 			scope = executeData.GetFunc().op_array.scope
 			if ZendVerifyConstAccess(c, scope) == 0 {
-				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 				HANDLE_EXCEPTION()
 			}
@@ -28011,7 +28011,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			ZendThrowError(nil, "Undefined class constant '%s'", Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))
+			ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -33232,14 +33232,14 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var value *Zval
 	value = EX_VAR(opline.GetOp1().GetVar())
 	if value.IsString() {
-		EX_VAR(opline.GetResult().GetVar()).SetLong(Z_STRLEN_P(value))
+		EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
 		ZEND_VM_NEXT_OPCODE()
 	} else {
 		var strict ZendBool
 		if (IS_CV&(IS_VAR|IS_CV)) != 0 && value.IsReference() {
 			value = Z_REFVAL_P(value)
 			if value.IsString() {
-				EX_VAR(opline.GetResult().GetVar()).SetLong(Z_STRLEN_P(value))
+				EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
 				ZEND_VM_NEXT_OPCODE()
 			}
 		}
