@@ -148,7 +148,7 @@ func ConvertToNumber(retval *Zval, str *byte, str_len int) int {
 	var overflow int
 	var lval ZendLong
 	var dval float64
-	if b.Assign(&type_, IsNumericStringEx(str, str_len, &lval, &dval, 0, &overflow)) != 0 {
+	if b.Assign(&type_, IsNumericStringEx(b.CastStr(str, str_len), &lval, &dval, 0, &overflow)) != 0 {
 		if type_ == IS_LONG {
 			retval.SetLong(lval)
 			return SUCCESS

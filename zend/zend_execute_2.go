@@ -415,7 +415,7 @@ try_again:
 	if dim.GetType() != IS_LONG {
 		switch dim.GetType() {
 		case IS_STRING:
-			if IS_LONG == IsNumericString(dim.GetStr().GetVal(), dim.GetStr().GetLen(), nil, nil, -1) {
+			if IS_LONG == IsNumericString(b.CastStr(dim.GetStr().GetVal(), dim.GetStr().GetLen()), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {

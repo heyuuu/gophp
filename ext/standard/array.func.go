@@ -50,7 +50,7 @@ func PhpArrayKeyCompare(a any, b any) int {
 			return zend.ZendLong(f.GetH() > zend.ZendLong(b.Cond(s.GetH() != 0, 1, -1)))
 		} else {
 			l1 = zend.ZendLong(f.GetH())
-			t = zend.IsNumericString(s.GetKey().GetVal(), s.GetKey().GetLen(), &l2, &d, 1)
+			t = zend.IsNumericString(b.CastStr(s.GetKey().GetVal(), s.GetKey().GetLen()), &l2, &d, 1)
 			if t == zend.IS_LONG {
 
 			} else if t == zend.IS_DOUBLE {
@@ -64,7 +64,7 @@ func PhpArrayKeyCompare(a any, b any) int {
 			return zend.ZendiSmartStrcmp(f.GetKey(), s.GetKey())
 		} else {
 			l2 = zend.ZendLong(s.GetH())
-			t = zend.IsNumericString(f.GetKey().GetVal(), f.GetKey().GetLen(), &l1, &d, 1)
+			t = zend.IsNumericString(b.CastStr(f.GetKey().GetVal(), f.GetKey().GetLen()), &l1, &d, 1)
 			if t == zend.IS_LONG {
 
 			} else if t == zend.IS_DOUBLE {
@@ -4131,7 +4131,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		if zstep.IsType(zend.IS_DOUBLE) {
 			is_step_double = 1
 		} else if zstep.IsType(zend.IS_STRING) {
-			var type_ int = zend.IsNumericString(zstep.GetStr().GetVal(), zstep.GetStr().GetLen(), nil, nil, 0)
+			var type_ int = zend.IsNumericString(b.CastStr(zstep.GetStr().GetVal(), zstep.GetStr().GetLen()), nil, nil, 0)
 			if type_ == zend.IS_DOUBLE {
 				is_step_double = 1
 			}
@@ -4164,8 +4164,8 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var low uint8
 		var high uint8
 		var lstep zend.ZendLong = zend.ZendLong(step)
-		type1 = zend.IsNumericString(zlow.GetStr().GetVal(), zlow.GetStr().GetLen(), nil, nil, 0)
-		type2 = zend.IsNumericString(zhigh.GetStr().GetVal(), zhigh.GetStr().GetLen(), nil, nil, 0)
+		type1 = zend.IsNumericString(b.CastStr(zlow.GetStr().GetVal(), zlow.GetStr().GetLen()), nil, nil, 0)
+		type2 = zend.IsNumericString(b.CastStr(zhigh.GetStr().GetVal(), zhigh.GetStr().GetLen()), nil, nil, 0)
 		if type1 == zend.IS_DOUBLE || type2 == zend.IS_DOUBLE || is_step_double != 0 {
 			goto double_str
 		} else if type1 == zend.IS_LONG || type2 == zend.IS_LONG {

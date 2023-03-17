@@ -89,7 +89,7 @@ func DetermineSwitchJumptableType(cases *ZendAstList) ZendUchar {
 			/* Non-uniform case types */
 
 		}
-		if cond_zv.IsString() && IsNumericString(cond_zv.GetStr().GetVal(), cond_zv.GetStr().GetLen(), nil, nil, 0) != 0 {
+		if cond_zv.IsString() && IsNumericString(b.CastStr(cond_zv.GetStr().GetVal(), cond_zv.GetStr().GetLen()), nil, nil, 0) != 0 {
 
 			/* Numeric strings cannot be compared with a simple hash lookup */
 
