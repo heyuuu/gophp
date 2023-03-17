@@ -225,7 +225,7 @@ func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
 	param_ptr = CurrEX().Arg(1)
-	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
+	arg_count = CurrEX().NumArgs()
 	if param_count > arg_count {
 		return FAILURE
 	}
@@ -240,7 +240,7 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
 	param_ptr = CurrEX().Arg(1)
-	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
+	arg_count = CurrEX().NumArgs()
 	if param_count > arg_count {
 		return FAILURE
 	}

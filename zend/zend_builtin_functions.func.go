@@ -81,7 +81,7 @@ func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *Zval) {
 		return_value.SetLong(-1)
 		return
 	}
-	return_value.SetLong(ZEND_CALL_NUM_ARGS(ex))
+	return_value.SetLong(ex.NumArgs())
 	return
 }
 func ZifFuncGetArg(executeData *ZendExecuteData, return_value *Zval) {
@@ -108,14 +108,14 @@ func ZifFuncGetArg(executeData *ZendExecuteData, return_value *Zval) {
 		return_value.SetFalse()
 		return
 	}
-	arg_count = ZEND_CALL_NUM_ARGS(ex)
+	arg_count = ex.NumArgs()
 	if ZendUlong(requested_offset >= arg_count) != 0 {
 		ZendError(E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", requested_offset)
 		return_value.SetFalse()
 		return
 	}
 	first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
-	if ZendUlong(requested_offset >= first_extra_arg && ZEND_CALL_NUM_ARGS(ex) > first_extra_arg) != 0 {
+	if ZendUlong(requested_offset >= first_extra_arg && ex.NumArgs() > first_extra_arg) != 0 {
 		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar()+ex.GetFunc().GetOpArray().GetT()) + (requested_offset - first_extra_arg)
 	} else {
 		arg = ex.Arg(requested_offset + 1)
@@ -140,7 +140,7 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *Zval) {
 		return_value.SetFalse()
 		return
 	}
-	arg_count = ZEND_CALL_NUM_ARGS(ex)
+	arg_count = ex.NumArgs()
 	if arg_count != 0 {
 		ArrayInitSize(return_value, arg_count)
 		first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
@@ -2467,7 +2467,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *Zval) {
 	}
 }
 func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
-	var num_args uint32 = ZEND_CALL_NUM_ARGS(call)
+	var num_args uint32 = call.NumArgs()
 	if num_args != 0 {
 		var i uint32 = 0
 		var p *Zval = call.Arg(1)

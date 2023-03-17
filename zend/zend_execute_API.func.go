@@ -612,7 +612,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 					ZendError(E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
 					must_wrap = 1
 					if EG__().GetException() != nil {
-						ZEND_CALL_NUM_ARGS(call) = i
+						call.NumArgs() = i
 						ZendVmStackFreeArgs(call)
 						ZendVmStackFreeCallFrame(call)
 						if CurrEX() == &dummy_execute_data {

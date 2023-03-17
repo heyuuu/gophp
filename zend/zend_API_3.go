@@ -234,7 +234,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 		}
 		return FAILURE
 	}
-	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
+	arg_count = CurrEX().NumArgs()
 	if num_args > arg_count {
 		ZendParseParametersDebugError("could not obtain parameters for parsing")
 		return FAILURE

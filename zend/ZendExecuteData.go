@@ -153,13 +153,18 @@ func (this *ZendExecuteData) GetOpline() *ZendOp                   { return this
 func (this *ZendExecuteData) SetOpline(value *ZendOp)              { this.opline = value }
 func (this *ZendExecuteData) GetCall() *ZendExecuteData            { return this.call }
 func (this *ZendExecuteData) SetCall(value *ZendExecuteData)       { this.call = value }
+func (this *ZendExecuteData) GetReturnValue() *Zval                { return this.returnValue }
 func (this *ZendExecuteData) SetReturnValue(value *Zval)           { this.returnValue = value }
 func (this *ZendExecuteData) GetFunc() *ZendFunction               { return this.func_ }
 func (this *ZendExecuteData) SetFunc(value *ZendFunction)          { this.func_ = value }
 func (this *ZendExecuteData) GetThis() *Zval                       { return &this.This }
+func (this *ZendExecuteData) SetThis(zv *Zval)                     { this.This = *zv }
 func (this *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return this.prevExecuteData }
 func (this *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
 	this.prevExecuteData = value
 }
 func (this *ZendExecuteData) GetSymbolTable() *ZendArray      { return this.symbolTable }
 func (this *ZendExecuteData) SetSymbolTable(value *ZendArray) { this.symbolTable = value }
+
+func (this *ZendExecuteData) GetRunTimeCache() any      { return this.runTimeCache }
+func (this *ZendExecuteData) SetRunTimeCache(value any) { this.symbolTable = value }

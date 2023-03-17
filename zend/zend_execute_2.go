@@ -259,7 +259,7 @@ func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *Zval, defa
 }
 func ZendVerifyInternalArgTypes(fbc *ZendFunction, call *ZendExecuteData) int {
 	var i uint32
-	var num_args uint32 = ZEND_CALL_NUM_ARGS(call)
+	var num_args uint32 = call.NumArgs()
 	var p *Zval = call.Arg(1)
 	var dummy_cache_slot any
 	for i = 0; i < num_args; i++ {

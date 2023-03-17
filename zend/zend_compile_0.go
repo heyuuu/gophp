@@ -52,11 +52,10 @@ func ZEND_ADD_CALL_FLAG(call *ZendExecuteData, flag uint32) {
 func ZEND_DEL_CALL_FLAG(call __auto__, flag uint32) {
 	ZEND_DEL_CALL_FLAG_EX(call.This.GetTypeInfo(), flag)
 }
-func ZEND_CALL_NUM_ARGS(call *ZendExecuteData) uint32     { return call.GetThis().GetNumArgs() }
 func ZEND_CALL_VAR(call *ZendExecuteData, n uint32) *Zval { return (*Zval)((*byte)(call) + int(n)) }
 func EX(element __auto__) __auto__                        { return executeData.element }
 func EX_CALL_INFO() uint32                                { return ZEND_CALL_INFO(executeData) }
-func EX_NUM_ARGS() uint32                                 { return ZEND_CALL_NUM_ARGS(executeData) }
+func EX_NUM_ARGS() uint32                                 { return executeData.NumArgs() }
 func EX_VAR(n uint32) *Zval                               { return ZEND_CALL_VAR(executeData, n) }
 func EX_VAR_NUM(n int) *Zval {
 	return executeData.VarNum(n)

@@ -41,8 +41,8 @@ func ZendGeneratorRestoreCallStack(generator *ZendGenerator) {
 	var prev_call *ZendExecuteData = nil
 	call = generator.GetFrozenCallStack()
 	for {
-		new_call = ZendVmStackPushCallFrame(ZEND_CALL_INFO(call) & ^ZEND_CALL_ALLOCATED, call.GetFunc(), ZEND_CALL_NUM_ARGS(call), call.GetThis().GetPtr())
-		memcpy((*Zval)(new_call)+ZEND_CALL_FRAME_SLOT, (*Zval)(call)+ZEND_CALL_FRAME_SLOT, ZEND_CALL_NUM_ARGS(call)*b.SizeOf("zval"))
+		new_call = ZendVmStackPushCallFrame(ZEND_CALL_INFO(call) & ^ZEND_CALL_ALLOCATED, call.GetFunc(), call.NumArgs(), call.GetThis().GetPtr())
+		memcpy((*Zval)(new_call)+ZEND_CALL_FRAME_SLOT, (*Zval)(call)+ZEND_CALL_FRAME_SLOT, call.NumArgs()*b.SizeOf("zval"))
 		new_call.SetPrevExecuteData(prev_call)
 		prev_call = new_call
 		call = call.GetPrevExecuteData()
@@ -66,7 +66,7 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 	used_stack = 0
 	call = EX(call)
 	for {
-		used_stack += ZEND_CALL_FRAME_SLOT + ZEND_CALL_NUM_ARGS(call)
+		used_stack += ZEND_CALL_FRAME_SLOT + call.NumArgs()
 		call = call.GetPrevExecuteData()
 		if call == nil {
 			break
@@ -78,7 +78,7 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 
 	call = EX(call)
 	for {
-		var frame_size int = ZEND_CALL_FRAME_SLOT + ZEND_CALL_NUM_ARGS(call)
+		var frame_size int = ZEND_CALL_FRAME_SLOT + call.NumArgs()
 		new_call = (*ZendExecuteData)(stack + used_stack - frame_size)
 		memcpy(new_call, call, frame_size*b.SizeOf("zval"))
 		used_stack -= frame_size

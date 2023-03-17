@@ -1072,7 +1072,7 @@ func ZEND_SEND_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var args *Zval
 	var arg_num int
 	args = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
-	arg_num = ZEND_CALL_NUM_ARGS(EX(call)) + 1
+	arg_num = EX(call).NumArgs() + 1
 send_again:
 	if args.IsArray() {
 		var ht *HashTable = args.GetArr()
@@ -1126,7 +1126,7 @@ send_again:
 			} else {
 				ZVAL_COPY_DEREF(top, arg)
 			}
-			ZEND_CALL_NUM_ARGS(EX(call))++
+			EX(call).NumArgs()++
 			arg_num++
 		}
 	} else if args.IsObject() {
@@ -1176,7 +1176,7 @@ send_again:
 				ZendVmStackExtendCallFrame(&(EX(call)), arg_num-1, 1)
 				top = EX(call).Arg(arg_num)
 				ZVAL_COPY_VALUE(top, arg)
-				ZEND_CALL_NUM_ARGS(EX(call))++
+				EX(call).NumArgs()++
 				iter.GetFuncs().GetMoveForward()(iter)
 			}
 			ZendIteratorDtor(iter)
@@ -1277,7 +1277,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 						arg.TryAddRefcount()
 						param.SetNewRef(arg)
 					}
-					ZEND_CALL_NUM_ARGS(EX(call))++
+					EX(call).NumArgs()++
 					arg_num++
 					param++
 				}
@@ -1321,7 +1321,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 					arg.TryAddRefcount()
 					param.SetNewRef(arg)
 				}
-				ZEND_CALL_NUM_ARGS(EX(call))++
+				EX(call).NumArgs()++
 				arg_num++
 				param++
 			}
@@ -1902,7 +1902,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		call.SetFunc(fbc.GetOpArray().GetScope().GetCall())
 	}
 	ZEND_ASSERT(ZendVmCalcUsedStack(2, call.GetFunc()) <= size_t((*byte)(EG__().GetVmStackEnd())-(*byte)(call)))
-	ZEND_CALL_NUM_ARGS(call) = 2
+	call.NumArgs() = 2
 	call.Arg(1).SetString(fbc.GetFunctionName())
 	if args != nil {
 		call.Arg(2).SetArray(args)

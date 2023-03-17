@@ -69,7 +69,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 					fallthrough
 				case ZEND_NEW:
 					if level == 0 {
-						ZEND_CALL_NUM_ARGS(call) = 0
+						call.NumArgs() = 0
 						do_exit = 1
 					}
 					level--
@@ -91,7 +91,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 					fallthrough
 				case ZEND_SEND_USER:
 					if level == 0 {
-						ZEND_CALL_NUM_ARGS(call) = opline.GetOp2().GetNum()
+						call.NumArgs() = opline.GetOp2().GetNum()
 						do_exit = 1
 					}
 				case ZEND_SEND_ARRAY:
