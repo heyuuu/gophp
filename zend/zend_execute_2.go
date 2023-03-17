@@ -152,7 +152,7 @@ func ZendVerifyPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendB
 }
 func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zval, executeData *ZendExecuteData) *Zval {
 	var tmp Zval
-	ZVAL_DEREF(value)
+	value = ZVAL_DEREF(value)
 	ZVAL_COPY(&tmp, value)
 	if IZendVerifyPropertyType(info, &tmp, EX_USES_STRICT_TYPES()) == 0 {
 		ZvalPtrDtor(&tmp)

@@ -288,7 +288,7 @@ func ZendParseArgImpl_Ex(arg *Zval, va *b.VaList, spec *b.StrPtrReader, error **
 
 	/* scan through modifiers */
 
-	ZVAL_DEREF(arg)
+	arg = ZVAL_DEREF(arg)
 	for true {
 		if specWalk.Curr() == '/' {
 			SEPARATE_ZVAL_NOREF(arg)

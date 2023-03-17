@@ -285,7 +285,7 @@ func ZendGetTypeByConst(type_ ZendUchar) string {
 	}
 }
 func ZendZvalTypeName(arg *Zval) string {
-	ZVAL_DEREF(arg)
+	arg = ZVAL_DEREF(arg)
 	return ZendGetTypeByConst(arg.GetType())
 }
 func ZendZvalGetType(arg *Zval) *ZendString {

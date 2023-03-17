@@ -345,7 +345,7 @@ func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecu
 func _getZvalPtrVarDeref(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *Zval {
 	var ret *Zval = EX_VAR(var_)
 	*should_free = ret
-	ZVAL_DEREF(ret)
+	ret = ZVAL_DEREF(ret)
 	return ret
 }
 func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *Zval {
@@ -400,7 +400,7 @@ func _getZvalPtrCvDeref(var_ uint32, type_ int, executeData *ZendExecuteData) *Z
 			return _getZvalCvLookup(ret, var_, type_, executeData)
 		}
 	}
-	ZVAL_DEREF(ret)
+	ret = ZVAL_DEREF(ret)
 	return ret
 }
 func _get_zval_ptr_cv_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) *Zval {
@@ -415,7 +415,7 @@ func _get_zval_ptr_cv_deref_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) 
 	if ret.IsUndef() {
 		return ZvalUndefinedCv(var_, executeData)
 	}
-	ZVAL_DEREF(ret)
+	ret = ZVAL_DEREF(ret)
 	return ret
 }
 func _get_zval_ptr_cv_BP_VAR_IS(var_ uint32, executeData *ZendExecuteData) *Zval {

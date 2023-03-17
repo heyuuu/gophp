@@ -1510,7 +1510,7 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 					result = ZendIsTrue(value)
 				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
 					ZEND_ASSERT(has_set_exists == ZEND_PROPERTY_ISSET)
-					ZVAL_DEREF(value)
+					value = ZVAL_DEREF(value)
 					result = value.GetType() != IS_NULL
 				} else {
 					ZEND_ASSERT(has_set_exists == ZEND_PROPERTY_EXISTS)

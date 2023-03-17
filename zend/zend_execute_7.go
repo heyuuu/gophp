@@ -64,7 +64,7 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *Zval, 
 			}
 		}
 	} else {
-		ZVAL_DEREF(val)
+		val = ZVAL_DEREF(val)
 		if IZendCheckPropertyType(prop_info, val, strict) != 0 {
 			return 1
 		}

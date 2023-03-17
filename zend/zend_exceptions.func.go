@@ -304,7 +304,7 @@ func zim_exception_getFile(executeData *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_FILE)
-	ZVAL_DEREF(prop)
+	prop = ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
 func zim_exception_getLine(executeData *ZendExecuteData, return_value *Zval) {
@@ -314,7 +314,7 @@ func zim_exception_getLine(executeData *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_LINE)
-	ZVAL_DEREF(prop)
+	prop = ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
 func zim_exception_getMessage(executeData *ZendExecuteData, return_value *Zval) {
@@ -324,7 +324,7 @@ func zim_exception_getMessage(executeData *ZendExecuteData, return_value *Zval) 
 		return
 	}
 	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_MESSAGE)
-	ZVAL_DEREF(prop)
+	prop = ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
 func zim_exception_getCode(executeData *ZendExecuteData, return_value *Zval) {
@@ -334,7 +334,7 @@ func zim_exception_getCode(executeData *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_CODE)
-	ZVAL_DEREF(prop)
+	prop = ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
 func zim_exception_getTrace(executeData *ZendExecuteData, return_value *Zval) {
@@ -344,7 +344,7 @@ func zim_exception_getTrace(executeData *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_TRACE)
-	ZVAL_DEREF(prop)
+	prop = ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
 func zim_error_exception_getSeverity(executeData *ZendExecuteData, return_value *Zval) {
@@ -354,7 +354,7 @@ func zim_error_exception_getSeverity(executeData *ZendExecuteData, return_value 
 		return
 	}
 	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_SEVERITY)
-	ZVAL_DEREF(prop)
+	prop = ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
 func TRACE_APPEND_KEY(key *ZendString) {
@@ -375,7 +375,7 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 	 * but that could cause some E_NOTICE and also damn long lines.
 	 */
 
-	ZVAL_DEREF(arg)
+	arg = ZVAL_DEREF(arg)
 	switch arg.GetType() {
 	case IS_NULL:
 		str.AppendString("NULL, ")

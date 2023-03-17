@@ -1222,7 +1222,7 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 		   the higher bits of a SOCKET variable uninitialized on systems with little endian. */
 
 		var this_fd core.PhpSocketT
-		zend.ZVAL_DEREF(elem)
+		elem = zend.ZVAL_DEREF(elem)
 		core.PhpStreamFromZvalNoVerify(stream, elem)
 		if stream == nil {
 			continue
@@ -1275,7 +1275,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 		key = _p.GetKey()
 		elem = _z
 		var this_fd core.PhpSocketT
-		zend.ZVAL_DEREF(elem)
+		elem = zend.ZVAL_DEREF(elem)
 		core.PhpStreamFromZvalNoVerify(stream, elem)
 		if stream == nil {
 			continue
@@ -1333,7 +1333,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 		num_ind = _p.GetH()
 		key = _p.GetKey()
 		elem = _z
-		zend.ZVAL_DEREF(elem)
+		elem = zend.ZVAL_DEREF(elem)
 		core.PhpStreamFromZvalNoVerify(stream, elem)
 		if stream == nil {
 			continue
@@ -1615,7 +1615,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 
 		wkey = _p.GetKey()
 		wval = _z
-		zend.ZVAL_DEREF(wval)
+		wval = zend.ZVAL_DEREF(wval)
 		if wkey != nil && wval.IsType(zend.IS_ARRAY) {
 			var __ht *zend.HashTable = wval.GetArr()
 			for _, _p := range __ht.foreachData() {

@@ -90,7 +90,7 @@ func PhpUrlEncodeHashEx(
 			prop_name = nil
 			prop_len = 0
 		}
-		zend.ZVAL_DEREF(zdata)
+		zdata = zend.ZVAL_DEREF(zdata)
 		if zdata.IsType(zend.IS_ARRAY) || zdata.IsType(zend.IS_OBJECT) {
 			if key != nil {
 				var ekey *zend.ZendString

@@ -281,7 +281,7 @@ try_again:
 		}
 		return retval
 	case zend.IS_REFERENCE:
-		zend.ZVAL_DEREF(offset)
+		offset = zend.ZVAL_DEREF(offset)
 		goto try_again
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
@@ -387,7 +387,7 @@ try_again:
 		ht.NextIndexInsert(value)
 		return
 	case zend.IS_REFERENCE:
-		zend.ZVAL_DEREF(offset)
+		offset = zend.ZVAL_DEREF(offset)
 		goto try_again
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
@@ -463,7 +463,7 @@ try_again:
 			zend.ZendError(zend.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 		}
 	case zend.IS_REFERENCE:
-		zend.ZVAL_DEREF(offset)
+		offset = zend.ZVAL_DEREF(offset)
 		goto try_again
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
@@ -530,7 +530,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 				return 0
 			}
 		case zend.IS_REFERENCE:
-			zend.ZVAL_DEREF(offset)
+			offset = zend.ZVAL_DEREF(offset)
 			goto try_again
 		default:
 			zend.ZendError(zend.E_WARNING, "Illegal offset type")
@@ -1269,7 +1269,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 	if entry.IsType(zend.IS_INDIRECT) {
 		entry = entry.GetZv()
 	}
-	zend.ZVAL_DEREF(entry)
+	entry = zend.ZVAL_DEREF(entry)
 	zend.ZVAL_BOOL(return_value, entry.IsType(zend.IS_ARRAY) || entry.IsType(zend.IS_OBJECT) && !intern.IsChildArraysOnly())
 	return
 }
@@ -1288,7 +1288,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	if entry.IsType(zend.IS_INDIRECT) {
 		entry = entry.GetZv()
 	}
-	zend.ZVAL_DEREF(entry)
+	entry = zend.ZVAL_DEREF(entry)
 	if entry.IsType(zend.IS_OBJECT) {
 		if intern.IsChildArraysOnly() {
 			return

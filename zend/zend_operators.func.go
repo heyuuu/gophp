@@ -1700,8 +1700,8 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		result.SetLong(op1.GetLval() | op2.GetLval())
 		return SUCCESS
 	}
-	ZVAL_DEREF(op1)
-	ZVAL_DEREF(op2)
+	op1 = ZVAL_DEREF(op1)
+	op2 = ZVAL_DEREF(op2)
 	if op1.IsString() && op2.IsString() {
 		var longer *Zval
 		var shorter *Zval
@@ -1785,8 +1785,8 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		result.SetLong(op1.GetLval() & op2.GetLval())
 		return SUCCESS
 	}
-	ZVAL_DEREF(op1)
-	ZVAL_DEREF(op2)
+	op1 = ZVAL_DEREF(op1)
+	op2 = ZVAL_DEREF(op2)
 	if op1.IsString() && op2.IsString() {
 		var longer *Zval
 		var shorter *Zval
@@ -1870,8 +1870,8 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		result.SetLong(op1.GetLval() ^ op2.GetLval())
 		return SUCCESS
 	}
-	ZVAL_DEREF(op1)
-	ZVAL_DEREF(op2)
+	op1 = ZVAL_DEREF(op1)
+	op2 = ZVAL_DEREF(op2)
 	if op1.IsString() && op2.IsString() {
 		var longer *Zval
 		var shorter *Zval
@@ -2518,8 +2518,8 @@ func HashZvalIdenticalFunction(z1 *Zval, z2 *Zval) int {
 	 * and non zero otherwise.
 	 */
 
-	ZVAL_DEREF(z1)
-	ZVAL_DEREF(z2)
+	z1 = ZVAL_DEREF(z1)
+	z2 = ZVAL_DEREF(z2)
 	return FastIsNotIdenticalFunction(z1, z2)
 }
 func ZendIsIdentical(op1 *Zval, op2 *Zval) ZendBool {

@@ -48,11 +48,11 @@ again:
 			if obj == nil || method == nil {
 				break
 			}
-			ZVAL_DEREF(method)
+			method = ZVAL_DEREF(method)
 			if method.GetType() != IS_STRING {
 				break
 			}
-			ZVAL_DEREF(obj)
+			obj = ZVAL_DEREF(obj)
 			if obj.IsString() {
 				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					return 1

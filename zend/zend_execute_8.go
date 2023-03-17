@@ -366,12 +366,12 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 			ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil
 		}
-		ZVAL_DEREF(obj)
+		obj = ZVAL_DEREF(obj)
 		if obj.GetType() != IS_STRING && obj.GetType() != IS_OBJECT {
 			ZendThrowError(nil, "First array member is not a valid class name or object")
 			return nil
 		}
-		ZVAL_DEREF(method)
+		method = ZVAL_DEREF(method)
 		if method.GetType() != IS_STRING {
 			ZendThrowError(nil, "Second array member is not a valid method")
 			return nil

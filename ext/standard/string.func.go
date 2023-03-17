@@ -5893,7 +5893,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *zend.Z
 			num_key = _p.GetH()
 			string_key = _p.GetKey()
 			subject_entry = _z
-			zend.ZVAL_DEREF(subject_entry)
+			subject_entry = zend.ZVAL_DEREF(subject_entry)
 			if subject_entry.GetType() != zend.IS_ARRAY && subject_entry.GetType() != zend.IS_OBJECT {
 				count += PhpStrReplaceInSubject(search, replace, subject_entry, &result, case_sensitivity)
 			} else {

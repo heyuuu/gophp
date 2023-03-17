@@ -213,7 +213,7 @@ func ZendAssignToPropertyReference(
 		if prop_op_type == IS_CONST {
 			prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_addr + 2))
 		} else {
-			ZVAL_DEREF(container)
+			container = ZVAL_DEREF(container)
 			prop_info = ZendObjectFetchPropertyTypeInfo(container.GetObj(), variable_ptr)
 		}
 		if prop_info != nil {

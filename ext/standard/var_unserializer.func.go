@@ -533,7 +533,7 @@ func ObjectCommon(
 
 		zend.ZendHashRealInitMixed(ary.GetArr())
 		if ProcessNestedData(rval, p, max, var_hash, ary.GetArr(), elements, nil) == 0 {
-			zend.ZVAL_DEREF(rval)
+			rval = zend.ZVAL_DEREF(rval)
 			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 			zend.ZvalPtrDtor(&ary)
 			return 0
@@ -542,7 +542,7 @@ func ObjectCommon(
 		/* Delay __unserialize() call until end of serialization. We use two slots here to
 		 * store both the object and the unserialized data array. */
 
-		zend.ZVAL_DEREF(rval)
+		rval = zend.ZVAL_DEREF(rval)
 		tmp = TmpVar(var_hash, 2)
 		zend.ZVAL_COPY(tmp, rval)
 		tmp.SetU2Extra(VAR_UNSERIALIZE_FLAG)
@@ -558,12 +558,12 @@ func ObjectCommon(
 	ht.Extend(ht.GetNNumOfElements() + elements)
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
-			zend.ZVAL_DEREF(rval)
+			rval = zend.ZVAL_DEREF(rval)
 			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 		}
 		return 0
 	}
-	zend.ZVAL_DEREF(rval)
+	rval = zend.ZVAL_DEREF(rval)
 	if has_wakeup != 0 {
 
 		/* Delay __wakeup call until end of serialization */
@@ -1481,7 +1481,7 @@ yy80:
 	if rval_ref == rval {
 		return 0
 	}
-	zend.ZVAL_DEREF(rval_ref)
+	rval_ref = zend.ZVAL_DEREF(rval_ref)
 	if rval_ref.GetType() != zend.IS_OBJECT {
 		return 0
 	}

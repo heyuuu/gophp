@@ -292,21 +292,21 @@ func ZendHashIndexFindPtr(ht *HashTable, h ZendUlong) any {
 func ZendHashIndexFindDeref(ht *HashTable, h ZendUlong) *Zval {
 	var zv = ht.IndexFindH(h)
 	if zv != nil {
-		ZVAL_DEREF(zv)
+		zv = ZVAL_DEREF(zv)
 	}
 	return zv
 }
 func ZendHashFindDeref(ht *HashTable, str *ZendString) *Zval {
 	var zv *Zval = ht.KeyFind(str.GetStr())
 	if zv != nil {
-		ZVAL_DEREF(zv)
+		zv = ZVAL_DEREF(zv)
 	}
 	return zv
 }
 func ZendHashStrFindDeref(ht *HashTable, str *byte, len_ int) *Zval {
 	var zv *Zval = ht.KeyFind(b.CastStr(str, len_))
 	if zv != nil {
-		ZVAL_DEREF(zv)
+		zv = ZVAL_DEREF(zv)
 	}
 	return zv
 }

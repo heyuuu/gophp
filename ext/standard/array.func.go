@@ -631,7 +631,7 @@ func PhpCountRecursive(ht *zend.HashTable) zend.ZendLong {
 		var _z *zend.Zval = _p.GetVal()
 
 		element = _z
-		zend.ZVAL_DEREF(element)
+		element = zend.ZVAL_DEREF(element)
 		if element.IsType(zend.IS_ARRAY) {
 			cnt += PhpCountRecursive(element.GetArr())
 		}
@@ -2170,7 +2170,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 			var orig_array_walk_fci_cache zend.ZendFcallInfoCache
 			var ref zend.Zval
 			zend.ZVAL_COPY_VALUE(&ref, zv)
-			zend.ZVAL_DEREF(zv)
+			zv = zend.ZVAL_DEREF(zv)
 			zend.SEPARATE_ARRAY(zv)
 			thash = zv.GetArr()
 			if thash.IsRecursive() {
@@ -2543,7 +2543,7 @@ func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 				num_idx = _p.GetH()
 				str_idx = _p.GetKey()
 				entry = _z
-				zend.ZVAL_DEREF(entry)
+				entry = zend.ZVAL_DEREF(entry)
 				if entry.IsType(zend.IS_LONG) && entry.GetLval() == value.GetLval() {
 					if behavior == 0 {
 						return_value.SetTrue()
@@ -2571,7 +2571,7 @@ func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 				num_idx = _p.GetH()
 				str_idx = _p.GetKey()
 				entry = _z
-				zend.ZVAL_DEREF(entry)
+				entry = zend.ZVAL_DEREF(entry)
 				if zend.FastIsIdenticalFunction(value, entry) != 0 {
 					if behavior == 0 {
 						return_value.SetTrue()
@@ -2809,7 +2809,7 @@ func PhpExtractIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.
 				zend.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
-			zend.ZVAL_DEREF(entry)
+			entry = zend.ZVAL_DEREF(entry)
 			zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
 			if zend.EG__().GetException() != nil {
 				return -1
@@ -2906,13 +2906,13 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 			if zend.ZendStringEqualsLiteral(var_name, "GLOBALS") {
 				continue
 			}
-			zend.ZVAL_DEREF(entry)
+			entry = zend.ZVAL_DEREF(entry)
 			zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
 			if zend.EG__().GetException() != nil {
 				return -1
 			}
 		} else {
-			zend.ZVAL_DEREF(entry)
+			entry = zend.ZVAL_DEREF(entry)
 			entry.TryAddRefcount()
 			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 		}
@@ -3019,7 +3019,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 					zend.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
-					zend.ZVAL_DEREF(entry)
+					entry = zend.ZVAL_DEREF(entry)
 					if b.Assign(&orig_var, symbol_table.KeyFind(final_name.GetStr().GetStr())) != nil {
 						if orig_var.IsType(zend.IS_INDIRECT) {
 							orig_var = orig_var.GetZv()
@@ -3162,7 +3162,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 					zend.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
-					zend.ZVAL_DEREF(entry)
+					entry = zend.ZVAL_DEREF(entry)
 					if b.Assign(&orig_var, symbol_table.KeyFind(final_name.GetStr().GetStr())) != nil {
 						if orig_var.IsType(zend.IS_INDIRECT) {
 							orig_var = orig_var.GetZv()
@@ -3187,7 +3187,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 			if zend.ZendStringEqualsLiteral(var_name, "this") {
 				goto prefix
 			}
-			zend.ZVAL_DEREF(entry)
+			entry = zend.ZVAL_DEREF(entry)
 			entry.TryAddRefcount()
 			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 			count++
@@ -3284,7 +3284,7 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 				zend.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
-				zend.ZVAL_DEREF(entry)
+				entry = zend.ZVAL_DEREF(entry)
 				if b.Assign(&orig_var, symbol_table.KeyFind(final_name.GetStr().GetStr())) != nil {
 					if orig_var.IsType(zend.IS_INDIRECT) {
 						orig_var = orig_var.GetZv()
@@ -3409,7 +3409,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 			zend.ZendThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
-			zend.ZVAL_DEREF(entry)
+			entry = zend.ZVAL_DEREF(entry)
 			if b.Assign(&orig_var, symbol_table.KeyFind(final_name.GetStr().GetStr())) != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3515,7 +3515,7 @@ func PhpExtractSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Zend
 				}
 			}
 		} else {
-			zend.ZVAL_DEREF(entry)
+			entry = zend.ZVAL_DEREF(entry)
 			entry.TryAddRefcount()
 			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 			count++
@@ -3679,10 +3679,10 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zval, entry *zend.Zval) {
 	var value_ptr *zend.Zval
 	var data zend.Zval
-	zend.ZVAL_DEREF(entry)
+	entry = zend.ZVAL_DEREF(entry)
 	if entry.IsType(zend.IS_STRING) {
 		if b.Assign(&value_ptr, zend.ZendHashFindInd(eg_active_symbol_table, entry.GetStr())) != nil {
-			zend.ZVAL_DEREF(value_ptr)
+			value_ptr = zend.ZVAL_DEREF(value_ptr)
 			value_ptr.TryAddRefcount()
 			return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), value_ptr)
 		} else if zend.ZendStringEqualsLiteral(entry.GetStr(), "this") {
@@ -4038,7 +4038,7 @@ func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _z *zend.Zval = _p.GetVal()
 
 		entry = _z
-		zend.ZVAL_DEREF(entry)
+		entry = zend.ZVAL_DEREF(entry)
 		val.TryAddRefcount()
 		if entry.IsType(zend.IS_LONG) {
 			return_value.GetArr().IndexUpdateH(entry.GetLval(), val)
@@ -5552,8 +5552,8 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 				var thash *zend.HashTable
 				var tmp zend.Zval
 				var ret int
-				zend.ZVAL_DEREF(src_zval)
-				zend.ZVAL_DEREF(dest_zval)
+				src_zval = zend.ZVAL_DEREF(src_zval)
+				dest_zval = zend.ZVAL_DEREF(dest_zval)
 				if dest_zval.IsType(zend.IS_ARRAY) {
 					thash = dest_zval.GetArr()
 				} else {
@@ -5669,7 +5669,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 		string_key = _p.GetKey()
 		src_entry = _z
 		src_zval = src_entry
-		zend.ZVAL_DEREF(src_zval)
+		src_zval = zend.ZVAL_DEREF(src_zval)
 		if string_key != nil {
 			if src_zval.GetType() != zend.IS_ARRAY || b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || dest_entry.GetType() != zend.IS_ARRAY && (!(dest_entry.IsReference()) || zend.Z_REFVAL_P(dest_entry).GetType() != zend.IS_ARRAY) {
 				var zv *zend.Zval = dest.KeyUpdate(string_key.GetStr(), src_entry)
@@ -5684,7 +5684,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 			}
 		}
 		dest_zval = dest_entry
-		zend.ZVAL_DEREF(dest_zval)
+		dest_zval = zend.ZVAL_DEREF(dest_zval)
 		if dest_zval.IsRecursive() || src_zval.IsRecursive() || src_entry.IsReference() && dest_entry.IsReference() && src_entry.GetRef() == dest_entry.GetRef() && dest_entry.GetRefcount()%2 != 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 			return 0
@@ -6129,7 +6129,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				num_idx = _p.GetH()
 				str_idx = _p.GetKey()
 				entry = _z
-				zend.ZVAL_DEREF(entry)
+				entry = zend.ZVAL_DEREF(entry)
 				if zend.FastIsIdenticalFunction(search_value, entry) != 0 {
 					if str_idx != nil {
 						new_val.SetStringCopy(str_idx)
@@ -6554,7 +6554,7 @@ func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _z *zend.Zval = _p.GetVal()
 
 		entry = _z
-		zend.ZVAL_DEREF(entry)
+		entry = zend.ZVAL_DEREF(entry)
 		if entry.IsType(zend.IS_LONG) {
 			if b.Assign(&tmp, return_value.GetArr().IndexFindH(entry.GetLval())) == nil {
 				var data zend.Zval
@@ -6608,7 +6608,7 @@ func ArrayColumnFetchProp(data *zend.Zval, name *zend.Zval, rv *zend.Zval) *zend
 		if zend.Z_OBJ_HT(*data).GetHasProperty()(data, name, zend.ZEND_PROPERTY_EXISTS, nil) != 0 || zend.Z_OBJ_HT(*data).GetHasProperty()(data, name, zend.ZEND_PROPERTY_ISSET, nil) != 0 {
 			prop = zend.Z_OBJ_HT(*data).GetReadProperty()(data, name, zend.BP_VAR_R, nil, rv)
 			if prop != nil {
-				zend.ZVAL_DEREF(prop)
+				prop = zend.ZVAL_DEREF(prop)
 				if prop != rv {
 					prop.TryAddRefcount()
 				}
@@ -6626,7 +6626,7 @@ func ArrayColumnFetchProp(data *zend.Zval, name *zend.Zval, rv *zend.Zval) *zend
 			prop = data.GetArr().IndexFindH(name.GetLval())
 		}
 		if prop != nil {
-			zend.ZVAL_DEREF(prop)
+			prop = zend.ZVAL_DEREF(prop)
 			prop.TryAddRefcount()
 		}
 	}
@@ -6727,7 +6727,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			var _z *zend.Zval = _p.GetVal()
 
 			data = _z
-			zend.ZVAL_DEREF(data)
+			data = zend.ZVAL_DEREF(data)
 			if column == nil {
 				data.TryAddRefcount()
 				colval = data
@@ -6750,7 +6750,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			var _z *zend.Zval = _p.GetVal()
 
 			data = _z
-			zend.ZVAL_DEREF(data)
+			data = zend.ZVAL_DEREF(data)
 			if column == nil {
 				data.TryAddRefcount()
 				colval = data
@@ -7209,7 +7209,7 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		num_idx = _p.GetH()
 		str_idx = _p.GetKey()
 		entry = _z
-		zend.ZVAL_DEREF(entry)
+		entry = zend.ZVAL_DEREF(entry)
 		if entry.IsType(zend.IS_LONG) {
 			if str_idx != nil {
 				data.SetStringCopy(str_idx)
@@ -7461,7 +7461,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 				/* First occurrence of the value */
 
 				if val.IsReference() && val.GetRefcount() == 1 {
-					zend.ZVAL_DEREF(val)
+					val = zend.ZVAL_DEREF(val)
 				}
 				val.TryAddRefcount()
 				if str_key != nil {
@@ -8713,7 +8713,7 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *zend.Zva
 
 	for i = 0; i < argc; i++ {
 		var arg *zend.Zval = &args[i]
-		zend.ZVAL_DEREF(arg)
+		arg = zend.ZVAL_DEREF(arg)
 		if arg.IsType(zend.IS_ARRAY) {
 			zend.SEPARATE_ARRAY(arg)
 

@@ -1056,7 +1056,7 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 	var key *ZendString
 	var val *Zval
 	var first int
-	ZVAL_DEREF(zv)
+	zv = ZVAL_DEREF(zv)
 	switch zv.GetType() {
 	case IS_NULL:
 		str.AppendString("null")

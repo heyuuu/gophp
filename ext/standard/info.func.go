@@ -148,7 +148,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 			} else {
 				PhpInfoPrint(" => ")
 			}
-			zend.ZVAL_DEREF(tmp)
+			tmp = zend.ZVAL_DEREF(tmp)
 			if tmp.IsType(zend.IS_ARRAY) {
 				if core.SM__().GetPhpinfoAsText() == 0 {
 					var str *zend.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)

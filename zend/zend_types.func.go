@@ -179,10 +179,18 @@ func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
 		}
 	}
 }
-func ZVAL_DEREF(z *Zval) { // todo replace
+
+func ZVAL_DEREF(z *Zval) *Zval { // todo replace
 	if z.IsReference() {
-		z = Z_REFVAL_P(z)
+		return Z_REFVAL_P(z)
 	}
+	return z
+}
+func ZVAL_DEINDIRECT_EX(z *Zval) *Zval { // todo replace
+	if z.IsIndirect() {
+		return z.GetZv()
+	}
+	return z
 }
 func ZVAL_DEINDIRECT(z *Zval) { // todo replace
 	if z.IsIndirect() {
@@ -264,7 +272,7 @@ func SEPARATE_ZVAL(zv *Zval) {
 	}
 }
 func SEPARATE_ARG_IF_REF(varptr *Zval) {
-	ZVAL_DEREF(varptr)
+	varptr = ZVAL_DEREF(varptr)
 	if varptr.IsRefcounted() {
 		Z_ADDREF_P(varptr)
 	}

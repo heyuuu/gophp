@@ -221,7 +221,7 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode 
 		ret = PhpExec(mode, cmd, nil, return_value)
 	} else {
 		if zend.Z_REFVAL_P(ret_array).IsType(zend.IS_ARRAY) {
-			zend.ZVAL_DEREF(ret_array)
+			ret_array = zend.ZVAL_DEREF(ret_array)
 			zend.SEPARATE_ARRAY(ret_array)
 		} else {
 			ret_array = zend.ZendTryArrayInit(ret_array)

@@ -919,7 +919,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 		var tmp_name *zend.ZendString
 		var priv_name *zend.ZendString
 		var prot_name *zend.ZendString
-		zend.ZVAL_DEREF(name_val)
+		name_val = zend.ZVAL_DEREF(name_val)
 		if name_val.GetType() != zend.IS_STRING {
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
 		}

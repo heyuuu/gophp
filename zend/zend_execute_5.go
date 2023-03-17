@@ -196,7 +196,7 @@ func ZendIssetDimSlow(container *Zval, offset *Zval, executeData *ZendExecuteDat
 
 			/*if (OP2_TYPE & (IS_CV|IS_VAR)) {*/
 
-			ZVAL_DEREF(offset)
+			offset = ZVAL_DEREF(offset)
 
 			/*}*/
 
@@ -233,7 +233,7 @@ func ZendIsemptyDimSlow(container *Zval, offset *Zval, executeData *ZendExecuteD
 
 			/*if (OP2_TYPE & (IS_CV|IS_VAR)) {*/
 
-			ZVAL_DEREF(offset)
+			offset = ZVAL_DEREF(offset)
 
 			/*}*/
 
@@ -306,7 +306,7 @@ func PromotesToArray(val *Zval) ZendBool {
 	return val.GetType() <= IS_FALSE || val.IsReference() && Z_REFVAL_P(val).GetType() <= IS_FALSE
 }
 func PromotesToObject(val *Zval) ZendBool {
-	ZVAL_DEREF(val)
+	val = ZVAL_DEREF(val)
 	return val.GetType() <= IS_FALSE || val.IsString() && Z_STRLEN_P(val) == 0
 }
 func CheckTypeArrayAssignable(type_ ZendType) ZendBool {

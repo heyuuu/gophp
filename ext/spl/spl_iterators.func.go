@@ -720,7 +720,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 	var data *zend.Zval
 	data = iterator.GetFuncs().GetGetCurrentData()(iterator)
 	if data != nil {
-		zend.ZVAL_DEREF(data)
+		data = zend.ZVAL_DEREF(data)
 
 		/* TODO: Remove this special case? */
 
@@ -1854,7 +1854,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 		if intern.IsFullCache() {
 			var key *zend.Zval = intern.GetKey()
 			var data *zend.Zval = intern.GetData()
-			zend.ZVAL_DEREF(data)
+			data = zend.ZVAL_DEREF(data)
 			data.TryAddRefcount()
 			zend.ArraySetZvalKey(intern.GetZcache().GetArr(), key, data)
 			zend.ZvalPtrDtor(data)

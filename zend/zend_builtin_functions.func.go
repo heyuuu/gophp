@@ -155,7 +155,7 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *Zval) {
 			for i < first_extra_arg {
 				q = p
 				if q.GetTypeInfo() != IS_UNDEF {
-					ZVAL_DEREF(q)
+					q = ZVAL_DEREF(q)
 					if q.IsRefcounted() {
 						q.AddRefcount()
 					}
@@ -175,7 +175,7 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *Zval) {
 		for i < arg_count {
 			q = p
 			if q.GetTypeInfo() != IS_UNDEF {
-				ZVAL_DEREF(q)
+				q = ZVAL_DEREF(q)
 				if q.IsRefcounted() {
 					q.AddRefcount()
 				}
@@ -649,7 +649,7 @@ func ZifEach(executeData *ZendExecuteData, return_value *Zval) {
 
 	/* add value elements */
 
-	ZVAL_DEREF(entry)
+	entry = ZVAL_DEREF(entry)
 	if entry.IsRefcounted() {
 		entry.GetCounted().AddRefcountEx(2)
 	}
@@ -790,7 +790,7 @@ func ValidateConstantArray(ht *HashTable) int {
 			}
 		}
 		val = _z
-		ZVAL_DEREF(val)
+		val = ZVAL_DEREF(val)
 		if val.IsRefcounted() {
 			if val.IsArray() {
 				if val.IsRefcounted() {
@@ -834,7 +834,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 
 		/* constant arrays can't contain references */
 
-		ZVAL_DEREF(val)
+		val = ZVAL_DEREF(val)
 		if key != nil {
 			new_val = dst.GetArr().KeyAddNew(key.GetStr(), val)
 		} else {
