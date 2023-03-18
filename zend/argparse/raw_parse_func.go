@@ -162,3 +162,28 @@ func ZendParseArgZvalDeref(arg *types.Zval, dest **types.Zval, check_null int) {
 		*dest = arg
 	}
 }
+
+func ZendParseArgClass(arg *types.Zval, pce **zend.ZendClassEntry, num int, check_null int) int {
+	var ce_base *zend.ZendClassEntry = *pce
+	if check_null != 0 && arg.IsNull() {
+		*pce = nil
+		return 1
+	}
+	if zend.TryConvertToString(arg) == 0 {
+		*pce = nil
+		return 0
+	}
+	*pce = zend.ZendLookupClass(arg.GetStr())
+	if ce_base != nil {
+		if (*pce) == nil || zend.InstanceofFunction(*pce, ce_base) == 0 {
+			zend.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, ce_base.GetName().GetVal(), arg.GetStr().GetVal())
+			*pce = nil
+			return 0
+		}
+	}
+	if (*pce) == nil {
+		zend.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.GetStr().GetVal())
+		return 0
+	}
+	return 1
+}

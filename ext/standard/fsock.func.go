@@ -66,12 +66,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 			argparse.ZendParseArgZvalDeref(_arg, &zerrno, 0)
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			timeout = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

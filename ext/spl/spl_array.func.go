@@ -962,11 +962,7 @@ func zim_spl_Array_setIteratorClass(executeData *zend.ZendExecuteData, return_va
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgClass(_arg, &ce_get_iterator, _i, 0) == 0 {
-				_error_code = argparse.ZPP_ERROR_FAILURE
-				break
-			}
+			ce_get_iterator = fp.ParseClass()
 			if fp.HasError() {
 				fp.HandleError()
 				return

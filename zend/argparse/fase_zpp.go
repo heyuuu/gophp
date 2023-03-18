@@ -227,16 +227,18 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 
 // @see Micro: Z_PARAM_CLASS
 func (p *FastParser) ParseClass() (dest *zend.ZendClassEntry) {
-	dest, _ = p.ParseClassEx(true)
-	return
+	return p.ParseClassEx(true)
 }
-func (p *FastParser) ParseClassEx(checkNull bool) (dest *zend.ZendClassEntry, isNull types.ZendBool) {
+func (p *FastParser) ParseClassEx(checkNull bool) (dest *zend.ZendClassEntry) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if ZendParseArgClass(p._arg, &dest, p._i, types.IntBool(checkNull)) == 0 {
+		p.errorCode = ZPP_ERROR_FAILURE
+	}
+
 	return
 }
 
@@ -251,7 +253,11 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 		return
 	}
 
-	// todo
+	if ZendParseArgDouble(p._arg, &dest, &isNull, 0) == 0 {
+		p._expected_type = Z_EXPECTED_DOUBLE
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 

@@ -140,12 +140,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *type
 			argparse.ZendParseArgZvalDeref(_arg, &zerrno, 0)
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			timeout = fp.ParseDouble()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if !argparse.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -348,12 +343,7 @@ func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *type
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			timeout = fp.ParseDouble()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &zpeername, 0)
 			if fp.HasError() {

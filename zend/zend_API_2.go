@@ -66,30 +66,6 @@ func ZendWrongCallbackDeprecated(num int, error string) {
 	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
 	ZendErrorEx(E_DEPRECATED, message)
 }
-func ZendParseArgClass(arg *types.Zval, pce **ZendClassEntry, num int, check_null int) int {
-	var ce_base *ZendClassEntry = *pce
-	if check_null != 0 && arg.IsNull() {
-		*pce = nil
-		return 1
-	}
-	if TryConvertToString(arg) == 0 {
-		*pce = nil
-		return 0
-	}
-	*pce = ZendLookupClass(arg.GetStr())
-	if ce_base != nil {
-		if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-			ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", GetActiveCalleeName(), num, ce_base.GetName().GetVal(), arg.GetStr().GetVal())
-			*pce = nil
-			return 0
-		}
-	}
-	if (*pce) == nil {
-		ZendInternalTypeError(CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", GetActiveCalleeName(), num, arg.GetStr().GetVal())
-		return 0
-	}
-	return 1
-}
 func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
 	if val, ok := argparse.ParseBoolWeak(arg); ok {
 		*dest = types.IntBool(val)

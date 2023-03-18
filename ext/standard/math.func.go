@@ -438,12 +438,7 @@ func ZifSin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -479,12 +474,7 @@ func ZifCos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -520,12 +510,7 @@ func ZifTan(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -561,12 +546,7 @@ func ZifAsin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -602,12 +582,7 @@ func ZifAcos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -643,12 +618,7 @@ func ZifAtan(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -685,18 +655,8 @@ func ZifAtan2(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num1, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num2, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num1 = fp.ParseDouble()
+			num2 = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -732,12 +692,7 @@ func ZifSinh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -773,12 +728,7 @@ func ZifCosh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -814,12 +764,7 @@ func ZifTanh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -855,12 +800,7 @@ func ZifAsinh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -896,12 +836,7 @@ func ZifAcosh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -937,12 +872,7 @@ func ZifAtanh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -982,12 +912,7 @@ func ZifIsFinite(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &dval, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			dval = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1023,12 +948,7 @@ func ZifIsInfinite(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &dval, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			dval = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1064,12 +984,7 @@ func ZifIsNan(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &dval, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			dval = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1144,12 +1059,7 @@ func ZifExp(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1185,12 +1095,7 @@ func ZifExpm1(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1226,12 +1131,7 @@ func ZifLog1p(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1268,19 +1168,9 @@ func ZifLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &base, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			base = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1333,12 +1223,7 @@ func ZifLog10(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1374,12 +1259,7 @@ func ZifSqrt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1416,18 +1296,8 @@ func ZifHypot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num1, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num2, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num1 = fp.ParseDouble()
+			num2 = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1463,12 +1333,7 @@ func ZifDeg2rad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &deg, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			deg = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1504,12 +1369,7 @@ func ZifRad2deg(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &rad, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			rad = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2177,12 +2037,7 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseDouble()
 			fp.StartOptional()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if !argparse.ZendParseArgLong00(_arg, &dec) {
@@ -2257,18 +2112,8 @@ func ZifFmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num1, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgDouble(_arg, &num2, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_DOUBLE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num1 = fp.ParseDouble()
+			num2 = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
 				return
