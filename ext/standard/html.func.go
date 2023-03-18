@@ -741,7 +741,7 @@ func ProcessNamedEntityHtml(buf **byte, start **byte, length *int) int {
 }
 func ResolveNamedEntityHtml(start *byte, length int, ht *EntityHt, uni_cp1 *unsigned, uni_cp2 *unsigned) int {
 	var s *EntityCpMap
-	var hash zend.ZendUlong = types.ZendInlineHashFunc(start, length)
+	var hash zend.ZendUlong = b.HashStr(b.CastStr(start, length))
 	s = ht.GetBuckets()[hash%ht.GetNumElems()]
 	for s.GetEntity() != nil {
 		if s.GetEntityLen() == length {

@@ -928,7 +928,7 @@ func PhpStreamUrlWrapHttp(
 	headers.SetUndef()
 	stream = PhpStreamUrlWrapHttpEx(wrapper, path, mode, options, opened_path, context, PHP_URL_REDIRECT_MAX, HTTP_WRAPPER_HEADER_INIT, &headers)
 	if !(headers.IsUndef()) {
-		if types.FAILURE == zend.ZendSetLocalVarStr("http_response_header", b.SizeOf("\"http_response_header\"")-1, &headers, 1) {
+		if types.FAILURE == zend.ZendSetLocalVarStr("http_response_header", &headers, 1) {
 			zend.ZvalPtrDtor(&headers)
 		}
 	}

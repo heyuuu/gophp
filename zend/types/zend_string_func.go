@@ -5,6 +5,7 @@ package types
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"strings"
 )
 
 func ZSTR_EMPTY_ALLOC() *ZendString { return ZSTR_EMPTY }
@@ -71,19 +72,21 @@ func ZendStringEquals(s1 *ZendString, s2 *ZendString) ZendBool {
 	return IntBool(s1.GetStr() == s2.GetStr())
 }
 func ZendStringEqualsCi(s1 *ZendString, s2 *ZendString) bool {
-	return zend.strCaseEquals(s1.GetStr(), s2.GetStr())
+	return strCaseEquals(s1.GetStr(), s2.GetStr())
 }
 func ZendStringEqualsLiteralCi(str *ZendString, c string) bool {
-	return zend.strCaseEquals(str.GetStr(), c)
+	return strCaseEquals(str.GetStr(), c)
 }
 func ZendStringEqualsLiteral(str *ZendString, literal string) bool {
 	return str.GetStr() == literal
 }
-func ZendInlineHashFunc(str *byte, len_ int) zend.ZendUlong {
-	var str_ = b.CastStr(str, len_)
-	return b.HashStr(str_)
+
+func strCaseEquals(str1 string, str2 string) bool {
+	if str1 == str2 {
+		return true
+	}
+	return strings.EqualFold(str1, str2)
 }
-func ZendHashFunc(str *byte, len_ int) zend.ZendUlong { return ZendInlineHashFunc(str, len_) }
 
 /**
  * Interned String 相关

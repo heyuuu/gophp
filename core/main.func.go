@@ -731,7 +731,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		var tmp types.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
-			if zend.ZendSetLocalVarStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp, 0) == types.FAILURE {
+			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
@@ -1012,7 +1012,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		var tmp types.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
-			if zend.ZendSetLocalVarStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp, 0) == types.FAILURE {
+			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {

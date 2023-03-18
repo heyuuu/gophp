@@ -1267,20 +1267,20 @@ func ZendSetLocalVar(name *types.ZendString, value *types.Zval, force int) int {
 	}
 	return types.FAILURE
 }
-func ZendSetLocalVarStr(name string, len_ int, value *types.Zval, force int) int {
+func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 	var executeData *ZendExecuteData = CurrEX()
 	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
 		executeData = executeData.GetPrevExecuteData()
 	}
 	if executeData != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
-			var h ZendUlong = types.ZendHashFunc(name, len_)
+			var h ZendUlong = b.HashStr(name)
 			var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **types.ZendString = op_array.GetVars()
 				var end **types.ZendString = str + op_array.GetLastVar()
 				for {
-					if str.GetH() == h && str.GetLen() == len_ && memcmp(str.GetVal(), name, len_) == 0 {
+					if (*str).GetStr() == name {
 						var var_ *types.Zval = executeData.VarNum(str - op_array.GetVars())
 						ZvalPtrDtor(var_)
 						types.ZVAL_COPY_VALUE(var_, value)
@@ -1295,12 +1295,12 @@ func ZendSetLocalVarStr(name string, len_ int, value *types.Zval, force int) int
 			if force != 0 {
 				var symbol_table *types.ZendArray = ZendRebuildSymbolTable()
 				if symbol_table != nil {
-					symbol_table.KeyUpdate(b.CastStr(name, len_), value)
+					symbol_table.KeyUpdate(name, value)
 					return types.SUCCESS
 				}
 			}
 		} else {
-			executeData.GetSymbolTable().KeyUpdateIndirect(b.CastStr(name, len_), value)
+			executeData.GetSymbolTable().KeyUpdateIndirect(name, value)
 			return types.SUCCESS
 		}
 	}
