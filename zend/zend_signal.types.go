@@ -99,7 +99,7 @@ type ZendSignalGlobalsT struct {
 	pavail   *ZendSignalQueueT
 }
 
-func (this *ZendSignalGlobalsT) GetCheck() types.ZendBool          { return types.intBool(this.check) }
+func (this *ZendSignalGlobalsT) GetCheck() types.ZendBool          { return types.IntBool(this.check) }
 func (this *ZendSignalGlobalsT) SetReset(value types.ZendBool)     { this.reset = value }
 func (this *ZendSignalGlobalsT) GetPstorage() []ZendSignalQueueT   { return this.pstorage }
 func (this *ZendSignalGlobalsT) GetPavail() *ZendSignalQueueT      { return this.pavail }

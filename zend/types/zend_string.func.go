@@ -88,10 +88,10 @@ func ZendStringReleaseEx(s *ZendString, persistent int) {
 	}
 }
 func ZendStringEqualContent(s1 *ZendString, s2 *ZendString) ZendBool {
-	return intBool(s1.GetStr() == s2.GetStr())
+	return IntBool(s1.GetStr() == s2.GetStr())
 }
 func ZendStringEquals(s1 *ZendString, s2 *ZendString) ZendBool {
-	return intBool(s1.GetStr() == s2.GetStr())
+	return IntBool(s1.GetStr() == s2.GetStr())
 }
 func ZendStringEqualsCi(s1 *ZendString, s2 *ZendString) bool {
 	return zend.strCaseEquals(s1.GetStr(), s2.GetStr())

@@ -95,7 +95,7 @@ func ZendGetUnmangledPropertyName(mangled_prop *types.ZendString) *byte {
 }
 func ZEND_USER_CODE(type_ types.ZendUchar) bool { return (type_ & 1) == 0 }
 func ZendCheckArgSendType(zf *ZendFunction, arg_num uint32, mask uint32) int {
-	return types.intBool(zf.CheckArgSendType(arg_num, uint8(mask)))
+	return types.IntBool(zf.CheckArgSendType(arg_num, uint8(mask)))
 }
 func ARG_MUST_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
 	return ZendCheckArgSendType(zf, arg_num, ZEND_SEND_BY_REF)
@@ -108,7 +108,7 @@ func ARG_MAY_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
 }
 
 func ZEND_CHECK_ARG_FLAG(zf *ZendFunction, arg_num uint32, mask uint8) int {
-	return types.intBool(zf.CheckArgSendType(arg_num, mask))
+	return types.IntBool(zf.CheckArgSendType(arg_num, mask))
 }
 func QUICK_ARG_MUST_BE_SENT_BY_REF(zf *ZendFunction, arg_num int) int {
 	return ZEND_CHECK_ARG_FLAG(zf, arg_num, ZEND_SEND_BY_REF)

@@ -390,7 +390,7 @@ func MakeZendReturnArgInfo(type_ types.ZendType, pass_by_reference bool) ZendArg
 	return ZendArgInfo{
 		name:              nil,
 		type_:             type_,
-		pass_by_reference: types.intBool(pass_by_reference),
+		pass_by_reference: types.IntBool(pass_by_reference),
 		is_variadic:       0,
 	}
 }

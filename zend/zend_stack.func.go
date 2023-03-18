@@ -17,7 +17,7 @@ func ZendStackIntTop(stack *ZendStack) int {
 		return types.FAILURE
 	}
 }
-func ZendStackIsEmpty(stack *ZendStack) types.ZendBool { return types.intBool(stack.IsEmpty()) }
+func ZendStackIsEmpty(stack *ZendStack) types.ZendBool { return types.IntBool(stack.IsEmpty()) }
 func ZendStackDestroy(stack *ZendStack)                { stack.Destroy() }
 func ZendStackApplyWithArgument(stack *ZendStack, type_ int, apply_function func(element any, arg any) int, arg any) {
 	stack.ApplyWithArgument(type_, apply_function, arg)

@@ -69,11 +69,11 @@ func Z_PARAM_PROLOGUE(deref int, separate int) {
 }
 func ZendParseArgBool(arg *types.Zval, dest *types.ZendBool, is_null *types.ZendBool, check_null int) int {
 	val, isNull, ok := ParseArgBool(arg, check_null != 0)
-	*dest = types.intBool(val)
+	*dest = types.IntBool(val)
 	if check_null != 0 {
-		*is_null = types.intBool(isNull)
+		*is_null = types.IntBool(isNull)
 	}
-	return types.intBool(ok)
+	return types.IntBool(ok)
 }
 
 func ZendParseArgLong00(arg *types.Zval, dest *ZendLong) bool {
@@ -86,7 +86,7 @@ func ZendParseArgLong(arg *types.Zval, dest *ZendLong, is_null *types.ZendBool, 
 	val, isNull, ok := ParseArgLong(arg, check_null != 0, cap != 0)
 	*dest = val
 	if is_null != nil {
-		*is_null = types.intBool(isNull)
+		*is_null = types.IntBool(isNull)
 	}
 	return ok
 }
@@ -94,15 +94,15 @@ func ZendParseArgDouble(arg *types.Zval, dest *float64, is_null *types.ZendBool,
 	val, isNull, ok := ParseArgDouble(arg, check_null != 0)
 	*dest = val
 	if is_null != nil {
-		*is_null = types.intBool(isNull)
+		*is_null = types.IntBool(isNull)
 	}
-	return types.intBool(ok)
+	return types.IntBool(ok)
 }
 func ZendParseArgStr(arg *types.Zval, dest **types.ZendString, check_null int) int {
 	val, _, ok := ParseArgStr(arg, check_null != 0, isArgUseStrictTypes())
 	// 为空时 *dest 直接为 nil，不需单独的 is_null 字符安
 	*dest = val
-	return types.intBool(ok)
+	return types.IntBool(ok)
 }
 func ZendParseArgString(arg *types.Zval, dest **byte, dest_len *int, check_null int) int {
 	var str *types.ZendString

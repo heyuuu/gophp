@@ -40,7 +40,7 @@ func (ht *HashTable) SymtableDel(key string) int {
 	} else {
 		result = ht.KeyDelete(key)
 	}
-	return resultCode(result)
+	return ResultCode(result)
 }
 func (ht *HashTable) SymtableFind(key string) *Zval {
 	if idx, ok := zend.zendParseNumericStr(key); ok {

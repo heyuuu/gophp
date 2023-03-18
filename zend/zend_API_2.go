@@ -92,7 +92,7 @@ func ZendParseArgClass(arg *types.Zval, pce **ZendClassEntry, num int, check_nul
 }
 func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
 	if val, ok := ParseArgBoolWeak(arg); ok {
-		*dest = types.intBool(val)
+		*dest = types.IntBool(val)
 		return 1
 	}
 	return 0

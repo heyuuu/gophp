@@ -76,7 +76,7 @@ var IniEntries = []ZendIniEntryDef{
 	*NewZendIniEntryDef("zend.exception_ignore_args", ZEND_INI_ALL).Value("0").
 		Displayer(ZendIniBooleanDisplayerCb).
 		OnModify(func(entry *ZendIniEntry, new_value *string, stage int) bool {
-			EG__().exception_ignore_args = types.intBool(ZendIniStringParseBool(*new_value))
+			EG__().exception_ignore_args = types.IntBool(ZendIniStringParseBool(*new_value))
 			return true
 		}),
 }

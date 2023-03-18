@@ -31,7 +31,7 @@ type ZendBool = int
 type ZendUchar = uint8
 type ZEND_RESULT_CODE = int
 
-func intBool(value bool) ZendBool {
+func IntBool(value bool) ZendBool {
 	if value {
 		return 1
 	} else {
@@ -39,7 +39,7 @@ func intBool(value bool) ZendBool {
 	}
 }
 
-func resultCode(value bool) ZEND_RESULT_CODE {
+func ResultCode(value bool) ZEND_RESULT_CODE {
 	if value {
 		return SUCCESS
 	} else {

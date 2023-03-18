@@ -25,15 +25,15 @@ func ZEND_HASH_INDEX_FIND(_ht *types.HashTable, _h ZendUlong, _ret *types.Zval, 
 }
 func ZendHashExists(ht *types.HashTable, key *types.ZendString) types.ZendBool {
 	var exists = ht.KeyExists(key.GetStr())
-	return types.intBool(exists)
+	return types.IntBool(exists)
 }
 func ZendHashStrExists(ht *types.HashTable, str *byte, len_ int) types.ZendBool {
 	var exists = ht.KeyExists(b.CastStr(str, len_))
-	return types.intBool(exists)
+	return types.IntBool(exists)
 }
 func ZendHashIndexExists(ht *types.HashTable, h ZendUlong) types.ZendBool {
 	var exists = ht.IndexExists(int(h))
-	return types.intBool(exists)
+	return types.IntBool(exists)
 }
 func ZendHashHasMoreElementsEx(ht *types.HashTable, pos *types.HashPosition) types.ZEND_RESULT_CODE {
 	if ZendHashGetCurrentKeyTypeEx(ht, pos) == HASH_KEY_NON_EXISTENT {
