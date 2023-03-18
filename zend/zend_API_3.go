@@ -11,7 +11,7 @@ func ZendParseArg(arg_num int, arg *types.Zval, va *va_list, spec **byte, flags 
 	var expected_type *byte = nil
 	var error *byte = nil
 	var severity int = 0
-	expected_type = ZendParseArgImpl(arg_num, arg, va, spec, &error, &severity)
+	expected_type = ZendParseArgImpl(arg, va, spec, &error, &severity)
 	if expected_type != nil {
 		if EG__().GetException() != nil {
 			return types.FAILURE

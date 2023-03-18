@@ -1,21 +1,21 @@
-package zend
+package args
 
 import (
 	"math"
+	"sik/zend"
 	"sik/zend/types"
 )
 
-func isArgUseStrictTypes() bool { return CurrEX().IsArgUseStrictTypes() }
-func isArgUseWeakTypes() bool   { return !CurrEX().IsArgUseStrictTypes() }
+func isArgUseWeakTypes() bool { return !zend.CurrEX().IsArgUseStrictTypes() }
 
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
 func parseArgNull[T any]() (T, bool, bool)      { var temp T; return temp, true, true }
 func parseArgFail[T any]() (T, bool, bool)      { var temp T; return temp, false, false }
 
-func ParseArgBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
+func ParseBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
 	// check null
-	if isNull = checkNull && arg.IsNull(); isNull {
-		return
+	if checkNull && arg.IsNull() {
+		return dest, true, true
 	}
 
 	// base parse
@@ -27,23 +27,23 @@ func ParseArgBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok b
 
 	// weak parse
 	if isArgUseWeakTypes() {
-		dest, ok = ParseArgBoolWeak(arg)
+		dest, ok = ParseBoolWeak(arg)
 	}
 
 	return
 }
 
-func ParseArgBoolWeak(arg *types.Zval) (dest bool, ok bool) {
+func ParseBoolWeak(arg *types.Zval) (dest bool, ok bool) {
 	if arg.GetType() <= types.IS_STRING {
-		return ZendIsTrueEx(arg), true
+		return zend.ZendIsTrueEx(arg), true
 	}
 	return false, false
 }
 
-func ParseArgLong(arg *types.Zval, checkNull bool, cap bool) (dest ZendLong, isNull bool, ok bool) {
+func ParseLong(arg *types.Zval, checkNull bool, cap bool) (dest int, isNull bool, ok bool) {
 	// check null
-	if isNull = checkNull && arg.IsNull(); isNull {
-		return
+	if checkNull && arg.IsNull() {
+		return dest, true, true
 	}
 
 	// base parse
@@ -53,20 +53,20 @@ func ParseArgLong(arg *types.Zval, checkNull bool, cap bool) (dest ZendLong, isN
 
 	// weak parse
 	if isArgUseWeakTypes() {
-		dest, ok = ParseArgLongWeak(arg, cap)
+		dest, ok = ParseLongWeak(arg, cap)
 	}
 
 	return
 }
 
-func ParseArgLongWeak(arg *types.Zval, cap bool) (dest ZendLong, ok bool) {
+func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg = ConvertNumericStrAsZval(arg.GetStr().GetStr(), ConvertNoticeOnErrors)
+		arg = zend.ConvertNumericStrAsZval(arg.GetStr().GetStr(), zend.ConvertNoticeOnErrors)
 		if arg == nil {
 			return // fail
 		}
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			return // fail
 		}
 	}
@@ -79,7 +79,7 @@ func ParseArgLongWeak(arg *types.Zval, cap bool) (dest ZendLong, ok bool) {
 	case types.IS_LONG:
 		dest = arg.GetLval()
 	case types.IS_DOUBLE:
-		return parseArgLongWeak_DvalToLval(arg.GetDval(), cap)
+		return parseArgWeak_DvalToLval(arg.GetDval(), cap)
 	default:
 		return // fail
 	}
@@ -87,24 +87,24 @@ func ParseArgLongWeak(arg *types.Zval, cap bool) (dest ZendLong, ok bool) {
 	return dest, true
 }
 
-func parseArgLongWeak_DvalToLval(dval float64, cap bool) (ZendLong, bool) {
+func parseArgWeak_DvalToLval(dval float64, cap bool) (zend.ZendLong, bool) {
 	if math.IsNaN(dval) {
 		return 0, false
 	}
 	if cap {
-		return ZendDvalToLvalCap(dval), true
+		return zend.ZendDvalToLvalCap(dval), true
 	} else {
-		if !ZEND_DOUBLE_FITS_LONG(dval) {
+		if !zend.ZEND_DOUBLE_FITS_LONG(dval) {
 			return 0, false
 		}
-		return ZendDvalToLval(dval), true
+		return zend.ZendDvalToLval(dval), true
 	}
 }
 
-func ParseArgDouble(arg *types.Zval, checkNull bool) (dest float64, isNull bool, ok bool) {
+func ParseDouble(arg *types.Zval, checkNull bool) (dest float64, isNull bool, ok bool) {
 	// check null
-	if isNull = checkNull && arg.IsNull(); isNull {
-		return
+	if checkNull && arg.IsNull() {
+		return dest, true, true
 	}
 
 	// base parse
@@ -116,20 +116,20 @@ func ParseArgDouble(arg *types.Zval, checkNull bool) (dest float64, isNull bool,
 
 	// weak parse
 	if isArgUseWeakTypes() {
-		dest, ok = ParseArgDoubleWeak(arg)
+		dest, ok = ParseDoubleWeak(arg)
 	}
 
 	return
 }
 
-func ParseArgDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
+func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg = ConvertNumericStrAsZval(arg.GetStr().GetStr(), ConvertNoticeOnErrors)
+		arg = zend.ConvertNumericStrAsZval(arg.GetStr().GetStr(), zend.ConvertNoticeOnErrors)
 		if arg == nil {
 			return // fail
 		}
-		if EG__().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			return // fail
 		}
 	}
@@ -150,28 +150,32 @@ func ParseArgDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	return dest, true
 }
 
-func ParseArgStr(arg *types.Zval, checkNull bool, strict bool) (dest *types.ZendString, isNull bool, ok bool) {
+/**
+ * 与 int/float 等类型不同，为空时 *dest 直接为 nil，不需单独的 is_null 字符安
+ */
+func ParseZStr(arg *types.Zval, checkNull bool) (dest *types.ZendString, ok bool) {
 	// check null
-	if isNull = checkNull && arg.IsNull(); isNull {
-		return
+	if checkNull && arg.IsNull() {
+		return nil, true
 	}
 
 	// base parse
 	if arg.IsString() {
-		return parseArgSucc(arg.GetStr())
+		return arg.GetStr(), true
 	}
 
 	// weak parse
-	if !strict {
-		dest, ok = ParseArgStrWeak(arg)
+	if isArgUseWeakTypes() {
+		return ParseZStrWeak(arg)
 	}
 
+	// fail
 	return
 }
 
-func ParseArgStrWeak(arg *types.Zval) (*types.ZendString, bool) {
+func ParseZStrWeak(arg *types.Zval) (*types.ZendString, bool) {
 	if arg.GetType() < types.IS_STRING {
-		ConvertToString(arg)
+		zend.ConvertToString(arg)
 		return arg.GetStr(), true
 	} else if arg.IsString() {
 		return arg.GetStr(), true
@@ -180,7 +184,7 @@ func ParseArgStrWeak(arg *types.Zval) (*types.ZendString, bool) {
 		if castFunc := handlers.GetCastObject(); castFunc != nil {
 			var obj types.Zval
 			if castFunc(arg, &obj, types.IS_STRING) == types.SUCCESS {
-				ZvalPtrDtor(arg)
+				zend.ZvalPtrDtor(arg)
 				types.ZVAL_COPY_VALUE(arg, &obj)
 				return arg.GetStr(), true
 			}
@@ -188,16 +192,16 @@ func ParseArgStrWeak(arg *types.Zval) (*types.ZendString, bool) {
 			var rv types.Zval
 			var z *types.Zval = getFunc(arg, &rv)
 			if z.GetType() != types.IS_OBJECT {
-				ZvalPtrDtor(arg)
+				zend.ZvalPtrDtor(arg)
 				if z.IsString() {
 					types.ZVAL_COPY_VALUE(arg, z)
 				} else {
-					arg.SetString(ZvalGetStringFunc(z))
-					ZvalPtrDtor(z)
+					arg.SetString(zend.ZvalGetStringFunc(z))
+					zend.ZvalPtrDtor(z)
 				}
 				return arg.GetStr(), true
 			}
-			ZvalPtrDtor(z)
+			zend.ZvalPtrDtor(z)
 		}
 		return nil, false
 	} else {

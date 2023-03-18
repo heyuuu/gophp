@@ -3,6 +3,7 @@ package zend
 import (
 	"fmt"
 	b "sik/builtin"
+	"sik/zend/args"
 	"sik/zend/types"
 )
 
@@ -91,21 +92,21 @@ func ZendParseArgClass(arg *types.Zval, pce **ZendClassEntry, num int, check_nul
 	return 1
 }
 func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
-	if val, ok := ParseArgBoolWeak(arg); ok {
+	if val, ok := args.ParseBoolWeak(arg); ok {
 		*dest = types.IntBool(val)
 		return 1
 	}
 	return 0
 }
 func ZendParseArgLongWeak(arg *types.Zval, dest *ZendLong) int {
-	if val, ok := ParseArgLongWeak(arg, false); ok {
+	if val, ok := args.ParseLongWeak(arg, false); ok {
 		*dest = val
 		return 1
 	}
 	return 0
 }
 func ZendParseArgDoubleWeak(arg *types.Zval, dest *float64) int {
-	if val, ok := ParseArgDoubleWeak(arg); ok {
+	if val, ok := args.ParseDoubleWeak(arg); ok {
 		*dest = val
 		return 1
 	}
@@ -113,25 +114,18 @@ func ZendParseArgDoubleWeak(arg *types.Zval, dest *float64) int {
 }
 
 func ZendParseArgStrWeak(arg *types.Zval, dest **types.ZendString) int {
-	if val, ok := ParseArgStrWeak(arg); ok {
+	if val, ok := args.ParseZStrWeak(arg); ok {
 		*dest = val
 		return 1
 	}
 	return 0
 }
 
-func ZendParseArgImpl(
-	arg_num int,
-	arg *types.Zval,
-	va *va_list,
-	spec **byte,
-	error **byte,
-	severity *int,
-) *byte {
+func ZendParseArgImpl(arg *types.Zval, va *interface{}, spec **byte, error **byte, severity *int) *byte {
 	return ZendParseArgImpl_Ex(arg, va, spec, error, severity)
 }
 
-func ZendParseArgImpl_Ex(arg *types.Zval, va *receiveArgs, spec *b.StrReader, error **byte, severity *int) string {
+func ZendParseArgImpl_Ex(arg *types.Zval, va *args.VaArgsReceiver, spec *b.StrReader, error **byte, severity *int) string {
 	specWalk := spec.Copy()
 	c := specWalk.Read()
 	var check_null int = 0
@@ -155,21 +149,22 @@ func ZendParseArgImpl_Ex(arg *types.Zval, va *receiveArgs, spec *b.StrReader, er
 	}
 	switch c {
 	case 'l', 'L':
-		if val, isNull, ok := ParseArgLong(arg, check_null != 0, c == 'L'); ok {
-			putReceiveArg(va, val)
+		if val, isNull, ok := args.ParseLong(arg, check_null != 0, c == 'L'); ok {
+			va.Long(val)
 			if check_null != 0 {
-				putReceiveArg(va, types.intBool(isNull))
+				va.Bool(isNull)
 			}
+		} else {
 			return "int"
 		}
 		break
 	case 'd':
-		var p *float64 = __va_arg(*va, (*float64)(_))
-		var is_null *types.ZendBool = nil
-		if check_null != 0 {
-			is_null = va.Pop().(*types.ZendBool)
-		}
-		if ZendParseArgDouble(arg, p, is_null, check_null) == 0 {
+		if val, isNull, ok := args.ParseDouble(arg, check_null != 0); ok {
+			va.Double(val)
+			if check_null != 0 {
+				va.Bool(isNull)
+			}
+		} else {
 			return "float"
 		}
 		break
@@ -194,18 +189,19 @@ func ZendParseArgImpl_Ex(arg *types.Zval, va *receiveArgs, spec *b.StrReader, er
 		}
 		break
 	case 'S':
-		var str **types.ZendString = __va_arg(*va, (**types.ZendString)(_))
-		if ZendParseArgStr(arg, str, check_null) == 0 {
+		if val, ok := args.ParseZStr(arg, check_null != 0); ok {
+			va.ZStr(val)
+		} else {
 			return "string"
 		}
 		break
 	case 'b':
-		var p *types.ZendBool = __va_arg(*va, (*types.ZendBool)(_))
-		var is_null *types.ZendBool = nil
-		if check_null != 0 {
-			is_null = va.Pop().(*types.ZendBool)
-		}
-		if ZendParseArgBool(arg, p, is_null, check_null) == 0 {
+		if val, isNull, ok := args.ParseBool(arg, check_null != 0); ok {
+			va.Bool(val)
+			if check_null != 0 {
+				va.Bool(isNull)
+			}
+		} else {
 			return "bool"
 		}
 		break
