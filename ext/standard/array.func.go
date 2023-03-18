@@ -5207,11 +5207,9 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input = fp.ParseArrayHt()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &column, 1)
+			column = fp.ParseZvalEx(true)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &index, 1)
+			index = fp.ParseZvalEx(true)
 			if fp.HasError() {
 				fp.HandleError()
 				return

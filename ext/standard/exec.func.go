@@ -159,8 +159,7 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 			cmd, cmd_len = fp.ParseString()
 			fp.StartOptional()
 			if mode == 0 {
-				argparse.Z_PARAM_PROLOGUE(0, 0)
-				argparse.ZendParseArgZvalDeref(_arg, &ret_array, 0)
+				ret_array = fp.ParseZval()
 			}
 			ret_code = fp.ParseZval()
 			if fp.HasError() {

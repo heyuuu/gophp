@@ -1284,8 +1284,7 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 				zcontext = fp.ParseResource()
 				wrappername, wrapperlen = fp.ParseString()
 				optionname, optionlen = fp.ParseString()
-				argparse.Z_PARAM_PROLOGUE(0, 0)
-				argparse.ZendParseArgZvalDeref(_arg, &zvalue, 0)
+				zvalue = fp.ParseZval()
 				if fp.HasError() {
 					fp.HandleError()
 					return_value.SetFalse()

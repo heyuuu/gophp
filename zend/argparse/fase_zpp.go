@@ -490,10 +490,9 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
 
 // @see Micro: Z_PARAM_ZVAL
 func (p *FastParser) ParseZval() (dest *types.Zval) {
-	dest, _ = p.ParseZvalEx(false)
-	return
+	return p.ParseZvalEx(false)
 }
-func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
@@ -510,12 +509,13 @@ func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
 	return
 }
 func (p *FastParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
-	p.paramPrologue(false, false)
+	p.paramPrologue(true, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	ZendParseArgZvalDeref(p._arg, &dest, types.IntBool(checkNull))
+
 	return
 }
 
