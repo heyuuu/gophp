@@ -206,31 +206,11 @@ func ZifVarDump(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				args = nil
 				argc = 0
 			}
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return
 			}
-			return
+			break
 		}
 		break
 	}
@@ -432,31 +412,11 @@ func ZifDebugZvalDump(executeData *zend.ZendExecuteData, return_value *types.Zva
 				args = nil
 				argc = 0
 			}
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return
 			}
-			return
+			break
 		}
 		break
 	}
@@ -699,31 +659,11 @@ func ZifVarExport(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return
 			}
-			return
+			break
 		}
 		break
 	}
@@ -1246,31 +1186,11 @@ func ZifSerialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &struc, 0)
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return
 			}
-			return
+			break
 		}
 		break
 	}
@@ -1330,38 +1250,13 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 				break
 			}
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgArray(_arg, &options, 0, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
+			options = fp.ParseArray()
+			if fp.HasError() {
+				fp.HandleError()
+				return_value.SetFalse()
+				return
 			}
 			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
-			}
-			return_value.SetFalse()
-			return
 		}
 		break
 	}
@@ -1510,32 +1405,12 @@ func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *types.Zv
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return_value.SetFalse()
+				return
 			}
-			return_value.SetFalse()
-			return
+			break
 		}
 		break
 	}
@@ -1573,32 +1448,12 @@ func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *type
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongCallbackException(_i, _error)
-					} else {
-						zend.ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						zend.ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return_value.SetFalse()
+				return
 			}
-			return_value.SetFalse()
-			return
+			break
 		}
 		break
 	}

@@ -94,6 +94,34 @@ func FastParseStart(executeData *zend.ZendExecuteData, minNumArgs int, maxNumArg
 	return p
 }
 
+func (p *FastParser) HandleError() {
+	if (p.flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+		if p.errorCode == ZPP_ERROR_WRONG_CALLBACK {
+			if (p.flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				zend.ZendWrongCallbackException(p._i, p._error)
+			} else {
+				zend.ZendWrongCallbackError(p._i, p._error)
+			}
+		} else if p.errorCode == ZPP_ERROR_WRONG_CLASS {
+			if (p.flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				zend.ZendWrongParameterClassException(p._i, p._error, p._arg)
+			} else {
+				zend.ZendWrongParameterClassError(p._i, p._error, p._arg)
+			}
+		} else if p.errorCode == ZPP_ERROR_WRONG_ARG {
+			if (p.flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				zend.ZendWrongParameterTypeException(p._i, p._expected_type, p._arg)
+			} else {
+				zend.ZendWrongParameterTypeError(p._i, p._expected_type, p._arg)
+			}
+		}
+	}
+}
+
+func (p *FastParser) HasError() bool {
+	return p.errorCode != ZPP_ERROR_OK
+}
+
 func (p *FastParser) IsFinish() bool {
 	return p.finish || p.errorCode != ZPP_ERROR_OK
 }
@@ -129,17 +157,22 @@ func (p *FastParser) paramPrologue(deref bool, separate bool) {
 }
 
 // @see Micro: Z_PARAM_ARRAY
-func (p *FastParser) PARAM_ARRAY() (dest *types.Zval) {
+func (p *FastParser) ParseArray() (dest *types.Zval) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if zend.ZendParseArgArray(p._arg, &dest, 0, 0) == 0 {
+		p._expected_type = Z_EXPECTED_ARRAY
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT
-func (p *FastParser) PARAM_ARRAY_OR_OBJECT() (dest *types.Zval) {
+func (p *FastParser) ParseArrayOrObject() (dest *types.Zval) {
 	if p.IsFinish() {
 		return
 	}
@@ -149,7 +182,7 @@ func (p *FastParser) PARAM_ARRAY_OR_OBJECT() (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_BOOL
-func (p *FastParser) PARAM_BOOL() (dest types.ZendBool) {
+func (p *FastParser) ParseBool() (dest types.ZendBool) {
 	if p.IsFinish() {
 		return
 	}
@@ -159,7 +192,7 @@ func (p *FastParser) PARAM_BOOL() (dest types.ZendBool) {
 }
 
 // @see Micro: Z_PARAM_CLASS
-func (p *FastParser) PARAM_CLASS() (dest *zend.ZendClassEntry) {
+func (p *FastParser) ParseClass() (dest *zend.ZendClassEntry) {
 	if p.IsFinish() {
 		return
 	}
@@ -169,7 +202,7 @@ func (p *FastParser) PARAM_CLASS() (dest *zend.ZendClassEntry) {
 }
 
 // @see Micro: Z_PARAM_DOUBLE
-func (p *FastParser) PARAM_DOUBLE() (dest float64) {
+func (p *FastParser) ParseDouble() (dest float64) {
 	if p.IsFinish() {
 		return
 	}
@@ -179,7 +212,7 @@ func (p *FastParser) PARAM_DOUBLE() (dest float64) {
 }
 
 // @see Micro: Z_PARAM_FUNC
-func (p *FastParser) PARAM_FUNC() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) {
+func (p *FastParser) ParseFunc() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) {
 	if p.IsFinish() {
 		return
 	}
@@ -189,7 +222,7 @@ func (p *FastParser) PARAM_FUNC() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInf
 }
 
 // @see Micro: Z_PARAM_ARRAY_HT
-func (p *FastParser) PARAM_ARRAY_HT() (dest *types.ZendArray) {
+func (p *FastParser) ParseArrayHt() (dest *types.ZendArray) {
 	if p.IsFinish() {
 		return
 	}
@@ -199,7 +232,7 @@ func (p *FastParser) PARAM_ARRAY_HT() (dest *types.ZendArray) {
 }
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT
-func (p *FastParser) PARAM_ARRAY_OR_OBJECT_HT() (dest *types.ZendArray) {
+func (p *FastParser) ParseArrayOrObjectHt() (dest *types.ZendArray) {
 	if p.IsFinish() {
 		return
 	}
@@ -209,7 +242,7 @@ func (p *FastParser) PARAM_ARRAY_OR_OBJECT_HT() (dest *types.ZendArray) {
 }
 
 // @see Micro: Z_PARAM_LONG
-func (p *FastParser) PARAM_LONG() (dest int) {
+func (p *FastParser) ParseLong() (dest int) {
 	if p.IsFinish() {
 		return
 	}
@@ -219,7 +252,7 @@ func (p *FastParser) PARAM_LONG() (dest int) {
 }
 
 // @see Micro: Z_PARAM_STRICT_LONG
-func (p *FastParser) PARAM_STRICT_LONG() (dest int) {
+func (p *FastParser) ParseStrictLong() (dest int) {
 	if p.IsFinish() {
 		return
 	}
@@ -229,7 +262,7 @@ func (p *FastParser) PARAM_STRICT_LONG() (dest int) {
 }
 
 // @see Micro: Z_PARAM_OBJECT
-func (p *FastParser) PARAM_OBJECT() (dest *types.Zval) {
+func (p *FastParser) ParseObject() (dest *types.Zval) {
 	if p.IsFinish() {
 		return
 	}
@@ -239,7 +272,7 @@ func (p *FastParser) PARAM_OBJECT() (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_OBJECT_OF_CLASS
-func (p *FastParser) PARAM_OBJECT_OF_CLASS(ce *zend.ZendClassEntry) (dest *types.Zval) {
+func (p *FastParser) ParseObjectOfClass(ce *zend.ZendClassEntry) (dest *types.Zval) {
 	if p.IsFinish() {
 		return
 	}
@@ -249,7 +282,7 @@ func (p *FastParser) PARAM_OBJECT_OF_CLASS(ce *zend.ZendClassEntry) (dest *types
 }
 
 // @see Micro: Z_PARAM_PATH
-func (p *FastParser) PARAM_PATH() (dest *byte, dest_len int) {
+func (p *FastParser) ParsePath() (dest *byte, dest_len int) {
 	if p.IsFinish() {
 		return
 	}
@@ -259,7 +292,7 @@ func (p *FastParser) PARAM_PATH() (dest *byte, dest_len int) {
 }
 
 // @see Micro: Z_PARAM_PATH_STR
-func (p *FastParser) PARAM_PATH_STR() (dest *types.ZendString) {
+func (p *FastParser) ParsePathStr() (dest *types.ZendString) {
 	if p.IsFinish() {
 		return
 	}
@@ -269,7 +302,7 @@ func (p *FastParser) PARAM_PATH_STR() (dest *types.ZendString) {
 }
 
 // @see Micro: Z_PARAM_RESOURCE
-func (p *FastParser) PARAM_RESOURCE() (dest *types.Zval) {
+func (p *FastParser) ParseResource() (dest *types.Zval) {
 	if p.IsFinish() {
 		return
 	}
@@ -279,7 +312,7 @@ func (p *FastParser) PARAM_RESOURCE() (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_STRING
-func (p *FastParser) PARAM_STRING() (dest *byte, dest_len int) {
+func (p *FastParser) ParseString() (dest *byte, dest_len int) {
 	if p.IsFinish() {
 		return
 	}
@@ -289,7 +322,7 @@ func (p *FastParser) PARAM_STRING() (dest *byte, dest_len int) {
 }
 
 // @see Micro: Z_PARAM_STR
-func (p *FastParser) PARAM_STR() (dest *types.ZendString) {
+func (p *FastParser) ParseStr() (dest *types.ZendString) {
 	if p.IsFinish() {
 		return
 	}
@@ -299,7 +332,7 @@ func (p *FastParser) PARAM_STR() (dest *types.ZendString) {
 }
 
 // @see Micro: Z_PARAM_ZVAL
-func (p *FastParser) PARAM_ZVAL() (dest *types.Zval) {
+func (p *FastParser) ParseZval() (dest *types.Zval) {
 	if p.IsFinish() {
 		return
 	}
@@ -309,7 +342,7 @@ func (p *FastParser) PARAM_ZVAL() (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_ZVAL_DEREF
-func (p *FastParser) PARAM_ZVAL_DEREF() (dest *types.Zval) {
+func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
 	if p.IsFinish() {
 		return
 	}
@@ -319,7 +352,7 @@ func (p *FastParser) PARAM_ZVAL_DEREF() (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_VARIADIC_1
-func (p *FastParser) PARAM_VARIADIC_1() (dest *types.Zval, num int) {
+func (p *FastParser) ParseVariadic1() (dest *types.Zval, num int) {
 	if p.IsFinish() {
 		return
 	}
@@ -329,7 +362,7 @@ func (p *FastParser) PARAM_VARIADIC_1() (dest *types.Zval, num int) {
 }
 
 // @see Micro: Z_PARAM_VARIADIC_0
-func (p *FastParser) PARAM_VARIADIC_0() (dest *types.Zval, num int) {
+func (p *FastParser) ParseVariadic0() (dest *types.Zval, num int) {
 	if p.IsFinish() {
 		return
 	}
