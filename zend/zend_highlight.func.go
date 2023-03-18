@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZendHtmlPutc(c byte) {
@@ -51,7 +52,7 @@ func ZendHtmlPuts(s *byte, len_ int) {
 	}
 }
 func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
-	var token Zval
+	var token types.Zval
 	var token_type int
 	var last_color *byte = syntax_highlighter_ini.GetHighlightHtml()
 	var next_color *byte
@@ -150,7 +151,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 	/* Discard parse errors thrown during tokenization */
 }
 func ZendStrip() {
-	var token Zval
+	var token types.Zval
 	var token_type int
 	var prev_space int = 0
 	for b.Assign(&token_type, LexScan(&token, nil)) {

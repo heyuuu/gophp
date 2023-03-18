@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/streamsfuncs.h>
@@ -30,9 +31,9 @@ const PHP_STREAM_CLIENT_PERSISTENT = 1
 const PHP_STREAM_CLIENT_ASYNC_CONNECT = 2
 const PHP_STREAM_CLIENT_CONNECT = 4
 
-var ZifStreamWrapperRegister func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var ZifStreamWrapperUnregister func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var ZifStreamWrapperRestore func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifStreamWrapperRegister func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var ZifStreamWrapperUnregister func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var ZifStreamWrapperRestore func(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 // Source: <ext/standard/streamsfuncs.c>
 

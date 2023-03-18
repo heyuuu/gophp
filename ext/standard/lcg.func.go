@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func MODMULT(a int, b int, c int, m int, s int) {
@@ -46,10 +47,10 @@ func LcgSeed() {
 func LcgInitGlobals(lcg_globals_p *PhpLcgGlobals) { LCG(seeded) = 0 }
 func ZmStartupLcg(type_ int, module_number int) int {
 	LcgInitGlobals(&LcgGlobals)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func ZifLcgValue(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifLcgValue(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	return_value.SetDouble(PhpCombinedLcg())

@@ -6,12 +6,13 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func MakeSha1Digest(sha1str *byte, digest *uint8) { MakeDigestEx(sha1str, digest, 20) }
-func ZifSha1(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg *zend.ZendString
-	var raw_output zend.ZendBool = 0
+func ZifSha1(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg *types.ZendString
+	var raw_output types.ZendBool = 0
 	var context PHP_SHA1_CTX
 	var digest []uint8
 	for {
@@ -20,12 +21,12 @@ func ZifSha1(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -95,14 +96,14 @@ func ZifSha1(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetRawString(b.CastStr((*byte)(digest), 20))
 		return
 	} else {
-		return_value.SetString(zend.ZendStringAlloc(40, 0))
+		return_value.SetString(types.ZendStringAlloc(40, 0))
 		MakeDigestEx(return_value.GetStr().GetVal(), digest, 20)
 	}
 }
-func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSha1File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *byte
 	var arg_len int
-	var raw_output zend.ZendBool = 0
+	var raw_output types.ZendBool = 0
 	var buf []uint8
 	var digest []uint8
 	var context PHP_SHA1_CTX
@@ -114,12 +115,12 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -197,7 +198,7 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetRawString(b.CastStr((*byte)(digest), 20))
 		return
 	} else {
-		return_value.SetString(zend.ZendStringAlloc(40, 0))
+		return_value.SetString(types.ZendStringAlloc(40, 0))
 		MakeDigestEx(return_value.GetStr().GetVal(), digest, 20)
 	}
 }

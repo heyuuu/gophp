@@ -7,10 +7,11 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func ZifUserFilterNop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {}
-func PhpBucketDtor(res *zend.ZendResource) {
+func ZifUserFilterNop(executeData *zend.ZendExecuteData, return_value *types.Zval) {}
+func PhpBucketDtor(res *types.ZendResource) {
 	var bucket *streams.PhpStreamBucket = (*streams.PhpStreamBucket)(res.GetPtr())
 	if bucket != nil {
 		streams.PhpStreamBucketDelref(bucket)
@@ -23,10 +24,10 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	/* init the filter class ancestor */
 
 	memset(&UserFilterClassEntry, 0, b.SizeOf("zend_class_entry"))
-	UserFilterClassEntry.SetName(zend.ZendStringInitInterned("php_user_filter", b.SizeOf("\"php_user_filter\"")-1, 1))
+	UserFilterClassEntry.SetName(types.ZendStringInitInterned("php_user_filter", b.SizeOf("\"php_user_filter\"")-1, 1))
 	UserFilterClassEntry.SetBuiltinFunctions(UserFilterClassFuncs)
 	if b.Assign(&php_user_filter, zend.ZendRegisterInternalClass(&UserFilterClassEntry)) == nil {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	zend.ZendDeclarePropertyString(php_user_filter, "filtername", b.SizeOf("\"filtername\"")-1, "", zend.ZEND_ACC_PUBLIC)
 	zend.ZendDeclarePropertyString(php_user_filter, "params", b.SizeOf("\"params\"")-1, "", zend.ZEND_ACC_PUBLIC)
@@ -35,8 +36,8 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	 * at the correct time */
 
 	LeUserfilters = zend.ZendRegisterListDestructorsEx(nil, nil, PHP_STREAM_FILTER_RES_NAME, 0)
-	if LeUserfilters == zend.FAILURE {
-		return zend.FAILURE
+	if LeUserfilters == types.FAILURE {
+		return types.FAILURE
 	}
 
 	/* Filters will dispose of their brigades */
@@ -46,8 +47,8 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	/* Brigades will dispose of their buckets */
 
 	LeBucket = zend.ZendRegisterListDestructorsEx(PhpBucketDtor, nil, PHP_STREAM_BUCKET_RES_NAME, module_number)
-	if LeBucketBrigade == zend.FAILURE {
-		return zend.FAILURE
+	if LeBucketBrigade == types.FAILURE {
+		return types.FAILURE
 	}
 	zend.REGISTER_LONG_CONSTANT("PSFS_PASS_ON", streams.PSFS_PASS_ON, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("PSFS_FEED_ME", streams.PSFS_FEED_ME, zend.CONST_CS|zend.CONST_PERSISTENT)
@@ -55,7 +56,7 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("PSFS_FLAG_NORMAL", streams.PSFS_FLAG_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("PSFS_FLAG_FLUSH_INC", streams.PSFS_FLAG_FLUSH_INC, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("PSFS_FLAG_FLUSH_CLOSE", streams.PSFS_FLAG_FLUSH_CLOSE, zend.CONST_CS|zend.CONST_PERSISTENT)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmDeactivateUserFilters(type_ int, module_number int) int {
 	if BG(user_filter_map) {
@@ -63,12 +64,12 @@ func ZmDeactivateUserFilters(type_ int, module_number int) int {
 		zend.Efree(BG(user_filter_map))
 		BG(user_filter_map) = nil
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func UserfilterDtor(thisfilter *core.PhpStreamFilter) {
-	var obj *zend.Zval = thisfilter.GetAbstract()
-	var func_name zend.Zval
-	var retval zend.Zval
+	var obj *types.Zval = thisfilter.GetAbstract()
+	var func_name types.Zval
+	var retval types.Zval
 	if obj == nil {
 
 		/* If there's no object associated then there's nothing to dispose of */
@@ -98,11 +99,11 @@ func UserfilterFilter(
 	flags int,
 ) streams.PhpStreamFilterStatusT {
 	var ret int = streams.PSFS_ERR_FATAL
-	var obj *zend.Zval = thisfilter.GetAbstract()
-	var func_name zend.Zval
-	var retval zend.Zval
-	var args []zend.Zval
-	var zpropname zend.Zval
+	var obj *types.Zval = thisfilter.GetAbstract()
+	var func_name types.Zval
+	var retval types.Zval
+	var args []types.Zval
+	var zpropname types.Zval
 	var call_result int
 
 	/* the userfilter object probably doesn't exist anymore */
@@ -115,8 +116,8 @@ func UserfilterFilter(
 
 	var orig_no_fclose uint32 = stream.GetFlags() & core.PHP_STREAM_FLAG_NO_FCLOSE
 	stream.AddFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
-	if !(zend.Z_OBJPROP_P(obj).KeyExistsInd("stream")) {
-		var tmp zend.Zval
+	if !(types.Z_OBJPROP_P(obj).KeyExistsInd("stream")) {
+		var tmp types.Zval
 
 		/* Give the userfilter class a hook back to the stream */
 
@@ -142,13 +143,13 @@ func UserfilterFilter(
 	} else {
 		args[2].SetNull()
 	}
-	zend.ZVAL_BOOL(&args[3], (flags&streams.PSFS_FLAG_FLUSH_CLOSE) != 0)
+	types.ZVAL_BOOL(&args[3], (flags&streams.PSFS_FLAG_FLUSH_CLOSE) != 0)
 	call_result = zend.CallUserFunctionEx(obj, &func_name, &retval, 4, args, 0)
 	zend.ZvalPtrDtor(&func_name)
-	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		zend.ConvertToLong(&retval)
 		ret = int(retval.GetLval())
-	} else if call_result == zend.FAILURE {
+	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to call filter function")
 	}
 	if bytes_consumed != nil {
@@ -179,7 +180,7 @@ func UserfilterFilter(
 	 * from being destroyed properly */
 
 	zpropname.SetRawString("stream")
-	zend.Z_OBJ_HT(*obj).GetUnsetProperty()(obj, &zpropname, nil)
+	types.Z_OBJ_HT(*obj).GetUnsetProperty()(obj, &zpropname, nil)
 	zend.ZvalPtrDtor(&zpropname)
 	zend.ZvalPtrDtor(&args[3])
 	zend.ZvalPtrDtor(&args[2])
@@ -189,13 +190,13 @@ func UserfilterFilter(
 	stream.AddFlags(orig_no_fclose)
 	return ret
 }
-func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
+func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	var fdat *PhpUserFilterData = nil
 	var filter *core.PhpStreamFilter
-	var obj zend.Zval
-	var zfilter zend.Zval
-	var func_name zend.Zval
-	var retval zend.Zval
+	var obj types.Zval
+	var zfilter types.Zval
+	var func_name types.Zval
+	var retval types.Zval
 	var len_ int
 
 	/* some sanity checks */
@@ -254,7 +255,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 
 	/* create the object */
 
-	if zend.ObjectInitEx(&obj, fdat.GetCe()) == zend.FAILURE {
+	if zend.ObjectInitEx(&obj, fdat.GetCe()) == types.FAILURE {
 		return nil
 	}
 	filter = streams.PhpStreamFilterAlloc(&UserfilterOps, nil, 0)
@@ -279,8 +280,8 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 
 	func_name.SetRawString("oncreate")
 	zend.CallUserFunction(&obj, &func_name, &retval, 0, nil)
-	if retval.GetType() != zend.IS_UNDEF {
-		if retval.IsType(zend.IS_FALSE) {
+	if retval.GetType() != types.IS_UNDEF {
+		if retval.IsType(types.IS_FALSE) {
 
 			/* User reported filter creation error "return false;" */
 
@@ -317,14 +318,14 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 	zend.ZvalPtrDtor(&zfilter)
 	return filter
 }
-func FilterItemDtor(zv *zend.Zval) {
+func FilterItemDtor(zv *types.Zval) {
 	var fdat *PhpUserFilterData = zv.GetPtr()
-	zend.ZendStringReleaseEx(fdat.GetClassname(), 0)
+	types.ZendStringReleaseEx(fdat.GetClassname(), 0)
 	zend.Efree(fdat)
 }
-func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zbrigade *zend.Zval
-	var zbucket zend.Zval
+func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zbrigade *types.Zval
+	var zbucket types.Zval
 	var brigade *streams.PhpStreamBucketBrigade
 	var bucket *streams.PhpStreamBucket
 	for {
@@ -333,12 +334,12 @@ func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_valu
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -412,11 +413,11 @@ func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_valu
 		zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 	}
 }
-func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zbrigade *zend.Zval
-	var zobject *zend.Zval
-	var pzbucket *zend.Zval
-	var pzdata *zend.Zval
+func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zbrigade *types.Zval
+	var zobject *types.Zval
+	var pzbucket *types.Zval
+	var pzdata *types.Zval
 	var brigade *streams.PhpStreamBucketBrigade
 	var bucket *streams.PhpStreamBucket
 	for {
@@ -425,12 +426,12 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -493,7 +494,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		}
 		break
 	}
-	if nil == b.Assign(&pzbucket, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "bucket", b.SizeOf("\"bucket\"")-1)) {
+	if nil == b.Assign(&pzbucket, zend.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "bucket", b.SizeOf("\"bucket\"")-1)) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Object has no bucket property")
 		return_value.SetFalse()
 		return
@@ -506,7 +507,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		return_value.SetFalse()
 		return
 	}
-	if nil != b.Assign(&pzdata, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "data", b.SizeOf("\"data\"")-1)) && pzdata.IsType(zend.IS_STRING) {
+	if nil != b.Assign(&pzdata, zend.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "data", b.SizeOf("\"data\"")-1)) && pzdata.IsType(types.IS_STRING) {
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}
@@ -534,15 +535,15 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 	 * multiple times. See bug35916.phpt for reference.
 	 */
 }
-func ZifStreamBucketPrepend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamBucketPrepend(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpStreamBucketAttach(0, executeData, return_value)
 }
-func ZifStreamBucketAppend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamBucketAppend(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpStreamBucketAttach(1, executeData, return_value)
 }
-func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zstream *zend.Zval
-	var zbucket zend.Zval
+func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zstream *types.Zval
+	var zbucket types.Zval
 	var stream *core.PhpStream
 	var buffer *byte
 	var pbuffer *byte
@@ -554,12 +555,12 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -636,18 +637,18 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	zend.AddPropertyStringl(return_value, "data", b.CastStr(bucket.GetBuf(), bucket.GetBuflen()))
 	zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 }
-func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var filter_name *zend.ZendString
-	var filters_hash *zend.HashTable
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var filter_name *types.ZendString
+	var filters_hash *types.HashTable
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	zend.ArrayInit(return_value)
 	filters_hash = core.PhpGetStreamFiltersHash()
 	if filters_hash != nil {
-		var __ht *zend.HashTable = filters_hash
+		var __ht *types.HashTable = filters_hash
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			filter_name = _p.GetKey()
 			if filter_name != nil {
@@ -656,9 +657,9 @@ func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *zend.Z
 		}
 	}
 }
-func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var filtername *zend.ZendString
-	var classname *zend.ZendString
+func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var filtername *types.ZendString
+	var classname *types.ZendString
 	var fdat *PhpUserFilterData
 	for {
 		var _flags int = 0
@@ -666,12 +667,12 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ze
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -744,15 +745,15 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ze
 		return
 	}
 	if !(BG(user_filter_map)) {
-		BG(user_filter_map) = (*zend.HashTable)(zend.Emalloc(b.SizeOf("HashTable")))
-		zend.ZendHashInit(BG(user_filter_map), 8, nil, zend.DtorFuncT(FilterItemDtor), 0)
+		BG(user_filter_map) = (*types.HashTable)(zend.Emalloc(b.SizeOf("HashTable")))
+		zend.ZendHashInit(BG(user_filter_map), 8, nil, types.DtorFuncT(FilterItemDtor), 0)
 	}
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
 	fdat.SetClassname(classname.Copy())
-	if zend.ZendHashAddPtr(BG(user_filter_map), filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == zend.SUCCESS {
+	if zend.ZendHashAddPtr(BG(user_filter_map), filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == types.SUCCESS {
 		return_value.SetTrue()
 	} else {
-		zend.ZendStringReleaseEx(classname, 0)
+		types.ZendStringReleaseEx(classname, 0)
 		zend.Efree(fdat)
 	}
 }

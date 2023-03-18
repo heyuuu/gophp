@@ -4,134 +4,135 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZendCompileFuncGetArgs(result *Znode, args *ZendAstList) int {
 	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 0 {
 		ZendEmitOpTmp(result, ZEND_FUNC_GET_ARGS, nil, nil)
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
 func ZendCompileFuncArrayKeyExists(result *Znode, args *ZendAstList) int {
 	var subject Znode
 	var needle Znode
 	if args.GetChildren() != 2 {
-		return FAILURE
+		return types.FAILURE
 	}
 	ZendCompileExpr(&needle, args.GetChild()[0])
 	ZendCompileExpr(&subject, args.GetChild()[1])
 	ZendEmitOpTmp(result, ZEND_ARRAY_KEY_EXISTS, &needle, &subject)
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 2 && args.GetChild()[0].GetKind() == ZEND_AST_CALL && args.GetChild()[0].GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0].GetChild()[0]).IsString() && args.GetChild()[0].GetChild()[1].GetKind() == ZEND_AST_ARG_LIST && args.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
-		var orig_name *ZendString = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
-		var is_fully_qualified ZendBool
-		var name *ZendString = ZendResolveFunctionName(orig_name, args.GetChild()[0].GetChild()[0].GetAttr(), &is_fully_qualified)
+		var orig_name *types.ZendString = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
+		var is_fully_qualified types.ZendBool
+		var name *types.ZendString = ZendResolveFunctionName(orig_name, args.GetChild()[0].GetChild()[0].GetAttr(), &is_fully_qualified)
 		var list *ZendAstList = ZendAstGetList(args.GetChild()[0].GetChild()[1])
-		var zv *Zval = ZendAstGetZval(args.GetChild()[1])
+		var zv *types.Zval = ZendAstGetZval(args.GetChild()[1])
 		var first Znode
-		if ZendStringEqualsLiteralCi(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.GetLval() >= 0 {
+		if types.ZendStringEqualsLiteralCi(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.GetLval() >= 0 {
 			first.SetOpType(IS_CONST)
 			first.GetConstant().SetLong(zv.GetLval())
 			ZendEmitOpTmp(result, ZEND_FUNC_GET_ARGS, &first, nil)
-			ZendStringReleaseEx(name, 0)
-			return SUCCESS
+			types.ZendStringReleaseEx(name, 0)
+			return types.SUCCESS
 		}
-		ZendStringReleaseEx(name, 0)
+		types.ZendStringReleaseEx(name, 0)
 	}
-	return FAILURE
+	return types.FAILURE
 }
-func ZendTryCompileSpecialFunc(result *Znode, lcname *ZendString, args *ZendAstList, fbc *ZendFunction, type_ uint32) int {
+func ZendTryCompileSpecialFunc(result *Znode, lcname *types.ZendString, args *ZendAstList, fbc *ZendFunction, type_ uint32) int {
 	if fbc.GetInternalFunction().GetHandler() == ZifDisplayDisabledFunction {
-		return FAILURE
+		return types.FAILURE
 	}
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_NO_BUILTINS) != 0 {
-		return FAILURE
+		return types.FAILURE
 	}
 	if ZendArgsContainUnpack(args) != 0 {
-		return FAILURE
+		return types.FAILURE
 	}
-	if ZendStringEqualsLiteral(lcname, "strlen") {
+	if types.ZendStringEqualsLiteral(lcname, "strlen") {
 		return ZendCompileFuncStrlen(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "is_null") {
-		return ZendCompileFuncTypecheck(result, args, IS_NULL)
-	} else if ZendStringEqualsLiteral(lcname, "is_bool") {
-		return ZendCompileFuncTypecheck(result, args, _IS_BOOL)
-	} else if ZendStringEqualsLiteral(lcname, "is_long") || ZendStringEqualsLiteral(lcname, "is_int") || ZendStringEqualsLiteral(lcname, "is_integer") {
-		return ZendCompileFuncTypecheck(result, args, IS_LONG)
-	} else if ZendStringEqualsLiteral(lcname, "is_float") || ZendStringEqualsLiteral(lcname, "is_double") {
-		return ZendCompileFuncTypecheck(result, args, IS_DOUBLE)
-	} else if ZendStringEqualsLiteral(lcname, "is_string") {
-		return ZendCompileFuncTypecheck(result, args, IS_STRING)
-	} else if ZendStringEqualsLiteral(lcname, "is_array") {
-		return ZendCompileFuncTypecheck(result, args, IS_ARRAY)
-	} else if ZendStringEqualsLiteral(lcname, "is_object") {
-		return ZendCompileFuncTypecheck(result, args, IS_OBJECT)
-	} else if ZendStringEqualsLiteral(lcname, "is_resource") {
-		return ZendCompileFuncTypecheck(result, args, IS_RESOURCE)
-	} else if ZendStringEqualsLiteral(lcname, "boolval") {
-		return ZendCompileFuncCast(result, args, _IS_BOOL)
-	} else if ZendStringEqualsLiteral(lcname, "intval") {
-		return ZendCompileFuncCast(result, args, IS_LONG)
-	} else if ZendStringEqualsLiteral(lcname, "floatval") || ZendStringEqualsLiteral(lcname, "doubleval") {
-		return ZendCompileFuncCast(result, args, IS_DOUBLE)
-	} else if ZendStringEqualsLiteral(lcname, "strval") {
-		return ZendCompileFuncCast(result, args, IS_STRING)
-	} else if ZendStringEqualsLiteral(lcname, "defined") {
+	} else if types.ZendStringEqualsLiteral(lcname, "is_null") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_NULL)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_bool") {
+		return ZendCompileFuncTypecheck(result, args, types._IS_BOOL)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_long") || types.ZendStringEqualsLiteral(lcname, "is_int") || types.ZendStringEqualsLiteral(lcname, "is_integer") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_LONG)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_float") || types.ZendStringEqualsLiteral(lcname, "is_double") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_DOUBLE)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_string") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_STRING)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_array") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_ARRAY)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_object") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_OBJECT)
+	} else if types.ZendStringEqualsLiteral(lcname, "is_resource") {
+		return ZendCompileFuncTypecheck(result, args, types.IS_RESOURCE)
+	} else if types.ZendStringEqualsLiteral(lcname, "boolval") {
+		return ZendCompileFuncCast(result, args, types._IS_BOOL)
+	} else if types.ZendStringEqualsLiteral(lcname, "intval") {
+		return ZendCompileFuncCast(result, args, types.IS_LONG)
+	} else if types.ZendStringEqualsLiteral(lcname, "floatval") || types.ZendStringEqualsLiteral(lcname, "doubleval") {
+		return ZendCompileFuncCast(result, args, types.IS_DOUBLE)
+	} else if types.ZendStringEqualsLiteral(lcname, "strval") {
+		return ZendCompileFuncCast(result, args, types.IS_STRING)
+	} else if types.ZendStringEqualsLiteral(lcname, "defined") {
 		return ZendCompileFuncDefined(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "chr") && type_ == BP_VAR_R {
+	} else if types.ZendStringEqualsLiteral(lcname, "chr") && type_ == BP_VAR_R {
 		return ZendCompileFuncChr(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "ord") && type_ == BP_VAR_R {
+	} else if types.ZendStringEqualsLiteral(lcname, "ord") && type_ == BP_VAR_R {
 		return ZendCompileFuncOrd(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "call_user_func_array") {
+	} else if types.ZendStringEqualsLiteral(lcname, "call_user_func_array") {
 		return ZendCompileFuncCufa(result, args, lcname)
-	} else if ZendStringEqualsLiteral(lcname, "call_user_func") {
+	} else if types.ZendStringEqualsLiteral(lcname, "call_user_func") {
 		return ZendCompileFuncCuf(result, args, lcname)
-	} else if ZendStringEqualsLiteral(lcname, "in_array") {
+	} else if types.ZendStringEqualsLiteral(lcname, "in_array") {
 		return ZendCompileFuncInArray(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "count") || ZendStringEqualsLiteral(lcname, "sizeof") {
+	} else if types.ZendStringEqualsLiteral(lcname, "count") || types.ZendStringEqualsLiteral(lcname, "sizeof") {
 		return ZendCompileFuncCount(result, args, lcname)
-	} else if ZendStringEqualsLiteral(lcname, "get_class") {
+	} else if types.ZendStringEqualsLiteral(lcname, "get_class") {
 		return ZendCompileFuncGetClass(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "get_called_class") {
+	} else if types.ZendStringEqualsLiteral(lcname, "get_called_class") {
 		return ZendCompileFuncGetCalledClass(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "gettype") {
+	} else if types.ZendStringEqualsLiteral(lcname, "gettype") {
 		return ZendCompileFuncGettype(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "func_num_args") {
+	} else if types.ZendStringEqualsLiteral(lcname, "func_num_args") {
 		return ZendCompileFuncNumArgs(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "func_get_args") {
+	} else if types.ZendStringEqualsLiteral(lcname, "func_get_args") {
 		return ZendCompileFuncGetArgs(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "array_slice") {
+	} else if types.ZendStringEqualsLiteral(lcname, "array_slice") {
 		return ZendCompileFuncArraySlice(result, args)
-	} else if ZendStringEqualsLiteral(lcname, "array_key_exists") {
+	} else if types.ZendStringEqualsLiteral(lcname, "array_key_exists") {
 		return ZendCompileFuncArrayKeyExists(result, args)
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
 func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var args_ast *ZendAst = ast.GetChild()[1]
 	var name_node Znode
-	if name_ast.GetKind() != ZEND_AST_ZVAL || ZendAstGetZval(name_ast).GetType() != IS_STRING {
+	if name_ast.GetKind() != ZEND_AST_ZVAL || ZendAstGetZval(name_ast).GetType() != types.IS_STRING {
 		ZendCompileExpr(&name_node, name_ast)
 		ZendCompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
-	var runtime_resolution ZendBool = ZendCompileFunctionName(&name_node, name_ast)
+	var runtime_resolution types.ZendBool = ZendCompileFunctionName(&name_node, name_ast)
 	if runtime_resolution != 0 {
-		if ZendStringEqualsLiteralCi(ZendAstGetStr(name_ast), "assert") {
+		if types.ZendStringEqualsLiteralCi(ZendAstGetStr(name_ast), "assert") {
 			ZendCompileAssert(result, ZendAstGetList(args_ast), name_node.GetConstant().GetStr(), nil)
 		} else {
 			ZendCompileNsCall(result, &name_node, args_ast)
 		}
 		return
 	}
-	var name *Zval = name_node.GetConstant()
-	var lcname *ZendString
+	var name *types.Zval = name_node.GetConstant()
+	var lcname *types.ZendString
 	var fbc *ZendFunction
 	var opline *ZendOp
 	lcname = ZendStringTolower(name.GetStr())
@@ -139,19 +140,19 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 
 	/* Special assert() handling should apply independently of compiler flags. */
 
-	if fbc != nil && ZendStringEqualsLiteral(lcname, "assert") {
+	if fbc != nil && types.ZendStringEqualsLiteral(lcname, "assert") {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
-		ZendStringRelease(lcname)
+		types.ZendStringRelease(lcname)
 		ZvalPtrDtor(name_node.GetConstant())
 		return
 	}
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
-		ZendStringReleaseEx(lcname, 0)
+		types.ZendStringReleaseEx(lcname, 0)
 		ZendCompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
-	if ZendTryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == SUCCESS {
-		ZendStringReleaseEx(lcname, 0)
+	if ZendTryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == types.SUCCESS {
+		types.ZendStringReleaseEx(lcname, 0)
 		ZvalPtrDtor(name_node.GetConstant())
 		return
 	}
@@ -178,7 +179,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	ZendCompileExpr(&method_node, method_ast)
 	opline = ZendEmitOp(nil, ZEND_INIT_METHOD_CALL, &obj_node, nil)
 	if method_node.GetOpType() == IS_CONST {
-		if method_node.GetConstant().GetType() != IS_STRING {
+		if method_node.GetConstant().GetType() != types.IS_STRING {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Method name must be a string")
 		}
 		opline.SetOp2Type(IS_CONST)
@@ -196,7 +197,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	/* Check if this calls a known method on $this */
 
 	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
-		var lcname *ZendString = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
+		var lcname *types.ZendString = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 		fbc = ZendHashFindPtr(CG__().GetActiveClassEntry().GetFunctionTable(), lcname)
 
 		/* We only know the exact method that is being called if it is either private or final.
@@ -212,8 +213,8 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	}
 	ZendCompileCallCommon(result, args_ast, fbc)
 }
-func ZendIsConstructor(name *ZendString) ZendBool {
-	return ZendStringEqualsLiteralCi(name, ZEND_CONSTRUCTOR_FUNC_NAME)
+func ZendIsConstructor(name *types.ZendString) types.ZendBool {
+	return types.ZendStringEqualsLiteralCi(name, ZEND_CONSTRUCTOR_FUNC_NAME)
 }
 func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var class_ast *ZendAst = ast.GetChild()[0]
@@ -226,8 +227,8 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
 	ZendCompileExpr(&method_node, method_ast)
 	if method_node.GetOpType() == IS_CONST {
-		var name *Zval = method_node.GetConstant()
-		if name.GetType() != IS_STRING {
+		var name *types.Zval = method_node.GetConstant()
+		if name.GetType() != types.IS_STRING {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Method name must be a string")
 		}
 		if ZendIsConstructor(name.GetStr()) != 0 {
@@ -259,16 +260,16 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	if opline.GetOp2Type() == IS_CONST {
 		var ce *ZendClassEntry = nil
 		if opline.GetOp1Type() == IS_CONST {
-			var lcname *ZendString = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
+			var lcname *types.ZendString = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
 			ce = ZendHashFindPtr(CG__().GetClassTable(), lcname)
-			if ce == nil && CG__().GetActiveClassEntry() != nil && ZendStringEqualsCi(CG__().GetActiveClassEntry().GetName(), lcname) {
+			if ce == nil && CG__().GetActiveClassEntry() != nil && types.ZendStringEqualsCi(CG__().GetActiveClassEntry().GetName(), lcname) {
 				ce = CG__().GetActiveClassEntry()
 			}
 		} else if opline.GetOp1Type() == IS_UNUSED && (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() != 0 {
 			ce = CG__().GetActiveClassEntry()
 		}
 		if ce != nil {
-			var lcname *ZendString = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
+			var lcname *types.ZendString = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 			fbc = ZendHashFindPtr(ce.GetFunctionTable(), lcname)
 			if fbc != nil && !fbc.IsPublic() {
 				if ce != CG__().GetActiveClassEntry() && (fbc.IsPrivate() || !fbc.GetScope().IsLinked() || CG__().GetActiveClassEntry() != nil && !CG__().GetActiveClassEntry().IsLinked() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), CG__().GetActiveClassEntry()) == 0) {
@@ -334,7 +335,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 	}
 	if IsThisFetch(var_ast) != 0 {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use $this as global variable")
-	} else if ZendTryCompileCv(&result, var_ast) == SUCCESS {
+	} else if ZendTryCompileCv(&result, var_ast) == types.SUCCESS {
 		var opline *ZendOp = ZendEmitOp(nil, ZEND_BIND_GLOBAL, &result, &name_node)
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 	} else {
@@ -351,7 +352,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 		ZendEmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
 	}
 }
-func ZendCompileStaticVarCommon(var_name *ZendString, value *Zval, mode uint32) {
+func ZendCompileStaticVarCommon(var_name *types.ZendString, value *types.Zval, mode uint32) {
 	var opline *ZendOp
 	if CG__().GetActiveOpArray().GetStaticVariables() == nil {
 		if CG__().GetActiveOpArray().GetScope() != nil {
@@ -360,7 +361,7 @@ func ZendCompileStaticVarCommon(var_name *ZendString, value *Zval, mode uint32) 
 		CG__().GetActiveOpArray().SetStaticVariables(ZendNewArray(8))
 	}
 	value = CG__().GetActiveOpArray().GetStaticVariables().KeyUpdate(var_name.GetStr(), value)
-	if ZendStringEqualsLiteral(var_name, "this") {
+	if types.ZendStringEqualsLiteral(var_name, "this") {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use $this as static variable")
 	}
 	opline = ZendEmitOp(nil, ZEND_BIND_STATIC, nil, nil)
@@ -371,7 +372,7 @@ func ZendCompileStaticVarCommon(var_name *ZendString, value *Zval, mode uint32) 
 func ZendCompileStaticVar(ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var value_ast *ZendAst = ast.GetChild()[1]
-	var value_zv Zval
+	var value_zv types.Zval
 	if value_ast != nil {
 		ZendConstExprToZval(&value_zv, value_ast)
 	} else {
@@ -388,7 +389,7 @@ func ZendCompileUnset(ast *ZendAst) {
 	case ZEND_AST_VAR:
 		if IsThisFetch(var_ast) != 0 {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot unset $this")
-		} else if ZendTryCompileCv(&var_node, var_ast) == SUCCESS {
+		} else if ZendTryCompileCv(&var_node, var_ast) == types.SUCCESS {
 			opline = ZendEmitOp(nil, ZEND_UNSET_CV, &var_node, nil)
 		} else {
 			opline = ZendCompileSimpleVarNoCv(nil, var_ast, BP_VAR_UNSET, 0)
@@ -505,8 +506,8 @@ func ZendHasFinally() int {
 }
 func ZendCompileReturn(ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
-	var is_generator ZendBool = CG__().GetActiveOpArray().IsGenerator()
-	var by_ref ZendBool = CG__().GetActiveOpArray().IsReturnReference()
+	var is_generator types.ZendBool = CG__().GetActiveOpArray().IsGenerator()
+	var by_ref types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
 	var expr_node Znode
 	var opline *ZendOp
 	if is_generator != 0 {
@@ -575,12 +576,12 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 	var depth ZendLong
 	ZEND_ASSERT(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
 	if depth_ast != nil {
-		var depth_zv *Zval
+		var depth_zv *types.Zval
 		if depth_ast.GetKind() != ZEND_AST_ZVAL {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth_zv = ZendAstGetZval(depth_ast)
-		if depth_zv.GetType() != IS_LONG || depth_zv.GetLval() < 1 {
+		if depth_zv.GetType() != types.IS_LONG || depth_zv.GetLval() < 1 {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth = depth_zv.GetLval()
@@ -617,7 +618,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 	var dest *ZendLabel
 	var current int
 	var remove_oplines int = opline.GetOp1().GetNum()
-	var label *Zval
+	var label *types.Zval
 	var opnum uint32 = opline - op_array.GetOpcodes()
 	label = CT_CONSTANT_EX(op_array, opline.GetOp2().GetConstant())
 	if CG__().GetContext().GetLabels() == nil || b.Assign(&dest, ZendHashFindPtr(CG__().GetContext().GetLabels(), label.GetStr())) == nil {
@@ -677,7 +678,7 @@ func ZendCompileGoto(ast *ZendAst) {
 	opline.SetExtendedValue(CG__().GetContext().GetCurrentBrkCont())
 }
 func ZendCompileLabel(ast *ZendAst) {
-	var label *ZendString = ZendAstGetStr(ast.GetChild()[0])
+	var label *types.ZendString = ZendAstGetStr(ast.GetChild()[0])
 	var dest ZendLabel
 	if CG__().GetContext().GetLabels() == nil {
 		ALLOC_HASHTABLE(CG__().GetContext().GetLabels())
@@ -764,8 +765,8 @@ func ZendCompileForeach(ast *ZendAst) {
 	var value_ast *ZendAst = ast.GetChild()[1]
 	var key_ast *ZendAst = ast.GetChild()[2]
 	var stmt_ast *ZendAst = ast.GetChild()[3]
-	var by_ref ZendBool = value_ast.GetKind() == ZEND_AST_REF
-	var is_variable ZendBool = ZendIsVariable(expr_ast) != 0 && ZendCanWriteToVariable(expr_ast) != 0
+	var by_ref types.ZendBool = value_ast.GetKind() == ZEND_AST_REF
+	var is_variable types.ZendBool = ZendIsVariable(expr_ast) != 0 && ZendCanWriteToVariable(expr_ast) != 0
 	var expr_node Znode
 	var reset_node Znode
 	var value_node Znode
@@ -802,7 +803,7 @@ func ZendCompileForeach(ast *ZendAst) {
 	opline = ZendEmitOp(nil, b.Cond(by_ref != 0, ZEND_FE_FETCH_RW, ZEND_FE_FETCH_R), &reset_node, nil)
 	if IsThisFetch(value_ast) != 0 {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot re-assign $this")
-	} else if value_ast.GetKind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == SUCCESS {
+	} else if value_ast.GetKind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == types.SUCCESS {
 		opline.SetOp2Type(value_node.GetOpType())
 		if value_node.GetOpType() == IS_CONST {
 			opline.GetOp2().SetConstant(ZendAddLiteral(value_node.GetConstant()))
@@ -814,7 +815,7 @@ func ZendCompileForeach(ast *ZendAst) {
 		opline.GetOp2().SetVar(GetTemporaryVariable())
 		value_node.SetOpType(opline.GetOp2Type())
 		if value_node.GetOpType() == IS_CONST {
-			ZVAL_COPY_VALUE(value_node.GetConstant(), CT_CONSTANT(opline.GetOp2()))
+			types.ZVAL_COPY_VALUE(value_node.GetConstant(), CT_CONSTANT(opline.GetOp2()))
 		} else {
 			value_node.SetOp(opline.GetOp2())
 		}

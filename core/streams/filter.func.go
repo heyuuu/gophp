@@ -7,10 +7,11 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpGetStreamFiltersHashGlobal() *zend.HashTable { return &StreamFiltersHash }
-func _phpGetStreamFiltersHash() *zend.HashTable {
+func PhpGetStreamFiltersHashGlobal() *types.HashTable { return &StreamFiltersHash }
+func _phpGetStreamFiltersHash() *types.HashTable {
 	if standard.FG(stream_filters) {
 		return standard.FG(stream_filters)
 	} else {
@@ -19,28 +20,28 @@ func _phpGetStreamFiltersHash() *zend.HashTable {
 }
 func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilterFactory) int {
 	var ret int
-	var str *zend.ZendString = zend.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
+	var str *types.ZendString = types.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
 	if zend.ZendHashAddPtr(&StreamFiltersHash, str, any(factory)) {
-		ret = zend.SUCCESS
+		ret = types.SUCCESS
 	} else {
-		ret = zend.FAILURE
+		ret = types.FAILURE
 	}
-	zend.ZendStringReleaseEx(str, 1)
+	types.ZendStringReleaseEx(str, 1)
 	return ret
 }
 func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
 	return zend.ZendHashStrDel(&StreamFiltersHash, filterpattern, strlen(filterpattern))
 }
-func PhpStreamFilterRegisterFactoryVolatile(filterpattern *zend.ZendString, factory *PhpStreamFilterFactory) int {
+func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.ZendString, factory *PhpStreamFilterFactory) int {
 	if !(standard.FG(stream_filters)) {
 		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
 		zend.ZendHashInit(standard.FG(stream_filters), StreamFiltersHash.GetNNumOfElements()+1, nil, nil, 0)
 		zend.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
 	}
 	if zend.ZendHashAddPtr(standard.FG(stream_filters), filterpattern, any(factory)) {
-		return zend.SUCCESS
+		return types.SUCCESS
 	} else {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 }
 func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf uint8, buf_persistent uint8) *PhpStreamBucket {
@@ -97,7 +98,7 @@ func PhpStreamBucketSplit(in *PhpStreamBucket, left **PhpStreamBucket, right **P
 	right.SetRefcount(1)
 	right.SetOwnBuf(1)
 	right.SetIsPersistent(in.GetIsPersistent())
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpStreamBucketDelref(bucket *PhpStreamBucket) {
 	if b.PreDec(&(bucket.GetRefcount())) == 0 {
@@ -147,8 +148,8 @@ func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
 	bucket.SetPrev(nil)
 	bucket.SetNext(bucket.GetPrev())
 }
-func PhpStreamFilterCreate(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
-	var filter_hash *zend.HashTable = b.CondF1(standard.FG(stream_filters), func() __auto__ { return standard.FG(stream_filters) }, &StreamFiltersHash)
+func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
+	var filter_hash *types.HashTable = b.CondF1(standard.FG(stream_filters), func() __auto__ { return standard.FG(stream_filters) }, &StreamFiltersHash)
 	var factory *PhpStreamFilterFactory = nil
 	var filter *core.PhpStreamFilter = nil
 	var n int
@@ -216,7 +217,7 @@ func PhpStreamFilterPrependEx(chain *PhpStreamFilterChain, filter *core.PhpStrea
 	}
 	chain.SetHead(filter)
 	filter.SetChain(chain)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func _phpStreamFilterPrepend(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) {
 	PhpStreamFilterPrependEx(chain, filter)
@@ -268,7 +269,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 				PhpStreamBucketDelref(bucket)
 			}
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Filter failed to process pre-buffered data")
-			return zend.FAILURE
+			return types.FAILURE
 		case PSFS_FEED_ME:
 
 			/* We don't actually need data yet,
@@ -301,10 +302,10 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 			}
 		}
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func _phpStreamFilterAppend(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) {
-	if PhpStreamFilterAppendEx(chain, filter) != zend.SUCCESS {
+	if PhpStreamFilterAppendEx(chain, filter) != types.SUCCESS {
 		if chain.GetHead() == filter {
 			chain.SetHead(nil)
 			chain.SetTail(nil)
@@ -330,7 +331,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 		/* Filter is not attached to a chain, or chain is somehow not part of a stream */
 
-		return zend.FAILURE
+		return types.FAILURE
 
 		/* Filter is not attached to a chain, or chain is somehow not part of a stream */
 
@@ -344,13 +345,13 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 			/* We've flushed the data far enough */
 
-			return zend.SUCCESS
+			return types.SUCCESS
 
 			/* We've flushed the data far enough */
 
 		}
 		if status == PSFS_ERR_FATAL {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 
 		/* Otherwise we have data available to PASS_ON
@@ -374,7 +375,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 		/* Unlikely, but possible */
 
-		return zend.SUCCESS
+		return types.SUCCESS
 
 		/* Unlikely, but possible */
 
@@ -422,7 +423,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 		/* Send flushed data to the stream */
 
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpStreamFilterRemove(filter *core.PhpStreamFilter, call_dtor int) *core.PhpStreamFilter {
 	if filter.GetPrev() != nil {

@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZEND_AST_SPEC_CALL(name __auto__) __auto__ {
@@ -53,26 +54,26 @@ func ZendAstCreateEx() __auto__ {
 func ZendAstCreateList(init_children int) __auto__ {
 	return ZEND_AST_SPEC_CALL(ZendAstCreateList, __VA_ARGS__)
 }
-func ZendAstIsSpecial(ast *ZendAst) ZendBool {
+func ZendAstIsSpecial(ast *ZendAst) types.ZendBool {
 	return ast.GetKind() >> ZEND_AST_SPECIAL_SHIFT & 1
 }
-func ZendAstIsList(ast *ZendAst) ZendBool {
+func ZendAstIsList(ast *ZendAst) types.ZendBool {
 	return ast.GetKind() >> ZEND_AST_IS_LIST_SHIFT & 1
 }
 func ZendAstGetList(ast *ZendAst) *ZendAstList {
 	ZEND_ASSERT(ZendAstIsList(ast) != 0)
 	return (*ZendAstList)(ast)
 }
-func ZendAstGetZval(ast *ZendAst) *Zval {
+func ZendAstGetZval(ast *ZendAst) *types.Zval {
 	ZEND_ASSERT(ast.GetKind() == ZEND_AST_ZVAL)
 	return (*ZendAstZval)(ast).GetVal()
 }
-func ZendAstGetStr(ast *ZendAst) *ZendString {
-	var zv *Zval = ZendAstGetZval(ast)
+func ZendAstGetStr(ast *ZendAst) *types.ZendString {
+	var zv *types.Zval = ZendAstGetZval(ast)
 	ZEND_ASSERT(zv.IsString())
 	return zv.GetStr()
 }
-func ZendAstGetConstantName(ast *ZendAst) *ZendString {
+func ZendAstGetConstantName(ast *ZendAst) *types.ZendString {
 	ZEND_ASSERT(ast.GetKind() == ZEND_AST_CONSTANT)
 	ZEND_ASSERT((*ZendAstZval)(ast).GetVal().IsString())
 	return (*ZendAstZval)(ast).GetVal().GetStr()
@@ -83,7 +84,7 @@ func ZendAstGetNumChildren(ast *ZendAst) uint32 {
 }
 func ZendAstGetLineno(ast *ZendAst) uint32 {
 	if ast.GetKind() == ZEND_AST_ZVAL {
-		var zv *Zval = ZendAstGetZval(ast)
+		var zv *types.Zval = ZendAstGetZval(ast)
 		return zv.GetLineno()
 	} else {
 		return ast.GetLineno()
@@ -128,35 +129,35 @@ func ZendAstCreateZnode(node *Znode) *ZendAst {
 	ast.SetNode(*node)
 	return (*ZendAst)(ast)
 }
-func ZendAstCreateZvalInt(zv *Zval, attr uint32, lineno uint32) *ZendAst {
+func ZendAstCreateZvalInt(zv *types.Zval, attr uint32, lineno uint32) *ZendAst {
 	var ast *ZendAstZval
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_zval"))
 	ast.SetKind(ZEND_AST_ZVAL)
 	ast.SetAttr(attr)
-	ZVAL_COPY_VALUE(ast.GetVal(), zv)
+	types.ZVAL_COPY_VALUE(ast.GetVal(), zv)
 	ast.GetVal().GetLineno() = lineno
 	return (*ZendAst)(ast)
 }
-func ZendAstCreateZvalWithLineno(zv *Zval, lineno uint32) *ZendAst {
+func ZendAstCreateZvalWithLineno(zv *types.Zval, lineno uint32) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, lineno)
 }
-func ZendAstCreateZvalEx(zv *Zval, attr ZendAstAttr) *ZendAst {
+func ZendAstCreateZvalEx(zv *types.Zval, attr ZendAstAttr) *ZendAst {
 	return ZendAstCreateZvalInt(zv, attr, CG__().GetZendLineno())
 }
-func ZendAstCreateZval(zv *Zval) *ZendAst {
+func ZendAstCreateZval(zv *types.Zval) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, CG__().GetZendLineno())
 }
-func ZendAstCreateZvalFromStr(str *ZendString) *ZendAst {
-	var zv Zval
+func ZendAstCreateZvalFromStr(str *types.ZendString) *ZendAst {
+	var zv types.Zval
 	zv.SetString(str)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
 func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
-	var zv Zval
+	var zv types.Zval
 	zv.SetLong(lval)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
-func ZendAstCreateConstant(name *ZendString, attr ZendAstAttr) *ZendAst {
+func ZendAstCreateConstant(name *types.ZendString, attr ZendAstAttr) *ZendAst {
 	var ast *ZendAstZval
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_zval"))
 	ast.SetKind(ZEND_AST_CONSTANT)
@@ -166,9 +167,9 @@ func ZendAstCreateConstant(name *ZendString, attr ZendAstAttr) *ZendAst {
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {
-	var name_str *ZendString = ZendAstGetStr(name)
-	if ZendStringEqualsLiteralCi(name_str, "class") {
-		ZendStringRelease(name_str)
+	var name_str *types.ZendString = ZendAstGetStr(name)
+	if types.ZendStringEqualsLiteralCi(name_str, "class") {
+		types.ZendStringRelease(name_str)
 		return ZendAstCreate(ZEND_AST_CLASS_NAME, class_name)
 	} else {
 		return ZendAstCreate(ZEND_AST_CLASS_CONST, class_name, name)
@@ -178,8 +179,8 @@ func ZendAstCreateDecl(
 	kind ZendAstKind,
 	flags uint32,
 	start_lineno uint32,
-	doc_comment *ZendString,
-	name *ZendString,
+	doc_comment *types.ZendString,
+	name *types.ZendString,
 	child0 *ZendAst,
 	child1 *ZendAst,
 	child2 *ZendAst,
@@ -353,7 +354,7 @@ func ZendAstCreateList2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *Zen
 	list.SetLineno(lineno)
 	return ast
 }
-func IsPowerOfTwo(n uint32) ZendBool { return n != 0 && n == (n & ^n + 1) }
+func IsPowerOfTwo(n uint32) types.ZendBool { return n != 0 && n == (n & ^n + 1) }
 func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 	var list *ZendAstList = ZendAstGetList(ast)
 	if list.GetChildren() >= 4 && IsPowerOfTwo(list.GetChildren()) != 0 {
@@ -362,49 +363,49 @@ func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 	list.GetChild()[b.PostInc(&(list.GetChildren()))] = op
 	return (*ZendAst)(list)
 }
-func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
+func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.Zval) int {
 	switch offset.GetType() {
-	case IS_UNDEF:
+	case types.IS_UNDEF:
 		if result.GetArr().NextIndexInsert(expr) == nil {
 			ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
-	case IS_STRING:
+	case types.IS_STRING:
 		result.GetArr().SymtableUpdate(offset.GetStr().GetStr(), expr)
 		ZvalPtrDtorStr(offset)
-	case IS_NULL:
-		result.GetArr().SymtableUpdate(ZSTR_EMPTY_ALLOC().GetStr(), expr)
-	case IS_LONG:
+	case types.IS_NULL:
+		result.GetArr().SymtableUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), expr)
+	case types.IS_LONG:
 		result.GetArr().IndexUpdateH(offset.GetLval(), expr)
-	case IS_FALSE:
+	case types.IS_FALSE:
 		result.GetArr().IndexUpdateH(0, expr)
-	case IS_TRUE:
+	case types.IS_TRUE:
 		result.GetArr().IndexUpdateH(1, expr)
-	case IS_DOUBLE:
+	case types.IS_DOUBLE:
 		result.GetArr().IndexUpdateH(ZendDvalToLval(offset.GetDval()), expr)
-	case IS_RESOURCE:
-		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(offset), Z_RES_HANDLE_P(offset))
-		result.GetArr().IndexUpdateH(Z_RES_HANDLE_P(offset), expr)
+	case types.IS_RESOURCE:
+		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(offset), types.Z_RES_HANDLE_P(offset))
+		result.GetArr().IndexUpdateH(types.Z_RES_HANDLE_P(offset), expr)
 	default:
 		ZendThrowError(nil, "Illegal offset type")
-		return FAILURE
+		return types.FAILURE
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
-func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
+func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 	if expr.IsArray() {
-		var ht *HashTable = expr.GetArr()
-		var val *Zval
-		var key *ZendString
-		var __ht *HashTable = ht
+		var ht *types.HashTable = expr.GetArr()
+		var val *types.Zval
+		var key *types.ZendString
+		var __ht *types.HashTable = ht
 		for _, _p := range __ht.foreachData() {
-			var _z *Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
 			val = _z
 			if key != nil {
 				ZendThrowError(nil, "Cannot unpack array with string keys")
-				return FAILURE
+				return types.FAILURE
 			} else {
 				if result.GetArr().NextIndexInsert(val) == nil {
 					ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
@@ -413,25 +414,25 @@ func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 				val.TryAddRefcount()
 			}
 		}
-		return SUCCESS
+		return types.SUCCESS
 	}
 
 	/* Objects or references cannot occur in a constant expression. */
 
 	ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
-	return FAILURE
+	return types.FAILURE
 }
-func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
-	var op1 Zval
-	var op2 Zval
-	var ret int = SUCCESS
+func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *ZendClassEntry) int {
+	var op1 types.Zval
+	var op2 types.Zval
+	var ret int = types.SUCCESS
 	switch ast.GetKind() {
 	case ZEND_AST_BINARY_OP:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
-		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != SUCCESS {
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
+		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 			ZvalPtrDtorNogc(&op1)
-			ret = FAILURE
+			ret = types.FAILURE
 		} else {
 			var op BinaryOpType = GetBinaryOp(ast.GetAttr())
 			ret = op(result, &op1, &op2)
@@ -441,11 +442,11 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 	case ZEND_AST_GREATER:
 		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
-		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != SUCCESS {
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
+		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 			ZvalPtrDtorNogc(&op1)
-			ret = FAILURE
+			ret = types.FAILURE
 		} else {
 
 			/* op1 > op2 is the same as op2 < op1 */
@@ -456,25 +457,25 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_UNARY_OP:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 		} else {
 			var op UnaryOpType = GetUnaryOp(ast.GetAttr())
 			ret = op(result, &op1)
 			ZvalPtrDtorNogc(&op1)
 		}
 	case ZEND_AST_ZVAL:
-		var zv *Zval = ZendAstGetZval(ast)
-		ZVAL_COPY(result, zv)
+		var zv *types.Zval = ZendAstGetZval(ast)
+		types.ZVAL_COPY(result, zv)
 	case ZEND_AST_CONSTANT:
-		var name *ZendString = ZendAstGetConstantName(ast)
-		var zv *Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
+		var name *types.ZendString = ZendAstGetConstantName(ast)
+		var zv *types.Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
 		if zv == nil {
 			result.SetUndef()
 			ret = ZendUseUndefinedConstant(name, ast.GetAttr(), result)
 			break
 		}
-		ZVAL_COPY_OR_DUP(result, zv)
+		types.ZVAL_COPY_OR_DUP(result, zv)
 	case ZEND_AST_CONSTANT_CLASS:
 		if scope != nil {
 			result.SetStringCopy(scope.GetName())
@@ -484,103 +485,103 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 	case ZEND_AST_CLASS_NAME:
 		if scope == nil {
 			ZendThrowError(nil, "Cannot use \"self\" when no class scope is active")
-			return FAILURE
+			return types.FAILURE
 		}
 		if ast.GetAttr() == ZEND_FETCH_CLASS_SELF {
 			result.SetStringCopy(scope.GetName())
 		} else if ast.GetAttr() == ZEND_FETCH_CLASS_PARENT {
 			if !(scope.GetParent()) {
 				ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
-				return FAILURE
+				return types.FAILURE
 			}
 			result.SetStringCopy(scope.GetParent().name)
 		} else {
 			ZEND_ASSERT(false)
 		}
 	case ZEND_AST_AND:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 			break
 		}
 		if ZendIsTrue(&op1) != 0 {
-			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != SUCCESS {
+			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 				ZvalPtrDtorNogc(&op1)
-				ret = FAILURE
+				ret = types.FAILURE
 				break
 			}
-			ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
+			types.ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
 			ZvalPtrDtorNogc(&op2)
 		} else {
 			result.SetFalse()
 		}
 		ZvalPtrDtorNogc(&op1)
 	case ZEND_AST_OR:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 			break
 		}
 		if ZendIsTrue(&op1) != 0 {
 			result.SetTrue()
 		} else {
-			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != SUCCESS {
+			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 				ZvalPtrDtorNogc(&op1)
-				ret = FAILURE
+				ret = types.FAILURE
 				break
 			}
-			ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
+			types.ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
 			ZvalPtrDtorNogc(&op2)
 		}
 		ZvalPtrDtorNogc(&op1)
 	case ZEND_AST_CONDITIONAL:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 			break
 		}
 		if ZendIsTrue(&op1) != 0 {
 			if ast.GetChild()[1] == nil {
 				*result = op1
 			} else {
-				if ZendAstEvaluate(result, ast.GetChild()[1], scope) != SUCCESS {
+				if ZendAstEvaluate(result, ast.GetChild()[1], scope) != types.SUCCESS {
 					ZvalPtrDtorNogc(&op1)
-					ret = FAILURE
+					ret = types.FAILURE
 					break
 				}
 				ZvalPtrDtorNogc(&op1)
 			}
 		} else {
-			if ZendAstEvaluate(result, ast.GetChild()[2], scope) != SUCCESS {
+			if ZendAstEvaluate(result, ast.GetChild()[2], scope) != types.SUCCESS {
 				ZvalPtrDtorNogc(&op1)
-				ret = FAILURE
+				ret = types.FAILURE
 				break
 			}
 			ZvalPtrDtorNogc(&op1)
 		}
 	case ZEND_AST_COALESCE:
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 			break
 		}
-		if op1.GetType() > IS_NULL {
+		if op1.GetType() > types.IS_NULL {
 			*result = op1
 		} else {
-			if ZendAstEvaluate(result, ast.GetChild()[1], scope) != SUCCESS {
+			if ZendAstEvaluate(result, ast.GetChild()[1], scope) != types.SUCCESS {
 				ZvalPtrDtorNogc(&op1)
-				ret = FAILURE
+				ret = types.FAILURE
 				break
 			}
 			ZvalPtrDtorNogc(&op1)
 		}
 	case ZEND_AST_UNARY_PLUS:
-		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 		} else {
 			op1.SetLong(0)
 			ret = AddFunction(result, &op1, &op2)
 			ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_UNARY_MINUS:
-		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
+		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
 		} else {
 			op1.SetLong(0)
 			ret = SubFunction(result, &op1, &op2)
@@ -597,47 +598,47 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		for i = 0; i < list.GetChildren(); i++ {
 			var elem *ZendAst = list.GetChild()[i]
 			if elem.GetKind() == ZEND_AST_UNPACK {
-				if ZendAstEvaluate(&op1, elem.GetChild()[0], scope) != SUCCESS {
+				if ZendAstEvaluate(&op1, elem.GetChild()[0], scope) != types.SUCCESS {
 					ZvalPtrDtorNogc(result)
-					return FAILURE
+					return types.FAILURE
 				}
-				if ZendAstAddUnpackedElement(result, &op1) != SUCCESS {
+				if ZendAstAddUnpackedElement(result, &op1) != types.SUCCESS {
 					ZvalPtrDtorNogc(&op1)
 					ZvalPtrDtorNogc(result)
-					return FAILURE
+					return types.FAILURE
 				}
 				ZvalPtrDtorNogc(&op1)
 				continue
 			}
 			if elem.GetChild()[1] != nil {
-				if ZendAstEvaluate(&op1, elem.GetChild()[1], scope) != SUCCESS {
+				if ZendAstEvaluate(&op1, elem.GetChild()[1], scope) != types.SUCCESS {
 					ZvalPtrDtorNogc(result)
-					return FAILURE
+					return types.FAILURE
 				}
 			} else {
 				op1.SetUndef()
 			}
-			if ZendAstEvaluate(&op2, elem.GetChild()[0], scope) != SUCCESS {
+			if ZendAstEvaluate(&op2, elem.GetChild()[0], scope) != types.SUCCESS {
 				ZvalPtrDtorNogc(&op1)
 				ZvalPtrDtorNogc(result)
-				return FAILURE
+				return types.FAILURE
 			}
-			if ZendAstAddArrayElement(result, &op1, &op2) != SUCCESS {
+			if ZendAstAddArrayElement(result, &op1, &op2) != types.SUCCESS {
 				ZvalPtrDtorNogc(&op1)
 				ZvalPtrDtorNogc(&op2)
 				ZvalPtrDtorNogc(result)
-				return FAILURE
+				return types.FAILURE
 			}
 		}
 	case ZEND_AST_DIM:
 		if ast.GetChild()[1] == nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for reading")
 		}
-		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
-			ret = FAILURE
-		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != SUCCESS {
+		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
+			ret = types.FAILURE
+		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
 			ZvalPtrDtorNogc(&op1)
-			ret = FAILURE
+			ret = types.FAILURE
 		} else {
 			ZendFetchDimensionConst(result, &op1, &op2, b.Cond((ast.GetAttr()&ZEND_DIM_IS) != 0, BP_VAR_IS, BP_VAR_R))
 			ZvalPtrDtorNogc(&op1)
@@ -645,7 +646,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		}
 	default:
 		ZendThrowError(nil, "Unsupported constant expression")
-		ret = FAILURE
+		ret = types.FAILURE
 	}
 	return ret
 }
@@ -679,7 +680,7 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 		var new_ *ZendAstZval = (*ZendAstZval)(buf)
 		new_.SetKind(ZEND_AST_ZVAL)
 		new_.SetAttr(ast.GetAttr())
-		ZVAL_COPY(new_.GetVal(), ZendAstGetZval(ast))
+		types.ZVAL_COPY(new_.GetVal(), ZendAstGetZval(ast))
 		buf = any((*byte)(buf + b.SizeOf("zend_ast_zval")))
 	} else if ast.GetKind() == ZEND_AST_CONSTANT {
 		var new_ *ZendAstZval = (*ZendAstZval)(buf)
@@ -721,15 +722,15 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 	}
 	return buf
 }
-func ZendAstCopy(ast *ZendAst) *ZendAstRef {
+func ZendAstCopy(ast *ZendAst) *types.ZendAstRef {
 	var tree_size int
-	var ref *ZendAstRef
+	var ref *types.ZendAstRef
 	ZEND_ASSERT(ast != nil)
 	tree_size = ZendAstTreeSize(ast) + b.SizeOf("zend_ast_ref")
 	ref = Emalloc(tree_size)
-	ZendAstTreeCopy(ast, GC_AST(ref))
+	ZendAstTreeCopy(ast, types.GC_AST(ref))
 	ref.SetRefcount(1)
-	ref.GetGcTypeInfo() = IS_CONSTANT_AST
+	ref.GetGcTypeInfo() = types.IS_CONSTANT_AST
 	return ref
 }
 func ZendAstDestroy(ast *ZendAst) {
@@ -758,14 +759,14 @@ tail_call:
 			goto tail_call
 		}
 	} else if ast.GetKind() == ZEND_AST_CONSTANT {
-		ZendStringReleaseEx(ZendAstGetConstantName(ast), 0)
+		types.ZendStringReleaseEx(ZendAstGetConstantName(ast), 0)
 	} else if ast.GetKind() >= ZEND_AST_FUNC_DECL {
 		var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 		if decl.GetName() != nil {
-			ZendStringReleaseEx(decl.GetName(), 0)
+			types.ZendStringReleaseEx(decl.GetName(), 0)
 		}
 		if decl.GetDocComment() != nil {
-			ZendStringReleaseEx(decl.GetDocComment(), 0)
+			types.ZendStringReleaseEx(decl.GetDocComment(), 0)
 		}
 		ZendAstDestroy(decl.GetChild()[0])
 		ZendAstDestroy(decl.GetChild()[1])
@@ -774,8 +775,8 @@ tail_call:
 		goto tail_call
 	}
 }
-func ZendAstRefDestroy(ast *ZendAstRef) {
-	ZendAstDestroy(GC_AST(ast))
+func ZendAstRefDestroy(ast *types.ZendAstRef) {
+	ZendAstDestroy(types.GC_AST(ast))
 	Efree(ast)
 }
 func ZendAstApply(ast *ZendAst, fn ZendAstApplyFunc) {
@@ -793,7 +794,7 @@ func ZendAstApply(ast *ZendAst, fn ZendAstApplyFunc) {
 		}
 	}
 }
-func ZendAstExportStr(str *SmartStr, s *ZendString) {
+func ZendAstExportStr(str *SmartStr, s *types.ZendString) {
 	var i int
 	for i = 0; i < s.GetLen(); i++ {
 		var c uint8 = s.GetVal()[i]
@@ -805,7 +806,7 @@ func ZendAstExportStr(str *SmartStr, s *ZendString) {
 		}
 	}
 }
-func ZendAstExportQstr(str *SmartStr, quote byte, s *ZendString) {
+func ZendAstExportQstr(str *SmartStr, quote byte, s *types.ZendString) {
 	var i int
 	for i = 0; i < s.GetLen(); i++ {
 		var c uint8 = s.GetVal()[i]
@@ -844,7 +845,7 @@ func ZendAstExportIndent(str *SmartStr, indent int) {
 }
 func ZendAstExportName(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
-		var zv *Zval = ZendAstGetZval(ast)
+		var zv *types.Zval = ZendAstGetZval(ast)
 		if zv.IsString() {
 			str.AppendString(zv.GetStr().GetStr())
 			return
@@ -854,7 +855,7 @@ func ZendAstExportName(str *SmartStr, ast *ZendAst, priority int, indent int) {
 }
 func ZendAstExportNsName(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
-		var zv *Zval = ZendAstGetZval(ast)
+		var zv *types.Zval = ZendAstGetZval(ast)
 		if zv.IsString() {
 			if ast.GetAttr() == ZEND_NAME_FQ {
 				str.AppendByte('\\')
@@ -897,7 +898,7 @@ func ZendAstVarNeedsBraces(ch byte) int {
 }
 func ZendAstExportVar(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
-		var zv *Zval = ZendAstGetZval(ast)
+		var zv *types.Zval = ZendAstGetZval(ast)
 		if zv.IsString() && ZendAstValidVarName(zv.GetStr().GetVal(), zv.GetStr().GetLen()) != 0 {
 			str.AppendString(zv.GetStr().GetStr())
 			return
@@ -926,10 +927,10 @@ func ZendAstExportEncapsList(str *SmartStr, quote byte, list *ZendAstList, inden
 	for i < list.GetChildren() {
 		ast = list.GetChild()[i]
 		if ast.GetKind() == ZEND_AST_ZVAL {
-			var zv *Zval = ZendAstGetZval(ast)
+			var zv *types.Zval = ZendAstGetZval(ast)
 			ZEND_ASSERT(zv.IsString())
 			ZendAstExportQstr(str, quote, zv.GetStr())
-		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces((*Z_STRVAL_P)(ZendAstGetZval(list.GetChild()[i+1]))) == 0) {
+		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces((*types.Z_STRVAL_P)(ZendAstGetZval(list.GetChild()[i+1]))) == 0) {
 			ZendAstExportEx(str, ast, 0, indent)
 		} else {
 			str.AppendByte('{')
@@ -1051,35 +1052,35 @@ tail_call:
 	ZendAstExportIndent(str, indent)
 	str.AppendByte('}')
 }
-func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
+func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) {
 	var idx ZendLong
-	var key *ZendString
-	var val *Zval
+	var key *types.ZendString
+	var val *types.Zval
 	var first int
-	zv = ZVAL_DEREF(zv)
+	zv = types.ZVAL_DEREF(zv)
 	switch zv.GetType() {
-	case IS_NULL:
+	case types.IS_NULL:
 		str.AppendString("null")
-	case IS_FALSE:
+	case types.IS_FALSE:
 		str.AppendString("false")
-	case IS_TRUE:
+	case types.IS_TRUE:
 		str.AppendString("true")
-	case IS_LONG:
+	case types.IS_LONG:
 		str.AppendLong(zv.GetLval())
-	case IS_DOUBLE:
+	case types.IS_DOUBLE:
 		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
 		str.AppendString(key.GetStr())
-		ZendStringReleaseEx(key, 0)
-	case IS_STRING:
+		types.ZendStringReleaseEx(key, 0)
+	case types.IS_STRING:
 		str.AppendByte('\'')
 		ZendAstExportStr(str, zv.GetStr())
 		str.AppendByte('\'')
-	case IS_ARRAY:
+	case types.IS_ARRAY:
 		str.AppendByte('[')
 		first = 1
-		var __ht *HashTable = Z_ARRVAL_P(zv)
+		var __ht *types.HashTable = types.Z_ARRVAL_P(zv)
 		for _, _p := range __ht.foreachData() {
-			var _z *Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			idx = _p.GetH()
 			key = _p.GetKey()
@@ -1100,8 +1101,8 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 			ZendAstExportZval(str, val, 0, indent)
 		}
 		str.AppendByte(']')
-	case IS_CONSTANT_AST:
-		ZendAstExportEx(str, Z_ASTVAL_P(zv), priority, indent)
+	case types.IS_CONSTANT_AST:
+		ZendAstExportEx(str, types.Z_ASTVAL_P(zv), priority, indent)
 	default:
 
 	}
@@ -1169,7 +1170,7 @@ tail_call:
 	case ZEND_AST_ZVAL:
 		ZendAstExportZval(str, ZendAstGetZval(ast), priority, indent)
 	case ZEND_AST_CONSTANT:
-		var name *ZendString = ZendAstGetConstantName(ast)
+		var name *types.ZendString = ZendAstGetConstantName(ast)
 		str.AppendString(name.GetStr())
 	case ZEND_AST_CONSTANT_CLASS:
 		str.AppendString("__CLASS__")
@@ -1356,10 +1357,10 @@ tail_call:
 		}
 	case ZEND_AST_TYPE:
 		switch ast.GetAttr() & ^ZEND_TYPE_NULLABLE {
-		case IS_ARRAY:
+		case types.IS_ARRAY:
 			APPEND_STR("array")
 			fallthrough
-		case IS_CALLABLE:
+		case types.IS_CALLABLE:
 			APPEND_STR("callable")
 			fallthrough
 		default:
@@ -1382,25 +1383,25 @@ tail_call:
 		fallthrough
 	case ZEND_AST_CAST:
 		switch ast.GetAttr() {
-		case IS_NULL:
+		case types.IS_NULL:
 			PREFIX_OP("(unset)", 240, 241)
 			fallthrough
-		case _IS_BOOL:
+		case types._IS_BOOL:
 			PREFIX_OP("(bool)", 240, 241)
 			fallthrough
-		case IS_LONG:
+		case types.IS_LONG:
 			PREFIX_OP("(int)", 240, 241)
 			fallthrough
-		case IS_DOUBLE:
+		case types.IS_DOUBLE:
 			PREFIX_OP("(double)", 240, 241)
 			fallthrough
-		case IS_STRING:
+		case types.IS_STRING:
 			PREFIX_OP("(string)", 240, 241)
 			fallthrough
-		case IS_ARRAY:
+		case types.IS_ARRAY:
 			PREFIX_OP("(array)", 240, 241)
 			fallthrough
-		case IS_OBJECT:
+		case types.IS_OBJECT:
 			PREFIX_OP("(object)", 240, 241)
 			fallthrough
 		default:
@@ -1420,7 +1421,7 @@ tail_call:
 		if ast.GetChild()[0].GetKind() == ZEND_AST_ENCAPS_LIST {
 			ZendAstExportEncapsList(str, '`', (*ZendAstList)(ast.GetChild()[0]), indent)
 		} else {
-			var zv *Zval
+			var zv *types.Zval
 			ZEND_ASSERT(ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL)
 			zv = ZendAstGetZval(ast.GetChild()[0])
 			ZEND_ASSERT(zv.IsString())
@@ -1999,7 +2000,7 @@ append_default_value:
 	}
 	return
 }
-func ZendAstExport(prefix string, ast *ZendAst, suffix string) *ZendString {
+func ZendAstExport(prefix string, ast *ZendAst, suffix string) *types.ZendString {
 	var str SmartStr = MakeSmartStr(0)
 	str.AppendString(b.CastStrAuto(prefix))
 	ZendAstExportEx(&str, ast, 0, 0)

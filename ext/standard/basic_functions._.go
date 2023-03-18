@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/basic_functions.h>
@@ -33,8 +34,8 @@ const BasicFunctionsModulePtr = &BasicFunctionsModule
 
 /* system functions */
 
-var ZifSetTimeLimit func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var ZifHeaderRegisterCallback func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifSetTimeLimit func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var ZifHeaderRegisterCallback func(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 /* From the INI parser */
 
@@ -878,8 +879,8 @@ var ArginfoDnsGetRecord []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("hostname"),
 	zend.MakeArgInfo("type"),
-	zend.MakeArgInfo("authns", ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1)), ArgInfoByRef(1)),
-	zend.MakeArgInfo("addtl", ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1)), ArgInfoByRef(1)),
+	zend.MakeArgInfo("authns", ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_ARRAY, 1)), ArgInfoByRef(1)),
+	zend.MakeArgInfo("addtl", ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_ARRAY, 1)), ArgInfoByRef(1)),
 	zend.MakeArgInfo("raw"),
 }
 var ArginfoDnsGetMx []zend.ArgInfo = []zend.ArgInfo{

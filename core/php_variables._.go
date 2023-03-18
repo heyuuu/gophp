@@ -3,7 +3,7 @@
 package core
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <main/php_variables.h>
@@ -62,7 +62,7 @@ const NUM_TRACK_VARS = 6
 
 /* for systems that need to override reading of environment variables */
 
-var PhpImportEnvironmentVariables func(array_ptr *zend.Zval) = _phpImportEnvironmentVariables
+var PhpImportEnvironmentVariables func(array_ptr *types.Zval) = _phpImportEnvironmentVariables
 
 /* binary-safe version */
 

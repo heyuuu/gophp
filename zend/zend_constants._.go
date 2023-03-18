@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_constants.h>
 
 /*
@@ -33,7 +35,7 @@ const PHP_USER_CONSTANT = 0x7fffff
 
 const ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK = 0x1000
 
-const ZEND_CONSTANT_DTOR DtorFuncT = FreeZendConstant
+const ZEND_CONSTANT_DTOR types.DtorFuncT = FreeZendConstant
 
 // Source: <Zend/zend_constants.c>
 

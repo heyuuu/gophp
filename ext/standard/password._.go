@@ -3,7 +3,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/password.c>
@@ -27,7 +27,7 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var PhpPasswordAlgos zend.ZendArray
+var PhpPasswordAlgos types.ZendArray
 
 /* bcrypt implementation */
 

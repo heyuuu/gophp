@@ -4,9 +4,10 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendGetImportHt(type_ uint32) *HashTable {
+func ZendGetImportHt(type_ uint32) *types.HashTable {
 	switch type_ {
 	case ZEND_SYMBOL_CLASS:
 		if FC__().GetImports() == nil {
@@ -44,8 +45,8 @@ func ZendGetUseTypeStr(type_ uint32) *byte {
 	}
 	return " unknown"
 }
-func ZendCheckAlreadyInUse(type_ uint32, old_name *ZendString, new_name *ZendString, check_name *ZendString) {
-	if ZendStringEqualsCi(old_name, check_name) {
+func ZendCheckAlreadyInUse(type_ uint32, old_name *types.ZendString, new_name *types.ZendString, check_name *types.ZendString) {
+	if types.ZendStringEqualsCi(old_name, check_name) {
 		return
 	}
 	ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
@@ -53,17 +54,17 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *ZendString, new_name *ZendStr
 func ZendCompileUse(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var current_ns *ZendString = FC__().GetCurrentNamespace()
+	var current_ns *types.ZendString = FC__().GetCurrentNamespace()
 	var type_ uint32 = ast.GetAttr()
-	var current_import *HashTable = ZendGetImportHt(type_)
-	var case_sensitive ZendBool = type_ == ZEND_SYMBOL_CONST
+	var current_import *types.HashTable = ZendGetImportHt(type_)
+	var case_sensitive types.ZendBool = type_ == ZEND_SYMBOL_CONST
 	for i = 0; i < list.GetChildren(); i++ {
 		var use_ast *ZendAst = list.GetChild()[i]
 		var old_name_ast *ZendAst = use_ast.GetChild()[0]
 		var new_name_ast *ZendAst = use_ast.GetChild()[1]
-		var old_name *ZendString = ZendAstGetStr(old_name_ast)
-		var new_name *ZendString
-		var lookup_name *ZendString
+		var old_name *types.ZendString = ZendAstGetStr(old_name_ast)
+		var new_name *types.ZendString
+		var lookup_name *types.ZendString
 		if new_name_ast != nil {
 			new_name = ZendAstGetStr(new_name_ast).Copy()
 		} else {
@@ -73,14 +74,14 @@ func ZendCompileUse(ast *ZendAst) {
 
 				/* The form "use A\B" is equivalent to "use A\B as B" */
 
-				new_name = ZendStringInit(unqualified_name, unqualified_name_len, 0)
+				new_name = types.ZendStringInit(unqualified_name, unqualified_name_len, 0)
 
 				/* The form "use A\B" is equivalent to "use A\B as B" */
 
 			} else {
 				new_name = old_name.Copy()
 				if current_ns == nil {
-					if type_ == T_CLASS && ZendStringEqualsLiteral(new_name, "strict") {
+					if type_ == T_CLASS && types.ZendStringEqualsLiteral(new_name, "strict") {
 						ZendErrorNoreturn(E_COMPILE_ERROR, "You seem to be trying to use a different language...")
 					}
 					ZendError(E_WARNING, "The use statement with non-compound name '%s' "+"has no effect", new_name.GetVal())
@@ -96,39 +97,39 @@ func ZendCompileUse(ast *ZendAst) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
 		if current_ns != nil {
-			var ns_name *ZendString = ZendStringAlloc(current_ns.GetLen()+1+new_name.GetLen(), 0)
+			var ns_name *types.ZendString = types.ZendStringAlloc(current_ns.GetLen()+1+new_name.GetLen(), 0)
 			ZendStrTolowerCopy(ns_name.GetVal(), current_ns.GetVal(), current_ns.GetLen())
 			ns_name.GetVal()[current_ns.GetLen()] = '\\'
 			memcpy(ns_name.GetVal()+current_ns.GetLen()+1, lookup_name.GetVal(), lookup_name.GetLen()+1)
 			if ZendHaveSeenSymbol(ns_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, ns_name)
 			}
-			ZendStringEfree(ns_name)
+			types.ZendStringEfree(ns_name)
 		} else {
 			if ZendHaveSeenSymbol(lookup_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
 			}
 		}
 		old_name.AddRefcount()
-		old_name = ZendNewInternedString(old_name)
+		old_name = types.ZendNewInternedString(old_name)
 		if !(ZendHashAddPtr(current_import, lookup_name, old_name)) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
-		ZendStringReleaseEx(lookup_name, 0)
-		ZendStringReleaseEx(new_name, 0)
+		types.ZendStringReleaseEx(lookup_name, 0)
+		types.ZendStringReleaseEx(new_name, 0)
 	}
 }
 func ZendCompileGroupUse(ast *ZendAst) {
 	var i uint32
-	var ns *ZendString = ZendAstGetStr(ast.GetChild()[0])
+	var ns *types.ZendString = ZendAstGetStr(ast.GetChild()[0])
 	var list *ZendAstList = ZendAstGetList(ast.GetChild()[1])
 	for i = 0; i < list.GetChildren(); i++ {
 		var inline_use *ZendAst
 		var use *ZendAst = list.GetChild()[i]
-		var name_zval *Zval = ZendAstGetZval(use.GetChild()[0])
-		var name *ZendString = name_zval.GetStr()
-		var compound_ns *ZendString = ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
-		ZendStringReleaseEx(name, 0)
+		var name_zval *types.Zval = ZendAstGetZval(use.GetChild()[0])
+		var name *types.ZendString = name_zval.GetStr()
+		var compound_ns *types.ZendString = ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
+		types.ZendStringReleaseEx(name, 0)
 		name_zval.SetString(compound_ns)
 		inline_use = ZendAstCreateList(1, ZEND_AST_USE, use)
 		if ast.GetAttr() != 0 {
@@ -146,21 +147,21 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		var const_ast *ZendAst = list.GetChild()[i]
 		var name_ast *ZendAst = const_ast.GetChild()[0]
 		var value_ast *ZendAst = const_ast.GetChild()[1]
-		var unqualified_name *ZendString = ZendAstGetStr(name_ast)
-		var name *ZendString
+		var unqualified_name *types.ZendString = ZendAstGetStr(name_ast)
+		var name *types.ZendString
 		var name_node Znode
 		var value_node Znode
-		var value_zv *Zval = value_node.GetConstant()
+		var value_zv *types.Zval = value_node.GetConstant()
 		value_node.SetOpType(IS_CONST)
 		ZendConstExprToZval(value_zv, value_ast)
 		if ZendLookupReservedConst(unqualified_name.GetVal(), unqualified_name.GetLen()) != nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
 		}
 		name = ZendPrefixWithNs(unqualified_name)
-		name = ZendNewInternedString(name)
+		name = types.ZendNewInternedString(name)
 		if FC__().GetImportsConst() != nil {
-			var import_name *ZendString = ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
-			if import_name != nil && ZendStringEquals(import_name, name) == 0 {
+			var import_name *types.ZendString = ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
+			if import_name != nil && types.ZendStringEquals(import_name, name) == 0 {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 			}
 		}
@@ -173,8 +174,8 @@ func ZendCompileConstDecl(ast *ZendAst) {
 func ZendCompileNamespace(ast *ZendAst) {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var stmt_ast *ZendAst = ast.GetChild()[1]
-	var name *ZendString
-	var with_bracket ZendBool = stmt_ast != nil
+	var name *types.ZendString
+	var with_bracket types.ZendBool = stmt_ast != nil
 
 	/* handle mixed syntax declaration or nested namespaces */
 
@@ -216,7 +217,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 		}
 	}
 	if FC__().GetCurrentNamespace() != nil {
-		ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
+		types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
 	}
 	if name_ast != nil {
 		name = ZendAstGetStr(name_ast)
@@ -240,8 +241,8 @@ func ZendCompileNamespace(ast *ZendAst) {
 func ZendCompileHaltCompiler(ast *ZendAst) {
 	var offset_ast *ZendAst = ast.GetChild()[0]
 	var offset ZendLong = ZendAstGetZval(offset_ast).GetLval()
-	var filename *ZendString
-	var name *ZendString
+	var filename *types.ZendString
+	var name *types.ZendString
 	var const_name = "__COMPILER_HALT_OFFSET__"
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
@@ -249,9 +250,9 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 	filename = ZendGetCompiledFilename()
 	name = ZendManglePropertyName_ZStr(const_name, filename.GetStr(), false)
 	ZendRegisterLongConstant(name.GetVal(), name.GetLen(), offset, CONST_CS, 0)
-	ZendStringReleaseEx(name, 0)
+	types.ZendStringReleaseEx(name, 0)
 }
-func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
+func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	var op_array *ZendOpArray = CG__().GetActiveOpArray()
 	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
 	switch ast.GetAttr() {
@@ -260,11 +261,11 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 	case T_FILE:
 		zv.SetStringCopy(CG__().GetCompiledFilename())
 	case T_DIR:
-		var filename *ZendString = CG__().GetCompiledFilename()
-		var dirname *ZendString = ZendStringInit(filename.GetVal(), filename.GetLen(), 0)
+		var filename *types.ZendString = CG__().GetCompiledFilename()
+		var dirname *types.ZendString = types.ZendStringInit(filename.GetVal(), filename.GetLen(), 0)
 		dirname.SetLen(ZendDirname(dirname.GetVal(), dirname.GetLen()))
 		if strcmp(dirname.GetVal(), ".") == 0 {
-			dirname = ZendStringExtend(dirname, MAXPATHLEN, 0)
+			dirname = types.ZendStringExtend(dirname, MAXPATHLEN, 0)
 			ZEND_IGNORE_VALUE(VCWD_GETCWD(dirname.GetVal(), MAXPATHLEN))
 			dirname.SetLen(strlen(dirname.GetVal()))
 		}
@@ -319,7 +320,7 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 	}
 	return 1
 }
-func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *Zval, op2 *Zval) ZendBool {
+func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	if !(opcode == ZEND_ADD || opcode == ZEND_SUB || opcode == ZEND_MUL || opcode == ZEND_DIV || opcode == ZEND_POW || opcode == ZEND_MOD || opcode == ZEND_SL || opcode == ZEND_SR || opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) {
 		return 0
 	}
@@ -338,13 +339,13 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *Zval, op2 *Zval)
 	}
 	return 0
 }
-func ZendBinaryOpProducesArrayConversionError(opcode uint32, op1 *Zval, op2 *Zval) ZendBool {
+func ZendBinaryOpProducesArrayConversionError(opcode uint32, op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	if opcode == ZEND_CONCAT && (op1.IsArray() || op2.IsArray()) {
 		return 1
 	}
 	return 0
 }
-func ZendTryCtEvalBinaryOp(result *Zval, opcode uint32, op1 *Zval, op2 *Zval) ZendBool {
+func ZendTryCtEvalBinaryOp(result *types.Zval, opcode uint32, op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	var fn BinaryOpType = GetBinaryOp(opcode)
 
 	/* don't evaluate division by zero at compile-time */
@@ -369,24 +370,24 @@ func ZendTryCtEvalBinaryOp(result *Zval, opcode uint32, op1 *Zval, op2 *Zval) Ze
 	fn(result, op1, op2)
 	return 1
 }
-func ZendCtEvalUnaryOp(result *Zval, opcode uint32, op *Zval) {
+func ZendCtEvalUnaryOp(result *types.Zval, opcode uint32, op *types.Zval) {
 	var fn UnaryOpType = GetUnaryOp(opcode)
 	fn(result, op)
 }
-func ZendTryCtEvalUnaryPm(result *Zval, kind ZendAstKind, op *Zval) ZendBool {
-	var left Zval
+func ZendTryCtEvalUnaryPm(result *types.Zval, kind ZendAstKind, op *types.Zval) types.ZendBool {
+	var left types.Zval
 	left.SetLong(b.Cond(kind == ZEND_AST_UNARY_PLUS, 1, -1))
 	return ZendTryCtEvalBinaryOp(result, ZEND_MUL, &left, op)
 }
-func ZendCtEvalGreater(result *Zval, kind ZendAstKind, op1 *Zval, op2 *Zval) {
+func ZendCtEvalGreater(result *types.Zval, kind ZendAstKind, op1 *types.Zval, op2 *types.Zval) {
 	var fn BinaryOpType = b.Cond(kind == ZEND_AST_GREATER, IsSmallerFunction, IsSmallerOrEqualFunction)
 	fn(result, op2, op1)
 }
-func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
+func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var last_elem_ast *ZendAst = nil
 	var i uint32
-	var is_constant ZendBool = 1
+	var is_constant types.ZendBool = 1
 	if ast.GetAttr() == ZEND_ARRAY_SYNTAX_LIST {
 		ZendError(E_COMPILE_ERROR, "Cannot use list() as standalone expression")
 	}
@@ -430,15 +431,15 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 		var elem_ast *ZendAst = list.GetChild()[i]
 		var value_ast *ZendAst = elem_ast.GetChild()[0]
 		var key_ast *ZendAst
-		var value *Zval = ZendAstGetZval(value_ast)
+		var value *types.Zval = ZendAstGetZval(value_ast)
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {
 			if value.IsArray() {
-				var ht *HashTable = value.GetArr()
-				var val *Zval
-				var key *ZendString
-				var __ht *HashTable = ht
+				var ht *types.HashTable = value.GetArr()
+				var val *types.Zval
+				var key *types.ZendString
+				var __ht *types.HashTable = ht
 				for _, _p := range __ht.foreachData() {
-					var _z *Zval = _p.GetVal()
+					var _z *types.Zval = _p.GetVal()
 
 					key = _p.GetKey()
 					val = _z
@@ -459,20 +460,20 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 		value.TryAddRefcount()
 		key_ast = elem_ast.GetChild()[1]
 		if key_ast != nil {
-			var key *Zval = ZendAstGetZval(key_ast)
+			var key *types.Zval = ZendAstGetZval(key_ast)
 			switch key.GetType() {
-			case IS_LONG:
+			case types.IS_LONG:
 				result.GetArr().IndexUpdateH(key.GetLval(), value)
-			case IS_STRING:
+			case types.IS_STRING:
 				result.GetArr().SymtableUpdate(key.GetStr().GetStr(), value)
-			case IS_DOUBLE:
+			case types.IS_DOUBLE:
 				result.GetArr().IndexUpdateH(ZendDvalToLval(key.GetDval()), value)
-			case IS_FALSE:
+			case types.IS_FALSE:
 				result.GetArr().IndexUpdateH(0, value)
-			case IS_TRUE:
+			case types.IS_TRUE:
 				result.GetArr().IndexUpdateH(1, value)
-			case IS_NULL:
-				result.GetArr().KeyUpdate(ZSTR_EMPTY_ALLOC().GetStr(), value)
+			case types.IS_NULL:
+				result.GetArr().KeyUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), value)
 			default:
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal offset type")
 			}
@@ -557,14 +558,14 @@ func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
 
 			if left_node.GetOpType() == IS_CONST {
 				if left_node.GetConstant().IsArray() {
-					ZendEmitOpTmp(&left_node, ZEND_CAST, &left_node, nil).SetExtendedValue(IS_STRING)
+					ZendEmitOpTmp(&left_node, ZEND_CAST, &left_node, nil).SetExtendedValue(types.IS_STRING)
 				} else {
 					ConvertToString(left_node.GetConstant())
 				}
 			}
 			if right_node.GetOpType() == IS_CONST {
 				if right_node.GetConstant().IsArray() {
-					ZendEmitOpTmp(&right_node, ZEND_CAST, &right_node, nil).SetExtendedValue(IS_STRING)
+					ZendEmitOpTmp(&right_node, ZEND_CAST, &right_node, nil).SetExtendedValue(types.IS_STRING)
 				} else {
 					ConvertToString(right_node.GetConstant())
 				}

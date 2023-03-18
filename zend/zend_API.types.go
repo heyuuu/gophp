@@ -2,7 +2,10 @@
 
 package zend
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+	"sik/zend/types"
+)
 
 /**
  * ZendFunctionEntry
@@ -65,21 +68,21 @@ func (this ZendFunctionEntry) IsStatic() bool              { return this.HasFlag
  */
 type ZendFcallInfo struct {
 	size          int
-	function_name Zval
-	retval        *Zval
-	params        *Zval
-	object        *ZendObject
-	no_separation ZendBool
+	function_name types.Zval
+	retval        *types.Zval
+	params        *types.Zval
+	object        *types.ZendObject
+	no_separation types.ZendBool
 	param_count   uint32
 }
 
 func MakeZendFcallInfo(
 	size int,
-	function_name Zval,
-	retval *Zval,
-	params *Zval,
-	object *ZendObject,
-	no_separation ZendBool,
+	function_name types.Zval,
+	retval *types.Zval,
+	params *types.Zval,
+	object *types.ZendObject,
+	no_separation types.ZendBool,
 	param_count uint32,
 ) ZendFcallInfo {
 	return ZendFcallInfo{
@@ -92,21 +95,21 @@ func MakeZendFcallInfo(
 		param_count:   param_count,
 	}
 }
-func (this *ZendFcallInfo) GetSize() int          { return this.size }
-func (this *ZendFcallInfo) SetSize(value int)     { this.size = value }
-func (this *ZendFcallInfo) GetFunctionName() Zval { return this.function_name }
+func (this *ZendFcallInfo) GetSize() int                { return this.size }
+func (this *ZendFcallInfo) SetSize(value int)           { this.size = value }
+func (this *ZendFcallInfo) GetFunctionName() types.Zval { return this.function_name }
 
 // func (this *ZendFcallInfo) SetFunctionName(value Zval) { this.function_name = value }
-func (this *ZendFcallInfo) GetRetval() *Zval               { return this.retval }
-func (this *ZendFcallInfo) SetRetval(value *Zval)          { this.retval = value }
-func (this *ZendFcallInfo) GetParams() *Zval               { return this.params }
-func (this *ZendFcallInfo) SetParams(value *Zval)          { this.params = value }
-func (this *ZendFcallInfo) GetObject() *ZendObject         { return this.object }
-func (this *ZendFcallInfo) SetObject(value *ZendObject)    { this.object = value }
-func (this *ZendFcallInfo) GetNoSeparation() ZendBool      { return this.no_separation }
-func (this *ZendFcallInfo) SetNoSeparation(value ZendBool) { this.no_separation = value }
-func (this *ZendFcallInfo) GetParamCount() uint32          { return this.param_count }
-func (this *ZendFcallInfo) SetParamCount(value uint32)     { this.param_count = value }
+func (this *ZendFcallInfo) GetRetval() *types.Zval               { return this.retval }
+func (this *ZendFcallInfo) SetRetval(value *types.Zval)          { this.retval = value }
+func (this *ZendFcallInfo) GetParams() *types.Zval               { return this.params }
+func (this *ZendFcallInfo) SetParams(value *types.Zval)          { this.params = value }
+func (this *ZendFcallInfo) GetObject() *types.ZendObject         { return this.object }
+func (this *ZendFcallInfo) SetObject(value *types.ZendObject)    { this.object = value }
+func (this *ZendFcallInfo) GetNoSeparation() types.ZendBool      { return this.no_separation }
+func (this *ZendFcallInfo) SetNoSeparation(value types.ZendBool) { this.no_separation = value }
+func (this *ZendFcallInfo) GetParamCount() uint32                { return this.param_count }
+func (this *ZendFcallInfo) SetParamCount(value uint32)           { this.param_count = value }
 
 /**
  * ZendFcallInfoCache
@@ -115,10 +118,10 @@ type ZendFcallInfoCache struct {
 	function_handler *ZendFunction
 	calling_scope    *ZendClassEntry
 	called_scope     *ZendClassEntry
-	object           *ZendObject
+	object           *types.ZendObject
 }
 
-func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *ZendClassEntry, called_scope *ZendClassEntry, object *ZendObject) ZendFcallInfoCache {
+func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *ZendClassEntry, called_scope *ZendClassEntry, object *types.ZendObject) ZendFcallInfoCache {
 	return ZendFcallInfoCache{
 		function_handler: function_handler,
 		calling_scope:    calling_scope,
@@ -134,5 +137,5 @@ func (this *ZendFcallInfoCache) GetCallingScope() *ZendClassEntry      { return 
 func (this *ZendFcallInfoCache) SetCallingScope(value *ZendClassEntry) { this.calling_scope = value }
 func (this *ZendFcallInfoCache) GetCalledScope() *ZendClassEntry       { return this.called_scope }
 func (this *ZendFcallInfoCache) SetCalledScope(value *ZendClassEntry)  { this.called_scope = value }
-func (this *ZendFcallInfoCache) GetObject() *ZendObject                { return this.object }
-func (this *ZendFcallInfoCache) SetObject(value *ZendObject)           { this.object = value }
+func (this *ZendFcallInfoCache) GetObject() *types.ZendObject          { return this.object }
+func (this *ZendFcallInfoCache) SetObject(value *types.ZendObject)     { this.object = value }

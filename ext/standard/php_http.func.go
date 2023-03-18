@@ -4,8 +4,9 @@ package standard
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpUrlEncodeHash(ht *zend.HashTable, formstr *zend.SmartStr) int {
+func PhpUrlEncodeHash(ht *types.HashTable, formstr *zend.SmartStr) int {
 	return PhpUrlEncodeHashEx(ht, formstr, nil, 0, nil, 0, nil, 0, nil)
 }

@@ -1,7 +1,8 @@
-package zend
+package types
 
 import (
 	b "sik/builtin"
+	"sik/zend"
 	"sort"
 )
 
@@ -163,10 +164,10 @@ func (this *HashTable) applyValidBucket(apply_func func(p *Bucket) int) {
 			continue
 		}
 		var result = apply_func(p)
-		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
+		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_REMOVE) {
 			this.deleteBucket(idx)
 		}
-		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
+		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_STOP) {
 			break
 		}
 	}
@@ -178,10 +179,10 @@ func (this *HashTable) applyValidBucketReserve(apply_func func(p *Bucket) int) {
 			continue
 		}
 		var result = apply_func(p)
-		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
+		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_REMOVE) {
 			this.deleteBucket(idx - 1)
 		}
-		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
+		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_STOP) {
 			break
 		}
 	}
@@ -213,7 +214,7 @@ func (this *HashTable) foreachDataReserve() []*Bucket {
 
 // 移动 bucket 到新位置
 func (this *HashTable) _moveBucket(pos uint32, newPos uint32) {
-	ZEND_ASSERT(newPos <= pos)
+	zend.ZEND_ASSERT(newPos <= pos)
 	if newPos == pos {
 		return
 	}
@@ -232,7 +233,7 @@ func (this *HashTable) removeHoles() bool {
 	}
 
 	if this.HasIterators() {
-		var iterPos = ZendHashIteratorsLowerPos(this, 0)
+		var iterPos = zend.ZendHashIteratorsLowerPos(this, 0)
 
 		this.eachValidBucket(func(pos uint32, p *Bucket) {
 			// 移动 bucket 到新位置
@@ -240,8 +241,8 @@ func (this *HashTable) removeHoles() bool {
 			if pos != newPos {
 				if pos >= iterPos {
 					for {
-						ZendHashIteratorsUpdate(this, iterPos, newPos)
-						iterPos = ZendHashIteratorsLowerPos(this, iterPos+1)
+						zend.ZendHashIteratorsUpdate(this, iterPos, newPos)
+						iterPos = zend.ZendHashIteratorsLowerPos(this, iterPos+1)
 						if iterPos >= pos {
 							break
 						}
@@ -261,7 +262,7 @@ func (this *HashTable) removeHoles() bool {
 	this.data = this.data[:newPos]
 	this.nNumOfElements = newPos
 
-	ZEND_ASSERT(this.IsWithoutHoles())
+	zend.ZEND_ASSERT(this.IsWithoutHoles())
 
 	return true
 }
@@ -287,7 +288,7 @@ func (this *HashTable) removeHolesForce() bool {
 	this.data = this.data[:newPos]
 	this.nNumOfElements = newPos
 
-	ZEND_ASSERT(this.IsWithoutHoles())
+	zend.ZEND_ASSERT(this.IsWithoutHoles())
 
 	return true
 }
@@ -330,7 +331,7 @@ func (this *HashTable) Rehash() {
 	/* Migrate pointer to one past the end of the array to the new one past the end, so that
 	 * newly inserted elements are picked up correctly. */
 	if this.HasIterators() {
-		_zendHashIteratorsUpdate(this, oldNumUsed, this.GetNNumUsed())
+		zend._zendHashIteratorsUpdate(this, oldNumUsed, this.GetNNumUsed())
 	}
 }
 
@@ -349,7 +350,7 @@ func (this *HashTable) doResize() {
 		// 无内存复制，仅扩充尺寸标识
 		this.nTableSize *= 2
 	} else {
-		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
+		zend.ZendErrorNoreturn(zend.E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
 	}
 }
 
@@ -358,7 +359,7 @@ func (this *HashTable) Extend(nSize uint32) {
 	this.assertRc1()
 	if nSize > this.nTableSize {
 		// 无内存复制，仅扩充尺寸标识
-		this.nTableSize = ZendHashCheckSize(nSize)
+		this.nTableSize = zend.ZendHashCheckSize(nSize)
 	}
 }
 
@@ -394,7 +395,7 @@ func (this *HashTable) Count() uint32 {
 		if this.nNumOfElements == num {
 			this.SubUFlags(HASH_FLAG_HAS_EMPTY_IND)
 		}
-	} else if this == EG__().GetSymbolTable() {
+	} else if this == zend.EG__().GetSymbolTable() {
 		num = this.RecalcElements()
 	} else {
 		num = this.GetNNumOfElements()
@@ -428,7 +429,7 @@ func (this *HashTable) validPos(pos uint32) (uint32, bool) {
 }
 
 func (this *HashTable) IsValidPos(pos uint32) bool {
-	ZEND_ASSERT(pos < this.DataSize())
+	zend.ZEND_ASSERT(pos < this.DataSize())
 	return !this.data[pos].GetVal().IsType(IS_UNDEF)
 }
 
@@ -452,10 +453,10 @@ func (this *ZendArray) appendBucket(bucket *Bucket) *Bucket {
 		var indexKey = bucket.IndexKey()
 		// 更新 nNextFreeElement
 		if indexKey > this.nNextFreeElement {
-			if indexKey < ZEND_LONG_MAX {
+			if indexKey < zend.ZEND_LONG_MAX {
 				this.nNextFreeElement = indexKey + 1
 			} else {
-				this.nNextFreeElement = ZEND_LONG_MAX
+				this.nNextFreeElement = zend.ZEND_LONG_MAX
 			}
 		}
 	}

@@ -1,6 +1,9 @@
-package zend
+package types
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+	"sik/zend"
+)
 
 /**
  * GC - Refcount
@@ -9,19 +12,19 @@ func (this *Zval) IsRefcounted() bool  { return this.GetTypeFlags() != 0 }
 func (this *Zval) IsCollectable() bool { return b.FlagMatch(this.GetTypeFlags(), IS_TYPE_COLLECTABLE) }
 
 func (this *Zval) GetRefcount() uint32 {
-	ZEND_ASSERT(this.IsRefcounted())
+	zend.ZEND_ASSERT(this.IsRefcounted())
 	return this.GetCounted().GetRefcount()
 }
 func (this *Zval) SetRefcount(rc uint32) uint32 {
-	ZEND_ASSERT(this.IsRefcounted())
+	zend.ZEND_ASSERT(this.IsRefcounted())
 	return this.GetCounted().SetRefcount(rc)
 }
 func (this *Zval) AddRefcount() uint32 {
-	ZEND_ASSERT(this.IsRefcounted())
+	zend.ZEND_ASSERT(this.IsRefcounted())
 	return this.GetCounted().AddRefcount()
 }
 func (this *Zval) DelRefcount() uint32 {
-	ZEND_ASSERT(this.IsRefcounted())
+	zend.ZEND_ASSERT(this.IsRefcounted())
 	return this.GetCounted().DelRefcount()
 }
 func (this *Zval) TryAddRefcount() {

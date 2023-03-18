@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_hash.h>
 
 /*
@@ -32,9 +34,9 @@ const HASH_KEY_NON_EXISTENT = 3
 
 const HASH_FLAG_MASK = 0xff
 
-var ZendEmptyArray HashTable
+var ZendEmptyArray types.HashTable
 
-type MergeCheckerFuncT func(target_ht *HashTable, source_data *Zval, hash_key *ZendHashKey, pParam any) ZendBool
+type MergeCheckerFuncT func(target_ht *types.HashTable, source_data *types.Zval, hash_key *types.ZendHashKey, pParam any) types.ZendBool
 
 /* startup/shutdown */
 
@@ -44,9 +46,9 @@ const ZEND_HASH_APPLY_KEEP = 0
 const ZEND_HASH_APPLY_REMOVE = 1 << 0
 const ZEND_HASH_APPLY_STOP = 1 << 1
 
-type ApplyFuncT func(pDest *Zval) int
-type ApplyFuncArgT func(pDest *Zval, argument any) int
-type ApplyFuncArgsT func(pDest *Zval, num_args int, args []any, hash_key *ZendHashKey) int
+type ApplyFuncT func(pDest *types.Zval) int
+type ApplyFuncArgT func(pDest *types.Zval, argument any) int
+type ApplyFuncArgsT func(pDest *types.Zval, num_args int, args []any, hash_key *types.ZendHashKey) int
 
 /* This function should be used with special care (in other words,
  * it should usually not be used).  When used with the ZEND_HASH_APPLY_STOP
@@ -95,9 +97,9 @@ type ApplyFuncArgsT func(pDest *Zval, num_args int, args []any, hash_key *ZendHa
    +----------------------------------------------------------------------+
 */
 
-const HT_POISONED_PTR *HashTable = (*HashTable)(intptr_t - 1)
+const HT_POISONED_PTR *types.HashTable = (*types.HashTable)(intptr_t - 1)
 
-var UninitializedBucket []uint32 = []uint32{HT_INVALID_IDX, HT_INVALID_IDX}
+var UninitializedBucket []uint32 = []uint32{types.HT_INVALID_IDX, types.HT_INVALID_IDX}
 
 //ZEND_API const HashTable zend_empty_array = {
 

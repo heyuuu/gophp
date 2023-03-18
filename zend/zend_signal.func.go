@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func SIGG(v __auto__) __auto__ { return ZendSignalGlobals.v }
@@ -149,7 +150,7 @@ func ZendSigaction(signo int, act *__struct__sigaction, oldact *__struct__sigact
 		sigaddset(&sigset, signo)
 		ZendSigprocmask(SIG_UNBLOCK, &sigset, nil)
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendSignal(signo int, handler func(int)) int {
 	var sa __struct__sigaction
@@ -163,7 +164,7 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 	var sa __struct__sigaction
 	if sigaction(signo, nil, &sa) == 0 {
 		if (sa.sa_flags&SA_SIGINFO) != 0 && sa.sa_sigaction == handler {
-			return FAILURE
+			return types.FAILURE
 		}
 		SIGG(handlers)[signo-1].flags = sa.sa_flags
 		if (sa.sa_flags & SA_SIGINFO) != 0 {
@@ -177,9 +178,9 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 		if sigaction(signo, &sa, nil) < 0 {
 			ZendErrorNoreturn(E_ERROR, "Error installing signal handler for %d", signo)
 		}
-		return SUCCESS
+		return types.SUCCESS
 	}
-	return FAILURE
+	return types.FAILURE
 }
 func ZendSignalActivate() {
 	var x int

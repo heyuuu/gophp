@@ -7,6 +7,7 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpOutputInitGlobals(G *ZendOutputGlobals) { memset(G, 0, b.SizeOf("* G")) }
@@ -39,8 +40,8 @@ func PhpOutputHeader() {
 		}
 	}
 }
-func ReverseConflictDtor(zv *zend.Zval) {
-	var ht *zend.HashTable = zv.GetPtr()
+func ReverseConflictDtor(zv *types.Zval) {
+	var ht *types.HashTable = zv.GetPtr()
 	ht.Destroy()
 }
 func PhpOutputStartup() {
@@ -60,7 +61,7 @@ func PhpOutputActivate() int {
 	memset(&OutputGlobals, 0, b.SizeOf("zend_output_globals"))
 	OG(handlers).Init()
 	OG(flags) |= PHP_OUTPUT_ACTIVATED
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpOutputDeactivate() {
 	var handler **PhpOutputHandler = nil
@@ -133,9 +134,9 @@ func PhpOutputFlush() int {
 			OG(handlers).Push(&(OG(active)))
 		}
 		PhpOutputContextDtor(&context)
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputFlushAll() {
 	if OG(active) {
@@ -148,9 +149,9 @@ func PhpOutputClean() int {
 		PhpOutputContextInit(&context, PHP_OUTPUT_HANDLER_CLEAN)
 		PhpOutputHandlerOp(OG(active), &context)
 		PhpOutputContextDtor(&context)
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputCleanAll() {
 	var context PhpOutputContext
@@ -161,9 +162,9 @@ func PhpOutputCleanAll() {
 }
 func PhpOutputEnd() int {
 	if PhpOutputStackPop(PHP_OUTPUT_POP_TRY) != 0 {
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputEndAll() {
 	for OG(active) && PhpOutputStackPop(PHP_OUTPUT_POP_FORCE) != 0 {
@@ -172,9 +173,9 @@ func PhpOutputEndAll() {
 }
 func PhpOutputDiscard() int {
 	if PhpOutputStackPop(PHP_OUTPUT_POP_DISCARD|PHP_OUTPUT_POP_TRY) != 0 {
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputDiscardAll() {
 	for OG(active) {
@@ -188,76 +189,76 @@ func PhpOutputGetLevel() int {
 		return 0
 	}
 }
-func PhpOutputGetContents(p *zend.Zval) int {
+func PhpOutputGetContents(p *types.Zval) int {
 	if OG(active) {
 		p.SetRawString(b.CastStr(OG(active).buffer.data, OG(active).buffer.used))
-		return zend.SUCCESS
+		return types.SUCCESS
 	} else {
 		p.SetNull()
-		return zend.FAILURE
+		return types.FAILURE
 	}
 }
-func PhpOutputGetLength(p *zend.Zval) int {
+func PhpOutputGetLength(p *types.Zval) int {
 	if OG(active) {
 		p.SetLong(OG(active).buffer.used)
-		return zend.SUCCESS
+		return types.SUCCESS
 	} else {
 		p.SetNull()
-		return zend.FAILURE
+		return types.FAILURE
 	}
 }
 func PhpOutputGetActiveHandler() *PhpOutputHandler { return OG(active) }
 func PhpOutputStartDefault() int {
 	var handler *PhpOutputHandler
 	handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
-	if zend.SUCCESS == PhpOutputHandlerStart(handler) {
-		return zend.SUCCESS
+	if types.SUCCESS == PhpOutputHandlerStart(handler) {
+		return types.SUCCESS
 	}
 	PhpOutputHandlerFree(&handler)
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputStartDevnull() int {
 	var handler *PhpOutputHandler
 	handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDevnullHandlerName), PhpOutputHandlerDevnullFunc, PHP_OUTPUT_HANDLER_DEFAULT_SIZE, 0)
-	if zend.SUCCESS == PhpOutputHandlerStart(handler) {
-		return zend.SUCCESS
+	if types.SUCCESS == PhpOutputHandlerStart(handler) {
+		return types.SUCCESS
 	}
 	PhpOutputHandlerFree(&handler)
-	return zend.FAILURE
+	return types.FAILURE
 }
-func PhpOutputStartUser(output_handler *zend.Zval, chunk_size int, flags int) int {
+func PhpOutputStartUser(output_handler *types.Zval, chunk_size int, flags int) int {
 	var handler *PhpOutputHandler
 	if output_handler != nil {
 		handler = PhpOutputHandlerCreateUser(output_handler, chunk_size, flags)
 	} else {
 		handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, chunk_size, flags)
 	}
-	if zend.SUCCESS == PhpOutputHandlerStart(handler) {
-		return zend.SUCCESS
+	if types.SUCCESS == PhpOutputHandlerStart(handler) {
+		return types.SUCCESS
 	}
 	PhpOutputHandlerFree(&handler)
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputStartInternal(name *byte, name_len int, output_handler PhpOutputHandlerFuncT, chunk_size int, flags int) int {
 	var handler *PhpOutputHandler
 	handler = PhpOutputHandlerCreateInternal(name, name_len, PhpOutputHandlerCompatFunc, chunk_size, flags)
 	PhpOutputHandlerSetContext(handler, output_handler, nil)
-	if zend.SUCCESS == PhpOutputHandlerStart(handler) {
-		return zend.SUCCESS
+	if types.SUCCESS == PhpOutputHandlerStart(handler) {
+		return types.SUCCESS
 	}
 	PhpOutputHandlerFree(&handler)
-	return zend.FAILURE
+	return types.FAILURE
 }
-func PhpOutputHandlerCreateUser(output_handler *zend.Zval, chunk_size int, flags int) *PhpOutputHandler {
-	var handler_name *zend.ZendString = nil
+func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flags int) *PhpOutputHandler {
+	var handler_name *types.ZendString = nil
 	var error *byte = nil
 	var handler *PhpOutputHandler = nil
 	var alias PhpOutputHandlerAliasCtorT = nil
 	var user *PhpOutputHandlerUserFuncT = nil
 	switch output_handler.GetType() {
-	case zend.IS_NULL:
+	case types.IS_NULL:
 		handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, chunk_size, flags)
-	case zend.IS_STRING:
+	case types.IS_STRING:
 		if output_handler.GetStr().GetLen() != 0 && b.Assign(&alias, PhpOutputHandlerAlias(output_handler.GetStr().GetVal(), output_handler.GetStr().GetLen())) {
 			handler = alias(output_handler.GetStr().GetVal(), output_handler.GetStr().GetLen(), chunk_size, flags)
 			break
@@ -265,9 +266,9 @@ func PhpOutputHandlerCreateUser(output_handler *zend.Zval, chunk_size int, flags
 		fallthrough
 	default:
 		user = zend.Ecalloc(1, b.SizeOf("php_output_handler_user_func_t"))
-		if zend.SUCCESS == zend.ZendFcallInfoInit(output_handler, 0, user.GetFci(), user.GetFcc(), &handler_name, &error) {
+		if types.SUCCESS == zend.ZendFcallInfoInit(output_handler, 0, user.GetFci(), user.GetFcc(), &handler_name, &error) {
 			handler = PhpOutputHandlerInit(handler_name, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_USER)
-			zend.ZVAL_COPY(user.GetZoh(), output_handler)
+			types.ZVAL_COPY(user.GetZoh(), output_handler)
 			handler.SetUser(user)
 		} else {
 			zend.Efree(user)
@@ -277,17 +278,17 @@ func PhpOutputHandlerCreateUser(output_handler *zend.Zval, chunk_size int, flags
 			zend.Efree(error)
 		}
 		if handler_name != nil {
-			zend.ZendStringReleaseEx(handler_name, 0)
+			types.ZendStringReleaseEx(handler_name, 0)
 		}
 	}
 	return handler
 }
 func PhpOutputHandlerCreateInternal(name *byte, name_len int, output_handler PhpOutputHandlerContextFuncT, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
-	var str *zend.ZendString = zend.ZendStringInit(name, name_len, 0)
+	var str *types.ZendString = types.ZendStringInit(name, name_len, 0)
 	handler = PhpOutputHandlerInit(str, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
 	handler.SetInternal(output_handler)
-	zend.ZendStringReleaseEx(str, 0)
+	types.ZendStringReleaseEx(str, 0)
 	return handler
 }
 func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any, dtor func(any)) {
@@ -298,24 +299,24 @@ func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any, dtor func(a
 	handler.SetOpaq(opaq)
 }
 func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
-	var rconflicts *zend.HashTable
+	var rconflicts *types.HashTable
 	var conflict PhpOutputHandlerConflictCheckT
 	if PhpOutputLockError(PHP_OUTPUT_HANDLER_START) != 0 || handler == nil {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if nil != b.Assign(&conflict, zend.ZendHashFindPtr(&PhpOutputHandlerConflicts, handler.GetName())) {
-		if zend.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
-			return zend.FAILURE
+		if types.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
+			return types.FAILURE
 		}
 	}
 	if nil != b.Assign(&rconflicts, zend.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
-		var __ht *zend.HashTable = rconflicts
+		var __ht *types.HashTable = rconflicts
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			conflict = _z.GetPtr()
-			if zend.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
-				return zend.FAILURE
+			if types.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
+				return types.FAILURE
 			}
 		}
 	}
@@ -324,7 +325,7 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 
 	handler.SetLevel(OG(handlers).Push(&handler))
 	OG(active) = handler
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpOutputHandlerStarted(name *byte, name_len int) int {
 	var handlers **PhpOutputHandler
@@ -352,83 +353,83 @@ func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_se
 	return 0
 }
 func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
-	var str *zend.ZendString
+	var str *types.ZendString
 	if zend.EG__().GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
-		return zend.FAILURE
+		return types.FAILURE
 	}
-	str = zend.ZendStringInitInterned(name, name_len, 1)
+	str = types.ZendStringInitInterned(name, name_len, 1)
 	zend.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str, check_func)
-	zend.ZendStringReleaseEx(str, 1)
-	return zend.SUCCESS
+	types.ZendStringReleaseEx(str, 1)
+	return types.SUCCESS
 }
 func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
-	var rev zend.HashTable
-	var rev_ptr *zend.HashTable = nil
+	var rev types.HashTable
+	var rev_ptr *types.HashTable = nil
 	if zend.EG__().GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if nil != b.Assign(&rev_ptr, zend.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
 		if zend.ZendHashNextIndexInsertPtr(rev_ptr, check_func) {
-			return zend.SUCCESS
+			return types.SUCCESS
 		} else {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	} else {
-		var str *zend.ZendString
+		var str *types.ZendString
 		zend.ZendHashInit(&rev, 8, nil, nil, 1)
 		if nil == zend.ZendHashNextIndexInsertPtr(&rev, check_func) {
 			rev.Destroy()
-			return zend.FAILURE
+			return types.FAILURE
 		}
-		str = zend.ZendStringInitInterned(name, name_len, 1)
+		str = types.ZendStringInitInterned(name, name_len, 1)
 		zend.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str, &rev, b.SizeOf("HashTable"))
-		zend.ZendStringReleaseEx(str, 1)
-		return zend.SUCCESS
+		types.ZendStringReleaseEx(str, 1)
+		return types.SUCCESS
 	}
 }
 func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT {
 	return zend.ZendHashStrFindPtr(&PhpOutputHandlerAliases, name, name_len)
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
-	var str *zend.ZendString
+	var str *types.ZendString
 	if zend.EG__().GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register an output handler alias outside of MINIT")
-		return zend.FAILURE
+		return types.FAILURE
 	}
-	str = zend.ZendStringInitInterned(name, name_len, 1)
+	str = types.ZendStringInitInterned(name, name_len, 1)
 	zend.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str, func_)
-	zend.ZendStringReleaseEx(str, 1)
-	return zend.SUCCESS
+	types.ZendStringReleaseEx(str, 1)
+	return types.SUCCESS
 }
 func PhpOutputHandlerHook(type_ PhpOutputHandlerHookT, arg any) int {
 	if OG(running) {
 		switch type_ {
 		case PHP_OUTPUT_HANDLER_HOOK_GET_OPAQ:
 			*((**any)(arg)) = OG(running).opaq
-			return zend.SUCCESS
+			return types.SUCCESS
 		case PHP_OUTPUT_HANDLER_HOOK_GET_FLAGS:
 			*((*int)(arg)) = OG(running).flags
-			return zend.SUCCESS
+			return types.SUCCESS
 		case PHP_OUTPUT_HANDLER_HOOK_GET_LEVEL:
 			*((*int)(arg)) = OG(running).level
-			return zend.SUCCESS
+			return types.SUCCESS
 		case PHP_OUTPUT_HANDLER_HOOK_IMMUTABLE:
 			OG(running).flags &= ^(PHP_OUTPUT_HANDLER_REMOVABLE | PHP_OUTPUT_HANDLER_CLEANABLE)
-			return zend.SUCCESS
+			return types.SUCCESS
 		case PHP_OUTPUT_HANDLER_HOOK_DISABLE:
 			OG(running).flags |= PHP_OUTPUT_HANDLER_DISABLED
-			return zend.SUCCESS
+			return types.SUCCESS
 		default:
 
 		}
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputHandlerDtor(handler *PhpOutputHandler) {
 	if handler.GetName() != nil {
-		zend.ZendStringReleaseEx(handler.GetName(), 0)
+		types.ZendStringReleaseEx(handler.GetName(), 0)
 	}
 	if handler.GetBuffer().GetData() != nil {
 		zend.Efree(handler.GetBuffer().GetData())
@@ -481,7 +482,7 @@ func PhpOutputContextReset(context *PhpOutputContext) {
 	memset(context, 0, b.SizeOf("php_output_context"))
 	context.SetOp(op)
 }
-func PhpOutputContextFeed(context *PhpOutputContext, data *byte, size int, used int, free zend.ZendBool) {
+func PhpOutputContextFeed(context *PhpOutputContext, data *byte, size int, used int, free types.ZendBool) {
 	if context.GetIn().GetFree() != 0 && context.GetIn().GetData() != nil {
 		zend.Efree(context.GetIn().GetData())
 	}
@@ -523,7 +524,7 @@ func PhpOutputContextDtor(context *PhpOutputContext) {
 		context.GetOut().SetData(nil)
 	}
 }
-func PhpOutputHandlerInit(name *zend.ZendString, chunk_size int, flags int) *PhpOutputHandler {
+func PhpOutputHandlerInit(name *types.ZendString, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
 	handler = zend.Ecalloc(1, b.SizeOf("php_output_handler"))
 	handler.SetName(name.Copy())
@@ -597,22 +598,22 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 		}
 		OG(running) = handler
 		if handler.IsUser() {
-			var retval zend.Zval
-			var ob_data zend.Zval
-			var ob_mode zend.Zval
+			var retval types.Zval
+			var ob_data types.Zval
+			var ob_mode types.Zval
 			ob_data.SetRawString(b.CastStr(handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed()))
 			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			zend.ZvalPtrDtor(&ob_data)
-			var PHP_OUTPUT_USER_SUCCESS func(retval zend.Zval) bool = func(retval zend.Zval) bool {
-				return retval.GetType() != zend.IS_UNDEF && retval.GetType() != zend.IS_FALSE
+			var PHP_OUTPUT_USER_SUCCESS func(retval types.Zval) bool = func(retval types.Zval) bool {
+				return retval.GetType() != types.IS_UNDEF && retval.GetType() != types.IS_FALSE
 			}
-			if zend.SUCCESS == zend.ZendFcallInfoCall(handler.GetUser().GetFci(), handler.GetUser().GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
+			if types.SUCCESS == zend.ZendFcallInfoCall(handler.GetUser().GetFci(), handler.GetUser().GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
 
 				/* user handler may have returned TRUE */
 
 				status = PHP_OUTPUT_HANDLER_NO_DATA
-				if retval.GetType() != zend.IS_FALSE && retval.GetType() != zend.IS_TRUE {
+				if retval.GetType() != types.IS_FALSE && retval.GetType() != types.IS_TRUE {
 					zend.ConvertToStringEx(&retval)
 					if retval.GetStr().GetLen() != 0 {
 						context.GetOut().SetData(zend.Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
@@ -634,7 +635,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			zend.ZvalPtrDtor(&retval)
 		} else {
 			PhpOutputContextFeed(context, handler.GetBuffer().GetData(), handler.GetBuffer().GetSize(), handler.GetBuffer().GetUsed(), 0)
-			if zend.SUCCESS == handler.GetInternal()(handler.GetOpaq(), context) {
+			if types.SUCCESS == handler.GetInternal()(handler.GetOpaq(), context) {
 				if context.GetOut().GetUsed() != 0 {
 					status = PHP_OUTPUT_HANDLER_SUCCESS
 				} else {
@@ -796,18 +797,18 @@ func PhpOutputStackApplyClean(h any, c any) int {
 }
 func PhpOutputStackApplyList(h any, z any) int {
 	var handler *PhpOutputHandler = *((**PhpOutputHandler)(h))
-	var array *zend.Zval = (*zend.Zval)(z)
+	var array *types.Zval = (*types.Zval)(z)
 	zend.AddNextIndexStr(array, handler.GetName().Copy())
 	return 0
 }
 func PhpOutputStackApplyStatus(h any, z any) int {
 	var handler *PhpOutputHandler = *((**PhpOutputHandler)(h))
-	var arr zend.Zval
-	var array *zend.Zval = (*zend.Zval)(z)
+	var arr types.Zval
+	var array *types.Zval = (*types.Zval)(z)
 	zend.AddNextIndexZval(array, PhpOutputHandlerStatus(handler, &arr))
 	return 0
 }
-func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *zend.Zval) *zend.Zval {
+func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *types.Zval) *types.Zval {
 	zend.ZEND_ASSERT(entry != nil)
 	zend.ArrayInit(entry)
 	zend.AddAssocStr(entry, "name", handler.GetName().GetStr())
@@ -889,28 +890,28 @@ func PhpOutputHandlerCompatFunc(handler_context *any, output_context *PhpOutputC
 		} else {
 			PhpOutputContextPass(output_context)
 		}
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func PhpOutputHandlerDefaultFunc(handler_context *any, output_context *PhpOutputContext) int {
 	PhpOutputContextPass(output_context)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpOutputHandlerDevnullFunc(handler_context *any, output_context *PhpOutputContext) int {
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func ZifObStart(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var output_handler *zend.Zval = nil
+func ZifObStart(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var output_handler *types.Zval = nil
 	var chunk_size zend.ZendLong = 0
 	var flags zend.ZendLong = PHP_OUTPUT_HANDLER_STDFLAGS
-	if zend.ZendParseParameters(executeData.NumArgs(), "|zll", &output_handler, &chunk_size, &flags) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|zll", &output_handler, &chunk_size, &flags) == types.FAILURE {
 		return
 	}
 	if chunk_size < 0 {
 		chunk_size = 0
 	}
-	if PhpOutputStartUser(output_handler, chunk_size, flags) == zend.FAILURE {
+	if PhpOutputStartUser(output_handler, chunk_size, flags) == types.FAILURE {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to create buffer")
 		return_value.SetFalse()
 		return
@@ -918,8 +919,8 @@ func ZifObStart(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if !(OG(active)) {
@@ -927,7 +928,7 @@ func ZifObFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	if zend.SUCCESS != PhpOutputFlush() {
+	if types.SUCCESS != PhpOutputFlush() {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to flush buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 		return_value.SetFalse()
 		return
@@ -935,8 +936,8 @@ func ZifObFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if !(OG(active)) {
@@ -944,7 +945,7 @@ func ZifObClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	if zend.SUCCESS != PhpOutputClean() {
+	if types.SUCCESS != PhpOutputClean() {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 		return_value.SetFalse()
 		return
@@ -952,8 +953,8 @@ func ZifObClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if !(OG(active)) {
@@ -961,11 +962,11 @@ func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_BOOL(return_value, zend.SUCCESS == PhpOutputEnd())
+	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputEnd())
 	return
 }
-func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if !(OG(active)) {
@@ -973,66 +974,66 @@ func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_BOOL(return_value, zend.SUCCESS == PhpOutputDiscard())
+	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputDiscard())
 	return
 }
-func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if PhpOutputGetContents(return_value) == zend.FAILURE {
+	if PhpOutputGetContents(return_value) == types.FAILURE {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush")
 		return_value.SetFalse()
 		return
 	}
-	if zend.SUCCESS != PhpOutputEnd() {
+	if types.SUCCESS != PhpOutputEnd() {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if !(OG(active)) {
 		return_value.SetFalse()
 		return
 	}
-	if PhpOutputGetContents(return_value) == zend.FAILURE {
+	if PhpOutputGetContents(return_value) == types.FAILURE {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer. No buffer to delete")
 		return_value.SetFalse()
 		return
 	}
-	if zend.SUCCESS != PhpOutputDiscard() {
+	if types.SUCCESS != PhpOutputDiscard() {
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if PhpOutputGetContents(return_value) == zend.FAILURE {
+	if PhpOutputGetContents(return_value) == types.FAILURE {
 		return_value.SetFalse()
 		return
 	}
 }
-func ZifObGetLevel(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObGetLevel(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	return_value.SetLong(PhpOutputGetLevel())
 	return
 }
-func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if PhpOutputGetLength(return_value) == zend.FAILURE {
+	if PhpOutputGetLength(return_value) == types.FAILURE {
 		return_value.SetFalse()
 		return
 	}
 }
-func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -1041,9 +1042,9 @@ func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	}
 	zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
 }
-func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var full_status zend.ZendBool = 0
-	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &full_status) == zend.FAILURE {
+func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var full_status types.ZendBool = 0
+	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &full_status) == types.FAILURE {
 		return
 	}
 	if !(OG(active)) {
@@ -1057,18 +1058,18 @@ func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		PhpOutputHandlerStatus(OG(active), return_value)
 	}
 }
-func ZifObImplicitFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObImplicitFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var flag zend.ZendLong = 1
-	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &flag) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &flag) == types.FAILURE {
 		return
 	}
 	PhpOutputSetImplicitFlush(flag)
 }
-func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if standard.PhpUrlScannerResetVars() == zend.SUCCESS {
+	if standard.PhpUrlScannerResetVars() == types.SUCCESS {
 		return_value.SetTrue()
 		return
 	} else {
@@ -1076,15 +1077,15 @@ func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *
 		return
 	}
 }
-func ZifOutputAddRewriteVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOutputAddRewriteVar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var name *byte
 	var value *byte
 	var name_len int
 	var value_len int
-	if zend.ZendParseParameters(executeData.NumArgs(), "ss", &name, &name_len, &value, &value_len) == zend.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), "ss", &name, &name_len, &value, &value_len) == types.FAILURE {
 		return
 	}
-	if standard.PhpUrlScannerAddVar(name, name_len, value, value_len, 1) == zend.SUCCESS {
+	if standard.PhpUrlScannerAddVar(name, name_len, value, value_len, 1) == types.SUCCESS {
 		return_value.SetTrue()
 		return
 	} else {

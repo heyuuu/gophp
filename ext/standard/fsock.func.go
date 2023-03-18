@@ -7,14 +7,15 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *zend.Zval, persistent int) {
+func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Zval, persistent int) {
 	var host *byte
 	var host_len int
 	var port zend.ZendLong = -1
-	var zerrno *zend.Zval = nil
-	var zerrstr *zend.Zval = nil
+	var zerrno *types.Zval = nil
+	var zerrstr *types.Zval = nil
 	var timeout float64 = float64(FG(default_socket_timeout))
 	var conv int64
 	var tv __struct__timeval
@@ -23,7 +24,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	var err int
 	var hostname *byte = nil
 	var hostname_len int
-	var errstr *zend.ZendString = nil
+	var errstr *types.ZendString = nil
 	return_value.SetFalse()
 	for {
 		var _flags int = 0
@@ -31,12 +32,12 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		var _max_num_args int = 5
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -143,7 +144,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *zend.Zv
 			if zerrstr != nil {
 				zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 			} else {
-				zend.ZendStringRelease(errstr)
+				types.ZendStringRelease(errstr)
 			}
 		}
 		return_value.SetFalse()
@@ -156,13 +157,13 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
 	}
 	if errstr != nil {
-		zend.ZendStringReleaseEx(errstr, 0)
+		types.ZendStringReleaseEx(errstr, 0)
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifFsockopen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFsockopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpFsockopenStream(executeData, return_value, 0)
 }
-func ZifPfsockopen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPfsockopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpFsockopenStream(executeData, return_value, 1)
 }

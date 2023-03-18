@@ -6,6 +6,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/file.h>
@@ -28,8 +29,8 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var ZifFdSet func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var ZifFdIsset func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifFdSet func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var ZifFdIsset func(executeData *zend.ZendExecuteData, return_value *types.Zval)
 var ZmStartupUserStreams func(type_ int, module_number int) int
 var PhpSetSockBlocking func(socketd core.PhpSocketT, block int) int
 
@@ -84,7 +85,7 @@ var FileGlobals PhpFileGlobals
 
 /* {{{ ZTS-stuff / Globals / Prototypes */
 
-var LeStreamContext int = zend.FAILURE
+var LeStreamContext int = types.FAILURE
 var FlockValues []int = []int{LOCK_SH, LOCK_EX, LOCK_UN}
 
 /* {{{ proto bool flock(resource fp, int operation [, int &wouldblock])

@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"sik/zend/types"
 	"strconv"
 	"strings"
 )
@@ -75,9 +76,9 @@ func (this *SmartStr) AppendUlong(num ZendUlong) {
  * todo 待移除方法
  */
 
-func (this *SmartStr) GetS() *ZendString {
+func (this *SmartStr) GetS() *types.ZendString {
 	// todo 需要确认是否兼容 ZendStringAlloc() 但未使用时的空 []byte
-	return NewZendString(this.GetStr())
+	return types.NewZendString(this.GetStr())
 }
 func (this *SmartStr) GetC() *byte {
 	// todo 仅占位，实际使用需替换

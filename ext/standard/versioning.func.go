@@ -5,6 +5,7 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpCanonicalizeVersion(version *byte) *byte {
@@ -186,7 +187,7 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	zend.Efree(ver2)
 	return compare
 }
-func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var v1 *byte
 	var v2 *byte
 	var op *byte = nil
@@ -200,12 +201,12 @@ func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -280,27 +281,27 @@ func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 	if !(strncmp(op, "<", op_len)) || !(strncmp(op, "lt", op_len)) {
-		zend.ZVAL_BOOL(return_value, compare == -1)
+		types.ZVAL_BOOL(return_value, compare == -1)
 		return
 	}
 	if !(strncmp(op, "<=", op_len)) || !(strncmp(op, "le", op_len)) {
-		zend.ZVAL_BOOL(return_value, compare != 1)
+		types.ZVAL_BOOL(return_value, compare != 1)
 		return
 	}
 	if !(strncmp(op, ">", op_len)) || !(strncmp(op, "gt", op_len)) {
-		zend.ZVAL_BOOL(return_value, compare == 1)
+		types.ZVAL_BOOL(return_value, compare == 1)
 		return
 	}
 	if !(strncmp(op, ">=", op_len)) || !(strncmp(op, "ge", op_len)) {
-		zend.ZVAL_BOOL(return_value, compare != -1)
+		types.ZVAL_BOOL(return_value, compare != -1)
 		return
 	}
 	if !(strncmp(op, "==", op_len)) || !(strncmp(op, "=", op_len)) || !(strncmp(op, "eq", op_len)) {
-		zend.ZVAL_BOOL(return_value, compare == 0)
+		types.ZVAL_BOOL(return_value, compare == 0)
 		return
 	}
 	if !(strncmp(op, "!=", op_len)) || !(strncmp(op, "<>", op_len)) || !(strncmp(op, "ne", op_len)) {
-		zend.ZVAL_BOOL(return_value, compare != 0)
+		types.ZVAL_BOOL(return_value, compare != 0)
 		return
 	}
 	return_value.SetNull()

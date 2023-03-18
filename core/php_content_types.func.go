@@ -3,7 +3,7 @@
 package core
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpDefaultPostReader() {
@@ -23,9 +23,9 @@ func PhpStartupSapiContentTypes() int {
 	SapiRegisterDefaultPostReader(PhpDefaultPostReader)
 	SapiRegisterTreatData(PhpDefaultTreatData)
 	SapiRegisterInputFilter(PhpDefaultInputFilter, nil)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpSetupSapiContentTypes() int {
 	SapiRegisterPostEntries(PhpPostEntries)
-	return zend.SUCCESS
+	return types.SUCCESS
 }

@@ -4,14 +4,15 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * ZendSplGlobals
  */
 type ZendSplGlobals struct {
-	autoload_extensions *zend.ZendString
-	autoload_functions  *zend.HashTable
+	autoload_extensions *types.ZendString
+	autoload_functions  *types.HashTable
 	hash_mask_handle    intPtr
 	hash_mask_handlers  intPtr
 	hash_mask_init      int
@@ -36,12 +37,12 @@ type ZendSplGlobals struct {
 //                 }
 //             }
 // func (this *ZendSplGlobals)  GetAutoloadExtensions() *zend.ZendString      { return this.autoload_extensions }
-func (this *ZendSplGlobals) SetAutoloadExtensions(value *zend.ZendString) {
+func (this *ZendSplGlobals) SetAutoloadExtensions(value *types.ZendString) {
 	this.autoload_extensions = value
 }
 
 // func (this *ZendSplGlobals)  GetAutoloadFunctions() *zend.HashTable      { return this.autoload_functions }
-func (this *ZendSplGlobals) SetAutoloadFunctions(value *zend.HashTable) {
+func (this *ZendSplGlobals) SetAutoloadFunctions(value *types.HashTable) {
 	this.autoload_functions = value
 }
 
@@ -59,8 +60,8 @@ func (this *ZendSplGlobals) SetAutoloadRunning(value int) { this.autoload_runnin
  */
 type AutoloadFuncInfo struct {
 	func_ptr *zend.ZendFunction
-	obj      zend.Zval
-	closure  zend.Zval
+	obj      types.Zval
+	closure  types.Zval
 	ce       *zend.ZendClassEntry
 }
 
@@ -74,10 +75,10 @@ type AutoloadFuncInfo struct {
 // }
 func (this *AutoloadFuncInfo) GetFuncPtr() *zend.ZendFunction      { return this.func_ptr }
 func (this *AutoloadFuncInfo) SetFuncPtr(value *zend.ZendFunction) { this.func_ptr = value }
-func (this *AutoloadFuncInfo) GetObj() zend.Zval                   { return this.obj }
+func (this *AutoloadFuncInfo) GetObj() types.Zval                  { return this.obj }
 
 // func (this *AutoloadFuncInfo) SetObj(value zend.Zval) { this.obj = value }
-func (this *AutoloadFuncInfo) GetClosure() zend.Zval { return this.closure }
+func (this *AutoloadFuncInfo) GetClosure() types.Zval { return this.closure }
 
 // func (this *AutoloadFuncInfo) SetClosure(value zend.Zval) { this.closure = value }
 func (this *AutoloadFuncInfo) GetCe() *zend.ZendClassEntry      { return this.ce }

@@ -1,21 +1,24 @@
 // <<generate>>
 
-package zend
+package types
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+	"sik/zend"
+)
 
 /**
  * ZendHashKey
  */
 type ZendHashKey struct {
-	h   ZendUlong
+	h   zend.ZendUlong
 	key *ZendString
 }
 
-func (this *ZendHashKey) GetH() ZendUlong          { return this.h }
-func (this *ZendHashKey) SetH(value ZendUlong)     { this.h = value }
-func (this *ZendHashKey) GetKey() *ZendString      { return this.key }
-func (this *ZendHashKey) SetKey(value *ZendString) { this.key = value }
+func (this *ZendHashKey) GetH() zend.ZendUlong      { return this.h }
+func (this *ZendHashKey) SetH(value zend.ZendUlong) { this.h = value }
+func (this *ZendHashKey) GetKey() *ZendString       { return this.key }
+func (this *ZendHashKey) SetKey(value *ZendString)  { this.key = value }
 
 /**
  * ZendArrayKey
@@ -31,7 +34,7 @@ func NewIndexKey(index int) ZendArrayKey { return ZendArrayKey{index, nil} }
 func (this ZendArrayKey) GetIndex() int  { return this.index }
 func (this ZendArrayKey) GetKey() string { return *this.key }
 func (this ZendArrayKey) IsStrKey() bool { return this.key != nil }
-func (this ZendArrayKey) GetH() ZendUlong {
+func (this ZendArrayKey) GetH() zend.ZendUlong {
 	// todo remove
 	if this.key != nil {
 		return b.HashStr(*this.key)
@@ -104,15 +107,15 @@ func (this *Bucket) SetIndexKey(index int) {
 	this.key = NewIndexKey(index)
 }
 
-func (this *Bucket) GetH() ZendUlong     { return this.key.GetH() }
-func (this *Bucket) GetKey() *ZendString { return this.key.GetZendStringKey() }
-func (this *Bucket) SetH(value ZendUlong) {
+func (this *Bucket) GetH() zend.ZendUlong { return this.key.GetH() }
+func (this *Bucket) GetKey() *ZendString  { return this.key.GetZendStringKey() }
+func (this *Bucket) SetH(value zend.ZendUlong) {
 	// todo remove
-	ZEND_ASSERT(false)
+	zend.ZEND_ASSERT(false)
 }
 func (this *Bucket) SetKey(value *ZendString) {
 	// todo 此方法应被替换
-	ZEND_ASSERT(false)
+	zend.ZEND_ASSERT(false)
 }
 
 func (this *Bucket) CopyFrom(from *Bucket) {
@@ -158,7 +161,7 @@ type ZendArray struct {
 	nNumOfElements   uint32
 	nTableSize       uint32
 	nInternalPointer uint32
-	nNextFreeElement ZendLong
+	nNextFreeElement zend.ZendLong
 	pDestructor      DtorFuncT
 
 	//
@@ -182,23 +185,23 @@ func (this *ZendArray) SetNNumUsed(value uint32) {
 	// todo remove
 }
 
-func (this *ZendArray) GetNNumOfElements() uint32          { return this.nNumOfElements }
-func (this *ZendArray) SetNNumOfElements(value uint32)     { this.nNumOfElements = value }
-func (this *ZendArray) GetNTableSize() uint32              { return this.nTableSize }
-func (this *ZendArray) SetNTableSize(value uint32)         { this.nTableSize = value }
-func (this *ZendArray) GetNInternalPointer() uint32        { return this.nInternalPointer }
-func (this *ZendArray) SetNInternalPointer(value uint32)   { this.nInternalPointer = value }
-func (this *ZendArray) GetNNextFreeElement() ZendLong      { return this.nNextFreeElement }
-func (this *ZendArray) SetNNextFreeElement(value ZendLong) { this.nNextFreeElement = value }
-func (this *ZendArray) GetPDestructor() DtorFuncT          { return this.pDestructor }
-func (this *ZendArray) SetPDestructor(value DtorFuncT)     { this.pDestructor = value }
+func (this *ZendArray) GetNNumOfElements() uint32               { return this.nNumOfElements }
+func (this *ZendArray) SetNNumOfElements(value uint32)          { this.nNumOfElements = value }
+func (this *ZendArray) GetNTableSize() uint32                   { return this.nTableSize }
+func (this *ZendArray) SetNTableSize(value uint32)              { this.nTableSize = value }
+func (this *ZendArray) GetNInternalPointer() uint32             { return this.nInternalPointer }
+func (this *ZendArray) SetNInternalPointer(value uint32)        { this.nInternalPointer = value }
+func (this *ZendArray) GetNNextFreeElement() zend.ZendLong      { return this.nNextFreeElement }
+func (this *ZendArray) SetNNextFreeElement(value zend.ZendLong) { this.nNextFreeElement = value }
+func (this *ZendArray) GetPDestructor() DtorFuncT               { return this.pDestructor }
+func (this *ZendArray) SetPDestructor(value DtorFuncT)          { this.pDestructor = value }
 
 func (this *ZendArray) GetNTableMask() uint32 {
 	// todo 待移除
 	return uint32(-(this.nTableSize + this.nTableSize))
 }
 func (this *ZendArray) SetNTableMask(value uint32) {
-	ZEND_ASSERT(this.GetNTableMask() == value)
+	zend.ZEND_ASSERT(this.GetNTableMask() == value)
 }
 
 /* ZendArray.u.v.flags */
@@ -248,13 +251,13 @@ func (this *ZendArray) IsIteratorsOverflow() bool { return this.GetNIteratorsCou
  * Constructor && Init
  */
 func NewZendArray(size uint32) *ZendArray {
-	return NewZendArrayEx(size, ZVAL_PTR_DTOR, false)
+	return NewZendArrayEx(size, zend.ZVAL_PTR_DTOR, false)
 }
 
 func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendArray {
 	var ht = &ZendArray{
 		nNumOfElements:   0,
-		nTableSize:       ZendHashCheckSize(size),
+		nTableSize:       zend.ZendHashCheckSize(size),
 		nInternalPointer: 0,
 		nNextFreeElement: 0,
 		pDestructor:      pDestructor,
@@ -278,7 +281,7 @@ func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendAr
 }
 
 func (this *ZendArray) assertRc1() {
-	ZEND_ASSERT(this.GetRefcount() == 1)
+	zend.ZEND_ASSERT(this.GetRefcount() == 1)
 }
 
 func (this *ZendArray) resetDataAndHash(dataSize uint32) {
@@ -342,7 +345,7 @@ func (this *ZendArray) KeyFindBucket(key string) *Bucket {
 	return nil
 }
 
-func (this *ZendArray) IndexFindH(h ZendUlong) *Zval {
+func (this *ZendArray) IndexFindH(h zend.ZendUlong) *Zval {
 	return this.IndexFind(int(h))
 }
 func (this *ZendArray) IndexFind(index int) *Zval {
@@ -401,7 +404,7 @@ func (this *ZendArray) KeyExistsInd(key string) bool {
  */
 
 // IndexAdd
-func (this *ZendArray) IndexAddH(h ZendUlong, pData *Zval) *Zval {
+func (this *ZendArray) IndexAddH(h zend.ZendUlong, pData *Zval) *Zval {
 	return this.IndexAdd(int(h), pData)
 }
 func (this *ZendArray) IndexAdd(index int, pData *Zval) *Zval {
@@ -416,7 +419,7 @@ func (this *ZendArray) IndexAdd(index int, pData *Zval) *Zval {
 }
 
 // IndexAddNew
-func (this *ZendArray) IndexAddNewH(h ZendUlong, pData *Zval) *Zval {
+func (this *ZendArray) IndexAddNewH(h zend.ZendUlong, pData *Zval) *Zval {
 	return this.IndexAddNew(int(h), pData)
 }
 func (this *ZendArray) IndexAddNew(index int, pData *Zval) *Zval {
@@ -427,7 +430,7 @@ func (this *ZendArray) IndexAddNew(index int, pData *Zval) *Zval {
 }
 
 // IndexUpdate
-func (this *ZendArray) IndexUpdateH(h ZendUlong, pData *Zval) *Zval {
+func (this *ZendArray) IndexUpdateH(h zend.ZendUlong, pData *Zval) *Zval {
 	return this.IndexUpdate(int(h), pData)
 }
 func (this *ZendArray) IndexUpdate(index int, pData *Zval) *Zval {
@@ -500,7 +503,7 @@ func (this *ZendArray) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 	var p = this.KeyFindBucket(strKey)
 	if p != nil {
 		var data *Zval
-		ZEND_ASSERT(p.GetVal() != pData)
+		zend.ZEND_ASSERT(p.GetVal() != pData)
 		data = p.GetVal()
 		if data.IsIndirect() {
 			data = data.GetZv()
@@ -528,7 +531,7 @@ func (this *ZendArray) KeyUpdate(key string, pData *Zval) *Zval {
 	var p = this.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
-		ZEND_ASSERT(p.GetVal() != pData)
+		zend.ZEND_ASSERT(p.GetVal() != pData)
 		data = p.GetVal()
 		if this.GetPDestructor() != nil {
 			this.GetPDestructor()(data)
@@ -548,7 +551,7 @@ func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	var p = this.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
-		ZEND_ASSERT(p.GetVal() != pData)
+		zend.ZEND_ASSERT(p.GetVal() != pData)
 		data = p.GetVal()
 		if data.IsType(IS_INDIRECT) {
 			data = data.GetZv()
@@ -647,10 +650,10 @@ func (this *HashTable) IndexDelete(index int) bool {
 
 func (this *ZendArray) deleteBucket(pos uint32) {
 	this.assertRc1()
-	ZEND_ASSERT(pos < this.DataSize())
+	zend.ZEND_ASSERT(pos < this.DataSize())
 
 	var p = &this.data[pos]
-	ZEND_ASSERT(p.IsValid())
+	zend.ZEND_ASSERT(p.IsValid())
 
 	// 移除映射
 	this.deleteHash(p.key)
@@ -664,7 +667,7 @@ func (this *ZendArray) deleteBucket(pos uint32) {
 		if this.nInternalPointer == pos {
 			this.nInternalPointer = newIdx
 		}
-		ZendHashIteratorsUpdate(this, pos, newIdx)
+		zend.ZendHashIteratorsUpdate(this, pos, newIdx)
 	}
 
 	// 析构函数
@@ -706,7 +709,7 @@ func (this *HashTable) Destroy() {
 			})
 		}
 	}
-	ZendHashIteratorsRemove(this)
+	zend.ZendHashIteratorsRemove(this)
 }
 
 func (this *HashTable) DestroyEx() {

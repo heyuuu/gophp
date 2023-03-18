@@ -3,9 +3,9 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpPasswordAlgoIdentify(hash *zend.ZendString) *PhpPasswordAlgo {
+func PhpPasswordAlgoIdentify(hash *types.ZendString) *PhpPasswordAlgo {
 	return PhpPasswordAlgoIdentifyEx(hash, PhpPasswordAlgoDefault())
 }

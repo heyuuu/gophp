@@ -4,51 +4,52 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ObjectPropertiesInit(object *ZendObject, class_type *ZendClassEntry) {
+func ObjectPropertiesInit(object *types.ZendObject, class_type *ZendClassEntry) {
 	object.SetProperties(nil)
 	_objectPropertiesInit(object, class_type)
 }
-func ObjectPropertiesInitEx(object *ZendObject, properties *HashTable) {
+func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.HashTable) {
 	object.SetProperties(properties)
 	if object.GetCe().GetDefaultPropertiesCount() != 0 {
-		var prop *Zval
-		var key *ZendString
+		var prop *types.Zval
+		var key *types.ZendString
 		var property_info *ZendPropertyInfo
-		var __ht *HashTable = properties
+		var __ht *types.HashTable = properties
 		for _, _p := range __ht.foreachData() {
-			var _z *Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
 			prop = _z
 			property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
 			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
-				var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
+				var slot *types.Zval = OBJ_PROP(object, property_info.GetOffset())
 				if property_info.GetType() != 0 {
-					var tmp Zval
-					ZVAL_COPY_VALUE(&tmp, prop)
+					var tmp types.Zval
+					types.ZVAL_COPY_VALUE(&tmp, prop)
 					if ZendVerifyPropertyType(property_info, &tmp, 0) == 0 {
 						continue
 					}
-					ZVAL_COPY_VALUE(slot, &tmp)
+					types.ZVAL_COPY_VALUE(slot, &tmp)
 				} else {
-					ZVAL_COPY_VALUE(slot, prop)
+					types.ZVAL_COPY_VALUE(slot, prop)
 				}
 				prop.SetIndirect(slot)
 			}
 		}
 	}
 }
-func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
-	var prop *Zval
-	var tmp Zval
-	var key *ZendString
+func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable) {
+	var prop *types.Zval
+	var tmp types.Zval
+	var key *types.ZendString
 	var h ZendLong
 	var property_info *ZendPropertyInfo
-	var __ht *HashTable = properties
+	var __ht *types.HashTable = properties
 	for _, _p := range __ht.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		h = _p.GetH()
 		key = _p.GetKey()
@@ -58,16 +59,16 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 				var class_name *byte
 				var prop_name *byte
 				var prop_name_len int
-				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == SUCCESS {
-					var pname *ZendString = ZendStringInit(prop_name, prop_name_len, 0)
+				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == types.SUCCESS {
+					var pname *types.ZendString = types.ZendStringInit(prop_name, prop_name_len, 0)
 					var prev_scope *ZendClassEntry = EG__().GetFakeScope()
 					if class_name != nil && class_name[0] != '*' {
-						var cname *ZendString = ZendStringInit(class_name, strlen(class_name), 0)
+						var cname *types.ZendString = types.ZendStringInit(class_name, strlen(class_name), 0)
 						EG__().SetFakeScope(ZendLookupClass(cname))
-						ZendStringReleaseEx(cname, 0)
+						types.ZendStringReleaseEx(cname, 0)
 					}
 					property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
-					ZendStringReleaseEx(pname, 0)
+					types.ZendStringReleaseEx(pname, 0)
 					EG__().SetFakeScope(prev_scope)
 				} else {
 					property_info = ZEND_WRONG_PROPERTY_INFO
@@ -76,9 +77,9 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 				property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
 			}
 			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
-				var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
+				var slot *types.Zval = OBJ_PROP(object, property_info.GetOffset())
 				ZvalPtrDtor(slot)
-				ZVAL_COPY_VALUE(slot, prop)
+				types.ZVAL_COPY_VALUE(slot, prop)
 				ZvalAddRef(slot)
 				if object.GetProperties() != nil {
 					tmp.SetIndirect(slot)
@@ -100,7 +101,7 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 		}
 	}
 }
-func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties *HashTable) int {
+func _objectAndPropertiesInit(arg *types.Zval, class_type *ZendClassEntry, properties *types.HashTable) int {
 	if class_type.HasCeFlags(ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) {
 		if class_type.IsInterface() {
 			ZendThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
@@ -111,17 +112,17 @@ func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties 
 		}
 		arg.SetNull()
 		arg.SetObj(nil)
-		return FAILURE
+		return types.FAILURE
 	}
 	if !class_type.IsConstantsUpdated() {
-		if ZendUpdateClassConstants(class_type) != SUCCESS {
+		if ZendUpdateClassConstants(class_type) != types.SUCCESS {
 			arg.SetNull()
 			arg.SetObj(nil)
-			return FAILURE
+			return types.FAILURE
 		}
 	}
 	if class_type.GetCreateObject() == nil {
-		var obj *ZendObject = ZendObjectsNew(class_type)
+		var obj *types.ZendObject = ZendObjectsNew(class_type)
 		arg.SetObject(obj)
 		if properties != nil {
 			ObjectPropertiesInitEx(obj, properties)
@@ -131,184 +132,184 @@ func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties 
 	} else {
 		arg.SetObject(class_type.GetCreateObject()(class_type))
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
-func ObjectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties *HashTable) int {
+func ObjectAndPropertiesInit(arg *types.Zval, class_type *ZendClassEntry, properties *types.HashTable) int {
 	return _objectAndPropertiesInit(arg, class_type, properties)
 }
-func ObjectInitEx(arg *Zval, class_type *ZendClassEntry) int {
+func ObjectInitEx(arg *types.Zval, class_type *ZendClassEntry) int {
 	return _objectAndPropertiesInit(arg, class_type, nil)
 }
-func ObjectInit(arg *Zval) int {
+func ObjectInit(arg *types.Zval) int {
 	arg.SetObject(ZendObjectsNew(ZendStandardClassDef))
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddAssocLongEx(arg *Zval, key string, n ZendLong) int {
-	var tmp Zval
+func AddAssocLongEx(arg *types.Zval, key string, n ZendLong) int {
+	var tmp types.Zval
 	tmp.SetLong(n)
 	arg.GetArr().SymtableUpdate(key, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddAssocNullEx(arg *Zval, key string) int {
-	var tmp Zval
+func AddAssocNullEx(arg *types.Zval, key string) int {
+	var tmp types.Zval
 	tmp.SetNull()
 	arg.GetArr().SymtableUpdate(key, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddAssocBoolEx(arg *Zval, key string, b int) int {
-	var tmp Zval
+func AddAssocBoolEx(arg *types.Zval, key string, b int) int {
+	var tmp types.Zval
 	tmp.SetBool(b != 0)
 	arg.GetArr().SymtableUpdate(key, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddAssocDoubleEx(arg *Zval, key string, d float64) int {
-	var tmp Zval
+func AddAssocDoubleEx(arg *types.Zval, key string, d float64) int {
+	var tmp types.Zval
 	tmp.SetDouble(d)
 	arg.GetArr().SymtableUpdate(key, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddAssocStrEx(arg *Zval, key string, str string) int {
-	arg.GetArr().SymtableUpdate(key, NewZvalString(str))
-	return SUCCESS
+func AddAssocStrEx(arg *types.Zval, key string, str string) int {
+	arg.GetArr().SymtableUpdate(key, types.NewZvalString(str))
+	return types.SUCCESS
 }
-func AddAssocStringlEx(arg *Zval, key string, str string) int {
-	arg.GetArr().SymtableUpdate(key, NewZvalString(str))
-	return SUCCESS
+func AddAssocStringlEx(arg *types.Zval, key string, str string) int {
+	arg.GetArr().SymtableUpdate(key, types.NewZvalString(str))
+	return types.SUCCESS
 }
-func AddAssocZvalEx(arg *Zval, key string, value *Zval) int {
+func AddAssocZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 	arg.GetArr().SymtableUpdate(key, value)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
-	var tmp Zval
+func AddIndexLong(arg *types.Zval, index ZendUlong, n ZendLong) int {
+	var tmp types.Zval
 	tmp.SetLong(n)
 	arg.GetArr().IndexUpdateH(index, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
-	var tmp Zval
+func AddIndexBool(arg *types.Zval, index ZendUlong, b int) int {
+	var tmp types.Zval
 	tmp.SetBool(b != 0)
 	arg.GetArr().IndexUpdateH(index, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexResource(arg *Zval, index ZendUlong, r *ZendResource) int {
-	var tmp Zval
+func AddIndexResource(arg *types.Zval, index ZendUlong, r *types.ZendResource) int {
+	var tmp types.Zval
 	tmp.SetResource(r)
 	arg.GetArr().IndexUpdateH(index, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
-	var tmp Zval
+func AddIndexDouble(arg *types.Zval, index ZendUlong, d float64) int {
+	var tmp types.Zval
 	tmp.SetDouble(d)
 	arg.GetArr().IndexUpdateH(index, &tmp)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
-	zv := NewZvalString(str.GetStr())
+func AddIndexStr(arg *types.Zval, index ZendUlong, str *types.ZendString) int {
+	zv := types.NewZvalString(str.GetStr())
 	arg.GetArr().IndexUpdateH(index, zv)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexString(arg *Zval, index ZendUlong, str *byte) int {
-	zv := NewZvalString(b.CastStrAuto(str))
+func AddIndexString(arg *types.Zval, index ZendUlong, str *byte) int {
+	zv := types.NewZvalString(b.CastStrAuto(str))
 	arg.GetArr().IndexUpdateH(index, zv)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddIndexStringl(arg *Zval, index ZendUlong, str *byte, length int) int {
-	zv := NewZvalString(b.CastStr(str, length))
+func AddIndexStringl(arg *types.Zval, index ZendUlong, str *byte, length int) int {
+	zv := types.NewZvalString(b.CastStr(str, length))
 	arg.GetArr().IndexUpdateH(index, zv)
-	return SUCCESS
+	return types.SUCCESS
 }
-func AddNextIndexLong(arg *Zval, n ZendLong) int {
-	if arg.GetArr().NextIndexInsert(NewZvalLong(n)) != nil {
-		return SUCCESS
+func AddNextIndexLong(arg *types.Zval, n ZendLong) int {
+	if arg.GetArr().NextIndexInsert(types.NewZvalLong(n)) != nil {
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexNull(arg *Zval) int {
-	if arg.GetArr().NextIndexInsert(NewZvalNull()) != nil {
-		return SUCCESS
+func AddNextIndexNull(arg *types.Zval) int {
+	if arg.GetArr().NextIndexInsert(types.NewZvalNull()) != nil {
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexBool(arg *Zval, b int) int {
-	var tmp Zval
+func AddNextIndexBool(arg *types.Zval, b int) int {
+	var tmp types.Zval
 	tmp.SetBool(b != 0)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexResource(arg *Zval, r *ZendResource) int {
-	var tmp Zval
+func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
+	var tmp types.Zval
 	tmp.SetResource(r)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexDouble(arg *Zval, d float64) int {
-	var tmp Zval
+func AddNextIndexDouble(arg *types.Zval, d float64) int {
+	var tmp types.Zval
 	tmp.SetDouble(d)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexStr(arg *Zval, str *ZendString) int {
-	var tmp Zval
+func AddNextIndexStr(arg *types.Zval, str *types.ZendString) int {
+	var tmp types.Zval
 	tmp.SetString(str)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexString(arg *Zval, str *byte) int {
-	var tmp Zval
+func AddNextIndexString(arg *types.Zval, str *byte) int {
+	var tmp types.Zval
 	tmp.SetRawString(b.CastStrAuto(str))
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddNextIndexStringl(arg *Zval, str *byte, length int) int {
-	var tmp Zval
+func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
+	var tmp types.Zval
 	tmp.SetRawString(b.CastStr(str, length))
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
-	var result *Zval
+func ArraySetZvalKey(ht *types.HashTable, key *types.Zval, value *types.Zval) int {
+	var result *types.Zval
 	switch key.GetType() {
-	case IS_STRING:
+	case types.IS_STRING:
 		result = ht.SymtableUpdate(key.GetStr().GetStr(), value)
 		break
-	case IS_NULL:
-		result = ht.SymtableUpdate(ZSTR_EMPTY_ALLOC().GetStr(), value)
+	case types.IS_NULL:
+		result = ht.SymtableUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), value)
 		break
-	case IS_RESOURCE:
-		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(key), Z_RES_HANDLE_P(key))
-		result = ht.IndexUpdate(Z_RES_HANDLE_P(key), value)
+	case types.IS_RESOURCE:
+		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(key), types.Z_RES_HANDLE_P(key))
+		result = ht.IndexUpdate(types.Z_RES_HANDLE_P(key), value)
 		break
-	case IS_FALSE:
+	case types.IS_FALSE:
 		result = ht.IndexUpdateH(0, value)
 		break
-	case IS_TRUE:
+	case types.IS_TRUE:
 		result = ht.IndexUpdateH(1, value)
 		break
-	case IS_LONG:
+	case types.IS_LONG:
 		result = ht.IndexUpdate(key.GetLval(), value)
 		break
-	case IS_DOUBLE:
+	case types.IS_DOUBLE:
 		result = ht.IndexUpdate(ZendDvalToLval(key.GetDval()), value)
 		break
 	default:
@@ -317,33 +318,33 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 	}
 	if result != nil {
 		result.TryAddRefcount()
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func AddPropertyLongEx(arg *Zval, key string, n ZendLong) int {
-	return AddPropertyZvalEx(arg, key, NewZvalLong(n))
+func AddPropertyLongEx(arg *types.Zval, key string, n ZendLong) int {
+	return AddPropertyZvalEx(arg, key, types.NewZvalLong(n))
 }
-func AddPropertyNullEx(arg *Zval, key string) int {
-	return AddPropertyZvalEx(arg, key, NewZvalNull())
+func AddPropertyNullEx(arg *types.Zval, key string) int {
+	return AddPropertyZvalEx(arg, key, types.NewZvalNull())
 }
-func AddPropertyResourceEx(arg *Zval, key string, r *ZendResource) int {
-	return AddPropertyZvalEx(arg, key, NewZvalResource(r))
+func AddPropertyResourceEx(arg *types.Zval, key string, r *types.ZendResource) int {
+	return AddPropertyZvalEx(arg, key, types.NewZvalResource(r))
 }
-func AddPropertyStrEx(arg *Zval, key string, str string) int {
-	return AddPropertyZvalEx(arg, key, NewZvalString(str))
+func AddPropertyStrEx(arg *types.Zval, key string, str string) int {
+	return AddPropertyZvalEx(arg, key, types.NewZvalString(str))
 }
-func AddPropertyZvalEx(arg *Zval, key string, value *Zval) int {
-	zKey := NewZvalString(key)
-	Z_OBJ_HT(*arg).GetWriteProperty()(arg, zKey, value, nil)
-	return SUCCESS
+func AddPropertyZvalEx(arg *types.Zval, key string, value *types.Zval) int {
+	zKey := types.NewZvalString(key)
+	types.Z_OBJ_HT(*arg).GetWriteProperty()(arg, zKey, value, nil)
+	return types.SUCCESS
 }
 func ZendStartupModuleEx(module *ZendModuleEntry) int {
 	var name_len int
-	var lcname *ZendString
+	var lcname *types.ZendString
 	if module.GetModuleStarted() != 0 {
-		return SUCCESS
+		return types.SUCCESS
 	}
 	module.SetModuleStarted(1)
 
@@ -355,18 +356,18 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 			if dep.GetType() == MODULE_DEP_REQUIRED {
 				var req_mod *ZendModuleEntry
 				name_len = strlen(dep.GetName())
-				lcname = ZendStringAlloc(name_len, 0)
+				lcname = types.ZendStringAlloc(name_len, 0)
 				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
 				if b.Assign(&req_mod, ZendHashFindPtr(&ModuleRegistry, lcname)) == nil || req_mod.GetModuleStarted() == 0 {
-					ZendStringEfree(lcname)
+					types.ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */
 
 					ZendError(E_CORE_WARNING, "Cannot load module '%s' because required module '%s' is not loaded", module.GetName(), dep.GetName())
 					module.SetModuleStarted(0)
-					return FAILURE
+					return types.FAILURE
 				}
-				ZendStringEfree(lcname)
+				types.ZendStringEfree(lcname)
 			}
 			dep++
 		}
@@ -381,12 +382,12 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 	}
 	if module.GetModuleStartupFunc() != nil {
 		EG__().SetCurrentModule(module)
-		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == FAILURE {
+		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
 			ZendErrorNoreturn(E_CORE_ERROR, "Unable to start %s module", module.GetName())
 			EG__().SetCurrentModule(nil)
-			return FAILURE
+			return types.FAILURE
 		}
 		EG__().SetCurrentModule(nil)
 	}
-	return SUCCESS
+	return types.SUCCESS
 }

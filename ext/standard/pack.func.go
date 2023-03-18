@@ -6,12 +6,13 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpPack(val *zend.Zval, size int, map_ *int, output *byte) {
+func PhpPack(val *types.Zval, size int, map_ *int, output *byte) {
 	var i int
 	var v *byte
-	if val.GetType() != zend.IS_LONG {
+	if val.GetType() != types.IS_LONG {
 		zend.ConvertToLong(val)
 	}
 	v = (*byte)(&(val.GetLval()))
@@ -82,8 +83,8 @@ func PhpPackParseDouble(is_little_endian int, src any) float64 {
 	}
 	return m.d
 }
-func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var argv *zend.Zval = nil
+func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var argv *types.Zval = nil
 	var num_args int = 0
 	var i int
 	var currentarg int
@@ -94,19 +95,19 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var formatcount int = 0
 	var outputpos int = 0
 	var outputsize int = 0
-	var output *zend.ZendString
+	var output *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -453,7 +454,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			outputsize = outputpos
 		}
 	}
-	output = zend.ZendStringAlloc(outputsize, 0)
+	output = types.ZendStringAlloc(outputsize, 0)
 	outputpos = 0
 	currentarg = 0
 
@@ -469,8 +470,8 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			fallthrough
 		case 'Z':
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
-			var tmp_str *zend.ZendString
-			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var tmp_str *types.ZendString
+			var str *types.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			memset(&output.GetVal()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
 			memcpy(&output.GetVal()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
@@ -480,9 +481,9 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		case 'H':
 			var nibbleshift int = b.Cond(code == 'h', 0, 4)
 			var first int = 1
-			var tmp_str *zend.ZendString
-			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
-			var v *byte = zend.ZSTR_VAL(str)
+			var tmp_str *types.ZendString
+			var str *types.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var v *byte = types.ZSTR_VAL(str)
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough characters in string", code)
@@ -660,11 +661,11 @@ func PhpUnpack(data *byte, size int, issigned int, map_ *int) zend.ZendLong {
 	}
 	return result
 }
-func ZifUnpack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var format *byte
 	var input *byte
-	var formatarg *zend.ZendString
-	var inputarg *zend.ZendString
+	var formatarg *types.ZendString
+	var inputarg *types.ZendString
 	var formatlen zend.ZendLong
 	var inputpos zend.ZendLong
 	var inputlen zend.ZendLong
@@ -676,12 +677,12 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -986,7 +987,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					var len_ zend.ZendLong = (inputlen - inputpos) * 2
 					var nibbleshift int = b.Cond(type_ == 'h', 0, 4)
 					var first int = 1
-					var buf *zend.ZendString
+					var buf *types.ZendString
 					var ipos zend.ZendLong
 					var opos zend.ZendLong
 
@@ -998,7 +999,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					if len_ > 0 && argb > 0 {
 						len_ -= argb % 2
 					}
-					buf = zend.ZendStringAlloc(len_, 0)
+					buf = types.ZendStringAlloc(len_, 0)
 					opos = 0
 					ipos = opos
 					for ; opos < len_; opos++ {
@@ -1240,7 +1241,7 @@ func ZmStartupPack(type_ int, module_number int) int {
 		LittleEndianLonglongMap[6] = 6
 		LittleEndianLonglongMap[7] = 7
 	} else {
-		var val zend.Zval
+		var val types.Zval
 		var size int = b.SizeOf("Z_LVAL ( val )")
 		val.SetLval(0)
 
@@ -1293,5 +1294,5 @@ func ZmStartupPack(type_ int, module_number int) int {
 		LittleEndianLonglongMap[6] = size - 7
 		LittleEndianLonglongMap[7] = size - 8
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }

@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func ZmStartupSyslog(type_ int, module_number int) int {
@@ -44,24 +45,24 @@ func ZmStartupSyslog(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("LOG_ODELAY", LOG_ODELAY, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("LOG_NDELAY", LOG_NDELAY, zend.CONST_CS|zend.CONST_PERSISTENT)
 	BG(syslog_device) = nil
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmActivateSyslog(type_ int, module_number int) int {
 	BG(syslog_device) = nil
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownSyslog(type_ int, module_number int) int {
 	if BG(syslog_device) {
 		zend.Free(BG(syslog_device))
 		BG(syslog_device) = nil
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpOpenlog(ident *byte, option int, facility int) {
 	openlog(ident, option, facility)
 	core.PG(have_called_openlog) = 1
 }
-func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ident *byte
 	var option zend.ZendLong
 	var facility zend.ZendLong
@@ -72,12 +73,12 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -157,8 +158,8 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifCloselog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifCloselog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	closelog()
@@ -169,7 +170,7 @@ func ZifCloselog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifSyslog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSyslog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var priority zend.ZendLong
 	var message *byte
 	var message_len int
@@ -179,12 +180,12 @@ func ZifSyslog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

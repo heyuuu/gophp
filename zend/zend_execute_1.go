@@ -2,8 +2,10 @@
 
 package zend
 
-func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+import "sik/zend/types"
+
+func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsUndef() {
 		ret.SetNull()
 		ZvalUndefinedCv(var_, executeData)
@@ -11,8 +13,8 @@ func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, executeData *ZendExecuteData) *Zval
 	}
 	return ret
 }
-func _get_zval_ptr_cv_BP_VAR_W(var_ uint32, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _get_zval_ptr_cv_BP_VAR_W(var_ uint32, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsUndef() {
 		ret.SetNull()
 	}
@@ -25,7 +27,7 @@ func _getZvalPtr(
 	type_ int,
 	executeData *ZendExecuteData,
 	opline *ZendOp,
-) *Zval {
+) *types.Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		return _getZvalPtrVar(node.GetVar(), should_free, executeData)
 	} else {
@@ -39,7 +41,7 @@ func _getZvalPtr(
 		}
 	}
 }
-func _getOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp, executeData *ZendExecuteData, opline *ZendOp) *Zval {
+func _getOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp, executeData *ZendExecuteData, opline *ZendOp) *types.Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		return _getZvalPtrVar(node.GetVar(), should_free, executeData)
 	} else {
@@ -60,7 +62,7 @@ func _getZvalPtrDeref(
 	type_ int,
 	executeData *ZendExecuteData,
 	opline *ZendOp,
-) *Zval {
+) *types.Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		if op_type == IS_TMP_VAR {
 			return _getZvalPtrTmp(node.GetVar(), should_free, executeData)
@@ -79,7 +81,7 @@ func _getZvalPtrDeref(
 		}
 	}
 }
-func _getOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp, executeData *ZendExecuteData, opline *ZendOp) *Zval {
+func _getOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp, executeData *ZendExecuteData, opline *ZendOp) *types.Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		if op_type == IS_TMP_VAR {
 			return _getZvalPtrTmp(node.GetVar(), should_free, executeData)
@@ -105,7 +107,7 @@ func _getZvalPtrUndef(
 	type_ int,
 	executeData *ZendExecuteData,
 	opline *ZendOp,
-) *Zval {
+) *types.Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		return _getZvalPtrVar(node.GetVar(), should_free, executeData)
 	} else {
@@ -119,8 +121,8 @@ func _getZvalPtrUndef(
 		}
 	}
 }
-func _getZvalPtrPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _getZvalPtrPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsIndirect() {
 		*should_free = nil
 		ret = ret.GetZv()
@@ -129,7 +131,7 @@ func _getZvalPtrPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendEx
 	}
 	return ret
 }
-func _getZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, executeData *ZendExecuteData) *Zval {
+func _getZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, executeData *ZendExecuteData) *types.Zval {
 	if op_type == IS_CV {
 		*should_free = nil
 		return _getZvalPtrCv(node.GetVar(), type_, executeData)
@@ -145,7 +147,7 @@ func _getObjZvalPtr(
 	type_ int,
 	executeData *ZendExecuteData,
 	opline *ZendOp,
-) *Zval {
+) *types.Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
 		return &(executeData.GetThis())
@@ -159,22 +161,22 @@ func _getObjZvalPtrUndef(
 	type_ int,
 	executeData *ZendExecuteData,
 	opline *ZendOp,
-) *Zval {
+) *types.Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
 		return &(executeData.GetThis())
 	}
 	return GetZvalPtrUndef(op_type, op, should_free, type_)
 }
-func _getObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, executeData *ZendExecuteData) *Zval {
+func _getObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, executeData *ZendExecuteData) *types.Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
 		return &(executeData.GetThis())
 	}
 	return GetZvalPtrPtr(op_type, node, should_free, type_)
 }
-func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
-	var ref *ZendReference
+func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval) {
+	var ref *types.ZendReference
 	if !(value_ptr.IsReference()) {
 		value_ptr.SetNewRef(value_ptr)
 	} else if variable_ptr == value_ptr {
@@ -183,7 +185,7 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	ref = value_ptr.GetRef()
 	ref.AddRefcount()
 	if variable_ptr.IsRefcounted() {
-		var garbage *ZendRefcounted = variable_ptr.GetCounted()
+		var garbage *types.ZendRefcounted = variable_ptr.GetCounted()
 		if garbage.DelRefcount() == 0 {
 			variable_ptr.SetReference(ref)
 			RcDtorFunc(garbage)
@@ -194,7 +196,7 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	}
 	variable_ptr.SetReference(ref)
 }
-func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval, value_ptr *Zval, executeData *ZendExecuteData) *Zval {
+func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *types.Zval, value_ptr *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		return EG__().GetUninitializedZval()
 	}
@@ -205,7 +207,7 @@ func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval,
 	ZEND_REF_ADD_TYPE_SOURCE(prop.GetRef(), prop_info)
 	return prop
 }
-func ZendWrongAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval, opline *ZendOp, executeData *ZendExecuteData) *Zval {
+func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
 	ZendError(E_NOTICE, "Only variables should be assigned by reference")
 	if EG__().GetException() != nil {
 		return EG__().GetUninitializedZval()
@@ -216,7 +218,7 @@ func ZendWrongAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval, opl
 	value_ptr.TryAddRefcount()
 	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
 }
-func ZendFormatType(type_ ZendType, part1 **byte, part2 **byte) {
+func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
 	if type_.AllowNull() {
 		*part1 = "?"
 	} else {
@@ -224,9 +226,9 @@ func ZendFormatType(type_ ZendType, part1 **byte, part2 **byte) {
 	}
 	if type_.IsClass() {
 		if type_.IsCe() {
-			*part2 = ZEND_TYPE_CE(type_).GetName().GetVal()
+			*part2 = types.ZEND_TYPE_CE(type_).GetName().GetVal()
 		} else {
-			*part2 = ZEND_TYPE_NAME(type_).GetVal()
+			*part2 = types.ZEND_TYPE_NAME(type_).GetVal()
 		}
 	} else {
 		*part2 = ZendGetTypeByConst(type_.Code())
@@ -247,17 +249,17 @@ func ZendThrowAutoInitInRefError(prop *ZendPropertyInfo, type_ string) {
 func ZendThrowAccessUninitPropByRefError(prop *ZendPropertyInfo) {
 	ZendThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()))
 }
-func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, executeData *ZendExecuteData) *Zval {
-	var obj *ZendObject
-	var ref *Zval = nil
+func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
+	var obj *types.ZendObject
+	var ref *types.Zval = nil
 	if object.IsReference() {
 		ref = object
-		object = Z_REFVAL_P(object)
+		object = types.Z_REFVAL_P(object)
 	}
-	if object.GetType() > IS_FALSE && (object.GetType() != IS_STRING || object.GetStr().GetLen() != 0) {
+	if object.GetType() > types.IS_FALSE && (object.GetType() != types.IS_STRING || object.GetStr().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
-			var tmp_property_name *ZendString
-			var property_name *ZendString = ZvalGetTmpString(property, &tmp_property_name)
+			var tmp_property_name *types.ZendString
+			var property_name *types.ZendString = ZvalGetTmpString(property, &tmp_property_name)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
 				ZendError(E_WARNING, "Attempt to increment/decrement property '%s' of non-object", property_name.GetVal())
 			} else if opline.GetOpcode() == ZEND_FETCH_OBJ_W || opline.GetOpcode() == ZEND_FETCH_OBJ_RW || opline.GetOpcode() == ZEND_FETCH_OBJ_FUNC_ARG || opline.GetOpcode() == ZEND_ASSIGN_OBJ_REF {
@@ -302,7 +304,7 @@ func ZendVerifyTypeErrorCommon(
 	zf *ZendFunction,
 	arg_info *ZendArgInfo,
 	ce *ZendClassEntry,
-	value *Zval,
+	value *types.Zval,
 	fname **byte,
 	fsep **byte,
 	fclass **byte,
@@ -312,7 +314,7 @@ func ZendVerifyTypeErrorCommon(
 	given_msg **byte,
 	given_kind **byte,
 ) {
-	var is_interface ZendBool = 0
+	var is_interface types.ZendBool = 0
 	*fname = zf.GetFunctionName().GetVal()
 	if zf.GetScope() != nil {
 		*fsep = "::"
@@ -335,17 +337,17 @@ func ZendVerifyTypeErrorCommon(
 			/* We don't know whether it's a class or interface, assume it's a class */
 
 			*need_msg = "be an instance of "
-			*need_kind = ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
+			*need_kind = types.ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
 		}
 	} else {
 		switch arg_info.GetType().Code() {
-		case IS_OBJECT:
+		case types.IS_OBJECT:
 			*need_msg = "be an "
 			*need_kind = "object"
-		case IS_CALLABLE:
+		case types.IS_CALLABLE:
 			*need_msg = "be callable"
 			*need_kind = ""
-		case IS_ITERABLE:
+		case types.IS_ITERABLE:
 			*need_msg = "be iterable"
 			*need_kind = ""
 		default:
@@ -365,7 +367,7 @@ func ZendVerifyTypeErrorCommon(
 	if value != nil {
 		if arg_info.GetType().IsClass() && value.IsObject() {
 			*given_msg = "instance of "
-			*given_kind = Z_OBJCE_P(value).GetName().GetVal()
+			*given_kind = types.Z_OBJCE_P(value).GetName().GetVal()
 		} else {
 			*given_msg = ZendZvalTypeName(value)
 			*given_kind = ""
@@ -375,7 +377,7 @@ func ZendVerifyTypeErrorCommon(
 		*given_kind = ""
 	}
 }
-func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *ZendClassEntry, value *Zval) {
+func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *ZendClassEntry, value *types.Zval) {
 	var ptr *ZendExecuteData = CurrEX().GetPrevExecuteData()
 	var fname *byte
 	var fsep *byte
@@ -411,11 +413,11 @@ func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce
 		ZendMissingArgError(ptr)
 	}
 }
-func IsNullConstant(scope *ZendClassEntry, default_value *Zval) int {
+func IsNullConstant(scope *ZendClassEntry, default_value *types.Zval) int {
 	if default_value.IsConstant() {
-		var constant Zval
-		ZVAL_COPY(&constant, default_value)
-		if ZvalUpdateConstantEx(&constant, scope) != SUCCESS {
+		var constant types.Zval
+		types.ZVAL_COPY(&constant, default_value)
+		if ZvalUpdateConstantEx(&constant, scope) != types.SUCCESS {
 			return 0
 		}
 		if constant.IsNull() {

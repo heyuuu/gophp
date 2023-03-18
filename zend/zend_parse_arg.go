@@ -2,6 +2,7 @@ package zend
 
 import (
 	"math"
+	"sik/zend/types"
 )
 
 func isArgUseStrictTypes() bool { return CurrEX().IsArgUseStrictTypes() }
@@ -11,7 +12,7 @@ func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
 func parseArgNull[T any]() (T, bool, bool)      { var temp T; return temp, true, true }
 func parseArgFail[T any]() (T, bool, bool)      { var temp T; return temp, false, false }
 
-func ParseArgBool(arg *Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
+func ParseArgBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -32,14 +33,14 @@ func ParseArgBool(arg *Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
 	return
 }
 
-func ParseArgBoolWeak(arg *Zval) (dest bool, ok bool) {
-	if arg.GetType() <= IS_STRING {
+func ParseArgBoolWeak(arg *types.Zval) (dest bool, ok bool) {
+	if arg.GetType() <= types.IS_STRING {
 		return ZendIsTrueEx(arg), true
 	}
 	return false, false
 }
 
-func ParseArgLong(arg *Zval, checkNull bool, cap bool) (dest ZendLong, isNull bool, ok bool) {
+func ParseArgLong(arg *types.Zval, checkNull bool, cap bool) (dest ZendLong, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -58,7 +59,7 @@ func ParseArgLong(arg *Zval, checkNull bool, cap bool) (dest ZendLong, isNull bo
 	return
 }
 
-func ParseArgLongWeak(arg *Zval, cap bool) (dest ZendLong, ok bool) {
+func ParseArgLongWeak(arg *types.Zval, cap bool) (dest ZendLong, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
 		arg = ConvertNumericStrAsZval(arg.GetStr().GetStr(), ConvertNoticeOnErrors)
@@ -71,13 +72,13 @@ func ParseArgLongWeak(arg *Zval, cap bool) (dest ZendLong, ok bool) {
 	}
 
 	switch arg.GetType() {
-	case IS_UNDEF, IS_NULL, IS_FALSE:
+	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
 		dest = 0
-	case IS_TRUE:
+	case types.IS_TRUE:
 		dest = 1
-	case IS_LONG:
+	case types.IS_LONG:
 		dest = arg.GetLval()
-	case IS_DOUBLE:
+	case types.IS_DOUBLE:
 		return parseArgLongWeak_DvalToLval(arg.GetDval(), cap)
 	default:
 		return // fail
@@ -100,7 +101,7 @@ func parseArgLongWeak_DvalToLval(dval float64, cap bool) (ZendLong, bool) {
 	}
 }
 
-func ParseArgDouble(arg *Zval, checkNull bool) (dest float64, isNull bool, ok bool) {
+func ParseArgDouble(arg *types.Zval, checkNull bool) (dest float64, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -121,7 +122,7 @@ func ParseArgDouble(arg *Zval, checkNull bool) (dest float64, isNull bool, ok bo
 	return
 }
 
-func ParseArgDoubleWeak(arg *Zval) (dest float64, ok bool) {
+func ParseArgDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
 		arg = ConvertNumericStrAsZval(arg.GetStr().GetStr(), ConvertNoticeOnErrors)
@@ -134,13 +135,13 @@ func ParseArgDoubleWeak(arg *Zval) (dest float64, ok bool) {
 	}
 
 	switch arg.GetType() {
-	case IS_UNDEF, IS_NULL, IS_FALSE:
+	case types.IS_UNDEF, types.IS_NULL, types.IS_FALSE:
 		dest = 0
-	case IS_TRUE:
+	case types.IS_TRUE:
 		dest = 1
-	case IS_LONG:
+	case types.IS_LONG:
 		dest = float64(arg.GetLval())
-	case IS_DOUBLE:
+	case types.IS_DOUBLE:
 		dest = arg.GetDval()
 	default:
 		return // fail
@@ -149,7 +150,7 @@ func ParseArgDoubleWeak(arg *Zval) (dest float64, ok bool) {
 	return dest, true
 }
 
-func ParseArgStr(arg *Zval, checkNull bool, strict bool) (dest *ZendString, isNull bool, ok bool) {
+func ParseArgStr(arg *types.Zval, checkNull bool, strict bool) (dest *types.ZendString, isNull bool, ok bool) {
 	// check null
 	if isNull = checkNull && arg.IsNull(); isNull {
 		return
@@ -168,8 +169,8 @@ func ParseArgStr(arg *Zval, checkNull bool, strict bool) (dest *ZendString, isNu
 	return
 }
 
-func ParseArgStrWeak(arg *Zval) (*ZendString, bool) {
-	if arg.GetType() < IS_STRING {
+func ParseArgStrWeak(arg *types.Zval) (*types.ZendString, bool) {
+	if arg.GetType() < types.IS_STRING {
 		ConvertToString(arg)
 		return arg.GetStr(), true
 	} else if arg.IsString() {
@@ -177,19 +178,19 @@ func ParseArgStrWeak(arg *Zval) (*ZendString, bool) {
 	} else if arg.IsObject() {
 		handlers := arg.GetObj().GetHandlers()
 		if castFunc := handlers.GetCastObject(); castFunc != nil {
-			var obj Zval
-			if castFunc(arg, &obj, IS_STRING) == SUCCESS {
+			var obj types.Zval
+			if castFunc(arg, &obj, types.IS_STRING) == types.SUCCESS {
 				ZvalPtrDtor(arg)
-				ZVAL_COPY_VALUE(arg, &obj)
+				types.ZVAL_COPY_VALUE(arg, &obj)
 				return arg.GetStr(), true
 			}
 		} else if getFunc := handlers.GetGet(); getFunc != nil {
-			var rv Zval
-			var z *Zval = getFunc(arg, &rv)
-			if z.GetType() != IS_OBJECT {
+			var rv types.Zval
+			var z *types.Zval = getFunc(arg, &rv)
+			if z.GetType() != types.IS_OBJECT {
 				ZvalPtrDtor(arg)
 				if z.IsString() {
-					ZVAL_COPY_VALUE(arg, z)
+					types.ZVAL_COPY_VALUE(arg, z)
 				} else {
 					arg.SetString(ZvalGetStringFunc(z))
 					ZvalPtrDtor(z)

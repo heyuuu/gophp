@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -12,7 +13,7 @@ import (
 type _spl_cbfilter_it_intern struct {
 	fci    zend.ZendFcallInfo
 	fcc    zend.ZendFcallInfoCache
-	object *zend.ZendObject
+	object *types.ZendObject
 }
 
 // func Make_spl_cbfilter_it_intern(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, object *zend.ZendObject) _spl_cbfilter_it_intern {
@@ -28,22 +29,22 @@ func (this *_spl_cbfilter_it_intern) GetFci() zend.ZendFcallInfo { return this.f
 func (this *_spl_cbfilter_it_intern) GetFcc() zend.ZendFcallInfoCache { return this.fcc }
 
 // func (this *_spl_cbfilter_it_intern) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }
-func (this *_spl_cbfilter_it_intern) GetObject() *zend.ZendObject      { return this.object }
-func (this *_spl_cbfilter_it_intern) SetObject(value *zend.ZendObject) { this.object = value }
+func (this *_spl_cbfilter_it_intern) GetObject() *types.ZendObject      { return this.object }
+func (this *_spl_cbfilter_it_intern) SetObject(value *types.ZendObject) { this.object = value }
 
 /**
  * SplDualItObject
  */
 type SplDualItObject struct {
 	inner struct {
-		zobject  zend.Zval
+		zobject  types.Zval
 		ce       *zend.ZendClassEntry
-		object   *zend.ZendObject
+		object   *types.ZendObject
 		iterator *zend.ZendObjectIterator
 	}
 	current struct {
-		data zend.Zval
-		key  zend.Zval
+		data types.Zval
+		key  types.Zval
 		pos  zend.ZendLong
 	}
 	dit_type DualItType
@@ -54,43 +55,43 @@ type SplDualItObject struct {
 		}
 		caching struct {
 			flags     zend.ZendLong
-			zstr      zend.Zval
-			zchildren zend.Zval
-			zcache    zend.Zval
+			zstr      types.Zval
+			zchildren types.Zval
+			zcache    types.Zval
 		}
 		append struct {
-			zarrayit zend.Zval
+			zarrayit types.Zval
 			iterator *zend.ZendObjectIterator
 		}
 		regex struct {
 			flags      zend.ZendLong
 			preg_flags zend.ZendLong
 			pce        *pcre_cache_entry
-			regex      *zend.ZendString
+			regex      *types.ZendString
 			mode       RegexMode
 			use_flags  int
 		}
 		cbfilter *_spl_cbfilter_it_intern
 	}
-	std zend.ZendObject
+	std types.ZendObject
 }
 
-func (this *SplDualItObject) GetZobject() zend.Zval { return this.inner.zobject }
+func (this *SplDualItObject) GetZobject() types.Zval { return this.inner.zobject }
 
 // func (this *SplDualItObject) SetZobject(value zend.Zval) { this.inner.zobject = value }
 func (this *SplDualItObject) GetCe() *zend.ZendClassEntry      { return this.inner.ce }
 func (this *SplDualItObject) SetCe(value *zend.ZendClassEntry) { this.inner.ce = value }
 
 // func (this *SplDualItObject)  GetObject() *zend.ZendObject      { return this.inner.object }
-func (this *SplDualItObject) SetObject(value *zend.ZendObject)           { this.inner.object = value }
+func (this *SplDualItObject) SetObject(value *types.ZendObject)          { this.inner.object = value }
 func (this *SplDualItObject) GetInnerIterator() *zend.ZendObjectIterator { return this.inner.iterator }
 func (this *SplDualItObject) SetInnerIterator(value *zend.ZendObjectIterator) {
 	this.inner.iterator = value
 }
-func (this *SplDualItObject) GetData() zend.Zval { return this.current.data }
+func (this *SplDualItObject) GetData() types.Zval { return this.current.data }
 
 // func (this *SplDualItObject) SetData(value zend.Zval) { this.current.data = value }
-func (this *SplDualItObject) GetKey() zend.Zval { return this.current.key }
+func (this *SplDualItObject) GetKey() types.Zval { return this.current.key }
 
 // func (this *SplDualItObject) SetKey(value zend.Zval) { this.current.key = value }
 func (this *SplDualItObject) GetPos() zend.ZendLong                { return this.current.pos }
@@ -103,16 +104,16 @@ func (this *SplDualItObject) GetCount() zend.ZendLong              { return this
 func (this *SplDualItObject) SetCount(value zend.ZendLong)         { this.u.limit.count = value }
 func (this *SplDualItObject) GetUCachingFlags() zend.ZendLong      { return this.u.caching.flags }
 func (this *SplDualItObject) SetUCachingFlags(value zend.ZendLong) { this.u.caching.flags = value }
-func (this *SplDualItObject) GetZstr() zend.Zval                   { return this.u.caching.zstr }
+func (this *SplDualItObject) GetZstr() types.Zval                  { return this.u.caching.zstr }
 
 // func (this *SplDualItObject) SetZstr(value zend.Zval) { this.u.caching.zstr = value }
-func (this *SplDualItObject) GetZchildren() zend.Zval { return this.u.caching.zchildren }
+func (this *SplDualItObject) GetZchildren() types.Zval { return this.u.caching.zchildren }
 
 // func (this *SplDualItObject) SetZchildren(value zend.Zval) { this.u.caching.zchildren = value }
-func (this *SplDualItObject) GetZcache() zend.Zval { return this.u.caching.zcache }
+func (this *SplDualItObject) GetZcache() types.Zval { return this.u.caching.zcache }
 
 // func (this *SplDualItObject) SetZcache(value zend.Zval) { this.u.caching.zcache = value }
-func (this *SplDualItObject) GetZarrayit() zend.Zval { return this.u.append.zarrayit }
+func (this *SplDualItObject) GetZarrayit() types.Zval { return this.u.append.zarrayit }
 
 // func (this *SplDualItObject) SetZarrayit(value zend.Zval) { this.u.append.zarrayit = value }
 func (this *SplDualItObject) GetUAppendIterator() *zend.ZendObjectIterator {
@@ -127,15 +128,15 @@ func (this *SplDualItObject) GetPregFlags() zend.ZendLong                { retur
 func (this *SplDualItObject) SetPregFlags(value zend.ZendLong)           { this.u.regex.preg_flags = value }
 func (this *SplDualItObject) GetPce() *pcre_cache_entry                  { return this.u.regex.pce }
 func (this *SplDualItObject) SetPce(value *pcre_cache_entry)             { this.u.regex.pce = value }
-func (this *SplDualItObject) GetURegexRegex() *zend.ZendString           { return this.u.regex.regex }
-func (this *SplDualItObject) SetURegexRegex(value *zend.ZendString)      { this.u.regex.regex = value }
+func (this *SplDualItObject) GetURegexRegex() *types.ZendString          { return this.u.regex.regex }
+func (this *SplDualItObject) SetURegexRegex(value *types.ZendString)     { this.u.regex.regex = value }
 func (this *SplDualItObject) GetMode() RegexMode                         { return this.u.regex.mode }
 func (this *SplDualItObject) SetMode(value RegexMode)                    { this.u.regex.mode = value }
 func (this *SplDualItObject) GetUseFlags() int                           { return this.u.regex.use_flags }
 func (this *SplDualItObject) SetUseFlags(value int)                      { this.u.regex.use_flags = value }
 func (this *SplDualItObject) GetCbfilter() *_spl_cbfilter_it_intern      { return this.u.cbfilter }
 func (this *SplDualItObject) SetCbfilter(value *_spl_cbfilter_it_intern) { this.u.cbfilter = value }
-func (this *SplDualItObject) GetStd() zend.ZendObject                    { return this.std }
+func (this *SplDualItObject) GetStd() types.ZendObject                   { return this.std }
 
 // func (this *SplDualItObject) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -234,7 +235,7 @@ func (this *SplDualItObject) SwitchUseFlags(value int, cond bool) {
  */
 type SplSubIterator struct {
 	iterator *zend.ZendObjectIterator
-	zobject  zend.Zval
+	zobject  types.Zval
 	ce       *zend.ZendClassEntry
 	state    RecursiveIteratorState
 }
@@ -249,7 +250,7 @@ type SplSubIterator struct {
 // }
 func (this *SplSubIterator) GetIterator() *zend.ZendObjectIterator      { return this.iterator }
 func (this *SplSubIterator) SetIterator(value *zend.ZendObjectIterator) { this.iterator = value }
-func (this *SplSubIterator) GetZobject() zend.Zval                      { return this.zobject }
+func (this *SplSubIterator) GetZobject() types.Zval                     { return this.zobject }
 
 // func (this *SplSubIterator) SetZobject(value zend.Zval) { this.zobject = value }
 func (this *SplSubIterator) GetCe() *zend.ZendClassEntry           { return this.ce }
@@ -266,7 +267,7 @@ type SplRecursiveItObject struct {
 	mode            RecursiveIteratorMode
 	flags           int
 	max_depth       int
-	in_iteration    zend.ZendBool
+	in_iteration    types.ZendBool
 	beginIteration  *zend.ZendFunction
 	endIteration    *zend.ZendFunction
 	callHasChildren *zend.ZendFunction
@@ -277,7 +278,7 @@ type SplRecursiveItObject struct {
 	ce              *zend.ZendClassEntry
 	prefix          []zend.SmartStr
 	postfix         []zend.SmartStr
-	std             zend.ZendObject
+	std             types.ZendObject
 }
 
 //             func MakeSplRecursiveItObject(
@@ -330,8 +331,8 @@ func (this *SplRecursiveItObject) SetMode(value RecursiveIteratorMode) { this.mo
 func (this *SplRecursiveItObject) SetFlags(value int)                    { this.flags = value }
 func (this *SplRecursiveItObject) GetMaxDepth() int                      { return this.max_depth }
 func (this *SplRecursiveItObject) SetMaxDepth(value int)                 { this.max_depth = value }
-func (this *SplRecursiveItObject) GetInIteration() zend.ZendBool         { return this.in_iteration }
-func (this *SplRecursiveItObject) SetInIteration(value zend.ZendBool)    { this.in_iteration = value }
+func (this *SplRecursiveItObject) GetInIteration() types.ZendBool        { return this.in_iteration }
+func (this *SplRecursiveItObject) SetInIteration(value types.ZendBool)   { this.in_iteration = value }
 func (this *SplRecursiveItObject) GetBeginIteration() *zend.ZendFunction { return this.beginIteration }
 func (this *SplRecursiveItObject) SetBeginIteration(value *zend.ZendFunction) {
 	this.beginIteration = value
@@ -368,7 +369,7 @@ func (this *SplRecursiveItObject) GetPrefix() []zend.SmartStr              { ret
 func (this *SplRecursiveItObject) GetPostfix() []zend.SmartStr { return this.postfix }
 
 // func (this *SplRecursiveItObject) SetPostfix(value []zend.SmartStr) { this.postfix = value }
-func (this *SplRecursiveItObject) GetStd() zend.ZendObject { return this.std }
+func (this *SplRecursiveItObject) GetStd() types.ZendObject { return this.std }
 
 // func (this *SplRecursiveItObject) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -418,8 +419,8 @@ func (this *SplRecursiveItIterator) GetIntern() zend.ZendObjectIterator { return
  * SplIteratorApplyInfo
  */
 type SplIteratorApplyInfo struct {
-	obj   *zend.Zval
-	args  *zend.Zval
+	obj   *types.Zval
+	args  *types.Zval
 	count zend.ZendLong
 	fci   zend.ZendFcallInfo
 	fcc   zend.ZendFcallInfoCache
@@ -434,11 +435,11 @@ type SplIteratorApplyInfo struct {
 //         fcc:fcc,
 //     }
 // }
-func (this *SplIteratorApplyInfo) GetObj() *zend.Zval { return this.obj }
+func (this *SplIteratorApplyInfo) GetObj() *types.Zval { return this.obj }
 
 // func (this *SplIteratorApplyInfo) SetObj(value *zend.Zval) { this.obj = value }
-func (this *SplIteratorApplyInfo) GetArgs() *zend.Zval          { return this.args }
-func (this *SplIteratorApplyInfo) SetArgs(value *zend.Zval)     { this.args = value }
+func (this *SplIteratorApplyInfo) GetArgs() *types.Zval         { return this.args }
+func (this *SplIteratorApplyInfo) SetArgs(value *types.Zval)    { this.args = value }
 func (this *SplIteratorApplyInfo) GetCount() zend.ZendLong      { return this.count }
 func (this *SplIteratorApplyInfo) SetCount(value zend.ZendLong) { this.count = value }
 func (this *SplIteratorApplyInfo) GetFci() zend.ZendFcallInfo   { return this.fci }

@@ -4,31 +4,32 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendWeakrefFrom(o *ZendObject) *ZendWeakref {
+func ZendWeakrefFrom(o *types.ZendObject) *ZendWeakref {
 	return (*ZendWeakref)((*byte)(o) - zend_long((*byte)(&((*ZendWeakref)(nil).GetStd()))-(*byte)(nil)))
 }
-func ZendWeakrefFetch(z *Zval) *ZendWeakref { return ZendWeakrefFrom(z.GetObj()) }
-func ZendWeakrefUnref(zv *Zval) {
+func ZendWeakrefFetch(z *types.Zval) *ZendWeakref { return ZendWeakrefFrom(z.GetObj()) }
+func ZendWeakrefUnref(zv *types.Zval) {
 	var wr = (*ZendWeakref)(zv.GetPtr())
-	wr.GetReferent().DelGcFlags(IS_OBJ_WEAKLY_REFERENCED)
+	wr.GetReferent().DelGcFlags(types.IS_OBJ_WEAKLY_REFERENCED)
 	wr.SetReferent(nil)
 }
 func ZendWeakrefsInit() {
 	ZendHashInit(EG__().GetWeakrefs(), 8, nil, ZendWeakrefUnref, 0)
 }
-func ZendWeakrefsNotify(object *ZendObject) {
+func ZendWeakrefsNotify(object *types.ZendObject) {
 	ZendHashIndexDel(EG__().GetWeakrefs(), ZendUlong(object))
 }
 func ZendWeakrefsShutdown() { EG__().GetWeakrefs().Destroy() }
-func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
+func ZendWeakrefNew(ce *ZendClassEntry) *types.ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
 	ZendObjectStdInit(wr.GetStd(), ZendCeWeakref)
 	wr.GetStd().SetHandlers(&ZendWeakrefHandlers)
 	return wr.GetStd()
 }
-func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
+func ZendWeakrefFind(referent *types.Zval, return_value *types.Zval) types.ZendBool {
 	var wr *ZendWeakref = ZendHashIndexFindPtr(EG__().GetWeakrefs(), ZendUlong(referent.GetObj()))
 	if wr == nil {
 		return 0
@@ -37,22 +38,22 @@ func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
 	return_value.SetObject(wr.GetStd())
 	return 1
 }
-func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
+func ZendWeakrefCreate(referent *types.Zval, return_value *types.Zval) {
 	var wr *ZendWeakref
 	ObjectInitEx(return_value, ZendCeWeakref)
 	wr = ZendWeakrefFetch(return_value)
 	wr.SetReferent(referent.GetObj())
 	ZendHashIndexAddPtr(EG__().GetWeakrefs(), ZendUlong(wr.GetReferent()), wr)
-	wr.GetReferent().AddGcFlags(IS_OBJ_WEAKLY_REFERENCED)
+	wr.GetReferent().AddGcFlags(types.IS_OBJ_WEAKLY_REFERENCED)
 }
-func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
+func ZendWeakrefGet(weakref *types.Zval, return_value *types.Zval) {
 	var wr *ZendWeakref = ZendWeakrefFetch(weakref)
 	if wr.GetReferent() != nil {
 		return_value.SetObject(wr.GetReferent())
 		return_value.AddRefcount()
 	}
 }
-func ZendWeakrefFree(zo *ZendObject) {
+func ZendWeakrefFree(zo *types.ZendObject) {
 	var wr *ZendWeakref = ZendWeakrefFrom(zo)
 	if wr.GetReferent() != nil {
 		ZendHashIndexDel(EG__().GetWeakrefs(), ZendUlong(wr.GetReferent()))
@@ -62,44 +63,46 @@ func ZendWeakrefFree(zo *ZendObject) {
 func ZendWeakrefUnsupported(thing string) {
 	ZendThrowError(nil, "WeakReference objects do not support "+thing)
 }
-func ZendWeakrefNoWrite(object *Zval, member *Zval, value *Zval, rtc *any) *Zval {
+func ZendWeakrefNoWrite(object *types.Zval, member *types.Zval, value *types.Zval, rtc *any) *types.Zval {
 	ZendWeakrefUnsupported("properties")
 	return EG__().GetUninitializedZval()
 }
-func ZendWeakrefNoRead(object *Zval, member *Zval, type_ int, rtc *any, rv *Zval) *Zval {
+func ZendWeakrefNoRead(object *types.Zval, member *types.Zval, type_ int, rtc *any, rv *types.Zval) *types.Zval {
 	if EG__().GetException() == nil {
 		ZendWeakrefUnsupported("properties")
 	}
 	return EG__().GetUninitializedZval()
 }
-func ZendWeakrefNoReadPtr(object *Zval, member *Zval, type_ int, rtc *any) *Zval {
+func ZendWeakrefNoReadPtr(object *types.Zval, member *types.Zval, type_ int, rtc *any) *types.Zval {
 	ZendWeakrefUnsupported("property references")
 	return nil
 }
-func ZendWeakrefNoIsset(object *Zval, member *Zval, hse int, rtc *any) int {
+func ZendWeakrefNoIsset(object *types.Zval, member *types.Zval, hse int, rtc *any) int {
 	if hse != 2 {
 		ZendWeakrefUnsupported("properties")
 	}
 	return 0
 }
-func ZendWeakrefNoUnset(object *Zval, member *Zval, rtc *any) { ZendWeakrefUnsupported("properties") }
-func zim_WeakReference___construct(executeData *ZendExecuteData, return_value *Zval) {
+func ZendWeakrefNoUnset(object *types.Zval, member *types.Zval, rtc *any) {
+	ZendWeakrefUnsupported("properties")
+}
+func zim_WeakReference___construct(executeData *ZendExecuteData, return_value *types.Zval) {
 	ZendThrowError(nil, "Direct instantiation of 'WeakReference' is not allowed, "+"use WeakReference::create instead")
 }
-func zim_WeakReference_create(executeData *ZendExecuteData, return_value *Zval) {
-	var referent *Zval
+func zim_WeakReference_create(executeData *ZendExecuteData, return_value *types.Zval) {
+	var referent *types.Zval
 	for {
 		var _flags int = ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *Zval
-		var _arg *Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type ZendExpectedType = Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy ZendBool
-		var _optional ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -160,19 +163,19 @@ func zim_WeakReference_create(executeData *ZendExecuteData, return_value *Zval) 
 	}
 	ZendWeakrefCreate(referent, return_value)
 }
-func zim_WeakReference_get(executeData *ZendExecuteData, return_value *Zval) {
+func zim_WeakReference_get(executeData *ZendExecuteData, return_value *types.Zval) {
 	for {
 		var _flags int = ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 0
 		var _max_num_args int = 0
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *Zval
-		var _arg *Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type ZendExpectedType = Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy ZendBool
-		var _optional ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -227,7 +230,7 @@ func zim_WeakReference_get(executeData *ZendExecuteData, return_value *Zval) {
 func ZendRegisterWeakrefCe() {
 	var ce ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("WeakReference", b.SizeOf("\"WeakReference\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("WeakReference", b.SizeOf("\"WeakReference\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendWeakrefMethods)
 	ZendCeWeakref = ZendRegisterInternalClass(&ce)
 	ZendCeWeakref.SetIsFinal(true)

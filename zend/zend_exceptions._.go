@@ -3,7 +3,7 @@
 package zend
 
 import (
-	b "sik/builtin"
+	"sik/zend/types"
 )
 
 var ZendCeThrowable *ZendClassEntry
@@ -16,7 +16,7 @@ var ZendCeTypeError *ZendClassEntry
 var ZendCeArgumentCountError *ZendClassEntry
 var ZendCeArithmeticError *ZendClassEntry
 var ZendCeDivisionByZeroError *ZendClassEntry
-var ZendThrowExceptionHook func(ex *Zval)
+var ZendThrowExceptionHook func(ex *types.Zval)
 
 var DefaultExceptionHandlers ZendObjectHandlers
 

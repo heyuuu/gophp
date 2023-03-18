@@ -1,7 +1,9 @@
 package zend
 
+import "sik/zend/types"
+
 // generate by ZifZendVersion
-var ZifZendVersionDef = DefFunc(DefFuncOpts{name: "zend_version", handler: func(executeData *ZendExecuteData, returnValue *Zval) {
+var ZifZendVersionDef = DefFunc(DefFuncOpts{name: "zend_version", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !executeData.CheckNumArgs(0, 0, false) {
 		return
 	}
@@ -10,7 +12,7 @@ var ZifZendVersionDef = DefFunc(DefFuncOpts{name: "zend_version", handler: func(
 }})
 
 // generate by ZifGcMemCaches
-var ZifGcMemCachesDef = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func(executeData *ZendExecuteData, returnValue *Zval) {
+var ZifGcMemCachesDef = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !executeData.CheckNumArgs(0, 0, false) {
 		return
 	}
@@ -19,7 +21,7 @@ var ZifGcMemCachesDef = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func
 }})
 
 // generate by ZifGcCollectCycles
-var ZifGcCollectCyclesDef = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handler: func(executeData *ZendExecuteData, returnValue *Zval) {
+var ZifGcCollectCyclesDef = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !executeData.CheckNumArgs(0, 0, false) {
 		return
 	}
@@ -28,7 +30,7 @@ var ZifGcCollectCyclesDef = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handl
 }})
 
 // generate by ZifGcEnabled
-var ZifGcEnabledDef = DefFunc(DefFuncOpts{name: "gc_enabled", handler: func(executeData *ZendExecuteData, returnValue *Zval) {
+var ZifGcEnabledDef = DefFunc(DefFuncOpts{name: "gc_enabled", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !executeData.CheckNumArgs(0, 0, false) {
 		return
 	}

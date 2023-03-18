@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_heap.h>
@@ -63,7 +64,7 @@ var spl_handler_SplPriorityQueue zend.ZendObjectHandlers
 
 type SplPtrHeapDtorFunc func(any)
 type SplPtrHeapCtorFunc func(any)
-type SplPtrHeapCmpFunc func(any, any, *zend.Zval) int
+type SplPtrHeapCmpFunc func(any, any, *types.Zval) int
 
 /* define an __special__  overloaded iterator structure */
 

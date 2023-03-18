@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZendWrongStringOffset(executeData *ZendExecuteData) {
@@ -133,9 +134,9 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	ZEND_ASSERT(msg != nil)
 	ZendThrowError(nil, "%s", msg)
 }
-func ZendWrongPropertyRead(property *Zval) {
-	var tmp_property_name *ZendString
-	var property_name *ZendString = ZvalGetTmpString(property, &tmp_property_name)
+func ZendWrongPropertyRead(property *types.Zval) {
+	var tmp_property_name *types.ZendString
+	var property_name *types.ZendString = ZvalGetTmpString(property, &tmp_property_name)
 	ZendError(E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
 	ZendTmpStringRelease(tmp_property_name)
 }
@@ -145,8 +146,8 @@ func ZendDeprecatedFunction(fbc *ZendFunction) {
 func ZendAbstractMethod(fbc *ZendFunction) {
 	ZendThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
 }
-func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var c ZendUchar
+func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	var c types.ZendUchar
 	var string_len int
 	var offset ZendLong
 	offset = ZendCheckStringOffset(dim, BP_VAR_W, executeData)
@@ -164,11 +165,11 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		}
 		return
 	}
-	if value.GetType() != IS_STRING {
+	if value.GetType() != types.IS_STRING {
 
 		/* Convert to string, just the time to pick the 1st byte */
 
-		var tmp *ZendString = ZvalTryGetStringFunc(value)
+		var tmp *types.ZendString = ZvalTryGetStringFunc(value)
 		if tmp == nil {
 			if RETURN_VALUE_USED(opline) {
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
@@ -176,11 +177,11 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 			return
 		}
 		string_len = tmp.GetLen()
-		c = ZendUchar(tmp.GetVal()[0])
-		ZendStringReleaseEx(tmp, 0)
+		c = types.ZendUchar(tmp.GetVal()[0])
+		types.ZendStringReleaseEx(tmp, 0)
 	} else {
 		string_len = value.GetStr().GetLen()
-		c = ZendUchar(value.GetStr().GetVal()[0])
+		c = types.ZendUchar(value.GetStr().GetVal()[0])
 	}
 	if string_len == 0 {
 
@@ -198,37 +199,37 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 	if int(offset >= str.GetStr().GetLen()) != 0 {
 
 		var old_len ZendLong = str.GetStr().GetLen()
-		str.SetString(ZendStringExtend(str.GetStr(), offset+1, 0))
+		str.SetString(types.ZendStringExtend(str.GetStr(), offset+1, 0))
 		memset(str.GetStr().GetVal()+old_len, ' ', offset-old_len)
 		str.GetStr().GetVal()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
-		str.SetString(ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
+		str.SetString(types.ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		str.SetString(ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
+		str.SetString(types.ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
 	} else {
-		ZendStringForgetHashVal(str.GetStr())
+		types.ZendStringForgetHashVal(str.GetStr())
 	}
 	str.GetStr().GetVal()[offset] = c
 	if RETURN_VALUE_USED(opline) {
 
 		/* Return the new character */
 
-		EX_VAR(opline.GetResult().GetVar()).SetInternedString(ZSTR_CHAR(c))
+		EX_VAR(opline.GetResult().GetVar()).SetInternedString(types.ZSTR_CHAR(c))
 
 		/* Return the new character */
 
 	}
 }
-func ZendGetPropNotAcceptingDouble(ref *ZendReference) *ZendPropertyInfo {
+func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *ZendPropertyInfo {
 	var prop *ZendPropertyInfo
-	var _source_list *ZendPropertyInfoSourceList = &(ref.GetSources())
+	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
-	var _list *ZendPropertyInfoList
+	var _list *types.ZendPropertyInfoList
 	if _source_list.GetPtr() != nil {
-		if ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
-			_list = ZEND_PROPERTY_INFO_SOURCE_TO_LIST(_source_list.GetList())
+		if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(_source_list.GetList()) != 0 {
+			_list = types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(_source_list.GetList())
 			_prop = _list.GetPtr()
 			_end = _list.GetPtr() + _list.GetNum()
 		} else {
@@ -237,14 +238,14 @@ func ZendGetPropNotAcceptingDouble(ref *ZendReference) *ZendPropertyInfo {
 		}
 		for ; _prop < _end; _prop++ {
 			prop = *_prop
-			if prop.GetType().Code() != IS_DOUBLE {
+			if prop.GetType().Code() != types.IS_DOUBLE {
 				return prop
 			}
 		}
 	}
 	return nil
 }
-func ZendThrowIncdecRefError(ref *ZendReference, opline *ZendOp) ZendLong {
+func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong {
 	var error_prop *ZendPropertyInfo = ZendGetPropNotAcceptingDouble(ref)
 
 	/* Currently there should be no way for a typed reference to accept both int and double.
@@ -271,13 +272,13 @@ func ZendThrowIncdecPropError(prop *ZendPropertyInfo, opline *ZendOp) ZendLong {
 		return ZEND_LONG_MIN
 	}
 }
-func ZendIncdecTypedRef(ref *ZendReference, copy *Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var tmp Zval
-	var var_ptr *Zval = ref.GetVal()
+func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	var tmp types.Zval
+	var var_ptr *types.Zval = ref.GetVal()
 	if copy == nil {
 		copy = &tmp
 	}
-	ZVAL_COPY(copy, var_ptr)
+	types.ZVAL_COPY(copy, var_ptr)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 		IncrementFunction(var_ptr)
 	} else {
@@ -288,18 +289,18 @@ func ZendIncdecTypedRef(ref *ZendReference, copy *Zval, opline *ZendOp, executeD
 		var_ptr.SetLong(val)
 	} else if ZendVerifyRefAssignableZval(ref, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(var_ptr)
-		ZVAL_COPY_VALUE(var_ptr, copy)
+		types.ZVAL_COPY_VALUE(var_ptr, copy)
 		copy.SetUndef()
 	} else if copy == &tmp {
 		ZvalPtrDtor(&tmp)
 	}
 }
-func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *Zval, copy *Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var tmp Zval
+func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	var tmp types.Zval
 	if copy == nil {
 		copy = &tmp
 	}
-	ZVAL_COPY(copy, var_ptr)
+	types.ZVAL_COPY(copy, var_ptr)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 		IncrementFunction(var_ptr)
 	} else {
@@ -310,28 +311,28 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *Zval, copy *Zval,
 		var_ptr.SetLong(val)
 	} else if ZendVerifyPropertyType(prop_info, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(var_ptr)
-		ZVAL_COPY_VALUE(var_ptr, copy)
+		types.ZVAL_COPY_VALUE(var_ptr, copy)
 		copy.SetUndef()
 	} else if copy == &tmp {
 		ZvalPtrDtor(&tmp)
 	}
 }
-func ZendPreIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			FastLongIncrementFunction(prop)
 		} else {
 			FastLongDecrementFunction(prop)
 		}
-		if prop.GetType() != IS_LONG && prop_info != nil {
+		if prop.GetType() != types.IS_LONG && prop_info != nil {
 			var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
 			prop.SetLong(val)
 		}
 	} else {
 		for {
 			if prop.IsReference() {
-				var ref *ZendReference = prop.GetRef()
-				prop = Z_REFVAL_P(prop)
+				var ref *types.ZendReference = prop.GetRef()
+				prop = types.Z_REFVAL_P(prop)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendIncdecTypedRef(ref, nil, opline, executeData)
 					break
@@ -348,10 +349,10 @@ func ZendPreIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *
 		}
 	}
 	if RETURN_VALUE_USED(opline) {
-		ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), prop)
+		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), prop)
 	}
 }
-func ZendPostIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
 		EX_VAR(opline.GetResult().GetVar()).SetLong(prop.GetLval())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
@@ -359,14 +360,14 @@ func ZendPostIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline 
 		} else {
 			FastLongDecrementFunction(prop)
 		}
-		if prop.GetType() != IS_LONG && prop_info != nil {
+		if prop.GetType() != types.IS_LONG && prop_info != nil {
 			var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
 			prop.SetLong(val)
 		}
 	} else {
 		if prop.IsReference() {
-			var ref *ZendReference = prop.GetRef()
-			prop = Z_REFVAL_P(prop)
+			var ref *types.ZendReference = prop.GetRef()
+			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, EX_VAR(opline.GetResult().GetVar()), opline, executeData)
 				return
@@ -375,7 +376,7 @@ func ZendPostIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline 
 		if prop_info != nil {
 			ZendIncdecTypedProp(prop_info, prop, EX_VAR(opline.GetResult().GetVar()), opline, executeData)
 		} else {
-			ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), prop)
+			types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), prop)
 			if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 				IncrementFunction(prop)
 			} else {
@@ -384,35 +385,35 @@ func ZendPostIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline 
 		}
 	}
 }
-func ZendPostIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
-	var rv Zval
-	var obj Zval
-	var z *Zval
-	var z_copy Zval
+func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
+	var rv types.Zval
+	var obj types.Zval
+	var z *types.Zval
+	var z_copy types.Zval
 	obj.SetObject(object.GetObj())
 	obj.AddRefcount()
-	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		return
 	}
-	if z.IsObject() && Z_OBJ_HT_P(z).GetGet() != nil {
-		var rv2 Zval
-		var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
+		var rv2 types.Zval
+		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
 			ZvalPtrDtor(&rv)
 		}
-		ZVAL_COPY_VALUE(z, value)
+		types.ZVAL_COPY_VALUE(z, value)
 	}
-	ZVAL_COPY_DEREF(&z_copy, z)
-	ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), &z_copy)
+	types.ZVAL_COPY_DEREF(&z_copy, z)
+	types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), &z_copy)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 		IncrementFunction(&z_copy)
 	} else {
 		DecrementFunction(&z_copy)
 	}
-	Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
+	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	OBJ_RELEASE(obj.GetObj())
 	ZvalPtrDtor(&z_copy)
 	ZvalPtrDtor(z)

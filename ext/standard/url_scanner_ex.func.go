@@ -6,12 +6,13 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func TagDtor(zv *zend.Zval) { zend.Free(zv.GetPtr()) }
+func TagDtor(zv *types.Zval) { zend.Free(zv.GetPtr()) }
 func PhpIniOnUpdateTags(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -34,7 +35,7 @@ func PhpIniOnUpdateTags(
 		ctx.SetTags(zend.Malloc(b.SizeOf("HashTable")))
 		if ctx.GetTags() == nil {
 			zend.Efree(tmp)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	}
 	zend.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
@@ -44,24 +45,24 @@ func PhpIniOnUpdateTags(
 		if val != nil {
 			var q *byte
 			var keylen int
-			var str *zend.ZendString
+			var str *types.ZendString
 			b.PostInc(&(*val)) = '0'
 			for q = key; *q; q++ {
 				*q = tolower(*q)
 			}
 			keylen = q - key
-			str = zend.ZendStringInit(key, keylen, 1)
-			zend.GC_MAKE_PERSISTENT_LOCAL(str)
+			str = types.ZendStringInit(key, keylen, 1)
+			types.GC_MAKE_PERSISTENT_LOCAL(str)
 			zend.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
-			zend.ZendStringReleaseEx(str, 1)
+			types.ZendStringReleaseEx(str, 1)
 		}
 	}
 	zend.Efree(tmp)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateSessionTags(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -71,7 +72,7 @@ func OnUpdateSessionTags(
 }
 func OnUpdateOutputTags(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -81,14 +82,14 @@ func OnUpdateOutputTags(
 }
 func PhpIniOnUpdateHosts(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	stage int,
 	type_ int,
 ) int {
-	var hosts *zend.HashTable
+	var hosts *types.HashTable
 	var key *byte
 	var tmp *byte
 	var lasts *byte = nil
@@ -104,24 +105,24 @@ func PhpIniOnUpdateHosts(
 	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var keylen int
-		var tmp_key *zend.ZendString
+		var tmp_key *types.ZendString
 		var q *byte
 		for q = key; *q; q++ {
 			*q = tolower(*q)
 		}
 		keylen = q - key
 		if keylen > 0 {
-			tmp_key = zend.ZendStringInit(key, keylen, 0)
+			tmp_key = types.ZendStringInit(key, keylen, 0)
 			zend.ZendHashAddEmptyElement(hosts, tmp_key)
-			zend.ZendStringReleaseEx(tmp_key, 0)
+			types.ZendStringReleaseEx(tmp_key, 0)
 		}
 	}
 	zend.Efree(tmp)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func OnUpdateSessionHosts(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -131,7 +132,7 @@ func OnUpdateSessionHosts(
 }
 func OnUpdateOutputHosts(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -161,7 +162,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	/* Check protocol. Only http/https is allowed. */
 
-	if url_parts.GetScheme() != nil && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
+	if url_parts.GetScheme() != nil && !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
 		dest.AppendSmartStr(url)
 		PhpUrlFree(url_parts)
 		return
@@ -170,14 +171,14 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	/* Check host whitelist. If it's not listed, do nothing. */
 
 	if url_parts.GetHost() != nil {
-		var tmp *zend.ZendString = zend.ZendStringTolower(url_parts.GetHost())
+		var tmp *types.ZendString = zend.ZendStringTolower(url_parts.GetHost())
 		if zend.ZendHashExists(&(BG(url_adapt_session_hosts_ht)), tmp) == 0 {
-			zend.ZendStringReleaseEx(tmp, 0)
+			types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)
 			return
 		}
-		zend.ZendStringReleaseEx(tmp, 0)
+		types.ZendStringReleaseEx(tmp, 0)
 	}
 
 	/*
@@ -260,12 +261,12 @@ func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	ctx.GetResult().AppendString(b.CastStr(start, YYCURSOR-start))
 }
 func CheckHttpHost(target *byte) int {
-	var host *zend.Zval
-	var tmp *zend.Zval
-	var host_tmp *zend.ZendString
+	var host *types.Zval
+	var tmp *types.Zval
+	var host_tmp *types.ZendString
 	var colon *byte
-	if b.Assign(&tmp, zend.EG__().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(zend.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(zend.IS_STRING) {
-		host_tmp = zend.ZendStringInit(host.GetStr().GetVal(), host.GetStr().
+	if b.Assign(&tmp, zend.EG__().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(types.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(types.IS_STRING) {
+		host_tmp = types.ZendStringInit(host.GetStr().GetVal(), host.GetStr().
 
 			/* HTTP_HOST could be 'localhost:8888' etc. */ GetLen(), 0)
 
@@ -275,33 +276,33 @@ func CheckHttpHost(target *byte) int {
 			host_tmp.GetVal()[host_tmp.GetLen()] = '0'
 		}
 		if !(strcasecmp(host_tmp.GetVal(), target)) {
-			zend.ZendStringReleaseEx(host_tmp, 0)
-			return zend.SUCCESS
+			types.ZendStringReleaseEx(host_tmp, 0)
+			return types.SUCCESS
 		}
-		zend.ZendStringReleaseEx(host_tmp, 0)
+		types.ZendStringReleaseEx(host_tmp, 0)
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
-	var allowed_hosts *zend.HashTable = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG(url_adapt_session_hosts_ht)) }, func() *__auto__ { return &(BG(url_adapt_output_hosts_ht)) })
+	var allowed_hosts *types.HashTable = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG(url_adapt_session_hosts_ht)) }, func() *__auto__ { return &(BG(url_adapt_output_hosts_ht)) })
 	zend.ZEND_ASSERT(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
 		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())
 	} else {
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
 	if url_parts == nil {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if url_parts.GetScheme() != nil {
 
 		/* Only http/https should be handled.
 		   A bit hacky check this here, but saves a URL parse. */
 
-		if !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
+		if !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
 			PhpUrlFree(url_parts)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 
 		/* Only http/https should be handled.
@@ -310,25 +311,25 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	}
 	if url_parts.GetHost() == nil {
 		PhpUrlFree(url_parts)
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
-	if !(allowed_hosts.GetNNumOfElements()) && CheckHttpHost(url_parts.GetHost().GetVal()) == zend.SUCCESS {
+	if !(allowed_hosts.GetNNumOfElements()) && CheckHttpHost(url_parts.GetHost().GetVal()) == types.SUCCESS {
 		PhpUrlFree(url_parts)
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
 	if allowed_hosts.KeyFind(url_parts.GetHost().GetStr()) == nil {
 		PhpUrlFree(url_parts)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	PhpUrlFree(url_parts)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	var doit int = 0
 	if ctx.GetFormApp().GetS().GetLen() > 0 {
 		switch ctx.GetTag().GetS().GetLen() {
 		case b.SizeOf("\"form\"") - 1:
-			if !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) && CheckHostWhitelist(ctx) == zend.SUCCESS {
+			if !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) && CheckHostWhitelist(ctx) == types.SUCCESS {
 				doit = 1
 			}
 		}
@@ -824,12 +825,12 @@ func PhpUrlScannerAdaptSingleUrl(
 	var surl zend.SmartStr = zend.MakeSmartStr(0)
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	var url_app zend.SmartStr = zend.MakeSmartStr(0)
-	var encoded *zend.ZendString
+	var encoded *types.ZendString
 	surl.AppendString(b.CastStr(url, urllen))
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, strlen(name))
 		url_app.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 	} else {
 		url_app.AppendString(b.CastStrAuto(name))
 	}
@@ -837,7 +838,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(value, strlen(value))
 		url_app.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 	} else {
 		url_app.AppendString(b.CastStrAuto(value))
 	}
@@ -851,7 +852,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	buf.Free()
 	return result
 }
-func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush zend.ZendBool, ctx *UrlAdaptStateExT) *byte {
+func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush types.ZendBool, ctx *UrlAdaptStateExT) *byte {
 	var retval *byte
 	XxMainloop(ctx, src, srclen)
 	if ctx.GetResult().GetS() == nil {
@@ -880,7 +881,7 @@ func PhpUrlScannerExActivate(type_ int) int {
 		ctx = &(BG(url_adapt_output_ex))
 	}
 	memset(ctx, 0, zend_long((*byte)(&((*UrlAdaptStateExT)(nil).GetTags()))-(*byte)(nil)))
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpUrlScannerExDeactivate(type_ int) int {
 	var ctx *UrlAdaptStateExT
@@ -894,7 +895,7 @@ func PhpUrlScannerExDeactivate(type_ int) int {
 	ctx.GetTag().Free()
 	ctx.GetArg().Free()
 	ctx.GetAttrVal().Free()
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpUrlScannerSessionHandlerImpl(
 	output *byte,
@@ -953,7 +954,7 @@ func PhpUrlScannerAddVarImpl(
 	var svalue zend.SmartStr = zend.MakeSmartStr(0)
 	var hname zend.SmartStr = zend.MakeSmartStr(0)
 	var hvalue zend.SmartStr = zend.MakeSmartStr(0)
-	var encoded *zend.ZendString
+	var encoded *types.ZendString
 	var url_state *UrlAdaptStateExT
 	var handler core.PhpOutputHandlerFuncT
 	if type_ != 0 {
@@ -974,16 +975,16 @@ func PhpUrlScannerAddVarImpl(
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, name_len)
 		sname.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 		encoded = PhpRawUrlEncode(value, value_len)
 		svalue.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name), name_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
 		hname.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(value), value_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
 		hvalue.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 	} else {
 		sname.AppendString(b.CastStr(name, name_len))
 		svalue.AppendString(b.CastStr(value, value_len))
@@ -1002,7 +1003,7 @@ func PhpUrlScannerAddVarImpl(
 	svalue.Free()
 	hname.Free()
 	hvalue.Free()
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpUrlScannerAddSessionVar(name *byte, name_len int, value *byte, value_len int, encode int) int {
 	return PhpUrlScannerAddVarImpl(name, name_len, value, value_len, encode, 1)
@@ -1026,13 +1027,13 @@ func PhpUrlScannerResetVarsImpl(type_ int) {
 }
 func PhpUrlScannerResetSessionVars() int {
 	PhpUrlScannerResetVarsImpl(1)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpUrlScannerResetVars() int {
 	PhpUrlScannerResetVarsImpl(0)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int {
+func PhpUrlScannerResetVarImpl(name *types.ZendString, encode int, type_ int) int {
 	var start *byte
 	var end *byte
 	var limit *byte
@@ -1041,9 +1042,9 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 	var hname zend.SmartStr = zend.MakeSmartStr(0)
 	var url_app zend.SmartStr = zend.MakeSmartStr(0)
 	var form_app zend.SmartStr = zend.MakeSmartStr(0)
-	var encoded *zend.ZendString
-	var ret int = zend.SUCCESS
-	var sep_removed zend.ZendBool = 0
+	var encoded *types.ZendString
+	var ret int = types.SUCCESS
+	var sep_removed types.ZendBool = 0
 	var url_state *UrlAdaptStateExT
 	if type_ != 0 {
 		url_state = &(BG(url_adapt_session_ex))
@@ -1054,15 +1055,15 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 	/* Short circuit check. Only check url_app. */
 
 	if url_state.GetUrlApp().GetS() == nil || url_state.GetUrlApp().GetS().GetLen() == 0 {
-		return zend.SUCCESS
+		return types.SUCCESS
 	}
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name.GetVal(), name.GetLen())
 		sname.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name.GetVal()), name.GetLen(), 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
 		hname.AppendString(encoded.GetStr())
-		zend.ZendStringFree(encoded)
+		types.ZendStringFree(encoded)
 	} else {
 		sname.AppendString(name.GetStr())
 		hname.AppendString(name.GetStr())
@@ -1081,7 +1082,7 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	start = (*byte)(core.PhpMemnstr(url_state.GetUrlApp().GetS().GetVal(), url_app.GetS().GetVal(), url_app.GetS().GetLen(), url_state.GetUrlApp().GetS().GetVal()+url_state.GetUrlApp().GetS().GetLen()))
 	if start == nil {
-		ret = zend.FAILURE
+		ret = types.FAILURE
 		goto finish
 	}
 
@@ -1125,7 +1126,7 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 		/* Should not happen */
 
-		ret = zend.FAILURE
+		ret = types.FAILURE
 		PhpUrlScannerResetVarsImpl(type_)
 		goto finish
 	}
@@ -1154,19 +1155,19 @@ finish:
 	hname.Free()
 	return ret
 }
-func PhpUrlScannerResetSessionVar(name *zend.ZendString, encode int) int {
+func PhpUrlScannerResetSessionVar(name *types.ZendString, encode int) int {
 	return PhpUrlScannerResetVarImpl(name, encode, 1)
 }
-func PhpUrlScannerResetVar(name *zend.ZendString, encode int) int {
+func PhpUrlScannerResetVar(name *types.ZendString, encode int) int {
 	return PhpUrlScannerResetVarImpl(name, encode, 0)
 }
 func ZmStartupUrlScanner(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownUrlScanner(type_ int, module_number int) int {
 	zend.UNREGISTER_INI_ENTRIES(module_number)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmActivateUrlScanner(type_ int, module_number int) int {
 	BG(url_adapt_session_ex).active = 0
@@ -1175,7 +1176,7 @@ func ZmActivateUrlScanner(type_ int, module_number int) int {
 	BG(url_adapt_output_ex).active = 0
 	BG(url_adapt_output_ex).tag_type = 0
 	BG(url_adapt_output_ex).attr_type = 0
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmDeactivateUrlScanner(type_ int, module_number int) int {
 	if BG(url_adapt_session_ex).active {
@@ -1194,5 +1195,5 @@ func ZmDeactivateUrlScanner(type_ int, module_number int) int {
 	}
 	BG(url_adapt_output_ex).form_app.Free()
 	BG(url_adapt_output_ex).url_app.Free()
-	return zend.SUCCESS
+	return types.SUCCESS
 }

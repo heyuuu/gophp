@@ -4,7 +4,7 @@ package streams
 
 import (
 	"sik/core"
-	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStreamXportCreate(
@@ -15,7 +15,7 @@ func PhpStreamXportCreate(
 	persistent_id *byte,
 	timeout *__struct__timeval,
 	context *core.PhpStreamContext,
-	estr **zend.ZendString,
+	estr **types.ZendString,
 	ecode *int,
 ) *core.PhpStream {
 	return _phpStreamXportCreate(name, namelen, options, flags, persistent_id, timeout, context, estr, ecode)

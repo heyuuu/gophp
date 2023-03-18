@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 // Source: <Zend/zend_compile.h>
@@ -255,9 +256,9 @@ const ZEND_RETURN_REFERENCE = 1
 
 /* zend_internal_function_handler */
 
-type ZifHandler func(executeData *ZendExecuteData, return_value *Zval)
+type ZifHandler func(executeData *ZendExecuteData, return_value *types.Zval)
 
-const ZEND_CALL_HAS_THIS = IS_OBJECT_EX
+const ZEND_CALL_HAS_THIS = types.IS_OBJECT_EX
 
 /* Top 16 bits of Z_TYPE_INFO(EX(This)) are used as call_info flags */
 
@@ -299,17 +300,17 @@ const ZEND_CALL_FRAME_SLOT = int((ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_execute_da
 /* convert constant back from run-time to compile-time */
 
 const IS_UNUSED = 0
-const IS_CONST ZendUchar = 1 << 0
-const IS_TMP_VAR ZendUchar = 1 << 1
-const IS_VAR ZendUchar = 1 << 2
-const IS_CV ZendUchar = 1 << 3
+const IS_CONST types.ZendUchar = 1 << 0
+const IS_TMP_VAR types.ZendUchar = 1 << 1
+const IS_VAR types.ZendUchar = 1 << 2
+const IS_CV types.ZendUchar = 1 << 3
 const ZEND_EXTRA_VALUE = 1
 
 var ZendCompileFile func(file_handle *ZendFileHandle, type_ int) *ZendOpArray
-var ZendCompileString func(source_string *Zval, filename *byte) *ZendOpArray
+var ZendCompileString func(source_string *types.Zval, filename *byte) *ZendOpArray
 
-type UnaryOpType func(*Zval, *Zval) int
-type BinaryOpType func(*Zval, *Zval, *Zval) int
+type UnaryOpType func(*types.Zval, *types.Zval) int
+type BinaryOpType func(*types.Zval, *types.Zval, *types.Zval) int
 
 /* Used during AST construction */
 
@@ -321,11 +322,11 @@ const INITIAL_OP_ARRAY_SIZE = 64
 
 /* helper functions in zend_language_scanner.l */
 
-const ZEND_FUNCTION_DTOR DtorFuncT = ZendFunctionDtor
-const ZEND_CLASS_DTOR DtorFuncT = DestroyZendClass
+const ZEND_FUNCTION_DTOR types.DtorFuncT = ZendFunctionDtor
+const ZEND_CLASS_DTOR types.DtorFuncT = DestroyZendClass
 
-type ZendNeedsLiveRangeCb func(op_array *ZendOpArray, opline *ZendOp) ZendBool
-type ZendAutoGlobalCallback func(name *ZendString) ZendBool
+type ZendNeedsLiveRangeCb func(op_array *ZendOpArray, opline *ZendOp) types.ZendBool
+type ZendAutoGlobalCallback func(name *types.ZendString) types.ZendBool
 
 /* BEGIN: OPCODES */
 
@@ -573,14 +574,14 @@ var ReservedClassNames []ReservedClassName = []ReservedClassName{
 }
 
 var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{
-	MakeBuiltinTypeInfo(ZEND_STRL("int"), IS_LONG),
-	MakeBuiltinTypeInfo(ZEND_STRL("float"), IS_DOUBLE),
-	MakeBuiltinTypeInfo(ZEND_STRL("string"), IS_STRING),
-	MakeBuiltinTypeInfo(ZEND_STRL("bool"), _IS_BOOL),
-	MakeBuiltinTypeInfo(ZEND_STRL("void"), IS_VOID),
-	MakeBuiltinTypeInfo(ZEND_STRL("iterable"), IS_ITERABLE),
-	MakeBuiltinTypeInfo(ZEND_STRL("object"), IS_OBJECT),
-	MakeBuiltinTypeInfo(nil, 0, IS_UNDEF),
+	MakeBuiltinTypeInfo(ZEND_STRL("int"), types.IS_LONG),
+	MakeBuiltinTypeInfo(ZEND_STRL("float"), types.IS_DOUBLE),
+	MakeBuiltinTypeInfo(ZEND_STRL("string"), types.IS_STRING),
+	MakeBuiltinTypeInfo(ZEND_STRL("bool"), types._IS_BOOL),
+	MakeBuiltinTypeInfo(ZEND_STRL("void"), types.IS_VOID),
+	MakeBuiltinTypeInfo(ZEND_STRL("iterable"), types.IS_ITERABLE),
+	MakeBuiltinTypeInfo(ZEND_STRL("object"), types.IS_OBJECT),
+	MakeBuiltinTypeInfo(nil, 0, types.IS_UNDEF),
 }
 
 /* Common part of zend_add_literal and zend_append_individual_literal */

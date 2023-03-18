@@ -7,9 +7,10 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func ZifReadlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var link *byte
 	var link_len int
 	var buff []byte
@@ -20,12 +21,12 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -98,7 +99,7 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetRawString(b.CastStr(buff, ret))
 	return
 }
-func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var link *byte
 	var dirname *byte
 	var link_len int
@@ -110,12 +111,12 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -189,7 +190,7 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(zend.ZendLong(sb.st_dev))
 	return
 }
-func ZifSymlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var topath *byte
 	var frompath *byte
 	var topath_len int
@@ -205,12 +206,12 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -311,7 +312,7 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var topath *byte
 	var frompath *byte
 	var topath_len int
@@ -325,12 +326,12 @@ func ZifLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

@@ -3,14 +3,14 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * ZendArrayGlobals
  */
 type ZendArrayGlobals struct {
-	multisort_func *zend.CompareFuncT
+	multisort_func *types.CompareFuncT
 }
 
 // func MakeZendArrayGlobals(multisort_func *zend.CompareFuncT) ZendArrayGlobals {

@@ -3,14 +3,14 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * Bucketindex
  */
 type Bucketindex struct {
-	b zend.Bucket
+	b types.Bucket
 	i uint
 }
 
@@ -20,7 +20,7 @@ type Bucketindex struct {
 //         i:i,
 //     }
 // }
-func (this *Bucketindex) GetB() zend.Bucket      { return this.b }
-func (this *Bucketindex) SetB(value zend.Bucket) { this.b = value }
-func (this *Bucketindex) GetI() uint             { return this.i }
-func (this *Bucketindex) SetI(value uint)        { this.i = value }
+func (this *Bucketindex) GetB() types.Bucket      { return this.b }
+func (this *Bucketindex) SetB(value types.Bucket) { this.b = value }
+func (this *Bucketindex) GetI() uint              { return this.i }
+func (this *Bucketindex) SetI(value uint)         { this.i = value }

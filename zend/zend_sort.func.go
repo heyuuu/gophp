@@ -2,12 +2,14 @@
 
 package zend
 
-func ZendSort2(a any, b any, cmp CompareFuncT, swp SwapFuncT) {
+import "sik/zend/types"
+
+func ZendSort2(a any, b any, cmp types.CompareFuncT, swp types.SwapFuncT) {
 	if cmp(a, b) > 0 {
 		swp(a, b)
 	}
 }
-func ZendSort3(a any, b any, c any, cmp CompareFuncT, swp SwapFuncT) {
+func ZendSort3(a any, b any, c any, cmp types.CompareFuncT, swp types.SwapFuncT) {
 	if cmp(a, b) <= 0 {
 		if cmp(b, c) <= 0 {
 			return
@@ -32,8 +34,8 @@ func ZendSort4(
 	b any,
 	c any,
 	d any,
-	cmp CompareFuncT,
-	swp SwapFuncT,
+	cmp types.CompareFuncT,
+	swp types.SwapFuncT,
 ) {
 	ZendSort3(a, b, c, cmp, swp)
 	if cmp(c, d) > 0 {
@@ -52,8 +54,8 @@ func ZendSort5(
 	c any,
 	d any,
 	e any,
-	cmp CompareFuncT,
-	swp SwapFuncT,
+	cmp types.CompareFuncT,
+	swp types.SwapFuncT,
 ) {
 	ZendSort4(a, b, c, d, cmp, swp)
 	if cmp(d, e) > 0 {
@@ -69,7 +71,7 @@ func ZendSort5(
 		}
 	}
 }
-func ZendInsertSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
+func ZendInsertSort(base any, nmemb int, siz int, cmp types.CompareFuncT, swp types.SwapFuncT) {
 	switch nmemb {
 	case 0:
 		fallthrough
@@ -141,7 +143,7 @@ func ZendInsertSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFunc
 		}
 	}
 }
-func ZendSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
+func ZendSort(base any, nmemb int, siz int, cmp types.CompareFuncT, swp types.SwapFuncT) {
 	for true {
 		if nmemb <= 16 {
 			ZendInsertSort(base, nmemb, siz, cmp, swp)

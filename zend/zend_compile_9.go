@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
@@ -16,16 +17,16 @@ func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CLASS_NAME, nil, nil)
 	opline.GetOp1().SetNum(ZEND_FETCH_CLASS_SELF)
 }
-func ZendIsAllowedInConstExpr(kind ZendAstKind) ZendBool {
+func ZendIsAllowedInConstExpr(kind ZendAstKind) types.ZendBool {
 	return kind == ZEND_AST_ZVAL || kind == ZEND_AST_BINARY_OP || kind == ZEND_AST_GREATER || kind == ZEND_AST_GREATER_EQUAL || kind == ZEND_AST_AND || kind == ZEND_AST_OR || kind == ZEND_AST_UNARY_OP || kind == ZEND_AST_UNARY_PLUS || kind == ZEND_AST_UNARY_MINUS || kind == ZEND_AST_CONDITIONAL || kind == ZEND_AST_DIM || kind == ZEND_AST_ARRAY || kind == ZEND_AST_ARRAY_ELEM || kind == ZEND_AST_UNPACK || kind == ZEND_AST_CONST || kind == ZEND_AST_CLASS_CONST || kind == ZEND_AST_CLASS_NAME || kind == ZEND_AST_MAGIC_CONST || kind == ZEND_AST_COALESCE
 }
 func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var const_ast *ZendAst = ast.GetChild()[1]
-	var class_name *ZendString
-	var const_name *ZendString = ZendAstGetStr(const_ast)
-	var name *ZendString
+	var class_name *types.ZendString
+	var const_name *types.ZendString = ZendAstGetStr(const_ast)
+	var name *types.ZendString
 	var fetch_type int
 	if class_ast.GetKind() != ZEND_AST_ZVAL {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
@@ -42,13 +43,13 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	}
 	name = ZendConcat3(class_name.GetVal(), class_name.GetLen(), "::", 2, const_name.GetVal(), const_name.GetLen())
 	ZendAstDestroy(ast)
-	ZendStringReleaseEx(class_name, 0)
+	types.ZendStringReleaseEx(class_name, 0)
 	*ast_ptr = ZendAstCreateConstant(name, fetch_type|ZEND_FETCH_CLASS_EXCEPTION)
 }
 func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
-	var class_name *ZendString = ZendAstGetStr(class_ast)
+	var class_name *types.ZendString = ZendAstGetStr(class_ast)
 	var fetch_type uint32 = ZendGetClassFetchType(class_name)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
@@ -57,7 +58,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 
 		/* For the const-eval representation store the fetch type instead of the name. */
 
-		ZendStringRelease(class_name)
+		types.ZendStringRelease(class_name)
 		ast.GetChild()[0] = nil
 		ast.SetAttr(fetch_type)
 		return
@@ -71,13 +72,13 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 func ZendCompileConstExprConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var name_ast *ZendAst = ast.GetChild()[0]
-	var orig_name *ZendString = ZendAstGetStr(name_ast)
-	var is_fully_qualified ZendBool
-	var result Zval
-	var resolved_name *ZendString
+	var orig_name *types.ZendString = ZendAstGetStr(name_ast)
+	var is_fully_qualified types.ZendBool
+	var result types.Zval
+	var resolved_name *types.ZendString
 	resolved_name = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
 	if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) != 0 {
-		ZendStringReleaseEx(resolved_name, 0)
+		types.ZendStringReleaseEx(resolved_name, 0)
 		ZendAstDestroy(ast)
 		*ast_ptr = ZendAstCreateZval(&result)
 		return
@@ -115,12 +116,12 @@ func ZendCompileConstExpr(ast_ptr **ZendAst) {
 		ZendAstApply(ast, ZendCompileConstExpr)
 	}
 }
-func ZendConstExprToZval(result *Zval, ast *ZendAst) {
+func ZendConstExprToZval(result *types.Zval, ast *ZendAst) {
 	var orig_ast *ZendAst = ast
 	ZendEvalConstExpr(&ast)
 	ZendCompileConstExpr(&ast)
 	if ast.GetKind() == ZEND_AST_ZVAL {
-		ZVAL_COPY_VALUE(result, ZendAstGetZval(ast))
+		types.ZVAL_COPY_VALUE(result, ZendAstGetZval(ast))
 	} else {
 		result.SetConstantAst(ZendAstCopy(ast))
 
@@ -257,7 +258,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 	}
 	switch ast.GetKind() {
 	case ZEND_AST_ZVAL:
-		ZVAL_COPY(result.GetConstant(), ZendAstGetZval(ast))
+		types.ZVAL_COPY(result.GetConstant(), ZendAstGetZval(ast))
 		result.SetOpType(IS_CONST)
 		return
 	case ZEND_AST_ZNODE:
@@ -423,7 +424,7 @@ func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *Zend
 		return nil
 	}
 }
-func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref ZendBool) *ZendOp {
+func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref types.ZendBool) *ZendOp {
 	switch ast.GetKind() {
 	case ZEND_AST_VAR:
 		return ZendCompileSimpleVar(result, ast, type_, 1)
@@ -443,7 +444,7 @@ func ZendDelayedCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref Zen
 }
 func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
-	var result Zval
+	var result types.Zval
 	if ast == nil {
 		return
 	}
@@ -469,8 +470,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_AND:
 		fallthrough
 	case ZEND_AST_OR:
-		var child0_is_true ZendBool
-		var child1_is_true ZendBool
+		var child0_is_true types.ZendBool
+		var child1_is_true types.ZendBool
 		ZendEvalConstExpr(ast.GetChild()[0])
 		ZendEvalConstExpr(ast.GetChild()[1])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
@@ -478,7 +479,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 		child0_is_true = ZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))
 		if child0_is_true == (ast.GetKind() == ZEND_AST_OR) {
-			ZVAL_BOOL(&result, ast.GetKind() == ZEND_AST_OR)
+			types.ZVAL_BOOL(&result, ast.GetKind() == ZEND_AST_OR)
 			break
 		}
 		if ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
@@ -486,9 +487,9 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 		child1_is_true = ZendIsTrue(ZendAstGetZval(ast.GetChild()[1]))
 		if ast.GetKind() == ZEND_AST_OR {
-			ZVAL_BOOL(&result, child0_is_true != 0 || child1_is_true != 0)
+			types.ZVAL_BOOL(&result, child0_is_true != 0 || child1_is_true != 0)
 		} else {
-			ZVAL_BOOL(&result, child0_is_true != 0 && child1_is_true != 0)
+			types.ZVAL_BOOL(&result, child0_is_true != 0 && child1_is_true != 0)
 		}
 	case ZEND_AST_UNARY_OP:
 		ZendEvalConstExpr(ast.GetChild()[0])
@@ -560,8 +561,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 
 		/* constant expression should be always read context ... */
 
-		var container *Zval
-		var dim *Zval
+		var container *types.Zval
+		var dim *types.Zval
 		if ast.GetChild()[1] == nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for reading")
 		}
@@ -583,18 +584,18 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		container = ZendAstGetZval(ast.GetChild()[0])
 		dim = ZendAstGetZval(ast.GetChild()[1])
 		if container.IsArray() {
-			var el *Zval
+			var el *types.Zval
 			if dim.IsLong() {
 				el = container.GetArr().IndexFindH(dim.GetLval())
 				if el != nil {
-					ZVAL_COPY(&result, el)
+					types.ZVAL_COPY(&result, el)
 				} else {
 					return
 				}
 			} else if dim.IsString() {
 				el = container.GetArr().SymtableFind(dim.GetStr().GetStr())
 				if el != nil {
-					ZVAL_COPY(&result, el)
+					types.ZVAL_COPY(&result, el)
 				} else {
 					return
 				}
@@ -603,18 +604,18 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			}
 		} else if container.IsString() {
 			var offset ZendLong
-			var c ZendUchar
+			var c types.ZendUchar
 			if dim.IsLong() {
 				offset = dim.GetLval()
-			} else if dim.GetType() != IS_STRING || IsNumericString(dim.GetStr().GetStr(), &offset, nil, 1) != IS_LONG {
+			} else if dim.GetType() != types.IS_STRING || IsNumericString(dim.GetStr().GetStr(), &offset, nil, 1) != types.IS_LONG {
 				return
 			}
 			if offset < 0 || int(offset >= container.GetStr().GetLen()) != 0 {
 				return
 			}
-			c = ZendUchar(container.GetStr().GetVal()[offset])
-			result.SetInternedString(ZSTR_CHAR(c))
-		} else if container.GetType() <= IS_FALSE {
+			c = types.ZendUchar(container.GetStr().GetVal()[offset])
+			result.SetInternedString(types.ZSTR_CHAR(c))
+		} else if container.GetType() <= types.IS_FALSE {
 			result.SetNull()
 		} else {
 			return
@@ -629,17 +630,17 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 	case ZEND_AST_CONST:
 		var name_ast *ZendAst = ast.GetChild()[0]
-		var is_fully_qualified ZendBool
-		var resolved_name *ZendString = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
+		var is_fully_qualified types.ZendBool
+		var resolved_name *types.ZendString = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
 		if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) == 0 {
-			ZendStringReleaseEx(resolved_name, 0)
+			types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
-		ZendStringReleaseEx(resolved_name, 0)
+		types.ZendStringReleaseEx(resolved_name, 0)
 	case ZEND_AST_CLASS_CONST:
 		var class_ast *ZendAst
 		var name_ast *ZendAst
-		var resolved_name *ZendString
+		var resolved_name *types.ZendString
 		ZendEvalConstExpr(ast.GetChild()[0])
 		ZendEvalConstExpr(ast.GetChild()[1])
 		class_ast = ast.GetChild()[0]
@@ -649,10 +650,10 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 		resolved_name = ZendResolveClassNameAst(class_ast)
 		if ZendTryCtEvalClassConst(&result, resolved_name, ZendAstGetStr(name_ast)) == 0 {
-			ZendStringReleaseEx(resolved_name, 0)
+			types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
-		ZendStringReleaseEx(resolved_name, 0)
+		types.ZendStringReleaseEx(resolved_name, 0)
 	case ZEND_AST_CLASS_NAME:
 		var class_ast *ZendAst = ast.GetChild()[0]
 		if ZendTryCompileConstExprResolveClassName(&result, class_ast) == 0 {

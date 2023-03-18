@@ -4,52 +4,53 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendCallMethodWith0Params(obj *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunction, function_name string, retval *Zval) *Zval {
+func ZendCallMethodWith0Params(obj *types.Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunction, function_name string, retval *types.Zval) *types.Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 0, nil, nil)
 }
 func ZendCallMethodWith1Params(
-	obj *Zval,
+	obj *types.Zval,
 	obj_ce *ZendClassEntry,
 	fn_proxy **ZendFunction,
 	function_name string,
-	retval *Zval,
-	arg1 *Zval,
-) *Zval {
+	retval *types.Zval,
+	arg1 *types.Zval,
+) *types.Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 1, arg1, nil)
 }
 func ZendCallMethodWith2Params(
-	obj *Zval,
+	obj *types.Zval,
 	obj_ce *ZendClassEntry,
 	fn_proxy **ZendFunction,
 	function_name string,
-	retval *Zval,
-	arg1 *Zval,
-	arg2 *Zval,
-) *Zval {
+	retval *types.Zval,
+	arg1 *types.Zval,
+	arg2 *types.Zval,
+) *types.Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 2, arg1, arg2)
 }
 func ZendCallMethod(
-	object *Zval,
+	object *types.Zval,
 	obj_ce *ZendClassEntry,
 	fn_proxy **ZendFunction,
 	function_name string,
 	function_name_len int,
-	retval_ptr *Zval,
+	retval_ptr *types.Zval,
 	param_count int,
-	arg1 *Zval,
-	arg2 *Zval,
-) *Zval {
+	arg1 *types.Zval,
+	arg2 *types.Zval,
+) *types.Zval {
 	var result int
 	var fci ZendFcallInfo
-	var retval Zval
-	var params []Zval
+	var retval types.Zval
+	var params []types.Zval
 	if param_count > 0 {
-		ZVAL_COPY_VALUE(&params[0], arg1)
+		types.ZVAL_COPY_VALUE(&params[0], arg1)
 	}
 	if param_count > 1 {
-		ZVAL_COPY_VALUE(&params[1], arg2)
+		types.ZVAL_COPY_VALUE(&params[1], arg2)
 	}
 	fci.SetSize(b.SizeOf("fci"))
 	if object != nil {
@@ -78,7 +79,7 @@ func ZendCallMethod(
 		fci.GetFunctionName().SetUndef()
 		if obj_ce == nil {
 			if object != nil {
-				obj_ce = Z_OBJCE_P(object)
+				obj_ce = types.Z_OBJCE_P(object)
 			} else {
 				obj_ce = nil
 			}
@@ -114,7 +115,7 @@ func ZendCallMethod(
 			fcic.SetFunctionHandler(*fn_proxy)
 		}
 		if object != nil {
-			fcic.SetCalledScope(Z_OBJCE_P(object))
+			fcic.SetCalledScope(types.Z_OBJCE_P(object))
 		} else {
 			var called_scope *ZendClassEntry = ZendGetCalledScope(CurrEX())
 			if obj_ce != nil && (called_scope == nil || InstanceofFunction(called_scope, obj_ce) == 0) {
@@ -130,13 +131,13 @@ func ZendCallMethod(
 		}
 		result = ZendCallFunction(&fci, &fcic)
 	}
-	if result == FAILURE {
+	if result == types.FAILURE {
 
 		/* error at c-level */
 
 		if obj_ce == nil {
 			if object != nil {
-				obj_ce = Z_OBJCE_P(object)
+				obj_ce = types.Z_OBJCE_P(object)
 			} else {
 				obj_ce = nil
 			}
@@ -151,7 +152,7 @@ func ZendCallMethod(
 	}
 	return retval_ptr
 }
-func ZendUserItNewIterator(ce *ZendClassEntry, object *Zval, retval *Zval) {
+func ZendUserItNewIterator(ce *ZendClassEntry, object *types.Zval, retval *types.Zval) {
 	ZendCallMethodWith0Params(object, ce, ce.GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", retval)
 }
 func ZendUserItInvalidateCurrent(_iter *ZendObjectIterator) {
@@ -163,41 +164,41 @@ func ZendUserItInvalidateCurrent(_iter *ZendObjectIterator) {
 }
 func ZendUserItDtor(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = iter.GetIt().GetData()
+	var object *types.Zval = iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
 	ZvalPtrDtor(object)
 }
 func ZendUserItValid(_iter *ZendObjectIterator) int {
 	if _iter != nil {
 		var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-		var object *Zval = iter.GetIt().GetData()
-		var more Zval
+		var object *types.Zval = iter.GetIt().GetData()
+		var more types.Zval
 		var result int
 		ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfValid(), "valid", &more)
 		result = IZendIsTrue(&more)
 		ZvalPtrDtor(&more)
 		if result != 0 {
-			return SUCCESS
+			return types.SUCCESS
 		} else {
-			return FAILURE
+			return types.FAILURE
 		}
 	}
-	return FAILURE
+	return types.FAILURE
 }
-func ZendUserItGetCurrentData(_iter *ZendObjectIterator) *Zval {
+func ZendUserItGetCurrentData(_iter *ZendObjectIterator) *types.Zval {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = iter.GetIt().GetData()
+	var object *types.Zval = iter.GetIt().GetData()
 	if iter.GetValue().IsUndef() {
 		ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfCurrent(), "current", iter.GetValue())
 	}
 	return iter.GetValue()
 }
-func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *Zval) {
+func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *types.Zval) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = iter.GetIt().GetData()
-	var retval Zval
+	var object *types.Zval = iter.GetIt().GetData()
+	var retval types.Zval
 	ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
-	if retval.GetType() != IS_UNDEF {
+	if retval.GetType() != types.IS_UNDEF {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
 		if EG__().GetException() == nil {
@@ -208,17 +209,17 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *Zval) {
 }
 func ZendUserItMoveForward(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = iter.GetIt().GetData()
+	var object *types.Zval = iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
 	ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfNext(), "next", nil)
 }
 func ZendUserItRewind(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = iter.GetIt().GetData()
+	var object *types.Zval = iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
 	ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfRewind(), "rewind", nil)
 }
-func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {
+func ZendUserItGetIterator(ce *ZendClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator {
 	var iterator *ZendUserIterator
 	if by_ref != 0 {
 		ZendThrowError(nil, "An iterator cannot be used with foreach by reference")
@@ -229,23 +230,23 @@ func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendOb
 	object.AddRefcount()
 	iterator.GetIt().GetData().SetObject(object.GetObj())
 	iterator.GetIt().SetFuncs(&ZendInterfaceIteratorFuncsIterator)
-	iterator.SetCe(Z_OBJCE_P(object))
+	iterator.SetCe(types.Z_OBJCE_P(object))
 	iterator.GetValue().SetUndef()
 	return (*ZendObjectIterator)(iterator)
 }
-func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {
-	var iterator Zval
+func ZendUserItGetNewIterator(ce *ZendClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator {
+	var iterator types.Zval
 	var new_iterator *ZendObjectIterator
 	var ce_it *ZendClassEntry
 	ZendUserItNewIterator(ce, object, &iterator)
 	if iterator.IsObject() {
-		ce_it = Z_OBJCE(iterator)
+		ce_it = types.Z_OBJCE(iterator)
 	} else {
 		ce_it = nil
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.GetObj() == object.GetObj() {
 		if EG__().GetException() == nil {
-			ZendThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return Z_OBJCE_P(object).GetName().GetVal() }))
+			ZendThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return types.Z_OBJCE_P(object).GetName().GetVal() }))
 		}
 		ZvalPtrDtor(&iterator)
 		return nil
@@ -259,18 +260,18 @@ func ZendImplementTraversable(interface_ *ZendClassEntry, class_type *ZendClassE
 
 	var i uint32
 	if class_type.GetGetIterator() != nil || class_type.GetParent() && class_type.GetParent().get_iterator {
-		return SUCCESS
+		return types.SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
 		ZEND_ASSERT(class_type.IsResolvedInterfaces())
 		for i = 0; i < class_type.GetNumInterfaces(); i++ {
 			if class_type.GetInterfaces()[i] == ZendCeAggregate || class_type.GetInterfaces()[i] == ZendCeIterator {
-				return SUCCESS
+				return types.SUCCESS
 			}
 		}
 	}
 	ZendErrorNoreturn(E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.GetName().GetVal(), ZendCeTraversable.GetName().GetVal(), ZendCeIterator.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
-	return FAILURE
+	return types.FAILURE
 }
 func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
 	var i uint32
@@ -281,7 +282,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 
 			/* inheritance ensures the class has necessary userland methods */
 
-			return SUCCESS
+			return types.SUCCESS
 
 			/* inheritance ensures the class has necessary userland methods */
 
@@ -294,7 +295,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.GetInterfaces()[i] == ZendCeIterator {
 						ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeIterator.GetName().GetVal())
-						return FAILURE
+						return types.FAILURE
 					}
 					if class_type.GetInterfaces()[i] == ZendCeTraversable {
 						t = i
@@ -302,7 +303,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 				}
 			}
 			if t == -1 {
-				return FAILURE
+				return types.FAILURE
 			}
 		}
 	}
@@ -328,7 +329,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			funcs_ptr.SetZfNewIterator(nil)
 		}
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
 	var funcs_ptr *ZendClassIteratorFuncs
@@ -337,7 +338,7 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 
 			/* inheritance ensures the class has the necessary userland methods */
 
-			return SUCCESS
+			return types.SUCCESS
 
 			/* inheritance ensures the class has the necessary userland methods */
 
@@ -348,7 +349,7 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 			if class_type.GetGetIterator() == ZendUserItGetNewIterator {
 				ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
 			}
-			return FAILURE
+			return types.FAILURE
 		}
 	}
 	if class_type.GetParent() && (class_type.GetParent().ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
@@ -382,66 +383,66 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 			funcs_ptr.SetZfRewind(nil)
 		}
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendImplementArrayaccess(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
-	return SUCCESS
+	return types.SUCCESS
 }
-func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
-	var ce *ZendClassEntry = Z_OBJCE_P(object)
-	var retval Zval
+func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
+	var ce *ZendClassEntry = types.Z_OBJCE_P(object)
+	var retval types.Zval
 	var result int
 	ZendCallMethodWith0Params(object, ce, ce.GetSerializeFunc(), "serialize", &retval)
 	if retval.IsUndef() || EG__().GetException() != nil {
-		result = FAILURE
+		result = types.FAILURE
 	} else {
 		switch retval.GetType() {
-		case IS_NULL:
+		case types.IS_NULL:
 
 			/* we could also make this '*buf_len = 0' but this allows to skip variables */
 
 			ZvalPtrDtor(&retval)
-			return FAILURE
-		case IS_STRING:
+			return types.FAILURE
+		case types.IS_STRING:
 			*buffer = (*uint8)(Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
 			*buf_len = retval.GetStr().GetLen()
-			result = SUCCESS
+			result = types.SUCCESS
 		default:
-			result = FAILURE
+			result = types.FAILURE
 		}
 		ZvalPtrDtor(&retval)
 	}
-	if result == FAILURE && EG__().GetException() == nil {
+	if result == types.FAILURE && EG__().GetException() == nil {
 		ZendThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.GetName().GetVal())
 	}
 	return result
 }
-func ZendUserUnserialize(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
-	var zdata Zval
-	if ObjectInitEx(object, ce) != SUCCESS {
-		return FAILURE
+func ZendUserUnserialize(object *types.Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
+	var zdata types.Zval
+	if ObjectInitEx(object, ce) != types.SUCCESS {
+		return types.FAILURE
 	}
 	zdata.SetRawString(b.CastStr((*byte)(buf), buf_len))
 	ZendCallMethodWith1Params(object, ce, ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
 	ZvalPtrDtor(&zdata)
 	if EG__().GetException() != nil {
-		return FAILURE
+		return types.FAILURE
 	} else {
-		return SUCCESS
+		return types.SUCCESS
 	}
 }
-func ZendClassSerializeDeny(object *Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
-	var ce *ZendClassEntry = Z_OBJCE_P(object)
+func ZendClassSerializeDeny(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
+	var ce *ZendClassEntry = types.Z_OBJCE_P(object)
 	ZendThrowExceptionEx(nil, 0, "Serialization of '%s' is not allowed", ce.GetName().GetVal())
-	return FAILURE
+	return types.FAILURE
 }
-func ZendClassUnserializeDeny(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
+func ZendClassUnserializeDeny(object *types.Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
 	ZendThrowExceptionEx(nil, 0, "Unserialization of '%s' is not allowed", ce.GetName().GetVal())
-	return FAILURE
+	return types.FAILURE
 }
 func ZendImplementSerializable(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
 	if class_type.GetParent() && (class_type.GetParent().serialize || class_type.GetParent().unserialize) && InstanceofFunctionEx(class_type.GetParent(), ZendCeSerializable, 1) == 0 {
-		return FAILURE
+		return types.FAILURE
 	}
 	if class_type.GetSerialize() == nil {
 		class_type.SetSerialize(ZendUserSerialize)
@@ -449,47 +450,47 @@ func ZendImplementSerializable(interface_ *ZendClassEntry, class_type *ZendClass
 	if class_type.GetUnserialize() == nil {
 		class_type.SetUnserialize(ZendUserUnserialize)
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendImplementCountable(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendRegisterInterfaces() {
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("Traversable", b.SizeOf("\"Traversable\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("Traversable", b.SizeOf("\"Traversable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsTraversable)
 	ZendCeTraversable = ZendRegisterInternalInterface(&ce)
 	ZendCeTraversable.SetInterfaceGetsImplemented(ZendImplementTraversable)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("IteratorAggregate", b.SizeOf("\"IteratorAggregate\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("IteratorAggregate", b.SizeOf("\"IteratorAggregate\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsAggregate)
 	ZendCeAggregate = ZendRegisterInternalInterface(&ce)
 	ZendCeAggregate.SetInterfaceGetsImplemented(ZendImplementAggregate)
 	ZendClassImplements(ZendCeAggregate, 1, ZendCeTraversable)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("Iterator", b.SizeOf("\"Iterator\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("Iterator", b.SizeOf("\"Iterator\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsIterator)
 	ZendCeIterator = ZendRegisterInternalInterface(&ce)
 	ZendCeIterator.SetInterfaceGetsImplemented(ZendImplementIterator)
 	ZendClassImplements(ZendCeIterator, 1, ZendCeTraversable)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("ArrayAccess", b.SizeOf("\"ArrayAccess\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("ArrayAccess", b.SizeOf("\"ArrayAccess\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsArrayaccess)
 	ZendCeArrayaccess = ZendRegisterInternalInterface(&ce)
 	ZendCeArrayaccess.SetInterfaceGetsImplemented(ZendImplementArrayaccess)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("Serializable", b.SizeOf("\"Serializable\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("Serializable", b.SizeOf("\"Serializable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsSerializable)
 	ZendCeSerializable = ZendRegisterInternalInterface(&ce)
 	ZendCeSerializable.SetInterfaceGetsImplemented(ZendImplementSerializable)
 	var ce ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(ZendStringInitInterned("Countable", b.SizeOf("\"Countable\"")-1, 1))
+	ce.SetName(types.ZendStringInitInterned("Countable", b.SizeOf("\"Countable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsCountable)
 	ZendCeCountable = ZendRegisterInternalInterface(&ce)
 	ZendCeCountable.SetInterfaceGetsImplemented(ZendImplementCountable)

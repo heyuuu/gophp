@@ -4,14 +4,15 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZvalPtrDtorNogc(zval_ptr *Zval) {
+func ZvalPtrDtorNogc(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() && zval_ptr.DelRefcount() == 0 {
 		RcDtorFunc(zval_ptr.GetCounted())
 	}
 }
-func IZvalPtrDtor(zval_ptr *Zval) {
+func IZvalPtrDtor(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() {
 		var ref = zval_ptr.GetCounted()
 		if ref.DelRefcount() == 0 {
@@ -21,50 +22,50 @@ func IZvalPtrDtor(zval_ptr *Zval) {
 		}
 	}
 }
-func ZvalPtrDtorStr(zval_ptr *Zval) {
+func ZvalPtrDtorStr(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() && zval_ptr.DelRefcount() == 0 {
 		ZEND_ASSERT(zval_ptr.IsString())
 		ZEND_ASSERT(true)
-		ZEND_ASSERT((zval_ptr.GetStr().GetGcFlags() & IS_STR_PERSISTENT) == 0)
+		ZEND_ASSERT((zval_ptr.GetStr().GetGcFlags() & types.IS_STR_PERSISTENT) == 0)
 		Efree(zval_ptr.GetStr())
 	}
 }
-func ZvalDtor(zvalue *Zval) { ZvalPtrDtorNogc(zvalue) }
-func RcDtorFunc(p IRefcounted) {
-	ZEND_ASSERT(p.GetGcType() <= IS_CONSTANT_AST)
+func ZvalDtor(zvalue *types.Zval) { ZvalPtrDtorNogc(zvalue) }
+func RcDtorFunc(p types.IRefcounted) {
+	ZEND_ASSERT(p.GetGcType() <= types.IS_CONSTANT_AST)
 	switch p.(type) {
-	case *ZendArray:
-		arr := p.(*ZendArray)
+	case *types.ZendArray:
+		arr := p.(*types.ZendArray)
 		arr.DestroyEx()
-	case *ZendObject:
-		obj := p.(*ZendObject)
+	case *types.ZendObject:
+		obj := p.(*types.ZendObject)
 		ZendObjectsStoreDel(obj)
-	case *ZendResource:
-		res := p.(*ZendResource)
+	case *types.ZendResource:
+		res := p.(*types.ZendResource)
 		ZendListFree(res)
-	case *ZendReference:
-		ref := p.(*ZendReference)
+	case *types.ZendReference:
+		ref := p.(*types.ZendReference)
 		ZendReferenceDestroy(ref)
-	case *ZendAstRef:
-		ast := p.(*ZendAstRef)
+	case *types.ZendAstRef:
+		ast := p.(*types.ZendAstRef)
 		ZendAstRefDestroy(ast)
 	}
 }
 
-func ZendReferenceDestroy(ref *ZendReference) {
+func ZendReferenceDestroy(ref *types.ZendReference) {
 	ZEND_ASSERT(!(ZEND_REF_HAS_TYPE_SOURCES(ref)))
 	IZvalPtrDtor(ref.GetVal())
 	EfreeSize(ref, b.SizeOf("zend_reference"))
 }
-func ZvalPtrDtor(zval_ptr *Zval) { IZvalPtrDtor(zval_ptr) }
-func ZvalInternalPtrDtor(zval_ptr *Zval) {
+func ZvalPtrDtor(zval_ptr *types.Zval) { IZvalPtrDtor(zval_ptr) }
+func ZvalInternalPtrDtor(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() {
-		var ref *ZendRefcounted = zval_ptr.GetCounted()
+		var ref *types.ZendRefcounted = zval_ptr.GetCounted()
 		if ref.DelRefcount() == 0 {
 			if zval_ptr.IsString() {
-				var str *ZendString = (*ZendString)(ref)
+				var str *types.ZendString = (*types.ZendString)(ref)
 				ZEND_ASSERT(true)
-				ZEND_ASSERT((str.GetGcFlags() & IS_STR_PERSISTENT) != 0)
+				ZEND_ASSERT((str.GetGcFlags() & types.IS_STR_PERSISTENT) != 0)
 				Free(str)
 			} else {
 				ZendErrorNoreturn(E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")
@@ -72,16 +73,16 @@ func ZvalInternalPtrDtor(zval_ptr *Zval) {
 		}
 	}
 }
-func ZvalAddRef(p *Zval) {
+func ZvalAddRef(p *types.Zval) {
 	if p.IsRefcounted() {
 		if p.IsReference() && p.GetRefcount() == 1 {
-			ZVAL_COPY(p, Z_REFVAL_P(p))
+			types.ZVAL_COPY(p, types.Z_REFVAL_P(p))
 		} else {
 			p.AddRefcount()
 		}
 	}
 }
-func ZvalCopyCtorFunc(zvalue *Zval) {
+func ZvalCopyCtorFunc(zvalue *types.Zval) {
 	if zvalue.IsArray() {
 		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsString() {

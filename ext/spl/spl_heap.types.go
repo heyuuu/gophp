@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -81,7 +82,7 @@ type SplHeapObject struct {
 	ce_get_iterator *zend.ZendClassEntry
 	fptr_cmp        *zend.ZendFunction
 	fptr_count      *zend.ZendFunction
-	std             zend.ZendObject
+	std             types.ZendObject
 }
 
 //             func MakeSplHeapObject(
@@ -111,7 +112,7 @@ func (this *SplHeapObject) GetFptrCmp() *zend.ZendFunction              { return
 func (this *SplHeapObject) SetFptrCmp(value *zend.ZendFunction)         { this.fptr_cmp = value }
 func (this *SplHeapObject) GetFptrCount() *zend.ZendFunction            { return this.fptr_count }
 func (this *SplHeapObject) SetFptrCount(value *zend.ZendFunction)       { this.fptr_count = value }
-func (this *SplHeapObject) GetStd() zend.ZendObject                     { return this.std }
+func (this *SplHeapObject) GetStd() types.ZendObject                    { return this.std }
 
 // func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -163,8 +164,8 @@ func (this *SplHeapIt) SwitchFlags(value int, cond bool) {
  * SplPqueueElem
  */
 type SplPqueueElem struct {
-	data     zend.Zval
-	priority zend.Zval
+	data     types.Zval
+	priority types.Zval
 }
 
 // func MakeSplPqueueElem(data zend.Zval, priority zend.Zval) SplPqueueElem {
@@ -173,9 +174,9 @@ type SplPqueueElem struct {
 //         priority:priority,
 //     }
 // }
-func (this *SplPqueueElem) GetData() zend.Zval { return this.data }
+func (this *SplPqueueElem) GetData() types.Zval { return this.data }
 
 // func (this *SplPqueueElem) SetData(value zend.Zval) { this.data = value }
-func (this *SplPqueueElem) GetPriority() zend.Zval { return this.priority }
+func (this *SplPqueueElem) GetPriority() types.Zval { return this.priority }
 
 // func (this *SplPqueueElem) SetPriority(value zend.Zval) { this.priority = value }

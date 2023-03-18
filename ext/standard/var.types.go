@@ -3,14 +3,14 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * PhpSerializeData
  */
 type PhpSerializeData struct {
-	ht zend.HashTable
+	ht types.HashTable
 	n  uint32
 }
 
@@ -20,7 +20,7 @@ type PhpSerializeData struct {
 //         n:n,
 //     }
 // }
-func (this *PhpSerializeData) GetHt() zend.HashTable { return this.ht }
+func (this *PhpSerializeData) GetHt() types.HashTable { return this.ht }
 
 // func (this *PhpSerializeData) SetHt(value zend.HashTable) { this.ht = value }
 func (this *PhpSerializeData) GetN() uint32      { return this.n }

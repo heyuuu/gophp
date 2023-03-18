@@ -5,9 +5,10 @@ package core
 import (
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **zend.ZendString) int {
+func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **types.ZendString) int {
 	var opened_path []byte
 	var trailing_slash *byte
 	var cwd []byte
@@ -36,7 +37,7 @@ func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **zend.ZendStri
 	}
 	fd = mkstemp(opened_path)
 	if fd != -1 && opened_path_p != nil {
-		*opened_path_p = zend.ZendStringInit(opened_path, strlen(opened_path), 0)
+		*opened_path_p = types.ZendStringInit(opened_path, strlen(opened_path), 0)
 	}
 	zend.Efree(new_state.GetCwd())
 	return fd
@@ -87,7 +88,7 @@ func PhpGetTemporaryDirectory() *byte {
 	PG(php_sys_temp_dir) = zend.Estrdup("/tmp")
 	return PG(php_sys_temp_dir)
 }
-func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **zend.ZendString, flags uint32) int {
+func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **types.ZendString, flags uint32) int {
 	var fd int
 	var temp_dir *byte
 	if pfx == nil {
@@ -123,10 +124,10 @@ func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **zend.ZendString,
 	}
 	return fd
 }
-func PhpOpenTemporaryFd(dir *byte, pfx string, opened_path_p **zend.ZendString) int {
+func PhpOpenTemporaryFd(dir *byte, pfx string, opened_path_p **types.ZendString) int {
 	return PhpOpenTemporaryFdEx(dir, pfx, opened_path_p, PHP_TMP_FILE_DEFAULT)
 }
-func PhpOpenTemporaryFile(dir *byte, pfx *byte, opened_path_p **zend.ZendString) *r.FILE {
+func PhpOpenTemporaryFile(dir *byte, pfx *byte, opened_path_p **types.ZendString) *r.FILE {
 	var fp *r.FILE
 	var fd int = PhpOpenTemporaryFd(dir, pfx, opened_path_p)
 	if fd == -1 {

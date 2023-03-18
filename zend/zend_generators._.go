@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_generators.h>
 
 /*
@@ -34,10 +36,10 @@ var zend_ce_ClosedGeneratorException *ZendClassEntry
  * When a Generator referenced by a node of the tree is added to `yield from`, that node now gets a list of children (we need to walk the descendants of that node and nodes of the tree of the other Generator down to the first multi-children node and copy all the leaf node pointers from there). In case there was no multi-children node (linear tree), we just add a pair (pointer to leaf node, pointer to child node), with the child node being in a direct path from leaf to this node.
  */
 
-var ZEND_GENERATOR_CURRENTLY_RUNNING ZendUchar = 0x1
-var ZEND_GENERATOR_FORCED_CLOSE ZendUchar = 0x2
-var ZEND_GENERATOR_AT_FIRST_YIELD ZendUchar = 0x4
-var ZEND_GENERATOR_DO_INIT ZendUchar = 0x8
+var ZEND_GENERATOR_CURRENTLY_RUNNING types.ZendUchar = 0x1
+var ZEND_GENERATOR_FORCED_CLOSE types.ZendUchar = 0x2
+var ZEND_GENERATOR_AT_FIRST_YIELD types.ZendUchar = 0x4
+var ZEND_GENERATOR_DO_INIT types.ZendUchar = 0x8
 
 // Source: <Zend/zend_generators.c>
 

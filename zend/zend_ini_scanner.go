@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 // Source: <Zend/zend_ini_scanner.h>
@@ -137,38 +138,38 @@ func EAT_TRAILING_WHITESPACE_EX(ch char) {
 /* Eat trailing whitespace */
 
 func EAT_TRAILING_WHITESPACE() { EAT_TRAILING_WHITESPACE_EX('X') }
-func ZendIniCopyValue(retval *Zval, str *byte, len_ int) {
-	retval.SetString(ZendStringInit(str, len_, ZEND_SYSTEM_INI))
+func ZendIniCopyValue(retval *types.Zval, str *byte, len_ int) {
+	retval.SetString(types.ZendStringInit(str, len_, ZEND_SYSTEM_INI))
 }
 
 // #define RETURN_TOKEN(type,str,len) { if ( SCNG ( scanner_mode ) == ZEND_INI_SCANNER_TYPED && ( YYSTATE == STATE ( ST_VALUE ) || YYSTATE == STATE ( ST_RAW ) ) ) { zend_ini_copy_typed_value ( ini_lval , type , str , len ) ; } else { zend_ini_copy_value ( ini_lval , str , len ) ; } return type ; }
 
-func ConvertToNumber(retval *Zval, str *byte, str_len int) int {
-	var type_ ZendUchar
+func ConvertToNumber(retval *types.Zval, str *byte, str_len int) int {
+	var type_ types.ZendUchar
 	var overflow int
 	var lval ZendLong
 	var dval float64
 	if b.Assign(&type_, IsNumericStringEx(b.CastStr(str, str_len), &lval, &dval, 0, &overflow)) != 0 {
-		if type_ == IS_LONG {
+		if type_ == types.IS_LONG {
 			retval.SetLong(lval)
-			return SUCCESS
-		} else if type_ == IS_DOUBLE && overflow == 0 {
+			return types.SUCCESS
+		} else if type_ == types.IS_DOUBLE && overflow == 0 {
 			retval.SetDouble(dval)
-			return SUCCESS
+			return types.SUCCESS
 		}
 	}
-	return FAILURE
+	return types.FAILURE
 }
-func ZendIniCopyTypedValue(retval *Zval, type_ int, str *byte, len_ int) {
+func ZendIniCopyTypedValue(retval *types.Zval, type_ int, str *byte, len_ int) {
 	switch type_ {
 	case BOOL_FALSE:
 		fallthrough
 	case BOOL_TRUE:
-		ZVAL_BOOL(retval, type_ == BOOL_TRUE)
+		types.ZVAL_BOOL(retval, type_ == BOOL_TRUE)
 	case NULL_NULL:
 		retval.SetNull()
 	case TC_NUMBER:
-		if ConvertToNumber(retval, str, len_) == SUCCESS {
+		if ConvertToNumber(retval, str, len_) == types.SUCCESS {
 			break
 		}
 		fallthrough
@@ -204,7 +205,7 @@ func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 
 	if scanner_mode != ZEND_INI_SCANNER_NORMAL && scanner_mode != ZEND_INI_SCANNER_RAW && scanner_mode != ZEND_INI_SCANNER_TYPED {
 		ZendError(E_WARNING, "Invalid scanner mode")
-		return FAILURE
+		return types.FAILURE
 	}
 	SCNG(lineno) = 1
 	SCNG(scanner_mode) = scanner_mode
@@ -216,7 +217,7 @@ func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 	}
 	SCNG(state_stack).Init()
 	BEGIN(INITIAL)
-	return SUCCESS
+	return types.SUCCESS
 }
 
 /* }}} */
@@ -247,31 +248,31 @@ func ZendIniScannerGetFilename() *byte {
 func ZendIniOpenFileForScanning(fh *ZendFileHandle, scanner_mode int) int {
 	var buf *byte
 	var size int
-	if ZendStreamFixup(fh, &buf, &size) == FAILURE {
-		return FAILURE
+	if ZendStreamFixup(fh, &buf, &size) == types.FAILURE {
+		return types.FAILURE
 	}
-	if InitIniScanner(scanner_mode, fh) == FAILURE {
+	if InitIniScanner(scanner_mode, fh) == types.FAILURE {
 		fh.Destroy()
-		return FAILURE
+		return types.FAILURE
 	}
 	YyScanBuffer(buf, uint(size))
-	return SUCCESS
+	return types.SUCCESS
 }
 
 /* }}} */
 
 func ZendIniPrepareStringForScanning(str *byte, scanner_mode int) int {
 	var len_ int = int(strlen(str))
-	if InitIniScanner(scanner_mode, nil) == FAILURE {
-		return FAILURE
+	if InitIniScanner(scanner_mode, nil) == types.FAILURE {
+		return types.FAILURE
 	}
 	YyScanBuffer(str, len_)
-	return SUCCESS
+	return types.SUCCESS
 }
 
 /* }}} */
 
-func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
+func ZendIniEscapeString(lval *types.Zval, str *byte, len_ int, quote_type byte) {
 	var s *byte
 	var t *byte
 	var end *byte
@@ -319,7 +320,7 @@ func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
 
 /* }}} */
 
-func IniLex(ini_lval *Zval) int {
+func IniLex(ini_lval *types.Zval) int {
 restart:
 	SCNG(yy_text) = YYCURSOR
 

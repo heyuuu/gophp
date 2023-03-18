@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func hiBit(u uint32) int             { return u & 0x80000000 }
@@ -91,7 +92,7 @@ func PhpMtRand() uint32 {
 	s1 ^= s1 << 15 & 0xefc60000
 	return s1 ^ s1>>18
 }
-func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var seed zend.ZendLong = 0
 	var mode zend.ZendLong = MT_RAND_MT19937
 	for {
@@ -100,12 +101,12 @@ func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -228,7 +229,7 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	RAND_RANGE_BADSCALING(n, min, max, PHP_MT_RAND_MAX)
 	return n
 }
-func ZifMtRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMtRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var argc int = executeData.NumArgs()
@@ -245,12 +246,12 @@ func ZifMtRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -320,8 +321,8 @@ func ZifMtRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(PhpMtRandCommon(min, max))
 	return
 }
-func ZifMtGetrandmax(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifMtGetrandmax(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 
@@ -336,5 +337,5 @@ func ZifMtGetrandmax(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 func ZmStartupMtRand(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT)
-	return zend.SUCCESS
+	return types.SUCCESS
 }

@@ -10,6 +10,7 @@ import (
 	"sik/sapi/cgi"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStreamOutputWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
@@ -99,7 +100,7 @@ func PhpStreamUrlWrapPhp(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var fd int = -1

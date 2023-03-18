@@ -2,14 +2,16 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendWeakref
  */
 type ZendWeakref struct {
-	referent *ZendObject
-	std      ZendObject
+	referent *types.ZendObject
+	std      types.ZendObject
 }
 
-func (this *ZendWeakref) GetReferent() *ZendObject      { return this.referent }
-func (this *ZendWeakref) SetReferent(value *ZendObject) { this.referent = value }
-func (this *ZendWeakref) GetStd() ZendObject            { return this.std }
+func (this *ZendWeakref) GetReferent() *types.ZendObject      { return this.referent }
+func (this *ZendWeakref) SetReferent(value *types.ZendObject) { this.referent = value }
+func (this *ZendWeakref) GetStd() types.ZendObject            { return this.std }

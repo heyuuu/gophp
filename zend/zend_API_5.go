@@ -4,21 +4,22 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendStartupModuleZval(zv *Zval) int {
+func ZendStartupModuleZval(zv *types.Zval) int {
 	var module *ZendModuleEntry = zv.GetPtr()
-	if ZendStartupModuleEx(module) == SUCCESS {
+	if ZendStartupModuleEx(module) == types.SUCCESS {
 		return ZEND_HASH_APPLY_KEEP
 	} else {
 		return ZEND_HASH_APPLY_REMOVE
 	}
 }
-func ZendSortModules(base any, count int, siz int, compare CompareFuncT, swp SwapFuncT) {
-	var b1 *Bucket = base
-	var b2 *Bucket
-	var end *Bucket = b1 + count
-	var tmp Bucket
+func ZendSortModules(base any, count int, siz int, compare types.CompareFuncT, swp types.SwapFuncT) {
+	var b1 *types.Bucket = base
+	var b2 *types.Bucket
+	var end *types.Bucket = b1 + count
+	var tmp types.Bucket
 	var m *ZendModuleEntry
 	var r *ZendModuleEntry
 	for b1 < end {
@@ -56,9 +57,9 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect extensions with request startup/shutdown handlers */
 
-	var __ht *HashTable = &ModuleRegistry
+	var __ht *types.HashTable = &ModuleRegistry
 	for _, _p := range __ht.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		module = _z.GetPtr()
 		if module.GetRequestStartupFunc() != nil {
@@ -78,9 +79,9 @@ func ZendCollectModuleHandlers() {
 	ModulePostDeactivateHandlers = ModuleRequestShutdownHandlers + shutdown_count + 1
 	ModulePostDeactivateHandlers[post_deactivate_count] = nil
 	startup_count = 0
-	var __ht__1 *HashTable = &ModuleRegistry
+	var __ht__1 *types.HashTable = &ModuleRegistry
 	for _, _p := range __ht__1.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		module = _z.GetPtr()
 		if module.GetRequestStartupFunc() != nil {
@@ -96,9 +97,9 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect internal classes with static members */
 
-	var __ht__2 *HashTable = CG__().GetClassTable()
+	var __ht__2 *types.HashTable = CG__().GetClassTable()
 	for _, _p := range __ht__2.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		ce = _z.GetPtr()
 		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
@@ -108,9 +109,9 @@ func ZendCollectModuleHandlers() {
 	ClassCleanupHandlers = (**ZendClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
-		var __ht *HashTable = CG__().GetClassTable()
+		var __ht *types.HashTable = CG__().GetClassTable()
 		for _, _p := range __ht.foreachData() {
-			var _z *Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			ce = _z.GetPtr()
 			if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
@@ -122,7 +123,7 @@ func ZendCollectModuleHandlers() {
 func ZendStartupModules() int {
 	ModuleRegistry.SortCompatibleEx(ZendSortModules)
 	ZendHashApply(&ModuleRegistry, ZendStartupModuleZval)
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendDestroyModules() {
 	Free(ClassCleanupHandlers)
@@ -131,7 +132,7 @@ func ZendDestroyModules() {
 }
 func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	var name_len int
-	var lcname *ZendString
+	var lcname *types.ZendString
 	var module_ptr *ZendModuleEntry
 	if module == nil {
 		return nil
@@ -144,41 +145,41 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 		for dep.GetName() != nil {
 			if dep.GetType() == MODULE_DEP_CONFLICTS {
 				name_len = strlen(dep.GetName())
-				lcname = ZendStringAlloc(name_len, 0)
+				lcname = types.ZendStringAlloc(name_len, 0)
 				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
 				if ZendHashExists(&ModuleRegistry, lcname) != 0 || ZendGetExtension(dep.GetName()) != nil {
-					ZendStringEfree(lcname)
+					types.ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */
 
 					ZendError(E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
 					return nil
 				}
-				ZendStringEfree(lcname)
+				types.ZendStringEfree(lcname)
 			}
 			dep++
 		}
 	}
 	name_len = strlen(module.GetName())
-	lcname = ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
+	lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
 	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
-	lcname = ZendNewInternedString(lcname)
+	lcname = types.ZendNewInternedString(lcname)
 	if b.Assign(&module_ptr, ZendHashAddMem(&ModuleRegistry, lcname, module, b.SizeOf("zend_module_entry"))) == nil {
 		ZendError(E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
-		ZendStringRelease(lcname)
+		types.ZendStringRelease(lcname)
 		return nil
 	}
 	module = module_ptr
 	EG__().SetCurrentModule(module)
-	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == FAILURE {
+	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
 		ZendHashDel(&ModuleRegistry, lcname)
-		ZendStringRelease(lcname)
+		types.ZendStringRelease(lcname)
 		EG__().SetCurrentModule(nil)
 		ZendError(E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
 		return nil
 	}
 	EG__().SetCurrentModule(nil)
-	ZendStringRelease(lcname)
+	types.ZendStringRelease(lcname)
 	return module
 }
 func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
@@ -245,11 +246,11 @@ func ZendCheckMagicMethodImplementation(ce *ZendClassEntry, fptr *ZendFunction, 
 		ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, function_table *HashTable, type_ int) int {
+func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
 	var ptr *ZendFunctionEntry = functions
 	var count int = 0
 	var unload int = 0
-	var target_function_table *HashTable = function_table
+	var target_function_table *types.HashTable = function_table
 	var error_type int
 	var ctor *ZendFunction = nil
 	var dtor *ZendFunction = nil
@@ -264,7 +265,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	var __debugInfo *ZendFunction = nil
 	var serialize_func *ZendFunction = nil
 	var unserialize_func *ZendFunction = nil
-	var lowercase_name *ZendString
+	var lowercase_name *types.ZendString
 	var fname_len int
 	var lc_class_name *byte = nil
 	var class_name_len int = 0
@@ -374,7 +375,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			if scope != nil && scope.IsInterface() {
 				Efree((*byte)(lc_class_name))
 				ZendError(error_type, "Interface %s cannot contain non abstract method %s()", scope.GetName().GetVal(), ptr.GetFname())
-				return FAILURE
+				return types.FAILURE
 			}
 			if internal_function.GetHandler() == nil {
 				if scope != nil {
@@ -382,17 +383,17 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 				}
 				ZendError(error_type, "Method %s%s%s() cannot be a NULL function", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 				ZendUnregisterFunctions(functions, count, target_function_table)
-				return FAILURE
+				return types.FAILURE
 			}
 		}
 		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName(), type_ == MODULE_PERSISTENT)
-		lowercase_name = ZendNewInternedString(lowercase_name)
+		lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = Malloc(b.SizeOf("zend_internal_function"))
 		memcpy(reg_function, &function, b.SizeOf("zend_internal_function"))
 		if ZendHashAddPtr(target_function_table, lowercase_name, reg_function) == nil {
 			unload = 1
 			Free(reg_function)
-			ZendStringRelease(lowercase_name)
+			types.ZendStringRelease(lowercase_name)
 			break
 		}
 
@@ -424,14 +425,14 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			for i = 0; i < num_args; i++ {
 				if new_arg_info[i].GetType().IsClass() {
 					var class_name *byte = (*byte)(new_arg_info[i].GetType())
-					var allow_null ZendBool = 0
-					var str *ZendString
+					var allow_null types.ZendBool = 0
+					var str *types.ZendString
 					if class_name[0] == '?' {
 						class_name++
 						allow_null = 1
 					}
-					str = ZendStringInitInterned(class_name, strlen(class_name), 1)
-					new_arg_info[i].SetType(ZEND_TYPE_ENCODE_CLASS(str, allow_null))
+					str = types.ZendStringInitInterned(class_name, strlen(class_name), 1)
+					new_arg_info[i].SetType(types.ZEND_TYPE_ENCODE_CLASS(str, allow_null))
 				}
 			}
 		}
@@ -444,40 +445,40 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 
 			if fname_len == class_name_len && ctor == nil && !(memcmp(lowercase_name.GetVal(), lc_class_name, class_name_len+1)) {
 				ctor = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, "serialize") {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, "serialize") {
 				serialize_func = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, "unserialize") {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, "unserialize") {
 				unserialize_func = reg_function
 			} else if lowercase_name.GetVal()[0] != '_' || lowercase_name.GetVal()[1] != '_' {
 				reg_function = nil
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CONSTRUCTOR_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CONSTRUCTOR_FUNC_NAME) {
 				ctor = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_DESTRUCTOR_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_DESTRUCTOR_FUNC_NAME) {
 				dtor = reg_function
 				if internal_function.GetNumArgs() != 0 {
 					ZendError(error_type, "Destructor %s::%s() cannot take arguments", scope.GetName().GetVal(), ptr.GetFname())
 				}
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CLONE_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CLONE_FUNC_NAME) {
 				clone = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CALL_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CALL_FUNC_NAME) {
 				__call = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CALLSTATIC_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CALLSTATIC_FUNC_NAME) {
 				__callstatic = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_TOSTRING_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_TOSTRING_FUNC_NAME) {
 				__tostring = reg_function
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_GET_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_GET_FUNC_NAME) {
 				__get = reg_function
 				scope.SetIsUseGuards(true)
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_SET_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_SET_FUNC_NAME) {
 				__set = reg_function
 				scope.SetIsUseGuards(true)
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_UNSET_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_UNSET_FUNC_NAME) {
 				__unset = reg_function
 				scope.SetIsUseGuards(true)
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_ISSET_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_ISSET_FUNC_NAME) {
 				__isset = reg_function
 				scope.SetIsUseGuards(true)
-			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_DEBUGINFO_FUNC_NAME) {
+			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_DEBUGINFO_FUNC_NAME) {
 				__debugInfo = reg_function
 			} else {
 				reg_function = nil
@@ -488,7 +489,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		}
 		ptr++
 		count++
-		ZendStringRelease(lowercase_name)
+		types.ZendStringRelease(lowercase_name)
 	}
 	if unload != 0 {
 		if scope != nil {
@@ -496,16 +497,16 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		}
 		for ptr.GetFname() != nil {
 			fname_len = strlen(ptr.GetFname())
-			lowercase_name = ZendStringAlloc(fname_len, 0)
+			lowercase_name = types.ZendStringAlloc(fname_len, 0)
 			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
 			if ZendHashExists(target_function_table, lowercase_name) != 0 {
 				ZendError(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
-			ZendStringEfree(lowercase_name)
+			types.ZendStringEfree(lowercase_name)
 			ptr++
 		}
 		ZendUnregisterFunctions(functions, count, target_function_table)
-		return FAILURE
+		return types.FAILURE
 	}
 	if scope != nil {
 		scope.SetConstructor(ctor)
@@ -599,5 +600,5 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		}
 		Efree((*byte)(lc_class_name))
 	}
-	return SUCCESS
+	return types.SUCCESS
 }

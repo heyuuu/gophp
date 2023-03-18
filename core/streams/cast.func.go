@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *r.FILE {
@@ -100,7 +101,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		/* if the stream is a stdio stream let's give it a chance to respond
 		 * first, to avoid doubling up the layers of stdio with an fopencookie */
 
-		if core.PhpStreamIs(stream, core.PHP_STREAM_IS_STDIO) && stream.GetOps().GetCast() != nil && !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast()(stream, castas, ret) == zend.SUCCESS {
+		if core.PhpStreamIs(stream, core.PHP_STREAM_IS_STDIO) && stream.GetOps().GetCast() != nil && !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast()(stream, castas, ret) == types.SUCCESS {
 			goto exit_success
 		}
 
@@ -133,10 +134,10 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		*/
 
 		core.PhpErrorDocref(nil, zend.E_ERROR, "fopencookie failed")
-		return zend.FAILURE
-		if !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, nil) == zend.SUCCESS {
-			if zend.FAILURE == stream.GetOps().GetCast()(stream, castas, ret) {
-				return zend.FAILURE
+		return types.FAILURE
+		if !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, nil) == types.SUCCESS {
+			if types.FAILURE == stream.GetOps().GetCast()(stream, castas, ret) {
+				return types.FAILURE
 			}
 			goto exit_success
 		} else if (flags & core.PHP_STREAM_CAST_TRY_HARD) != 0 {
@@ -144,11 +145,11 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 			newstream = _phpStreamFopenTmpfile(0)
 			if newstream != nil {
 				var retcopy int = core.PhpStreamCopyToStreamEx(stream, newstream, core.PHP_STREAM_COPY_ALL, nil)
-				if retcopy != zend.SUCCESS {
+				if retcopy != types.SUCCESS {
 					core.PhpStreamClose(newstream)
 				} else {
 					var retcast int = core.PhpStreamCast(newstream, castas|flags, (*any)(ret), show_err)
-					if retcast == zend.SUCCESS {
+					if retcast == types.SUCCESS {
 						r.Rewind(*((**r.FILE)(ret)))
 					}
 
@@ -174,8 +175,8 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		if show_err != 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "cannot cast a filtered stream on this system")
 		}
-		return zend.FAILURE
-	} else if stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, ret) == zend.SUCCESS {
+		return types.FAILURE
+	} else if stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, ret) == types.SUCCESS {
 		goto exit_success
 	}
 	if show_err != 0 {
@@ -185,7 +186,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		var cast_names []*byte = []*byte{"STDIO FILE*", "File Descriptor", "Socket Descriptor", "select()able descriptor"}
 		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas])
 	}
-	return zend.FAILURE
+	return types.FAILURE
 exit_success:
 	if stream.GetWritepos()-stream.GetReadpos() > 0 && stream.GetFcloseStdiocast() != core.PHP_STREAM_FCLOSE_FOPENCOOKIE && (flags&core.PHP_STREAM_CAST_INTERNAL) == 0 {
 
@@ -206,19 +207,19 @@ exit_success:
 	if (flags & core.PHP_STREAM_CAST_RELEASE) != 0 {
 		core.PhpStreamFree(stream, core.PHP_STREAM_FREE_CLOSE_CASTED)
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **zend.ZendString) *r.FILE {
+func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.ZendString) *r.FILE {
 	var fp *r.FILE = nil
 	var stream *core.PhpStream = nil
 	stream = core.PhpStreamOpenWrapperRel(path, mode, options|core.STREAM_WILL_CAST, opened_path)
 	if stream == nil {
 		return nil
 	}
-	if core.PhpStreamCast(stream, core.PHP_STREAM_AS_STDIO|core.PHP_STREAM_CAST_TRY_HARD|core.PHP_STREAM_CAST_RELEASE, (*any)(&fp), core.REPORT_ERRORS) == zend.FAILURE {
+	if core.PhpStreamCast(stream, core.PHP_STREAM_AS_STDIO|core.PHP_STREAM_CAST_TRY_HARD|core.PHP_STREAM_CAST_RELEASE, (*any)(&fp), core.REPORT_ERRORS) == types.FAILURE {
 		core.PhpStreamClose(stream)
 		if opened_path != nil && (*opened_path) != nil {
-			zend.ZendStringReleaseEx(*opened_path, 0)
+			types.ZendStringReleaseEx(*opened_path, 0)
 		}
 		return nil
 	}
@@ -244,7 +245,7 @@ func _phpStreamMakeSeekable(origstream *core.PhpStream, newstream **core.PhpStre
 	if (*newstream) == nil {
 		return core.PHP_STREAM_FAILED
 	}
-	if core.PhpStreamCopyToStreamEx(origstream, *newstream, core.PHP_STREAM_COPY_ALL, nil) != zend.SUCCESS {
+	if core.PhpStreamCopyToStreamEx(origstream, *newstream, core.PHP_STREAM_COPY_ALL, nil) != types.SUCCESS {
 		core.PhpStreamClose(*newstream)
 		*newstream = nil
 		return core.PHP_STREAM_CRITICAL

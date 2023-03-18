@@ -5,6 +5,7 @@ package core
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func FCGI_HASH_FUNC(var_ __auto__, var_len int) __auto__ {
@@ -602,7 +603,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		}
 	} else if hdr.GetType() == FCGI_GET_VALUES {
 		var p *uint8 = buf + b.SizeOf("fcgi_header")
-		var value *zend.Zval
+		var value *types.Zval
 		var zlen uint
 		var q *FcgiHashBucket
 		if SafeRead(req, buf, len_+padding) != len_+padding {
@@ -973,19 +974,19 @@ func FcgiQuickPutenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint,
 		return FcgiHashSet(req.GetEnv(), hash_value, var_, var_len, val, uint(strlen(val)))
 	}
 }
-func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *zend.Zval) {
+func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *types.Zval) {
 	FcgiHashApply(req.GetEnv(), func_, array)
 }
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
-	var zvalue zend.Zval
-	var key *zend.ZendString = zend.ZendStringInit(name, name_len, 1)
-	zvalue.SetString(zend.ZendStringInit(value, value_len, 1))
-	zend.GC_MAKE_PERSISTENT_LOCAL(key)
-	zend.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
+	var zvalue types.Zval
+	var key *types.ZendString = types.ZendStringInit(name, name_len, 1)
+	zvalue.SetString(types.ZendStringInit(value, value_len, 1))
+	types.GC_MAKE_PERSISTENT_LOCAL(key)
+	types.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
-	zend.ZendStringReleaseEx(key, 1)
+	types.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zv.GetStr(), 1) }
+func FcgiFreeMgmtVarCb(zv *types.Zval) { zend.Pefree(zv.GetStr(), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 

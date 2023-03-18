@@ -4,6 +4,7 @@ package zend
 
 import (
 	r "sik/runtime"
+	"sik/zend/types"
 )
 
 func ZendStreamStdioReader(handle *r.FILE, buf *byte, len_ int) ssize_t {
@@ -29,18 +30,18 @@ func ZendStreamInitFilename(handle *ZendFileHandle, filename string) {
 }
 func ZendStreamOpen(filename string, handle *ZendFileHandle) int {
 	if handle.Open(filename) {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
 func ZendStreamFixup(file_handle *ZendFileHandle, buf **byte, len_ *int) int {
 	if buf_, ok := file_handle.Fixup(); ok {
 		*buf = (*byte)(buf_)
 		*len_ = len(buf_)
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
 func ZendFileHandleDtor(fh *ZendFileHandle) { fh.Destroy() }

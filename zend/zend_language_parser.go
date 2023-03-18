@@ -5,6 +5,7 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
+	"sik/zend/types"
 )
 
 // Source: <Zend/zend_language_parser.h>
@@ -1180,7 +1181,7 @@ func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
 		ZendAstDestroy(yyvaluep.GetAst())
 	case 273:
 		if yyvaluep.GetStr() != nil {
-			ZendStringReleaseEx(yyvaluep.GetStr(), 0)
+			types.ZendStringReleaseEx(yyvaluep.GetStr(), 0)
 		}
 	case 277:
 		ZendAstDestroy(yyvaluep.GetAst())

@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpVarUnserializeInit() PhpUnserializeDataT {
@@ -45,10 +46,10 @@ func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
 		BG(unserialize).data = nil
 	}
 }
-func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *zend.HashTable {
+func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *types.HashTable {
 	return d.GetAllowedClasses()
 }
-func PhpVarUnserializeSetAllowedClasses(d PhpUnserializeDataT, classes *zend.HashTable) {
+func PhpVarUnserializeSetAllowedClasses(d PhpUnserializeDataT, classes *types.HashTable) {
 	d.SetAllowedClasses(classes)
 }
 func PhpVarUnserializeSetMaxDepth(d PhpUnserializeDataT, max_depth zend.ZendLong) {
@@ -59,7 +60,7 @@ func PhpVarUnserializeSetCurDepth(d PhpUnserializeDataT, cur_depth zend.ZendLong
 	d.SetCurDepth(cur_depth)
 }
 func PhpVarUnserializeGetCurDepth(d PhpUnserializeDataT) zend.ZendLong { return d.GetCurDepth() }
-func VarPush(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
+func VarPush(var_hashx *PhpUnserializeDataT, rval *types.Zval) {
 	var var_hash *VarEntries = var_hashx.GetLast()
 	if var_hash.GetUsedSlots() == VAR_ENTRIES_MAX {
 		var_hash = zend.Emalloc(b.SizeOf("var_entries"))
@@ -70,16 +71,16 @@ func VarPush(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
 	}
 	var_hash.GetData()[b.PostInc(&(var_hash.GetUsedSlots()))] = rval
 }
-func VarPushDtor(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
+func VarPushDtor(var_hashx *PhpUnserializeDataT, rval *types.Zval) {
 	if rval.IsRefcounted() {
-		var tmp_var *zend.Zval = VarTmpVar(var_hashx)
+		var tmp_var *types.Zval = VarTmpVar(var_hashx)
 		if tmp_var == nil {
 			return
 		}
-		zend.ZVAL_COPY(tmp_var, rval)
+		types.ZVAL_COPY(tmp_var, rval)
 	}
 }
-func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *zend.Zval {
+func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *types.Zval {
 	var var_hash *VarDtorEntries
 	var used_slots zend.ZendLong
 	if var_hashx == nil || (*var_hashx) == nil || num < 1 {
@@ -103,8 +104,8 @@ func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *zend.Zval {
 	}
 	return var_hash.GetData()[used_slots]
 }
-func VarTmpVar(var_hashx *PhpUnserializeDataT) *zend.Zval { return TmpVar(var_hashx, 1) }
-func VarReplace(var_hashx *PhpUnserializeDataT, ozval *zend.Zval, nzval *zend.Zval) {
+func VarTmpVar(var_hashx *PhpUnserializeDataT) *types.Zval { return TmpVar(var_hashx, 1) }
+func VarReplace(var_hashx *PhpUnserializeDataT, ozval *types.Zval, nzval *types.Zval) {
 	var i zend.ZendLong
 	var var_hash *VarEntries = var_hashx.GetEntries()
 	for var_hash != nil {
@@ -116,7 +117,7 @@ func VarReplace(var_hashx *PhpUnserializeDataT, ozval *zend.Zval, nzval *zend.Zv
 		var_hash = var_hash.GetNext()
 	}
 }
-func VarAccess(var_hashx *PhpUnserializeDataT, id zend.ZendLong) *zend.Zval {
+func VarAccess(var_hashx *PhpUnserializeDataT, id zend.ZendLong) *types.Zval {
 	var var_hash *VarEntries = var_hashx.GetEntries()
 	for id >= VAR_ENTRIES_MAX && var_hash != nil && var_hash.GetUsedSlots() == VAR_ENTRIES_MAX {
 		var_hash = var_hash.GetNext()
@@ -135,9 +136,9 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	var i zend.ZendLong
 	var var_hash *VarEntries = var_hashx.GetEntries().GetNext()
 	var var_dtor_hash *VarDtorEntries = var_hashx.GetFirstDtor()
-	var delayed_call_failed zend.ZendBool = 0
-	var wakeup_name zend.Zval
-	var unserialize_name zend.Zval
+	var delayed_call_failed types.ZendBool = 0
+	var wakeup_name types.Zval
+	var unserialize_name types.Zval
 	wakeup_name.SetUndef()
 	unserialize_name.SetUndef()
 	for var_hash != nil {
@@ -147,25 +148,25 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	}
 	for var_dtor_hash != nil {
 		for i = 0; i < var_dtor_hash.GetUsedSlots(); i++ {
-			var zv *zend.Zval = var_dtor_hash.GetData()[i]
+			var zv *types.Zval = var_dtor_hash.GetData()[i]
 			if zv.GetU2Extra() == VAR_WAKEUP_FLAG {
 
 				/* Perform delayed __wakeup calls */
 
 				if delayed_call_failed == 0 {
-					var retval zend.Zval
+					var retval types.Zval
 					if wakeup_name.IsUndef() {
 						wakeup_name.SetRawString("__wakeup")
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || retval.IsUndef() {
+					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == types.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
-						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
+						zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
+					zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __wakeup calls */
@@ -175,22 +176,22 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 				/* Perform delayed __unserialize calls */
 
 				if delayed_call_failed == 0 {
-					var retval zend.Zval
-					var param zend.Zval
-					zend.ZVAL_COPY(&param, var_dtor_hash.GetData()[i+1])
+					var retval types.Zval
+					var param types.Zval
+					types.ZVAL_COPY(&param, var_dtor_hash.GetData()[i+1])
 					if unserialize_name.IsUndef() {
 						unserialize_name.SetRawString("__unserialize")
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || retval.IsUndef() {
+					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == types.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
-						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
+						zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&param)
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
+					zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __unserialize calls */
@@ -209,18 +210,18 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 		zend.FREE_HASHTABLE(var_hashx.GetRefProps())
 	}
 }
-func UnserializeStr(p **uint8, len_ int, maxlen int) *zend.ZendString {
+func UnserializeStr(p **uint8, len_ int, maxlen int) *types.ZendString {
 	var i int
 	var j int
-	var str *zend.ZendString = zend.ZendStringSafeAlloc(1, len_, 0, 0)
+	var str *types.ZendString = types.ZendStringSafeAlloc(1, len_, 0, 0)
 	var end *uint8 = *((**uint8)(p + maxlen))
 	if end < (*p) {
-		zend.ZendStringEfree(str)
+		types.ZendStringEfree(str)
 		return nil
 	}
 	for i = 0; i < len_; i++ {
 		if (*p) >= end {
-			zend.ZendStringEfree(str)
+			types.ZendStringEfree(str)
 			return nil
 		}
 		if (*(*p)) != '\\' {
@@ -236,7 +237,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *zend.ZendString {
 				} else if (*(*p)) >= 'A' && (*(*p)) <= 'F' {
 					ch = (ch << 4) + ((*(*p)) - 'A' + 10)
 				} else {
-					zend.ZendStringEfree(str)
+					types.ZendStringEfree(str)
 					return nil
 				}
 			}
@@ -248,9 +249,9 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *zend.ZendString {
 	str.SetLen(i)
 	return str
 }
-func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserializeDataT) int {
-	var classes *zend.HashTable = var_hashx.GetAllowedClasses()
-	var lcname *zend.ZendString
+func UnserializeAllowedClass(class_name *types.ZendString, var_hashx *PhpUnserializeDataT) int {
+	var classes *types.HashTable = var_hashx.GetAllowedClasses()
+	var lcname *types.ZendString
 	var res int
 	if classes == nil {
 		return 1
@@ -258,7 +259,7 @@ func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserial
 	if !(classes.GetNNumOfElements()) {
 		return 0
 	}
-	zend.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen(), use_heap)
+	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen(), use_heap)
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
 	res = zend.ZendHashExists(classes, lcname)
 	lcname.Free()
@@ -314,13 +315,13 @@ func ParseUiv(p *uint8) int {
 	return result
 }
 func ProcessNestedData(
-	rval *zend.Zval,
+	rval *types.Zval,
 	p **uint8,
 	max *uint8,
 	var_hash *PhpUnserializeDataT,
-	ht *zend.HashTable,
+	ht *types.HashTable,
 	elements zend.ZendLong,
-	obj *zend.ZendObject,
+	obj *types.ZendObject,
 ) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
@@ -330,10 +331,10 @@ func ProcessNestedData(
 		var_hash.GetCurDepth()++
 	}
 	for b.PostDec(&elements) > 0 {
-		var key zend.Zval
-		var data *zend.Zval
-		var d zend.Zval
-		var old_data *zend.Zval
+		var key types.Zval
+		var data *types.Zval
+		var d types.Zval
+		var old_data *types.Zval
 		var idx zend.ZendUlong
 		var info *zend.ZendPropertyInfo = nil
 		key.SetUndef()
@@ -344,7 +345,7 @@ func ProcessNestedData(
 		data = nil
 		d.SetUndef()
 		if obj == nil {
-			if key.IsType(zend.IS_LONG) {
+			if key.IsType(types.IS_LONG) {
 				idx = key.GetLval()
 			numeric_key:
 				if b.Assign(&old_data, ht.IndexFindH(idx)) != nil {
@@ -356,7 +357,7 @@ func ProcessNestedData(
 				} else {
 					data = ht.IndexAddNewH(idx, &d)
 				}
-			} else if key.IsType(zend.IS_STRING) {
+			} else if key.IsType(types.IS_STRING) {
 				if zend.ZEND_HANDLE_NUMERIC(key.GetStr(), &idx) {
 					goto numeric_key
 				}
@@ -374,32 +375,32 @@ func ProcessNestedData(
 				goto failure
 			}
 		} else {
-			if key.IsType(zend.IS_STRING) {
+			if key.IsType(types.IS_STRING) {
 			string_key:
 				if obj != nil && obj.GetCe().GetPropertiesInfo().GetNNumOfElements() > 0 {
 					var existing_propinfo *zend.ZendPropertyInfo
-					var new_key *zend.ZendString
+					var new_key *types.ZendString
 					var unmangled_class *byte = nil
 					var unmangled_prop *byte
 					var unmangled_prop_len int
-					var unmangled *zend.ZendString
-					if zend.ZendUnmanglePropertyNameEx(key.GetStr(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == zend.FAILURE {
+					var unmangled *types.ZendString
+					if zend.ZendUnmanglePropertyNameEx(key.GetStr(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
 						zend.ZvalPtrDtor(&key)
 						goto failure
 					}
-					unmangled = zend.ZendStringInit(unmangled_prop, unmangled_prop_len, 0)
+					unmangled = types.ZendStringInit(unmangled_prop, unmangled_prop_len, 0)
 					existing_propinfo = zend.ZendHashFindPtr(obj.GetCe().GetPropertiesInfo(), unmangled)
 					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.ZEND_ACC_PPP_MASK) {
 						if existing_propinfo.HasFlags(zend.ZEND_ACC_PROTECTED) {
 							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr(), false)
-							zend.ZendStringReleaseEx(unmangled, 0)
+							types.ZendStringReleaseEx(unmangled, 0)
 						} else if existing_propinfo.HasFlags(zend.ZEND_ACC_PRIVATE) {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
 								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr(), false)
 							} else {
 								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().GetName().GetStr(), unmangled.GetStr(), false)
 							}
-							zend.ZendStringReleaseEx(unmangled, 0)
+							types.ZendStringReleaseEx(unmangled, 0)
 						} else {
 							zend.ZEND_ASSERT(existing_propinfo.HasFlags(zend.ZEND_ACC_PUBLIC))
 							new_key = unmangled
@@ -407,11 +408,11 @@ func ProcessNestedData(
 						zend.ZvalPtrDtorStr(&key)
 						key.SetString(new_key)
 					} else {
-						zend.ZendStringReleaseEx(unmangled, 0)
+						types.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
 				if b.Assign(&old_data, ht.KeyFind(key.GetStr().GetStr())) != nil {
-					if old_data.IsType(zend.IS_INDIRECT) {
+					if old_data.IsType(types.IS_INDIRECT) {
 						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
@@ -425,7 +426,7 @@ func ProcessNestedData(
 								var_hash.SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
 								zend.ZendHashInit(var_hash.GetRefProps(), 8, nil, nil, 0)
 							}
-							zend.ZendHashIndexUpdatePtr(var_hash.GetRefProps(), zend.ZendUintptrT(data), info)
+							zend.ZendHashIndexUpdatePtr(var_hash.GetRefProps(), types.ZendUintptrT(data), info)
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)
@@ -434,7 +435,7 @@ func ProcessNestedData(
 				} else {
 					data = ht.KeyAddNew(key.GetStr().GetStr(), &d)
 				}
-			} else if key.IsType(zend.IS_LONG) {
+			} else if key.IsType(types.IS_LONG) {
 
 				/* object properties should include no integers */
 
@@ -479,14 +480,14 @@ failure:
 	}
 	return 0
 }
-func FinishNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int {
+func FinishNestedData(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int {
 	if (*p) >= max || (*(*p)) != '}' {
 		return 0
 	}
 	*p++
 	return 1
 }
-func ObjectCustom(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, ce *zend.ZendClassEntry) int {
+func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, ce *zend.ZendClassEntry) int {
 	var datalen zend.ZendLong
 	datalen = ParseIv2((*p)+2, p)
 	*p += 2
@@ -505,26 +506,26 @@ func ObjectCustom(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 	if ce.GetUnserialize() == nil {
 		zend.ZendError(zend.E_WARNING, "Class %s has no unserializer", ce.GetName().GetVal())
 		zend.ObjectInitEx(rval, ce)
-	} else if ce.GetUnserialize()(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != zend.SUCCESS {
+	} else if ce.GetUnserialize()(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != types.SUCCESS {
 		return 0
 	}
 	*p += datalen + 1
 	return 1
 }
 func ObjectCommon(
-	rval *zend.Zval,
+	rval *types.Zval,
 	p **uint8,
 	max *uint8,
 	var_hash *PhpUnserializeDataT,
 	elements zend.ZendLong,
-	has_unserialize zend.ZendBool,
+	has_unserialize types.ZendBool,
 ) int {
-	var ht *zend.HashTable
-	var has_wakeup zend.ZendBool
+	var ht *types.HashTable
+	var has_wakeup types.ZendBool
 	if has_unserialize != 0 {
-		var ary zend.Zval
-		var tmp *zend.Zval
-		if elements >= zend.HT_MAX_SIZE {
+		var ary types.Zval
+		var tmp *types.Zval
+		if elements >= types.HT_MAX_SIZE {
 			return 0
 		}
 		zend.ArrayInitSize(&ary, elements)
@@ -533,8 +534,8 @@ func ObjectCommon(
 
 		zend.ZendHashRealInitMixed(ary.GetArr())
 		if ProcessNestedData(rval, p, max, var_hash, ary.GetArr(), elements, nil) == 0 {
-			rval = zend.ZVAL_DEREF(rval)
-			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
+			rval = types.ZVAL_DEREF(rval)
+			rval.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 			zend.ZvalPtrDtor(&ary)
 			return 0
 		}
@@ -542,39 +543,39 @@ func ObjectCommon(
 		/* Delay __unserialize() call until end of serialization. We use two slots here to
 		 * store both the object and the unserialized data array. */
 
-		rval = zend.ZVAL_DEREF(rval)
+		rval = types.ZVAL_DEREF(rval)
 		tmp = TmpVar(var_hash, 2)
-		zend.ZVAL_COPY(tmp, rval)
+		types.ZVAL_COPY(tmp, rval)
 		tmp.SetU2Extra(VAR_UNSERIALIZE_FLAG)
 		tmp++
-		zend.ZVAL_COPY_VALUE(tmp, &ary)
+		types.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = zend.Z_OBJCE_P(rval) != PHP_IC_ENTRY && zend.ZendHashStrExists(zend.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
-	ht = zend.Z_OBJPROP_P(rval)
-	if elements >= zend_long(zend.HT_MAX_SIZE-ht.GetNNumOfElements()) {
+	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && zend.ZendHashStrExists(types.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
+	ht = types.Z_OBJPROP_P(rval)
+	if elements >= zend_long(types.HT_MAX_SIZE-ht.GetNNumOfElements()) {
 		return 0
 	}
 	ht.Extend(ht.GetNNumOfElements() + elements)
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
-			rval = zend.ZVAL_DEREF(rval)
-			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
+			rval = types.ZVAL_DEREF(rval)
+			rval.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 		}
 		return 0
 	}
-	rval = zend.ZVAL_DEREF(rval)
+	rval = types.ZVAL_DEREF(rval)
 	if has_wakeup != 0 {
 
 		/* Delay __wakeup call until end of serialization */
 
-		var wakeup_var *zend.Zval = VarTmpVar(var_hash)
-		zend.ZVAL_COPY(wakeup_var, rval)
+		var wakeup_var *types.Zval = VarTmpVar(var_hash)
+		types.ZVAL_COPY(wakeup_var, rval)
 		wakeup_var.SetU2Extra(VAR_WAKEUP_FLAG)
 	}
 	return FinishNestedData(rval, p, max, var_hash)
 }
-func PhpVarUnserialize(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int {
+func PhpVarUnserialize(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int {
 	var orig_var_entries *VarEntries = var_hash.GetLast()
 	var orig_used_slots zend.ZendLong = b.CondF1(orig_var_entries != nil, func() zend.ZendLong { return orig_var_entries.GetUsedSlots() }, 0)
 	var result int
@@ -597,12 +598,12 @@ func PhpVarUnserialize(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 	}
 	return result
 }
-func PhpVarUnserializeInternal(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, as_key int) int {
+func PhpVarUnserializeInternal(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, as_key int) int {
 	var cursor *uint8
 	var limit *uint8
 	var marker *uint8
 	var start *uint8
-	var rval_ref *zend.Zval
+	var rval_ref *types.Zval
 	limit = max
 	cursor = *p
 	if YYCURSOR >= YYLIMIT {
@@ -783,14 +784,14 @@ yy18:
 	var maxlen int
 	var elements zend_long
 	var str *byte
-	var class_name *zend.ZendString
+	var class_name *types.ZendString
 	var ce *zend.ZendClassEntry
-	var incomplete_class zend.ZendBool = 0
-	var custom_object zend.ZendBool = 0
-	var has_unserialize zend.ZendBool = 0
-	var user_func zend.Zval
-	var retval zend.Zval
-	var args []zend.Zval
+	var incomplete_class types.ZendBool = 0
+	var custom_object types.ZendBool = 0
+	var has_unserialize types.ZendBool = 0
+	var user_func types.Zval
+	var retval types.Zval
+	var args []types.Zval
 	if var_hash == nil {
 		return 0
 	}
@@ -819,7 +820,7 @@ yy18:
 		*p = YYCURSOR + len3 - len_
 		return 0
 	}
-	class_name = zend.ZendStringInit(str, len_, 0)
+	class_name = types.ZendStringInit(str, len_, 0)
 	for {
 		if UnserializeAllowedClass(class_name, var_hash) == 0 {
 			incomplete_class = 1
@@ -834,14 +835,14 @@ yy18:
 		if ce != nil {
 			BG(serialize_lock)--
 			if zend.EG__().GetException() != nil {
-				zend.ZendStringReleaseEx(class_name, 0)
+				types.ZendStringReleaseEx(class_name, 0)
 				return 0
 			}
 			break
 		}
 		BG(serialize_lock)--
 		if zend.EG__().GetException() != nil {
-			zend.ZendStringReleaseEx(class_name, 0)
+			types.ZendStringReleaseEx(class_name, 0)
 			return 0
 		}
 
@@ -858,10 +859,10 @@ yy18:
 		user_func.SetRawString(b.CastStrAuto(core.PG(unserialize_callback_func)))
 		args[0].SetStringCopy(class_name)
 		BG(serialize_lock)++
-		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != zend.SUCCESS {
+		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {
 			BG(serialize_lock)--
 			if zend.EG__().GetException() != nil {
-				zend.ZendStringReleaseEx(class_name, 0)
+				types.ZendStringReleaseEx(class_name, 0)
 				zend.ZvalPtrDtor(&user_func)
 				zend.ZvalPtrDtor(&args[0])
 				return 0
@@ -876,7 +877,7 @@ yy18:
 		BG(serialize_lock)--
 		zend.ZvalPtrDtor(&retval)
 		if zend.EG__().GetException() != nil {
-			zend.ZendStringReleaseEx(class_name, 0)
+			types.ZendStringReleaseEx(class_name, 0)
 			zend.ZvalPtrDtor(&user_func)
 			zend.ZvalPtrDtor(&args[0])
 			return 0
@@ -903,17 +904,17 @@ yy18:
 		if ret != 0 && incomplete_class != 0 {
 			PhpStoreClassName(rval, class_name.GetVal(), len2)
 		}
-		zend.ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 		return ret
 	}
 	if (*p) >= max-2 {
 		zend.ZendError(zend.E_WARNING, "Bad unserialize data")
-		zend.ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	elements = ParseIv2((*p)+2, p)
 	if elements < 0 || elements > max-YYCURSOR {
-		zend.ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	*p += 2
@@ -926,17 +927,17 @@ yy18:
 
 	if ce.GetSerialize() != nil && has_unserialize == 0 {
 		zend.ZendError(zend.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
-		zend.ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
-	if zend.ObjectInitEx(rval, ce) == zend.FAILURE {
-		zend.ZendStringReleaseEx(class_name, 0)
+	if zend.ObjectInitEx(rval, ce) == types.FAILURE {
+		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	if incomplete_class != 0 {
 		PhpStoreClassName(rval, class_name.GetVal(), len2)
 	}
-	zend.ZendStringReleaseEx(class_name, 0)
+	types.ZendStringReleaseEx(class_name, 0)
 	return ObjectCommon(rval, p, max, var_hash, elements, has_unserialize)
 yy23:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -974,7 +975,7 @@ yy24:
 	if var_hash == nil {
 		return 0
 	}
-	if elements < 0 || elements >= zend.HT_MAX_SIZE || elements > max-YYCURSOR {
+	if elements < 0 || elements >= types.HT_MAX_SIZE || elements > max-YYCURSOR {
 		return 0
 	}
 	if elements != 0 {
@@ -1043,7 +1044,7 @@ yy30:
 		return 0
 	}
 	if (*YYCURSOR) != '"' {
-		zend.ZendStringEfree(str)
+		types.ZendStringEfree(str)
 		*p = YYCURSOR
 		return 0
 	}
@@ -1108,9 +1109,9 @@ yy36:
 	if len_ == 0 {
 		zend.ZVAL_EMPTY_STRING(rval)
 	} else if len_ == 1 {
-		rval.SetInternedString(zend.ZSTR_CHAR(zend_uchar * str))
+		rval.SetInternedString(types.ZSTR_CHAR(zend_uchar * str))
 	} else if as_key != 0 {
-		rval.SetString(zend.ZendStringInitInterned(str, len_, 0))
+		rval.SetString(types.ZendStringInitInterned(str, len_, 0))
 	} else {
 		rval.SetRawString(b.CastStr(str, len_))
 	}
@@ -1481,11 +1482,11 @@ yy80:
 	if rval_ref == rval {
 		return 0
 	}
-	rval_ref = zend.ZVAL_DEREF(rval_ref)
-	if rval_ref.GetType() != zend.IS_OBJECT {
+	rval_ref = types.ZVAL_DEREF(rval_ref)
+	if rval_ref.GetType() != types.IS_OBJECT {
 		return 0
 	}
-	zend.ZVAL_COPY(rval, rval_ref)
+	types.ZVAL_COPY(rval, rval_ref)
 	return 1
 yy84:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -1520,20 +1521,20 @@ yy85:
 	if id == -1 || b.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
-	if rval_ref.IsUndef() || rval_ref.IsReference() && zend.Z_REFVAL_P(rval_ref).IsUndef() {
+	if rval_ref.IsUndef() || rval_ref.IsReference() && types.Z_REFVAL_P(rval_ref).IsUndef() {
 		return 0
 	}
 	if !(rval_ref.IsReference()) {
 		var info *zend.ZendPropertyInfo = nil
 		if var_hash.GetRefProps() != nil {
-			info = zend.ZendHashIndexFindPtr(var_hash.GetRefProps(), zend.ZendUintptrT(rval_ref))
+			info = zend.ZendHashIndexFindPtr(var_hash.GetRefProps(), types.ZendUintptrT(rval_ref))
 		}
 		rval_ref.SetNewRef(rval_ref)
 		if info != nil {
 			zend.ZEND_REF_ADD_TYPE_SOURCE(rval_ref.GetRef(), info)
 		}
 	}
-	zend.ZVAL_COPY(rval, rval_ref)
+	types.ZVAL_COPY(rval, rval_ref)
 	return 1
 	return 0
 }

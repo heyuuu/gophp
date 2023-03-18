@@ -6,19 +6,20 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func IncompleteClassMessage(object *zend.Zval, error_type int) {
-	var class_name *zend.ZendString
+func IncompleteClassMessage(object *types.Zval, error_type int) {
+	var class_name *types.ZendString
 	class_name = PhpLookupClassName(object)
 	if class_name != nil {
 		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
-		zend.ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 	} else {
 		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, "unknown")
 	}
 }
-func IncompleteClassGetProperty(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any, rv *zend.Zval) *zend.Zval {
+func IncompleteClassGetProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	IncompleteClassMessage(object, zend.E_NOTICE)
 	if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
 		rv.IsError()
@@ -27,29 +28,29 @@ func IncompleteClassGetProperty(object *zend.Zval, member *zend.Zval, type_ int,
 		return zend.EG__().GetUninitializedZval()
 	}
 }
-func IncompleteClassWriteProperty(object *zend.Zval, member *zend.Zval, value *zend.Zval, cache_slot *any) *zend.Zval {
+func IncompleteClassWriteProperty(object *types.Zval, member *types.Zval, value *types.Zval, cache_slot *any) *types.Zval {
 	IncompleteClassMessage(object, zend.E_NOTICE)
 	return value
 }
-func IncompleteClassGetPropertyPtrPtr(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any) *zend.Zval {
+func IncompleteClassGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int, cache_slot *any) *types.Zval {
 	IncompleteClassMessage(object, zend.E_NOTICE)
 	return zend.EG__().GetErrorZval()
 }
-func IncompleteClassUnsetProperty(object *zend.Zval, member *zend.Zval, cache_slot *any) {
+func IncompleteClassUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *any) {
 	IncompleteClassMessage(object, zend.E_NOTICE)
 }
-func IncompleteClassHasProperty(object *zend.Zval, member *zend.Zval, check_empty int, cache_slot *any) int {
+func IncompleteClassHasProperty(object *types.Zval, member *types.Zval, check_empty int, cache_slot *any) int {
 	IncompleteClassMessage(object, zend.E_NOTICE)
 	return 0
 }
-func IncompleteClassGetMethod(object **zend.ZendObject, method *zend.ZendString, key *zend.Zval) *zend.ZendFunction {
-	var zobject zend.Zval
+func IncompleteClassGetMethod(object **types.ZendObject, method *types.ZendString, key *types.Zval) *zend.ZendFunction {
+	var zobject types.Zval
 	zobject.SetObject(*object)
 	IncompleteClassMessage(&zobject, zend.E_ERROR)
 	return nil
 }
-func PhpCreateIncompleteObject(class_type *zend.ZendClassEntry) *zend.ZendObject {
-	var object *zend.ZendObject
+func PhpCreateIncompleteObject(class_type *zend.ZendClassEntry) *types.ZendObject {
+	var object *types.ZendObject
 	object = zend.ZendObjectsNew(class_type)
 	object.SetHandlers(&PhpIncompleteObjectHandlers)
 	zend.ObjectPropertiesInit(object, class_type)
@@ -58,7 +59,7 @@ func PhpCreateIncompleteObject(class_type *zend.ZendClassEntry) *zend.ZendObject
 func PhpCreateIncompleteClass() *zend.ZendClassEntry {
 	var incomplete_class zend.ZendClassEntry
 	memset(&incomplete_class, 0, b.SizeOf("zend_class_entry"))
-	incomplete_class.SetName(zend.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1))
+	incomplete_class.SetName(types.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1))
 	incomplete_class.SetBuiltinFunctions(nil)
 	incomplete_class.SetCreateObject(PhpCreateIncompleteObject)
 	memcpy(&PhpIncompleteObjectHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
@@ -70,17 +71,17 @@ func PhpCreateIncompleteClass() *zend.ZendClassEntry {
 	PhpIncompleteObjectHandlers.SetGetMethod(IncompleteClassGetMethod)
 	return zend.ZendRegisterInternalClass(&incomplete_class)
 }
-func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
-	var val *zend.Zval
-	var object_properties *zend.HashTable
-	object_properties = zend.Z_OBJPROP_P(object)
-	if b.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsType(zend.IS_STRING) {
+func PhpLookupClassName(object *types.Zval) *types.ZendString {
+	var val *types.Zval
+	var object_properties *types.HashTable
+	object_properties = types.Z_OBJPROP_P(object)
+	if b.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsType(types.IS_STRING) {
 		return val.GetStr().Copy()
 	}
 	return nil
 }
-func PhpStoreClassName(object *zend.Zval, name *byte, len_ int) {
-	var val zend.Zval
+func PhpStoreClassName(object *types.Zval, name *byte, len_ int) {
+	var val types.Zval
 	val.SetRawString(b.CastStr(name, len_))
-	zend.Z_OBJPROP_P(object).KeyUpdate(b.CastStrAuto(MAGIC_MEMBER), &val)
+	types.Z_OBJPROP_P(object).KeyUpdate(b.CastStrAuto(MAGIC_MEMBER), &val)
 }

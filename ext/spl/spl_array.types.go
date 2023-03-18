@@ -4,13 +4,14 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * SplArrayObject
  */
 type SplArrayObject struct {
-	array           zend.Zval
+	array           types.Zval
 	ht_iter         uint32
 	ar_flags        int
 	nApplyCount     uint8
@@ -20,7 +21,7 @@ type SplArrayObject struct {
 	fptr_offset_del *zend.ZendFunction
 	fptr_count      *zend.ZendFunction
 	ce_get_iterator *zend.ZendClassEntry
-	std             zend.ZendObject
+	std             types.ZendObject
 }
 
 //             func MakeSplArrayObject(
@@ -50,7 +51,7 @@ type SplArrayObject struct {
 //                     std:std,
 //                 }
 //             }
-func (this *SplArrayObject) GetArray() zend.Zval { return this.array }
+func (this *SplArrayObject) GetArray() types.Zval { return this.array }
 
 // func (this *SplArrayObject) SetArray(value zend.Zval) { this.array = value }
 func (this *SplArrayObject) GetHtIter() uint32      { return this.ht_iter }
@@ -74,7 +75,7 @@ func (this *SplArrayObject) GetCeGetIterator() *zend.ZendClassEntry    { return 
 func (this *SplArrayObject) SetCeGetIterator(value *zend.ZendClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplArrayObject) GetStd() zend.ZendObject { return this.std }
+func (this *SplArrayObject) GetStd() types.ZendObject { return this.std }
 
 // func (this *SplArrayObject) SetStd(value zend.ZendObject) { this.std = value }
 

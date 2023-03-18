@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func _phpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {
@@ -120,7 +121,7 @@ func PhpGlobStreamOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var pglob *GlobST
@@ -130,7 +131,7 @@ func PhpGlobStreamOpener(
 	if !(strncmp(path, "glob://", b.SizeOf("\"glob://\"")-1)) {
 		path += b.SizeOf("\"glob://\"") - 1
 		if opened_path != nil {
-			*opened_path = zend.ZendStringInit(path, strlen(path), 0)
+			*opened_path = types.ZendStringInit(path, strlen(path), 0)
 		}
 	}
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {

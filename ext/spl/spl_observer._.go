@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_observer.h>
@@ -52,20 +53,20 @@ var spl_ce_MultipleIterator *zend.ZendClassEntry
    +----------------------------------------------------------------------+
 */
 
-var zim_spl_SplObserver_update func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var zim_spl_SplSubject_attach func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var zim_spl_SplSubject_detach func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
-var zim_spl_SplSubject_notify func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var zim_spl_SplObserver_update func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var zim_spl_SplSubject_attach func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var zim_spl_SplSubject_detach func(executeData *zend.ZendExecuteData, return_value *types.Zval)
+var zim_spl_SplSubject_notify func(executeData *zend.ZendExecuteData, return_value *types.Zval)
 var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("subject", zend.ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
+	zend.MakeArgInfo("subject", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 }
 var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntryEx("update", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplObserver_update),
 }
 var arginfo_SplSubject_attach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("observer", zend.ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
+	zend.MakeArgInfo("observer", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
 }
 var arginfo_SplSubject_void []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
@@ -212,16 +213,16 @@ const SPL_MULTIPLE_ITERATOR_GET_ALL_KEY = 2
 
 var arginfo_MultipleIterator_attachIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 	zend.MakeArgInfo("infos"),
 }
 var arginfo_MultipleIterator_detachIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var arginfo_MultipleIterator_containsIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var arginfo_MultipleIterator_setflags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),

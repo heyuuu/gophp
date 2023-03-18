@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZendMakeVarResult(result *Znode, opline *ZendOp) {
@@ -11,7 +12,7 @@ func ZendMakeVarResult(result *Znode, opline *ZendOp) {
 	opline.GetResult().SetVar(GetTemporaryVariable())
 	result.SetOpType(opline.GetResultType())
 	if result.GetOpType() == IS_CONST {
-		ZVAL_COPY_VALUE(result.GetConstant(), CT_CONSTANT(opline.GetResult()))
+		types.ZVAL_COPY_VALUE(result.GetConstant(), CT_CONSTANT(opline.GetResult()))
 	} else {
 		result.SetOp(opline.GetResult())
 	}
@@ -21,12 +22,12 @@ func ZendMakeTmpResult(result *Znode, opline *ZendOp) {
 	opline.GetResult().SetVar(GetTemporaryVariable())
 	result.SetOpType(opline.GetResultType())
 	if result.GetOpType() == IS_CONST {
-		ZVAL_COPY_VALUE(result.GetConstant(), CT_CONSTANT(opline.GetResult()))
+		types.ZVAL_COPY_VALUE(result.GetConstant(), CT_CONSTANT(opline.GetResult()))
 	} else {
 		result.SetOp(opline.GetResult())
 	}
 }
-func ZendEmitOp(result *Znode, opcode ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
+func ZendEmitOp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
 	var opline *ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -50,7 +51,7 @@ func ZendEmitOp(result *Znode, opcode ZendUchar, op1 *Znode, op2 *Znode) *ZendOp
 	}
 	return opline
 }
-func ZendEmitOpTmp(result *Znode, opcode ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
+func ZendEmitOpTmp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
 	var opline *ZendOp = GetNextOp()
 	opline.SetOpcode(opcode)
 	if op1 != nil {
@@ -135,7 +136,7 @@ func ZendIsSmartBranch(opline *ZendOp) int {
 		return 0
 	}
 }
-func ZendEmitCondJump(opcode ZendUchar, cond *Znode, opnum_target uint32) uint32 {
+func ZendEmitCondJump(opcode types.ZendUchar, cond *Znode, opnum_target uint32) uint32 {
 	var opnum uint32 = GetNextOpNumber()
 	var opline *ZendOp
 	if (cond.GetOpType()&(IS_CV|IS_CONST)) != 0 && opnum > 0 && ZendIsSmartBranch(CG__().GetActiveOpArray().GetOpcodes()+opnum-1) != 0 {
@@ -173,7 +174,7 @@ func ZendUpdateJumpTarget(opnum_jump uint32, opnum_target uint32) {
 func ZendUpdateJumpTargetToNext(opnum_jump uint32) {
 	ZendUpdateJumpTarget(opnum_jump, GetNextOpNumber())
 }
-func ZendDelayedEmitOp(result *Znode, opcode ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
+func ZendDelayedEmitOp(result *Znode, opcode types.ZendUchar, op1 *Znode, op2 *Znode) *ZendOp {
 	var tmp_opline ZendOp
 	InitOp(&tmp_opline)
 	tmp_opline.SetOpcode(opcode)
@@ -246,13 +247,13 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 		ZEND_ASSERT(false)
 	}
 }
-func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit ZendBool) {
+func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit types.ZendBool) {
 	if return_info.GetType().IsSet() {
 		var opline *ZendOp
 
 		/* `return ...;` is illegal in a void function (but `return;` isn't) */
 
-		if return_info.GetType().Code() == IS_VOID {
+		if return_info.GetType().Code() == types.IS_VOID {
 			if expr != nil {
 				if expr.GetOpType() == IS_CONST && expr.GetConstant().IsNull() {
 					ZendErrorNoreturn(E_COMPILE_ERROR, "A void function must not return a value "+"(did you mean \"return;\" instead of \"return null;\"?)")
@@ -276,7 +277,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit Zen
 			}
 		}
 		if expr != nil && expr.GetOpType() == IS_CONST {
-			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == _IS_BOOL && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
+			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == types._IS_BOOL && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
 
 				/* we don't need run-time check */
 
@@ -304,7 +305,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit Zen
 func ZendEmitFinalReturn(return_one int) {
 	var zn Znode
 	var ret *ZendOp
-	var returns_reference ZendBool = CG__().GetActiveOpArray().IsReturnReference()
+	var returns_reference types.ZendBool = CG__().GetActiveOpArray().IsReturnReference()
 	if CG__().GetActiveOpArray().IsHasReturnType() && !CG__().GetActiveOpArray().IsGenerator() {
 		ZendEmitReturnTypeCheck(nil, CG__().GetActiveOpArray().GetArgInfo()-1, 1)
 	}
@@ -317,25 +318,25 @@ func ZendEmitFinalReturn(return_one int) {
 	ret = ZendEmitOp(nil, b.Cond(returns_reference != 0, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
 	ret.SetExtendedValue(-1)
 }
-func ZendIsVariable(ast *ZendAst) ZendBool {
+func ZendIsVariable(ast *ZendAst) types.ZendBool {
 	return ast.GetKind() == ZEND_AST_VAR || ast.GetKind() == ZEND_AST_DIM || ast.GetKind() == ZEND_AST_PROP || ast.GetKind() == ZEND_AST_STATIC_PROP
 }
-func ZendIsCall(ast *ZendAst) ZendBool {
+func ZendIsCall(ast *ZendAst) types.ZendBool {
 	return ast.GetKind() == ZEND_AST_CALL || ast.GetKind() == ZEND_AST_METHOD_CALL || ast.GetKind() == ZEND_AST_STATIC_CALL
 }
-func ZendIsVariableOrCall(ast *ZendAst) ZendBool {
+func ZendIsVariableOrCall(ast *ZendAst) types.ZendBool {
 	return ZendIsVariable(ast) != 0 || ZendIsCall(ast) != 0
 }
-func ZendIsUntickedStmt(ast *ZendAst) ZendBool {
+func ZendIsUntickedStmt(ast *ZendAst) types.ZendBool {
 	return ast.GetKind() == ZEND_AST_STMT_LIST || ast.GetKind() == ZEND_AST_LABEL || ast.GetKind() == ZEND_AST_PROP_DECL || ast.GetKind() == ZEND_AST_CLASS_CONST_DECL || ast.GetKind() == ZEND_AST_USE_TRAIT || ast.GetKind() == ZEND_AST_METHOD
 }
-func ZendCanWriteToVariable(ast *ZendAst) ZendBool {
+func ZendCanWriteToVariable(ast *ZendAst) types.ZendBool {
 	for ast.GetKind() == ZEND_AST_DIM || ast.GetKind() == ZEND_AST_PROP {
 		ast = ast.GetChild()[0]
 	}
 	return ZendIsVariableOrCall(ast)
 }
-func ZendIsConstDefaultClassRef(name_ast *ZendAst) ZendBool {
+func ZendIsConstDefaultClassRef(name_ast *ZendAst) types.ZendBool {
 	if name_ast.GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}
@@ -386,8 +387,8 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 		var name_node Znode
 		ZendCompileExpr(&name_node, name_ast)
 		if name_node.GetOpType() == IS_CONST {
-			var name *ZendString
-			if name_node.GetConstant().GetType() != IS_STRING {
+			var name *types.ZendString
+			if name_node.GetConstant().GetType() != types.IS_STRING {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal class name")
 			}
 			name = name_node.GetConstant().GetStr()
@@ -400,7 +401,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 				result.SetOpType(IS_UNUSED)
 				result.GetOp().SetNum(fetch_type | fetch_flags)
 			}
-			ZendStringReleaseEx(name, 0)
+			types.ZendStringReleaseEx(name, 0)
 		} else {
 			var opline *ZendOp = ZendEmitOp(result, ZEND_FETCH_CLASS, nil, &name_node)
 			opline.GetOp1().SetNum(ZEND_FETCH_CLASS_DEFAULT | fetch_flags)
@@ -428,24 +429,24 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	if name_ast.GetKind() == ZEND_AST_ZVAL {
-		var zv *Zval = ZendAstGetZval(name_ast)
-		var name *ZendString
+		var zv *types.Zval = ZendAstGetZval(name_ast)
+		var name *types.ZendString
 		if zv.IsString() {
 			name = ZvalMakeInternedString(zv)
 		} else {
-			name = ZendNewInternedString(ZvalGetStringFunc(zv))
+			name = types.ZendNewInternedString(ZvalGetStringFunc(zv))
 		}
 		if ZendIsAutoGlobal(name) != 0 {
-			return FAILURE
+			return types.FAILURE
 		}
 		result.SetOpType(IS_CV)
 		result.GetOp().SetVar(LookupCv(name))
-		if zv.GetType() != IS_STRING {
-			ZendStringReleaseEx(name, 0)
+		if zv.GetType() != types.IS_STRING {
+			types.ZendStringReleaseEx(name, 0)
 		}
-		return SUCCESS
+		return types.SUCCESS
 	}
-	return FAILURE
+	return types.FAILURE
 }
 func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed int) *ZendOp {
 	var name_ast *ZendAst = ast.GetChild()[0]
@@ -468,10 +469,10 @@ func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed
 	ZendAdjustForFetchType(opline, result, type_)
 	return opline
 }
-func IsThisFetch(ast *ZendAst) ZendBool {
+func IsThisFetch(ast *ZendAst) types.ZendBool {
 	if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL {
-		var name *Zval = ZendAstGetZval(ast.GetChild()[0])
-		return name.IsString() && ZendStringEqualsLiteral(name.GetStr(), "this")
+		var name *types.Zval = ZendAstGetZval(ast.GetChild()[0])
+		return name.IsString() && types.ZendStringEqualsLiteral(name.GetStr(), "this")
 	}
 	return 0
 }
@@ -484,7 +485,7 @@ func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int
 		}
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
 		return opline
-	} else if ZendTryCompileCv(result, ast) == FAILURE {
+	} else if ZendTryCompileCv(result, ast) == types.FAILURE {
 		return ZendCompileSimpleVarNoCv(result, ast, type_, delayed)
 	}
 	return nil
@@ -613,7 +614,7 @@ func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int
 	ZendAdjustForFetchType(opline, result, type_)
 	return opline
 }
-func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style ZendBool) {
+func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style types.ZendBool) {
 	if var_ast.GetKind() == ZEND_AST_ARRAY {
 		if var_ast.GetAttr() == ZEND_ARRAY_SYNTAX_LONG {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot assign to array(), use [] instead")
@@ -625,9 +626,9 @@ func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style ZendBool) {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Assignments can only happen to writable values")
 	}
 }
-func ZendPropagateListRefs(ast *ZendAst) ZendBool {
+func ZendPropagateListRefs(ast *ZendAst) types.ZendBool {
 	var list *ZendAstList = ZendAstGetList(ast)
-	var has_refs ZendBool = 0
+	var has_refs types.ZendBool = 0
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
 		var elem_ast *ZendAst = list.GetChild()[i]
@@ -641,11 +642,11 @@ func ZendPropagateListRefs(ast *ZendAst) ZendBool {
 	}
 	return has_refs
 }
-func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style ZendBool) {
+func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_style types.ZendBool) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var has_elems ZendBool = 0
-	var is_keyed ZendBool = list.GetChildren() > 0 && list.GetChild()[0] != nil && list.GetChild()[0].GetChild()[1] != nil
+	var has_elems types.ZendBool = 0
+	var is_keyed types.ZendBool = list.GetChildren() > 0 && list.GetChild()[0] != nil && list.GetChild()[0].GetChild()[1] != nil
 	if list.GetChildren() != 0 && expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsString() {
 		ZvalMakeInternedString(expr_node.GetConstant())
 	}
@@ -723,7 +724,7 @@ func ZendEnsureWritableVariable(ast *ZendAst) {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Can't use method return value in write context")
 	}
 }
-func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) ZendBool {
+func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
 	if expr_ast.GetKind() != ZEND_AST_VAR || expr_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}
@@ -733,11 +734,11 @@ func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) ZendBool {
 	if var_ast.GetKind() != ZEND_AST_VAR || var_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}
-	var name1 *ZendString = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
-	var name2 *ZendString = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
-	var result ZendBool = ZendStringEquals(name1, name2)
-	ZendStringReleaseEx(name1, 0)
-	ZendStringReleaseEx(name2, 0)
+	var name1 *types.ZendString = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
+	var name2 *types.ZendString = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
+	var result types.ZendBool = types.ZendStringEquals(name1, name2)
+	types.ZendStringReleaseEx(name1, 0)
+	types.ZendStringReleaseEx(name2, 0)
 	return result
 }
 func ZendCompileAssign(result *Znode, ast *ZendAst) {
@@ -775,7 +776,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 			/* $a[0] = $a should evaluate the right $a first */
 
 			var cv_node Znode
-			if ZendTryCompileCv(&cv_node, expr_ast) == FAILURE {
+			if ZendTryCompileCv(&cv_node, expr_ast) == types.FAILURE {
 				ZendCompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
 			} else {
 				ZendEmitOpTmp(&expr_node, ZEND_QM_ASSIGN, &cv_node, nil)
@@ -816,7 +817,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 				/* list($a, $b) = $a should evaluate the right $a first */
 
 				var cv_node Znode
-				if ZendTryCompileCv(&cv_node, expr_ast) == FAILURE {
+				if ZendTryCompileCv(&cv_node, expr_ast) == types.FAILURE {
 					ZendCompileSimpleVarNoCv(&expr_node, expr_ast, BP_VAR_R, 0)
 				} else {
 					ZendEmitOpTmp(&expr_node, ZEND_QM_ASSIGN, &cv_node, nil)

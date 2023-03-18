@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 	"strings"
 )
 
@@ -14,7 +15,7 @@ type LangScanner struct {
 
 	incrementLineno uint32 // CG__().increment_lineno
 
-	zendlval *Zval                // argument zendlval
+	zendlval *types.Zval          // argument zendlval
 	elem     *ZendParserStackElem // argument: elem
 
 	scannedStringLen uint // LANG_SCNG__().scanned_string_len
@@ -52,15 +53,15 @@ func NewLangScanner(code string, skipShebang bool) *LangScanner {
 	}
 }
 
-func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
-	var zv Zval
+func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *types.Zval) {
+	var zv types.Zval
 	zv.SetUndef()
 	sc.zendlval = &zv
 	token := sc.LexScanEx(&zv, elem)
 	return token, &zv
 }
 
-func (sc *LangScanner) LexScanEx(zendlval *Zval, elem *ZendParserStackElem) int {
+func (sc *LangScanner) LexScanEx(zendlval *types.Zval, elem *ZendParserStackElem) int {
 	sc.limit = uint(len(sc.code)) - 1
 
 	// 初始化

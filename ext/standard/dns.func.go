@@ -6,11 +6,12 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func ZifGethostname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var buf []byte
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if gethostname(buf, b.SizeOf("buf")) {
@@ -21,22 +22,22 @@ func ZifGethostname(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 	return_value.SetRawString(b.CastStrAuto(buf))
 	return
 }
-func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var addr *byte
 	var addr_len int
-	var hostname *zend.ZendString
+	var hostname *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -100,7 +101,7 @@ func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return_value.SetString(hostname)
 	}
 }
-func PhpGethostbyaddr(ip *byte) *zend.ZendString {
+func PhpGethostbyaddr(ip *byte) *types.ZendString {
 	var addr6 __struct__in6_addr
 	var addr __struct__in_addr
 	var hp *__struct__hostent
@@ -112,11 +113,11 @@ func PhpGethostbyaddr(ip *byte) *zend.ZendString {
 		return nil
 	}
 	if hp == nil || hp.h_name == nil || hp.h_name[0] == '0' {
-		return zend.ZendStringInit(ip, strlen(ip), 0)
+		return types.ZendStringInit(ip, strlen(ip), 0)
 	}
-	return zend.ZendStringInit(hp.h_name, strlen(hp.h_name), 0)
+	return types.ZendStringInit(hp.h_name, strlen(hp.h_name), 0)
 }
-func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	for {
@@ -125,12 +126,12 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -197,7 +198,7 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetString(PhpGethostbyname(hostname))
 	return
 }
-func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var hp *__struct__hostent
@@ -209,12 +210,12 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -297,27 +298,27 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		zend.AddNextIndexString(return_value, inet_ntoa(in))
 	}
 }
-func PhpGethostbyname(name *byte) *zend.ZendString {
+func PhpGethostbyname(name *byte) *types.ZendString {
 	var hp *__struct__hostent
 	var h_addr_0 *__struct__in_addr
 	var in __struct__in_addr
 	var address *byte
 	hp = core.PhpNetworkGethostbyname(name)
 	if hp == nil {
-		return zend.ZendStringInit(name, strlen(name), 0)
+		return types.ZendStringInit(name, strlen(name), 0)
 	}
 
 	/* On macos h_addr_list entries may be misaligned. */
 
 	memcpy(&h_addr_0, hp.h_addr_list[0], b.SizeOf("struct in_addr *"))
 	if h_addr_0 == nil {
-		return zend.ZendStringInit(name, strlen(name), 0)
+		return types.ZendStringInit(name, strlen(name), 0)
 	}
 	memcpy(in.s_addr, h_addr_0, b.SizeOf("in . s_addr"))
 	address = inet_ntoa(in)
-	return zend.ZendStringInit(address, strlen(address), 0)
+	return types.ZendStringInit(address, strlen(address), 0)
 }
-func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hp *HEADER
 	var answer Querybuf
 	var hostname *byte
@@ -335,12 +336,12 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -453,7 +454,7 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 	hp = (*HEADER)(&answer)
-	zend.ZVAL_BOOL(return_value, ntohs(hp.ancount) != 0)
+	types.ZVAL_BOOL(return_value, ntohs(hp.ancount) != 0)
 	return
 }
 func PhpParserr(
@@ -463,7 +464,7 @@ func PhpParserr(
 	type_to_fetch int,
 	store int,
 	raw int,
-	subarray *zend.Zval,
+	subarray *types.Zval,
 ) *u_char {
 	var type_ u_short
 	var class u_short
@@ -622,10 +623,10 @@ func PhpParserr(
 	case DNS_T_TXT:
 		var l1 int = 0
 		var l2 int = 0
-		var entries zend.Zval
-		var tp *zend.ZendString
+		var entries types.Zval
+		var tp *types.ZendString
 		zend.AddAssocString(subarray, "type", "TXT")
-		tp = zend.ZendStringAlloc(dlen, 0)
+		tp = types.ZendStringAlloc(dlen, 0)
 		zend.ArrayInit(&entries)
 		for l1 < dlen {
 			n = cp[l1]
@@ -863,12 +864,12 @@ func PhpParserr(
 	}
 	return cp
 }
-func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var type_param zend.ZendLong = PHP_DNS_ANY
-	var authns *zend.Zval = nil
-	var addtl *zend.Zval = nil
+	var authns *types.Zval = nil
+	var addtl *types.Zval = nil
 	var type_to_fetch int
 	var dns_errno int
 	var from __struct__sockaddr_storage
@@ -886,19 +887,19 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	var type_ int
 	var first_query int = 1
 	var store_results int = 1
-	var raw zend.ZendBool = 0
+	var raw types.ZendBool = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 5
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1164,9 +1165,9 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			/* YAY! Our real answers! */
 
 			for b.PostDec(&an) && cp != nil && cp < end {
-				var retval zend.Zval
+				var retval types.Zval
 				cp = PhpParserr(cp, end, &answer, type_to_fetch, store_results, raw, &retval)
-				if retval.GetType() != zend.IS_UNDEF && store_results != 0 {
+				if retval.GetType() != types.IS_UNDEF && store_results != 0 {
 					zend.AddNextIndexZval(return_value, &retval)
 				}
 			}
@@ -1177,9 +1178,9 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 				 */
 
 				for b.PostDec(&ns) > 0 && cp != nil && cp < end {
-					var retval zend.Zval
+					var retval types.Zval
 					cp = PhpParserr(cp, end, &answer, DNS_T_ANY, authns != nil, raw, &retval)
-					if retval.GetType() != zend.IS_UNDEF {
+					if retval.GetType() != types.IS_UNDEF {
 						zend.AddNextIndexZval(authns, &retval)
 					}
 				}
@@ -1194,9 +1195,9 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 				/* Additional records associated with authoritative name servers */
 
 				for b.PostDec(&ar) > 0 && cp != nil && cp < end {
-					var retval zend.Zval
+					var retval types.Zval
 					cp = PhpParserr(cp, end, &answer, DNS_T_ANY, 1, raw, &retval)
-					if retval.GetType() != zend.IS_UNDEF {
+					if retval.GetType() != types.IS_UNDEF {
 						zend.AddNextIndexZval(addtl, &retval)
 					}
 				}
@@ -1208,11 +1209,11 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 	}
 }
-func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hostname *byte
 	var hostname_len int
-	var mx_list *zend.Zval
-	var weight_list *zend.Zval = nil
+	var mx_list *types.Zval
+	var weight_list *types.Zval = nil
 	var count int
 	var qdc int
 	var type_ u_short
@@ -1232,12 +1233,12 @@ func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1357,7 +1358,7 @@ func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	PhpDnsFreeHandle(handle)
-	zend.ZVAL_BOOL(return_value, zend.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
+	types.ZVAL_BOOL(return_value, types.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
 	return
 }
 func ZmStartupDns(type_ int, module_number int) int {
@@ -1376,5 +1377,5 @@ func ZmStartupDns(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("DNS_A6", PHP_DNS_A6, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("DNS_ANY", PHP_DNS_ANY, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("DNS_ALL", PHP_DNS_ALL, zend.CONST_CS|zend.CONST_PERSISTENT)
-	return zend.SUCCESS
+	return types.SUCCESS
 }

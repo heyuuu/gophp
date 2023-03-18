@@ -7,29 +7,30 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpUrlFree(theurl *PhpUrl) {
 	if theurl.GetScheme() != nil {
-		zend.ZendStringReleaseEx(theurl.GetScheme(), 0)
+		types.ZendStringReleaseEx(theurl.GetScheme(), 0)
 	}
 	if theurl.GetUser() != nil {
-		zend.ZendStringReleaseEx(theurl.GetUser(), 0)
+		types.ZendStringReleaseEx(theurl.GetUser(), 0)
 	}
 	if theurl.GetPass() != nil {
-		zend.ZendStringReleaseEx(theurl.GetPass(), 0)
+		types.ZendStringReleaseEx(theurl.GetPass(), 0)
 	}
 	if theurl.GetHost() != nil {
-		zend.ZendStringReleaseEx(theurl.GetHost(), 0)
+		types.ZendStringReleaseEx(theurl.GetHost(), 0)
 	}
 	if theurl.GetPath() != nil {
-		zend.ZendStringReleaseEx(theurl.GetPath(), 0)
+		types.ZendStringReleaseEx(theurl.GetPath(), 0)
 	}
 	if theurl.GetQuery() != nil {
-		zend.ZendStringReleaseEx(theurl.GetQuery(), 0)
+		types.ZendStringReleaseEx(theurl.GetQuery(), 0)
 	}
 	if theurl.GetFragment() != nil {
-		zend.ZendStringReleaseEx(theurl.GetFragment(), 0)
+		types.ZendStringReleaseEx(theurl.GetFragment(), 0)
 	}
 	zend.Efree(theurl)
 }
@@ -62,10 +63,10 @@ func BinaryStrcspn(s *byte, e *byte, chars string) *byte {
 	return e
 }
 func PhpUrlParseEx(str *byte, length int) *PhpUrl {
-	var has_port zend.ZendBool
+	var has_port types.ZendBool
 	return PhpUrlParseEx2(str, length, &has_port)
 }
-func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
+func PhpUrlParseEx2(str *byte, length int, has_port *types.ZendBool) *PhpUrl {
 	var port_buf []byte
 	var ret *PhpUrl = zend.Ecalloc(1, b.SizeOf("php_url"))
 	var s *byte
@@ -102,7 +103,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 			p++
 		}
 		if e+1 == ue {
-			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
+			ret.SetScheme(types.ZendStringInit(s, e-s, 0))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			return ret
 		}
@@ -125,16 +126,16 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 			if (p == ue || (*p) == '/') && p-e < 7 {
 				goto parse_port
 			}
-			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
+			ret.SetScheme(types.ZendStringInit(s, e-s, 0))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			s = e + 1
 			goto just_path
 		} else {
-			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
+			ret.SetScheme(types.ZendStringInit(s, e-s, 0))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
-				if zend.ZendStringEqualsLiteralCi(ret.GetScheme(), "file") {
+				if types.ZendStringEqualsLiteralCi(ret.GetScheme(), "file") {
 					if e+3 < ue && (*(e + 3)) == '/' {
 
 						/* support windows drive letters as in:
@@ -201,13 +202,13 @@ parse_host:
 
 	if b.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
 		if b.Assign(&pp, memchr(s, ':', p-s)) {
-			ret.SetUser(zend.ZendStringInit(s, pp-s, 0))
+			ret.SetUser(types.ZendStringInit(s, pp-s, 0))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 			pp++
-			ret.SetPass(zend.ZendStringInit(pp, p-pp, 0))
+			ret.SetPass(types.ZendStringInit(pp, p-pp, 0))
 			PhpReplaceControlcharsEx(ret.GetPass().GetVal(), ret.GetPass().GetLen())
 		} else {
-			ret.SetUser(zend.ZendStringInit(s, p-s, 0))
+			ret.SetUser(types.ZendStringInit(s, p-s, 0))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 		}
 		s = p + 1
@@ -262,7 +263,7 @@ parse_host:
 		PhpUrlFree(ret)
 		return nil
 	}
-	ret.SetHost(zend.ZendStringInit(s, p-s, 0))
+	ret.SetHost(types.ZendStringInit(s, p-s, 0))
 	PhpReplaceControlcharsEx(ret.GetHost().GetVal(), ret.GetHost().GetLen())
 	if e == ue {
 		return ret
@@ -274,7 +275,7 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetFragment(zend.ZendStringInit(p, e-p, 0))
+			ret.SetFragment(types.ZendStringInit(p, e-p, 0))
 			PhpReplaceControlcharsEx(ret.GetFragment().GetVal(), ret.GetFragment().GetLen())
 		}
 		e = p - 1
@@ -283,36 +284,36 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetQuery(zend.ZendStringInit(p, e-p, 0))
+			ret.SetQuery(types.ZendStringInit(p, e-p, 0))
 			PhpReplaceControlcharsEx(ret.GetQuery().GetVal(), ret.GetQuery().GetLen())
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
-		ret.SetPath(zend.ZendStringInit(s, e-s, 0))
+		ret.SetPath(types.ZendStringInit(s, e-s, 0))
 		PhpReplaceControlcharsEx(ret.GetPath().GetVal(), ret.GetPath().GetLen())
 	}
 	return ret
 }
-func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
 	var str_len int
 	var resource *PhpUrl
 	var key zend.ZendLong = -1
-	var tmp zend.Zval
-	var has_port zend.ZendBool
+	var tmp types.Zval
+	var has_port types.ZendBool
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -432,35 +433,35 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if resource.GetScheme() != nil {
 		tmp.SetStringCopy(resource.GetScheme())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_SCHEME).GetStr(), &tmp)
 	}
 	if resource.GetHost() != nil {
 		tmp.SetStringCopy(resource.GetHost())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_HOST).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_HOST).GetStr(), &tmp)
 	}
 	if has_port != 0 {
 		tmp.SetLong(resource.GetPort())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PORT).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_PORT).GetStr(), &tmp)
 	}
 	if resource.GetUser() != nil {
 		tmp.SetStringCopy(resource.GetUser())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_USER).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_USER).GetStr(), &tmp)
 	}
 	if resource.GetPass() != nil {
 		tmp.SetStringCopy(resource.GetPass())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PASS).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_PASS).GetStr(), &tmp)
 	}
 	if resource.GetPath() != nil {
 		tmp.SetStringCopy(resource.GetPath())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PATH).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_PATH).GetStr(), &tmp)
 	}
 	if resource.GetQuery() != nil {
 		tmp.SetStringCopy(resource.GetQuery())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_QUERY).GetStr(), &tmp)
 	}
 	if resource.GetFragment() != nil {
 		tmp.SetStringCopy(resource.GetFragment())
-		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT).GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_FRAGMENT).GetStr(), &tmp)
 	}
 done:
 	PhpUrlFree(resource)
@@ -484,15 +485,15 @@ func PhpHtoi(s *byte) int {
 	}
 	return value
 }
-func PhpUrlEncode(s *byte, len_ int) *zend.ZendString {
+func PhpUrlEncode(s *byte, len_ int) *types.ZendString {
 	var c uint8
 	var to *uint8
 	var from *uint8
 	var end uint8
-	var start *zend.ZendString
+	var start *types.ZendString
 	from = (*uint8)(s)
 	end = (*uint8)(s + len_)
-	start = zend.ZendStringSafeAlloc(3, len_, 0, 0)
+	start = types.ZendStringSafeAlloc(3, len_, 0, 0)
 	to = (*uint8)(start.GetVal())
 	for from < end {
 		*from++
@@ -509,23 +510,23 @@ func PhpUrlEncode(s *byte, len_ int) *zend.ZendString {
 		}
 	}
 	*to = '0'
-	start = zend.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
+	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
 	return start
 }
-func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var in_str *zend.ZendString
+func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var in_str *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -584,21 +585,21 @@ func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var in_str *zend.ZendString
-	var out_str *zend.ZendString
+func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var in_str *types.ZendString
+	var out_str *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -654,7 +655,7 @@ func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
+	out_str = types.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
 	out_str.SetLen(PhpUrlDecode(out_str.GetVal(), out_str.GetLen()))
 	return_value.SetString(out_str)
 	return
@@ -678,12 +679,12 @@ func PhpUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func PhpRawUrlEncode(s *byte, len_ int) *zend.ZendString {
+func PhpRawUrlEncode(s *byte, len_ int) *types.ZendString {
 	var x int
 	var y int
-	var str *zend.ZendString
+	var str *types.ZendString
 	var ret *byte
-	str = zend.ZendStringSafeAlloc(3, len_, 0, 0)
+	str = types.ZendStringSafeAlloc(3, len_, 0, 0)
 	ret = str.GetVal()
 	x = 0
 	y = 0
@@ -699,23 +700,23 @@ func PhpRawUrlEncode(s *byte, len_ int) *zend.ZendString {
 		y++
 	}
 	ret[y] = '0'
-	str = zend.ZendStringTruncate(str, y, 0)
+	str = types.ZendStringTruncate(str, y, 0)
 	return str
 }
-func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var in_str *zend.ZendString
+func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var in_str *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -774,21 +775,21 @@ func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var in_str *zend.ZendString
-	var out_str *zend.ZendString
+func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var in_str *types.ZendString
+	var out_str *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -844,7 +845,7 @@ func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		break
 	}
-	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
+	out_str = types.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
 	out_str.SetLen(PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen()))
 	return_value.SetString(out_str)
 	return
@@ -866,14 +867,14 @@ func PhpRawUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var url *byte
 	var url_len int
 	var stream *core.PhpStream
-	var prev_val *zend.Zval
-	var hdr *zend.Zval = nil
+	var prev_val *types.Zval
+	var hdr *types.Zval = nil
 	var format zend.ZendLong = 0
-	var zcontext *zend.Zval = nil
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -881,12 +882,12 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -960,18 +961,18 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	if stream.GetWrapperdata().GetType() != zend.IS_ARRAY {
+	if stream.GetWrapperdata().GetType() != types.IS_ARRAY {
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
-	var __ht *zend.HashTable = stream.GetWrapperdata().GetArr()
+	var __ht *types.HashTable = stream.GetWrapperdata().GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		hdr = _z
-		if hdr.GetType() != zend.IS_STRING {
+		if hdr.GetType() != types.IS_STRING {
 			continue
 		}
 		if format == 0 {

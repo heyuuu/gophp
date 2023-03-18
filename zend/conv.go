@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	. "sik/runtime/ctype"
+	"sik/zend/types"
 	"strconv"
 	"strings"
 )
@@ -12,18 +13,18 @@ import (
  * ConvertNumericStr 解析结果
  */
 type NumericStrResult struct {
-	Overflow uint8     // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
-	Type     ZendUchar // 数字类型，可能值为 0, IS_LONG, IS_DOUBLE
-	Lval     int       // 数字为整数时的值，其他情况为 0
-	Dval     float64   // 数字为浮点数时的值，默认为 0.0
+	Overflow uint8           // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
+	Type     types.ZendUchar // 数字类型，可能值为 0, IS_LONG, IS_DOUBLE
+	Lval     int             // 数字为整数时的值，其他情况为 0
+	Dval     float64         // 数字为浮点数时的值，默认为 0.0
 }
 
 func (r NumericStrResult) Int() (int, bool) {
-	return r.Lval, r.Type == IS_LONG
+	return r.Lval, r.Type == types.IS_LONG
 }
 
 func (r NumericStrResult) Float() (float64, bool) {
-	return r.Dval, r.Type == IS_LONG
+	return r.Dval, r.Type == types.IS_LONG
 }
 
 type ConvertNumericMode int
@@ -105,7 +106,7 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrRe
 		if len(matchStr) < MAX_LENGTH_OF_LONG {
 			lval, err := strconv.Atoi(matchStr)
 			if err == nil {
-				return NumericStrResult{Type: IS_LONG, Lval: lval}
+				return NumericStrResult{Type: types.IS_LONG, Lval: lval}
 			}
 		}
 		// 整数溢出, 记录溢出信息
@@ -120,16 +121,16 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrRe
 	if err != nil {
 		log.Panicf("代码逻辑错误，预期为数字字符串，但转换失败了: s=%s ,err=%s", matchStr, err.Error())
 	}
-	return NumericStrResult{Type: IS_DOUBLE, Dval: dval, Overflow: overflow}
+	return NumericStrResult{Type: types.IS_DOUBLE, Dval: dval, Overflow: overflow}
 }
 
-func ConvertNumericStrAsZval(str string, mode ConvertNumericMode) *Zval {
+func ConvertNumericStrAsZval(str string, mode ConvertNumericMode) *types.Zval {
 	r := ConvertNumericStr(str, mode)
 	switch r.Type {
-	case IS_LONG:
-		return NewZvalLong(r.Lval)
-	case IS_DOUBLE:
-		return NewZvalDouble(r.Dval)
+	case types.IS_LONG:
+		return types.NewZvalLong(r.Lval)
+	case types.IS_DOUBLE:
+		return types.NewZvalDouble(r.Dval)
 	default:
 		return nil
 	}

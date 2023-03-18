@@ -2,6 +2,7 @@ package zend
 
 import (
 	"log"
+	"sik/zend/types"
 	"strconv"
 	"strings"
 )
@@ -32,13 +33,13 @@ func strToD(str string) float64 {
 	return value
 }
 
-func castZendStringPtr(str *string) *ZendString {
+func castZendStringPtr(str *string) *types.ZendString {
 	if str != nil {
-		return NewZendString(*str)
+		return types.NewZendString(*str)
 	}
 	return nil
 }
-func castStrPtr(str *ZendString) *string {
+func castStrPtr(str *types.ZendString) *string {
 	if str != nil {
 		var s = str.GetStr()
 		return &s

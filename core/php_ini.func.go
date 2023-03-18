@@ -7,6 +7,7 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
@@ -53,15 +54,15 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	var module_number int
 	var ini_entry *zend.ZendIniEntry
-	var first zend.ZendBool = 1
+	var first types.ZendBool = 1
 	if module != nil {
 		module_number = module.GetModuleNumber()
 	} else {
 		module_number = 0
 	}
-	var __ht *zend.HashTable = zend.EG__().GetIniDirectives()
+	var __ht *types.HashTable = zend.EG__().GetIniDirectives()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		ini_entry = _z.GetPtr()
 		if ini_entry.GetModuleNumber() != module_number {
@@ -94,21 +95,21 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 		standard.PhpInfoPrintTableEnd()
 	}
 }
-func ConfigZvalDtor(zvalue *zend.Zval) {
-	if zvalue.IsType(zend.IS_ARRAY) {
+func ConfigZvalDtor(zvalue *types.Zval) {
+	if zvalue.IsType(types.IS_ARRAY) {
 		zvalue.GetArr().Destroy()
 		zend.Free(zvalue.GetArr())
-	} else if zvalue.IsType(zend.IS_STRING) {
-		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
+	} else if zvalue.IsType(types.IS_STRING) {
+		types.ZendStringReleaseEx(zvalue.GetStr(), 1)
 	}
 }
 func RESET_ACTIVE_INI_HASH() {
 	ActiveIniHash = nil
 	IsSpecialSection = 0
 }
-func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, target_hash *zend.HashTable) {
-	var entry *zend.Zval
-	var active_hash *zend.HashTable
+func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, target_hash *types.HashTable) {
+	var entry *types.Zval
+	var active_hash *types.HashTable
 	var extension_name *byte
 	if ActiveIniHash != nil {
 		active_hash = ActiveIniHash
@@ -146,8 +147,8 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		/* PHP and Zend extensions are not added into configuration hash! */
 
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
-		var option_arr zend.Zval
-		var find_arr *zend.Zval
+		var option_arr types.Zval
+		var find_arr *types.Zval
 		if arg2 == nil {
 
 			/* bare string - nothing to do */
@@ -160,8 +161,8 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, active_hash.KeyFind(arg1.GetStr().GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
-			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
+		if b.Assign(&find_arr, active_hash.KeyFind(arg1.GetStr().GetStr())) == nil || find_arr.GetType() != types.IS_ARRAY {
+			types.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
 			zend.ZendHashInit(option_arr.GetArr(), 8, nil, ConfigZvalDtor, 1)
 			find_arr = active_hash.KeyUpdate(arg1.GetStr().GetStr(), &option_arr)
 		}
@@ -223,12 +224,12 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 			/* Search for existing entry and if it does not exist create one */
 
 			if b.Assign(&entry, target_hash.KeyFind(b.CastStr(key, key_len))) == nil {
-				var section_arr zend.Zval
-				zend.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
-				zend.ZendHashInit(section_arr.GetArr(), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
+				var section_arr types.Zval
+				types.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
+				zend.ZendHashInit(section_arr.GetArr(), 8, nil, types.DtorFuncT(ConfigZvalDtor), 1)
 				entry = target_hash.KeyUpdate(b.CastStr(key, key_len), &section_arr)
 			}
-			if entry.IsType(zend.IS_ARRAY) {
+			if entry.IsType(types.IS_ARRAY) {
 				ActiveIniHash = entry.GetArr()
 			}
 		}
@@ -294,7 +295,7 @@ func PhpInitConfig() int {
 	var php_ini_scanned_path_len int
 	var open_basedir *byte
 	var free_ini_search_path int = 0
-	var opened_path *zend.ZendString = nil
+	var opened_path *types.ZendString = nil
 	var fp *r.FILE
 	var filename *byte
 	Config().Init()
@@ -431,11 +432,11 @@ func PhpInitConfig() int {
 		fh.InitFp(fp, filename)
 		RESET_ACTIVE_INI_HASH()
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
-		var tmp zend.Zval
-		tmp.SetString(zend.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
+		var tmp types.Zval
+		tmp.SetString(types.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
 		Config().Set("cfg_file_path", fh.GetFilenameStr())
 		if opened_path != nil {
-			zend.ZendStringReleaseEx(opened_path, 0)
+			types.ZendStringReleaseEx(opened_path, 0)
 		} else {
 			zend.Efree((*byte)(fh.GetFilename()))
 		}
@@ -515,7 +516,7 @@ func PhpInitConfig() int {
 							var fh zend.ZendFileHandle
 							fh.InitFp(zend.VCWD_FOPEN(ini_file, "r"), ini_file)
 							if fh.GetFp() != nil {
-								if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash()) == zend.SUCCESS {
+								if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash()) == types.SUCCESS {
 
 									/* Here, add it to the list of ini files read */
 
@@ -565,7 +566,7 @@ func PhpInitConfig() int {
 		RESET_ACTIVE_INI_HASH()
 		zend.ZendParseIniString(SM__().GetIniEntries(), 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpShutdownConfig() int {
 	Config().Destroy()
@@ -577,7 +578,7 @@ func PhpShutdownConfig() int {
 		zend.Free(PhpIniScannedFiles)
 		PhpIniScannedFiles = nil
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpIniRegisterExtensions() {
 	ExtensionLists.GetEngine().Apply(PhpLoadZendExtensionCb)
@@ -585,7 +586,7 @@ func PhpIniRegisterExtensions() {
 	ExtensionLists.GetEngine().Destroy()
 	ExtensionLists.GetFunctions().Destroy()
 }
-func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *zend.HashTable) int {
+func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.HashTable) int {
 	var sb zend.ZendStatT
 	var ini_file []byte
 	Snprintf(ini_file, MAXPATHLEN, "%s%c%s", dirname, zend.DEFAULT_SLASH, ini_filename)
@@ -598,30 +599,30 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *zend.Ha
 				/* Reset active ini section */
 
 				RESET_ACTIVE_INI_HASH()
-				if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), target_hash) == zend.SUCCESS {
+				if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), target_hash) == types.SUCCESS {
 
 					/* FIXME: Add parsed file to the list of user files read? */
 
-					return zend.SUCCESS
+					return types.SUCCESS
 
 					/* FIXME: Add parsed file to the list of user files read? */
 
 				}
-				return zend.FAILURE
+				return types.FAILURE
 			}
 		}
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
-func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage int) {
-	var str *zend.ZendString
-	var data *zend.Zval
+func PhpIniActivateConfig(source_hash *types.HashTable, modify_type int, stage int) {
+	var str *types.ZendString
+	var data *types.Zval
 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 
-	var __ht *zend.HashTable = source_hash
+	var __ht *types.HashTable = source_hash
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		str = _p.GetKey()
 		data = _z
@@ -632,7 +633,7 @@ func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage in
 }
 func PhpIniHasPerDirConfig() int { return HasPerDirConfig }
 func PhpIniActivatePerDirConfig(path *byte, path_len int) {
-	var tmp2 *zend.Zval
+	var tmp2 *types.Zval
 	var ptr *byte
 	if path_len > MAXPATHLEN {
 		return
@@ -659,7 +660,7 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 }
 func PhpIniHasPerHostConfig() int { return HasPerHostConfig }
 func PhpIniActivatePerHostConfig(host *byte, host_len int) {
-	var tmp *zend.Zval
+	var tmp *types.Zval
 	if HasPerHostConfig != 0 && host != nil && host_len != 0 {
 
 		/* Search for source array matching the host from configuration_hash */
@@ -673,33 +674,33 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 	}
 }
 
-func CfgGetEntry(name string) *zend.Zval {
+func CfgGetEntry(name string) *types.Zval {
 	return Config().KeyFind(name)
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
-	var tmp *zend.Zval
+	var tmp *types.Zval
 	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = 0
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	*result = zend.ZvalGetLong(tmp)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func CfgGetDouble(varname *byte, result *float64) int {
-	var tmp *zend.Zval
+	var tmp *types.Zval
 	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = float64(0)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	*result = zend.ZvalGetDouble(tmp)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func CfgGetString(varname *byte, result **byte) int {
-	var tmp *zend.Zval
+	var tmp *types.Zval
 	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = nil
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	*result = tmp.GetStr().GetVal()
-	return zend.SUCCESS
+	return types.SUCCESS
 }

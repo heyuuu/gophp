@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -61,15 +62,15 @@ func (this *PhpMetaTagsData) SetInMeta(value int)      { this.in_meta = value }
 type PhpFileGlobals struct {
 	pclose_ret                   int
 	def_chunk_size               int
-	auto_detect_line_endings     zend.ZendBool
+	auto_detect_line_endings     types.ZendBool
 	default_socket_timeout       zend.ZendLong
 	user_agent                   *byte
 	from_address                 *byte
 	user_stream_current_filename *byte
 	default_context              *core.PhpStreamContext
-	stream_wrappers              *zend.HashTable
-	stream_filters               *zend.HashTable
-	wrapper_errors               *zend.HashTable
+	stream_wrappers              *types.HashTable
+	stream_filters               *types.HashTable
+	wrapper_errors               *types.HashTable
 	pclose_wait                  int
 }
 

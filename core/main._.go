@@ -4,13 +4,14 @@ package core
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 var CoreGlobals PhpCoreGlobals
 var PhpInternalEncodingChanged func() = nil
 var OnChangeBrowscap func(
 	entry *zend.ZendIniEntry,
-	new_value *zend.ZendString,
+	new_value *types.ZendString,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,

@@ -1,15 +1,18 @@
 // <<generate>>
 
-package zend
+package types
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+	"sik/zend"
+)
 
 /**
  * ZendString
  */
 type ZendString struct {
 	ZendRefcounted
-	h    ZendUlong
+	h    zend.ZendUlong
 	len_ int
 	val  []byte
 }
@@ -33,18 +36,18 @@ func NewZendStringPersistent(str string, persistent bool) *ZendString {
 	return zs
 }
 
-func (this *ZendString) GetH() ZendUlong      { return this.h }
-func (this *ZendString) SetH(value ZendUlong) { this.h = value }
-func (this *ZendString) GetLen() int          { return this.len_ }
-func (this *ZendString) SetLen(value int)     { this.len_ = value }
-func (this *ZendString) GetVal() []byte       { return this.val }
-func (this *ZendString) SetVal(value []byte)  { this.val = value }
+func (this *ZendString) GetH() zend.ZendUlong      { return this.h }
+func (this *ZendString) SetH(value zend.ZendUlong) { this.h = value }
+func (this *ZendString) GetLen() int               { return this.len_ }
+func (this *ZendString) SetLen(value int)          { this.len_ = value }
+func (this *ZendString) GetVal() []byte            { return this.val }
+func (this *ZendString) SetVal(value []byte)       { this.val = value }
 
 func (this *ZendString) GetStr() string {
 	return string(this.val[:this.len_])
 }
 
-func (this *ZendString) GetHash() ZendUlong {
+func (this *ZendString) GetHash() zend.ZendUlong {
 	if this.h == 0 {
 		this.h = b.HashBytes(this.val[:this.len_])
 	}

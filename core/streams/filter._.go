@@ -3,7 +3,7 @@
 package streams
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <main/streams/filter.c>
@@ -28,7 +28,7 @@ import (
 
 /* Global filter hash, copied to FG(stream_filters) on registration of volatile filter */
 
-var StreamFiltersHash zend.HashTable
+var StreamFiltersHash types.HashTable
 
 /* Should only be used during core initialization */
 

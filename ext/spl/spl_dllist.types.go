@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -13,7 +14,7 @@ type SplPtrLlistElement struct {
 	prev *SplPtrLlistElement
 	next *SplPtrLlistElement
 	rc   int
-	data zend.Zval
+	data types.Zval
 }
 
 // func MakeSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) SplPtrLlistElement {
@@ -30,7 +31,7 @@ func (this *SplPtrLlistElement) GetNext() *SplPtrLlistElement      { return this
 func (this *SplPtrLlistElement) SetNext(value *SplPtrLlistElement) { this.next = value }
 func (this *SplPtrLlistElement) GetRc() int                        { return this.rc }
 func (this *SplPtrLlistElement) SetRc(value int)                   { this.rc = value }
-func (this *SplPtrLlistElement) GetData() zend.Zval                { return this.data }
+func (this *SplPtrLlistElement) GetData() types.Zval               { return this.data }
 
 // func (this *SplPtrLlistElement) SetData(value zend.Zval) { this.data = value }
 
@@ -79,9 +80,9 @@ type SplDllistObject struct {
 	fptr_offset_del   *zend.ZendFunction
 	fptr_count        *zend.ZendFunction
 	ce_get_iterator   *zend.ZendClassEntry
-	gc_data           *zend.Zval
+	gc_data           *types.Zval
 	gc_data_count     int
-	std               zend.ZendObject
+	std               types.ZendObject
 }
 
 //             func MakeSplDllistObject(
@@ -139,11 +140,11 @@ func (this *SplDllistObject) GetCeGetIterator() *zend.ZendClassEntry    { return
 func (this *SplDllistObject) SetCeGetIterator(value *zend.ZendClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplDllistObject) GetGcData() *zend.Zval      { return this.gc_data }
-func (this *SplDllistObject) SetGcData(value *zend.Zval) { this.gc_data = value }
-func (this *SplDllistObject) GetGcDataCount() int        { return this.gc_data_count }
-func (this *SplDllistObject) SetGcDataCount(value int)   { this.gc_data_count = value }
-func (this *SplDllistObject) GetStd() zend.ZendObject    { return this.std }
+func (this *SplDllistObject) GetGcData() *types.Zval      { return this.gc_data }
+func (this *SplDllistObject) SetGcData(value *types.Zval) { this.gc_data = value }
+func (this *SplDllistObject) GetGcDataCount() int         { return this.gc_data_count }
+func (this *SplDllistObject) SetGcDataCount(value int)    { this.gc_data_count = value }
+func (this *SplDllistObject) GetStd() types.ZendObject    { return this.std }
 
 // func (this *SplDllistObject) SetStd(value zend.ZendObject) { this.std = value }
 

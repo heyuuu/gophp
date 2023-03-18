@@ -1,6 +1,6 @@
 // <<generate>>
 
-package zend
+package types
 
 import (
 	"math"

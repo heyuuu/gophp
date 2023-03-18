@@ -2,11 +2,13 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendIniEntryDef
  */
 type ZendIniEntryModifierEx = func(entry *ZendIniEntry, new_value *string, stage int) bool
-type ZendIniEntryModifier = func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int
+type ZendIniEntryModifier = func(entry *ZendIniEntry, new_value *types.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int
 type ZendIniEntryDisplayer = func(ini_entry *ZendIniEntry, type_ int)
 type ZendIniEntryDef struct {
 	name       string
@@ -44,7 +46,7 @@ func _buildOnModify(onModify ZendIniEntryModifier, mh_arg1 any, mh_arg2 any, mh_
 
 	return func(entry *ZendIniEntry, new_value *string, stage int) bool {
 		result := onModify(entry, castZendStringPtr(new_value), mh_arg1, mh_arg2, mh_arg3, stage)
-		return result == SUCCESS
+		return result == types.SUCCESS
 	}
 }
 
@@ -85,7 +87,7 @@ func (this *ZendIniEntry) HasOnModify() bool {
 	return this.onModify != nil
 }
 
-func (this *ZendIniEntry) EmitOnModify(new_value *ZendString, stage int) bool {
+func (this *ZendIniEntry) EmitOnModify(new_value *types.ZendString, stage int) bool {
 	if this.onModify == nil {
 		return true
 	}
@@ -102,11 +104,11 @@ func (this *ZendIniEntry) EmitOnModifyCurrValue(stage int) bool {
  */
 func (this *ZendIniEntry) SetValueStr(value *string) { this.value = value }
 
-func (this *ZendIniEntry) GetName() *ZendString           { return castZendStringPtr(this.name) }
-func (this *ZendIniEntry) GetValue() *ZendString          { return castZendStringPtr(this.value) }
-func (this *ZendIniEntry) GetOrigValue() *ZendString      { return castZendStringPtr(this.orig_value) }
-func (this *ZendIniEntry) SetValue(value *ZendString)     { this.value = castStrPtr(value) }
-func (this *ZendIniEntry) SetOrigValue(value *ZendString) { this.orig_value = castStrPtr(value) }
+func (this *ZendIniEntry) GetName() *types.ZendString           { return castZendStringPtr(this.name) }
+func (this *ZendIniEntry) GetValue() *types.ZendString          { return castZendStringPtr(this.value) }
+func (this *ZendIniEntry) GetOrigValue() *types.ZendString      { return castZendStringPtr(this.orig_value) }
+func (this *ZendIniEntry) SetValue(value *types.ZendString)     { this.value = castStrPtr(value) }
+func (this *ZendIniEntry) SetOrigValue(value *types.ZendString) { this.orig_value = castStrPtr(value) }
 
 func (this *ZendIniEntry) GetDisplayer() func(ini_entry *ZendIniEntry, type_ int) {
 	return this.displayer

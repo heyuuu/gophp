@@ -5,6 +5,7 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpHex2int(c int) byte {
@@ -18,7 +19,7 @@ func PhpHex2int(c int) byte {
 		return -1
 	}
 }
-func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.ZendString {
+func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.ZendString {
 	var i int
 	var p1 *uint8
 	var p2 *uint8
@@ -26,7 +27,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 	var l_nbl uint
 	var decoded_len int
 	var buf_size int
-	var retval *zend.ZendString
+	var retval *types.ZendString
 	var hexval_tbl []uint = []uint{64, 64, 64, 64, 64, 64, 64, 64, 64, 32, 16, 64, 64, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 32, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 64, 64, 64, 64, 64, 64, 64, 10, 11, 12, 13, 14, 15, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 10, 11, 12, 13, 14, 15, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64}
 	if replace_us_by_ws != 0 {
 		replace_us_by_ws = '_'
@@ -43,7 +44,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 		p1++
 		i--
 	}
-	retval = zend.ZendStringAlloc(buf_size, 0)
+	retval = types.ZendStringAlloc(buf_size, 0)
 	i = length
 	p1 = str
 	p2 = (*uint8)(retval.GetVal())
@@ -103,13 +104,13 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 	retval.SetLen(decoded_len)
 	return retval
 }
-func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
+func PhpQuotPrintEncode(str *uint8, length int) *types.ZendString {
 	var lp zend.ZendUlong = 0
 	var c uint8
 	var d *uint8
 	var hex *byte = "0123456789ABCDEF"
-	var ret *zend.ZendString
-	ret = zend.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
+	var ret *types.ZendString
+	ret = types.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
 	d = (*uint8)(ret.GetVal())
 	for b.PostDec(&length) {
 		if b.Assign(&c, b.PostInc(&(*str))) == '0' && (*str) == '0' && length > 0 {
@@ -141,13 +142,13 @@ func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
 		}
 	}
 	*d = '0'
-	ret = zend.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()), 0)
+	ret = types.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()), 0)
 	return ret
 }
-func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg1 *zend.ZendString
+func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg1 *types.ZendString
 	var str_in *byte
-	var str_out *zend.ZendString
+	var str_out *types.ZendString
 	var i int = 0
 	var j int = 0
 	var k int
@@ -157,12 +158,12 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *z
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -226,7 +227,7 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *z
 		return
 	}
 	str_in = arg1.GetVal()
-	str_out = zend.ZendStringAlloc(arg1.GetLen(), 0)
+	str_out = types.ZendStringAlloc(arg1.GetLen(), 0)
 	for str_in[i] {
 		switch str_in[i] {
 		case '=':
@@ -280,21 +281,21 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *z
 	str_out.SetLen(j)
 	return_value.SetString(str_out)
 }
-func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var str *zend.ZendString
-	var new_str *zend.ZendString
+func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var str *types.ZendString
+	var new_str *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

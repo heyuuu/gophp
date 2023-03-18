@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 const FCGI_VERSION_1 = 1
@@ -63,7 +63,7 @@ const INADDR_NONE = uint64(-1)
 
 var FcgiLog FcgiLogger
 
-var FcgiMgmtVars zend.HashTable
+var FcgiMgmtVars types.HashTable
 var IsInitialized int = 0
 var IsFastcgi int = 0
 var InShutdown int = 0

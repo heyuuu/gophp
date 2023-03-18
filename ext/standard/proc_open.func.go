@@ -9,23 +9,24 @@ import (
 	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
-	var element *zend.Zval
+func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT {
+	var element *types.Zval
 	var env PhpProcessEnvT
-	var key *zend.ZendString
-	var str *zend.ZendString
+	var key *types.ZendString
+	var str *types.ZendString
 	var ep **byte
 	var p *byte
 	var cnt int
 	var sizeenv int = 0
-	var env_hash *zend.HashTable
+	var env_hash *types.HashTable
 	memset(&env, 0, b.SizeOf("env"))
 	if environment == nil {
 		return env
 	}
-	cnt = zend.Z_ARRVAL_P(environment).GetNNumOfElements()
+	cnt = types.Z_ARRVAL_P(environment).GetNNumOfElements()
 	if cnt < 1 {
 		env.SetEnvarray((**byte)(zend.Pecalloc(1, b.SizeOf("char *"), is_persistent)))
 		env.SetEnvp((*byte)(zend.Pecalloc(4, 1, is_persistent)))
@@ -36,15 +37,15 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 
 	/* first, we have to get the size of all the elements in the hash */
 
-	var __ht *zend.HashTable = environment.GetArr()
+	var __ht *types.HashTable = environment.GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
 		element = _z
 		str = zend.ZvalGetString(element)
 		if str.GetLen() == 0 {
-			zend.ZendStringReleaseEx(str, 0)
+			types.ZendStringReleaseEx(str, 0)
 			continue
 		}
 		sizeenv += str.GetLen() + 1
@@ -59,9 +60,9 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 	ep = env.GetEnvarray()
 	env.SetEnvp((*byte)(zend.Pecalloc(sizeenv+4, 1, is_persistent)))
 	p = env.GetEnvp()
-	var __ht__1 *zend.HashTable = env_hash
+	var __ht__1 *types.HashTable = env_hash
 	for _, _p := range __ht__1.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
 		str = _z.GetPtr()
@@ -75,7 +76,7 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 		memcpy(p, str.GetVal(), str.GetLen())
 		p += str.GetLen()
 		b.PostInc(&(*p)) = '0'
-		zend.ZendStringReleaseEx(str, 0)
+		types.ZendStringReleaseEx(str, 0)
 	}
 	r.Assert(uint32(p-env.GetEnvp()) <= sizeenv)
 	env_hash.Destroy()
@@ -90,7 +91,7 @@ func _phpFreeEnvp(env PhpProcessEnvT, is_persistent int) {
 		zend.Pefree(env.GetEnvp(), is_persistent)
 	}
 }
-func ProcOpenRsrcDtor(rsrc *zend.ZendResource) {
+func ProcOpenRsrcDtor(rsrc *types.ZendResource) {
 	var proc *PhpProcessHandle = (*PhpProcessHandle)(rsrc.GetPtr())
 	var i int
 	var wstatus int
@@ -130,10 +131,10 @@ func ProcOpenRsrcDtor(rsrc *zend.ZendResource) {
 }
 func ZmStartupProcOpen(type_ int, module_number int) int {
 	LeProcOpen = zend.ZendRegisterListDestructorsEx(ProcOpenRsrcDtor, nil, "process", module_number)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zproc *zend.Zval
+func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zproc *types.Zval
 	var proc *PhpProcessHandle
 	var sig_no zend.ZendLong = SIGTERM
 	for {
@@ -142,12 +143,12 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -223,8 +224,8 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return
 	}
 }
-func ZifProcClose(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zproc *zend.Zval
+func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zproc *types.Zval
 	var proc *PhpProcessHandle
 	for {
 		var _flags int = 0
@@ -232,12 +233,12 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -304,8 +305,8 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(FG(pclose_ret))
 	return
 }
-func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zproc *zend.Zval
+func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zproc *types.Zval
 	var proc *PhpProcessHandle
 	var wstatus int
 	var wait_pid pid_t
@@ -321,12 +322,12 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -417,32 +418,32 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	zend.AddAssocLong(return_value, "stopsig", stopsig)
 }
 func CloseDescriptor(fd PhpFileDescriptorT) __auto__ { return close(fd) }
-func GetValidArgString(zv *zend.Zval, elem_num int) *zend.ZendString {
-	var str *zend.ZendString = zend.ZvalGetString(zv)
+func GetValidArgString(zv *types.Zval, elem_num int) *types.ZendString {
+	var str *types.ZendString = zend.ZvalGetString(zv)
 	if str == nil {
 		return nil
 	}
 	if strlen(str.GetVal()) != str.GetLen() {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Command array element %d contains a null byte", elem_num)
-		zend.ZendStringRelease(str)
+		types.ZendStringRelease(str)
 		return nil
 	}
 	return str
 }
-func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var command_zv *zend.Zval
+func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var command_zv *types.Zval
 	var command *byte = nil
 	var cwd *byte = nil
 	var cwd_len int = 0
-	var descriptorspec *zend.Zval
-	var pipes *zend.Zval
-	var environment *zend.Zval = nil
-	var other_options *zend.Zval = nil
+	var descriptorspec *types.Zval
+	var pipes *types.Zval
+	var environment *types.Zval = nil
+	var other_options *types.Zval = nil
 	var env PhpProcessEnvT
 	var ndesc int = 0
 	var i int
-	var descitem *zend.Zval = nil
-	var str_index *zend.ZendString
+	var descitem *types.Zval = nil
+	var str_index *types.ZendString
 	var nindex zend.ZendUlong
 	var descriptors *PhpProcOpenDescriptorItem = nil
 	var ndescriptors_array int
@@ -456,12 +457,12 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 6
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -542,9 +543,9 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	memset(&env, 0, b.SizeOf("env"))
-	if command_zv.IsType(zend.IS_ARRAY) {
-		var arg_zv *zend.Zval
-		var num_elems uint32 = zend.Z_ARRVAL_P(command_zv).GetNNumOfElements()
+	if command_zv.IsType(types.IS_ARRAY) {
+		var arg_zv *types.Zval
+		var num_elems uint32 = types.Z_ARRVAL_P(command_zv).GetNNumOfElements()
 		if num_elems == 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Command array must have at least one element")
 			return_value.SetFalse()
@@ -552,12 +553,12 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		argv = zend.SafeEmalloc(b.SizeOf("char *"), num_elems+1, 0)
 		i = 0
-		var __ht *zend.HashTable = command_zv.GetArr()
+		var __ht *types.HashTable = command_zv.GetArr()
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			arg_zv = _z
-			var arg_str *zend.ZendString = GetValidArgString(arg_zv, i+1)
+			var arg_str *types.ZendString = GetValidArgString(arg_zv, i+1)
 			if arg_str == nil {
 				argv[i] = nil
 				goto exit_fail
@@ -566,7 +567,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				command = zend.Pestrdup(arg_str.GetVal(), is_persistent)
 			}
 			argv[b.PostInc(&i)] = zend.Estrdup(arg_str.GetVal())
-			zend.ZendStringRelease(arg_str)
+			types.ZendStringRelease(arg_str)
 		}
 		argv[i] = nil
 
@@ -583,33 +584,33 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if environment != nil {
 		env = _phpArrayToEnvp(environment, is_persistent)
 	}
-	ndescriptors_array = zend.Z_ARRVAL_P(descriptorspec).GetNNumOfElements()
+	ndescriptors_array = types.Z_ARRVAL_P(descriptorspec).GetNNumOfElements()
 	descriptors = zend.SafeEmalloc(b.SizeOf("struct php_proc_open_descriptor_item"), ndescriptors_array, 0)
 	memset(descriptors, 0, b.SizeOf("struct php_proc_open_descriptor_item")*ndescriptors_array)
 
 	/* walk the descriptor spec and set up files/pipes */
 
-	var __ht *zend.HashTable = descriptorspec.GetArr()
+	var __ht *types.HashTable = descriptorspec.GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		nindex = _p.GetH()
 		str_index = _p.GetKey()
 		descitem = _z
-		var ztype *zend.Zval
+		var ztype *types.Zval
 		if str_index != nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "descriptor spec must be an integer indexed array")
 			goto exit_fail
 		}
 		descriptors[ndesc].SetIndex(int(nindex))
-		if descitem.IsType(zend.IS_RESOURCE) {
+		if descitem.IsType(types.IS_RESOURCE) {
 
 			/* should be a stream - try and dup the descriptor */
 
 			var stream *core.PhpStream
 			var fd core.PhpSocketT
 			core.PhpStreamFromZval(stream, descitem)
-			if zend.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
+			if types.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
 				goto exit_fail
 			}
 			descriptors[ndesc].SetChildend(dup(fd))
@@ -618,7 +619,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				goto exit_fail
 			}
 			descriptors[ndesc].SetMode(DESC_FILE)
-		} else if descitem.GetType() != zend.IS_ARRAY {
+		} else if descitem.GetType() != types.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Descriptor item must be either an array or a File-Handle")
 			goto exit_fail
 		} else {
@@ -632,7 +633,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			if strcmp(ztype.GetStr().GetVal(), "pipe") == 0 {
 				var newpipe []PhpFileDescriptorT
-				var zmode *zend.Zval
+				var zmode *types.Zval
 				if b.Assign(&zmode, descitem.GetArr().IndexFindH(1)) != nil {
 					if zend.TryConvertToString(zmode) == 0 {
 						goto exit_fail
@@ -660,8 +661,8 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					descriptors[ndesc].SetModeFlags(O_RDONLY)
 				}
 			} else if strcmp(ztype.GetStr().GetVal(), "file") == 0 {
-				var zfile *zend.Zval
-				var zmode *zend.Zval
+				var zfile *types.Zval
+				var zmode *types.Zval
 				var fd core.PhpSocketT
 				var stream *core.PhpStream
 				descriptors[ndesc].SetMode(DESC_FILE)
@@ -688,19 +689,19 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 				/* force into an fd */
 
-				if stream == nil || zend.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_CAST_RELEASE|core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
+				if stream == nil || types.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_CAST_RELEASE|core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
 					goto exit_fail
 				}
 				descriptors[ndesc].SetChildend(fd)
 			} else if strcmp(ztype.GetStr().GetVal(), "redirect") == 0 {
-				var ztarget *zend.Zval = zend.ZendHashIndexFindDeref(descitem.GetArr(), 1)
+				var ztarget *types.Zval = zend.ZendHashIndexFindDeref(descitem.GetArr(), 1)
 				var target *PhpProcOpenDescriptorItem = nil
 				var childend PhpFileDescriptorT
 				if ztarget == nil {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing redirection target")
 					goto exit_fail
 				}
-				if ztarget.GetType() != zend.IS_LONG {
+				if ztarget.GetType() != types.IS_LONG {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target must be an integer")
 					goto exit_fail
 				}
@@ -840,7 +841,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			stream = streams.PhpStreamFopenFromFd(descriptors[i].GetParentend(), mode_string, nil)
 			if stream != nil {
-				var retfp zend.Zval
+				var retfp types.Zval
 
 				/* nasty hack; don't copy it */
 

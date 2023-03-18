@@ -3,7 +3,7 @@
 package streams
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <main/streams/streams.c>
@@ -31,10 +31,10 @@ import (
 
 /* {{{ resource and registration code */
 
-var UrlStreamWrappersHash zend.HashTable
-var LeStream int = zend.FAILURE
-var LePstream int = zend.FAILURE
-var LeStreamFilter int = zend.FAILURE
+var UrlStreamWrappersHash types.HashTable
+var LeStream int = types.FAILURE
+var LePstream int = types.FAILURE
+var LeStreamFilter int = types.FAILURE
 
 /* {{{ wrapper error reporting */
 

@@ -8,15 +8,16 @@ import (
 	"sik/core/streams"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpSelect(m core.PhpSocketT, r *fd_set, w *fd_set, e *fd_set, t *__struct__timeval) __auto__ {
 	return select_(m, r, w, e, t)
 }
-func GET_CTX_OPT(stream *core.PhpStream, wrapper string, name string, val *zend.Zval) bool {
+func GET_CTX_OPT(stream *core.PhpStream, wrapper string, name string, val *types.Zval) bool {
 	return core.PHP_STREAM_CONTEXT(stream) != nil && nil != b.Assign(&val, streams.PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), wrapper, name))
 }
-func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var domain zend.ZendLong
 	var type_ zend.ZendLong
 	var protocol zend.ZendLong
@@ -29,12 +30,12 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -121,11 +122,11 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *zend.Z
 	zend.AddNextIndexResource(return_value, s1.GetRes())
 	zend.AddNextIndexResource(return_value, s2.GetRes())
 }
-func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var host *zend.ZendString
-	var zerrno *zend.Zval = nil
-	var zerrstr *zend.Zval = nil
-	var zcontext *zend.Zval = nil
+func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var host *types.ZendString
+	var zerrno *types.Zval = nil
+	var zerrstr *types.Zval = nil
+	var zcontext *types.Zval = nil
 	var timeout float64 = float64(FG(default_socket_timeout))
 	var conv PhpTimeoutUll
 	var tv __struct__timeval
@@ -133,7 +134,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend
 	var stream *core.PhpStream = nil
 	var err int
 	var flags zend.ZendLong = PHP_STREAM_CLIENT_CONNECT
-	var errstr *zend.ZendString = nil
+	var errstr *types.ZendString = nil
 	var context *core.PhpStreamContext = nil
 	return_value.SetFalse()
 	for {
@@ -142,12 +143,12 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 6
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -248,9 +249,9 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend
 
 		/* host might contain binary characters */
 
-		var quoted_host *zend.ZendString = PhpAddslashes(host)
+		var quoted_host *types.ZendString = PhpAddslashes(host)
 		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
-		zend.ZendStringReleaseEx(quoted_host, 0)
+		types.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
 		zend.Efree(hashkey)
@@ -262,26 +263,26 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend
 		if zerrstr != nil && errstr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 		} else if errstr != nil {
-			zend.ZendStringReleaseEx(errstr, 0)
+			types.ZendStringReleaseEx(errstr, 0)
 		}
 		return_value.SetFalse()
 		return
 	}
 	if errstr != nil {
-		zend.ZendStringReleaseEx(errstr, 0)
+		types.ZendStringReleaseEx(errstr, 0)
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var host *byte
 	var host_len int
-	var zerrno *zend.Zval = nil
-	var zerrstr *zend.Zval = nil
-	var zcontext *zend.Zval = nil
+	var zerrno *types.Zval = nil
+	var zerrstr *types.Zval = nil
+	var zcontext *types.Zval = nil
 	var stream *core.PhpStream = nil
 	var err int = 0
 	var flags zend.ZendLong = streams.STREAM_XPORT_BIND | streams.STREAM_XPORT_LISTEN
-	var errstr *zend.ZendString = nil
+	var errstr *types.ZendString = nil
 	var context *core.PhpStreamContext = nil
 	return_value.SetFalse()
 	for {
@@ -290,12 +291,12 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 5
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -390,38 +391,38 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *zend
 		if zerrstr != nil && errstr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 		} else if errstr != nil {
-			zend.ZendStringReleaseEx(errstr, 0)
+			types.ZendStringReleaseEx(errstr, 0)
 		}
 		return_value.SetFalse()
 		return
 	}
 	if errstr != nil {
-		zend.ZendStringReleaseEx(errstr, 0)
+		types.ZendStringReleaseEx(errstr, 0)
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var timeout float64 = float64(FG(default_socket_timeout))
-	var zpeername *zend.Zval = nil
-	var peername *zend.ZendString = nil
+	var zpeername *types.Zval = nil
+	var peername *types.ZendString = nil
 	var conv PhpTimeoutUll
 	var tv __struct__timeval
 	var stream *core.PhpStream = nil
 	var clistream *core.PhpStream = nil
-	var zstream *zend.Zval
-	var errstr *zend.ZendString = nil
+	var zstream *types.Zval
+	var errstr *types.ZendString = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -501,32 +502,32 @@ func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *zend
 		core.PhpStreamToZval(clistream, return_value)
 	} else {
 		if peername != nil {
-			zend.ZendStringRelease(peername)
+			types.ZendStringRelease(peername)
 		}
 		core.PhpErrorDocref(nil, zend.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
 		return_value.SetFalse()
 	}
 	if errstr != nil {
-		zend.ZendStringReleaseEx(errstr, 0)
+		types.ZendStringReleaseEx(errstr, 0)
 	}
 }
-func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
-	var zstream *zend.Zval
-	var want_peer zend.ZendBool
-	var name *zend.ZendString = nil
+	var zstream *types.Zval
+	var want_peer types.ZendBool
+	var name *types.ZendString = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -595,15 +596,15 @@ func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *zen
 		return
 	}
 	if name.GetLen() == 0 || name.GetVal()[0] == 0 {
-		zend.ZendStringReleaseEx(name, 0)
+		types.ZendStringReleaseEx(name, 0)
 		return_value.SetFalse()
 		return
 	}
 	return_value.SetString(name)
 }
-func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
-	var zstream *zend.Zval
+	var zstream *types.Zval
 	var flags zend.ZendLong = 0
 	var data *byte
 	var target_addr *byte = nil
@@ -617,12 +618,12 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -703,7 +704,7 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend
 
 		/* parse the address */
 
-		if zend.FAILURE == core.PhpNetworkParseNetworkAddressWithPort(target_addr, target_addr_len, (*__struct__sockaddr)(&sa), &sl) {
+		if types.FAILURE == core.PhpNetworkParseNetworkAddressWithPort(target_addr, target_addr_len, (*__struct__sockaddr)(&sa), &sl) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to parse `%s' into a valid network address", target_addr)
 			return_value.SetFalse()
 			return
@@ -715,13 +716,13 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend
 	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
-func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
-	var zstream *zend.Zval
-	var zremote *zend.Zval = nil
-	var remote_addr *zend.ZendString = nil
+	var zstream *types.Zval
+	var zremote *types.Zval = nil
+	var remote_addr *types.ZendString = nil
 	var to_read zend.ZendLong = 0
-	var read_buf *zend.ZendString
+	var read_buf *types.ZendString
 	var flags zend.ZendLong = 0
 	var recvd int
 	for {
@@ -730,12 +731,12 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ze
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -816,7 +817,7 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ze
 		return_value.SetFalse()
 		return
 	}
-	read_buf = zend.ZendStringAlloc(to_read, 0)
+	read_buf = types.ZendStringAlloc(to_read, 0)
 	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf.GetVal(), to_read, int(flags), nil, nil, b.Cond(zremote != nil, &remote_addr, nil))
 	if recvd >= 0 {
 		if zremote != nil && remote_addr != nil {
@@ -827,28 +828,28 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ze
 		return_value.SetString(read_buf)
 		return
 	}
-	zend.ZendStringEfree(read_buf)
+	types.ZendStringEfree(read_buf)
 	return_value.SetFalse()
 	return
 }
-func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
-	var zsrc *zend.Zval
+	var zsrc *types.Zval
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
 	var desiredpos zend.ZendLong = -1
-	var contents *zend.ZendString
+	var contents *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -959,11 +960,11 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *zend.
 		return
 	}
 }
-func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var src *core.PhpStream
 	var dest *core.PhpStream
-	var zsrc *zend.Zval
-	var zdest *zend.Zval
+	var zsrc *types.Zval
+	var zdest *types.Zval
 	var maxlen zend.ZendLong = core.PHP_STREAM_COPY_ALL
 	var pos zend.ZendLong = 0
 	var len_ int
@@ -974,12 +975,12 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1063,15 +1064,15 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *zend
 		return
 	}
 	ret = core.PhpStreamCopyToStreamEx(src, dest, maxlen, &len_)
-	if ret != zend.SUCCESS {
+	if ret != types.SUCCESS {
 		return_value.SetFalse()
 		return
 	}
 	return_value.SetLong(len_)
 	return
 }
-func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zstream *zend.Zval
+func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -1079,12 +1080,12 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *zend.
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1162,17 +1163,17 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *zend.
 		zend.AddAssocString(return_value, "uri", stream.GetOrigPath())
 	}
 }
-func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var stream_xport_hash *zend.HashTable
-	var stream_xport *zend.ZendString
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var stream_xport_hash *types.HashTable
+	var stream_xport *types.ZendString
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if b.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
 		zend.ArrayInit(return_value)
-		var __ht *zend.HashTable = stream_xport_hash
+		var __ht *types.HashTable = stream_xport_hash
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			stream_xport = _p.GetKey()
 			zend.AddNextIndexStr(return_value, stream_xport.Copy())
@@ -1182,17 +1183,17 @@ func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *zen
 		return
 	}
 }
-func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var url_stream_wrappers_hash *zend.HashTable
-	var stream_protocol *zend.ZendString
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var url_stream_wrappers_hash *types.HashTable
+	var stream_protocol *types.ZendString
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if b.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
 		zend.ArrayInit(return_value)
-		var __ht *zend.HashTable = url_stream_wrappers_hash
+		var __ht *types.HashTable = url_stream_wrappers_hash
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			stream_protocol = _p.GetKey()
 			if stream_protocol != nil {
@@ -1204,16 +1205,16 @@ func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *zend.
 		return
 	}
 }
-func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSocketT) int {
-	var elem *zend.Zval
+func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpSocketT) int {
+	var elem *types.Zval
 	var stream *core.PhpStream
 	var cnt int = 0
-	if stream_array.GetType() != zend.IS_ARRAY {
+	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	var __ht *zend.HashTable = stream_array.GetArr()
+	var __ht *types.HashTable = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		elem = _z
 
@@ -1222,7 +1223,7 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 		   the higher bits of a SOCKET variable uninitialized on systems with little endian. */
 
 		var this_fd core.PhpSocketT
-		elem = zend.ZVAL_DEREF(elem)
+		elem = types.ZVAL_DEREF(elem)
 		core.PhpStreamFromZvalNoVerify(stream, elem)
 		if stream == nil {
 			continue
@@ -1234,7 +1235,7 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 		 * is not displayed.
 		 * */
 
-		if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != -1 {
+		if types.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != -1 {
 			core.PHP_SAFE_FD_SET(this_fd, fds)
 			if this_fd > (*max_fd) {
 				*max_fd = this_fd
@@ -1255,27 +1256,27 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 		return 0
 	}
 }
-func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
-	var elem *zend.Zval
-	var dest_elem *zend.Zval
-	var ht *zend.HashTable
+func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
+	var elem *types.Zval
+	var dest_elem *types.Zval
+	var ht *types.HashTable
 	var stream *core.PhpStream
 	var ret int = 0
-	var key *zend.ZendString
+	var key *types.ZendString
 	var num_ind zend.ZendUlong
-	if stream_array.GetType() != zend.IS_ARRAY {
+	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
-	var __ht *zend.HashTable = stream_array.GetArr()
+	ht = zend.ZendNewArray(types.Z_ARRVAL_P(stream_array).GetNNumOfElements())
+	var __ht *types.HashTable = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		num_ind = _p.GetH()
 		key = _p.GetKey()
 		elem = _z
 		var this_fd core.PhpSocketT
-		elem = zend.ZVAL_DEREF(elem)
+		elem = types.ZVAL_DEREF(elem)
 		core.PhpStreamFromZvalNoVerify(stream, elem)
 		if stream == nil {
 			continue
@@ -1287,7 +1288,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 		 * is not displayed.
 		 */
 
-		if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != core.SOCK_ERR {
+		if types.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != core.SOCK_ERR {
 			if core.PHP_SAFE_FD_ISSET(this_fd, fds) {
 				if key == nil {
 					dest_elem = ht.IndexUpdateH(num_ind, elem)
@@ -1314,26 +1315,26 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 	stream_array.SetArray(ht)
 	return ret
 }
-func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
-	var elem *zend.Zval
-	var dest_elem *zend.Zval
-	var ht *zend.HashTable
+func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
+	var elem *types.Zval
+	var dest_elem *types.Zval
+	var ht *types.HashTable
 	var stream *core.PhpStream
 	var ret int = 0
 	var num_ind zend.ZendUlong
-	var key *zend.ZendString
-	if stream_array.GetType() != zend.IS_ARRAY {
+	var key *types.ZendString
+	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
-	var __ht *zend.HashTable = stream_array.GetArr()
+	ht = zend.ZendNewArray(types.Z_ARRVAL_P(stream_array).GetNNumOfElements())
+	var __ht *types.HashTable = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		num_ind = _p.GetH()
 		key = _p.GetKey()
 		elem = _z
-		elem = zend.ZVAL_DEREF(elem)
+		elem = types.ZVAL_DEREF(elem)
 		core.PhpStreamFromZvalNoVerify(stream, elem)
 		if stream == nil {
 			continue
@@ -1368,10 +1369,10 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 	}
 	return ret
 }
-func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var r_array *zend.Zval
-	var w_array *zend.Zval
-	var e_array *zend.Zval
+func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var r_array *types.Zval
+	var w_array *types.Zval
+	var e_array *types.Zval
 	var tv __struct__timeval
 	var tv_p *__struct__timeval = nil
 	var rfds fd_set
@@ -1382,7 +1383,7 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	var sets int = 0
 	var sec zend.ZendLong
 	var usec zend.ZendLong = 0
-	var secnull zend.ZendBool
+	var secnull types.ZendBool
 	var set_count int
 	var max_set_count int = 0
 	for {
@@ -1391,12 +1392,12 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _max_num_args int = 5
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1575,9 +1576,9 @@ func UserSpaceStreamNotifier(
 	bytes_max int,
 	ptr any,
 ) {
-	var callback *zend.Zval = context.GetNotifier().GetPtr()
-	var retval zend.Zval
-	var zvs []zend.Zval
+	var callback *types.Zval = context.GetNotifier().GetPtr()
+	var retval types.Zval
+	var zvs []types.Zval
 	var i int
 	zvs[0].SetLong(notifycode)
 	zvs[1].SetLong(severity)
@@ -1589,7 +1590,7 @@ func UserSpaceStreamNotifier(
 	zvs[3].SetLong(xcode)
 	zvs[4].SetLong(bytes_sofar)
 	zvs[5].SetLong(bytes_max)
-	if zend.FAILURE == zend.CallUserFunctionEx(nil, callback, &retval, 6, zvs, 0) {
+	if types.FAILURE == zend.CallUserFunctionEx(nil, callback, &retval, 6, zvs, 0) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to call user notifier")
 	}
 	for i = 0; i < 6; i++ {
@@ -1598,28 +1599,28 @@ func UserSpaceStreamNotifier(
 	zend.ZvalPtrDtor(&retval)
 }
 func UserSpaceStreamNotifierDtor(notifier *streams.PhpStreamNotifier) {
-	if notifier != nil && notifier.GetPtr().GetType() != zend.IS_UNDEF {
+	if notifier != nil && notifier.GetPtr().GetType() != types.IS_UNDEF {
 		zend.ZvalPtrDtor(notifier.GetPtr())
 		notifier.GetPtr().SetUndef()
 	}
 }
-func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int {
-	var wval *zend.Zval
-	var oval *zend.Zval
-	var wkey *zend.ZendString
-	var okey *zend.ZendString
-	var ret int = zend.SUCCESS
-	var __ht *zend.HashTable = options.GetArr()
+func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) int {
+	var wval *types.Zval
+	var oval *types.Zval
+	var wkey *types.ZendString
+	var okey *types.ZendString
+	var ret int = types.SUCCESS
+	var __ht *types.HashTable = options.GetArr()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		wkey = _p.GetKey()
 		wval = _z
-		wval = zend.ZVAL_DEREF(wval)
-		if wkey != nil && wval.IsType(zend.IS_ARRAY) {
-			var __ht *zend.HashTable = wval.GetArr()
+		wval = types.ZVAL_DEREF(wval)
+		if wkey != nil && wval.IsType(types.IS_ARRAY) {
+			var __ht *types.HashTable = wval.GetArr()
 			for _, _p := range __ht.foreachData() {
-				var _z *zend.Zval = _p.GetVal()
+				var _z *types.Zval = _p.GetVal()
 
 				okey = _p.GetKey()
 				oval = _z
@@ -1633,9 +1634,9 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 	}
 	return ret
 }
-func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
-	var ret int = zend.SUCCESS
-	var tmp *zend.Zval
+func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int {
+	var ret int = types.SUCCESS
+	var tmp *types.Zval
 	if nil != b.Assign(&tmp, params.GetArr().KeyFind("notification")) {
 		if context.GetNotifier() != nil {
 			streams.PhpStreamNotificationFree(context.GetNotifier())
@@ -1643,11 +1644,11 @@ func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 		}
 		context.SetNotifier(streams.PhpStreamNotificationAlloc())
 		context.GetNotifier().SetFunc(UserSpaceStreamNotifier)
-		zend.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
+		types.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
 	if nil != b.Assign(&tmp, params.GetArr().KeyFind("options")) {
-		if tmp.IsType(zend.IS_ARRAY) {
+		if tmp.IsType(types.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
@@ -1655,7 +1656,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 	}
 	return ret
 }
-func DecodeContextParam(contextresource *zend.Zval) *core.PhpStreamContext {
+func DecodeContextParam(contextresource *types.Zval) *core.PhpStreamContext {
 	var context *core.PhpStreamContext = nil
 	context = zend.ZendFetchResourceEx(contextresource, nil, PhpLeStreamContext())
 	if context == nil {
@@ -1677,8 +1678,8 @@ func DecodeContextParam(contextresource *zend.Zval) *core.PhpStreamContext {
 	}
 	return context
 }
-func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zcontext *zend.Zval
+func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -1686,12 +1687,12 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1754,25 +1755,25 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_COPY(return_value, context.GetOptions())
+	types.ZVAL_COPY(return_value, context.GetOptions())
 }
-func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zcontext *zend.Zval = nil
+func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext
 	if executeData.NumArgs() == 2 {
-		var options *zend.Zval
+		var options *types.Zval
 		for {
 			var _flags int = 0
 			var _min_num_args int = 2
 			var _max_num_args int = 2
 			var _num_args int = executeData.NumArgs()
 			var _i int = 0
-			var _real_arg *zend.Zval
-			var _arg *zend.Zval = nil
+			var _real_arg *types.Zval
+			var _arg *types.Zval = nil
 			var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 			var _error *byte = nil
-			var _dummy zend.ZendBool
-			var _optional zend.ZendBool = 0
+			var _dummy types.ZendBool
+			var _optional types.ZendBool = 0
 			var _error_code int = zend.ZPP_ERROR_OK
 			void(_i)
 			void(_real_arg)
@@ -1843,10 +1844,10 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 			return_value.SetFalse()
 			return
 		}
-		zend.ZVAL_BOOL(return_value, ParseContextOptions(context, options) == zend.SUCCESS)
+		types.ZVAL_BOOL(return_value, ParseContextOptions(context, options) == types.SUCCESS)
 		return
 	} else {
-		var zvalue *zend.Zval
+		var zvalue *types.Zval
 		var wrappername *byte
 		var optionname *byte
 		var wrapperlen int
@@ -1857,12 +1858,12 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 			var _max_num_args int = 4
 			var _num_args int = executeData.NumArgs()
 			var _i int = 0
-			var _real_arg *zend.Zval
-			var _arg *zend.Zval = nil
+			var _real_arg *types.Zval
+			var _arg *types.Zval = nil
 			var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 			var _error *byte = nil
-			var _dummy zend.ZendBool
-			var _optional zend.ZendBool = 0
+			var _dummy types.ZendBool
+			var _optional types.ZendBool = 0
 			var _error_code int = zend.ZPP_ERROR_OK
 			void(_i)
 			void(_real_arg)
@@ -1941,13 +1942,13 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 			return_value.SetFalse()
 			return
 		}
-		zend.ZVAL_BOOL(return_value, streams.PhpStreamContextSetOption(context, wrappername, optionname, zvalue) == zend.SUCCESS)
+		types.ZVAL_BOOL(return_value, streams.PhpStreamContextSetOption(context, wrappername, optionname, zvalue) == types.SUCCESS)
 		return
 	}
 }
-func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var params *zend.Zval
-	var zcontext *zend.Zval
+func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var params *types.Zval
+	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -1955,12 +1956,12 @@ func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2029,10 +2030,10 @@ func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_BOOL(return_value, ParseContextParams(context, params) == zend.SUCCESS)
+	types.ZVAL_BOOL(return_value, ParseContextParams(context, params) == types.SUCCESS)
 }
-func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zcontext *zend.Zval
+func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -2040,12 +2041,12 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2109,15 +2110,15 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 		return
 	}
 	zend.ArrayInit(return_value)
-	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().GetType() != zend.IS_UNDEF && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
+	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().GetType() != types.IS_UNDEF && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
 		context.GetNotifier().GetPtr().TryAddRefcount()
 		zend.AddAssocZvalEx(return_value, "notification", context.GetNotifier().GetPtr())
 	}
 	context.GetOptions().TryAddRefcount()
 	zend.AddAssocZvalEx(return_value, "options", context.GetOptions())
 }
-func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var params *zend.Zval = nil
+func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var params *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -2125,12 +2126,12 @@ func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value 
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2197,8 +2198,8 @@ func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value 
 	}
 	streams.PhpStreamContextToZval(context, return_value)
 }
-func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var options *zend.Zval = nil
+func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var options *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -2206,12 +2207,12 @@ func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value 
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2274,9 +2275,9 @@ func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value 
 	ParseContextOptions(context, options)
 	streams.PhpStreamContextToZval(context, return_value)
 }
-func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var options *zend.Zval = nil
-	var params *zend.Zval = nil
+func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var options *types.Zval = nil
+	var params *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
 		var _flags int = 0
@@ -2284,12 +2285,12 @@ func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *zen
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2363,13 +2364,13 @@ func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *zen
 	return_value.SetResource(context.GetRes())
 	return
 }
-func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zstream *zend.Zval
+func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zstream *types.Zval
 	var stream *core.PhpStream
 	var filtername *byte
 	var filternamelen int
 	var read_write zend.ZendLong = 0
-	var filterparams *zend.Zval = nil
+	var filterparams *types.Zval = nil
 	var filter *core.PhpStreamFilter = nil
 	var ret int
 	for {
@@ -2378,12 +2379,12 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2482,7 +2483,7 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 		} else {
 			ret = streams.PhpStreamFilterPrependEx(stream.GetReadfilters(), filter)
 		}
-		if ret != zend.SUCCESS {
+		if ret != types.SUCCESS {
 			streams.PhpStreamFilterRemove(filter, 1)
 			return_value.SetFalse()
 			return
@@ -2499,7 +2500,7 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 		} else {
 			ret = streams.PhpStreamFilterPrependEx(stream.GetWritefilters(), filter)
 		}
-		if ret != zend.SUCCESS {
+		if ret != types.SUCCESS {
 			streams.PhpStreamFilterRemove(filter, 1)
 			return_value.SetFalse()
 			return
@@ -2515,14 +2516,14 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 		return
 	}
 }
-func ZifStreamFilterPrepend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamFilterPrepend(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	ApplyFilterToStream(0, executeData, return_value)
 }
-func ZifStreamFilterAppend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamFilterAppend(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	ApplyFilterToStream(1, executeData, return_value)
 }
-func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zfilter *zend.Zval
+func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zfilter *types.Zval
 	var filter *core.PhpStreamFilter
 	for {
 		var _flags int = 0
@@ -2530,12 +2531,12 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2598,12 +2599,12 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *zend
 		return_value.SetFalse()
 		return
 	}
-	if streams.PhpStreamFilterFlush(filter, 1) == zend.FAILURE {
+	if streams.PhpStreamFilterFlush(filter, 1) == types.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to flush filter, not removing")
 		return_value.SetFalse()
 		return
 	}
-	if zend.ZendListClose(zfilter.GetRes()) == zend.FAILURE {
+	if zend.ZendListClose(zfilter.GetRes()) == types.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not invalidate filter, not removing")
 		return_value.SetFalse()
 		return
@@ -2613,12 +2614,12 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *zend
 		return
 	}
 }
-func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte = nil
 	var str_len int = 0
 	var max_length zend.ZendLong
-	var zstream *zend.Zval
-	var buf *zend.ZendString
+	var zstream *types.Zval
+	var buf *types.ZendString
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -2626,12 +2627,12 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2718,9 +2719,9 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return
 	}
 }
-func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zstream *zend.Zval
-	var block zend.ZendBool
+func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zstream *types.Zval
+	var block types.ZendBool
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -2728,12 +2729,12 @@ func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *zend.
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2803,8 +2804,8 @@ func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *zend.
 	return_value.SetTrue()
 	return
 }
-func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var socket *zend.Zval
+func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var socket *types.Zval
 	var seconds zend.ZendLong
 	var microseconds zend.ZendLong = 0
 	var t __struct__timeval
@@ -2816,12 +2817,12 @@ func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2905,8 +2906,8 @@ func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *zend.Z
 	return_value.SetFalse()
 	return
 }
-func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg1 *zend.Zval
+func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg1 *types.Zval
 	var ret int
 	var arg2 zend.ZendLong
 	var buff int
@@ -2917,12 +2918,12 @@ func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *ze
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2998,10 +2999,10 @@ func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *ze
 	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
-func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ret int
 	var csize zend.ZendLong
-	var zstream *zend.Zval
+	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -3009,12 +3010,12 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3098,8 +3099,8 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *zend
 	return_value.SetLong(b.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
 	return
 }
-func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg1 *zend.Zval
+func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg1 *types.Zval
 	var ret int
 	var arg2 zend.ZendLong
 	var buff int
@@ -3110,12 +3111,12 @@ func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *zen
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3191,14 +3192,14 @@ func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *zen
 	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
-func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var cryptokind zend.ZendLong = 0
-	var zstream *zend.Zval
-	var zsessstream *zend.Zval = nil
+	var zstream *types.Zval
+	var zsessstream *types.Zval = nil
 	var stream *core.PhpStream
 	var sessstream *core.PhpStream = nil
-	var enable zend.ZendBool
-	var cryptokindnull zend.ZendBool = 1
+	var enable types.ZendBool
+	var cryptokindnull types.ZendBool = 1
 	var ret int
 	for {
 		var _flags int = 0
@@ -3206,12 +3207,12 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3290,7 +3291,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 	core.PhpStreamFromZval(stream, zstream)
 	if enable != 0 {
 		if cryptokindnull != 0 {
-			var val *zend.Zval
+			var val *types.Zval
 			if !(GET_CTX_OPT(stream, "ssl", "crypto_method", val)) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "When enabling encryption you must specify the crypto type")
 				return_value.SetFalse()
@@ -3319,7 +3320,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 }
-func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var resolved_path *string
@@ -3329,12 +3330,12 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3398,8 +3399,8 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 	return_value.SetFalse()
 	return
 }
-func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zstream *zend.Zval
+func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zstream *types.Zval
 	var stream *core.PhpStream = nil
 	var wrapper *core.PhpStreamWrapper = nil
 	for {
@@ -3408,12 +3409,12 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3466,7 +3467,7 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	if zstream.IsType(zend.IS_RESOURCE) {
+	if zstream.IsType(types.IS_RESOURCE) {
 		core.PhpStreamFromZval(stream, zstream)
 		if stream == nil {
 			return_value.SetFalse()
@@ -3483,24 +3484,24 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_BOOL(return_value, wrapper.GetIsUrl() == 0)
+	types.ZVAL_BOOL(return_value, wrapper.GetIsUrl() == 0)
 	return
 }
-func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
-	var zsrc *zend.Zval
+	var zsrc *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3565,8 +3566,8 @@ func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *zend
 	return_value.SetTrue()
 	return
 }
-func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var zsrc *zend.Zval
+func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var zsrc *types.Zval
 	var stream *core.PhpStream
 	var fileno core.PhpSocketT
 	for {
@@ -3575,12 +3576,12 @@ func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3638,9 +3639,9 @@ func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		break
 	}
 	core.PhpStreamFromZval(stream, zsrc)
-	if core.PhpStreamCanCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT) == zend.SUCCESS {
+	if core.PhpStreamCanCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT) == types.SUCCESS {
 		core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT, any(&fileno), 0)
-	} else if core.PhpStreamCanCast(stream, core.PHP_STREAM_AS_FD) == zend.SUCCESS {
+	} else if core.PhpStreamCanCast(stream, core.PHP_STREAM_AS_FD) == types.SUCCESS {
 		core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD, any(&fileno), 0)
 	} else {
 		return_value.SetFalse()
@@ -3649,13 +3650,13 @@ func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 
 	/* Check if the file descriptor identifier is a terminal */
 
-	zend.ZVAL_BOOL(return_value, zend.Isatty(fileno) != 0)
+	types.ZVAL_BOOL(return_value, zend.Isatty(fileno) != 0)
 
 	/* Check if the file descriptor identifier is a terminal */
 }
-func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var how zend.ZendLong
-	var zstream *zend.Zval
+	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -3663,12 +3664,12 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ze
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3737,6 +3738,6 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ze
 		return
 	}
 	core.PhpStreamFromZval(stream, zstream)
-	zend.ZVAL_BOOL(return_value, streams.PhpStreamXportShutdown(stream, streams.StreamShutdownT(how)) == 0)
+	types.ZVAL_BOOL(return_value, streams.PhpStreamXportShutdown(stream, streams.StreamShutdownT(how)) == 0)
 	return
 }

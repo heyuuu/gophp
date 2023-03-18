@@ -9,15 +9,16 @@ import (
 	"sik/core/streams"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func ZmStartupExec(type_ int, module_number int) int {
 	/* This is just an arbitrary value for the fallback case. */
 
 	CmdMaxLen = 4096
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func PhpExec(type_ int, cmd *byte, array *zend.Zval, return_value *zend.Zval) int {
+func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) int {
 	var fp *r.FILE
 	var buf *byte
 	var l int = 0
@@ -126,11 +127,11 @@ err:
 	pclose_return = -1
 	goto done
 }
-func PhpExecEx(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
+func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
 	var cmd *byte
 	var cmd_len int
-	var ret_code *zend.Zval = nil
-	var ret_array *zend.Zval = nil
+	var ret_code *types.Zval = nil
+	var ret_array *types.Zval = nil
 	var ret int
 	for {
 		var _flags int = 0
@@ -138,12 +139,12 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode 
 		var _max_num_args int = b.Cond(mode != 0, 2, 3)
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -220,9 +221,9 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode 
 	if ret_array == nil {
 		ret = PhpExec(mode, cmd, nil, return_value)
 	} else {
-		if zend.Z_REFVAL_P(ret_array).IsType(zend.IS_ARRAY) {
-			ret_array = zend.ZVAL_DEREF(ret_array)
-			zend.SEPARATE_ARRAY(ret_array)
+		if types.Z_REFVAL_P(ret_array).IsType(types.IS_ARRAY) {
+			ret_array = types.ZVAL_DEREF(ret_array)
+			types.SEPARATE_ARRAY(ret_array)
 		} else {
 			ret_array = zend.ZendTryArrayInit(ret_array)
 			if ret_array == nil {
@@ -235,30 +236,30 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode 
 		zend.ZEND_TRY_ASSIGN_REF_LONG(ret_code, ret)
 	}
 }
-func ZifExec(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpExecEx(executeData, return_value, 0)
 }
-func ZifSystem(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSystem(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpExecEx(executeData, return_value, 1)
 }
-func ZifPassthru(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPassthru(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpExecEx(executeData, return_value, 3)
 }
-func PhpEscapeShellCmd(str *byte) *zend.ZendString {
+func PhpEscapeShellCmd(str *byte) *types.ZendString {
 	var x int
 	var y int
 	var l int = strlen(str)
 	var estimate uint64 = 2*uint64(l) + 1
-	var cmd *zend.ZendString
+	var cmd *types.ZendString
 	var p *byte = nil
 
 	/* max command line length - two single quotes - \0 byte length */
 
 	if l > CmdMaxLen-2-1 {
 		core.PhpErrorDocref(nil, zend.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
-		return zend.ZSTR_EMPTY_ALLOC()
+		return types.ZSTR_EMPTY_ALLOC()
 	}
-	cmd = zend.ZendStringSafeAlloc(2, l, 0, 0)
+	cmd = types.ZendStringSafeAlloc(2, l, 0, 0)
 	x = 0
 	y = 0
 	for ; x < l; x++ {
@@ -336,15 +337,15 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 	cmd.GetVal()[y] = '0'
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, zend.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
-		zend.ZendStringReleaseEx(cmd, 0)
-		return zend.ZSTR_EMPTY_ALLOC()
+		types.ZendStringReleaseEx(cmd, 0)
+		return types.ZSTR_EMPTY_ALLOC()
 	}
 	if estimate-y > 4096 {
 
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
 
-		cmd = zend.ZendStringTruncate(cmd, y, 0)
+		cmd = types.ZendStringTruncate(cmd, y, 0)
 
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
@@ -353,20 +354,20 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 	cmd.SetLen(y)
 	return cmd
 }
-func PhpEscapeShellArg(str *byte) *zend.ZendString {
+func PhpEscapeShellArg(str *byte) *types.ZendString {
 	var x int
 	var y int = 0
 	var l int = strlen(str)
-	var cmd *zend.ZendString
+	var cmd *types.ZendString
 	var estimate uint64 = 4*uint64(l) + 3
 
 	/* max command line length - two single quotes - \0 byte length */
 
 	if l > CmdMaxLen-2-1 {
 		core.PhpErrorDocref(nil, zend.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
-		return zend.ZSTR_EMPTY_ALLOC()
+		return types.ZSTR_EMPTY_ALLOC()
 	}
-	cmd = zend.ZendStringSafeAlloc(4, l, 2, 0)
+	cmd = types.ZendStringSafeAlloc(4, l, 2, 0)
 	cmd.GetVal()[b.PostInc(&y)] = '\''
 	for x = 0; x < l; x++ {
 		var mb_len int = PhpMblen(str+x, l-x)
@@ -395,15 +396,15 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 	cmd.GetVal()[y] = '0'
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, zend.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
-		zend.ZendStringReleaseEx(cmd, 0)
-		return zend.ZSTR_EMPTY_ALLOC()
+		types.ZendStringReleaseEx(cmd, 0)
+		return types.ZSTR_EMPTY_ALLOC()
 	}
 	if estimate-y > 4096 {
 
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
 
-		cmd = zend.ZendStringTruncate(cmd, y, 0)
+		cmd = types.ZendStringTruncate(cmd, y, 0)
 
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
@@ -412,7 +413,7 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 	cmd.SetLen(y)
 	return cmd
 }
-func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var command *byte
 	var command_len int
 	for {
@@ -421,12 +422,12 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -492,7 +493,7 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		zend.ZVAL_EMPTY_STRING(return_value)
 	}
 }
-func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var argument *byte
 	var argument_len int
 	for {
@@ -501,12 +502,12 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -570,11 +571,11 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		return_value.SetString(PhpEscapeShellArg(argument))
 	}
 }
-func ZifShellExec(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var in *r.FILE
 	var command *byte
 	var command_len int
-	var ret *zend.ZendString
+	var ret *types.ZendString
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -582,12 +583,12 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -665,7 +666,7 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetString(ret)
 	}
 }
-func ZifProcNice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifProcNice(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var pri zend.ZendLong
 	for {
 		var _flags int = 0
@@ -673,12 +674,12 @@ func ZifProcNice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

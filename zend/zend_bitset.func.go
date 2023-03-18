@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZEND_BITSET_ELM_NUM(n uint32) int { return n >> 6 }
@@ -42,7 +43,7 @@ func ZendUlongNtz(num ZendUlong) int {
 func ZendBitsetLen(n uint32) uint32 {
 	return (n + (b.SizeOf("zend_long")*8 - 1)) / (b.SizeOf("zend_long") * 8)
 }
-func ZendBitsetIn(set ZendBitset, n uint32) ZendBool { return ZEND_BIT_TEST(set, n) }
+func ZendBitsetIn(set ZendBitset, n uint32) types.ZendBool { return ZEND_BIT_TEST(set, n) }
 func ZendBitsetIncl(set ZendBitset, n uint32) {
 	set[ZEND_BITSET_ELM_NUM(n)] |= uint64(1) << ZEND_BITSET_BIT_NUM(n)
 }
@@ -64,7 +65,7 @@ func ZendBitsetEmpty(set ZendBitset, len_ uint32) int {
 func ZendBitsetFill(set ZendBitset, len_ uint32) {
 	memset(set, 0xff, len_*ZEND_BITSET_ELM_SIZE)
 }
-func ZendBitsetEqual(set1 ZendBitset, set2 ZendBitset, len_ uint32) ZendBool {
+func ZendBitsetEqual(set1 ZendBitset, set2 ZendBitset, len_ uint32) types.ZendBool {
 	return memcmp(set1, set2, len_*ZEND_BITSET_ELM_SIZE) == 0
 }
 func ZendBitsetCopy(set1 ZendBitset, set2 ZendBitset, len_ uint32) {
@@ -100,7 +101,7 @@ func ZendBitsetUnionWithDifference(set1 ZendBitset, set2 ZendBitset, set3 ZendBi
 		set1[i] = set2[i] | set3[i] & ^(set4[i])
 	}
 }
-func ZendBitsetSubset(set1 ZendBitset, set2 ZendBitset, len_ uint32) ZendBool {
+func ZendBitsetSubset(set1 ZendBitset, set2 ZendBitset, len_ uint32) types.ZendBool {
 	var i uint32
 	for i = 0; i < len_; i++ {
 		if (set1[i] & ^(set2[i])) != 0 {

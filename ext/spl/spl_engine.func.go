@@ -5,25 +5,26 @@ package spl
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func SplInstantiateArgEx1(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zend.Zval) int {
+func SplInstantiateArgEx1(pce *zend.ZendClassEntry, retval *types.Zval, arg1 *types.Zval) int {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetVal(), func_.GetFunctionName().GetLen(), nil, 1, arg1, nil)
 	return 0
 }
-func SplInstantiateArgEx2(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zend.Zval, arg2 *zend.Zval) int {
+func SplInstantiateArgEx2(pce *zend.ZendClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetVal(), func_.GetFunctionName().GetLen(), nil, 2, arg1, arg2)
 	return 0
 }
-func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *zend.Zval, argc int, argv *zend.Zval) {
+func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
 	var fci zend.ZendFcallInfo
 	var fcc zend.ZendFcallInfoCache
-	var dummy zend.Zval
+	var dummy types.Zval
 	SplInstantiate(pce, retval)
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
 	fci.GetFunctionName().SetString(func_.GetFunctionName())
@@ -37,28 +38,28 @@ func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *zend.Zval, argc int, a
 	fcc.SetObject(retval.GetObj())
 	zend.ZendCallFunction(&fci, &fcc)
 }
-func SplInstantiate(pce *zend.ZendClassEntry, object *zend.Zval) { zend.ObjectInitEx(object, pce) }
-func SplOffsetConvertToLong(offset *zend.Zval) zend.ZendLong {
+func SplInstantiate(pce *zend.ZendClassEntry, object *types.Zval) { zend.ObjectInitEx(object, pce) }
+func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 	var idx zend.ZendUlong
 try_again:
 	switch offset.GetType() {
-	case zend.IS_STRING:
+	case types.IS_STRING:
 		if zend.ZEND_HANDLE_NUMERIC(offset.GetStr(), &idx) {
 			return idx
 		}
-	case zend.IS_DOUBLE:
+	case types.IS_DOUBLE:
 		return zend.ZendLong(offset.GetDval())
-	case zend.IS_LONG:
+	case types.IS_LONG:
 		return offset.GetLval()
-	case zend.IS_FALSE:
+	case types.IS_FALSE:
 		return 0
-	case zend.IS_TRUE:
+	case types.IS_TRUE:
 		return 1
-	case zend.IS_REFERENCE:
-		offset = zend.Z_REFVAL_P(offset)
+	case types.IS_REFERENCE:
+		offset = types.Z_REFVAL_P(offset)
 		goto try_again
-	case zend.IS_RESOURCE:
-		return zend.Z_RES_HANDLE_P(offset)
+	case types.IS_RESOURCE:
+		return types.Z_RES_HANDLE_P(offset)
 	}
 	return -1
 }

@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func IS_VALID_SALT_CHARACTER(c byte) bool {
@@ -21,11 +22,11 @@ func ZmStartupCrypt(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("CRYPT_SHA256", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("CRYPT_SHA512", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
 	PhpInitCryptR()
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownCrypt(type_ int, module_number int) int {
 	PhpShutdownCryptR()
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpTo64(s *byte, n int) {
 	for b.PreDec(&n) >= 0 {
@@ -33,9 +34,9 @@ func PhpTo64(s *byte, n int) {
 		s++
 	}
 }
-func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet zend.ZendBool) *zend.ZendString {
+func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet types.ZendBool) *types.ZendString {
 	var crypt_res *byte
-	var result *zend.ZendString
+	var result *types.ZendString
 	if salt[0] == '*' && (salt[1] == '0' || salt[1] == '1') {
 		return nil
 	}
@@ -49,7 +50,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet zend
 		var out *byte
 		out = PhpMd5CryptR(password, salt, output)
 		if out != nil {
-			return zend.ZendStringInit(out, strlen(out), 0)
+			return types.ZendStringInit(out, strlen(out), 0)
 		}
 		return nil
 	} else if salt[0] == '$' && salt[1] == '6' && salt[2] == '$' {
@@ -61,7 +62,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet zend
 			zend.Efree(output)
 			return nil
 		} else {
-			result = zend.ZendStringInit(output, strlen(output), 0)
+			result = types.ZendStringInit(output, strlen(output), 0)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -75,7 +76,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet zend
 			zend.Efree(output)
 			return nil
 		} else {
-			result = zend.ZendStringInit(output, strlen(output), 0)
+			result = types.ZendStringInit(output, strlen(output), 0)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -88,7 +89,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet zend
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return nil
 		} else {
-			result = zend.ZendStringInit(output, strlen(output), 0)
+			result = types.ZendStringInit(output, strlen(output), 0)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return result
 		}
@@ -121,36 +122,36 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet zend
 		if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 			return nil
 		} else {
-			result = zend.ZendStringInit(crypt_res, strlen(crypt_res), 0)
+			result = types.ZendStringInit(crypt_res, strlen(crypt_res), 0)
 			return result
 		}
 	}
 	if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 		return nil
 	} else {
-		result = zend.ZendStringInit(crypt_res, strlen(crypt_res), 0)
+		result = types.ZendStringInit(crypt_res, strlen(crypt_res), 0)
 		return result
 	}
 }
-func ZifCrypt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifCrypt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var salt []byte
 	var str *byte
 	var salt_in *byte = nil
 	var str_len int
 	var salt_in_len int = 0
-	var result *zend.ZendString
+	var result *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

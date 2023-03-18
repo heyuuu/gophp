@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendAbstractInfo
  */
@@ -37,7 +39,7 @@ type VarianceObligation struct {
 		__0           struct {
 			parent_fn    ZendFunction
 			child_fn     ZendFunction
-			always_error ZendBool
+			always_error types.ZendBool
 		}
 		__1 struct {
 			parent_prop *ZendPropertyInfo
@@ -58,8 +60,10 @@ func (this *VarianceObligation) GetParentFn() ZendFunction { return this.__0.__0
 func (this *VarianceObligation) GetChildFn() ZendFunction { return this.__0.__0.child_fn }
 
 // func (this *VarianceObligation) SetChildFn(value ZendFunction) { this.__0.__0.child_fn = value }
-func (this *VarianceObligation) GetAlwaysError() ZendBool         { return this.__0.__0.always_error }
-func (this *VarianceObligation) SetAlwaysError(value ZendBool)    { this.__0.__0.always_error = value }
+func (this *VarianceObligation) GetAlwaysError() types.ZendBool { return this.__0.__0.always_error }
+func (this *VarianceObligation) SetAlwaysError(value types.ZendBool) {
+	this.__0.__0.always_error = value
+}
 func (this *VarianceObligation) GetParentProp() *ZendPropertyInfo { return this.__0.__1.parent_prop }
 func (this *VarianceObligation) SetParentProp(value *ZendPropertyInfo) {
 	this.__0.__1.parent_prop = value

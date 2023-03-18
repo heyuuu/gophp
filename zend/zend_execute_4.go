@@ -4,16 +4,17 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
-	var rv Zval
-	var z *Zval
-	var obj Zval
-	var z_copy Zval
+func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
+	var rv types.Zval
+	var z *types.Zval
+	var obj types.Zval
+	var z_copy types.Zval
 	obj.SetObject(object.GetObj())
 	obj.AddRefcount()
-	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		if RETURN_VALUE_USED(opline) {
@@ -21,43 +22,43 @@ func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *a
 		}
 		return
 	}
-	if z.IsObject() && Z_OBJ_HT_P(z).GetGet() != nil {
-		var rv2 Zval
-		var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
+		var rv2 types.Zval
+		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
 			ZvalPtrDtor(&rv)
 		}
-		ZVAL_COPY_VALUE(z, value)
+		types.ZVAL_COPY_VALUE(z, value)
 	}
-	ZVAL_COPY_DEREF(&z_copy, z)
+	types.ZVAL_COPY_DEREF(&z_copy, z)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 		IncrementFunction(&z_copy)
 	} else {
 		DecrementFunction(&z_copy)
 	}
 	if RETURN_VALUE_USED(opline) {
-		ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), &z_copy)
+		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), &z_copy)
 	}
-	Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
+	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	OBJ_RELEASE(obj.GetObj())
 	ZvalPtrDtor(&z_copy)
 	ZvalPtrDtor(z)
 }
 func ZendAssignOpOverloadedProperty(
-	object *Zval,
-	property *Zval,
+	object *types.Zval,
+	property *types.Zval,
 	cache_slot *any,
-	value *Zval,
+	value *types.Zval,
 	opline *ZendOp,
 	executeData *ZendExecuteData,
 ) {
-	var z *Zval
-	var rv Zval
-	var obj Zval
-	var res Zval
+	var z *types.Zval
+	var rv types.Zval
+	var obj types.Zval
+	var res types.Zval
 	obj.SetObject(object.GetObj())
 	obj.AddRefcount()
-	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
+	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		if RETURN_VALUE_USED(opline) {
@@ -65,19 +66,19 @@ func ZendAssignOpOverloadedProperty(
 		}
 		return
 	}
-	if z.IsObject() && Z_OBJ_HT_P(z).GetGet() != nil {
-		var rv2 Zval
-		var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
+	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
+		var rv2 types.Zval
+		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
 			ZvalPtrDtor(&rv)
 		}
-		ZVAL_COPY_VALUE(z, value)
+		types.ZVAL_COPY_VALUE(z, value)
 	}
-	if ZendBinaryOp(&res, z, value, opline) == SUCCESS {
-		Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &res, cache_slot)
+	if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
+		types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &res, cache_slot)
 	}
 	if RETURN_VALUE_USED(opline) {
-		ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), &res)
+		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), &res)
 	}
 	ZvalPtrDtor(z)
 	ZvalPtrDtor(&res)
@@ -98,8 +99,8 @@ func ZendExtensionFcallEndHandler(extension *ZendExtension, frame *ZendExecuteDa
 		extension.GetFcallEndHandler()(frame)
 	}
 }
-func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *HashTable {
-	var ht *HashTable
+func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *types.HashTable {
+	var ht *types.HashTable
 	if (fetch_type & (ZEND_FETCH_GLOBAL_LOCK | ZEND_FETCH_GLOBAL)) != 0 {
 		ht = EG__().GetSymbolTable()
 	} else {
@@ -114,47 +115,47 @@ func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *Has
 func ZendUndefinedOffset(lval ZendLong) {
 	ZendError(E_NOTICE, "Undefined offset: "+ZEND_LONG_FMT, lval)
 }
-func ZendUndefinedIndex(offset *ZendString) {
+func ZendUndefinedIndex(offset *types.ZendString) {
 	ZendError(E_NOTICE, "Undefined index: %s", offset.GetVal())
 }
-func ZendUndefinedOffsetWrite(ht *HashTable, lval ZendLong) int {
+func ZendUndefinedOffsetWrite(ht *types.HashTable, lval ZendLong) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
-	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+	if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 		ht.AddRefcount()
 	}
 	ZendUndefinedOffset(lval)
-	if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+	if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 		ht.DestroyEx()
-		return FAILURE
+		return types.FAILURE
 	}
 	if EG__().GetException() != nil {
-		return FAILURE
+		return types.FAILURE
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
-func ZendUndefinedIndexWrite(ht *HashTable, offset *ZendString) int {
+func ZendUndefinedIndexWrite(ht *types.HashTable, offset *types.ZendString) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
-	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+	if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 		ht.AddRefcount()
 	}
 	ZendUndefinedIndex(offset)
-	if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+	if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 		ht.DestroyEx()
-		return FAILURE
+		return types.FAILURE
 	}
 	if EG__().GetException() != nil {
-		return FAILURE
+		return types.FAILURE
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
-func ZendUndefinedMethod(ce *ZendClassEntry, method *ZendString) {
+func ZendUndefinedMethod(ce *ZendClassEntry, method *types.ZendString) {
 	ZendThrowError(nil, "Call to undefined method %s::%s()", ce.GetName().GetVal(), method.GetVal())
 }
-func ZendInvalidMethodCall(object *Zval, function_name *Zval) {
+func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
 	ZendThrowError(nil, "Call to a member function %s() on %s", function_name.GetStr().GetVal(), ZendGetTypeByConst(object.GetType()))
 }
 func ZendNonStaticMethodCall(fbc *ZendFunction) {
@@ -173,13 +174,13 @@ func ZendUseScalarAsArray() {
 func ZendCannotAddElement() {
 	ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 }
-func ZendUseResourceAsOffset(dim *Zval) {
-	ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(dim), Z_RES_HANDLE_P(dim))
+func ZendUseResourceAsOffset(dim *types.Zval) {
+	ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(dim), types.Z_RES_HANDLE_P(dim))
 }
 func ZendUseNewElementForString() {
 	ZendThrowError(nil, "[] operator not supported for strings")
 }
-func ZendBinaryAssignOpDimSlow(container *Zval, dim *Zval, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	if container.IsString() {
 		if opline.GetOp2Type() == IS_UNUSED {
 			ZendUseNewElementForString()
@@ -191,49 +192,49 @@ func ZendBinaryAssignOpDimSlow(container *Zval, dim *Zval, opline *ZendOp, execu
 		ZendUseScalarAsArray()
 	}
 }
-func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, executeData *ZendExecuteData) ZendUchar {
+func SlowIndexConvert(ht *types.HashTable, dim *types.Zval, value *types.ZendValue, executeData *ZendExecuteData) types.ZendUchar {
 	switch dim.GetType() {
-	case IS_UNDEF:
+	case types.IS_UNDEF:
 
 		/* The array may be destroyed while throwing the notice.
 		 * Temporarily increase the refcount to detect this situation. */
 
-		if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 			ht.AddRefcount()
 		}
 		ZVAL_UNDEFINED_OP2()
-		if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+		if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 			ht.DestroyEx()
-			return IS_NULL
+			return types.IS_NULL
 		}
 		if EG__().GetException() != nil {
-			return IS_NULL
+			return types.IS_NULL
 		}
 		fallthrough
-	case IS_NULL:
-		value.SetStr(ZSTR_EMPTY_ALLOC())
-		return IS_STRING
-	case IS_DOUBLE:
+	case types.IS_NULL:
+		value.SetStr(types.ZSTR_EMPTY_ALLOC())
+		return types.IS_STRING
+	case types.IS_DOUBLE:
 		value.SetLval(ZendDvalToLval(dim.GetDval()))
-		return IS_LONG
-	case IS_RESOURCE:
+		return types.IS_LONG
+	case types.IS_RESOURCE:
 		ZendUseResourceAsOffset(dim)
-		value.SetLval(Z_RES_HANDLE_P(dim))
-		return IS_LONG
-	case IS_FALSE:
+		value.SetLval(types.Z_RES_HANDLE_P(dim))
+		return types.IS_LONG
+	case types.IS_FALSE:
 		value.SetLval(0)
-		return IS_LONG
-	case IS_TRUE:
+		return types.IS_LONG
+	case types.IS_TRUE:
 		value.SetLval(1)
-		return IS_LONG
+		return types.IS_LONG
 	default:
 		ZendIllegalOffset()
-		return IS_NULL
+		return types.IS_NULL
 	}
 }
-func ZendFetchDimensionAddressInner(ht *HashTable, dim *Zval, dim_type int, type_ int, executeData *ZendExecuteData) *Zval {
-	var retval *Zval = nil
-	var offset_key *ZendString
+func ZendFetchDimensionAddressInner(ht *types.HashTable, dim *types.Zval, dim_type int, type_ int, executeData *ZendExecuteData) *types.Zval {
+	var retval *types.Zval = nil
+	var offset_key *types.ZendString
 	var hval ZendUlong
 try_again:
 	if dim.IsLong() {
@@ -251,7 +252,7 @@ try_again:
 		case BP_VAR_IS:
 			retval = EG__().GetUninitializedZval()
 		case BP_VAR_RW:
-			if ZendUndefinedOffsetWrite(ht, hval) == FAILURE {
+			if ZendUndefinedOffsetWrite(ht, hval) == types.FAILURE {
 				return nil
 			}
 			fallthrough
@@ -309,26 +310,26 @@ try_again:
 				/* Key may be released while throwing the undefined index warning. */
 
 				offset_key.AddRefcount()
-				if ZendUndefinedIndexWrite(ht, offset_key) == FAILURE {
-					ZendStringRelease(offset_key)
+				if ZendUndefinedIndexWrite(ht, offset_key) == types.FAILURE {
+					types.ZendStringRelease(offset_key)
 					return nil
 				}
 				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
-				ZendStringRelease(offset_key)
+				types.ZendStringRelease(offset_key)
 			case BP_VAR_W:
 				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
 			}
 		}
 	} else if dim.IsReference() {
-		dim = Z_REFVAL_P(dim)
+		dim = types.Z_REFVAL_P(dim)
 		goto try_again
 	} else {
-		var val ZendValue
-		var t ZendUchar = SlowIndexConvert(ht, dim, &val, executeData)
-		if t == IS_STRING {
+		var val types.ZendValue
+		var t types.ZendUchar = SlowIndexConvert(ht, dim, &val, executeData)
+		if t == types.IS_STRING {
 			offset_key = val.GetStr()
 			goto str_index
-		} else if t == IS_LONG {
+		} else if t == types.IS_LONG {
 			hval = val.GetLval()
 			goto num_index
 		} else {
@@ -341,30 +342,30 @@ try_again:
 	}
 	return retval
 }
-func zend_fetch_dimension_address_inner_W(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+func zend_fetch_dimension_address_inner_W(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_inner_W_CONST(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+func zend_fetch_dimension_address_inner_W_CONST(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_inner_RW(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+func zend_fetch_dimension_address_inner_RW(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_RW, executeData)
 }
-func zend_fetch_dimension_address_inner_RW_CONST(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+func zend_fetch_dimension_address_inner_RW_CONST(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_RW, executeData)
 }
 func ZendFetchDimensionAddress(
-	result *Zval,
-	container *Zval,
-	dim *Zval,
+	result *types.Zval,
+	container *types.Zval,
+	dim *types.Zval,
 	dim_type int,
 	type_ int,
 	executeData *ZendExecuteData,
 ) {
-	var retval *Zval
+	var retval *types.Zval
 	if container.IsArray() {
 	try_array:
-		SEPARATE_ARRAY(container)
+		types.SEPARATE_ARRAY(container)
 	fetch_from_array:
 		if dim == nil {
 			retval = container.GetArr().NextIndexInsert(EG__().GetUninitializedZval())
@@ -383,11 +384,11 @@ func ZendFetchDimensionAddress(
 		result.SetIndirect(retval)
 		return
 	} else if container.IsReference() {
-		var ref *ZendReference = container.GetRef()
-		container = Z_REFVAL_P(container)
+		var ref *types.ZendReference = container.GetRef()
+		container = types.Z_REFVAL_P(container)
 		if container.IsArray() {
 			goto try_array
-		} else if container.GetType() <= IS_FALSE {
+		} else if container.GetType() <= types.IS_FALSE {
 			if type_ != BP_VAR_UNSET {
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					if ZendVerifyRefArrayAssignable(ref) == 0 {
@@ -417,23 +418,23 @@ func ZendFetchDimensionAddress(
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
 		}
-		retval = Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
+		retval = types.Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
 		if retval == EG__().GetUninitializedZval() {
-			var ce *ZendClassEntry = Z_OBJCE_P(container)
+			var ce *ZendClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()
 			ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
-		} else if retval != nil && retval.GetType() != IS_UNDEF {
+		} else if retval != nil && retval.GetType() != types.IS_UNDEF {
 			if !(retval.IsReference()) {
 				if result != retval {
-					ZVAL_COPY(result, retval)
+					types.ZVAL_COPY(result, retval)
 					retval = result
 				}
-				if retval.GetType() != IS_OBJECT {
-					var ce *ZendClassEntry = Z_OBJCE_P(container)
+				if retval.GetType() != types.IS_OBJECT {
+					var ce *ZendClassEntry = types.Z_OBJCE_P(container)
 					ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
 				}
 			} else if retval.GetRefcount() == 1 {
-				ZVAL_UNREF(retval)
+				types.ZVAL_UNREF(retval)
 			}
 			if result != retval {
 				result.SetIndirect(retval)
@@ -442,7 +443,7 @@ func ZendFetchDimensionAddress(
 			result.IsError()
 		}
 	} else {
-		if container.GetType() <= IS_FALSE {
+		if container.GetType() <= types.IS_FALSE {
 			if type_ != BP_VAR_W && container.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 			}

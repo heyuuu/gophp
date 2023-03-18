@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_ini.h>
 
 /*
@@ -43,7 +45,7 @@ const ZEND_INI_STAGE_IN_REQUEST = ZEND_INI_STAGE_ACTIVATE | ZEND_INI_STAGE_DEACT
 
 /* INI parsing engine */
 
-type ZendIniParserCbT func(arg1 *Zval, arg2 *Zval, arg3 *Zval, callback_type int, arg any)
+type ZendIniParserCbT func(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arg any)
 
 /* INI entries */
 
@@ -51,7 +53,7 @@ const ZEND_INI_PARSER_ENTRY = 1
 const ZEND_INI_PARSER_SECTION = 2
 const ZEND_INI_PARSER_POP_ENTRY = 3
 
-var RegisteredZendIniDirectives *HashTable
+var RegisteredZendIniDirectives *types.HashTable
 
 const NO_VALUE_PLAINTEXT = "no value"
 const NO_VALUE_HTML = "<i>no value</i>"

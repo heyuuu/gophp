@@ -4,10 +4,11 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 	"strings"
 )
 
-func ZendUnregisterFunctions(functions []ZendFunctionEntry, count int, functionTable *HashTable) {
+func ZendUnregisterFunctions(functions []ZendFunctionEntry, count int, functionTable *types.HashTable) {
 	targetFunctionTable := functionTable
 	if targetFunctionTable == nil {
 		targetFunctionTable = CG__().GetFunctionTable()
@@ -23,7 +24,7 @@ func ZendUnregisterFunctions(functions []ZendFunctionEntry, count int, functionT
 	}
 }
 
-func CleanModuleClass(el *Zval, arg any) int {
+func CleanModuleClass(el *types.Zval, arg any) int {
 	var ce *ZendClassEntry = (*ZendClassEntry)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == module_number {
@@ -67,7 +68,7 @@ func ZendActivateModules() {
 	var p **ZendModuleEntry = ModuleRequestStartupHandlers
 	for (*p) != nil {
 		var module *ZendModuleEntry = *p
-		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == FAILURE {
+		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
 			ZendError(E_WARNING, "request_startup() for %s module failed", module.GetName())
 			exit(1)
 		}
@@ -82,9 +83,9 @@ func ZendDeactivateModules() {
 	if SETJMP(__bailout) == 0 {
 		if EG__().GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
-			var __ht *HashTable = &ModuleRegistry
+			var __ht *types.HashTable = &ModuleRegistry
 			for _, _p := range __ht.foreachDataReserve() {
-				var _z Zval = _p.GetVal()
+				var _z types.Zval = _p.GetVal()
 
 				module = _z.GetPtr()
 				if module.GetRequestShutdownFunc() != nil {
@@ -112,20 +113,20 @@ func ZendCleanupInternalClasses() {
 func ZendPostDeactivateModules() {
 	if EG__().GetFullTablesCleanup() != 0 {
 		var module *ZendModuleEntry
-		var zv *Zval
-		var key *ZendString
-		var __ht *HashTable = &ModuleRegistry
+		var zv *types.Zval
+		var key *types.ZendString
+		var __ht *types.HashTable = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {
-			var _z *Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()
 			if module.GetPostDeactivateFunc() != nil {
 				module.GetPostDeactivateFunc()()
 			}
 		}
-		var __ht__1 *HashTable = &ModuleRegistry
+		var __ht__1 *types.HashTable = &ModuleRegistry
 		for _, _p := range __ht__1.foreachDataReserve() {
-			var _z Zval = _p.GetVal()
+			var _z types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
 			zv = _z
@@ -135,20 +136,20 @@ func ZendPostDeactivateModules() {
 			}
 			ModuleDestructor(module)
 			Free(module)
-			ZendStringReleaseEx(key, 0)
+			types.ZendStringReleaseEx(key, 0)
 			__ht__1.GetNNumOfElements()--
-			var j uint32 = HT_IDX_TO_HASH(_idx - 1)
+			var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 			var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
-			var i uint32 = HT_HASH(__ht__1, nIndex)
+			var i uint32 = types.HT_HASH(__ht__1, nIndex)
 			if j != i {
-				var prev *Bucket = __ht__1.Bucket(i)
+				var prev *types.Bucket = __ht__1.Bucket(i)
 				for prev.GetVal().GetNext() != j {
 					i = prev.GetVal().GetNext()
 					prev = __ht__1.Bucket(i)
 				}
 				prev.GetVal().GetNext() = _p.GetVal().GetNext()
 			} else {
-				HT_HASH(__ht__1, nIndex) = _p.GetVal().GetNext()
+				types.HT_HASH(__ht__1, nIndex) = _p.GetVal().GetNext()
 			}
 		}
 		__ht__1.SetNNumUsed(_idx)
@@ -166,7 +167,7 @@ func ZendNextFreeModule() int {
 }
 func DoRegisterInternalClass(orig_class_entry *ZendClassEntry, ce_flags uint32) *ZendClassEntry {
 	var class_entry *ZendClassEntry = Malloc(b.SizeOf("zend_class_entry"))
-	var lowercase_name *ZendString
+	var lowercase_name *types.ZendString
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
@@ -176,9 +177,9 @@ func DoRegisterInternalClass(orig_class_entry *ZendClassEntry, ce_flags uint32) 
 		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), EG__().GetCurrentModule().GetType())
 	}
 	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), EG__().GetCurrentModule().GetType() == MODULE_PERSISTENT)
-	lowercase_name = ZendNewInternedString(lowercase_name)
+	lowercase_name = types.ZendNewInternedString(lowercase_name)
 	ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name, class_entry)
-	ZendStringReleaseEx(lowercase_name, 1)
+	types.ZendStringReleaseEx(lowercase_name, 1)
 	return class_entry
 }
 func ZendRegisterInternalClassEx(class_entry *ZendClassEntry, parent_ce *ZendClassEntry) *ZendClassEntry {
@@ -207,9 +208,9 @@ func ZendRegisterInternalInterface(orig_class_entry *ZendClassEntry) *ZendClassE
 	return DoRegisterInternalClass(orig_class_entry, ZEND_ACC_INTERFACE)
 }
 func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, persistent int) int {
-	var lcname *ZendString
-	var zv Zval
-	var ret *Zval
+	var lcname *types.ZendString
+	var zv types.Zval
+	var ret *types.Zval
 
 	/* TODO: Move this out of here in 7.4. */
 
@@ -217,51 +218,51 @@ func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, pers
 		persistent = 0
 	}
 	if name[0] == '\\' {
-		lcname = ZendStringAlloc(name_len-1, persistent)
+		lcname = types.ZendStringAlloc(name_len-1, persistent)
 		ZendStrTolowerCopy(lcname.GetVal(), name+1, name_len-1)
 	} else {
-		lcname = ZendStringAlloc(name_len, persistent)
+		lcname = types.ZendStringAlloc(name_len, persistent)
 		ZendStrTolowerCopy(lcname.GetVal(), name, name_len)
 	}
 	ZendAssertValidClassName(lcname)
-	lcname = ZendNewInternedString(lcname)
-	ZVAL_ALIAS_PTR(&zv, ce)
+	lcname = types.ZendNewInternedString(lcname)
+	types.ZVAL_ALIAS_PTR(&zv, ce)
 	ret = CG__().GetClassTable().KeyAdd(lcname.GetStr(), &zv)
-	ZendStringReleaseEx(lcname, 0)
+	types.ZendStringReleaseEx(lcname, 0)
 	if ret != nil {
 		if !ce.IsImmutable() {
 			ce.GetRefcount()++
 		}
-		return SUCCESS
+		return types.SUCCESS
 	}
-	return FAILURE
+	return types.FAILURE
 }
 func ZendSetHashSymbol(
-	symbol *Zval,
+	symbol *types.Zval,
 	name *byte,
 	name_length int,
-	is_ref ZendBool,
+	is_ref types.ZendBool,
 	num_symbol_tables int,
 	_ ...any,
 ) int {
-	var symbol_table *HashTable
+	var symbol_table *types.HashTable
 	var symbol_table_list va_list
 	if num_symbol_tables <= 0 {
-		return FAILURE
+		return types.FAILURE
 	}
 	if is_ref != 0 {
-		ZVAL_MAKE_REF(symbol)
+		types.ZVAL_MAKE_REF(symbol)
 	}
 	va_start(symbol_table_list, num_symbol_tables)
 	for b.PostDec(&num_symbol_tables) > 0 {
-		symbol_table = __va_arg(symbol_table_list, (*HashTable)(_))
+		symbol_table = __va_arg(symbol_table_list, (*types.HashTable)(_))
 		symbol_table.KeyUpdate(b.CastStr(name, name_length), symbol)
 		symbol.TryAddRefcount()
 	}
 	va_end(symbol_table_list)
-	return SUCCESS
+	return types.SUCCESS
 }
-func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *Zval) {
+func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 	ZendError(E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
@@ -272,7 +273,7 @@ func ZendDisableFunction(function_name *byte, function_name_length int) int {
 		func_.SetNumArgs(0)
 		func_.SetArgInfo(nil)
 		func_.SetHandler(ZifDisplayDisabledFunction)
-		return SUCCESS
+		return types.SUCCESS
 	}
-	return FAILURE
+	return types.FAILURE
 }

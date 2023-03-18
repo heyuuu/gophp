@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func ZmStartupImagetypes(type_ int, module_number int) int {
@@ -30,7 +31,7 @@ func ZmStartupImagetypes(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_WEBP", IMAGE_FILETYPE_WEBP, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_UNKNOWN", IMAGE_FILETYPE_UNKNOWN, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_COUNT", IMAGE_FILETYPE_COUNT, zend.CONST_CS|zend.CONST_PERSISTENT)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpHandleGif(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
@@ -196,11 +197,11 @@ func PhpSkipVariable(stream *core.PhpStream) int {
 	core.PhpStreamSeek(stream, zend.ZendLong(length), r.SEEK_CUR)
 	return 1
 }
-func php_read_APP(stream *core.PhpStream, marker uint, info *zend.Zval) int {
+func php_read_APP(stream *core.PhpStream, marker uint, info *types.Zval) int {
 	var length uint16
 	var buffer *byte
 	var markername []byte
-	var tmp *zend.Zval
+	var tmp *types.Zval
 	length = PhpRead2(stream)
 	if length < 2 {
 		return 0
@@ -224,7 +225,7 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *zend.Zval) int {
 	zend.Efree(buffer)
 	return 1
 }
-func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
+func PhpHandleJpeg(stream *core.PhpStream, info *types.Zval) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var marker uint = M_PSEUDO
 	var length uint16
@@ -480,7 +481,7 @@ func PhpIfdGet32s(Long any, motorola_intel int) int {
 func PhpIfdGet32u(Long any, motorola_intel int) unsigned {
 	return unsigned(PhpIfdGet32s(Long, motorola_intel) & 0xffffffff)
 }
-func PhpHandleTiff(stream *core.PhpStream, info *zend.Zval, motorola_intel int) *Gfxinfo {
+func PhpHandleTiff(stream *core.PhpStream, info *types.Zval, motorola_intel int) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var i int
 	var num_entries int
@@ -869,7 +870,7 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 		return "application/octet-stream"
 	}
 }
-func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var p_image_type zend.ZendLong
 	for {
 		var _flags int = 0
@@ -877,12 +878,12 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *zen
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -940,9 +941,9 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *zen
 	}
 	return_value.SetRawString(b.CastStrAuto((*byte)(PhpImageTypeToMimeType(p_image_type))))
 }
-func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var image_type zend.ZendLong
-	var inc_dot zend.ZendBool = 1
+	var inc_dot types.ZendBool = 1
 	var imgext *byte = nil
 	for {
 		var _flags int = 0
@@ -950,12 +951,12 @@ func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *ze
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1154,7 +1155,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 	}
 	return IMAGE_FILETYPE_UNKNOWN
 }
-func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpGetimagesizeFromStream(stream *core.PhpStream, info *types.Zval, executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var itype int = 0
 	var result *Gfxinfo = nil
 	if stream == nil {
@@ -1225,8 +1226,8 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, executeD
 		return
 	}
 }
-func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
-	var info *zend.Zval = nil
+func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
+	var info *types.Zval = nil
 	var stream *core.PhpStream = nil
 	var input *byte
 	var input_len int
@@ -1237,12 +1238,12 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *zen
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1323,9 +1324,9 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *zen
 	PhpGetimagesizeFromStream(stream, info, executeData, return_value)
 	core.PhpStreamClose(stream)
 }
-func ZifGetimagesize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetimagesize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpGetimagesizeFromAny(executeData, return_value, FROM_PATH)
 }
-func ZifGetimagesizefromstring(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetimagesizefromstring(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpGetimagesizeFromAny(executeData, return_value, FROM_DATA)
 }

@@ -5,6 +5,7 @@ package streams
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -41,7 +42,7 @@ func (this *PhpUserStreamWrapper) GetWrapper() core.PhpStreamWrapper { return th
  */
 type _phpUserstreamData struct {
 	wrapper *PhpUserStreamWrapper
-	object  zend.Zval
+	object  types.Zval
 }
 
 // func Make_phpUserstreamData(wrapper *PhpUserStreamWrapper, object zend.Zval) _phpUserstreamData {
@@ -52,6 +53,6 @@ type _phpUserstreamData struct {
 // }
 func (this *_phpUserstreamData) GetWrapper() *PhpUserStreamWrapper      { return this.wrapper }
 func (this *_phpUserstreamData) SetWrapper(value *PhpUserStreamWrapper) { this.wrapper = value }
-func (this *_phpUserstreamData) GetObject() zend.Zval                   { return this.object }
+func (this *_phpUserstreamData) GetObject() types.Zval                  { return this.object }
 
 // func (this *_phpUserstreamData) SetObject(value zend.Zval) { this.object = value }

@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_list.h>
 
 /*
@@ -23,7 +25,7 @@ package zend
    +----------------------------------------------------------------------+
 */
 
-type RsrcDtorFuncT func(res *ZendResource)
+type RsrcDtorFuncT func(res *types.ZendResource)
 
 var LeIndexPtr int
 
@@ -50,4 +52,4 @@ var LeIndexPtr int
 
 /* true global */
 
-var ListDestructors HashTable
+var ListDestructors types.HashTable

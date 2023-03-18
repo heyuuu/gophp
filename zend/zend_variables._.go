@@ -1,3 +1,5 @@
 package zend
 
-var ZVAL_PTR_DTOR DtorFuncT = ZvalPtrDtor
+import "sik/zend/types"
+
+var ZVAL_PTR_DTOR types.DtorFuncT = ZvalPtrDtor

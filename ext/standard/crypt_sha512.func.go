@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func Sha512ProcessBlock(buffer any, len_ int, ctx *Sha512Ctx) {
@@ -252,7 +253,7 @@ func PhpSha512CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	/* Default number of rounds.  */
 
 	var rounds int = ROUNDS_DEFAULT
-	var rounds_custom zend.ZendBool = 0
+	var rounds_custom types.ZendBool = 0
 
 	/* Find beginning of salt string.  The prefix should normally always
 	   be present.  Just in case it is not.  */

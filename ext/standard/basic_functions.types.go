@@ -5,18 +5,19 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * PhpBasicGlobals
  */
 type PhpBasicGlobals struct {
-	user_shutdown_function_names *zend.HashTable
-	putenv_ht                    zend.HashTable
-	strtok_zval                  zend.Zval
+	user_shutdown_function_names *types.HashTable
+	putenv_ht                    types.HashTable
+	strtok_zval                  types.Zval
 	strtok_string                *byte
-	locale_string                *zend.ZendString
-	locale_changed               zend.ZendBool
+	locale_string                *types.ZendString
+	locale_changed               types.ZendBool
 	strtok_last                  *byte
 	strtok_table                 []byte
 	strtok_len                   zend.ZendUlong
@@ -26,7 +27,7 @@ type PhpBasicGlobals struct {
 	user_compare_fci             zend.ZendFcallInfo
 	user_compare_fci_cache       zend.ZendFcallInfoCache
 	user_tick_functions          *zend.ZendLlist
-	active_ini_file_section      zend.Zval
+	active_ini_file_section      types.Zval
 	page_uid                     zend.ZendLong
 	page_gid                     zend.ZendLong
 	page_inode                   zend.ZendLong
@@ -38,7 +39,7 @@ type PhpBasicGlobals struct {
 	state                        []uint32
 	next                         *uint32
 	left                         int
-	mt_rand_is_seeded            zend.ZendBool
+	mt_rand_is_seeded            types.ZendBool
 	mt_rand_mode                 zend.ZendLong
 	syslog_device                *byte
 	incomplete_class             *zend.ZendClassEntry
@@ -52,12 +53,12 @@ type PhpBasicGlobals struct {
 		level unsigned
 	}
 	url_adapt_session_ex       UrlAdaptStateExT
-	url_adapt_session_hosts_ht zend.HashTable
+	url_adapt_session_hosts_ht types.HashTable
 	url_adapt_output_ex        UrlAdaptStateExT
-	url_adapt_output_hosts_ht  zend.HashTable
+	url_adapt_output_hosts_ht  types.HashTable
 	mmap_file                  any
 	mmap_len                   int
-	user_filter_map            *zend.HashTable
+	user_filter_map            *types.HashTable
 	umask                      int
 	unserialize_max_depth      zend.ZendLong
 }
@@ -139,7 +140,7 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
 }
 
 // func (this *PhpBasicGlobals) SetUrlAdaptSessionEx(value UrlAdaptStateExT) { this.url_adapt_session_ex = value }
-func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() zend.HashTable {
+func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.HashTable {
 	return this.url_adapt_session_hosts_ht
 }
 
@@ -147,7 +148,7 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() zend.HashTable {
 func (this *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return this.url_adapt_output_ex }
 
 // func (this *PhpBasicGlobals) SetUrlAdaptOutputEx(value UrlAdaptStateExT) { this.url_adapt_output_ex = value }
-func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() zend.HashTable {
+func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.HashTable {
 	return this.url_adapt_output_hosts_ht
 }
 
@@ -194,7 +195,7 @@ func (this *PutenvEntry) SetKeyLen(value int)          { this.key_len = value }
  * PhpShutdownFunctionEntry
  */
 type PhpShutdownFunctionEntry struct {
-	arguments *zend.Zval
+	arguments *types.Zval
 	arg_count int
 }
 
@@ -204,16 +205,16 @@ type PhpShutdownFunctionEntry struct {
 //         arg_count:arg_count,
 //     }
 // }
-func (this *PhpShutdownFunctionEntry) GetArguments() *zend.Zval      { return this.arguments }
-func (this *PhpShutdownFunctionEntry) SetArguments(value *zend.Zval) { this.arguments = value }
-func (this *PhpShutdownFunctionEntry) GetArgCount() int              { return this.arg_count }
-func (this *PhpShutdownFunctionEntry) SetArgCount(value int)         { this.arg_count = value }
+func (this *PhpShutdownFunctionEntry) GetArguments() *types.Zval      { return this.arguments }
+func (this *PhpShutdownFunctionEntry) SetArguments(value *types.Zval) { this.arguments = value }
+func (this *PhpShutdownFunctionEntry) GetArgCount() int               { return this.arg_count }
+func (this *PhpShutdownFunctionEntry) SetArgCount(value int)          { this.arg_count = value }
 
 /**
  * UserTickFunctionEntry
  */
 type UserTickFunctionEntry struct {
-	arguments *zend.Zval
+	arguments *types.Zval
 	arg_count int
 	calling   int
 }
@@ -225,9 +226,9 @@ type UserTickFunctionEntry struct {
 //         calling:calling,
 //     }
 // }
-func (this *UserTickFunctionEntry) GetArguments() *zend.Zval      { return this.arguments }
-func (this *UserTickFunctionEntry) SetArguments(value *zend.Zval) { this.arguments = value }
-func (this *UserTickFunctionEntry) GetArgCount() int              { return this.arg_count }
-func (this *UserTickFunctionEntry) SetArgCount(value int)         { this.arg_count = value }
-func (this *UserTickFunctionEntry) GetCalling() int               { return this.calling }
-func (this *UserTickFunctionEntry) SetCalling(value int)          { this.calling = value }
+func (this *UserTickFunctionEntry) GetArguments() *types.Zval      { return this.arguments }
+func (this *UserTickFunctionEntry) SetArguments(value *types.Zval) { this.arguments = value }
+func (this *UserTickFunctionEntry) GetArgCount() int               { return this.arg_count }
+func (this *UserTickFunctionEntry) SetArgCount(value int)          { this.arg_count = value }
+func (this *UserTickFunctionEntry) GetCalling() int                { return this.calling }
+func (this *UserTickFunctionEntry) SetCalling(value int)           { this.calling = value }

@@ -7,9 +7,10 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpStreamContextFromZval(zcontext *zend.Zval, nocontext int) __auto__ {
+func PhpStreamContextFromZval(zcontext *types.Zval, nocontext int) __auto__ {
 	if b.CondF2(b.CondF1(zcontext != nil, func() any { return zend.ZendFetchResourceEx(zcontext, "Stream-Context", standard.PhpLeStreamContext()) }, nocontext), nil, func() __auto__ { return standard.FG(default_context) }) {
 		return standard.FG(default_context)
 	} else {
@@ -17,7 +18,7 @@ func PhpStreamContextFromZval(zcontext *zend.Zval, nocontext int) __auto__ {
 		return standard.FG(default_context)
 	}
 }
-func PhpStreamContextToZval(context *core.PhpStreamContext, zval *zend.Zval) {
+func PhpStreamContextToZval(context *core.PhpStreamContext, zval *types.Zval) {
 	zval.SetResource(context.GetRes())
 	context.GetRes().AddRefcount()
 }

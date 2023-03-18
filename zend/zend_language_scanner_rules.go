@@ -3,6 +3,7 @@ package zend
 import (
 	"math"
 	b "sik/builtin"
+	"sik/zend/types"
 	"strings"
 )
 
@@ -351,7 +352,7 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 	sc.cursor = savedCursor
 	if isHeredoc && !sc.heredocScanAhead {
 		var currentState ZendLexState
-		var savedDocComment *ZendString = CG__().doc_comment
+		var savedDocComment *types.ZendString = CG__().doc_comment
 		heredocNestingLevel := 1
 		firstToken := 0
 		errno := 0
@@ -582,7 +583,7 @@ heredoc_scan_done:
 	sc.setStr(sc.segLen(sc.len_ - newline))
 	if !(sc.heredocScanAhead) && !(EG__().exception) && sc.isParserMode() {
 		newlineAtStart := b.EqualsAny(sc.yyTextN(-1), '\r', '\n')
-		var copy *ZendString = Z_STR_P(sc.zendlval)
+		var copy *types.ZendString = types.Z_STR_P(sc.zendlval)
 		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newlineAtStart, newline != 0)) {
 			return sc.token(T_ERROR)
 		}

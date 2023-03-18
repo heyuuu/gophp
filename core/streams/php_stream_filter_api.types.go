@@ -4,7 +4,7 @@ package streams
 
 import (
 	"sik/core"
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -163,13 +163,13 @@ func (this *PhpStreamFilterChain) SetStream(value *core.PhpStream)      { this.s
  */
 type PhpStreamFilter struct {
 	fops          *PhpStreamFilterOps
-	abstract      zend.Zval
+	abstract      types.Zval
 	next          *core.PhpStreamFilter
 	prev          *core.PhpStreamFilter
 	is_persistent int
 	chain         *PhpStreamFilterChain
 	buffer        PhpStreamBucketBrigade
-	res           *zend.ZendResource
+	res           *types.ZendResource
 }
 
 //             func MakePhpStreamFilter(
@@ -195,7 +195,7 @@ type PhpStreamFilter struct {
 //             }
 func (this *PhpStreamFilter) GetFops() *PhpStreamFilterOps      { return this.fops }
 func (this *PhpStreamFilter) SetFops(value *PhpStreamFilterOps) { this.fops = value }
-func (this *PhpStreamFilter) GetAbstract() zend.Zval            { return this.abstract }
+func (this *PhpStreamFilter) GetAbstract() types.Zval           { return this.abstract }
 
 // func (this *PhpStreamFilter) SetAbstract(value zend.Zval) { this.abstract = value }
 func (this *PhpStreamFilter) GetNext() *core.PhpStreamFilter       { return this.next }
@@ -209,22 +209,22 @@ func (this *PhpStreamFilter) SetChain(value *PhpStreamFilterChain) { this.chain 
 
 // func (this *PhpStreamFilter)  GetBuffer() PhpStreamBucketBrigade      { return this.buffer }
 // func (this *PhpStreamFilter) SetBuffer(value PhpStreamBucketBrigade) { this.buffer = value }
-func (this *PhpStreamFilter) GetRes() *zend.ZendResource      { return this.res }
-func (this *PhpStreamFilter) SetRes(value *zend.ZendResource) { this.res = value }
+func (this *PhpStreamFilter) GetRes() *types.ZendResource      { return this.res }
+func (this *PhpStreamFilter) SetRes(value *types.ZendResource) { this.res = value }
 
 /**
  * PhpStreamFilterFactory
  */
 type PhpStreamFilterFactory struct {
-	create_filter func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter
+	create_filter func(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter
 }
 
-func MakePhpStreamFilterFactory(create_filter func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter) PhpStreamFilterFactory {
+func MakePhpStreamFilterFactory(create_filter func(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter) PhpStreamFilterFactory {
 	return PhpStreamFilterFactory{
 		create_filter: create_filter,
 	}
 }
-func (this *PhpStreamFilterFactory) GetCreateFilter() func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
+func (this *PhpStreamFilterFactory) GetCreateFilter() func(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	return this.create_filter
 }
 

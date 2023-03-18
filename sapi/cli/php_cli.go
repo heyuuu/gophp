@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 var CliModule = &CliModuleType{}
@@ -82,7 +83,7 @@ func (c *CliModuleType) ReadPost(buffer *byte, count_bytes int) int {
 
 func (c *CliModuleType) ReadCookies() (string, bool) { return "", false }
 
-func (c *CliModuleType) RegisterServerVariables(trackVarsArray []zend.Zval) {
+func (c *CliModuleType) RegisterServerVariables(trackVarsArray []types.Zval) {
 	SapiCliRegisterVariables(trackVarsArray)
 }
 

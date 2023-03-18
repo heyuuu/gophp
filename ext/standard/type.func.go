@@ -5,23 +5,24 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func ZifGettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg *zend.Zval
-	var type_ *zend.ZendString
+func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg *types.Zval
+	var type_ *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -82,23 +83,23 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifSettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var var_ *zend.Zval
-	var type_ *zend.ZendString
-	var tmp zend.Zval
-	var ptr *zend.Zval
+func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var var_ *types.Zval
+	var type_ *types.ZendString
+	var tmp types.Zval
+	var ptr *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -158,36 +159,36 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ZEND_ASSERT(var_.IsReference())
 	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.GetRef()) {
-		zend.ZVAL_COPY(&tmp, zend.Z_REFVAL_P(var_))
+		types.ZVAL_COPY(&tmp, types.Z_REFVAL_P(var_))
 		ptr = &tmp
 	} else {
-		ptr = zend.Z_REFVAL_P(var_)
+		ptr = types.Z_REFVAL_P(var_)
 	}
-	if zend.ZendStringEqualsLiteralCi(type_, "integer") {
+	if types.ZendStringEqualsLiteralCi(type_, "integer") {
 		zend.ConvertToLong(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "int") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "int") {
 		zend.ConvertToLong(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "float") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "float") {
 		zend.ConvertToDouble(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "double") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "double") {
 		zend.ConvertToDouble(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "string") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "string") {
 		zend.ConvertToString(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "array") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "array") {
 		zend.ConvertToArray(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "object") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "object") {
 		zend.ConvertToObject(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "bool") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "bool") {
 		zend.ConvertToBoolean(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "boolean") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "boolean") {
 		zend.ConvertToBoolean(ptr)
-	} else if zend.ZendStringEqualsLiteralCi(type_, "null") {
+	} else if types.ZendStringEqualsLiteralCi(type_, "null") {
 		zend.ConvertToNull(ptr)
 	} else {
 		if ptr == &tmp {
 			zend.ZvalPtrDtor(&tmp)
 		}
-		if zend.ZendStringEqualsLiteralCi(type_, "resource") {
+		if types.ZendStringEqualsLiteralCi(type_, "resource") {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot convert to resource type")
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid type")
@@ -200,8 +201,8 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetTrue()
 }
-func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var num *zend.Zval
+func ZifIntval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var num *types.Zval
 	var base zend.ZendLong = 10
 	for {
 		var _flags int = 0
@@ -209,12 +210,12 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -273,7 +274,7 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if num.GetType() != zend.IS_STRING || base == 10 {
+	if num.GetType() != types.IS_STRING || base == 10 {
 		return_value.SetLong(zend.ZvalGetLong(num))
 		return
 	}
@@ -318,20 +319,20 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetLong(zend.ZEND_STRTOL(num.GetStr().GetVal(), nil, base))
 }
-func ZifFloatval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var num *zend.Zval
+func ZifFloatval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var num *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -386,20 +387,20 @@ func ZifFloatval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetDouble(zend.ZvalGetDouble(num))
 	return
 }
-func ZifBoolval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var val *zend.Zval
+func ZifBoolval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var val *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -451,23 +452,23 @@ func ZifBoolval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.ZVAL_BOOL(return_value, zend.ZendIsTrue(val) != 0)
+	types.ZVAL_BOOL(return_value, zend.ZendIsTrue(val) != 0)
 	return
 }
-func ZifStrval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var num *zend.Zval
+func ZifStrval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var num *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -521,20 +522,20 @@ func ZifStrval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetString(zend.ZvalGetString(num))
 }
-func PhpIsType(executeData *zend.ZendExecuteData, return_value *zend.Zval, type_ int) {
-	var arg *zend.Zval
+func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type_ int) {
+	var arg *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -588,7 +589,7 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *zend.Zval, type_
 		break
 	}
 	if arg.IsType(type_) {
-		if type_ == zend.IS_RESOURCE {
+		if type_ == types.IS_RESOURCE {
 			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.GetRes())
 			if type_name == nil {
 				return_value.SetFalse()
@@ -602,26 +603,26 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *zend.Zval, type_
 		return
 	}
 }
-func ZifIsNull(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_NULL)
+func ZifIsNull(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_NULL)
 }
-func ZifIsResource(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_RESOURCE)
+func ZifIsResource(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_RESOURCE)
 }
-func ZifIsBool(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg *zend.Zval
+func ZifIsBool(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -674,38 +675,38 @@ func ZifIsBool(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.ZVAL_BOOL(return_value, arg.IsType(zend.IS_FALSE) || arg.IsType(zend.IS_TRUE))
+	types.ZVAL_BOOL(return_value, arg.IsType(types.IS_FALSE) || arg.IsType(types.IS_TRUE))
 	return
 }
-func ZifIsInt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_LONG)
+func ZifIsInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_LONG)
 }
-func ZifIsFloat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_DOUBLE)
+func ZifIsFloat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_DOUBLE)
 }
-func ZifIsString(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_STRING)
+func ZifIsString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_STRING)
 }
-func ZifIsArray(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_ARRAY)
+func ZifIsArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_ARRAY)
 }
-func ZifIsObject(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(executeData, return_value, zend.IS_OBJECT)
+func ZifIsObject(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	PhpIsType(executeData, return_value, types.IS_OBJECT)
 }
-func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg *zend.Zval
+func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -758,12 +759,12 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	switch arg.GetType() {
-	case zend.IS_LONG:
+	case types.IS_LONG:
 		fallthrough
-	case zend.IS_DOUBLE:
+	case types.IS_DOUBLE:
 		return_value.SetTrue()
 		return
-	case zend.IS_STRING:
+	case types.IS_STRING:
 		if zend.IsNumericString(arg.GetStr().GetStr(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
@@ -776,20 +777,20 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg *zend.Zval
+func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -842,15 +843,15 @@ func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	switch arg.GetType() {
-	case zend.IS_FALSE:
+	case types.IS_FALSE:
 		fallthrough
-	case zend.IS_TRUE:
+	case types.IS_TRUE:
 		fallthrough
-	case zend.IS_DOUBLE:
+	case types.IS_DOUBLE:
 		fallthrough
-	case zend.IS_LONG:
+	case types.IS_LONG:
 		fallthrough
-	case zend.IS_STRING:
+	case types.IS_STRING:
 		return_value.SetTrue()
 		return
 	default:
@@ -858,13 +859,13 @@ func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var var_ *zend.Zval
-	var callable_name *zend.Zval = nil
-	var name *zend.ZendString
+func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var var_ *types.Zval
+	var callable_name *types.Zval = nil
+	var name *types.ZendString
 	var error *byte
-	var retval zend.ZendBool
-	var syntax_only zend.ZendBool = 0
+	var retval types.ZendBool
+	var syntax_only types.ZendBool = 0
 	var check_flags int = 0
 	for {
 		var _flags int = 0
@@ -872,12 +873,12 @@ func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -956,23 +957,23 @@ func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* ignore errors */
 
 	}
-	zend.ZVAL_BOOL(return_value, retval != 0)
+	types.ZVAL_BOOL(return_value, retval != 0)
 	return
 }
-func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var var_ *zend.Zval
+func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var var_ *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1024,23 +1025,23 @@ func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.ZVAL_BOOL(return_value, zend.ZendIsIterable(var_) != 0)
+	types.ZVAL_BOOL(return_value, zend.ZendIsIterable(var_) != 0)
 	return
 }
-func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var var_ *zend.Zval
+func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var var_ *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1092,6 +1093,6 @@ func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		break
 	}
-	zend.ZVAL_BOOL(return_value, zend.ZendIsCountable(var_) != 0)
+	types.ZVAL_BOOL(return_value, zend.ZendIsCountable(var_) != 0)
 	return
 }

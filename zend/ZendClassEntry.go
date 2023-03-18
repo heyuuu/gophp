@@ -2,26 +2,28 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendClassEntry
  */
 type ZendClassEntry struct {
 	type_ byte
-	name  *ZendString
+	name  *types.ZendString
 	__0   struct /* union */ {
 		parent      *ZendClassEntry
-		parent_name *ZendString
+		parent_name *types.ZendString
 	}
 	refcount                     int
 	ce_flags                     uint32
 	default_properties_count     int
 	default_static_members_count int
-	default_properties_table     *Zval
-	default_static_members_table *Zval
-	static_members_table__ptr    **Zval
-	function_table               HashTable
-	properties_info              HashTable
-	constants_table              HashTable
+	default_properties_table     *types.Zval
+	default_static_members_table *types.Zval
+	static_members_table__ptr    **types.Zval
+	function_table               types.HashTable
+	properties_info              types.HashTable
+	constants_table              types.HashTable
 	properties_info_table        **ZendPropertyInfo
 	constructor                  *ZendFunction
 	destructor                   *ZendFunction
@@ -38,13 +40,13 @@ type ZendClassEntry struct {
 	unserialize_func             *ZendFunction
 	iterator_funcs_ptr           *ZendClassIteratorFuncs
 	__1                          struct /* union */ {
-		create_object              func(class_type *ZendClassEntry) *ZendObject
+		create_object              func(class_type *ZendClassEntry) *types.ZendObject
 		interface_gets_implemented func(iface *ZendClassEntry, class_type *ZendClassEntry) int
 	}
-	get_iterator      func(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator
-	get_static_method func(ce *ZendClassEntry, method *ZendString) *ZendFunction
-	serialize         func(object *Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int
-	unserialize       func(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int
+	get_iterator      func(ce *ZendClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator
+	get_static_method func(ce *ZendClassEntry, method *types.ZendString) *ZendFunction
+	serialize         func(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int
+	unserialize       func(object *types.Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int
 	num_interfaces    uint32
 	num_traits        uint32
 	__2               struct /* union */ {
@@ -56,10 +58,10 @@ type ZendClassEntry struct {
 	trait_precedences **ZendTraitPrecedence
 	info              struct /* union */ {
 		user struct {
-			filename    *ZendString
+			filename    *types.ZendString
 			line_start  uint32
 			line_end    uint32
-			doc_comment *ZendString
+			doc_comment *types.ZendString
 		}
 		internal struct {
 			builtin_functions *ZendFunctionEntry
@@ -104,19 +106,19 @@ func (this *ZendClassEntry) Name() string { return this.name.GetStr() }
 /**
  * Getter / Setter
  */
-func (this *ZendClassEntry) GetType() byte                   { return this.type_ }
-func (this *ZendClassEntry) SetType(value byte)              { this.type_ = value }
-func (this *ZendClassEntry) GetName() *ZendString            { return this.name }
-func (this *ZendClassEntry) SetName(value *ZendString)       { this.name = value }
-func (this *ZendClassEntry) GetParent() *ZendClassEntry      { return this.__0.parent }
-func (this *ZendClassEntry) SetParent(value *ZendClassEntry) { this.__0.parent = value }
-func (this *ZendClassEntry) GetParentName() *ZendString      { return this.__0.parent_name }
-func (this *ZendClassEntry) SetParentName(value *ZendString) { this.__0.parent_name = value }
-func (this *ZendClassEntry) GetRefcount() int                { return this.refcount }
-func (this *ZendClassEntry) SetRefcount(value int)           { this.refcount = value }
-func (this *ZendClassEntry) GetCeFlags() uint32              { return this.ce_flags }
-func (this *ZendClassEntry) SetCeFlags(value uint32)         { this.ce_flags = value }
-func (this *ZendClassEntry) GetDefaultPropertiesCount() int  { return this.default_properties_count }
+func (this *ZendClassEntry) GetType() byte                         { return this.type_ }
+func (this *ZendClassEntry) SetType(value byte)                    { this.type_ = value }
+func (this *ZendClassEntry) GetName() *types.ZendString            { return this.name }
+func (this *ZendClassEntry) SetName(value *types.ZendString)       { this.name = value }
+func (this *ZendClassEntry) GetParent() *ZendClassEntry            { return this.__0.parent }
+func (this *ZendClassEntry) SetParent(value *ZendClassEntry)       { this.__0.parent = value }
+func (this *ZendClassEntry) GetParentName() *types.ZendString      { return this.__0.parent_name }
+func (this *ZendClassEntry) SetParentName(value *types.ZendString) { this.__0.parent_name = value }
+func (this *ZendClassEntry) GetRefcount() int                      { return this.refcount }
+func (this *ZendClassEntry) SetRefcount(value int)                 { this.refcount = value }
+func (this *ZendClassEntry) GetCeFlags() uint32                    { return this.ce_flags }
+func (this *ZendClassEntry) SetCeFlags(value uint32)               { this.ce_flags = value }
+func (this *ZendClassEntry) GetDefaultPropertiesCount() int        { return this.default_properties_count }
 func (this *ZendClassEntry) SetDefaultPropertiesCount(value int) {
 	this.default_properties_count = value
 }
@@ -126,20 +128,24 @@ func (this *ZendClassEntry) GetDefaultStaticMembersCount() int {
 func (this *ZendClassEntry) SetDefaultStaticMembersCount(value int) {
 	this.default_static_members_count = value
 }
-func (this *ZendClassEntry) GetDefaultPropertiesTable() *Zval { return this.default_properties_table }
-func (this *ZendClassEntry) SetDefaultPropertiesTable(value *Zval) {
+func (this *ZendClassEntry) GetDefaultPropertiesTable() *types.Zval {
+	return this.default_properties_table
+}
+func (this *ZendClassEntry) SetDefaultPropertiesTable(value *types.Zval) {
 	this.default_properties_table = value
 }
-func (this *ZendClassEntry) GetDefaultStaticMembersTable() *Zval {
+func (this *ZendClassEntry) GetDefaultStaticMembersTable() *types.Zval {
 	return this.default_static_members_table
 }
-func (this *ZendClassEntry) SetDefaultStaticMembersTable(value *Zval) {
+func (this *ZendClassEntry) SetDefaultStaticMembersTable(value *types.Zval) {
 	this.default_static_members_table = value
 }
-func (this *ZendClassEntry) GetStaticMembersTablePtr() **Zval { return this.static_members_table__ptr }
-func (this *ZendClassEntry) GetFunctionTable() HashTable      { return this.function_table }
-func (this *ZendClassEntry) GetPropertiesInfo() HashTable     { return this.properties_info }
-func (this *ZendClassEntry) GetConstantsTable() HashTable     { return this.constants_table }
+func (this *ZendClassEntry) GetStaticMembersTablePtr() **types.Zval {
+	return this.static_members_table__ptr
+}
+func (this *ZendClassEntry) GetFunctionTable() types.HashTable  { return this.function_table }
+func (this *ZendClassEntry) GetPropertiesInfo() types.HashTable { return this.properties_info }
+func (this *ZendClassEntry) GetConstantsTable() types.HashTable { return this.constants_table }
 func (this *ZendClassEntry) GetPropertiesInfoTable() **ZendPropertyInfo {
 	return this.properties_info_table
 }
@@ -178,10 +184,10 @@ func (this *ZendClassEntry) GetIteratorFuncsPtr() *ZendClassIteratorFuncs {
 func (this *ZendClassEntry) SetIteratorFuncsPtr(value *ZendClassIteratorFuncs) {
 	this.iterator_funcs_ptr = value
 }
-func (this *ZendClassEntry) GetCreateObject() func(class_type *ZendClassEntry) *ZendObject {
+func (this *ZendClassEntry) GetCreateObject() func(class_type *ZendClassEntry) *types.ZendObject {
 	return this.__1.create_object
 }
-func (this *ZendClassEntry) SetCreateObject(value func(class_type *ZendClassEntry) *ZendObject) {
+func (this *ZendClassEntry) SetCreateObject(value func(class_type *ZendClassEntry) *types.ZendObject) {
 	this.__1.create_object = value
 }
 func (this *ZendClassEntry) GetInterfaceGetsImplemented() func(iface *ZendClassEntry, class_type *ZendClassEntry) int {
@@ -190,28 +196,28 @@ func (this *ZendClassEntry) GetInterfaceGetsImplemented() func(iface *ZendClassE
 func (this *ZendClassEntry) SetInterfaceGetsImplemented(value func(iface *ZendClassEntry, class_type *ZendClassEntry) int) {
 	this.__1.interface_gets_implemented = value
 }
-func (this *ZendClassEntry) GetGetIterator() func(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {
+func (this *ZendClassEntry) GetGetIterator() func(ce *ZendClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator {
 	return this.get_iterator
 }
-func (this *ZendClassEntry) SetGetIterator(value func(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator) {
+func (this *ZendClassEntry) SetGetIterator(value func(ce *ZendClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator) {
 	this.get_iterator = value
 }
-func (this *ZendClassEntry) GetGetStaticMethod() func(ce *ZendClassEntry, method *ZendString) *ZendFunction {
+func (this *ZendClassEntry) GetGetStaticMethod() func(ce *ZendClassEntry, method *types.ZendString) *ZendFunction {
 	return this.get_static_method
 }
-func (this *ZendClassEntry) SetGetStaticMethod(value func(ce *ZendClassEntry, method *ZendString) *ZendFunction) {
+func (this *ZendClassEntry) SetGetStaticMethod(value func(ce *ZendClassEntry, method *types.ZendString) *ZendFunction) {
 	this.get_static_method = value
 }
-func (this *ZendClassEntry) GetSerialize() func(object *Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
+func (this *ZendClassEntry) GetSerialize() func(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
 	return this.serialize
 }
-func (this *ZendClassEntry) SetSerialize(value func(object *Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int) {
+func (this *ZendClassEntry) SetSerialize(value func(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int) {
 	this.serialize = value
 }
-func (this *ZendClassEntry) GetUnserialize() func(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
+func (this *ZendClassEntry) GetUnserialize() func(object *types.Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
 	return this.unserialize
 }
-func (this *ZendClassEntry) SetUnserialize(value func(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int) {
+func (this *ZendClassEntry) SetUnserialize(value func(object *types.Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int) {
 	this.unserialize = value
 }
 func (this *ZendClassEntry) GetNumInterfaces() uint32               { return this.num_interfaces }
@@ -232,16 +238,18 @@ func (this *ZendClassEntry) GetTraitPrecedences() **ZendTraitPrecedence {
 func (this *ZendClassEntry) SetTraitPrecedences(value **ZendTraitPrecedence) {
 	this.trait_precedences = value
 }
-func (this *ZendClassEntry) GetFilename() *ZendString      { return this.info.user.filename }
-func (this *ZendClassEntry) SetFilename(value *ZendString) { this.info.user.filename = value }
+func (this *ZendClassEntry) GetFilename() *types.ZendString      { return this.info.user.filename }
+func (this *ZendClassEntry) SetFilename(value *types.ZendString) { this.info.user.filename = value }
 
 // func (this *ZendClassEntry)  GetLineStart() uint32      { return this.info.user.line_start }
 func (this *ZendClassEntry) SetLineStart(value uint32) { this.info.user.line_start = value }
 
 // func (this *ZendClassEntry)  GetLineEnd() uint32      { return this.info.user.line_end }
-func (this *ZendClassEntry) SetLineEnd(value uint32)         { this.info.user.line_end = value }
-func (this *ZendClassEntry) GetDocComment() *ZendString      { return this.info.user.doc_comment }
-func (this *ZendClassEntry) SetDocComment(value *ZendString) { this.info.user.doc_comment = value }
+func (this *ZendClassEntry) SetLineEnd(value uint32)          { this.info.user.line_end = value }
+func (this *ZendClassEntry) GetDocComment() *types.ZendString { return this.info.user.doc_comment }
+func (this *ZendClassEntry) SetDocComment(value *types.ZendString) {
+	this.info.user.doc_comment = value
+}
 func (this *ZendClassEntry) GetBuiltinFunctions() *ZendFunctionEntry {
 	return this.info.internal.builtin_functions
 }

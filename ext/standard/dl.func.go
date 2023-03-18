@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func GET_DL_ERROR() __auto__ { return zend.DL_ERROR() }
@@ -49,7 +50,7 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 
 		if type_ == zend.MODULE_TEMPORARY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Temporary module name should contain only filename")
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		libpath = zend.Estrdup(filename)
 	} else if extension_dir != nil && extension_dir[0] {
@@ -66,7 +67,7 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		/* Try as filename first */
 
 	} else {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	handle = PhpLoadShlib(libpath, &err1)
 	if !handle {
@@ -86,7 +87,7 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 			zend.Efree(err1)
 			zend.Efree(libpath)
 			zend.Efree(err2)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		zend.Efree(orig_libpath)
 		zend.Efree(err1)
@@ -105,42 +106,42 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		if zend.DL_FETCH_SYMBOL(handle, "zend_extension_entry") || zend.DL_FETCH_SYMBOL(handle, "_zend_extension_entry") {
 			zend.DL_UNLOAD(handle)
 			core.PhpErrorDocref(nil, error_type, "Invalid library (appears to be a Zend Extension, try loading using zend_extension=%s from php.ini)", filename)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		zend.DL_UNLOAD(handle)
 		core.PhpErrorDocref(nil, error_type, "Invalid library (maybe not a PHP library) '%s'", filename)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	module_entry = get_module()
 	if module_entry.GetZendApi() != zend.ZEND_MODULE_API_NO {
 		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with module API=%d\n"+"PHP    compiled with module API=%d\n"+"These options need to match\n", module_entry.GetName(), module_entry.GetZendApi(), zend.ZEND_MODULE_API_NO)
 		zend.DL_UNLOAD(handle)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if strcmp(module_entry.GetBuildId(), "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS) {
 		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with build ID=%s\n"+"PHP    compiled with build ID=%s\n"+"These options need to match\n", module_entry.GetName(), module_entry.GetBuildId(), "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
 		zend.DL_UNLOAD(handle)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	module_entry.SetType(type_)
 	module_entry.SetModuleNumber(zend.ZendNextFreeModule())
 	module_entry.SetHandle(handle)
 	if b.Assign(&module_entry, zend.ZendRegisterModuleEx(module_entry)) == nil {
 		zend.DL_UNLOAD(handle)
-		return zend.FAILURE
+		return types.FAILURE
 	}
-	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && zend.ZendStartupModuleEx(module_entry) == zend.FAILURE {
+	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && zend.ZendStartupModuleEx(module_entry) == types.FAILURE {
 		zend.DL_UNLOAD(handle)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && module_entry.GetRequestStartupFunc() != nil {
-		if module_entry.GetRequestStartupFunc()(type_, module_entry.GetModuleNumber()) == zend.FAILURE {
+		if module_entry.GetRequestStartupFunc()(type_, module_entry.GetModuleNumber()) == types.FAILURE {
 			core.PhpErrorDocref(nil, error_type, "Unable to initialize module '%s'", module_entry.GetName())
 			zend.DL_UNLOAD(handle)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmInfoDl(zend_module *zend.ZendModuleEntry) {
 	PhpInfoPrintTableRow(2, "Dynamic Library Support", "enabled")

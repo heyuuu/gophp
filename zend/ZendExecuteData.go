@@ -5,6 +5,7 @@ package zend
 import (
 	"math"
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 /**
@@ -13,14 +14,14 @@ import (
 type ZendExecuteData struct {
 	opline          *ZendOp
 	call            *ZendExecuteData
-	returnValue     *Zval
+	returnValue     *types.Zval
 	func_           *ZendFunction
-	This            Zval
+	This            types.Zval
 	prevExecuteData *ZendExecuteData
-	symbolTable     *ZendArray
+	symbolTable     *types.ZendArray
 	//runTimeCache    *any
 	// Ex
-	runTimeCache []Zval
+	runTimeCache []types.Zval
 }
 
 func (this *ZendExecuteData) FunctionName() string {
@@ -103,13 +104,13 @@ func (this *ZendExecuteData) IsRetUseStrictTypes() bool  { return this.isStrictT
 func (this *ZendExecuteData) IsArgUseStrictTypes() bool  { return this.prevExecuteData.isStrictTypes() } // ZEND_ARG_USES_STRICT_TYPES
 
 func (this *ZendExecuteData) NumArgs() int { return int(this.This.GetNumArgs()) }
-func (this *ZendExecuteData) VarNum(n int) *Zval {
+func (this *ZendExecuteData) VarNum(n int) *types.Zval {
 	if len(this.runTimeCache) > n {
 		return &this.runTimeCache[n]
 	}
 	return nil
 }
-func (this *ZendExecuteData) Arg(n int) *Zval { return this.VarNum(n - 1) }
+func (this *ZendExecuteData) Arg(n int) *types.Zval { return this.VarNum(n - 1) }
 
 func (this *ZendExecuteData) CheckNumArgsError(minNumArgs int, maxNumArgs int) bool {
 	return this.CheckNumArgs(minNumArgs, maxNumArgs, false)
@@ -153,18 +154,18 @@ func (this *ZendExecuteData) GetOpline() *ZendOp                   { return this
 func (this *ZendExecuteData) SetOpline(value *ZendOp)              { this.opline = value }
 func (this *ZendExecuteData) GetCall() *ZendExecuteData            { return this.call }
 func (this *ZendExecuteData) SetCall(value *ZendExecuteData)       { this.call = value }
-func (this *ZendExecuteData) GetReturnValue() *Zval                { return this.returnValue }
-func (this *ZendExecuteData) SetReturnValue(value *Zval)           { this.returnValue = value }
+func (this *ZendExecuteData) GetReturnValue() *types.Zval          { return this.returnValue }
+func (this *ZendExecuteData) SetReturnValue(value *types.Zval)     { this.returnValue = value }
 func (this *ZendExecuteData) GetFunc() *ZendFunction               { return this.func_ }
 func (this *ZendExecuteData) SetFunc(value *ZendFunction)          { this.func_ = value }
-func (this *ZendExecuteData) GetThis() *Zval                       { return &this.This }
-func (this *ZendExecuteData) SetThis(zv *Zval)                     { this.This = *zv }
+func (this *ZendExecuteData) GetThis() *types.Zval                 { return &this.This }
+func (this *ZendExecuteData) SetThis(zv *types.Zval)               { this.This = *zv }
 func (this *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return this.prevExecuteData }
 func (this *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
 	this.prevExecuteData = value
 }
-func (this *ZendExecuteData) GetSymbolTable() *ZendArray      { return this.symbolTable }
-func (this *ZendExecuteData) SetSymbolTable(value *ZendArray) { this.symbolTable = value }
+func (this *ZendExecuteData) GetSymbolTable() *types.ZendArray      { return this.symbolTable }
+func (this *ZendExecuteData) SetSymbolTable(value *types.ZendArray) { this.symbolTable = value }
 
 func (this *ZendExecuteData) GetRunTimeCache() any      { return this.runTimeCache }
 func (this *ZendExecuteData) SetRunTimeCache(value any) { this.symbolTable = value }

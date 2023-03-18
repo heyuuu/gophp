@@ -4,21 +4,24 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZEND_REF_TYPE_SOURCES(ref *ZendReference) *ZendPropertyInfoSourceList { return ref.GetSources() }
-func ZEND_REF_HAS_TYPE_SOURCES(ref *ZendReference) bool {
+func ZEND_REF_TYPE_SOURCES(ref *types.ZendReference) *types.ZendPropertyInfoSourceList {
+	return ref.GetSources()
+}
+func ZEND_REF_HAS_TYPE_SOURCES(ref *types.ZendReference) bool {
 	return ZEND_REF_TYPE_SOURCES(ref).GetPtr() != nil
 }
-func ZEND_REF_FIRST_SOURCE(ref *ZendReference) *ZendPropertyInfo {
-	if ZEND_PROPERTY_INFO_SOURCE_IS_LIST(ref.GetSources().GetList()) != 0 {
-		return ZEND_PROPERTY_INFO_SOURCE_TO_LIST(ref.GetSources().GetList()).GetPtr()[0]
+func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *ZendPropertyInfo {
+	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(ref.GetSources().GetList()) != 0 {
+		return types.ZEND_PROPERTY_INFO_SOURCE_TO_LIST(ref.GetSources().GetList()).GetPtr()[0]
 	} else {
 		return ref.GetSources().GetPtr()
 	}
 }
-func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, ref *ZendRefcounted) {
-	ZVAL_COPY_VALUE(variable_ptr, value)
+func ZendCopyToVariable(variable_ptr *types.Zval, value *types.Zval, value_type types.ZendUchar, ref *types.ZendRefcounted) {
+	types.ZVAL_COPY_VALUE(variable_ptr, value)
 
 	if (value_type & (IS_CONST | IS_CV)) != 0 {
 		if variable_ptr.IsRefcounted() {
@@ -32,26 +35,26 @@ func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, r
 		}
 	}
 }
-func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, strict ZendBool) *Zval {
-	var ref *ZendRefcounted = nil
+func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_type types.ZendUchar, strict types.ZendBool) *types.Zval {
+	var ref *types.ZendRefcounted = nil
 	if value.IsReference() {
 		ref = value.GetCounted()
-		value = Z_REFVAL_P(value)
+		value = types.Z_REFVAL_P(value)
 	}
 	for {
 		if variable_ptr.IsRefcounted() {
-			var garbage *ZendRefcounted
+			var garbage *types.ZendRefcounted
 			if variable_ptr.IsReference() {
 				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.GetRef()) {
 					return ZendAssignToTypedRef(variable_ptr, value, value_type, strict, ref)
 				}
-				variable_ptr = Z_REFVAL_P(variable_ptr)
+				variable_ptr = types.Z_REFVAL_P(variable_ptr)
 				if !(variable_ptr.IsRefcounted()) {
 					break
 				}
 			}
-			if variable_ptr.IsObject() && Z_OBJ_HT(*variable_ptr).GetSet() != nil {
-				Z_OBJ_HT(*variable_ptr).GetSet()(variable_ptr, value)
+			if variable_ptr.IsObject() && types.Z_OBJ_HT(*variable_ptr).GetSet() != nil {
+				types.Z_OBJ_HT(*variable_ptr).GetSet()(variable_ptr, value)
 				return variable_ptr
 			}
 			garbage = variable_ptr.GetCounted()
@@ -77,7 +80,7 @@ func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar,
 	return variable_ptr
 }
 func ZEND_VM_STACK_ELEMENTS(stack ZendVmStack) __auto__ {
-	return (*Zval)(stack) + ZEND_VM_STACK_HEADER_SLOTS
+	return (*types.Zval)(stack) + ZEND_VM_STACK_HEADER_SLOTS
 }
 func ZendVmInitCallFrame(call *ZendExecuteData, call_info uint32, func_ *ZendFunction, num_args uint32, object_or_called_scope any) {
 	call.SetFunc(func_)
@@ -92,7 +95,7 @@ func ZendVmStackPushCallFrameEx(used_stack uint32, call_info uint32, func_ *Zend
 		ZendVmInitCallFrame(call, call_info|ZEND_CALL_ALLOCATED, func_, num_args, object_or_called_scope)
 		return call
 	} else {
-		EG__().SetVmStackTop((*Zval)((*byte)(call + used_stack)))
+		EG__().SetVmStackTop((*types.Zval)((*byte)(call + used_stack)))
 		ZendVmInitCallFrame(call, call_info, func_, num_args, object_or_called_scope)
 		return call
 	}
@@ -111,10 +114,10 @@ func ZendVmStackPushCallFrame(call_info uint32, func_ *ZendFunction, num_args ui
 func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
 		var count uint32 = call.NumArgs() - call.GetFunc().GetOpArray().GetNumArgs()
-		var p *Zval = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
+		var p *types.Zval = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
 		for {
 			if p.IsRefcounted() {
-				var r *ZendRefcounted = p.GetCounted()
+				var r *types.ZendRefcounted = p.GetCounted()
 				if r.DelRefcount() == 0 {
 					p.SetNull()
 					RcDtorFunc(r)
@@ -135,10 +138,10 @@ func ZendVmStackFreeExtraArgs(call *ZendExecuteData) {
 func ZendVmStackFreeArgs(call *ZendExecuteData) {
 	var num_args uint32 = call.NumArgs()
 	if num_args > 0 {
-		var p *Zval = call.Arg(1)
+		var p *types.Zval = call.Arg(1)
 		for {
 			if p.IsRefcounted() {
-				var r *ZendRefcounted = p.GetCounted()
+				var r *types.ZendRefcounted = p.GetCounted()
 				if r.DelRefcount() == 0 {
 					p.SetNull()
 					RcDtorFunc(r)
@@ -161,7 +164,7 @@ func ZendVmStackFreeCallFrameEx(call_info uint32, call *ZendExecuteData) {
 		EG__().SetVmStack(prev)
 		Efree(p)
 	} else {
-		EG__().SetVmStackTop((*Zval)(call))
+		EG__().SetVmStackTop((*types.Zval)(call))
 	}
 }
 func ZendVmStackFreeCallFrame(call *ZendExecuteData) {
@@ -214,70 +217,70 @@ func SKIP_EXT_OPLINE(opline __auto__) {
 func ZEND_CLASS_HAS_TYPE_HINTS(ce *ZendClassEntry) bool {
 	return (ce.GetCeFlags() & ZEND_ACC_HAS_TYPE_HINTS) == ZEND_ACC_HAS_TYPE_HINTS
 }
-func ZEND_REF_ADD_TYPE_SOURCE(ref *ZendReference, source *ZendPropertyInfo) {
+func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo) {
 	ZendRefAddTypeSource(&(ref.GetSources()), source)
 }
-func ZEND_REF_DEL_TYPE_SOURCE(ref *ZendReference, source *ZendPropertyInfo) {
+func ZEND_REF_DEL_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo) {
 	ZendRefDelTypeSource(&(ref.GetSources()), source)
 }
-func GetZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtr(op_type, node, should_free, type_, executeData, opline)
 }
-func GetZvalPtrDeref(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetZvalPtrDeref(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrDeref(op_type, node, should_free, type_, executeData, opline)
 }
-func GetZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrUndef(op_type, node, should_free, type_, executeData, opline)
 }
-func GetOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *Zval {
+func GetOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *types.Zval {
 	return _getOpDataZvalPtrR(op_type, node, should_free, executeData, opline)
 }
-func GetOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *Zval {
+func GetOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *types.Zval {
 	return _getOpDataZvalPtrDerefR(op_type, node, should_free, executeData, opline)
 }
-func GetZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrPtr(op_type, node, should_free, type_, executeData)
 }
-func GetZvalPtrPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetZvalPtrPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrPtr(op_type, node, should_free, type_, executeData)
 }
-func GetObjZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetObjZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getObjZvalPtr(op_type, node, should_free, type_, executeData, opline)
 }
-func GetObjZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetObjZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getObjZvalPtrUndef(op_type, node, should_free, type_, executeData, opline)
 }
-func GetObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
+func GetObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getObjZvalPtrPtr(op_type, node, should_free, type_, executeData)
 }
 func RETURN_VALUE_USED(opline *ZendOp) bool {
 	return opline.GetResultType() != IS_UNUSED
 }
-func ZifPass(executeData *ZendExecuteData, return_value *Zval) {}
-func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *Zval, result *Zval) {
-	var __container_to_free *Zval = free_op
+func ZifPass(executeData *ZendExecuteData, return_value *types.Zval) {}
+func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *types.Zval, result *types.Zval) {
+	var __container_to_free *types.Zval = free_op
 	if __container_to_free != nil && __container_to_free.IsRefcounted() {
-		var __ref *ZendRefcounted = __container_to_free.GetCounted()
+		var __ref *types.ZendRefcounted = __container_to_free.GetCounted()
 		if __ref.DelRefcount() == 0 {
-			var __zv *Zval = result
+			var __zv *types.Zval = result
 			if __zv.IsIndirect() {
-				ZVAL_COPY(__zv, __zv.GetZv())
+				types.ZVAL_COPY(__zv, __zv.GetZv())
 			}
 			RcDtorFunc(__ref)
 		}
 	}
 }
-func FREE_OP(should_free *Zval) {
+func FREE_OP(should_free *types.Zval) {
 	if should_free != nil {
 		ZvalPtrDtorNogc(should_free)
 	}
 }
-func FREE_UNFETCHED_OP(type_ ZendUchar, var_ uint32) {
+func FREE_UNFETCHED_OP(type_ types.ZendUchar, var_ uint32) {
 	if (type_ & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZvalPtrDtorNogc(EX_VAR(var_))
 	}
 }
-func FREE_OP_VAR_PTR(should_free *Zval) {
+func FREE_OP_VAR_PTR(should_free *types.Zval) {
 	if should_free != nil {
 		ZvalPtrDtorNogc(should_free)
 	}
@@ -289,7 +292,7 @@ func ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size int, page_size int) int {
 func ZendVmStackNewPage(size int, prev ZendVmStack) ZendVmStack {
 	var page ZendVmStack = ZendVmStack(Emalloc(size))
 	page.SetTop(ZEND_VM_STACK_ELEMENTS(page))
-	page.SetEnd((*Zval)((*byte)(page + size)))
+	page.SetEnd((*types.Zval)((*byte)(page + size)))
 	page.SetPrev(prev)
 	return page
 }
@@ -328,42 +331,42 @@ func ZendVmStackExtend(size int) any {
 	EG__().SetVmStackEnd(stack.GetEnd())
 	return ptr
 }
-func ZendGetCompiledVariableValue(executeData *ZendExecuteData, var_ uint32) *Zval {
+func ZendGetCompiledVariableValue(executeData *ZendExecuteData, var_ uint32) *types.Zval {
 	return EX_VAR(var_)
 }
-func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	*should_free = ret
-	ZEND_ASSERT(ret.GetType() != IS_REFERENCE)
+	ZEND_ASSERT(ret.GetType() != types.IS_REFERENCE)
 	return ret
 }
-func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	*should_free = ret
 	return ret
 }
-func _getZvalPtrVarDeref(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _getZvalPtrVarDeref(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	*should_free = ret
-	ret = ZVAL_DEREF(ret)
+	ret = types.ZVAL_DEREF(ret)
 	return ret
 }
-func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *Zval {
+func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *types.Zval {
 	if EG__().GetException() == nil {
-		var cv *ZendString = CV_DEF_OF(EX_VAR_TO_NUM(var_))
+		var cv *types.ZendString = CV_DEF_OF(EX_VAR_TO_NUM(var_))
 		ZendError(E_NOTICE, "Undefined variable: %s", cv.GetVal())
 	}
 	return EG__().GetUninitializedZval()
 }
-func _zvalUndefinedOp1(executeData *ZendExecuteData) *Zval {
+func _zvalUndefinedOp1(executeData *ZendExecuteData) *types.Zval {
 	return ZvalUndefinedCv(executeData.GetOpline().op1.var_, executeData)
 }
-func _zvalUndefinedOp2(executeData *ZendExecuteData) *Zval {
+func _zvalUndefinedOp2(executeData *ZendExecuteData) *types.Zval {
 	return ZvalUndefinedCv(executeData.GetOpline().op2.var_, executeData)
 }
-func ZVAL_UNDEFINED_OP1() *Zval { return _zvalUndefinedOp1(executeData) }
-func ZVAL_UNDEFINED_OP2() *Zval { return _zvalUndefinedOp2(executeData) }
-func _getZvalCvLookup(ptr *Zval, var_ uint32, type_ int, executeData *ZendExecuteData) *Zval {
+func ZVAL_UNDEFINED_OP1() *types.Zval { return _zvalUndefinedOp1(executeData) }
+func ZVAL_UNDEFINED_OP2() *types.Zval { return _zvalUndefinedOp2(executeData) }
+func _getZvalCvLookup(ptr *types.Zval, var_ uint32, type_ int, executeData *ZendExecuteData) *types.Zval {
 	switch type_ {
 	case BP_VAR_R:
 		fallthrough
@@ -379,8 +382,8 @@ func _getZvalCvLookup(ptr *Zval, var_ uint32, type_ int, executeData *ZendExecut
 	}
 	return ptr
 }
-func _getZvalPtrCv(var_ uint32, type_ int, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _getZvalPtrCv(var_ uint32, type_ int, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsUndef() {
 		if type_ == BP_VAR_W {
 			ret.SetNull()
@@ -390,8 +393,8 @@ func _getZvalPtrCv(var_ uint32, type_ int, executeData *ZendExecuteData) *Zval {
 	}
 	return ret
 }
-func _getZvalPtrCvDeref(var_ uint32, type_ int, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _getZvalPtrCvDeref(var_ uint32, type_ int, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsUndef() {
 		if type_ == BP_VAR_W {
 			ret.SetNull()
@@ -400,25 +403,25 @@ func _getZvalPtrCvDeref(var_ uint32, type_ int, executeData *ZendExecuteData) *Z
 			return _getZvalCvLookup(ret, var_, type_, executeData)
 		}
 	}
-	ret = ZVAL_DEREF(ret)
+	ret = types.ZVAL_DEREF(ret)
 	return ret
 }
-func _get_zval_ptr_cv_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _get_zval_ptr_cv_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsUndef() {
 		return ZvalUndefinedCv(var_, executeData)
 	}
 	return ret
 }
-func _get_zval_ptr_cv_deref_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _get_zval_ptr_cv_deref_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsUndef() {
 		return ZvalUndefinedCv(var_, executeData)
 	}
-	ret = ZVAL_DEREF(ret)
+	ret = types.ZVAL_DEREF(ret)
 	return ret
 }
-func _get_zval_ptr_cv_BP_VAR_IS(var_ uint32, executeData *ZendExecuteData) *Zval {
-	var ret *Zval = EX_VAR(var_)
+func _get_zval_ptr_cv_BP_VAR_IS(var_ uint32, executeData *ZendExecuteData) *types.Zval {
+	var ret *types.Zval = EX_VAR(var_)
 	return ret
 }

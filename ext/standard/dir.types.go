@@ -3,14 +3,14 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * PhpDirGlobals
  */
 type PhpDirGlobals struct {
-	default_dir *zend.ZendResource
+	default_dir *types.ZendResource
 }
 
 // func MakePhpDirGlobals(default_dir *zend.ZendResource) PhpDirGlobals {

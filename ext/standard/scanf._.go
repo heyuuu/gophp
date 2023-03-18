@@ -3,7 +3,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/scanf.h>
@@ -30,7 +30,7 @@ const SCAN_MAX_ARGS = 0xff
 
 /* passed to (f|s)scanf. This is an artificial   */
 
-const SCAN_SUCCESS = zend.SUCCESS
+const SCAN_SUCCESS = types.SUCCESS
 const SCAN_ERROR_EOF = -1
 
 /* can be caused by bad parameters or format*/

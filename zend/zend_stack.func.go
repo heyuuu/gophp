@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 func ZendStackInit(stack *ZendStack, size int)        { stack.Init() }
 func ZendStackPush(stack *ZendStack, element any) int { return stack.Push(element) }
 func ZendStackTop(stack *ZendStack) any               { return stack.Top() }
@@ -12,14 +14,14 @@ func ZendStackIntTop(stack *ZendStack) int {
 	if e != nil {
 		return *e
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
-func ZendStackIsEmpty(stack *ZendStack) ZendBool { return intBool(stack.IsEmpty()) }
-func ZendStackDestroy(stack *ZendStack)          { stack.Destroy() }
+func ZendStackIsEmpty(stack *ZendStack) types.ZendBool { return types.intBool(stack.IsEmpty()) }
+func ZendStackDestroy(stack *ZendStack)                { stack.Destroy() }
 func ZendStackApplyWithArgument(stack *ZendStack, type_ int, apply_function func(element any, arg any) int, arg any) {
 	stack.ApplyWithArgument(type_, apply_function, arg)
 }
-func ZendStackClean(stack *ZendStack, func_ func(any), free_elements ZendBool) {
+func ZendStackClean(stack *ZendStack, func_ func(any), free_elements types.ZendBool) {
 	stack.Clean(func_, free_elements)
 }

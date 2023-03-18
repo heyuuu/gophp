@@ -6,9 +6,10 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
+func PhpInetNtop(addr *__struct__sockaddr) *types.ZendString {
 	var addrlen socklen_t = b.SizeOf("struct sockaddr_in")
 	if addr == nil {
 		return nil
@@ -18,20 +19,20 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *zend.ZendString = zend.ZendStringAlloc(INET_ADDRSTRLEN, 0)
+		var ret *types.ZendString = types.ZendStringAlloc(INET_ADDRSTRLEN, 0)
 		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
 			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
-		zend.ZendStringEfree(ret)
+		types.ZendStringEfree(ret)
 	}
 
 	/* Fallback on getnameinfo() */
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *zend.ZendString = zend.ZendStringAlloc(NI_MAXHOST, 0)
-		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == zend.SUCCESS {
+		var ret *types.ZendString = types.ZendStringAlloc(NI_MAXHOST, 0)
+		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == types.SUCCESS {
 
 			/* Also demangle numeric host with %name suffix */
 
@@ -42,20 +43,20 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
-		zend.ZendStringEfree(ret)
+		types.ZendStringEfree(ret)
 	}
 	return nil
 }
 func IfaceAppendUnicast(
-	unicast *zend.Zval,
+	unicast *types.Zval,
 	flags zend.ZendLong,
 	addr *__struct__sockaddr,
 	netmask *__struct__sockaddr,
 	broadcast *__struct__sockaddr,
 	ptp *__struct__sockaddr,
 ) {
-	var host *zend.ZendString
-	var u zend.Zval
+	var host *types.ZendString
+	var u types.Zval
 	zend.ArrayInit(&u)
 	zend.AddAssocLong(&u, "flags", flags)
 	if addr != nil {
@@ -75,7 +76,7 @@ func IfaceAppendUnicast(
 	}
 	zend.AddNextIndexZval(unicast, &u)
 }
-func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
 	if executeData.NumArgs() != 0 {
@@ -89,17 +90,17 @@ func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *zend.Z
 	}
 	zend.ArrayInit(return_value)
 	for p = addrs; p != nil; p = p.ifa_next {
-		var iface *zend.Zval = return_value.GetArr().KeyFind(b.CastStrAuto(p.ifa_name))
-		var unicast *zend.Zval
-		var status *zend.Zval
+		var iface *types.Zval = return_value.GetArr().KeyFind(b.CastStrAuto(p.ifa_name))
+		var unicast *types.Zval
+		var status *types.Zval
 		if iface == nil {
-			var newif zend.Zval
+			var newif types.Zval
 			zend.ArrayInit(&newif)
 			iface = return_value.GetArr().KeyAdd(b.CastStrAuto(p.ifa_name), &newif)
 		}
 		unicast = iface.GetArr().KeyFind("unicast")
 		if unicast == nil {
-			var newuni zend.Zval
+			var newuni types.Zval
 			zend.ArrayInit(&newuni)
 			unicast = iface.GetArr().KeyAdd("unicast", &newuni)
 		}

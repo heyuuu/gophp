@@ -5,9 +5,10 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func ZifSoundex(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSoundex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
 	var i int
 	var _small int
@@ -22,12 +23,12 @@ func ZifSoundex(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

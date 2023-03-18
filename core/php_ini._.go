@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 const PHP_INI_USER = zend.ZEND_INI_USER
@@ -19,7 +20,7 @@ const PHP_INI_STAGE_HTACCESS = zend.ZEND_INI_STAGE_HTACCESS
 const PhpIniColorDisplayerCb = zend.ZendIniColorDisplayerCb
 
 var IsSpecialSection int = 0
-var ActiveIniHash *zend.HashTable
+var ActiveIniHash *types.HashTable
 var HasPerDirConfig int = 0
 var HasPerHostConfig int = 0
 var PhpIniOpenedPath *byte = nil

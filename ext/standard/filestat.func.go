@@ -8,12 +8,13 @@ import (
 	"sik/core/streams"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func ZmActivateFilestat(type_ int, module_number int) int {
 	BG(CurrentStatFile) = nil
 	BG(CurrentLStatFile) = nil
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmDeactivateFilestat(type_ int, module_number int) int {
 	if BG(CurrentStatFile) {
@@ -24,14 +25,14 @@ func ZmDeactivateFilestat(type_ int, module_number int) int {
 		zend.Efree(BG(CurrentLStatFile))
 		BG(CurrentLStatFile) = nil
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpDiskTotalSpace(path *byte, space *float64) int {
 	var bytestotal float64 = 0
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if buf.f_frsize {
 		bytestotal = float64(buf.f_blocks) * float64(buf.f_frsize)
@@ -39,9 +40,9 @@ func PhpDiskTotalSpace(path *byte, space *float64) int {
 		bytestotal = float64(buf.f_blocks) * float64(buf.f_bsize)
 	}
 	*space = bytestotal
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func ZifDiskTotalSpace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDiskTotalSpace(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var bytestotal float64
 	var path *byte
 	var fullpath []*byte
@@ -52,12 +53,12 @@ func ZifDiskTotalSpace(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -121,7 +122,7 @@ func ZifDiskTotalSpace(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		return_value.SetFalse()
 		return
 	}
-	if PhpDiskTotalSpace(fullpath, &bytestotal) == zend.SUCCESS {
+	if PhpDiskTotalSpace(fullpath, &bytestotal) == types.SUCCESS {
 		return_value.SetDouble(bytestotal)
 		return
 	}
@@ -133,7 +134,7 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if buf.f_frsize {
 		bytesfree = float64(buf.f_bavail) * float64(buf.f_frsize)
@@ -141,9 +142,9 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 		bytesfree = float64(buf.f_bavail) * float64(buf.f_bsize)
 	}
 	*space = bytesfree
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var bytesfree float64
 	var path *byte
 	var fullpath []*byte
@@ -154,12 +155,12 @@ func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -223,7 +224,7 @@ func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return_value.SetFalse()
 		return
 	}
-	if PhpDiskFreeSpace(fullpath, &bytesfree) == zend.SUCCESS {
+	if PhpDiskFreeSpace(fullpath, &bytesfree) == types.SUCCESS {
 		return_value.SetDouble(bytesfree)
 		return
 	}
@@ -233,15 +234,15 @@ func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *zend.Zval
 func PhpGetGidByName(name *byte, gid *gid_t) int {
 	var gr *__struct__group = getgrnam(name)
 	if gr == nil {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	*gid = gr.gr_gid
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_lchgrp int) {
+func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_lchgrp int) {
 	var filename *byte
 	var filename_len int
-	var group *zend.Zval
+	var group *types.Zval
 	var gid gid_t
 	var ret int
 	var wrapper *core.PhpStreamWrapper
@@ -251,12 +252,12 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -320,10 +321,10 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if group.IsType(zend.IS_LONG) {
+			if group.IsType(types.IS_LONG) {
 				option = core.PHP_STREAM_META_GROUP
 				value = &(group.GetLval())
-			} else if group.IsType(zend.IS_STRING) {
+			} else if group.IsType(types.IS_STRING) {
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = group.GetStr().GetVal()
 			} else {
@@ -347,10 +348,10 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 			return
 		}
 	}
-	if group.IsType(zend.IS_LONG) {
+	if group.IsType(types.IS_LONG) {
 		gid = gid_t(group.GetLval())
-	} else if group.IsType(zend.IS_STRING) {
-		if PhpGetGidByName(group.GetStr().GetVal(), &gid) != zend.SUCCESS {
+	} else if group.IsType(types.IS_STRING) {
+		if PhpGetGidByName(group.GetStr().GetVal(), &gid) != types.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find gid for %s", group.GetStr().GetVal())
 			return_value.SetFalse()
 			return
@@ -380,24 +381,24 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 	return_value.SetTrue()
 	return
 }
-func ZifChgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpDoChgrp(executeData, return_value, 0)
 }
-func ZifLchgrp(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLchgrp(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpDoChgrp(executeData, return_value, 1)
 }
 func PhpGetUidByName(name *byte, uid *uid_t) uid_t {
 	var pw *__struct__passwd = getpwnam(name)
 	if pw == nil {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	*uid = pw.pw_uid
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func PhpDoChown(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_lchown int) {
+func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_lchown int) {
 	var filename *byte
 	var filename_len int
-	var user *zend.Zval
+	var user *types.Zval
 	var uid uid_t
 	var ret int
 	var wrapper *core.PhpStreamWrapper
@@ -407,12 +408,12 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -475,10 +476,10 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if user.IsType(zend.IS_LONG) {
+			if user.IsType(types.IS_LONG) {
 				option = core.PHP_STREAM_META_OWNER
 				value = &(user.GetLval())
-			} else if user.IsType(zend.IS_STRING) {
+			} else if user.IsType(types.IS_STRING) {
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = user.GetStr().GetVal()
 			} else {
@@ -502,10 +503,10 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 			return
 		}
 	}
-	if user.IsType(zend.IS_LONG) {
+	if user.IsType(types.IS_LONG) {
 		uid = uid_t(user.GetLval())
-	} else if user.IsType(zend.IS_STRING) {
-		if PhpGetUidByName(user.GetStr().GetVal(), &uid) != zend.SUCCESS {
+	} else if user.IsType(types.IS_STRING) {
+		if PhpGetUidByName(user.GetStr().GetVal(), &uid) != types.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find uid for %s", user.GetStr().GetVal())
 			return_value.SetFalse()
 			return
@@ -535,14 +536,14 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *zend.Zval, do_l
 	return_value.SetTrue()
 	return
 }
-func ZifChown(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChown(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpDoChown(executeData, return_value, 0)
 }
-func ZifLchown(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLchown(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	PhpDoChown(executeData, return_value, 1)
 }
-func ZifChmod(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var mode zend.ZendLong
@@ -555,12 +556,12 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -655,7 +656,7 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifTouch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var filetime zend.ZendLong = 0
@@ -672,12 +673,12 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -822,7 +823,7 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func PhpClearStatCache(clear_realpath_cache zend.ZendBool, filename *byte, filename_len int) {
+func PhpClearStatCache(clear_realpath_cache types.ZendBool, filename *byte, filename_len int) {
 	/* always clear CurrentStatFile and CurrentLStatFile even if filename is not NULL
 	 * as it may contain outdated data (e.g. "nlink" for a directory when deleting a file
 	 * in this directory, as shown by lstat_stat_variation9.phpt) */
@@ -843,8 +844,8 @@ func PhpClearStatCache(clear_realpath_cache zend.ZendBool, filename *byte, filen
 		}
 	}
 }
-func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var clear_realpath_cache zend.ZendBool = 0
+func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var clear_realpath_cache types.ZendBool = 0
 	var filename *byte = nil
 	var filename_len int = 0
 	for {
@@ -853,12 +854,12 @@ func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -935,20 +936,20 @@ func IS_ABLE_CHECK(__t int) bool {
 func IS_ACCESS_CHECK(__t int) bool {
 	return IS_ABLE_CHECK(type_) || __t == FS_EXISTS
 }
-func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.Zval) {
-	var stat_dev zend.Zval
-	var stat_ino zend.Zval
-	var stat_mode zend.Zval
-	var stat_nlink zend.Zval
-	var stat_uid zend.Zval
-	var stat_gid zend.Zval
-	var stat_rdev zend.Zval
-	var stat_size zend.Zval
-	var stat_atime zend.Zval
-	var stat_mtime zend.Zval
-	var stat_ctime zend.Zval
-	var stat_blksize zend.Zval
-	var stat_blocks zend.Zval
+func PhpStat(filename *byte, filename_length int, type_ int, return_value *types.Zval) {
+	var stat_dev types.Zval
+	var stat_ino types.Zval
+	var stat_mode types.Zval
+	var stat_nlink types.Zval
+	var stat_uid types.Zval
+	var stat_gid types.Zval
+	var stat_rdev types.Zval
+	var stat_size types.Zval
+	var stat_atime types.Zval
+	var stat_mtime types.Zval
+	var stat_ctime types.Zval
+	var stat_blksize types.Zval
+	var stat_blocks types.Zval
 	var stat_sb *zend.ZendStatT
 	var ssb core.PhpStreamStatbuf
 	var flags int = 0
@@ -1087,22 +1088,22 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 		return_value.SetRawString("unknown")
 		return
 	case FS_IS_W:
-		zend.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&wmask) != 0)
+		types.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&wmask) != 0)
 		return
 	case FS_IS_R:
-		zend.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&rmask) != 0)
+		types.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&rmask) != 0)
 		return
 	case FS_IS_X:
-		zend.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&xmask) != 0)
+		types.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&xmask) != 0)
 		return
 	case FS_IS_FILE:
-		zend.ZVAL_BOOL(return_value, zend.S_ISREG(ssb.GetSb().st_mode))
+		types.ZVAL_BOOL(return_value, zend.S_ISREG(ssb.GetSb().st_mode))
 		return
 	case FS_IS_DIR:
-		zend.ZVAL_BOOL(return_value, zend.S_ISDIR(ssb.GetSb().st_mode))
+		types.ZVAL_BOOL(return_value, zend.S_ISDIR(ssb.GetSb().st_mode))
 		return
 	case FS_IS_LINK:
-		zend.ZVAL_BOOL(return_value, zend.S_ISLNK(ssb.GetSb().st_mode))
+		types.ZVAL_BOOL(return_value, zend.S_ISLNK(ssb.GetSb().st_mode))
 		return
 	case FS_EXISTS:
 		return_value.SetTrue()
@@ -1162,7 +1163,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 	return_value.SetFalse()
 	return
 }
-func ZifFileperms(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFileperms(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1171,12 +1172,12 @@ func ZifFileperms(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1234,7 +1235,7 @@ func ZifFileperms(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_PERMS, return_value)
 }
-func ZifFileinode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFileinode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1243,12 +1244,12 @@ func ZifFileinode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1306,7 +1307,7 @@ func ZifFileinode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_INODE, return_value)
 }
-func ZifFilesize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFilesize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1315,12 +1316,12 @@ func ZifFilesize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1378,7 +1379,7 @@ func ZifFilesize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_SIZE, return_value)
 }
-func ZifFileowner(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFileowner(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1387,12 +1388,12 @@ func ZifFileowner(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1450,7 +1451,7 @@ func ZifFileowner(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_OWNER, return_value)
 }
-func ZifFilegroup(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFilegroup(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1459,12 +1460,12 @@ func ZifFilegroup(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1522,7 +1523,7 @@ func ZifFilegroup(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_GROUP, return_value)
 }
-func ZifFileatime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFileatime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1531,12 +1532,12 @@ func ZifFileatime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1594,7 +1595,7 @@ func ZifFileatime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_ATIME, return_value)
 }
-func ZifFilemtime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFilemtime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1603,12 +1604,12 @@ func ZifFilemtime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1666,7 +1667,7 @@ func ZifFilemtime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_MTIME, return_value)
 }
-func ZifFilectime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFilectime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1675,12 +1676,12 @@ func ZifFilectime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1738,7 +1739,7 @@ func ZifFilectime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_CTIME, return_value)
 }
-func ZifFiletype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFiletype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1747,12 +1748,12 @@ func ZifFiletype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1810,7 +1811,7 @@ func ZifFiletype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_TYPE, return_value)
 }
-func ZifIsWritable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsWritable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1819,12 +1820,12 @@ func ZifIsWritable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1882,7 +1883,7 @@ func ZifIsWritable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_IS_W, return_value)
 }
-func ZifIsReadable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsReadable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1891,12 +1892,12 @@ func ZifIsReadable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1954,7 +1955,7 @@ func ZifIsReadable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_IS_R, return_value)
 }
-func ZifIsExecutable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsExecutable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1963,12 +1964,12 @@ func ZifIsExecutable(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2026,7 +2027,7 @@ func ZifIsExecutable(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	PhpStat(filename, filename_len, FS_IS_X, return_value)
 }
-func ZifIsFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -2035,12 +2036,12 @@ func ZifIsFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2098,7 +2099,7 @@ func ZifIsFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_IS_FILE, return_value)
 }
-func ZifIsDir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsDir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -2107,12 +2108,12 @@ func ZifIsDir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2170,7 +2171,7 @@ func ZifIsDir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_IS_DIR, return_value)
 }
-func ZifIsLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -2179,12 +2180,12 @@ func ZifIsLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2242,7 +2243,7 @@ func ZifIsLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_IS_LINK, return_value)
 }
-func ZifFileExists(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFileExists(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -2251,12 +2252,12 @@ func ZifFileExists(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2314,7 +2315,7 @@ func ZifFileExists(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_EXISTS, return_value)
 }
-func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -2323,12 +2324,12 @@ func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2386,7 +2387,7 @@ func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_LSTAT, return_value)
 }
-func PhpIfStat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpIfStat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -2395,12 +2396,12 @@ func PhpIfStat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2458,24 +2459,24 @@ func PhpIfStat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_STAT, return_value)
 }
-func ZifRealpathCacheSize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifRealpathCacheSize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	return_value.SetLong(zend.RealpathCacheSize())
 	return
 }
-func ZifRealpathCacheGet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRealpathCacheGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var buckets **zend.RealpathCacheBucket = zend.RealpathCacheGetBuckets()
 	var end ***zend.RealpathCacheBucket = buckets + zend.RealpathCacheMaxBuckets()
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	zend.ArrayInit(return_value)
 	for buckets < end {
 		var bucket *zend.RealpathCacheBucket = *buckets
 		for bucket != nil {
-			var entry zend.Zval
+			var entry types.Zval
 			zend.ArrayInit(&entry)
 
 			/* bucket->key is unsigned long */

@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -11,7 +12,7 @@ import (
  */
 type SplFixedarray struct {
 	size     zend.ZendLong
-	elements *zend.Zval
+	elements *types.Zval
 }
 
 // func MakeSplFixedarray(size zend.ZendLong, elements *zend.Zval) SplFixedarray {
@@ -20,10 +21,10 @@ type SplFixedarray struct {
 //         elements:elements,
 //     }
 // }
-func (this *SplFixedarray) GetSize() zend.ZendLong       { return this.size }
-func (this *SplFixedarray) SetSize(value zend.ZendLong)  { this.size = value }
-func (this *SplFixedarray) GetElements() *zend.Zval      { return this.elements }
-func (this *SplFixedarray) SetElements(value *zend.Zval) { this.elements = value }
+func (this *SplFixedarray) GetSize() zend.ZendLong        { return this.size }
+func (this *SplFixedarray) SetSize(value zend.ZendLong)   { this.size = value }
+func (this *SplFixedarray) GetElements() *types.Zval      { return this.elements }
+func (this *SplFixedarray) SetElements(value *types.Zval) { this.elements = value }
 
 /**
  * SplFixedarrayObject
@@ -38,7 +39,7 @@ type SplFixedarrayObject struct {
 	current         int
 	flags           int
 	ce_get_iterator *zend.ZendClassEntry
-	std             zend.ZendObject
+	std             types.ZendObject
 }
 
 //             func MakeSplFixedarrayObject(
@@ -95,7 +96,7 @@ func (this *SplFixedarrayObject) GetCeGetIterator() *zend.ZendClassEntry { retur
 func (this *SplFixedarrayObject) SetCeGetIterator(value *zend.ZendClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplFixedarrayObject) GetStd() zend.ZendObject { return this.std }
+func (this *SplFixedarrayObject) GetStd() types.ZendObject { return this.std }
 
 // func (this *SplFixedarrayObject) SetStd(value zend.ZendObject) { this.std = value }
 

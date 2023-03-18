@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -41,8 +42,8 @@ type PhpCliServerRequest struct {
 	path_translated       string
 	path_info             string
 	query_string          string
-	headers               zend.HashTable
-	headers_original_case zend.HashTable
+	headers               types.HashTable
+	headers_original_case types.HashTable
 	content               string
 	ext                   string
 	sb                    zend.ZendStatT
@@ -97,8 +98,8 @@ func (this *PhpCliServerRequest) GetPathInfoLen() int             { return this.
 func (this *PhpCliServerRequest) SetPathInfoLen(value int)        { this.path_info_len = value }
 func (this *PhpCliServerRequest) GetQueryString() *byte           { return this.query_string }
 func (this *PhpCliServerRequest) GetQueryStringLen() int          { return this.query_string_len }
-func (this *PhpCliServerRequest) GetHeaders() zend.HashTable      { return this.headers }
-func (this *PhpCliServerRequest) GetHeadersOriginalCase() zend.HashTable {
+func (this *PhpCliServerRequest) GetHeaders() types.HashTable     { return this.headers }
+func (this *PhpCliServerRequest) GetHeadersOriginalCase() types.HashTable {
 	return this.headers_original_case
 }
 func (this *PhpCliServerRequest) GetContent() *byte          { return this.content }
@@ -277,7 +278,7 @@ type PhpCliServer struct {
 	document_root  string
 	router         string
 	socklen        socklen_t
-	clients        zend.HashTable
+	clients        types.HashTable
 }
 
 func (this *PhpCliServer) Serve() error {
@@ -324,7 +325,7 @@ func (this *PhpCliServer) GetDocumentRootLen() int             { return this.doc
 func (this *PhpCliServer) GetRouter() *byte                    { return this.router }
 func (this *PhpCliServer) SetRouter(value *byte)               { this.router = value }
 func (this *PhpCliServer) GetSocklen() socklen_t               { return this.socklen }
-func (this *PhpCliServer) GetClients() zend.HashTable          { return this.clients }
+func (this *PhpCliServer) GetClients() types.HashTable         { return this.clients }
 
 /**
  * PhpCliServerDoEventForEachFdCallbackParams

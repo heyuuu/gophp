@@ -4,16 +4,17 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) int {
+func ZendParseArg(arg_num int, arg *types.Zval, va *va_list, spec **byte, flags int) int {
 	var expected_type *byte = nil
 	var error *byte = nil
 	var severity int = 0
 	expected_type = ZendParseArgImpl(arg_num, arg, va, spec, &error, &severity)
 	if expected_type != nil {
 		if EG__().GetException() != nil {
-			return FAILURE
+			return types.FAILURE
 		}
 		if (flags&ZEND_PARSE_PARAMS_QUIET) == 0 && ((*expected_type) || error != nil) {
 			var throwException = CurrEX().IsArgUseStrictTypes() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
@@ -25,10 +26,10 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 			}
 		}
 		if severity != E_DEPRECATED {
-			return FAILURE
+			return types.FAILURE
 		}
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendParseParametersDebugError(msg string) {
 	var active_function *ZendFunction = CurrEX().GetFunc()
@@ -118,7 +119,7 @@ func ZendParseVaArgs_Ex(numArgs int, typeSpec string, args []any, flags int) boo
 			numVarargs := numArgs + 1 - postVarargs // todo
 
 			/* eat up the passed in storage even if it won't be filled in with varargs */
-			varargs := args[vaIndex].(**Zval)
+			varargs := args[vaIndex].(**types.Zval)
 			nVarargs := args[vaIndex].(*int)
 			typeSpecIndex++
 			if numVarargs > 0 {
@@ -152,10 +153,10 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 	var min_num_args int = -1
 	var max_num_args int = 0
 	var post_varargs int = 0
-	var arg *Zval
+	var arg *types.Zval
 	var arg_count int
-	var have_varargs ZendBool = 0
-	var varargs **Zval = nil
+	var have_varargs types.ZendBool = 0
+	var varargs **types.Zval = nil
 	var n_varargs *int = nil
 	for spec_walk = type_spec; *spec_walk; spec_walk++ {
 		c = *spec_walk
@@ -196,7 +197,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 		case '+':
 			if have_varargs != 0 {
 				ZendParseParametersDebugError("only one varargs specifier (* or +) is permitted")
-				return FAILURE
+				return types.FAILURE
 			}
 			have_varargs = 1
 
@@ -212,7 +213,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			break
 		default:
 			ZendParseParametersDebugError("bad type specifier while parsing parameters")
-			return FAILURE
+			return types.FAILURE
 		}
 	}
 	if min_num_args < 0 {
@@ -232,12 +233,12 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			var throw_exception = CurrEX().IsArgUseStrictTypes() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			ZendInternalArgumentCountError(throw_exception, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 		}
-		return FAILURE
+		return types.FAILURE
 	}
 	arg_count = CurrEX().NumArgs()
 	if num_args > arg_count {
 		ZendParseParametersDebugError("could not obtain parameters for parsing")
-		return FAILURE
+		return types.FAILURE
 	}
 	i = 0
 	for b.PostDec(&num_args) > 0 {
@@ -249,7 +250,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 
 			/* eat up the passed in storage even if it won't be filled in with varargs */
 
-			varargs = __va_arg(*va, (**Zval)(_))
+			varargs = __va_arg(*va, (**types.Zval)(_))
 			n_varargs = __va_arg(*va, (*int)(_))
 			type_spec++
 			if num_varargs > 0 {
@@ -267,18 +268,18 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			}
 		}
 		arg = CurrEX().Arg(i + 1)
-		if ZendParseArg(i+1, arg, va, &type_spec, flags) == FAILURE {
+		if ZendParseArg(i+1, arg, va, &type_spec, flags) == types.FAILURE {
 
 			/* clean up varargs array if it was used */
 
 			if varargs != nil && (*varargs) != nil {
 				*varargs = nil
 			}
-			return FAILURE
+			return types.FAILURE
 		}
 		i++
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendParseParametersEx(flags int, num_args int, type_spec string, _ ...any) int {
 	var va va_list
@@ -306,12 +307,12 @@ func ZendParseParametersThrow(num_args int, type_spec string, _ ...any) int {
 	va_end(va)
 	return retval
 }
-func ZendParseMethodParameters(num_args int, this_ptr *Zval, type_spec string, _ ...any) int {
+func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec string, _ ...any) int {
 	var va va_list
 	var retval int
 	var flags int = 0
 	var p *byte = type_spec
-	var object **Zval
+	var object **types.Zval
 	var ce *ZendClassEntry
 
 	/* Just checking this_ptr is not enough, because fcall_common_helper does not set
@@ -319,30 +320,30 @@ func ZendParseMethodParameters(num_args int, this_ptr *Zval, type_spec string, _
 	 * In that case EG(This) would still be the $this from the calling code and we'd take the
 	 * wrong branch here. */
 
-	var is_method ZendBool = CurrEX().GetFunc().GetScope() != nil
-	if is_method == 0 || this_ptr == nil || this_ptr.GetType() != IS_OBJECT {
+	var is_method types.ZendBool = CurrEX().GetFunc().GetScope() != nil
+	if is_method == 0 || this_ptr == nil || this_ptr.GetType() != types.IS_OBJECT {
 		va_start(va, type_spec)
 		retval = ZendParseVaArgs(num_args, type_spec, &va, flags)
 		va_end(va)
 	} else {
 		p++
 		va_start(va, type_spec)
-		object = __va_arg(va, (**Zval)(_))
+		object = __va_arg(va, (**types.Zval)(_))
 		ce = __va_arg(va, (*ZendClassEntry)(_))
 		*object = this_ptr
-		if ce != nil && InstanceofFunction(Z_OBJCE_P(this_ptr), ce) == 0 {
-			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
+		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
+			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
 		}
 		retval = ZendParseVaArgs(num_args, p, &va, flags)
 		va_end(va)
 	}
 	return retval
 }
-func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *Zval, type_spec *byte, _ ...any) int {
+func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *types.Zval, type_spec *byte, _ ...any) int {
 	var va va_list
 	var retval int
 	var p *byte = type_spec
-	var object **Zval
+	var object **types.Zval
 	var ce *ZendClassEntry
 	if this_ptr == nil {
 		va_start(va, type_spec)
@@ -351,35 +352,35 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *Zval, type_s
 	} else {
 		p++
 		va_start(va, type_spec)
-		object = __va_arg(va, (**Zval)(_))
+		object = __va_arg(va, (**types.Zval)(_))
 		ce = __va_arg(va, (*ZendClassEntry)(_))
 		*object = this_ptr
-		if ce != nil && InstanceofFunction(Z_OBJCE_P(this_ptr), ce) == 0 {
+		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
 			if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-				ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName())
+				ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName())
 			}
 			va_end(va)
-			return FAILURE
+			return types.FAILURE
 		}
 		retval = ZendParseVaArgs(num_args, p, &va, flags)
 		va_end(va)
 	}
 	return retval
 }
-func ZendMergeProperties(obj *Zval, properties *HashTable) {
-	var obj_ht *ZendObjectHandlers = Z_OBJ_HT_P(obj)
+func ZendMergeProperties(obj *types.Zval, properties *types.HashTable) {
+	var obj_ht *ZendObjectHandlers = types.Z_OBJ_HT_P(obj)
 	var old_scope *ZendClassEntry = EG__().GetFakeScope()
-	var key *ZendString
-	var value *Zval
-	EG__().SetFakeScope(Z_OBJCE_P(obj))
-	var __ht *HashTable = properties
+	var key *types.ZendString
+	var value *types.Zval
+	EG__().SetFakeScope(types.Z_OBJCE_P(obj))
+	var __ht *types.HashTable = properties
 	for _, _p := range __ht.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
 		value = _z
 		if key != nil {
-			var member Zval
+			var member types.Zval
 			member.SetString(key)
 			obj_ht.GetWriteProperty()(obj, &member, value, nil)
 		}
@@ -390,22 +391,22 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 	if !class_type.IsConstantsUpdated() {
 		var ce *ZendClassEntry
 		var c *ZendClassConstant
-		var val *Zval
+		var val *types.Zval
 		var prop_info *ZendPropertyInfo
 		if class_type.GetParent() {
-			if ZendUpdateClassConstants(class_type.GetParent()) != SUCCESS {
-				return FAILURE
+			if ZendUpdateClassConstants(class_type.GetParent()) != types.SUCCESS {
+				return types.FAILURE
 			}
 		}
-		var __ht *HashTable = class_type.GetConstantsTable()
+		var __ht *types.HashTable = class_type.GetConstantsTable()
 		for _, _p := range __ht.foreachData() {
-			var _z *Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			c = _z.GetPtr()
 			val = c.GetValue()
 			if val.IsConstant() {
-				if ZvalUpdateConstantEx(val, c.GetCe()) != SUCCESS {
-					return FAILURE
+				if ZvalUpdateConstantEx(val, c.GetCe()) != types.SUCCESS {
+					return types.FAILURE
 				}
 			}
 		}
@@ -416,33 +417,33 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 		}
 		ce = class_type
 		for ce != nil {
-			var __ht *HashTable = ce.GetPropertiesInfo()
+			var __ht *types.HashTable = ce.GetPropertiesInfo()
 			for _, _p := range __ht.foreachData() {
-				var _z *Zval = _p.GetVal()
+				var _z *types.Zval = _p.GetVal()
 
 				prop_info = _z.GetPtr()
 				if prop_info.GetCe() == ce {
 					if prop_info.IsStatic() {
 						val = CE_STATIC_MEMBERS(class_type) + prop_info.GetOffset()
 					} else {
-						val = (*Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
+						val = (*types.Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
 					}
 					if val.IsConstant() {
 						if prop_info.GetType() != 0 {
-							var tmp Zval
-							ZVAL_COPY(&tmp, val)
-							if ZvalUpdateConstantEx(&tmp, ce) != SUCCESS {
+							var tmp types.Zval
+							types.ZVAL_COPY(&tmp, val)
+							if ZvalUpdateConstantEx(&tmp, ce) != types.SUCCESS {
 								ZvalPtrDtor(&tmp)
-								return FAILURE
+								return types.FAILURE
 							}
 							if ZendVerifyPropertyType(prop_info, &tmp, 1) == 0 {
 								ZvalPtrDtor(&tmp)
-								return FAILURE
+								return types.FAILURE
 							}
 							ZvalPtrDtor(val)
-							ZVAL_COPY_VALUE(val, &tmp)
-						} else if ZvalUpdateConstantEx(val, ce) != SUCCESS {
-							return FAILURE
+							types.ZVAL_COPY_VALUE(val, &tmp)
+						} else if ZvalUpdateConstantEx(val, ce) != types.SUCCESS {
+							return types.FAILURE
 						}
 					}
 				}
@@ -451,16 +452,16 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 		}
 		class_type.SetIsConstantsUpdated(true)
 	}
-	return SUCCESS
+	return types.SUCCESS
 }
-func _objectPropertiesInit(object *ZendObject, class_type *ZendClassEntry) {
+func _objectPropertiesInit(object *types.ZendObject, class_type *ZendClassEntry) {
 	if class_type.GetDefaultPropertiesCount() != 0 {
-		var src *Zval = class_type.GetDefaultPropertiesTable()
-		var dst *Zval = object.GetPropertiesTable()
-		var end *Zval = src + class_type.GetDefaultPropertiesCount()
+		var src *types.Zval = class_type.GetDefaultPropertiesTable()
+		var dst *types.Zval = object.GetPropertiesTable()
+		var end *types.Zval = src + class_type.GetDefaultPropertiesCount()
 		if class_type.GetType() == ZEND_INTERNAL_CLASS {
 			for {
-				ZVAL_COPY_OR_DUP_PROP(dst, src)
+				types.ZVAL_COPY_OR_DUP_PROP(dst, src)
 				src++
 				dst++
 				if src == end {
@@ -469,7 +470,7 @@ func _objectPropertiesInit(object *ZendObject, class_type *ZendClassEntry) {
 			}
 		} else {
 			for {
-				ZVAL_COPY_PROP(dst, src)
+				types.ZVAL_COPY_PROP(dst, src)
 				src++
 				dst++
 				if src == end {

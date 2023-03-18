@@ -5,19 +5,20 @@ package spl
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func SplRegisterInterface(ppce **zend.ZendClassEntry, class_name string, functions *zend.ZendFunctionEntry) {
 	var ce zend.ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(zend.ZendStringInitInterned(class_name, strlen(class_name), 1))
+	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
 	ce.SetBuiltinFunctions(functions)
 	*ppce = zend.ZendRegisterInternalInterface(&ce)
 }
 func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
 	var ce zend.ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(zend.ZendStringInitInterned(class_name, strlen(class_name), 1))
+	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
 	ce.SetBuiltinFunctions(function_list)
 	*ppce = zend.ZendRegisterInternalClass(&ce)
 
@@ -32,7 +33,7 @@ func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor
 func SplRegisterSubClass(ppce **zend.ZendClassEntry, parent_ce *zend.ZendClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
 	var ce zend.ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(zend.ZendStringInitInterned(class_name, strlen(class_name), 1))
+	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
 	ce.SetBuiltinFunctions(function_list)
 	*ppce = zend.ZendRegisterInternalClassEx(&ce, parent_ce)
 
@@ -49,17 +50,17 @@ func SplRegisterSubClass(ppce **zend.ZendClassEntry, parent_ce *zend.ZendClassEn
 func SplRegisterProperty(class_entry *zend.ZendClassEntry, prop_name string, prop_name_len int, prop_flags int) {
 	zend.ZendDeclarePropertyNull(class_entry, prop_name, prop_name_len, prop_flags)
 }
-func SplAddClassName(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
+func SplAddClassName(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	if allow == 0 || allow > 0 && pce.HasCeFlags(ce_flags) || allow < 0 && !pce.HasCeFlags(ce_flags) {
-		var tmp *zend.Zval
+		var tmp *types.Zval
 		if b.Assign(&tmp, list.GetArr().KeyFind(pce.GetName().GetStr())) == nil {
-			var t zend.Zval
+			var t types.Zval
 			t.SetStringCopy(pce.GetName())
 			list.GetArr().KeyAdd(pce.GetName().GetStr(), &t)
 		}
 	}
 }
-func SplAddInterfaces(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
+func SplAddInterfaces(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	var num_interfaces uint32
 	if pce.GetNumInterfaces() != 0 {
 		zend.ZEND_ASSERT(pce.HasCeFlags(zend.ZEND_ACC_LINKED))
@@ -68,7 +69,7 @@ func SplAddInterfaces(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_f
 		}
 	}
 }
-func SplAddTraits(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
+func SplAddTraits(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	var num_traits uint32
 	var trait *zend.ZendClassEntry
 	for num_traits = 0; num_traits < pce.GetNumTraits(); num_traits++ {
@@ -77,7 +78,7 @@ func SplAddTraits(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags
 		SplAddClassName(list, trait, allow, ce_flags)
 	}
 }
-func SplAddClasses(pce *zend.ZendClassEntry, list *zend.Zval, sub int, allow int, ce_flags int) int {
+func SplAddClasses(pce *zend.ZendClassEntry, list *types.Zval, sub int, allow int, ce_flags int) int {
 	if pce == nil {
 		return 0
 	}
@@ -91,7 +92,7 @@ func SplAddClasses(pce *zend.ZendClassEntry, list *zend.Zval, sub int, allow int
 	}
 	return 0
 }
-func SplGenPrivatePropName(ce *zend.ZendClassEntry, prop_name string) *zend.ZendString {
+func SplGenPrivatePropName(ce *zend.ZendClassEntry, prop_name string) *types.ZendString {
 	str := zend.ZendManglePropertyName_Ex(ce.GetName().GetStr(), prop_name)
-	return zend.NewZendString(str)
+	return types.NewZendString(str)
 }

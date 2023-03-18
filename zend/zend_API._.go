@@ -1,6 +1,9 @@
 package zend
 
-import "log"
+import (
+	"log"
+	"sik/zend/types"
+)
 
 /* Parameter parsing API -- andrei */
 
@@ -17,7 +20,7 @@ const IS_CALLABLE_STRICT uint32 = IS_CALLABLE_CHECK_IS_STATIC
 
 //const ZEND_THIS *Zval = &(EX(This))
 
-func ZEND_THIS(executeData *ZendExecuteData) *Zval {
+func ZEND_THIS(executeData *ZendExecuteData) *types.Zval {
 	return executeData.GetThis()
 }
 
@@ -72,7 +75,7 @@ const ZPP_ERROR_WRONG_COUNT = 5
 
 /* these variables are true statics/globals, and have to be mutex'ed on every access */
 
-var ModuleRegistry HashTable
+var ModuleRegistry types.HashTable
 var ModuleRequestStartupHandlers **ZendModuleEntry
 var ModuleRequestShutdownHandlers **ZendModuleEntry
 var ModulePostDeactivateHandlers **ZendModuleEntry

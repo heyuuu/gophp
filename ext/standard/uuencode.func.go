@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PHP_UU_ENC(c __auto__) __auto__ {
@@ -23,19 +24,19 @@ func PHP_UU_ENC_C3(c int) __auto__ {
 	return PHP_UU_ENC((*(c + 1))<<2&074 | (*(c + 2))>>6&3)
 }
 func PHP_UU_DEC(c char) int { return c - ' '&077 }
-func PhpUuencode(src *byte, src_len int) *zend.ZendString {
+func PhpUuencode(src *byte, src_len int) *types.ZendString {
 	var len_ int = 45
 	var p *uint8
 	var s *uint8
 	var e *uint8
 	var ee *uint8
-	var dest *zend.ZendString
+	var dest *types.ZendString
 
 	/* encoded length is ~ 38% greater than the original
 	   Use 1.5 for easier calculation.
 	*/
 
-	dest = zend.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
+	dest = types.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
 	p = (*uint8)(dest.GetVal())
 	s = (*uint8)(src)
 	e = s + src_len
@@ -84,18 +85,18 @@ func PhpUuencode(src *byte, src_len int) *zend.ZendString {
 	b.PostInc(&(*p)) = PHP_UU_ENC('0')
 	b.PostInc(&(*p)) = '\n'
 	*p = '0'
-	dest = zend.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()), 0)
+	dest = types.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()), 0)
 	return dest
 }
-func PhpUudecode(src *byte, src_len int) *zend.ZendString {
+func PhpUudecode(src *byte, src_len int) *types.ZendString {
 	var len_ int
 	var total_len int = 0
 	var s *byte
 	var e *byte
 	var p *byte
 	var ee *byte
-	var dest *zend.ZendString
-	dest = zend.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
+	var dest *types.ZendString
+	dest = types.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
 	p = dest.GetVal()
 	s = src
 	e = src + src_len
@@ -151,23 +152,23 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 	dest.GetVal()[dest.GetLen()] = '0'
 	return dest
 err:
-	zend.ZendStringEfree(dest)
+	types.ZendStringEfree(dest)
 	return nil
 }
-func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var src *zend.ZendString
+func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var src *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -231,21 +232,21 @@ func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	return_value.SetString(PhpUuencode(src.GetVal(), src.GetLen()))
 	return
 }
-func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var src *zend.ZendString
-	var dest *zend.ZendString
+func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var src *types.ZendString
+	var dest *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

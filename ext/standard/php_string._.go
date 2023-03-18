@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/php_string.h>
@@ -27,4 +28,4 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var ZifNlLanginfo func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifNlLanginfo func(executeData *zend.ZendExecuteData, return_value *types.Zval)

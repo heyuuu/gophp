@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func __phpStpncpy(dst *byte, src *byte, len_ int) *byte {
@@ -265,7 +266,7 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	/* Default number of rounds.  */
 
 	var rounds int = ROUNDS_DEFAULT
-	var rounds_custom zend.ZendBool = 0
+	var rounds_custom types.ZendBool = 0
 
 	/* Find beginning of salt string.  The prefix should normally always
 	   be present.  Just in case it is not.  */

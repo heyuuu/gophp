@@ -5,11 +5,12 @@ package core
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStartupTicks() int {
 	PG(tick_functions).Init(b.SizeOf("struct st_tick_function"), nil, 1)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpDeactivateTicks() { PG(tick_functions).Clean() }
 func PhpShutdownTicks()   { PG(tick_functions).Destroy() }

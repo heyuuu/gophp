@@ -5,6 +5,7 @@ package zend
 import (
 	"log"
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 // Source: <Zend/zend_ini_parser.h>
@@ -107,15 +108,15 @@ var ZEND_INI_PARSER_CB = CG__().GetIniParserParam().GetIniParserCb()
 var ZEND_INI_PARSER_ARG = CG__().GetIniParserParam().GetArg()
 var ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
 
-func GetIntVal(op *Zval) int {
+func GetIntVal(op *types.Zval) int {
 	switch op.GetType() {
-	case IS_LONG:
+	case types.IS_LONG:
 		return op.GetLval()
-	case IS_DOUBLE:
+	case types.IS_DOUBLE:
 		return int(op.GetDval())
-	case IS_STRING:
+	case types.IS_STRING:
 		var val int = atoi(op.GetStr().GetVal())
-		ZendStringFree(op.GetStr())
+		types.ZendStringFree(op.GetStr())
 		return val
 	default:
 
@@ -125,7 +126,7 @@ func GetIntVal(op *Zval) int {
 /* {{{ zend_ini_do_op()
  */
 
-func ZendIniDoOp(type_ byte, result *Zval, op1 *Zval, op2 *Zval) {
+func ZendIniDoOp(type_ byte, result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	var i_result int
 	var i_op1 int
 	var i_op2 int
@@ -152,27 +153,27 @@ func ZendIniDoOp(type_ byte, result *Zval, op1 *Zval, op2 *Zval) {
 		i_result = 0
 	}
 	str_len = sprintf(str_result, "%d", i_result)
-	result.SetString(ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
+	result.SetString(types.ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
 }
 
 /* }}} */
 
-func ZendIniInitString(result *Zval) {
+func ZendIniInitString(result *types.Zval) {
 	result.SetStringVal("")
 }
 
 /* }}} */
 
-func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
+func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	var length int
 	var op1_len int
-	if op1.GetType() != IS_STRING {
+	if op1.GetType() != types.IS_STRING {
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 		if ZEND_SYSTEM_INI != 0 {
-			var tmp_str *ZendString
-			var str *ZendString = ZvalGetTmpString(op1, &tmp_str)
+			var tmp_str *types.ZendString
+			var str *types.ZendString = ZvalGetTmpString(op1, &tmp_str)
 			op1.SetRawString(str.GetStr())
 			ZendTmpStringRelease(tmp_str)
 		} else {
@@ -183,34 +184,34 @@ func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 
 	}
 	op1_len = int(op1.GetStr().GetLen())
-	if op2.GetType() != IS_STRING {
+	if op2.GetType() != types.IS_STRING {
 		ConvertToString(op2)
 	}
 	length = op1_len + int(op2.GetStr().GetLen())
-	result.SetString(ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
+	result.SetString(types.ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
 	memcpy(result.GetStr().GetVal()+op1_len, op2.GetStr().GetVal(), op2.GetStr().GetLen()+1)
 }
 
-func ZendIniGetConstant(result *Zval, name *Zval) {
-	var c *Zval
-	var tmp Zval
+func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
+	var c *types.Zval
+	var tmp types.Zval
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 
 	if !(memchr(name.GetStr().GetVal(), ':', name.GetStr().GetLen())) && b.Assign(&c, ZendGetConstant(name.GetStr())) != 0 {
-		if c.GetType() != IS_STRING {
-			ZVAL_COPY_OR_DUP(&tmp, c)
+		if c.GetType() != types.IS_STRING {
+			types.ZVAL_COPY_OR_DUP(&tmp, c)
 			if tmp.IsConstant() {
 				ZvalUpdateConstantEx(&tmp, nil)
 			}
 			ConvertToString(&tmp)
 			c = &tmp
 		}
-		result.SetString(ZendStringInit(c.GetStr().GetVal(), c.GetStr().GetLen(), ZEND_SYSTEM_INI))
+		result.SetString(types.ZendStringInit(c.GetStr().GetVal(), c.GetStr().GetLen(), ZEND_SYSTEM_INI))
 		if c == &tmp {
-			ZendStringRelease(tmp.GetStr())
+			types.ZendStringRelease(tmp.GetStr())
 		}
-		ZendStringFree(name.GetStr())
+		types.ZendStringFree(name.GetStr())
 	} else {
 		*result = *name
 	}
@@ -240,52 +241,52 @@ func IniError(msg *byte) {
 
 /* }}} */
 
-func ZendParseIniFile(fh *ZendFileHandle, unbuffered_errors ZendBool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
+func ZendParseIniFile(fh *ZendFileHandle, unbuffered_errors types.ZendBool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
 	var retval int
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
 	ini_parser_param.SetArg(arg)
 	CG__().SetIniParserParam(&ini_parser_param)
-	if ZendIniOpenFileForScanning(fh, scanner_mode) == FAILURE {
-		return FAILURE
+	if ZendIniOpenFileForScanning(fh, scanner_mode) == types.FAILURE {
+		return types.FAILURE
 	}
 	CG__().SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
 	fh.Destroy()
 	ShutdownIniScanner()
 	if retval == 0 {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
 
 /* }}} */
 
-func ZendParseIniString(str *byte, unbuffered_errors ZendBool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
+func ZendParseIniString(str *byte, unbuffered_errors types.ZendBool, scanner_mode int, ini_parser_cb ZendIniParserCbT, arg any) int {
 	var retval int
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
 	ini_parser_param.SetArg(arg)
 	CG__().SetIniParserParam(&ini_parser_param)
-	if ZendIniPrepareStringForScanning(str, scanner_mode) == FAILURE {
-		return FAILURE
+	if ZendIniPrepareStringForScanning(str, scanner_mode) == types.FAILURE {
+		return types.FAILURE
 	}
 	CG__().SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
 	ShutdownIniScanner()
 	if retval == 0 {
-		return SUCCESS
+		return types.SUCCESS
 	} else {
-		return FAILURE
+		return types.FAILURE
 	}
 }
 
 /* }}} */
 
-func ZvalIniDtor(zv *Zval) {
+func ZvalIniDtor(zv *types.Zval) {
 	if zv.IsString() {
-		ZendStringRelease(zv.GetStr())
+		types.ZendStringRelease(zv.GetStr())
 	}
 }
 
@@ -383,7 +384,7 @@ var Free func(any)
  */
 type IniUnionYyalloc struct /* union */ {
 	yyss_alloc yytype_int16
-	yyvs_alloc Zval
+	yyvs_alloc types.Zval
 }
 
 // func MakeIniUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc Zval) IniUnionYyalloc {
@@ -770,7 +771,7 @@ func IniYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, 
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
-func IniYydestruct(yymsg *byte, yytype int, yyvaluep *Zval) {
+func IniYydestruct(yymsg *byte, yytype int, yyvaluep *types.Zval) {
 	YYUSE(yyvaluep)
 	if yymsg == nil {
 		yymsg = "Deleting"

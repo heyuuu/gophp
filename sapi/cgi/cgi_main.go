@@ -8,11 +8,12 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func main(argc int, argv []*byte) int {
 	var free_query_string int = 0
-	var exit_status int = zend.SUCCESS
+	var exit_status int = types.SUCCESS
 	var cgi int = 0
 	var c int
 	var i int
@@ -141,7 +142,7 @@ func main(argc int, argv []*byte) int {
 
 	if !CgiModule.Startup() {
 		zend.Free(bindpath)
-		return zend.FAILURE
+		return types.FAILURE
 	}
 
 	/* check force_cgi after startup, so we have proper output */
@@ -167,7 +168,7 @@ func main(argc int, argv []*byte) int {
 			}
 			zend.EG__().SetBailout(__orig_bailout)
 			zend.Free(bindpath)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 
 		/* Apache will generate REDIRECT_STATUS,
@@ -187,7 +188,7 @@ func main(argc int, argv []*byte) int {
 		fcgi_fd = core.FcgiListen(bindpath, backlog)
 		if fcgi_fd < 0 {
 			log.Printf("Couldn't create FastCGI listen socket on port %s\n", bindpath)
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		fastcgi = core.FcgiIsFastcgi()
 	}
@@ -204,7 +205,7 @@ func main(argc int, argv []*byte) int {
 			max_requests = atoi(getenv("PHP_FCGI_MAX_REQUESTS"))
 			if max_requests < 0 {
 				log.Printf("PHP_FCGI_MAX_REQUESTS is not valid\n")
-				return zend.FAILURE
+				return types.FAILURE
 			}
 		}
 
@@ -219,7 +220,7 @@ func main(argc int, argv []*byte) int {
 			Children = atoi(children_str)
 			if Children < 0 {
 				log.Printf("PHP_FCGI_CHILDREN is not valid\n")
-				return zend.FAILURE
+				return types.FAILURE
 			}
 			core.FcgiSetMgmtVar("FCGI_MAX_CONNS", b.SizeOf("\"FCGI_MAX_CONNS\"")-1, children_str, strlen(children_str))
 
@@ -381,11 +382,11 @@ func main(argc int, argv []*byte) int {
 						if script_file != nil {
 							zend.Efree(script_file)
 						}
-						if core.PhpRequestStartup() == zend.FAILURE {
+						if core.PhpRequestStartup() == types.FAILURE {
 							core.SG__().server_context = nil
 							core.PhpModuleShutdown()
 							zend.Free(bindpath)
-							return zend.FAILURE
+							return types.FAILURE
 						}
 						if no_headers != 0 {
 							core.SG__().headers_sent = 1
@@ -422,11 +423,11 @@ func main(argc int, argv []*byte) int {
 							zend.Efree(script_file)
 						}
 						no_headers = 1
-						if core.PhpRequestStartup() == zend.FAILURE {
+						if core.PhpRequestStartup() == types.FAILURE {
 							core.SG__().server_context = nil
 							core.PhpModuleShutdown()
 							zend.Free(bindpath)
-							return zend.FAILURE
+							return types.FAILURE
 						}
 						core.SG__().headers_sent = 1
 						core.SG__().request_info.no_headers = 1
@@ -538,13 +539,13 @@ func main(argc int, argv []*byte) int {
 			/* request startup only after we've done all we can to
 			 * get path_translated */
 
-			if core.PhpRequestStartup() == zend.FAILURE {
+			if core.PhpRequestStartup() == types.FAILURE {
 				if fastcgi != 0 {
 					core.FcgiFinishRequest(request, 1)
 				}
 				core.SG__().server_context = nil
 				core.PhpModuleShutdown()
-				return zend.FAILURE
+				return types.FAILURE
 			}
 			if no_headers != 0 {
 				core.SG__().headers_sent = 1
@@ -558,7 +559,7 @@ func main(argc int, argv []*byte) int {
 			*/
 
 			if cgi != 0 || fastcgi != 0 || core.SG__().request_info.path_translated {
-				if core.PhpFopenPrimaryScript(&file_handle) == zend.FAILURE {
+				if core.PhpFopenPrimaryScript(&file_handle) == types.FAILURE {
 					var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 					var __bailout JMP_BUF
 					zend.EG__().SetBailout(&__bailout)
@@ -595,7 +596,7 @@ func main(argc int, argv []*byte) int {
 					core.PhpModuleShutdown()
 					app.SapiShutdown()
 					zend.Free(bindpath)
-					return zend.FAILURE
+					return types.FAILURE
 				}
 			}
 			if CGIG(check_shebang_line) {
@@ -608,23 +609,23 @@ func main(argc int, argv []*byte) int {
 			case PHP_MODE_LINT:
 				core.PG(during_request_startup) = 0
 				exit_status = core.PhpLintScript(&file_handle)
-				if exit_status == zend.SUCCESS {
+				if exit_status == types.SUCCESS {
 					zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
 				} else {
 					zend.ZendPrintf("Errors parsing %s\n", file_handle.GetFilename())
 				}
 				break
 			case PHP_MODE_STRIP:
-				if zend.OpenFileForScanning(&file_handle) == zend.SUCCESS {
+				if zend.OpenFileForScanning(&file_handle) == types.SUCCESS {
 					zend.ZendStrip()
 					zend.ZendFileHandleDtor(&file_handle)
 					core.PhpOutputTeardown()
 				}
-				return zend.SUCCESS
+				return types.SUCCESS
 				break
 			case PHP_MODE_HIGHLIGHT:
 				var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-				if zend.OpenFileForScanning(&file_handle) == zend.SUCCESS {
+				if zend.OpenFileForScanning(&file_handle) == types.SUCCESS {
 					standard.PhpGetHighlight(&syntax_highlighter_ini)
 					zend.ZendHighlight(&syntax_highlighter_ini)
 					if fastcgi != 0 {
@@ -633,7 +634,7 @@ func main(argc int, argv []*byte) int {
 					zend.ZendFileHandleDtor(&file_handle)
 					core.PhpOutputTeardown()
 				}
-				return zend.SUCCESS
+				return types.SUCCESS
 				break
 			}
 		fastcgi_request_done:

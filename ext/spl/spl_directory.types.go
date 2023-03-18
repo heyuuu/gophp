@@ -5,6 +5,7 @@ package spl
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -33,7 +34,7 @@ func (this *SplOtherHandler) GetClone() SplForeignCloneT { return this.clone }
  */
 type SplFilesystemIterator struct {
 	intern  zend.ZendObjectIterator
-	current zend.Zval
+	current types.Zval
 	object  any
 }
 
@@ -47,10 +48,10 @@ type SplFilesystemIterator struct {
 func (this *SplFilesystemIterator) GetIntern() zend.ZendObjectIterator { return this.intern }
 
 // func (this *SplFilesystemIterator) SetIntern(value zend.ZendObjectIterator) { this.intern = value }
-func (this *SplFilesystemIterator) GetCurrent() zend.Zval      { return this.current }
-func (this *SplFilesystemIterator) SetCurrent(value zend.Zval) { this.current = value }
-func (this *SplFilesystemIterator) GetObject() any             { return this.object }
-func (this *SplFilesystemIterator) SetObject(value any)        { this.object = value }
+func (this *SplFilesystemIterator) GetCurrent() types.Zval      { return this.current }
+func (this *SplFilesystemIterator) SetCurrent(value types.Zval) { this.current = value }
+func (this *SplFilesystemIterator) GetObject() any              { return this.object }
+func (this *SplFilesystemIterator) SetObject(value any)         { this.object = value }
 
 /**
  * SplFilesystemObject
@@ -82,22 +83,22 @@ type SplFilesystemObject struct {
 		file struct {
 			stream           *core.PhpStream
 			context          *core.PhpStreamContext
-			zcontext         *zend.Zval
+			zcontext         *types.Zval
 			open_mode        *byte
 			open_mode_len    int
-			current_zval     zend.Zval
+			current_zval     types.Zval
 			current_line     *byte
 			current_line_len int
 			max_line_len     int
 			current_line_num zend.ZendLong
-			zresource        zend.Zval
+			zresource        types.Zval
 			func_getCurr     *zend.ZendFunction
 			delimiter        byte
 			enclosure        byte
 			escape           int
 		}
 	}
-	std zend.ZendObject
+	std types.ZendObject
 }
 
 func (this *SplFilesystemObject) GetOth() any                             { return this.oth }
@@ -151,14 +152,14 @@ func (this *SplFilesystemObject) GetContext() *core.PhpStreamContext { return th
 func (this *SplFilesystemObject) SetContext(value *core.PhpStreamContext) {
 	this.u.file.context = value
 }
-func (this *SplFilesystemObject) GetZcontext() *zend.Zval { return this.u.file.zcontext }
+func (this *SplFilesystemObject) GetZcontext() *types.Zval { return this.u.file.zcontext }
 
 // func (this *SplFilesystemObject) SetZcontext(value *zend.Zval) { this.u.file.zcontext = value }
-func (this *SplFilesystemObject) GetOpenMode() *byte        { return this.u.file.open_mode }
-func (this *SplFilesystemObject) SetOpenMode(value *byte)   { this.u.file.open_mode = value }
-func (this *SplFilesystemObject) GetOpenModeLen() int       { return this.u.file.open_mode_len }
-func (this *SplFilesystemObject) SetOpenModeLen(value int)  { this.u.file.open_mode_len = value }
-func (this *SplFilesystemObject) GetCurrentZval() zend.Zval { return this.u.file.current_zval }
+func (this *SplFilesystemObject) GetOpenMode() *byte         { return this.u.file.open_mode }
+func (this *SplFilesystemObject) SetOpenMode(value *byte)    { this.u.file.open_mode = value }
+func (this *SplFilesystemObject) GetOpenModeLen() int        { return this.u.file.open_mode_len }
+func (this *SplFilesystemObject) SetOpenModeLen(value int)   { this.u.file.open_mode_len = value }
+func (this *SplFilesystemObject) GetCurrentZval() types.Zval { return this.u.file.current_zval }
 
 // func (this *SplFilesystemObject) SetCurrentZval(value zend.Zval) { this.u.file.current_zval = value }
 func (this *SplFilesystemObject) GetCurrentLine() *byte       { return this.u.file.current_line }
@@ -173,20 +174,20 @@ func (this *SplFilesystemObject) GetCurrentLineNum() zend.ZendLong {
 func (this *SplFilesystemObject) SetCurrentLineNum(value zend.ZendLong) {
 	this.u.file.current_line_num = value
 }
-func (this *SplFilesystemObject) GetZresource() zend.Zval { return this.u.file.zresource }
+func (this *SplFilesystemObject) GetZresource() types.Zval { return this.u.file.zresource }
 
 // func (this *SplFilesystemObject) SetZresource(value zend.Zval) { this.u.file.zresource = value }
 func (this *SplFilesystemObject) GetFuncGetCurr() *zend.ZendFunction { return this.u.file.func_getCurr }
 func (this *SplFilesystemObject) SetFuncGetCurr(value *zend.ZendFunction) {
 	this.u.file.func_getCurr = value
 }
-func (this *SplFilesystemObject) GetDelimiter() byte      { return this.u.file.delimiter }
-func (this *SplFilesystemObject) SetDelimiter(value byte) { this.u.file.delimiter = value }
-func (this *SplFilesystemObject) GetEnclosure() byte      { return this.u.file.enclosure }
-func (this *SplFilesystemObject) SetEnclosure(value byte) { this.u.file.enclosure = value }
-func (this *SplFilesystemObject) GetEscape() int          { return this.u.file.escape }
-func (this *SplFilesystemObject) SetEscape(value int)     { this.u.file.escape = value }
-func (this *SplFilesystemObject) GetStd() zend.ZendObject { return this.std }
+func (this *SplFilesystemObject) GetDelimiter() byte       { return this.u.file.delimiter }
+func (this *SplFilesystemObject) SetDelimiter(value byte)  { this.u.file.delimiter = value }
+func (this *SplFilesystemObject) GetEnclosure() byte       { return this.u.file.enclosure }
+func (this *SplFilesystemObject) SetEnclosure(value byte)  { this.u.file.enclosure = value }
+func (this *SplFilesystemObject) GetEscape() int           { return this.u.file.escape }
+func (this *SplFilesystemObject) SetEscape(value int)      { this.u.file.escape = value }
+func (this *SplFilesystemObject) GetStd() types.ZendObject { return this.std }
 
 // func (this *SplFilesystemObject) SetStd(value zend.ZendObject) { this.std = value }
 

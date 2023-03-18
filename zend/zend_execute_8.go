@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 func ZendVmStackExtendCallFrame(call **ZendExecuteData, passed_args uint32, additional_args uint32) {
@@ -157,7 +158,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 			if call.GetFunc().IsClosure() {
 				ZendObjectRelease(ZEND_CLOSURE_OBJECT(call.GetFunc()))
 			} else if call.GetFunc().IsCallViaTrampoline() {
-				ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
+				types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 				ZendFreeTrampoline(call.GetFunc())
 			}
 			executeData.GetCall() = call.GetPrevExecuteData()
@@ -195,33 +196,33 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 			if catch_op_num == 0 || catch_op_num >= range_.GetEnd() {
 				var kind uint32 = range_.GetVar() & ZEND_LIVE_MASK
 				var var_num uint32 = range_.GetVar() & ^ZEND_LIVE_MASK
-				var var_ *Zval = EX_VAR(var_num)
+				var var_ *types.Zval = EX_VAR(var_num)
 				if kind == ZEND_LIVE_TMPVAR {
 					ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_NEW {
-					var obj *ZendObject
+					var obj *types.ZendObject
 					ZEND_ASSERT(var_.IsObject())
 					obj = var_.GetObj()
 					ZendObjectStoreCtorFailed(obj)
 					OBJ_RELEASE(obj)
 				} else if kind == ZEND_LIVE_LOOP {
-					if var_.GetType() != IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
+					if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
 						ZendHashIteratorDel(var_.GetFeIterIdx())
 					}
 					ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_ROPE {
-					var rope **ZendString = (**ZendString)(var_)
+					var rope **types.ZendString = (**types.ZendString)(var_)
 					var last *ZendOp = executeData.GetFunc().op_array.opcodes + op_num
 					for last.GetOpcode() != ZEND_ROPE_ADD && last.GetOpcode() != ZEND_ROPE_INIT || last.GetResult().GetVar() != var_num {
 						ZEND_ASSERT(last >= executeData.GetFunc().op_array.opcodes)
 						last--
 					}
 					if last.GetOpcode() == ZEND_ROPE_INIT {
-						ZendStringReleaseEx(*rope, 0)
+						types.ZendStringReleaseEx(*rope, 0)
 					} else {
 						var j int = last.GetExtendedValue()
 						for {
-							ZendStringReleaseEx(rope[j], 0)
+							types.ZendStringReleaseEx(rope[j], 0)
 							if !(b.PostDec(&j)) {
 								break
 							}
@@ -248,7 +249,7 @@ func ZendCleanupUnfinishedExecution(executeData *ZendExecuteData, op_num uint32,
 }
 func ZendSwapOperands(op *ZendOp) {
 	var tmp ZnodeOp
-	var tmp_type ZendUchar
+	var tmp_type types.ZendUchar
 	tmp = op.GetOp1()
 	tmp_type = op.GetOp1Type()
 	op.SetOp1(op.GetOp2())
@@ -256,23 +257,23 @@ func ZendSwapOperands(op *ZendOp) {
 	op.SetOp2(tmp)
 	op.SetOp2Type(tmp_type)
 }
-func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecuteData {
+func ZendInitDynamicCallString(function *types.ZendString, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
-	var func_ *Zval
+	var func_ *types.Zval
 	var called_scope *ZendClassEntry
-	var lcname *ZendString
+	var lcname *types.ZendString
 	var colon *byte
 	if b.Assign(&colon, ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
-		var mname *ZendString
+		var mname *types.ZendString
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)
-		lcname = ZendStringInit(function.GetVal(), cname_length, 0)
+		lcname = types.ZendStringInit(function.GetVal(), cname_length, 0)
 		called_scope = ZendFetchClassByName(lcname, nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 		if called_scope == nil {
-			ZendStringReleaseEx(lcname, 0)
+			types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		mname = ZendStringInit(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length, 0)
+		mname = types.ZendStringInit(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length, 0)
 		if called_scope.GetGetStaticMethod() != nil {
 			fbc = called_scope.GetGetStaticMethod()(called_scope, mname)
 		} else {
@@ -282,12 +283,12 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(called_scope, mname)
 			}
-			ZendStringReleaseEx(lcname, 0)
-			ZendStringReleaseEx(mname, 0)
+			types.ZendStringReleaseEx(lcname, 0)
+			types.ZendStringReleaseEx(mname, 0)
 			return nil
 		}
-		ZendStringReleaseEx(lcname, 0)
-		ZendStringReleaseEx(mname, 0)
+		types.ZendStringReleaseEx(lcname, 0)
+		types.ZendStringReleaseEx(mname, 0)
 		if !fbc.IsStatic() {
 			ZendNonStaticMethodCall(fbc)
 			if EG__().GetException() != nil {
@@ -299,17 +300,17 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		}
 	} else {
 		if function.GetVal()[0] == '\\' {
-			lcname = ZendStringAlloc(function.GetLen()-1, 0)
+			lcname = types.ZendStringAlloc(function.GetLen()-1, 0)
 			ZendStrTolowerCopy(lcname.GetVal(), function.GetVal()+1, function.GetLen()-1)
 		} else {
 			lcname = ZendStringTolower(function)
 		}
 		if b.Assign(&func_, EG__().GetFunctionTable().KeyFind(lcname.GetStr())) == nil {
 			ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
-			ZendStringReleaseEx(lcname, 0)
+			types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		ZendStringReleaseEx(lcname, 0)
+		types.ZendStringReleaseEx(lcname, 0)
 		fbc = func_.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
@@ -318,13 +319,13 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 	}
 	return ZendVmStackPushCallFrame(ZEND_CALL_NESTED_FUNCTION|ZEND_CALL_DYNAMIC, fbc, num_args, called_scope)
 }
-func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData {
+func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
 	var object_or_called_scope any
 	var called_scope *ZendClassEntry
-	var object *ZendObject
+	var object *types.ZendObject
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	if Z_OBJ_HT(*function).GetGetClosure() != nil && Z_OBJ_HT(*function).GetGetClosure()(function, &called_scope, &fbc, &object) == SUCCESS {
+	if types.Z_OBJ_HT(*function).GetGetClosure() != nil && types.Z_OBJ_HT(*function).GetGetClosure()(function, &called_scope, &fbc, &object) == types.SUCCESS {
 		object_or_called_scope = called_scope
 		if fbc.IsClosure() {
 
@@ -353,26 +354,26 @@ func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData
 	}
 	return ZendVmStackPushCallFrame(call_info, fbc, num_args, object_or_called_scope)
 }
-func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecuteData {
+func ZendInitDynamicCallArray(function *types.ZendArray, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
 	var object_or_called_scope any
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
 	if function.GetNNumOfElements() == 2 {
-		var obj *Zval
-		var method *Zval
+		var obj *types.Zval
+		var method *types.Zval
 		obj = function.IndexFindH(0)
 		method = function.IndexFindH(1)
 		if obj == nil || method == nil {
 			ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil
 		}
-		obj = ZVAL_DEREF(obj)
-		if obj.GetType() != IS_STRING && obj.GetType() != IS_OBJECT {
+		obj = types.ZVAL_DEREF(obj)
+		if obj.GetType() != types.IS_STRING && obj.GetType() != types.IS_OBJECT {
 			ZendThrowError(nil, "First array member is not a valid class name or object")
 			return nil
 		}
-		method = ZVAL_DEREF(method)
-		if method.GetType() != IS_STRING {
+		method = types.ZVAL_DEREF(method)
+		if method.GetType() != types.IS_STRING {
 			ZendThrowError(nil, "Second array member is not a valid method")
 			return nil
 		}
@@ -400,8 +401,8 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 			}
 			object_or_called_scope = called_scope
 		} else {
-			var object *ZendObject = obj.GetObj()
-			fbc = Z_OBJ_HT_P(obj).GetGetMethod()(&object, method.GetStr(), nil)
+			var object *types.ZendObject = obj.GetObj()
+			fbc = types.Z_OBJ_HT_P(obj).GetGetMethod()(&object, method.GetStr(), nil)
 			if fbc == nil {
 				if EG__().GetException() == nil {
 					ZendUndefinedMethod(object.GetCe(), method.GetStr())

@@ -4,20 +4,21 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
  * spl_SplObjectStorage
  */
 type spl_SplObjectStorage struct {
-	storage       zend.HashTable
+	storage       types.HashTable
 	index         zend.ZendLong
-	pos           zend.HashPosition
+	pos           types.HashPosition
 	flags         zend.ZendLong
 	fptr_get_hash *zend.ZendFunction
-	gcdata        *zend.Zval
+	gcdata        *types.Zval
 	gcdata_num    int
-	std           zend.ZendObject
+	std           types.ZendObject
 }
 
 //             func Makespl_SplObjectStorage(
@@ -41,24 +42,24 @@ type spl_SplObjectStorage struct {
 //                     std:std,
 //                 }
 //             }
-func (this *spl_SplObjectStorage) GetStorage() zend.HashTable { return this.storage }
+func (this *spl_SplObjectStorage) GetStorage() types.HashTable { return this.storage }
 
 // func (this *spl_SplObjectStorage) SetStorage(value zend.HashTable) { this.storage = value }
 func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong            { return this.index }
 func (this *spl_SplObjectStorage) SetIndex(value zend.ZendLong)       { this.index = value }
-func (this *spl_SplObjectStorage) GetPos() zend.HashPosition          { return this.pos }
-func (this *spl_SplObjectStorage) SetPos(value zend.HashPosition)     { this.pos = value }
+func (this *spl_SplObjectStorage) GetPos() types.HashPosition         { return this.pos }
+func (this *spl_SplObjectStorage) SetPos(value types.HashPosition)    { this.pos = value }
 func (this *spl_SplObjectStorage) GetFlags() zend.ZendLong            { return this.flags }
 func (this *spl_SplObjectStorage) SetFlags(value zend.ZendLong)       { this.flags = value }
 func (this *spl_SplObjectStorage) GetFptrGetHash() *zend.ZendFunction { return this.fptr_get_hash }
 func (this *spl_SplObjectStorage) SetFptrGetHash(value *zend.ZendFunction) {
 	this.fptr_get_hash = value
 }
-func (this *spl_SplObjectStorage) GetGcdata() *zend.Zval      { return this.gcdata }
-func (this *spl_SplObjectStorage) SetGcdata(value *zend.Zval) { this.gcdata = value }
-func (this *spl_SplObjectStorage) GetGcdataNum() int          { return this.gcdata_num }
-func (this *spl_SplObjectStorage) SetGcdataNum(value int)     { this.gcdata_num = value }
-func (this *spl_SplObjectStorage) GetStd() zend.ZendObject    { return this.std }
+func (this *spl_SplObjectStorage) GetGcdata() *types.Zval      { return this.gcdata }
+func (this *spl_SplObjectStorage) SetGcdata(value *types.Zval) { this.gcdata = value }
+func (this *spl_SplObjectStorage) GetGcdataNum() int           { return this.gcdata_num }
+func (this *spl_SplObjectStorage) SetGcdataNum(value int)      { this.gcdata_num = value }
+func (this *spl_SplObjectStorage) GetStd() types.ZendObject    { return this.std }
 
 // func (this *spl_SplObjectStorage) SetStd(value zend.ZendObject) { this.std = value }
 
@@ -82,8 +83,8 @@ func (this *spl_SplObjectStorage) SetIsKeysAssoc(cond bool) { this.SwitchFlags(M
  * spl_SplObjectStorageElement
  */
 type spl_SplObjectStorageElement struct {
-	obj zend.Zval
-	inf zend.Zval
+	obj types.Zval
+	inf types.Zval
 }
 
 // func Makespl_SplObjectStorageElement(obj zend.Zval, inf zend.Zval) spl_SplObjectStorageElement {
@@ -92,9 +93,9 @@ type spl_SplObjectStorageElement struct {
 //         inf:inf,
 //     }
 // }
-func (this *spl_SplObjectStorageElement) GetObj() zend.Zval { return this.obj }
+func (this *spl_SplObjectStorageElement) GetObj() types.Zval { return this.obj }
 
 // func (this *spl_SplObjectStorageElement) SetObj(value zend.Zval) { this.obj = value }
-func (this *spl_SplObjectStorageElement) GetInf() zend.Zval { return this.inf }
+func (this *spl_SplObjectStorageElement) GetInf() types.Zval { return this.inf }
 
 // func (this *spl_SplObjectStorageElement) SetInf(value zend.Zval) { this.inf = value }

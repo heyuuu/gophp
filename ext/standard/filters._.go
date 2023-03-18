@@ -4,7 +4,7 @@ package standard
 
 import (
 	"sik/core/streams"
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/filters.c>
@@ -50,7 +50,7 @@ var StrfilterStripTagsFactory streams.PhpStreamFilterFactory = streams.MakePhpSt
 type PhpConvErrT = int
 
 const (
-	PHP_CONV_ERR_SUCCESS PhpConvErrT = zend.SUCCESS
+	PHP_CONV_ERR_SUCCESS PhpConvErrT = types.SUCCESS
 	PHP_CONV_ERR_UNKNOWN
 	PHP_CONV_ERR_TOO_BIG
 	PHP_CONV_ERR_INVALID_SEQ

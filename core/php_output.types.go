@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -58,7 +59,7 @@ func (this *PhpOutputContext) GetOut() *PhpOutputBuffer { return &this.out }
 type PhpOutputHandlerUserFuncT struct {
 	fci zend.ZendFcallInfo
 	fcc zend.ZendFcallInfoCache
-	zoh zend.Zval
+	zoh types.Zval
 }
 
 // func MakePhpOutputHandlerUserFuncT(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, zoh zend.Zval) PhpOutputHandlerUserFuncT {
@@ -74,7 +75,7 @@ func (this *PhpOutputHandlerUserFuncT) GetFci() zend.ZendFcallInfo { return this
 func (this *PhpOutputHandlerUserFuncT) GetFcc() zend.ZendFcallInfoCache { return this.fcc }
 
 // func (this *PhpOutputHandlerUserFuncT) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }
-func (this *PhpOutputHandlerUserFuncT) GetZoh() zend.Zval { return this.zoh }
+func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval { return this.zoh }
 
 // func (this *PhpOutputHandlerUserFuncT) SetZoh(value zend.Zval) { this.zoh = value }
 
@@ -82,7 +83,7 @@ func (this *PhpOutputHandlerUserFuncT) GetZoh() zend.Zval { return this.zoh }
  * PhpOutputHandler
  */
 type PhpOutputHandler struct {
-	name   *zend.ZendString
+	name   *types.ZendString
 	flags  int
 	level  int
 	size   int
@@ -95,15 +96,15 @@ type PhpOutputHandler struct {
 	}
 }
 
-func (this *PhpOutputHandler) GetName() *zend.ZendString      { return this.name }
-func (this *PhpOutputHandler) SetName(value *zend.ZendString) { this.name = value }
-func (this *PhpOutputHandler) GetFlags() int                  { return this.flags }
-func (this *PhpOutputHandler) SetFlags(value int)             { this.flags = value }
-func (this *PhpOutputHandler) GetLevel() int                  { return this.level }
-func (this *PhpOutputHandler) SetLevel(value int)             { this.level = value }
-func (this *PhpOutputHandler) GetSize() int                   { return this.size }
-func (this *PhpOutputHandler) SetSize(value int)              { this.size = value }
-func (this *PhpOutputHandler) GetBuffer() PhpOutputBuffer     { return this.buffer }
+func (this *PhpOutputHandler) GetName() *types.ZendString      { return this.name }
+func (this *PhpOutputHandler) SetName(value *types.ZendString) { this.name = value }
+func (this *PhpOutputHandler) GetFlags() int                   { return this.flags }
+func (this *PhpOutputHandler) SetFlags(value int)              { this.flags = value }
+func (this *PhpOutputHandler) GetLevel() int                   { return this.level }
+func (this *PhpOutputHandler) SetLevel(value int)              { this.level = value }
+func (this *PhpOutputHandler) GetSize() int                    { return this.size }
+func (this *PhpOutputHandler) SetSize(value int)               { this.size = value }
+func (this *PhpOutputHandler) GetBuffer() PhpOutputBuffer      { return this.buffer }
 
 // func (this *PhpOutputHandler) SetBuffer(value PhpOutputBuffer) { this.buffer = value }
 func (this *PhpOutputHandler) GetOpaq() any                              { return this.opaq }

@@ -4,7 +4,7 @@ package streams
 
 import (
 	"sik/core"
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -46,7 +46,7 @@ type PhpStreamTempData struct {
 	innerstream *core.PhpStream
 	smax        int
 	mode        int
-	meta        zend.Zval
+	meta        types.Zval
 	tmpdir      *byte
 }
 
@@ -65,8 +65,8 @@ func (this *PhpStreamTempData) GetSmax() int                         { return th
 func (this *PhpStreamTempData) SetSmax(value int)                    { this.smax = value }
 
 // func (this *PhpStreamTempData)  GetMode() int      { return this.mode }
-func (this *PhpStreamTempData) SetMode(value int)  { this.mode = value }
-func (this *PhpStreamTempData) GetMeta() zend.Zval { return this.meta }
+func (this *PhpStreamTempData) SetMode(value int)   { this.mode = value }
+func (this *PhpStreamTempData) GetMeta() types.Zval { return this.meta }
 
 // func (this *PhpStreamTempData) SetMeta(value zend.Zval) { this.meta = value }
 func (this *PhpStreamTempData) GetTmpdir() *byte      { return this.tmpdir }

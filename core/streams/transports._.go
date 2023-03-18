@@ -3,7 +3,7 @@
 package streams
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <main/streams/transports.c>
@@ -26,7 +26,7 @@ import (
   +----------------------------------------------------------------------+
 */
 
-var XportHash zend.HashTable
+var XportHash types.HashTable
 
 /* Bind the stream to a local address */
 

@@ -2,14 +2,16 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendObjectIteratorFuncs
  */
 type ZendObjectIteratorFuncs struct {
 	dtor               func(iter *ZendObjectIterator)
 	valid              func(iter *ZendObjectIterator) int
-	get_current_data   func(iter *ZendObjectIterator) *Zval
-	get_current_key    func(iter *ZendObjectIterator, key *Zval)
+	get_current_data   func(iter *ZendObjectIterator) *types.Zval
+	get_current_key    func(iter *ZendObjectIterator, key *types.Zval)
 	move_forward       func(iter *ZendObjectIterator)
 	rewind             func(iter *ZendObjectIterator)
 	invalidate_current func(iter *ZendObjectIterator)
@@ -18,8 +20,8 @@ type ZendObjectIteratorFuncs struct {
 func MakeZendObjectIteratorFuncs(
 	dtor func(iter *ZendObjectIterator),
 	valid func(iter *ZendObjectIterator) int,
-	get_current_data func(iter *ZendObjectIterator) *Zval,
-	get_current_key func(iter *ZendObjectIterator, key *Zval),
+	get_current_data func(iter *ZendObjectIterator) *types.Zval,
+	get_current_key func(iter *ZendObjectIterator, key *types.Zval),
 	move_forward func(iter *ZendObjectIterator),
 	rewind func(iter *ZendObjectIterator),
 	invalidate_current func(iter *ZendObjectIterator),
@@ -40,12 +42,12 @@ func (this *ZendObjectIteratorFuncs) GetDtor() func(iter *ZendObjectIterator) { 
 func (this *ZendObjectIteratorFuncs) GetValid() func(iter *ZendObjectIterator) int { return this.valid }
 
 // func (this *ZendObjectIteratorFuncs) SetValid(value func(iter *ZendObjectIterator) int) { this.valid = value }
-func (this *ZendObjectIteratorFuncs) GetGetCurrentData() func(iter *ZendObjectIterator) *Zval {
+func (this *ZendObjectIteratorFuncs) GetGetCurrentData() func(iter *ZendObjectIterator) *types.Zval {
 	return this.get_current_data
 }
 
 // func (this *ZendObjectIteratorFuncs) SetGetCurrentData(value func(iter *ZendObjectIterator) *Zval) { this.get_current_data = value }
-func (this *ZendObjectIteratorFuncs) GetGetCurrentKey() func(iter *ZendObjectIterator, key *Zval) {
+func (this *ZendObjectIteratorFuncs) GetGetCurrentKey() func(iter *ZendObjectIterator, key *types.Zval) {
 	return this.get_current_key
 }
 
@@ -68,8 +70,8 @@ func (this *ZendObjectIteratorFuncs) GetInvalidateCurrent() func(iter *ZendObjec
  * ZendObjectIterator
  */
 type ZendObjectIterator struct {
-	std   ZendObject
-	data  Zval
+	std   types.ZendObject
+	data  types.Zval
 	funcs *ZendObjectIteratorFuncs
 	index ZendUlong
 }
@@ -82,10 +84,10 @@ type ZendObjectIterator struct {
 //         index:index,
 //     }
 // }
-func (this *ZendObjectIterator) GetStd() ZendObject { return this.std }
+func (this *ZendObjectIterator) GetStd() types.ZendObject { return this.std }
 
 // func (this *ZendObjectIterator) SetStd(value ZendObject) { this.std = value }
-func (this *ZendObjectIterator) GetData() Zval { return this.data }
+func (this *ZendObjectIterator) GetData() types.Zval { return this.data }
 
 // func (this *ZendObjectIterator) SetData(value Zval) { this.data = value }
 func (this *ZendObjectIterator) GetFuncs() *ZendObjectIteratorFuncs      { return this.funcs }

@@ -8,6 +8,7 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStreamFopenFromFdInt(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
@@ -40,7 +41,7 @@ func PhpStreamParseFopenModes(mode *byte, open_flags *int) int {
 
 		/* unknown mode */
 
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if strchr(mode, '+') {
 		flags |= O_RDWR
@@ -50,7 +51,7 @@ func PhpStreamParseFopenModes(mode *byte, open_flags *int) int {
 		flags |= O_RDONLY
 	}
 	*open_flags = flags
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PHP_STDIOP_GET_FD(anfd int, data *PhpStdioStreamData) int {
 	if data.GetFile() != nil {
@@ -97,8 +98,8 @@ func _phpStreamFopenFromFileInt(file *r.FILE, mode *byte) *core.PhpStream {
 	self.SetFd(fileno(file))
 	return core.PhpStreamAllocRel(&PhpStreamStdioOps, self, 0, mode)
 }
-func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **zend.ZendString) *core.PhpStream {
-	var opened_path *zend.ZendString = nil
+func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **types.ZendString) *core.PhpStream {
+	var opened_path *types.ZendString = nil
 	var fd int
 	fd = core.PhpOpenTemporaryFd(dir, pfx, &opened_path)
 	if fd != -1 {
@@ -284,7 +285,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 
 			/* temporary streams are never persistent */
 
-			zend.ZendStringReleaseEx(data.GetTempName(), 0)
+			types.ZendStringReleaseEx(data.GetTempName(), 0)
 			data.SetTempName(nil)
 		}
 	} else {
@@ -352,26 +353,26 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 				PhpStreamModeSanitizeFdopenFopencookie(stream, fixed_mode)
 				data.SetFile(fdopen(data.GetFd(), fixed_mode))
 				if data.GetFile() == nil {
-					return zend.FAILURE
+					return types.FAILURE
 				}
 			}
 			*((**r.FILE)(ret)) = data.GetFile()
 			data.SetFd(core.SOCK_ERR)
 		}
-		return zend.SUCCESS
+		return types.SUCCESS
 	case core.PHP_STREAM_AS_FD_FOR_SELECT:
 		PHP_STDIOP_GET_FD(fd, data)
 		if core.SOCK_ERR == fd {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = fd
 		}
-		return zend.SUCCESS
+		return types.SUCCESS
 	case core.PHP_STREAM_AS_FD:
 		PHP_STDIOP_GET_FD(fd, data)
 		if core.SOCK_ERR == fd {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		if data.GetFile() != nil {
 			r.Fflush(data.GetFile())
@@ -379,9 +380,9 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = fd
 		}
-		return zend.SUCCESS
+		return types.SUCCESS
 	default:
-		return zend.FAILURE
+		return types.FAILURE
 	}
 
 	/* as soon as someone touches the stdio layer, buffering may ensue,
@@ -430,7 +431,7 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		if fd == -1 {
 			return -1
 		}
-		if zend.ZendUintptrT(ptrparam == core.PHP_STREAM_LOCK_SUPPORTED) != 0 {
+		if types.ZendUintptrT(ptrparam == core.PHP_STREAM_LOCK_SUPPORTED) != 0 {
 			return 0
 		}
 		if !(flock(fd, value)) {
@@ -556,7 +557,7 @@ func PhpPlainFilesDirOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var dir *DIR = nil
@@ -576,14 +577,14 @@ func PhpPlainFilesDirOpener(
 	}
 	return stream
 }
-func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, options int) *core.PhpStream {
+func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.ZendString, options int) *core.PhpStream {
 	var realpath []byte
 	var open_flags int
 	var fd int
 	var ret *core.PhpStream
 	var persistent int = options & core.STREAM_OPEN_PERSISTENT
 	var persistent_id *byte = nil
-	if zend.FAILURE == PhpStreamParseFopenModes(mode, &open_flags) {
+	if types.FAILURE == PhpStreamParseFopenModes(mode, &open_flags) {
 		PhpStreamWrapperLogError(&PhpPlainFilesWrapper, options, "`%s' is not a valid mode for fopen", mode)
 		return nil
 	}
@@ -602,7 +603,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 
 				//TODO: avoid reallocation???
 
-				*opened_path = zend.ZendStringInit(realpath, strlen(realpath), 0)
+				*opened_path = types.ZendStringInit(realpath, strlen(realpath), 0)
 
 				//TODO: avoid reallocation???
 
@@ -622,7 +623,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 		}
 		if ret != nil {
 			if opened_path != nil {
-				*opened_path = zend.ZendStringInit(realpath, strlen(realpath), 0)
+				*opened_path = types.ZendStringInit(realpath, strlen(realpath), 0)
 			}
 			if persistent_id != nil {
 				zend.Efree(persistent_id)
@@ -640,7 +641,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 				r = DoFstat(self, 0)
 				if r == 0 && !(zend.S_ISREG(self.GetSb().st_mode)) {
 					if opened_path != nil {
-						zend.ZendStringReleaseEx(*opened_path, 0)
+						types.ZendStringReleaseEx(*opened_path, 0)
 						*opened_path = nil
 					}
 					core.PhpStreamClose(ret)
@@ -674,7 +675,7 @@ func PhpPlainFilesStreamOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
@@ -885,7 +886,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 		fallthrough
 	case core.PHP_STREAM_META_OWNER:
 		if option == core.PHP_STREAM_META_OWNER_NAME {
-			if PhpGetUidByName((*byte)(value), &uid) != zend.SUCCESS {
+			if PhpGetUidByName((*byte)(value), &uid) != types.SUCCESS {
 				core.PhpErrorDocref1(nil, url, zend.E_WARNING, "Unable to find uid for %s", (*byte)(value))
 				return 0
 			}
@@ -897,7 +898,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 		fallthrough
 	case core.PHP_STREAM_META_GROUP_NAME:
 		if option == core.PHP_STREAM_META_GROUP_NAME {
-			if PhpGetGidByName((*byte)(value), &gid) != zend.SUCCESS {
+			if PhpGetGidByName((*byte)(value), &gid) != types.SUCCESS {
 				core.PhpErrorDocref1(nil, url, zend.E_WARNING, "Unable to find gid for %s", (*byte)(value))
 				return 0
 			}
@@ -919,7 +920,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	standard.PhpClearStatCache(0, nil, 0)
 	return 1
 }
-func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path **zend.ZendString, options int) *core.PhpStream {
+func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path **types.ZendString, options int) *core.PhpStream {
 	/* code ripped off from fopen_wrappers.c */
 
 	var pathbuf *byte
@@ -928,7 +929,7 @@ func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path
 	var trypath []byte
 	var stream *core.PhpStream
 	var filename_length int
-	var exec_filename *zend.ZendString
+	var exec_filename *types.ZendString
 	if opened_path != nil {
 		*opened_path = nil
 	}

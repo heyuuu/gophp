@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
 // Source: <Zend/zend_execute.h>
@@ -29,13 +30,13 @@ import (
 */
 
 var ZendExecuteEx func(executeData *ZendExecuteData)
-var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *Zval)
+var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *types.Zval)
 
 /* export zend_pass_function to allow comparisons against it */
 
 /* dedicated Zend executor functions - do not use! */
 
-const ZEND_VM_STACK_HEADER_SLOTS *Zval = (ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct _zend_vm_stack")) + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval"))
+const ZEND_VM_STACK_HEADER_SLOTS *types.Zval = (ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct _zend_vm_stack")) + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval"))
 
 /*
  * In general in RELEASE build ZEND_ASSERT() must be zero-cost, but for some
@@ -56,7 +57,7 @@ const ZEND_USER_OPCODE_DISPATCH_TO = 0x100
 
 /* former zend_execute_locks.h */
 
-type ZendFreeOp *Zval
+type ZendFreeOp *types.Zval
 
 const CACHE_SPECIAL = 1 << 0
 
@@ -69,7 +70,7 @@ const _VAR_CODE = 2
 const _UNUSED_CODE = 3
 const _CV_CODE = 4
 
-type IncdecT func(*Zval) int
+type IncdecT func(*types.Zval) int
 
 var ZendPassFunction = MakeInternalFunctionSimplify(ZifPass)
 

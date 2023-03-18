@@ -8,10 +8,11 @@ import (
 	"sik/core/streams"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func BG(v *uint32) __auto__ { return BasicGlobals.v }
-func PhpPutenvDestructor(zv *zend.Zval) {
+func PhpPutenvDestructor(zv *types.Zval) {
 	var pe *PutenvEntry = zv.GetPtr()
 	if pe.GetPreviousValue() != nil {
 		putenv(pe.GetPreviousValue())
@@ -117,65 +118,65 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	RegisterPhpinfoConstants(type_, module_number)
 	RegisterHtmlConstants(type_, module_number)
 	RegisterStringConstants(type_, module_number)
-	if ZmStartupVar(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupVar(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupFile(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupFile(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupPack(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupPack(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupBrowscap(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupBrowscap(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupStandardFilters(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupStandardFilters(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupUserFilters(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupUserFilters(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupPassword(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupPassword(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupMtRand(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupMtRand(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if zm_startup_nl_langinfo(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if zm_startup_nl_langinfo(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupCrypt(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupCrypt(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupLcg(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupLcg(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupDir(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupDir(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupSyslog(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupSyslog(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupArray(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupArray(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupAssert(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupAssert(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupUrlScannerEx(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupUrlScannerEx(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupProcOpen(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupProcOpen(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupExec(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupExec(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupUserStreams(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupUserStreams(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupImagetypes(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupImagetypes(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
 	streams.PhpRegisterUrlStreamWrapper("php", &PhpStreamPhpWrapper)
 	streams.PhpRegisterUrlStreamWrapper("file", &PhpPlainFilesWrapper)
@@ -183,16 +184,16 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	streams.PhpRegisterUrlStreamWrapper("data", &streams.PhpStreamRfc2397Wrapper)
 	streams.PhpRegisterUrlStreamWrapper("http", &PhpStreamHttpWrapper)
 	streams.PhpRegisterUrlStreamWrapper("ftp", &PhpStreamFtpWrapper)
-	if ZmStartupDns(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupDns(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupRandom(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupRandom(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	if ZmStartupHrtime(type_, module_number) != zend.SUCCESS {
-		return zend.FAILURE
+	if ZmStartupHrtime(type_, module_number) != types.SUCCESS {
+		return types.FAILURE
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownBasic(type_ int, module_number int) int {
 	ZmShutdownSyslog(type_, module_number)
@@ -209,7 +210,7 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	ZmShutdownCrypt(type_, module_number)
 	ZmShutdownRandom(type_, module_number)
 	ZmShutdownPassword(type_, module_number)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmActivateBasic(type_ int, module_number int) int {
 	memset(BG(strtok_table), 0, 256)
@@ -247,7 +248,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	/* Default to global filters only */
 
 	FG(stream_filters) = nil
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
 	zend.ZvalPtrDtor(&(BG(strtok_zval)))
@@ -268,7 +269,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 		setlocale(LC_ALL, "C")
 		setlocale(LC_CTYPE, "")
 		if BG(locale_string) {
-			zend.ZendStringReleaseEx(BG(locale_string), 0)
+			types.ZendStringReleaseEx(BG(locale_string), 0)
 			BG(locale_string) = nil
 		}
 	}
@@ -289,7 +290,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	ZmDeactivateBrowscap(type_, module_number)
 	BG(page_uid) = -1
 	BG(page_gid) = -1
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
 	PhpInfoPrintTableStart()
@@ -298,9 +299,9 @@ func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
 	PhpInfoPrintTableEnd()
 	ZmInfoAssert(zend_module)
 }
-func ZifConstant(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var const_name *zend.ZendString
-	var c *zend.Zval
+func ZifConstant(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var const_name *types.ZendString
+	var c *types.Zval
 	var scope *zend.ZendClassEntry
 	for {
 		var _flags int = 0
@@ -308,12 +309,12 @@ func ZifConstant(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -372,9 +373,9 @@ func ZifConstant(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	scope = zend.ZendGetExecutedScope()
 	c = zend.ZendGetConstantEx(const_name, scope, zend.ZEND_FETCH_CLASS_SILENT)
 	if c != nil {
-		zend.ZVAL_COPY_OR_DUP(return_value, c)
-		if return_value.IsType(zend.IS_CONSTANT_AST) {
-			if zend.ZvalUpdateConstantEx(return_value, scope) != zend.SUCCESS {
+		types.ZVAL_COPY_OR_DUP(return_value, c)
+		if return_value.IsType(types.IS_CONSTANT_AST) {
+			if zend.ZvalUpdateConstantEx(return_value, scope) != types.SUCCESS {
 				return
 			}
 		}
@@ -386,7 +387,7 @@ func ZifConstant(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifInetNtop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifInetNtop(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var address *byte
 	var address_len int
 	var af int = AF_INET
@@ -397,12 +398,12 @@ func ZifInetNtop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -472,7 +473,7 @@ func ZifInetNtop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetRawString(b.CastStrAuto(buffer))
 	return
 }
-func PhpInetPton(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpInetPton(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ret int
 	var af int = AF_INET
 	var address *byte
@@ -484,12 +485,12 @@ func PhpInetPton(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -561,7 +562,7 @@ func PhpInetPton(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetRawString(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
 	return
 }
-func ZifIp2long(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIp2long(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var addr *byte
 	var addr_len int
 	var ip __struct__in_addr
@@ -571,12 +572,12 @@ func ZifIp2long(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -639,7 +640,7 @@ func ZifIp2long(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(ntohl(ip.s_addr))
 	return
 }
-func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ip zend.ZendUlong
 	var sip zend.ZendLong
 	var myaddr __struct__in_addr
@@ -650,12 +651,12 @@ func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -724,23 +725,23 @@ func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ptr *byte
 	var str *byte = nil
 	var str_len int
-	var local_only zend.ZendBool = 0
+	var local_only types.ZendBool = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -838,7 +839,7 @@ func ZifGetenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifPutenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var setting *byte
 	var setting_len int
 	var p *byte
@@ -850,12 +851,12 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1001,7 +1002,7 @@ func ParseOpts(opts *byte, result **core.Opt) int {
 	}
 	return count
 }
-func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var options *byte = nil
 	var argv **byte = nil
 	var opt []byte = []byte{'0'}
@@ -1012,10 +1013,10 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var len_ int
 	var php_optarg *byte = nil
 	var php_optind int = 1
-	var val zend.Zval
-	var args *zend.Zval = nil
-	var p_longopts *zend.Zval = nil
-	var zoptind *zend.Zval = nil
+	var val types.Zval
+	var args *types.Zval = nil
+	var p_longopts *types.Zval = nil
+	var zoptind *types.Zval = nil
 	var optname_len int = 0
 	var opts *core.Opt
 	var orig_opts *core.Opt
@@ -1025,12 +1026,12 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1107,14 +1108,14 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
+	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_KNOWN(types.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_KNOWN(types.ZEND_STR_ARGV), 1)) != nil) {
 		var pos int = 0
-		var entry *zend.Zval
-		if args.GetType() != zend.IS_ARRAY {
+		var entry *types.Zval
+		if args.GetType() != types.IS_ARRAY {
 			return_value.SetFalse()
 			return
 		}
-		argc = zend.Z_ARRVAL_P(args).GetNNumOfElements()
+		argc = types.Z_ARRVAL_P(args).GetNNumOfElements()
 
 		/* Attempt to allocate enough memory to hold all of the arguments
 		 * and a trailing NULL */
@@ -1123,13 +1124,13 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *zend.HashTable = args.GetArr()
+		var __ht *types.HashTable = args.GetArr()
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			entry = _z
-			var tmp_arg_str *zend.ZendString
-			var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var tmp_arg_str *types.ZendString
+			var arg_str *types.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 			zend.ZendTmpStringRelease(tmp_arg_str)
 		}
@@ -1152,8 +1153,8 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	len_ = ParseOpts(options, &opts)
 	if p_longopts != nil {
 		var count int
-		var entry *zend.Zval
-		count = zend.Z_ARRVAL_P(p_longopts).GetNNumOfElements()
+		var entry *types.Zval
+		count = types.Z_ARRVAL_P(p_longopts).GetNNumOfElements()
 
 		/* the first <len> slots are filled by the one short ops
 		 * we now extend our array and jump to the new added structs */
@@ -1165,13 +1166,13 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *zend.HashTable = p_longopts.GetArr()
+		var __ht *types.HashTable = p_longopts.GetArr()
 		for _, _p := range __ht.foreachData() {
-			var _z *zend.Zval = _p.GetVal()
+			var _z *types.Zval = _p.GetVal()
 
 			entry = _z
-			var tmp_arg_str *zend.ZendString
-			var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var tmp_arg_str *types.ZendString
+			var arg_str *types.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			opts.SetNeedParam(0)
 			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
 			len_ = strlen(opts.GetOptName())
@@ -1241,13 +1242,13 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Add this option / argument pair to the result hash. */
 
 		optname_len = strlen(optname)
-		if !(optname_len > 1 && optname[0] == '0') && zend.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == zend.IS_LONG {
+		if !(optname_len > 1 && optname[0] == '0') && zend.IsNumericString(b.CastStr(optname, optname_len), nil, nil, 0) == types.IS_LONG {
 
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
 			if b.Assign(&args, return_value.GetArr().IndexFindH(optname_int)) != nil {
-				if args.GetType() != zend.IS_ARRAY {
+				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
 				args.GetArr().NextIndexInsert(&val)
@@ -1259,7 +1260,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			/* other strings */
 
 			if b.Assign(&args, return_value.GetArr().KeyFind(b.CastStrAuto(optname))) != nil {
-				if args.GetType() != zend.IS_ARRAY {
+				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
 				args.GetArr().NextIndexInsert(&val)
@@ -1282,13 +1283,13 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.Efree(orig_opts)
 	FreeArgv(argv, argc)
 }
-func ZifFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	core.SapiFlush()
 }
-func ZifSleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var num zend.ZendLong
 	for {
 		var _flags int = 0
@@ -1296,12 +1297,12 @@ func ZifSleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1366,7 +1367,7 @@ func ZifSleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(core.PhpSleep(uint(num)))
 	return
 }
-func ZifUsleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUsleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var num zend.ZendLong
 	for {
 		var _flags int = 0
@@ -1374,12 +1375,12 @@ func ZifUsleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1442,7 +1443,7 @@ func ZifUsleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	usleep(uint(num))
 }
-func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var tv_sec zend.ZendLong
 	var tv_nsec zend.ZendLong
 	var php_req __struct__timespec
@@ -1453,12 +1454,12 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1546,7 +1547,7 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetFalse()
 	return
 }
-func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var target_secs float64
 	var tm __struct__timeval
 	var php_req __struct__timespec
@@ -1561,12 +1562,12 @@ func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1648,40 +1649,40 @@ func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	return_value.SetTrue()
 	return
 }
-func ZifGetCurrentUser(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifGetCurrentUser(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	return_value.SetRawString(b.CastStrAuto(core.PhpGetCurrentUser()))
 	return
 }
-func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, retval *zend.Zval) {
-	if entry.IsType(zend.IS_STRING) {
-		var str *zend.ZendString = entry.GetStr()
-		if (str.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
+func AddConfigEntry(h zend.ZendUlong, key *types.ZendString, entry *types.Zval, retval *types.Zval) {
+	if entry.IsType(types.IS_STRING) {
+		var str *types.ZendString = entry.GetStr()
+		if (str.GetGcFlags() & types.GC_PERSISTENT) == 0 {
 			str.AddRefcount()
 		} else {
-			str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
+			str = types.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		}
 		if key != nil {
 			zend.AddAssocStrEx(retval, key.GetStr(), str.GetStr())
 		} else {
 			zend.AddIndexStr(retval, h, str)
 		}
-	} else if entry.IsType(zend.IS_ARRAY) {
-		var tmp zend.Zval
+	} else if entry.IsType(types.IS_ARRAY) {
+		var tmp types.Zval
 		zend.ArrayInit(&tmp)
 		AddConfigEntries(entry.GetArr(), &tmp)
 		retval.GetArr().KeyUpdate(key.GetStr(), &tmp)
 	}
 }
-func AddConfigEntries(hash *zend.HashTable, return_value *zend.Zval) {
+func AddConfigEntries(hash *types.HashTable, return_value *types.Zval) {
 	var h zend.ZendUlong
-	var key *zend.ZendString
-	var zv *zend.Zval
-	var __ht *zend.HashTable = hash
+	var key *types.ZendString
+	var zv *types.Zval
+	var __ht *types.HashTable = hash
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		h = _p.GetH()
 		key = _p.GetKey()
@@ -1689,22 +1690,22 @@ func AddConfigEntries(hash *zend.HashTable, return_value *zend.Zval) {
 		AddConfigEntry(h, key, zv, return_value)
 	}
 }
-func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var varname *byte
 	var varname_len int
-	var retval *zend.Zval
+	var retval *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1762,7 +1763,7 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	retval = core.CfgGetEntry(b.CastStr(varname, varname_len))
 	if retval != nil {
-		if retval.IsType(zend.IS_ARRAY) {
+		if retval.IsType(types.IS_ARRAY) {
 			zend.ArrayInit(return_value)
 			AddConfigEntries(retval.GetArr(), return_value)
 			return
@@ -1775,21 +1776,21 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetMagicQuotesRuntime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifGetMagicQuotesRuntime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	return_value.SetFalse()
 	return
 }
-func ZifGetMagicQuotesGpc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifGetMagicQuotesGpc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	return_value.SetFalse()
 	return
 }
-func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var message *byte
 	var opt *byte = nil
 	var headers *byte = nil
@@ -1805,12 +1806,12 @@ func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1888,7 +1889,7 @@ func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if argc > 1 {
 		opt_err = int(erropt)
 	}
-	if _phpErrorLogEx(opt_err, message, message_len, opt, headers) == zend.FAILURE {
+	if _phpErrorLogEx(opt_err, message, message_len, opt, headers) == types.FAILURE {
 		return_value.SetFalse()
 		return
 	}
@@ -1904,34 +1905,34 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 	switch opt_err {
 	case 1:
 		if PhpMail(opt, "PHP error_log message", message, headers, nil) == 0 {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	case 2:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "TCP/IP option not available!")
-		return zend.FAILURE
+		return types.FAILURE
 	case 3:
 		stream = core.PhpStreamOpenWrapper(opt, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
 		if stream == nil {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		nbytes = core.PhpStreamWrite(stream, message, message_len)
 		core.PhpStreamClose(stream)
 		if nbytes != message_len {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	case 4:
 		if core.SM__().GetLogMessage() != nil {
 			core.SM__().GetLogMessage()(message, -1)
 		} else {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	default:
 		core.PhpLogErrWithSeverity(message, LOG_NOTICE)
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if core.PG(last_error_message) {
@@ -1946,8 +1947,8 @@ func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		zend.AddAssocLongEx(return_value, "line", core.PG(last_error_lineno))
 	}
 }
-func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if core.PG(last_error_message) {
@@ -1961,8 +1962,8 @@ func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		}
 	}
 }
-func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var retval zend.Zval
+func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var retval types.Zval
 	var fci zend.ZendFcallInfo
 	var fci_cache zend.ZendFcallInfoCache
 	for {
@@ -1971,12 +1972,12 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _max_num_args int = -1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2050,16 +2051,16 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		break
 	}
 	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		zend.ZVAL_COPY_VALUE(return_value, &retval)
+		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 }
-func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var params *zend.Zval
-	var retval zend.Zval
+func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var params *types.Zval
+	var retval types.Zval
 	var fci zend.ZendFcallInfo
 	var fci_cache zend.ZendFcallInfoCache
 	for {
@@ -2068,12 +2069,12 @@ func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *zend.
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2144,16 +2145,16 @@ func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *zend.
 	}
 	zend.ZendFcallInfoArgs(&fci, params)
 	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		zend.ZVAL_COPY_VALUE(return_value, &retval)
+		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var retval zend.Zval
+func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var retval types.Zval
 	var fci zend.ZendFcallInfo
 	var fci_cache zend.ZendFcallInfoCache
 	var called_scope *zend.ZendClassEntry
@@ -2163,12 +2164,12 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *zend.
 		var _max_num_args int = -1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2250,16 +2251,16 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *zend.
 	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
-	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		zend.ZVAL_COPY_VALUE(return_value, &retval)
+		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 }
-func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var params *zend.Zval
-	var retval zend.Zval
+func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var params *types.Zval
+	var retval types.Zval
 	var fci zend.ZendFcallInfo
 	var fci_cache zend.ZendFcallInfoCache
 	var called_scope *zend.ZendClassEntry
@@ -2269,12 +2270,12 @@ func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2349,15 +2350,15 @@ func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *
 	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
-	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
-		zend.ZVAL_COPY_VALUE(return_value, &retval)
+		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func UserShutdownFunctionDtor(zv *zend.Zval) {
+func UserShutdownFunctionDtor(zv *types.Zval) {
 	var i int
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
 	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
@@ -2373,37 +2374,37 @@ func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
 	}
 	zend.Efree(tick_function_entry.GetArguments())
 }
-func UserShutdownFunctionCall(zv *zend.Zval) int {
+func UserShutdownFunctionCall(zv *types.Zval) int {
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
-	var retval zend.Zval
+	var retval types.Zval
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var function_name *zend.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		var function_name *types.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpError(zend.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
-		zend.ZendStringReleaseEx(function_name, 0)
+		types.ZendStringReleaseEx(function_name, 0)
 		return 0
 	}
-	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == zend.SUCCESS {
+	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == types.SUCCESS {
 		zend.ZvalPtrDtor(&retval)
 	}
 	return 0
 }
 func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
-	var retval zend.Zval
-	var function *zend.Zval = tick_fe.GetArguments()[0]
+	var retval types.Zval
+	var function *types.Zval = tick_fe.GetArguments()[0]
 
 	/* Prevent reentrant calls to the same user ticks function */
 
 	if tick_fe.GetCalling() == 0 {
 		tick_fe.SetCalling(1)
-		if zend.CallUserFunction(nil, function, &retval, tick_fe.GetArgCount()-1, tick_fe.GetArguments()+1) == zend.SUCCESS {
+		if zend.CallUserFunction(nil, function, &retval, tick_fe.GetArgCount()-1, tick_fe.GetArguments()+1) == types.SUCCESS {
 			zend.ZvalPtrDtor(&retval)
 		} else {
-			var obj *zend.Zval
-			var method *zend.Zval
-			if function.IsType(zend.IS_STRING) {
+			var obj *types.Zval
+			var method *types.Zval
+			if function.IsType(types.IS_STRING) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s() - function does not exist", function.GetStr().GetVal())
-			} else if function.IsType(zend.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFindH(0)) != nil && b.Assign(&method, function.GetArr().IndexFindH(1)) != nil && obj.IsType(zend.IS_OBJECT) && method.IsType(zend.IS_STRING) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", zend.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
+			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFindH(0)) != nil && b.Assign(&method, function.GetArr().IndexFindH(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call tick function")
 			}
@@ -2417,14 +2418,14 @@ func RunUserTickFunctions(tick_count int, arg any) {
 	BG(user_tick_functions).Apply(zend.LlistApplyFuncT(UserTickFunctionCall))
 }
 func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTickFunctionEntry) int {
-	var func1 *zend.Zval = tick_fe1.GetArguments()[0]
-	var func2 *zend.Zval = tick_fe2.GetArguments()[0]
+	var func1 *types.Zval = tick_fe1.GetArguments()[0]
+	var func2 *types.Zval = tick_fe2.GetArguments()[0]
 	var ret int
-	if func1.IsType(zend.IS_STRING) && func2.IsType(zend.IS_STRING) {
+	if func1.IsType(types.IS_STRING) && func2.IsType(types.IS_STRING) {
 		ret = zend.ZendBinaryZvalStrcmp(func1, func2) == 0
-	} else if func1.IsType(zend.IS_ARRAY) && func2.IsType(zend.IS_ARRAY) {
+	} else if func1.IsType(types.IS_ARRAY) && func2.IsType(types.IS_ARRAY) {
 		ret = zend.ZendCompareArrays(func1, func2) == 0
-	} else if func1.IsType(zend.IS_OBJECT) && func2.IsType(zend.IS_OBJECT) {
+	} else if func1.IsType(types.IS_OBJECT) && func2.IsType(types.IS_OBJECT) {
 		ret = zend.ZendCompareObjects(func1, func2) == 0
 	} else {
 		ret = 0
@@ -2466,7 +2467,7 @@ func PhpFreeShutdownFunctions() {
 		zend.EG__().SetBailout(__orig_bailout)
 	}
 }
-func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var shutdown_function_entry PhpShutdownFunctionEntry
 	var i int
 	shutdown_function_entry.SetArgCount(executeData.NumArgs())
@@ -2474,8 +2475,8 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 		zend.ZendWrongParamCount()
 		return
 	}
-	shutdown_function_entry.SetArguments((*zend.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
-	if zend.ZendGetParametersArray(executeData.NumArgs(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == zend.FAILURE {
+	shutdown_function_entry.SetArguments((*types.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
+	if zend.ZendGetParametersArray(executeData.NumArgs(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == types.FAILURE {
 		zend.Efree(shutdown_function_entry.GetArguments())
 		return_value.SetFalse()
 		return
@@ -2484,10 +2485,10 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var callback_name *zend.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		var callback_name *types.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
-		zend.ZendStringReleaseEx(callback_name, 0)
+		types.ZendStringReleaseEx(callback_name, 0)
 		return_value.SetFalse()
 	} else {
 		if !(BG(user_shutdown_function_names)) {
@@ -2502,7 +2503,7 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 }
-func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdown_function_entry *PhpShutdownFunctionEntry) zend.ZendBool {
+func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdown_function_entry *PhpShutdownFunctionEntry) types.ZendBool {
 	if !(BG(user_shutdown_function_names)) {
 		zend.ALLOC_HASHTABLE(BG(user_shutdown_function_names))
 		zend.ZendHashInit(BG(user_shutdown_function_names), 0, nil, UserShutdownFunctionDtor, 0)
@@ -2510,13 +2511,13 @@ func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdow
 	zend.ZendHashStrUpdateMem(BG(user_shutdown_function_names), function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	return 1
 }
-func RemoveUserShutdownFunction(function_name *byte, function_len int) zend.ZendBool {
+func RemoveUserShutdownFunction(function_name *byte, function_len int) types.ZendBool {
 	if BG(user_shutdown_function_names) {
-		return zend.ZendHashStrDel(BG(user_shutdown_function_names), function_name, function_len) != zend.FAILURE
+		return zend.ZendHashStrDel(BG(user_shutdown_function_names), function_name, function_len) != types.FAILURE
 	}
 	return 0
 }
-func AppendUserShutdownFunction(shutdown_function_entry PhpShutdownFunctionEntry) zend.ZendBool {
+func AppendUserShutdownFunction(shutdown_function_entry PhpShutdownFunctionEntry) types.ZendBool {
 	if !(BG(user_shutdown_function_names)) {
 		zend.ALLOC_HASHTABLE(BG(user_shutdown_function_names))
 		zend.ZendHashInit(BG(user_shutdown_function_names), 0, nil, UserShutdownFunctionDtor, 0)
@@ -2530,24 +2531,24 @@ func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 	syntax_highlighter_ini.SetHighlightKeyword(zend.INI_STR("highlight.keyword"))
 	syntax_highlighter_ini.SetHighlightString(zend.INI_STR("highlight.string"))
 }
-func ZifHighlightFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHighlightFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var ret int
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-	var i zend.ZendBool = 0
+	var i types.ZendBool = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2620,7 +2621,7 @@ func ZifHighlightFile(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	PhpGetHighlight(&syntax_highlighter_ini)
 	ret = zend.HighlightFile(filename, &syntax_highlighter_ini)
-	if ret == zend.FAILURE {
+	if ret == types.FAILURE {
 		if i != 0 {
 			core.PhpOutputEnd()
 		}
@@ -2635,7 +2636,7 @@ func ZifHighlightFile(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return
 	}
 }
-func ZifPhpStripWhitespace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpStripWhitespace(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var original_lex_state zend.ZendLexState
@@ -2646,12 +2647,12 @@ func ZifPhpStripWhitespace(executeData *zend.ZendExecuteData, return_value *zend
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2711,7 +2712,7 @@ func ZifPhpStripWhitespace(executeData *zend.ZendExecuteData, return_value *zend
 	core.PhpOutputStartDefault()
 	file_handle.InitFilename(filename)
 	zend.ZendSaveLexicalState(&original_lex_state)
-	if zend.OpenFileForScanning(&file_handle) == zend.FAILURE {
+	if zend.OpenFileForScanning(&file_handle) == types.FAILURE {
 		zend.ZendRestoreLexicalState(&original_lex_state)
 		core.PhpOutputEnd()
 		zend.ZVAL_EMPTY_STRING(return_value)
@@ -2723,11 +2724,11 @@ func ZifPhpStripWhitespace(executeData *zend.ZendExecuteData, return_value *zend
 	core.PhpOutputGetContents(return_value)
 	core.PhpOutputDiscard()
 }
-func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var expr *zend.Zval
+func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var expr *types.Zval
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 	var hicompiled_string_description *byte
-	var i zend.ZendBool = 0
+	var i types.ZendBool = 0
 	var old_error_reporting int = zend.EG__().GetErrorReporting()
 	for {
 		var _flags int = 0
@@ -2735,12 +2736,12 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2809,7 +2810,7 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	zend.EG__().SetErrorReporting(zend.E_ERROR)
 	PhpGetHighlight(&syntax_highlighter_ini)
 	hicompiled_string_description = zend.ZendMakeCompiledStringDescription("highlighted code")
-	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == zend.FAILURE {
+	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == types.FAILURE {
 		zend.Efree(hicompiled_string_description)
 		zend.EG__().SetErrorReporting(old_error_reporting)
 		if i != 0 {
@@ -2828,21 +2829,21 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		return
 	}
 }
-func ZifIniGet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var varname *zend.ZendString
-	var val *zend.ZendString
+func ZifIniGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var varname *types.ZendString
+	var val *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -2906,20 +2907,20 @@ func ZifIniGet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if val.GetLen() == 0 {
 		zend.ZVAL_EMPTY_STRING(return_value)
 	} else if val.GetLen() == 1 {
-		return_value.SetInternedString(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
-	} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
+		return_value.SetInternedString(types.ZSTR_CHAR(types.ZendUchar(val.GetVal()[0])))
+	} else if (val.GetGcFlags() & types.GC_PERSISTENT) == 0 {
 		return_value.SetString(val.Copy())
 	} else {
-		return_value.SetString(zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
+		return_value.SetString(types.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 	}
 }
-func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var extname *byte = nil
 	var extname_len int = 0
 	var module_number int = 0
 	var module *zend.ZendModuleEntry
-	var details zend.ZendBool = 1
-	var key *zend.ZendString
+	var details types.ZendBool = 1
+	var key *types.ZendString
 	var ini_entry *zend.ZendIniEntry
 	for {
 		var _flags int = 0
@@ -2927,12 +2928,12 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3005,13 +3006,13 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		module_number = module.GetModuleNumber()
 	}
 	zend.ArrayInit(return_value)
-	var __ht *zend.HashTable = zend.EG__().GetIniDirectives()
+	var __ht *types.HashTable = zend.EG__().GetIniDirectives()
 	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
 		ini_entry = _z.GetPtr()
-		var option zend.Zval
+		var option types.Zval
 		if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
 			continue
 		}
@@ -3034,7 +3035,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 				return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), &option)
 			} else {
 				if ini_entry.GetValue() != nil {
-					var zv zend.Zval
+					var zv types.Zval
 					zv.SetStringCopy(ini_entry.GetValue())
 					return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), &zv)
 				} else {
@@ -3050,22 +3051,22 @@ func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, 
 	}
 	return !(strncmp(option_name, new_option_name, option_len))
 }
-func ZifIniSet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var varname *zend.ZendString
-	var new_value *zend.ZendString
-	var val *zend.ZendString
+func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var varname *types.ZendString
+	var new_value *types.ZendString
+	var val *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3135,11 +3136,11 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		if val.GetLen() == 0 {
 			zend.ZVAL_EMPTY_STRING(return_value)
 		} else if val.GetLen() == 1 {
-			return_value.SetInternedString(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
-		} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
+			return_value.SetInternedString(types.ZSTR_CHAR(types.ZendUchar(val.GetVal()[0])))
+		} else if (val.GetGcFlags() & types.GC_PERSISTENT) == 0 {
 			return_value.SetString(val.Copy())
 		} else {
-			return_value.SetString(zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
+			return_value.SetString(types.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 		}
 	} else {
 		return_value.SetFalse()
@@ -3158,26 +3159,26 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 		}
 	}
-	if zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == zend.FAILURE {
+	if zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
 		zend.ZvalPtrDtorStr(return_value)
 		return_value.SetFalse()
 		return
 	}
 }
-func ZifIniRestore(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var varname *zend.ZendString
+func ZifIniRestore(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var varname *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3235,22 +3236,22 @@ func ZifIniRestore(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ZendRestoreIniEntry(varname, core.PHP_INI_STAGE_RUNTIME)
 }
-func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var new_value *zend.ZendString
+func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var new_value *types.ZendString
 	var old_value *byte
-	var key *zend.ZendString
+	var key *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3315,18 +3316,18 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	} else {
 		return_value.SetFalse()
 	}
-	key = zend.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
-	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == zend.FAILURE {
-		zend.ZendStringReleaseEx(key, 0)
+	key = types.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
+	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
+		types.ZendStringReleaseEx(key, 0)
 		zend.ZvalPtrDtorStr(return_value)
 		return_value.SetFalse()
 		return
 	}
-	zend.ZendStringReleaseEx(key, 0)
+	types.ZendStringReleaseEx(key, 0)
 }
-func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	str = zend.ZendIniString("include_path", b.SizeOf("\"include_path\"")-1, 0)
@@ -3337,30 +3338,30 @@ func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	return_value.SetRawString(b.CastStrAuto(str))
 	return
 }
-func ZifRestoreIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var key *zend.ZendString
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifRestoreIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var key *types.ZendString
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	key = zend.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
+	key = types.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
-	zend.ZendStringEfree(key)
+	types.ZendStringEfree(key)
 }
-func ZifPrintR(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var var_ *zend.Zval
-	var do_return zend.ZendBool = 0
+func ZifPrintR(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var var_ *types.Zval
+	var do_return types.ZendBool = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3429,16 +3430,16 @@ func ZifPrintR(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifConnectionAborted(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifConnectionAborted(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetLong(core.PG(connection_status) & core.PHP_CONNECTION_ABORTED)
 	return
 }
-func ZifConnectionStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifConnectionStatus(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetLong(core.PG(connection_status))
 	return
 }
-func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var arg zend.ZendBool = 0
+func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var arg types.ZendBool = 0
 	var old_setting int
 	for {
 		var _flags int = 0
@@ -3446,12 +3447,12 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3510,14 +3511,14 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	old_setting = uint16(core.PG(ignore_user_abort))
 	if executeData.NumArgs() != 0 {
-		var key *zend.ZendString = zend.ZendStringInit("ignore_user_abort", b.SizeOf("\"ignore_user_abort\"")-1, 0)
+		var key *types.ZendString = types.ZendStringInit("ignore_user_abort", b.SizeOf("\"ignore_user_abort\"")-1, 0)
 		zend.ZendAlterIniEntryChars(key, b.Cond(arg != 0, "1", "0"), 1, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
-		zend.ZendStringReleaseEx(key, 0)
+		types.ZendStringReleaseEx(key, 0)
 	}
 	return_value.SetLong(old_setting)
 	return
 }
-func ZifGetservbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetservbyname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var name *byte
 	var proto *byte
 	var name_len int
@@ -3529,12 +3530,12 @@ func ZifGetservbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3608,7 +3609,7 @@ func ZifGetservbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetLong(ntohs(serv.s_port))
 	return
 }
-func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var proto *byte
 	var proto_len int
 	var port zend.ZendLong
@@ -3619,12 +3620,12 @@ func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3694,7 +3695,7 @@ func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetRawString(b.CastStrAuto(serv.s_name))
 	return
 }
-func ZifGetprotobyname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetprotobyname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var name *byte
 	var name_len int
 	var ent *__struct__protoent
@@ -3704,12 +3705,12 @@ func ZifGetprotobyname(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3773,7 +3774,7 @@ func ZifGetprotobyname(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	return_value.SetLong(ent.p_proto)
 	return
 }
-func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var proto zend.ZendLong
 	var ent *__struct__protoent
 	for {
@@ -3782,12 +3783,12 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3851,18 +3852,18 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *zend.Z
 	return_value.SetRawString(b.CastStrAuto(ent.p_name))
 	return
 }
-func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var tick_fe UserTickFunctionEntry
 	var i int
-	var function_name *zend.ZendString = nil
+	var function_name *types.ZendString = nil
 	tick_fe.SetCalling(0)
 	tick_fe.SetArgCount(executeData.NumArgs())
 	if tick_fe.GetArgCount() < 1 {
 		zend.ZendWrongParamCount()
 		return
 	}
-	tick_fe.SetArguments((*zend.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), tick_fe.GetArgCount(), 0)))
-	if zend.ZendGetParametersArray(executeData.NumArgs(), tick_fe.GetArgCount(), tick_fe.GetArguments()) == zend.FAILURE {
+	tick_fe.SetArguments((*types.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), tick_fe.GetArgCount(), 0)))
+	if zend.ZendGetParametersArray(executeData.NumArgs(), tick_fe.GetArgCount(), tick_fe.GetArguments()) == types.FAILURE {
 		zend.Efree(tick_fe.GetArguments())
 		return_value.SetFalse()
 		return
@@ -3870,13 +3871,13 @@ func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *ze
 	if zend.ZendIsCallable(tick_fe.GetArguments()[0], 0, &function_name) == 0 {
 		zend.Efree(tick_fe.GetArguments())
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
-		zend.ZendStringReleaseEx(function_name, 0)
+		types.ZendStringReleaseEx(function_name, 0)
 		return_value.SetFalse()
 		return
 	} else if function_name != nil {
-		zend.ZendStringReleaseEx(function_name, 0)
+		types.ZendStringReleaseEx(function_name, 0)
 	}
-	if tick_fe.GetArguments()[0].GetType() != zend.IS_ARRAY && tick_fe.GetArguments()[0].GetType() != zend.IS_OBJECT {
+	if tick_fe.GetArguments()[0].GetType() != types.IS_ARRAY && tick_fe.GetArguments()[0].GetType() != types.IS_OBJECT {
 		zend.ConvertToStringEx(tick_fe.GetArguments()[0])
 	}
 	if !(BG(user_tick_functions)) {
@@ -3891,8 +3892,8 @@ func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *ze
 	return_value.SetTrue()
 	return
 }
-func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var function *zend.Zval
+func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var function *types.Zval
 	var tick_fe UserTickFunctionEntry
 	for {
 		var _flags int = 0
@@ -3900,12 +3901,12 @@ func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -3960,16 +3961,16 @@ func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *
 	if !(BG(user_tick_functions)) {
 		return
 	}
-	if function.GetType() != zend.IS_ARRAY && function.GetType() != zend.IS_OBJECT {
+	if function.GetType() != types.IS_ARRAY && function.GetType() != types.IS_OBJECT {
 		zend.ConvertToString(function)
 	}
-	tick_fe.SetArguments((*zend.Zval)(zend.Emalloc(b.SizeOf("zval"))))
-	zend.ZVAL_COPY_VALUE(tick_fe.GetArguments()[0], function)
+	tick_fe.SetArguments((*types.Zval)(zend.Emalloc(b.SizeOf("zval"))))
+	types.ZVAL_COPY_VALUE(tick_fe.GetArguments()[0], function)
 	tick_fe.SetArgCount(1)
 	zend.ZendLlistDelElement(BG(user_tick_functions), &tick_fe, (func(any, any) int)(UserTickFunctionCompare))
 	zend.Efree(tick_fe.GetArguments())
 }
-func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var path *byte
 	var path_len int
 	if !(core.SG__().rfc1867_uploaded_files) {
@@ -3982,12 +3983,12 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -4051,12 +4052,12 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 }
-func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var path *byte
 	var new_path *byte
 	var path_len int
 	var new_path_len int
-	var successful zend.ZendBool = 0
+	var successful types.ZendBool = 0
 	var oldmask int
 	var ret int
 	if !(core.SG__().rfc1867_uploaded_files) {
@@ -4069,12 +4070,12 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Z
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -4152,7 +4153,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Z
 		if ret == -1 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
 		}
-	} else if PhpCopyFileEx(path, new_path, core.STREAM_DISABLE_OPEN_BASEDIR) == zend.SUCCESS {
+	} else if PhpCopyFileEx(path, new_path, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
 		zend.VCWD_UNLINK(path)
 		successful = 1
 	}
@@ -4161,10 +4162,10 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *zend.Z
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
-	zend.ZVAL_BOOL(return_value, successful != 0)
+	types.ZVAL_BOOL(return_value, successful != 0)
 	return
 }
-func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
+func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
 	switch callback_type {
 	case zend.ZEND_INI_PARSER_ENTRY:
 		if arg2 == nil {
@@ -4179,8 +4180,8 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 		arg2.TryAddRefcount()
 		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), arg2)
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
-		var hash zend.Zval
-		var find_hash *zend.Zval
+		var hash types.Zval
+		var find_hash *types.Zval
 		if arg2 == nil {
 
 			/* bare string - nothing to do */
@@ -4190,7 +4191,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetStr(), nil, nil, 0) == zend.IS_LONG {
+		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetStr(), nil, nil, 0) == types.IS_LONG {
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()))
 			if b.Assign(&find_hash, arr.GetArr().IndexFindH(key)) == nil {
 				zend.ArrayInit(&hash)
@@ -4202,11 +4203,11 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 				find_hash = arr.GetArr().KeyAddNew(arg1.GetStr().GetStr(), &hash)
 			}
 		}
-		if find_hash.GetType() != zend.IS_ARRAY {
+		if find_hash.GetType() != types.IS_ARRAY {
 			zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || arg3.IsType(zend.IS_STRING) && arg3.GetStr().GetLen() == 0 {
+		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.GetStr().GetLen() == 0 {
 			arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {
@@ -4216,13 +4217,13 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 
 	}
 }
-func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
+func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&(BG(active_ini_file_section)))
 		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), &(BG(active_ini_file_section)))
 	} else if arg2 != nil {
-		var active_arr *zend.Zval
-		if BG(active_ini_file_section).u1.v.type_ != zend.IS_UNDEF {
+		var active_arr *types.Zval
+		if BG(active_ini_file_section).u1.v.type_ != types.IS_UNDEF {
 			active_arr = &(BG(active_ini_file_section))
 		} else {
 			active_arr = arr
@@ -4230,10 +4231,10 @@ func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zva
 		PhpSimpleIniParserCb(arg1, arg2, arg3, callback_type, active_arr)
 	}
 }
-func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte = nil
 	var filename_len int = 0
-	var process_sections zend.ZendBool = 0
+	var process_sections types.ZendBool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
 	var fh zend.ZendFileHandle
 	var ini_parser_cb zend.ZendIniParserCbT
@@ -4243,12 +4244,12 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -4337,17 +4338,17 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 
 	fh.InitFilename(filename)
 	zend.ArrayInit(return_value)
-	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
+	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
 		return_value.GetArr().DestroyEx()
 		return_value.SetFalse()
 		return
 	}
 }
-func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var string *byte = nil
 	var str *byte = nil
 	var str_len int = 0
-	var process_sections zend.ZendBool = 0
+	var process_sections types.ZendBool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
 	var ini_parser_cb zend.ZendIniParserCbT
 	for {
@@ -4356,12 +4357,12 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -4450,15 +4451,15 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	memcpy(string, str, str_len)
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
-	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
+	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
 		return_value.GetArr().DestroyEx()
 		return_value.SetFalse()
 	}
 	zend.Efree(string)
 }
-func ZifSysGetloadavg(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSysGetloadavg(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var load []float64
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	if getloadavg(load, 3) == -1 {

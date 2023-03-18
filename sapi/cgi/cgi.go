@@ -3,6 +3,7 @@ package cgi
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 var _ core.ISapiModule = (*CgiModuleType)(nil)
@@ -82,7 +83,7 @@ func (c *CgiModuleType) ReadCookies() (string, bool) {
 	return getenv("HTTP_COOKIE")
 }
 
-func (c *CgiModuleType) RegisterServerVariables(trackVarsArray []zend.Zval) {
+func (c *CgiModuleType) RegisterServerVariables(trackVarsArray []types.Zval) {
 	SapiCgiRegisterVariables(trackVarsArray)
 }
 

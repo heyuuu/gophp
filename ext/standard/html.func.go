@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func LIMIT_ALL(all __auto__, doctype int, charset EntityCharset) {
@@ -38,11 +39,11 @@ func GetDefaultCharset() *byte {
 func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, status *int) uint {
 	var pos int = *cursor
 	var this_char uint = 0
-	*status = zend.SUCCESS
+	*status = types.SUCCESS
 	r.Assert(pos <= str_len)
 	if !(CHECK_LEN(pos, 1)) {
 		*cursor = pos + 1
-		*status = zend.FAILURE
+		*status = types.FAILURE
 		return 0
 	}
 	switch charset {
@@ -60,23 +61,23 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			pos++
 		} else if c < 0xc2 {
 			*cursor = pos + 1
-			*status = zend.FAILURE
+			*status = types.FAILURE
 			return 0
 		} else if c < 0xe0 {
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			if !(Utf8Trail(str[pos+1])) {
 				*cursor = pos + b.Cond(Utf8Lead(str[pos+1]), 1, 2)
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			this_char = (c&0x1f)<<6 | str[pos+1]&0x3f
 			if this_char < 0x80 {
 				*cursor = pos + 2
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -85,26 +86,26 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			if avail < 3 || !(Utf8Trail(str[pos+1])) || !(Utf8Trail(str[pos+2])) {
 				if avail < 2 || Utf8Lead(str[pos+1]) {
 					*cursor = pos + 1
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else if avail < 3 || Utf8Lead(str[pos+2]) {
 					*cursor = pos + 2
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else {
 					*cursor = pos + 3
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				}
 			}
 			this_char = (c&0xf)<<12 | (str[pos+1]&0x3f)<<6 | str[pos+2]&0x3f
 			if this_char < 0x800 {
 				*cursor = pos + 3
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			} else if this_char >= 0xd800 && this_char <= 0xdfff {
 				*cursor = pos + 3
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 3
@@ -113,32 +114,32 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			if avail < 4 || !(Utf8Trail(str[pos+1])) || !(Utf8Trail(str[pos+2])) || !(Utf8Trail(str[pos+3])) {
 				if avail < 2 || Utf8Lead(str[pos+1]) {
 					*cursor = pos + 1
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else if avail < 3 || Utf8Lead(str[pos+2]) {
 					*cursor = pos + 2
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else if avail < 4 || Utf8Lead(str[pos+3]) {
 					*cursor = pos + 3
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else {
 					*cursor = pos + 4
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				}
 			}
 			this_char = (c&0x7)<<18 | (str[pos+1]&0x3f)<<12 | (str[pos+2]&0x3f)<<6 | str[pos+3]&0x3f
 			if this_char < 0x10000 || this_char > 0x10ffff {
 				*cursor = pos + 4
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 4
 		} else {
 			*cursor = pos + 1
-			*status = zend.FAILURE
+			*status = types.FAILURE
 			return 0
 		}
 	case CsBig5:
@@ -150,7 +151,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			var next uint8
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			next = str[pos+1]
@@ -158,7 +159,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				this_char = c<<8 | next
 			} else {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -172,7 +173,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			var next uint8
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			next = str[pos+1]
@@ -180,11 +181,11 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				this_char = c<<8 | next
 			} else if next != 0x80 && next != 0xff {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			} else {
 				*cursor = pos + 2
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -198,7 +199,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			var next uint8
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			next = str[pos+1]
@@ -206,11 +207,11 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				this_char = c<<8 | next
 			} else if Gb2312Lead(next) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			} else {
 				*cursor = pos + 2
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -219,7 +220,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			pos += 1
 		} else {
 			*cursor = pos + 1
-			*status = zend.FAILURE
+			*status = types.FAILURE
 			return 0
 		}
 	case CsSjis:
@@ -228,7 +229,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			var next uint8
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			next = str[pos+1]
@@ -236,11 +237,11 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				this_char = c<<8 | next
 			} else if SjisLead(next) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			} else {
 				*cursor = pos + 2
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -249,7 +250,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			pos += 1
 		} else {
 			*cursor = pos + 1
-			*status = zend.FAILURE
+			*status = types.FAILURE
 			return 0
 		}
 	case CsEucjp:
@@ -258,7 +259,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			var next unsigned
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			next = str[pos+1]
@@ -272,7 +273,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 
 			} else {
 				*cursor = pos + b.Cond(next != 0xa0 && next != 0xff, 1, 2)
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -280,7 +281,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			var next unsigned
 			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			next = str[pos+1]
@@ -294,7 +295,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 
 			} else {
 				*cursor = pos + b.Cond(next != 0xa0 && next != 0xff, 1, 2)
-				*status = zend.FAILURE
+				*status = types.FAILURE
 				return 0
 			}
 			pos += 2
@@ -303,15 +304,15 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			if avail < 3 || !(str[pos+1] >= 0xa1 && str[pos+1] <= 0xfe) || !(str[pos+2] >= 0xa1 && str[pos+2] <= 0xfe) {
 				if avail < 2 || str[pos+1] != 0xa0 && str[pos+1] != 0xff {
 					*cursor = pos + 1
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else if avail < 3 || str[pos+2] != 0xa0 && str[pos+2] != 0xff {
 					*cursor = pos + 2
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				} else {
 					*cursor = pos + 3
-					*status = zend.FAILURE
+					*status = types.FAILURE
 					return 0
 				}
 			} else {
@@ -332,7 +333,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			pos += 1
 		} else {
 			*cursor = pos + 1
-			*status = zend.FAILURE
+			*status = types.FAILURE
 			return 0
 		}
 	default:
@@ -481,7 +482,7 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		/* identity mapping of code points to unicode */
 
 		if code > 0xff {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		*res = code
 	case Cs88595:
@@ -493,11 +494,11 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 			*res = 0xfd
 		} else if code >= 0x401 && code <= 0x44f {
 			if code == 0x40d || code == 0x450 || code == 0x45d {
-				return zend.FAILURE
+				return types.FAILURE
 			}
 			*res = code - 0x360
 		} else {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	case Cs885915:
 		if code < 0xa4 || code > 0xbe && code <= 0xff {
@@ -507,7 +508,7 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 			if found != 0 {
 				*res = found
 			} else {
-				return zend.FAILURE
+				return types.FAILURE
 			}
 		}
 	case CsCp1252:
@@ -518,12 +519,12 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 			if found != 0 {
 				*res = found
 			} else {
-				return zend.FAILURE
+				return types.FAILURE
 			}
 		}
 	case CsMacroman:
 		if code == 0x7f {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 		table = UnimapMacroman
 		table_size = b.SizeOf("unimap_macroman") / b.SizeOf("* unimap_macroman")
@@ -547,7 +548,7 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 			if found != 0 {
 				*res = found
 			} else {
-				return zend.FAILURE
+				return types.FAILURE
 			}
 		}
 	case CsSjis:
@@ -559,11 +560,11 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 
 		if code >= 0x20 && code <= 0x7d {
 			if code == 0x5c {
-				return zend.FAILURE
+				return types.FAILURE
 			}
 			*res = code
 		} else {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	case CsBig5:
 		fallthrough
@@ -573,12 +574,12 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		if code >= 0x20 && code <= 0x7d {
 			*res = code
 		} else {
-			return zend.FAILURE
+			return types.FAILURE
 		}
 	default:
-		return zend.FAILURE
+		return types.FAILURE
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func MapToUnicode(code unsigned, table *EncToUni, res *unsigned) {
 	/* only single byte encodings are currently supported; assumed code <= 0xFF */
@@ -693,7 +694,7 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 	 * we're not interested */
 
 	if hexadecimal != 0 && !(isxdigit(*(*buf))) || hexadecimal == 0 && !(isdigit(*(*buf))) {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	code_l = zend.ZEND_STRTOL(*buf, &endptr, b.Cond(hexadecimal != 0, 16, 10))
 
@@ -701,19 +702,19 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 
 	*buf = endptr
 	if (*(*buf)) != ';' {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 
 	/* many more are invalid, but that depends on whether it's HTML
 	 * (and which version) or XML. */
 
 	if code_l > int64(0x10ffff) {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if code_point != nil {
 		*code_point = unsigned(code_l)
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ProcessNamedEntityHtml(buf **byte, start **byte, length *int) int {
 	*start = *buf
@@ -728,32 +729,32 @@ func ProcessNamedEntityHtml(buf **byte, start **byte, length *int) int {
 		*buf++
 	}
 	if (*(*buf)) != ';' {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 
 	/* cast to size_t OK as the quantity is always non-negative */
 
 	*length = (*buf) - (*start)
 	if (*length) == 0 {
-		return zend.FAILURE
+		return types.FAILURE
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ResolveNamedEntityHtml(start *byte, length int, ht *EntityHt, uni_cp1 *unsigned, uni_cp2 *unsigned) int {
 	var s *EntityCpMap
-	var hash zend.ZendUlong = zend.ZendInlineHashFunc(start, length)
+	var hash zend.ZendUlong = types.ZendInlineHashFunc(start, length)
 	s = ht.GetBuckets()[hash%ht.GetNumElems()]
 	for s.GetEntity() != nil {
 		if s.GetEntityLen() == length {
 			if memcmp(start, s.GetEntity(), length) == 0 {
 				*uni_cp1 = s.GetCodepoint1()
 				*uni_cp2 = s.GetCodepoint2()
-				return zend.SUCCESS
+				return types.SUCCESS
 			}
 		}
 		s++
 	}
-	return zend.FAILURE
+	return types.FAILURE
 }
 func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
 	/* code is not necessarily a unicode code point */
@@ -809,7 +810,7 @@ func TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(oldlen int) int { return oldlen + oldlen/
 func TraverseForEntities(
 	old *byte,
 	oldlen int,
-	ret *zend.ZendString,
+	ret *types.ZendString,
 	all int,
 	flags int,
 	inv_map *EntityHt,
@@ -842,7 +843,7 @@ func TraverseForEntities(
 
 		if p[1] == '#' {
 			next = &p[2]
-			if ProcessNumericEntity(&next, &code) == zend.FAILURE {
+			if ProcessNumericEntity(&next, &code) == types.FAILURE {
 				goto invalid_code
 			}
 
@@ -872,10 +873,10 @@ func TraverseForEntities(
 			var ent_len int
 			next = &p[1]
 			start = next
-			if ProcessNamedEntityHtml(&next, &start, &ent_len) == zend.FAILURE {
+			if ProcessNamedEntityHtml(&next, &start, &ent_len) == types.FAILURE {
 				goto invalid_code
 			}
-			if ResolveNamedEntityHtml(start, ent_len, inv_map, &code, &code2) == zend.FAILURE {
+			if ResolveNamedEntityHtml(start, ent_len, inv_map, &code, &code2) == types.FAILURE {
 				if doctype == ENT_HTML_DOC_XHTML && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's' {
 
 					/* uses html4 inv_map, which doesn't include apos;. This is a
@@ -903,7 +904,7 @@ func TraverseForEntities(
 
 			/* replace unicode code point */
 
-			if MapFromUnicode(code, charset, &code) == zend.FAILURE || code2 != 0 {
+			if MapFromUnicode(code, charset, &code) == types.FAILURE || code2 != 0 {
 				goto invalid_code
 			}
 
@@ -967,8 +968,8 @@ func DetermineEntityTable(all int, doctype int) EntityTableOpt {
 	}
 	return retval
 }
-func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_charset *byte) *zend.ZendString {
-	var ret *zend.ZendString
+func PhpUnescapeHtmlEntities(str *types.ZendString, all int, flags int, hint_charset *byte) *types.ZendString {
+	var ret *types.ZendString
 	var charset EntityCharset
 	var inverse_map *EntityHt
 	var new_size int
@@ -993,7 +994,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 		/* overflow, refuse to do anything */
 
 	}
-	ret = zend.ZendStringAlloc(new_size, 0)
+	ret = types.ZendStringAlloc(new_size, 0)
 	inverse_map = UnescapeInverseMap(all, flags)
 
 	/* replace numeric entities */
@@ -1001,7 +1002,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 	TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
 	return ret
 }
-func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *zend.ZendString {
+func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *types.ZendString {
 	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, 1)
 }
 func FindEntityForChar(
@@ -1030,13 +1031,13 @@ func FindEntityForChar(
 		/* peek at next char */
 
 		var cursor_before int = *cursor
-		var status int = zend.SUCCESS
+		var status int = types.SUCCESS
 		var next_char unsigned
 		if (*cursor) >= oldlen {
 			goto no_suitable_2nd
 		}
 		next_char = GetNextChar(charset, old, oldlen, cursor, &status)
-		if status == zend.FAILURE {
+		if status == types.FAILURE {
 			goto no_suitable_2nd
 		}
 		var s *EntityMulticodepointRow
@@ -1079,12 +1080,12 @@ func PhpEscapeHtmlEntitiesEx(
 	all int,
 	flags int,
 	hint_charset string,
-	double_encode zend.ZendBool,
-) *zend.ZendString {
+	double_encode types.ZendBool,
+) *types.ZendString {
 	var cursor int
 	var maxlen int
 	var len_ int
-	var replaced *zend.ZendString
+	var replaced *types.ZendString
 	var charset EntityCharset = DetermineCharset(hint_charset)
 	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	var entity_table EntityTableOpt
@@ -1133,24 +1134,24 @@ func PhpEscapeHtmlEntitiesEx(
 	} else {
 		maxlen = zend.ZendSafeAddmult(oldlen, 2, 0, "html_entities")
 	}
-	replaced = zend.ZendStringAlloc(maxlen, 0)
+	replaced = types.ZendStringAlloc(maxlen, 0)
 	len_ = 0
 	cursor = 0
 	for cursor < oldlen {
 		var mbsequence *uint8 = nil
 		var mbseqlen int = 0
 		var cursor_before int = cursor
-		var status int = zend.SUCCESS
+		var status int = types.SUCCESS
 		var this_char uint = GetNextChar(charset, old, oldlen, &cursor, &status)
 
 		/* guarantee we have at least 40 bytes to write.
 		 * In HTML5, entities may take up to 33 bytes */
 
 		if len_ > maxlen-40 {
-			replaced = zend.ZendStringSafeRealloc(replaced, maxlen, 1, 128, 0)
+			replaced = types.ZendStringSafeRealloc(replaced, maxlen, 1, 128, 0)
 			maxlen += 128
 		}
-		if status == zend.FAILURE {
+		if status == types.FAILURE {
 
 			/* invalid MB sequence */
 
@@ -1161,8 +1162,8 @@ func PhpEscapeHtmlEntitiesEx(
 				len_ += replacement_len
 				continue
 			} else {
-				zend.ZendStringEfree(replaced)
-				return zend.ZSTR_EMPTY_ALLOC()
+				types.ZendStringEfree(replaced)
+				return types.ZSTR_EMPTY_ALLOC()
 			}
 
 			/* invalid MB sequence */
@@ -1274,7 +1275,7 @@ func PhpEscapeHtmlEntitiesEx(
 					var valid int
 					var pos *byte = (*byte)(&old[cursor+1])
 					valid = ProcessNumericEntity((**byte)(&pos), &code_point)
-					if valid == zend.FAILURE {
+					if valid == types.FAILURE {
 						goto encode_amp
 					}
 					if (flags & ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS) != 0 {
@@ -1291,10 +1292,10 @@ func PhpEscapeHtmlEntitiesEx(
 					var next *byte = start
 					var dummy1 unsigned
 					var dummy2 unsigned
-					if ProcessNamedEntityHtml(&next, &start, &ent_len) == zend.FAILURE {
+					if ProcessNamedEntityHtml(&next, &start, &ent_len) == types.FAILURE {
 						goto encode_amp
 					}
-					if ResolveNamedEntityHtml(start, ent_len, inv_map, &dummy1, &dummy2) == zend.FAILURE {
+					if ResolveNamedEntityHtml(start, ent_len, inv_map, &dummy1, &dummy2) == types.FAILURE {
 						if !(doctype == ENT_HTML_DOC_XHTML && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's') {
 
 							/* uses html4 inv_map, which doesn't include apos;. This is a
@@ -1315,7 +1316,7 @@ func PhpEscapeHtmlEntitiesEx(
 
 					/* ent_len < oldlen, which is certainly <= SIZE_MAX/2 */
 
-					replaced = zend.ZendStringSafeRealloc(replaced, maxlen, 1, ent_len+128, 0)
+					replaced = types.ZendStringSafeRealloc(replaced, maxlen, 1, ent_len+128, 0)
 					maxlen += ent_len + 128
 				}
 				replaced.GetVal()[b.PostInc(&len_)] = '&'
@@ -1330,25 +1331,25 @@ func PhpEscapeHtmlEntitiesEx(
 	replaced.SetLen(len_)
 	return replaced
 }
-func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *zend.Zval, all int) {
-	var str *zend.ZendString
-	var hint_charset *zend.ZendString = nil
+func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval, all int) {
+	var str *types.ZendString
+	var hint_charset *types.ZendString = nil
 	var default_charset *byte
 	var flags zend.ZendLong = ENT_COMPAT
-	var replaced *zend.ZendString
-	var double_encode zend.ZendBool = 1
+	var replaced *types.ZendString
+	var double_encode types.ZendBool = 1
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 4
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1443,25 +1444,25 @@ func RegisterHtmlConstants(type_ int, module_number int) {
 	zend.REGISTER_LONG_CONSTANT("ENT_XHTML", ENT_XHTML, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_LONG_CONSTANT("ENT_HTML5", ENT_HTML5, zend.CONST_PERSISTENT|zend.CONST_CS)
 }
-func ZifHtmlspecialchars(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHtmlspecialchars(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 0)
 }
-func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var str *zend.ZendString
+func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var str *types.ZendString
 	var quote_style zend.ZendLong = ENT_COMPAT
-	var replaced *zend.ZendString
+	var replaced *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1532,24 +1533,24 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 	return_value.SetFalse()
 	return
 }
-func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var str *zend.ZendString
-	var hint_charset *zend.ZendString = nil
+func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var str *types.ZendString
+	var hint_charset *types.ZendString = nil
 	var default_charset *byte
 	var quote_style zend.ZendLong = ENT_COMPAT
-	var replaced *zend.ZendString
+	var replaced *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -1629,10 +1630,10 @@ func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *zend.Z
 	return_value.SetFalse()
 	return
 }
-func ZifHtmlentities(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHtmlentities(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 1)
 }
-func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset, arr *zend.Zval) {
+func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset, arr *types.Zval) {
 	var key []byte = ""
 	var entity []byte = []byte{'&'}
 	var written_k1 int
@@ -1661,7 +1662,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 			uni_cp = mcpr[i].GetSecondCp()
 			l = mcpr[i].GetEntityLen()
 			if !(CHARSET_UNICODE_COMPAT(charset)) {
-				if MapFromUnicode(uni_cp, charset, &spe_cp) == zend.FAILURE {
+				if MapFromUnicode(uni_cp, charset, &spe_cp) == types.FAILURE {
 					continue
 				}
 			} else {
@@ -1674,7 +1675,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 		}
 	}
 }
-func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var all zend.ZendLong = HTML_SPECIALCHARS
 	var flags zend.ZendLong = ENT_COMPAT
 	var doctype int
@@ -1694,12 +1695,12 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpIptcPut1(fp *r.FILE, spool int, c uint8, spoolbuf **uint8) int {
@@ -89,7 +90,7 @@ func PhpIptcNextMarker(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	}
 	return uint(c)
 }
-func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var iptcdata *byte
 	var jpeg_file *byte
 	var iptcdata_len int
@@ -99,22 +100,22 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var marker uint
 	var done uint = 0
 	var inx int
-	var spoolbuf *zend.ZendString = nil
+	var spoolbuf *types.ZendString = nil
 	var poi *uint8 = nil
 	var sb zend.ZendStatT
-	var written zend.ZendBool = 0
+	var written types.ZendBool = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -202,14 +203,14 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		spoolbuf = zend.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
+		spoolbuf = types.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
 		poi = (*uint8)(spoolbuf.GetVal())
 		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
 	}
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xff {
 		r.Fclose(fp)
 		if spoolbuf != nil {
-			zend.ZendStringEfree(spoolbuf)
+			types.ZendStringEfree(spoolbuf)
 		}
 		return_value.SetFalse()
 		return
@@ -217,7 +218,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xd8 {
 		r.Fclose(fp)
 		if spoolbuf != nil {
-			zend.ZendStringEfree(spoolbuf)
+			types.ZendStringEfree(spoolbuf)
 		}
 		return_value.SetFalse()
 		return
@@ -277,7 +278,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	r.Fclose(fp)
 	if spool < 2 {
-		spoolbuf = zend.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()), 0)
+		spoolbuf = types.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()), 0)
 		return_value.SetString(spoolbuf)
 		return
 	} else {
@@ -285,7 +286,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var inx int = 0
 	var len_ int
 	var tagsfound uint = 0
@@ -295,20 +296,20 @@ func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var key []*byte
 	var str_len int
-	var values zend.Zval
-	var element *zend.Zval
+	var values types.Zval
+	var element *types.Zval
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

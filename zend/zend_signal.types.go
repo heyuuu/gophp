@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendSignalEntryT
  */
@@ -89,7 +91,7 @@ type ZendSignalGlobalsT struct {
 	running  int
 	active   int
 	check    bool
-	reset    ZendBool
+	reset    types.ZendBool
 	handlers []ZendSignalEntryT
 	pstorage []ZendSignalQueueT
 	phead    *ZendSignalQueueT
@@ -97,8 +99,8 @@ type ZendSignalGlobalsT struct {
 	pavail   *ZendSignalQueueT
 }
 
-func (this *ZendSignalGlobalsT) GetCheck() ZendBool                { return intBool(this.check) }
-func (this *ZendSignalGlobalsT) SetReset(value ZendBool)           { this.reset = value }
+func (this *ZendSignalGlobalsT) GetCheck() types.ZendBool          { return types.intBool(this.check) }
+func (this *ZendSignalGlobalsT) SetReset(value types.ZendBool)     { this.reset = value }
 func (this *ZendSignalGlobalsT) GetPstorage() []ZendSignalQueueT   { return this.pstorage }
 func (this *ZendSignalGlobalsT) GetPavail() *ZendSignalQueueT      { return this.pavail }
 func (this *ZendSignalGlobalsT) SetPavail(value *ZendSignalQueueT) { this.pavail = value }

@@ -4,14 +4,15 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/types"
 )
 
-func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
+func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *ZendOpArray {
 	var new_op_array *ZendOpArray = nil
-	var tmp_inc_filename Zval
+	var tmp_inc_filename types.Zval
 	tmp_inc_filename.SetUndef()
-	if inc_filename.GetType() != IS_STRING {
-		var tmp *ZendString = ZvalTryGetStringFunc(inc_filename)
+	if inc_filename.GetType() != types.IS_STRING {
+		var tmp *types.ZendString = ZvalTryGetStringFunc(inc_filename)
 		if tmp == nil {
 			return nil
 		}
@@ -37,14 +38,14 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		} else {
 			*resolved_path = inc_filename.GetStr().GetStr()
 		}
-		if SUCCESS == ZendStreamOpen(*resolved_path, &file_handle) {
+		if types.SUCCESS == ZendStreamOpen(*resolved_path, &file_handle) {
 			if file_handle.GetOpenedPath() == nil {
 				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
 			if ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
-				if tmp_inc_filename.GetType() != IS_UNDEF {
+				if tmp_inc_filename.GetType() != types.IS_UNDEF {
 					ZvalPtrDtorStr(&tmp_inc_filename)
 				}
 				return op_array
@@ -71,21 +72,21 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 	default:
 
 	}
-	if tmp_inc_filename.GetType() != IS_UNDEF {
+	if tmp_inc_filename.GetType() != types.IS_UNDEF {
 		ZvalPtrDtorStr(&tmp_inc_filename)
 	}
 	return new_op_array
 }
-func ZendDoFcallOverloaded(call *ZendExecuteData, ret *Zval) int {
+func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	var fbc *ZendFunction = call.GetFunc()
-	var object *ZendObject
+	var object *types.ZendObject
 
 	/* Not sure what should be done here if it's a static method */
 
-	if call.GetThis().GetType() != IS_OBJECT {
+	if call.GetThis().GetType() != types.IS_OBJECT {
 		ZendVmStackFreeArgs(call)
 		if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
-			ZendStringReleaseEx(fbc.GetFunctionName(), 0)
+			types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
 		}
 		Efree(fbc)
 		ZendVmStackFreeCallFrame(call)
@@ -99,15 +100,15 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *Zval) int {
 	EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 	ZendVmStackFreeArgs(call)
 	if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
-		ZendStringReleaseEx(fbc.GetFunctionName(), 0)
+		types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
 	}
 	Efree(fbc)
 	return 1
 }
-func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) ZendBool {
-	var ce *ZendClassEntry = Z_OBJCE_P(array_ptr)
+func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) types.ZendBool {
+	var ce *ZendClassEntry = types.Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
-	var is_empty ZendBool
+	var is_empty types.ZendBool
 	if iter == nil || EG__().GetException() != nil {
 		if iter != nil {
 			OBJ_RELEASE(iter.GetStd())
@@ -127,7 +128,7 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, executeDat
 			return 1
 		}
 	}
-	is_empty = iter.GetFuncs().GetValid()(iter) != SUCCESS
+	is_empty = iter.GetFuncs().GetValid()(iter) != types.SUCCESS
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(iter.GetStd())
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
@@ -138,9 +139,9 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, executeDat
 	EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
-func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
-	var zv *Zval
-	var orig_key *Zval = key
+func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
+	var zv *types.Zval
+	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
 	zv = EG__().GetZendConstants().KeyFind(key.GetStr().GetStr())
 	if zv != nil {
@@ -184,17 +185,17 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			}
 		}
-		return FAILURE
+		return types.FAILURE
 	}
 	if check_defined_only == 0 {
-		ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.GetValue())
+		types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.GetValue())
 		if (ZEND_CONSTANT_FLAGS(c) & (CONST_CS | CONST_CT_SUBST)) == 0 {
 			var ns_sep *byte
 			var shortname_offset int
 			var shortname_len int
-			var is_deprecated ZendBool
+			var is_deprecated types.ZendBool
 			if (flags & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var access_key *Zval
+				var access_key *types.Zval
 				if (flags & IS_CONSTANT_IN_NAMESPACE) == 0 {
 					access_key = orig_key - 1
 				} else {
@@ -204,7 +205,7 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 						access_key = orig_key + 2
 					}
 				}
-				is_deprecated = !(ZendStringEquals(c.GetName(), access_key.GetStr()))
+				is_deprecated = !(types.ZendStringEquals(c.GetName(), access_key.GetStr()))
 			} else {
 			check_short_name:
 
@@ -222,17 +223,17 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 			}
 			if is_deprecated != 0 {
 				ZendError(E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
-				return SUCCESS
+				return types.SUCCESS
 			}
 		}
 	}
 	CACHE_PTR(opline.GetExtendedValue(), c)
-	return SUCCESS
+	return types.SUCCESS
 }
-func ZendQuickGetConstant(key *Zval, flags uint32, opline *ZendOp, executeData *ZendExecuteData) {
+func ZendQuickGetConstant(key *types.Zval, flags uint32, opline *ZendOp, executeData *ZendExecuteData) {
 	_zendQuickGetConstant(key, flags, 0, opline, executeData)
 }
-func ZendQuickCheckConstant(key *Zval, opline *ZendOp, executeData *ZendExecuteData) int {
+func ZendQuickCheckConstant(key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) int {
 	return _zendQuickGetConstant(key, 0, 1, opline, executeData)
 }
 func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION() {
@@ -360,7 +361,7 @@ func UNDEF_RESULT() {
 		EX_VAR(opline.result.var_).SetUndef()
 	}
 }
-func ZendSetUserOpcodeHandler(opcode ZendUchar, handler UserOpcodeHandlerT) int {
+func ZendSetUserOpcodeHandler(opcode types.ZendUchar, handler UserOpcodeHandlerT) int {
 	if opcode != ZEND_USER_OPCODE {
 		if handler == nil {
 
@@ -374,11 +375,11 @@ func ZendSetUserOpcodeHandler(opcode ZendUchar, handler UserOpcodeHandlerT) int 
 			ZendUserOpcodes[opcode] = ZEND_USER_OPCODE
 		}
 		ZendUserOpcodeHandlers[opcode] = handler
-		return SUCCESS
+		return types.SUCCESS
 	}
-	return FAILURE
+	return types.FAILURE
 }
-func ZendGetUserOpcodeHandler(opcode ZendUchar) UserOpcodeHandlerT {
+func ZendGetUserOpcodeHandler(opcode types.ZendUchar) UserOpcodeHandlerT {
 	return ZendUserOpcodeHandlers[opcode]
 }
 func ZendGetZvalPtr(
@@ -388,8 +389,8 @@ func ZendGetZvalPtr(
 	executeData *ZendExecuteData,
 	should_free *ZendFreeOp,
 	type_ int,
-) *Zval {
-	var ret *Zval
+) *types.Zval {
+	var ret *types.Zval
 	switch op_type {
 	case IS_CONST:
 		ret = RT_CONSTANT(opline, *node)

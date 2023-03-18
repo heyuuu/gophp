@@ -4,6 +4,7 @@ package zend
 
 import (
 	r "sik/runtime"
+	"sik/zend/types"
 )
 
 const ZEND_VERSION = "3.4.0"
@@ -57,9 +58,9 @@ const PRINT_ZVAL_INDENT = 4
 var ZendStandardClassDef *ZendClassEntry = nil
 var ZendPostStartupCb func() int = nil
 var ZendPostShutdownCb func() = nil
-var ZendPreloadAutoload func(filename *ZendString) int = nil
+var ZendPreloadAutoload func(filename *types.ZendString) int = nil
 var ZendMessageDispatcherP func(message ZendLong, data any)
-var ZendGetConfigurationDirectiveP func(name string) *Zval
+var ZendGetConfigurationDirectiveP func(name string) *types.Zval
 
 const SIGNAL_CHECK_DEFAULT = "0"
 
@@ -75,7 +76,7 @@ var IniEntries = []ZendIniEntryDef{
 	*NewZendIniEntryDef("zend.exception_ignore_args", ZEND_INI_ALL).Value("0").
 		Displayer(ZendIniBooleanDisplayerCb).
 		OnModify(func(entry *ZendIniEntry, new_value *string, stage int) bool {
-			EG__().exception_ignore_args = intBool(ZendIniStringParseBool(*new_value))
+			EG__().exception_ignore_args = types.intBool(ZendIniStringParseBool(*new_value))
 			return true
 		}),
 }

@@ -7,18 +7,19 @@ import (
 	"sik/core/streams"
 	r "sik/runtime"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStreamAllocRel(ops *PhpStreamOps, thisptr any, persistent *byte, mode string) *PhpStream {
 	return _phpStreamAlloc(ops, thisptr, persistent, mode)
 }
-func PhpStreamCopyToMemRel(src *PhpStream, maxlen int, persistent __auto__) *zend.ZendString {
+func PhpStreamCopyToMemRel(src *PhpStream, maxlen int, persistent __auto__) *types.ZendString {
 	return _phpStreamCopyToMem(src, buf, maxlen, persistent)
 }
-func PhpStreamFopenRel(filename *byte, mode *byte, opened **zend.ZendString, options int) *PhpStream {
+func PhpStreamFopenRel(filename *byte, mode *byte, opened **types.ZendString, options int) *PhpStream {
 	return streams._phpStreamFopen(filename, mode, opened, options)
 }
-func PhpStreamFopenWithPathRel(filename *byte, mode *byte, path *byte, opened **zend.ZendString, options int) *PhpStream {
+func PhpStreamFopenWithPathRel(filename *byte, mode *byte, path *byte, opened **types.ZendString, options int) *PhpStream {
 	return streams._phpStreamFopenWithPath(filename, mode, path, opened, options)
 }
 func PhpStreamFopenFromFdRel(fd int, mode *byte, persistent_id *byte) *PhpStream {
@@ -30,13 +31,13 @@ func PhpStreamFopenFromFileRel(file *r.FILE, mode *byte) *PhpStream {
 func PhpStreamFopenFromPipeRel(file *r.FILE, mode *byte) *PhpStream {
 	return streams._phpStreamFopenFromPipe(file, mode)
 }
-func PhpStreamFopenTemporaryFileRel(dir *byte, pfx *byte, opened_path **zend.ZendString) *PhpStream {
+func PhpStreamFopenTemporaryFileRel(dir *byte, pfx *byte, opened_path **types.ZendString) *PhpStream {
 	return streams._phpStreamFopenTemporaryFile(dir, pfx, opened_path)
 }
-func PhpStreamOpenWrapperRel(path *byte, mode string, options int, opened **zend.ZendString) *PhpStream {
+func PhpStreamOpenWrapperRel(path *byte, mode string, options int, opened **types.ZendString) *PhpStream {
 	return _phpStreamOpenWrapperEx(path, mode, options, opened, nil)
 }
-func PhpStreamOpenWrapperExRel(path *byte, mode *byte, options int, opened **zend.ZendString, context *PhpStreamContext) *PhpStream {
+func PhpStreamOpenWrapperExRel(path *byte, mode *byte, options int, opened **types.ZendString, context *PhpStreamContext) *PhpStream {
 	return _phpStreamOpenWrapperEx(path, mode, options, opened, context)
 }
 func PhpStreamMakeSeekableRel(origstream *PhpStream, newstream **PhpStream, flags int) int {
@@ -52,17 +53,17 @@ func PhpStreamGetResourceId(stream __auto__) int {
 	return (*PhpStream)(stream).GetRes().GetHandle()
 }
 func PhpStreamAutoCleanup(stream *PhpStream) { stream.SetExposed(1) }
-func PhpStreamToZval(stream *PhpStream, zval *zend.Zval) {
+func PhpStreamToZval(stream *PhpStream, zval *types.Zval) {
 	zval.SetResource(stream.GetRes())
 	stream.SetExposed(1)
 }
-func PhpStreamFromZval(xstr *PhpStream, pzval *zend.Zval) {
+func PhpStreamFromZval(xstr *PhpStream, pzval *types.Zval) {
 	if b.Assign(&xstr, (*PhpStream)(zend.ZendFetchResource2Ex(pzval, "stream", PhpFileLeStream(), PhpFileLePstream()))) == nil {
 		return_value.SetFalse()
 		return
 	}
 }
-func PhpStreamFromRes(xstr *PhpStream, res *zend.ZendResource) {
+func PhpStreamFromRes(xstr *PhpStream, res *types.ZendResource) {
 	if b.Assign(&xstr, (*PhpStream)(zend.ZendFetchResource2(res, "stream", PhpFileLeStream(), PhpFileLePstream()))) == nil {
 		return_value.SetFalse()
 		return
@@ -72,7 +73,7 @@ func PhpStreamFromResNoVerify(xstr *PhpStream, pzval __auto__) *PhpStream {
 	xstr = (*PhpStream)(zend.ZendFetchResource2(res, "stream", PhpFileLeStream(), PhpFileLePstream()))
 	return xstr
 }
-func PhpStreamFromZvalNoVerify(xstr *PhpStream, pzval *zend.Zval) *PhpStream {
+func PhpStreamFromZvalNoVerify(xstr *PhpStream, pzval *types.Zval) *PhpStream {
 	xstr = (*PhpStream)(zend.ZendFetchResource2Ex(pzval, "stream", PhpFileLeStream(), PhpFileLePstream()))
 	return xstr
 }
@@ -139,7 +140,7 @@ func PhpStreamReaddir(dirstream *PhpStream, dirent PhpStreamDirent) *PhpStreamDi
 }
 func PhpStreamClosedir(dirstream *PhpStream) int  { return PhpStreamClose(dirstream) }
 func PhpStreamRewinddir(dirstream *PhpStream) int { return PhpStreamRewind(dirstream) }
-func PhpStreamScandir(dirname *byte, namelist ***zend.ZendString, context *PhpStreamContext, compare any) int {
+func PhpStreamScandir(dirname *byte, namelist ***types.ZendString, context *PhpStreamContext, compare any) int {
 	return _phpStreamScandir(dirname, namelist, 0, context, compare)
 }
 func PhpStreamSetOption(stream *PhpStream, option int, value int, ptrvalue any) int {
@@ -168,7 +169,7 @@ func PhpStreamTruncateSupported(stream *PhpStream) int {
 func PhpStreamTruncateSetSize(stream *PhpStream, size zend.ZendLong) int {
 	return _phpStreamTruncateSetSize(stream, size)
 }
-func PhpStreamPopulateMetaData(stream *PhpStream, zv *zend.Zval) int {
+func PhpStreamPopulateMetaData(stream *PhpStream, zv *types.Zval) int {
 	if _phpStreamSetOption(stream, PHP_STREAM_OPTION_META_DATA_API, 0, zv) == PHP_STREAM_OPTION_RETURN_OK {
 		return 1
 	} else {
@@ -181,7 +182,7 @@ func PhpStreamCopyToStream(src *PhpStream, dest *PhpStream, maxlen int) int {
 func PhpStreamCopyToStreamEx(src *PhpStream, dest *PhpStream, maxlen zend.ZendLong, len_ *int) int {
 	return _phpStreamCopyToStreamEx(src, dest, maxlen, len_)
 }
-func PhpStreamCopyToMem(src *PhpStream, maxlen zend.ZendLong, persistent int) *zend.ZendString {
+func PhpStreamCopyToMem(src *PhpStream, maxlen zend.ZendLong, persistent int) *types.ZendString {
 	return _phpStreamCopyToMem(src, maxlen, persistent)
 }
 func PhpStreamPassthru(stream *PhpStream) ssize_t { return _phpStreamPassthru(stream) }
@@ -193,16 +194,16 @@ func PhpStreamCast(stream *PhpStream, as int, ret *any, show_err int) int {
 }
 func PhpStreamIs(stream *PhpStream, anops *PhpStreamOps) bool { return stream.GetOps() == anops }
 func PhpStreamIsPersistent(stream *PhpStream) uint8           { return stream.GetIsPersistent() }
-func PhpStreamOpenWrapper(path *byte, mode string, options int, opened **zend.ZendString) *PhpStream {
+func PhpStreamOpenWrapper(path *byte, mode string, options int, opened **types.ZendString) *PhpStream {
 	return _phpStreamOpenWrapperEx(path, mode, options, opened, nil)
 }
-func PhpStreamOpenWrapperEx(path string, mode string, options int, opened **zend.ZendString, context *PhpStreamContext) *PhpStream {
+func PhpStreamOpenWrapperEx(path string, mode string, options int, opened **types.ZendString, context *PhpStreamContext) *PhpStream {
 	return _phpStreamOpenWrapperEx(path, mode, options, opened, context)
 }
 func PhpStreamMakeSeekable(origstream *PhpStream, newstream **PhpStream, flags int) int {
 	return _phpStreamMakeSeekable(origstream, newstream, flags)
 }
-func PhpStreamGetUrlStreamWrappersHash() *zend.HashTable {
+func PhpStreamGetUrlStreamWrappersHash() *types.HashTable {
 	return _phpStreamGetUrlStreamWrappersHash()
 }
-func PhpGetStreamFiltersHash() *zend.HashTable { return _phpGetStreamFiltersHash() }
+func PhpGetStreamFiltersHash() *types.HashTable { return _phpGetStreamFiltersHash() }

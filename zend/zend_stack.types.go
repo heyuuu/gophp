@@ -1,5 +1,7 @@
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendStack
  */
@@ -83,7 +85,7 @@ func (this *ZendStack[T]) ApplyWithArgument(type_ int, apply_function func(eleme
 	}
 }
 
-func (this *ZendStack[T]) Clean(func_ func(any), free_elements ZendBool) {
+func (this *ZendStack[T]) Clean(func_ func(any), free_elements types.ZendBool) {
 	if func_ != nil {
 		for _, element := range this.elements {
 			func_(element)

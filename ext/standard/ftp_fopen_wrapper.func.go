@@ -9,6 +9,7 @@ import (
 	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func GET_FTP_RESULT(stream *core.PhpStream) int {
@@ -57,7 +58,7 @@ func PhpFtpFopenConnect(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 	preuseid **core.PhpStream,
 	presource **PhpUrl,
@@ -380,7 +381,7 @@ func PhpStreamUrlWrapFtp(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream = nil
@@ -395,12 +396,12 @@ func PhpStreamUrlWrapFtp(
 	var use_ssl_on_data int = 0
 	var reuseid *core.PhpStream = nil
 	var file_size int = 0
-	var tmpzval *zend.Zval
-	var allow_overwrite zend.ZendBool = 0
+	var tmpzval *types.Zval
+	var allow_overwrite types.ZendBool = 0
 	var read_write int8_t = 0
 	var transport *byte
 	var transport_len int
-	var error_message *zend.ZendString = nil
+	var error_message *types.ZendString = nil
 	tmp_line[0] = '0'
 	if strpbrk(mode, "r+") {
 		read_write = 1
@@ -521,7 +522,7 @@ func PhpStreamUrlWrapFtp(
 
 		/* set resume position if applicable */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(zend.IS_LONG) && tmpzval.GetLval() > 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.GetLval() > 0 {
 			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.GetLval())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
@@ -606,7 +607,7 @@ errexit:
 	}
 	if error_message != nil {
 		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", error_message.GetVal())
-		zend.ZendStringRelease(error_message)
+		types.ZendStringRelease(error_message)
 	}
 	return nil
 }
@@ -614,7 +615,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ent *core.PhpStreamDirent = (*core.PhpStreamDirent)(buf)
 	var innerstream *core.PhpStream
 	var tmp_len int
-	var basename *zend.ZendString
+	var basename *types.ZendString
 	innerstream = (*PhpFtpDirstreamData)(stream.GetAbstract()).GetDatastream()
 	if count != b.SizeOf("php_stream_dirent") {
 		return -1
@@ -629,7 +630,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), basename.GetLen()-1)
 	memcpy(ent.GetDName(), basename.GetVal(), tmp_len)
 	ent.GetDName()[tmp_len-1] = '0'
-	zend.ZendStringReleaseEx(basename, 0)
+	types.ZendStringReleaseEx(basename, 0)
 
 	/* Trim off trailing whitespace characters */
 
@@ -661,7 +662,7 @@ func PhpStreamFtpOpendir(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **zend.ZendString,
+	opened_path **types.ZendString,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream
@@ -917,7 +918,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	   (or a 21/0 0/21 combination which is also "same")
 	  Also require paths to/from */
 
-	if resource_from == nil || resource_to == nil || resource_from.GetScheme() == nil || resource_to.GetScheme() == nil || zend.ZendStringEquals(resource_from.GetScheme(), resource_to.GetScheme()) == 0 || resource_from.GetHost() == nil || resource_to.GetHost() == nil || zend.ZendStringEquals(resource_from.GetHost(), resource_to.GetHost()) == 0 || resource_from.GetPort() != resource_to.GetPort() && resource_from.GetPort()*resource_to.GetPort() != 0 && resource_from.GetPort()+resource_to.GetPort() != 21 || resource_from.GetPath() == nil || resource_to.GetPath() == nil {
+	if resource_from == nil || resource_to == nil || resource_from.GetScheme() == nil || resource_to.GetScheme() == nil || types.ZendStringEquals(resource_from.GetScheme(), resource_to.GetScheme()) == 0 || resource_from.GetHost() == nil || resource_to.GetHost() == nil || types.ZendStringEquals(resource_from.GetHost(), resource_to.GetHost()) == 0 || resource_from.GetPort() != resource_to.GetPort() && resource_from.GetPort()*resource_to.GetPort() != 0 && resource_from.GetPort()+resource_to.GetPort() != 21 || resource_from.GetPath() == nil || resource_to.GetPath() == nil {
 		goto rename_errexit
 	}
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)

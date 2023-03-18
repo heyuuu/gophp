@@ -6,13 +6,14 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 var Act __struct__sigaction
 var OldTerm __struct__sigaction
 var OldQuit __struct__sigaction
 var OldInt __struct__sigaction
-var PhpPhpImportEnvironmentVariables func(array_ptr *zend.Zval)
+var PhpPhpImportEnvironmentVariables func(array_ptr *types.Zval)
 
 /* these globals used for forking children on unix systems */
 

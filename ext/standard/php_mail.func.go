@@ -5,13 +5,14 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
-func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *zend.ZendString, val *zend.Zval) {
+func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.ZendString, val *types.Zval) {
 	for {
-		if val.IsType(zend.IS_STRING) {
+		if val.IsType(types.IS_STRING) {
 			PhpMailBuildHeadersElem(&s, key, val)
-		} else if val.IsType(zend.IS_ARRAY) {
+		} else if val.IsType(types.IS_ARRAY) {
 			if !(strncasecmp(target, key.GetVal(), key.GetLen())) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "'%s' header must be at most one header. Array is passed for '%s'", target, target)
 				continue
@@ -23,10 +24,10 @@ func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *zend.ZendS
 		break
 	}
 }
-func PHP_MAIL_BUILD_HEADER_DEFAULT(s zend.SmartStr, key *zend.ZendString, val *zend.Zval) {
-	if val.IsType(zend.IS_STRING) {
+func PHP_MAIL_BUILD_HEADER_DEFAULT(s zend.SmartStr, key *types.ZendString, val *types.Zval) {
+	if val.IsType(types.IS_STRING) {
 		PhpMailBuildHeadersElem(&s, key, val)
-	} else if val.IsType(zend.IS_ARRAY) {
+	} else if val.IsType(types.IS_ARRAY) {
 		PhpMailBuildHeadersElems(&s, key, val)
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header element '%s' cannot be other than string or array.", key.GetVal())

@@ -6,6 +6,7 @@ import (
 	"bytes"
 	b "sik/builtin"
 	r "sik/runtime"
+	"sik/zend/types"
 )
 
 /**
@@ -234,9 +235,9 @@ func (this *ZendFileHandle) SetStream(stream ZendStream) {
 
 func (this *ZendFileHandle) GetFilenameStr() string { return b.CastStrAuto(this.filename) }
 
-func (this *ZendFileHandle) GetFilename() *byte              { return this.filename }
-func (this *ZendFileHandle) SetFilename(value *byte)         { this.filename = value }
-func (this *ZendFileHandle) GetOpenedPath() *ZendString      { return this.openedPath }
-func (this *ZendFileHandle) SetOpenedPath(value *ZendString) { this.openedPath = value }
-func (this *ZendFileHandle) GetType() ZendStreamType         { return this.type_ }
-func (this *ZendFileHandle) SetType(value ZendStreamType)    { this.type_ = value }
+func (this *ZendFileHandle) GetFilename() *byte                    { return this.filename }
+func (this *ZendFileHandle) SetFilename(value *byte)               { this.filename = value }
+func (this *ZendFileHandle) GetOpenedPath() *types.ZendString      { return this.openedPath }
+func (this *ZendFileHandle) SetOpenedPath(value *types.ZendString) { this.openedPath = value }
+func (this *ZendFileHandle) GetType() ZendStreamType               { return this.type_ }
+func (this *ZendFileHandle) SetType(value ZendStreamType)          { this.type_ = value }

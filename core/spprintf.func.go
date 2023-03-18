@@ -5,6 +5,7 @@ package core
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func INS_STRING(xbuf *zend.SmartStr, str *byte, len_ int) {
@@ -19,8 +20,8 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 	var s *byte = nil
 	var s_len int
 	var free_zcopy int
-	var zvp *zend.Zval
-	var zcopy zend.Zval
+	var zvp *types.Zval
+	var zcopy types.Zval
 	var min_width int = 0
 	var precision int = 0
 	var adjust int
@@ -207,7 +208,7 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 
 			switch *fmt {
 			case 'Z':
-				zvp = (*zend.Zval)(__va_arg(ap, (*zend.Zval)(_)))
+				zvp = (*types.Zval)(__va_arg(ap, (*types.Zval)(_)))
 				free_zcopy = zend.ZendMakePrintableZval(zvp, &zcopy)
 				if free_zcopy != 0 {
 					zvp = &zcopy

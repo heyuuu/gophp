@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStatpage() {
@@ -30,9 +31,9 @@ func PhpGetgid() zend.ZendLong {
 	PhpStatpage()
 	return BG(page_gid)
 }
-func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var uid zend.ZendLong
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	uid = PhpGetuid()
@@ -44,9 +45,9 @@ func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetmygid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmygid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var gid zend.ZendLong
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	gid = PhpGetgid()
@@ -58,9 +59,9 @@ func ZifGetmygid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetmypid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmypid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var pid zend.ZendLong
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	pid = getpid()
@@ -72,8 +73,8 @@ func ZifGetmypid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetmyinode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifGetmyinode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	PhpStatpage()
@@ -89,9 +90,9 @@ func PhpGetlastmod() int64 {
 	PhpStatpage()
 	return BG(page_mtime)
 }
-func ZifGetlastmod(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetlastmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var lm zend.ZendLong
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	lm = PhpGetlastmod()

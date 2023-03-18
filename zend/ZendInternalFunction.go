@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendInternalFunction
  */
@@ -10,10 +12,10 @@ const ZEND_MAX_RESERVED_RESOURCES = 6
 var _ IFunction = (*ZendInternalFunction)(nil)
 
 type ZendInternalFunction struct {
-	type_             ZendUchar
-	arg_flags         []ZendUchar
+	type_             types.ZendUchar
+	arg_flags         []types.ZendUchar
 	fn_flags          uint32
-	function_name     *ZendString
+	function_name     *types.ZendString
 	scope             *ZendClassEntry
 	prototype         *ZendFunction
 	num_args          uint32
@@ -30,7 +32,7 @@ func NewInternalFunction() *ZendInternalFunction {
 
 func NewInternalFunctionEx(funcName string, handler ZifHandler) *ZendInternalFunction {
 	return &ZendInternalFunction{
-		function_name: NewZendString(funcName),
+		function_name: types.NewZendString(funcName),
 		handler:       handler,
 	}
 }
@@ -41,20 +43,22 @@ func MakeInternalFunctionSimplify(handler ZifHandler) ZendInternalFunction {
 
 func (this *ZendInternalFunction) InitByEntry(entry *ZendFunctionEntry) {
 	this.handler = entry.Handler()
-	this.function_name = NewZendString(entry.FuncName())
+	this.function_name = types.NewZendString(entry.FuncName())
 	this.prototype = nil
 }
 
 func (this *ZendInternalFunction) GetType() uint8 { return ZEND_INTERNAL_FUNCTION }
 
-func (this *ZendInternalFunction) SetType(value ZendUchar) { this.type_ = value }
+func (this *ZendInternalFunction) SetType(value types.ZendUchar) { this.type_ = value }
 
 // func (this *ZendInternalFunction)  GetArgFlags() []ZendUchar      { return this.arg_flags }
 // func (this *ZendInternalFunction) SetArgFlags(value []ZendUchar) { this.arg_flags = value }
 // func (this *ZendInternalFunction)  GetFnFlags() uint32      { return this.fn_flags }
-func (this *ZendInternalFunction) SetFnFlags(value uint32)           { this.fn_flags = value }
-func (this *ZendInternalFunction) GetFunctionName() *ZendString      { return this.function_name }
-func (this *ZendInternalFunction) SetFunctionName(value *ZendString) { this.function_name = value }
+func (this *ZendInternalFunction) SetFnFlags(value uint32)            { this.fn_flags = value }
+func (this *ZendInternalFunction) GetFunctionName() *types.ZendString { return this.function_name }
+func (this *ZendInternalFunction) SetFunctionName(value *types.ZendString) {
+	this.function_name = value
+}
 
 // func (this *ZendInternalFunction)  GetScope() *ZendClassEntry      { return this.scope }
 func (this *ZendInternalFunction) SetScope(value *ZendClassEntry) { this.scope = value }

@@ -3,7 +3,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -31,7 +31,7 @@ func (this *PhpProcessEnvT) SetEnvarray(value **byte) { this.envarray = value }
 type PhpProcessHandle struct {
 	child         PhpProcessIdT
 	npipes        int
-	pipes         **zend.ZendResource
+	pipes         **types.ZendResource
 	command       *byte
 	is_persistent int
 	env           PhpProcessEnvT
@@ -54,18 +54,18 @@ type PhpProcessHandle struct {
 //                     env:env,
 //                 }
 //             }
-func (this *PhpProcessHandle) GetChild() PhpProcessIdT            { return this.child }
-func (this *PhpProcessHandle) SetChild(value PhpProcessIdT)       { this.child = value }
-func (this *PhpProcessHandle) GetNpipes() int                     { return this.npipes }
-func (this *PhpProcessHandle) SetNpipes(value int)                { this.npipes = value }
-func (this *PhpProcessHandle) GetPipes() **zend.ZendResource      { return this.pipes }
-func (this *PhpProcessHandle) SetPipes(value **zend.ZendResource) { this.pipes = value }
-func (this *PhpProcessHandle) GetCommand() *byte                  { return this.command }
-func (this *PhpProcessHandle) SetCommand(value *byte)             { this.command = value }
-func (this *PhpProcessHandle) GetIsPersistent() int               { return this.is_persistent }
-func (this *PhpProcessHandle) SetIsPersistent(value int)          { this.is_persistent = value }
-func (this *PhpProcessHandle) GetEnv() PhpProcessEnvT             { return this.env }
-func (this *PhpProcessHandle) SetEnv(value PhpProcessEnvT)        { this.env = value }
+func (this *PhpProcessHandle) GetChild() PhpProcessIdT             { return this.child }
+func (this *PhpProcessHandle) SetChild(value PhpProcessIdT)        { this.child = value }
+func (this *PhpProcessHandle) GetNpipes() int                      { return this.npipes }
+func (this *PhpProcessHandle) SetNpipes(value int)                 { this.npipes = value }
+func (this *PhpProcessHandle) GetPipes() **types.ZendResource      { return this.pipes }
+func (this *PhpProcessHandle) SetPipes(value **types.ZendResource) { this.pipes = value }
+func (this *PhpProcessHandle) GetCommand() *byte                   { return this.command }
+func (this *PhpProcessHandle) SetCommand(value *byte)              { this.command = value }
+func (this *PhpProcessHandle) GetIsPersistent() int                { return this.is_persistent }
+func (this *PhpProcessHandle) SetIsPersistent(value int)           { this.is_persistent = value }
+func (this *PhpProcessHandle) GetEnv() PhpProcessEnvT              { return this.env }
+func (this *PhpProcessHandle) SetEnv(value PhpProcessEnvT)         { this.env = value }
 
 /**
  * PhpProcOpenDescriptorItem

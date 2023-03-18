@@ -5,7 +5,7 @@ package streams
 import (
 	"sik/core"
 	r "sik/runtime"
-	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {
@@ -17,9 +17,9 @@ func PhpStreamFopenFromFd(fd int, mode *byte, persistent_id *byte) *core.PhpStre
 func PhpStreamFopenFromPipe(file *r.FILE, mode *byte) *core.PhpStream {
 	return _phpStreamFopenFromPipe(file, mode)
 }
-func PhpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path **zend.ZendString) *core.PhpStream {
+func PhpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path **types.ZendString) *core.PhpStream {
 	return _phpStreamFopenTemporaryFile(dir, pfx, opened_path)
 }
-func PhpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **zend.ZendString) *r.FILE {
+func PhpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.ZendString) *r.FILE {
 	return _phpStreamOpenWrapperAsFile(path, mode, options, opened_path)
 }

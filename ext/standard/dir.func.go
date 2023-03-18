@@ -7,10 +7,11 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func DIRG(v __auto__) __auto__ { return DirGlobals.v }
-func PhpSetDefaultDir(res *zend.ZendResource) {
+func PhpSetDefaultDir(res *types.ZendResource) {
 	if DIRG(default_dir) {
 		zend.ZendListDelete(DIRG(default_dir))
 	}
@@ -21,14 +22,14 @@ func PhpSetDefaultDir(res *zend.ZendResource) {
 }
 func ZmActivateDir(type_ int, module_number int) int {
 	DIRG(default_dir) = nil
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmStartupDir(type_ int, module_number int) int {
 	var dirsep_str []byte
 	var pathsep_str []byte
 	var dir_class_entry zend.ZendClassEntry
 	memset(&dir_class_entry, 0, b.SizeOf("zend_class_entry"))
-	dir_class_entry.SetName(zend.ZendStringInitInterned("Directory", b.SizeOf("\"Directory\"")-1, 1))
+	dir_class_entry.SetName(types.ZendStringInitInterned("Directory", b.SizeOf("\"Directory\"")-1, 1))
 	dir_class_entry.SetBuiltinFunctions(PhpDirClassFunctions)
 	DirClassEntryPtr = zend.ZendRegisterInternalClass(&dir_class_entry)
 	dirsep_str[0] = zend.DEFAULT_SLASH
@@ -57,12 +58,12 @@ func ZmStartupDir(type_ int, module_number int) int {
 	const GLOB_AVAILABLE_FLAGS zend.ZendLong = 0 | GLOB_BRACE | GLOB_MARK | GLOB_NOSORT | GLOB_NOCHECK | GLOB_NOESCAPE | GLOB_ERR | GLOB_ONLYDIR
 	zend.REGISTER_LONG_CONSTANT("GLOB_ONLYDIR", GLOB_ONLYDIR, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("GLOB_AVAILABLE_FLAGS", GLOB_AVAILABLE_FLAGS, zend.CONST_CS|zend.CONST_PERSISTENT)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
-func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval, createobject int) {
+func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, createobject int) {
 	var dirname *byte
 	var dir_len int
-	var zcontext *zend.Zval = nil
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
 	var dirp *core.PhpStream
 	for {
@@ -71,12 +72,12 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval, c
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -156,30 +157,30 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval, c
 		core.PhpStreamToZval(dirp, return_value)
 	}
 }
-func ZifOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 0)
 }
-func ZifGetdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 1)
 }
-func ZifClosedir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var id *zend.Zval = nil
-	var tmp *zend.Zval
-	var myself *zend.Zval
+func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var id *types.Zval = nil
+	var tmp *types.Zval
+	var myself *types.Zval
 	var dirp *core.PhpStream
-	var res *zend.ZendResource
+	var res *types.ZendResource
 	for {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -239,7 +240,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
@@ -271,7 +272,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		PhpSetDefaultDir(nil)
 	}
 }
-func ZifChroot(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChroot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -281,12 +282,12 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -359,7 +360,7 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifChdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -369,12 +370,12 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -452,10 +453,10 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var path []byte
 	var ret *byte = nil
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	ret = zend.VCWD_GETCWD(path, core.MAXPATHLEN)
@@ -467,10 +468,10 @@ func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var id *zend.Zval = nil
-	var tmp *zend.Zval
-	var myself *zend.Zval
+func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var id *types.Zval = nil
+	var tmp *types.Zval
+	var myself *types.Zval
 	var dirp *core.PhpStream
 	for {
 		var _flags int = 0
@@ -478,12 +479,12 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -543,7 +544,7 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
@@ -571,10 +572,10 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	core.PhpStreamRewinddir(dirp)
 }
-func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var id *zend.Zval = nil
-	var tmp *zend.Zval
-	var myself *zend.Zval
+func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	var id *types.Zval = nil
+	var tmp *types.Zval
+	var myself *types.Zval
 	var dirp *core.PhpStream
 	var entry core.PhpStreamDirent
 	for {
@@ -583,12 +584,12 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 1
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -648,7 +649,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if executeData.NumArgs() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
+			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
@@ -681,7 +682,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifGlob(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var cwd_skip int = 0
 	var pattern *byte = nil
 	var pattern_len int
@@ -689,19 +690,19 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var globbuf glob_t
 	var n int
 	var ret int
-	var basedir_limit zend.ZendBool = 0
+	var basedir_limit types.ZendBool = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -830,20 +831,20 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.AddNextIndexString(return_value, globbuf.gl_pathv[n]+cwd_skip)
 	}
 	globfree(&globbuf)
-	if basedir_limit != 0 && !(zend.Z_ARRVAL_P(return_value).GetNNumOfElements()) {
+	if basedir_limit != 0 && !(types.Z_ARRVAL_P(return_value).GetNNumOfElements()) {
 		return_value.GetArr().DestroyEx()
 		return_value.SetFalse()
 		return
 	}
 }
-func ZifScandir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var dirn *byte
 	var dirn_len int
 	var flags zend.ZendLong = 0
-	var namelist **zend.ZendString
+	var namelist **types.ZendString
 	var n int
 	var i int
-	var zcontext *zend.Zval = nil
+	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
 	for {
 		var _flags int = 0
@@ -851,12 +852,12 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)

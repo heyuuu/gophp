@@ -2,13 +2,15 @@
 
 package zend
 
+import "sik/zend/types"
+
 /**
  * ZendClosure
  */
 type ZendClosure struct {
-	std                   ZendObject
+	std                   types.ZendObject
 	func_                 ZendFunction
-	this_ptr              Zval
+	this_ptr              types.Zval
 	called_scope          *ZendClassEntry
 	orig_internal_handler ZifHandler
 }
@@ -22,13 +24,13 @@ type ZendClosure struct {
 //         orig_internal_handler:orig_internal_handler,
 //     }
 // }
-func (this *ZendClosure) GetStd() ZendObject { return this.std }
+func (this *ZendClosure) GetStd() types.ZendObject { return this.std }
 
 // func (this *ZendClosure) SetStd(value ZendObject) { this.std = value }
 func (this *ZendClosure) GetFunc() ZendFunction { return this.func_ }
 
 // func (this *ZendClosure) SetFunc(value ZendFunction) { this.func_ = value }
-func (this *ZendClosure) GetThisPtr() Zval { return this.this_ptr }
+func (this *ZendClosure) GetThisPtr() types.Zval { return this.this_ptr }
 
 // func (this *ZendClosure) SetThisPtr(value Zval) { this.this_ptr = value }
 func (this *ZendClosure) GetCalledScope() *ZendClassEntry         { return this.called_scope }

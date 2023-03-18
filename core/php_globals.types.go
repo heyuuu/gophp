@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 /**
@@ -31,22 +32,22 @@ func (this *ArgSeparators) GetInput() *byte { return this.input }
  * PhpCoreGlobals
  */
 type PhpCoreGlobals struct {
-	implicit_flush              zend.ZendBool
+	implicit_flush              types.ZendBool
 	output_buffering            zend.ZendLong
-	enable_dl                   zend.ZendBool
+	enable_dl                   types.ZendBool
 	output_handler              *byte
 	unserialize_callback_func   *byte
 	serialize_precision         zend.ZendLong
 	memory_limit                zend.ZendLong
 	max_input_time              zend.ZendLong
-	track_errors                zend.ZendBool
-	display_errors              zend.ZendBool
-	display_startup_errors      zend.ZendBool
-	log_errors                  zend.ZendBool
+	track_errors                types.ZendBool
+	display_errors              types.ZendBool
+	display_startup_errors      types.ZendBool
+	log_errors                  types.ZendBool
 	log_errors_max_len          zend.ZendLong
-	ignore_repeated_errors      zend.ZendBool
-	ignore_repeated_source      zend.ZendBool
-	report_memleaks             zend.ZendBool
+	ignore_repeated_errors      types.ZendBool
+	ignore_repeated_source      types.ZendBool
+	report_memleaks             types.ZendBool
 	error_log                   *byte
 	doc_root                    *byte
 	user_dir                    *byte
@@ -66,27 +67,27 @@ type PhpCoreGlobals struct {
 	output_encoding             *byte
 	arg_separator               ArgSeparators
 	variables_order             *byte
-	rfc1867_protected_variables zend.HashTable
+	rfc1867_protected_variables types.HashTable
 	connection_status           short
-	ignore_user_abort           zend.ZendBool
+	ignore_user_abort           types.ZendBool
 	header_is_being_sent        uint8
 	tick_functions              zend.ZendLlist
-	http_globals                []zend.Zval
-	expose_php                  zend.ZendBool
-	register_argc_argv          zend.ZendBool
-	auto_globals_jit            zend.ZendBool
+	http_globals                []types.Zval
+	expose_php                  types.ZendBool
+	register_argc_argv          types.ZendBool
+	auto_globals_jit            types.ZendBool
 	docref_root                 *byte
 	docref_ext                  *byte
-	html_errors                 zend.ZendBool
-	xmlrpc_errors               zend.ZendBool
+	html_errors                 types.ZendBool
+	xmlrpc_errors               types.ZendBool
 	xmlrpc_error_number         zend.ZendLong
-	activated_auto_globals      []zend.ZendBool
-	modules_activated           zend.ZendBool
-	file_uploads                zend.ZendBool
-	during_request_startup      zend.ZendBool
-	allow_url_fopen             zend.ZendBool
-	enable_post_data_reading    zend.ZendBool
-	report_zend_debug           zend.ZendBool
+	activated_auto_globals      []types.ZendBool
+	modules_activated           types.ZendBool
+	file_uploads                types.ZendBool
+	during_request_startup      types.ZendBool
+	allow_url_fopen             types.ZendBool
+	enable_post_data_reading    types.ZendBool
+	report_zend_debug           types.ZendBool
 	last_error_type             int
 	last_error_message          *byte
 	last_error_file             *byte
@@ -94,19 +95,19 @@ type PhpCoreGlobals struct {
 	php_sys_temp_dir            *byte
 	disable_functions           *byte
 	disable_classes             *byte
-	allow_url_include           zend.ZendBool
+	allow_url_include           types.ZendBool
 	max_input_nesting_level     zend.ZendLong
 	max_input_vars              zend.ZendLong
-	in_user_include             zend.ZendBool
+	in_user_include             types.ZendBool
 	user_ini_filename           *byte
 	user_ini_cache_ttl          zend.ZendLong
 	request_order               *byte
-	mail_x_header               zend.ZendBool
+	mail_x_header               types.ZendBool
 	mail_log                    *byte
-	in_error_log                zend.ZendBool
+	in_error_log                types.ZendBool
 	syslog_facility             zend.ZendLong
 	syslog_ident                *byte
-	have_called_openlog         zend.ZendBool
+	have_called_openlog         types.ZendBool
 	syslog_filter               zend.ZendLong
 }
 
@@ -269,13 +270,13 @@ type PhpCoreGlobals struct {
 //                     syslog_filter:syslog_filter,
 //                 }
 //             }
-func (this *PhpCoreGlobals) GetImplicitFlush() zend.ZendBool { return this.implicit_flush }
+func (this *PhpCoreGlobals) GetImplicitFlush() types.ZendBool { return this.implicit_flush }
 
 // func (this *PhpCoreGlobals) SetImplicitFlush(value zend.ZendBool) { this.implicit_flush = value }
 func (this *PhpCoreGlobals) GetOutputBuffering() zend.ZendLong { return this.output_buffering }
 
 // func (this *PhpCoreGlobals) SetOutputBuffering(value zend.ZendLong) { this.output_buffering = value }
-func (this *PhpCoreGlobals) GetEnableDl() zend.ZendBool { return this.enable_dl }
+func (this *PhpCoreGlobals) GetEnableDl() types.ZendBool { return this.enable_dl }
 
 // func (this *PhpCoreGlobals) SetEnableDl(value zend.ZendBool) { this.enable_dl = value }
 func (this *PhpCoreGlobals) GetOutputHandler() *byte { return this.output_handler }
@@ -292,34 +293,34 @@ func (this *PhpCoreGlobals) GetSerializePrecision() zend.ZendLong { return this.
 func (this *PhpCoreGlobals) GetMaxInputTime() zend.ZendLong { return this.max_input_time }
 
 // func (this *PhpCoreGlobals) SetMaxInputTime(value zend.ZendLong) { this.max_input_time = value }
-func (this *PhpCoreGlobals) GetTrackErrors() zend.ZendBool { return this.track_errors }
+func (this *PhpCoreGlobals) GetTrackErrors() types.ZendBool { return this.track_errors }
 
 // func (this *PhpCoreGlobals) SetTrackErrors(value zend.ZendBool) { this.track_errors = value }
-func (this *PhpCoreGlobals) GetDisplayErrors() zend.ZendBool { return this.display_errors }
+func (this *PhpCoreGlobals) GetDisplayErrors() types.ZendBool { return this.display_errors }
 
 // func (this *PhpCoreGlobals) SetDisplayErrors(value zend.ZendBool) { this.display_errors = value }
-func (this *PhpCoreGlobals) GetDisplayStartupErrors() zend.ZendBool {
+func (this *PhpCoreGlobals) GetDisplayStartupErrors() types.ZendBool {
 	return this.display_startup_errors
 }
 
 // func (this *PhpCoreGlobals) SetDisplayStartupErrors(value zend.ZendBool) { this.display_startup_errors = value }
-func (this *PhpCoreGlobals) GetLogErrors() zend.ZendBool { return this.log_errors }
+func (this *PhpCoreGlobals) GetLogErrors() types.ZendBool { return this.log_errors }
 
 // func (this *PhpCoreGlobals) SetLogErrors(value zend.ZendBool) { this.log_errors = value }
 func (this *PhpCoreGlobals) GetLogErrorsMaxLen() zend.ZendLong { return this.log_errors_max_len }
 
 // func (this *PhpCoreGlobals) SetLogErrorsMaxLen(value zend.ZendLong) { this.log_errors_max_len = value }
-func (this *PhpCoreGlobals) GetIgnoreRepeatedErrors() zend.ZendBool {
+func (this *PhpCoreGlobals) GetIgnoreRepeatedErrors() types.ZendBool {
 	return this.ignore_repeated_errors
 }
 
 // func (this *PhpCoreGlobals) SetIgnoreRepeatedErrors(value zend.ZendBool) { this.ignore_repeated_errors = value }
-func (this *PhpCoreGlobals) GetIgnoreRepeatedSource() zend.ZendBool {
+func (this *PhpCoreGlobals) GetIgnoreRepeatedSource() types.ZendBool {
 	return this.ignore_repeated_source
 }
 
 // func (this *PhpCoreGlobals) SetIgnoreRepeatedSource(value zend.ZendBool) { this.ignore_repeated_source = value }
-func (this *PhpCoreGlobals) GetReportMemleaks() zend.ZendBool { return this.report_memleaks }
+func (this *PhpCoreGlobals) GetReportMemleaks() types.ZendBool { return this.report_memleaks }
 
 // func (this *PhpCoreGlobals) SetReportMemleaks(value zend.ZendBool) { this.report_memleaks = value }
 func (this *PhpCoreGlobals) GetErrorLog() *byte { return this.error_log }
@@ -383,7 +384,7 @@ func (this *PhpCoreGlobals) GetVariablesOrder() *byte { return this.variables_or
 // func (this *PhpCoreGlobals) SetRfc1867ProtectedVariables(value zend.HashTable) { this.rfc1867_protected_variables = value }
 // func (this *PhpCoreGlobals)  GetConnectionStatus() short      { return this.connection_status }
 // func (this *PhpCoreGlobals) SetConnectionStatus(value short) { this.connection_status = value }
-func (this *PhpCoreGlobals) GetIgnoreUserAbort() zend.ZendBool { return this.ignore_user_abort }
+func (this *PhpCoreGlobals) GetIgnoreUserAbort() types.ZendBool { return this.ignore_user_abort }
 
 // func (this *PhpCoreGlobals) SetIgnoreUserAbort(value zend.ZendBool) { this.ignore_user_abort = value }
 // func (this *PhpCoreGlobals)  GetHeaderIsBeingSent() uint8      { return this.header_is_being_sent }
@@ -392,13 +393,13 @@ func (this *PhpCoreGlobals) GetIgnoreUserAbort() zend.ZendBool { return this.ign
 // func (this *PhpCoreGlobals) SetTickFunctions(value zend.ZendLlist) { this.tick_functions = value }
 // func (this *PhpCoreGlobals)  GetHttpGlobals() []zend.Zval      { return this.http_globals }
 // func (this *PhpCoreGlobals) SetHttpGlobals(value []zend.Zval) { this.http_globals = value }
-func (this *PhpCoreGlobals) GetExposePhp() zend.ZendBool { return this.expose_php }
+func (this *PhpCoreGlobals) GetExposePhp() types.ZendBool { return this.expose_php }
 
 // func (this *PhpCoreGlobals) SetExposePhp(value zend.ZendBool) { this.expose_php = value }
-func (this *PhpCoreGlobals) GetRegisterArgcArgv() zend.ZendBool { return this.register_argc_argv }
+func (this *PhpCoreGlobals) GetRegisterArgcArgv() types.ZendBool { return this.register_argc_argv }
 
 // func (this *PhpCoreGlobals) SetRegisterArgcArgv(value zend.ZendBool) { this.register_argc_argv = value }
-func (this *PhpCoreGlobals) GetAutoGlobalsJit() zend.ZendBool { return this.auto_globals_jit }
+func (this *PhpCoreGlobals) GetAutoGlobalsJit() types.ZendBool { return this.auto_globals_jit }
 
 // func (this *PhpCoreGlobals) SetAutoGlobalsJit(value zend.ZendBool) { this.auto_globals_jit = value }
 func (this *PhpCoreGlobals) GetDocrefRoot() *byte { return this.docref_root }
@@ -407,10 +408,10 @@ func (this *PhpCoreGlobals) GetDocrefRoot() *byte { return this.docref_root }
 func (this *PhpCoreGlobals) GetDocrefExt() *byte { return this.docref_ext }
 
 // func (this *PhpCoreGlobals) SetDocrefExt(value *byte) { this.docref_ext = value }
-func (this *PhpCoreGlobals) GetHtmlErrors() zend.ZendBool { return this.html_errors }
+func (this *PhpCoreGlobals) GetHtmlErrors() types.ZendBool { return this.html_errors }
 
 // func (this *PhpCoreGlobals) SetHtmlErrors(value zend.ZendBool) { this.html_errors = value }
-func (this *PhpCoreGlobals) GetXmlrpcErrors() zend.ZendBool { return this.xmlrpc_errors }
+func (this *PhpCoreGlobals) GetXmlrpcErrors() types.ZendBool { return this.xmlrpc_errors }
 
 // func (this *PhpCoreGlobals) SetXmlrpcErrors(value zend.ZendBool) { this.xmlrpc_errors = value }
 func (this *PhpCoreGlobals) GetXmlrpcErrorNumber() zend.ZendLong { return this.xmlrpc_error_number }
@@ -420,20 +421,20 @@ func (this *PhpCoreGlobals) GetXmlrpcErrorNumber() zend.ZendLong { return this.x
 // func (this *PhpCoreGlobals) SetActivatedAutoGlobals(value []zend.ZendBool) { this.activated_auto_globals = value }
 // func (this *PhpCoreGlobals)  GetModulesActivated() zend.ZendBool      { return this.modules_activated }
 // func (this *PhpCoreGlobals) SetModulesActivated(value zend.ZendBool) { this.modules_activated = value }
-func (this *PhpCoreGlobals) GetFileUploads() zend.ZendBool { return this.file_uploads }
+func (this *PhpCoreGlobals) GetFileUploads() types.ZendBool { return this.file_uploads }
 
 // func (this *PhpCoreGlobals) SetFileUploads(value zend.ZendBool) { this.file_uploads = value }
 // func (this *PhpCoreGlobals)  GetDuringRequestStartup() zend.ZendBool      { return this.during_request_startup }
 // func (this *PhpCoreGlobals) SetDuringRequestStartup(value zend.ZendBool) { this.during_request_startup = value }
-func (this *PhpCoreGlobals) GetAllowUrlFopen() zend.ZendBool { return this.allow_url_fopen }
+func (this *PhpCoreGlobals) GetAllowUrlFopen() types.ZendBool { return this.allow_url_fopen }
 
 // func (this *PhpCoreGlobals) SetAllowUrlFopen(value zend.ZendBool) { this.allow_url_fopen = value }
-func (this *PhpCoreGlobals) GetEnablePostDataReading() zend.ZendBool {
+func (this *PhpCoreGlobals) GetEnablePostDataReading() types.ZendBool {
 	return this.enable_post_data_reading
 }
 
 // func (this *PhpCoreGlobals) SetEnablePostDataReading(value zend.ZendBool) { this.enable_post_data_reading = value }
-func (this *PhpCoreGlobals) GetReportZendDebug() zend.ZendBool { return this.report_zend_debug }
+func (this *PhpCoreGlobals) GetReportZendDebug() types.ZendBool { return this.report_zend_debug }
 
 // func (this *PhpCoreGlobals) SetReportZendDebug(value zend.ZendBool) { this.report_zend_debug = value }
 // func (this *PhpCoreGlobals)  GetLastErrorType() int      { return this.last_error_type }
@@ -454,7 +455,7 @@ func (this *PhpCoreGlobals) GetDisableFunctions() *byte { return this.disable_fu
 func (this *PhpCoreGlobals) GetDisableClasses() *byte { return this.disable_classes }
 
 // func (this *PhpCoreGlobals) SetDisableClasses(value *byte) { this.disable_classes = value }
-func (this *PhpCoreGlobals) GetAllowUrlInclude() zend.ZendBool { return this.allow_url_include }
+func (this *PhpCoreGlobals) GetAllowUrlInclude() types.ZendBool { return this.allow_url_include }
 
 // func (this *PhpCoreGlobals) SetAllowUrlInclude(value zend.ZendBool) { this.allow_url_include = value }
 func (this *PhpCoreGlobals) GetMaxInputNestingLevel() zend.ZendLong {
@@ -476,7 +477,7 @@ func (this *PhpCoreGlobals) GetUserIniCacheTtl() zend.ZendLong { return this.use
 func (this *PhpCoreGlobals) GetRequestOrder() *byte { return this.request_order }
 
 // func (this *PhpCoreGlobals) SetRequestOrder(value *byte) { this.request_order = value }
-func (this *PhpCoreGlobals) GetMailXHeader() zend.ZendBool { return this.mail_x_header }
+func (this *PhpCoreGlobals) GetMailXHeader() types.ZendBool { return this.mail_x_header }
 
 // func (this *PhpCoreGlobals) SetMailXHeader(value zend.ZendBool) { this.mail_x_header = value }
 func (this *PhpCoreGlobals) GetMailLog() *byte { return this.mail_log }

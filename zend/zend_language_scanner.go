@@ -1,12 +1,15 @@
 package zend
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+	"sik/zend/types"
+)
 
 func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array *ZendOpArray = nil
 	ZendSaveLexicalState(&original_lex_state)
-	if OpenFileForScanning(file_handle) == FAILURE {
+	if OpenFileForScanning(file_handle) == types.FAILURE {
 		if !(EG__().exception) {
 			if type_ == ZEND_REQUIRE {
 				ZendMessageDispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.filename)
@@ -38,7 +41,7 @@ type ZendLexState struct {
 
 	in                   *ZendFileHandle
 	lineno               uint32
-	filename             *ZendString
+	filename             *types.ZendString
 	script_org           *uint8
 	script_org_size      int
 	script_filtered      *uint8

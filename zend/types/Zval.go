@@ -1,12 +1,14 @@
 // <<generate>>
 
-package zend
+package types
+
+import "sik/zend"
 
 /**
  * ZendValue
  */
 type ZendValue struct /* union */ {
-	lval    ZendLong
+	lval    zend.ZendLong
 	dval    float64
 	counted *ZendRefcounted
 	str     *ZendString
@@ -17,16 +19,16 @@ type ZendValue struct /* union */ {
 	ast     *ZendAstRef
 	zv      *Zval
 	ptr     any
-	ce      *ZendClassEntry
-	func_   *ZendFunction
+	ce      *zend.ZendClassEntry
+	func_   *zend.ZendFunction
 	ww      struct {
 		w1 uint32
 		w2 uint32
 	}
 }
 
-func (this *ZendValue) GetLval() ZendLong                { return this.lval }
-func (this *ZendValue) SetLval(value ZendLong)           { this.lval = value }
+func (this *ZendValue) GetLval() zend.ZendLong           { return this.lval }
+func (this *ZendValue) SetLval(value zend.ZendLong)      { this.lval = value }
 func (this *ZendValue) GetDval() float64                 { return this.dval }
 func (this *ZendValue) SetDval(value float64)            { this.dval = value }
 func (this *ZendValue) GetCounted() *ZendRefcounted      { return this.counted }
@@ -47,10 +49,10 @@ func (this *ZendValue) GetZv() *Zval                     { return this.zv }
 func (this *ZendValue) SetZv(value *Zval)                { this.zv = value }
 func (this *ZendValue) GetPtr() any                      { return this.ptr }
 func (this *ZendValue) SetPtr(value any)                 { this.ptr = value }
-func (this *ZendValue) GetCe() *ZendClassEntry           { return this.ce }
-func (this *ZendValue) SetCe(value *ZendClassEntry)      { this.ce = value }
-func (this *ZendValue) GetFunc() *ZendFunction           { return this.func_ }
-func (this *ZendValue) SetFunc(value *ZendFunction)      { this.func_ = value }
+func (this *ZendValue) GetCe() *zend.ZendClassEntry      { return this.ce }
+func (this *ZendValue) SetCe(value *zend.ZendClassEntry) { this.ce = value }
+func (this *ZendValue) GetFunc() *zend.ZendFunction      { return this.func_ }
+func (this *ZendValue) SetFunc(value *zend.ZendFunction) { this.func_ = value }
 func (this *ZendValue) GetW1() uint32                    { return this.ww.w1 }
 func (this *ZendValue) SetW1(value uint32)               { this.ww.w1 = value }
 func (this *ZendValue) GetW2() uint32                    { return this.ww.w2 }
@@ -90,8 +92,8 @@ func (this *Zval) GetRawStr() string { return this.value.str.GetStr() }
 
 func (this *Zval) GetValue() ZendValue              { return this.value }
 func (this *Zval) SetValue(value ZendValue)         { this.value = value }
-func (this *Zval) GetLval() ZendLong                { return this.value.lval }
-func (this *Zval) SetLval(value ZendLong)           { this.value.lval = value }
+func (this *Zval) GetLval() zend.ZendLong           { return this.value.lval }
+func (this *Zval) SetLval(value zend.ZendLong)      { this.value.lval = value }
 func (this *Zval) GetDval() float64                 { return this.value.dval }
 func (this *Zval) SetDval(value float64)            { this.value.dval = value }
 func (this *Zval) GetCounted() *ZendRefcounted      { return this.value.counted }
@@ -112,10 +114,10 @@ func (this *Zval) GetZv() *Zval                     { return this.value.zv }
 func (this *Zval) SetZv(value *Zval)                { this.value.zv = value }
 func (this *Zval) GetPtr() any                      { return this.value.ptr }
 func (this *Zval) SetPtr(value any)                 { this.value.ptr = value }
-func (this *Zval) GetCe() *ZendClassEntry           { return this.value.ce }
-func (this *Zval) SetCe(value *ZendClassEntry)      { this.value.ce = value }
-func (this *Zval) GetFunc() *ZendFunction           { return this.value.func_ }
-func (this *Zval) SetFunc(value *ZendFunction)      { this.value.func_ = value }
+func (this *Zval) GetCe() *zend.ZendClassEntry      { return this.value.ce }
+func (this *Zval) SetCe(value *zend.ZendClassEntry) { this.value.ce = value }
+func (this *Zval) GetFunc() *zend.ZendFunction      { return this.value.func_ }
+func (this *Zval) SetFunc(value *zend.ZendFunction) { this.value.func_ = value }
 func (this *Zval) GetW1() uint32                    { return this.value.ww.w1 }
 func (this *Zval) SetW1(value uint32)               { this.value.ww.w1 = value }
 func (this *Zval) GetW2() uint32                    { return this.value.ww.w2 }
@@ -212,7 +214,7 @@ func NewZvalFalse() *Zval                     { var tmp Zval; tmp.SetFalse(); re
 func NewZvalTrue() *Zval                      { var tmp Zval; tmp.SetTrue(); return &tmp }
 func NewZvalBool(b bool) *Zval                { var tmp Zval; tmp.SetBool(b); return &tmp }
 func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetRawString(str); return &tmp }
-func NewZvalLong(l ZendLong) *Zval            { var tmp Zval; tmp.SetLong(l); return &tmp }
+func NewZvalLong(l zend.ZendLong) *Zval       { var tmp Zval; tmp.SetLong(l); return &tmp }
 func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); return &tmp }
 func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
 
@@ -231,7 +233,7 @@ func (this *Zval) SetBool(b bool) {
 	}
 }
 
-func (this *Zval) SetLong(l ZendLong) {
+func (this *Zval) SetLong(l zend.ZendLong) {
 	this.SetTypeInfo(IS_LONG)
 	this.SetLval(l)
 }

@@ -4,18 +4,18 @@ package standard
 
 import (
 	b "sik/builtin"
-	"sik/zend"
+	"sik/zend/types"
 )
 
-func PHP_SET_CLASS_ATTRIBUTES(struc *zend.Zval) {
-	if zend.Z_OBJCE_P(struc) == BG(incomplete_class) {
+func PHP_SET_CLASS_ATTRIBUTES(struc *types.Zval) {
+	if types.Z_OBJCE_P(struc) == BG(incomplete_class) {
 		class_name = PhpLookupClassName(struc)
 		if !class_name {
-			class_name = zend.ZendStringInit(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 0)
+			class_name = types.ZendStringInit(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 0)
 		}
 		incomplete_class = 1
 	} else {
-		class_name = zend.Z_OBJCE_P(struc).GetName().Copy()
+		class_name = types.Z_OBJCE_P(struc).GetName().Copy()
 	}
 }
-func PHP_CLEANUP_CLASS_ATTRIBUTES() { zend.ZendStringReleaseEx(class_name, 0) }
+func PHP_CLEANUP_CLASS_ATTRIBUTES() { types.ZendStringReleaseEx(class_name, 0) }

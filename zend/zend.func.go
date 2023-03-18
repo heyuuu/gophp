@@ -6,6 +6,7 @@ import (
 	"fmt"
 	b "sik/builtin"
 	r "sik/runtime"
+	"sik/zend/types"
 )
 
 func USED_RET() bool {
@@ -72,18 +73,18 @@ func ZendSpprintf(message *string, max_len int, format string, args ...any) int 
 	return len(result)
 }
 
-func ZendStrpprintf(max_len int, format string, args ...any) *ZendString {
+func ZendStrpprintf(max_len int, format string, args ...any) *types.ZendString {
 	result := ZendSprintfEx(max_len, format, args...)
-	return NewZendString(result)
+	return types.NewZendString(result)
 }
 
-func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
+func PrintHash(buf *SmartStr, ht *types.HashTable, indent int, is_object types.ZendBool) {
 	for i := 0; i < indent; i++ {
 		buf.AppendByte(' ')
 	}
 	buf.AppendString("(\n")
 	indent += PRINT_ZVAL_INDENT
-	ht.eachValidBucketIndirect(func(_ uint32, p *Bucket, z *Zval) {
+	ht.eachValidBucketIndirect(func(_ uint32, p *types.Bucket, z *types.Zval) {
 		for i := 0; i < indent; i++ {
 			buf.AppendByte(' ')
 		}
@@ -117,14 +118,14 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 	}
 	buf.AppendString(")\n")
 }
-func PrintFlatHash(ht *HashTable) {
-	var tmp *Zval
-	var string_key *ZendString
+func PrintFlatHash(ht *types.HashTable) {
+	var tmp *types.Zval
+	var string_key *types.ZendString
 	var num_key ZendUlong
 	var i int = 0
-	var __ht *HashTable = ht
+	var __ht *types.HashTable = ht
 	for _, _p := range __ht.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 		if _z.IsIndirect() {
 			_z = _z.GetZv()
 			if _z.IsUndef() {
@@ -147,7 +148,7 @@ func PrintFlatHash(ht *HashTable) {
 		ZendPrintFlatZvalR(tmp)
 	}
 }
-func ZendMakePrintableZval(expr *Zval, expr_copy *Zval) int {
+func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	if expr.IsString() {
 		return 0
 	} else {
@@ -155,9 +156,9 @@ func ZendMakePrintableZval(expr *Zval, expr_copy *Zval) int {
 		return 1
 	}
 }
-func ZendPrintZval(expr *Zval, indent int) int {
-	var tmp_str *ZendString
-	var str *ZendString = ZvalGetTmpString(expr, &tmp_str)
+func ZendPrintZval(expr *types.Zval, indent int) int {
+	var tmp_str *types.ZendString
+	var str *types.ZendString = ZvalGetTmpString(expr, &tmp_str)
 	var len_ int = str.GetLen()
 	if len_ != 0 {
 		ZendWrite(str.GetStr())
@@ -165,11 +166,11 @@ func ZendPrintZval(expr *Zval, indent int) int {
 	ZendTmpStringRelease(tmp_str)
 	return len_
 }
-func ZendPrintFlatZvalR(expr *Zval) {
+func ZendPrintFlatZvalR(expr *types.Zval) {
 	switch expr.GetType() {
-	case IS_ARRAY:
+	case types.IS_ARRAY:
 		ZEND_PUTS("Array (")
-		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			if expr.GetArr().IsRecursive() {
 				ZEND_PUTS(" *RECURSION*")
 				return
@@ -178,20 +179,20 @@ func ZendPrintFlatZvalR(expr *Zval) {
 		}
 		PrintFlatHash(expr.GetArr())
 		ZEND_PUTS(")")
-		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			expr.GetArr().UnprotectRecursive()
 		}
 		break
-	case IS_OBJECT:
-		var properties *HashTable
-		var class_name *ZendString = Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
+	case types.IS_OBJECT:
+		var properties *types.HashTable
+		var class_name *types.ZendString = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		ZendPrintf("%s Object (", class_name.GetVal())
-		ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 		if expr.GetCounted().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
 			return
 		}
-		properties = Z_OBJPROP_P(expr)
+		properties = types.Z_OBJPROP_P(expr)
 		if properties != nil {
 			expr.GetObj().ProtectRecursive()
 			PrintFlatHash(properties)
@@ -199,19 +200,19 @@ func ZendPrintFlatZvalR(expr *Zval) {
 		}
 		ZEND_PUTS(")")
 		break
-	case IS_REFERENCE:
-		ZendPrintFlatZvalR(Z_REFVAL_P(expr))
+	case types.IS_REFERENCE:
+		ZendPrintFlatZvalR(types.Z_REFVAL_P(expr))
 		break
 	default:
 		ZendPrintZval(expr, 0)
 		break
 	}
 }
-func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
+func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 	switch expr.GetType() {
-	case IS_ARRAY:
+	case types.IS_ARRAY:
 		buf.AppendString("Array\n")
-		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			if expr.GetArr().IsRecursive() {
 				buf.AppendString(" *RECURSION*")
 				return
@@ -219,15 +220,15 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 			expr.GetArr().ProtectRecursive()
 		}
 		PrintHash(buf, expr.GetArr(), indent, 0)
-		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			expr.GetArr().UnprotectRecursive()
 		}
 		break
-	case IS_OBJECT:
-		var properties *HashTable
-		var class_name *ZendString = Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
+	case types.IS_OBJECT:
+		var properties *types.HashTable
+		var class_name *types.ZendString = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		buf.AppendString(class_name.GetStr())
-		ZendStringReleaseEx(class_name, 0)
+		types.ZendStringReleaseEx(class_name, 0)
 		buf.AppendString(" Object\n")
 		if expr.GetObj().IsRecursive() {
 			buf.AppendString(" *RECURSION*")
@@ -241,32 +242,32 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 		expr.GetObj().UnprotectRecursive()
 		ZendReleaseProperties(properties)
 		break
-	case IS_LONG:
+	case types.IS_LONG:
 		buf.AppendLong(expr.GetLval())
 		break
-	case IS_REFERENCE:
-		ZendPrintZvalRToBuf(buf, Z_REFVAL_P(expr), indent)
+	case types.IS_REFERENCE:
+		ZendPrintZvalRToBuf(buf, types.Z_REFVAL_P(expr), indent)
 		break
-	case IS_STRING:
+	case types.IS_STRING:
 		buf.AppendString(expr.GetStr().GetStr())
 		break
 	default:
-		var str *ZendString = ZvalGetStringFunc(expr)
+		var str *types.ZendString = ZvalGetStringFunc(expr)
 		buf.AppendString(str.GetStr())
-		ZendStringReleaseEx(str, 0)
+		types.ZendStringReleaseEx(str, 0)
 		break
 	}
 }
-func ZendPrintZvalRToStr(expr *Zval, indent int) *ZendString {
+func ZendPrintZvalRToStr(expr *types.Zval, indent int) *types.ZendString {
 	var buf SmartStr = SmartStr{}
 	ZendPrintZvalRToBuf(&buf, expr, indent)
 	buf.ZeroTail()
 	return buf.GetS()
 }
-func ZendPrintZvalR(expr *Zval, indent int) {
-	var str *ZendString = ZendPrintZvalRToStr(expr, indent)
+func ZendPrintZvalR(expr *types.Zval, indent int) {
+	var str *types.ZendString = ZendPrintZvalRToStr(expr, indent)
 	ZendWrite(str.GetStr())
-	ZendStringReleaseEx(str, 0)
+	types.ZendStringReleaseEx(str, 0)
 }
 func ZendFopenWrapper(filename string, opened_path *string) *r.FILE {
 	if opened_path != nil {
@@ -295,20 +296,20 @@ func ZendInitCallTrampolineOp() {
 	EG__().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
 	ZendVmSetOpcodeHandler(EG__().GetCallTrampolineOp())
 }
-func AutoGlobalDtor(zv *Zval) { Free(zv.GetPtr()) }
+func AutoGlobalDtor(zv *types.Zval) { Free(zv.GetPtr()) }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
 func PhpScannerGlobalsCtor(scanner_globals_p *ZendPhpScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
-func ModuleDestructorZval(zv *Zval) {
+func ModuleDestructorZval(zv *types.Zval) {
 	var module *ZendModuleEntry = (*ZendModuleEntry)(zv.GetPtr())
 	ModuleDestructor(module)
 	Free(module)
 }
-func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
-	var globals Zval
+func PhpAutoGlobalsCreateGlobals(name *types.ZendString) types.ZendBool {
+	var globals types.Zval
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
@@ -361,7 +362,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	CG__().InitTables()
 	EG__().InitTables()
-	ModuleRegistry = *NewZendArrayEx(32, ModuleDestructorZval, true)
+	ModuleRegistry = *types.NewZendArrayEx(32, ModuleDestructorZval, true)
 
 	ZendInitRsrcListDtors()
 	IniScannerGlobalsCtor(&ini_scanner_globals)
@@ -374,15 +375,15 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	CG__().SetMapPtrSize(0)
 	CG__().SetMapPtrLast(0)
 	EG__().SetErrorReporting(E_ALL & ^E_NOTICE)
-	ZendInternedStringsInit()
+	types.ZendInternedStringsInit()
 	ZendStartupBuiltinFunctions()
 	ZendRegisterStandardConstants()
-	ZendRegisterAutoGlobal(ZendStringInitInterned("GLOBALS", b.SizeOf("\"GLOBALS\"")-1, 1), 1, PhpAutoGlobalsCreateGlobals)
+	ZendRegisterAutoGlobal(types.ZendStringInitInterned("GLOBALS", b.SizeOf("\"GLOBALS\"")-1, 1), 1, PhpAutoGlobalsCreateGlobals)
 	ZendInitRsrcPlist()
 	ZendInitExceptionOp()
 	ZendInitCallTrampolineOp()
 	ZendIniStartup()
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendRegisterStandardIniEntries() {
 	REGISTER_INI_ENTRIES(0)
@@ -390,28 +391,28 @@ func ZendRegisterStandardIniEntries() {
 func ZendResolvePropertyTypes() {
 	var ce *ZendClassEntry
 	var prop_info *ZendPropertyInfo
-	var __ht *HashTable = CG__().GetClassTable()
+	var __ht *types.HashTable = CG__().GetClassTable()
 	for _, _p := range __ht.foreachData() {
-		var _z *Zval = _p.GetVal()
+		var _z *types.Zval = _p.GetVal()
 
 		ce = _z.GetPtr()
 		if ce.GetType() != ZEND_INTERNAL_CLASS {
 			continue
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
-			var __ht *HashTable = ce.GetPropertiesInfo()
+			var __ht *types.HashTable = ce.GetPropertiesInfo()
 			for _, _p := range __ht.foreachData() {
-				var _z *Zval = _p.GetVal()
+				var _z *types.Zval = _p.GetVal()
 
 				prop_info = _z.GetPtr()
 				if prop_info.GetType().IsName() {
-					var type_name *ZendString = prop_info.GetType().Name()
-					var lc_type_name *ZendString = ZendStringTolower(type_name)
+					var type_name *types.ZendString = prop_info.GetType().Name()
+					var lc_type_name *types.ZendString = ZendStringTolower(type_name)
 					var prop_ce *ZendClassEntry = ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
 					ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
-					prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
-					ZendStringRelease(lc_type_name)
-					ZendStringRelease(type_name)
+					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
+					types.ZendStringRelease(lc_type_name)
+					types.ZendStringRelease(type_name)
 				}
 			}
 		}
@@ -423,12 +424,12 @@ func ZendPostStartup() int {
 	if ZendPostStartupCb != nil {
 		var cb func() int = ZendPostStartupCb
 		ZendPostStartupCb = nil
-		if cb() != SUCCESS {
-			return FAILURE
+		if cb() != types.SUCCESS {
+			return types.FAILURE
 		}
 	}
 	GlobalMapPtrLast = CG__().GetMapPtrLast()
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendShutdown() {
 	ZendVmDtor()
@@ -473,7 +474,7 @@ func _zendBailout(filename *byte, lineno uint32) {
 	CG__().SetActiveClassEntry(nil)
 	CG__().SetInCompilation(0)
 	EG__().SetCurrentExecuteData(nil)
-	LONGJMP((*EG__)().bailout, FAILURE)
+	LONGJMP((*EG__)().bailout, types.FAILURE)
 }
 func ZendAppendVersionInfo(extension *ZendExtension) {
 	ZendVersionInfo += fmt.Sprintf("    with %s v%s, %s, by %s\n", extension.GetNameStr(), extension.GetVersionStr(), extension.GetCopyrightStr(), extension.GetAuthorStr())
@@ -533,7 +534,7 @@ func ZendMessageDispatcher(message ZendLong, data any) {
 		ZendMessageDispatcherP(message, data)
 	}
 }
-func ZendGetConfigurationDirective(name *ZendString) *Zval {
+func ZendGetConfigurationDirective(name *types.ZendString) *types.Zval {
 	if ZendGetConfigurationDirectiveP != nil {
 		return ZendGetConfigurationDirectiveP(name.GetStr())
 	} else {
@@ -558,14 +559,14 @@ func RESTORE_STACK(stack ZendStack) {
 }
 func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format string, args ...any) {
 	var usr_copy va_list
-	var params []Zval
-	var retval Zval
-	var orig_user_error_handler Zval
-	var in_compilation ZendBool
+	var params []types.Zval
+	var retval types.Zval
+	var orig_user_error_handler types.Zval
+	var in_compilation types.ZendBool
 	var saved_class_entry *ZendClassEntry
 	var loop_var_stack ZendStack
 	var delayed_oplines_stack ZendStack
-	var symbol_table *ZendArray
+	var symbol_table *types.ZendArray
 	var orig_fake_scope *ZendClassEntry
 
 	/* Report about uncaught exception in case of fatal errors */
@@ -649,7 +650,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			} else {
 				params[4].SetArray(ZendArrayDup(symbol_table))
 			}
-			ZVAL_COPY_VALUE(&orig_user_error_handler, EG__().GetUserErrorHandler())
+			types.ZVAL_COPY_VALUE(&orig_user_error_handler, EG__().GetUserErrorHandler())
 			EG__().GetUserErrorHandler().SetUndef()
 
 			/* User error handler may include() additinal PHP files.
@@ -667,8 +668,8 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			}
 			orig_fake_scope = EG__().GetFakeScope()
 			EG__().SetFakeScope(nil)
-			if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == SUCCESS {
-				if retval.GetType() != IS_UNDEF {
+			if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == types.SUCCESS {
+				if retval.GetType() != types.IS_UNDEF {
 					if retval.IsFalse() {
 						ZendErrorCb(type_, error_filename, error_lineno, format, args)
 					}
@@ -694,7 +695,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			ZvalPtrDtor(&params[2])
 			ZvalPtrDtor(&params[1])
 			if EG__().GetUserErrorHandler().IsUndef() {
-				ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), &orig_user_error_handler)
+				types.ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), &orig_user_error_handler)
 			} else {
 				ZvalPtrDtor(&orig_user_error_handler)
 			}
@@ -885,17 +886,17 @@ func ZendInternalArgumentCountError(throw_exception bool, format string, args ..
 		ZendError(E_WARNING, "%s", message)
 	}
 }
-func ZendOutputDebugString(trigger_break ZendBool, format string, _ ...any) {}
+func ZendOutputDebugString(trigger_break types.ZendBool, format string, _ ...any) {}
 func ZendUserExceptionHandler() {
-	var orig_user_exception_handler Zval
-	var params []Zval
-	var retval2 Zval
-	var old_exception *ZendObject
+	var orig_user_exception_handler types.Zval
+	var params []types.Zval
+	var retval2 types.Zval
+	var old_exception *types.ZendObject
 	old_exception = EG__().GetException()
 	EG__().SetException(nil)
 	params[0].SetObject(old_exception)
-	ZVAL_COPY_VALUE(&orig_user_exception_handler, EG__().GetUserExceptionHandler())
-	if CallUserFunction(nil, &orig_user_exception_handler, &retval2, 1, params) == SUCCESS {
+	types.ZVAL_COPY_VALUE(&orig_user_exception_handler, EG__().GetUserExceptionHandler())
+	if CallUserFunction(nil, &orig_user_exception_handler, &retval2, 1, params) == types.SUCCESS {
 		ZvalPtrDtor(&retval2)
 		if EG__().GetException() != nil {
 			OBJ_RELEASE(EG__().GetException())
@@ -906,7 +907,7 @@ func ZendUserExceptionHandler() {
 		EG__().SetException(old_exception)
 	}
 }
-func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
+func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any) int {
 	var files va_list
 	var i int
 	var file_handle *ZendFileHandle
@@ -926,7 +927,7 @@ func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
 			ZendExecute(op_array, retval)
 			ZendExceptionRestore()
 			if EG__().GetException() != nil {
-				if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
+				if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
 					ZendUserExceptionHandler()
 				}
 				if EG__().GetException() != nil {
@@ -937,11 +938,11 @@ func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
 			EfreeSize(op_array, b.SizeOf("zend_op_array"))
 		} else if type_ == ZEND_REQUIRE {
 			va_end(files)
-			return FAILURE
+			return types.FAILURE
 		}
 	}
 	va_end(files)
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendMakeCompiledStringDescription(name string) *byte {
 	var cur_filename *byte

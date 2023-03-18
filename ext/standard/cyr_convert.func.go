@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
@@ -63,26 +64,26 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	}
 	return (*byte)(str)
 }
-func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var input *byte
 	var fr_cs *byte
 	var to_cs *byte
 	var input_len int
 	var fr_cs_len int
 	var to_cs_len int
-	var str *zend.ZendString
+	var str *types.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
 		var _num_args int = executeData.NumArgs()
 		var _i int = 0
-		var _real_arg *zend.Zval
-		var _arg *zend.Zval = nil
+		var _real_arg *types.Zval
+		var _arg *types.Zval = nil
 		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
 		var _error *byte = nil
-		var _dummy zend.ZendBool
-		var _optional zend.ZendBool = 0
+		var _dummy types.ZendBool
+		var _optional types.ZendBool = 0
 		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
@@ -150,7 +151,7 @@ func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	}
-	str = zend.ZendStringInit(input, input_len, 0)
+	str = types.ZendStringInit(input, input_len, 0)
 	PhpConvertCyrString((*uint8)(str.GetVal()), str.GetLen(), fr_cs[0], to_cs[0])
 	return_value.SetString(str)
 }

@@ -5,6 +5,7 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
+	"sik/zend/types"
 )
 
 func ZEND_MM_ALIGNED_SIZE(size int) int {
@@ -39,10 +40,10 @@ func Pestrdup(s *byte, persistent int) *byte {
 func Pestrndup(s *byte, length int, persistent int) *byte {
 	return b.Strndup(s, length)
 }
-func ALLOC_HASHTABLE(ht *HashTable) *HashTable { return NewZendArray(0) }
-func FREE_HASHTABLE(ht *HashTable)             { b.Free(ht) }
-func ZendMmGc(__ZendMmHeap any) int            { return 0 }
-func IsZendMm() int                            { return 0 }
+func ALLOC_HASHTABLE(ht *types.HashTable) *types.HashTable { return types.NewZendArray(0) }
+func FREE_HASHTABLE(ht *types.HashTable)                   { b.Free(ht) }
+func ZendMmGc(__ZendMmHeap any) int                        { return 0 }
+func IsZendMm() int                                        { return 0 }
 func ZendStrndup(s *byte, length int) *byte {
 	var p *byte
 	if length+1 == 0 {
@@ -53,7 +54,7 @@ func ZendStrndup(s *byte, length int) *byte {
 }
 func ZendSetMemoryLimit(memory_limit int) int {
 	// notice memory 限制失效
-	return SUCCESS
+	return types.SUCCESS
 }
 func ZendMemoryUsage(real_usage int) int {
 	// notice 获取 memory 使用情况失效

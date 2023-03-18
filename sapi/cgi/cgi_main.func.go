@@ -9,10 +9,11 @@ import (
 	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/types"
 	"sort"
 )
 
-func UserConfigCacheEntryDtor(el *zend.Zval) {
+func UserConfigCacheEntryDtor(el *types.Zval) {
 	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.GetPtr())
 	entry.GetUserConfig().Destroy()
 	zend.Free(entry.GetUserConfig())
@@ -105,14 +106,14 @@ func SapiFcgiFlush(server_context any) {
 func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
-	var ignore_status zend.ZendBool = 0
+	var ignore_status types.ZendBool = 0
 	var response_status int = core.SG__().sapi_headers.http_response_code
 	if core.SG__().request_info.no_headers == 1 {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if CGIG(nph) || core.SG__().sapi_headers.http_response_code != 200 {
 		var len_ int
-		var has_status zend.ZendBool = 0
+		var has_status types.ZendBool = 0
 		var buf []byte
 		if CGIG(rfc2616_headers) && core.SG__().sapi_headers.http_status_line {
 			var s *byte
@@ -249,19 +250,19 @@ func SapiFcgiReadCookies() *byte {
 	return core.FCGI_GETENV(request, "HTTP_COOKIE")
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
-	var array_ptr *zend.Zval = (*zend.Zval)(arg)
+	var array_ptr *types.Zval = (*types.Zval)(arg)
 	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
 	}
 }
-func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
+func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 	if core.PG(variables_order) && (strchr(core.PG(variables_order), 'E') || strchr(core.PG(variables_order), 'e')) {
-		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ != zend.IS_ARRAY {
+		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ != types.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
+		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == types.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
 			array_ptr.GetArr().DestroyEx()
 			array_ptr.SetArr(zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr()))
 			return
@@ -276,7 +277,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 		core.FcgiLoadenv(request, CgiPhpLoadEnvVar, array_ptr)
 	}
 }
-func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
+func SapiCgiRegisterVariables(track_vars_array *types.Zval) {
 	var php_self_len int
 	var php_self *byte
 
@@ -371,8 +372,8 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 	if b.Assign(&entry, zend.ZendHashStrFindPtr(&(CGIG(user_config_cache)), path, path_len)) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"), 1)
 		new_entry.SetExpires(0)
-		new_entry.SetUserConfig((*zend.HashTable)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
-		zend.ZendHashInit(new_entry.GetUserConfig(), 8, nil, zend.DtorFuncT(core.ConfigZvalDtor), 1)
+		new_entry.SetUserConfig((*types.HashTable)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
+		zend.ZendHashInit(new_entry.GetUserConfig(), 8, nil, types.DtorFuncT(core.ConfigZvalDtor), 1)
 		entry = zend.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), path, path_len, new_entry)
 	}
 
@@ -439,7 +440,7 @@ func SapiCgiActivate() int {
 	/* PATH_TRANSLATED should be defined at this stage but better safe than sorry :) */
 
 	if !(core.SG__().request_info.path_translated) {
-		return zend.FAILURE
+		return types.FAILURE
 	}
 	if core.PhpIniHasPerHostConfig() != 0 {
 		var server_name *byte
@@ -517,7 +518,7 @@ func SapiCgiActivate() int {
 		}
 		zend.Efree(path)
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func SapiCgiDeactivate() int {
 	/* flush only when SAPI was started. The reasons are:
@@ -534,13 +535,13 @@ func SapiCgiDeactivate() int {
 			SapiCgiFlush(core.SG__().server_context)
 		}
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpCgiStartup(sapi_module *core.sapi_module_struct) int {
-	if core.PhpModuleStartup(sapi_module, &CgiModuleEntry, 1) == zend.FAILURE {
-		return zend.FAILURE
+	if core.PhpModuleStartup(sapi_module, &CgiModuleEntry, 1) == types.FAILURE {
+		return types.FAILURE
 	}
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func PhpCgiUsage(argv0 *byte) {
 	var prog *byte
@@ -903,15 +904,15 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmShutdownCgi(type_ int, module_number int) int {
 	CGIG(user_config_cache).Destroy()
 	zend.UNREGISTER_INI_ENTRIES(module_number)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
 func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
-func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if zend.ZendParseParametersNone() != 0 {
 		return
 	}
@@ -1013,7 +1014,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ze
 		}
 	}
 }
-func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
+func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 	if h.GetHeaderLen() > 0 {
 		var s *byte
 		var len_ int = 0
@@ -1041,8 +1042,8 @@ func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
 		}
 	}
 }
-func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() == zend.FAILURE {
+func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
 	zend.ArrayInit(return_value)

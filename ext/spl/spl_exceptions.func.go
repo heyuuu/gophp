@@ -3,7 +3,7 @@
 package spl
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 func ZmStartupSplExceptions(type_ int, module_number int) int {
@@ -20,5 +20,5 @@ func ZmStartupSplExceptions(type_ int, module_number int) int {
 	SplRegisterSubClass(&spl_ce_RangeException, spl_ce_RuntimeException, "RangeException", nil, nil)
 	SplRegisterSubClass(&spl_ce_UnderflowException, spl_ce_RuntimeException, "UnderflowException", nil, nil)
 	SplRegisterSubClass(&spl_ce_UnexpectedValueException, spl_ce_RuntimeException, "UnexpectedValueException", nil, nil)
-	return zend.SUCCESS
+	return types.SUCCESS
 }
