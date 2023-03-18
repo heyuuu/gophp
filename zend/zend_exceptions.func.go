@@ -51,18 +51,18 @@ func ZendExceptionSetPrevious(exception *types.ZendObject, add_previous *types.Z
 	zv.SetObject(exception)
 	ex = &zv
 	for {
-		ancestor = ZendReadPropertyEx(IGetExceptionBase(&pv), &pv, types.ZSTR_KNOWN(types.ZEND_STR_PREVIOUS), 1, &rv)
+		ancestor = ZendReadPropertyEx(IGetExceptionBase(&pv), &pv, types.ZSTR_PREVIOUS, 1, &rv)
 		for ancestor.IsObject() {
 			if ancestor.GetObj() == ex.GetObj() {
 				OBJ_RELEASE(add_previous)
 				return
 			}
-			ancestor = ZendReadPropertyEx(IGetExceptionBase(ancestor), ancestor, types.ZSTR_KNOWN(types.ZEND_STR_PREVIOUS), 1, &rv)
+			ancestor = ZendReadPropertyEx(IGetExceptionBase(ancestor), ancestor, types.ZSTR_PREVIOUS, 1, &rv)
 		}
 		base_ce = IGetExceptionBase(ex)
-		previous = ZendReadPropertyEx(base_ce, ex, types.ZSTR_KNOWN(types.ZEND_STR_PREVIOUS), 1, &rv)
+		previous = ZendReadPropertyEx(base_ce, ex, types.ZSTR_PREVIOUS, 1, &rv)
 		if previous.IsNull() {
-			ZendUpdatePropertyEx(base_ce, ex, types.ZSTR_KNOWN(types.ZEND_STR_PREVIOUS), &pv)
+			ZendUpdatePropertyEx(base_ce, ex, types.ZSTR_PREVIOUS, &pv)
 			add_previous.DelRefcount()
 			return
 		}
@@ -163,17 +163,17 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	base_ce = IGetExceptionBase(&obj)
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, ZendGetCompiledFilename())) {
 		tmp.SetRawString(b.CastStrAuto(ZendGetExecutedFilename()))
-		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_KNOWN(types.ZEND_STR_FILE), &tmp)
+		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_FILE, &tmp)
 		ZvalPtrDtor(&tmp)
 		tmp.SetLong(ZendGetExecutedLineno())
-		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_KNOWN(types.ZEND_STR_LINE), &tmp)
+		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_LINE, &tmp)
 	} else {
 		tmp.SetString(filename)
-		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_KNOWN(types.ZEND_STR_FILE), &tmp)
+		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_FILE, &tmp)
 		tmp.SetLong(ZendGetCompiledLineno())
-		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_KNOWN(types.ZEND_STR_LINE), &tmp)
+		ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_LINE, &tmp)
 	}
-	ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_KNOWN(types.ZEND_STR_TRACE), &trace)
+	ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_TRACE, &trace)
 	return object
 }
 func ZendDefaultExceptionNew(class_type *ZendClassEntry) *types.ZendObject {
@@ -213,14 +213,14 @@ func ZimExceptionConstruct(executeData *ZendExecuteData, return_value *types.Zva
 	}
 	if message != nil {
 		tmp.SetString(message)
-		ZendUpdatePropertyEx(base_ce, object, types.ZSTR_KNOWN(types.ZEND_STR_MESSAGE), &tmp)
+		ZendUpdatePropertyEx(base_ce, object, types.ZSTR_MESSAGE, &tmp)
 	}
 	if code != 0 {
 		tmp.SetLong(code)
-		ZendUpdatePropertyEx(base_ce, object, types.ZSTR_KNOWN(types.ZEND_STR_CODE), &tmp)
+		ZendUpdatePropertyEx(base_ce, object, types.ZSTR_CODE, &tmp)
 	}
 	if previous != nil {
-		ZendUpdatePropertyEx(base_ce, object, types.ZSTR_KNOWN(types.ZEND_STR_PREVIOUS), previous)
+		ZendUpdatePropertyEx(base_ce, object, types.ZSTR_PREVIOUS, previous)
 	}
 }
 func CHECK_EXC_TYPE(id types.ZendKnownStringId, type_ uint32) {
@@ -269,27 +269,27 @@ func ZimErrorExceptionConstruct(executeData *ZendExecuteData, return_value *type
 	object = ZEND_THIS(executeData)
 	if message != nil {
 		tmp.SetStringCopy(message)
-		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_KNOWN(types.ZEND_STR_MESSAGE), &tmp)
+		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_MESSAGE, &tmp)
 		ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
 		tmp.SetLong(code)
-		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_KNOWN(types.ZEND_STR_CODE), &tmp)
+		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_CODE, &tmp)
 	}
 	if previous != nil {
-		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_KNOWN(types.ZEND_STR_PREVIOUS), previous)
+		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_PREVIOUS, previous)
 	}
 	tmp.SetLong(severity)
-	ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_KNOWN(types.ZEND_STR_SEVERITY), &tmp)
+	ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_SEVERITY, &tmp)
 	if argc >= 4 {
 		tmp.SetStringCopy(filename)
-		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_KNOWN(types.ZEND_STR_FILE), &tmp)
+		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_FILE, &tmp)
 		ZvalPtrDtor(&tmp)
 		if argc < 5 {
 			lineno = 0
 		}
 		tmp.SetLong(lineno)
-		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_KNOWN(types.ZEND_STR_LINE), &tmp)
+		ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_LINE, &tmp)
 	}
 }
 func GET_PROPERTY(object *types.Zval, id types.ZendKnownStringId) *types.Zval {
@@ -418,14 +418,14 @@ func _buildTraceString(str *SmartStr, ht *types.HashTable, num uint32) {
 	str.AppendByte('#')
 	str.AppendLong(num)
 	str.AppendByte(' ')
-	file = ht.KeyFind(types.ZSTR_KNOWN(types.ZEND_STR_FILE).GetStr())
+	file = ht.KeyFind(types.ZSTR_FILE.GetStr())
 	if file != nil {
 		if file.GetType() != types.IS_STRING {
 			ZendError(E_WARNING, "Function name is no string")
 			str.AppendString("[unknown function]")
 		} else {
 			var line ZendLong
-			tmp = ht.KeyFind(types.ZSTR_KNOWN(types.ZEND_STR_LINE).GetStr())
+			tmp = ht.KeyFind(types.ZSTR_LINE.GetStr())
 			if tmp != nil {
 				if tmp.IsLong() {
 					line = tmp.GetLval()
@@ -444,11 +444,11 @@ func _buildTraceString(str *SmartStr, ht *types.HashTable, num uint32) {
 	} else {
 		str.AppendString("[internal function]: ")
 	}
-	TRACE_APPEND_KEY(types.ZSTR_KNOWN(types.ZEND_STR_CLASS))
-	TRACE_APPEND_KEY(types.ZSTR_KNOWN(types.ZEND_STR_TYPE))
-	TRACE_APPEND_KEY(types.ZSTR_KNOWN(types.ZEND_STR_FUNCTION))
+	TRACE_APPEND_KEY(types.ZSTR_CLASS)
+	TRACE_APPEND_KEY(types.ZSTR_TYPE)
+	TRACE_APPEND_KEY(types.ZSTR_FUNCTION)
 	str.AppendByte('(')
-	tmp = ht.KeyFind(types.ZSTR_KNOWN(types.ZEND_STR_ARGS).GetStr())
+	tmp = ht.KeyFind(types.ZSTR_ARGS.GetStr())
 	if tmp != nil {
 		if tmp.IsArray() {
 			var last_len int = str.GetS().GetLen()
@@ -483,7 +483,7 @@ func zim_exception_getTraceAsString(executeData *ZendExecuteData, return_value *
 	}
 	object = ZEND_THIS(executeData)
 	base_ce = IGetExceptionBase(object)
-	trace = ZendReadPropertyEx(base_ce, object, types.ZSTR_KNOWN(types.ZEND_STR_TRACE), 1, &rv)
+	trace = ZendReadPropertyEx(base_ce, object, types.ZSTR_TRACE, 1, &rv)
 	if trace.GetType() != types.IS_ARRAY {
 		return_value.SetFalse()
 		return
@@ -586,7 +586,7 @@ func zim_exception___toString(executeData *ZendExecuteData, return_value *types.
 	 * the result in uncaught exception handlers without memleaks. */
 
 	tmp.SetString(str)
-	ZendUpdatePropertyEx(base_ce, exception, types.ZSTR_KNOWN(types.ZEND_STR_STRING), &tmp)
+	ZendUpdatePropertyEx(base_ce, exception, types.ZSTR_STRING, &tmp)
 	return_value.SetString(str)
 	return
 }
@@ -677,12 +677,12 @@ func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendL
 	ObjectInitEx(&ex, exception_ce)
 	if message {
 		tmp.SetRawString(b.CastStrAuto(message))
-		ZendUpdatePropertyEx(exception_ce, &ex, types.ZSTR_KNOWN(types.ZEND_STR_MESSAGE), &tmp)
+		ZendUpdatePropertyEx(exception_ce, &ex, types.ZSTR_MESSAGE, &tmp)
 		ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
 		tmp.SetLong(code)
-		ZendUpdatePropertyEx(exception_ce, &ex, types.ZSTR_KNOWN(types.ZEND_STR_CODE), &tmp)
+		ZendUpdatePropertyEx(exception_ce, &ex, types.ZSTR_CODE, &tmp)
 	}
 	ZendThrowExceptionInternal(&ex)
 	return ex.GetObj()
@@ -698,7 +698,7 @@ func ZendThrowErrorException(exception_ce *ZendClassEntry, message string, code 
 	var obj = ZendThrowException(exception_ce, message, code)
 	ex.SetObject(obj)
 	tmp.SetLong(severity)
-	ZendUpdatePropertyEx(ZendCeErrorException, &ex, types.ZSTR_KNOWN(types.ZEND_STR_SEVERITY), &tmp)
+	ZendUpdatePropertyEx(ZendCeErrorException, &ex, types.ZSTR_SEVERITY, &tmp)
 	return obj
 }
 func ZendErrorVa(type_ int, file *byte, lineno uint32, format string, _ ...any) {
@@ -737,7 +737,7 @@ func ZendExceptionError(ex *types.ZendObject, severity int) {
 			if tmp.GetType() != types.IS_STRING {
 				ZendError(E_WARNING, "%s::__toString() must return a string", ce_exception.GetName().GetVal())
 			} else {
-				ZendUpdatePropertyEx(IGetExceptionBase(&exception), &exception, types.ZSTR_KNOWN(types.ZEND_STR_STRING), &tmp)
+				ZendUpdatePropertyEx(IGetExceptionBase(&exception), &exception, types.ZSTR_STRING, &tmp)
 			}
 		}
 		ZvalPtrDtor(&tmp)

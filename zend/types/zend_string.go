@@ -11,8 +11,9 @@ import (
  * ZendString
  */
 type ZendString struct {
+	str string
+	h   uint
 	ZendRefcounted
-	h    zend.ZendUlong
 	len_ int
 	val  []byte
 }
@@ -26,6 +27,10 @@ func NewZendString(str string) *ZendString {
 	zs.SetGcTypeInfo(IS_STRING)
 
 	return zs
+}
+
+func initZendString(str string) *ZendString {
+	return NewZendString(str)
 }
 
 func NewZendStringPersistent(str string, persistent bool) *ZendString {

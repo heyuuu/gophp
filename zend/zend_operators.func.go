@@ -742,7 +742,7 @@ try_again:
 	case types.IS_ARRAY:
 		ZendError(E_NOTICE, "Array to string conversion")
 		ZvalPtrDtor(op)
-		op.SetInternedString(types.ZSTR_KNOWN(types.ZEND_STR_ARRAY_CAPITALIZED))
+		op.SetInternedString(types.ZSTR_ARRAY_CAPITALIZED)
 	case types.IS_OBJECT:
 		var tmp types.Zval
 		if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
@@ -861,7 +861,7 @@ try_again:
 		var tmp types.Zval
 		types.ZVAL_COPY_VALUE(&tmp, op)
 		ObjectInit(op)
-		types.Z_OBJPROP_P(op).KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_SCALAR).GetStr(), &tmp)
+		types.Z_OBJPROP_P(op).KeyAddNew(types.ZSTR_SCALAR.GetStr(), &tmp)
 	}
 }
 func _zvalGetLongFuncEx(op *types.Zval, silent types.ZendBool) ZendLong {
@@ -993,7 +993,7 @@ try_again:
 		if try != 0 && EG__().GetException() != nil {
 			return nil
 		} else {
-			return types.ZSTR_KNOWN(types.ZEND_STR_ARRAY_CAPITALIZED)
+			return types.ZSTR_ARRAY_CAPITALIZED
 		}
 		fallthrough
 	case types.IS_OBJECT:

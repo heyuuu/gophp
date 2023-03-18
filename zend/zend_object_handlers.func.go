@@ -1609,7 +1609,7 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 func ZendStdGetClosure(obj *types.Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int {
 	var func_ *types.Zval
 	var ce *ZendClassEntry = types.Z_OBJCE_P(obj)
-	if b.Assign(&func_, ce.GetFunctionTable().KeyFind(types.ZSTR_KNOWN(types.ZEND_STR_MAGIC_INVOKE).GetStr())) == nil {
+	if b.Assign(&func_, ce.GetFunctionTable().KeyFind(types.ZSTR_MAGIC_INVOKE.GetStr())) == nil {
 		return types.FAILURE
 	}
 	*fptr_ptr = func_.GetFunc()

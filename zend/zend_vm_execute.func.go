@@ -585,8 +585,8 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
 
-				/* Free extra args before releasing the closure,
-				 * as that may free the op_array. */))
+			/* Free extra args before releasing the closure,
+			 * as that may free the op_array. */))
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -1540,7 +1540,7 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		for {
 			EG__().SetErrorReporting(0)
 			if EG__().GetErrorReportingIniEntry() == nil {
-				var zv *types.Zval = EG__().GetIniDirectives().KeyFind(types.ZSTR_KNOWN(types.ZEND_STR_ERROR_REPORTING).GetStr())
+				var zv *types.Zval = EG__().GetIniDirectives().KeyFind(types.ZSTR_ERROR_REPORTING.GetStr())
 				if zv != nil {
 					EG__().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
 				} else {
@@ -1552,7 +1552,7 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
 					ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
 				}
-				if ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_KNOWN(types.ZEND_STR_ERROR_REPORTING), EG__().GetErrorReportingIniEntry()) != nil {
+				if ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING, EG__().GetErrorReportingIniEntry()) != nil {
 					EG__().GetErrorReportingIniEntry().SetOrigValue(EG__().GetErrorReportingIniEntry().GetValue())
 					EG__().GetErrorReportingIniEntry().SetOrigModifiable(EG__().GetErrorReportingIniEntry().GetModifiable())
 					EG__().GetErrorReportingIniEntry().SetModified(1)
@@ -2957,7 +2957,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_CONST == IS_CONST {
 					if expr.IsRefcounted() {
 						expr.AddRefcount()
@@ -7292,7 +7292,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
-		if types.ZendStringEquals(name, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) != 0 {
+		if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			if IS_CONST != IS_CONST {
@@ -7315,7 +7315,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	} else if retval.IsIndirect() {
 		retval = retval.GetZv()
 		if retval.IsUndef() {
-			if types.ZendStringEquals(name, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) != 0 {
+			if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
 				goto fetch_this
 			}
 			if type_ == BP_VAR_W {
@@ -14085,7 +14085,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
-		if types.ZendStringEquals(name, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) != 0 {
+		if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
@@ -14108,7 +14108,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	} else if retval.IsIndirect() {
 		retval = retval.GetZv()
 		if retval.IsUndef() {
-			if types.ZendStringEquals(name, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) != 0 {
+			if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
 				goto fetch_this
 			}
 			if type_ == BP_VAR_W {
@@ -15456,7 +15456,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_TMP_VAR == IS_CONST {
 					if expr.IsRefcounted() {
 						expr.AddRefcount()
@@ -18263,7 +18263,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_VAR == IS_CONST {
 					if expr.IsRefcounted() {
 						expr.AddRefcount()
@@ -32827,7 +32827,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_KNOWN(types.ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_CV == IS_CONST {
 					if expr.IsRefcounted() {
 						expr.AddRefcount()
@@ -39770,7 +39770,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
-		if types.ZendStringEquals(name, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) != 0 {
+		if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			if IS_CV != IS_CONST {
@@ -39793,7 +39793,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	} else if retval.IsIndirect() {
 		retval = retval.GetZv()
 		if retval.IsUndef() {
-			if types.ZendStringEquals(name, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) != 0 {
+			if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
 				goto fetch_this
 			}
 			if type_ == BP_VAR_W {

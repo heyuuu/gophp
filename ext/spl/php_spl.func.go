@@ -645,10 +645,10 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 		return
 	}
 	if zend.EG__().GetAutoloadFunc() == nil {
-		if b.Assign(&fptr, zend.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_KNOWN(types.ZEND_STR_MAGIC_AUTOLOAD))) {
+		if b.Assign(&fptr, zend.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_MAGIC_AUTOLOAD)) {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
-			tmp.SetStringCopy(types.ZSTR_KNOWN(types.ZEND_STR_MAGIC_AUTOLOAD))
+			tmp.SetStringCopy(types.ZSTR_MAGIC_AUTOLOAD)
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 			return
 		}

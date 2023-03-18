@@ -10,4 +10,3 @@ func CopyRegistryModules() []*ZendModuleEntry {
 	}
 	return modules
 }
-

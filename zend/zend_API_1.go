@@ -273,26 +273,26 @@ func ZendZvalTypeName(arg *types.Zval) string {
 func ZendZvalGetType(arg *types.Zval) *types.ZendString {
 	switch arg.GetType() {
 	case types.IS_NULL:
-		return types.ZSTR_KNOWN(types.ZEND_STR_NULL)
+		return types.ZSTR_NULL
 	case types.IS_FALSE:
 
 	case types.IS_TRUE:
-		return types.ZSTR_KNOWN(types.ZEND_STR_BOOLEAN)
+		return types.ZSTR_BOOLEAN
 	case types.IS_LONG:
-		return types.ZSTR_KNOWN(types.ZEND_STR_INTEGER)
+		return types.ZSTR_INTEGER
 	case types.IS_DOUBLE:
-		return types.ZSTR_KNOWN(types.ZEND_STR_DOUBLE)
+		return types.ZSTR_DOUBLE
 	case types.IS_STRING:
-		return types.ZSTR_KNOWN(types.ZEND_STR_STRING)
+		return types.ZSTR_STRING
 	case types.IS_ARRAY:
-		return types.ZSTR_KNOWN(types.ZEND_STR_ARRAY)
+		return types.ZSTR_ARRAY
 	case types.IS_OBJECT:
-		return types.ZSTR_KNOWN(types.ZEND_STR_OBJECT)
+		return types.ZSTR_OBJECT
 	case types.IS_RESOURCE:
 		if ZendRsrcListGetRsrcType(arg.GetRes()) != nil {
-			return types.ZSTR_KNOWN(types.ZEND_STR_RESOURCE)
+			return types.ZSTR_RESOURCE
 		} else {
-			return types.ZSTR_KNOWN(types.ZEND_STR_CLOSED_RESOURCE)
+			return types.ZSTR_CLOSED_RESOURCE
 		}
 	default:
 		return nil

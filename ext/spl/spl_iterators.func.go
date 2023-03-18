@@ -726,7 +726,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 		/* TODO: Remove this special case? */
 
 		if data.IsType(types.IS_ARRAY) {
-			return_value.SetInternedString(types.ZSTR_KNOWN(types.ZEND_STR_ARRAY_CAPITALIZED))
+			return_value.SetInternedString(types.ZSTR_ARRAY_CAPITALIZED)
 		} else {
 			types.ZVAL_COPY(return_value, data)
 			zend.ConvertToString(return_value)

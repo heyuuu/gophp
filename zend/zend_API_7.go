@@ -420,14 +420,14 @@ try_again:
 			method = ZendHashIndexFindDeref(callable.GetArr(), 1)
 		}
 		if obj == nil || method == nil || method.GetType() != types.IS_STRING {
-			return types.ZSTR_KNOWN(types.ZEND_STR_ARRAY_CAPITALIZED)
+			return types.ZSTR_ARRAY_CAPITALIZED
 		}
 		if obj.IsString() {
 			return ZendCreateMethodString(obj.GetStr(), method.GetStr())
 		} else if obj.IsObject() {
 			return ZendCreateMethodString(types.Z_OBJCE_P(obj).GetName(), method.GetStr())
 		} else {
-			return types.ZSTR_KNOWN(types.ZEND_STR_ARRAY_CAPITALIZED)
+			return types.ZSTR_ARRAY_CAPITALIZED
 		}
 	case types.IS_OBJECT:
 		var calling_scope *ZendClassEntry

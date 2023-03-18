@@ -1672,7 +1672,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 
 			/* Check again, the original check might have not known the protocol name */
 
-			if b.Assign(&wrapper, zend.ZendHashFindExPtr(wrapper_hash, types.ZSTR_KNOWN(types.ZEND_STR_FILE), 1)) != nil {
+			if b.Assign(&wrapper, zend.ZendHashFindExPtr(wrapper_hash, types.ZSTR_FILE, 1)) != nil {
 				return wrapper
 			}
 			if (options & core.REPORT_ERRORS) != 0 {

@@ -1108,7 +1108,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_KNOWN(types.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_KNOWN(types.ZEND_STR_ARGV), 1)) != nil) {
+	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV, 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {

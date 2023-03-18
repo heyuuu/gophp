@@ -578,13 +578,13 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 	}
 	if SG__().request_info.argc {
 		arr.AddRefcount()
-		zend.EG__().GetSymbolTable().KeyUpdate(types.ZSTR_KNOWN(types.ZEND_STR_ARGV).GetStr(), &arr)
-		zend.EG__().GetSymbolTable().KeyUpdate(types.ZSTR_KNOWN(types.ZEND_STR_ARGC).GetStr(), &argc)
+		zend.EG__().GetSymbolTable().KeyUpdate(types.ZSTR_ARGV.GetStr(), &arr)
+		zend.EG__().GetSymbolTable().KeyUpdate(types.ZSTR_ARGC.GetStr(), &argc)
 	}
 	if track_vars_array != nil && track_vars_array.IsType(types.IS_ARRAY) {
 		arr.AddRefcount()
-		track_vars_array.GetArr().KeyUpdate(types.ZSTR_KNOWN(types.ZEND_STR_ARGV).GetStr(), &arr)
-		track_vars_array.GetArr().KeyUpdate(types.ZSTR_KNOWN(types.ZEND_STR_ARGC).GetStr(), &argc)
+		track_vars_array.GetArr().KeyUpdate(types.ZSTR_ARGV.GetStr(), &arr)
+		track_vars_array.GetArr().KeyUpdate(types.ZSTR_ARGC.GetStr(), &argc)
 	}
 	zend.ZvalPtrDtorNogc(&arr)
 }
@@ -722,10 +722,10 @@ func PhpAutoGlobalsCreateServer(name *types.ZendString) types.ZendBool {
 			if SG__().request_info.argc {
 				var argc *types.Zval
 				var argv *types.Zval
-				if b.Assign(&argc, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_KNOWN(types.ZEND_STR_ARGC), 1)) != nil && b.Assign(&argv, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_KNOWN(types.ZEND_STR_ARGV), 1)) != nil {
+				if b.Assign(&argc, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGC, 1)) != nil && b.Assign(&argv, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil {
 					argv.AddRefcount()
-					PG(http_globals)[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_KNOWN(types.ZEND_STR_ARGV).GetStr(), argv)
-					PG(http_globals)[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_KNOWN(types.ZEND_STR_ARGC).GetStr(), argc)
+					PG(http_globals)[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_ARGV.GetStr(), argv)
+					PG(http_globals)[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_ARGC.GetStr(), argc)
 				}
 			} else {
 				PhpBuildArgv(SG__().request_info.query_string, &PG(http_globals)[TRACK_VARS_SERVER])

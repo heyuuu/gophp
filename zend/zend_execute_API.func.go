@@ -782,7 +782,7 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 		return nil
 	}
 	if EG__().GetAutoloadFunc() == nil {
-		var func_ *ZendFunction = ZendFetchFunction(types.ZSTR_KNOWN(types.ZEND_STR_MAGIC_AUTOLOAD))
+		var func_ *ZendFunction = ZendFetchFunction(types.ZSTR_MAGIC_AUTOLOAD)
 		if func_ != nil {
 			EG__().SetAutoloadFunc(func_)
 		} else {

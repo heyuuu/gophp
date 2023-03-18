@@ -6662,7 +6662,7 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
 		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
-		if zend.ZendHashDel(symbol_table, types.ZSTR_KNOWN(types.ZEND_STR_THIS)) == types.SUCCESS {
+		if zend.ZendHashDel(symbol_table, types.ZSTR_THIS) == types.SUCCESS {
 			zend.ZendThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {

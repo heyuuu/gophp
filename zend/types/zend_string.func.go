@@ -11,8 +11,8 @@ func ZSTR_VAL(zstr *ZendString) []byte { return zstr.GetVal() }
 
 var ZendEmptyString *ZendString = nil
 
-func STR_EMPTY_ALLOC() *ZendString  { return ZendEmptyString }
-func ZSTR_EMPTY_ALLOC() *ZendString { return ZendEmptyString }
+func STR_EMPTY_ALLOC() *ZendString  { return ZSTR_EMPTY }
+func ZSTR_EMPTY_ALLOC() *ZendString { return ZSTR_EMPTY }
 
 func ZSTR_CHAR(c int) *ZendString { return ZendOneCharString[c] }
 func ZSTR_KNOWN(str string) *ZendString {
@@ -114,15 +114,8 @@ func ZendHashFunc(str *byte, len_ int) zend.ZendUlong { return ZendInlineHashFun
 var IsInRequestForInternedString bool = false
 
 func ZendInternedStringsInit() {
-	ZendEmptyString = nil
 	InternedStringsPermanent.Clean()
 	IsInRequestForInternedString = false
-
-	/* interned empty string */
-	ZendEmptyString = InitInternedZendString("")
-	for i := 0; i < 256; i++ {
-		ZendOneCharString[i] = InitInternedZendString(string([]byte{byte(i)}))
-	}
 }
 func ZendInternedStringsDtor() {
 	InternedStringsPermanent.Clean()
