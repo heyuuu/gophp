@@ -7,25 +7,20 @@ import (
 	"sik/zend"
 )
 
-func ZSTR_VAL(zstr *ZendString) []byte { return zstr.GetVal() }
-
-var ZendEmptyString *ZendString = nil
-
-func STR_EMPTY_ALLOC() *ZendString  { return ZSTR_EMPTY }
 func ZSTR_EMPTY_ALLOC() *ZendString { return ZSTR_EMPTY }
-
-func ZSTR_CHAR(c int) *ZendString { return ZendOneCharString[c] }
+func ZSTR_CHAR(c int) *ZendString   { return ZendOneCharString[c] }
 func ZSTR_KNOWN(str string) *ZendString {
 	return NewZendStringPersistent(str, true)
 }
 
-func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap any) {
+func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int) {
 	*str = *ZendStringAlloc(_len, 0)
 }
 
 func ZendStringForgetHashVal(s *ZendString) {
-	s.SetH(0)
-	s.DelGcFlags(IS_STR_VALID_UTF8)
+	// todo remove
+	//s.SetH(0)
+	//s.DelGcFlags(IS_STR_VALID_UTF8)
 }
 
 func ZendStringAlloc(len_ int, persistent int) *ZendString {

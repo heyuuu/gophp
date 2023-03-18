@@ -2770,7 +2770,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	types.ZSTR_ALLOCA_ALLOC(ord_needle, 1, use_heap)
+	types.ZSTR_ALLOCA_ALLOC(ord_needle, 1)
 	if zneedle.IsType(types.IS_STRING) {
 		needle = zneedle.GetStr()
 	} else {
@@ -2815,9 +2815,9 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 		/* Borrow that ord_needle buffer to avoid repeatedly tolower()ing needle */
 
-		(*types.ZSTR_VAL)(ord_needle) = tolower((*types.ZSTR_VAL)(needle))
+		ord_needle.GetVal() = tolower(needle.GetVal())
 		for e >= p {
-			if tolower(*e) == (*types.ZSTR_VAL)(ord_needle) {
+			if tolower(*e) == ord_needle.GetVal() {
 				ord_needle.Free()
 				return_value.SetLong(e - p + b.Cond(offset > 0, offset, 0))
 				return
@@ -3456,7 +3456,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 				if repl_idx < types.Z_ARRVAL_P(repl).GetNNumUsed() {
 					repl_str = zend.ZvalGetTmpString(tmp_repl, &tmp_repl_str)
 				} else {
-					repl_str = types.STR_EMPTY_ALLOC()
+					repl_str = types.ZSTR_EMPTY
 				}
 			} else {
 				repl_str = repl.GetStr()
@@ -7283,7 +7283,7 @@ func ZifStrRepeat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	/* Heavy optimization for situations where input string is 1 byte long */
 
 	if input_str.GetLen() == 1 {
-		memset(result.GetVal(), (*types.ZSTR_VAL)(input_str), mult)
+		memset(result.GetVal(), input_str.GetVal(), mult)
 	} else {
 		var s *byte
 		var ee *byte

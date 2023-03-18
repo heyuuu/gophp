@@ -1182,7 +1182,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.ZendString,
 	if key != nil {
 		lc_method_name = key.GetStr()
 	} else {
-		types.ZSTR_ALLOCA_ALLOC(lc_method_name, method_name.GetLen(), use_heap)
+		types.ZSTR_ALLOCA_ALLOC(lc_method_name, method_name.GetLen())
 		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
 	}
 	if b.Assign(&func_, zobj.GetCe().GetFunctionTable().KeyFind(lc_method_name.GetStr())) == nil {

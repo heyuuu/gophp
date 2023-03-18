@@ -158,7 +158,7 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.ZendString, persistent
 func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.ZendString, persistent types.ZendBool) *types.ZendString {
 	var lcname *types.ZendString
 	var interned *types.ZendString
-	types.ZSTR_ALLOCA_ALLOC(lcname, str.GetLen(), use_heap)
+	types.ZSTR_ALLOCA_ALLOC(lcname, str.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), str.GetVal(), str.GetLen())
 	interned = zend.ZendHashFindPtr(ctx.GetStrInterned(), lcname)
 	if interned != nil {
@@ -404,7 +404,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.ZendString, found
 
 	/* Lowercase the pattern, the agent name is already lowercase */
 
-	types.ZSTR_ALLOCA_ALLOC(pattern_lc, entry.GetPattern().GetLen(), use_heap)
+	types.ZSTR_ALLOCA_ALLOC(pattern_lc, entry.GetPattern().GetLen())
 	zend.ZendStrTolowerCopy(pattern_lc.GetVal(), entry.GetPattern().GetVal(), entry.GetPattern().GetLen())
 
 	/* Check if the agent contains the "contains" portions */

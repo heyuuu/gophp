@@ -483,7 +483,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var first int = 1
 			var tmp_str *types.ZendString
 			var str *types.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
-			var v *byte = types.ZSTR_VAL(str)
+			var v *byte = str.GetVal()
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough characters in string", code)

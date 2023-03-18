@@ -57,7 +57,7 @@ func ZendIsCallableCheckClass(name *types.ZendString, scope *ZendClassEntry, fcc
 	var ce *ZendClassEntry
 	var name_len int = name.GetLen()
 	var lcname *types.ZendString
-	types.ZSTR_ALLOCA_ALLOC(lcname, name_len, use_heap)
+	types.ZSTR_ALLOCA_ALLOC(lcname, name_len)
 	ZendStrTolowerCopy(lcname.GetVal(), name.GetVal(), name_len)
 	*strict_class = 0
 	if types.ZendStringEqualsLiteral(lcname, "self") {
@@ -182,7 +182,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *ZendFca
 
 			/* Skip leading \ */
 
-			types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen()-1, use_heap)
+			types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen()-1)
 			ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal()+1, callable.GetStr().GetLen()-1)
 			func_ = ZendFetchFunction(lmname)
 			lmname.Free()
@@ -190,7 +190,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *ZendFca
 			lmname = callable.GetStr()
 			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
-				types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen(), use_heap)
+				types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen())
 				ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal(), callable.GetStr().GetLen())
 				func_ = ZendFetchFunction(lmname)
 				lmname.Free()

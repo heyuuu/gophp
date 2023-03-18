@@ -259,7 +259,7 @@ func UnserializeAllowedClass(class_name *types.ZendString, var_hashx *PhpUnseria
 	if !(classes.GetNNumOfElements()) {
 		return 0
 	}
-	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen(), use_heap)
+	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
 	res = zend.ZendHashExists(classes, lcname)
 	lcname.Free()

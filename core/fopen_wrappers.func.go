@@ -48,7 +48,7 @@ func OnUpdateBaseDir(
 
 	/* Shortcut: When we have a open_basedir and someone tries to unset, we know it'll fail */
 
-	if new_value == nil || !((*types.ZSTR_VAL)(new_value)) {
+	if new_value == nil || !new_value.GetVal() {
 		return types.FAILURE
 	}
 
