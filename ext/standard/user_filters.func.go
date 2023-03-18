@@ -418,12 +418,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgObject(_arg, &zobject, nil, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_OBJECT
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zobject = fp.ParseObject()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

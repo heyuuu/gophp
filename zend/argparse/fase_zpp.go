@@ -366,7 +366,11 @@ func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval, isNull typ
 		return
 	}
 
-	// todo
+	if ZendParseArgObject(p._arg, &dest, nil, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_OBJECT
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
@@ -381,7 +385,16 @@ func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull boo
 		return
 	}
 
-	// todo
+	if ZendParseArgObject(p._arg, &dest, ce, types.IntBool(checkNull)) == 0 {
+		if ce != nil {
+			p._error = ce.Name()
+			p.errorCode = ZPP_ERROR_WRONG_CLASS
+		} else {
+			p._expected_type = Z_EXPECTED_OBJECT
+			p.errorCode = ZPP_ERROR_WRONG_ARG
+		}
+	}
+
 	return
 }
 
