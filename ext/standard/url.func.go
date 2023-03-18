@@ -742,12 +742,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			url, url_len = fp.ParsePath()
 			fp.StartOptional()
 			format = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zcontext = fp.ParseResourceEx(true)
 			if fp.HasError() {
 				fp.HandleError()
 				return

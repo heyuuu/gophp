@@ -160,12 +160,7 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zproc, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zproc = fp.ParseResource()
 			fp.StartOptional()
 			sig_no = fp.ParseLong()
 			if fp.HasError() {
@@ -214,12 +209,7 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zproc, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zproc = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -272,12 +262,7 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zproc, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zproc = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

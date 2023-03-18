@@ -351,12 +351,7 @@ func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_valu
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zbrigade, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zbrigade = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -412,12 +407,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zbrigade, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zbrigade = fp.ParseResource()
 			zobject = fp.ParseObject()
 			if fp.HasError() {
 				fp.HandleError()

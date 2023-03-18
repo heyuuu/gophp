@@ -91,12 +91,7 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, 
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			dirname, dir_len = fp.ParsePath()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zcontext = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -157,12 +152,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &id, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			id = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -358,12 +348,7 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &id, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			id = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -432,12 +417,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &id, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			id = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -630,12 +610,7 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			dirn, dirn_len = fp.ParsePath()
 			fp.StartOptional()
 			flags = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_RESOURCE
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			zcontext = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
 				return

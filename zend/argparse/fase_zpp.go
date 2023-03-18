@@ -436,16 +436,19 @@ func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString) {
 
 // @see Micro: Z_PARAM_RESOURCE
 func (p *FastParser) ParseResource() (dest *types.Zval) {
-	dest, _ = p.ParseResourceEx(false)
-	return
+	return p.ParseResourceEx(false)
 }
-func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if ZendParseArgResource(p._arg, &dest, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_RESOURCE
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
