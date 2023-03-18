@@ -218,25 +218,10 @@ func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *types.Zv
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &v1, &v1_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &v2, &v2_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			v1, v1_len = fp.ParseString()
+			v2, v2_len = fp.ParseString()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &op, &op_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			op, op_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return

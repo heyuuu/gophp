@@ -49,12 +49,7 @@ func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &addr, &addr_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			addr, addr_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -112,12 +107,7 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			hostname, hostname_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -165,12 +155,7 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zv
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			hostname, hostname_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -260,19 +245,9 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zv
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &rectype, &rectype_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			rectype, rectype_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -787,12 +762,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
 			type_param = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
@@ -1085,12 +1055,7 @@ func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			hostname, hostname_len = fp.ParseString()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &mx_list, 0)
 			fp.StartOptional()

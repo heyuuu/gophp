@@ -40,12 +40,7 @@ func ZifUniqid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &prefix, &prefix_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			prefix, prefix_len = fp.ParseString()
 			more_entropy = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()

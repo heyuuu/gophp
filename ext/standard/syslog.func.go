@@ -90,12 +90,7 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &ident, &ident_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			ident, ident_len = fp.ParseString()
 			option = fp.ParseLong()
 			facility = fp.ParseLong()
 			if fp.HasError() {
@@ -157,12 +152,7 @@ func ZifSyslog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			priority = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &message, &message_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			message, message_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return

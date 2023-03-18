@@ -38,12 +38,7 @@ func ZifFtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			pathname, pathname_len = fp.ParsePath()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &proj, &proj_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			proj, proj_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return

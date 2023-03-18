@@ -454,25 +454,27 @@ func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_STRING
 func (p *FastParser) ParseString() (dest *byte, destLen int) {
-	dest, destLen, _ = p.ParseStringEx(false)
-	return
+	return p.ParseStringEx(false)
 }
-func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int, isNull types.ZendBool) {
+func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if ZendParseArgString(p._arg, &dest, &destLen, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_STRING
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
 // @see Micro: Z_PARAM_STR
 func (p *FastParser) ParseStr() (dest *types.ZendString) {
-	dest, _ = p.ParseStrEx(false)
-	return
+	return p.ParseStrEx(false)
 }
-func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString, isNull types.ZendBool) {
+func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return

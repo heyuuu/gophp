@@ -2020,18 +2020,8 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *types.Zval
 			num = fp.ParseDouble()
 			fp.StartOptional()
 			dec = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &dec_point, &dec_point_len, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &thousand_sep, &thousand_sep_len, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			dec_point, dec_point_len = fp.ParseStringEx(true)
+			thousand_sep, thousand_sep_len = fp.ParseStringEx(true)
 			if fp.HasError() {
 				fp.HandleError()
 				return

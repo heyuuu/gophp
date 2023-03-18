@@ -550,12 +550,7 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			fp.StartOptional()
 			linelength = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &breakchar, &breakchar_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			breakchar, breakchar_len = fp.ParseString()
 			docut = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
@@ -1353,19 +1348,9 @@ func ZifBasename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &string, &string_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			string, string_len = fp.ParseString()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &suffix, &suffix_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			suffix, suffix_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1405,12 +1390,7 @@ func ZifDirname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			levels = fp.ParseLong()
 			if fp.HasError() {
@@ -1481,12 +1461,7 @@ func ZifPathinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &path, &path_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			path, path_len = fp.ParseString()
 			fp.StartOptional()
 			opt = fp.ParseLong()
 			if fp.HasError() {
@@ -2324,12 +2299,7 @@ func ZifChunkSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			}
 			fp.StartOptional()
 			chunklen = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &end, &endlen, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			end, endlen = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -3078,12 +3048,7 @@ func ZifUcwords(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &delims, &delims_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			delims, delims_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -3711,12 +3676,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &from, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &to, &to_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			to, to_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4694,12 +4654,7 @@ func PhpHebrev(executeData *zend.ZendExecuteData, return_value *types.Zval, conv
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			max_chars = fp.ParseLong()
 			if fp.HasError() {
@@ -5189,12 +5144,7 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &arg, &arglen, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			arg, arglen = fp.ParseString()
 			fp.StartOptional()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &arrayArg, 0)
@@ -5665,24 +5615,9 @@ func ZifStrGetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &delim_str, &delim_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &enc_str, &enc_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &esc_str, &esc_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			delim_str, delim_len = fp.ParseString()
+			enc_str, enc_len = fp.ParseString()
+			esc_str, esc_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -6038,18 +5973,8 @@ func ZifSubstrCount(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &haystack, &haystack_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &needle, &needle_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			haystack, haystack_len = fp.ParseString()
+			needle, needle_len = fp.ParseString()
 			fp.StartOptional()
 			offset = fp.ParseLong()
 			length = fp.ParseLong()
@@ -6149,12 +6074,7 @@ func ZifStrPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			pad_length = fp.ParseLong()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &pad_str, &pad_str_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			pad_str, pad_str_len = fp.ParseString()
 			pad_type_val = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
@@ -6252,18 +6172,8 @@ func ZifSscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &format, &format_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			str, str_len = fp.ParseString()
+			format, format_len = fp.ParseString()
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -6459,12 +6369,7 @@ func ZifStrWordCount(executeData *zend.ZendExecuteData, return_value *types.Zval
 			}
 			fp.StartOptional()
 			type_ = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &char_list, &char_list_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			char_list, char_list_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -6564,12 +6469,7 @@ func ZifMoneyFormat(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &format, &format_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			format, format_len = fp.ParseString()
 			value = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()
@@ -6898,12 +6798,7 @@ func ZifUtf8Encode(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &arg, &arg_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			arg, arg_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -6940,12 +6835,7 @@ func ZifUtf8Decode(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &arg, &arg_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			arg, arg_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return

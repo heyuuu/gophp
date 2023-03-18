@@ -607,12 +607,7 @@ func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &ext_name, &ext_name_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			ext_name, ext_name_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -706,12 +701,7 @@ func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &mode, &modelen, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			mode, modelen = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return

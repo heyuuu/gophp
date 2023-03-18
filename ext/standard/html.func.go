@@ -1601,12 +1601,7 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 			fp.StartOptional()
 			all = fp.ParseLong()
 			flags = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgString(_arg, &charset_hint, &charset_hint_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			charset_hint, charset_hint_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
 				return
