@@ -4,7 +4,6 @@ package types
 
 import (
 	b "sik/builtin"
-	"sik/zend"
 )
 
 /**
@@ -94,7 +93,7 @@ func (this *ZendRefcounted) AddRefcount() uint32 {
 }
 
 func (this *ZendRefcounted) DelRefcount() uint32 {
-	zend.ZEND_ASSERT(this.gc.refcount > 0)
+	b.Assert(this.gc.refcount > 0)
 	this.gc.refcount--
 	return this.gc.refcount
 }

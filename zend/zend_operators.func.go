@@ -5,8 +5,8 @@ package zend
 import (
 	"math"
 	b "sik/builtin"
+	. "sik/builtin/ctype"
 	"sik/core"
-	. "sik/runtime/ctype"
 	"sik/zend/types"
 	"strings"
 )
@@ -776,7 +776,7 @@ try_again:
 }
 func _tryConvertToString(op *types.Zval) types.ZendBool {
 	var str *types.ZendString
-	ZEND_ASSERT(op.GetType() != types.IS_STRING)
+	b.Assert(op.GetType() != types.IS_STRING)
 	str = ZvalTryGetStringFunc(op)
 	if str == nil {
 		return 0
@@ -2321,7 +2321,7 @@ func NumericCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
 	return ZEND_NORMALIZE_BOOL(d1 - d2)
 }
 func ZendFreeObjGetResult(op *types.Zval) {
-	ZEND_ASSERT(!(op.IsRefcounted()) || op.GetRefcount() != 0)
+	b.Assert(!(op.IsRefcounted()) || op.GetRefcount() != 0)
 	ZvalPtrDtor(op)
 }
 func ConvertCompareResultToLong(result *types.Zval) {
@@ -2510,7 +2510,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetLong(-1)
 				return types.SUCCESS
 			} else {
-				ZEND_ASSERT(false)
+				b.Assert(false)
 				ZendThrowError(nil, "Unsupported operand types")
 				if result != op1 {
 					result.SetUndef()
@@ -2609,7 +2609,7 @@ func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.Zend
 func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.ZendBool {
 	var i uint32
 	if instance_ce.GetNumInterfaces() != 0 {
-		ZEND_ASSERT(instance_ce.IsResolvedInterfaces())
+		b.Assert(instance_ce.IsResolvedInterfaces())
 		for i = 0; i < instance_ce.GetNumInterfaces(); i++ {
 			if instance_ce.GetInterfaces()[i] == ce {
 				return 1
@@ -2620,10 +2620,10 @@ func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.
 }
 func InstanceofFunctionEx(instance_ce *ZendClassEntry, ce *ZendClassEntry, is_interface types.ZendBool) types.ZendBool {
 	if is_interface != 0 {
-		ZEND_ASSERT(ce.IsInterface())
+		b.Assert(ce.IsInterface())
 		return InstanceofInterface(instance_ce, ce)
 	} else {
-		ZEND_ASSERT(!ce.IsInterface())
+		b.Assert(!ce.IsInterface())
 		return InstanceofClass(instance_ce, ce)
 	}
 }

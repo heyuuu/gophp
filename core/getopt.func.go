@@ -3,8 +3,9 @@
 package core
 
 import (
+	"log"
 	b "sik/builtin"
-	r "sik/runtime"
+	r "sik/builtin/file"
 )
 
 func PhpOptError(

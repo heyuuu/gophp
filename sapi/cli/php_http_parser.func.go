@@ -4,7 +4,6 @@ package cli
 
 import (
 	b "sik/builtin"
-	r "sik/runtime"
 )
 
 func MIN(a int, b int) int {
@@ -1014,7 +1013,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 					}
 					break
 				default:
-					r.Assert(false)
+					b.Assert(false)
 					break
 				}
 				break
@@ -1158,7 +1157,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			case HConnection:
 
 			case HTransferEncoding:
-				r.Assert(false)
+				b.Assert(false)
 				break
 			case HContentLength:
 				if ch == ' ' {
@@ -1326,7 +1325,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SBodyIdentity:
-			r.Assert(pe >= p)
+			b.Assert(pe >= p)
 			to_read = b.Min(size_t(pe-p), int(parser.GetContentLength()))
 			if to_read > 0 {
 				if settings.GetOnBody() != nil {
@@ -1354,7 +1353,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SChunkSizeStart:
-			r.Assert(parser.IsChunked())
+			b.Assert(parser.IsChunked())
 			c = Unhex[uint8(ch)]
 			if c == -1 {
 				goto error
@@ -1363,7 +1362,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			state = SChunkSize
 			break
 		case SChunkSize:
-			r.Assert(parser.IsChunked())
+			b.Assert(parser.IsChunked())
 			if ch == CR {
 				state = SChunkSizeAlmostDone
 				break
@@ -1380,7 +1379,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			parser.SetContentLength(parser.GetContentLength() + c)
 			break
 		case SChunkParameters:
-			r.Assert(parser.IsChunked())
+			b.Assert(parser.IsChunked())
 
 			/* just ignore this shit. TODO check for overflow */
 
@@ -1390,7 +1389,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SChunkSizeAlmostDone:
-			r.Assert(parser.IsChunked())
+			b.Assert(parser.IsChunked())
 			if parser.GetContentLength() == 0 {
 				parser.SetIsTrailing(true)
 				state = SHeaderFieldStart
@@ -1399,8 +1398,8 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SChunkData:
-			r.Assert(parser.IsChunked())
-			r.Assert(pe >= p)
+			b.Assert(parser.IsChunked())
+			b.Assert(pe >= p)
 			to_read = b.Min(size_t(pe-p), size_t(parser.GetContentLength()))
 			if to_read > 0 {
 				if settings.GetOnBody() != nil {
@@ -1414,15 +1413,15 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			parser.SetContentLength(parser.GetContentLength() - to_read)
 			break
 		case SChunkDataAlmostDone:
-			r.Assert(parser.IsChunked())
+			b.Assert(parser.IsChunked())
 			state = SChunkDataDone
 			break
 		case SChunkDataDone:
-			r.Assert(parser.IsChunked())
+			b.Assert(parser.IsChunked())
 			state = SChunkSizeStart
 			break
 		default:
-			r.Assert(false)
+			b.Assert(false)
 			goto error
 		}
 	}

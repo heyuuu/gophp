@@ -53,7 +53,7 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 		} else if p.IsArray() {
 			var guards *types.HashTable
 			guards = p.GetArr()
-			ZEND_ASSERT(guards != nil)
+			b.Assert(guards != nil)
 			guards.Destroy()
 			FREE_HASHTABLE(guards)
 		}

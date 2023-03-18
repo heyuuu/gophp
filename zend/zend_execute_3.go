@@ -122,7 +122,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 				break
 			}
 			if opline.GetOp2Type() == IS_VAR && opline.GetOp2().GetVar() == var_ {
-				ZEND_ASSERT(opline.GetOpcode() == ZEND_ASSIGN_REF)
+				b.Assert(opline.GetOpcode() == ZEND_ASSIGN_REF)
 				msg = "Cannot create references to/from string offsets"
 				break
 			}
@@ -131,7 +131,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	default:
 
 	}
-	ZEND_ASSERT(msg != nil)
+	b.Assert(msg != nil)
 	ZendThrowError(nil, "%s", msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
@@ -251,7 +251,7 @@ func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong 
 	/* Currently there should be no way for a typed reference to accept both int and double.
 	 * Generalize this and the related property code once this becomes possible. */
 
-	ZEND_ASSERT(error_prop != nil)
+	b.Assert(error_prop != nil)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 		ZendTypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MAX

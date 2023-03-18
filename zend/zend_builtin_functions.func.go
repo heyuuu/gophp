@@ -149,7 +149,7 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 		var __fill_ht *types.HashTable = return_value.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		i = 0
 		p = ex.Arg(1)
 		if arg_count > first_extra_arg {
@@ -2477,7 +2477,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		var __fill_ht *types.HashTable = arg_array.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {
 			var first_extra_arg uint32 = b.Min(num_args, call.GetFunc().GetOpArray().GetNumArgs())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {

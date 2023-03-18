@@ -209,7 +209,7 @@ func (sc *LangScanner) token(token int) (int, bool) {
 
 func (sc *LangScanner) tokenWithVal(token int) (int, bool) {
 	if sc.isParserMode() {
-		ZEND_ASSERT(!sc.zendlval.IsUndef())
+		b.Assert(!sc.zendlval.IsUndef())
 		sc.elem.ast = ZendAstCreateZvalWithLineno(sc.zendlval, uint32(sc.startLine))
 	}
 	return sc.token(token)

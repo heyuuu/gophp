@@ -105,7 +105,7 @@ func CallUserFunctionEx(object *types.Zval, function_name *types.Zval, retval_pt
 }
 func ZendForbidDynamicCall(func_name string) int {
 	var ex *ZendExecuteData = CurrEX()
-	ZEND_ASSERT(ex != nil && ex.GetFunc() != nil)
+	b.Assert(ex != nil && ex.GetFunc() != nil)
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_DYNAMIC) != 0 {
 		ZendError(E_WARNING, "Cannot call %s dynamically", func_name)
 		return types.FAILURE
@@ -158,7 +158,7 @@ func _ZEND_TRY_ASSIGN_NULL(zv *types.Zval, is_ref int) {
 	}
 }
 func ZEND_TRY_ASSIGN_REF_NULL(zv *types.Zval) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_NULL(zv, 1)
 }
 func _ZEND_TRY_ASSIGN_LONG(zv *types.Zval, lval ZendLong, is_ref int) {
@@ -178,7 +178,7 @@ func _ZEND_TRY_ASSIGN_LONG(zv *types.Zval, lval ZendLong, is_ref int) {
 	}
 }
 func ZEND_TRY_ASSIGN_REF_LONG(zv *types.Zval, lval ZendLong) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_LONG(zv, lval, 1)
 }
 func _ZEND_TRY_ASSIGN_DOUBLE(zv *types.Zval, dval float64, is_ref int) {
@@ -198,7 +198,7 @@ func _ZEND_TRY_ASSIGN_DOUBLE(zv *types.Zval, dval float64, is_ref int) {
 	}
 }
 func ZEND_TRY_ASSIGN_REF_DOUBLE(zv *types.Zval, dval float64) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 1)
 }
 func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *types.Zval, is_ref int) {
@@ -218,7 +218,7 @@ func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *types.Zval, is_ref int) {
 	}
 }
 func ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zv *types.Zval) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 1)
 }
 func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.ZendString, is_ref int) {
@@ -238,7 +238,7 @@ func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.ZendString, is_ref int) {
 	}
 }
 func ZEND_TRY_ASSIGN_REF_STR(zv *types.Zval, str *types.ZendString) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STR(zv, str, 1)
 }
 func _ZEND_TRY_ASSIGN_STRING(zv *types.Zval, string *byte, is_ref int) {
@@ -258,7 +258,7 @@ func _ZEND_TRY_ASSIGN_STRING(zv *types.Zval, string *byte, is_ref int) {
 	}
 }
 func ZEND_TRY_ASSIGN_REF_STRING(zv *types.Zval, string *byte) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STRING(zv, string, 1)
 }
 func _ZEND_TRY_ASSIGN_STRINGL(zv *types.Zval, string *byte, len_ int, is_ref int) {
@@ -278,6 +278,6 @@ func _ZEND_TRY_ASSIGN_STRINGL(zv *types.Zval, string *byte, len_ int, is_ref int
 	}
 }
 func ZEND_TRY_ASSIGN_REF_STRINGL(zv *types.Zval, string *byte, len_ int) {
-	ZEND_ASSERT(zv.IsReference())
+	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 1)
 }

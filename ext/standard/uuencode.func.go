@@ -5,7 +5,6 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -138,7 +137,7 @@ func PhpUudecode(src *byte, src_len int) *types.ZendString {
 		/* skip \n */
 
 	}
-	r.Assert(p >= dest.GetVal())
+	b.Assert(p >= dest.GetVal())
 	if b.Assign(&len_, total_len) > size_t(p-dest.GetVal()) {
 		b.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
 		if len_ > 1 {

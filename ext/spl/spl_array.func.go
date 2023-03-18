@@ -95,7 +95,7 @@ func SplArrayObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clon
 			} else if types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayObject {
 				intern.GetArray().SetArray(zend.ZendArrayDup(SplArrayGetHashTable(other)))
 			} else {
-				zend.ZEND_ASSERT(types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayIterator)
+				b.Assert(types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayIterator)
 				types.ZVAL_COPY(intern.GetArray(), orig)
 				intern.SetIsUseOther(true)
 			}

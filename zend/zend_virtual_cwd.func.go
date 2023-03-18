@@ -4,7 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
-	r "sik/runtime"
+	r "sik/builtin/file"
 )
 
 func IS_SLASH(c byte) bool                       { return c == '/' }
@@ -298,7 +298,7 @@ func TsrmRealpathR(
 		for i > start && !(IS_SLASH(path[i-1])) {
 			i--
 		}
-		r.Assert(i < MAXPATHLEN)
+		b.Assert(i < MAXPATHLEN)
 		if i == len_ || i+1 == len_ && path[i] == '.' {
 
 			/* remove double slashes and '.' */
@@ -328,11 +328,11 @@ func TsrmRealpathR(
 			j = TsrmRealpathR(path, start, i-1, ll, t, use_realpath, 1, nil)
 			if j > start && j != size_t-1 {
 				j--
-				r.Assert(i < MAXPATHLEN)
+				b.Assert(i < MAXPATHLEN)
 				for j > start && !(IS_SLASH(path[j])) {
 					j--
 				}
-				r.Assert(i < MAXPATHLEN)
+				b.Assert(i < MAXPATHLEN)
 				if start == 0 {
 
 					/* leading '..' must not be removed in case of relative path */

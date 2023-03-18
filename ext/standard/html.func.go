@@ -5,7 +5,6 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -40,7 +39,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 	var pos int = *cursor
 	var this_char uint = 0
 	*status = types.SUCCESS
-	r.Assert(pos <= str_len)
+	b.Assert(pos <= str_len)
 	if !(CHECK_LEN(pos, 1)) {
 		*cursor = pos + 1
 		*status = types.FAILURE
@@ -800,7 +799,7 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
 		*buf = code
 		return 1
 	default:
-		r.Assert(false)
+		b.Assert(false)
 		return 0
 	}
 
@@ -821,7 +820,7 @@ func TraverseForEntities(
 	var q *byte
 	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	lim = old + oldlen
-	r.Assert((*lim) == '0')
+	b.Assert((*lim) == '0')
 	p = old
 	q = ret.GetVal()
 	for p < lim {
@@ -892,7 +891,7 @@ func TraverseForEntities(
 				}
 			}
 		}
-		r.Assert((*next) == ';')
+		b.Assert((*next) == ';')
 		if code == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || code == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 			goto invalid_code
 		}
@@ -952,7 +951,7 @@ func UnescapeInverseMap(all int, flags int) *EntityHt {
 }
 func DetermineEntityTable(all int, doctype int) EntityTableOpt {
 	var retval EntityTableOpt = MakeEntityTableOpt(nil)
-	r.Assert(!(doctype == ENT_HTML_DOC_XML1 && all != 0))
+	b.Assert(!(doctype == ENT_HTML_DOC_XML1 && all != 0))
 	if all != 0 {
 		if doctype == ENT_HTML_DOC_HTML5 {
 			retval.SetMsTable(EntityMsTableHtml5)

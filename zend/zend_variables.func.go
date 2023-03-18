@@ -24,15 +24,15 @@ func IZvalPtrDtor(zval_ptr *types.Zval) {
 }
 func ZvalPtrDtorStr(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() && zval_ptr.DelRefcount() == 0 {
-		ZEND_ASSERT(zval_ptr.IsString())
-		ZEND_ASSERT(true)
-		ZEND_ASSERT((zval_ptr.GetStr().GetGcFlags() & types.IS_STR_PERSISTENT) == 0)
+		b.Assert(zval_ptr.IsString())
+		b.Assert(true)
+		b.Assert((zval_ptr.GetStr().GetGcFlags() & types.IS_STR_PERSISTENT) == 0)
 		Efree(zval_ptr.GetStr())
 	}
 }
 func ZvalDtor(zvalue *types.Zval) { ZvalPtrDtorNogc(zvalue) }
 func RcDtorFunc(p types.IRefcounted) {
-	ZEND_ASSERT(p.GetGcType() <= types.IS_CONSTANT_AST)
+	b.Assert(p.GetGcType() <= types.IS_CONSTANT_AST)
 	switch p.(type) {
 	case *types.ZendArray:
 		arr := p.(*types.ZendArray)
@@ -53,7 +53,7 @@ func RcDtorFunc(p types.IRefcounted) {
 }
 
 func ZendReferenceDestroy(ref *types.ZendReference) {
-	ZEND_ASSERT(!(ZEND_REF_HAS_TYPE_SOURCES(ref)))
+	b.Assert(!(ZEND_REF_HAS_TYPE_SOURCES(ref)))
 	IZvalPtrDtor(ref.GetVal())
 	EfreeSize(ref, b.SizeOf("zend_reference"))
 }
@@ -64,8 +64,8 @@ func ZvalInternalPtrDtor(zval_ptr *types.Zval) {
 		if ref.DelRefcount() == 0 {
 			if zval_ptr.IsString() {
 				var str *types.ZendString = (*types.ZendString)(ref)
-				ZEND_ASSERT(true)
-				ZEND_ASSERT((str.GetGcFlags() & types.IS_STR_PERSISTENT) != 0)
+				b.Assert(true)
+				b.Assert((str.GetGcFlags() & types.IS_STR_PERSISTENT) != 0)
 				Free(str)
 			} else {
 				ZendErrorNoreturn(E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")
@@ -86,7 +86,7 @@ func ZvalCopyCtorFunc(zvalue *types.Zval) {
 	if zvalue.IsArray() {
 		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsString() {
-		ZEND_ASSERT(true)
+		b.Assert(true)
 		zvalue.SetString(zvalue.GetStr().Dup(0))
 	}
 }

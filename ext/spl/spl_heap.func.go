@@ -5,7 +5,6 @@ package spl
 import (
 	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -18,7 +17,7 @@ func SplHeapElem(heap *SplPtrHeap, i int) any {
 	return any((*byte)(heap.GetElements() + heap.GetElemSize()*i))
 }
 func SplHeapElemCopy(heap *SplPtrHeap, to any, from any) {
-	r.Assert(to != from)
+	b.Assert(to != from)
 	memcpy(to, from, heap.GetElemSize())
 }
 func SplPtrHeapZvalDtor(elem any) { zend.ZvalPtrDtor((*types.Zval)(elem)) }
@@ -60,7 +59,7 @@ func SplPqueueExtractHelper(result *types.Zval, elem *SplPqueueElem, flags int) 
 		types.ZVAL_COPY(result, elem.GetPriority())
 		return
 	}
-	zend.ZEND_ASSERT(false)
+	b.Assert(false)
 }
 func SplPtrHeapZvalMaxCmp(x any, y any, object *types.Zval) int {
 	var a *types.Zval = x

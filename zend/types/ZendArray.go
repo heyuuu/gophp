@@ -111,11 +111,11 @@ func (this *Bucket) GetH() zend.ZendUlong { return this.key.GetH() }
 func (this *Bucket) GetKey() *ZendString  { return this.key.GetZendStringKey() }
 func (this *Bucket) SetH(value zend.ZendUlong) {
 	// todo remove
-	zend.ZEND_ASSERT(false)
+	b.Assert(false)
 }
 func (this *Bucket) SetKey(value *ZendString) {
 	// todo 此方法应被替换
-	zend.ZEND_ASSERT(false)
+	b.Assert(false)
 }
 
 func (this *Bucket) CopyFrom(from *Bucket) {
@@ -201,7 +201,7 @@ func (this *ZendArray) GetNTableMask() uint32 {
 	return uint32(-(this.nTableSize + this.nTableSize))
 }
 func (this *ZendArray) SetNTableMask(value uint32) {
-	zend.ZEND_ASSERT(this.GetNTableMask() == value)
+	b.Assert(this.GetNTableMask() == value)
 }
 
 /* ZendArray.u.v.flags */
@@ -281,7 +281,7 @@ func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendAr
 }
 
 func (this *ZendArray) assertRc1() {
-	zend.ZEND_ASSERT(this.GetRefcount() == 1)
+	b.Assert(this.GetRefcount() == 1)
 }
 
 func (this *ZendArray) resetDataAndHash(dataSize uint32) {
@@ -503,7 +503,7 @@ func (this *ZendArray) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 	var p = this.KeyFindBucket(strKey)
 	if p != nil {
 		var data *Zval
-		zend.ZEND_ASSERT(p.GetVal() != pData)
+		b.Assert(p.GetVal() != pData)
 		data = p.GetVal()
 		if data.IsIndirect() {
 			data = data.GetZv()
@@ -531,7 +531,7 @@ func (this *ZendArray) KeyUpdate(key string, pData *Zval) *Zval {
 	var p = this.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
-		zend.ZEND_ASSERT(p.GetVal() != pData)
+		b.Assert(p.GetVal() != pData)
 		data = p.GetVal()
 		if this.GetPDestructor() != nil {
 			this.GetPDestructor()(data)
@@ -551,7 +551,7 @@ func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	var p = this.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
-		zend.ZEND_ASSERT(p.GetVal() != pData)
+		b.Assert(p.GetVal() != pData)
 		data = p.GetVal()
 		if data.IsType(IS_INDIRECT) {
 			data = data.GetZv()
@@ -650,10 +650,10 @@ func (this *HashTable) IndexDelete(index int) bool {
 
 func (this *ZendArray) deleteBucket(pos uint32) {
 	this.assertRc1()
-	zend.ZEND_ASSERT(pos < this.DataSize())
+	b.Assert(pos < this.DataSize())
 
 	var p = &this.data[pos]
-	zend.ZEND_ASSERT(p.IsValid())
+	b.Assert(p.IsValid())
 
 	// 移除映射
 	this.deleteHash(p.key)

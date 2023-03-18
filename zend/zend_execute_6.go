@@ -256,7 +256,7 @@ func ZendFetchStaticPropertyAddressEx(
 	var op2_type types.ZendUchar = opline.GetOp2Type()
 	if op2_type == IS_CONST {
 		var class_name *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
-		ZEND_ASSERT(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
+		b.Assert(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
 		if b.Assign(&ce, CACHED_PTR(cache_slot)) == nil {
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
@@ -432,7 +432,7 @@ func ZendVerifyRefAssignableZval(ref *types.ZendReference, zv *types.Zval, stric
 	var seen_prop *ZendPropertyInfo = nil
 	var seen_type types.ZendUchar
 	var needs_coercion types.ZendBool = 0
-	ZEND_ASSERT(zv.GetType() != types.IS_REFERENCE)
+	b.Assert(zv.GetType() != types.IS_REFERENCE)
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo

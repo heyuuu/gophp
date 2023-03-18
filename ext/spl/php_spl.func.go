@@ -943,7 +943,7 @@ func ZmStartupSpl(type_ int, module_number int) int {
 	ZmStartupSplObserver(type_, module_number)
 	SplAutoloadFn = zend.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload", b.SizeOf("\"spl_autoload\"")-1)
 	SplAutoloadCallFn = zend.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload_call", b.SizeOf("\"spl_autoload_call\"")-1)
-	zend.ZEND_ASSERT(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
+	b.Assert(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
 	return types.SUCCESS
 }
 func ZmActivateSpl(type_ int, module_number int) int {

@@ -4,9 +4,9 @@ package core
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core/streams"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -16,7 +16,7 @@ func PhpRegisterVariable(var_ string, strval *byte, track_vars_array *types.Zval
 }
 func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_array *types.Zval) {
 	var new_entry types.Zval
-	r.Assert(strval != nil)
+	b.Assert(strval != nil)
 
 	/* Prepare value */
 
@@ -46,7 +46,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 	var gpc_element_p *types.Zval
 	var is_array types.ZendBool = 0
 	var symtable1 *types.HashTable = nil
-	r.Assert(var_name != nil)
+	b.Assert(var_name != nil)
 	if track_vars_array != nil && track_vars_array.IsType(types.IS_ARRAY) {
 		symtable1 = track_vars_array.GetArr()
 	}

@@ -226,7 +226,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 			memcpy(wildcard, filtername, len_+1)
 			period = wildcard + (period - filtername)
 			for period != nil {
-				zend.ZEND_ASSERT(period[0] == '.')
+				b.Assert(period[0] == '.')
 				period[1] = '*'
 				period[2] = '0'
 				if nil != b.Assign(&fdat, zend.ZendHashStrFindPtr(BG(user_filter_map), wildcard, strlen(wildcard))) {

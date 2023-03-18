@@ -313,7 +313,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 	}
 }
 func ZvalMakeInternedString(zv *types.Zval) *types.ZendString {
-	ZEND_ASSERT(zv.IsString())
+	b.Assert(zv.IsString())
 	zv.SetStr(types.ZendNewInternedString(zv.GetStr()))
 
 	return zv.GetStr()
@@ -360,7 +360,7 @@ func ZendDeclareTypedProperty(
 		}
 		types.ZVAL_COPY_VALUE(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()], property)
 		if ce.GetStaticMembersTablePtr() == nil {
-			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
+			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
 			if CurrEX() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
@@ -379,8 +379,8 @@ func ZendDeclareTypedProperty(
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			ZendHashDel(ce.GetPropertiesInfo(), name)
-			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
-			ZEND_ASSERT(ce.GetPropertiesInfoTable() != nil)
+			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
+			b.Assert(ce.GetPropertiesInfoTable() != nil)
 			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info
 		} else {
 			property_info.SetOffset(OBJ_PROP_TO_OFFSET(ce.GetDefaultPropertiesCount()))
@@ -432,7 +432,7 @@ func ZendDeclareTypedProperty(
 	} else if (access_type & ZEND_ACC_PRIVATE) != 0 {
 		property_info.SetName(ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr(), IsPersistentClass(ce) != 0))
 	} else {
-		ZEND_ASSERT((access_type & ZEND_ACC_PROTECTED) != 0)
+		b.Assert((access_type & ZEND_ACC_PROTECTED) != 0)
 		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr(), IsPersistentClass(ce) != 0))
 	}
 	property_info.SetName(types.ZendNewInternedString(property_info.GetName()))

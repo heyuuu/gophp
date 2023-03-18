@@ -106,7 +106,7 @@ func ZendFetchDimensionAddressRead(
 			dim++
 		}
 		retval = types.Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
-		ZEND_ASSERT(result != nil)
+		b.Assert(result != nil)
 		if retval != nil {
 			if result != retval {
 				types.ZVAL_COPY_DEREF(result, retval)
@@ -332,7 +332,7 @@ func check_type_stdClass_assignable(type_ types.ZendType) types.ZendBool {
 }
 func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
 	var prop *ZendPropertyInfo
-	ZEND_ASSERT(ZEND_REF_HAS_TYPE_SOURCES(ref))
+	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
@@ -358,7 +358,7 @@ func ZendVerifyRefArrayAssignable(ref *types.ZendReference) types.ZendBool {
 }
 func zend_verify_ref_stdClass_assignable(ref *types.ZendReference) types.ZendBool {
 	var prop *ZendPropertyInfo
-	ZEND_ASSERT(ZEND_REF_HAS_TYPE_SOURCES(ref))
+	b.Assert(ZEND_REF_HAS_TYPE_SOURCES(ref))
 	var _source_list *types.ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo

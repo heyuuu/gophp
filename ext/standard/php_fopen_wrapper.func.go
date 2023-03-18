@@ -4,9 +4,9 @@ package standard
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
 	"sik/sapi/cgi"
 	"sik/sapi/cli"
 	"sik/zend"

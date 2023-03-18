@@ -4,9 +4,9 @@ package standard
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/types"
@@ -14,7 +14,7 @@ import (
 
 func FG(v __auto__) __auto__ { return FileGlobals.v }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
-	zend.ZEND_ASSERT(arg.IsType(types.IS_RESOURCE))
+	b.Assert(arg.IsType(types.IS_RESOURCE))
 	core.PhpStreamFromRes(stream, arg.GetRes())
 }
 func PhpLeStreamContext() int { return LeStreamContext }
@@ -3778,7 +3778,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	var ret int
 	var field_tmp *types.Zval
 	var csvline zend.SmartStr = zend.MakeSmartStr(0)
-	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
+	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = types.Z_ARRVAL_P(fields).GetNNumOfElements()
 	var __ht *types.HashTable = fields.GetArr()
 	for _, _p := range __ht.foreachData() {
@@ -4019,7 +4019,7 @@ func PhpFgetcsv(
 	var line_end_len int
 	var inc_len int
 	var first_field types.ZendBool = 1
-	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
+	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 
 	/* initialize internal state */
 

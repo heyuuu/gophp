@@ -10,7 +10,7 @@ import (
 func IZvalPtrDtorNoref(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() {
 		var ref *types.ZendRefcounted = zval_ptr.GetCounted()
-		ZEND_ASSERT(zval_ptr.GetType() != types.IS_REFERENCE)
+		b.Assert(zval_ptr.GetType() != types.IS_REFERENCE)
 		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
 		} else if GC_MAY_LEAK(ref) {
@@ -97,12 +97,12 @@ func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *Z
 	var ptr **ZendPropertyInfo
 	var end ***ZendPropertyInfo
 	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(source_list.GetList()) == 0 {
-		ZEND_ASSERT(source_list.GetPtr() == prop)
+		b.Assert(source_list.GetPtr() == prop)
 		source_list.SetPtr(nil)
 		return
 	}
 	if list.GetNum() == 1 {
-		ZEND_ASSERT(list.ptr == prop)
+		b.Assert(list.ptr == prop)
 		Efree(list)
 		source_list.SetPtr(nil)
 		return
@@ -116,7 +116,7 @@ func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *Z
 	for ptr < end && (*ptr) != prop {
 		ptr++
 	}
-	ZEND_ASSERT((*ptr) == prop)
+	b.Assert((*ptr) == prop)
 
 	/* Copy the last list element into the deleted slot. */
 
@@ -265,7 +265,7 @@ func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 func IInitFuncExecuteData(op_array *ZendOpArray, return_value *types.Zval, may_be_trampoline types.ZendBool, executeData *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
-	ZEND_ASSERT(executeData.GetFunc() == (*ZendFunction)(op_array))
+	b.Assert(executeData.GetFunc() == (*ZendFunction)(op_array))
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value
@@ -293,7 +293,7 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *types.Zval, may_b
 }
 func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 	var run_time_cache *any
-	ZEND_ASSERT(RUN_TIME_CACHE(op_array) == nil)
+	b.Assert(RUN_TIME_CACHE(op_array) == nil)
 	run_time_cache = ZendArenaAlloc(CG__().GetArena(), op_array.GetCacheSize())
 	memset(run_time_cache, 0, op_array.GetCacheSize())
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
@@ -327,14 +327,14 @@ func ZendInitFuncRunTimeCache(op_array *ZendOpArray) {
 	}
 }
 func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *types.Zval) {
-	ZEND_ASSERT(executeData.GetFunc() == (*ZendFunction)(op_array))
+	b.Assert(executeData.GetFunc() == (*ZendFunction)(op_array))
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value
 	ZendAttachSymbolTable(executeData)
 	if op_array.GetRunTimeCachePtr() == nil {
 		var ptr any
-		ZEND_ASSERT(op_array.IsHeapRtCache())
+		b.Assert(op_array.IsHeapRtCache())
 		ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
 		ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
 		ptr = (*byte)(ptr + b.SizeOf("void *"))

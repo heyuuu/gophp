@@ -5,7 +5,7 @@ package zend
 import (
 	"fmt"
 	b "sik/builtin"
-	r "sik/runtime"
+	r "sik/builtin/file"
 	"sik/zend/types"
 )
 
@@ -409,7 +409,7 @@ func ZendResolvePropertyTypes() {
 					var type_name *types.ZendString = prop_info.GetType().Name()
 					var lc_type_name *types.ZendString = ZendStringTolower(type_name)
 					var prop_ce *ZendClassEntry = ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
-					ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
+					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 					types.ZendStringRelease(lc_type_name)
 					types.ZendStringRelease(type_name)

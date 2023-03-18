@@ -2,7 +2,10 @@
 
 package zend
 
-import "sik/zend/types"
+import (
+	b "sik/builtin"
+	"sik/zend/types"
+)
 
 func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(var_)
@@ -67,7 +70,7 @@ func _getZvalPtrDeref(
 		if op_type == IS_TMP_VAR {
 			return _getZvalPtrTmp(node.GetVar(), should_free, executeData)
 		} else {
-			ZEND_ASSERT(op_type == IS_VAR)
+			b.Assert(op_type == IS_VAR)
 			return _getZvalPtrVarDeref(node.GetVar(), should_free, executeData)
 		}
 	} else {
@@ -86,7 +89,7 @@ func _getOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp,
 		if op_type == IS_TMP_VAR {
 			return _getZvalPtrTmp(node.GetVar(), should_free, executeData)
 		} else {
-			ZEND_ASSERT(op_type == IS_VAR)
+			b.Assert(op_type == IS_VAR)
 			return _getZvalPtrVarDeref(node.GetVar(), should_free, executeData)
 		}
 	} else {
@@ -136,7 +139,7 @@ func _getZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ in
 		*should_free = nil
 		return _getZvalPtrCv(node.GetVar(), type_, executeData)
 	} else {
-		ZEND_ASSERT(op_type == IS_VAR)
+		b.Assert(op_type == IS_VAR)
 		return _getZvalPtrPtrVar(node.GetVar(), should_free, executeData)
 	}
 }

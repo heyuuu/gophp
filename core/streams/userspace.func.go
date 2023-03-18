@@ -4,9 +4,9 @@ package streams
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -359,7 +359,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	var args []types.Zval
 	var didwrite ssize_t
-	r.Assert(us != nil)
+	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_WRITE)
 	args[0].SetRawString(b.CastStr((*byte)(buf), count))
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
@@ -396,7 +396,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var call_result int
 	var didread int = 0
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
-	r.Assert(us != nil)
+	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_READ)
 	args[0].SetLong(count)
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
@@ -448,7 +448,7 @@ func PhpUserstreamopClose(stream *core.PhpStream, close_handle int) int {
 	var func_name types.Zval
 	var retval types.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
-	r.Assert(us != nil)
+	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_CLOSE)
 	zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&retval)
@@ -463,7 +463,7 @@ func PhpUserstreamopFlush(stream *core.PhpStream) int {
 	var retval types.Zval
 	var call_result int
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
-	r.Assert(us != nil)
+	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_FLUSH)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&retval) != 0 {
@@ -482,7 +482,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	var ret int
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	var args []types.Zval
-	r.Assert(us != nil)
+	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_SEEK)
 	args[0].SetLong(offset)
 	args[1].SetLong(whence)
@@ -1026,7 +1026,7 @@ func PhpUserstreamopClosedir(stream *core.PhpStream, close_handle int) int {
 	var func_name types.Zval
 	var retval types.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
-	r.Assert(us != nil)
+	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_DIR_CLOSE)
 	zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&retval)

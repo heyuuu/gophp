@@ -10,7 +10,6 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 	"strconv"
@@ -794,7 +793,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	var status_string *byte = GetStatusString(status)
 	var content_template string = GetTemplateString(status)
 	var errstr *byte = GetLastError()
-	r.Assert(status_string != nil)
+	b.Assert(status_string != nil)
 	PhpCliServerContentSenderCtor(client.GetContentSender())
 	client.SetContentSenderInitialized(1)
 	escaped_request_uri = standard.PhpEscapeHtmlEntitiesEx((*uint8)(client.GetRequest().GetRequestUri()), client.GetRequest().GetRequestUriLen(), 0, standard.ENT_QUOTES, nil, 0)

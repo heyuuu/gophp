@@ -1,6 +1,9 @@
 package zend
 
-import "sik/zend/types"
+import (
+	b "sik/builtin"
+	"sik/zend/types"
+)
 
 /**
  * ZendStack
@@ -17,7 +20,7 @@ func (this *ZendStack[T]) Init() {
 }
 
 func (this *ZendStack[T]) Slice(len_ int) {
-	ZEND_ASSERT(len_ <= len(this.elements))
+	b.Assert(len_ <= len(this.elements))
 	if len_ == 0 {
 		this.elements = nil
 	} else {

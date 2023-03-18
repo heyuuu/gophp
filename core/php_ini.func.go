@@ -4,8 +4,8 @@ package core
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )

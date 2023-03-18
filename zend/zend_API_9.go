@@ -269,7 +269,7 @@ func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *types.ZendString, v
 	if property == nil {
 		return types.FAILURE
 	}
-	ZEND_ASSERT(!(value.IsReference()))
+	b.Assert(!(value.IsReference()))
 	value.TryAddRefcount()
 	if prop_info.GetType() != 0 {
 		types.ZVAL_COPY_VALUE(&tmp, value)
@@ -368,7 +368,7 @@ func ZendReplaceErrorHandling(error_handling ZendErrorHandlingT, exception_class
 	if current != nil {
 		ZendSaveErrorHandling(current)
 	}
-	ZEND_ASSERT(error_handling == EH_THROW || exception_class == nil)
+	b.Assert(error_handling == EH_THROW || exception_class == nil)
 	EG__().SetErrorHandling(error_handling)
 	EG__().SetExceptionClass(exception_class)
 }

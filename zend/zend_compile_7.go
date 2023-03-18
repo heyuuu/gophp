@@ -583,7 +583,7 @@ func ZendCompileGreater(result *Znode, ast *ZendAst) {
 	var right_ast *ZendAst = ast.GetChild()[1]
 	var left_node Znode
 	var right_node Znode
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_GREATER || ast.GetKind() == ZEND_AST_GREATER_EQUAL)
+	b.Assert(ast.GetKind() == ZEND_AST_GREATER || ast.GetKind() == ZEND_AST_GREATER_EQUAL)
 	ZendCompileExpr(&left_node, left_ast)
 	ZendCompileExpr(&right_node, right_ast)
 	if left_node.GetOpType() == IS_CONST && right_node.GetOpType() == IS_CONST {

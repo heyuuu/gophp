@@ -5,9 +5,9 @@ package standard
 import (
 	"sik/builtin"
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )

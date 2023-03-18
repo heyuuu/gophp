@@ -5,8 +5,8 @@ package cgi
 import (
 	"log"
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
-	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/types"
@@ -183,7 +183,7 @@ func SapiCgiReadPost(buffer *byte, count_bytes int) int {
 	var read_bytes int = 0
 	var tmp_read_bytes int
 	var remaining_bytes int
-	r.Assert(core.SG__().request_info.content_length >= core.SG__().read_post_bytes)
+	b.Assert(core.SG__().request_info.content_length >= core.SG__().read_post_bytes)
 	remaining_bytes = size_t(core.SG__().request_info.content_length - core.SG__().read_post_bytes)
 	count_bytes = cli.MIN(count_bytes, remaining_bytes)
 	for read_bytes < count_bytes {

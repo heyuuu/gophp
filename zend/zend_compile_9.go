@@ -13,7 +13,7 @@ func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
 		result.SetOpType(IS_CONST)
 		return
 	}
-	ZEND_ASSERT(ast.GetAttr() == T_CLASS_C && CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().IsTrait())
+	b.Assert(ast.GetAttr() == T_CLASS_C && CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().IsTrait())
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CLASS_NAME, nil, nil)
 	opline.GetOp1().SetNum(ZEND_FETCH_CLASS_SELF)
 }
@@ -91,7 +91,7 @@ func ZendCompileConstExprMagicConst(ast_ptr **ZendAst) {
 
 	/* Other cases already resolved by constant folding */
 
-	ZEND_ASSERT(ast.GetAttr() == T_CLASS_C)
+	b.Assert(ast.GetAttr() == T_CLASS_C)
 	ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreate(ZEND_AST_CONSTANT_CLASS)
 }
@@ -390,7 +390,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		ZendCompileFuncDecl(result, ast, 0)
 		return
 	default:
-		ZEND_ASSERT(false)
+		b.Assert(false)
 	}
 }
 func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *ZendOp {

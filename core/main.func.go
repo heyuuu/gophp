@@ -5,9 +5,9 @@ package core
 import (
 	"log"
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core/streams"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )

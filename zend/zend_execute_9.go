@@ -241,7 +241,7 @@ func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION() {
 	ZEND_VM_CONTINUE()
 }
 func ZEND_VM_NEXT_OPCODE() {
-	ZEND_ASSERT(EG__().GetException() == nil)
+	b.Assert(EG__().GetException() == nil)
 	OPLINE = opline + 1
 	ZEND_VM_CONTINUE()
 }

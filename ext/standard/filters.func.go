@@ -4,9 +4,9 @@ package standard
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -125,7 +125,7 @@ func StrfilterStripTagsFilter(
 	return streams.PSFS_PASS_ON
 }
 func StrfilterStripTagsDtor(thisfilter *core.PhpStreamFilter) {
-	r.Assert(thisfilter.GetAbstract().GetPtr() != nil)
+	b.Assert(thisfilter.GetAbstract().GetPtr() != nil)
 	PhpStripTagsFilterDtor((*PhpStripTagsFilter)(thisfilter.GetAbstract().GetPtr()))
 	zend.Pefree(thisfilter.GetAbstract().GetPtr(), (*PhpStripTagsFilter)(types.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
 }
@@ -209,7 +209,7 @@ func PhpConvBase64EncodeCtor(
 	return PHP_CONV_ERR_SUCCESS
 }
 func PhpConvBase64EncodeDtor(inst *PhpConvBase64Encode) {
-	r.Assert(inst != nil)
+	b.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
 		zend.Pefree(any(inst.GetLbchars()), inst.GetPersistent())
 	}
@@ -494,7 +494,7 @@ func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left
 	return err
 }
 func PhpConvQprintEncodeDtor(inst *PhpConvQprintEncode) {
-	r.Assert(inst != nil)
+	b.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
 		zend.Pefree(any(inst.GetLbchars()), inst.GetPersistent())
 	}
@@ -744,7 +744,7 @@ func PhpConvQprintEncodeCtor(
 	return PHP_CONV_ERR_SUCCESS
 }
 func PhpConvQprintDecodeDtor(inst *PhpConvQprintDecode) {
-	r.Assert(inst != nil)
+	b.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
 		zend.Pefree(any(inst.GetLbchars()), inst.GetPersistent())
 	}
@@ -1352,7 +1352,7 @@ out_failure:
 	return streams.PSFS_ERR_FATAL
 }
 func StrfilterConvertDtor(thisfilter *core.PhpStreamFilter) {
-	r.Assert(thisfilter.GetAbstract().GetPtr() != nil)
+	b.Assert(thisfilter.GetAbstract().GetPtr() != nil)
 	PhpConvertFilterDtor((*PhpConvertFilter)(thisfilter.GetAbstract().GetPtr()))
 	zend.Pefree(thisfilter.GetAbstract().GetPtr(), (*PhpConvertFilter)(types.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
 }

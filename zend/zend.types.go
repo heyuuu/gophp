@@ -3,7 +3,7 @@
 package zend
 
 import (
-	r "sik/runtime"
+	r "sik/builtin/file"
 	"sik/zend/types"
 )
 

@@ -286,7 +286,7 @@ func CheckHttpHost(target *byte) int {
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
 	var allowed_hosts *types.HashTable = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG(url_adapt_session_hosts_ht)) }, func() *__auto__ { return &(BG(url_adapt_output_hosts_ht)) })
-	zend.ZEND_ASSERT(ctx.GetTagType() == TAG_FORM)
+	b.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
 		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())
 	} else {

@@ -11,7 +11,7 @@ func ZendCompileUnaryPm(result *Znode, ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var expr_node Znode
 	var lefthand_node Znode
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_UNARY_PLUS || ast.GetKind() == ZEND_AST_UNARY_MINUS)
+	b.Assert(ast.GetKind() == ZEND_AST_UNARY_PLUS || ast.GetKind() == ZEND_AST_UNARY_MINUS)
 	ZendCompileExpr(&expr_node, expr_ast)
 	if expr_node.GetOpType() == IS_CONST {
 		if ZendTryCtEvalUnaryPm(result.GetConstant(), ast.GetKind(), expr_node.GetConstant()) != 0 {
@@ -32,7 +32,7 @@ func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
 	var opline_jmpz *ZendOp
 	var opline_bool *ZendOp
 	var opnum_jmpz uint32
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
+	b.Assert(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
 	ZendCompileExpr(&left_node, left_ast)
 	if left_node.GetOpType() == IS_CONST {
 		if ast.GetKind() == ZEND_AST_AND && ZendIsTrue(left_node.GetConstant()) == 0 || ast.GetKind() == ZEND_AST_OR && ZendIsTrue(left_node.GetConstant()) != 0 {
@@ -82,7 +82,7 @@ func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
 }
 func ZendCompilePostIncdec(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_POST_INC || ast.GetKind() == ZEND_AST_POST_DEC)
+	b.Assert(ast.GetKind() == ZEND_AST_POST_INC || ast.GetKind() == ZEND_AST_POST_DEC)
 	ZendEnsureWritableVariable(var_ast)
 	if var_ast.GetKind() == ZEND_AST_PROP {
 		var opline *ZendOp = ZendCompileProp(nil, var_ast, BP_VAR_RW, 0)
@@ -108,7 +108,7 @@ func ZendCompilePostIncdec(result *Znode, ast *ZendAst) {
 }
 func ZendCompilePreIncdec(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_PRE_INC || ast.GetKind() == ZEND_AST_PRE_DEC)
+	b.Assert(ast.GetKind() == ZEND_AST_PRE_INC || ast.GetKind() == ZEND_AST_PRE_DEC)
 	ZendEnsureWritableVariable(var_ast)
 	if var_ast.GetKind() == ZEND_AST_PROP {
 		var opline *ZendOp = ZendCompileProp(result, var_ast, BP_VAR_RW, 0)
@@ -148,7 +148,7 @@ func ZendCompileShorthandConditional(result *Znode, ast *ZendAst) {
 	var false_node Znode
 	var opline_qm_assign *ZendOp
 	var opnum_jmp_set uint32
-	ZEND_ASSERT(ast.GetChild()[1] == nil)
+	b.Assert(ast.GetChild()[1] == nil)
 	ZendCompileExpr(&cond_node, cond_ast)
 	opnum_jmp_set = GetNextOpNumber()
 	ZendEmitOpTmp(result, ZEND_JMP_SET, &cond_node, nil)
@@ -428,7 +428,7 @@ func ZendCompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var var_node Znode
 	var opline *ZendOp = nil
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_ISSET || ast.GetKind() == ZEND_AST_EMPTY)
+	b.Assert(ast.GetKind() == ZEND_AST_ISSET || ast.GetKind() == ZEND_AST_EMPTY)
 	if ZendIsVariable(var_ast) == 0 {
 		if ast.GetKind() == ZEND_AST_EMPTY {
 
@@ -515,7 +515,7 @@ func ZendCompileArray(result *Znode, ast *ZendAst) {
 
 	/* Empty arrays are handled at compile-time */
 
-	ZEND_ASSERT(list.GetChildren() > 0)
+	b.Assert(list.GetChildren() > 0)
 	for i = 0; i < list.GetChildren(); i++ {
 		var elem_ast *ZendAst = list.GetChild()[i]
 		var value_ast *ZendAst
@@ -578,7 +578,7 @@ func ZendCompileArray(result *Znode, ast *ZendAst) {
 	/* Add a flag to INIT_ARRAY if we know this array cannot be packed */
 
 	if packed == 0 {
-		ZEND_ASSERT(opnum_init != uint32-1)
+		b.Assert(opnum_init != uint32-1)
 		opline = CG__().GetActiveOpArray().GetOpcodes()[opnum_init]
 		opline.SetExtendedValue(opline.GetExtendedValue() | ZEND_ARRAY_NOT_PACKED)
 	}
@@ -732,7 +732,7 @@ func ZendCompileEncapsList(result *Znode, ast *ZendAst) {
 	var last_const_node Znode
 	var list *ZendAstList = ZendAstGetList(ast)
 	var reserved_op_number uint32 = -1
-	ZEND_ASSERT(list.GetChildren() > 0)
+	b.Assert(list.GetChildren() > 0)
 	j = 0
 	last_const_node.SetOpType(IS_UNUSED)
 	for i = 0; i < list.GetChildren(); i++ {

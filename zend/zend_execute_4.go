@@ -104,7 +104,7 @@ func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *typ
 	if (fetch_type & (ZEND_FETCH_GLOBAL_LOCK | ZEND_FETCH_GLOBAL)) != 0 {
 		ht = EG__().GetSymbolTable()
 	} else {
-		ZEND_ASSERT((fetch_type & ZEND_FETCH_LOCAL) != 0)
+		b.Assert((fetch_type & ZEND_FETCH_LOCAL) != 0)
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			ZendRebuildSymbolTable()
 		}

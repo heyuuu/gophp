@@ -232,7 +232,7 @@ func PhpArrayDataCompare(a any, b any) int {
 	if zend.CompareFunction(&result, first, second) == types.FAILURE {
 		return 0
 	}
-	zend.ZEND_ASSERT(result.IsType(types.IS_LONG))
+	b.Assert(result.IsType(types.IS_LONG))
 	return zend.ZEND_NORMALIZE_BOOL(result.GetLval())
 }
 func PhpArrayReverseDataCompare(a any, b any) int { return PhpArrayDataCompare(a, b) * -1 }
@@ -4188,7 +4188,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				var __fill_ht *types.HashTable = return_value.GetArr()
 				var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 				var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-				zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+				b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 				for ; low >= high; low -= uint(lstep) {
 					__fill_bkt.GetVal().SetInternedString(types.ZSTR_CHAR(low))
 					__fill_bkt.SetH(__fill_idx)
@@ -4216,7 +4216,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				var __fill_ht *types.HashTable = return_value.GetArr()
 				var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 				var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-				zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+				b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 				for ; low <= high; low += uint(lstep) {
 					__fill_bkt.GetVal().SetInternedString(types.ZSTR_CHAR(low))
 					__fill_bkt.SetH(__fill_idx)
@@ -4269,7 +4269,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __fill_ht *types.HashTable = return_value.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 			i = 0
 			element = low
 			for i < size && element >= high {
@@ -4302,7 +4302,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __fill_ht *types.HashTable = return_value.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 			i = 0
 			element = low
 			for i < size && element <= high {
@@ -4361,7 +4361,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __fill_ht *types.HashTable = return_value.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 			for i = 0; i < size; i++ {
 				__fill_bkt.GetVal().SetLong(low - i*lstep)
 				__fill_bkt.SetH(__fill_idx)
@@ -4390,7 +4390,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __fill_ht *types.HashTable = return_value.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 			for i = 0; i < size; i++ {
 				__fill_bkt.GetVal().SetLong(low + i*lstep)
 				__fill_bkt.SetH(__fill_idx)
@@ -5564,7 +5564,7 @@ func PhpArrayMergeRecursive(dest *types.HashTable, src *types.HashTable) int {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 					return 0
 				}
-				zend.ZEND_ASSERT(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
+				b.Assert(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
 				types.SEPARATE_ZVAL(dest_entry)
 				dest_zval = dest_entry
 				if dest_zval.IsType(types.IS_NULL) {
@@ -5614,7 +5614,7 @@ func PhpArrayMerge(dest *types.HashTable, src *types.HashTable) int {
 		var __fill_ht *types.HashTable = dest
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		var __ht *types.HashTable = src
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -5690,7 +5690,7 @@ func PhpArrayReplaceRecursive(dest *types.HashTable, src *types.HashTable) int {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 			return 0
 		}
-		zend.ZEND_ASSERT(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
+		b.Assert(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
 		types.SEPARATE_ZVAL(dest_entry)
 		dest_zval = dest_entry
 		if dest_zval.IsRefcounted() {
@@ -5953,7 +5953,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 		var __fill_ht *types.HashTable = dest
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		var __ht *types.HashTable = src
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -6169,7 +6169,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var __fill_ht *types.HashTable = return_value.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 
 		/* Go through input array and add keys to the return array */
 
@@ -6447,7 +6447,7 @@ func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var __fill_ht *types.HashTable = return_value.GetArr()
 	var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 	var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-	zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+	b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 	var __ht *types.HashTable = arrval
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -6722,7 +6722,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		var __fill_ht *types.HashTable = return_value.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		var __ht *types.HashTable = input
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -6894,7 +6894,7 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var __fill_ht *types.HashTable = return_value.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		var __ht *types.HashTable = input.GetArr()
 		for _, _p := range __ht.foreachDataReserve() {
 			var _z types.Zval = _p.GetVal()
@@ -7048,7 +7048,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __fill_ht *types.HashTable = return_value.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 			for i = 0; i < num_pads; i++ {
 				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), pad_value)
 				__fill_bkt.SetH(__fill_idx)
@@ -7064,7 +7064,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var __fill_ht *types.HashTable = return_value.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 		var __ht *types.HashTable = input.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -7085,7 +7085,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __fill_ht *types.HashTable = return_value.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 			for i = 0; i < num_pads; i++ {
 				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), pad_value)
 				__fill_bkt.SetH(__fill_idx)
@@ -9067,7 +9067,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var __fill_ht *types.HashTable = return_value.GetArr()
 	var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 	var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-	zend.ZEND_ASSERT(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+	b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
 
 	/* We can't use zend_hash_index_find()
 	 * because the array may have string keys or gaps. */

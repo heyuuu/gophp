@@ -4,8 +4,8 @@ package core
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -809,7 +809,7 @@ func PhpOutputStackApplyStatus(h any, z any) int {
 	return 0
 }
 func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *types.Zval) *types.Zval {
-	zend.ZEND_ASSERT(entry != nil)
+	b.Assert(entry != nil)
 	zend.ArrayInit(entry)
 	zend.AddAssocStr(entry, "name", handler.GetName().GetStr())
 	zend.AddAssocLong(entry, "type", zend_long(handler.GetFlags()&0xf))

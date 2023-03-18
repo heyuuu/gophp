@@ -356,7 +356,7 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *types.ZendString, silent 
 					return ZEND_WRONG_PROPERTY_OFFSET
 				}
 			} else {
-				ZEND_ASSERT((flags & ZEND_ACC_PROTECTED) != 0)
+				b.Assert((flags & ZEND_ACC_PROTECTED) != 0)
 				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 					goto wrong
 				}
@@ -439,7 +439,7 @@ func ZendGetPropertyInfo(ce *ZendClassEntry, member *types.ZendString, silent in
 					return ZEND_WRONG_PROPERTY_INFO
 				}
 			} else {
-				ZEND_ASSERT((flags & ZEND_ACC_PROTECTED) != 0)
+				b.Assert((flags & ZEND_ACC_PROTECTED) != 0)
 				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 					goto wrong
 				}
@@ -490,13 +490,13 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.ZendS
 
 			}
 		} else {
-			ZEND_ASSERT(property_info.IsProtected())
+			b.Assert(property_info.IsProtected())
 		}
 		return types.SUCCESS
 	} else {
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), prop_info_name, 1)
 		if property_info == nil {
-			ZEND_ASSERT(is_dynamic != 0)
+			b.Assert(is_dynamic != 0)
 			return types.SUCCESS
 		} else if property_info == ZEND_WRONG_PROPERTY_INFO {
 			return types.FAILURE
@@ -518,7 +518,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.ZendString) *uin
 	var guards *types.HashTable
 	var zv *types.Zval
 	var ptr *uint32
-	ZEND_ASSERT(zobj.GetCe().IsUseGuards())
+	b.Assert(zobj.GetCe().IsUseGuards())
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
 	if zv.IsString() {
 		var str *types.ZendString = zv.GetStr()
@@ -540,13 +540,13 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.ZendString) *uin
 		}
 	} else if zv.IsArray() {
 		guards = zv.GetArr()
-		ZEND_ASSERT(guards != nil)
+		b.Assert(guards != nil)
 		zv = guards.KeyFind(member.GetStr())
 		if zv != nil {
 			return (*uint32)(types.ZendUintptrT(zv.GetPtr()) & ^1)
 		}
 	} else {
-		ZEND_ASSERT(zv.IsUndef())
+		b.Assert(zv.IsUndef())
 		zv.SetStringCopy(member)
 		zv.SetPropertyGuard(0)
 		return &(zv.GetPropertyGuard())
@@ -679,7 +679,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			/* Trigger the correct error */
 
 			ZendGetPropertyOffset(zobj.GetCe(), name, 0, nil, &prop_info)
-			ZEND_ASSERT(EG__().GetException() != nil)
+			b.Assert(EG__().GetException() != nil)
 			retval = EG__().GetUninitializedZval()
 			goto exit
 		}
@@ -709,7 +709,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 	var tmp types.Zval
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	ZEND_ASSERT(!(value.IsReference()))
+	b.Assert(!(value.IsReference()))
 	zobj = object.GetObj()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
@@ -776,12 +776,12 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			ZEND_ASSERT(EG__().GetException() != nil)
+			b.Assert(EG__().GetException() != nil)
 			variable_ptr = EG__().GetErrorZval()
 			goto exit
 		}
 	} else {
-		ZEND_ASSERT(!(IS_WRONG_PROPERTY_OFFSET(property_offset)))
+		b.Assert(!(IS_WRONG_PROPERTY_OFFSET(property_offset)))
 	write_std_property:
 		value.TryAddRefcount()
 		if IS_VALID_PROPERTY_OFFSET(property_offset) {
@@ -1041,7 +1041,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			ZEND_ASSERT(EG__().GetException() != nil)
+			b.Assert(EG__().GetException() != nil)
 			goto exit
 		}
 	}
@@ -1113,7 +1113,7 @@ func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *types.ZendString
 	 */
 
 	var dummy any = any(intPtr(2))
-	ZEND_ASSERT(fbc != nil)
+	b.Assert(fbc != nil)
 	if EG__().GetTrampoline().GetFunctionName() == nil {
 		func_ = EG__().GetTrampoline().GetOpArray()
 	} else {
@@ -1510,11 +1510,11 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 				if has_set_exists == ZEND_PROPERTY_NOT_EMPTY {
 					result = ZendIsTrue(value)
 				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
-					ZEND_ASSERT(has_set_exists == ZEND_PROPERTY_ISSET)
+					b.Assert(has_set_exists == ZEND_PROPERTY_ISSET)
 					value = types.ZVAL_DEREF(value)
 					result = value.GetType() != types.IS_NULL
 				} else {
-					ZEND_ASSERT(has_set_exists == ZEND_PROPERTY_EXISTS)
+					b.Assert(has_set_exists == ZEND_PROPERTY_EXISTS)
 					result = 1
 				}
 				goto exit
@@ -1653,7 +1653,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ha
 		}
 		return ht
 	default:
-		ZEND_ASSERT(false)
+		b.Assert(false)
 		return nil
 	}
 }

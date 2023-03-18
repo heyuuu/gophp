@@ -4,8 +4,8 @@ package standard
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -185,7 +185,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.ZendString {
 	var key *types.ZendString
 	var val *types.Zval
 	var s zend.SmartStr = zend.MakeSmartStr(0)
-	zend.ZEND_ASSERT(headers.IsType(types.IS_ARRAY))
+	b.Assert(headers.IsType(types.IS_ARRAY))
 	var __ht *types.HashTable = headers.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()

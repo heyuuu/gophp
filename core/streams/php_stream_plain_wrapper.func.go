@@ -3,8 +3,8 @@
 package streams
 
 import (
+	r "sik/builtin/file"
 	"sik/core"
-	r "sik/runtime"
 	"sik/zend/types"
 )
 

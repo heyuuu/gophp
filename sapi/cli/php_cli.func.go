@@ -5,9 +5,9 @@ package cli
 import (
 	"fmt"
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 	"sort"

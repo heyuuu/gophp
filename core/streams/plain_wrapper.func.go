@@ -4,9 +4,9 @@ package streams
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -172,7 +172,7 @@ func _phpStreamFopenFromPipe(file *r.FILE, mode *byte) *core.PhpStream {
 }
 func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 	if data.GetFd() >= 0 {
 		var bytes_written ssize_t = write(data.GetFd(), buf, count)
 		if bytes_written < 0 {
@@ -202,7 +202,7 @@ func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	var ret ssize_t
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 	if data.GetFd() >= 0 {
 		ret = read(data.GetFd(), buf, PLAIN_WRAP_BUF_SIZE(count))
 		if ret == size_t-1 && errno == EINTR {
@@ -257,7 +257,7 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 	var ret int
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 	if data.GetLastMappedAddr() != nil {
 		munmap(data.GetLastMappedAddr(), data.GetLastMappedLen())
 		data.SetLastMappedAddr(nil)
@@ -298,7 +298,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 }
 func PhpStdiopFlush(stream *core.PhpStream) int {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 
 	/*
 	 * stdio buffers data in user land. By calling fflush(3), this
@@ -314,7 +314,7 @@ func PhpStdiopFlush(stream *core.PhpStream) int {
 func PhpStdiopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffset *zend.ZendOffT) int {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	var ret int
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 	if !(data.GetIsSeekable()) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot seek on this stream")
 		return -1
@@ -336,7 +336,7 @@ func PhpStdiopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, new
 func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 	var fd core.PhpSocketT
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 
 	/* as soon as someone touches the stdio layer, buffering may ensue,
 	 * so we need to stop using the fd directly in that case */
@@ -391,7 +391,7 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 func PhpStdiopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var ret int
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
-	r.Assert(data != nil)
+	b.Assert(data != nil)
 	if b.Assign(&ret, DoFstat(data, 1)) == 0 {
 		memcpy(ssb.GetSb(), data.GetSb(), b.SizeOf("ssb -> sb"))
 	}

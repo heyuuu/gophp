@@ -158,7 +158,7 @@ func ZendVmStackFreeCallFrameEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_ALLOCATED) != 0 {
 		var p ZendVmStack = EG__().GetVmStack()
 		var prev ZendVmStack = p.GetPrev()
-		ZEND_ASSERT(call == (*ZendExecuteData)(ZEND_VM_STACK_ELEMENTS(EG__().GetVmStack())))
+		b.Assert(call == (*ZendExecuteData)(ZEND_VM_STACK_ELEMENTS(EG__().GetVmStack())))
 		EG__().SetVmStackTop(prev.GetTop())
 		EG__().SetVmStackEnd(prev.GetEnd())
 		EG__().SetVmStack(prev)
@@ -305,7 +305,7 @@ func ZendVmStackInit() {
 func ZendVmStackInitEx(page_size int) {
 	/* page_size must be a power of 2 */
 
-	ZEND_ASSERT(page_size > 0 && (page_size&page_size-1) == 0)
+	b.Assert(page_size > 0 && (page_size&page_size-1) == 0)
 	EG__().SetVmStackPageSize(page_size)
 	EG__().SetVmStack(ZendVmStackNewPage(page_size, nil))
 	EG__().SetVmStackTop(EG__().GetVmStack().GetTop())
@@ -337,7 +337,7 @@ func ZendGetCompiledVariableValue(executeData *ZendExecuteData, var_ uint32) *ty
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(var_)
 	*should_free = ret
-	ZEND_ASSERT(ret.GetType() != types.IS_REFERENCE)
+	b.Assert(ret.GetType() != types.IS_REFERENCE)
 	return ret
 }
 func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {

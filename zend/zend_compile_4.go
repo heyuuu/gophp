@@ -459,7 +459,7 @@ func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
 
 		} else {
 			var opline *ZendOp
-			ZEND_ASSERT((loop_var.GetVarType() & (IS_VAR | IS_TMP_VAR)) != 0)
+			b.Assert((loop_var.GetVarType() & (IS_VAR | IS_TMP_VAR)) != 0)
 			opline = GetNextOp()
 			opline.SetOpcode(loop_var.GetOpcode())
 			opline.SetOp1Type(loop_var.GetVarType())
@@ -574,7 +574,7 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 	var depth_ast *ZendAst = ast.GetChild()[0]
 	var opline *ZendOp
 	var depth ZendLong
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
+	b.Assert(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
 	if depth_ast != nil {
 		var depth_zv *types.Zval
 		if depth_ast.GetKind() != ZEND_AST_ZVAL {
@@ -600,7 +600,7 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 		var cur int = CG__().GetContext().GetCurrentBrkCont()
 		for d = depth - 1; d > 0; d-- {
 			cur = CG__().GetContext().GetBrkContArray()[cur].GetParent()
-			ZEND_ASSERT(cur != -1)
+			b.Assert(cur != -1)
 		}
 		if CG__().GetContext().GetBrkContArray()[cur].GetIsSwitch() != 0 {
 			if depth == 1 {
@@ -656,7 +656,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 	opline.SetOp1Type(IS_UNUSED)
 	opline.SetOp2Type(IS_UNUSED)
 	opline.SetResultType(IS_UNUSED)
-	ZEND_ASSERT(remove_oplines >= 0)
+	b.Assert(remove_oplines >= 0)
 	for b.PostDec(&remove_oplines) {
 		opline--
 		MAKE_NOP(opline)

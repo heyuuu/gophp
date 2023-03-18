@@ -565,7 +565,7 @@ func ZendCreateClosure(res *types.Zval, func_ *ZendFunction, scope *ZendClassEnt
 			/* avoid infinity recursion, by taking handler from nested closure */
 
 			var nested *ZendClosure = (*ZendClosure)((*byte)(func_ - zend_long((*byte)(&((*ZendClosure)(nil).GetFunc()))-(*byte)(nil))))
-			ZEND_ASSERT(nested.GetStd().GetCe() == ZendCeClosure)
+			b.Assert(nested.GetStd().GetCe() == ZendCeClosure)
 			closure.SetOrigInternalHandler(nested.GetOrigInternalHandler())
 		} else {
 			closure.SetOrigInternalHandler(closure.GetFunc().GetInternalFunction().GetHandler())

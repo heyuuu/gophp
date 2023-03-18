@@ -8,7 +8,6 @@ import (
 	"sik/zend/types"
 )
 
-func ZEND_ASSERT(c bool)           {}
 func ZEND_IGNORE_VALUE(x __auto__) { void(x) }
 func ZendQuietWrite()              { ZEND_IGNORE_VALUE(write(__VA_ARGS__)) }
 func DL_LOAD(libname *byte) __auto__ {

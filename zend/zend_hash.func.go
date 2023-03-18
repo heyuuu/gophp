@@ -360,7 +360,7 @@ func ZendHashRealInitPacked(ht *types.HashTable)                  { /* ignore si
 func ZendHashRealInitMixed(ht *types.HashTable)                   { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *types.HashTable) {
 	// todo 此函数不应被调用
-	ZEND_ASSERT(false)
+	b.Assert(false)
 }
 func ZendHashIteratorAdd(ht *types.HashTable, pos types.HashPosition) uint32 {
 	var iter *types.HashTableIterator = EG__().GetHtIterators()
@@ -399,7 +399,7 @@ func ZendHashIteratorAdd(ht *types.HashTable, pos types.HashPosition) uint32 {
 }
 func ZendHashIteratorPos(idx uint32, ht *types.HashTable) types.HashPosition {
 	var iter *types.HashTableIterator = EG__().GetHtIterators() + idx
-	ZEND_ASSERT(idx != uint32-1)
+	b.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
 		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
 			iter.GetHt().DecNIteratorsCount()
@@ -415,7 +415,7 @@ func ZendHashIteratorPos(idx uint32, ht *types.HashTable) types.HashPosition {
 func ZendHashIteratorPosEx(idx uint32, array *types.Zval) types.HashPosition {
 	var ht *types.HashTable = array.GetArr()
 	var iter *types.HashTableIterator = EG__().GetHtIterators() + idx
-	ZEND_ASSERT(idx != uint32-1)
+	b.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
 		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(ht.IsIteratorsOverflow()) {
 			iter.GetHt().DecNIteratorsCount()
@@ -432,9 +432,9 @@ func ZendHashIteratorPosEx(idx uint32, array *types.Zval) types.HashPosition {
 }
 func ZendHashIteratorDel(idx uint32) {
 	var iter *types.HashTableIterator = EG__().GetHtIterators() + idx
-	ZEND_ASSERT(idx != uint32-1)
+	b.Assert(idx != uint32-1)
 	if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
-		ZEND_ASSERT(iter.GetHt().GetNIteratorsCount() != 0)
+		b.Assert(iter.GetHt().GetNIteratorsCount() != 0)
 		iter.GetHt().DecNIteratorsCount()
 	}
 	iter.SetHt(nil)
@@ -787,7 +787,7 @@ func ZendHashCompareImpl(ht1 *types.HashTable, ht2 *types.HashTable, compar type
 		}
 		if ordered != 0 {
 			for true {
-				ZEND_ASSERT(idx2 != ht2.GetNNumUsed())
+				b.Assert(idx2 != ht2.GetNNumUsed())
 				p2 = ht2.GetArData() + idx2
 				if p2.GetVal().GetType() != types.IS_UNDEF {
 					break

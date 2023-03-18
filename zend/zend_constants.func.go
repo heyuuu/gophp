@@ -168,7 +168,7 @@ func ZendVerifyConstAccess(c *ZendClassConstant, scope *ZendClassEntry) int {
 	} else if (c.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) != 0 {
 		return c.GetCe() == scope
 	} else {
-		ZEND_ASSERT((c.GetValue().GetAccessFlags() & ZEND_ACC_PROTECTED) != 0)
+		b.Assert((c.GetValue().GetAccessFlags() & ZEND_ACC_PROTECTED) != 0)
 		return ZendCheckProtected(c.GetCe(), scope)
 	}
 }

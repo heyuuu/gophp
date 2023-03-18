@@ -63,7 +63,7 @@ func SplAddClassName(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_f
 func SplAddInterfaces(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	var num_interfaces uint32
 	if pce.GetNumInterfaces() != 0 {
-		zend.ZEND_ASSERT(pce.HasCeFlags(zend.ZEND_ACC_LINKED))
+		b.Assert(pce.HasCeFlags(zend.ZEND_ACC_LINKED))
 		for num_interfaces = 0; num_interfaces < pce.GetNumInterfaces(); num_interfaces++ {
 			SplAddClassName(list, pce.GetInterfaces()[num_interfaces], allow, ce_flags)
 		}
@@ -74,7 +74,7 @@ func SplAddTraits(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flag
 	var trait *zend.ZendClassEntry
 	for num_traits = 0; num_traits < pce.GetNumTraits(); num_traits++ {
 		trait = zend.ZendFetchClassByName(pce.GetTraitNames()[num_traits].GetName(), pce.GetTraitNames()[num_traits].GetLcName(), zend.ZEND_FETCH_CLASS_TRAIT)
-		zend.ZEND_ASSERT(trait != nil)
+		b.Assert(trait != nil)
 		SplAddClassName(list, trait, allow, ce_flags)
 	}
 }

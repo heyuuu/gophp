@@ -4,16 +4,16 @@ package streams
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/zend"
 	"sik/zend/types"
 )
 
 func PhpStreamMemoryWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	r.Assert(ms != nil)
+	b.Assert(ms != nil)
 	if (ms.GetMode() & core.TEMP_STREAM_READONLY) != 0 {
 		return ssize_t - 1
 	} else if (ms.GetMode() & core.TEMP_STREAM_APPEND) != 0 {
@@ -33,7 +33,7 @@ func PhpStreamMemoryWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 		count = 0
 	}
 	if count != 0 {
-		r.Assert(buf != nil)
+		b.Assert(buf != nil)
 		memcpy(ms.GetData()+ms.GetFpos(), (*byte)(buf), count)
 		ms.SetFpos(ms.GetFpos() + count)
 	}
@@ -41,7 +41,7 @@ func PhpStreamMemoryWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 }
 func PhpStreamMemoryRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	r.Assert(ms != nil)
+	b.Assert(ms != nil)
 	if ms.GetFpos() == ms.GetFsize() {
 		stream.SetEof(1)
 		count = 0
@@ -50,8 +50,8 @@ func PhpStreamMemoryRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			count = ms.GetFsize() - ms.GetFpos()
 		}
 		if count != 0 {
-			r.Assert(ms.GetData() != nil)
-			r.Assert(buf != nil)
+			b.Assert(ms.GetData() != nil)
+			b.Assert(buf != nil)
 			memcpy(buf, ms.GetData()+ms.GetFpos(), count)
 			ms.SetFpos(ms.GetFpos() + count)
 		}
@@ -60,7 +60,7 @@ func PhpStreamMemoryRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 }
 func PhpStreamMemoryClose(stream *core.PhpStream, close_handle int) int {
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	r.Assert(ms != nil)
+	b.Assert(ms != nil)
 	if ms.GetData() != nil && close_handle != 0 && ms.GetMode() != core.TEMP_STREAM_READONLY {
 		zend.Efree(ms.GetData())
 	}
@@ -76,7 +76,7 @@ func PhpStreamMemoryFlush(stream *core.PhpStream) int {
 }
 func PhpStreamMemorySeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffs *zend.ZendOffT) int {
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	r.Assert(ms != nil)
+	b.Assert(ms != nil)
 	switch whence {
 	case r.SEEK_CUR:
 		if offset < 0 {
@@ -140,7 +140,7 @@ func PhpStreamMemoryCast(stream *core.PhpStream, castas int, ret *any) int { ret
 func PhpStreamMemoryStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var timestamp int64 = 0
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	r.Assert(ms != nil)
+	b.Assert(ms != nil)
 	memset(ssb, 0, b.SizeOf("php_stream_statbuf"))
 
 	/* read-only across the board */
@@ -241,7 +241,7 @@ func _phpStreamMemoryOpen(mode int, buf *byte, length int) *core.PhpStream {
 			ms.SetFsize(length)
 		} else {
 			if length != 0 {
-				r.Assert(buf != nil)
+				b.Assert(buf != nil)
 				core.PhpStreamWrite(stream, buf, length)
 			}
 		}
@@ -250,14 +250,14 @@ func _phpStreamMemoryOpen(mode int, buf *byte, length int) *core.PhpStream {
 }
 func _phpStreamMemoryGetBuffer(stream *core.PhpStream, length *int) *byte {
 	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	r.Assert(ms != nil)
-	r.Assert(length != 0)
+	b.Assert(ms != nil)
+	b.Assert(length != 0)
 	*length = ms.GetFsize()
 	return ms.GetData()
 }
 func PhpStreamTempWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
-	r.Assert(ts != nil)
+	b.Assert(ts != nil)
 	if ts.GetInnerstream() == nil {
 		return -1
 	}
@@ -281,7 +281,7 @@ func PhpStreamTempWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 func PhpStreamTempRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
 	var got int
-	r.Assert(ts != nil)
+	b.Assert(ts != nil)
 	if ts.GetInnerstream() == nil {
 		return -1
 	}
@@ -292,7 +292,7 @@ func PhpStreamTempRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 func PhpStreamTempClose(stream *core.PhpStream, close_handle int) int {
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
 	var ret int
-	r.Assert(ts != nil)
+	b.Assert(ts != nil)
 	if ts.GetInnerstream() != nil {
 		ret = core.PhpStreamFreeEnclosed(ts.GetInnerstream(), core.PHP_STREAM_FREE_CLOSE|b.Cond(close_handle != 0, 0, core.PHP_STREAM_FREE_PRESERVE_HANDLE))
 	} else {
@@ -307,7 +307,7 @@ func PhpStreamTempClose(stream *core.PhpStream, close_handle int) int {
 }
 func PhpStreamTempFlush(stream *core.PhpStream) int {
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
-	r.Assert(ts != nil)
+	b.Assert(ts != nil)
 	if ts.GetInnerstream() != nil {
 		return core.PhpStreamFlush(ts.GetInnerstream())
 	} else {
@@ -317,7 +317,7 @@ func PhpStreamTempFlush(stream *core.PhpStream) int {
 func PhpStreamTempSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffs *zend.ZendOffT) int {
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
 	var ret int
-	r.Assert(ts != nil)
+	b.Assert(ts != nil)
 	if ts.GetInnerstream() == nil {
 		*newoffs = -1
 		return -1
@@ -333,7 +333,7 @@ func PhpStreamTempCast(stream *core.PhpStream, castas int, ret *any) int {
 	var memsize int
 	var membuf *byte
 	var pos zend.ZendOffT
-	r.Assert(ts != nil)
+	b.Assert(ts != nil)
 	if ts.GetInnerstream() == nil {
 		return types.FAILURE
 	}
@@ -419,12 +419,12 @@ func _phpStreamTempOpen(mode int, max_memory_usage int, buf *byte, length int) *
 	var newoffs zend.ZendOffT
 	if b.Assign(&stream, core.PhpStreamTempCreateRel(mode, max_memory_usage)) != nil {
 		if length != 0 {
-			r.Assert(buf != nil)
+			b.Assert(buf != nil)
 			PhpStreamTempWrite(stream, buf, length)
 			PhpStreamTempSeek(stream, 0, r.SEEK_SET, &newoffs)
 		}
 		ts = (*PhpStreamTempData)(stream.GetAbstract())
-		r.Assert(ts != nil)
+		b.Assert(ts != nil)
 		ts.SetMode(mode)
 	}
 	return stream
@@ -570,7 +570,7 @@ func PhpStreamUrlWrapRfc2397(
 		stream.GetMode()[vlen] = '0'
 		stream.SetOps(&PhpStreamRfc2397Ops)
 		ts = (*PhpStreamTempData)(stream.GetAbstract())
-		r.Assert(ts != nil)
+		b.Assert(ts != nil)
 		if mode != nil && mode[0] == 'r' && mode[1] != '+' {
 			ts.SetMode(core.TEMP_STREAM_READONLY)
 		} else {

@@ -4,8 +4,8 @@ package standard
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
-	r "sik/runtime"
 )
 
 func PhpFlock(fd int, operation int) int {

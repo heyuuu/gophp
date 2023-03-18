@@ -208,7 +208,7 @@ func ZendDelayedCompileEnd(offset uint32) *ZendOp {
 	var oplines *ZendOp = CG__().GetDelayedOplinesStack().GetElements()
 	var i uint32
 	var count uint32 = CG__().GetDelayedOplinesStack().GetTop()
-	ZEND_ASSERT(count >= offset)
+	b.Assert(count >= offset)
 	for i = offset; i < count; i++ {
 		opline = GetNextOp()
 		memcpy(opline, &oplines[i], b.SizeOf("zend_op"))
@@ -244,7 +244,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 			result.GetConstant().TryAddRefcount()
 		}
 	} else {
-		ZEND_ASSERT(false)
+		b.Assert(false)
 	}
 }
 func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit types.ZendBool) {
@@ -361,7 +361,7 @@ func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 			 */
 
 			var c int = ZendAddLiteral(dim_node.GetConstant())
-			ZEND_ASSERT(opline.GetOp2().GetConstant()+1 == c)
+			b.Assert(opline.GetOp2().GetConstant()+1 == c)
 			CT_CONSTANT(opline.GetOp2()).SetLong(index)
 			CT_CONSTANT(opline.GetOp2()).GetU2Extra() = ZEND_EXTRA_VALUE
 			return

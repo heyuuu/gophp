@@ -512,7 +512,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	if EG__().GetException() != nil {
 		return types.FAILURE
 	}
-	ZEND_ASSERT(fci.GetSize() == b.SizeOf("zend_fcall_info"))
+	b.Assert(fci.GetSize() == b.SizeOf("zend_fcall_info"))
 
 	/* Initialize executeData */
 

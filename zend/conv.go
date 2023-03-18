@@ -3,7 +3,7 @@ package zend
 import (
 	"flag"
 	"log"
-	. "sik/runtime/ctype"
+	. "sik/builtin/ctype"
 	"sik/zend/types"
 	"strconv"
 	"strings"

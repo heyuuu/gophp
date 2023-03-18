@@ -118,7 +118,7 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *ZendClassEntry) types.
 	return 1
 }
 func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict types.ZendBool) types.ZendBool {
-	ZEND_ASSERT(!(property.IsReference()))
+	b.Assert(!(property.IsReference()))
 	if info.GetType().IsClass() {
 		if property.GetType() != types.IS_OBJECT {
 			return property.IsNull() && info.GetType().AllowNull()
@@ -128,7 +128,7 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict
 		}
 		return InstanceofFunction(types.Z_OBJCE_P(property), info.GetType().Ce())
 	}
-	ZEND_ASSERT(info.GetType().Code() != types.IS_CALLABLE)
+	b.Assert(info.GetType().Code() != types.IS_CALLABLE)
 	if info.GetType().Code() == property.GetType() {
 		return 1
 	} else if property.IsNull() {
@@ -236,7 +236,7 @@ func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, defaul
 func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo = zf.GetArgInfo()[arg_num-1]
 	var ce *ZendClassEntry
-	ZEND_ASSERT(arg_num <= zf.GetNumArgs())
+	b.Assert(arg_num <= zf.GetNumArgs())
 	cur_arg_info = zf.GetArgInfo()[arg_num-1]
 	ce = nil
 	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
@@ -248,8 +248,8 @@ func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, de
 func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
 	var ce *ZendClassEntry
-	ZEND_ASSERT(arg_num > zf.GetNumArgs())
-	ZEND_ASSERT(zf.IsVariadic())
+	b.Assert(arg_num > zf.GetNumArgs())
+	b.Assert(zf.IsVariadic())
 	cur_arg_info = zf.GetArgInfo()[zf.GetNumArgs()]
 	ce = nil
 	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
@@ -381,7 +381,7 @@ func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opl
 
 	if opline.GetExtendedValue() == ZEND_CONCAT && ref.GetVal().IsString() {
 		ConcatFunction(ref.GetVal(), ref.GetVal(), value)
-		ZEND_ASSERT(ref.GetVal().IsString() && "Concat should return string")
+		b.Assert(ref.GetVal().IsString() && "Concat should return string")
 		return
 	}
 	ZendBinaryOp(&z_copy, ref.GetVal(), value, opline)
@@ -399,7 +399,7 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, 
 
 	if opline.GetExtendedValue() == ZEND_CONCAT && zptr.IsString() {
 		ConcatFunction(zptr, zptr, value)
-		ZEND_ASSERT(zptr.IsString() && "Concat should return string")
+		b.Assert(zptr.IsString() && "Concat should return string")
 		return
 	}
 	ZendBinaryOp(&z_copy, zptr, value, opline)

@@ -32,7 +32,7 @@ func ZendCompileIf(ast *ZendAst) {
 
 			/* "else" can only occur as last element. */
 
-			ZEND_ASSERT(i == list.GetChildren()-1)
+			b.Assert(i == list.GetChildren()-1)
 			ZendCompileStmt(stmt_ast)
 		}
 	}
@@ -113,7 +113,7 @@ func ShouldUseJumptable(cases *ZendAstList, jumptable_type types.ZendUchar) type
 	if jumptable_type == types.IS_LONG {
 		return cases.GetChildren() >= 5
 	} else {
-		ZEND_ASSERT(jumptable_type == types.IS_STRING)
+		b.Assert(jumptable_type == types.IS_STRING)
 		return cases.GetChildren() >= 2
 	}
 
@@ -193,18 +193,18 @@ func ZendCompileSwitch(ast *ZendAst) {
 				var cond_zv *types.Zval = ZendAstGetZval(cond_ast)
 				var jmp_target types.Zval
 				jmp_target.SetLong(GetNextOpNumber())
-				ZEND_ASSERT(cond_zv.IsType(jumptable_type))
+				b.Assert(cond_zv.IsType(jumptable_type))
 				if cond_zv.IsLong() {
 					jumptable.IndexAddH(cond_zv.GetLval(), &jmp_target)
 				} else {
-					ZEND_ASSERT(cond_zv.IsString())
+					b.Assert(cond_zv.IsString())
 					jumptable.KeyAdd(cond_zv.GetStr().GetStr(), &jmp_target)
 				}
 			}
 		} else {
 			ZendUpdateJumpTargetToNext(opnum_default_jmp)
 			if jumptable != nil {
-				ZEND_ASSERT(opnum_switch != uint32-1)
+				b.Assert(opnum_switch != uint32-1)
 				opline = CG__().GetActiveOpArray().GetOpcodes()[opnum_switch]
 				opline.SetExtendedValue(GetNextOpNumber())
 			}
@@ -325,7 +325,7 @@ func ZendCompileTry(ast *ZendAst) {
 		if is_last_catch == 0 {
 			jmp_opnums[i+1] = ZendEmitJump(0)
 		}
-		ZEND_ASSERT(opnum_catch != uint32-1 && "Should have at least one class")
+		b.Assert(opnum_catch != uint32-1 && "Should have at least one class")
 		opline = CG__().GetActiveOpArray().GetOpcodes()[opnum_catch]
 		if is_last_catch == 0 {
 			opline.GetOp2().SetOplineNum(GetNextOpNumber())

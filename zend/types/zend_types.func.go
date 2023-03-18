@@ -195,7 +195,7 @@ func ZVAL_MAKE_REF(zv *Zval) {
 func ZVAL_UNREF(z *Zval) {
 	var _z *Zval = z
 	var ref *ZendReference
-	zend.ZEND_ASSERT(_z.IsReference())
+	b.Assert(_z.IsReference())
 	ref = _z.GetRef()
 	ZVAL_COPY_VALUE(_z, ref.GetVal())
 	zend.EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -237,7 +237,7 @@ func SEPARATE_ZVAL_IF_NOT_REF(zv *Zval) {
 }
 func SEPARATE_ZVAL_NOREF(zv *Zval) {
 	var _zv *Zval = zv
-	zend.ZEND_ASSERT(_zv.GetType() != IS_REFERENCE)
+	b.Assert(_zv.GetType() != IS_REFERENCE)
 	SEPARATE_ZVAL_IF_NOT_REF(_zv)
 }
 func SEPARATE_ZVAL(zv *Zval) {

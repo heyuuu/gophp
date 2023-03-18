@@ -314,7 +314,7 @@ func ZendParseArgImpl_Ex(arg *types.Zval, va *receiveArgs, spec *b.StrReader, er
 
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
 
-		ZEND_ASSERT(c != 'Z')
+		b.Assert(c != 'Z')
 	default:
 		return "unknown"
 	}

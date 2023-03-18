@@ -5,7 +5,7 @@ package zend
 import (
 	"bytes"
 	b "sik/builtin"
-	r "sik/runtime"
+	r "sik/builtin/file"
 	"sik/zend/types"
 )
 
@@ -72,7 +72,7 @@ func (this *ZendFileHandle) reset() {
 }
 
 func (this *ZendFileHandle) FileSize() int {
-	ZEND_ASSERT(this.type_ == ZEND_HANDLE_STREAM)
+	b.Assert(this.type_ == ZEND_HANDLE_STREAM)
 	if this.stream.Isatty() {
 		return 0
 	}

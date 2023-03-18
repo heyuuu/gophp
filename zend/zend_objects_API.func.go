@@ -45,7 +45,7 @@ func ZendObjectAlloc(obj_size int, ce *ZendClassEntry) any {
 func ZendGetPropertyInfoForSlot(obj *types.ZendObject, slot *types.Zval) *ZendPropertyInfo {
 	var table **ZendPropertyInfo = obj.GetCe().GetPropertiesInfoTable()
 	var prop_num intPtr = slot - obj.GetPropertiesTable()
-	ZEND_ASSERT(prop_num >= 0 && prop_num < obj.GetCe().GetDefaultPropertiesCount())
+	b.Assert(prop_num >= 0 && prop_num < obj.GetCe().GetDefaultPropertiesCount())
 	return table[prop_num]
 }
 func ZendGetTypedPropertyInfoForSlot(obj *types.ZendObject, slot *types.Zval) *ZendPropertyInfo {
@@ -182,7 +182,7 @@ func ZendObjectsStorePut(object *types.ZendObject) {
 	EG__().GetObjectsStore().GetObjectBuckets()[handle] = object
 }
 func ZendObjectsStoreDel(object *types.ZendObject) {
-	ZEND_ASSERT(object.GetRefcount() == 0)
+	b.Assert(object.GetRefcount() == 0)
 
 	/* GC might have released this object already. */
 
@@ -206,8 +206,8 @@ func ZendObjectsStoreDel(object *types.ZendObject) {
 	if object.GetRefcount() == 0 {
 		var handle uint32 = object.GetHandle()
 		var ptr any
-		ZEND_ASSERT(EG__().GetObjectsStore().GetObjectBuckets() != nil)
-		ZEND_ASSERT(IS_OBJ_VALID(EG__().GetObjectsStore().GetObjectBuckets()[handle]))
+		b.Assert(EG__().GetObjectsStore().GetObjectBuckets() != nil)
+		b.Assert(IS_OBJ_VALID(EG__().GetObjectsStore().GetObjectBuckets()[handle]))
 		EG__().GetObjectsStore().GetObjectBuckets()[handle] = SET_OBJ_INVALID(object)
 		if (object.GetGcFlags() & types.IS_OBJ_FREE_CALLED) == 0 {
 			object.AddGcFlags(types.IS_OBJ_FREE_CALLED)

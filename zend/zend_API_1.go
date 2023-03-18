@@ -49,8 +49,8 @@ func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
 func ZendTryArrayInit(zv *types.Zval) *types.Zval { return ZendTryArrayInitSize(zv, 0) }
 func Z_PARAM_PROLOGUE(deref int, separate int) {
 	_i++
-	ZEND_ASSERT(_i <= _min_num_args || _optional == 1)
-	ZEND_ASSERT(_i > _min_num_args || _optional == 0)
+	b.Assert(_i <= _min_num_args || _optional == 1)
+	b.Assert(_i > _min_num_args || _optional == 0)
 	if _optional {
 		if _i > _num_args {
 			break

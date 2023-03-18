@@ -1,10 +1,13 @@
 package types
 
-import "sik/zend"
+import (
+	b "sik/builtin"
+	"sik/zend"
+)
 
 func (this *HashTable) SymtableClean() {
 	// todo 这里可能不会严格对等，需要处理一下
-	zend.ZEND_ASSERT(this.pDestructor == zend.ZVAL_PTR_DTOR)
+	b.Assert(this.pDestructor == zend.ZVAL_PTR_DTOR)
 
 	this.Clean()
 }

@@ -61,25 +61,25 @@ func ZendAstIsList(ast *ZendAst) types.ZendBool {
 	return ast.GetKind() >> ZEND_AST_IS_LIST_SHIFT & 1
 }
 func ZendAstGetList(ast *ZendAst) *ZendAstList {
-	ZEND_ASSERT(ZendAstIsList(ast) != 0)
+	b.Assert(ZendAstIsList(ast) != 0)
 	return (*ZendAstList)(ast)
 }
 func ZendAstGetZval(ast *ZendAst) *types.Zval {
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_ZVAL)
+	b.Assert(ast.GetKind() == ZEND_AST_ZVAL)
 	return (*ZendAstZval)(ast).GetVal()
 }
 func ZendAstGetStr(ast *ZendAst) *types.ZendString {
 	var zv *types.Zval = ZendAstGetZval(ast)
-	ZEND_ASSERT(zv.IsString())
+	b.Assert(zv.IsString())
 	return zv.GetStr()
 }
 func ZendAstGetConstantName(ast *ZendAst) *types.ZendString {
-	ZEND_ASSERT(ast.GetKind() == ZEND_AST_CONSTANT)
-	ZEND_ASSERT((*ZendAstZval)(ast).GetVal().IsString())
+	b.Assert(ast.GetKind() == ZEND_AST_CONSTANT)
+	b.Assert((*ZendAstZval)(ast).GetVal().IsString())
 	return (*ZendAstZval)(ast).GetVal().GetStr()
 }
 func ZendAstGetNumChildren(ast *ZendAst) uint32 {
-	ZEND_ASSERT(ZendAstIsList(ast) == 0)
+	b.Assert(ZendAstIsList(ast) == 0)
 	return ast.GetKind() >> ZEND_AST_NUM_CHILDREN_SHIFT
 }
 func ZendAstGetLineno(ast *ZendAst) uint32 {
@@ -204,7 +204,7 @@ func ZendAstCreateDecl(
 }
 func ZendAstCreate0(kind ZendAstKind) *ZendAst {
 	var ast *ZendAst
-	ZEND_ASSERT(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 0)
+	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 0)
 	ast = ZendAstAlloc(ZendAstSize(0))
 	ast.SetKind(kind)
 	ast.SetAttr(0)
@@ -214,7 +214,7 @@ func ZendAstCreate0(kind ZendAstKind) *ZendAst {
 func ZendAstCreate1(kind ZendAstKind, child *ZendAst) *ZendAst {
 	var ast *ZendAst
 	var lineno uint32
-	ZEND_ASSERT(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 1)
+	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 1)
 	ast = ZendAstAlloc(ZendAstSize(1))
 	ast.SetKind(kind)
 	ast.SetAttr(0)
@@ -231,7 +231,7 @@ func ZendAstCreate1(kind ZendAstKind, child *ZendAst) *ZendAst {
 func ZendAstCreate2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *ZendAst {
 	var ast *ZendAst
 	var lineno uint32
-	ZEND_ASSERT(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 2)
+	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 2)
 	ast = ZendAstAlloc(ZendAstSize(2))
 	ast.SetKind(kind)
 	ast.SetAttr(0)
@@ -250,7 +250,7 @@ func ZendAstCreate2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *ZendAst
 func ZendAstCreate3(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst) *ZendAst {
 	var ast *ZendAst
 	var lineno uint32
-	ZEND_ASSERT(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 3)
+	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 3)
 	ast = ZendAstAlloc(ZendAstSize(3))
 	ast.SetKind(kind)
 	ast.SetAttr(0)
@@ -272,7 +272,7 @@ func ZendAstCreate3(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *
 func ZendAstCreate4(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst, child4 *ZendAst) *ZendAst {
 	var ast *ZendAst
 	var lineno uint32
-	ZEND_ASSERT(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 4)
+	b.Assert(kind>>ZEND_AST_NUM_CHILDREN_SHIFT == 4)
 	ast = ZendAstAlloc(ZendAstSize(4))
 	ast.SetKind(kind)
 	ast.SetAttr(0)
@@ -496,7 +496,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *ZendClassEntry) in
 			}
 			result.SetStringCopy(scope.GetParent().name)
 		} else {
-			ZEND_ASSERT(false)
+			b.Assert(false)
 		}
 	case ZEND_AST_AND:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
@@ -725,7 +725,7 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 func ZendAstCopy(ast *ZendAst) *types.ZendAstRef {
 	var tree_size int
 	var ref *types.ZendAstRef
-	ZEND_ASSERT(ast != nil)
+	b.Assert(ast != nil)
 	tree_size = ZendAstTreeSize(ast) + b.SizeOf("zend_ast_ref")
 	ref = Emalloc(tree_size)
 	ZendAstTreeCopy(ast, types.GC_AST(ref))
@@ -928,7 +928,7 @@ func ZendAstExportEncapsList(str *SmartStr, quote byte, list *ZendAstList, inden
 		ast = list.GetChild()[i]
 		if ast.GetKind() == ZEND_AST_ZVAL {
 			var zv *types.Zval = ZendAstGetZval(ast)
-			ZEND_ASSERT(zv.IsString())
+			b.Assert(zv.IsString())
 			ZendAstExportQstr(str, quote, zv.GetStr())
 		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces((*types.Z_STRVAL_P)(ZendAstGetZval(list.GetChild()[i+1]))) == 0) {
 			ZendAstExportEx(str, ast, 0, indent)
@@ -1025,7 +1025,7 @@ tail_call:
 	i = 0
 	for i < list.GetChildren() {
 		ast = list.GetChild()[i]
-		ZEND_ASSERT(ast.GetKind() == ZEND_AST_IF_ELEM)
+		b.Assert(ast.GetKind() == ZEND_AST_IF_ELEM)
 		if ast.GetChild()[0] != nil {
 			if i == 0 {
 				str.AppendString("if (")
@@ -1178,7 +1178,7 @@ tail_call:
 
 		/* This AST kind is only used for temporary nodes during compilation */
 
-		ZEND_ASSERT(false)
+		b.Assert(false)
 	case ZEND_AST_FUNC_DECL:
 		fallthrough
 	case ZEND_AST_CLOSURE:
@@ -1227,7 +1227,7 @@ tail_call:
 		}
 		if decl.GetChild()[2] != nil {
 			if decl.GetKind() == ZEND_AST_ARROW_FUNC {
-				ZEND_ASSERT(decl.GetChild()[2].GetKind() == ZEND_AST_RETURN)
+				b.Assert(decl.GetChild()[2].GetKind() == ZEND_AST_RETURN)
 				str.AppendString(" => ")
 				ZendAstExportEx(str, decl.GetChild()[2].GetChild()[0], 0, indent)
 				break
@@ -1422,9 +1422,9 @@ tail_call:
 			ZendAstExportEncapsList(str, '`', (*ZendAstList)(ast.GetChild()[0]), indent)
 		} else {
 			var zv *types.Zval
-			ZEND_ASSERT(ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL)
+			b.Assert(ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL)
 			zv = ZendAstGetZval(ast.GetChild()[0])
-			ZEND_ASSERT(zv.IsString())
+			b.Assert(zv.IsString())
 			ZendAstExportQstr(str, '`', zv.GetStr())
 		}
 		str.AppendByte('`')
@@ -1773,7 +1773,7 @@ tail_call:
 		ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 	case ZEND_AST_DECLARE:
 		str.AppendString("declare(")
-		ZEND_ASSERT(ast.GetChild()[0].GetKind() == ZEND_AST_CONST_DECL)
+		b.Assert(ast.GetChild()[0].GetKind() == ZEND_AST_CONST_DECL)
 		ZendAstExportList(str, (*ZendAstList)(ast.GetChild()[0]), 1, 0, indent)
 		str.AppendByte(')')
 		if ast.GetChild()[1] != nil {

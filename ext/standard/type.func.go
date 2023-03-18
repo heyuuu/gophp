@@ -3,6 +3,7 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
 	"sik/zend/types"
@@ -157,7 +158,7 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	zend.ZEND_ASSERT(var_.IsReference())
+	b.Assert(var_.IsReference())
 	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.GetRef()) {
 		types.ZVAL_COPY(&tmp, types.Z_REFVAL_P(var_))
 		ptr = &tmp

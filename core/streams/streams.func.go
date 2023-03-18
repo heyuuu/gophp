@@ -4,9 +4,9 @@ package streams
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/types"
@@ -867,7 +867,7 @@ func _phpStreamGetLine(stream *core.PhpStream, buf *byte, maxlen int, returned_l
 	}
 	if total_copied == 0 {
 		if grow_mode != 0 {
-			r.Assert(bufstart == nil)
+			b.Assert(bufstart == nil)
 		}
 		return nil
 	}
@@ -1104,7 +1104,7 @@ func _phpStreamWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if count == 0 {
 		return 0
 	}
-	zend.ZEND_ASSERT(buf != nil)
+	b.Assert(buf != nil)
 	if stream.GetOps().GetWrite() == nil {
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "Stream is not writable")
 		return ssize_t - 1

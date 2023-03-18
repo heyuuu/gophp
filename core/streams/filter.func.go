@@ -166,7 +166,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 		memcpy(wildname, filtername, n+1)
 		period = wildname + (period - filtername)
 		for period != nil && filter == nil {
-			zend.ZEND_ASSERT(period[0] == '.')
+			b.Assert(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
 			if nil != b.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, wildname, strlen(wildname))) {

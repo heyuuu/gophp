@@ -99,7 +99,7 @@ func FunctionAddRef(function *ZendFunction) {
 			}
 		}
 		if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
-			ZEND_ASSERT(op_array.IsPreloaded())
+			b.Assert(op_array.IsPreloaded())
 			ZEND_MAP_PTR_NEW(op_array.run_time_cache)
 			ZEND_MAP_PTR_NEW(op_array.static_variables_ptr)
 		} else {
@@ -117,7 +117,7 @@ func DoBindFunctionError(lcname *types.ZendString, op_array *ZendOpArray, compil
 	var zv *types.Zval = b.CondF(compile_time != 0, func() *types.HashTable { return CG__().GetFunctionTable() }, func() *types.HashTable { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
 	var error_level int = b.Cond(compile_time != 0, E_COMPILE_ERROR, E_ERROR)
 	var old_function *ZendFunction
-	ZEND_ASSERT(zv != nil)
+	b.Assert(zv != nil)
 	old_function = (*ZendFunction)(zv.GetPtr())
 	if old_function.GetType() == ZEND_USER_FUNCTION && old_function.GetOpArray().GetLast() > 0 {
 		ZendErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
@@ -160,7 +160,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
 			return types.FAILURE
 		} else {
 			for {
-				ZEND_ASSERT(CurrEX().GetFunc().GetOpArray().IsPreloaded())
+				b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(CurrEX().GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
 					zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
 					if zv != nil {
@@ -235,7 +235,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 		var run_time_cache *any
 		if op_array.GetRunTimeCachePtr() == nil {
 			var ptr any
-			ZEND_ASSERT(op_array.IsHeapRtCache())
+			b.Assert(op_array.IsHeapRtCache())
 			ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
 			ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
 			ptr = (*byte)(ptr + b.SizeOf("void *"))
@@ -609,7 +609,7 @@ func Zendlex(elem *ZendParserStackElem) int {
 		CG__().SetIncrementLineno(0)
 	}
 	ret = LexScan(&zv, elem)
-	ZEND_ASSERT(EG__().GetException() == nil || ret == T_ERROR)
+	b.Assert(EG__().GetException() == nil || ret == T_ERROR)
 	return ret
 }
 func ZendInitializeClassData(ce *ZendClassEntry, nullify_handlers types.ZendBool) {
@@ -691,7 +691,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 		if zv.GetLval() == 0 {
 			zv.SetString(types.ZendStringInit("-0", b.SizeOf("\"-0\"")-1, 0))
 		} else {
-			ZEND_ASSERT(zv.GetLval() > 0)
+			b.Assert(zv.GetLval() > 0)
 			zv.SetLval(zv.GetLval() * -1)
 		}
 	} else if zv.IsString() {
@@ -700,7 +700,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 		memmove(zv.GetStr().GetVal()+1, zv.GetStr().GetVal(), orig_len+1)
 		zv.GetStr().GetVal()[0] = '-'
 	} else {
-		ZEND_ASSERT(false)
+		b.Assert(false)
 	}
 	return ast
 }

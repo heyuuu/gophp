@@ -80,7 +80,7 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 		break
 	}
 	if gettimeofday(&tp, nil) {
-		zend.ZEND_ASSERT(false)
+		b.Assert(false)
 	}
 	if get_as_float != 0 {
 		return_value.SetDouble(float64(tp.tv_sec + tp.tv_usec/MICRO_IN_SEC))

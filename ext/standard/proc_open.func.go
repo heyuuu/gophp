@@ -4,9 +4,9 @@ package standard
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/types"
@@ -78,7 +78,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 		b.PostInc(&(*p)) = '0'
 		types.ZendStringReleaseEx(str, 0)
 	}
-	r.Assert(uint32(p-env.GetEnvp()) <= sizeenv)
+	b.Assert(uint32(p-env.GetEnvp()) <= sizeenv)
 	env_hash.Destroy()
 	zend.FREE_HASHTABLE(env_hash)
 	return env
@@ -573,7 +573,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 		/* As the array is non-empty, we should have found a command. */
 
-		zend.ZEND_ASSERT(command != nil)
+		b.Assert(command != nil)
 
 		/* As the array is non-empty, we should have found a command. */
 

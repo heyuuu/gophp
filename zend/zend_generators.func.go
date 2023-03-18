@@ -93,7 +93,7 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 		}
 	}
 	executeData.SetCall(nil)
-	ZEND_ASSERT(prev_call == (*ZendExecuteData)(stack))
+	b.Assert(prev_call == (*ZendExecuteData)(stack))
 	return prev_call
 }
 func ZendGeneratorCleanupUnfinishedExecution(generator *ZendGenerator, executeData *ZendExecuteData, catch_op_num uint32) {
@@ -155,7 +155,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution types.ZendB
 		if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
 			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc(
 
-			/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */ )))
+				/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */)))
 		}
 
 		if generator.GetGcBuffer() != nil {
@@ -538,7 +538,7 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 }
 func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNode, child *ZendGenerator) {
 	var leaf ZendUlong
-	ZEND_ASSERT(src.GetChildren() > 1)
+	b.Assert(src.GetChildren() > 1)
 	var __ht *types.HashTable = src.GetHt()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()

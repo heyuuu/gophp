@@ -1,6 +1,7 @@
 package zend
 
 import (
+	b "sik/builtin"
 	"sik/zend/types"
 	"strconv"
 	"strings"
@@ -91,7 +92,7 @@ func (this *SmartStr) SetC(value *byte) {
 	if value == nil {
 		this.Reset()
 	} else {
-		ZEND_ASSERT(false)
+		b.Assert(false)
 	}
 }
 func (this *SmartStr) SetLen(value int) {

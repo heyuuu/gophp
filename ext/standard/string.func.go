@@ -3556,8 +3556,8 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 					l = 0
 				}
 			}
-			zend.ZEND_ASSERT(0 <= f && f <= zend.ZEND_LONG_MAX)
-			zend.ZEND_ASSERT(0 <= l && l <= zend.ZEND_LONG_MAX)
+			b.Assert(0 <= f && f <= zend.ZEND_LONG_MAX)
+			b.Assert(0 <= l && l <= zend.ZEND_LONG_MAX)
 			if int(f+l) > orig_str.GetLen() {
 				l = orig_str.GetLen() - f
 			}
@@ -5760,7 +5760,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 			types.ZendStringReleaseEx(lc_subject_str, 0)
 		}
 	} else {
-		zend.ZEND_ASSERT(search.IsType(types.IS_STRING))
+		b.Assert(search.IsType(types.IS_STRING))
 		if search.GetStr().GetLen() == 1 {
 			result.SetString(PhpCharToStrEx(subject_str, search.GetStr().GetVal()[0], replace.GetStr().GetVal(), replace.GetStr().GetLen(), case_sensitivity, &replace_count))
 		} else if search.GetStr().GetLen() > 1 {

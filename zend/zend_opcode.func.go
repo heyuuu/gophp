@@ -77,11 +77,11 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 func ZendFunctionDtor(zv *types.Zval) {
 	var function *ZendFunction = zv.GetPtr()
 	if function.GetType() == ZEND_USER_FUNCTION {
-		ZEND_ASSERT(function.GetFunctionName() != nil)
+		b.Assert(function.GetFunctionName() != nil)
 		DestroyOpArray(function.GetOpArray())
 	} else {
-		ZEND_ASSERT(function.GetType() == ZEND_INTERNAL_FUNCTION)
-		ZEND_ASSERT(function.GetFunctionName() != nil)
+		b.Assert(function.GetType() == ZEND_INTERNAL_FUNCTION)
+		b.Assert(function.GetFunctionName() != nil)
 		types.ZendStringReleaseEx(function.GetFunctionName(), 1)
 
 		/* For methods this will be called explicitly. */
@@ -556,7 +556,7 @@ func EmitLiveRangeRaw(op_array *ZendOpArray, var_num uint32, kind uint32, start 
 	var range_ *ZendLiveRange
 	op_array.GetLastLiveRange()++
 	op_array.SetLiveRange(Erealloc(op_array.GetLiveRange(), b.SizeOf("zend_live_range")*op_array.GetLastLiveRange()))
-	ZEND_ASSERT(start < end)
+	b.Assert(start < end)
 	range_ = op_array.GetLiveRange()[op_array.GetLastLiveRange()-1]
 	range_.SetVar(uint32(intPtr(nil.VarNum(op_array.GetLastVar() + var_num))))
 	range_.SetVar(range_.GetVar() | kind)
@@ -574,7 +574,7 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 	case ZEND_ADD_ARRAY_UNPACK:
 		fallthrough
 	case ZEND_ROPE_ADD:
-		ZEND_ASSERT(false)
+		b.Assert(false)
 		return
 	case ZEND_JMPZ_EX:
 		fallthrough
@@ -709,7 +709,7 @@ func KeepsOp1Alive(opline *ZendOp) types.ZendBool {
 	if opline.GetOpcode() == ZEND_CASE || opline.GetOpcode() == ZEND_SWITCH_LONG || opline.GetOpcode() == ZEND_FETCH_LIST_R || opline.GetOpcode() == ZEND_COPY_TMP {
 		return 1
 	}
-	ZEND_ASSERT(opline.GetOpcode() != ZEND_SWITCH_STRING && opline.GetOpcode() != ZEND_FE_FETCH_R && opline.GetOpcode() != ZEND_FE_FETCH_RW && opline.GetOpcode() != ZEND_FETCH_LIST_W && opline.GetOpcode() != ZEND_VERIFY_RETURN_TYPE && opline.GetOpcode() != ZEND_BIND_LEXICAL && opline.GetOpcode() != ZEND_ROPE_ADD)
+	b.Assert(opline.GetOpcode() != ZEND_SWITCH_STRING && opline.GetOpcode() != ZEND_FE_FETCH_R && opline.GetOpcode() != ZEND_FE_FETCH_RW && opline.GetOpcode() != ZEND_FETCH_LIST_W && opline.GetOpcode() != ZEND_VERIFY_RETURN_TYPE && opline.GetOpcode() != ZEND_BIND_LEXICAL && opline.GetOpcode() != ZEND_ROPE_ADD)
 	return 0
 }
 func CmpLiveRange(a *ZendLiveRange, b *ZendLiveRange) int { return a.GetStart() - b.GetStart() }
@@ -731,7 +731,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 	var var_offset uint32 = op_array.GetLastVar()
 	var last_use *uint32 = DoAlloca(b.SizeOf("uint32_t")*op_array.GetT(), use_heap)
 	memset(last_use, -1, b.SizeOf("uint32_t")*op_array.GetT())
-	ZEND_ASSERT(op_array.GetLiveRange() == nil)
+	b.Assert(op_array.GetLiveRange() == nil)
 	for opnum > 0 {
 		opnum--
 		opline--
@@ -753,7 +753,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 
 					/* OP_DATA uses only op1 operand */
 
-					ZEND_ASSERT(opline.GetOpcode() != ZEND_OP_DATA)
+					b.Assert(opline.GetOpcode() != ZEND_OP_DATA)
 					num = opnum
 					EmitLiveRange(op_array, var_num, num, last_use[var_num], needs_live_range)
 				}
@@ -800,7 +800,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 
 				/* OP_DATA uses only op1 operand */
 
-				ZEND_ASSERT(opline.GetOpcode() != ZEND_OP_DATA)
+				b.Assert(opline.GetOpcode() != ZEND_OP_DATA)
 				last_use[var_num] = opnum
 			}
 		}
@@ -831,7 +831,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 func ZendRecalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	/* We assume that we never create live-ranges where there were none before. */
 
-	ZEND_ASSERT(op_array.GetLiveRange() != nil)
+	b.Assert(op_array.GetLiveRange() != nil)
 	Efree(op_array.GetLiveRange())
 	op_array.SetLiveRange(nil)
 	op_array.SetLastLiveRange(0)
@@ -1047,7 +1047,7 @@ func GetBinaryOp(opcode int) BinaryOpType {
 	case ZEND_BOOL_XOR:
 		return BinaryOpType(BooleanXorFunction)
 	default:
-		ZEND_ASSERT(false)
+		b.Assert(false)
 		return BinaryOpType(nil)
 	}
 }

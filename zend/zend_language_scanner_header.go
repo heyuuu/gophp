@@ -83,7 +83,7 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	}
 	size := len(buf)
 
-	ZEND_ASSERT(!(EG__().exception) && "stream_fixup() should have failed")
+	b.Assert(!(EG__().exception) && "stream_fixup() should have failed")
 
 	ZendLlistAddElement(CG__().open_files, fileHandle)
 

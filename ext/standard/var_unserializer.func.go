@@ -402,7 +402,7 @@ func ProcessNestedData(
 							}
 							types.ZendStringReleaseEx(unmangled, 0)
 						} else {
-							zend.ZEND_ASSERT(existing_propinfo.HasFlags(zend.ZEND_ACC_PUBLIC))
+							b.Assert(existing_propinfo.HasFlags(zend.ZEND_ACC_PUBLIC))
 							new_key = unmangled
 						}
 						zend.ZvalPtrDtorStr(&key)

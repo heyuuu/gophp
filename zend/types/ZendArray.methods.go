@@ -214,7 +214,7 @@ func (this *HashTable) foreachDataReserve() []*Bucket {
 
 // 移动 bucket 到新位置
 func (this *HashTable) _moveBucket(pos uint32, newPos uint32) {
-	zend.ZEND_ASSERT(newPos <= pos)
+	b.Assert(newPos <= pos)
 	if newPos == pos {
 		return
 	}
@@ -262,7 +262,7 @@ func (this *HashTable) removeHoles() bool {
 	this.data = this.data[:newPos]
 	this.nNumOfElements = newPos
 
-	zend.ZEND_ASSERT(this.IsWithoutHoles())
+	b.Assert(this.IsWithoutHoles())
 
 	return true
 }
@@ -288,7 +288,7 @@ func (this *HashTable) removeHolesForce() bool {
 	this.data = this.data[:newPos]
 	this.nNumOfElements = newPos
 
-	zend.ZEND_ASSERT(this.IsWithoutHoles())
+	b.Assert(this.IsWithoutHoles())
 
 	return true
 }
@@ -429,7 +429,7 @@ func (this *HashTable) validPos(pos uint32) (uint32, bool) {
 }
 
 func (this *HashTable) IsValidPos(pos uint32) bool {
-	zend.ZEND_ASSERT(pos < this.DataSize())
+	b.Assert(pos < this.DataSize())
 	return !this.data[pos].GetVal().IsType(IS_UNDEF)
 }
 

@@ -2578,7 +2578,7 @@ func _phpMathLongtobase(arg *types.Zval, base int) *types.ZendString {
 	end = ptr
 	*ptr = '0'
 	for {
-		zend.ZEND_ASSERT(ptr > buf)
+		b.Assert(ptr > buf)
 		*(b.PreDec(&ptr)) = digits[value%base]
 		value /= base
 		if value == 0 {

@@ -1,8 +1,9 @@
-// <<generate>>
+package file
 
-package runtime
-
-// Source: <runtime/stdio.h>
+/**
+ * FILE
+ */
+type FILE struct{}
 
 const BUFSIZ = 1024
 const EOF = -1

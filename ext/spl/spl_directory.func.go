@@ -4,10 +4,10 @@ package spl
 
 import (
 	b "sik/builtin"
+	r "sik/builtin/file"
 	"sik/core"
 	"sik/core/streams"
 	"sik/ext/standard"
-	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/types"
@@ -295,7 +295,7 @@ func SplFilesystemObjectClone(zobject *types.Zval) *types.ZendObject {
 		}
 		intern.SetIndex(index)
 	case SPL_FS_FILE:
-		zend.ZEND_ASSERT(false)
+		b.Assert(false)
 	}
 	intern.SetFileClass(source.GetFileClass())
 	intern.SetInfoClass(source.GetInfoClass())

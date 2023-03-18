@@ -42,14 +42,14 @@ func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
 	return NewZendStringPersistent(str_, persistent != 0)
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
-	zend.ZEND_ASSERT(len_ >= s.GetLen())
+	b.Assert(len_ >= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr + b.EmptyString(len_-len(oldStr))
 	s.DelRefcount()
 	return NewZendStringPersistent(newStr, persistent != 0)
 }
 func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
-	zend.ZEND_ASSERT(len_ <= s.GetLen())
+	b.Assert(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]
 	s.DelRefcount()
@@ -69,12 +69,12 @@ func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *
 	return ret
 }
 func ZendStringFree(s *ZendString) {
-	zend.ZEND_ASSERT(s.GetRefcount() <= 1)
+	b.Assert(s.GetRefcount() <= 1)
 	b.Free(s)
 }
 func ZendStringEfree(s *ZendString) {
-	zend.ZEND_ASSERT(s.GetRefcount() <= 1)
-	zend.ZEND_ASSERT((s.GetGcFlags() & IS_STR_PERSISTENT) == 0)
+	b.Assert(s.GetRefcount() <= 1)
+	b.Assert((s.GetGcFlags() & IS_STR_PERSISTENT) == 0)
 	b.Free(s)
 }
 func ZendStringRelease(s *ZendString) {

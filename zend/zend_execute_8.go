@@ -34,7 +34,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 		var level int
 		var do_exit int
 		if opline.GetOpcode() == ZEND_INIT_FCALL || opline.GetOpcode() == ZEND_INIT_FCALL_BY_NAME || opline.GetOpcode() == ZEND_INIT_NS_FCALL_BY_NAME || opline.GetOpcode() == ZEND_INIT_DYNAMIC_CALL || opline.GetOpcode() == ZEND_INIT_USER_CALL || opline.GetOpcode() == ZEND_INIT_METHOD_CALL || opline.GetOpcode() == ZEND_INIT_STATIC_METHOD_CALL || opline.GetOpcode() == ZEND_NEW {
-			ZEND_ASSERT(op_num != 0)
+			b.Assert(op_num != 0)
 			opline--
 		}
 		for {
@@ -201,7 +201,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_NEW {
 					var obj *types.ZendObject
-					ZEND_ASSERT(var_.IsObject())
+					b.Assert(var_.IsObject())
 					obj = var_.GetObj()
 					ZendObjectStoreCtorFailed(obj)
 					OBJ_RELEASE(obj)
@@ -214,7 +214,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					var rope **types.ZendString = (**types.ZendString)(var_)
 					var last *ZendOp = executeData.GetFunc().op_array.opcodes + op_num
 					for last.GetOpcode() != ZEND_ROPE_ADD && last.GetOpcode() != ZEND_ROPE_INIT || last.GetResult().GetVar() != var_num {
-						ZEND_ASSERT(last >= executeData.GetFunc().op_array.opcodes)
+						b.Assert(last >= executeData.GetFunc().op_array.opcodes)
 						last--
 					}
 					if last.GetOpcode() == ZEND_ROPE_INIT {
