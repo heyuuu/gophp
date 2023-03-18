@@ -96,12 +96,7 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_PATH
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			arg, arg_len = fp.ParsePath()
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
 			if fp.HasError() {

@@ -133,12 +133,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgPath(_arg, &jpeg_file, &jpeg_file_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_PATH
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			jpeg_file, jpeg_file_len = fp.ParsePath()
 			fp.StartOptional()
 			spool = fp.ParseLong()
 			if fp.HasError() {

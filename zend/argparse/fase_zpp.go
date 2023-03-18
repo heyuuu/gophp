@@ -400,31 +400,37 @@ func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull boo
 
 // @see Micro: Z_PARAM_PATH
 func (p *FastParser) ParsePath() (dest *byte, destLen int) {
-	dest, destLen, _ = p.ParsePathEx(false)
-	return
+	return p.ParsePathEx(false)
 }
-func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int, isNull types.ZendBool) {
+func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if ZendParseArgPath(p._arg, &dest, &destLen, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_PATH
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
 // @see Micro: Z_PARAM_PATH_STR
 func (p *FastParser) ParsePathStr() (dest *types.ZendString) {
-	dest, _ = p.ParsePathStrEx(false)
-	return
+	return p.ParsePathStrEx(false)
 }
-func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString, isNull types.ZendBool) {
+func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString) {
 	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if ZendParseArgPathStr(p._arg, &dest, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_PATH
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 

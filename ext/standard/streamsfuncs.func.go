@@ -2329,12 +2329,7 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_PATH
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				fp.HandleError()
 				return
