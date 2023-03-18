@@ -2508,11 +2508,7 @@ func ZifSubstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 					l = zend.ZendLong(str.GetLen() - f + l)
 				}
 
-				/* if "length" position is negative, set it to the length
-				 * needed to stop that many chars from the end of the string
-				 */
-
-			} else if int(l > str.GetLen()-int(f)) != 0 {
+			} else if l > str.GetLen()-int(f) {
 				goto truncate_len
 			}
 		} else {
@@ -2531,10 +2527,6 @@ func ZifSubstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			} else {
 				l = zend.ZendLong(str.GetLen() - f + l)
 			}
-
-			/* if "length" position is negative, set it to the length
-			 * needed to stop that many chars from the end of the string
-			 */
 
 		} else if int(l > str.GetLen()-int(f)) != 0 {
 			goto truncate_len
@@ -2667,11 +2659,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 					f = 0
 				}
 			} else if int(f > str.GetStr().GetLen()) != 0 {
-				f = str.GetStr().GetLen(
-
-					/* if "length" position is negative, set it to the length
-					 * needed to stop that many chars from the end of the string
-					 */)
+				f = str.GetStr().GetLen()
 			}
 
 			if l < 0 {

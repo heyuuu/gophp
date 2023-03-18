@@ -227,6 +227,11 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 
 // @see Micro: Z_PARAM_CLASS
 func (p *FastParser) ParseClass() (dest *zend.ZendClassEntry) {
+	dest, _ = p.ParseClassEx(true)
+	return
+}
+func (p *FastParser) ParseClassEx(checkNull bool) (dest *zend.ZendClassEntry, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -237,6 +242,11 @@ func (p *FastParser) ParseClass() (dest *zend.ZendClassEntry) {
 
 // @see Micro: Z_PARAM_DOUBLE
 func (p *FastParser) ParseDouble() (dest float64) {
+	dest, _ = p.ParseDoubleEx(true)
+	return
+}
+func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -247,6 +257,11 @@ func (p *FastParser) ParseDouble() (dest float64) {
 
 // @see Micro: Z_PARAM_FUNC
 func (p *FastParser) ParseFunc() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) {
+	fci, fcc, _ = p.ParseFuncEx(true)
+	return
+}
+func (p *FastParser) ParseFuncEx(checkNull bool) (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -257,6 +272,11 @@ func (p *FastParser) ParseFunc() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfo
 
 // @see Micro: Z_PARAM_ARRAY_HT
 func (p *FastParser) ParseArrayHt() (dest *types.ZendArray) {
+	dest, _ = p.ParseArrayHtEx(true)
+	return
+}
+func (p *FastParser) ParseArrayHtEx(checkNull bool) (dest *types.ZendArray, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -267,6 +287,11 @@ func (p *FastParser) ParseArrayHt() (dest *types.ZendArray) {
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT
 func (p *FastParser) ParseArrayOrObjectHt() (dest *types.ZendArray) {
+	dest, _ = p.ParseArrayOrObjectHtEx(true)
+	return
+}
+func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool) (dest *types.ZendArray, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -277,6 +302,11 @@ func (p *FastParser) ParseArrayOrObjectHt() (dest *types.ZendArray) {
 
 // @see Micro: Z_PARAM_LONG
 func (p *FastParser) ParseLong() (dest int) {
+	dest, _ = p.ParseLongEx(true)
+	return
+}
+func (p *FastParser) ParseLongEx(checkNull bool) (dest int, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -287,6 +317,11 @@ func (p *FastParser) ParseLong() (dest int) {
 
 // @see Micro: Z_PARAM_STRICT_LONG
 func (p *FastParser) ParseStrictLong() (dest int) {
+	dest, _ = p.ParseStrictLongEx(true)
+	return
+}
+func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -297,6 +332,11 @@ func (p *FastParser) ParseStrictLong() (dest int) {
 
 // @see Micro: Z_PARAM_OBJECT
 func (p *FastParser) ParseObject() (dest *types.Zval) {
+	dest, _ = p.ParseObjectEx(true)
+	return
+}
+func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -307,6 +347,11 @@ func (p *FastParser) ParseObject() (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_OBJECT_OF_CLASS
 func (p *FastParser) ParseObjectOfClass(ce *zend.ZendClassEntry) (dest *types.Zval) {
+	dest, _ = p.ParseObjectOfClassEx(ce, true)
+	return
+}
+func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -316,7 +361,12 @@ func (p *FastParser) ParseObjectOfClass(ce *zend.ZendClassEntry) (dest *types.Zv
 }
 
 // @see Micro: Z_PARAM_PATH
-func (p *FastParser) ParsePath() (dest *byte, dest_len int) {
+func (p *FastParser) ParsePath() (dest *byte, destLen int) {
+	dest, destLen, _ = p.ParsePathEx(true)
+	return
+}
+func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -327,6 +377,11 @@ func (p *FastParser) ParsePath() (dest *byte, dest_len int) {
 
 // @see Micro: Z_PARAM_PATH_STR
 func (p *FastParser) ParsePathStr() (dest *types.ZendString) {
+	dest, _ = p.ParsePathStrEx(true)
+	return
+}
+func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -337,6 +392,11 @@ func (p *FastParser) ParsePathStr() (dest *types.ZendString) {
 
 // @see Micro: Z_PARAM_RESOURCE
 func (p *FastParser) ParseResource() (dest *types.Zval) {
+	dest, _ = p.ParseResourceEx(true)
+	return
+}
+func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -346,7 +406,12 @@ func (p *FastParser) ParseResource() (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_STRING
-func (p *FastParser) ParseString() (dest *byte, dest_len int) {
+func (p *FastParser) ParseString() (dest *byte, destLen int) {
+	dest, destLen, _ = p.ParseStringEx(true)
+	return
+}
+func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -357,6 +422,11 @@ func (p *FastParser) ParseString() (dest *byte, dest_len int) {
 
 // @see Micro: Z_PARAM_STR
 func (p *FastParser) ParseStr() (dest *types.ZendString) {
+	dest, _ = p.ParseStrEx(true)
+	return
+}
+func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -367,6 +437,11 @@ func (p *FastParser) ParseStr() (dest *types.ZendString) {
 
 // @see Micro: Z_PARAM_ZVAL
 func (p *FastParser) ParseZval() (dest *types.Zval) {
+	dest, _ = p.ParseZvalEx(true)
+	return
+}
+func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -377,6 +452,11 @@ func (p *FastParser) ParseZval() (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_ZVAL_DEREF
 func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
+	dest, _ = p.ParseZvalDerefEx(true)
+	return
+}
+func (p *FastParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
