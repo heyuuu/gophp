@@ -892,11 +892,11 @@ func PhpArrayUserCompare(a any, b any) int {
 	s = (*types.Bucket)(b)
 	types.ZVAL_COPY(&args[0], f.GetVal())
 	types.ZVAL_COPY(&args[1], s.GetVal())
-	BG(user_compare_fci).param_count = 2
-	BG(user_compare_fci).params = args
-	BG(user_compare_fci).retval = &retval
-	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	BG__().user_compare_fci.param_count = 2
+	BG__().user_compare_fci.params = args
+	BG__().user_compare_fci.retval = &retval
+	BG__().user_compare_fci.no_separation = 0
+	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		var ret zend.ZendLong = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 		zend.ZvalPtrDtor(&args[1])
@@ -911,21 +911,21 @@ func PhpArrayUserCompare(a any, b any) int {
 func PHP_ARRAY_CMP_FUNC_CHECK(func_name **types.Zval) {
 	if zend.ZendIsCallable(*func_name, 0, nil) == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid comparison function")
-		BG(user_compare_fci) = old_user_compare_fci
-		BG(user_compare_fci_cache) = old_user_compare_fci_cache
+		BG__().user_compare_fci = old_user_compare_fci
+		BG__().user_compare_fci_cache = old_user_compare_fci_cache
 		return_value.SetFalse()
 		return
 	}
 }
 func PHP_ARRAY_CMP_FUNC_BACKUP() {
-	old_user_compare_fci = BG(user_compare_fci)
-	old_user_compare_fci_cache = BG(user_compare_fci_cache)
-	BG(user_compare_fci_cache) = zend.EmptyFcallInfoCache
+	old_user_compare_fci = BG__().user_compare_fci
+	old_user_compare_fci_cache = BG__().user_compare_fci_cache
+	BG__().user_compare_fci_cache = zend.EmptyFcallInfoCache
 }
 func PHP_ARRAY_CMP_FUNC_RESTORE() {
-	zend.ZendReleaseFcallInfoCache(&(BG(user_compare_fci_cache)))
-	BG(user_compare_fci) = old_user_compare_fci
-	BG(user_compare_fci_cache) = old_user_compare_fci_cache
+	zend.ZendReleaseFcallInfoCache(&(BG__().user_compare_fci_cache))
+	BG__().user_compare_fci = old_user_compare_fci
+	BG__().user_compare_fci_cache = old_user_compare_fci_cache
 }
 func PhpUsort(executeData *zend.ZendExecuteData, return_value *types.Zval, compare_func types.CompareFuncT, renumber types.ZendBool) {
 	var array *types.Zval
@@ -958,7 +958,7 @@ func PhpUsort(executeData *zend.ZendExecuteData, return_value *types.Zval, compa
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArrayEx2(false, true, false)
 			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache)), 0, &_error) == 0 {
+			if argparse.ZendParseArgFunc(_arg, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = argparse.Z_EXPECTED_FUNC
 					_error_code = argparse.ZPP_ERROR_WRONG_ARG
@@ -1022,11 +1022,11 @@ func PhpArrayUserKeyCompare(a any, b any) int {
 	} else {
 		args[1].SetStringCopy(s.GetKey())
 	}
-	BG(user_compare_fci).param_count = 2
-	BG(user_compare_fci).params = args
-	BG(user_compare_fci).retval = &retval
-	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	BG__().user_compare_fci.param_count = 2
+	BG__().user_compare_fci.params = args
+	BG__().user_compare_fci.retval = &retval
+	BG__().user_compare_fci.no_separation = 0
+	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		result = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 	} else {
@@ -1472,14 +1472,14 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 	if userdata != nil {
 		types.ZVAL_COPY(&args[2], userdata)
 	}
-	BG(array_walk_fci).retval = &retval
+	BG__().array_walk_fci.retval = &retval
 	if userdata != nil {
-		BG(array_walk_fci).param_count = 3
+		BG__().array_walk_fci.param_count = 3
 	} else {
-		BG(array_walk_fci).param_count = 2
+		BG__().array_walk_fci.param_count = 2
 	}
-	BG(array_walk_fci).params = args
-	BG(array_walk_fci).no_separation = 0
+	BG__().array_walk_fci.params = args
+	BG__().array_walk_fci.no_separation = 0
 	zend.ZendHashInternalPointerResetEx(target_hash, &pos)
 	ht_iter = zend.ZendHashIteratorAdd(target_hash, pos)
 
@@ -1550,8 +1550,8 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 
 			/* backup the fcall info and cache */
 
-			orig_array_walk_fci = BG(array_walk_fci)
-			orig_array_walk_fci_cache = BG(array_walk_fci_cache)
+			orig_array_walk_fci = BG__().array_walk_fci
+			orig_array_walk_fci_cache = BG__().array_walk_fci_cache
 			ref.AddRefcount()
 			thash.ProtectRecursive()
 			result = PhpArrayWalk(zv, userdata, recursive)
@@ -1570,14 +1570,14 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 
 			/* restore the fcall info and cache */
 
-			BG(array_walk_fci) = orig_array_walk_fci
-			BG(array_walk_fci_cache) = orig_array_walk_fci_cache
+			BG__().array_walk_fci = orig_array_walk_fci
+			BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 		} else {
 			types.ZVAL_COPY(&args[0], zv)
 
 			/* Call the userland function */
 
-			result = zend.ZendCallFunction(&(BG(array_walk_fci)), &(BG(array_walk_fci_cache)))
+			result = zend.ZendCallFunction(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
 			if result == types.SUCCESS {
 				zend.ZvalPtrDtor(&retval)
 			}
@@ -1622,8 +1622,8 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var userdata *types.Zval = nil
 	var orig_array_walk_fci zend.ZendFcallInfo
 	var orig_array_walk_fci_cache zend.ZendFcallInfoCache
-	orig_array_walk_fci = BG(array_walk_fci)
-	orig_array_walk_fci_cache = BG(array_walk_fci_cache)
+	orig_array_walk_fci = BG__().array_walk_fci
+	orig_array_walk_fci_cache = BG__().array_walk_fci_cache
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1648,7 +1648,7 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArrayOrObjectEx(false, true)
 			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &(BG(array_walk_fci)), &(BG(array_walk_fci_cache)), 0, &_error) == 0 {
+			if argparse.ZendParseArgFunc(_arg, &(BG__().array_walk_fci), &(BG__().array_walk_fci_cache), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = argparse.Z_EXPECTED_FUNC
 					_error_code = argparse.ZPP_ERROR_WRONG_ARG
@@ -1666,16 +1666,16 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		if _error_code != argparse.ZPP_ERROR_OK {
 			fp.HandleError()
-			BG(array_walk_fci) = orig_array_walk_fci
-			BG(array_walk_fci_cache) = orig_array_walk_fci_cache
+			BG__().array_walk_fci = orig_array_walk_fci
+			BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 			return
 		}
 		break
 	}
 	PhpArrayWalk(array, userdata, 0)
-	zend.ZendReleaseFcallInfoCache(&(BG(array_walk_fci_cache)))
-	BG(array_walk_fci) = orig_array_walk_fci
-	BG(array_walk_fci_cache) = orig_array_walk_fci_cache
+	zend.ZendReleaseFcallInfoCache(&(BG__().array_walk_fci_cache))
+	BG__().array_walk_fci = orig_array_walk_fci
+	BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 	return_value.SetTrue()
 	return
 }
@@ -1684,8 +1684,8 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *type
 	var userdata *types.Zval = nil
 	var orig_array_walk_fci zend.ZendFcallInfo
 	var orig_array_walk_fci_cache zend.ZendFcallInfoCache
-	orig_array_walk_fci = BG(array_walk_fci)
-	orig_array_walk_fci_cache = BG(array_walk_fci_cache)
+	orig_array_walk_fci = BG__().array_walk_fci
+	orig_array_walk_fci_cache = BG__().array_walk_fci_cache
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1710,7 +1710,7 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *type
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArrayOrObjectEx(false, true)
 			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &(BG(array_walk_fci)), &(BG(array_walk_fci_cache)), 0, &_error) == 0 {
+			if argparse.ZendParseArgFunc(_arg, &(BG__().array_walk_fci), &(BG__().array_walk_fci_cache), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = argparse.Z_EXPECTED_FUNC
 					_error_code = argparse.ZPP_ERROR_WRONG_ARG
@@ -1728,16 +1728,16 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *type
 		}
 		if _error_code != argparse.ZPP_ERROR_OK {
 			fp.HandleError()
-			BG(array_walk_fci) = orig_array_walk_fci
-			BG(array_walk_fci_cache) = orig_array_walk_fci_cache
+			BG__().array_walk_fci = orig_array_walk_fci
+			BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 			return
 		}
 		break
 	}
 	PhpArrayWalk(array, userdata, 1)
-	zend.ZendReleaseFcallInfoCache(&(BG(array_walk_fci_cache)))
-	BG(array_walk_fci) = orig_array_walk_fci
-	BG(array_walk_fci_cache) = orig_array_walk_fci_cache
+	zend.ZendReleaseFcallInfoCache(&(BG__().array_walk_fci_cache))
+	BG__().array_walk_fci = orig_array_walk_fci
+	BG__().array_walk_fci_cache = orig_array_walk_fci_cache
 	return_value.SetTrue()
 	return
 }
@@ -5837,11 +5837,11 @@ func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
 	var retval types.Zval
 	types.ZVAL_COPY_VALUE(&args[0], a)
 	types.ZVAL_COPY_VALUE(&args[1], b)
-	BG(user_compare_fci).param_count = 2
-	BG(user_compare_fci).params = args
-	BG(user_compare_fci).retval = &retval
-	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	BG__().user_compare_fci.param_count = 2
+	BG__().user_compare_fci.params = args
+	BG__().user_compare_fci.retval = &retval
+	BG__().user_compare_fci.no_separation = 0
+	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
 		var ret zend.ZendLong = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 		return zend.ZEND_NORMALIZE_BOOL(ret)
@@ -5887,7 +5887,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 		core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, argc)
 		return
 	}
-	if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == types.FAILURE {
+	if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &argc, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.FAILURE {
 		return
 	}
 	for i = 0; i < argc; i++ {
@@ -6061,11 +6061,11 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 	lists = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
 	ptrs = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
 	if behavior == INTERSECT_NORMAL && data_compare_type == INTERSECT_COMP_DATA_USER {
-		BG(user_compare_fci) = *fci_data
-		BG(user_compare_fci_cache) = *fci_data_cache
+		BG__().user_compare_fci = *fci_data
+		BG__().user_compare_fci_cache = *fci_data_cache
 	} else if (behavior&INTERSECT_ASSOC) != 0 && key_compare_type == INTERSECT_COMP_KEY_USER {
-		BG(user_compare_fci) = *fci_key
-		BG(user_compare_fci_cache) = *fci_key_cache
+		BG__().user_compare_fci = *fci_key
+		BG__().user_compare_fci_cache = *fci_key_cache
 	}
 	for i = 0; i < arr_argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
@@ -6102,8 +6102,8 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 
 	for ptrs[0].GetVal().GetType() != types.IS_UNDEF {
 		if (behavior&INTERSECT_ASSOC) != 0 && key_compare_type == INTERSECT_COMP_KEY_USER {
-			BG(user_compare_fci) = *fci_key
-			BG(user_compare_fci_cache) = *fci_key_cache
+			BG__().user_compare_fci = *fci_key
+			BG__().user_compare_fci_cache = *fci_key_cache
 		}
 		for i = 1; i < arr_argc; i++ {
 			if (behavior & INTERSECT_NORMAL) != 0 {
@@ -6122,14 +6122,14 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 					 * since when we have INTERSECT_KEY compare of data is not wanted. */
 
 					if data_compare_type == INTERSECT_COMP_DATA_USER {
-						BG(user_compare_fci) = *fci_data
-						BG(user_compare_fci_cache) = *fci_data_cache
+						BG__().user_compare_fci = *fci_data
+						BG__().user_compare_fci_cache = *fci_data_cache
 					}
 					if intersect_data_compare_func(ptrs[0], ptrs[i]) != 0 {
 						c = 1
 						if key_compare_type == INTERSECT_COMP_KEY_USER {
-							BG(user_compare_fci) = *fci_key
-							BG(user_compare_fci_cache) = *fci_key_cache
+							BG__().user_compare_fci = *fci_key
+							BG__().user_compare_fci_cache = *fci_key_cache
 						}
 					}
 				}
@@ -6269,7 +6269,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 3 parameters are required, %d given", executeData.NumArgs())
 			return
 		}
-		if zend.ZendParseParameters(executeData.NumArgs(), "+f", &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == types.FAILURE {
+		if zend.ZendParseParameters(executeData.NumArgs(), "+f", &args, &argc, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.FAILURE {
 			return
 		}
 		diff_data_compare_func = ZvalUserCompare
@@ -6456,11 +6456,11 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 	lists = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
 	ptrs = (**types.Bucket)(zend.SafeEmalloc(arr_argc, b.SizeOf("Bucket *"), 0))
 	if behavior == DIFF_NORMAL && data_compare_type == DIFF_COMP_DATA_USER {
-		BG(user_compare_fci) = *fci_data
-		BG(user_compare_fci_cache) = *fci_data_cache
+		BG__().user_compare_fci = *fci_data
+		BG__().user_compare_fci_cache = *fci_data_cache
 	} else if (behavior&DIFF_ASSOC) != 0 && key_compare_type == DIFF_COMP_KEY_USER {
-		BG(user_compare_fci) = *fci_key
-		BG(user_compare_fci_cache) = *fci_key_cache
+		BG__().user_compare_fci = *fci_key
+		BG__().user_compare_fci_cache = *fci_key_cache
 	}
 	for i = 0; i < arr_argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
@@ -6497,8 +6497,8 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 
 	for ptrs[0].GetVal().GetType() != types.IS_UNDEF {
 		if (behavior&DIFF_ASSOC) != 0 && key_compare_type == DIFF_COMP_KEY_USER {
-			BG(user_compare_fci) = *fci_key
-			BG(user_compare_fci_cache) = *fci_key_cache
+			BG__().user_compare_fci = *fci_key
+			BG__().user_compare_fci_cache = *fci_key_cache
 		}
 		c = 1
 		for i = 1; i < arr_argc; i++ {
@@ -6525,8 +6525,8 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 
 					if ptr.GetVal().GetType() != types.IS_UNDEF {
 						if data_compare_type == DIFF_COMP_DATA_USER {
-							BG(user_compare_fci) = *fci_data
-							BG(user_compare_fci_cache) = *fci_data_cache
+							BG__().user_compare_fci = *fci_data
+							BG__().user_compare_fci_cache = *fci_data_cache
 						}
 						if diff_data_compare_func(ptrs[0], ptr) != 0 {
 
@@ -6534,8 +6534,8 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 
 							c = -1
 							if key_compare_type == DIFF_COMP_KEY_USER {
-								BG(user_compare_fci) = *fci_key
-								BG(user_compare_fci_cache) = *fci_key_cache
+								BG__().user_compare_fci = *fci_key
+								BG__().user_compare_fci_cache = *fci_key_cache
 							}
 						} else {
 							break

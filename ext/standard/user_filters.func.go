@@ -60,10 +60,10 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmDeactivateUserFilters(type_ int, module_number int) int {
-	if BG(user_filter_map) {
-		BG(user_filter_map).Destroy()
-		zend.Efree(BG(user_filter_map))
-		BG(user_filter_map) = nil
+	if BG__().user_filter_map {
+		BG__().user_filter_map.Destroy()
+		zend.Efree(BG__().user_filter_map)
+		BG__().user_filter_map = nil
 	}
 	return types.SUCCESS
 }
@@ -210,7 +210,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	/* determine the classname/class entry */
 
-	if nil == b.Assign(&fdat, zend.ZendHashStrFindPtr(BG(user_filter_map), (*byte)(filtername), len_)) {
+	if nil == b.Assign(&fdat, zend.ZendHashStrFindPtr(BG__().user_filter_map, (*byte)(filtername), len_)) {
 		var period *byte
 
 		/* Userspace Filters using ambiguous wildcards could cause problems.
@@ -230,7 +230,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 				b.Assert(period[0] == '.')
 				period[1] = '*'
 				period[2] = '0'
-				if nil != b.Assign(&fdat, zend.ZendHashStrFindPtr(BG(user_filter_map), wildcard, strlen(wildcard))) {
+				if nil != b.Assign(&fdat, zend.ZendHashStrFindPtr(BG__().user_filter_map, wildcard, strlen(wildcard))) {
 					period = nil
 				} else {
 					*period = '0'
@@ -590,13 +590,13 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Class name cannot be empty")
 		return
 	}
-	if !(BG(user_filter_map)) {
-		BG(user_filter_map) = (*types.HashTable)(zend.Emalloc(b.SizeOf("HashTable")))
-		zend.ZendHashInit(BG(user_filter_map), 8, nil, types.DtorFuncT(FilterItemDtor), 0)
+	if !(BG__().user_filter_map) {
+		BG__().user_filter_map = (*types.HashTable)(zend.Emalloc(b.SizeOf("HashTable")))
+		zend.ZendHashInit(BG__().user_filter_map, 8, nil, types.DtorFuncT(FilterItemDtor), 0)
 	}
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
 	fdat.SetClassname(classname.Copy())
-	if zend.ZendHashAddPtr(BG(user_filter_map), filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == types.SUCCESS {
+	if zend.ZendHashAddPtr(BG__().user_filter_map, filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == types.SUCCESS {
 		return_value.SetTrue()
 	} else {
 		types.ZendStringReleaseEx(classname, 0)

@@ -39,10 +39,10 @@ func PhpMtReload() {
 	/* Generate N new values in state
 	   Made clearer and faster by Matthew Bellew (matthew.bellew@home.com) */
 
-	var state *uint32 = BG(state)
+	var state *uint32 = BG__().state
 	var p *uint32 = state
 	var i int
-	if BG(mt_rand_mode) == MT_RAND_MT19937 {
+	if BG__().mt_rand_mode == MT_RAND_MT19937 {
 		for i = N - M; b.PostDec(&i); p++ {
 			*p = Twist(p[M], p[0], p[1])
 		}
@@ -59,18 +59,18 @@ func PhpMtReload() {
 		}
 		*p = TwistPhp(p[M-N], p[0], state[0])
 	}
-	BG(left) = N
-	BG(next) = state
+	BG__().left = N
+	BG__().next = state
 }
 func PhpMtSrand(seed uint32) {
 	/* Seed the generator with a simple uint32 */
 
-	PhpMtInitialize(seed, BG(state))
+	PhpMtInitialize(seed, BG__().state)
 	PhpMtReload()
 
 	/* Seed only once */
 
-	BG(mt_rand_is_seeded) = 1
+	BG__().mt_rand_is_seeded = 1
 
 	/* Seed only once */
 }
@@ -79,15 +79,15 @@ func PhpMtRand() uint32 {
 	   Every other access function simply transforms the numbers extracted here */
 
 	var s1 uint32
-	if !(BG(mt_rand_is_seeded)) {
+	if !(BG__().mt_rand_is_seeded) {
 		PhpMtSrand(GENERATE_SEED())
 	}
-	if BG(left) == 0 {
+	if BG__().left == 0 {
 		PhpMtReload()
 	}
-	BG(left)--
-	(*BG)(next)++
-	s1 = (*BG)(next) - 1
+	BG__().left--
+	*BG__().next++
+	s1 = *BG__().next - 1
 	s1 ^= s1 >> 11
 	s1 ^= s1 << 7 & 0x9d2c5680
 	s1 ^= s1 << 15 & 0xefc60000
@@ -134,9 +134,9 @@ func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	switch mode {
 	case MT_RAND_PHP:
-		BG(mt_rand_mode) = MT_RAND_PHP
+		BG__().mt_rand_mode = MT_RAND_PHP
 	default:
-		BG(mt_rand_mode) = MT_RAND_MT19937
+		BG__().mt_rand_mode = MT_RAND_MT19937
 	}
 	PhpMtSrand(seed)
 }
@@ -178,7 +178,7 @@ func PhpMtRandRange(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 }
 func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	var n int64
-	if BG(mt_rand_mode) == MT_RAND_MT19937 {
+	if BG__().mt_rand_mode == MT_RAND_MT19937 {
 		return PhpMtRandRange(min, max)
 	}
 

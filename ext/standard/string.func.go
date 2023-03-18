@@ -940,7 +940,7 @@ func ZifImplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpImplode(glue, pieces, return_value)
 	zend.ZendTmpStringRelease(tmp_glue)
 }
-func STRTOK_TABLE(p *byte) __auto__ { return BG(strtok_table)[uint8(*p)] }
+func STRTOK_TABLE(p *byte) __auto__ { return BG__().strtok_table[uint8(*p)] }
 func ZifStrtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *types.ZendString
 	var tok *types.ZendString = nil
@@ -985,14 +985,14 @@ func ZifStrtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if executeData.NumArgs() == 1 {
 		tok = str
 	} else {
-		zend.ZvalPtrDtor(&(BG(strtok_zval)))
-		(BG(strtok_zval)).SetRawString(str.GetStr())
-		BG(strtok_string) = BG(strtok_zval).GetStr().GetVal()
-		BG(strtok_last) = BG(strtok_string)
-		BG(strtok_len) = str.GetLen()
+		zend.ZvalPtrDtor(&(BG__().strtok_zval))
+		(BG__().strtok_zval).SetRawString(str.GetStr())
+		BG__().strtok_string = BG__().strtok_zval.GetStr().GetVal()
+		BG__().strtok_last = BG__().strtok_string
+		BG__().strtok_len = str.GetLen()
 	}
-	p = BG(strtok_last)
-	pe = BG(strtok_string) + BG(strtok_len)
+	p = BG__().strtok_last
+	pe = BG__().strtok_string + BG__().strtok_len
 	if p == nil || p >= pe {
 		return_value.SetFalse()
 		return
@@ -1010,7 +1010,7 @@ func ZifStrtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 			/* no other chars left */
 
-			BG(strtok_last) = nil
+			BG__().strtok_last = nil
 			return_value.SetFalse()
 			goto restore
 		}
@@ -1024,13 +1024,13 @@ func ZifStrtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			goto return_token
 		}
 	}
-	if p-BG(strtok_last) != 0 {
+	if p-BG__().strtok_last != 0 {
 	return_token:
-		return_value.SetRawString(b.CastStr(BG(strtok_last)+skipped, p-BG(strtok_last)-skipped))
-		BG(strtok_last) = p + 1
+		return_value.SetRawString(b.CastStr(BG__().strtok_last+skipped, p-BG__().strtok_last-skipped))
+		BG__().strtok_last = p + 1
 	} else {
 		return_value.SetFalse()
-		BG(strtok_last) = nil
+		BG__().strtok_last = nil
 	}
 
 	/* Restore table -- usually faster then memset'ing the table on every invocation */
@@ -4859,19 +4859,19 @@ func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				/* Remember if locale was changed */
 
 				var len_ int = strlen(retval)
-				BG(locale_changed) = 1
+				BG__().locale_changed = 1
 				if cat == LC_CTYPE || cat == LC_ALL {
-					if BG(locale_string) {
-						types.ZendStringReleaseEx(BG(locale_string), 0)
+					if BG__().locale_string {
+						types.ZendStringReleaseEx(BG__().locale_string, 0)
 					}
 					if len_ == loc.GetLen() && !(memcmp(loc.GetVal(), retval, len_)) {
-						BG(locale_string) = loc.Copy()
-						return_value.SetString(BG(locale_string))
+						BG__().locale_string = loc.Copy()
+						return_value.SetString(BG__().locale_string)
 						return
 					} else {
-						BG(locale_string) = types.ZendStringInit(retval, len_, 0)
+						BG__().locale_string = types.ZendStringInit(retval, len_, 0)
 						types.ZendStringReleaseEx(loc, 0)
-						return_value.SetStringCopy(BG(locale_string))
+						return_value.SetStringCopy(BG__().locale_string)
 						return
 					}
 				} else if len_ == loc.GetLen() && !(memcmp(loc.GetVal(), retval, len_)) {

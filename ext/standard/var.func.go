@@ -742,9 +742,9 @@ func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	var fname types.Zval
 	var res int
 	fname.SetRawString("__sleep")
-	BG(serialize_lock)++
+	BG__().serialize_lock++
 	res = zend.CallUserFunction(nil, struc, &fname, retval, 0, 0)
-	BG(serialize_lock)--
+	BG__().serialize_lock--
 	zend.ZvalPtrDtorStr(&fname)
 	if res == types.FAILURE || retval.IsUndef() {
 		zend.ZvalPtrDtor(retval)
@@ -761,9 +761,9 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	var fname types.Zval
 	var res int
 	fname.SetRawString("__serialize")
-	BG(serialize_lock)++
+	BG__().serialize_lock++
 	res = zend.CallUserFunction(obj, &fname, retval, 0, 0)
-	BG(serialize_lock)--
+	BG__().serialize_lock--
 	zend.ZvalPtrDtorStr(&fname)
 	if res == types.FAILURE || retval.IsUndef() {
 		zend.ZvalPtrDtor(retval)
@@ -1125,31 +1125,31 @@ func PhpVarSerialize(buf *zend.SmartStr, struc *types.Zval, data *PhpSerializeDa
 func PhpVarSerializeInit() PhpSerializeDataT {
 	var d *PhpSerializeData
 
-	/* fprintf(stderr, "SERIALIZE_INIT      == lock: %u, level: %u\n", BG(serialize_lock), BG(serialize).level); */
+	/* fprintf(stderr, "SERIALIZE_INIT      == lock: %u, level: %u\n", BG__().serialize_lock, BG__().serialize.level); */
 
-	if BG(serialize_lock) || !(BG(serialize).level) {
+	if BG__().serialize_lock || !(BG__().serialize.level) {
 		d = zend.Emalloc(b.SizeOf("struct php_serialize_data"))
 		zend.ZendHashInit(d.GetHt(), 16, nil, zend.ZVAL_PTR_DTOR, 0)
 		d.SetN(0)
-		if !(BG(serialize_lock)) {
-			BG(serialize).data = d
-			BG(serialize).level = 1
+		if !(BG__().serialize_lock) {
+			BG__().serialize.data = d
+			BG__().serialize.level = 1
 		}
 	} else {
-		d = BG(serialize).data
-		BG(serialize).level++
+		d = BG__().serialize.data
+		BG__().serialize.level++
 	}
 	return d
 }
 func PhpVarSerializeDestroy(d PhpSerializeDataT) {
-	/* fprintf(stderr, "SERIALIZE_DESTROY   == lock: %u, level: %u\n", BG(serialize_lock), BG(serialize).level); */
+	/* fprintf(stderr, "SERIALIZE_DESTROY   == lock: %u, level: %u\n", BG__().serialize_lock, BG__().serialize.level); */
 
-	if BG(serialize_lock) || BG(serialize).level == 1 {
+	if BG__().serialize_lock || BG__().serialize.level == 1 {
 		d.GetHt().Destroy()
 		zend.Efree(d)
 	}
-	if !(BG(serialize_lock)) && !(b.PreDec(&(BG(serialize).level))) {
-		BG(serialize).data = nil
+	if !(BG__().serialize_lock) && !(b.PreDec(&(BG__().serialize.level))) {
+		BG__().serialize.data = nil
 	}
 }
 func ZifSerialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1318,7 +1318,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 		}
 	}
-	if BG(unserialize).level > 1 {
+	if BG__().unserialize.level > 1 {
 		retval = VarTmpVar(&var_hash)
 	} else {
 		retval = return_value
@@ -1327,11 +1327,11 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		if zend.EG__().GetException() == nil {
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
-		if BG(unserialize).level <= 1 {
+		if BG__().unserialize.level <= 1 {
 			zend.ZvalPtrDtor(return_value)
 		}
 		return_value.SetFalse()
-	} else if BG(unserialize).level > 1 {
+	} else if BG__().unserialize.level > 1 {
 		types.ZVAL_COPY(return_value, retval)
 	} else if return_value.IsRefcounted() {
 		var ref *types.ZendRefcounted = return_value.GetCounted()

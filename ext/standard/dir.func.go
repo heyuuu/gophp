@@ -294,13 +294,13 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	if BG(CurrentStatFile) && !(zend.IS_ABSOLUTE_PATH(BG(CurrentStatFile), strlen(BG(CurrentStatFile)))) {
-		zend.Efree(BG(CurrentStatFile))
-		BG(CurrentStatFile) = nil
+	if BG__().CurrentStatFile && !(zend.IS_ABSOLUTE_PATH(BG__().CurrentStatFile, strlen(BG__().CurrentStatFile))) {
+		zend.Efree(BG__().CurrentStatFile)
+		BG__().CurrentStatFile = nil
 	}
-	if BG(CurrentLStatFile) && !(zend.IS_ABSOLUTE_PATH(BG(CurrentLStatFile), strlen(BG(CurrentLStatFile)))) {
-		zend.Efree(BG(CurrentLStatFile))
-		BG(CurrentLStatFile) = nil
+	if BG__().CurrentLStatFile && !(zend.IS_ABSOLUTE_PATH(BG__().CurrentLStatFile, strlen(BG__().CurrentLStatFile))) {
+		zend.Efree(BG__().CurrentLStatFile)
+		BG__().CurrentLStatFile = nil
 	}
 	return_value.SetTrue()
 	return

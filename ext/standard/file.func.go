@@ -1723,8 +1723,8 @@ func ZifUmask(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var mask zend.ZendLong = 0
 	var oldumask int
 	oldumask = umask(077)
-	if BG(umask) == -1 {
-		BG(umask) = oldumask
+	if BG__().umask == -1 {
+		BG__().umask = oldumask
 	}
 	for {
 		var _flags int = 0

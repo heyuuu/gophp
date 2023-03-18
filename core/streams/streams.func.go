@@ -1726,13 +1726,13 @@ func _phpStreamStatPath(path *byte, flags int, ssb *core.PhpStreamStatbuf, conte
 		/* Try to hit the cache first */
 
 		if (flags & core.PHP_STREAM_URL_STAT_LINK) != 0 {
-			if standard.BG(CurrentLStatFile) && strcmp(path, standard.BG(CurrentLStatFile)) == 0 {
-				memcpy(ssb, &(standard.BG(lssb)), b.SizeOf("php_stream_statbuf"))
+			if standard.BG__().CurrentLStatFile && strcmp(path, standard.BG__().CurrentLStatFile) == 0 {
+				memcpy(ssb, &(standard.BG__().lssb), b.SizeOf("php_stream_statbuf"))
 				return 0
 			}
 		} else {
-			if standard.BG(CurrentStatFile) && strcmp(path, standard.BG(CurrentStatFile)) == 0 {
-				memcpy(ssb, &(standard.BG(ssb)), b.SizeOf("php_stream_statbuf"))
+			if standard.BG__().CurrentStatFile && strcmp(path, standard.BG__().CurrentStatFile) == 0 {
+				memcpy(ssb, &(standard.BG__().ssb), b.SizeOf("php_stream_statbuf"))
 				return 0
 			}
 		}
@@ -1749,17 +1749,17 @@ func _phpStreamStatPath(path *byte, flags int, ssb *core.PhpStreamStatbuf, conte
 				/* Drop into cache */
 
 				if (flags & core.PHP_STREAM_URL_STAT_LINK) != 0 {
-					if standard.BG(CurrentLStatFile) {
-						zend.Efree(standard.BG(CurrentLStatFile))
+					if standard.BG__().CurrentLStatFile {
+						zend.Efree(standard.BG__().CurrentLStatFile)
 					}
-					standard.BG(CurrentLStatFile) = zend.Estrdup(path)
-					memcpy(&(standard.BG(lssb)), ssb, b.SizeOf("php_stream_statbuf"))
+					standard.BG__().CurrentLStatFile = zend.Estrdup(path)
+					memcpy(&(standard.BG__().lssb), ssb, b.SizeOf("php_stream_statbuf"))
 				} else {
-					if standard.BG(CurrentStatFile) {
-						zend.Efree(standard.BG(CurrentStatFile))
+					if standard.BG__().CurrentStatFile {
+						zend.Efree(standard.BG__().CurrentStatFile)
 					}
-					standard.BG(CurrentStatFile) = zend.Estrdup(path)
-					memcpy(&(standard.BG(ssb)), ssb, b.SizeOf("php_stream_statbuf"))
+					standard.BG__().CurrentStatFile = zend.Estrdup(path)
+					memcpy(&(standard.BG__().ssb), ssb, b.SizeOf("php_stream_statbuf"))
 				}
 
 				/* Drop into cache */

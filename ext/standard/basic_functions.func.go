@@ -12,7 +12,7 @@ import (
 	"sik/zend/types"
 )
 
-func BG(v *uint32) __auto__ { return BasicGlobals.v }
+func BG__() *PhpBasicGlobals { return &BasicGlobals }
 func PhpPutenvDestructor(zv *types.Zval) {
 	var pe *PutenvEntry = zv.GetPtr()
 	if pe.GetPreviousValue() != nil {
@@ -32,25 +32,25 @@ func PhpPutenvDestructor(zv *types.Zval) {
 	zend.Efree(pe)
 }
 func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
-	BG(mt_rand_is_seeded) = 0
-	BG(mt_rand_mode) = MT_RAND_MT19937
-	BG(umask) = -1
-	BG(next) = nil
-	BG(left) = -1
-	BG(user_tick_functions) = nil
-	BG(user_filter_map) = nil
-	BG(serialize_lock) = 0
-	memset(&(BG(serialize)), 0, b.SizeOf("BG ( serialize )"))
-	memset(&(BG(unserialize)), 0, b.SizeOf("BG ( unserialize )"))
-	memset(&(BG(url_adapt_session_ex)), 0, b.SizeOf("BG ( url_adapt_session_ex )"))
-	memset(&(BG(url_adapt_output_ex)), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
-	BG(url_adapt_session_ex).type_ = 1
-	BG(url_adapt_output_ex).type_ = 0
-	zend.ZendHashInit(&(BG(url_adapt_session_hosts_ht)), 0, nil, nil, 1)
-	zend.ZendHashInit(&(BG(url_adapt_output_hosts_ht)), 0, nil, nil, 1)
-	BG(incomplete_class) = IncompleteClassEntry
-	BG(page_uid) = -1
-	BG(page_gid) = -1
+	BG__().mt_rand_is_seeded = 0
+	BG__().mt_rand_mode = MT_RAND_MT19937
+	BG__().umask = -1
+	BG__().next = nil
+	BG__().left = -1
+	BG__().user_tick_functions = nil
+	BG__().user_filter_map = nil
+	BG__().serialize_lock = 0
+	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
+	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))
+	memset(&(BG__().url_adapt_session_ex), 0, b.SizeOf("BG ( url_adapt_session_ex )"))
+	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
+	BG__().url_adapt_session_ex.type_ = 1
+	BG__().url_adapt_output_ex.type_ = 0
+	zend.ZendHashInit(&(BG__().url_adapt_session_hosts_ht), 0, nil, nil, 1)
+	zend.ZendHashInit(&(BG__().url_adapt_output_hosts_ht), 0, nil, nil, 1)
+	BG__().incomplete_class = IncompleteClassEntry
+	BG__().page_uid = -1
+	BG__().page_gid = -1
 }
 func BasicGlobalsDtor(basic_globals_p *PhpBasicGlobals) {
 	if basic_globals_p.GetUrlAdaptSessionEx().GetTags() != nil {
@@ -69,7 +69,7 @@ func PhpGetInf() float64 { return zend.ZEND_INFINITY }
 func ZmStartupBasic(type_ int, module_number int) int {
 	BasicGlobalsCtor(&BasicGlobals)
 	IncompleteClassEntry = PhpCreateIncompleteClass()
-	BG(incomplete_class) = IncompleteClassEntry
+	BG__().incomplete_class = IncompleteClassEntry
 	zend.REGISTER_LONG_CONSTANT("CONNECTION_ABORTED", core.PHP_CONNECTION_ABORTED, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("CONNECTION_NORMAL", core.PHP_CONNECTION_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("CONNECTION_TIMEOUT", core.PHP_CONNECTION_TIMEOUT, zend.CONST_CS|zend.CONST_PERSISTENT)
@@ -214,25 +214,25 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmActivateBasic(type_ int, module_number int) int {
-	memset(BG(strtok_table), 0, 256)
-	BG(serialize_lock) = 0
-	memset(&(BG(serialize)), 0, b.SizeOf("BG ( serialize )"))
-	memset(&(BG(unserialize)), 0, b.SizeOf("BG ( unserialize )"))
-	BG(strtok_string) = nil
-	BG(strtok_zval).SetUndef()
-	BG(strtok_last) = nil
-	BG(locale_string) = nil
-	BG(locale_changed) = 0
-	BG(array_walk_fci) = zend.EmptyFcallInfo
-	BG(array_walk_fci_cache) = zend.EmptyFcallInfoCache
-	BG(user_compare_fci) = zend.EmptyFcallInfo
-	BG(user_compare_fci_cache) = zend.EmptyFcallInfoCache
-	BG(page_uid) = -1
-	BG(page_gid) = -1
-	BG(page_inode) = -1
-	BG(page_mtime) = -1
-	zend.ZendHashInit(&(BG(putenv_ht)), 1, nil, PhpPutenvDestructor, 0)
-	BG(user_shutdown_function_names) = nil
+	memset(BG__().strtok_table, 0, 256)
+	BG__().serialize_lock = 0
+	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
+	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))
+	BG__().strtok_string = nil
+	BG__().strtok_zval.SetUndef()
+	BG__().strtok_last = nil
+	BG__().locale_string = nil
+	BG__().locale_changed = 0
+	BG__().array_walk_fci = zend.EmptyFcallInfo
+	BG__().array_walk_fci_cache = zend.EmptyFcallInfoCache
+	BG__().user_compare_fci = zend.EmptyFcallInfo
+	BG__().user_compare_fci_cache = zend.EmptyFcallInfoCache
+	BG__().page_uid = -1
+	BG__().page_gid = -1
+	BG__().page_inode = -1
+	BG__().page_mtime = -1
+	zend.ZendHashInit(&(BG__().putenv_ht), 1, nil, PhpPutenvDestructor, 0)
+	BG__().user_shutdown_function_names = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
 	ZmActivateDir(type_, module_number)
@@ -252,26 +252,26 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
-	zend.ZvalPtrDtor(&(BG(strtok_zval)))
-	BG(strtok_zval).SetUndef()
-	BG(strtok_string) = nil
+	zend.ZvalPtrDtor(&(BG__().strtok_zval))
+	BG__().strtok_zval.SetUndef()
+	BG__().strtok_string = nil
 	tsrm_env_lock()
-	BG(putenv_ht).Destroy()
+	BG__().putenv_ht.Destroy()
 	tsrm_env_unlock()
-	BG(mt_rand_is_seeded) = 0
-	if BG(umask) != -1 {
-		umask(BG(umask))
+	BG__().mt_rand_is_seeded = 0
+	if BG__().umask != -1 {
+		umask(BG__().umask)
 	}
 
 	/* Check if locale was changed and change it back
 	 * to the value in startup environment */
 
-	if BG(locale_changed) {
+	if BG__().locale_changed {
 		setlocale(LC_ALL, "C")
 		setlocale(LC_CTYPE, "")
-		if BG(locale_string) {
-			types.ZendStringReleaseEx(BG(locale_string), 0)
-			BG(locale_string) = nil
+		if BG__().locale_string {
+			types.ZendStringReleaseEx(BG__().locale_string, 0)
+			BG__().locale_string = nil
 		}
 	}
 
@@ -282,15 +282,15 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	ZmDeactivateAssert(type_, module_number)
 	ZmDeactivateUrlScannerEx(type_, module_number)
 	streams.ZmDeactivateStreams(type_, module_number)
-	if BG(user_tick_functions) {
-		BG(user_tick_functions).Destroy()
-		zend.Efree(BG(user_tick_functions))
-		BG(user_tick_functions) = nil
+	if BG__().user_tick_functions {
+		BG__().user_tick_functions.Destroy()
+		zend.Efree(BG__().user_tick_functions)
+		BG__().user_tick_functions = nil
 	}
 	ZmDeactivateUserFilters(type_, module_number)
 	ZmDeactivateBrowscap(type_, module_number)
-	BG(page_uid) = -1
-	BG(page_gid) = -1
+	BG__().page_uid = -1
+	BG__().page_gid = -1
 	return types.SUCCESS
 }
 func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
@@ -668,7 +668,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	pe.SetKeyLen(strlen(pe.GetKey()))
 	tsrm_env_lock()
-	zend.ZendHashStrDel(&(BG(putenv_ht)), pe.GetKey(), pe.GetKeyLen())
+	zend.ZendHashStrDel(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen())
 
 	/* find previous value */
 
@@ -683,7 +683,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		unsetenv(pe.GetPutenvString())
 	}
 	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		zend.ZendHashStrAddMem(&(BG(putenv_ht)), pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
+		zend.ZendHashStrAddMem(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
 		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
 			tzset()
 		}
@@ -1742,7 +1742,7 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 	/* Prevent reentrant calls to the same user ticks function */
 }
 func RunUserTickFunctions(tick_count int, arg any) {
-	BG(user_tick_functions).Apply(zend.LlistApplyFuncT(UserTickFunctionCall))
+	BG__().user_tick_functions.Apply(zend.LlistApplyFuncT(UserTickFunctionCall))
 }
 func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTickFunctionEntry) int {
 	var func1 *types.Zval = tick_fe1.GetArguments()[0]
@@ -1764,32 +1764,32 @@ func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTick
 	return ret
 }
 func PhpCallShutdownFunctions() {
-	if BG(user_shutdown_function_names) {
+	if BG__().user_shutdown_function_names {
 		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
 		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			zend.ZendHashApply(BG(user_shutdown_function_names), UserShutdownFunctionCall)
+			zend.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
 		}
 		zend.EG__().SetBailout(__orig_bailout)
 	}
 }
 func PhpFreeShutdownFunctions() {
-	if BG(user_shutdown_function_names) {
+	if BG__().user_shutdown_function_names {
 		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
 		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			BG(user_shutdown_function_names).Destroy()
-			zend.FREE_HASHTABLE(BG(user_shutdown_function_names))
-			BG(user_shutdown_function_names) = nil
+			BG__().user_shutdown_function_names.Destroy()
+			zend.FREE_HASHTABLE(BG__().user_shutdown_function_names)
+			BG__().user_shutdown_function_names = nil
 		} else {
 			zend.EG__().SetBailout(__orig_bailout)
 
 			/* maybe shutdown method call exit, we just ignore it */
 
-			zend.FREE_HASHTABLE(BG(user_shutdown_function_names))
-			BG(user_shutdown_function_names) = nil
+			zend.FREE_HASHTABLE(BG__().user_shutdown_function_names)
+			BG__().user_shutdown_function_names = nil
 		}
 		zend.EG__().SetBailout(__orig_bailout)
 	}
@@ -1818,38 +1818,38 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 		types.ZendStringReleaseEx(callback_name, 0)
 		return_value.SetFalse()
 	} else {
-		if !(BG(user_shutdown_function_names)) {
-			zend.ALLOC_HASHTABLE(BG(user_shutdown_function_names))
-			zend.ZendHashInit(BG(user_shutdown_function_names), 0, nil, UserShutdownFunctionDtor, 0)
+		if !(BG__().user_shutdown_function_names) {
+			zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
+			zend.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
 		}
-		zend.ZendHashNextIndexInsertMem(BG(user_shutdown_function_names), &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+		zend.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	}
 
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 }
 func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdown_function_entry *PhpShutdownFunctionEntry) types.ZendBool {
-	if !(BG(user_shutdown_function_names)) {
-		zend.ALLOC_HASHTABLE(BG(user_shutdown_function_names))
-		zend.ZendHashInit(BG(user_shutdown_function_names), 0, nil, UserShutdownFunctionDtor, 0)
+	if !(BG__().user_shutdown_function_names) {
+		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
+		zend.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
 	}
-	zend.ZendHashStrUpdateMem(BG(user_shutdown_function_names), function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+	zend.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	return 1
 }
 func RemoveUserShutdownFunction(function_name *byte, function_len int) types.ZendBool {
-	if BG(user_shutdown_function_names) {
-		return zend.ZendHashStrDel(BG(user_shutdown_function_names), function_name, function_len) != types.FAILURE
+	if BG__().user_shutdown_function_names {
+		return zend.ZendHashStrDel(BG__().user_shutdown_function_names, function_name, function_len) != types.FAILURE
 	}
 	return 0
 }
 func AppendUserShutdownFunction(shutdown_function_entry PhpShutdownFunctionEntry) types.ZendBool {
-	if !(BG(user_shutdown_function_names)) {
-		zend.ALLOC_HASHTABLE(BG(user_shutdown_function_names))
-		zend.ZendHashInit(BG(user_shutdown_function_names), 0, nil, UserShutdownFunctionDtor, 0)
+	if !(BG__().user_shutdown_function_names) {
+		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
+		zend.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
 	}
-	return zend.ZendHashNextIndexInsertMem(BG(user_shutdown_function_names), &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry")) != nil
+	return zend.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry")) != nil
 }
 func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 	syntax_highlighter_ini.SetHighlightComment(zend.INI_STR("highlight.comment"))
@@ -2672,15 +2672,15 @@ func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *ty
 	if tick_fe.GetArguments()[0].GetType() != types.IS_ARRAY && tick_fe.GetArguments()[0].GetType() != types.IS_OBJECT {
 		zend.ConvertToStringEx(tick_fe.GetArguments()[0])
 	}
-	if !(BG(user_tick_functions)) {
-		BG(user_tick_functions) = (*zend.ZendLlist)(zend.Emalloc(b.SizeOf("zend_llist")))
-		BG(user_tick_functions).Init(b.SizeOf("user_tick_function_entry"), zend.LlistDtorFuncT(UserTickFunctionDtor), 0)
+	if !(BG__().user_tick_functions) {
+		BG__().user_tick_functions = (*zend.ZendLlist)(zend.Emalloc(b.SizeOf("zend_llist")))
+		BG__().user_tick_functions.Init(b.SizeOf("user_tick_function_entry"), zend.LlistDtorFuncT(UserTickFunctionDtor), 0)
 		core.PhpAddTickFunction(RunUserTickFunctions, nil)
 	}
 	for i = 0; i < tick_fe.GetArgCount(); i++ {
 		tick_fe.GetArguments()[i].TryAddRefcount()
 	}
-	BG(user_tick_functions).AddElement(&tick_fe)
+	BG__().user_tick_functions.AddElement(&tick_fe)
 	return_value.SetTrue()
 	return
 }
@@ -2718,7 +2718,7 @@ func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *
 		}
 		break
 	}
-	if !(BG(user_tick_functions)) {
+	if !(BG__().user_tick_functions) {
 		return
 	}
 	if function.GetType() != types.IS_ARRAY && function.GetType() != types.IS_OBJECT {
@@ -2727,7 +2727,7 @@ func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *
 	tick_fe.SetArguments((*types.Zval)(zend.Emalloc(b.SizeOf("zval"))))
 	types.ZVAL_COPY_VALUE(tick_fe.GetArguments()[0], function)
 	tick_fe.SetArgCount(1)
-	zend.ZendLlistDelElement(BG(user_tick_functions), &tick_fe, (func(any, any) int)(UserTickFunctionCompare))
+	zend.ZendLlistDelElement(BG__().user_tick_functions, &tick_fe, (func(any, any) int)(UserTickFunctionCompare))
 	zend.Efree(tick_fe.GetArguments())
 }
 func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2902,12 +2902,12 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 }
 func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
-		zend.ArrayInit(&(BG(active_ini_file_section)))
-		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), &(BG(active_ini_file_section)))
+		zend.ArrayInit(&(BG__().active_ini_file_section))
+		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), &(BG__().active_ini_file_section))
 	} else if arg2 != nil {
 		var active_arr *types.Zval
-		if BG(active_ini_file_section).u1.v.type_ != types.IS_UNDEF {
-			active_arr = &(BG(active_ini_file_section))
+		if BG__().active_ini_file_section.u1.v.type_ != types.IS_UNDEF {
+			active_arr = &(BG__().active_ini_file_section)
 		} else {
 			active_arr = arr
 		}
@@ -2965,7 +2965,7 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *types.Zval
 	/* Set callback function */
 
 	if process_sections != 0 {
-		BG(active_ini_file_section).SetUndef()
+		BG__().active_ini_file_section.SetUndef()
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
 		ini_parser_cb = zend.ZendIniParserCbT(PhpSimpleIniParserCb)
@@ -3030,7 +3030,7 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *types.Zv
 	/* Set callback function */
 
 	if process_sections != 0 {
-		BG(active_ini_file_section).SetUndef()
+		BG__().active_ini_file_section.SetUndef()
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
 		ini_parser_cb = zend.ZendIniParserCbT(PhpSimpleIniParserCb)

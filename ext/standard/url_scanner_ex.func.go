@@ -24,9 +24,9 @@ func PhpIniOnUpdateTags(
 	var tmp *byte
 	var lasts *byte = nil
 	if type_ != 0 {
-		ctx = &(BG(url_adapt_session_ex))
+		ctx = &(BG__().url_adapt_session_ex)
 	} else {
-		ctx = &(BG(url_adapt_output_ex))
+		ctx = &(BG__().url_adapt_output_ex)
 	}
 	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
 	if ctx.GetTags() != nil {
@@ -94,9 +94,9 @@ func PhpIniOnUpdateHosts(
 	var tmp *byte
 	var lasts *byte = nil
 	if type_ != 0 {
-		hosts = &(BG(url_adapt_session_hosts_ht))
+		hosts = &(BG__().url_adapt_session_hosts_ht)
 	} else {
-		hosts = &(BG(url_adapt_output_hosts_ht))
+		hosts = &(BG__().url_adapt_output_hosts_ht)
 	}
 	hosts.Clean()
 
@@ -172,7 +172,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetHost() != nil {
 		var tmp *types.ZendString = zend.ZendStringTolower(url_parts.GetHost())
-		if zend.ZendHashExists(&(BG(url_adapt_session_hosts_ht)), tmp) == 0 {
+		if zend.ZendHashExists(&(BG__().url_adapt_session_hosts_ht), tmp) == 0 {
 			types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)
@@ -285,7 +285,7 @@ func CheckHttpHost(target *byte) int {
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
-	var allowed_hosts *types.HashTable = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG(url_adapt_session_hosts_ht)) }, func() *__auto__ { return &(BG(url_adapt_output_hosts_ht)) })
+	var allowed_hosts *types.HashTable = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG__().url_adapt_session_hosts_ht) }, func() *__auto__ { return &(BG__().url_adapt_output_hosts_ht) })
 	b.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
 		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())
@@ -876,9 +876,9 @@ func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush types.ZendBool, ct
 func PhpUrlScannerExActivate(type_ int) int {
 	var ctx *UrlAdaptStateExT
 	if type_ != 0 {
-		ctx = &(BG(url_adapt_session_ex))
+		ctx = &(BG__().url_adapt_session_ex)
 	} else {
-		ctx = &(BG(url_adapt_output_ex))
+		ctx = &(BG__().url_adapt_output_ex)
 	}
 	memset(ctx, 0, zend_long((*byte)(&((*UrlAdaptStateExT)(nil).GetTags()))-(*byte)(nil)))
 	return types.SUCCESS
@@ -886,9 +886,9 @@ func PhpUrlScannerExActivate(type_ int) int {
 func PhpUrlScannerExDeactivate(type_ int) int {
 	var ctx *UrlAdaptStateExT
 	if type_ != 0 {
-		ctx = &(BG(url_adapt_session_ex))
+		ctx = &(BG__().url_adapt_session_ex)
 	} else {
-		ctx = &(BG(url_adapt_output_ex))
+		ctx = &(BG__().url_adapt_output_ex)
 	}
 	ctx.GetResult().Free()
 	ctx.GetBuf().Free()
@@ -908,9 +908,9 @@ func PhpUrlScannerSessionHandlerImpl(
 	var len_ int
 	var url_state *UrlAdaptStateExT
 	if type_ != 0 {
-		url_state = &(BG(url_adapt_session_ex))
+		url_state = &(BG__().url_adapt_session_ex)
 	} else {
-		url_state = &(BG(url_adapt_output_ex))
+		url_state = &(BG__().url_adapt_output_ex)
 	}
 	if url_state.GetUrlApp().GetS().GetLen() != 0 {
 		*handled_output = UrlAdaptExt(output, output_len, &len_, zend_bool(b.Cond((mode&(core.PHP_OUTPUT_HANDLER_END|core.PHP_OUTPUT_HANDLER_CONT|core.PHP_OUTPUT_HANDLER_FLUSH|core.PHP_OUTPUT_HANDLER_FINAL)) != 0, 1, 0)), url_state)
@@ -958,10 +958,10 @@ func PhpUrlScannerAddVarImpl(
 	var url_state *UrlAdaptStateExT
 	var handler core.PhpOutputHandlerFuncT
 	if type_ != 0 {
-		url_state = &(BG(url_adapt_session_ex))
+		url_state = &(BG__().url_adapt_session_ex)
 		handler = PhpUrlScannerSessionHandler
 	} else {
-		url_state = &(BG(url_adapt_output_ex))
+		url_state = &(BG__().url_adapt_output_ex)
 		handler = PhpUrlScannerOutputHandler
 	}
 	if url_state.GetActive() == 0 {
@@ -1014,9 +1014,9 @@ func PhpUrlScannerAddVar(name *byte, name_len int, value *byte, value_len int, e
 func PhpUrlScannerResetVarsImpl(type_ int) {
 	var url_state *UrlAdaptStateExT
 	if type_ != 0 {
-		url_state = &(BG(url_adapt_session_ex))
+		url_state = &(BG__().url_adapt_session_ex)
 	} else {
-		url_state = &(BG(url_adapt_output_ex))
+		url_state = &(BG__().url_adapt_output_ex)
 	}
 	if url_state.GetFormApp().GetS() != nil {
 		url_state.GetFormApp().GetS().GetLen() = 0
@@ -1047,9 +1047,9 @@ func PhpUrlScannerResetVarImpl(name *types.ZendString, encode int, type_ int) in
 	var sep_removed types.ZendBool = 0
 	var url_state *UrlAdaptStateExT
 	if type_ != 0 {
-		url_state = &(BG(url_adapt_session_ex))
+		url_state = &(BG__().url_adapt_session_ex)
 	} else {
-		url_state = &(BG(url_adapt_output_ex))
+		url_state = &(BG__().url_adapt_output_ex)
 	}
 
 	/* Short circuit check. Only check url_app. */
@@ -1170,30 +1170,30 @@ func ZmShutdownUrlScanner(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmActivateUrlScanner(type_ int, module_number int) int {
-	BG(url_adapt_session_ex).active = 0
-	BG(url_adapt_session_ex).tag_type = 0
-	BG(url_adapt_session_ex).attr_type = 0
-	BG(url_adapt_output_ex).active = 0
-	BG(url_adapt_output_ex).tag_type = 0
-	BG(url_adapt_output_ex).attr_type = 0
+	BG__().url_adapt_session_ex.active = 0
+	BG__().url_adapt_session_ex.tag_type = 0
+	BG__().url_adapt_session_ex.attr_type = 0
+	BG__().url_adapt_output_ex.active = 0
+	BG__().url_adapt_output_ex.tag_type = 0
+	BG__().url_adapt_output_ex.attr_type = 0
 	return types.SUCCESS
 }
 func ZmDeactivateUrlScanner(type_ int, module_number int) int {
-	if BG(url_adapt_session_ex).active {
+	if BG__().url_adapt_session_ex.active {
 		PhpUrlScannerExDeactivate(1)
-		BG(url_adapt_session_ex).active = 0
-		BG(url_adapt_session_ex).tag_type = 0
-		BG(url_adapt_session_ex).attr_type = 0
+		BG__().url_adapt_session_ex.active = 0
+		BG__().url_adapt_session_ex.tag_type = 0
+		BG__().url_adapt_session_ex.attr_type = 0
 	}
-	BG(url_adapt_session_ex).form_app.Free()
-	BG(url_adapt_session_ex).url_app.Free()
-	if BG(url_adapt_output_ex).active {
+	BG__().url_adapt_session_ex.form_app.Free()
+	BG__().url_adapt_session_ex.url_app.Free()
+	if BG__().url_adapt_output_ex.active {
 		PhpUrlScannerExDeactivate(0)
-		BG(url_adapt_output_ex).active = 0
-		BG(url_adapt_output_ex).tag_type = 0
-		BG(url_adapt_output_ex).attr_type = 0
+		BG__().url_adapt_output_ex.active = 0
+		BG__().url_adapt_output_ex.tag_type = 0
+		BG__().url_adapt_output_ex.attr_type = 0
 	}
-	BG(url_adapt_output_ex).form_app.Free()
-	BG(url_adapt_output_ex).url_app.Free()
+	BG__().url_adapt_output_ex.form_app.Free()
+	BG__().url_adapt_output_ex.url_app.Free()
 	return types.SUCCESS
 }

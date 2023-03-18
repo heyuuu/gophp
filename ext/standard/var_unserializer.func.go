@@ -12,9 +12,9 @@ import (
 func PhpVarUnserializeInit() PhpUnserializeDataT {
 	var d PhpUnserializeDataT
 
-	/* fprintf(stderr, "UNSERIALIZE_INIT    == lock: %u, level: %u\n", BG(serialize_lock), BG(unserialize).level); */
+	/* fprintf(stderr, "UNSERIALIZE_INIT    == lock: %u, level: %u\n", BG__().serialize_lock, BG__().unserialize.level); */
 
-	if BG(serialize_lock) || !(BG(unserialize).level) {
+	if BG__().serialize_lock || !(BG__().unserialize.level) {
 		d = zend.Emalloc(b.SizeOf("struct php_unserialize_data"))
 		d.SetLast(d.GetEntries())
 		d.SetLastDtor(nil)
@@ -22,28 +22,28 @@ func PhpVarUnserializeInit() PhpUnserializeDataT {
 		d.SetAllowedClasses(nil)
 		d.SetRefProps(nil)
 		d.SetCurDepth(0)
-		d.SetMaxDepth(BG(unserialize_max_depth))
+		d.SetMaxDepth(BG__().unserialize_max_depth)
 		d.GetEntries().SetUsedSlots(0)
 		d.GetEntries().SetNext(nil)
-		if !(BG(serialize_lock)) {
-			BG(unserialize).data = d
-			BG(unserialize).level = 1
+		if !(BG__().serialize_lock) {
+			BG__().unserialize.data = d
+			BG__().unserialize.level = 1
 		}
 	} else {
-		d = BG(unserialize).data
-		BG(unserialize).level++
+		d = BG__().unserialize.data
+		BG__().unserialize.level++
 	}
 	return d
 }
 func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
-	/* fprintf(stderr, "UNSERIALIZE_DESTROY == lock: %u, level: %u\n", BG(serialize_lock), BG(unserialize).level); */
+	/* fprintf(stderr, "UNSERIALIZE_DESTROY == lock: %u, level: %u\n", BG__().serialize_lock, BG__().unserialize.level); */
 
-	if BG(serialize_lock) || BG(unserialize).level == 1 {
+	if BG__().serialize_lock || BG__().unserialize.level == 1 {
 		VarDestroy(&d)
 		zend.Efree(d)
 	}
-	if !(BG(serialize_lock)) && !(b.PreDec(&(BG(unserialize).level))) {
-		BG(unserialize).data = nil
+	if !(BG__().serialize_lock) && !(b.PreDec(&(BG__().unserialize.level))) {
+		BG__().unserialize.data = nil
 	}
 }
 func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *types.HashTable {
@@ -158,12 +158,12 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					if wakeup_name.IsUndef() {
 						wakeup_name.SetRawString("__wakeup")
 					}
-					BG(serialize_lock)++
+					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == types.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					}
-					BG(serialize_lock)--
+					BG__().serialize_lock--
 					zend.ZvalPtrDtor(&retval)
 				} else {
 					zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
@@ -182,12 +182,12 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					if unserialize_name.IsUndef() {
 						unserialize_name.SetRawString("__unserialize")
 					}
-					BG(serialize_lock)++
+					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == types.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					}
-					BG(serialize_lock)--
+					BG__().serialize_lock--
 					zend.ZvalPtrDtor(&param)
 					zend.ZvalPtrDtor(&retval)
 				} else {
@@ -461,7 +461,7 @@ func ProcessNestedData(
 				zend.ZEND_REF_ADD_TYPE_SOURCE(data.GetRef(), info)
 			}
 		}
-		if BG(unserialize).level > 1 {
+		if BG__().unserialize.level > 1 {
 			VarPushDtor(var_hash, data)
 		}
 		zend.ZvalPtrDtorStr(&key)
@@ -830,17 +830,17 @@ yy18:
 
 		/* Try to find class directly */
 
-		BG(serialize_lock)++
+		BG__().serialize_lock++
 		ce = zend.ZendLookupClass(class_name)
 		if ce != nil {
-			BG(serialize_lock)--
+			BG__().serialize_lock--
 			if zend.EG__().GetException() != nil {
 				types.ZendStringReleaseEx(class_name, 0)
 				return 0
 			}
 			break
 		}
-		BG(serialize_lock)--
+		BG__().serialize_lock--
 		if zend.EG__().GetException() != nil {
 			types.ZendStringReleaseEx(class_name, 0)
 			return 0
@@ -858,9 +858,9 @@ yy18:
 
 		user_func.SetRawString(b.CastStrAuto(core.PG(unserialize_callback_func)))
 		args[0].SetStringCopy(class_name)
-		BG(serialize_lock)++
+		BG__().serialize_lock++
 		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {
-			BG(serialize_lock)--
+			BG__().serialize_lock--
 			if zend.EG__().GetException() != nil {
 				types.ZendStringReleaseEx(class_name, 0)
 				zend.ZvalPtrDtor(&user_func)
@@ -874,7 +874,7 @@ yy18:
 			zend.ZvalPtrDtor(&args[0])
 			break
 		}
-		BG(serialize_lock)--
+		BG__().serialize_lock--
 		zend.ZvalPtrDtor(&retval)
 		if zend.EG__().GetException() != nil {
 			types.ZendStringReleaseEx(class_name, 0)
@@ -885,13 +885,13 @@ yy18:
 
 		/* The callback function may have defined the class */
 
-		BG(serialize_lock)++
+		BG__().serialize_lock++
 		if b.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.GetStr().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}
-		BG(serialize_lock)--
+		BG__().serialize_lock--
 		zend.ZvalPtrDtor(&user_func)
 		zend.ZvalPtrDtor(&args[0])
 		break

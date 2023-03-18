@@ -13,18 +13,18 @@ import (
 )
 
 func ZmActivateFilestat(type_ int, module_number int) int {
-	BG(CurrentStatFile) = nil
-	BG(CurrentLStatFile) = nil
+	BG__().CurrentStatFile = nil
+	BG__().CurrentLStatFile = nil
 	return types.SUCCESS
 }
 func ZmDeactivateFilestat(type_ int, module_number int) int {
-	if BG(CurrentStatFile) {
-		zend.Efree(BG(CurrentStatFile))
-		BG(CurrentStatFile) = nil
+	if BG__().CurrentStatFile {
+		zend.Efree(BG__().CurrentStatFile)
+		BG__().CurrentStatFile = nil
 	}
-	if BG(CurrentLStatFile) {
-		zend.Efree(BG(CurrentLStatFile))
-		BG(CurrentLStatFile) = nil
+	if BG__().CurrentLStatFile {
+		zend.Efree(BG__().CurrentLStatFile)
+		BG__().CurrentLStatFile = nil
 	}
 	return types.SUCCESS
 }
@@ -596,13 +596,13 @@ func PhpClearStatCache(clear_realpath_cache types.ZendBool, filename *byte, file
 	 * as it may contain outdated data (e.g. "nlink" for a directory when deleting a file
 	 * in this directory, as shown by lstat_stat_variation9.phpt) */
 
-	if BG(CurrentStatFile) {
-		zend.Efree(BG(CurrentStatFile))
-		BG(CurrentStatFile) = nil
+	if BG__().CurrentStatFile {
+		zend.Efree(BG__().CurrentStatFile)
+		BG__().CurrentStatFile = nil
 	}
-	if BG(CurrentLStatFile) {
-		zend.Efree(BG(CurrentLStatFile))
-		BG(CurrentLStatFile) = nil
+	if BG__().CurrentLStatFile {
+		zend.Efree(BG__().CurrentLStatFile)
+		BG__().CurrentLStatFile = nil
 	}
 	if clear_realpath_cache != 0 {
 		if filename != nil {

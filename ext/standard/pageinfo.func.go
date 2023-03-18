@@ -11,25 +11,25 @@ import (
 func PhpStatpage() {
 	var pstat *zend.ZendStatT
 	pstat = core.SapiGetStat()
-	if BG(page_uid) == -1 || BG(page_gid) == -1 {
+	if BG__().page_uid == -1 || BG__().page_gid == -1 {
 		if pstat != nil {
-			BG(page_uid) = pstat.st_uid
-			BG(page_gid) = pstat.st_gid
-			BG(page_inode) = pstat.st_ino
-			BG(page_mtime) = pstat.st_mtime
+			BG__().page_uid = pstat.st_uid
+			BG__().page_gid = pstat.st_gid
+			BG__().page_inode = pstat.st_ino
+			BG__().page_mtime = pstat.st_mtime
 		} else {
-			BG(page_uid) = getuid()
-			BG(page_gid) = getgid()
+			BG__().page_uid = getuid()
+			BG__().page_gid = getgid()
 		}
 	}
 }
 func PhpGetuid() zend.ZendLong {
 	PhpStatpage()
-	return BG(page_uid)
+	return BG__().page_uid
 }
 func PhpGetgid() zend.ZendLong {
 	PhpStatpage()
-	return BG(page_gid)
+	return BG__().page_gid
 }
 func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var uid zend.ZendLong
@@ -78,17 +78,17 @@ func ZifGetmyinode(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	PhpStatpage()
-	if BG(page_inode) < 0 {
+	if BG__().page_inode < 0 {
 		return_value.SetFalse()
 		return
 	} else {
-		return_value.SetLong(BG(page_inode))
+		return_value.SetLong(BG__().page_inode)
 		return
 	}
 }
 func PhpGetlastmod() int64 {
 	PhpStatpage()
-	return BG(page_mtime)
+	return BG__().page_mtime
 }
 func ZifGetlastmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var lm zend.ZendLong

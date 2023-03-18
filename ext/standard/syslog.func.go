@@ -45,17 +45,17 @@ func ZmStartupSyslog(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("LOG_CONS", LOG_CONS, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("LOG_ODELAY", LOG_ODELAY, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("LOG_NDELAY", LOG_NDELAY, zend.CONST_CS|zend.CONST_PERSISTENT)
-	BG(syslog_device) = nil
+	BG__().syslog_device = nil
 	return types.SUCCESS
 }
 func ZmActivateSyslog(type_ int, module_number int) int {
-	BG(syslog_device) = nil
+	BG__().syslog_device = nil
 	return types.SUCCESS
 }
 func ZmShutdownSyslog(type_ int, module_number int) int {
-	if BG(syslog_device) {
-		zend.Free(BG(syslog_device))
-		BG(syslog_device) = nil
+	if BG__().syslog_device {
+		zend.Free(BG__().syslog_device)
+		BG__().syslog_device = nil
 	}
 	return types.SUCCESS
 }
@@ -101,15 +101,15 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	if BG(syslog_device) {
-		zend.Free(BG(syslog_device))
+	if BG__().syslog_device {
+		zend.Free(BG__().syslog_device)
 	}
-	BG(syslog_device) = zend.ZendStrndup(ident, ident_len)
-	if BG(syslog_device) == nil {
+	BG__().syslog_device = zend.ZendStrndup(ident, ident_len)
+	if BG__().syslog_device == nil {
 		return_value.SetFalse()
 		return
 	}
-	PhpOpenlog(BG(syslog_device), option, facility)
+	PhpOpenlog(BG__().syslog_device, option, facility)
 	return_value.SetTrue()
 	return
 }
@@ -118,9 +118,9 @@ func ZifCloselog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	closelog()
-	if BG(syslog_device) {
-		zend.Free(BG(syslog_device))
-		BG(syslog_device) = nil
+	if BG__().syslog_device {
+		zend.Free(BG__().syslog_device)
+		BG__().syslog_device = nil
 	}
 	return_value.SetTrue()
 	return
