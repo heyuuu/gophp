@@ -1282,16 +1282,7 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			file_handle = fp.ParseResource()
 			format, format_len = fp.ParseString()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return

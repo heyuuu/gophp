@@ -531,16 +531,7 @@ func ZifUserSprintf(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format = fp.ParseZval()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -634,16 +625,7 @@ func ZifUserPrintf(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format = fp.ParseZval()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -750,16 +732,7 @@ func ZifFprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg1 = fp.ParseResource()
 			format = fp.ParseZval()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

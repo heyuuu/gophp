@@ -1450,16 +1450,9 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.ParseFunc(&fci, &fci_cache)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				fci.SetParams(_real_arg + 1)
-				fci.SetParamCount(_num_varargs)
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				fci.SetParams(nil)
-				fci.SetParamCount(0)
-			}
+			__arg, __arg_len := fp.ParseVariadic0()
+			fci.SetParams(__arg)
+			fci.SetParamCount(uint32(__arg_len))
 			if fp.HasError() {
 				fp.HandleError()
 				return

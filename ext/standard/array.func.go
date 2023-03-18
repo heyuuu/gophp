@@ -1313,16 +1313,7 @@ func ZifMin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1391,16 +1382,7 @@ func ZifMax(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2921,16 +2903,7 @@ func ZifCompact(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				num_args = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				num_args = 0
-			}
+			args, num_args = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -3754,16 +3727,7 @@ func ZifArrayPush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			stack = fp.ParseArrayEx(false, true)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4027,16 +3991,7 @@ func ZifArrayUnshift(executeData *zend.ZendExecuteData, return_value *types.Zval
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			stack = fp.ParseArrayEx(false, true)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4495,16 +4450,7 @@ func PhpArrayReplaceWrapper(executeData *zend.ZendExecuteData, return_value *typ
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4570,16 +4516,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -6636,16 +6573,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -6884,16 +6812,7 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *types.Zv
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				argc = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				argc = 0
-			}
+			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -7616,16 +7535,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.ParseFuncEx(&fci, &fci_cache, true)
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				arrays = _real_arg + 1
-				n_arrays = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				arrays = nil
-				n_arrays = 0
-			}
+			arrays, n_arrays = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return

@@ -120,16 +120,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format, formatlen = fp.ParseString()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				argv = _real_arg + 1
-				num_args = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				argv = nil
-				num_args = 0
-			}
+			argv, num_args = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return

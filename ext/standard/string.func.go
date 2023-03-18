@@ -4804,16 +4804,7 @@ func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			cat = fp.ParseLong()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				num_args = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				num_args = 0
-			}
+			args, num_args = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -5923,16 +5914,7 @@ func ZifSscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			format, format_len = fp.ParseString()
-			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
-				args = _real_arg + 1
-				num_args = _num_varargs
-				_i += _num_varargs
-				_real_arg += _num_varargs
-			} else {
-				args = nil
-				num_args = 0
-			}
+			args, num_args = fp.ParseVariadic0()
 			if fp.HasError() {
 				fp.HandleError()
 				return
