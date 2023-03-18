@@ -167,12 +167,7 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zva
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &sig_no) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			sig_no = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

@@ -544,12 +544,7 @@ func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &sip) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			sip = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1056,12 +1051,7 @@ func ZifSleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &num) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -1103,12 +1093,7 @@ func ZifUsleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &num) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			num = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1151,18 +1136,8 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &tv_sec) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &tv_nsec) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			tv_sec = fp.ParseLong()
+			tv_nsec = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1407,12 +1382,7 @@ func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &erropt) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			erropt = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgPath(_arg, &opt, &opt_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -2679,12 +2649,7 @@ func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &port) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			port = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgString(_arg, &proto, &proto_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
@@ -2780,12 +2745,7 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *types.
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &proto) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			proto = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -3125,12 +3085,7 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *types.Zval
 			}
 			fp.StartOptional()
 			process_sections = fp.ParseBool()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &scanner_mode) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			scanner_mode = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -3202,12 +3157,7 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *types.Zv
 			}
 			fp.StartOptional()
 			process_sections = fp.ParseBool()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &scanner_mode) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			scanner_mode = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

@@ -794,12 +794,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &type_param) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			type_param = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &authns, 0)
 			argparse.Z_PARAM_PROLOGUE(0, 0)

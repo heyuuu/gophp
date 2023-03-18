@@ -326,12 +326,7 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &len_) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			len_ = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -434,12 +429,7 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &len_) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			len_ = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return

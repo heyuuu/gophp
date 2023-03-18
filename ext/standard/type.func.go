@@ -169,12 +169,7 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &num, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &base) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			base = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return

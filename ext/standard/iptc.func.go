@@ -140,12 +140,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &spool) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			spool = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return

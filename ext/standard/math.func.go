@@ -354,18 +354,8 @@ func ZifRound(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &value, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &precision) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &mode) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			precision = fp.ParseLong()
+			mode = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1825,18 +1815,8 @@ func ZifBaseConvert(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &number, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &frombase) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &tobase) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			frombase = fp.ParseLong()
+			tobase = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2039,12 +2019,7 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &dec) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			dec = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgString(_arg, &dec_point, &dec_point_len, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
@@ -2150,18 +2125,8 @@ func ZifIntdiv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &dividend) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &divisor) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			dividend = fp.ParseLong()
+			divisor = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return

@@ -535,12 +535,7 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &flags) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			flags = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -659,12 +654,7 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &flags) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			flags = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE

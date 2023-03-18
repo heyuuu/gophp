@@ -322,7 +322,14 @@ func (p *FastParser) ParseLongEx(checkNull bool) (dest int, isNull types.ZendBoo
 		return
 	}
 
-	// todo
+	dest, isNullBool, ok := ParseLong(p._arg, checkNull, false)
+	isNull = types.IntBool(isNullBool)
+
+	if !ok {
+		p._expected_type = Z_EXPECTED_LONG
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 

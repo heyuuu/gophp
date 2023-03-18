@@ -455,12 +455,7 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &mode) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			mode = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -542,18 +537,8 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &filetime) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &fileatime) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			filetime = fp.ParseLong()
+			fileatime = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return

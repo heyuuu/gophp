@@ -56,12 +56,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &port) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			port = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &zerrno, 0)
 			argparse.Z_PARAM_PROLOGUE(0, 0)

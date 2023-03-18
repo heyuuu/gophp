@@ -332,12 +332,7 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &key) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			key = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -751,12 +746,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &format) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			format = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE

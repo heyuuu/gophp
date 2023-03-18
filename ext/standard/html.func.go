@@ -1367,12 +1367,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &flags) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			flags = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgStr(_arg, &hint_charset, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
@@ -1444,12 +1439,7 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &quote_style) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			quote_style = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1501,12 +1491,7 @@ func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *types.
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &quote_style) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			quote_style = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgStr(_arg, &hint_charset, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
@@ -1614,18 +1599,8 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &all) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if !argparse.ZendParseArgLong00(_arg, &flags) {
-				_expected_type = argparse.Z_EXPECTED_LONG
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			all = fp.ParseLong()
+			flags = fp.ParseLong()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgString(_arg, &charset_hint, &charset_hint_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
