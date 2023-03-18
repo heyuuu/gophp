@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/args"
 	"sik/zend/types"
 )
 
@@ -69,7 +68,7 @@ func Z_PARAM_PROLOGUE(deref int, separate int) {
 	}
 }
 func ZendParseArgBool(arg *types.Zval, dest *types.ZendBool, is_null *types.ZendBool, check_null int) int {
-	val, isNull, ok := args.ParseBool(arg, check_null != 0)
+	val, isNull, ok := argparse.ParseBool(arg, check_null != 0)
 	*dest = types.IntBool(val)
 	if check_null != 0 {
 		*is_null = types.IntBool(isNull)
@@ -78,13 +77,13 @@ func ZendParseArgBool(arg *types.Zval, dest *types.ZendBool, is_null *types.Zend
 }
 
 func ZendParseArgLong00(arg *types.Zval, dest *ZendLong) bool {
-	val, _, ok := args.ParseLong(arg, false, false)
+	val, _, ok := argparse.ParseLong(arg, false, false)
 	*dest = val
 	return ok
 }
 
 func ZendParseArgLong(arg *types.Zval, dest *ZendLong, is_null *types.ZendBool, check_null int, cap int) bool {
-	val, isNull, ok := args.ParseLong(arg, check_null != 0, cap != 0)
+	val, isNull, ok := argparse.ParseLong(arg, check_null != 0, cap != 0)
 	*dest = val
 	if is_null != nil {
 		*is_null = types.IntBool(isNull)
@@ -92,7 +91,7 @@ func ZendParseArgLong(arg *types.Zval, dest *ZendLong, is_null *types.ZendBool, 
 	return ok
 }
 func ZendParseArgDouble(arg *types.Zval, dest *float64, is_null *types.ZendBool, check_null int) int {
-	val, isNull, ok := args.ParseDouble(arg, check_null != 0)
+	val, isNull, ok := argparse.ParseDouble(arg, check_null != 0)
 	*dest = val
 	if is_null != nil {
 		*is_null = types.IntBool(isNull)
@@ -101,7 +100,7 @@ func ZendParseArgDouble(arg *types.Zval, dest *float64, is_null *types.ZendBool,
 }
 func ZendParseArgStr(arg *types.Zval, dest **types.ZendString, check_null int) int {
 	// 为空时 *dest 直接为 nil，不需单独的 is_null 字符安
-	val, ok := args.ParseZStr(arg, check_null != 0)
+	val, ok := argparse.ParseZStr(arg, check_null != 0)
 	*dest = val
 	return types.IntBool(ok)
 }

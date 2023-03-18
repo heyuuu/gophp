@@ -2,8 +2,6 @@ package zend
 
 import (
 	"fmt"
-	b "sik/builtin"
-	"sik/zend/args"
 	"sik/zend/types"
 )
 
@@ -92,21 +90,21 @@ func ZendParseArgClass(arg *types.Zval, pce **ZendClassEntry, num int, check_nul
 	return 1
 }
 func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
-	if val, ok := args.ParseBoolWeak(arg); ok {
+	if val, ok := argparse.ParseBoolWeak(arg); ok {
 		*dest = types.IntBool(val)
 		return 1
 	}
 	return 0
 }
 func ZendParseArgLongWeak(arg *types.Zval, dest *ZendLong) int {
-	if val, ok := args.ParseLongWeak(arg, false); ok {
+	if val, ok := argparse.ParseLongWeak(arg, false); ok {
 		*dest = val
 		return 1
 	}
 	return 0
 }
 func ZendParseArgDoubleWeak(arg *types.Zval, dest *float64) int {
-	if val, ok := args.ParseDoubleWeak(arg); ok {
+	if val, ok := argparse.ParseDoubleWeak(arg); ok {
 		*dest = val
 		return 1
 	}
@@ -114,206 +112,9 @@ func ZendParseArgDoubleWeak(arg *types.Zval, dest *float64) int {
 }
 
 func ZendParseArgStrWeak(arg *types.Zval, dest **types.ZendString) int {
-	if val, ok := args.ParseZStrWeak(arg); ok {
+	if val, ok := argparse.ParseZStrWeak(arg); ok {
 		*dest = val
 		return 1
 	}
 	return 0
-}
-
-func ZendParseArgImpl(arg *types.Zval, va *interface{}, spec **byte, error **byte, severity *int) *byte {
-	return ZendParseArgImpl_Ex(arg, va, spec, error, severity)
-}
-
-func ZendParseArgImpl_Ex(arg *types.Zval, va *args.VaArgsReceiver, spec *b.StrReader, error **byte, severity *int) string {
-	specWalk := spec.Copy()
-	c := specWalk.Read()
-	var check_null int = 0
-	var separate int = 0
-	var real_arg *types.Zval = arg
-
-	/* scan through modifiers */
-
-	arg = types.ZVAL_DEREF(arg)
-	for true {
-		if specWalk.Curr() == '/' {
-			types.SEPARATE_ZVAL_NOREF(arg)
-			real_arg = arg
-			separate = 1
-		} else if specWalk.Curr() == '!' {
-			check_null = 1
-		} else {
-			break
-		}
-		specWalk.Next()
-	}
-	switch c {
-	case 'l', 'L':
-		if val, isNull, ok := args.ParseLong(arg, check_null != 0, c == 'L'); ok {
-			va.Long(val)
-			if check_null != 0 {
-				va.Bool(isNull)
-			}
-		} else {
-			return "int"
-		}
-		break
-	case 'd':
-		if val, isNull, ok := args.ParseDouble(arg, check_null != 0); ok {
-			va.Double(val)
-			if check_null != 0 {
-				va.Bool(isNull)
-			}
-		} else {
-			return "float"
-		}
-		break
-	case 's':
-		var p **byte = __va_arg(*va, (**byte)(_))
-		var pl *int = __va_arg(*va, (*int)(_))
-		if ZendParseArgString(arg, p, pl, check_null) == 0 {
-			return "string"
-		}
-		break
-	case 'p':
-		var p **byte = __va_arg(*va, (**byte)(_))
-		var pl *int = __va_arg(*va, (*int)(_))
-		if ZendParseArgPath(arg, p, pl, check_null) == 0 {
-			return "a valid path"
-		}
-		break
-	case 'P':
-		var str **types.ZendString = __va_arg(*va, (**types.ZendString)(_))
-		if ZendParseArgPathStr(arg, str, check_null) == 0 {
-			return "a valid path"
-		}
-		break
-	case 'S':
-		if val, ok := args.ParseZStr(arg, check_null != 0); ok {
-			va.ZStr(val)
-		} else {
-			return "string"
-		}
-		break
-	case 'b':
-		if val, isNull, ok := args.ParseBool(arg, check_null != 0); ok {
-			va.Bool(val)
-			if check_null != 0 {
-				va.Bool(isNull)
-			}
-		} else {
-			return "bool"
-		}
-		break
-	case 'r':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgResource(arg, p, check_null) == 0 {
-			return "resource"
-		}
-		break
-	case 'A':
-
-	case 'a':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgArray(arg, p, check_null, c == 'A') == 0 {
-			return "array"
-		}
-		break
-	case 'H':
-
-	case 'h':
-		var p **types.HashTable = __va_arg(*va, (**types.HashTable)(_))
-		if ZendParseArgArrayHt(arg, p, check_null, c == 'H', separate) == 0 {
-			return "array"
-		}
-		break
-	case 'o':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgObject(arg, p, nil, check_null) == 0 {
-			return "object"
-		}
-		break
-	case 'O':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		var ce *ZendClassEntry = __va_arg(*va, (*ZendClassEntry)(_))
-		if ZendParseArgObject(arg, p, ce, check_null) == 0 {
-			if ce != nil {
-				return ce.GetName().GetVal()
-			} else {
-				return "object"
-			}
-		}
-		break
-	case 'C':
-		var lookup *ZendClassEntry
-		var pce **ZendClassEntry = __va_arg(*va, (**ZendClassEntry)(_))
-		var ce_base *ZendClassEntry = *pce
-		if check_null != 0 && arg.IsNull() {
-			*pce = nil
-			break
-		}
-		if TryConvertToString(arg) == 0 {
-			*pce = nil
-			return "valid class name"
-		}
-		if b.Assign(&lookup, ZendLookupClass(arg.GetStr())) == nil {
-			*pce = nil
-		} else {
-			*pce = lookup
-		}
-		if ce_base != nil {
-			if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-				ZendSpprintf(error, 0, "to be a class name derived from %s, '%s' given", ce_base.GetName().GetVal(), arg.GetStr().GetVal())
-				*pce = nil
-				return ""
-			}
-		}
-		if (*pce) == nil {
-			ZendSpprintf(error, 0, "to be a valid class name, '%s' given", arg.GetStr().GetVal())
-			return ""
-		}
-		break
-		break
-	case 'f':
-		var fci *ZendFcallInfo = __va_arg(*va, (*ZendFcallInfo)(_))
-		var fcc *ZendFcallInfoCache = __va_arg(*va, (*ZendFcallInfoCache)(_))
-		var is_callable_error *byte = nil
-		if check_null != 0 && arg.IsNull() {
-			fci.SetSize(0)
-			fcc.SetFunctionHandler(0)
-			break
-		}
-		if ZendFcallInfoInit(arg, 0, fci, fcc, nil, &is_callable_error) == types.SUCCESS {
-			if is_callable_error != nil {
-				*severity = E_DEPRECATED
-				ZendSpprintf(error, 0, "to be a valid callback, %s", is_callable_error)
-				Efree(is_callable_error)
-				*spec = specWalk
-				return ""
-			}
-			break
-		} else {
-			if is_callable_error != nil {
-				*severity = E_ERROR
-				ZendSpprintf(error, 0, "to be a valid callback, %s", is_callable_error)
-				Efree(is_callable_error)
-				return ""
-			} else {
-				return "valid callback"
-			}
-		}
-	case 'z':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		ZendParseArgZvalDeref(real_arg, p, check_null)
-		break
-	case 'Z':
-
-		/* 'Z' iz not supported anymore and should be replaced with 'z' */
-
-		b.Assert(c != 'Z')
-	default:
-		return "unknown"
-	}
-	*spec = specWalk
-	return ""
 }

@@ -1,4 +1,4 @@
-package args
+package argparse
 
 import (
 	"log"
@@ -14,17 +14,20 @@ func NewVaListReceiver(args []any, pos int) *VaArgsReceiver {
 	return &VaArgsReceiver{args: args, pos: pos}
 }
 
-func PutVaArg[T any](r *VaArgsReceiver, val T) {
-	if r.pos >= len(r.args) {
+func SetVaArg[T any](args []any, pos int, val T) {
+	if pos >= len(args) {
 		log.Fatal("解析参数异常，超过获取长度")
 	}
 
-	if ptr, ok := r.args[r.pos].(*T); ok {
+	if ptr, ok := args[pos].(*T); ok {
 		*ptr = val
 	} else {
 		log.Fatalf("解析参数异常: 类型不匹配，pos=%d", r.pos)
 	}
+}
 
+func PutVaArg[T any](r *VaArgsReceiver, val T) {
+	SetVaArg(r.args, r.pos, val)
 	r.pos++
 }
 
