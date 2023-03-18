@@ -137,11 +137,7 @@ func ZifFlock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -154,7 +150,7 @@ func ZifFlock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &wouldblock, 0)
 			break
@@ -254,18 +250,14 @@ func ZifGetMetaTags(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
@@ -472,18 +464,14 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *types.Z
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
@@ -592,11 +580,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -605,7 +589,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &data, 0)
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -800,18 +784,14 @@ func ZifFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -958,11 +938,7 @@ func ZifTempnam(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dir, &dir_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -1057,11 +1033,7 @@ func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -1074,7 +1046,7 @@ func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
@@ -1148,11 +1120,7 @@ func ZifFclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1227,11 +1195,7 @@ func ZifPopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &command, &command_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -1317,11 +1281,7 @@ func ZifPclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1388,11 +1348,7 @@ func ZifFeof(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1466,18 +1422,14 @@ func ZifFgets(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &len_) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -1579,11 +1531,7 @@ func ZifFgetc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1662,18 +1610,14 @@ func ZifFgetss(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fd, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &bytes) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -1777,11 +1721,7 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &file_handle, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1883,11 +1823,7 @@ func ZifFwrite(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1900,7 +1836,7 @@ func ZifFwrite(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &maxlen) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -1981,11 +1917,7 @@ func ZifFflush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2054,11 +1986,7 @@ func ZifRewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2127,11 +2055,7 @@ func ZifFtell(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2202,11 +2126,7 @@ func ZifFseek(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2219,7 +2139,7 @@ func ZifFseek(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &whence) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -2300,18 +2220,14 @@ func ZifMkdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dir, &dir_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &mode) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -2389,18 +2305,14 @@ func ZifRmdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dir, &dir_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2469,18 +2381,14 @@ func ZifReadfile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
@@ -2561,12 +2469,8 @@ func ZifUmask(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
-			_optional = 1
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &mask) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -2635,11 +2539,7 @@ func ZifFpassthru(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2709,11 +2609,7 @@ func ZifRename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &old_name, &old_name_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -2726,7 +2622,7 @@ func ZifRename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2809,18 +2705,14 @@ func ZifUnlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2896,11 +2788,7 @@ func PhpIfFtruncate(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fp, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -2995,11 +2883,7 @@ func PhpIfFstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fp, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -3115,11 +2999,7 @@ func ZifCopy(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &source, &source_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -3132,7 +3012,7 @@ func ZifCopy(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -3288,11 +3168,7 @@ func ZifFread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &res, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -3425,11 +3301,7 @@ func ZifFputcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fp, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -3442,7 +3314,7 @@ func ZifFputcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &delimiter_str, &delimiter_str_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
@@ -3638,18 +3510,14 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &fd, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &len_zv, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -4094,11 +3962,7 @@ func ZifRealpath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -4255,11 +4119,7 @@ func ZifFnmatch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &pattern, &pattern_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
@@ -4272,7 +4132,7 @@ func ZifFnmatch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong00(_arg, &flags) {
 				_expected_type = argparse.Z_EXPECTED_LONG

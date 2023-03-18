@@ -174,11 +174,7 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *t
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg1, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
@@ -299,11 +295,7 @@ func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *t
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING

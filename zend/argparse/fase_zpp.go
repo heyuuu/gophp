@@ -1,6 +1,10 @@
 package argparse
 
-import "sik/zend"
+import (
+	b "sik/builtin"
+	"sik/zend"
+	"sik/zend/types"
+)
 
 /**
  * FAST_ZPP: PHP7之后新增的参数处理方式
@@ -38,18 +42,298 @@ import "sik/zend"
  * | 	+ 	| Z_PARAM_VARIADIC('+', dest, num) 	| dest - zval*, num int 								|
  * | 	* 	| Z_PARAM_VARIADIC('*', dest, num) 	| dest - zval*, num int 								|
  */
+type FastParser struct {
+	executeData *zend.ZendExecuteData
+	numArgs     int
+	minNumArgs  int
+	maxNumArgs  int
+	flags       int
+	errorCode   int
+	finish      bool
 
-func ZppCheckNumArgs(_num_args int, _min_num_args int, _max_num_args int, _flags int) int {
-	if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-		if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-			if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
-				zend.CheckNumArgsException(_min_num_args, _max_num_args)
-			} else {
-				zend.CheckNumArgsError(_min_num_args, _max_num_args)
-			}
-		}
-		return ZPP_ERROR_FAILURE
+	optional        bool
+	_i              int
+	_real_arg_index int
+	_real_arg       *types.Zval
+	_arg            *types.Zval
+	_expected_type  ZendExpectedType
+	_error          *byte
+	_dummy          types.ZendBool
+}
+
+// @see Micro: ZEND_PARSE_PARAMETERS_START | ZEND_PARSE_PARAMETERS_START_EX
+func FastParseStart(executeData *zend.ZendExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParser {
+	// new
+	p := &FastParser{
+		executeData: executeData,
+		numArgs:     executeData.NumArgs(),
+		minNumArgs:  minNumArgs,
+		maxNumArgs:  maxNumArgs,
+		flags:       flags,
+		//
 	}
 
-	return ZPP_ERROR_OK
+	// check num args
+	if p.numArgs < minNumArgs || p.numArgs > maxNumArgs && maxNumArgs >= 0 {
+		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+			if (flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				zend.CheckNumArgsException(minNumArgs, maxNumArgs)
+			} else {
+				zend.CheckNumArgsError(minNumArgs, maxNumArgs)
+			}
+		}
+		p.errorCode = ZPP_ERROR_FAILURE
+	}
+
+	// init
+	if !p.IsFinish() {
+		p._real_arg_index = 0
+		p._real_arg = executeData.Arg(p._real_arg_index)
+	}
+
+	return p
+}
+
+func (p *FastParser) IsFinish() bool {
+	return p.finish || p.errorCode != ZPP_ERROR_OK
+}
+
+// @see Micro: Z_PARAM_OPTIONAL
+func (p *FastParser) StartOptional() {
+	p.optional = true
+}
+
+// Micro: Z_PARAM_PROLOGUE
+func (p *FastParser) paramPrologue(deref bool, separate bool) {
+	p._i++
+	b.Assert(p._i <= p.minNumArgs || p.optional)
+	b.Assert(p._i > p.minNumArgs || !p.optional)
+	if p.optional {
+		if p._i > p.numArgs {
+			p.finish = true
+			return
+		}
+	}
+
+	p._real_arg_index++
+	p._real_arg = p.executeData.Arg(p._real_arg_index)
+	p._arg = p._real_arg
+	if deref {
+		if p._arg.IsReference() {
+			p._arg = types.Z_REFVAL_P(p._arg)
+		}
+	}
+	if separate {
+		types.SEPARATE_ZVAL_NOREF(p._arg)
+	}
+}
+
+// @see Micro: Z_PARAM_ARRAY
+func (p *FastParser) PARAM_ARRAY() (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_ARRAY_OR_OBJECT
+func (p *FastParser) PARAM_ARRAY_OR_OBJECT() (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_BOOL
+func (p *FastParser) PARAM_BOOL() (dest types.ZendBool) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_CLASS
+func (p *FastParser) PARAM_CLASS() (dest *zend.ZendClassEntry) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_DOUBLE
+func (p *FastParser) PARAM_DOUBLE() (dest float64) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_FUNC
+func (p *FastParser) PARAM_FUNC() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_ARRAY_HT
+func (p *FastParser) PARAM_ARRAY_HT() (dest *types.ZendArray) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT
+func (p *FastParser) PARAM_ARRAY_OR_OBJECT_HT() (dest *types.ZendArray) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_LONG
+func (p *FastParser) PARAM_LONG() (dest int) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_STRICT_LONG
+func (p *FastParser) PARAM_STRICT_LONG() (dest int) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_OBJECT
+func (p *FastParser) PARAM_OBJECT() (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_OBJECT_OF_CLASS
+func (p *FastParser) PARAM_OBJECT_OF_CLASS(ce *zend.ZendClassEntry) (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_PATH
+func (p *FastParser) PARAM_PATH() (dest *byte, dest_len int) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_PATH_STR
+func (p *FastParser) PARAM_PATH_STR() (dest *types.ZendString) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_RESOURCE
+func (p *FastParser) PARAM_RESOURCE() (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_STRING
+func (p *FastParser) PARAM_STRING() (dest *byte, dest_len int) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_STR
+func (p *FastParser) PARAM_STR() (dest *types.ZendString) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_ZVAL
+func (p *FastParser) PARAM_ZVAL() (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_ZVAL_DEREF
+func (p *FastParser) PARAM_ZVAL_DEREF() (dest *types.Zval) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_VARIADIC_1
+func (p *FastParser) PARAM_VARIADIC_1() (dest *types.Zval, num int) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
+}
+
+// @see Micro: Z_PARAM_VARIADIC_0
+func (p *FastParser) PARAM_VARIADIC_0() (dest *types.Zval, num int) {
+	if p.IsFinish() {
+		return
+	}
+
+	// todo
+	return
 }

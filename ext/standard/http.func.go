@@ -259,18 +259,14 @@ func ZifHttpBuildQuery(executeData *zend.ZendExecuteData, return_value *types.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			_error_code = argparse.ZppCheckNumArgs(_num_args, _min_num_args, _max_num_args, _flags)
-			if _error_code != argparse.ZPP_ERROR_OK {
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &formdata, 0, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_ARRAY
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_optional = 1
+			fp.StartOptional()
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &prefix, &prefix_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
