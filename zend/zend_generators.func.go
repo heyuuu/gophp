@@ -967,45 +967,14 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						CheckNumArgsException(_min_num_args, _max_num_args)
-					} else {
-						CheckNumArgsError(_min_num_args, _max_num_args)
-					}
-				}
-				_error_code = argparse.ZPP_ERROR_FAILURE
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			Z_PARAM_PROLOGUE(0, 0)
 			ZendParseArgZvalDeref(_arg, &value, 0)
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongCallbackException(_i, _error)
-					} else {
-						ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return
 			}
-			return
+			break
 		}
 		break
 	}
@@ -1055,45 +1024,14 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						CheckNumArgsException(_min_num_args, _max_num_args)
-					} else {
-						CheckNumArgsError(_min_num_args, _max_num_args)
-					}
-				}
-				_error_code = argparse.ZPP_ERROR_FAILURE
-				break
-			}
-			_real_arg = executeData.Arg(0)
+			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			Z_PARAM_PROLOGUE(0, 0)
 			ZendParseArgZvalDeref(_arg, &exception, 0)
-			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongCallbackException(_i, _error)
-					} else {
-						ZendWrongCallbackError(_i, _error)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongParameterClassException(_i, _error, _arg)
-					} else {
-						ZendWrongParameterClassError(_i, _error, _arg)
-					}
-				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
-					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongParameterTypeException(_i, _expected_type, _arg)
-					} else {
-						ZendWrongParameterTypeError(_i, _expected_type, _arg)
-					}
-				}
+			if fp.HasError() {
+				fp.HandleError()
+				return
 			}
-			return
+			break
 		}
 		break
 	}
