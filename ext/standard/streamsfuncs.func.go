@@ -421,12 +421,7 @@ func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *typ
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &want_peer, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			want_peer = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -2055,12 +2050,7 @@ func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *types
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &block, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			block = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2378,12 +2368,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &enable, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			enable = fp.ParseBool()
 			fp.StartOptional()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if !argparse.ZendParseArgLong(_arg, &cryptokind, &cryptokindnull, 1, 0) {

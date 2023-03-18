@@ -1842,12 +1842,7 @@ func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *types.Zval,
 			argparse.ZendParseArgZvalDeref(_arg, &value, 0)
 			array = fp.ParseArray()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			strict = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4364,12 +4359,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			fp.StartOptional()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &z_length, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			preserve_keys = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4900,12 +4890,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &search_value, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			strict = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -5471,12 +5456,7 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input = fp.ParseArray()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			preserve_keys = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -8118,12 +8098,7 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			preserve_keys = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return

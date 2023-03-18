@@ -701,12 +701,7 @@ func ZifDefine(executeData *ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &val, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &non_cs, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			non_cs = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -939,12 +934,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &allow_string, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			allow_string = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1450,12 +1440,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &autoload, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			autoload = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return

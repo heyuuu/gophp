@@ -212,6 +212,7 @@ func (p *FastParser) ParseBool() (dest types.ZendBool) {
 
 // @see Micro: Z_PARAM_BOOL_EX
 func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull types.ZendBool) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
@@ -221,7 +222,6 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}
 
-	// todo
 	return
 }
 

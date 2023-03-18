@@ -238,12 +238,7 @@ func ZifGetMetaTags(executeData *zend.ZendExecuteData, return_value *types.Zval)
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			use_include_path = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -432,12 +427,7 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *types.Z
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			use_include_path = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -927,12 +917,7 @@ func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			use_include_path = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1834,12 +1819,7 @@ func ZifMkdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &recursive, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			recursive = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
@@ -1949,12 +1929,7 @@ func ZifReadfile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &use_include_path, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			use_include_path = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE

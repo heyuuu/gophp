@@ -686,12 +686,7 @@ func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *types.Zv
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &clear_realpath_cache, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			clear_realpath_cache = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if argparse.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH

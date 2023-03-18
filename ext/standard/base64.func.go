@@ -217,12 +217,7 @@ func ZifBase64Decode(executeData *zend.ZendExecuteData, return_value *types.Zval
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			strict = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return

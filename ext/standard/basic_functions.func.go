@@ -605,12 +605,7 @@ func ZifGetenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &local_only, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			local_only = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -1989,12 +1984,7 @@ func ZifHighlightFile(executeData *zend.ZendExecuteData, return_value *types.Zva
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &i, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			i = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -2116,12 +2106,7 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *types.Z
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &expr, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &i, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			i = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -2248,12 +2233,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &details, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			details = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2546,12 +2526,7 @@ func ZifPrintR(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &do_return, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			do_return = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -2604,12 +2579,7 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Z
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &arg, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			arg = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -3159,12 +3129,7 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *types.Zval
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &process_sections, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			process_sections = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if !argparse.ZendParseArgLong00(_arg, &scanner_mode) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -3241,12 +3206,7 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *types.Zv
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &process_sections, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			process_sections = fp.ParseBool()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			if !argparse.ZendParseArgLong00(_arg, &scanner_mode) {
 				_expected_type = argparse.Z_EXPECTED_LONG

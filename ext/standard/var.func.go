@@ -653,12 +653,7 @@ func ZifVarExport(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &return_output, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			return_output = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1399,12 +1394,7 @@ func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *types.Zv
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &real_usage, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			real_usage = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -1442,12 +1432,7 @@ func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *type
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &real_usage, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			real_usage = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

@@ -571,12 +571,7 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &docut, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			docut = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1687,12 +1682,7 @@ func ZifStristr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &part, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			part = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1773,12 +1763,7 @@ func ZifStrstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &part, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			part = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2684,9 +2669,9 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			} else if int(f > str.GetStr().GetLen()) != 0 {
 				f = str.GetStr().GetLen(
 
-				/* if "length" position is negative, set it to the length
-				 * needed to stop that many chars from the end of the string
-				 */)
+					/* if "length" position is negative, set it to the length
+					 * needed to stop that many chars from the end of the string
+					 */)
 			}
 
 			if l < 0 {
@@ -4994,12 +4979,7 @@ func ZifNl2br(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				break
 			}
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &is_xhtml, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			is_xhtml = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -6944,12 +6924,7 @@ func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *types.Zva
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgBool(_arg, &cs, &_dummy, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_BOOL
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			cs = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
