@@ -8,10 +8,7 @@ import (
 )
 
 func ZSTR_EMPTY_ALLOC() *ZendString { return ZSTR_EMPTY }
-func ZSTR_CHAR(c int) *ZendString   { return ZendOneCharString[c] }
-func ZSTR_KNOWN(str string) *ZendString {
-	return NewZendStringPersistent(str, true)
-}
+func ZSTR_CHAR(c int) *ZendString   { return oneCharStrings[c] }
 
 func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int) {
 	*str = *ZendStringAlloc(_len, 0)
@@ -25,7 +22,7 @@ func ZendStringForgetHashVal(s *ZendString) {
 
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
 	var str_ = b.EmptyString(len_)
-	return NewZendStringPersistent(str_, persistent != 0)
+	return NewZendStringPersistent(str_)
 }
 func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 	// todo 不太明白参数作用，仅从纯代码功能重构
@@ -34,21 +31,21 @@ func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 }
 func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
 	var str_ = b.CastStr(str, len_)
-	return NewZendStringPersistent(str_, persistent != 0)
+	return NewZendStringPersistent(str_)
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 	b.Assert(len_ >= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr + b.EmptyString(len_-len(oldStr))
 	s.DelRefcount()
-	return NewZendStringPersistent(newStr, persistent != 0)
+	return NewZendStringPersistent(newStr)
 }
 func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 	b.Assert(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]
 	s.DelRefcount()
-	return NewZendStringPersistent(newStr, persistent != 0)
+	return NewZendStringPersistent(newStr)
 }
 func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString
@@ -63,25 +60,10 @@ func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *
 	s.DelRefcount()
 	return ret
 }
-func ZendStringFree(s *ZendString) {
-	b.Assert(s.GetRefcount() <= 1)
-	b.Free(s)
-}
-func ZendStringEfree(s *ZendString) {
-	b.Assert(s.GetRefcount() <= 1)
-	b.Assert((s.GetGcFlags() & IS_STR_PERSISTENT) == 0)
-	b.Free(s)
-}
-func ZendStringRelease(s *ZendString) {
-	if s.DelRefcount() == 0 {
-		b.Free(s)
-	}
-}
-func ZendStringReleaseEx(s *ZendString, persistent int) {
-	if s.DelRefcount() == 0 {
-		b.Free(s)
-	}
-}
+func ZendStringFree(s *ZendString)             {} // todo remove
+func ZendStringEfree(s *ZendString)            {} // todo remove
+func ZendStringRelease(s *ZendString)          {} // todo remove
+func ZendStringReleaseEx(s *ZendString, _ int) {} // todo remove
 func ZendStringEqualContent(s1 *ZendString, s2 *ZendString) ZendBool {
 	return IntBool(s1.GetStr() == s2.GetStr())
 }

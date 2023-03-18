@@ -4,74 +4,50 @@ package types
 
 import (
 	b "sik/builtin"
-	"sik/zend"
 )
 
 /**
  * ZendString
  */
 type ZendString struct {
-	str string
-	h   uint
-	ZendRefcounted
+	str  string
+	hash uint
 	len_ int
 	val  []byte
 }
 
-var _ IRefcounted = &ZendString{}
-
 func NewZendString(str string) *ZendString {
-	var zs = &ZendString{val: []byte(str), len_: len(str)}
-
-	zs.SetRefcount(1)
-	zs.SetGcTypeInfo(IS_STRING)
-
-	return zs
+	return &ZendString{str: str}
 }
 
 func initZendString(str string) *ZendString {
 	return NewZendString(str)
 }
 
-func NewZendStringPersistent(str string, persistent bool) *ZendString {
-	var zs = NewZendString(str)
-	if persistent {
-		zs.AddGcFlags(IS_STR_PERSISTENT)
-	}
-	return zs
+func NewZendStringPersistent(str string) *ZendString {
+	return NewZendString(str)
 }
 
-func (this *ZendString) GetH() zend.ZendUlong      { return this.h }
-func (this *ZendString) SetH(value zend.ZendUlong) { this.h = value }
-func (this *ZendString) GetLen() int               { return this.len_ }
-func (this *ZendString) SetLen(value int)          { this.len_ = value }
-func (this *ZendString) GetVal() []byte            { return this.val }
-func (this *ZendString) SetVal(value []byte)       { this.val = value }
+func (zs ZendString) Copy() *ZendString { return &zs }
 
-func (this *ZendString) GetStr() string {
-	return string(this.val[:this.len_])
-}
-
-func (this *ZendString) GetHash() zend.ZendUlong {
-	if this.h == 0 {
-		this.h = b.HashBytes(this.val[:this.len_])
+func (zs *ZendString) GetStr() string { return zs.str }
+func (zs *ZendString) GetLen() int    { return len(zs.str) }
+func (zs *ZendString) GetH() uint     { return zs.hash }
+func (zs *ZendString) GetHash() uint {
+	if zs.hash == 0 {
+		zs.hash = b.HashStr(zs.str)
 	}
 
-	return this.h
+	return zs.hash
 }
 
-func (this *ZendString) Copy() *ZendString {
-	this.AddRefcount()
-	return this
-}
-
-func (this *ZendString) Dup(persistent int) *ZendString {
-	return NewZendStringPersistent(this.GetStr(), persistent != 0)
-}
-
-func (this *ZendString) Free() {
-	b.Free(this)
-}
+func (zs *ZendString) GetVal() []byte      { return zs.val }           // todo remove
+func (zs *ZendString) SetLen(value int)    { zs.str = zs.str[:value] } // todo remove
+func (zs *ZendString) SetVal(value []byte) { zs.str = string(value) }  // todo remove
+func (zs *ZendString) Free()               {}                          // todo remove
+func (zs *ZendString) GetRefcount() uint32 { panic("implement me") }   // todo remove
+func (zs *ZendString) AddRefcount() uint32 { panic("implement me") }   // todo remove
+func (zs *ZendString) DelRefcount() uint32 { panic("implement me") }   // todo remove
 
 /**
  * InternedStrings

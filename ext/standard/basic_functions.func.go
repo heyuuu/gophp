@@ -1658,12 +1658,7 @@ func ZifGetCurrentUser(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func AddConfigEntry(h zend.ZendUlong, key *types.ZendString, entry *types.Zval, retval *types.Zval) {
 	if entry.IsType(types.IS_STRING) {
-		var str *types.ZendString = entry.GetStr()
-		if (str.GetGcFlags() & types.GC_PERSISTENT) == 0 {
-			str.AddRefcount()
-		} else {
-			str = types.ZendStringInit(str.GetVal(), str.GetLen(), 0)
-		}
+		var str = entry.GetStr().Copy()
 		if key != nil {
 			zend.AddAssocStrEx(retval, key.GetStr(), str.GetStr())
 		} else {
@@ -2908,10 +2903,8 @@ func ZifIniGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		zend.ZVAL_EMPTY_STRING(return_value)
 	} else if val.GetLen() == 1 {
 		return_value.SetInternedString(types.ZSTR_CHAR(types.ZendUchar(val.GetVal()[0])))
-	} else if (val.GetGcFlags() & types.GC_PERSISTENT) == 0 {
-		return_value.SetString(val.Copy())
 	} else {
-		return_value.SetString(types.ZendStringInit(val.GetVal(), val.GetLen(), 0))
+		return_value.SetString(val.Copy())
 	}
 }
 func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -3137,10 +3130,8 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			zend.ZVAL_EMPTY_STRING(return_value)
 		} else if val.GetLen() == 1 {
 			return_value.SetInternedString(types.ZSTR_CHAR(types.ZendUchar(val.GetVal()[0])))
-		} else if (val.GetGcFlags() & types.GC_PERSISTENT) == 0 {
-			return_value.SetString(val.Copy())
 		} else {
-			return_value.SetString(types.ZendStringInit(val.GetVal(), val.GetLen(), 0))
+			return_value.SetString(val.Copy())
 		}
 	} else {
 		return_value.SetFalse()

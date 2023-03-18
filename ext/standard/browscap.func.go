@@ -164,7 +164,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.ZendString, persiste
 	if interned != nil {
 		interned.AddRefcount()
 	} else {
-		interned = lcname.Dup(persistent)
+		interned = lcname.Copy()
 		if persistent != 0 {
 			interned = types.ZendNewInternedString(interned)
 		}
@@ -507,12 +507,8 @@ func BrowscapZvalCopyCtor(p *types.Zval) {
 	if p.IsRefcounted() {
 		var str *types.ZendString
 		b.Assert(p.IsType(types.IS_STRING))
-		str = p.GetStr()
-		if (str.GetGcFlags() & types.GC_PERSISTENT) == 0 {
-			str.AddRefcount()
-		} else {
-			p.SetString(types.ZendStringInit(str.GetVal(), str.GetLen(), 0))
-		}
+		str = p.GetStr().Copy()
+		p.SetString(str)
 	}
 }
 func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) {

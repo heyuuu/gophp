@@ -277,7 +277,7 @@ func ZendManglePropertyName_Ex(src1 string, src2 string) string {
 
 func ZendManglePropertyName_ZStr(src1 string, src2 string, internal bool) *types.ZendString {
 	str := ZendManglePropertyName_Ex(src1, src2)
-	return types.NewZendStringPersistent(str, internal)
+	return types.NewZendStringPersistent(str)
 }
 
 func ZendUnmanglePropertyName_Ex(name string) (className string, propName string, ok bool) {
