@@ -158,12 +158,22 @@ func (p *FastParser) paramPrologue(deref bool, separate bool) {
 
 // @see Micro: Z_PARAM_ARRAY
 func (p *FastParser) ParseArray() (dest *types.Zval) {
-	p.paramPrologue(false, false)
+	return p.ParseArrayEx(false, false)
+}
+
+// @see Micro: Z_PARAM_ARRAY_EX
+func (p *FastParser) ParseArrayEx(checkNull bool, separate bool) (dest *types.Zval) {
+	return p.ParseArrayEx2(checkNull, separate, separate)
+}
+
+// @see Micro: Z_PARAM_ARRAY_EX2
+func (p *FastParser) ParseArrayEx2(checkNull bool, deref bool, separate bool) (dest *types.Zval) {
+	p.paramPrologue(deref, separate)
 	if p.IsFinish() {
 		return
 	}
 
-	if zend.ZendParseArgArray(p._arg, &dest, 0, 0) == 0 {
+	if zend.ZendParseArgArray(p._arg, &dest, types.IntBool(checkNull), 0) == 0 {
 		p._expected_type = Z_EXPECTED_ARRAY
 		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}
@@ -173,11 +183,16 @@ func (p *FastParser) ParseArray() (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT
 func (p *FastParser) ParseArrayOrObject() (dest *types.Zval) {
+	p.paramPrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	// todo
+	if zend.ZendParseArgArray(p._arg, &dest, 0, 1) == 0 {
+		p._expected_type = Z_EXPECTED_ARRAY
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 

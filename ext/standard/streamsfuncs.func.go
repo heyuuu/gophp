@@ -1099,24 +1099,9 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(1, 0)
-			if zend.ZendParseArgArray(_arg, &r_array, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			zend.Z_PARAM_PROLOGUE(1, 0)
-			if zend.ZendParseArgArray(_arg, &w_array, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			zend.Z_PARAM_PROLOGUE(1, 0)
-			if zend.ZendParseArgArray(_arg, &e_array, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			r_array = fp.ParseArrayEx2(true, true, false)
+			w_array = fp.ParseArrayEx2(true, true, false)
+			e_array = fp.ParseArrayEx2(true, true, false)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if !zend.ZendParseArgLong(_arg, &sec, &secnull, 1, 0) {
 				_expected_type = argparse.Z_EXPECTED_LONG
@@ -1792,18 +1777,8 @@ func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *typ
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgArray(_arg, &options, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgArray(_arg, &params, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			options = fp.ParseArrayEx(true, false)
+			params = fp.ParseArrayEx(true, false)
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
