@@ -361,11 +361,9 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &command_zv, 0)
+			command_zv = fp.ParseZval()
 			descriptorspec = fp.ParseArray()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &pipes, 0)
+			pipes = fp.ParseZval()
 			fp.StartOptional()
 			cwd, cwd_len = fp.ParseStringEx(true)
 			environment = fp.ParseArrayEx(true, false)

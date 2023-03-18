@@ -789,8 +789,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			options, options_len = fp.ParseString()
 			fp.StartOptional()
 			p_longopts = fp.ParseArray()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zoptind, 0)
+			zoptind = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -2003,8 +2002,7 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *types.Z
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &expr, 0)
+			expr = fp.ParseZval()
 			fp.StartOptional()
 			i = fp.ParseBool()
 			if fp.HasError() {
@@ -2393,8 +2391,7 @@ func ZifPrintR(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
+			var_ = fp.ParseZval()
 			fp.StartOptional()
 			do_return = fp.ParseBool()
 			if fp.HasError() {
@@ -2712,8 +2709,7 @@ func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &function, 0)
+			function = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

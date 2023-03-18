@@ -1180,8 +1180,7 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input, input_len = fp.ParseString()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &info, 0)
+			info = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

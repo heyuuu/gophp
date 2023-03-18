@@ -115,11 +115,9 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &assertion, 0)
+			assertion = fp.ParseZval()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &description, 0)
+			description = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -262,8 +260,7 @@ func ZifAssertOptions(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			what = fp.ParseLong()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &value, 0)
+			value = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

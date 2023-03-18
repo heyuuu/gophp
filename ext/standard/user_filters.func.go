@@ -495,8 +495,7 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Z
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zstream, 0)
+			zstream = fp.ParseZval()
 			buffer, buffer_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()

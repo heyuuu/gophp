@@ -198,8 +198,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &group, 0)
+			group = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -318,8 +317,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &user, 0)
+			user = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

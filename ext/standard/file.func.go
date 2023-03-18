@@ -141,8 +141,7 @@ func ZifFlock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			res = fp.ParseResource()
 			operation = fp.ParseLong()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &wouldblock, 0)
+			wouldblock = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -477,8 +476,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &data, 0)
+			data = fp.ParseZval()
 			fp.StartOptional()
 			flags = fp.ParseLong()
 			zcontext = fp.ParseResourceEx(true)
@@ -2513,8 +2511,7 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fd = fp.ParseResource()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &len_zv, 0)
+			len_zv = fp.ParseZval()
 			delimiter_str, delimiter_str_len = fp.ParseString()
 			enclosure_str, enclosure_str_len = fp.ParseString()
 			escape_str, escape_str_len = fp.ParseString()

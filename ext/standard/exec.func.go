@@ -162,8 +162,7 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 				argparse.Z_PARAM_PROLOGUE(0, 0)
 				argparse.ZendParseArgZvalDeref(_arg, &ret_array, 0)
 			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &ret_code, 0)
+			ret_code = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

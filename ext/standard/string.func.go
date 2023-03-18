@@ -905,11 +905,9 @@ func ZifImplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &arg1, 0)
+			arg1 = fp.ParseZval()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &arg2, 0)
+			arg2 = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1544,8 +1542,7 @@ func ZifStristr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
+			needle = fp.ParseZval()
 			fp.StartOptional()
 			part = fp.ParseBool()
 			if fp.HasError() {
@@ -1620,8 +1617,7 @@ func ZifStrstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
+			needle = fp.ParseZval()
 			fp.StartOptional()
 			part = fp.ParseBool()
 			if fp.HasError() {
@@ -1690,8 +1686,7 @@ func ZifStrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
+			needle = fp.ParseZval()
 			fp.StartOptional()
 			offset = fp.ParseLong()
 			if fp.HasError() {
@@ -1765,8 +1760,7 @@ func ZifStripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
+			needle = fp.ParseZval()
 			fp.StartOptional()
 			offset = fp.ParseLong()
 			if fp.HasError() {
@@ -1851,8 +1845,7 @@ func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zneedle, 0)
+			zneedle = fp.ParseZval()
 			fp.StartOptional()
 			offset = fp.ParseLong()
 			if fp.HasError() {
@@ -1943,8 +1936,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zneedle, 0)
+			zneedle = fp.ParseZval()
 			fp.StartOptional()
 			offset = fp.ParseLong()
 			if fp.HasError() {
@@ -2082,8 +2074,7 @@ func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			haystack = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &needle, 0)
+			needle = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -2371,15 +2362,11 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &str, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &repl, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &from, 0)
+			str = fp.ParseZval()
+			repl = fp.ParseZval()
+			from = fp.ParseZval()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &len_, 0)
+			len_ = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -3523,8 +3510,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &from, 0)
+			from = fp.ParseZval()
 			fp.StartOptional()
 			to, to_len = fp.ParseString()
 			if fp.HasError() {
@@ -3728,8 +3714,7 @@ func ZifSimilarText(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			t1 = fp.ParseStr()
 			t2 = fp.ParseStr()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &percent, 0)
+			percent = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4338,15 +4323,11 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &search, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &replace, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &subject, 0)
+			search = fp.ParseZval()
+			replace = fp.ParseZval()
+			subject = fp.ParseZval()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zcount, 0)
+			zcount = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4747,8 +4728,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &allow, 0)
+			allow = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -4946,8 +4926,7 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg, arglen = fp.ParseString()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &arrayArg, 0)
+			arrayArg = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

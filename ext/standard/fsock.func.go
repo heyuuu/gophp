@@ -52,10 +52,8 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 			host, host_len = fp.ParseString()
 			fp.StartOptional()
 			port = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zerrno, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
+			zerrno = fp.ParseZval()
+			zerrstr = fp.ParseZval()
 			timeout = fp.ParseDouble()
 			if fp.HasError() {
 				fp.HandleError()

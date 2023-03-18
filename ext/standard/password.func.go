@@ -430,8 +430,7 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hash = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &znew_algo, 0)
+			znew_algo = fp.ParseZval()
 			fp.StartOptional()
 			options = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
@@ -531,8 +530,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			password = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &zalgo, 0)
+			zalgo = fp.ParseZval()
 			fp.StartOptional()
 			options = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {

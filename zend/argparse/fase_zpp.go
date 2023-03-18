@@ -499,7 +499,8 @@ func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval, isNull types
 		return
 	}
 
-	// todo
+	ZendParseArgZvalDeref(p._arg, &dest, types.IntBool(checkNull))
+
 	return
 }
 

@@ -765,10 +765,8 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
 			type_param = fp.ParseLong()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &authns, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &addtl, 0)
+			authns = fp.ParseZval()
+			addtl = fp.ParseZval()
 			raw = fp.ParseBool()
 			if fp.HasError() {
 				fp.HandleError()
@@ -1056,11 +1054,9 @@ func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hostname, hostname_len = fp.ParseString()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &mx_list, 0)
+			mx_list = fp.ParseZval()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &weight_list, 0)
+			weight_list = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

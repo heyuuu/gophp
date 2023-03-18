@@ -650,8 +650,7 @@ func ZifVarExport(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
+			var_ = fp.ParseZval()
 			fp.StartOptional()
 			return_output = fp.ParseBool()
 			if fp.HasError() {
@@ -1179,8 +1178,7 @@ func ZifSerialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &struc, 0)
+			struc = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return

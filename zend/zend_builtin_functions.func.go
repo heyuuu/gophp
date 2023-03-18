@@ -484,8 +484,7 @@ func ZifErrorReporting(executeData *ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &err, 0)
+			err = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -638,8 +637,7 @@ func ZifDefine(executeData *ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &val, 0)
+			val = fp.ParseZval()
 			fp.StartOptional()
 			non_cs = fp.ParseBool()
 			if fp.HasError() {
@@ -860,8 +858,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &obj, 0)
+			obj = fp.ParseZval()
 			class_name = fp.ParseStr()
 			fp.StartOptional()
 			allow_string = fp.ParseBool()
@@ -1228,8 +1225,7 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			argparse.ZendParseArgZvalDeref(_arg, &klass, 0)
+			klass = fp.ParseZval()
 			method_name = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
