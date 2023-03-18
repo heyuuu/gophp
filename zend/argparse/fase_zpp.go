@@ -206,8 +206,19 @@ func (p *FastParser) ParseArrayOrObjectEx(checkNull bool, separate bool) (dest *
 
 // @see Micro: Z_PARAM_BOOL
 func (p *FastParser) ParseBool() (dest types.ZendBool) {
+	dest, _ = p.ParseBoolEx(false)
+	return
+}
+
+// @see Micro: Z_PARAM_BOOL_EX
+func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull types.ZendBool) {
 	if p.IsFinish() {
 		return
+	}
+
+	if zend.ZendParseArgBool(p._arg, &dest, &isNull, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_BOOL
+		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}
 
 	// todo
