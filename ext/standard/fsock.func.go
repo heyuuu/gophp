@@ -31,22 +31,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 5
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			host, host_len = fp.ParseString()

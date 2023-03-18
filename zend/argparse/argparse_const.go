@@ -6,8 +6,6 @@ const ZEND_PARSE_PARAMS_QUIET = 1 << 1
 const ZEND_PARSE_PARAMS_THROW = 1 << 2
 
 /* Fast parameter parsing API */
-type ZendExpectedType = string
-
 const (
 	Z_EXPECTED_LONG     = "int"
 	Z_EXPECTED_BOOL     = "bool"

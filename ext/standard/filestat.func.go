@@ -52,22 +52,7 @@ func ZifDiskTotalSpace(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			path, path_len = fp.ParsePath()
@@ -118,22 +103,7 @@ func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *types.Zva
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			path, path_len = fp.ParsePath()
@@ -179,22 +149,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -298,22 +253,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -409,22 +349,7 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -485,22 +410,7 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -620,22 +530,7 @@ func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
@@ -897,22 +792,7 @@ func ZifFileperms(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -933,22 +813,7 @@ func ZifFileinode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -969,22 +834,7 @@ func ZifFilesize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1005,22 +855,7 @@ func ZifFileowner(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1041,22 +876,7 @@ func ZifFilegroup(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1077,22 +897,7 @@ func ZifFileatime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1113,22 +918,7 @@ func ZifFilemtime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1149,22 +939,7 @@ func ZifFilectime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1185,22 +960,7 @@ func ZifFiletype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1221,22 +981,7 @@ func ZifIsWritable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1257,22 +1002,7 @@ func ZifIsReadable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1293,22 +1023,7 @@ func ZifIsExecutable(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1329,22 +1044,7 @@ func ZifIsFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1365,22 +1065,7 @@ func ZifIsDir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1401,22 +1086,7 @@ func ZifIsLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1437,22 +1107,7 @@ func ZifFileExists(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1473,22 +1128,7 @@ func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
@@ -1509,22 +1149,7 @@ func PhpIfStat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()

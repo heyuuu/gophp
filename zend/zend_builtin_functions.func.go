@@ -206,22 +206,7 @@ func ZifStrlen(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s = fp.ParseStr()
@@ -242,22 +227,7 @@ func ZifStrcmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
@@ -281,22 +251,7 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
@@ -325,22 +280,7 @@ func ZifStrcasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
@@ -364,22 +304,7 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
@@ -465,22 +390,7 @@ func ZifErrorReporting(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
@@ -618,22 +528,7 @@ func ZifDefine(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
@@ -727,22 +622,7 @@ func ZifDefined(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
@@ -840,22 +720,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseZval()
@@ -1001,22 +866,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseObject()
@@ -1109,22 +959,7 @@ func ZifGetMangledObjectVars(executeData *ZendExecuteData, return_value *types.Z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseObject()
@@ -1207,22 +1042,7 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			klass = fp.ParseZval()
@@ -1326,22 +1146,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
@@ -1395,22 +1200,7 @@ func ZifFunctionExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = executeData.NumArgs()
-		var _i int = 0
-		var _real_arg *types.Zval
-		var _arg *types.Zval = nil
-		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
-		var _error *byte = nil
-		var _dummy types.ZendBool
-		var _optional types.ZendBool = 0
-		var _error_code int = argparse.ZPP_ERROR_OK
-		void(_i)
-		void(_real_arg)
-		void(_arg)
-		void(_expected_type)
-		void(_error)
-		void(_dummy)
-		void(_optional)
+
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()

@@ -15,7 +15,7 @@ func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
 	return CurrEX().CheckNumArgsException(minNumArgs, maxNumArgs)
 }
 
-func WrongParamTypeError(num int, expectedType argparse.ZendExpectedType, arg *types.Zval, forceStrict bool) {
+func WrongParamTypeError(num int, expectedType string, arg *types.Zval, forceStrict bool) {
 	if EG__().GetException() != nil {
 		return
 	}
