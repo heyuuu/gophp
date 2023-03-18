@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/argparse"
 	"sik/zend/types"
 )
 
@@ -953,11 +954,11 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 		var _i int = 0
 		var _real_arg *types.Zval
 		var _arg *types.Zval = nil
-		var _expected_type ZendExpectedType = Z_EXPECTED_LONG
+		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
 		var _error *byte = nil
 		var _dummy types.ZendBool
 		var _optional types.ZendBool = 0
-		var _error_code int = ZPP_ERROR_OK
+		var _error_code int = argparse.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -967,14 +968,14 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
 						CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = ZPP_ERROR_FAILURE
+				_error_code = argparse.ZPP_ERROR_FAILURE
 				break
 			}
 			_real_arg = executeData.Arg(0)
@@ -982,22 +983,22 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 			ZendParseArgZvalDeref(_arg, &value, 0)
 			break
 		}
-		if _error_code != ZPP_ERROR_OK {
-			if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+		if _error_code != argparse.ZPP_ERROR_OK {
+			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongCallbackException(_i, _error)
 					} else {
 						ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == ZPP_ERROR_WRONG_CLASS {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == ZPP_ERROR_WRONG_ARG {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1041,11 +1042,11 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		var _i int = 0
 		var _real_arg *types.Zval
 		var _arg *types.Zval = nil
-		var _expected_type ZendExpectedType = Z_EXPECTED_LONG
+		var _expected_type argparse.ZendExpectedType = argparse.Z_EXPECTED_LONG
 		var _error *byte = nil
 		var _dummy types.ZendBool
 		var _optional types.ZendBool = 0
-		var _error_code int = ZPP_ERROR_OK
+		var _error_code int = argparse.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1055,14 +1056,14 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
 						CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = ZPP_ERROR_FAILURE
+				_error_code = argparse.ZPP_ERROR_FAILURE
 				break
 			}
 			_real_arg = executeData.Arg(0)
@@ -1070,22 +1071,22 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 			ZendParseArgZvalDeref(_arg, &exception, 0)
 			break
 		}
-		if _error_code != ZPP_ERROR_OK {
-			if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-				if _error_code == ZPP_ERROR_WRONG_CALLBACK {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+		if _error_code != argparse.ZPP_ERROR_OK {
+			if (_flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == argparse.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongCallbackException(_i, _error)
 					} else {
 						ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == ZPP_ERROR_WRONG_CLASS {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				} else if _error_code == argparse.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == ZPP_ERROR_WRONG_ARG {
-					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
+				} else if _error_code == argparse.ZPP_ERROR_WRONG_ARG {
+					if (_flags & argparse.ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						ZendWrongParameterTypeError(_i, _expected_type, _arg)

@@ -2,6 +2,7 @@ package zend
 
 import (
 	"fmt"
+	"sik/zend/argparse"
 	"sik/zend/types"
 )
 
@@ -14,7 +15,7 @@ func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
 	return CurrEX().CheckNumArgsException(minNumArgs, maxNumArgs)
 }
 
-func WrongParamTypeError(num int, expectedType ZendExpectedType, arg *types.Zval, forceStrict bool) {
+func WrongParamTypeError(num int, expectedType argparse.ZendExpectedType, arg *types.Zval, forceStrict bool) {
 	if EG__().GetException() != nil {
 		return
 	}
@@ -23,10 +24,10 @@ func WrongParamTypeError(num int, expectedType ZendExpectedType, arg *types.Zval
 	ZendInternalTypeErrorEx(throwException, message)
 }
 
-func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *types.Zval) {
+func ZendWrongParameterTypeError(num int, expected_type argparse.ZendExpectedType, arg *types.Zval) {
 	WrongParamTypeError(num, expected_type, arg, false)
 }
-func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, arg *types.Zval) {
+func ZendWrongParameterTypeException(num int, expected_type argparse.ZendExpectedType, arg *types.Zval) {
 	WrongParamTypeError(num, expected_type, arg, true)
 }
 

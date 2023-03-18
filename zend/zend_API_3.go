@@ -21,7 +21,7 @@ func ZendParseParameters(num_args int, type_spec string, args ...any) int {
 	return argparse.ParseVaArgs(num_args, type_spec, args, 0)
 }
 func ZendParseParametersThrow(num_args int, type_spec string, args ...any) int {
-	return argparse.ParseVaArgs(num_args, type_spec, args, ZEND_PARSE_PARAMS_THROW)
+	return argparse.ParseVaArgs(num_args, type_spec, args, argparse.ZEND_PARSE_PARAMS_THROW)
 }
 func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec string, args ...any) int {
 	/* Just checking this_ptr is not enough, because fcall_common_helper does not set
@@ -50,7 +50,7 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *types.Zval, 
 		ce := args[1].(*ZendClassEntry)
 		*object = this_ptr
 		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
-			if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+			if (flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName())
 			}
 			return types.FAILURE

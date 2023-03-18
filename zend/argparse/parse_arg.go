@@ -35,8 +35,8 @@ func ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceiver, spec *b.StrR
 		if zend.EG__().GetException() != nil {
 			return types.FAILURE
 		}
-		if (flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
-			var throwException = zend.CurrEX().IsArgUseStrictTypes() || (flags&zend.ZEND_PARSE_PARAMS_THROW) != 0
+		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+			var throwException = zend.CurrEX().IsArgUseStrictTypes() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			zend.ZendInternalTypeError(throwException, "%s() expects parameter %d %s", zend.GetActiveCalleeName(), arg_num, err.Error())
 		}
 		if err.severity != zend.E_DEPRECATED {
