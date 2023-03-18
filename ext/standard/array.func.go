@@ -957,25 +957,12 @@ func PhpUsort(executeData *zend.ZendExecuteData, return_value *types.Zval, compa
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArrayEx2(false, true, false)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache), 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
+			fp.ParseFunc(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache))
+			if fp.HasError() {
+				PHP_ARRAY_CMP_FUNC_RESTORE()
+				return
 			}
 			break
-		}
-		if _error_code != argparse.ZPP_ERROR_OK {
-			fp.HandleError()
-			PHP_ARRAY_CMP_FUNC_RESTORE()
-			return
 		}
 		break
 	}
@@ -1647,19 +1634,7 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArrayOrObjectEx(false, true)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &(BG__().array_walk_fci), &(BG__().array_walk_fci_cache), 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
 			fp.StartOptional()
 			userdata = fp.ParseZval()
 			break
@@ -1709,19 +1684,7 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *type
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArrayOrObjectEx(false, true)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &(BG__().array_walk_fci), &(BG__().array_walk_fci_cache), 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
 			fp.StartOptional()
 			userdata = fp.ParseZval()
 			break
@@ -7447,19 +7410,7 @@ func ZifArrayReduce(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input = fp.ParseArray()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&fci, &fci_cache)
 			fp.StartOptional()
 			initial = fp.ParseZval()
 			if fp.HasError() {
@@ -7546,19 +7497,7 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			array = fp.ParseArray()
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&fci, &fci_cache)
 			use_type = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
@@ -7676,19 +7615,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 1, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFuncEx(&fci, &fci_cache, true)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				arrays = _real_arg + 1

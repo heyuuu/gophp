@@ -1,31 +1,10 @@
 package argparse
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 	"sik/zend/types"
 )
 
-func Z_PARAM_PROLOGUE(deref int, separate int) {
-	_i++
-	b.Assert(_i <= _min_num_args || _optional == 1)
-	b.Assert(_i > _min_num_args || _optional == 0)
-	if _optional {
-		if _i > _num_args {
-			break
-		}
-	}
-	_real_arg++
-	_arg = _real_arg
-	if deref != 0 {
-		if _arg.IsReference() {
-			_arg = types.Z_REFVAL_P(_arg)
-		}
-	}
-	if separate != 0 {
-		types.SEPARATE_ZVAL_NOREF(_arg)
-	}
-}
 func ZendParseArgBool(arg *types.Zval, dest *types.ZendBool, is_null *types.ZendBool, check_null int) int {
 	val, isNull, ok := ParseBool(arg, check_null != 0)
 	*dest = types.IntBool(val)

@@ -1449,19 +1449,7 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&fci, &fci_cache)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				fci.SetParams(_real_arg + 1)
@@ -1515,19 +1503,7 @@ func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *types
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&fci, &fci_cache)
 			params = fp.ParseArray()
 			if fp.HasError() {
 				fp.HandleError()
@@ -1574,19 +1550,7 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&fci, &fci_cache)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				fci.SetParams(_real_arg + 1)
@@ -1649,19 +1613,7 @@ func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
-				if _error == nil {
-					_expected_type = argparse.Z_EXPECTED_FUNC
-					_error_code = argparse.ZPP_ERROR_WRONG_ARG
-					break
-				} else {
-					_error_code = argparse.ZPP_ERROR_WRONG_CALLBACK
-					break
-				}
-			} else if _error != nil {
-				zend.ZendWrongCallbackDeprecated(_i, _error)
-			}
+			fp.ParseFunc(&fci, &fci_cache)
 			params = fp.ParseArray()
 			if fp.HasError() {
 				fp.HandleError()

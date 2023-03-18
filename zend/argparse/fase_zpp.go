@@ -250,18 +250,17 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 }
 
 // @see Micro: Z_PARAM_FUNC
-func (p *FastParser) ParseFunc() (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) {
-	fci, fcc, _ = p.ParseFuncEx(false)
-	return
+func (p *FastParser) ParseFunc(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInfoCache) {
+	p.ParseFuncEx(fci, fcc, false)
 }
-func (p *FastParser) ParseFuncEx(checkNull bool) (fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, isNull types.ZendBool) {
+func (p *FastParser) ParseFuncEx(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInfoCache, checkNull bool) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
 	var err *string
-	if ZendParseArgFunc(p.arg, &fci, &fcc, types.IntBool(checkNull), &err) == 0 {
+	if ZendParseArgFunc(p.arg, fci, fcc, types.IntBool(checkNull), &err) == 0 {
 		if err == nil {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_FUNC)
 		} else {
