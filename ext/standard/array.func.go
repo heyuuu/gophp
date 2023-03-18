@@ -1712,12 +1712,7 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayOrObjectEx(false, true)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgFunc(_arg, &(BG(array_walk_fci)), &(BG(array_walk_fci_cache)), 0, &_error) == 0 {
 				if _error == nil {
@@ -1780,12 +1775,7 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *type
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayOrObjectEx(false, true)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgFunc(_arg, &(BG(array_walk_fci)), &(BG(array_walk_fci_cache)), 0, &_error) == 0 {
 				if _error == nil {

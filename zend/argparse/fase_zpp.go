@@ -133,6 +133,9 @@ func (p *FastParser) StartOptional() {
 
 // Micro: Z_PARAM_PROLOGUE
 func (p *FastParser) paramPrologue(deref bool, separate bool) {
+	if p.IsFinish() {
+		return
+	}
 	p._i++
 	b.Assert(p._i <= p.minNumArgs || p.optional)
 	b.Assert(p._i > p.minNumArgs || !p.optional)
@@ -183,12 +186,17 @@ func (p *FastParser) ParseArrayEx2(checkNull bool, deref bool, separate bool) (d
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT
 func (p *FastParser) ParseArrayOrObject() (dest *types.Zval) {
-	p.paramPrologue(false, false)
+	return p.ParseArrayOrObjectEx(false, false)
+}
+
+// @see Micro: Z_PARAM_ARRAY_OR_OBJECT_EX
+func (p *FastParser) ParseArrayOrObjectEx(checkNull bool, separate bool) (dest *types.Zval) {
+	p.paramPrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
 
-	if zend.ZendParseArgArray(p._arg, &dest, 0, 1) == 0 {
+	if zend.ZendParseArgArray(p._arg, &dest, types.IntBool(checkNull), 1) == 0 {
 		p._expected_type = Z_EXPECTED_ARRAY
 		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}
