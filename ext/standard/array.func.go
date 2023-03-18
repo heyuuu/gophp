@@ -1100,12 +1100,7 @@ func ZifEnd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(1, 1)
-			if argparse.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayHtEx(false, true)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1151,12 +1146,7 @@ func ZifPrev(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(1, 1)
-			if argparse.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayHtEx(false, true)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1202,12 +1192,7 @@ func ZifNext(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(1, 1)
-			if argparse.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayHtEx(false, true)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1253,12 +1238,7 @@ func ZifReset(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(1, 1)
-			if argparse.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayHtEx(false, true)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1304,12 +1284,7 @@ func ZifCurrent(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1351,12 +1326,7 @@ func ZifKey(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			array = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -5314,12 +5284,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &input, 0, 0, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			input = fp.ParseArrayHt()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &column, 1)
 			fp.StartOptional()
@@ -8202,18 +8167,8 @@ func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &keys, 0, 0, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &values, 0, 0, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			keys = fp.ParseArrayHt()
+			values = fp.ParseArrayHt()
 			if fp.HasError() {
 				fp.HandleError()
 				return

@@ -443,12 +443,7 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &znew_algo, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			options = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -564,12 +559,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &zalgo, 0)
 			fp.StartOptional()
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_ARRAY
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			options = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
 				fp.HandleError()
 				return
