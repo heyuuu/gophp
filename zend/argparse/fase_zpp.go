@@ -522,18 +522,6 @@ func (p *FastParser) ParseVariadicEx(postVarargs int) []*types.Zval {
 
 	return args
 }
-
-// @see Micro: Z_PARAM_VARIADIC_1
-func (p *FastParser) ParseVariadic1() (dest *types.Zval, num int) {
-	if p.IsFinish() {
-		return
-	}
-
-	args := p.ParseVariadic()
-	return args[0], len(args)
-}
-
-// @see Micro: Z_PARAM_VARIADIC_0
 func (p *FastParser) ParseVariadic0() (dest *types.Zval, num int) {
 	if p.IsFinish() {
 		return
