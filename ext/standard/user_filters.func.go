@@ -571,18 +571,8 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgStr(_arg, &filtername, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgStr(_arg, &classname, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			filtername = fp.ParseStr()
+			classname = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()

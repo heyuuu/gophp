@@ -287,12 +287,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			argparse.Z_PARAM_PROLOGUE(0, 0)
 			argparse.ZendParseArgZvalDeref(_arg, &headers, 0)
-			argparse.Z_PARAM_PROLOGUE(0, 0)
-			if argparse.ZendParseArgStr(_arg, &extra_cmd, 0) == 0 {
-				_expected_type = argparse.Z_EXPECTED_STRING
-				_error_code = argparse.ZPP_ERROR_WRONG_ARG
-				break
-			}
+			extra_cmd = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
 				return

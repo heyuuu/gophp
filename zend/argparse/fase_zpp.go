@@ -480,7 +480,11 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
 		return
 	}
 
-	// todo
+	if ZendParseArgStr(p._arg, &dest, types.IntBool(checkNull)) == 0 {
+		p._expected_type = Z_EXPECTED_STRING
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
