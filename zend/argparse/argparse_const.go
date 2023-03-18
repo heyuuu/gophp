@@ -1,52 +1,23 @@
 package argparse
 
-import "log"
-
 /* Parameter parsing API -- andrei */
 
 const ZEND_PARSE_PARAMS_QUIET = 1 << 1
 const ZEND_PARSE_PARAMS_THROW = 1 << 2
 
 /* Fast parameter parsing API */
-
-type ZendExpectedType int
-
-func (t ZendExpectedType) String() string {
-	switch t {
-	case Z_EXPECTED_LONG:
-		return "int"
-	case Z_EXPECTED_BOOL:
-		return "bool"
-	case Z_EXPECTED_STRING:
-		return "string"
-	case Z_EXPECTED_ARRAY:
-		return "array"
-	case Z_EXPECTED_FUNC:
-		return "array"
-	case Z_EXPECTED_RESOURCE:
-		return "array"
-	case Z_EXPECTED_PATH:
-		return "array"
-	case Z_EXPECTED_OBJECT:
-		return "array"
-	case Z_EXPECTED_DOUBLE:
-		return "array"
-	default:
-		log.Printf("unexpected ZendExpectedType: %d\n", t)
-		return ""
-	}
-}
+type ZendExpectedType = string
 
 const (
-	Z_EXPECTED_LONG ZendExpectedType = iota
-	Z_EXPECTED_BOOL
-	Z_EXPECTED_STRING
-	Z_EXPECTED_ARRAY
-	Z_EXPECTED_FUNC
-	Z_EXPECTED_RESOURCE
-	Z_EXPECTED_PATH
-	Z_EXPECTED_OBJECT
-	Z_EXPECTED_DOUBLE
+	Z_EXPECTED_LONG     = "int"
+	Z_EXPECTED_BOOL     = "bool"
+	Z_EXPECTED_STRING   = "string"
+	Z_EXPECTED_ARRAY    = "array"
+	Z_EXPECTED_FUNC     = "valid callback"
+	Z_EXPECTED_RESOURCE = "resource"
+	Z_EXPECTED_PATH     = "a valid path"
+	Z_EXPECTED_OBJECT   = "object"
+	Z_EXPECTED_DOUBLE   = "float"
 )
 
 const ZPP_ERROR_OK = 0

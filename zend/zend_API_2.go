@@ -24,13 +24,6 @@ func WrongParamTypeError(num int, expectedType argparse.ZendExpectedType, arg *t
 	ZendInternalTypeErrorEx(throwException, message)
 }
 
-func ZendWrongParameterTypeError(num int, expected_type argparse.ZendExpectedType, arg *types.Zval) {
-	WrongParamTypeError(num, expected_type, arg, false)
-}
-func ZendWrongParameterTypeException(num int, expected_type argparse.ZendExpectedType, arg *types.Zval) {
-	WrongParamTypeError(num, expected_type, arg, true)
-}
-
 func WrongParamClassError(num int, name string, arg *types.Zval, forceStrict bool) {
 	if EG__().GetException() != nil {
 		return
@@ -38,13 +31,6 @@ func WrongParamClassError(num int, name string, arg *types.Zval, forceStrict boo
 	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, name, ZendZvalTypeName(arg))
 	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
 	ZendInternalTypeErrorEx(throwException, message)
-}
-
-func ZendWrongParameterClassError(num int, name string, arg *types.Zval) {
-	WrongParamClassError(num, name, arg, false)
-}
-func ZendWrongParameterClassException(num int, name string, arg *types.Zval) {
-	WrongParamClassError(num, name, arg, true)
 }
 
 func WrongCallbackError(num int, error string, forceStrict bool) {
@@ -56,12 +42,6 @@ func WrongCallbackError(num int, error string, forceStrict bool) {
 	ZendInternalTypeErrorEx(throwException, message)
 }
 
-func ZendWrongCallbackError(num int, error string) {
-	WrongCallbackError(num, error, false)
-}
-func ZendWrongCallbackException(num int, error string) {
-	WrongCallbackError(num, error, true)
-}
 func ZendWrongCallbackDeprecated(num int, error string) {
 	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
 	ZendErrorEx(E_DEPRECATED, message)

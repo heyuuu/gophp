@@ -131,11 +131,11 @@ func ZendParseArgResource(arg *types.Zval, dest **types.Zval, check_null int) in
 	}
 	return 1
 }
-func ZendParseArgFunc(arg *types.Zval, dest_fci *zend.ZendFcallInfo, dest_fcc *zend.ZendFcallInfoCache, check_null int, error **byte) int {
+func ZendParseArgFunc(arg *types.Zval, dest_fci *zend.ZendFcallInfo, dest_fcc *zend.ZendFcallInfoCache, check_null int, error **string) int {
 	if check_null != 0 && arg.IsNull() {
 		dest_fci.SetSize(0)
 		dest_fcc.SetFunctionHandler(nil)
-		*error = nil
+		error = nil
 	} else if zend.ZendFcallInfoInit(arg, 0, dest_fci, dest_fcc, nil, error) != types.SUCCESS {
 		return 0
 	}
