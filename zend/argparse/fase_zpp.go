@@ -344,7 +344,14 @@ func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.Z
 		return
 	}
 
-	// todo
+	dest, isNullBool, ok := ParseLong(p._arg, checkNull, true)
+	isNull = types.IntBool(isNullBool)
+
+	if !ok {
+		p._expected_type = Z_EXPECTED_LONG
+		p.errorCode = ZPP_ERROR_WRONG_ARG
+	}
+
 	return
 }
 
