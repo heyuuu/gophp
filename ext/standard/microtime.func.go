@@ -35,8 +35,8 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &get_as_float, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &get_as_float, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -103,8 +103,8 @@ func ZifGetrusage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if !zend.ZendParseArgLong00(_arg, &pwho) {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if !argparse.ZendParseArgLong00(_arg, &pwho) {
 				_expected_type = argparse.Z_EXPECTED_LONG
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

@@ -160,15 +160,15 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgResource(_arg, &zproc, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgResource(_arg, &zproc, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if !zend.ZendParseArgLong00(_arg, &sig_no) {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if !argparse.ZendParseArgLong00(_arg, &sig_no) {
 				_expected_type = argparse.Z_EXPECTED_LONG
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -219,8 +219,8 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgResource(_arg, &zproc, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgResource(_arg, &zproc, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -277,8 +277,8 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zva
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgResource(_arg, &zproc, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgResource(_arg, &zproc, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_RESOURCE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -381,14 +381,14 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &command_zv, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &command_zv, 0)
 			descriptorspec = fp.ParseArray()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &pipes, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &pipes, 0)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgString(_arg, &cwd, &cwd_len, 1) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgString(_arg, &cwd, &cwd_len, 1) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

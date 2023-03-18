@@ -114,8 +114,8 @@ func zim_WeakReference_create(executeData *ZendExecuteData, return_value *types.
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			Z_PARAM_PROLOGUE(0, 0)
-			if ZendParseArgObject(_arg, &referent, nil, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgObject(_arg, &referent, nil, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_OBJECT
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

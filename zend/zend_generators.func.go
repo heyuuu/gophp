@@ -968,8 +968,8 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			Z_PARAM_PROLOGUE(0, 0)
-			ZendParseArgZvalDeref(_arg, &value, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &value, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -1025,8 +1025,8 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			Z_PARAM_PROLOGUE(0, 0)
-			ZendParseArgZvalDeref(_arg, &exception, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &exception, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return

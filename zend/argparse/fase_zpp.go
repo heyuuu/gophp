@@ -176,7 +176,7 @@ func (p *FastParser) ParseArrayEx2(checkNull bool, deref bool, separate bool) (d
 		return
 	}
 
-	if zend.ZendParseArgArray(p._arg, &dest, types.IntBool(checkNull), 0) == 0 {
+	if ZendParseArgArray(p._arg, &dest, types.IntBool(checkNull), 0) == 0 {
 		p._expected_type = Z_EXPECTED_ARRAY
 		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}
@@ -196,7 +196,7 @@ func (p *FastParser) ParseArrayOrObjectEx(checkNull bool, separate bool) (dest *
 		return
 	}
 
-	if zend.ZendParseArgArray(p._arg, &dest, types.IntBool(checkNull), 1) == 0 {
+	if ZendParseArgArray(p._arg, &dest, types.IntBool(checkNull), 1) == 0 {
 		p._expected_type = Z_EXPECTED_ARRAY
 		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}
@@ -216,7 +216,7 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 		return
 	}
 
-	if zend.ZendParseArgBool(p._arg, &dest, &isNull, types.IntBool(checkNull)) == 0 {
+	if ZendParseArgBool(p._arg, &dest, &isNull, types.IntBool(checkNull)) == 0 {
 		p._expected_type = Z_EXPECTED_BOOL
 		p.errorCode = ZPP_ERROR_WRONG_ARG
 	}

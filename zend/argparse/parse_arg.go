@@ -90,18 +90,18 @@ func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *p
 	case 's':
 		var p **byte = __va_arg(*va, (**byte)(_))
 		var pl *int = __va_arg(*va, (*int)(_))
-		if zend.ZendParseArgString(arg, p, pl, check_null) == 0 {
+		if ZendParseArgString(arg, p, pl, check_null) == 0 {
 			return parseTypeError(arg, "string")
 		}
 	case 'p':
 		var p **byte = __va_arg(*va, (**byte)(_))
 		var pl *int = __va_arg(*va, (*int)(_))
-		if zend.ZendParseArgPath(arg, p, pl, check_null) == 0 {
+		if ZendParseArgPath(arg, p, pl, check_null) == 0 {
 			return parseTypeError(arg, "a valid path")
 		}
 	case 'P':
 		var str **types.ZendString = __va_arg(*va, (**types.ZendString)(_))
-		if zend.ZendParseArgPathStr(arg, str, check_null) == 0 {
+		if ZendParseArgPathStr(arg, str, check_null) == 0 {
 			return parseTypeError(arg, "a valid path")
 		}
 	case 'S':
@@ -121,28 +121,28 @@ func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *p
 		}
 	case 'r':
 		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if zend.ZendParseArgResource(arg, p, check_null) == 0 {
+		if ZendParseArgResource(arg, p, check_null) == 0 {
 			return parseTypeError(arg, "resource")
 		}
 	case 'A', 'a':
 		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if zend.ZendParseArgArray(arg, p, check_null, c == 'A') == 0 {
+		if ZendParseArgArray(arg, p, check_null, c == 'A') == 0 {
 			return parseTypeError(arg, "array")
 		}
 	case 'H', 'h':
 		var p **types.HashTable = __va_arg(*va, (**types.HashTable)(_))
-		if zend.ZendParseArgArrayHt(arg, p, check_null, c == 'H', separate) == 0 {
+		if ZendParseArgArrayHt(arg, p, check_null, c == 'H', separate) == 0 {
 			return parseTypeError(arg, "array")
 		}
 	case 'o':
 		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if zend.ZendParseArgObject(arg, p, nil, check_null) == 0 {
+		if ZendParseArgObject(arg, p, nil, check_null) == 0 {
 			return parseTypeError(arg, "object")
 		}
 	case 'O':
 		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
 		var ce *zend.ZendClassEntry = __va_arg(*va, (*zend.ZendClassEntry)(_))
-		if zend.ZendParseArgObject(arg, p, ce, check_null) == 0 {
+		if ZendParseArgObject(arg, p, ce, check_null) == 0 {
 			if ce != nil {
 				return ce.GetName().GetVal()
 			} else {
@@ -198,7 +198,7 @@ func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *p
 		}
 	case 'z':
 		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		zend.ZendParseArgZvalDeref(real_arg, p, check_null)
+		ZendParseArgZvalDeref(real_arg, p, check_null)
 	case 'Z':
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
 		b.Assert(c != 'Z')

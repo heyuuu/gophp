@@ -368,8 +368,8 @@ func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *types.Z
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &hash, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -434,17 +434,17 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &hash, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &znew_algo, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &znew_algo, 0)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_ARRAY
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -502,14 +502,14 @@ func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *types.Zv
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &password, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &password, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &hash, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -555,17 +555,17 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &password, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &password, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &zalgo, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &zalgo, 0)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_ARRAY
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

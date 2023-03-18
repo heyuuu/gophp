@@ -49,25 +49,25 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgString(_arg, &host, &host_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgString(_arg, &host, &host_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if !zend.ZendParseArgLong00(_arg, &port) {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if !argparse.ZendParseArgLong00(_arg, &port) {
 				_expected_type = argparse.Z_EXPECTED_LONG
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &zerrno, 0)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &zerrno, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_DOUBLE
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

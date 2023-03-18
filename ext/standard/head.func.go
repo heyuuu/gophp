@@ -36,21 +36,21 @@ func ZifHeader(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &rep, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &rep, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if !zend.ZendParseArgLong00(_arg, ctr.GetResponseCode()) {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if !argparse.ZendParseArgLong00(_arg, ctr.GetResponseCode()) {
 				_expected_type = argparse.Z_EXPECTED_LONG
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -92,8 +92,8 @@ func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *types.Zval
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -310,41 +310,41 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &name, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &name, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &value, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &value, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &expires_or_options, 0)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &path, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &expires_or_options, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &path, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &domain, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &domain, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -420,41 +420,41 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *types.Zval
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &name, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &name, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &value, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &value, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &expires_or_options, 0)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &path, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &expires_or_options, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &path, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &domain, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &domain, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -526,10 +526,10 @@ func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg1, 0)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg2, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg1, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg2, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -599,8 +599,8 @@ func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *types.
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if !zend.ZendParseArgLong00(_arg, &response_code) {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if !argparse.ZendParseArgLong00(_arg, &response_code) {
 				_expected_type = argparse.Z_EXPECTED_LONG
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

@@ -35,8 +35,8 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -81,10 +81,10 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgStr(_arg, &type_, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgStr(_arg, &type_, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_STRING
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -166,11 +166,11 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &num, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &num, 0)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if !zend.ZendParseArgLong00(_arg, &base) {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if !argparse.ZendParseArgLong00(_arg, &base) {
 				_expected_type = argparse.Z_EXPECTED_LONG
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -252,8 +252,8 @@ func ZifFloatval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &num, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &num, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -289,8 +289,8 @@ func ZifBoolval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &val, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &val, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -326,8 +326,8 @@ func ZifStrval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &num, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &num, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -362,8 +362,8 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -418,8 +418,8 @@ func ZifIsBool(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return_value.SetFalse()
@@ -471,8 +471,8 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -524,8 +524,8 @@ func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &arg, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -581,17 +581,17 @@ func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
 			fp.StartOptional()
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgBool(_arg, &syntax_only, &_dummy, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgBool(_arg, &syntax_only, &_dummy, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_BOOL
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &callable_name, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &callable_name, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -645,8 +645,8 @@ func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return
@@ -682,8 +682,8 @@ func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			argparse.ZendParseArgZvalDeref(_arg, &var_, 0)
 			if fp.HasError() {
 				fp.HandleError()
 				return

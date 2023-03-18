@@ -38,8 +38,8 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -97,8 +97,8 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -161,14 +161,14 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgPath(_arg, &frompath, &frompath_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgPath(_arg, &frompath, &frompath_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
@@ -250,14 +250,14 @@ func ZifLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgPath(_arg, &frompath, &frompath_len, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgPath(_arg, &frompath, &frompath_len, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_PATH
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break

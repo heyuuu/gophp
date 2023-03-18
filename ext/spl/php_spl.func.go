@@ -725,8 +725,8 @@ func ZifSplObjectId(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		void(_optional)
 		for {
 			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgObject(_arg, &obj, nil, 0) == 0 {
+			argparse.Z_PARAM_PROLOGUE(0, 0)
+			if argparse.ZendParseArgObject(_arg, &obj, nil, 0) == 0 {
 				_expected_type = argparse.Z_EXPECTED_OBJECT
 				_error_code = argparse.ZPP_ERROR_WRONG_ARG
 				break
