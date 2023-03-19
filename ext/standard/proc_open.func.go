@@ -35,7 +35,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 		return env
 	}
 	zend.ALLOC_HASHTABLE(env_hash)
-	zend.ZendHashInit(env_hash, cnt, nil, nil, 0)
+	types.ZendHashInit(env_hash, cnt, nil, nil, 0)
 
 	/* first, we have to get the size of all the elements in the hash */
 
@@ -53,9 +53,9 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 		sizeenv += str.GetLen() + 1
 		if key != nil && key.GetLen() != 0 {
 			sizeenv += key.GetLen() + 1
-			zend.ZendHashAddPtr(env_hash, key, str)
+			types.ZendHashAddPtr(env_hash, key, str)
 		} else {
-			zend.ZendHashNextIndexInsertPtr(env_hash, str)
+			types.ZendHashNextIndexInsertPtr(env_hash, str)
 		}
 	}
 	env.SetEnvarray((**byte)(zend.Pecalloc(cnt+1, b.SizeOf("char *"), is_persistent)))
@@ -470,7 +470,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				}
 				descriptors[ndesc].SetChildend(fd)
 			} else if strcmp(ztype.GetStr().GetVal(), "redirect") == 0 {
-				var ztarget *types.Zval = zend.ZendHashIndexFindDeref(descitem.GetArr(), 1)
+				var ztarget *types.Zval = types.ZendHashIndexFindDeref(descitem.GetArr(), 1)
 				var target *PhpProcOpenDescriptorItem = nil
 				var childend PhpFileDescriptorT
 				if ztarget == nil {

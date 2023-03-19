@@ -79,13 +79,13 @@ var ArginfoGeneratorThrow []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("exception"),
 }
-var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("rewind", ZEND_ACC_PUBLIC, zim_Generator_rewind, ArginfoGeneratorVoid),
-	MakeZendFunctionEntryEx("valid", ZEND_ACC_PUBLIC, zim_Generator_valid, ArginfoGeneratorVoid),
-	MakeZendFunctionEntryEx("current", ZEND_ACC_PUBLIC, zim_Generator_current, ArginfoGeneratorVoid),
-	MakeZendFunctionEntryEx("key", ZEND_ACC_PUBLIC, zim_Generator_key, ArginfoGeneratorVoid),
-	MakeZendFunctionEntryEx("next", ZEND_ACC_PUBLIC, zim_Generator_next, ArginfoGeneratorVoid),
-	MakeZendFunctionEntryEx("send", ZEND_ACC_PUBLIC, zim_Generator_send, ArginfoGeneratorSend),
-	MakeZendFunctionEntryEx("throw", ZEND_ACC_PUBLIC, zim_Generator_throw, ArginfoGeneratorThrow),
-	MakeZendFunctionEntryEx("getReturn", ZEND_ACC_PUBLIC, zim_Generator_getReturn, ArginfoGeneratorVoid),
+var GeneratorFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("rewind", ZEND_ACC_PUBLIC, zim_Generator_rewind, ArginfoGeneratorVoid),
+	types.MakeZendFunctionEntryEx("valid", ZEND_ACC_PUBLIC, zim_Generator_valid, ArginfoGeneratorVoid),
+	types.MakeZendFunctionEntryEx("current", ZEND_ACC_PUBLIC, zim_Generator_current, ArginfoGeneratorVoid),
+	types.MakeZendFunctionEntryEx("key", ZEND_ACC_PUBLIC, zim_Generator_key, ArginfoGeneratorVoid),
+	types.MakeZendFunctionEntryEx("next", ZEND_ACC_PUBLIC, zim_Generator_next, ArginfoGeneratorVoid),
+	types.MakeZendFunctionEntryEx("send", ZEND_ACC_PUBLIC, zim_Generator_send, ArginfoGeneratorSend),
+	types.MakeZendFunctionEntryEx("throw", ZEND_ACC_PUBLIC, zim_Generator_throw, ArginfoGeneratorThrow),
+	types.MakeZendFunctionEntryEx("getReturn", ZEND_ACC_PUBLIC, zim_Generator_getReturn, ArginfoGeneratorVoid),
 }

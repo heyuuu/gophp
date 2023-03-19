@@ -22,7 +22,7 @@ func SplFindCeByName(name *types.ZendString, autoload types.ZendBool) *types.Cla
 	var ce *types.ClassEntry
 	if autoload == 0 {
 		var lc_name *types.ZendString = zend.ZendStringTolower(name)
-		ce = zend.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name)
+		ce = types.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name)
 		types.ZendStringRelease(lc_name)
 	} else {
 		ce = zend.ZendLookupClass(name)
@@ -205,7 +205,7 @@ func SplAutoload(class_name *types.ZendString, lc_name *types.ZendString, ext *b
 				zend.ZvalPtrDtor(&result)
 			}
 			zend.Efree(class_file)
-			return zend.ZendHashExists(zend.EG__().GetClassTable(), lc_name)
+			return types.ZendHashExists(zend.EG__().GetClassTable(), lc_name)
 		}
 	}
 	zend.Efree(class_file)
@@ -301,8 +301,8 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 		var pos types.HashPosition
 		var num_idx zend.ZendUlong
 		var func_ *zend.ZendFunction
-		var fci zend.ZendFcallInfo
-		var fcic zend.ZendFcallInfoCache
+		var fci types.ZendFcallInfo
+		var fcic types.ZendFcallInfoCache
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
 		var l_autoload_running int = SPL_G(autoload_running)
 		SPL_G(autoload_running) = 1
@@ -313,9 +313,9 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 		fci.SetParams(class_name)
 		fci.SetNoSeparation(1)
 		fci.GetFunctionName().SetUndef()
-		zend.ZendHashInternalPointerResetEx(SPL_G(autoload_functions), &pos)
-		for zend.ZendHashGetCurrentKeyEx(SPL_G(autoload_functions), &func_name, &num_idx, &pos) == zend.HASH_KEY_IS_STRING {
-			alfi = zend.ZendHashGetCurrentDataPtrEx(SPL_G(autoload_functions), &pos)
+		types.ZendHashInternalPointerResetEx(SPL_G(autoload_functions), &pos)
+		for types.ZendHashGetCurrentKeyEx(SPL_G(autoload_functions), &func_name, &num_idx, &pos) == types.HASH_KEY_IS_STRING {
+			alfi = types.ZendHashGetCurrentDataPtrEx(SPL_G(autoload_functions), &pos)
 			func_ = alfi.GetFuncPtr()
 			if func_.HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
 				func_ = zend.Emalloc(b.SizeOf("zend_op_array"))
@@ -342,10 +342,10 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 			if zend.EG__().GetException() != nil {
 				break
 			}
-			if pos+1 == SPL_G(autoload_functions).nNumUsed || zend.ZendHashExists(zend.EG__().GetClassTable(), lc_name) != 0 {
+			if pos+1 == SPL_G(autoload_functions).nNumUsed || types.ZendHashExists(zend.EG__().GetClassTable(), lc_name) != 0 {
 				break
 			}
-			zend.ZendHashMoveForwardEx(SPL_G(autoload_functions), &pos)
+			types.ZendHashMoveForwardEx(SPL_G(autoload_functions), &pos)
 		}
 		types.ZendStringReleaseEx(lc_name, 0)
 		SPL_G(autoload_running) = l_autoload_running
@@ -353,8 +353,8 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 
 		/* do not use or overwrite &EG(autoload_func) here */
 
-		var fcall_info zend.ZendFcallInfo
-		var fcall_cache zend.ZendFcallInfoCache
+		var fcall_info types.ZendFcallInfo
+		var fcall_cache types.ZendFcallInfoCache
 		retval.SetUndef()
 		fcall_info.SetSize(b.SizeOf("fcall_info"))
 		fcall_info.GetFunctionName().SetUndef()
@@ -386,7 +386,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 	var spl_func_ptr *zend.ZendFunction
 	var alfi AutoloadFuncInfo
 	var obj_ptr *types.ZendObject
-	var fcc zend.ZendFcallInfoCache
+	var fcc types.ZendFcallInfoCache
 	if zend.ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == types.FAILURE {
 		return
 	}
@@ -475,7 +475,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 
 		}
 		types.ZendStringReleaseEx(func_name, 0)
-		if SPL_G(autoload_functions) && zend.ZendHashExists(SPL_G(autoload_functions), lc_name) != 0 {
+		if SPL_G(autoload_functions) && types.ZendHashExists(SPL_G(autoload_functions), lc_name) != 0 {
 			if !(alfi.GetClosure().IsUndef()) {
 				alfi.GetClosure().DelRefcount()
 			}
@@ -495,7 +495,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 		}
 		if !(SPL_G(autoload_functions)) {
 			zend.ALLOC_HASHTABLE(SPL_G(autoload_functions))
-			zend.ZendHashInit(SPL_G(autoload_functions), 1, nil, AutoloadFuncInfoDtor, 0)
+			types.ZendHashInit(SPL_G(autoload_functions), 1, nil, AutoloadFuncInfoDtor, 0)
 		}
 		spl_func_ptr = SplAutoloadFn
 		if zend.EG__().GetAutoloadFunc() == spl_func_ptr {
@@ -504,7 +504,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			spl_alfi.GetObj().SetUndef()
 			spl_alfi.GetClosure().SetUndef()
 			spl_alfi.SetCe(nil)
-			zend.ZendHashAddMem(SPL_G(autoload_functions), SplAutoloadFn.GetFunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
+			types.ZendHashAddMem(SPL_G(autoload_functions), SplAutoloadFn.GetFunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
 			if prepend != 0 && SPL_G(autoload_functions).nNumOfElements > 1 {
 
 				/* Move the newly created element to the head of the hashtable */
@@ -521,7 +521,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			alfi.GetFuncPtr().SetFunctionName(nil)
 			alfi.SetFuncPtr(copy)
 		}
-		if zend.ZendHashAddMem(SPL_G(autoload_functions), lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
+		if types.ZendHashAddMem(SPL_G(autoload_functions), lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
 			if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 				alfi.GetObj().DelRefcount()
 			}
@@ -561,7 +561,7 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *t
 	var success int = types.FAILURE
 	var spl_func_ptr *zend.ZendFunction
 	var obj_ptr *types.ZendObject
-	var fcc zend.ZendFcallInfoCache
+	var fcc types.ZendFcallInfoCache
 	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zcallable) == types.FAILURE {
 		return
 	}
@@ -618,12 +618,12 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *t
 
 			/* remove specific */
 
-			success = zend.ZendHashDel(SPL_G(autoload_functions), lc_name)
+			success = types.ZendHashDel(SPL_G(autoload_functions), lc_name)
 			if success != types.SUCCESS && obj_ptr != nil {
 				lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
 				memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 				lc_name.GetVal()[lc_name.GetLen()] = '0'
-				success = zend.ZendHashDel(SPL_G(autoload_functions), lc_name)
+				success = types.ZendHashDel(SPL_G(autoload_functions), lc_name)
 			}
 		}
 	} else if types.ZendStringEquals(lc_name, SplAutoloadFn.GetFunctionName()) != 0 {
@@ -647,7 +647,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 		return
 	}
 	if zend.EG__().GetAutoloadFunc() == nil {
-		if b.Assign(&fptr, zend.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_MAGIC_AUTOLOAD)) {
+		if b.Assign(&fptr, types.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_MAGIC_AUTOLOAD)) {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
 			tmp.SetStringCopy(types.ZSTR_MAGIC_AUTOLOAD)
@@ -892,8 +892,8 @@ func ZmStartupSpl(type_ int, module_number int) int {
 	ZmStartupSplHeap(type_, module_number)
 	ZmStartupSplFixedarray(type_, module_number)
 	ZmStartupSplObserver(type_, module_number)
-	SplAutoloadFn = zend.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload", b.SizeOf("\"spl_autoload\"")-1)
-	SplAutoloadCallFn = zend.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload_call", b.SizeOf("\"spl_autoload_call\"")-1)
+	SplAutoloadFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload", b.SizeOf("\"spl_autoload\"")-1)
+	SplAutoloadCallFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload_call", b.SizeOf("\"spl_autoload_call\"")-1)
 	b.Assert(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
 	return types.SUCCESS
 }

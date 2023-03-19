@@ -235,7 +235,7 @@ func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
 			*part2 = types.ZEND_TYPE_NAME(type_).GetVal()
 		}
 	} else {
-		*part2 = ZendGetTypeByConst(type_.Code())
+		*part2 = types.ZendGetTypeByConst(type_.Code())
 	}
 }
 func ZendThrowAutoInitInPropError(prop *ZendPropertyInfo, type_ string) {
@@ -356,7 +356,7 @@ func ZendVerifyTypeErrorCommon(
 			*need_kind = ""
 		default:
 			*need_msg = "be of the type "
-			*need_kind = ZendGetTypeByConst(arg_info.GetType().Code())
+			*need_kind = types.ZendGetTypeByConst(arg_info.GetType().Code())
 		}
 	}
 	if arg_info.GetType().AllowNull() {
@@ -373,7 +373,7 @@ func ZendVerifyTypeErrorCommon(
 			*given_msg = "instance of "
 			*given_kind = types.Z_OBJCE_P(value).GetName().GetVal()
 		} else {
-			*given_msg = ZendZvalTypeName(value)
+			*given_msg = types.ZendZvalTypeName(value)
 			*given_kind = ""
 		}
 	} else {

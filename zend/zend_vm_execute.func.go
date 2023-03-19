@@ -1210,7 +1210,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 				goto send_array
 			}
 		}
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "call_user_func_array() expects parameter 2 to be array, %s given", ZendGetTypeByConst(args.GetType()))
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "call_user_func_array() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(args.GetType()))
 		if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_CLOSURE) != 0 {
 			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetCall().func_))
 		} else if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_RELEASE_THIS) != 0 {
@@ -1552,9 +1552,9 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			if EG__().GetErrorReportingIniEntry().GetModified() == 0 {
 				if EG__().GetModifiedIniDirectives() == nil {
 					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
-					ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
+					types.ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
 				}
-				if ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING, EG__().GetErrorReportingIniEntry()) != nil {
+				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING, EG__().GetErrorReportingIniEntry()) != nil {
 					EG__().GetErrorReportingIniEntry().SetOrigValue(EG__().GetErrorReportingIniEntry().GetValue())
 					EG__().GetErrorReportingIniEntry().SetOrigModifiable(EG__().GetErrorReportingIniEntry().GetModifiable())
 					EG__().GetErrorReportingIniEntry().SetModified(1)
@@ -1878,8 +1878,8 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if num_args != 0 {
 		var p *types.Zval = executeData.Arg(1)
 		var end *types.Zval = p + num_args
-		args = ZendNewArray(num_args)
-		ZendHashRealInitPacked(args)
+		args = types.ZendNewArray(num_args)
+		types.ZendHashRealInitPacked(args)
 		for {
 			var __fill_ht *types.HashTable = args
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
@@ -1917,7 +1917,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if args != nil {
 		call.Arg(2).SetArray(args)
 	} else {
-		ZVAL_EMPTY_ARRAY(call.Arg(2))
+		types.ZVAL_EMPTY_ARRAY(call.Arg(2))
 	}
 	ZendFreeTrampoline(fbc)
 	fbc = call.GetFunc()
@@ -2234,7 +2234,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if arg_num <= arg_count {
 		var param *types.Zval
 		ArrayInitSize(params, arg_count-arg_num+1)
-		ZendHashRealInitPacked(params.GetArr())
+		types.ZendHashRealInitPacked(params.GetArr())
 		for {
 			var __fill_ht *types.HashTable = params.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
@@ -2281,7 +2281,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 	} else {
-		ZVAL_EMPTY_ARRAY(params)
+		types.ZVAL_EMPTY_ARRAY(params)
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
@@ -2885,7 +2885,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()
-	case types._IS_BOOL:
+	case types.IS_BOOL:
 		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -2916,7 +2916,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			if IS_CONST == IS_CONST || expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
-					result.SetArray(ZendNewArray(1))
+					result.SetArray(types.ZendNewArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_CONST == IS_CONST {
 						if expr.IsRefcounted() {
@@ -2928,7 +2928,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 						}
 					}
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
 				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
@@ -2936,28 +2936,28 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			}
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.GetArr())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
-					ht = ZendArrayDup(ht)
+					ht = types.ZendArrayDup(ht)
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
 				types.Z_OBJ_P(result).SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
-				ht = ZendNewArray(1)
+				ht = types.ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_CONST == IS_CONST {
@@ -3045,7 +3045,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
@@ -3057,7 +3057,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				result.SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
@@ -3104,11 +3104,11 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 		if IS_CONST == IS_CONST {
-			array_ptr.SetArray(ZendArrayDup(array_ptr.GetArr()))
+			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		} else {
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		if IS_CONST == IS_VAR {
 
 		}
@@ -3131,14 +3131,14 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.GetNNumOfElements() == 0 {
 				EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
@@ -3398,7 +3398,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
+				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			break
@@ -4609,7 +4609,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var fcc ZendFcallInfoCache
+	var fcc types.ZendFcallInfoCache
 	var error *byte = nil
 	var func_ *ZendFunction
 	var object_or_called_scope any
@@ -4780,7 +4780,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -4832,16 +4832,16 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CONST != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -4863,11 +4863,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, IS_CONST == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, IS_CONST == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -4982,7 +4982,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 		zv = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 		if zv != nil {
 			ce = zv.GetCe()
-			zv = ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
+			zv = types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
 			if zv == nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			} else {
@@ -4991,7 +4991,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 					/* Reload bucket pointer, the hash table may have been reallocated */
 
 					zv = EG__().GetClassTable().KeyFind(lcname.GetStr().GetStr())
-					ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), (lcname + 1).GetStr())
+					types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), (lcname + 1).GetStr())
 					HANDLE_EXCEPTION()
 				}
 			}
@@ -5889,7 +5889,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecute
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -6645,7 +6645,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp
 	var function_name *types.Zval
-	var fcc ZendFcallInfoCache
+	var fcc types.ZendFcallInfoCache
 	var error *byte = nil
 	var func_ *ZendFunction
 	var object_or_called_scope any
@@ -6754,7 +6754,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -6807,16 +6807,16 @@ func ZEND_INIT_ARRAY_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CONST != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -6839,11 +6839,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, (IS_TMP_VAR|IS_VAR) == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, (IS_TMP_VAR|IS_VAR) == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -7616,7 +7616,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -7668,16 +7668,16 @@ func ZEND_INIT_ARRAY_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CONST != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -7703,7 +7703,7 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	ZendHashDelInd(target_symbol_table, name)
+	types.ZendHashDelInd(target_symbol_table, name)
 	if IS_CONST != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -8011,7 +8011,7 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 				if IS_CONST == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -8024,7 +8024,7 @@ func ZEND_GET_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	var type_ *types.ZendString
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	type_ = ZendZvalGetType(op1)
+	type_ = types.ZendZvalGetType(op1)
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
@@ -8052,9 +8052,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	}
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
-		ht = ZendNewArray(result_size)
+		ht = types.ZendNewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
-		ZendHashRealInitPacked(ht)
+		types.ZendHashRealInitPacked(ht)
 		var __fill_ht *types.HashTable = ht
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
@@ -8113,7 +8113,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		__fill_ht.SetNInternalPointer(0)
 		ht.SetNNumOfElements(result_size)
 	} else {
-		ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))
+		types.ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))
 	}
 	ZEND_VM_NEXT_OPCODE()
 }
@@ -8816,7 +8816,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var fcc ZendFcallInfoCache
+	var fcc types.ZendFcallInfoCache
 	var error *byte = nil
 	var func_ *ZendFunction
 	var object_or_called_scope any
@@ -8921,7 +8921,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -8973,16 +8973,16 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CONST != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -9004,11 +9004,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, IS_CV == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, IS_CV == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -11342,7 +11342,7 @@ func ZEND_FE_FREE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var_ = EX_VAR(opline.GetOp1().GetVar())
 	if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
-		ZendHashIteratorDel(var_.GetFeIterIdx())
+		types.ZendHashIteratorDel(var_.GetFeIterIdx())
 	}
 	ZvalPtrDtorNogc(var_)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -11532,7 +11532,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
+				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			break
@@ -12594,11 +12594,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, IS_CONST == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, IS_CONST == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -12768,7 +12768,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDa
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZvalPtrDtorNogc(free_op1)
@@ -12816,7 +12816,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_TMPVARCV_HANDLER(executeData *ZendExecut
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZvalPtrDtorNogc(free_op1)
@@ -13897,11 +13897,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, (IS_TMP_VAR|IS_VAR) == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, (IS_TMP_VAR|IS_VAR) == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -14184,7 +14184,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	ZendHashDelInd(target_symbol_table, name)
+	types.ZendHashDelInd(target_symbol_table, name)
 	if (IS_TMP_VAR | IS_VAR) != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -14357,7 +14357,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 				if (IS_TMP_VAR|IS_VAR) == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -15013,11 +15013,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, IS_CV == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, IS_CV == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -15384,7 +15384,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()
-	case types._IS_BOOL:
+	case types.IS_BOOL:
 		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -15415,7 +15415,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			if IS_TMP_VAR == IS_CONST || expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
-					result.SetArray(ZendNewArray(1))
+					result.SetArray(types.ZendNewArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_TMP_VAR == IS_CONST {
 						if expr.IsRefcounted() {
@@ -15427,7 +15427,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 						}
 					}
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
 				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
@@ -15435,28 +15435,28 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			}
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.GetArr())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
-					ht = ZendArrayDup(ht)
+					ht = types.ZendArrayDup(ht)
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
 				types.Z_OBJ_P(result).SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
-				ht = ZendNewArray(1)
+				ht = types.ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_TMP_VAR == IS_CONST {
@@ -15495,7 +15495,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
@@ -15507,7 +15507,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				result.SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
@@ -15557,11 +15557,11 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 		if IS_TMP_VAR == IS_CONST {
-			array_ptr.SetArray(ZendArrayDup(array_ptr.GetArr()))
+			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		} else {
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		if IS_TMP_VAR == IS_VAR {
 
 		}
@@ -15584,14 +15584,14 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.GetNNumOfElements() == 0 {
 				EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
@@ -16014,7 +16014,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -16066,16 +16066,16 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_TMP_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -16435,7 +16435,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -16488,16 +16488,16 @@ func ZEND_INIT_ARRAY_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_TMP_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -16913,7 +16913,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -16965,16 +16965,16 @@ func ZEND_INIT_ARRAY_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_TMP_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -17141,7 +17141,7 @@ func ZEND_GET_TYPE_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	var type_ *types.ZendString
 	op1 = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-	type_ = ZendZvalGetType(op1)
+	type_ = types.ZendZvalGetType(op1)
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
@@ -17302,7 +17302,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -17354,16 +17354,16 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_TMP_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -18190,7 +18190,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()
-	case types._IS_BOOL:
+	case types.IS_BOOL:
 		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -18222,7 +18222,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			if IS_VAR == IS_CONST || expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
-					result.SetArray(ZendNewArray(1))
+					result.SetArray(types.ZendNewArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_VAR == IS_CONST {
 						if expr.IsRefcounted() {
@@ -18234,7 +18234,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 						}
 					}
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
 				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
@@ -18242,28 +18242,28 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			}
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.GetArr())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
-					ht = ZendArrayDup(ht)
+					ht = types.ZendArrayDup(ht)
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
 				types.Z_OBJ_P(result).SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
-				ht = ZendNewArray(1)
+				ht = types.ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_VAR == IS_CONST {
@@ -18303,7 +18303,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
@@ -18316,7 +18316,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtorNogc(free_op1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZvalPtrDtorNogc(free_op1)
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -18367,11 +18367,11 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 		if IS_VAR == IS_CONST {
-			array_ptr.SetArray(ZendArrayDup(array_ptr.GetArr()))
+			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		} else {
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		if IS_VAR == IS_VAR {
 			if free_op1 != nil {
 				ZvalPtrDtorNogc(free_op1)
@@ -18396,7 +18396,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.GetNNumOfElements() == 0 {
@@ -18406,7 +18406,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			if free_op1 != nil {
 				ZvalPtrDtorNogc(free_op1)
 			}
@@ -18496,7 +18496,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			/* plain object */
 
 			fe_ht = types.Z_OBJPROP_P(array)
-			pos = ZendHashIteratorPos(array.GetFeIterIdx(), fe_ht)
+			pos = types.ZendHashIteratorPos(array.GetFeIterIdx(), fe_ht)
 			p = fe_ht.GetArData() + pos
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
@@ -18612,7 +18612,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetOp1().GetVar())
 	array = types.ZVAL_DEREF(array)
 	if array.IsArray() {
-		pos = ZendHashIteratorPosEx(EX_VAR(opline.GetOp1().GetVar()).GetFeIterIdx(), array)
+		pos = types.ZendHashIteratorPosEx(EX_VAR(opline.GetOp1().GetVar()).GetFeIterIdx(), array)
 		fe_ht = array.GetArr()
 		p = fe_ht.GetArData() + pos
 		for true {
@@ -18656,7 +18656,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			/* plain object */
 
 			fe_ht = types.Z_OBJPROP_P(array)
-			pos = ZendHashIteratorPos(EX_VAR(opline.GetOp1().GetVar()).GetFeIterIdx(), fe_ht)
+			pos = types.ZendHashIteratorPos(EX_VAR(opline.GetOp1().GetVar()).GetFeIterIdx(), fe_ht)
 			p = fe_ht.GetArData() + pos
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
@@ -19213,7 +19213,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 			if IS_VAR == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -19562,7 +19562,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -19676,7 +19676,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -19791,7 +19791,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -19905,7 +19905,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -20047,7 +20047,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = RT_CONSTANT(opline, opline.GetOp2())
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -20159,7 +20159,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -20272,7 +20272,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -20380,7 +20380,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				dim = RT_CONSTANT(opline, opline.GetOp2())
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -20741,7 +20741,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -20793,16 +20793,16 @@ func ZEND_INIT_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -20825,7 +20825,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if offset.IsString() {
 				key = offset.GetStr()
 				if IS_CONST != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, &hval) {
+					if types.ZEND_HANDLE_NUMERIC(key, &hval) {
 						goto num_index_dim
 					}
 				}
@@ -20833,12 +20833,12 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key)
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
 			num_index_dim:
-				ZendHashIndexDel(ht, hval)
+				types.ZendHashIndexDel(ht, hval)
 			} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && offset.IsReference() {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
@@ -21283,7 +21283,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 			if IS_VAR == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -21654,7 +21654,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -21770,7 +21770,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -21887,7 +21887,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -22003,7 +22003,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -22147,7 +22147,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -22260,7 +22260,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -22374,7 +22374,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -22483,7 +22483,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -22752,7 +22752,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -22805,16 +22805,16 @@ func ZEND_INIT_ARRAY_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -22838,7 +22838,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			if offset.IsString() {
 				key = offset.GetStr()
 				if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, &hval) {
+					if types.ZEND_HANDLE_NUMERIC(key, &hval) {
 						goto num_index_dim
 					}
 				}
@@ -22846,12 +22846,12 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key)
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
 			num_index_dim:
-				ZendHashIndexDel(ht, hval)
+				types.ZendHashIndexDel(ht, hval)
 			} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && offset.IsReference() {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
@@ -23496,7 +23496,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 			if IS_VAR == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -23631,7 +23631,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -23743,7 +23743,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -23856,7 +23856,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -23964,7 +23964,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -24230,7 +24230,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -24282,16 +24282,16 @@ func ZEND_INIT_ARRAY_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -24499,7 +24499,7 @@ func ZEND_GET_TYPE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	var type_ *types.ZendString
 	op1 = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
-	type_ = ZendZvalGetType(op1)
+	type_ = types.ZendZvalGetType(op1)
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
@@ -24665,7 +24665,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			if IS_VAR == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -25014,7 +25014,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -25128,7 +25128,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -25243,7 +25243,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -25357,7 +25357,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -25499,7 +25499,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 				dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -25611,7 +25611,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -25724,7 +25724,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -25832,7 +25832,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 				dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -26154,7 +26154,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -26206,16 +26206,16 @@ func ZEND_INIT_ARRAY_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_VAR != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -26238,7 +26238,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			if offset.IsString() {
 				key = offset.GetStr()
 				if IS_CV != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, &hval) {
+					if types.ZEND_HANDLE_NUMERIC(key, &hval) {
 						goto num_index_dim
 					}
 				}
@@ -26246,12 +26246,12 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key)
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
 			num_index_dim:
-				ZendHashIndexDel(ht, hval)
+				types.ZendHashIndexDel(ht, hval)
 			} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && offset.IsReference() {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
@@ -27181,7 +27181,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -27291,7 +27291,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -27402,7 +27402,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -27512,7 +27512,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -28030,16 +28030,16 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_UNUSED != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -28760,7 +28760,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -28872,7 +28872,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -28985,7 +28985,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -29097,7 +29097,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -29556,16 +29556,16 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_UNUSED != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -30181,16 +30181,16 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_UNUSED != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -30390,7 +30390,7 @@ func ZEND_GET_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int
 				if IS_UNUSED == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -30438,9 +30438,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 	}
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
-		ht = ZendNewArray(result_size)
+		ht = types.ZendNewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
-		ZendHashRealInitPacked(ht)
+		types.ZendHashRealInitPacked(ht)
 		var __fill_ht *types.HashTable = ht
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
@@ -30499,7 +30499,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		__fill_ht.SetNInternalPointer(0)
 		ht.SetNNumOfElements(result_size)
 	} else {
-		ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))
+		types.ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))
 	}
 	ZEND_VM_NEXT_OPCODE()
 }
@@ -30991,7 +30991,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -31101,7 +31101,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -31212,7 +31212,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -31322,7 +31322,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -31763,16 +31763,16 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_UNUSED != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -32755,7 +32755,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()
-	case types._IS_BOOL:
+	case types.IS_BOOL:
 		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -32786,7 +32786,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			if IS_CV == IS_CONST || expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
-					result.SetArray(ZendNewArray(1))
+					result.SetArray(types.ZendNewArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_CV == IS_CONST {
 						if expr.IsRefcounted() {
@@ -32798,7 +32798,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 						}
 					}
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
 				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
@@ -32806,28 +32806,28 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 
 					/* fast copy */
 
-					result.SetArray(ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
+					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
-					ZVAL_EMPTY_ARRAY(result)
+					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			}
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.GetArr())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
-					ht = ZendArrayDup(ht)
+					ht = types.ZendArrayDup(ht)
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
 				}
 				types.Z_OBJ_P(result).SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
-				ht = ZendNewArray(1)
+				ht = types.ZendNewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				if IS_CV == IS_CONST {
@@ -32915,7 +32915,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
@@ -32927,7 +32927,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				result.SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			result.SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			result.SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 0, opline, executeData)
@@ -32974,11 +32974,11 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
 		if IS_CV == IS_CONST {
-			array_ptr.SetArray(ZendArrayDup(array_ptr.GetArr()))
+			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		} else {
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		if IS_CV == IS_VAR {
 
 		}
@@ -33001,14 +33001,14 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
 				}
-				types.Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.GetNNumOfElements() == 0 {
 				EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(ZendHashIteratorAdd(properties, 0))
+			EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
@@ -33263,7 +33263,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
+				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			break
@@ -34067,7 +34067,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 			if IS_CV == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -34599,7 +34599,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -34709,7 +34709,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -34820,7 +34820,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -34930,7 +34930,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -35068,7 +35068,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 				dim = RT_CONSTANT(opline, opline.GetOp2())
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -35176,7 +35176,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -35285,7 +35285,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -35389,7 +35389,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 				dim = RT_CONSTANT(opline, opline.GetOp2())
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -35784,7 +35784,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -35836,16 +35836,16 @@ func ZEND_INIT_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CV != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -35867,7 +35867,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if offset.IsString() {
 				key = offset.GetStr()
 				if IS_CONST != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, &hval) {
+					if types.ZEND_HANDLE_NUMERIC(key, &hval) {
 						goto num_index_dim
 					}
 				}
@@ -35875,12 +35875,12 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key)
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
 			num_index_dim:
-				ZendHashIndexDel(ht, hval)
+				types.ZendHashIndexDel(ht, hval)
 			} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && offset.IsReference() {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
@@ -35977,11 +35977,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, IS_CONST == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, IS_CONST == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -36421,7 +36421,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -36465,7 +36465,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CV_TMPVARCV_HANDLER(executeData *ZendExecuteDat
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -37121,7 +37121,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 			if IS_CV == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -37678,7 +37678,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -37790,7 +37790,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -37903,7 +37903,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -38015,7 +38015,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -38155,7 +38155,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -38264,7 +38264,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -38374,7 +38374,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -38479,7 +38479,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -38854,7 +38854,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -38907,16 +38907,16 @@ func ZEND_INIT_ARRAY_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CV != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -38939,7 +38939,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			if offset.IsString() {
 				key = offset.GetStr()
 				if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, &hval) {
+					if types.ZEND_HANDLE_NUMERIC(key, &hval) {
 						goto num_index_dim
 					}
 				}
@@ -38947,12 +38947,12 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key)
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
 			num_index_dim:
-				ZendHashIndexDel(ht, hval)
+				types.ZendHashIndexDel(ht, hval)
 			} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && offset.IsReference() {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
@@ -39053,11 +39053,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 		if offset.IsString() {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, (IS_TMP_VAR|IS_VAR) == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, (IS_TMP_VAR|IS_VAR) == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -39732,7 +39732,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 			if IS_CV == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -39962,7 +39962,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -40070,7 +40070,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -40179,7 +40179,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -40283,7 +40283,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -40355,7 +40355,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -40407,16 +40407,16 @@ func ZEND_INIT_ARRAY_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CV != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -40459,7 +40459,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	ZendHashDelInd(target_symbol_table, name)
+	types.ZendHashDelInd(target_symbol_table, name)
 	if IS_CV != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -40737,13 +40737,13 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	ht = ZEND_MAP_PTR_GET(executeData.GetFunc().op_array.static_variables_ptr)
 	if ht == nil {
 		b.Assert((executeData.GetFunc().op_array.fn_flags & (ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED)) != 0)
-		ht = ZendArrayDup(executeData.GetFunc().op_array.static_variables)
+		ht = types.ZendArrayDup(executeData.GetFunc().op_array.static_variables)
 		ZEND_MAP_PTR_SET(executeData.GetFunc().op_array.static_variables_ptr, ht)
 	} else if ht.GetRefcount() > 1 {
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 			ht.DelRefcount()
 		}
-		ht = ZendArrayDup(ht)
+		ht = types.ZendArrayDup(ht)
 		ZEND_MAP_PTR_SET(executeData.GetFunc().op_array.static_variables_ptr, ht)
 	}
 	value = (*types.Zval)((*byte)(ht.GetArData() + (opline.GetExtendedValue() & ^(ZEND_BIND_REF | ZEND_BIND_IMPLICIT))))
@@ -40891,7 +40891,7 @@ func ZEND_GET_CLASS_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				if IS_CV == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -40904,7 +40904,7 @@ func ZEND_GET_TYPE_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	var type_ *types.ZendString
 	op1 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
-	type_ = ZendZvalGetType(op1)
+	type_ = types.ZendZvalGetType(op1)
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
@@ -41549,7 +41549,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			if IS_CV == IS_CV && container.GetTypeInfo() == types.IS_UNDEF {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(ZendNewArray(8))
+			container.SetArray(types.ZendNewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -42078,7 +42078,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -42188,7 +42188,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -42299,7 +42299,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -42409,7 +42409,7 @@ assign_object:
 					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 						zobj.GetProperties().DelRefcount()
 					}
-					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
@@ -42547,7 +42547,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 				dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -42655,7 +42655,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -42764,7 +42764,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -42868,7 +42868,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 				dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(ZendNewArray(8))
+				object_ptr.SetArray(types.ZendNewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -43283,7 +43283,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index
 				}
 			}
@@ -43335,16 +43335,16 @@ func ZEND_INIT_ARRAY_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	if IS_CV != IS_UNUSED {
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(ZendNewArray(size))
+		array.SetArray(types.ZendNewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.GetArr())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData)
 	} else {
-		array.SetArray(ZendNewArray(0))
+		array.SetArray(types.ZendNewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -43366,7 +43366,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			if offset.IsString() {
 				key = offset.GetStr()
 				if IS_CV != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, &hval) {
+					if types.ZEND_HANDLE_NUMERIC(key, &hval) {
 						goto num_index_dim
 					}
 				}
@@ -43374,12 +43374,12 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key)
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
 			num_index_dim:
-				ZendHashIndexDel(ht, hval)
+				types.ZendHashIndexDel(ht, hval)
 			} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && offset.IsReference() {
 				offset = types.Z_REFVAL_P(offset)
 				goto offset_again
@@ -43476,11 +43476,11 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 		if offset.IsString() {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, &hval) {
+				if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 					goto num_index_prop
 				}
 			}
-			value = ZendHashFindExInd(ht, str, IS_CV == IS_CONST)
+			value = types.ZendHashFindExInd(ht, str, IS_CV == IS_CONST)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
@@ -47206,8 +47206,8 @@ func InitOpcodeSerialiser() {
 	var i int
 	var tmp types.Zval
 	ZendHandlersTable = Malloc(b.SizeOf("HashTable"))
-	ZendHashInitEx(ZendHandlersTable, ZendHandlersCount, nil, nil, 1, 0)
-	ZendHashRealInit(ZendHandlersTable, 0)
+	types.ZendHashInitEx(ZendHandlersTable, ZendHandlersCount, nil, nil, 1, 0)
+	types.ZendHashRealInit(ZendHandlersTable, 0)
 	tmp.SetTypeInfo(types.IS_LONG)
 	for i = 0; i < ZendHandlersCount; i++ {
 		tmp.SetLval(i)

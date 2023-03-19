@@ -242,7 +242,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 
 			if PG__().http_globals[TRACK_VARS_COOKIE].u1.v.type_ != types.IS_UNDEF && symtable1 == PG__().http_globals[TRACK_VARS_COOKIE].GetArr() && symtable1.SymtableExists(b.CastStr(index, index_len)) {
 				zend.ZvalPtrDtorNogc(val)
-			} else if zend.ZEND_HANDLE_NUMERIC_STR(index, index_len, &idx) {
+			} else if types.ZEND_HANDLE_NUMERIC_STR(index, index_len, &idx) {
 				symtable1.IndexUpdateH(idx, val)
 			} else {
 				PhpRegisterVariableQuick(index, index_len, val, symtable1)
@@ -506,7 +506,7 @@ func ImportEnvironmentVariable(ht *types.HashTable, env *byte) {
 	} else {
 		val.SetString(types.ZendStringInit(p, len_, 0))
 	}
-	if zend.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) {
+	if types.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) {
 		ht.IndexUpdateH(idx, &val)
 	} else {
 		PhpRegisterVariableQuick(env, name_len, &val, ht)
@@ -705,10 +705,10 @@ func PhpAutoGlobalsCreateFiles(name *types.ZendString) types.ZendBool {
 	return 0
 }
 func CheckHttpProxy(var_table *types.HashTable) {
-	if zend.ZendHashStrExists(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1) != 0 {
+	if types.ZendHashStrExists(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1) != 0 {
 		var local_proxy *byte = getenv("HTTP_PROXY")
 		if local_proxy == nil {
-			zend.ZendHashStrDel(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1)
+			types.ZendHashStrDel(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1)
 		} else {
 			var local_zval types.Zval
 			local_zval.SetRawString(b.CastStrAuto(local_proxy))
@@ -723,7 +723,7 @@ func PhpAutoGlobalsCreateServer(name *types.ZendString) types.ZendBool {
 			if SG__().request_info.argc {
 				var argc *types.Zval
 				var argv *types.Zval
-				if b.Assign(&argc, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGC, 1)) != nil && b.Assign(&argv, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil {
+				if b.Assign(&argc, types.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGC, 1)) != nil && b.Assign(&argv, types.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil {
 					argv.AddRefcount()
 					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_ARGV.GetStr(), argv)
 					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_ARGC.GetStr(), argc)

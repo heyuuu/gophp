@@ -30,7 +30,7 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	type_ = zend.ZendZvalGetType(arg)
+	type_ = types.ZendZvalGetType(arg)
 	if type_ != nil {
 		return_value.SetInternedString(type_)
 		return

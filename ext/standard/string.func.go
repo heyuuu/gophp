@@ -1236,7 +1236,7 @@ func ZifPathinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		types.ZVAL_COPY_VALUE(return_value, &tmp)
 	} else {
 		var element *types.Zval
-		if b.Assign(&element, zend.ZendHashGetCurrentData(tmp.GetArr())) != nil {
+		if b.Assign(&element, types.ZendHashGetCurrentData(tmp.GetArr())) != nil {
 			types.ZVAL_COPY_DEREF(return_value, element)
 		} else {
 			zend.ZVAL_EMPTY_STRING(return_value)
@@ -2612,7 +2612,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.ZendString, pats *type
 
 		/* we have to rebuild HashTable with numeric keys */
 
-		zend.ZendHashInit(&str_hash, pats.GetNNumOfElements(), nil, nil, 0)
+		types.ZendHashInit(&str_hash, pats.GetNNumOfElements(), nil, nil, 0)
 		var __ht *types.HashTable = pats
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -4294,7 +4294,7 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
 		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
-		if zend.ZendHashDel(symbol_table, types.ZSTR_THIS) == types.SUCCESS {
+		if types.ZendHashDel(symbol_table, types.ZSTR_THIS) == types.SUCCESS {
 			faults.ThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {

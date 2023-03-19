@@ -91,15 +91,15 @@ const IS_CONSTANT_AST = 11
 const IS_INDIRECT = 13
 const IS_PTR = 14
 const IS_ALIAS_PTR = 15
-const _IS_ERROR = 15
+const IS_ERROR = 15 // _IS_ERROR
 
 /* fake types used only for type hinting (Z_TYPE(zv) can not use them) */
 
-const _IS_BOOL = 16
+const IS_BOOL = 16 // _IS_BOOL
 const IS_CALLABLE = 17
 const IS_ITERABLE = 18
 const IS_VOID = 19
-const _IS_NUMBER = 20
+const IS_NUMBER = 20 // _IS_NUMBER
 
 /* we should never set just Z_TYPE, we should set Z_TYPE_INFO */
 

@@ -3,7 +3,6 @@
 package standard
 
 import (
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -32,10 +31,10 @@ var DirClassEntryPtr *types.ClassEntry
 
 /* {{{ arginfo */
 
-var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("close", 0, ZifClosedir, ArginfoDir),
-	zend.MakeZendFunctionEntryEx("rewind", 0, ZifRewinddir, ArginfoDir),
-	zend.MakeZendFunctionEntryEx("read", 0, PhpIfReaddir, ArginfoDir),
+var PhpDirClassFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("close", 0, ZifClosedir, ArginfoDir),
+	types.MakeZendFunctionEntryEx("rewind", 0, ZifRewinddir, ArginfoDir),
+	types.MakeZendFunctionEntryEx("read", 0, PhpIfReaddir, ArginfoDir),
 }
 
 /* {{{ proto bool chroot(string directory)

@@ -2,7 +2,6 @@ package argparse
 
 import (
 	"fmt"
-	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -70,11 +69,11 @@ func (p *baseParser) triggerError(errorCode int, err string) {
 			faults.InternalTypeErrorEx(p.isThrowEx(), message)
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
-			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, name, zend.ZendZvalTypeName(p.arg))
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, name, types.ZendZvalTypeName(p.arg))
 			faults.InternalTypeErrorEx(p.isThrowEx(), message)
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
-			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, expectedType, zend.ZendZvalTypeName(p.arg))
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, expectedType, types.ZendZvalTypeName(p.arg))
 			faults.InternalTypeErrorEx(p.isThrowEx(), message)
 		}
 	}

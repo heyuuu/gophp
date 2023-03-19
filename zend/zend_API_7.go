@@ -34,7 +34,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	var fn *ZendFunction
 	key = types.ZendStringAlloc(class_name_length, 0)
 	ZendStrTolowerCopy(key.GetVal(), class_name, class_name_length)
-	disabled_class = ZendHashFindPtr(CG__().GetClassTable(), key)
+	disabled_class = types.ZendHashFindPtr(CG__().GetClassTable(), key)
 	types.ZendStringReleaseEx(key, 0)
 	if disabled_class == nil {
 		return types.FAILURE
@@ -53,7 +53,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	disabled_class.GetFunctionTable().Clean()
 	return types.SUCCESS
 }
-func ZendIsCallableCheckClass(name *types.ZendString, scope *types.ClassEntry, fcc *ZendFcallInfoCache, strict_class *int, error **byte) int {
+func ZendIsCallableCheckClass(name *types.ZendString, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error **byte) int {
 	var ret int = 0
 	var ce *types.ClassEntry
 	var name_len int = name.GetLen()
@@ -150,7 +150,7 @@ func ZendIsCallableCheckClass(name *types.ZendString, scope *types.ClassEntry, f
 	lcname.Free()
 	return ret
 }
-func ZendReleaseFcallInfoCache(fcc *ZendFcallInfoCache) {
+func ZendReleaseFcallInfoCache(fcc *types.ZendFcallInfoCache) {
 	if fcc.GetFunctionHandler() != nil && (fcc.GetFunctionHandler().IsCallViaTrampoline() || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION) {
 		if fcc.GetFunctionHandler().GetType() != ZEND_OVERLOADED_FUNCTION && fcc.GetFunctionHandler().GetFunctionName() != nil {
 			types.ZendStringReleaseEx(fcc.GetFunctionHandler().GetFunctionName(), 0)
@@ -159,7 +159,7 @@ func ZendReleaseFcallInfoCache(fcc *ZendFcallInfoCache) {
 	}
 	fcc.SetFunctionHandler(nil)
 }
-func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *ZendFcallInfoCache, strict_class int, error **byte) int {
+func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.ZendFcallInfoCache, strict_class int, error **byte) int {
 	var ce_org *types.ClassEntry = fcc.GetCallingScope()
 	var retval int = 0
 	var mname *types.ZendString
@@ -417,8 +417,8 @@ try_again:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
 		if types.Z_ARRVAL_P(callable).GetNNumOfElements() == 2 {
-			obj = ZendHashIndexFindDeref(callable.GetArr(), 0)
-			method = ZendHashIndexFindDeref(callable.GetArr(), 1)
+			obj = types.ZendHashIndexFindDeref(callable.GetArr(), 0)
+			method = types.ZendHashIndexFindDeref(callable.GetArr(), 1)
 		}
 		if obj == nil || method == nil || method.GetType() != types.IS_STRING {
 			return types.ZSTR_ARRAY_CAPITALIZED

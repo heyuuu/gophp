@@ -61,8 +61,8 @@ var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("subject", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 }
-var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("update", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplObserver_update),
+var spl_funcs_SplObserver []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("update", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplObserver_update),
 }
 var arginfo_SplSubject_attach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
@@ -76,10 +76,10 @@ var arginfo_SplSubject_void []zend.ArgInfo = []zend.ArgInfo{
     ZEND_ARG_OBJ_INFO(0, ignore, SplObserver, 1)
 ZEND_END_ARG_INFO();*/
 
-var spl_funcs_SplSubject []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("attach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_attach),
-	zend.MakeZendFunctionEntryEx("detach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_attach),
-	zend.MakeZendFunctionEntryEx("notify", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_void),
+var spl_funcs_SplSubject []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("attach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_attach),
+	types.MakeZendFunctionEntryEx("detach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_attach),
+	types.MakeZendFunctionEntryEx("notify", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_void),
 }
 var spl_handler_SplObjectStorage zend.ZendObjectHandlers
 
@@ -170,31 +170,31 @@ var arginfo_offsetGet []zend.ArgInfo = []zend.ArgInfo{
 var ArginfoSplobjectVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
-var spl_funcs_SplObjectStorage []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("attach", 0, zim_spl_SplObjectStorage_attach, ArginfoAttach),
-	zend.MakeZendFunctionEntryEx("detach", 0, zim_spl_SplObjectStorage_detach, arginfo_Object),
-	zend.MakeZendFunctionEntryEx("contains", 0, zim_spl_SplObjectStorage_contains, arginfo_Object),
-	zend.MakeZendFunctionEntryEx("addAll", 0, zim_spl_SplObjectStorage_addAll, arginfo_Object),
-	zend.MakeZendFunctionEntryEx("removeAll", 0, zim_spl_SplObjectStorage_removeAll, arginfo_Object),
-	zend.MakeZendFunctionEntryEx("removeAllExcept", 0, zim_spl_SplObjectStorage_removeAllExcept, arginfo_Object),
-	zend.MakeZendFunctionEntryEx("getInfo", 0, zim_spl_SplObjectStorage_getInfo, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("setInfo", 0, zim_spl_SplObjectStorage_setInfo, arginfo_setInfo),
-	zend.MakeZendFunctionEntryEx("getHash", 0, zim_spl_SplObjectStorage_getHash, arginfo_getHash),
-	zend.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("count", 0, zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("rewind", 0, zim_spl_SplObjectStorage_rewind, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("valid", 0, zim_spl_SplObjectStorage_valid, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("key", 0, zim_spl_SplObjectStorage_key, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("current", 0, zim_spl_SplObjectStorage_current, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("next", 0, zim_spl_SplObjectStorage_next, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("unserialize", 0, zim_spl_SplObjectStorage_unserialize, arginfo_Serialized),
-	zend.MakeZendFunctionEntryEx("serialize", 0, zim_spl_SplObjectStorage_serialize, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("__unserialize", 0, zim_spl_SplObjectStorage___unserialize, arginfo_Serialized),
-	zend.MakeZendFunctionEntryEx("__serialize", 0, zim_spl_SplObjectStorage___serialize, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("offsetExists", 0, zim_spl_SplObjectStorage_contains, arginfo_offsetGet),
-	zend.MakeZendFunctionEntryEx("offsetSet", 0, zim_spl_SplObjectStorage_attach, ArginfoAttach),
-	zend.MakeZendFunctionEntryEx("offsetUnset", 0, zim_spl_SplObjectStorage_detach, arginfo_offsetGet),
-	zend.MakeZendFunctionEntryEx("offsetGet", 0, zim_spl_SplObjectStorage_offsetGet, arginfo_offsetGet),
+var spl_funcs_SplObjectStorage []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("attach", 0, zim_spl_SplObjectStorage_attach, ArginfoAttach),
+	types.MakeZendFunctionEntryEx("detach", 0, zim_spl_SplObjectStorage_detach, arginfo_Object),
+	types.MakeZendFunctionEntryEx("contains", 0, zim_spl_SplObjectStorage_contains, arginfo_Object),
+	types.MakeZendFunctionEntryEx("addAll", 0, zim_spl_SplObjectStorage_addAll, arginfo_Object),
+	types.MakeZendFunctionEntryEx("removeAll", 0, zim_spl_SplObjectStorage_removeAll, arginfo_Object),
+	types.MakeZendFunctionEntryEx("removeAllExcept", 0, zim_spl_SplObjectStorage_removeAllExcept, arginfo_Object),
+	types.MakeZendFunctionEntryEx("getInfo", 0, zim_spl_SplObjectStorage_getInfo, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("setInfo", 0, zim_spl_SplObjectStorage_setInfo, arginfo_setInfo),
+	types.MakeZendFunctionEntryEx("getHash", 0, zim_spl_SplObjectStorage_getHash, arginfo_getHash),
+	types.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("count", 0, zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("rewind", 0, zim_spl_SplObjectStorage_rewind, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("valid", 0, zim_spl_SplObjectStorage_valid, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("key", 0, zim_spl_SplObjectStorage_key, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("current", 0, zim_spl_SplObjectStorage_current, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("next", 0, zim_spl_SplObjectStorage_next, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("unserialize", 0, zim_spl_SplObjectStorage_unserialize, arginfo_Serialized),
+	types.MakeZendFunctionEntryEx("serialize", 0, zim_spl_SplObjectStorage_serialize, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("__unserialize", 0, zim_spl_SplObjectStorage___unserialize, arginfo_Serialized),
+	types.MakeZendFunctionEntryEx("__serialize", 0, zim_spl_SplObjectStorage___serialize, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("offsetExists", 0, zim_spl_SplObjectStorage_contains, arginfo_offsetGet),
+	types.MakeZendFunctionEntryEx("offsetSet", 0, zim_spl_SplObjectStorage_attach, ArginfoAttach),
+	types.MakeZendFunctionEntryEx("offsetUnset", 0, zim_spl_SplObjectStorage_detach, arginfo_offsetGet),
+	types.MakeZendFunctionEntryEx("offsetGet", 0, zim_spl_SplObjectStorage_offsetGet, arginfo_offsetGet),
 }
 
 type MultipleIteratorFlags = int
@@ -228,20 +228,20 @@ var arginfo_MultipleIterator_setflags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("flags"),
 }
-var spl_funcs_MultipleIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", 0, zim_spl_MultipleIterator___construct, arginfo_MultipleIterator_setflags),
-	zend.MakeZendFunctionEntryEx("getFlags", 0, zim_spl_MultipleIterator_getFlags, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("setFlags", 0, zim_spl_MultipleIterator_setFlags, arginfo_MultipleIterator_setflags),
-	zend.MakeZendFunctionEntryEx("attachIterator", 0, zim_spl_MultipleIterator_attachIterator, arginfo_MultipleIterator_attachIterator),
-	zend.MakeZendFunctionEntryEx("detachIterator", 0, zim_spl_SplObjectStorage_detach, arginfo_MultipleIterator_detachIterator),
-	zend.MakeZendFunctionEntryEx("containsIterator", 0, zim_spl_SplObjectStorage_contains, arginfo_MultipleIterator_containsIterator),
-	zend.MakeZendFunctionEntryEx("countIterators", 0, zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("rewind", 0, zim_spl_MultipleIterator_rewind, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("valid", 0, zim_spl_MultipleIterator_valid, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("key", 0, zim_spl_MultipleIterator_key, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("current", 0, zim_spl_MultipleIterator_current, ArginfoSplobjectVoid),
-	zend.MakeZendFunctionEntryEx("next", 0, zim_spl_MultipleIterator_next, ArginfoSplobjectVoid),
+var spl_funcs_MultipleIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", 0, zim_spl_MultipleIterator___construct, arginfo_MultipleIterator_setflags),
+	types.MakeZendFunctionEntryEx("getFlags", 0, zim_spl_MultipleIterator_getFlags, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("setFlags", 0, zim_spl_MultipleIterator_setFlags, arginfo_MultipleIterator_setflags),
+	types.MakeZendFunctionEntryEx("attachIterator", 0, zim_spl_MultipleIterator_attachIterator, arginfo_MultipleIterator_attachIterator),
+	types.MakeZendFunctionEntryEx("detachIterator", 0, zim_spl_SplObjectStorage_detach, arginfo_MultipleIterator_detachIterator),
+	types.MakeZendFunctionEntryEx("containsIterator", 0, zim_spl_SplObjectStorage_contains, arginfo_MultipleIterator_containsIterator),
+	types.MakeZendFunctionEntryEx("countIterators", 0, zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("rewind", 0, zim_spl_MultipleIterator_rewind, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("valid", 0, zim_spl_MultipleIterator_valid, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("key", 0, zim_spl_MultipleIterator_key, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("current", 0, zim_spl_MultipleIterator_current, ArginfoSplobjectVoid),
+	types.MakeZendFunctionEntryEx("next", 0, zim_spl_MultipleIterator_next, ArginfoSplobjectVoid),
 }
 
 /* {{{ PHP_MINIT_FUNCTION(spl_observer) */

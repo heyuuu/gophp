@@ -57,8 +57,8 @@ func (this *PhpOutputContext) GetOut() *PhpOutputBuffer { return &this.out }
  * PhpOutputHandlerUserFuncT
  */
 type PhpOutputHandlerUserFuncT struct {
-	fci zend.ZendFcallInfo
-	fcc zend.ZendFcallInfoCache
+	fci types.ZendFcallInfo
+	fcc types.ZendFcallInfoCache
 	zoh types.Zval
 }
 
@@ -69,10 +69,10 @@ type PhpOutputHandlerUserFuncT struct {
 //         zoh:zoh,
 //     }
 // }
-func (this *PhpOutputHandlerUserFuncT) GetFci() zend.ZendFcallInfo { return this.fci }
+func (this *PhpOutputHandlerUserFuncT) GetFci() types.ZendFcallInfo { return this.fci }
 
 // func (this *PhpOutputHandlerUserFuncT) SetFci(value zend.ZendFcallInfo) { this.fci = value }
-func (this *PhpOutputHandlerUserFuncT) GetFcc() zend.ZendFcallInfoCache { return this.fcc }
+func (this *PhpOutputHandlerUserFuncT) GetFcc() types.ZendFcallInfoCache { return this.fcc }
 
 // func (this *PhpOutputHandlerUserFuncT) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }
 func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval { return this.zoh }

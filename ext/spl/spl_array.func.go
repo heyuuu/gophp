@@ -37,7 +37,7 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.HashTable {
 			if (obj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 				obj.GetProperties().DelRefcount()
 			}
-			obj.SetProperties(zend.ZendArrayDup(obj.GetProperties()))
+			obj.SetProperties(types.ZendArrayDup(obj.GetProperties()))
 		}
 		return obj.GetProperties()
 	}
@@ -59,8 +59,8 @@ func SplArrayIsObject(intern *SplArrayObject) types.ZendBool {
 	return intern.IsIsSelf() || intern.GetArray().IsType(types.IS_OBJECT)
 }
 func SplArrayCreateHtIter(ht *types.HashTable, intern *SplArrayObject) {
-	intern.SetHtIter(zend.ZendHashIteratorAdd(ht, ht.currentPosVal()))
-	zend.ZendHashInternalPointerResetEx(ht, zend.EG__().GetHtIterators()[intern.GetHtIter()].GetPos())
+	intern.SetHtIter(types.ZendHashIteratorAdd(ht, ht.currentPosVal()))
+	types.ZendHashInternalPointerResetEx(ht, zend.EG__().GetHtIterators()[intern.GetHtIter()].GetPos())
 	SplArraySkipProtected(intern, ht)
 }
 func SplArrayGetPosPtr(ht *types.HashTable, intern *SplArrayObject) *uint32 {
@@ -72,7 +72,7 @@ func SplArrayGetPosPtr(ht *types.HashTable, intern *SplArrayObject) *uint32 {
 func SplArrayObjectFreeStorage(object *types.ZendObject) {
 	var intern *SplArrayObject = SplArrayFromObj(object)
 	if intern.GetHtIter() != uint32-1 {
-		zend.ZendHashIteratorDel(intern.GetHtIter())
+		types.ZendHashIteratorDel(intern.GetHtIter())
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
 	zend.ZvalPtrDtor(intern.GetArray())
@@ -95,7 +95,7 @@ func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_o
 			if other.IsIsSelf() {
 				intern.GetArray().SetUndef()
 			} else if types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayObject {
-				intern.GetArray().SetArray(zend.ZendArrayDup(SplArrayGetHashTable(other)))
+				intern.GetArray().SetArray(types.ZendArrayDup(SplArrayGetHashTable(other)))
 			} else {
 				b.Assert(types.Z_OBJ_HT_P(orig) == &spl_handler_ArrayIterator)
 				types.ZVAL_COPY(intern.GetArray(), orig)
@@ -123,23 +123,23 @@ func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_o
 		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of ArrayObject or ArrayIterator")
 	}
 	if inherited != 0 {
-		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetget", b.SizeOf("\"offsetget\"")-1))
+		intern.SetFptrOffsetGet(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetget", b.SizeOf("\"offsetget\"")-1))
 		if intern.GetFptrOffsetGet().GetScope() == parent {
 			intern.SetFptrOffsetGet(nil)
 		}
-		intern.SetFptrOffsetSet(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetset", b.SizeOf("\"offsetset\"")-1))
+		intern.SetFptrOffsetSet(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetset", b.SizeOf("\"offsetset\"")-1))
 		if intern.GetFptrOffsetSet().GetScope() == parent {
 			intern.SetFptrOffsetSet(nil)
 		}
-		intern.SetFptrOffsetHas(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetexists", b.SizeOf("\"offsetexists\"")-1))
+		intern.SetFptrOffsetHas(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetexists", b.SizeOf("\"offsetexists\"")-1))
 		if intern.GetFptrOffsetHas().GetScope() == parent {
 			intern.SetFptrOffsetHas(nil)
 		}
-		intern.SetFptrOffsetDel(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetunset", b.SizeOf("\"offsetunset\"")-1))
+		intern.SetFptrOffsetDel(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetunset", b.SizeOf("\"offsetunset\"")-1))
 		if intern.GetFptrOffsetDel().GetScope() == parent {
 			intern.SetFptrOffsetDel(nil)
 		}
-		intern.SetFptrCount(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}
@@ -150,11 +150,11 @@ func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_o
 	if intern.GetStd().GetHandlers() == &spl_handler_ArrayIterator {
 		var funcs_ptr *zend.ZendClassIteratorFuncs = class_type.GetIteratorFuncsPtr()
 		if funcs_ptr.GetZfCurrent() == nil {
-			funcs_ptr.SetZfRewind(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "rewind", b.SizeOf("\"rewind\"")-1))
-			funcs_ptr.SetZfValid(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "valid", b.SizeOf("\"valid\"")-1))
-			funcs_ptr.SetZfKey(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "key", b.SizeOf("\"key\"")-1))
-			funcs_ptr.SetZfCurrent(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "current", b.SizeOf("\"current\"")-1))
-			funcs_ptr.SetZfNext(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "next", b.SizeOf("\"next\"")-1))
+			funcs_ptr.SetZfRewind(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "rewind", b.SizeOf("\"rewind\"")-1))
+			funcs_ptr.SetZfValid(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "valid", b.SizeOf("\"valid\"")-1))
+			funcs_ptr.SetZfKey(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "key", b.SizeOf("\"key\"")-1))
+			funcs_ptr.SetZfCurrent(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "current", b.SizeOf("\"current\"")-1))
+			funcs_ptr.SetZfNext(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "next", b.SizeOf("\"next\"")-1))
 		}
 		if inherited != 0 {
 			if funcs_ptr.GetZfRewind().GetScope() != parent {
@@ -434,7 +434,7 @@ try_again:
 						zend.ZvalPtrDtor(data)
 						data.SetUndef()
 						ht.AddUFlags(types.HASH_FLAG_HAS_EMPTY_IND)
-						zend.ZendHashMoveForwardEx(ht, SplArrayGetPosPtr(ht, intern))
+						types.ZendHashMoveForwardEx(ht, SplArrayGetPosPtr(ht, intern))
 						if SplArrayIsObject(intern) != 0 {
 							SplArraySkipProtected(intern, ht)
 						}
@@ -462,7 +462,7 @@ try_again:
 		index = offset.GetLval()
 	num_index:
 		ht = SplArrayGetHashTable(intern)
-		if zend.ZendHashIndexDel(ht, index) == types.FAILURE {
+		if types.ZendHashIndexDel(ht, index) == types.FAILURE {
 			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 		}
 	case types.IS_REFERENCE:
@@ -606,7 +606,7 @@ func zim_spl_Array_offsetUnset(executeData *zend.ZendExecuteData, return_value *
 func zim_spl_Array_getArrayCopy(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	return_value.SetArray(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
+	return_value.SetArray(types.ZendArrayDup(SplArrayGetHashTable(intern)))
 	return
 }
 func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) *types.HashTable {
@@ -637,7 +637,7 @@ func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) 
 	}
 	ht = SplArrayGetHashTable(intern)
 	if dup != 0 {
-		ht = zend.ZendArrayDup(ht)
+		ht = types.ZendArrayDup(ht)
 	} else {
 		ht.AddRefcount()
 	}
@@ -652,11 +652,11 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.HashTable {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
 	if intern.IsIsSelf() {
-		return zend.ZendArrayDup(intern.GetStd().GetProperties())
+		return types.ZendArrayDup(intern.GetStd().GetProperties())
 	} else {
 		var debug_info *types.HashTable
-		debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
-		zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
+		debug_info = types.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
+		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
 		storage = intern.GetArray()
 		storage.TryAddRefcount()
 		if types.Z_OBJ_HT_P(obj) == &spl_handler_ArrayIterator {
@@ -746,8 +746,8 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.HashTable) int {
 	if SplArrayIsObject(intern) != 0 {
 		var pos_ptr *uint32 = SplArrayGetPosPtr(aht, intern)
 		for {
-			if zend.ZendHashGetCurrentKeyEx(aht, &string_key, &num_key, pos_ptr) == zend.HASH_KEY_IS_STRING {
-				data = zend.ZendHashGetCurrentDataEx(aht, pos_ptr)
+			if types.ZendHashGetCurrentKeyEx(aht, &string_key, &num_key, pos_ptr) == types.HASH_KEY_IS_STRING {
+				data = types.ZendHashGetCurrentDataEx(aht, pos_ptr)
 				if data != nil && data.IsType(types.IS_INDIRECT) && b.Assign(&data, data.GetZv()).GetType() == types.IS_UNDEF {
 
 				} else if string_key.GetLen() == 0 || string_key.GetVal()[0] {
@@ -756,10 +756,10 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.HashTable) int {
 			} else {
 				return types.SUCCESS
 			}
-			if zend.ZendHashHasMoreElementsEx(aht, pos_ptr) != types.SUCCESS {
+			if types.ZendHashHasMoreElementsEx(aht, pos_ptr) != types.SUCCESS {
 				return types.FAILURE
 			}
-			zend.ZendHashMoveForwardEx(aht, pos_ptr)
+			types.ZendHashMoveForwardEx(aht, pos_ptr)
 
 		}
 	}
@@ -767,11 +767,11 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.HashTable) int {
 }
 func SplArrayNextEx(intern *SplArrayObject, aht *types.HashTable) int {
 	var pos_ptr *uint32 = SplArrayGetPosPtr(aht, intern)
-	zend.ZendHashMoveForwardEx(aht, pos_ptr)
+	types.ZendHashMoveForwardEx(aht, pos_ptr)
 	if SplArrayIsObject(intern) != 0 {
 		return SplArraySkipProtected(intern, aht)
 	} else {
-		return zend.ZendHashHasMoreElementsEx(aht, pos_ptr)
+		return types.ZendHashHasMoreElementsEx(aht, pos_ptr)
 	}
 }
 func SplArrayNext(intern *SplArrayObject) int {
@@ -788,7 +788,7 @@ func SplArrayItValid(iter *zend.ZendObjectIterator) int {
 	if object.IsOverloadedValid() {
 		return zend.ZendUserItValid(iter)
 	} else {
-		return zend.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, object))
+		return types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, object))
 	}
 }
 func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
@@ -797,7 +797,7 @@ func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 	if object.IsOverloadedCurrent() {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
-		var data *types.Zval = zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, object))
+		var data *types.Zval = types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, object))
 		if data != nil && data.IsType(types.IS_INDIRECT) {
 			data = data.GetZv()
 		}
@@ -810,7 +810,7 @@ func SplArrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval) {
 	if object.IsOverloadedKey() {
 		zend.ZendUserItGetCurrentKey(iter, key)
 	} else {
-		zend.ZendHashGetCurrentKeyZvalEx(aht, key, SplArrayGetPosPtr(aht, object))
+		types.ZendHashGetCurrentKeyZvalEx(aht, key, SplArrayGetPosPtr(aht, object))
 	}
 }
 func SplArrayItMoveForward(iter *zend.ZendObjectIterator) {
@@ -828,7 +828,7 @@ func SplArrayRewind(intern *SplArrayObject) {
 	if intern.GetHtIter() == uint32-1 {
 		SplArrayGetPosPtr(aht, intern)
 	} else {
-		zend.ZendHashInternalPointerResetEx(aht, SplArrayGetPosPtr(aht, intern))
+		types.ZendHashInternalPointerResetEx(aht, SplArrayGetPosPtr(aht, intern))
 		SplArraySkipProtected(intern, aht)
 	}
 }
@@ -854,7 +854,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 
 			//??? TODO: try to avoid array duplication
 
-			intern.GetArray().SetArray(zend.ZendArrayDup(array.GetArr()))
+			intern.GetArray().SetArray(types.ZendArrayDup(array.GetArr()))
 
 			//??? TODO: try to avoid array duplication
 
@@ -988,7 +988,7 @@ func zim_spl_Array_exchangeArray(executeData *zend.ZendExecuteData, return_value
 		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
-	return_value.SetArray(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
+	return_value.SetArray(types.ZendArrayDup(SplArrayGetHashTable(intern)))
 	SplArraySetArray(object, intern, array, 0, 1)
 }
 func zim_spl_Array_getIterator(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1024,7 +1024,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 		for b.PostDec(&position) > 0 && b.Assign(&result, SplArrayNext(intern)) == types.SUCCESS {
 
 		}
-		if result == types.SUCCESS && zend.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS {
+		if result == types.SUCCESS && types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS {
 			return
 		}
 	}
@@ -1156,7 +1156,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if b.Assign(&entry, zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
+	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
 	if entry.IsType(types.IS_INDIRECT) {
@@ -1176,7 +1176,7 @@ func zim_spl_Array_key(executeData *zend.ZendExecuteData, return_value *types.Zv
 func SplArrayIteratorKey(object *types.Zval, return_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
-	zend.ZendHashGetCurrentKeyZvalEx(aht, return_value, SplArrayGetPosPtr(aht, intern))
+	types.ZendHashGetCurrentKeyZvalEx(aht, return_value, SplArrayGetPosPtr(aht, intern))
 }
 func zim_spl_Array_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
@@ -1194,7 +1194,7 @@ func zim_spl_Array_valid(executeData *zend.ZendExecuteData, return_value *types.
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	types.ZVAL_BOOL(return_value, zend.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS)
+	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS)
 	return
 }
 func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1205,7 +1205,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if b.Assign(&entry, zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
+	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return_value.SetFalse()
 		return
 	}
@@ -1225,7 +1225,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if b.Assign(&entry, zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
+	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
 	if entry.IsType(types.IS_INDIRECT) {

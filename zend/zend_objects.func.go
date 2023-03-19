@@ -70,8 +70,8 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 	if destructor != nil {
 		var old_exception *types.ZendObject
 		var orig_fake_scope *types.ClassEntry
-		var fci ZendFcallInfo
-		var fcic ZendFcallInfoCache
+		var fci types.ZendFcallInfo
+		var fcic types.ZendFcallInfoCache
 		var ret types.Zval
 		if destructor.GetOpArray().HasFnFlags(ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED) {
 			if destructor.GetOpArray().IsPrivate() {
@@ -204,8 +204,8 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		var num_key ZendUlong
 		var key *types.ZendString
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
-			ZendHashRealInitMixed(new_object.GetProperties())
+			new_object.SetProperties(types.ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
+			types.ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
 			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().GetNNumOfElements())
 		}
@@ -224,15 +224,15 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 				ZvalAddRef(&new_prop)
 			}
 			if key != nil {
-				_zendHashAppend(new_object.GetProperties(), key, &new_prop)
+				types._zendHashAppend(new_object.GetProperties(), key, &new_prop)
 			} else {
 				new_object.GetProperties().IndexAddNewH(num_key, &new_prop)
 			}
 		}
 	}
 	if old_object.GetCe().GetClone() != nil {
-		var fci ZendFcallInfo
-		var fcic ZendFcallInfoCache
+		var fci types.ZendFcallInfo
+		var fcic types.ZendFcallInfoCache
 		var ret types.Zval
 		new_object.AddRefcount()
 		ret.SetUndef()

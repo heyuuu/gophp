@@ -510,7 +510,7 @@ func ZendGeneratorGetChild(node *ZendGeneratorNode, leaf *ZendGenerator) *ZendGe
 	} else if node.GetChildren() == 1 {
 		return node.GetChildSingleChild()
 	} else {
-		return ZendHashIndexFindPtr(node.GetHt(), ZendUlong(leaf))
+		return types.ZendHashIndexFindPtr(node.GetHt(), ZendUlong(leaf))
 	}
 }
 func ZendGeneratorSearchMultiChildrenNode(node *ZendGeneratorNode) *ZendGeneratorNode {
@@ -530,11 +530,11 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 	} else {
 		if node.GetChildren() == 1 {
 			var ht *types.HashTable = Emalloc(b.SizeOf("HashTable"))
-			ZendHashInit(ht, 0, nil, nil, 0)
-			ZendHashIndexAddPtr(ht, ZendUlong(node.GetChildSingleLeaf()), node.GetChildSingleChild())
+			types.ZendHashInit(ht, 0, nil, nil, 0)
+			types.ZendHashIndexAddPtr(ht, ZendUlong(node.GetChildSingleLeaf()), node.GetChildSingleChild())
 			node.SetHt(ht)
 		}
-		ZendHashIndexAddPtr(node.GetHt(), ZendUlong(leaf), child)
+		types.ZendHashIndexAddPtr(node.GetHt(), ZendUlong(leaf), child)
 	}
 	node.GetChildren()++
 }
@@ -560,9 +560,9 @@ func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {
 		generator.GetNode().SetPtrLeaf(leaf)
 		for next != nil {
 			if next.GetNode().GetChildren() > 1 {
-				var child *ZendGenerator = ZendHashIndexFindPtr(next.GetNode().GetHt(), ZendUlong(generator))
-				ZendHashIndexDel(next.GetNode().GetHt(), ZendUlong(generator))
-				ZendHashIndexAddPtr(next.GetNode().GetHt(), ZendUlong(leaf), child)
+				var child *ZendGenerator = types.ZendHashIndexFindPtr(next.GetNode().GetHt(), ZendUlong(generator))
+				types.ZendHashIndexDel(next.GetNode().GetHt(), ZendUlong(generator))
+				types.ZendHashIndexAddPtr(next.GetNode().GetHt(), ZendUlong(leaf), child)
 			}
 			next.GetNode().SetPtrLeaf(leaf)
 			next = next.GetNode().GetParent()

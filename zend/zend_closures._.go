@@ -78,10 +78,10 @@ var ArginfoClosureFromcallable []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("callable"),
 }
-var ClosureFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("__construct", ZEND_ACC_PRIVATE, zim_Closure___construct, nil),
-	MakeZendFunctionEntryEx("bind", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_bind, ArginfoClosureBind),
-	MakeZendFunctionEntryEx("bindTo", ZEND_ACC_PUBLIC, zim_Closure_bind, ArginfoClosureBindto),
-	MakeZendFunctionEntryEx("call", ZEND_ACC_PUBLIC, zim_Closure_call, ArginfoClosureCall),
-	MakeZendFunctionEntryEx("fromCallable", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_fromCallable, ArginfoClosureFromcallable),
+var ClosureFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", ZEND_ACC_PRIVATE, zim_Closure___construct, nil),
+	types.MakeZendFunctionEntryEx("bind", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_bind, ArginfoClosureBind),
+	types.MakeZendFunctionEntryEx("bindTo", ZEND_ACC_PUBLIC, zim_Closure_bind, ArginfoClosureBindto),
+	types.MakeZendFunctionEntryEx("call", ZEND_ACC_PUBLIC, zim_Closure_call, ArginfoClosureCall),
+	types.MakeZendFunctionEntryEx("fromCallable", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_fromCallable, ArginfoClosureFromcallable),
 }

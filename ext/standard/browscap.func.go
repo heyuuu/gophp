@@ -145,7 +145,7 @@ func BrowscapConvertPattern(pattern *types.ZendString, persistent int) *types.Ze
 	return res
 }
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.ZendString, persistent types.ZendBool) *types.ZendString {
-	var interned *types.ZendString = zend.ZendHashFindPtr(ctx.GetStrInterned(), str)
+	var interned *types.ZendString = types.ZendHashFindPtr(ctx.GetStrInterned(), str)
 	if interned != nil {
 		interned.AddRefcount()
 	} else {
@@ -153,7 +153,7 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.ZendString, persistent
 		if persistent != 0 {
 			interned = types.ZendNewInternedString(str)
 		}
-		zend.ZendHashAddNewPtr(ctx.GetStrInterned(), interned, interned)
+		types.ZendHashAddNewPtr(ctx.GetStrInterned(), interned, interned)
 	}
 	return interned
 }
@@ -162,7 +162,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.ZendString, persiste
 	var interned *types.ZendString
 	types.ZSTR_ALLOCA_ALLOC(lcname, str.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), str.GetVal(), str.GetLen())
-	interned = zend.ZendHashFindPtr(ctx.GetStrInterned(), lcname)
+	interned = types.ZendHashFindPtr(ctx.GetStrInterned(), lcname)
 	if interned != nil {
 		interned.AddRefcount()
 	} else {
@@ -170,7 +170,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.ZendString, persiste
 		if persistent != 0 {
 			interned = types.ZendNewInternedString(interned)
 		}
-		zend.ZendHashAddNewPtr(ctx.GetStrInterned(), interned, interned)
+		types.ZendHashAddNewPtr(ctx.GetStrInterned(), interned, interned)
 	}
 	lcname.Free()
 	return interned
@@ -187,7 +187,7 @@ func BrowscapAddKv(bdata *BrowserData, key *types.ZendString, value *types.ZendS
 func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.HashTable {
 	var tmp types.Zval
 	var i uint32
-	var ht *types.HashTable = zend.ZendNewArray(8)
+	var ht *types.HashTable = types.ZendNewArray(8)
 	tmp.SetString(BrowscapConvertPattern(entry.GetPattern(), 0))
 	ht.KeyAdd("browser_name_regex", &tmp)
 	tmp.SetStringCopy(entry.GetPattern())
@@ -257,7 +257,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
 		entry = ctx.GetCurrentEntry()
-		zend.ZendHashUpdatePtr(bdata.GetHtab(), pattern, entry)
+		types.ZendHashUpdatePtr(bdata.GetHtab(), pattern, entry)
 		if ctx.GetCurrentSectionName() != nil {
 			types.ZendStringRelease(ctx.GetCurrentSectionName())
 		}
@@ -286,7 +286,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 		return types.FAILURE
 	}
 	browdata.SetHtab(zend.Pemalloc(sizeof*browdata.GetHtab(), persistent))
-	zend.ZendHashInitEx(browdata.GetHtab(), 0, nil, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent, 0)
+	types.ZendHashInitEx(browdata.GetHtab(), 0, nil, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent, 0)
 	browdata.SetKvSize(16 * 1024)
 	browdata.SetKvUsed(0)
 	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv")*browdata.GetKvSize(), persistent))
@@ -296,7 +296,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	ctx.SetBdata(browdata)
 	ctx.SetCurrentEntry(nil)
 	ctx.SetCurrentSectionName(nil)
-	zend.ZendHashInit(ctx.GetStrInterned(), 8, nil, StrInternedDtor, persistent)
+	types.ZendHashInit(ctx.GetStrInterned(), 8, nil, StrInternedDtor, persistent)
 	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
 
 	/* Destroy parser context */
@@ -567,7 +567,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		agent_name = http_user_agent.GetStr()
 	}
 	lookup_browser_name = zend.ZendStringTolower(agent_name)
-	found_entry = zend.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
+	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
 	if found_entry == nil {
 		var entry *BrowscapEntry
 		var __ht *types.HashTable = bdata.GetHtab()
@@ -580,7 +580,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			}
 		}
 		if found_entry == nil {
-			found_entry = zend.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME, b.SizeOf("DEFAULT_SECTION_NAME")-1)
+			found_entry = types.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME, b.SizeOf("DEFAULT_SECTION_NAME")-1)
 			if found_entry == nil {
 				types.ZendStringRelease(lookup_browser_name)
 				return_value.SetFalse()
@@ -595,15 +595,15 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		zend.ObjectAndPropertiesInit(return_value, zend.ZendStandardClassDef, agent_ht)
 	}
 	for found_entry.GetParent() != nil {
-		found_entry = zend.ZendHashFindPtr(bdata.GetHtab(), found_entry.GetParent())
+		found_entry = types.ZendHashFindPtr(bdata.GetHtab(), found_entry.GetParent())
 		if found_entry == nil {
 			break
 		}
 		agent_ht = BrowscapEntryToArray(bdata, found_entry)
 		if return_array != 0 {
-			zend.ZendHashMerge(return_value.GetArr(), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			types.ZendHashMerge(return_value.GetArr(), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		} else {
-			zend.ZendHashMerge(types.Z_OBJPROP_P(return_value), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			types.ZendHashMerge(types.Z_OBJPROP_P(return_value), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		}
 		agent_ht.Destroy()
 		zend.Efree(agent_ht)

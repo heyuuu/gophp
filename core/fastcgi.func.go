@@ -181,7 +181,7 @@ func FcgiInit() int {
 	if IsInitialized == 0 {
 		var sa SaT
 		var len_ socklen_t = b.SizeOf("sa")
-		zend.ZendHashInit(&FcgiMgmtVars, 8, nil, FcgiFreeMgmtVarCb, 1)
+		types.ZendHashInit(&FcgiMgmtVars, 8, nil, FcgiFreeMgmtVarCb, 1)
 		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf("\"FCGI_MPXS_CONNS\"")-1, "0", b.SizeOf("\"0\"")-1)
 		IsInitialized = 1
 		errno = 0

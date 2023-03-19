@@ -78,8 +78,8 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
 	var newthis *types.Zval
 	var closure_result types.Zval
 	var closure *ZendClosure
-	var fci ZendFcallInfo
-	var fci_cache ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fci_cache types.ZendFcallInfoCache
 	var my_function ZendFunction
 	var newobj *types.ZendObject
 	fci.SetParamCount(0)
@@ -192,8 +192,8 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 	ZendCreateClosure(return_value, closure.GetFunc(), ce, called_scope, newthis)
 }
 func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval) {
-	var fci ZendFcallInfo
-	var fcc ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fcc types.ZendFcallInfoCache
 	var params []types.Zval
 	memset(&fci, 0, b.SizeOf("zend_fcall_info"))
 	memset(&fcc, 0, b.SizeOf("zend_fcall_info_cache"))
@@ -211,7 +211,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval
 		ArrayInitSize(fci.GetParams()[1], executeData.NumArgs())
 		ZendCopyParametersArray(executeData.NumArgs(), fci.GetParams()[1])
 	} else {
-		ZVAL_EMPTY_ARRAY(fci.GetParams()[1])
+		types.ZVAL_EMPTY_ARRAY(fci.GetParams()[1])
 	}
 	fci.SetObject(ZEND_THIS(executeData).GetObj())
 	fcc.SetObject(fci.GetObject())
@@ -220,7 +220,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval
 	ZvalPtrDtor(fci.GetParams()[1])
 }
 func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zval, error **byte) int {
-	var fcc ZendFcallInfoCache
+	var fcc types.ZendFcallInfoCache
 	var mptr *ZendFunction
 	var instance types.Zval
 	if ZendIsCallableEx(callable, nil, 0, nil, &fcc, error) == 0 {
@@ -399,11 +399,11 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable 
 	var debug_info *types.HashTable
 	var zstr_args types.ZendBool = closure.GetFunc().GetType() == ZEND_USER_FUNCTION || closure.GetFunc().IsUserArgInfo()
 	*is_temp = 1
-	debug_info = ZendNewArray(8)
+	debug_info = types.ZendNewArray(8)
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 		var var_ *types.Zval
 		var static_variables *types.HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
-		val.SetArray(ZendArrayDup(static_variables))
+		val.SetArray(types.ZendArrayDup(static_variables))
 		debug_info.KeyUpdate(types.ZSTR_STATIC.GetStr(), &val)
 		var __ht *types.HashTable = val.GetArr()
 		for _, _p := range __ht.foreachData() {
@@ -520,7 +520,7 @@ func ZendCreateClosure(res *types.Zval, func_ *ZendFunction, scope *types.ClassE
 		closure.GetFunc().SetIsClosure(true)
 		closure.GetFunc().SetIsImmutable(false)
 		if closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
-			closure.GetFunc().GetOpArray().SetStaticVariables(ZendArrayDup(closure.GetFunc().GetOpArray().GetStaticVariables()))
+			closure.GetFunc().GetOpArray().SetStaticVariables(types.ZendArrayDup(closure.GetFunc().GetOpArray().GetStaticVariables()))
 		}
 		ZEND_MAP_PTR_INIT(closure.GetFunc().GetOpArray().static_variables_ptr, closure.GetFunc().GetOpArray().GetStaticVariables())
 

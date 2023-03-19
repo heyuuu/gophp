@@ -139,7 +139,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.ZendString, va
 	if value.IsConstant() {
 		ce.SetIsConstantsUpdated(false)
 	}
-	if !(ZendHashAddPtr(ce.GetConstantsTable(), name, c)) {
+	if !(types.ZendHashAddPtr(ce.GetConstantsTable(), name, c)) {
 		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
 	}
 	return types.SUCCESS

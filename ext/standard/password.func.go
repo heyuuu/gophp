@@ -20,7 +20,7 @@ func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	return types.FAILURE
 }
 func PhpPasswordAlgoUnregister(ident *byte) {
-	zend.ZendHashStrDel(&PhpPasswordAlgos, ident, strlen(ident))
+	types.ZendHashStrDel(&PhpPasswordAlgos, ident, strlen(ident))
 }
 func PhpPasswordSaltIsAlphabet(str *byte, len_ int) int {
 	var i int = 0
@@ -247,7 +247,7 @@ func PhpPasswordBcryptHash(password *types.ZendString, options *types.ZendArray)
 	return result
 }
 func ZmStartupPassword(type_ int, module_number int) int {
-	zend.ZendHashInit(&PhpPasswordAlgos, 4, nil, zend.ZVAL_PTR_DTOR, 1)
+	types.ZendHashInit(&PhpPasswordAlgos, 4, nil, zend.ZVAL_PTR_DTOR, 1)
 	zend.REGISTER_STRING_CONSTANT("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT)
 	if types.FAILURE == PhpPasswordAlgoRegister("2y", &PhpPasswordAlgoBcrypt) {
 		return types.FAILURE

@@ -11,9 +11,9 @@ import (
 func ZendStartupModuleZval(zv *types.Zval) int {
 	var module *ZendModuleEntry = zv.GetPtr()
 	if ZendStartupModuleEx(module) == types.SUCCESS {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	} else {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	}
 }
 func ZendSortModules(base any, count int, siz int, compare types.CompareFuncT, swp types.SwapFuncT) {
@@ -123,7 +123,7 @@ func ZendCollectModuleHandlers() {
 }
 func ZendStartupModules() int {
 	ModuleRegistry.SortCompatibleEx(ZendSortModules)
-	ZendHashApply(&ModuleRegistry, ZendStartupModuleZval)
+	types.ZendHashApply(&ModuleRegistry, ZendStartupModuleZval)
 	return types.SUCCESS
 }
 func ZendDestroyModules() {
@@ -148,7 +148,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 				name_len = strlen(dep.GetName())
 				lcname = types.ZendStringAlloc(name_len, 0)
 				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if ZendHashExists(&ModuleRegistry, lcname) != 0 || ZendGetExtension(dep.GetName()) != nil {
+				if types.ZendHashExists(&ModuleRegistry, lcname) != 0 || ZendGetExtension(dep.GetName()) != nil {
 					types.ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */
@@ -165,7 +165,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
 	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
 	lcname = types.ZendNewInternedString(lcname)
-	if b.Assign(&module_ptr, ZendHashAddMem(&ModuleRegistry, lcname, module, b.SizeOf("zend_module_entry"))) == nil {
+	if b.Assign(&module_ptr, types.ZendHashAddMem(&ModuleRegistry, lcname, module, b.SizeOf("zend_module_entry"))) == nil {
 		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
 		types.ZendStringRelease(lcname)
 		return nil
@@ -173,7 +173,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	module = module_ptr
 	EG__().SetCurrentModule(module)
 	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
-		ZendHashDel(&ModuleRegistry, lcname)
+		types.ZendHashDel(&ModuleRegistry, lcname)
 		types.ZendStringRelease(lcname)
 		EG__().SetCurrentModule(nil)
 		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
@@ -247,8 +247,8 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *ZendFunction
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
-	var ptr *ZendFunctionEntry = functions
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
+	var ptr *types.ZendFunctionEntry = functions
 	var count int = 0
 	var unload int = 0
 	var target_function_table *types.HashTable = function_table
@@ -391,7 +391,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 		lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = Malloc(b.SizeOf("zend_internal_function"))
 		memcpy(reg_function, &function, b.SizeOf("zend_internal_function"))
-		if ZendHashAddPtr(target_function_table, lowercase_name, reg_function) == nil {
+		if types.ZendHashAddPtr(target_function_table, lowercase_name, reg_function) == nil {
 			unload = 1
 			Free(reg_function)
 			types.ZendStringRelease(lowercase_name)
@@ -500,7 +500,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 			fname_len = strlen(ptr.GetFname())
 			lowercase_name = types.ZendStringAlloc(fname_len, 0)
 			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
-			if ZendHashExists(target_function_table, lowercase_name) != 0 {
+			if types.ZendHashExists(target_function_table, lowercase_name) != 0 {
 				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			types.ZendStringEfree(lowercase_name)

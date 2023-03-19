@@ -94,7 +94,7 @@ type SapiGlobals struct {
 	global_request_time      float64
 	known_post_content_types types.HashTable
 	callback_func            types.Zval
-	fci_cache                zend.ZendFcallInfoCache
+	fci_cache                types.ZendFcallInfoCache
 }
 
 func (this *SapiGlobals) Init() {

@@ -237,9 +237,9 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 			}
 			memoized_result = *result
 		}
-		ZendHashIndexUpdateMem(CG__().GetMemoizedExprs(), uintPtr(expr), &memoized_result, b.SizeOf("znode"))
+		types.ZendHashIndexUpdateMem(CG__().GetMemoizedExprs(), uintPtr(expr), &memoized_result, b.SizeOf("znode"))
 	} else if memoize_mode == ZEND_MEMOIZE_FETCH {
-		var memoized_result *Znode = ZendHashIndexFindPtr(CG__().GetMemoizedExprs(), uintPtr(expr))
+		var memoized_result *Znode = types.ZendHashIndexFindPtr(CG__().GetMemoizedExprs(), uintPtr(expr))
 		*result = *memoized_result
 		if result.GetOpType() == IS_CONST {
 			result.GetConstant().TryAddRefcount()
@@ -278,7 +278,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit typ
 			}
 		}
 		if expr != nil && expr.GetOpType() == IS_CONST {
-			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == types._IS_BOOL && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
+			if return_info.GetType().Code() == expr.GetConstant().GetType() || return_info.GetType().Code() == types.IS_BOOL && (expr.GetConstant().IsFalse() || expr.GetConstant().IsTrue()) || return_info.GetType().AllowNull() && expr.GetConstant().IsNull() {
 
 				/* we don't need run-time check */
 
@@ -346,7 +346,7 @@ func ZendIsConstDefaultClassRef(name_ast *ZendAst) types.ZendBool {
 func ZendHandleNumericOp(node *Znode) {
 	if node.GetOpType() == IS_CONST && node.GetConstant().IsString() {
 		var index ZendUlong
-		if ZEND_HANDLE_NUMERIC(node.GetConstant().GetStr(), &index) {
+		if types.ZEND_HANDLE_NUMERIC(node.GetConstant().GetStr(), &index) {
 			ZvalPtrDtor(node.GetConstant())
 			node.GetConstant().SetLong(index)
 		}
@@ -355,7 +355,7 @@ func ZendHandleNumericOp(node *Znode) {
 func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 	if dim_node.GetConstant().IsString() {
 		var index ZendUlong
-		if ZEND_HANDLE_NUMERIC(dim_node.GetConstant().GetStr(), &index) {
+		if types.ZEND_HANDLE_NUMERIC(dim_node.GetConstant().GetStr(), &index) {
 
 			/* For numeric indexes we also keep the original value to use by ArrayAccess
 			 * See bug #63217

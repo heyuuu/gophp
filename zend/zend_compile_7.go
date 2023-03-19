@@ -13,19 +13,19 @@ func ZendGetImportHt(type_ uint32) *types.HashTable {
 	case ZEND_SYMBOL_CLASS:
 		if FC__().GetImports() == nil {
 			FC__().SetImports(Emalloc(b.SizeOf("HashTable")))
-			ZendHashInit(FC__().GetImports(), 8, nil, StrDtor, 0)
+			types.ZendHashInit(FC__().GetImports(), 8, nil, StrDtor, 0)
 		}
 		return FC__().GetImports()
 	case ZEND_SYMBOL_FUNCTION:
 		if FC__().GetImportsFunction() == nil {
 			FC__().SetImportsFunction(Emalloc(b.SizeOf("HashTable")))
-			ZendHashInit(FC__().GetImportsFunction(), 8, nil, StrDtor, 0)
+			types.ZendHashInit(FC__().GetImportsFunction(), 8, nil, StrDtor, 0)
 		}
 		return FC__().GetImportsFunction()
 	case ZEND_SYMBOL_CONST:
 		if FC__().GetImportsConst() == nil {
 			FC__().SetImportsConst(Emalloc(b.SizeOf("HashTable")))
-			ZendHashInit(FC__().GetImportsConst(), 8, nil, StrDtor, 0)
+			types.ZendHashInit(FC__().GetImportsConst(), 8, nil, StrDtor, 0)
 		}
 		return FC__().GetImportsConst()
 	default:
@@ -113,7 +113,7 @@ func ZendCompileUse(ast *ZendAst) {
 		}
 		old_name.AddRefcount()
 		old_name = types.ZendNewInternedString(old_name)
-		if !(ZendHashAddPtr(current_import, lookup_name, old_name)) {
+		if !(types.ZendHashAddPtr(current_import, lookup_name, old_name)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
 		types.ZendStringReleaseEx(lookup_name, 0)
@@ -161,7 +161,7 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		name = ZendPrefixWithNs(unqualified_name)
 		name = types.ZendNewInternedString(name)
 		if FC__().GetImportsConst() != nil {
-			var import_name *types.ZendString = ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
+			var import_name *types.ZendString = types.ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
 			if import_name != nil && types.ZendStringEquals(import_name, name) == 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 			}
@@ -424,7 +424,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 		return 0
 	}
 	if list.GetChildren() == 0 {
-		ZVAL_EMPTY_ARRAY(result)
+		types.ZVAL_EMPTY_ARRAY(result)
 		return 1
 	}
 	ArrayInitSize(result, list.GetChildren())

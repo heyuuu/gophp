@@ -11,7 +11,7 @@ func CE_STATIC_MEMBERS(ce *types.ClassEntry) *types.Zval {
 	// todo
 	return (ZEND_MAP_PTR_GET(ce.static_members_table__ptr)).(*types.Zval)
 }
-func ZEND_FCI_INITIALIZED(fci ZendFcallInfo) bool { return fci.GetSize() != 0 }
+func ZEND_FCI_INITIALIZED(fci types.ZendFcallInfo) bool { return fci.GetSize() != 0 }
 func ZendGetParametersArray(ht uint32, param_count int, argument_array *types.Zval) int {
 	return _zendGetParametersArrayEx(param_count, argument_array)
 }
@@ -41,8 +41,8 @@ func getThis(executeData *ZendExecuteData) *types.Zval {
 		return nil
 	}
 }
-func ArrayInit(arg *types.Zval)                  { arg.SetArray(ZendNewArray(0)) }
-func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(ZendNewArray(size)) }
+func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.ZendNewArray(0)) }
+func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.ZendNewArray(size)) }
 func AddAssocLong(__arg *types.Zval, __key string, __n ZendLong) int {
 	return AddAssocLongEx(__arg, __key, __n)
 }

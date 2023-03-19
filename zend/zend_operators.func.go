@@ -449,7 +449,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func f
 	dst.SetUndef()
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
 		if types.Z_OBJ_HT_P(op).GetCastObject()(op, dst, ctype) == types.FAILURE {
-			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), ZendGetTypeByConst(ctype))
+			faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), types.ZendGetTypeByConst(ctype))
 		}
 	} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
 		var newop *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, dst)
@@ -487,7 +487,7 @@ try_again:
 		op.SetLong(l)
 	case types.IS_OBJECT:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types._IS_NUMBER, ConvertScalarToNumber)
+		ConvertObjectToType(op, &dst, types.IS_NUMBER, ConvertScalarToNumber)
 		if check != 0 && EG__().GetException() != nil {
 			return
 		}
@@ -522,7 +522,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		holder.SetLong(types.Z_RES_HANDLE_P(op))
 		return holder
 	case types.IS_OBJECT:
-		ConvertObjectToType(op, holder, types._IS_NUMBER, ConvertScalarToNumber)
+		ConvertObjectToType(op, holder, types.IS_NUMBER, ConvertScalarToNumber)
 		if EG__().GetException() != nil || holder.GetType() != types.IS_LONG && holder.GetType() != types.IS_DOUBLE {
 			holder.SetLong(1)
 		}
@@ -699,7 +699,7 @@ try_again:
 		types.ZVAL_BOOL(op, tmp != 0)
 	case types.IS_OBJECT:
 		var dst types.Zval
-		ConvertObjectToType(op, &dst, types._IS_BOOL, ConvertToBoolean)
+		ConvertObjectToType(op, &dst, types.IS_BOOL, ConvertToBoolean)
 		ZvalPtrDtor(op)
 		if dst.GetTypeInfo() == types.IS_FALSE || dst.GetTypeInfo() == types.IS_TRUE {
 			op.SetTypeInfo(dst.GetTypeInfo())
@@ -787,7 +787,7 @@ func _tryConvertToString(op *types.Zval) types.ZendBool {
 	return 1
 }
 func ConvertScalarToArray(op *types.Zval) {
-	var ht *types.HashTable = ZendNewArray(1)
+	var ht *types.HashTable = types.ZendNewArray(1)
 	ht.IndexAddNewH(0, op)
 	op.SetArray(ht)
 }
@@ -802,7 +802,7 @@ try_again:
 		} else {
 			var obj_ht *types.HashTable = ZendGetPropertiesFor(op, ZEND_PROP_PURPOSE_ARRAY_CAST)
 			if obj_ht != nil {
-				var new_obj_ht *types.HashTable = ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
+				var new_obj_ht *types.HashTable = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
 				ZvalPtrDtor(op)
 				op.SetArray(new_obj_ht)
 				ZendReleaseProperties(obj_ht)
@@ -833,13 +833,13 @@ func ConvertToObject(op *types.Zval) {
 try_again:
 	switch op.GetType() {
 	case types.IS_ARRAY:
-		var ht *types.HashTable = ZendSymtableToProptable(Z_ARR_P(op))
+		var ht *types.HashTable = types.ZendSymtableToProptable(Z_ARR_P(op))
 		var obj *types.ZendObject
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 			/* TODO: try not to duplicate immutable arrays as well ??? */
 
-			ht = ZendArrayDup(ht)
+			ht = types.ZendArrayDup(ht)
 
 			/* TODO: try not to duplicate immutable arrays as well ??? */
 
@@ -1044,11 +1044,11 @@ func AddFunctionArray(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 
 	}
 	if result != op1 {
-		result.SetArray(ZendArrayDup(op1.GetArr()))
+		result.SetArray(types.ZendArrayDup(op1.GetArr()))
 	} else {
 		types.SEPARATE_ARRAY(result)
 	}
-	ZendHashMerge(result.GetArr(), op2.GetArr(), ZvalAddRef, 0)
+	types.ZendHashMerge(result.GetArr(), op2.GetArr(), ZvalAddRef, 0)
 }
 func AddFunctionFast(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
@@ -2448,7 +2448,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return ret
 				} else if op2.GetType() != types.IS_OBJECT && types.Z_OBJ_HT_P(op1).GetCastObject() != nil {
 					tmp_free.SetUndef()
-					if types.Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(op2.IsFalse() || op2.IsTrue(), types._IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
+					if types.Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(op2.IsFalse() || op2.IsTrue(), types.IS_BOOL, func() __auto__ { return op2.GetType() })) == types.FAILURE {
 						result.SetLong(1)
 						ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
@@ -2467,7 +2467,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					return ret
 				} else if op1.GetType() != types.IS_OBJECT && types.Z_OBJ_HT_P(op2).GetCastObject() != nil {
 					tmp_free.SetUndef()
-					if types.Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(op1.IsFalse() || op1.IsTrue(), types._IS_BOOL, func() __auto__ { return op1.GetType() })) == types.FAILURE {
+					if types.Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(op1.IsFalse() || op1.IsTrue(), types.IS_BOOL, func() __auto__ { return op1.GetType() })) == types.FAILURE {
 						result.SetLong(-1)
 						ZendFreeObjGetResult(&tmp_free)
 						return types.SUCCESS
@@ -2552,7 +2552,7 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	case types.IS_STRING:
 		return types.ZendStringEquals(op1.GetStr(), op2.GetStr())
 	case types.IS_ARRAY:
-		return op1.GetArr() == op2.GetArr() || ZendHashCompare(op1.GetArr(), op2.GetArr(), types.CompareFuncT(HashZvalIdenticalFunction), 1) == 0
+		return op1.GetArr() == op2.GetArr() || types.ZendHashCompare(op1.GetArr(), op2.GetArr(), types.CompareFuncT(HashZvalIdenticalFunction), 1) == 0
 	case types.IS_OBJECT:
 		return op1.GetObj() == op2.GetObj()
 	default:
@@ -2835,7 +2835,7 @@ func ZendIsTrue(op *types.Zval) int    { return IZendIsTrue(op) }
 func ZendObjectIsTrue(op *types.Zval) int {
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
 		var tmp types.Zval
-		if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types._IS_BOOL) == types.SUCCESS {
+		if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types.IS_BOOL) == types.SUCCESS {
 			return tmp.IsTrue()
 		}
 		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", types.Z_OBJ_P(op).GetCe().GetName().GetVal())
@@ -3154,7 +3154,7 @@ func ZendCompareSymbolTables(ht1 *types.HashTable, ht2 *types.HashTable) int {
 	if ht1 == ht2 {
 		return 0
 	} else {
-		return ZendHashCompare(ht1, ht2, types.CompareFuncT(HashZvalCompareFunction), 0)
+		return types.ZendHashCompare(ht1, ht2, types.CompareFuncT(HashZvalCompareFunction), 0)
 	}
 }
 func ZendCompareArrays(a1 *types.Zval, a2 *types.Zval) int {

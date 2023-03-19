@@ -176,7 +176,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = group.GetStr().GetVal()
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group))
 				return_value.SetFalse()
 				return
 			}
@@ -205,7 +205,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(group))
 		return_value.SetFalse()
 		return
 	}
@@ -279,7 +279,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = user.GetStr().GetVal()
 			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user))
 				return_value.SetFalse()
 				return
 			}
@@ -308,7 +308,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", types.ZendZvalTypeName(user))
 		return_value.SetFalse()
 		return
 	}

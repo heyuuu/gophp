@@ -2,7 +2,6 @@ package argparse
 
 import (
 	b "sik/builtin"
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -246,8 +245,8 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 			p.triggerError(ZPP_ERROR_FAILURE, "")
 		}
 	case 'f':
-		fci := va.Pop().(*zend.ZendFcallInfo)
-		fcc := va.Pop().(*zend.ZendFcallInfoCache)
+		fci := va.Pop().(*types.ZendFcallInfo)
+		fcc := va.Pop().(*types.ZendFcallInfoCache)
 		err, ok := ParseFunc(p.arg, fci, fcc, checkNull)
 		if !ok {
 			if err != nil {

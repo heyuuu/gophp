@@ -86,11 +86,11 @@ func NormalizeProtectedVariable(varname *byte) {
 }
 func AddProtectedVariable(varname *byte) {
 	NormalizeProtectedVariable(varname)
-	zend.ZendHashStrAddEmptyElement(&(PG__().rfc1867_protected_variables), varname, strlen(varname))
+	types.ZendHashStrAddEmptyElement(&(PG__().rfc1867_protected_variables), varname, strlen(varname))
 }
 func IsProtectedVariable(varname *byte) types.ZendBool {
 	NormalizeProtectedVariable(varname)
-	return zend.ZendHashStrExists(&(PG__().rfc1867_protected_variables), varname, strlen(varname))
+	return types.ZendHashStrExists(&(PG__().rfc1867_protected_variables), varname, strlen(varname))
 }
 func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types.Zval, override_protection types.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
@@ -607,9 +607,9 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	/* Initialize $_FILES[] */
 
-	zend.ZendHashInit(&(PG__().rfc1867_protected_variables), 8, nil, nil, 0)
+	types.ZendHashInit(&(PG__().rfc1867_protected_variables), 8, nil, nil, 0)
 	zend.ALLOC_HASHTABLE(uploaded_files)
-	zend.ZendHashInit(uploaded_files, 8, nil, FreeFilename, 0)
+	types.ZendHashInit(uploaded_files, 8, nil, FreeFilename, 0)
 	SG__().rfc1867_uploaded_files = uploaded_files
 	if PG__().http_globals[TRACK_VARS_FILES].u1.v.type_ != types.IS_ARRAY {
 
@@ -890,7 +890,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				}
 				temp_filename = nil
 			} else {
-				zend.ZendHashAddPtr(SG__().rfc1867_uploaded_files, temp_filename, temp_filename)
+				types.ZendHashAddPtr(SG__().rfc1867_uploaded_files, temp_filename, temp_filename)
 			}
 
 			/* is_arr_upload is true when name of file upload field

@@ -22,10 +22,10 @@ type PhpBasicGlobals struct {
 	strtok_table                 []byte
 	strtok_len                   zend.ZendUlong
 	str_ebuf                     []byte
-	array_walk_fci               zend.ZendFcallInfo
-	array_walk_fci_cache         zend.ZendFcallInfoCache
-	user_compare_fci             zend.ZendFcallInfo
-	user_compare_fci_cache       zend.ZendFcallInfoCache
+	array_walk_fci               types.ZendFcallInfo
+	array_walk_fci_cache         types.ZendFcallInfoCache
+	user_compare_fci             types.ZendFcallInfo
+	user_compare_fci_cache       types.ZendFcallInfoCache
 	user_tick_functions          *zend.ZendLlist
 	active_ini_file_section      types.Zval
 	page_uid                     zend.ZendLong

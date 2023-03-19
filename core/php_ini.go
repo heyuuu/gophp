@@ -1,7 +1,6 @@
 package core
 
 import (
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -14,7 +13,7 @@ type Configuration struct {
 }
 
 func (this *Configuration) Init() {
-	zend.ZendHashInit(&this.hash, 8, nil, ConfigZvalDtor, 1)
+	types.ZendHashInit(&this.hash, 8, nil, ConfigZvalDtor, 1)
 }
 
 func (this *Configuration) Set(key string, value string) *types.Zval {

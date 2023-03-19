@@ -359,7 +359,7 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 				name_len = strlen(dep.GetName())
 				lcname = types.ZendStringAlloc(name_len, 0)
 				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if b.Assign(&req_mod, ZendHashFindPtr(&ModuleRegistry, lcname)) == nil || req_mod.GetModuleStarted() == 0 {
+				if b.Assign(&req_mod, types.ZendHashFindPtr(&ModuleRegistry, lcname)) == nil || req_mod.GetModuleStarted() == 0 {
 					types.ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */

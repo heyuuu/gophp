@@ -32,7 +32,7 @@ func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict types.
 	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
 }
 func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
-	var arr *types.ZendArray = ZendNewArray(size)
+	var arr *types.ZendArray = types.ZendNewArray(size)
 	if zv.IsReference() {
 		var ref *types.ZendReference = zv.GetRef()
 		if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -80,66 +80,4 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 }
 func ZendWrongParamCount() {
 	faults.InternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
-}
-func ZendGetTypeByConst(type_ types.ZendUchar) string {
-	switch type_ {
-	case types.IS_FALSE, types.IS_TRUE, types._IS_BOOL:
-		return "bool"
-	case types.IS_LONG:
-		return "int"
-	case types.IS_DOUBLE:
-		return "float"
-	case types.IS_STRING:
-		return "string"
-	case types.IS_OBJECT:
-		return "object"
-	case types.IS_RESOURCE:
-		return "resource"
-	case types.IS_NULL:
-		return "null"
-	case types.IS_CALLABLE:
-		return "callable"
-	case types.IS_ITERABLE:
-		return "iterable"
-	case types.IS_ARRAY:
-		return "array"
-	case types.IS_VOID:
-		return "void"
-	case types._IS_NUMBER:
-		return "number"
-	default:
-		return "unknown"
-	}
-}
-func ZendZvalTypeName(arg *types.Zval) string {
-	arg = types.ZVAL_DEREF(arg)
-	return ZendGetTypeByConst(arg.GetType())
-}
-func ZendZvalGetType(arg *types.Zval) *types.ZendString {
-	switch arg.GetType() {
-	case types.IS_NULL:
-		return types.ZSTR_NULL
-	case types.IS_FALSE:
-
-	case types.IS_TRUE:
-		return types.ZSTR_BOOLEAN
-	case types.IS_LONG:
-		return types.ZSTR_INTEGER
-	case types.IS_DOUBLE:
-		return types.ZSTR_DOUBLE
-	case types.IS_STRING:
-		return types.ZSTR_STRING
-	case types.IS_ARRAY:
-		return types.ZSTR_ARRAY
-	case types.IS_OBJECT:
-		return types.ZSTR_OBJECT
-	case types.IS_RESOURCE:
-		if ZendRsrcListGetRsrcType(arg.GetRes()) != nil {
-			return types.ZSTR_RESOURCE
-		} else {
-			return types.ZSTR_CLOSED_RESOURCE
-		}
-	default:
-		return nil
-	}
 }

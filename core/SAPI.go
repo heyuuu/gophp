@@ -54,8 +54,8 @@ type ISapiModule interface {
 	SetPhpinfoAsText(value int)
 	GetIniEntries() *byte
 	SetIniEntries(value *byte)
-	GetAdditionalFunctions() *zend.ZendFunctionEntry
-	SetAdditionalFunctions(value *zend.ZendFunctionEntry)
+	GetAdditionalFunctions() *types.ZendFunctionEntry
+	SetAdditionalFunctions(value *types.ZendFunctionEntry)
 	GetInputFilterInit() func() uint
 	SetInputFilterInit(value func() uint)
 }
@@ -88,7 +88,7 @@ type BaseSapiModule struct {
 	ini_defaults          func(configuration_hash *types.HashTable)
 	phpinfo_as_text       int
 	ini_entries           *byte
-	additional_functions  *zend.ZendFunctionEntry
+	additional_functions  *types.ZendFunctionEntry
 	input_filter_init     func() uint
 }
 
@@ -202,10 +202,10 @@ func (this *BaseSapiModule) GetPhpinfoAsText() int      { return this.phpinfo_as
 func (this *BaseSapiModule) SetPhpinfoAsText(value int) { this.phpinfo_as_text = value }
 func (this *BaseSapiModule) GetIniEntries() *byte       { return this.ini_entries }
 func (this *BaseSapiModule) SetIniEntries(value *byte)  { this.ini_entries = value }
-func (this *BaseSapiModule) GetAdditionalFunctions() *zend.ZendFunctionEntry {
+func (this *BaseSapiModule) GetAdditionalFunctions() *types.ZendFunctionEntry {
 	return this.additional_functions
 }
-func (this *BaseSapiModule) SetAdditionalFunctions(value *zend.ZendFunctionEntry) {
+func (this *BaseSapiModule) SetAdditionalFunctions(value *types.ZendFunctionEntry) {
 	this.additional_functions = value
 }
 func (this *BaseSapiModule) GetInputFilterInit() func() uint      { return this.input_filter_init }

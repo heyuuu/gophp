@@ -41,7 +41,7 @@ func MakeInternalFunctionSimplify(handler ZifHandler) ZendInternalFunction {
 	return ZendInternalFunction{handler: handler}
 }
 
-func (this *ZendInternalFunction) InitByEntry(entry *ZendFunctionEntry) {
+func (this *ZendInternalFunction) InitByEntry(entry *types.ZendFunctionEntry) {
 	this.handler = entry.Handler()
 	this.function_name = types.NewZendString(entry.FuncName())
 	this.prototype = nil

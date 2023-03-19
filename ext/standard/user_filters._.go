@@ -55,10 +55,10 @@ var arginfo_php_user_filter_onCreate []zend.ArgInfo = []zend.ArgInfo{
 var arginfo_php_user_filter_onClose []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
-var UserFilterClassFuncs []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("filter", 0, ZifUserFilterNop, ArginfoPhpUserFilterFilter),
-	zend.MakeZendFunctionEntryEx("onCreate", 0, ZifUserFilterNop, arginfo_php_user_filter_onCreate),
-	zend.MakeZendFunctionEntryEx("onClose", 0, ZifUserFilterNop, arginfo_php_user_filter_onClose),
+var UserFilterClassFuncs []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("filter", 0, ZifUserFilterNop, ArginfoPhpUserFilterFilter),
+	types.MakeZendFunctionEntryEx("onCreate", 0, ZifUserFilterNop, arginfo_php_user_filter_onCreate),
+	types.MakeZendFunctionEntryEx("onClose", 0, ZifUserFilterNop, arginfo_php_user_filter_onClose),
 }
 var UserFilterClassEntry types.ClassEntry
 var UserfilterOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(UserfilterFilter, UserfilterDtor, "user-filter")

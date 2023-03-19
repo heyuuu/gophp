@@ -1,11 +1,14 @@
 package zend
 
-import "log"
+import (
+	"log"
+	"sik/zend/types"
+)
 
 /**
  * 函数定义相关
  */
-type DefFuncType = ZendFunctionEntry
+type DefFuncType = types.ZendFunctionEntry
 type DefFuncOpts struct {
 	name       string
 	handler    ZifHandler

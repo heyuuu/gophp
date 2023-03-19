@@ -136,7 +136,7 @@ func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format st
 			if symbol_table == nil {
 				params[4].SetNull()
 			} else {
-				params[4].SetArray(zend.ZendArrayDup(symbol_table))
+				params[4].SetArray(types.ZendArrayDup(symbol_table))
 			}
 			types.ZVAL_COPY_VALUE(&orig_user_error_handler, zend.EG__().GetUserErrorHandler())
 			zend.EG__().GetUserErrorHandler().SetUndef()

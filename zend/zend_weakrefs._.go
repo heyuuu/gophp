@@ -14,8 +14,8 @@ var ZendWeakrefCreateArginfo = []ArgInfo{
 var ZendWeakrefGetArginfo = []ArgInfo{
 	MakeReturnArgInfo(0, ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_OBJECT, 1))),
 }
-var ZendWeakrefMethods = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("__construct", ZEND_ACC_PUBLIC, zim_WeakReference___construct, nil),
-	MakeZendFunctionEntryEx("create", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_WeakReference_create, ZendWeakrefCreateArginfo),
-	MakeZendFunctionEntryEx("get", ZEND_ACC_PUBLIC, zim_WeakReference_get, ZendWeakrefGetArginfo),
+var ZendWeakrefMethods = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", ZEND_ACC_PUBLIC, zim_WeakReference___construct, nil),
+	types.MakeZendFunctionEntryEx("create", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_WeakReference_create, ZendWeakrefCreateArginfo),
+	types.MakeZendFunctionEntryEx("get", ZEND_ACC_PUBLIC, zim_WeakReference_get, ZendWeakrefGetArginfo),
 }

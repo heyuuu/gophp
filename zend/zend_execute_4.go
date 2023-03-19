@@ -157,7 +157,7 @@ func ZendUndefinedMethod(ce *types.ClassEntry, method *types.ZendString) {
 	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.GetName().GetVal(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
-	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.GetStr().GetVal(), ZendGetTypeByConst(object.GetType()))
+	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.GetStr().GetVal(), types.ZendGetTypeByConst(object.GetType()))
 }
 func ZendNonStaticMethodCall(fbc *ZendFunction) {
 	if fbc.IsAllowStatic() {
@@ -241,7 +241,7 @@ try_again:
 	if dim.IsLong() {
 		hval = dim.GetLval()
 	num_index:
-		ZEND_HASH_INDEX_FIND(ht, hval, retval, num_undef)
+		types.ZEND_HASH_INDEX_FIND(ht, hval, retval, num_undef)
 		return retval
 	num_undef:
 		switch type_ {
@@ -263,7 +263,7 @@ try_again:
 	} else if dim.IsString() {
 		offset_key = dim.GetStr()
 		{
-			if ZEND_HANDLE_NUMERIC(offset_key, &hval) {
+			if types.ZEND_HANDLE_NUMERIC(offset_key, &hval) {
 				goto num_index
 			}
 		}

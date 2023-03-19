@@ -72,13 +72,13 @@ func CleanModuleConstant(el *types.Zval, arg any) int {
 	var c *ZendConstant = (*ZendConstant)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ZEND_CONSTANT_MODULE_NUMBER(c) == module_number {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	} else {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	}
 }
 func CleanModuleConstants(module_number int) {
-	ZendHashApplyWithArgument(EG__().GetZendConstants(), CleanModuleConstant, any(&module_number))
+	types.ZendHashApplyWithArgument(EG__().GetZendConstants(), CleanModuleConstant, any(&module_number))
 }
 func ZendRegisterStandardConstants() {
 	REGISTER_MAIN_LONG_CONSTANT("E_ERROR", faults.E_ERROR, CONST_PERSISTENT|CONST_CS)
@@ -157,7 +157,7 @@ func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
 		/* check for __COMPILER_HALT_OFFSET__ */
 
 		haltname := ZendManglePropertyName_Ex(haltoff, cfilename)
-		c = ZendHashFindPtr(EG__().GetZendConstants(), haltname)
+		c = types.ZendHashFindPtr(EG__().GetZendConstants(), haltname)
 		return c
 	} else {
 		return nil
@@ -175,10 +175,10 @@ func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) int {
 }
 func ZendGetConstantStrImpl(name *byte, name_len int) *ZendConstant {
 	var c *ZendConstant
-	if b.Assign(&c, ZendHashStrFindPtr(EG__().GetZendConstants(), name, name_len)) == nil {
+	if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), name, name_len)) == nil {
 		var lcname *byte = DoAlloca(name_len+1, use_heap)
 		ZendStrTolowerCopy(lcname, name, name_len)
-		if b.Assign(&c, ZendHashStrFindPtr(EG__().GetZendConstants(), lcname, name_len)) != nil {
+		if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname, name_len)) != nil {
 			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 				c = nil
 			}
@@ -285,7 +285,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 			ce = ZendFetchClass(class_name, flags)
 		}
 		if ce != nil {
-			c = ZendHashFindPtr(ce.GetConstantsTable(), constant_name)
+			c = types.ZendHashFindPtr(ce.GetConstantsTable(), constant_name)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
 					faults.ThrowError(nil, "Undefined class constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
@@ -342,12 +342,12 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 
 		lcname[prefix_len] = '\\'
 		memcpy(lcname+prefix_len+1, constant_name, const_name_len+1)
-		if b.Assign(&c, ZendHashStrFindPtr(EG__().GetZendConstants(), lcname, lcname_len)) == nil {
+		if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname, lcname_len)) == nil {
 
 			/* try lowercase */
 
 			ZendStrTolower(lcname+prefix_len+1, const_name_len)
-			if b.Assign(&c, ZendHashStrFindPtr(EG__().GetZendConstants(), lcname, lcname_len)) != nil {
+			if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname, lcname_len)) != nil {
 				if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 					c = nil
 				}
@@ -385,7 +385,7 @@ func ZendHashAddConstant(ht *types.HashTable, key *types.ZendString, c *ZendCons
 	var ret any
 	var copy *ZendConstant = Pemalloc(b.SizeOf("zend_constant"), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
 	memcpy(copy, c, b.SizeOf("zend_constant"))
-	ret = ZendHashAddPtr(ht, key, copy)
+	ret = types.ZendHashAddPtr(ht, key, copy)
 	if !ret {
 		Pefree(copy, ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
 	}

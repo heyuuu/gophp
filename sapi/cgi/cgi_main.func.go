@@ -264,7 +264,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 		}
 		if core.PG__().http_globals[core.TRACK_VARS_ENV].u1.v.type_ == types.IS_ARRAY && array_ptr.GetArr() != core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr() {
 			array_ptr.GetArr().DestroyEx()
-			array_ptr.SetArr(zend.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr()))
+			array_ptr.SetArr(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr()))
 			return
 		}
 	}
@@ -369,12 +369,12 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 	/* Find cached config entry: If not found, create one */
 
-	if b.Assign(&entry, zend.ZendHashStrFindPtr(&(CGIG(user_config_cache)), path, path_len)) == nil {
+	if b.Assign(&entry, types.ZendHashStrFindPtr(&(CGIG(user_config_cache)), path, path_len)) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"), 1)
 		new_entry.SetExpires(0)
 		new_entry.SetUserConfig((*types.HashTable)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
-		zend.ZendHashInit(new_entry.GetUserConfig(), 8, nil, types.DtorFuncT(core.ConfigZvalDtor), 1)
-		entry = zend.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), path, path_len, new_entry)
+		types.ZendHashInit(new_entry.GetUserConfig(), 8, nil, types.DtorFuncT(core.ConfigZvalDtor), 1)
+		entry = types.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), path, path_len, new_entry)
 	}
 
 	/* Check whether cache entry has expired and rescan if it is */
@@ -900,7 +900,7 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	zend.ZendHashInit(php_cgi_globals.GetUserConfigCache(), 8, nil, UserConfigCacheEntryDtor, 1)
+	types.ZendHashInit(php_cgi_globals.GetUserConfigCache(), 8, nil, UserConfigCacheEntryDtor, 1)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)

@@ -25,4 +25,4 @@ var ModuleRequestStartupHandlers **ZendModuleEntry
 var ModuleRequestShutdownHandlers **ZendModuleEntry
 var ModulePostDeactivateHandlers **ZendModuleEntry
 var ClassCleanupHandlers **types.ClassEntry
-var DisabledClassNew []ZendFunctionEntry = []ZendFunctionEntry{}
+var DisabledClassNew []types.ZendFunctionEntry = []types.ZendFunctionEntry{}

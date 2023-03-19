@@ -301,7 +301,7 @@ func (this *PhpCliServer) handler(writer http.ResponseWriter, request *http.Requ
 func (this *PhpCliServer) NewClient() *PhpCliServerClient {
 	client := NewPhpCliServerClient(this)
 	PhpCliServerClientCtor(client, this)
-	zend.ZendHashIndexUpdatePtr(&this.clients, 0, client)
+	types.ZendHashIndexUpdatePtr(&this.clients, 0, client)
 	return client
 }
 

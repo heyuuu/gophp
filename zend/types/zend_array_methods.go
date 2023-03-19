@@ -165,10 +165,10 @@ func (this *HashTable) applyValidBucket(apply_func func(p *Bucket) int) {
 			continue
 		}
 		var result = apply_func(p)
-		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_REMOVE) {
+		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
 			this.deleteBucket(idx)
 		}
-		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_STOP) {
+		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
 			break
 		}
 	}
@@ -180,10 +180,10 @@ func (this *HashTable) applyValidBucketReserve(apply_func func(p *Bucket) int) {
 			continue
 		}
 		var result = apply_func(p)
-		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_REMOVE) {
+		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
 			this.deleteBucket(idx - 1)
 		}
-		if b.FlagMatch(result, zend.ZEND_HASH_APPLY_STOP) {
+		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
 			break
 		}
 	}
@@ -234,7 +234,7 @@ func (this *HashTable) removeHoles() bool {
 	}
 
 	if this.HasIterators() {
-		var iterPos = zend.ZendHashIteratorsLowerPos(this, 0)
+		var iterPos = ZendHashIteratorsLowerPos(this, 0)
 
 		this.eachValidBucket(func(pos uint32, p *Bucket) {
 			// 移动 bucket 到新位置
@@ -242,8 +242,8 @@ func (this *HashTable) removeHoles() bool {
 			if pos != newPos {
 				if pos >= iterPos {
 					for {
-						zend.ZendHashIteratorsUpdate(this, iterPos, newPos)
-						iterPos = zend.ZendHashIteratorsLowerPos(this, iterPos+1)
+						ZendHashIteratorsUpdate(this, iterPos, newPos)
+						iterPos = ZendHashIteratorsLowerPos(this, iterPos+1)
 						if iterPos >= pos {
 							break
 						}
@@ -360,7 +360,7 @@ func (this *HashTable) Extend(nSize uint32) {
 	this.assertRc1()
 	if nSize > this.nTableSize {
 		// 无内存复制，仅扩充尺寸标识
-		this.nTableSize = zend.ZendHashCheckSize(nSize)
+		this.nTableSize = ZendHashCheckSize(nSize)
 	}
 }
 

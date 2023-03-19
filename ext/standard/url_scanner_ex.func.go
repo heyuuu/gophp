@@ -38,7 +38,7 @@ func PhpIniOnUpdateTags(
 			return types.FAILURE
 		}
 	}
-	zend.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
+	types.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')
@@ -53,7 +53,7 @@ func PhpIniOnUpdateTags(
 			keylen = q - key
 			str = types.ZendStringInit(key, keylen, 1)
 			types.GC_MAKE_PERSISTENT_LOCAL(str)
-			zend.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
+			types.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
 			types.ZendStringReleaseEx(str, 1)
 		}
 	}
@@ -113,7 +113,7 @@ func PhpIniOnUpdateHosts(
 		keylen = q - key
 		if keylen > 0 {
 			tmp_key = types.ZendStringInit(key, keylen, 0)
-			zend.ZendHashAddEmptyElement(hosts, tmp_key)
+			types.ZendHashAddEmptyElement(hosts, tmp_key)
 			types.ZendStringReleaseEx(tmp_key, 0)
 		}
 	}
@@ -172,7 +172,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetHost() != nil {
 		var tmp *types.ZendString = zend.ZendStringTolower(url_parts.GetHost())
-		if zend.ZendHashExists(&(BG__().url_adapt_session_hosts_ht), tmp) == 0 {
+		if types.ZendHashExists(&(BG__().url_adapt_session_hosts_ht), tmp) == 0 {
 			types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)
@@ -351,7 +351,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 
 	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
 
-	if b.Assign(&(ctx.GetLookupData()), zend.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetVal(), ctx.GetTag().GetS().GetLen())) != nil {
+	if b.Assign(&(ctx.GetLookupData()), types.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetVal(), ctx.GetTag().GetS().GetLen())) != nil {
 		ok = 1
 		if ctx.GetTag().GetS().GetLen() == b.SizeOf("\"form\"")-1 && !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) {
 			ctx.SetTagType(TAG_FORM)

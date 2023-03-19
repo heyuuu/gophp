@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 const SOCK_EINVAL = EINVAL
@@ -57,8 +58,8 @@ var CliServerModuleEntry = zend.MakeZendModuleEntry(
 	"API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS,
 )
 
-var ServerAdditionalFunctions = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, nil),
-	zend.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, nil),
-	zend.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, nil),
+var ServerAdditionalFunctions = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, nil),
+	types.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, nil),
+	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, nil),
 }

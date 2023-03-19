@@ -8,9 +8,9 @@ import (
 	"sik/zend/types"
 )
 
-func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, check_flags uint32, fcc *ZendFcallInfoCache, error **byte) types.ZendBool {
+func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, check_flags uint32, fcc *types.ZendFcallInfoCache, error **byte) types.ZendBool {
 	var ret types.ZendBool
-	var fcc_local ZendFcallInfoCache
+	var fcc_local types.ZendFcallInfoCache
 	var strict_class int = 0
 	if fcc == nil {
 		fcc = &fcc_local
@@ -128,7 +128,7 @@ func ZendIsCallableEx(
 	object *types.ZendObject,
 	check_flags uint32,
 	callable_name **types.ZendString,
-	fcc *ZendFcallInfoCache,
+	fcc *types.ZendFcallInfoCache,
 	error **byte,
 ) types.ZendBool {
 	var ret types.ZendBool = ZendIsCallableImpl(callable, object, check_flags, fcc, error)
@@ -143,8 +143,8 @@ func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **ty
 func ZendFcallInfoInit(
 	callable *types.Zval,
 	check_flags uint32,
-	fci *ZendFcallInfo,
-	fcc *ZendFcallInfoCache,
+	fci *types.ZendFcallInfo,
+	fcc *types.ZendFcallInfoCache,
 	callable_name **types.ZendString,
 	error **byte,
 ) int {
@@ -160,7 +160,7 @@ func ZendFcallInfoInit(
 	fci.SetNoSeparation(1)
 	return types.SUCCESS
 }
-func ZendFcallInfoArgsClear(fci *ZendFcallInfo, free_mem int) {
+func ZendFcallInfoArgsClear(fci *types.ZendFcallInfo, free_mem int) {
 	if fci.GetParams() != nil {
 		var p *types.Zval = fci.GetParams()
 		var end *types.Zval = p + fci.GetParamCount()
@@ -175,18 +175,18 @@ func ZendFcallInfoArgsClear(fci *ZendFcallInfo, free_mem int) {
 	}
 	fci.SetParamCount(0)
 }
-func ZendFcallInfoArgsSave(fci *ZendFcallInfo, param_count *int, params **types.Zval) {
+func ZendFcallInfoArgsSave(fci *types.ZendFcallInfo, param_count *int, params **types.Zval) {
 	*param_count = fci.GetParamCount()
 	*params = fci.GetParams()
 	fci.SetParamCount(0)
 	fci.SetParams(nil)
 }
-func ZendFcallInfoArgsRestore(fci *ZendFcallInfo, param_count int, params *types.Zval) {
+func ZendFcallInfoArgsRestore(fci *types.ZendFcallInfo, param_count int, params *types.Zval) {
 	ZendFcallInfoArgsClear(fci, 1)
 	fci.SetParamCount(param_count)
 	fci.SetParams(params)
 }
-func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *types.Zval) int {
+func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ *ZendFunction, args *types.Zval) int {
 	var arg *types.Zval
 	var params *types.Zval
 	var n uint32 = 1
@@ -216,10 +216,10 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *types.Zv
 	}
 	return types.SUCCESS
 }
-func ZendFcallInfoArgs(fci *ZendFcallInfo, args *types.Zval) int {
+func ZendFcallInfoArgs(fci *types.ZendFcallInfo, args *types.Zval) int {
 	return ZendFcallInfoArgsEx(fci, nil, args)
 }
-func ZendFcallInfoArgp(fci *ZendFcallInfo, argc int, argv *types.Zval) int {
+func ZendFcallInfoArgp(fci *types.ZendFcallInfo, argc int, argv *types.Zval) int {
 	var i int
 	if argc < 0 {
 		return types.FAILURE
@@ -234,7 +234,7 @@ func ZendFcallInfoArgp(fci *ZendFcallInfo, argc int, argv *types.Zval) int {
 	}
 	return types.SUCCESS
 }
-func ZendFcallInfoArgv(fci *ZendFcallInfo, argc int, argv *va_list) int {
+func ZendFcallInfoArgv(fci *types.ZendFcallInfo, argc int, argv *va_list) int {
 	var i int
 	var arg *types.Zval
 	if argc < 0 {
@@ -251,7 +251,7 @@ func ZendFcallInfoArgv(fci *ZendFcallInfo, argc int, argv *va_list) int {
 	}
 	return types.SUCCESS
 }
-func ZendFcallInfoArgn(fci *ZendFcallInfo, argc int, _ ...any) int {
+func ZendFcallInfoArgn(fci *types.ZendFcallInfo, argc int, _ ...any) int {
 	var ret int
 	var argv va_list
 	va_start(argv, argc)
@@ -259,7 +259,7 @@ func ZendFcallInfoArgn(fci *ZendFcallInfo, argc int, _ ...any) int {
 	va_end(argv)
 	return ret
 }
-func ZendFcallInfoCall(fci *ZendFcallInfo, fcc *ZendFcallInfoCache, retval_ptr *types.Zval, args *types.Zval) int {
+func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, retval_ptr *types.Zval, args *types.Zval) int {
 	var retval types.Zval
 	var org_params *types.Zval = nil
 	var result int
@@ -288,7 +288,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 	var module *ZendModuleEntry
 	lname = types.ZendStringAlloc(name_len, 0)
 	ZendStrTolowerCopy(lname.GetVal(), module_name, name_len)
-	module = ZendHashFindPtr(&ModuleRegistry, lname)
+	module = types.ZendHashFindPtr(&ModuleRegistry, lname)
 	types.ZendStringEfree(lname)
 	if module != nil {
 		return module.GetVersion()
@@ -333,10 +333,10 @@ func ZendDeclareTypedProperty(
 		access_type |= ZEND_ACC_PUBLIC
 	}
 	if (access_type & ZEND_ACC_STATIC) != 0 {
-		if b.Assign(&property_info_ptr, ZendHashFindPtr(ce.GetPropertiesInfo(), name)) != nil && property_info_ptr.IsStatic() {
+		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name)) != nil && property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
-			ZendHashDel(ce.GetPropertiesInfo(), name)
+			types.ZendHashDel(ce.GetPropertiesInfo(), name)
 		} else {
 			ce.GetDefaultStaticMembersCount()++
 			property_info.SetOffset(ce.GetDefaultStaticMembersCount() - 1)
@@ -359,10 +359,10 @@ func ZendDeclareTypedProperty(
 		}
 	} else {
 		var property_default_ptr *types.Zval
-		if b.Assign(&property_info_ptr, ZendHashFindPtr(ce.GetPropertiesInfo(), name)) != nil && !property_info_ptr.IsStatic() {
+		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name)) != nil && !property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
-			ZendHashDel(ce.GetPropertiesInfo(), name)
+			types.ZendHashDel(ce.GetPropertiesInfo(), name)
 			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
 			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info
@@ -424,7 +424,7 @@ func ZendDeclareTypedProperty(
 	property_info.SetDocComment(doc_comment)
 	property_info.SetCe(ce)
 	property_info.SetType(type_)
-	ZendHashUpdatePtr(ce.GetPropertiesInfo(), name, property_info)
+	types.ZendHashUpdatePtr(ce.GetPropertiesInfo(), name, property_info)
 	return types.SUCCESS
 }
 func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict types.ZendBool) int {

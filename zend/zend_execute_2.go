@@ -11,7 +11,7 @@ import (
 
 func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) types.ZendBool {
 	switch type_hint {
-	case types._IS_BOOL:
+	case types.IS_BOOL:
 		var dest types.ZendBool
 		if argparse.ZendParseArgBoolWeak(arg, &dest) == 0 {
 			return 0
@@ -85,9 +85,9 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
 	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
 	void(prop_type1)
 	if info.GetType().IsClass() {
-		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
 	} else {
-		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return types.ZendGetTypeByConst(property.GetType()) }))
 	}
 }
 func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
@@ -135,7 +135,7 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *types.Zval, strict
 		return 1
 	} else if property.IsNull() {
 		return info.GetType().AllowNull()
-	} else if info.GetType().Code() == types._IS_BOOL && property.IsFalse() || property.IsTrue() {
+	} else if info.GetType().Code() == types.IS_BOOL && property.IsFalse() || property.IsTrue() {
 		return 1
 	} else if info.GetType().Code() == types.IS_ITERABLE {
 		return ZendIsIterable(property)
@@ -210,7 +210,7 @@ func ZendCheckType(
 		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
 	} else if type_.Code() == types.IS_ITERABLE {
 		return ZendIsIterable(arg)
-	} else if type_.Code() == types._IS_BOOL && arg.IsFalse() || arg.IsTrue() {
+	} else if type_.Code() == types.IS_BOOL && arg.IsFalse() || arg.IsTrue() {
 		return 1
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
 		return 0

@@ -1556,7 +1556,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	/* register additional functions */
 
 	if SM__().GetAdditionalFunctions() != nil {
-		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard", b.SizeOf("\"standard\"")-1)) != nil {
+		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard", b.SizeOf("\"standard\"")-1)) != nil {
 			zend.EG__().SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
 			zend.EG__().SetCurrentModule(nil)
@@ -1570,7 +1570,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* make core report what it should */
 
-	if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, "core", b.SizeOf("\"core\"")-1)) != nil {
+	if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "core", b.SizeOf("\"core\"")-1)) != nil {
 		module.SetVersion(PHP_VERSION)
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}
@@ -1700,7 +1700,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		if primary_file.GetFilename() != nil && strcmp("Standard input code", primary_file.GetFilename()) && primary_file.GetOpenedPath() == nil && primary_file.GetType() != zend.ZEND_HANDLE_FILENAME {
 			if ExpandFilepath(primary_file.GetFilename(), realfile) != nil {
 				primary_file.SetOpenedPath(types.ZendStringInit(realfile, strlen(realfile), 0))
-				zend.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primary_file.GetOpenedPath())
+				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primary_file.GetOpenedPath())
 			}
 		}
 		if PG__().auto_prepend_file && PG__().auto_prepend_file[0] {

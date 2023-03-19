@@ -408,7 +408,7 @@ func ZendResolvePropertyTypes() {
 				if prop_info.GetType().IsName() {
 					var type_name *types.ZendString = prop_info.GetType().Name()
 					var lc_type_name *types.ZendString = ZendStringTolower(type_name)
-					var prop_ce *types.ClassEntry = ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
+					var prop_ce *types.ClassEntry = types.ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
 					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 					types.ZendStringRelease(lc_type_name)
@@ -578,7 +578,7 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 		}
 		op_array = ZendCompileFile(file_handle, type_)
 		if file_handle.GetOpenedPath() != nil {
-			ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath())
+			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath())
 		}
 		ZendDestroyFileHandle(file_handle)
 		if op_array != nil {

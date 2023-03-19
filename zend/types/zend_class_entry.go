@@ -62,13 +62,13 @@ type ClassEntry struct {
 			doc_comment *ZendString
 		}
 		internal struct {
-			builtin_functions *zend.ZendFunctionEntry
+			builtin_functions *ZendFunctionEntry
 			module            *zend.ZendModuleEntry
 		}
 	}
 }
 
-func (this *ClassEntry) InitMethods(functions []zend.ZendFunctionEntry) {
+func (this *ClassEntry) InitMethods(functions []ZendFunctionEntry) {
 	this.SetConstructor(nil)
 	this.SetDestructor(nil)
 	this.SetClone(nil)
@@ -252,10 +252,10 @@ func (this *ClassEntry) GetDocComment() *ZendString { return this.info.user.doc_
 func (this *ClassEntry) SetDocComment(value *ZendString) {
 	this.info.user.doc_comment = value
 }
-func (this *ClassEntry) GetBuiltinFunctions() *zend.ZendFunctionEntry {
+func (this *ClassEntry) GetBuiltinFunctions() *ZendFunctionEntry {
 	return this.info.internal.builtin_functions
 }
-func (this *ClassEntry) SetBuiltinFunctions(value *zend.ZendFunctionEntry) {
+func (this *ClassEntry) SetBuiltinFunctions(value *ZendFunctionEntry) {
 	this.info.internal.builtin_functions = value
 }
 func (this *ClassEntry) GetModule() *zend.ZendModuleEntry      { return this.info.internal.module }

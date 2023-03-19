@@ -271,7 +271,7 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 			if (types.Z_OBJ_P(arg).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 				types.Z_OBJ_P(arg).GetProperties().DelRefcount()
 			}
-			types.Z_OBJ_P(arg).SetProperties(zend.ZendArrayDup(types.Z_OBJ_P(arg).GetProperties()))
+			types.Z_OBJ_P(arg).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(arg).GetProperties()))
 		}
 		return types.Z_OBJ_HT_P(arg).GetGetProperties()(arg), true
 	} else if checkNull && arg.IsNull() {
@@ -301,7 +301,7 @@ func ParseResource(arg *types.Zval, checkNull bool) (dest *types.Zval, ok bool) 
 	}
 }
 
-func ParseFunc(arg *types.Zval, dest_fci *zend.ZendFcallInfo, dest_fcc *zend.ZendFcallInfoCache, checkNull bool) (error *string, ok bool) {
+func ParseFunc(arg *types.Zval, dest_fci *types.ZendFcallInfo, dest_fcc *types.ZendFcallInfoCache, checkNull bool) (error *string, ok bool) {
 	if checkNull && arg.IsNull() {
 		dest_fci.SetSize(0)
 		dest_fcc.SetFunctionHandler(nil)

@@ -11,8 +11,8 @@ import (
  * _spl_cbfilter_it_intern
  */
 type _spl_cbfilter_it_intern struct {
-	fci    zend.ZendFcallInfo
-	fcc    zend.ZendFcallInfoCache
+	fci    types.ZendFcallInfo
+	fcc    types.ZendFcallInfoCache
 	object *types.ZendObject
 }
 
@@ -23,10 +23,10 @@ type _spl_cbfilter_it_intern struct {
 //         object:object,
 //     }
 // }
-func (this *_spl_cbfilter_it_intern) GetFci() zend.ZendFcallInfo { return this.fci }
+func (this *_spl_cbfilter_it_intern) GetFci() types.ZendFcallInfo { return this.fci }
 
 // func (this *_spl_cbfilter_it_intern) SetFci(value zend.ZendFcallInfo) { this.fci = value }
-func (this *_spl_cbfilter_it_intern) GetFcc() zend.ZendFcallInfoCache { return this.fcc }
+func (this *_spl_cbfilter_it_intern) GetFcc() types.ZendFcallInfoCache { return this.fcc }
 
 // func (this *_spl_cbfilter_it_intern) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }
 func (this *_spl_cbfilter_it_intern) GetObject() *types.ZendObject      { return this.object }
@@ -422,8 +422,8 @@ type SplIteratorApplyInfo struct {
 	obj   *types.Zval
 	args  *types.Zval
 	count zend.ZendLong
-	fci   zend.ZendFcallInfo
-	fcc   zend.ZendFcallInfoCache
+	fci   types.ZendFcallInfo
+	fcc   types.ZendFcallInfoCache
 }
 
 // func MakeSplIteratorApplyInfo(obj *zend.Zval, args *zend.Zval, count zend.ZendLong, fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) SplIteratorApplyInfo {
@@ -442,9 +442,9 @@ func (this *SplIteratorApplyInfo) GetArgs() *types.Zval         { return this.ar
 func (this *SplIteratorApplyInfo) SetArgs(value *types.Zval)    { this.args = value }
 func (this *SplIteratorApplyInfo) GetCount() zend.ZendLong      { return this.count }
 func (this *SplIteratorApplyInfo) SetCount(value zend.ZendLong) { this.count = value }
-func (this *SplIteratorApplyInfo) GetFci() zend.ZendFcallInfo   { return this.fci }
+func (this *SplIteratorApplyInfo) GetFci() types.ZendFcallInfo  { return this.fci }
 
 // func (this *SplIteratorApplyInfo) SetFci(value zend.ZendFcallInfo) { this.fci = value }
-func (this *SplIteratorApplyInfo) GetFcc() zend.ZendFcallInfoCache { return this.fcc }
+func (this *SplIteratorApplyInfo) GetFcc() types.ZendFcallInfoCache { return this.fcc }
 
 // func (this *SplIteratorApplyInfo) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }

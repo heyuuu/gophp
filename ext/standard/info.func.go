@@ -120,7 +120,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var key *types.ZendString
 	key = types.ZendStringInit(name, name_length, 0)
 	zend.ZendIsAutoGlobal(key)
-	if b.Assign(&data, zend.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key)) != nil && data.IsType(types.IS_ARRAY) {
+	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key)) != nil && data.IsType(types.IS_ARRAY) {
 		var __ht *types.HashTable = data.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -328,8 +328,8 @@ func PhpPrintInfo(flag int) {
 	if (flag & PHP_INFO_MODULES) != 0 {
 		var sorted_registry types.HashTable
 		var module *zend.ZendModuleEntry
-		zend.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
-		zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
+		types.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
+		types.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		sorted_registry.SortCompatible(ModuleNameCmp, 0)
 		var __ht *types.HashTable = &sorted_registry
 		for _, _p := range __ht.foreachData() {

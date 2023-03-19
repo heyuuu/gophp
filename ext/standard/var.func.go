@@ -46,7 +46,7 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, ind
 		b.Assert(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
 			return b.CondF(prop_info.GetType().IsCe(), func() *types.ZendString { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.ZendString { return prop_info.GetType().Name() }).GetVal()
-		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.GetType().Code()) }))
+		}, func() *byte { return types.ZendGetTypeByConst(prop_info.GetType().Code()) }))
 	} else {
 		PhpVarDump(zv, level+2)
 	}
@@ -228,7 +228,7 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, in
 		b.Assert(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
 			return b.CondF(prop_info.GetType().IsCe(), func() *types.ZendString { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.ZendString { return prop_info.GetType().Name() }).GetVal()
-		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.GetType().Code()) }))
+		}, func() *byte { return types.ZendGetTypeByConst(prop_info.GetType().Code()) }))
 	} else {
 		PhpDebugZvalDump(zv, level+2)
 	}
@@ -741,7 +741,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 	var props *types.HashTable = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
 	var retval int = types.SUCCESS
-	zend.ZendHashInit(ht, sleep_retval.GetNNumOfElements(), nil, zend.ZVAL_PTR_DTOR, 0)
+	types.ZendHashInit(ht, sleep_retval.GetNNumOfElements(), nil, zend.ZVAL_PTR_DTOR, 0)
 
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
@@ -931,7 +931,7 @@ again:
 		var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
 		var incomplete_class types.ZendBool
 		var count uint32
-		if zend.ZendHashStrExists(ce.GetFunctionTable(), "__serialize", b.SizeOf("\"__serialize\"")-1) != 0 {
+		if types.ZendHashStrExists(ce.GetFunctionTable(), "__serialize", b.SizeOf("\"__serialize\"")-1) != 0 {
 			var retval types.Zval
 			var obj types.Zval
 			var key *types.ZendString
@@ -1005,7 +1005,7 @@ again:
 			}
 			return
 		}
-		if ce != PHP_IC_ENTRY && zend.ZendHashStrExists(ce.GetFunctionTable(), "__sleep", b.SizeOf("\"__sleep\"")-1) != 0 {
+		if ce != PHP_IC_ENTRY && types.ZendHashStrExists(ce.GetFunctionTable(), "__sleep", b.SizeOf("\"__sleep\"")-1) != 0 {
 			var retval types.Zval
 			var tmp types.Zval
 			struc.AddRefcount()
@@ -1067,7 +1067,7 @@ func PhpVarSerializeInit() PhpSerializeDataT {
 
 	if BG__().serialize_lock || !(BG__().serialize.level) {
 		d = zend.Emalloc(b.SizeOf("struct php_serialize_data"))
-		zend.ZendHashInit(d.GetHt(), 16, nil, zend.ZVAL_PTR_DTOR, 0)
+		types.ZendHashInit(d.GetHt(), 16, nil, zend.ZVAL_PTR_DTOR, 0)
 		d.SetN(0)
 		if !(BG__().serialize_lock) {
 			BG__().serialize.data = d
@@ -1168,7 +1168,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	if options != nil {
 		var classes *types.Zval
 		var max_depth *types.Zval
-		classes = zend.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
+		classes = types.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
 		if classes != nil && classes.GetType() != types.IS_ARRAY && classes.GetType() != types.IS_TRUE && classes.GetType() != types.IS_FALSE {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "allowed_classes option should be array or boolean")
 			return_value.SetFalse()
@@ -1176,7 +1176,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		}
 		if classes != nil && (classes.IsType(types.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
 			zend.ALLOC_HASHTABLE(class_hash)
-			zend.ZendHashInit(class_hash, b.CondF1(classes.IsType(types.IS_ARRAY), func() __auto__ { return types.Z_ARRVAL_P(classes).GetNNumOfElements() }, 0), nil, nil, 0)
+			types.ZendHashInit(class_hash, b.CondF1(classes.IsType(types.IS_ARRAY), func() __auto__ { return types.Z_ARRVAL_P(classes).GetNNumOfElements() }, 0), nil, nil, 0)
 		}
 		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
 			var entry *types.Zval
@@ -1188,7 +1188,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 				entry = _z
 				zend.ConvertToStringEx(entry)
 				lcname = zend.ZendStringTolower(entry.GetStr())
-				zend.ZendHashAddEmptyElement(class_hash, lcname)
+				types.ZendHashAddEmptyElement(class_hash, lcname)
 				types.ZendStringReleaseEx(lcname, 0)
 			}
 
@@ -1202,7 +1202,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 		}
 		var_hash.SetAllowedClasses(class_hash)
-		max_depth = zend.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
+		max_depth = types.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
 		if max_depth != nil {
 			if max_depth.GetType() != types.IS_LONG {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth should be int")

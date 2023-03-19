@@ -47,9 +47,9 @@ func ReverseConflictDtor(zv *types.Zval) {
 }
 func PhpOutputStartup() {
 	PhpOutputInitGlobals(&OutputGlobals)
-	zend.ZendHashInit(&PhpOutputHandlerAliases, 8, nil, nil, 1)
-	zend.ZendHashInit(&PhpOutputHandlerConflicts, 8, nil, nil, 1)
-	zend.ZendHashInit(&PhpOutputHandlerReverseConflicts, 8, nil, ReverseConflictDtor, 1)
+	types.ZendHashInit(&PhpOutputHandlerAliases, 8, nil, nil, 1)
+	types.ZendHashInit(&PhpOutputHandlerConflicts, 8, nil, nil, 1)
+	types.ZendHashInit(&PhpOutputHandlerReverseConflicts, 8, nil, ReverseConflictDtor, 1)
 	PhpOutputDirect = PhpOutputStdout
 }
 func PhpOutputShutdown() {
@@ -305,12 +305,12 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 	if PhpOutputLockError(PHP_OUTPUT_HANDLER_START) != 0 || handler == nil {
 		return types.FAILURE
 	}
-	if nil != b.Assign(&conflict, zend.ZendHashFindPtr(&PhpOutputHandlerConflicts, handler.GetName())) {
+	if nil != b.Assign(&conflict, types.ZendHashFindPtr(&PhpOutputHandlerConflicts, handler.GetName())) {
 		if types.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
 			return types.FAILURE
 		}
 	}
-	if nil != b.Assign(&rconflicts, zend.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
+	if nil != b.Assign(&rconflicts, types.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
 		var __ht *types.HashTable = rconflicts
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -360,7 +360,7 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
-	zend.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str, check_func)
+	types.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str, check_func)
 	types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }
@@ -371,27 +371,27 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 		faults.Error(faults.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return types.FAILURE
 	}
-	if nil != b.Assign(&rev_ptr, zend.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
-		if zend.ZendHashNextIndexInsertPtr(rev_ptr, check_func) {
+	if nil != b.Assign(&rev_ptr, types.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
+		if types.ZendHashNextIndexInsertPtr(rev_ptr, check_func) {
 			return types.SUCCESS
 		} else {
 			return types.FAILURE
 		}
 	} else {
 		var str *types.ZendString
-		zend.ZendHashInit(&rev, 8, nil, nil, 1)
-		if nil == zend.ZendHashNextIndexInsertPtr(&rev, check_func) {
+		types.ZendHashInit(&rev, 8, nil, nil, 1)
+		if nil == types.ZendHashNextIndexInsertPtr(&rev, check_func) {
 			rev.Destroy()
 			return types.FAILURE
 		}
 		str = types.ZendStringInitInterned(name, name_len, 1)
-		zend.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str, &rev, b.SizeOf("HashTable"))
+		types.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str, &rev, b.SizeOf("HashTable"))
 		types.ZendStringReleaseEx(str, 1)
 		return types.SUCCESS
 	}
 }
 func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT {
-	return zend.ZendHashStrFindPtr(&PhpOutputHandlerAliases, name, name_len)
+	return types.ZendHashStrFindPtr(&PhpOutputHandlerAliases, name, name_len)
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *types.ZendString
@@ -400,7 +400,7 @@ func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHand
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
-	zend.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str, func_)
+	types.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str, func_)
 	types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }

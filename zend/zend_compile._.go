@@ -577,7 +577,7 @@ var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{
 	MakeBuiltinTypeInfo(ZEND_STRL("int"), types.IS_LONG),
 	MakeBuiltinTypeInfo(ZEND_STRL("float"), types.IS_DOUBLE),
 	MakeBuiltinTypeInfo(ZEND_STRL("string"), types.IS_STRING),
-	MakeBuiltinTypeInfo(ZEND_STRL("bool"), types._IS_BOOL),
+	MakeBuiltinTypeInfo(ZEND_STRL("bool"), types.IS_BOOL),
 	MakeBuiltinTypeInfo(ZEND_STRL("void"), types.IS_VOID),
 	MakeBuiltinTypeInfo(ZEND_STRL("iterable"), types.IS_ITERABLE),
 	MakeBuiltinTypeInfo(ZEND_STRL("object"), types.IS_OBJECT),

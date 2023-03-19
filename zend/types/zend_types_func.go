@@ -1,5 +1,3 @@
-// <<generate>>
-
 package types
 
 import (
@@ -72,7 +70,7 @@ func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
 }
 func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
 func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
-	return faketype == realtype || faketype == _IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
+	return faketype == realtype || faketype == IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
 func Z_FE_ITER_P(zval_p *Zval) uint32      { return zval_p.GetFeIterIdx() }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
@@ -221,7 +219,7 @@ func SEPARATE_ARRAY(zv *Zval) {
 		if _zv.IsRefcounted() {
 			_arr.DelRefcount()
 		}
-		ZVAL_ARR(_zv, zend.ZendArrayDup(_arr))
+		ZVAL_ARR(_zv, ZendArrayDup(_arr))
 	}
 }
 func SEPARATE_ZVAL_IF_NOT_REF(zv *Zval) {
@@ -231,7 +229,7 @@ func SEPARATE_ZVAL_IF_NOT_REF(zv *Zval) {
 			if __zv.IsRefcounted() {
 				Z_DELREF_P(__zv)
 			}
-			ZVAL_ARR(__zv, zend.ZendArrayDup(__zv.GetArr()))
+			ZVAL_ARR(__zv, ZendArrayDup(__zv.GetArr()))
 		}
 	}
 }
@@ -249,7 +247,7 @@ func SEPARATE_ZVAL(zv *Zval) {
 			if _r.DelRefcount() == 0 {
 				zend.EfreeSize(_r, b.SizeOf("zend_reference"))
 			} else if _zv.IsArray() {
-				ZVAL_ARR(_zv, zend.ZendArrayDup(_zv.GetArr()))
+				ZVAL_ARR(_zv, ZendArrayDup(_zv.GetArr()))
 				break
 			} else if _zv.IsRefcounted() {
 				Z_ADDREF_P(_zv)
@@ -274,4 +272,65 @@ func ZVAL_COPY_PROP(z *Zval, v *Zval) {
 func ZVAL_COPY_OR_DUP_PROP(z *Zval, v *Zval) {
 	ZVAL_COPY_OR_DUP(z, v)
 	z.SetU2Extra(v.GetU2Extra())
+}
+
+func ZendGetTypeByConst(type_ ZendUchar) string {
+	switch type_ {
+	case IS_FALSE, IS_TRUE, IS_BOOL:
+		return "bool"
+	case IS_LONG:
+		return "int"
+	case IS_DOUBLE:
+		return "float"
+	case IS_STRING:
+		return "string"
+	case IS_OBJECT:
+		return "object"
+	case IS_RESOURCE:
+		return "resource"
+	case IS_NULL:
+		return "null"
+	case IS_CALLABLE:
+		return "callable"
+	case IS_ITERABLE:
+		return "iterable"
+	case IS_ARRAY:
+		return "array"
+	case IS_VOID:
+		return "void"
+	case IS_NUMBER:
+		return "number"
+	default:
+		return "unknown"
+	}
+}
+func ZendZvalTypeName(arg *Zval) string {
+	arg = ZVAL_DEREF(arg)
+	return ZendGetTypeByConst(arg.GetType())
+}
+func ZendZvalGetType(arg *Zval) *ZendString {
+	switch arg.GetType() {
+	case IS_NULL:
+		return ZSTR_NULL
+	case IS_FALSE, IS_TRUE:
+		return ZSTR_BOOLEAN
+	case IS_LONG:
+		return ZSTR_INTEGER
+	case IS_DOUBLE:
+		return ZSTR_DOUBLE
+	case IS_STRING:
+		return ZSTR_STRING
+	case IS_ARRAY:
+		return ZSTR_ARRAY
+	case IS_OBJECT:
+		return ZSTR_OBJECT
+	case IS_RESOURCE:
+		if zend.ZendRsrcListGetRsrcType(arg.GetRes()) != nil {
+			return ZSTR_RESOURCE
+		} else {
+			return ZSTR_CLOSED_RESOURCE
+		}
+	default:
+		return nil
+	}
 }

@@ -91,9 +91,9 @@ const STDIN_FILENO = 0
 var ArginfoNoArgs = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
-var CgiFunctions = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, ArginfoNoArgs),
-	zend.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, ArginfoNoArgs),
-	zend.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, ArginfoNoArgs),
+var CgiFunctions = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, ArginfoNoArgs),
+	types.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, ArginfoNoArgs),
+	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, ArginfoNoArgs),
 }
 var CgiModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)

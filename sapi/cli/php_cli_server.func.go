@@ -64,7 +64,7 @@ func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_
 func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, persistent int) {
 	var val *byte
 	var tv __struct__timeval = __struct__timeval{0}
-	if nil != b.Assign(&val, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host", b.SizeOf("\"host\"")-1)) {
+	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host", b.SizeOf("\"host\"")-1)) {
 		buffer.AppendString("Host: ")
 		buffer.AppendString(b.CastStrAuto(val))
 		buffer.AppendString("\r\n")
@@ -185,7 +185,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 func SapiCliServerReadCookies() *byte {
 	var client *PhpCliServerClient = core.SG__().server_context
 	var val *byte
-	if nil == b.Assign(&val, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie", b.SizeOf("\"cookie\"")-1)) {
+	if nil == b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie", b.SizeOf("\"cookie\"")-1)) {
 		return nil
 	}
 	return val
@@ -233,7 +233,7 @@ func SapiCliServerRegisterEntryCb(entry **byte, num_args int, args ...any, hash_
 		zend.Efree(key)
 		zend.Efree(real_key)
 	}
-	return zend.ZEND_HASH_APPLY_KEEP
+	return types.ZEND_HASH_APPLY_KEEP
 }
 func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	var client *PhpCliServerClient = core.SG__().server_context
@@ -294,7 +294,7 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	if client.GetRequest().GetQueryString() != nil {
 		SapiCliServerRegisterVariable(track_vars_array, "QUERY_STRING", client.GetRequest().GetQueryString())
 	}
-	zend.ZendHashApplyWithArguments(client.GetRequest().GetHeaders(), zend.ApplyFuncArgsT(SapiCliServerRegisterEntryCb), 1, track_vars_array)
+	types.ZendHashApplyWithArguments(client.GetRequest().GetHeaders(), types.ApplyFuncArgsT(SapiCliServerRegisterEntryCb), 1, track_vars_array)
 }
 func SapiCliServerLogWrite(type_ int, msg *byte) {
 	var buf []byte
@@ -745,7 +745,7 @@ func PhpCliServerClientPopulateRequestInfo(client *PhpCliServerClient, request_i
 	request_info.SetAuthDigest(nil)
 	request_info.SetAuthPassword(request_info.GetAuthDigest())
 	request_info.SetAuthUser(request_info.GetAuthPassword())
-	if nil != b.Assign(&val, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type", b.SizeOf("\"content-type\"")-1)) {
+	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type", b.SizeOf("\"content-type\"")-1)) {
 		request_info.SetContentType(val)
 	}
 }
@@ -787,7 +787,7 @@ func PhpCliServerClientDtor(client *PhpCliServerClient) {
 }
 func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClient) {
 	PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s Closing", client.GetAddrStr())
-	zend.ZendHashIndexDel(server.GetClients(), client.GetSock())
+	types.ZendHashIndexDel(server.GetClients(), client.GetSock())
 }
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
 	var escaped_request_uri *types.ZendString = nil
@@ -951,7 +951,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
 	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().request_info))
-	if nil != b.Assign(&auth, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization", b.SizeOf("\"authorization\"")-1)) {
+	if nil != b.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization", b.SizeOf("\"authorization\"")-1)) {
 		core.PhpHandleAuthData(auth)
 	}
 	core.SG__().sapi_headers.http_response_code = 200

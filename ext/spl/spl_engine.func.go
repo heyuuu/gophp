@@ -22,8 +22,8 @@ func SplInstantiateArgEx2(pce *types.ClassEntry, retval *types.Zval, arg1 *types
 }
 func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
-	var fci zend.ZendFcallInfo
-	var fcc zend.ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fcc types.ZendFcallInfoCache
 	var dummy types.Zval
 	SplInstantiate(pce, retval)
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
@@ -44,7 +44,7 @@ func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 try_again:
 	switch offset.GetType() {
 	case types.IS_STRING:
-		if zend.ZEND_HANDLE_NUMERIC(offset.GetStr(), &idx) {
+		if types.ZEND_HANDLE_NUMERIC(offset.GetStr(), &idx) {
 			return idx
 		}
 	case types.IS_DOUBLE:

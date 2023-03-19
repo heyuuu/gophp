@@ -142,7 +142,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 	if jumptable_type != types.IS_UNDEF && ShouldUseJumptable(cases, jumptable_type) != 0 {
 		var jumptable_op Znode
 		ALLOC_HASHTABLE(jumptable)
-		ZendHashInit(jumptable, cases.GetChildren(), nil, nil, 0)
+		types.ZendHashInit(jumptable, cases.GetChildren(), nil, nil, 0)
 		jumptable_op.SetOpType(IS_CONST)
 		jumptable_op.GetConstant().SetArray(jumptable)
 		opline = ZendEmitOp(nil, b.Cond(jumptable_type == types.IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
@@ -608,7 +608,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
 						default:
 							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().GetType())) {
-								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", ZendGetTypeByConst(arg_info.GetType().Code()), ZendGetTypeByConst(arg_info.GetType().Code()))
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", types.ZendGetTypeByConst(arg_info.GetType().Code()), types.ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
 						}
 					}

@@ -64,17 +64,17 @@ var ZendInterfaceIteratorFuncsIterator ZendObjectIteratorFuncs = MakeZendObjectI
 
 /* }}}*/
 
-var ZendFuncsAggregate []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("getIterator", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+var ZendFuncsAggregate []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("getIterator", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
 }
-var ZendFuncsIterator []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("current", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
-	MakeZendFunctionEntryEx("next", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
-	MakeZendFunctionEntryEx("key", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
-	MakeZendFunctionEntryEx("valid", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
-	MakeZendFunctionEntryEx("rewind", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+var ZendFuncsIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("current", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("next", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("key", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("valid", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("rewind", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
 }
-var ZendFuncsTraversable *ZendFunctionEntry = nil
+var ZendFuncsTraversable *types.ZendFunctionEntry = nil
 var ArginfoArrayaccessOffset []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("offset"),
@@ -88,23 +88,23 @@ var ArginfoArrayaccessOffsetValue []ArgInfo = []ArgInfo{
 	MakeArgInfo("offset"),
 	MakeArgInfo("value"),
 }
-var ZendFuncsArrayaccess []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("offsetExists", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffset),
-	MakeZendFunctionEntryEx("offsetGet", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffsetGet),
-	MakeZendFunctionEntryEx("offsetSet", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffsetValue),
-	MakeZendFunctionEntryEx("offsetUnset", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffset),
+var ZendFuncsArrayaccess []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("offsetExists", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffset),
+	types.MakeZendFunctionEntryEx("offsetGet", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffsetGet),
+	types.MakeZendFunctionEntryEx("offsetSet", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffsetValue),
+	types.MakeZendFunctionEntryEx("offsetUnset", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoArrayaccessOffset),
 }
 var ArginfoSerializableSerialize []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(-1),
 	MakeArgInfo("serialized"),
 }
-var ZendFuncsSerializable []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("serialize", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
-	MakeZendFunctionEntryEx("unserialize", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoSerializableSerialize),
+var ZendFuncsSerializable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("serialize", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("unserialize", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoSerializableSerialize),
 }
 var ArginfoCountableCount []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(-1),
 }
-var ZendFuncsCountable []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("count", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoCountableCount),
+var ZendFuncsCountable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("count", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, ArginfoCountableCount),
 }

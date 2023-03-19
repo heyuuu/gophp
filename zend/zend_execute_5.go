@@ -125,7 +125,7 @@ func ZendFetchDimensionAddressRead(
 			ZVAL_UNDEFINED_OP2()
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {
-			faults.Error(faults.E_NOTICE, "Trying to access array offset on value of type %s", ZendZvalTypeName(container))
+			faults.Error(faults.E_NOTICE, "Trying to access array offset on value of type %s", types.ZendZvalTypeName(container))
 		}
 		result.SetNull()
 	}
@@ -157,7 +157,7 @@ func ZendFindArrayDimSlow(ht *types.HashTable, offset *types.Zval, executeData *
 		return ht.IndexFindH(hval)
 	} else if offset.IsNull() {
 	str_idx:
-		return ZendHashFindExInd(ht, types.ZSTR_EMPTY_ALLOC(), 1)
+		return types.ZendHashFindExInd(ht, types.ZSTR_EMPTY_ALLOC(), 1)
 	} else if offset.IsFalse() {
 		hval = 0
 		goto num_idx
@@ -255,11 +255,11 @@ func ZendArrayKeyExistsFast(ht *types.HashTable, key *types.Zval, opline *ZendOp
 try_again:
 	if key.IsString() {
 		str = key.GetStr()
-		if ZEND_HANDLE_NUMERIC(str, &hval) {
+		if types.ZEND_HANDLE_NUMERIC(str, &hval) {
 			goto num_key
 		}
 	str_key:
-		if ZendHashFindInd(ht, str) != nil {
+		if types.ZendHashFindInd(ht, str) != nil {
 			return types.IS_TRUE
 		} else {
 			return types.IS_FALSE
@@ -300,7 +300,7 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp
 		if subject.GetTypeInfo() == types.IS_UNDEF {
 			ZVAL_UNDEFINED_OP2()
 		}
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", ZendGetTypeByConst(subject.GetType()))
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(subject.GetType()))
 		return types.IS_NULL
 	}
 }

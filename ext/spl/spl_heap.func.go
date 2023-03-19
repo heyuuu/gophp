@@ -309,11 +309,11 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
 	}
 	if inherited != 0 {
-		intern.SetFptrCmp(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "compare", b.SizeOf("\"compare\"")-1))
+		intern.SetFptrCmp(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "compare", b.SizeOf("\"compare\"")-1))
 		if intern.GetFptrCmp().GetScope() == parent {
 			intern.SetFptrCmp(nil)
 		}
-		intern.SetFptrCount(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}
@@ -357,8 +357,8 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Has
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
-	debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
-	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
+	debug_info = types.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
+	types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(ce, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func ZendUnregisterFunctions(functions []ZendFunctionEntry, count int, functionTable *types.HashTable) {
+func ZendUnregisterFunctions(functions []types.ZendFunctionEntry, count int, functionTable *types.HashTable) {
 	targetFunctionTable := functionTable
 	if targetFunctionTable == nil {
 		targetFunctionTable = CG__().GetFunctionTable()
@@ -29,13 +29,13 @@ func CleanModuleClass(el *types.Zval, arg any) int {
 	var ce *types.ClassEntry = (*types.ClassEntry)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == module_number {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	} else {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	}
 }
 func CleanModuleClasses(module_number int) {
-	ZendHashApplyWithArgument(EG__().GetClassTable(), CleanModuleClass, any(&module_number))
+	types.ZendHashApplyWithArgument(EG__().GetClassTable(), CleanModuleClass, any(&module_number))
 }
 func ModuleDestructor(module *ZendModuleEntry) {
 	if module.GetType() == MODULE_TEMPORARY {
@@ -179,7 +179,7 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	}
 	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), EG__().GetCurrentModule().GetType() == MODULE_PERSISTENT)
 	lowercase_name = types.ZendNewInternedString(lowercase_name)
-	ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name, class_entry)
+	types.ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name, class_entry)
 	types.ZendStringReleaseEx(lowercase_name, 1)
 	return class_entry
 }
@@ -268,7 +268,7 @@ func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *type
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
 	var func_ *ZendInternalFunction
-	if b.Assign(&func_, ZendHashStrFindPtr(CG__().GetFunctionTable(), function_name, function_name_length)) {
+	if b.Assign(&func_, types.ZendHashStrFindPtr(CG__().GetFunctionTable(), function_name, function_name_length)) {
 		ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(ZEND_ACC_VARIADIC | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_HAS_RETURN_TYPE)
 		func_.SetNumArgs(0)

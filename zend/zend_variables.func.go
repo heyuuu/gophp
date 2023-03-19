@@ -79,7 +79,7 @@ func ZvalAddRef(p *types.Zval) {
 }
 func ZvalCopyCtorFunc(zvalue *types.Zval) {
 	if zvalue.IsArray() {
-		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
+		zvalue.SetArray(types.ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsString() {
 		b.Assert(true)
 		zvalue.SetString(zvalue.GetStr().Copy())

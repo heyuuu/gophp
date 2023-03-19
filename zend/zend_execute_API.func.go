@@ -22,25 +22,25 @@ func ZendExtensionDeactivator(extension *ZendExtension) {
 func CleanNonPersistentConstantFull(zv *types.Zval) int {
 	var c *ZendConstant = zv.GetPtr()
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) != 0 {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	} else {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	}
 }
 func CleanNonPersistentFunctionFull(zv *types.Zval) int {
 	var function *ZendFunction = zv.GetPtr()
 	if function.GetType() == ZEND_INTERNAL_FUNCTION {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	} else {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	}
 }
 func CleanNonPersistentClassFull(zv *types.Zval) int {
 	var ce *types.ClassEntry = zv.GetPtr()
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	} else {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	}
 }
 func InitExecutor() {
@@ -60,9 +60,9 @@ func InitExecutor() {
 	EG__().SetErrorHandling(EH_NORMAL)
 	EG__().SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
-	ZendHashInit(EG__().GetSymbolTable(), 64, nil, ZVAL_PTR_DTOR, 0)
+	types.ZendHashInit(EG__().GetSymbolTable(), 64, nil, ZVAL_PTR_DTOR, 0)
 	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
-	ZendHashInit(EG__().GetIncludedFiles(), 8, nil, nil, 0)
+	types.ZendHashInit(EG__().GetIncludedFiles(), 8, nil, nil, 0)
 	EG__().SetTicksCount(0)
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
@@ -94,9 +94,9 @@ func ZvalCallDestructor(zv *types.Zval) int {
 		zv = zv.GetZv()
 	}
 	if zv.IsObject() && zv.GetRefcount() == 1 {
-		return ZEND_HASH_APPLY_REMOVE
+		return types.ZEND_HASH_APPLY_REMOVE
 	} else {
-		return ZEND_HASH_APPLY_KEEP
+		return types.ZEND_HASH_APPLY_KEEP
 	}
 }
 func ZendUncleanZvalPtrDtor(zv *types.Zval) {
@@ -124,7 +124,7 @@ func ShutdownDestructors() {
 		var symbols uint32
 		for {
 			symbols = EG__().GetSymbolTable().GetNNumOfElements()
-			ZendHashReverseApply(EG__().GetSymbolTable(), ApplyFuncT(ZvalCallDestructor))
+			types.ZendHashReverseApply(EG__().GetSymbolTable(), types.ApplyFuncT(ZvalCallDestructor))
 			if symbols == EG__().GetSymbolTable().GetNNumOfElements() {
 				break
 			}
@@ -259,9 +259,9 @@ func ShutdownExecutor() {
 	} else {
 		ZendVmStackDestroy()
 		if EG__().GetFullTablesCleanup() != 0 {
-			ZendHashReverseApply(EG__().GetZendConstants(), CleanNonPersistentConstantFull)
-			ZendHashReverseApply(EG__().GetFunctionTable(), CleanNonPersistentFunctionFull)
-			ZendHashReverseApply(EG__().GetClassTable(), CleanNonPersistentClassFull)
+			types.ZendHashReverseApply(EG__().GetZendConstants(), CleanNonPersistentConstantFull)
+			types.ZendHashReverseApply(EG__().GetFunctionTable(), CleanNonPersistentFunctionFull)
+			types.ZendHashReverseApply(EG__().GetClassTable(), CleanNonPersistentClassFull)
 		} else {
 			var __ht *types.HashTable = EG__().GetZendConstants()
 			for _, _p := range __ht.foreachDataReserve() {
@@ -484,7 +484,7 @@ func _callUserFunctionEx(
 	params []types.Zval,
 	no_separation int,
 ) int {
-	var fci ZendFcallInfo
+	var fci types.ZendFcallInfo
 	fci.SetSize(b.SizeOf("fci"))
 	if object != nil {
 		fci.SetObject(object.GetObj())
@@ -498,11 +498,11 @@ func _callUserFunctionEx(
 	fci.SetNoSeparation(types.ZendBool(no_separation))
 	return ZendCallFunction(&fci, nil)
 }
-func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
+func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCache) int {
 	var i uint32
 	var call *ZendExecuteData
 	var dummy_execute_data ZendExecuteData
-	var fci_cache_local ZendFcallInfoCache
+	var fci_cache_local types.ZendFcallInfoCache
 	var func_ *ZendFunction
 	var call_info uint32
 	var object_or_called_scope any
@@ -740,8 +740,8 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 	var zv *types.Zval
 	var local_retval types.Zval
 	var lc_name *types.ZendString
-	var fcall_info ZendFcallInfo
-	var fcall_cache ZendFcallInfoCache
+	var fcall_info types.ZendFcallInfo
+	var fcall_cache types.ZendFcallInfoCache
 	var orig_fake_scope *types.ClassEntry
 	if key != nil {
 		lc_name = key
@@ -802,9 +802,9 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 	}
 	if EG__().GetInAutoload() == nil {
 		ALLOC_HASHTABLE(EG__().GetInAutoload())
-		ZendHashInit(EG__().GetInAutoload(), 8, nil, nil, 0)
+		types.ZendHashInit(EG__().GetInAutoload(), 8, nil, nil, 0)
 	}
-	if ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
+	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
 		if key == nil {
 			types.ZendStringReleaseEx(lc_name, 0)
 		}
@@ -830,13 +830,13 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 	EG__().SetFakeScope(nil)
 	faults.ExceptionSave()
 	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
-		ce = ZendHashFindPtr(EG__().GetClassTable(), lc_name)
+		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lc_name)
 	}
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
 	ZvalPtrDtor(&args[0])
 	ZvalPtrDtorStr(fcall_info.GetFunctionName())
-	ZendHashDel(EG__().GetInAutoload(), lc_name)
+	types.ZendHashDel(EG__().GetInAutoload(), lc_name)
 	ZvalPtrDtor(&local_retval)
 	if key == nil {
 		types.ZendStringReleaseEx(lc_name, 0)
@@ -1120,7 +1120,7 @@ func ZendFetchClassByName(class_name *types.ZendString, key *types.ZendString, f
 	return ce
 }
 func ZendDeleteGlobalVariable(name *types.ZendString) int {
-	return ZendHashDelInd(EG__().GetSymbolTable(), name)
+	return types.ZendHashDelInd(EG__().GetSymbolTable(), name)
 }
 func ZendRebuildSymbolTable() *types.ZendArray {
 	var ex *ZendExecuteData
@@ -1147,19 +1147,19 @@ func ZendRebuildSymbolTable() *types.ZendArray {
 		}
 		symbol_table.Extend(ex.GetFunc().GetOpArray().GetLastVar())
 	} else {
-		ex.SetSymbolTable(ZendNewArray(ex.GetFunc().GetOpArray().GetLastVar()))
+		ex.SetSymbolTable(types.ZendNewArray(ex.GetFunc().GetOpArray().GetLastVar()))
 		symbol_table = ex.GetSymbolTable()
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table
 		}
-		ZendHashRealInitMixed(symbol_table)
+		types.ZendHashRealInitMixed(symbol_table)
 	}
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
 		var str **types.ZendString = ex.GetFunc().GetOpArray().GetVars()
 		var end **types.ZendString = str + ex.GetFunc().GetOpArray().GetLastVar()
 		var var_ *types.Zval = ex.VarNum(0)
 		for {
-			_zendHashAppendInd(symbol_table, *str, var_)
+			types._zendHashAppendInd(symbol_table, *str, var_)
 			str++
 			var_++
 			if str == end {
@@ -1217,7 +1217,7 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 		var var_ *types.Zval = executeData.VarNum(0)
 		for {
 			if var_.IsUndef() {
-				ZendHashDel(ht, *str)
+				types.ZendHashDel(ht, *str)
 			} else {
 				ht.KeyUpdate(str.GetStr(), var_)
 				var_.SetUndef()

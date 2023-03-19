@@ -18,7 +18,7 @@ func SapiAddHeader(str string) int {
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
 func SapiRunHeaderCallback(callback *types.Zval) {
 	var error int
-	var fci zend.ZendFcallInfo
+	var fci types.ZendFcallInfo
 	var callback_error *byte = nil
 	var retval types.Zval
 	if zend.ZendFcallInfoInit(callback, 0, &fci, &(SG__().fci_cache), nil, &callback_error) == types.SUCCESS {
@@ -74,7 +74,7 @@ func SapiReadPostData() {
 
 	/* now try to find an appropriate POST content handler */
 
-	if b.Assign(&post_entry, zend.ZendHashStrFindPtr(&(SG__().known_post_content_types), content_type, content_type_length)) != nil {
+	if b.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().known_post_content_types), content_type, content_type_length)) != nil {
 
 		/* found one, register it for use */
 
@@ -692,7 +692,7 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	}
 	key = types.ZendStringInit(post_entry.GetContentType(), post_entry.GetContentTypeLen(), 1)
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
-	if zend.ZendHashAddMem(&(SG__().known_post_content_types), key, any(post_entry), b.SizeOf("sapi_post_entry")) {
+	if types.ZendHashAddMem(&(SG__().known_post_content_types), key, any(post_entry), b.SizeOf("sapi_post_entry")) {
 		ret = types.SUCCESS
 	} else {
 		ret = types.FAILURE

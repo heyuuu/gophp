@@ -371,7 +371,7 @@ func ZendCompileFuncTypecheck(result *Znode, args *ZendAstList, type_ uint32) in
 	}
 	ZendCompileExpr(&arg_node, args.GetChild()[0])
 	opline = ZendEmitOpTmp(result, ZEND_TYPE_CHECK, &arg_node, nil)
-	if type_ != types._IS_BOOL {
+	if type_ != types.IS_BOOL {
 		opline.SetExtendedValue(1 << type_)
 	} else {
 		opline.SetExtendedValue(1<<types.IS_FALSE | 1<<types.IS_TRUE)
@@ -452,7 +452,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	}
 	name = ZendAstGetStr(name_ast)
 	lcname = ZendStringTolower(name)
-	fbc = ZendHashFindPtr(CG__().GetFunctionTable(), lcname)
+	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname)
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
 		types.ZendStringReleaseEx(lcname, 0)
 		return types.FAILURE
@@ -603,7 +603,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var val *types.Zval
 		var tmp types.Zval
 		var src *types.HashTable = array.GetConstant().GetArr()
-		var dst *types.HashTable = ZendNewArray(src.GetNNumOfElements())
+		var dst *types.HashTable = types.ZendNewArray(src.GetNNumOfElements())
 		tmp.SetTrue()
 		if strict != 0 {
 			var __ht *types.HashTable = src

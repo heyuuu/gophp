@@ -47,8 +47,8 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
 	BG__().url_adapt_session_ex.type_ = 1
 	BG__().url_adapt_output_ex.type_ = 0
-	zend.ZendHashInit(&(BG__().url_adapt_session_hosts_ht), 0, nil, nil, 1)
-	zend.ZendHashInit(&(BG__().url_adapt_output_hosts_ht), 0, nil, nil, 1)
+	types.ZendHashInit(&(BG__().url_adapt_session_hosts_ht), 0, nil, nil, 1)
+	types.ZendHashInit(&(BG__().url_adapt_output_hosts_ht), 0, nil, nil, 1)
 	BG__().incomplete_class = IncompleteClassEntry
 	BG__().page_uid = -1
 	BG__().page_gid = -1
@@ -232,7 +232,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().page_gid = -1
 	BG__().page_inode = -1
 	BG__().page_mtime = -1
-	zend.ZendHashInit(&(BG__().putenv_ht), 1, nil, PhpPutenvDestructor, 0)
+	types.ZendHashInit(&(BG__().putenv_ht), 1, nil, PhpPutenvDestructor, 0)
 	BG__().user_shutdown_function_names = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
@@ -564,7 +564,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	pe.SetKeyLen(strlen(pe.GetKey()))
 	tsrm_env_lock()
-	zend.ZendHashStrDel(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen())
+	types.ZendHashStrDel(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen())
 
 	/* find previous value */
 
@@ -579,7 +579,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		unsetenv(pe.GetPutenvString())
 	}
 	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		zend.ZendHashStrAddMem(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
+		types.ZendHashStrAddMem(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
 		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
 			tzset()
 		}
@@ -691,7 +691,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV, 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindExInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV, 1)) != nil || b.Assign(&args, types.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -1216,8 +1216,8 @@ func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var retval types.Zval
-	var fci zend.ZendFcallInfo
-	var fci_cache zend.ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fci_cache types.ZendFcallInfoCache
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1248,8 +1248,8 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval
 func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var params *types.Zval
 	var retval types.Zval
-	var fci zend.ZendFcallInfo
-	var fci_cache zend.ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fci_cache types.ZendFcallInfoCache
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1279,8 +1279,8 @@ func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *types
 }
 func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var retval types.Zval
-	var fci zend.ZendFcallInfo
-	var fci_cache zend.ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fci_cache types.ZendFcallInfoCache
 	var called_scope *types.ClassEntry
 	for {
 		var _flags int = 0
@@ -1327,8 +1327,8 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var params *types.Zval
 	var retval types.Zval
-	var fci zend.ZendFcallInfo
-	var fci_cache zend.ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fci_cache types.ZendFcallInfoCache
 	var called_scope *types.ClassEntry
 	for {
 		var _flags int = 0
@@ -1445,7 +1445,7 @@ func PhpCallShutdownFunctions() {
 		var __bailout JMP_BUF
 		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			zend.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
+			types.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
 		}
 		zend.EG__().SetBailout(__orig_bailout)
 	}
@@ -1496,12 +1496,12 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 	} else {
 		if !(BG__().user_shutdown_function_names) {
 			zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-			zend.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
+			types.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
 		}
-		zend.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+		types.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	}
 
 	/* Prevent entering of anything but valid callback (syntax check only!) */
@@ -1509,23 +1509,23 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdown_function_entry *PhpShutdownFunctionEntry) types.ZendBool {
 	if !(BG__().user_shutdown_function_names) {
 		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-		zend.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
+		types.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
 	}
-	zend.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+	types.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	return 1
 }
 func RemoveUserShutdownFunction(function_name *byte, function_len int) types.ZendBool {
 	if BG__().user_shutdown_function_names {
-		return zend.ZendHashStrDel(BG__().user_shutdown_function_names, function_name, function_len) != types.FAILURE
+		return types.ZendHashStrDel(BG__().user_shutdown_function_names, function_name, function_len) != types.FAILURE
 	}
 	return 0
 }
 func AppendUserShutdownFunction(shutdown_function_entry PhpShutdownFunctionEntry) types.ZendBool {
 	if !(BG__().user_shutdown_function_names) {
 		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-		zend.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
+		types.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
 	}
-	return zend.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry")) != nil
+	return types.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry")) != nil
 }
 func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 	syntax_highlighter_ini.SetHighlightComment(zend.INI_STR("highlight.comment"))
@@ -1733,7 +1733,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	zend.ZendIniSortEntries()
 	if extname != nil {
-		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, extname, extname_len)) == nil {
+		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, extname, extname_len)) == nil {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", extname)
 			return_value.SetFalse()
 			return
@@ -2204,7 +2204,7 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zv
 		}
 		break
 	}
-	if zend.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) != 0 {
+	if types.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) != 0 {
 		return_value.SetTrue()
 		return
 	} else {
@@ -2241,7 +2241,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		}
 		break
 	}
-	if zend.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) == 0 {
+	if types.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) == 0 {
 		return_value.SetFalse()
 		return
 	}
@@ -2262,7 +2262,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		successful = 1
 	}
 	if successful != 0 {
-		zend.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, path, path_len)
+		types.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, path, path_len)
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}

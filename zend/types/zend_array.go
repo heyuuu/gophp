@@ -257,7 +257,7 @@ func NewZendArray(size uint32) *ZendArray {
 func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendArray {
 	var ht = &ZendArray{
 		nNumOfElements:   0,
-		nTableSize:       zend.ZendHashCheckSize(size),
+		nTableSize:       ZendHashCheckSize(size),
 		nInternalPointer: 0,
 		nNextFreeElement: 0,
 		pDestructor:      pDestructor,
@@ -667,7 +667,7 @@ func (this *ZendArray) deleteBucket(pos uint32) {
 		if this.nInternalPointer == pos {
 			this.nInternalPointer = newIdx
 		}
-		zend.ZendHashIteratorsUpdate(this, pos, newIdx)
+		ZendHashIteratorsUpdate(this, pos, newIdx)
 	}
 
 	// 析构函数
@@ -709,7 +709,7 @@ func (this *HashTable) Destroy() {
 			})
 		}
 	}
-	zend.ZendHashIteratorsRemove(this)
+	ZendHashIteratorsRemove(this)
 }
 
 func (this *HashTable) DestroyEx() {

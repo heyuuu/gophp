@@ -259,7 +259,7 @@ func ZendFileContextBegin(prev_context *ZendFileContext) {
 	FC__().SetInNamespace(0)
 	FC__().SetHasBracketedNamespaces(0)
 	FC__().GetDeclarables().SetTicks(0)
-	ZendHashInit(&(FC__().GetSeenSymbols()), 8, nil, nil, 0)
+	types.ZendHashInit(&(FC__().GetSeenSymbols()), 8, nil, nil, 0)
 }
 func ZendFileContextEnd(prev_context *ZendFileContext) {
 	ZendEndNamespace()
@@ -644,7 +644,7 @@ func ZendHashFindPtrLc(ht *types.HashTable, str *byte, len_ int) any {
 	var lcname *types.ZendString
 	types.ZSTR_ALLOCA_ALLOC(lcname, len_)
 	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
-	result = ZendHashFindPtr(ht, lcname)
+	result = types.ZendHashFindPtr(ht, lcname)
 	lcname.Free()
 	return result
 }
@@ -672,7 +672,7 @@ func ZendResolveNonClassName(name *types.ZendString, type_ uint32, is_fully_qual
 
 		var import_name *types.ZendString
 		if case_sensitive != 0 {
-			import_name = ZendHashFindPtr(current_import_sub, name)
+			import_name = types.ZendHashFindPtr(current_import_sub, name)
 		} else {
 			import_name = ZendHashFindPtrLc(current_import_sub, name.GetVal(), name.GetLen())
 		}

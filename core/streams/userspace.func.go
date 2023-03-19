@@ -67,8 +67,8 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		zend.AddPropertyNull(object, "context")
 	}
 	if uwrap.GetCe().GetConstructor() != nil {
-		var fci zend.ZendFcallInfo
-		var fcc zend.ZendFcallInfoCache
+		var fci types.ZendFcallInfo
+		var fcc types.ZendFcallInfoCache
 		var retval types.Zval
 		fci.SetSize(b.SizeOf("fci"))
 		fci.GetFunctionName().SetUndef()
@@ -281,7 +281,7 @@ func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *t
 
 			/* We failed.  But why? */
 
-			if zend.ZendHashExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol) != 0 {
+			if types.ZendHashExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol) != 0 {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 
@@ -330,13 +330,13 @@ func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *ty
 		return
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
-	if b.Assign(&wrapper, zend.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
+	if b.Assign(&wrapper, types.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
 		return_value.SetFalse()
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
-	if wrapper_hash == global_wrapper_hash || zend.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
+	if wrapper_hash == global_wrapper_hash || types.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
 		return_value.SetTrue()
 		return

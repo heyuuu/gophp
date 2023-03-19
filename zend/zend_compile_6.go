@@ -15,7 +15,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *ZendOpArray, uses_ast *
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(ZendNewArray(8))
+		op_array.SetStaticVariables(types.ZendNewArray(8))
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.GetChild()[i]
@@ -66,7 +66,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 				/* $this does not need to be explicitly imported. */
 
 			}
-			ZendHashAddEmptyElement(info.GetUses(), name)
+			types.ZendHashAddEmptyElement(info.GetUses(), name)
 		} else {
 			info.SetVarvarsUsed(1)
 			FindImplicitBindsRecursively(info, name_ast)
@@ -87,7 +87,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 			var uses_list *ZendAstList = ZendAstGetList(uses_ast)
 			var i uint32
 			for i = 0; i < uses_list.GetChildren(); i++ {
-				ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.GetChild()[i]))
+				types.ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.GetChild()[i]))
 			}
 		}
 	} else if ast.GetKind() == ZEND_AST_ARROW_FUNC {
@@ -107,14 +107,14 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst) {
 	var param_list *ZendAstList = ZendAstGetList(params_ast)
 	var i uint32
-	ZendHashInit(info.GetUses(), param_list.GetChildren(), nil, nil, 0)
+	types.ZendHashInit(info.GetUses(), param_list.GetChildren(), nil, nil, 0)
 	FindImplicitBindsRecursively(info, stmt_ast)
 
 	/* Remove variables that are parameters */
 
 	for i = 0; i < param_list.GetChildren(); i++ {
 		var param_ast *ZendAst = param_list.GetChild()[i]
-		ZendHashDel(info.GetUses(), ZendAstGetStr(param_ast.GetChild()[1]))
+		types.ZendHashDel(info.GetUses(), ZendAstGetStr(param_ast.GetChild()[1]))
 	}
 
 	/* Remove variables that are parameters */
@@ -129,7 +129,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(ZendNewArray(8))
+		op_array.SetStaticVariables(types.ZendNewArray(8))
 	}
 	var __ht *types.HashTable = info.GetUses()
 	for _, _p := range __ht.foreachData() {
@@ -203,7 +203,7 @@ func ZendBeginMethodDecl(op_array *ZendOpArray, name *types.ZendString, has_body
 	op_array.SetFunctionName(name.Copy())
 	lcname = ZendStringTolower(name)
 	lcname = types.ZendNewInternedString(lcname)
-	if ZendHashAddPtr(ce.GetFunctionTable(), lcname, op_array) == nil {
+	if types.ZendHashAddPtr(ce.GetFunctionTable(), lcname, op_array) == nil {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
 	}
 	if in_interface != 0 {
@@ -353,7 +353,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *ZendOpArray, decl *ZendAstDecl, 
 	}
 	ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_FUNCTION)
 	if toplevel != 0 {
-		if ZendHashAddPtr(CG__().GetFunctionTable(), lcname, op_array) == nil {
+		if types.ZendHashAddPtr(CG__().GetFunctionTable(), lcname, op_array) == nil {
 			DoBindFunctionError(lcname, op_array, 1)
 		}
 		types.ZendStringReleaseEx(lcname, 0)
@@ -366,7 +366,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *ZendOpArray, decl *ZendAstDecl, 
 	for {
 		ZendTmpStringRelease(key)
 		key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
-		if ZendHashAddPtr(CG__().GetFunctionTable(), key, op_array) {
+		if types.ZendHashAddPtr(CG__().GetFunctionTable(), key, op_array) {
 			break
 		}
 	}
@@ -510,7 +510,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if type_ast != nil {
 			type_ = ZendCompileTypename(type_ast, 0)
 			if type_.Code() == types.IS_VOID || type_.Code() == types.IS_CALLABLE {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ce.GetName().GetVal(), name.GetVal(), ZendGetTypeByConst(type_.Code()))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ce.GetName().GetVal(), name.GetVal(), types.ZendGetTypeByConst(type_.Code()))
 			}
 		}
 
@@ -522,7 +522,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if (flags & ZEND_ACC_FINAL) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.GetName().GetVal(), name.GetVal())
 		}
-		if ZendHashExists(ce.GetPropertiesInfo(), name) != 0 {
+		if types.ZendHashExists(ce.GetPropertiesInfo(), name) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.GetName().GetVal(), name.GetVal())
 		}
 		if value_ast != nil {
@@ -530,14 +530,14 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 			if type_.IsSet() && !(value_zv.IsConstant()) {
 				if value_zv.IsNull() {
 					if !(type_.AllowNull()) {
-						var name *byte = b.CondF(type_.IsClass(), func() []byte { return types.ZEND_TYPE_NAME(type_).GetVal() }, func() *byte { return ZendGetTypeByConst(type_.Code()) })
+						var name *byte = b.CondF(type_.IsClass(), func() []byte { return types.ZEND_TYPE_NAME(type_).GetVal() }, func() *byte { return types.ZendGetTypeByConst(type_.Code()) })
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s may not be null. "+"Use the nullable type ?%s to allow null default value", name, name)
 					}
 				} else if type_.IsClass() {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Property of type %s may not have default value", types.ZEND_TYPE_NAME(type_).GetVal())
 				} else if type_.Code() == types.IS_ARRAY || type_.Code() == types.IS_ITERABLE {
 					if value_zv.GetType() != types.IS_ARRAY {
-						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be an array", ZendGetTypeByConst(type_.Code()))
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be an array", types.ZendGetTypeByConst(type_.Code()))
 					}
 				} else if type_.Code() == types.IS_DOUBLE {
 					if value_zv.GetType() != types.IS_DOUBLE && value_zv.GetType() != types.IS_LONG {
@@ -545,7 +545,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 					}
 					ConvertToDouble(&value_zv)
 				} else if !(types.ZEND_SAME_FAKE_TYPE(type_.Code(), value_zv.GetType())) {
-					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be %s", ZendGetTypeByConst(type_.Code()), ZendGetTypeByConst(type_.Code()))
+					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for property of type %s can only be %s", types.ZendGetTypeByConst(type_.Code()), types.ZendGetTypeByConst(type_.Code()))
 				}
 			}
 		} else if !(type_.IsSet()) {
@@ -738,7 +738,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			ZendTmpStringRelease(lcname)
 			name = ZendGenerateAnonClassName(decl.GetStartLineno())
 			lcname = ZendStringTolower(name)
-			if ZendHashExists(CG__().GetClassTable(), lcname) == 0 {
+			if types.ZendHashExists(CG__().GetClassTable(), lcname) == 0 {
 				break
 			}
 		}
@@ -843,7 +843,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 				CG__().SetZendLineno(ast.GetLineno())
 			}
 		} else {
-			if ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) != nil {
+			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) != nil {
 				types.ZendStringRelease(lcname)
 				ZendBuildPropertiesInfoTable(ce)
 				ce.SetIsLinked(true)
@@ -867,7 +867,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 		opline.SetResultType(IS_VAR)
 		opline.GetResult().SetVar(GetTemporaryVariable())
-		if !(ZendHashAddPtr(CG__().GetClassTable(), lcname, ce)) {
+		if !(types.ZendHashAddPtr(CG__().GetClassTable(), lcname, ce)) {
 
 			/* We checked above that the class name is not used. This really shouldn't happen. */
 
@@ -884,7 +884,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		for {
 			ZendTmpStringRelease(key)
 			key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
-			if ZendHashAddPtr(CG__().GetClassTable(), key, ce) {
+			if types.ZendHashAddPtr(CG__().GetClassTable(), key, ce) {
 				break
 			}
 		}

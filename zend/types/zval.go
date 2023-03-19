@@ -167,7 +167,7 @@ func (this *Zval) IsResource() bool            { return this.IsType(IS_RESOURCE)
 func (this *Zval) IsReference() bool           { return this.IsType(IS_REFERENCE) }
 func (this *Zval) IsConstant() bool            { return this.IsType(IS_CONSTANT_AST) }
 func (this *Zval) IsIndirect() bool            { return this.IsType(IS_INDIRECT) }
-func (this *Zval) IsError() bool               { return this.IsType(_IS_ERROR) }
+func (this *Zval) IsError() bool               { return this.IsType(IS_ERROR) }
 
 /* Zval.u1.v.type_flags */
 func (this *Zval) AddTypeFlags(value ZendUchar)      { this.u1.v.type_flags |= value }

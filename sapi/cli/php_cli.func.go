@@ -72,7 +72,7 @@ func PrintModules() {
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
-	return zend.ZEND_HASH_APPLY_KEEP
+	return types.ZEND_HASH_APPLY_KEEP
 }
 func PrintExtensions() {
 	elements := zend.ZendExtensions.ElementsData()
@@ -597,7 +597,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			var len_ int = strlen(reflection_what)
 			var lcname *byte = zend.ZendStrTolowerDup(reflection_what, len_)
 			var module *zend.ZendModuleEntry
-			if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname, len_)) == nil {
+			if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname, len_)) == nil {
 				if !(strcmp(reflection_what, "main")) {
 					core.DisplayIniEntries(nil)
 				} else {

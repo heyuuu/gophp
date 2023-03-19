@@ -592,7 +592,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		var i uint32
 		var list *ZendAstList = ZendAstGetList(ast)
 		if list.GetChildren() == 0 {
-			ZVAL_EMPTY_ARRAY(result)
+			types.ZVAL_EMPTY_ARRAY(result)
 			break
 		}
 		ArrayInit(result)
@@ -1387,7 +1387,7 @@ tail_call:
 		case types.IS_NULL:
 			PREFIX_OP("(unset)", 240, 241)
 			fallthrough
-		case types._IS_BOOL:
+		case types.IS_BOOL:
 			PREFIX_OP("(bool)", 240, 241)
 			fallthrough
 		case types.IS_LONG:

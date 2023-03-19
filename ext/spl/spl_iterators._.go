@@ -140,9 +140,9 @@ type SplIteratorApplyFuncT func(iter *zend.ZendObjectIterator, puser any) int
 var ArginfoRecursiveItVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
-var spl_funcs_RecursiveIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
 }
 
 type RecursiveIteratorMode = int
@@ -245,25 +245,25 @@ var arginfo_recursive_it_setMaxDepth []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(0),
 	zend.MakeArgInfo("max_depth"),
 }
-var spl_funcs_RecursiveIteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator___construct, ArginfoRecursiveItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_key, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_current, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getDepth", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getDepth, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getSubIterator", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getSubIterator, arginfo_recursive_it_getSubIterator),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getInnerIterator, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("beginIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginIteration, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("endIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endIteration, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("callHasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callHasChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("callGetChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callGetChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("beginChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("endChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("nextElement", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_nextElement, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setMaxDepth", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_setMaxDepth, arginfo_recursive_it_setMaxDepth),
-	zend.MakeZendFunctionEntryEx("getMaxDepth", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getMaxDepth, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveIteratorIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator___construct, ArginfoRecursiveItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_key, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_current, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getDepth", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getDepth, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getSubIterator", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getSubIterator, arginfo_recursive_it_getSubIterator),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getInnerIterator, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("beginIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginIteration, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("endIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endIteration, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("callHasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callHasChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("callGetChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callGetChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("beginChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("endChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("nextElement", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_nextElement, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setMaxDepth", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_setMaxDepth, arginfo_recursive_it_setMaxDepth),
+	types.MakeZendFunctionEntryEx("getMaxDepth", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_getMaxDepth, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto RecursiveTreeIterator::__construct(RecursiveIterator|IteratorAggregate it [, int flags = RTIT_BYPASS_KEY [, int cit_flags = CIT_CATCH_GET_CHILD [, mode = RIT_SELF_FIRST ]]]) throws InvalidArgumentException
@@ -306,25 +306,25 @@ var arginfo_recursive_tree_it_setPostfix []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("postfix"),
 }
-var spl_funcs_RecursiveTreeIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator___construct, ArginfoRecursiveTreeItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_key, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_current, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("beginIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginIteration, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("endIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endIteration, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("callHasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callHasChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("callGetChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callGetChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("beginChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("endChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("nextElement", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_nextElement, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getPrefix", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_getPrefix, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setPrefixPart", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_setPrefixPart, arginfo_recursive_tree_it_setPrefixPart),
-	zend.MakeZendFunctionEntryEx("getEntry", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_getEntry, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setPostfix", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_setPostfix, arginfo_recursive_tree_it_setPostfix),
-	zend.MakeZendFunctionEntryEx("getPostfix", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_getPostfix, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveTreeIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator___construct, ArginfoRecursiveTreeItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_key, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_current, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("beginIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginIteration, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("endIteration", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endIteration, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("callHasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callHasChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("callGetChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_callGetChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("beginChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_beginChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("endChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_endChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("nextElement", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveIteratorIterator_nextElement, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getPrefix", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_getPrefix, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setPrefixPart", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_setPrefixPart, arginfo_recursive_tree_it_setPrefixPart),
+	types.MakeZendFunctionEntryEx("getEntry", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_getEntry, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setPostfix", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_setPostfix, arginfo_recursive_tree_it_setPostfix),
+	types.MakeZendFunctionEntryEx("getPostfix", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveTreeIterator_getPostfix, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto FilterIterator::__construct(Iterator it)
@@ -435,47 +435,47 @@ var ArginfoFilterItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
-var spl_funcs_FilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_FilterIterator___construct, ArginfoFilterItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_FilterIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, ZimSplDualItValid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_FilterIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
+var spl_funcs_FilterIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_FilterIterator___construct, ArginfoFilterItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_FilterIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, ZimSplDualItValid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_FilterIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
 }
 var ArginfoCallbackFilterItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 	zend.MakeArgInfo("callback"),
 }
-var spl_funcs_CallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_CallbackFilterIterator___construct, ArginfoCallbackFilterItConstruct),
-	zend.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_CallbackFilterIterator_accept, ArginfoRecursiveItVoid),
+var spl_funcs_CallbackFilterIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_CallbackFilterIterator___construct, ArginfoCallbackFilterItConstruct),
+	types.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_CallbackFilterIterator_accept, ArginfoRecursiveItVoid),
 }
 var ArginfoRecursiveCallbackFilterItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
 	zend.MakeArgInfo("callback"),
 }
-var spl_funcs_RecursiveCallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCallbackFilterIterator___construct, ArginfoRecursiveCallbackFilterItConstruct),
-	zend.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCallbackFilterIterator_getChildren, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveCallbackFilterIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCallbackFilterIterator___construct, ArginfoRecursiveCallbackFilterItConstruct),
+	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCallbackFilterIterator_getChildren, ArginfoRecursiveItVoid),
 }
 var ArginfoParentItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
 }
-var spl_funcs_RecursiveFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator___construct, ArginfoParentItConstruct),
-	zend.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_getChildren, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveFilterIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator___construct, ArginfoParentItConstruct),
+	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_getChildren, ArginfoRecursiveItVoid),
 }
-var spl_funcs_ParentIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_ParentIterator___construct, ArginfoParentItConstruct),
-	zend.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
+var spl_funcs_ParentIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_ParentIterator___construct, ArginfoParentItConstruct),
+	types.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
 }
 var ArginfoRegexItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(2),
@@ -497,16 +497,16 @@ var ArginfoRegexItSetPregFlags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("preg_flags"),
 }
-var spl_funcs_RegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator___construct, ArginfoRegexItConstruct),
-	zend.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_accept, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getMode", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getMode, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setMode", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_setMode, ArginfoRegexItSetMode),
-	zend.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getFlags, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_setFlags, ArginfoRegexItSetFlags),
-	zend.MakeZendFunctionEntryEx("getPregFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getPregFlags, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setPregFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_setPregFlags, ArginfoRegexItSetPregFlags),
-	zend.MakeZendFunctionEntryEx("getRegex", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getRegex, ArginfoRecursiveItVoid),
+var spl_funcs_RegexIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator___construct, ArginfoRegexItConstruct),
+	types.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_accept, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getMode", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getMode, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setMode", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_setMode, ArginfoRegexItSetMode),
+	types.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getFlags, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_setFlags, ArginfoRegexItSetFlags),
+	types.MakeZendFunctionEntryEx("getPregFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getPregFlags, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setPregFlags", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_setPregFlags, ArginfoRegexItSetPregFlags),
+	types.MakeZendFunctionEntryEx("getRegex", zend.ZEND_ACC_PUBLIC, zim_spl_RegexIterator_getRegex, ArginfoRecursiveItVoid),
 }
 var ArginfoRecRegexItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(2),
@@ -516,11 +516,11 @@ var ArginfoRecRegexItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("flags"),
 	zend.MakeArgInfo("preg_flags"),
 }
-var spl_funcs_RecursiveRegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveRegexIterator___construct, ArginfoRecRegexItConstruct),
-	zend.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveRegexIterator_accept, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveRegexIterator_getChildren, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveRegexIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveRegexIterator___construct, ArginfoRecRegexItConstruct),
+	types.MakeZendFunctionEntryEx("accept", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveRegexIterator_accept, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveRegexIterator_getChildren, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto LimitIterator::__construct(Iterator it [, int offset, int count])
@@ -545,8 +545,8 @@ var ArginfoSeekableItSeek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("position", ArgInfoType(types.ZEND_TYPE_ENCODE(types.IS_LONG, 0))),
 }
-var spl_funcs_SeekableIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("seek", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoSeekableItSeek),
+var spl_funcs_SeekableIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("seek", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoSeekableItSeek),
 }
 var ArginfoLimitItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
@@ -558,16 +558,16 @@ var ArginfoLimitItSeek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("position"),
 }
-var spl_funcs_LimitIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator___construct, ArginfoLimitItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("seek", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_seek, ArginfoLimitItSeek),
-	zend.MakeZendFunctionEntryEx("getPosition", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_getPosition, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
+var spl_funcs_LimitIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator___construct, ArginfoLimitItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("seek", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_seek, ArginfoLimitItSeek),
+	types.MakeZendFunctionEntryEx("getPosition", zend.ZEND_ACC_PUBLIC, zim_spl_LimitIterator_getPosition, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto CachingIterator::__construct(Iterator it [, flags = CIT_CALL_TOSTRING])
@@ -609,24 +609,24 @@ var arginfo_caching_it_offsetSet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("index"),
 	zend.MakeArgInfo("newval"),
 }
-var spl_funcs_CachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator___construct, ArginfoCachingItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("hasNext", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_hasNext, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("__toString", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator___toString, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_getFlags, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_setFlags, arginfo_caching_it_setFlags),
-	zend.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetGet, arginfo_caching_it_offsetGet),
-	zend.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetSet, arginfo_caching_it_offsetSet),
-	zend.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetUnset, arginfo_caching_it_offsetGet),
-	zend.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetExists, arginfo_caching_it_offsetGet),
-	zend.MakeZendFunctionEntryEx("getCache", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_getCache, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_count, ArginfoRecursiveItVoid),
+var spl_funcs_CachingIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator___construct, ArginfoCachingItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("hasNext", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_hasNext, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("__toString", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator___toString, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_getFlags, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_setFlags, arginfo_caching_it_setFlags),
+	types.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetGet, arginfo_caching_it_offsetGet),
+	types.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetSet, arginfo_caching_it_offsetSet),
+	types.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetUnset, arginfo_caching_it_offsetGet),
+	types.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_offsetExists, arginfo_caching_it_offsetGet),
+	types.MakeZendFunctionEntryEx("getCache", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_getCache, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_CachingIterator_count, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto RecursiveCachingIterator::__construct(RecursiveIterator it [, flags = CIT_CALL_TOSTRING])
@@ -643,10 +643,10 @@ var ArginfoCachingRecItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 	zend.MakeArgInfo("flags"),
 }
-var spl_funcs_RecursiveCachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCachingIterator___construct, ArginfoCachingRecItConstruct),
-	zend.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCachingIterator_hasChildren, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCachingIterator_getChildren, ArginfoRecursiveItVoid),
+var spl_funcs_RecursiveCachingIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCachingIterator___construct, ArginfoCachingRecItConstruct),
+	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCachingIterator_hasChildren, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_RecursiveCachingIterator_getChildren, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto IteratorIterator::__construct(Traversable it)
@@ -656,14 +656,14 @@ var ArginfoIteratorItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
 }
-var spl_funcs_IteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_IteratorIterator___construct, ArginfoIteratorItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, ZimSplDualItRewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, ZimSplDualItValid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, ZimSplDualItNext, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
+var spl_funcs_IteratorIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_IteratorIterator___construct, ArginfoIteratorItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, ZimSplDualItRewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, ZimSplDualItValid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, ZimSplDualItCurrent, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, ZimSplDualItNext, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto NoRewindIterator::__construct(Iterator it)
@@ -688,14 +688,14 @@ var ArginfoNorewindItConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
-var spl_funcs_NoRewindIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator___construct, ArginfoNorewindItConstruct),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_key, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_current, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
+var spl_funcs_NoRewindIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator___construct, ArginfoNorewindItConstruct),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_key, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_current, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_NoRewindIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto InfiniteIterator::__construct(Iterator it)
@@ -704,9 +704,9 @@ var spl_funcs_NoRewindIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 /* {{{ proto void InfiniteIterator::next()
    Prevent a call to inner iterators rewind() (internally the current data will be fetched if valid()) */
 
-var spl_funcs_InfiniteIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_InfiniteIterator___construct, ArginfoNorewindItConstruct),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_InfiniteIterator_next, ArginfoRecursiveItVoid),
+var spl_funcs_InfiniteIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_InfiniteIterator___construct, ArginfoNorewindItConstruct),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_InfiniteIterator_next, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto void EmptyIterator::rewind()
@@ -724,12 +724,12 @@ var spl_funcs_InfiniteIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 /* {{{ proto void EmptyIterator::next()
    Does nothing */
 
-var spl_funcs_EmptyIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_key, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_current, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_next, ArginfoRecursiveItVoid),
+var spl_funcs_EmptyIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_key, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_current, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_EmptyIterator_next, ArginfoRecursiveItVoid),
 }
 
 /* {{{ proto AppendIterator::__construct()
@@ -760,20 +760,20 @@ var ArginfoAppendItAppend []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("iterator", ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
-var spl_funcs_AppendIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator___construct, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("append", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_append, ArginfoAppendItAppend),
-	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_rewind, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_valid, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_current, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_next, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getIteratorIndex", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_getIteratorIndex, ArginfoRecursiveItVoid),
-	zend.MakeZendFunctionEntryEx("getArrayIterator", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_getArrayIterator, ArginfoRecursiveItVoid),
+var spl_funcs_AppendIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator___construct, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("append", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_append, ArginfoAppendItAppend),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_rewind, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_valid, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, ZimSplDualItKey, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_current, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_next, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC, zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getIteratorIndex", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_getIteratorIndex, ArginfoRecursiveItVoid),
+	types.MakeZendFunctionEntryEx("getArrayIterator", zend.ZEND_ACC_PUBLIC, zim_spl_AppendIterator_getArrayIterator, ArginfoRecursiveItVoid),
 }
-var spl_funcs_OuterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
+var spl_funcs_OuterIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("getInnerIterator", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, ArginfoRecursiveItVoid),
 }
 
 /* {{{ PHP_MINIT_FUNCTION(spl_iterators)

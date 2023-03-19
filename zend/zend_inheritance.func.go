@@ -198,9 +198,9 @@ func LookupClass(scope *types.ClassEntry, name *types.ZendString) *types.ClassEn
 
 		if CG__().GetDelayedAutoloads() == nil {
 			ALLOC_HASHTABLE(CG__().GetDelayedAutoloads())
-			ZendHashInit(CG__().GetDelayedAutoloads(), 0, nil, nil, 0)
+			types.ZendHashInit(CG__().GetDelayedAutoloads(), 0, nil, nil, 0)
 		}
-		ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name)
+		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name)
 	} else {
 		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce != nil && ClassVisible(ce) != 0 {
@@ -510,7 +510,7 @@ func ZendAppendTypeHint(str *SmartStr, fptr *ZendFunction, arg_info *ZendArgInfo
 			str.AppendByte(' ')
 		}
 	} else if arg_info.GetType().IsCode() {
-		var type_name *byte = ZendGetTypeByConst(arg_info.GetType().Code())
+		var type_name *byte = types.ZendGetTypeByConst(arg_info.GetType().Code())
 		str.AppendString(b.CastStrAuto(type_name))
 		if return_hint == 0 {
 			str.AppendByte(' ')
@@ -807,9 +807,9 @@ func DoInheritMethod(key *types.ZendString, parent *ZendFunction, ce *types.Clas
 		}
 		parent = ZendDuplicateFunction(parent, ce, is_interface)
 		if is_interface == 0 {
-			_zendHashAppendPtr(ce.GetFunctionTable(), key, parent)
+			types._zendHashAppendPtr(ce.GetFunctionTable(), key, parent)
 		} else {
-			ZendHashAddNewPtr(ce.GetFunctionTable(), key, parent)
+			types.ZendHashAddNewPtr(ce.GetFunctionTable(), key, parent)
 		}
 	}
 }
@@ -862,7 +862,7 @@ func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendProp
 func EmitIncompatiblePropertyError(child *ZendPropertyInfo, parent *ZendPropertyInfo) {
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must be %s%s (as in class %s)", child.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(child.GetName()), b.Cond(parent.GetType().AllowNull(), "?", ""), b.CondF(parent.GetType().IsClass(), func() []byte {
 		return b.CondF(parent.GetType().IsCe(), func() *types.ZendString { return types.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types.ZendString { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
-	}, func() *byte { return ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
+	}, func() *byte { return types.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
 }
 func DoInheritProperty(parent_info *ZendPropertyInfo, key *types.ZendString, ce *types.ClassEntry) {
 	var child *types.Zval = ce.GetPropertiesInfo().KeyFind(key.GetStr())
@@ -907,7 +907,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *types.ZendString, ce 
 		} else {
 			child_info = parent_info
 		}
-		_zendHashAppendPtr(ce.GetPropertiesInfo(), key, child_info)
+		types._zendHashAppendPtr(ce.GetPropertiesInfo(), key, child_info)
 	}
 }
 func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
@@ -975,7 +975,7 @@ func DoInheritClassConstant(name *types.ZendString, parent_const *ZendClassConst
 			memcpy(c, parent_const, b.SizeOf("zend_class_constant"))
 			parent_const = c
 		}
-		_zendHashAppendPtr(ce.GetConstantsTable(), name, parent_const)
+		types._zendHashAppendPtr(ce.GetConstantsTable(), name, parent_const)
 	}
 }
 func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
@@ -1325,7 +1325,7 @@ func DoInheritIfaceConstant(name *types.ZendString, c *ZendClassConstant, ce *ty
 			memcpy(ct, c, b.SizeOf("zend_class_constant"))
 			c = ct
 		}
-		ZendHashUpdatePtr(ce.GetConstantsTable(), name, c)
+		types.ZendHashUpdatePtr(ce.GetConstantsTable(), name, c)
 	}
 }
 func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
@@ -1510,7 +1510,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.ZendString, fe *Zend
 func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.ZendString, fn *ZendFunction, overridden **types.HashTable) {
 	var existing_fn *ZendFunction = nil
 	var new_fn *ZendFunction
-	if b.Assign(&existing_fn, ZendHashFindPtr(ce.GetFunctionTable(), key)) != nil {
+	if b.Assign(&existing_fn, types.ZendHashFindPtr(ce.GetFunctionTable(), key)) != nil {
 
 		/* if it is the same function with the same visibility and has not been assigned a class scope yet, regardless
 		 * of where it is coming from there is no conflict and we do not need to add it again */
@@ -1523,7 +1523,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.ZendString,
 			/* members from the current class override trait methods */
 
 			if (*overridden) != nil {
-				if b.Assign(&existing_fn, ZendHashFindPtr(*overridden, key)) != nil {
+				if b.Assign(&existing_fn, types.ZendHashFindPtr(*overridden, key)) != nil {
 					if existing_fn.IsAbstract() {
 
 						/* Make sure the trait method is compatible with previosly declared abstract method */
@@ -1543,9 +1543,9 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.ZendString,
 				}
 			} else {
 				ALLOC_HASHTABLE(*overridden)
-				ZendHashInitEx(*overridden, 8, nil, OverriddenPtrDtor, 0, 0)
+				types.ZendHashInitEx(*overridden, 8, nil, OverriddenPtrDtor, 0, 0)
 			}
-			ZendHashUpdateMem(*overridden, key, fn, b.SizeOf("zend_function"))
+			types.ZendHashUpdateMem(*overridden, key, fn, b.SizeOf("zend_function"))
 			return
 		} else if fn.IsAbstract() && !existing_fn.IsAbstract() {
 
@@ -1580,7 +1580,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.ZendString,
 		new_fn.GetOpArray().SetIsImmutable(false)
 	}
 	FunctionAddRef(new_fn)
-	fn = ZendHashUpdatePtr(ce.GetFunctionTable(), key, new_fn)
+	fn = types.ZendHashUpdatePtr(ce.GetFunctionTable(), key, new_fn)
 	ZendAddMagicMethods(ce, key, fn)
 }
 func ZendFixupTraitMethod(fn *ZendFunction, ce *types.ClassEntry) {
@@ -1738,7 +1738,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 			/** Ensure that the preferred method is actually available. */
 
 			lcname = ZendStringTolower(cur_method_ref.GetMethodName())
-			if ZendHashExists(trait.GetFunctionTable(), lcname) == 0 {
+			if types.ZendHashExists(trait.GetFunctionTable(), lcname) == 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 			}
 
@@ -1759,9 +1759,9 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				trait_num = ZendCheckTraitUsage(ce, exclude_ce, traits)
 				if exclude_tables[trait_num] == nil {
 					ALLOC_HASHTABLE(exclude_tables[trait_num])
-					ZendHashInit(exclude_tables[trait_num], 0, nil, nil, 0)
+					types.ZendHashInit(exclude_tables[trait_num], 0, nil, nil, 0)
 				}
-				if ZendHashAddEmptyElement(exclude_tables[trait_num], lcname) == nil {
+				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname) == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.GetName().GetVal())
 				}
 
@@ -1804,7 +1804,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				/** And, ensure that the referenced method is resolvable, too. */
 
 				lcname = ZendStringTolower(cur_method_ref.GetMethodName())
-				if ZendHashExists(trait.GetFunctionTable(), lcname) == 0 {
+				if types.ZendHashExists(trait.GetFunctionTable(), lcname) == 0 {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 				}
 				types.ZendStringReleaseEx(lcname, 0)
@@ -1871,7 +1871,7 @@ func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, curren
 	var i int
 	if coliding_ce == ce {
 		for i = 0; i < current_trait; i++ {
-			if traits[i] != nil && ZendHashExists(traits[i].GetPropertiesInfo(), prop_name) != 0 {
+			if traits[i] != nil && types.ZendHashExists(traits[i].GetPropertiesInfo(), prop_name) != 0 {
 				return traits[i]
 			}
 		}
@@ -1924,9 +1924,9 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 			/* next: check for conflicts with current class */
 
-			if b.Assign(&coliding_prop, ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name)) != nil {
+			if b.Assign(&coliding_prop, types.ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name)) != nil {
 				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
-					ZendHashDel(ce.GetPropertiesInfo(), prop_name)
+					types.ZendHashDel(ce.GetPropertiesInfo(), prop_name)
 					flags |= ZEND_ACC_CHANGED
 				} else {
 					not_compatible = 1
@@ -2035,7 +2035,7 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 					     as in the case where alias is set. */
 
 					lc_method_name = ZendStringTolower(cur_alias.GetTraitMethod().GetMethodName())
-					if ZendHashExists(ce.GetFunctionTable(), lc_method_name) != 0 {
+					if types.ZendHashExists(ce.GetFunctionTable(), lc_method_name) != 0 {
 						types.ZendStringReleaseEx(lc_method_name, 0)
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", cur_alias.GetTraitMethod().GetMethodName().GetVal())
 					} else {
@@ -2183,16 +2183,16 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.HashTable {
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
 		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
-		ZendHashInit(CG__().GetDelayedVarianceObligations(), 0, nil, VarianceObligationHtDtor, 0)
+		types.ZendHashInit(CG__().GetDelayedVarianceObligations(), 0, nil, VarianceObligationHtDtor, 0)
 	}
 	key = ZendUlong(uintPtr(ce))
-	ht = ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
+	ht = types.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
 	if ht != nil {
 		return ht
 	}
 	ALLOC_HASHTABLE(ht)
-	ZendHashInit(ht, 0, nil, VarianceObligationDtor, 0)
-	ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
+	types.ZendHashInit(ht, 0, nil, VarianceObligationDtor, 0)
+	types.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht
 }
@@ -2201,7 +2201,7 @@ func AddDependencyObligation(ce *types.ClassEntry, dependency_ce *types.ClassEnt
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_DEPENDENCY)
 	obligation.SetDependencyCe(dependency_ce)
-	ZendHashNextIndexInsertPtr(obligations, obligation)
+	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func AddCompatibilityObligation(ce *types.ClassEntry, child_fn *ZendFunction, parent_fn *ZendFunction, always_error types.ZendBool) {
 	var obligations *types.HashTable = GetOrInitObligationsForClass(ce)
@@ -2221,7 +2221,7 @@ func AddCompatibilityObligation(ce *types.ClassEntry, child_fn *ZendFunction, pa
 		memcpy(obligation.GetParentFn(), parent_fn, b.SizeOf("zend_op_array"))
 	}
 	obligation.SetAlwaysError(always_error)
-	ZendHashNextIndexInsertPtr(obligations, obligation)
+	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPropertyInfo, parent_prop *ZendPropertyInfo) {
 	var obligations *types.HashTable = GetOrInitObligationsForClass(ce)
@@ -2229,7 +2229,7 @@ func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPr
 	obligation.SetType(OBLIGATION_PROPERTY_COMPATIBILITY)
 	obligation.SetChildProp(child_prop)
 	obligation.SetParentProp(parent_prop)
-	ZendHashNextIndexInsertPtr(obligations, obligation)
+	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func CheckVarianceObligation(zv *types.Zval) int {
 	var obligation *VarianceObligation = zv.GetPtr()
@@ -2239,14 +2239,14 @@ func CheckVarianceObligation(zv *types.Zval) int {
 			ResolveDelayedVarianceObligations(dependency_ce)
 		}
 		if !dependency_ce.IsLinked() {
-			return ZEND_HASH_APPLY_KEEP
+			return types.ZEND_HASH_APPLY_KEEP
 		}
 	} else if obligation.GetType() == OBLIGATION_COMPATIBILITY {
 		var unresolved_class *types.ZendString
 		var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, obligation.GetChildFn(), obligation.GetParentFn())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return ZEND_HASH_APPLY_KEEP
+				return types.ZEND_HASH_APPLY_KEEP
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatibleMethodErrorOrWarning(obligation.GetChildFn(), obligation.GetParentFn(), status, unresolved_class, obligation.GetAlwaysError())
@@ -2256,13 +2256,13 @@ func CheckVarianceObligation(zv *types.Zval) int {
 		var status InheritanceStatus = PropertyTypesCompatible(obligation.GetParentProp(), obligation.GetChildProp())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return ZEND_HASH_APPLY_KEEP
+				return types.ZEND_HASH_APPLY_KEEP
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatiblePropertyError(obligation.GetChildProp(), obligation.GetParentProp())
 		}
 	}
-	return ZEND_HASH_APPLY_REMOVE
+	return types.ZEND_HASH_APPLY_REMOVE
 }
 func LoadDelayedClasses() {
 	var delayed_autoloads *types.HashTable = CG__().GetDelayedAutoloads()
@@ -2289,13 +2289,13 @@ func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 	var obligations *types.HashTable
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
-	obligations = ZendHashIndexFindPtr(all_obligations, num_key)
+	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
-	ZendHashApply(obligations, CheckVarianceObligation)
+	types.ZendHashApply(obligations, CheckVarianceObligation)
 	if obligations.GetNNumOfElements() == 0 {
 		ce.SetIsUnresolvedVariance(false)
 		ce.SetIsLinked(true)
-		ZendHashIndexDel(all_obligations, num_key)
+		types.ZendHashIndexDel(all_obligations, num_key)
 	}
 }
 func ReportVarianceErrors(ce *types.ClassEntry) {
@@ -2304,7 +2304,7 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 	var obligation *VarianceObligation
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
-	obligations = ZendHashIndexFindPtr(all_obligations, num_key)
+	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
 	var __ht *types.HashTable = obligations
 	for _, _p := range __ht.foreachData() {
@@ -2332,7 +2332,7 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 
 	ce.SetIsUnresolvedVariance(false)
 	ce.SetIsLinked(true)
-	ZendHashIndexDel(all_obligations, num_key)
+	types.ZendHashIndexDel(all_obligations, num_key)
 }
 func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 	/* If this class has been used while unlinked through a variance obligation, it is not legal
@@ -2475,12 +2475,12 @@ func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname 
 	var status InheritanceStatus = ZendCanEarlyBind(ce, parent_ce)
 	if status != INHERITANCE_UNRESOLVED {
 		if delayed_early_binding != nil {
-			if ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(delayed_early_binding), lcname) == nil {
+			if types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(delayed_early_binding), lcname) == nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 				return 0
 			}
 		} else {
-			if ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) == nil {
+			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) == nil {
 				return 0
 			}
 		}

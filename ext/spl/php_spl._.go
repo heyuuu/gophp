@@ -161,22 +161,22 @@ var ArginfoSplObjectId []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("obj"),
 }
-var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("spl_classes", 0, ZifSplClasses, ArginfoSplClasses),
-	zend.MakeZendFunctionEntryEx("spl_autoload", 0, ZifSplAutoload, ArginfoSplAutoload),
-	zend.MakeZendFunctionEntryEx("spl_autoload_extensions", 0, ZifSplAutoloadExtensions, ArginfoSplAutoloadExtensions),
-	zend.MakeZendFunctionEntryEx("spl_autoload_register", 0, ZifSplAutoloadRegister, ArginfoSplAutoloadRegister),
-	zend.MakeZendFunctionEntryEx("spl_autoload_unregister", 0, ZifSplAutoloadUnregister, ArginfoSplAutoloadUnregister),
-	zend.MakeZendFunctionEntryEx("spl_autoload_functions", 0, ZifSplAutoloadFunctions, ArginfoSplAutoloadFunctions),
-	zend.MakeZendFunctionEntryEx("spl_autoload_call", 0, ZifSplAutoloadCall, ArginfoSplAutoloadCall),
-	zend.MakeZendFunctionEntryEx("class_parents", 0, ZifClassParents, ArginfoClassParents),
-	zend.MakeZendFunctionEntryEx("class_implements", 0, ZifClassImplements, ArginfoClassImplements),
-	zend.MakeZendFunctionEntryEx("class_uses", 0, ZifClassUses, ArginfoClassUses),
-	zend.MakeZendFunctionEntryEx("spl_object_hash", 0, ZifSplObjectHash, ArginfoSplObjectHash),
-	zend.MakeZendFunctionEntryEx("spl_object_id", 0, ZifSplObjectId, ArginfoSplObjectId),
-	zend.MakeZendFunctionEntryEx("iterator_to_array", 0, ZifIteratorToArray, ArginfoIteratorToArray),
-	zend.MakeZendFunctionEntryEx("iterator_count", 0, ZifIteratorCount, ArginfoIterator),
-	zend.MakeZendFunctionEntryEx("iterator_apply", 0, ZifIteratorApply, ArginfoIteratorApply),
+var SplFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("spl_classes", 0, ZifSplClasses, ArginfoSplClasses),
+	types.MakeZendFunctionEntryEx("spl_autoload", 0, ZifSplAutoload, ArginfoSplAutoload),
+	types.MakeZendFunctionEntryEx("spl_autoload_extensions", 0, ZifSplAutoloadExtensions, ArginfoSplAutoloadExtensions),
+	types.MakeZendFunctionEntryEx("spl_autoload_register", 0, ZifSplAutoloadRegister, ArginfoSplAutoloadRegister),
+	types.MakeZendFunctionEntryEx("spl_autoload_unregister", 0, ZifSplAutoloadUnregister, ArginfoSplAutoloadUnregister),
+	types.MakeZendFunctionEntryEx("spl_autoload_functions", 0, ZifSplAutoloadFunctions, ArginfoSplAutoloadFunctions),
+	types.MakeZendFunctionEntryEx("spl_autoload_call", 0, ZifSplAutoloadCall, ArginfoSplAutoloadCall),
+	types.MakeZendFunctionEntryEx("class_parents", 0, ZifClassParents, ArginfoClassParents),
+	types.MakeZendFunctionEntryEx("class_implements", 0, ZifClassImplements, ArginfoClassImplements),
+	types.MakeZendFunctionEntryEx("class_uses", 0, ZifClassUses, ArginfoClassUses),
+	types.MakeZendFunctionEntryEx("spl_object_hash", 0, ZifSplObjectHash, ArginfoSplObjectHash),
+	types.MakeZendFunctionEntryEx("spl_object_id", 0, ZifSplObjectId, ArginfoSplObjectId),
+	types.MakeZendFunctionEntryEx("iterator_to_array", 0, ZifIteratorToArray, ArginfoIteratorToArray),
+	types.MakeZendFunctionEntryEx("iterator_count", 0, ZifIteratorCount, ArginfoIterator),
+	types.MakeZendFunctionEntryEx("iterator_apply", 0, ZifIteratorApply, ArginfoIteratorApply),
 }
 
 /* {{{ spl_module_entry

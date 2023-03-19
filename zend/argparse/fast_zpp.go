@@ -2,7 +2,6 @@ package argparse
 
 import (
 	b "sik/builtin"
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -191,10 +190,10 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 }
 
 // @see Micro: Z_PARAM_FUNC，Old: 'f'
-func (p *FastParser) ParseFunc(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInfoCache) {
+func (p *FastParser) ParseFunc(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache) {
 	p.ParseFuncEx(fci, fcc, false)
 }
-func (p *FastParser) ParseFuncEx(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInfoCache, checkNull bool) {
+func (p *FastParser) ParseFuncEx(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, checkNull bool) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return

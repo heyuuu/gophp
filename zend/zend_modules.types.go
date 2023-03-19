@@ -2,7 +2,10 @@
 
 package zend
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+	"sik/zend/types"
+)
 
 /**
  * ZendModuleEntry
@@ -15,7 +18,7 @@ type ZendModuleEntry struct {
 	ini_entry             *ZendIniEntry
 	deps                  *ZendModuleDep
 	name                  *byte
-	functions             *ZendFunctionEntry
+	functions             *types.ZendFunctionEntry
 	module_startup_func   func(type_ int, module_number int) int
 	module_shutdown_func  func(type_ int, module_number int) int
 	request_startup_func  func(type_ int, module_number int) int
@@ -42,7 +45,7 @@ func MakeZendModuleEntry(
 	ini_entry *ZendIniEntry,
 	deps *ZendModuleDep,
 	name *byte,
-	functions *ZendFunctionEntry,
+	functions *types.ZendFunctionEntry,
 	module_startup_func func(type_ int, module_number int) int,
 	module_shutdown_func func(type_ int, module_number int) int,
 	request_startup_func func(type_ int, module_number int) int,
@@ -87,11 +90,11 @@ func MakeZendModuleEntry(
 	}
 }
 
-func (this *ZendModuleEntry) GetZendApi() uint                 { return this.zend_api }
-func (this *ZendModuleEntry) GetDeps() *ZendModuleDep          { return this.deps }
-func (this *ZendModuleEntry) GetName() *byte                   { return this.name }
-func (this *ZendModuleEntry) GetNameStr() string               { return b.CastStrAuto(this.name) }
-func (this *ZendModuleEntry) GetFunctions() *ZendFunctionEntry { return this.functions }
+func (this *ZendModuleEntry) GetZendApi() uint                       { return this.zend_api }
+func (this *ZendModuleEntry) GetDeps() *ZendModuleDep                { return this.deps }
+func (this *ZendModuleEntry) GetName() *byte                         { return this.name }
+func (this *ZendModuleEntry) GetNameStr() string                     { return b.CastStrAuto(this.name) }
+func (this *ZendModuleEntry) GetFunctions() *types.ZendFunctionEntry { return this.functions }
 func (this *ZendModuleEntry) GetModuleStartupFunc() func(type_ int, module_number int) int {
 	return this.module_startup_func
 }

@@ -24,15 +24,15 @@ var ZendThrowExceptionHook func(ex *types.Zval)
 
 var DefaultExceptionHandlers zend.ZendObjectHandlers
 
-var ZendFuncsThrowable []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("getFile", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("getLine", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("getTrace", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("getPrevious", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	zend.MakeZendFunctionEntryEx("__toString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+var ZendFuncsThrowable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getFile", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getLine", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getTrace", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getPrevious", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("__toString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
 }
 var ArginfoExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(0),
@@ -40,18 +40,18 @@ var ArginfoExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("code"),
 	zend.MakeArgInfo("previous"),
 }
-var DefaultExceptionFunctions = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__clone", zend.ZEND_ACC_PRIVATE|zend.ZEND_ACC_FINAL, ZimExceptionClone, nil),
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimExceptionConstruct, ArginfoExceptionConstruct),
-	zend.MakeZendFunctionEntryEx("__wakeup", zend.ZEND_ACC_PUBLIC, ZimExceptionWakeup, nil),
-	zend.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getMessage, nil),
-	zend.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getCode, nil),
-	zend.MakeZendFunctionEntryEx("getFile", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getFile, nil),
-	zend.MakeZendFunctionEntryEx("getLine", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getLine, nil),
-	zend.MakeZendFunctionEntryEx("getTrace", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTrace, nil),
-	zend.MakeZendFunctionEntryEx("getPrevious", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getPrevious, nil),
-	zend.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTraceAsString, nil),
-	zend.MakeZendFunctionEntryEx("__toString", 0, zim_exception___toString, nil),
+var DefaultExceptionFunctions = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__clone", zend.ZEND_ACC_PRIVATE|zend.ZEND_ACC_FINAL, ZimExceptionClone, nil),
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimExceptionConstruct, ArginfoExceptionConstruct),
+	types.MakeZendFunctionEntryEx("__wakeup", zend.ZEND_ACC_PUBLIC, ZimExceptionWakeup, nil),
+	types.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getMessage, nil),
+	types.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getCode, nil),
+	types.MakeZendFunctionEntryEx("getFile", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getFile, nil),
+	types.MakeZendFunctionEntryEx("getLine", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getLine, nil),
+	types.MakeZendFunctionEntryEx("getTrace", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTrace, nil),
+	types.MakeZendFunctionEntryEx("getPrevious", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getPrevious, nil),
+	types.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTraceAsString, nil),
+	types.MakeZendFunctionEntryEx("__toString", 0, zim_exception___toString, nil),
 }
 var ArginfoErrorExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(0),
@@ -62,9 +62,9 @@ var ArginfoErrorExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("lineno"),
 	zend.MakeArgInfo("previous"),
 }
-var ErrorExceptionFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct),
-	zend.MakeZendFunctionEntryEx("getSeverity", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_error_exception_getSeverity, nil),
+var ErrorExceptionFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct),
+	types.MakeZendFunctionEntryEx("getSeverity", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_error_exception_getSeverity, nil),
 }
 
 /**
@@ -578,7 +578,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	var exception *types.Zval
 	var base_ce *types.ClassEntry
 	var str *types.ZendString
-	var fci zend.ZendFcallInfo
+	var fci types.ZendFcallInfo
 	var rv types.Zval
 	var tmp types.Zval
 	var fname *types.ZendString

@@ -41,9 +41,9 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		var prop_info *ZendPropertyInfo
 		var ce *types.ClassEntry = zobj.GetCe()
 		var flags uint32 = 0
-		zobj.SetProperties(ZendNewArray(ce.GetDefaultPropertiesCount()))
+		zobj.SetProperties(types.ZendNewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
-			ZendHashRealInitMixed(zobj.GetProperties())
+			types.ZendHashRealInitMixed(zobj.GetProperties())
 			var __ht *types.HashTable = ce.GetPropertiesInfo()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
@@ -54,7 +54,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
 						zobj.GetProperties().GetUFlags() |= types.HASH_FLAG_HAS_EMPTY_IND
 					}
-					_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
+					types._zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 				}
 			}
 			if (flags & ZEND_ACC_CHANGED) != 0 {
@@ -99,7 +99,7 @@ func ZendStdGetGc(object *types.Zval, table **types.Zval, n *int) *types.HashTab
 			*n = 0
 			if zobj.GetProperties().GetRefcount() > 1 && (zobj.GetProperties().GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 {
 				zobj.GetProperties().DelRefcount()
-				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 			}
 			return zobj.GetProperties()
 		} else {
@@ -121,7 +121,7 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable {
 	if retval.IsArray() {
 		if !(retval.IsRefcounted()) {
 			*is_temp = 1
-			return ZendArrayDup(retval.GetArr())
+			return types.ZendArrayDup(retval.GetArr())
 		} else if retval.GetRefcount() <= 1 {
 			*is_temp = 1
 			ht = retval.GetArr()
@@ -133,7 +133,7 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable {
 		}
 	} else if retval.IsNull() {
 		*is_temp = 1
-		ht = ZendNewArray(0)
+		ht = types.ZendNewArray(0)
 		return ht
 	}
 	faults.ErrorNoreturn(faults.E_ERROR, ZEND_DEBUGINFO_FUNC_NAME+"() must return an array")
@@ -142,8 +142,8 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable {
 func ZendStdCallGetter(zobj *types.ZendObject, prop_name *types.ZendString, retval *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
 	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci ZendFcallInfo
-	var fcic ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fcic types.ZendFcallInfoCache
 	var member types.Zval
 	EG__().SetFakeScope(nil)
 
@@ -170,8 +170,8 @@ func ZendStdCallGetter(zobj *types.ZendObject, prop_name *types.ZendString, retv
 func ZendStdCallSetter(zobj *types.ZendObject, prop_name *types.ZendString, value *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
 	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci ZendFcallInfo
-	var fcic ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fcic types.ZendFcallInfoCache
 	var args []types.Zval
 	var ret types.Zval
 	EG__().SetFakeScope(nil)
@@ -201,8 +201,8 @@ func ZendStdCallSetter(zobj *types.ZendObject, prop_name *types.ZendString, valu
 func ZendStdCallUnsetter(zobj *types.ZendObject, prop_name *types.ZendString) {
 	var ce *types.ClassEntry = zobj.GetCe()
 	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci ZendFcallInfo
-	var fcic ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fcic types.ZendFcallInfoCache
 	var ret types.Zval
 	var member types.Zval
 	EG__().SetFakeScope(nil)
@@ -230,8 +230,8 @@ func ZendStdCallUnsetter(zobj *types.ZendObject, prop_name *types.ZendString) {
 func ZendStdCallIssetter(zobj *types.ZendObject, prop_name *types.ZendString, retval *types.Zval) {
 	var ce *types.ClassEntry = zobj.GetCe()
 	var orig_fake_scope *types.ClassEntry = EG__().GetFakeScope()
-	var fci ZendFcallInfo
-	var fcic ZendFcallInfoCache
+	var fci types.ZendFcallInfo
+	var fcic types.ZendFcallInfoCache
 	var member types.Zval
 	EG__().SetFakeScope(nil)
 
@@ -531,11 +531,11 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.ZendString) *uin
 			return &(zv.GetPropertyGuard())
 		} else {
 			ALLOC_HASHTABLE(guards)
-			ZendHashInit(guards, 8, nil, ZendPropertyGuardDtor, 0)
+			types.ZendHashInit(guards, 8, nil, ZendPropertyGuardDtor, 0)
 
 			/* mark pointer as "special" using low bit */
 
-			ZendHashAddNewPtr(guards, str, any(zend_uintptr_t&zv.GetPropertyGuard()|1))
+			types.ZendHashAddNewPtr(guards, str, any(zend_uintptr_t&zv.GetPropertyGuard()|1))
 			ZvalPtrDtorStr(zv)
 			zv.SetArray(guards)
 		}
@@ -557,7 +557,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.ZendString) *uin
 
 	ptr = (*uint32)(Emalloc(b.SizeOf("uint32_t")))
 	*ptr = 0
-	return (*uint32)(ZendHashAddNewPtr(guards, member, ptr))
+	return (*uint32)(types.ZendHashAddNewPtr(guards, member, ptr))
 }
 func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	var zobj *types.ZendObject
@@ -747,7 +747,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 				if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					zobj.GetProperties().DelRefcount()
 				}
-				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 			}
 			if b.Assign(&variable_ptr, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				value.TryAddRefcount()
@@ -946,7 +946,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 				if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					zobj.GetProperties().DelRefcount()
 				}
-				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 			}
 			if b.Assign(&retval, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				ZendTmpStringRelease(tmp_name)
@@ -1017,9 +1017,9 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 				zobj.GetProperties().DelRefcount()
 			}
-			zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
+			zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 		}
-		if ZendHashDel(zobj.GetProperties(), name) != types.FAILURE {
+		if types.ZendHashDel(zobj.GetProperties(), name) != types.FAILURE {
 			goto exit
 		}
 	} else if EG__().GetException() != nil {
@@ -1307,7 +1307,7 @@ func ZendClassInitStatics(class_type *types.ClassEntry) {
 func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types.ZendString, type_ int, property_info_ptr **ZendPropertyInfo) *types.Zval {
 	var ret *types.Zval
 	var scope *types.ClassEntry
-	var property_info *ZendPropertyInfo = ZendHashFindPtr(ce.GetPropertiesInfo(), property_name)
+	var property_info *ZendPropertyInfo = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property_name)
 	*property_info_ptr = property_info
 	if property_info == nil {
 		goto undeclared_property
@@ -1584,7 +1584,7 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 			}
 		}
 		return types.FAILURE
-	case types._IS_BOOL:
+	case types.IS_BOOL:
 		writeobj.SetTrue()
 		return types.SUCCESS
 	case types.IS_LONG:
@@ -1597,7 +1597,7 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to float", ce.GetName().GetVal())
 		writeobj.SetDouble(1)
 		return types.SUCCESS
-	case types._IS_NUMBER:
+	case types.IS_NUMBER:
 		ce = types.Z_OBJCE_P(readobj)
 		faults.Error(faults.E_NOTICE, "Object of class %s could not be converted to number", ce.GetName().GetVal())
 		writeobj.SetLong(1)
