@@ -458,7 +458,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		}
 		zend.Efree(logline)
 	}
-	if core.PG(mail_x_header) {
+	if core.PG__().mail_x_header {
 		var tmp *byte = zend.ZendGetExecutedFilename()
 		var f *types.ZendString
 		f = PhpBasename(tmp, strlen(tmp), nil, 0)

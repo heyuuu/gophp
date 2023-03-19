@@ -61,7 +61,7 @@ func ZmShutdownSyslog(type_ int, module_number int) int {
 }
 func PhpOpenlog(ident *byte, option int, facility int) {
 	openlog(ident, option, facility)
-	core.PG(have_called_openlog) = 1
+	core.PG__().have_called_openlog = 1
 }
 func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ident *byte

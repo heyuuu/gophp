@@ -496,8 +496,8 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	var message_buf *byte = ""
 	var error_buf *byte = ""
 	var append_error_message types.ZendBool = 0
-	if core.PG(last_error_message) {
-		switch core.PG(last_error_type) {
+	if core.PG__().last_error_message {
+		switch core.PG__().last_error_type {
 		case zend.E_ERROR:
 
 		case zend.E_CORE_ERROR:
@@ -541,7 +541,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	/* error */
 
 	if append_error_message != 0 {
-		core.Spprintf(&error_buf, 0, " - %s in %s on line %d", core.PG(last_error_message), core.PG(last_error_file), core.PG(last_error_lineno))
+		core.Spprintf(&error_buf, 0, " - %s in %s on line %d", core.PG__().last_error_message, core.PG__().last_error_file, core.PG__().last_error_lineno)
 		if error_buf == nil {
 			zend.Efree(basic_buf)
 			if message != nil {
@@ -961,7 +961,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 		DestroyRequestInfo(&(core.SG__().request_info))
 		return types.FAILURE
 	}
-	core.PG(during_request_startup) = 0
+	core.PG__().during_request_startup = 0
 	return types.SUCCESS
 }
 func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClient) int {

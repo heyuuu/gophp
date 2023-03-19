@@ -304,7 +304,7 @@ func PhpInitConfig() int {
 	}
 	ExtensionLists.GetEngine().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 	ExtensionLists.GetFunctions().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
-	open_basedir = PG(open_basedir)
+	open_basedir = PG__().open_basedir
 	if SM__().GetPhpIniPathOverride() != nil {
 		php_ini_file_name = SM__().GetPhpIniPathOverride()
 		php_ini_search_path = SM__().GetPhpIniPathOverride()
@@ -346,10 +346,10 @@ func PhpInitConfig() int {
 			}
 			strlcat(php_ini_search_path, ".", search_path_size)
 		}
-		if PG(php_binary) {
+		if PG__().php_binary {
 			var separator_location *byte
 			var binary_location *byte
-			binary_location = zend.Estrdup(PG(php_binary))
+			binary_location = zend.Estrdup(PG__().php_binary)
 			separator_location = strrchr(binary_location, zend.DEFAULT_SLASH)
 			if separator_location != nil && separator_location != binary_location {
 				*separator_location = 0
@@ -369,7 +369,7 @@ func PhpInitConfig() int {
 		}
 		strlcat(php_ini_search_path, default_location, search_path_size)
 	}
-	PG(open_basedir) = nil
+	PG__().open_basedir = nil
 
 	/*
 	 * Find and open actual ini file
@@ -426,7 +426,7 @@ func PhpInitConfig() int {
 	if free_ini_search_path != 0 {
 		zend.Efree(php_ini_search_path)
 	}
-	PG(open_basedir) = open_basedir
+	PG__().open_basedir = open_basedir
 	if fp != nil {
 		var fh zend.ZendFileHandle
 		fh.InitFp(fp, filename)

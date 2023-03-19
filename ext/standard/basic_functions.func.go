@@ -690,7 +690,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV, 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV, 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -1186,30 +1186,30 @@ func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *types.Zval
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if core.PG(last_error_message) {
+	if core.PG__().last_error_message {
 		zend.ArrayInit(return_value)
-		zend.AddAssocLongEx(return_value, "type", core.PG(last_error_type))
-		zend.AddAssocStr(return_value, "message", b.CastStrAuto(core.PG(last_error_message)))
-		if core.PG(last_error_file) {
-			zend.AddAssocStr(return_value, "file", b.CastStrAuto(core.PG(last_error_file)))
+		zend.AddAssocLongEx(return_value, "type", core.PG__().last_error_type)
+		zend.AddAssocStr(return_value, "message", b.CastStrAuto(core.PG__().last_error_message))
+		if core.PG__().last_error_file {
+			zend.AddAssocStr(return_value, "file", b.CastStrAuto(core.PG__().last_error_file))
 		} else {
 			zend.AddAssocStr(return_value, "file", "-")
 		}
-		zend.AddAssocLongEx(return_value, "line", core.PG(last_error_lineno))
+		zend.AddAssocLongEx(return_value, "line", core.PG__().last_error_lineno)
 	}
 }
 func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
 	}
-	if core.PG(last_error_message) {
-		core.PG(last_error_type) = 0
-		core.PG(last_error_lineno) = 0
-		zend.Free(core.PG(last_error_message))
-		core.PG(last_error_message) = nil
-		if core.PG(last_error_file) {
-			zend.Free(core.PG(last_error_file))
-			core.PG(last_error_file) = nil
+	if core.PG__().last_error_message {
+		core.PG__().last_error_type = 0
+		core.PG__().last_error_lineno = 0
+		zend.Free(core.PG__().last_error_message)
+		core.PG__().last_error_message = nil
+		if core.PG__().last_error_file {
+			zend.Free(core.PG__().last_error_file)
+			core.PG__().last_error_file = nil
 		}
 	}
 }
@@ -1826,7 +1826,7 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 	/* open basedir check */
 
-	if core.PG(open_basedir) {
+	if core.PG__().open_basedir {
 		if PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
 			if core.PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 				zend.ZvalPtrDtorStr(return_value)
@@ -1953,11 +1953,11 @@ func ZifPrintR(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 }
 func ZifConnectionAborted(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	return_value.SetLong(core.PG(connection_status) & core.PHP_CONNECTION_ABORTED)
+	return_value.SetLong(core.PG__().connection_status & core.PHP_CONNECTION_ABORTED)
 	return
 }
 func ZifConnectionStatus(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	return_value.SetLong(core.PG(connection_status))
+	return_value.SetLong(core.PG__().connection_status)
 	return
 }
 func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1980,7 +1980,7 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Z
 		}
 		break
 	}
-	old_setting = uint16(core.PG(ignore_user_abort))
+	old_setting = uint16(core.PG__().ignore_user_abort)
 	if executeData.NumArgs() != 0 {
 		var key *types.ZendString = types.ZendStringInit("ignore_user_abort", b.SizeOf("\"ignore_user_abort\"")-1, 0)
 		zend.ZendAlterIniEntryChars(key, b.Cond(arg != 0, "1", "0"), 1, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)

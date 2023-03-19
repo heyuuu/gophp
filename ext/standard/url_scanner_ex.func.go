@@ -249,7 +249,7 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 		ctx.GetResult().AppendByte(type_)
 	}
 	if f {
-		AppendModifiedUrl(ctx.GetVal(), ctx.GetResult(), ctx.GetUrlApp(), core.PG(arg_separator).output)
+		AppendModifiedUrl(ctx.GetVal(), ctx.GetResult(), ctx.GetUrlApp(), core.PG__().arg_separator.output)
 	} else {
 		ctx.GetResult().AppendSmartStr(ctx.GetVal())
 	}
@@ -842,7 +842,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	} else {
 		url_app.AppendString(b.CastStrAuto(value))
 	}
-	AppendModifiedUrl(&surl, &buf, &url_app, core.PG(arg_separator).output)
+	AppendModifiedUrl(&surl, &buf, &url_app, core.PG__().arg_separator.output)
 	buf.ZeroTail()
 	if newlen != nil {
 		*newlen = buf.GetS().GetLen()
@@ -970,7 +970,7 @@ func PhpUrlScannerAddVarImpl(
 		url_state.SetActive(1)
 	}
 	if url_state.GetUrlApp().GetS() != nil && url_state.GetUrlApp().GetS().GetLen() != 0 {
-		url_state.GetUrlApp().AppendString(b.CastStrAuto(core.PG(arg_separator).output))
+		url_state.GetUrlApp().AppendString(b.CastStrAuto(core.PG__().arg_separator.output))
 	}
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, name_len)
@@ -1090,9 +1090,9 @@ func PhpUrlScannerResetVarImpl(name *types.ZendString, encode int, type_ int) in
 
 	limit = url_state.GetUrlApp().GetS().GetVal() + url_state.GetUrlApp().GetS().GetLen()
 	end = start + url_app.GetS().GetLen()
-	separator_len = strlen(core.PG(arg_separator).output)
+	separator_len = strlen(core.PG__().arg_separator.output)
 	for end < limit {
-		if !(memcmp(end, core.PG(arg_separator).output, separator_len)) {
+		if !(memcmp(end, core.PG__().arg_separator.output, separator_len)) {
 			end += separator_len
 			sep_removed = 1
 			break
@@ -1109,7 +1109,7 @@ func PhpUrlScannerResetVarImpl(name *types.ZendString, encode int, type_ int) in
 
 	/* Check preceding separator */
 
-	if sep_removed == 0 && size_t(start-core.PG(arg_separator).output) >= separator_len && !(memcmp(start-separator_len, core.PG(arg_separator).output, separator_len)) {
+	if sep_removed == 0 && size_t(start-core.PG__().arg_separator.output) >= separator_len && !(memcmp(start-separator_len, core.PG__().arg_separator.output, separator_len)) {
 		start -= separator_len
 	}
 

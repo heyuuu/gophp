@@ -251,20 +251,20 @@ func SapiFcgiReadCookies() *byte {
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
 	var array_ptr *types.Zval = (*types.Zval)(arg)
-	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
+	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
 	}
 }
 func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
-	if core.PG(variables_order) && (strchr(core.PG(variables_order), 'E') || strchr(core.PG(variables_order), 'e')) {
-		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ != types.IS_ARRAY {
+	if core.PG__().variables_order && (strchr(core.PG__().variables_order, 'E') || strchr(core.PG__().variables_order, 'e')) {
+		if core.PG__().http_globals[core.TRACK_VARS_ENV].u1.v.type_ != types.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == types.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
+		if core.PG__().http_globals[core.TRACK_VARS_ENV].u1.v.type_ == types.IS_ARRAY && array_ptr.GetArr() != core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr() {
 			array_ptr.GetArr().DestroyEx()
-			array_ptr.SetArr(zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr()))
+			array_ptr.SetArr(zend.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr()))
 			return
 		}
 	}
@@ -417,17 +417,17 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 			var ptr *byte = s2 + doc_root_len
 			for b.Assign(&ptr, strchr(ptr, zend.DEFAULT_SLASH)) != nil {
 				*ptr = 0
-				core.PhpParseUserIniFile(path, core.PG(user_ini_filename), entry.GetUserConfig())
+				core.PhpParseUserIniFile(path, core.PG__().user_ini_filename, entry.GetUserConfig())
 				*ptr = '/'
 				ptr++
 			}
 		} else {
-			core.PhpParseUserIniFile(path, core.PG(user_ini_filename), entry.GetUserConfig())
+			core.PhpParseUserIniFile(path, core.PG__().user_ini_filename, entry.GetUserConfig())
 		}
 		if real_path != nil {
 			zend.Efree(real_path)
 		}
-		entry.SetExpires(request_time + core.PG(user_ini_cache_ttl))
+		entry.SetExpires(request_time + core.PG__().user_ini_cache_ttl)
 	}
 
 	/* Activate ini entries with values from the user config hash */
@@ -467,7 +467,7 @@ func SapiCgiActivate() int {
 		/* SERVER_NAME should also be defined at this stage..but better check it anyway */
 
 	}
-	if core.PhpIniHasPerDirConfig() != 0 || core.PG(user_ini_filename) && (*core.PG)(user_ini_filename) {
+	if core.PhpIniHasPerDirConfig() != 0 || core.PG__().user_ini_filename && *core.PG__().user_ini_filename {
 		var path *byte
 		var path_len int
 
@@ -494,7 +494,7 @@ func SapiCgiActivate() int {
 
 		/* Load and activate user ini files in path starting from DOCUMENT_ROOT */
 
-		if core.PG(user_ini_filename) && (*core.PG)(user_ini_filename) {
+		if core.PG__().user_ini_filename && *core.PG__().user_ini_filename {
 			var doc_root *byte
 			if core.FcgiIsFastcgi() != 0 {
 				var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
@@ -638,8 +638,8 @@ func InitRequestInfo(request *core.FcgiRequest) {
 			var orig_script_name *byte = env_script_name
 			var orig_script_filename *byte = env_script_filename
 			var script_path_translated_len int
-			if env_document_root == nil && core.PG(doc_root) {
-				env_document_root = CGI_PUTENV("DOCUMENT_ROOT", core.PG(doc_root))
+			if env_document_root == nil && core.PG__().doc_root {
+				env_document_root = CGI_PUTENV("DOCUMENT_ROOT", core.PG__().doc_root)
 
 				/* fix docroot */
 

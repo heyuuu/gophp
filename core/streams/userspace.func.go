@@ -116,16 +116,16 @@ func UserWrapperOpener(
 	/* if the user stream was registered as local and we are in include context,
 	   we add allow_url_include restrictions to allow_url_fopen ones */
 
-	old_in_user_include = core.PG(in_user_include)
-	if uwrap.GetWrapper().GetIsUrl() == 0 && (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG(allow_url_include)) {
-		core.PG(in_user_include) = 1
+	old_in_user_include = core.PG__().in_user_include
+	if uwrap.GetWrapper().GetIsUrl() == 0 && (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
+		core.PG__().in_user_include = 1
 	}
 	us = zend.Emalloc(b.SizeOf("* us"))
 	us.SetWrapper(uwrap)
 	UserStreamCreateObject(uwrap, context, us.GetObject())
 	if us.GetObject().IsType(types.IS_UNDEF) {
 		standard.FG(user_stream_current_filename) = nil
-		core.PG(in_user_include) = old_in_user_include
+		core.PG__().in_user_include = old_in_user_include
 		zend.Efree(us)
 		return nil
 	}
@@ -184,7 +184,7 @@ func UserWrapperOpener(
 	zend.ZvalPtrDtor(&args[1])
 	zend.ZvalPtrDtor(&args[0])
 	standard.FG(user_stream_current_filename) = nil
-	core.PG(in_user_include) = old_in_user_include
+	core.PG__().in_user_include = old_in_user_include
 	return stream
 }
 func UserWrapperOpendir(

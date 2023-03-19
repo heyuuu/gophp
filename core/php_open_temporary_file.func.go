@@ -45,21 +45,21 @@ func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **types.ZendStr
 func PhpGetTemporaryDirectory() *byte {
 	/* Did we determine the temporary directory already? */
 
-	if PG(php_sys_temp_dir) {
-		return PG(php_sys_temp_dir)
+	if PG__().php_sys_temp_dir {
+		return PG__().php_sys_temp_dir
 	}
 
 	/* Is there a temporary directory "sys_temp_dir" in .ini defined? */
 
-	var sys_temp_dir *byte = PG(sys_temp_dir)
+	var sys_temp_dir *byte = PG__().sys_temp_dir
 	if sys_temp_dir != nil {
 		var len_ int = strlen(sys_temp_dir)
 		if len_ >= 2 && sys_temp_dir[len_-1] == zend.DEFAULT_SLASH {
-			PG(php_sys_temp_dir) = zend.Estrndup(sys_temp_dir, len_-1)
-			return PG(php_sys_temp_dir)
+			PG__().php_sys_temp_dir = zend.Estrndup(sys_temp_dir, len_-1)
+			return PG__().php_sys_temp_dir
 		} else if len_ >= 1 && sys_temp_dir[len_-1] != zend.DEFAULT_SLASH {
-			PG(php_sys_temp_dir) = zend.Estrndup(sys_temp_dir, len_)
-			return PG(php_sys_temp_dir)
+			PG__().php_sys_temp_dir = zend.Estrndup(sys_temp_dir, len_)
+			return PG__().php_sys_temp_dir
 		}
 	}
 
@@ -69,24 +69,24 @@ func PhpGetTemporaryDirectory() *byte {
 	if s != nil && (*s) {
 		var len_ int = strlen(s)
 		if s[len_-1] == zend.DEFAULT_SLASH {
-			PG(php_sys_temp_dir) = zend.Estrndup(s, len_-1)
+			PG__().php_sys_temp_dir = zend.Estrndup(s, len_-1)
 		} else {
-			PG(php_sys_temp_dir) = zend.Estrndup(s, len_)
+			PG__().php_sys_temp_dir = zend.Estrndup(s, len_)
 		}
-		return PG(php_sys_temp_dir)
+		return PG__().php_sys_temp_dir
 	}
 
 	/* Use the standard default temporary directory. */
 
 	if P_tmpdir {
-		PG(php_sys_temp_dir) = zend.Estrdup(P_tmpdir)
-		return PG(php_sys_temp_dir)
+		PG__().php_sys_temp_dir = zend.Estrdup(P_tmpdir)
+		return PG__().php_sys_temp_dir
 	}
 
 	/* Shouldn't ever(!) end up here ... last ditch default. */
 
-	PG(php_sys_temp_dir) = zend.Estrdup("/tmp")
-	return PG(php_sys_temp_dir)
+	PG__().php_sys_temp_dir = zend.Estrdup("/tmp")
+	return PG__().php_sys_temp_dir
 }
 func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **types.ZendString, flags uint32) int {
 	var fd int

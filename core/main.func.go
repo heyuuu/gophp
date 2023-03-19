@@ -77,7 +77,7 @@ func OnSetSerializePrecision(
 	var i zend.ZendLong
 	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
-		PG(serialize_precision) = i
+		PG__().serialize_precision = i
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -115,7 +115,7 @@ func OnChangeMemoryLimit(
 		 * shut down and the minimal amount of memory is used. */
 
 	}
-	PG(memory_limit) = value
+	PG__().memory_limit = value
 	return types.SUCCESS
 }
 func OnSetLogFilter(
@@ -128,19 +128,19 @@ func OnSetLogFilter(
 ) int {
 	var filter *byte = new_value.GetVal()
 	if !(strcmp(filter, "all")) {
-		PG(syslog_filter) = PHP_SYSLOG_FILTER_ALL
+		PG__().syslog_filter = PHP_SYSLOG_FILTER_ALL
 		return types.SUCCESS
 	}
 	if !(strcmp(filter, "no-ctrl")) {
-		PG(syslog_filter) = PHP_SYSLOG_FILTER_NO_CTRL
+		PG__().syslog_filter = PHP_SYSLOG_FILTER_NO_CTRL
 		return types.SUCCESS
 	}
 	if !(strcmp(filter, "ascii")) {
-		PG(syslog_filter) = PHP_SYSLOG_FILTER_ASCII
+		PG__().syslog_filter = PHP_SYSLOG_FILTER_ASCII
 		return types.SUCCESS
 	}
 	if !(strcmp(filter, "raw")) {
-		PG(syslog_filter) = PHP_SYSLOG_FILTER_RAW
+		PG__().syslog_filter = PHP_SYSLOG_FILTER_RAW
 		return types.SUCCESS
 	}
 	return types.FAILURE
@@ -151,8 +151,8 @@ func PhpDisableFunctions() {
 	if !(*(zend.INI_STR("disable_functions"))) {
 		return
 	}
-	PG(disable_functions) = strdup(zend.INI_STR("disable_functions"))
-	e = PG(disable_functions)
+	PG__().disable_functions = strdup(zend.INI_STR("disable_functions"))
+	e = PG__().disable_functions
 	if e == nil {
 		return
 	}
@@ -183,8 +183,8 @@ func PhpDisableClasses() {
 	if !(*(zend.INI_STR("disable_classes"))) {
 		return
 	}
-	PG(disable_classes) = strdup(zend.INI_STR("disable_classes"))
-	e = PG(disable_classes)
+	PG__().disable_classes = strdup(zend.INI_STR("disable_classes"))
+	e = PG__().disable_classes
 	for *e {
 		switch *e {
 		case ' ':
@@ -240,7 +240,7 @@ func PhpBinaryInit() {
 			binary_location = nil
 		}
 	}
-	PG(php_binary) = binary_location
+	PG__().php_binary = binary_location
 }
 func OnUpdateTimeout(
 	entry *zend.ZendIniEntry,
@@ -311,7 +311,7 @@ func OnUpdateDisplayErrors(
 	mh_arg3 any,
 	stage int,
 ) int {
-	PG(display_errors) = types.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
+	PG__().display_errors = types.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
 	return types.SUCCESS
 }
 func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
@@ -452,7 +452,7 @@ func OnUpdateErrorLog(
 	/* Only do the safemode/open_basedir check at runtime */
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(new_value.GetVal(), "syslog") {
-		if PG(open_basedir) && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
+		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 			return types.FAILURE
 		}
 	}
@@ -470,7 +470,7 @@ func OnUpdateMailLog(
 	/* Only do the safemode/open_basedir check at runtime */
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil {
-		if PG(open_basedir) && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
+		if PG__().open_basedir && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 			return types.FAILURE
 		}
 	}
@@ -497,7 +497,7 @@ func PhpDuringModuleShutdown() int { return ModuleShutdown }
 func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 	var fd int = -1
 	var error_time int64
-	if PG(in_error_log) {
+	if PG__().in_error_log {
 
 		/* prevent recursive invocation */
 
@@ -506,17 +506,17 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 		/* prevent recursive invocation */
 
 	}
-	PG(in_error_log) = 1
+	PG__().in_error_log = 1
 
 	/* Try to use the specified logging location. */
 
-	if PG(error_log) != nil {
-		if !(strcmp(PG(error_log), "syslog")) {
+	if PG__().error_log != nil {
+		if !(strcmp(PG__().error_log, "syslog")) {
 			PhpSyslog(syslog_type_int, "%s", log_message)
-			PG(in_error_log) = 0
+			PG__().in_error_log = 0
 			return
 		}
-		fd = zend.VCWD_OPEN_MODE(PG(error_log), O_CREAT|O_APPEND|O_WRONLY, 0644)
+		fd = zend.VCWD_OPEN_MODE(PG__().error_log, O_CREAT|O_APPEND|O_WRONLY, 0644)
 		if fd != -1 {
 			var tmp *byte
 			var len_ int
@@ -528,7 +528,7 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 			zend.Efree(tmp)
 			types.ZendStringFree(error_time_str)
 			close(fd)
-			PG(in_error_log) = 0
+			PG__().in_error_log = 0
 			return
 		}
 	}
@@ -538,7 +538,7 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 	if SM__().GetLogMessage() != nil {
 		SM__().GetLogMessage()(log_message, syslog_type_int)
 	}
-	PG(in_error_log) = 0
+	PG__().in_error_log = 0
 }
 func PhpPrintf(format string, _ ...any) int {
 	var args va_list
@@ -573,7 +573,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	/* get error text into buffer and escape for html if necessary */
 
 	buffer_len = int(Vspprintf(&buffer, 0, format, args))
-	if PG(html_errors) {
+	if PG__().html_errors {
 		replace_buffer = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 
 		/* Retry with substituting invalid chars on fail. */
@@ -637,7 +637,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	} else {
 		origin_len = int(Spprintf(&origin, 0, "%s", function))
 	}
-	if PG(html_errors) {
+	if PG__().html_errors {
 		replace_origin = standard.PhpEscapeHtmlEntities((*uint8)(origin), origin_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 		zend.Efree(origin)
 		origin = replace_origin.GetVal()
@@ -673,13 +673,13 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	 * - the user wants to see the links
 	 */
 
-	if docref != nil && is_function != 0 && PG(html_errors) && strlen(PG(docref_root)) {
+	if docref != nil && is_function != 0 && PG__().html_errors && strlen(PG__().docref_root) {
 		if strncmp(docref, "http://", 7) {
 
 			/* We don't have 'http://' so we use docref_root */
 
 			var ref *byte
-			docref_root = PG(docref_root)
+			docref_root = PG__().docref_root
 			ref = zend.Estrdup(docref)
 			if docref_buf != nil {
 				zend.Efree(docref_buf)
@@ -699,8 +699,8 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 
 			/* add the extension if it is set in ini */
 
-			if PG(docref_ext) && strlen(PG(docref_ext)) {
-				Spprintf(&docref_buf, 0, "%s%s", ref, PG(docref_ext))
+			if PG__().docref_ext && strlen(PG__().docref_ext) {
+				Spprintf(&docref_buf, 0, "%s%s", ref, PG__().docref_ext)
 				zend.Efree(ref)
 			}
 			docref = docref_buf
@@ -708,7 +708,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 
 		/* display html formatted or only show the additional links */
 
-		if PG(html_errors) {
+		if PG__().html_errors {
 			Spprintf(&message, 0, "%s [<a href='%s%s%s'>%s</a>]: %s", origin, docref_root, docref, docref_target, docref, buffer)
 		} else {
 			Spprintf(&message, 0, "%s [%s%s%s]: %s", origin, docref_root, docref, docref_target, buffer)
@@ -727,7 +727,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	if docref_buf != nil {
 		zend.Efree(docref_buf)
 	}
-	if PG(track_errors) && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsType(types.IS_UNDEF) || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
+	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsType(types.IS_UNDEF) || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp types.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
@@ -781,23 +781,23 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	var buffer *byte
 	var buffer_len int
 	var display int
-	buffer_len = int(Vspprintf(&buffer, PG(log_errors_max_len), format, args))
+	buffer_len = int(Vspprintf(&buffer, PG__().log_errors_max_len, format, args))
 
 	/* check for repeated errors to be ignored */
 
-	if PG(ignore_repeated_errors) && PG(last_error_message) {
+	if PG__().ignore_repeated_errors && PG__().last_error_message {
 
-		/* no check for PG(last_error_file) is needed since it cannot
-		 * be NULL if PG(last_error_message) is not NULL */
+		/* no check for PG__().last_error_file is needed since it cannot
+		 * be NULL if PG__().last_error_message is not NULL */
 
-		if strcmp(PG(last_error_message), buffer) || !(PG(ignore_repeated_source)) && (PG(last_error_lineno) != int(error_lineno) || strcmp(PG(last_error_file), error_filename)) {
+		if strcmp(PG__().last_error_message, buffer) || !(PG__().ignore_repeated_source) && (PG__().last_error_lineno != int(error_lineno) || strcmp(PG__().last_error_file, error_filename)) {
 			display = 1
 		} else {
 			display = 0
 		}
 
-		/* no check for PG(last_error_file) is needed since it cannot
-		 * be NULL if PG(last_error_message) is not NULL */
+		/* no check for PG__().last_error_file is needed since it cannot
+		 * be NULL if PG__().last_error_message is not NULL */
 
 	} else {
 		display = 1
@@ -850,28 +850,28 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	/* store the error if it has changed */
 
 	if display != 0 {
-		if PG(last_error_message) {
-			var s *byte = PG(last_error_message)
-			PG(last_error_message) = nil
+		if PG__().last_error_message {
+			var s *byte = PG__().last_error_message
+			PG__().last_error_message = nil
 			zend.Free(s)
 		}
-		if PG(last_error_file) {
-			var s *byte = PG(last_error_file)
-			PG(last_error_file) = nil
+		if PG__().last_error_file {
+			var s *byte = PG__().last_error_file
+			PG__().last_error_file = nil
 			zend.Free(s)
 		}
 		if error_filename == nil {
 			error_filename = "Unknown"
 		}
-		PG(last_error_type) = type_
-		PG(last_error_message) = strdup(buffer)
-		PG(last_error_file) = strdup(error_filename)
-		PG(last_error_lineno) = error_lineno
+		PG__().last_error_type = type_
+		PG__().last_error_message = strdup(buffer)
+		PG__().last_error_file = strdup(error_filename)
+		PG__().last_error_lineno = error_lineno
 	}
 
 	/* display/log the error if necessary */
 
-	if display != 0 && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&zend.E_CORE) != 0) && (PG(log_errors) || PG(display_errors) || ModuleInitialized == 0) {
+	if display != 0 && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&zend.E_CORE) != 0) && (PG__().log_errors || PG__().display_errors || ModuleInitialized == 0) {
 		var error_type_str *byte
 		var syslog_type_int int = LOG_NOTICE
 		switch type_ {
@@ -915,19 +915,19 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		default:
 			error_type_str = "Unknown error"
 		}
-		if ModuleInitialized == 0 || PG(log_errors) {
+		if ModuleInitialized == 0 || PG__().log_errors {
 			var log_buffer *byte
 			Spprintf(&log_buffer, 0, "PHP %s:  %s in %s on line %"+"u", error_type_str, buffer, error_filename, error_lineno)
 			PhpLogErrWithSeverity(log_buffer, syslog_type_int)
 			zend.Efree(log_buffer)
 		}
-		if PG(display_errors) && (ModuleInitialized != 0 && !(PG(during_request_startup)) || PG(display_startup_errors)) {
-			if PG(xmlrpc_errors) {
-				PhpPrintf("<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>"+zend.ZEND_LONG_FMT+"</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %"+"u"+"</string></value></member></struct></value></fault></methodResponse>", PG(xmlrpc_error_number), error_type_str, buffer, error_filename, error_lineno)
+		if PG__().display_errors && (ModuleInitialized != 0 && !(PG__().during_request_startup) || PG__().display_startup_errors) {
+			if PG__().xmlrpc_errors {
+				PhpPrintf("<?xml version=\"1.0\"?><methodResponse><fault><value><struct><member><name>faultCode</name><value><int>"+zend.ZEND_LONG_FMT+"</int></value></member><member><name>faultString</name><value><string>%s:%s in %s on line %"+"u"+"</string></value></member></struct></value></fault></methodResponse>", PG__().xmlrpc_error_number, error_type_str, buffer, error_filename, error_lineno)
 			} else {
 				var prepend_string *byte = zend.INI_STR("error_prepend_string")
 				var append_string *byte = zend.INI_STR("error_append_string")
-				if PG(html_errors) {
+				if PG__().html_errors {
 					if type_ == zend.E_ERROR || type_ == zend.E_PARSE {
 						var buf *types.ZendString = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
@@ -939,7 +939,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
 
-					if PG(display_errors) == PHP_DISPLAY_ERRORS_STDERR {
+					if PG__().display_errors == PHP_DISPLAY_ERRORS_STDERR {
 						log.Printf("%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
 					} else {
 						PhpPrintf("%s\n%s: %s in %s on line %"+"u"+"\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))
@@ -977,7 +977,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	case zend.E_USER_ERROR:
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
-			if !(PG(display_errors)) && !(SG__().headers_sent) && SG__().sapi_headers.http_response_code == 200 {
+			if !(PG__().display_errors) && !(SG__().headers_sent) && SG__().sapi_headers.http_response_code == 200 {
 				var ctr SapiHeaderLine = MakeSapiHeaderLine(0)
 				ctr.SetLine("HTTP/1.0 500 Internal Server Error")
 				ctr.SetLineLen(b.SizeOf("\"HTTP/1.0 500 Internal Server Error\"") - 1)
@@ -990,7 +990,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 				/* restore memory limit */
 
-				zend.ZendSetMemoryLimit(PG(memory_limit))
+				zend.ZendSetMemoryLimit(PG__().memory_limit)
 				zend.Efree(buffer)
 				zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
 				zend.ZendBailout()
@@ -1008,7 +1008,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 		zend.Efree(buffer)
 		return
 	}
-	if PG(track_errors) && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
+	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
 		var tmp types.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
@@ -1098,7 +1098,7 @@ func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode in
 }
 func PhpResolvePathForZend(filename string) *string {
 	var result string
-	zstr := PhpResolvePath(filename, b.CastStrPtr(filename), len(filename), PG(include_path))
+	zstr := PhpResolvePath(filename, b.CastStrPtr(filename), len(filename), PG__().include_path)
 	if zstr == nil {
 		return nil
 	}
@@ -1106,25 +1106,25 @@ func PhpResolvePathForZend(filename string) *string {
 	return &result
 }
 func PhpFreeRequestGlobals() {
-	if PG(last_error_message) {
-		zend.Free(PG(last_error_message))
-		PG(last_error_message) = nil
+	if PG__().last_error_message {
+		zend.Free(PG__().last_error_message)
+		PG__().last_error_message = nil
 	}
-	if PG(last_error_file) {
-		zend.Free(PG(last_error_file))
-		PG(last_error_file) = nil
+	if PG__().last_error_file {
+		zend.Free(PG__().last_error_file)
+		PG__().last_error_file = nil
 	}
-	if PG(php_sys_temp_dir) {
-		zend.Efree(PG(php_sys_temp_dir))
-		PG(php_sys_temp_dir) = nil
+	if PG__().php_sys_temp_dir {
+		zend.Efree(PG__().php_sys_temp_dir)
+		PG__().php_sys_temp_dir = nil
 	}
 }
 func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 	switch message {
 	case zend.ZMSG_FAILED_INCLUDE_FOPEN:
-		PhpErrorDocref("function.include", zend.E_WARNING, "Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG(include_path)))
+		PhpErrorDocref("function.include", zend.E_WARNING, "Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
 	case zend.ZMSG_FAILED_REQUIRE_FOPEN:
-		PhpErrorDocref("function.require", zend.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG(include_path)))
+		PhpErrorDocref("function.require", zend.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
 	case zend.ZMSG_FAILED_HIGHLIGHT_FOPEN:
 		PhpErrorDocref(nil, zend.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
 	case zend.ZMSG_MEMORY_LEAK_DETECTED:
@@ -1153,7 +1153,7 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 	}
 }
 func PhpOnTimeout(seconds int) {
-	PG(connection_status) |= PHP_CONNECTION_TIMEOUT
+	PG__().connection_status |= PHP_CONNECTION_TIMEOUT
 }
 func PhpRequestStartup() int {
 	var retval int = types.SUCCESS
@@ -1162,41 +1162,41 @@ func PhpRequestStartup() int {
 	var __bailout JMP_BUF
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
-		PG(in_error_log) = 0
-		PG(during_request_startup) = 1
+		PG__().in_error_log = 0
+		PG__().during_request_startup = 1
 		PhpOutputActivate()
 
 		/* initialize global variables */
 
-		PG(modules_activated) = 0
-		PG(header_is_being_sent) = 0
-		PG(connection_status) = PHP_CONNECTION_NORMAL
-		PG(in_user_include) = 0
+		PG__().modules_activated = 0
+		PG__().header_is_being_sent = 0
+		PG__().connection_status = PHP_CONNECTION_NORMAL
+		PG__().in_user_include = 0
 		zend.ZendActivate()
 		SapiActivate()
 		zend.ZendSignalActivate()
-		if PG(max_input_time) == -1 {
+		if PG__().max_input_time == -1 {
 			zend.ZendSetTimeout(zend.EG__().GetTimeoutSeconds(), 1)
 		} else {
-			zend.ZendSetTimeout(PG(max_input_time), 1)
+			zend.ZendSetTimeout(PG__().max_input_time, 1)
 		}
 
 		/* Disable realpath cache if an open_basedir is set */
 
-		if PG(open_basedir) && (*PG)(open_basedir) {
+		if PG__().open_basedir && *PG__().open_basedir {
 			zend.CWDG(realpath_cache_size_limit) = 0
 		}
-		if PG(expose_php) {
+		if PG__().expose_php {
 			SapiAddHeader(SAPI_PHP_VERSION_HEADER)
 		}
-		if PG(output_handler) && PG(output_handler)[0] {
+		if PG__().output_handler && PG__().output_handler[0] {
 			var oh types.Zval
-			oh.SetRawString(b.CastStrAuto(PG(output_handler)))
+			oh.SetRawString(b.CastStrAuto(PG__().output_handler))
 			PhpOutputStartUser(&oh, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 			zend.ZvalPtrDtor(&oh)
-		} else if PG(output_buffering) {
-			PhpOutputStartUser(nil, b.CondF1(PG(output_buffering) > 1, func() __auto__ { return PG(output_buffering) }, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
-		} else if PG(implicit_flush) {
+		} else if PG__().output_buffering {
+			PhpOutputStartUser(nil, b.CondF1(PG__().output_buffering > 1, func() __auto__ { return PG__().output_buffering }, 0), PHP_OUTPUT_HANDLER_STDFLAGS)
+		} else if PG__().implicit_flush {
 			PhpOutputSetImplicitFlush(1)
 		}
 
@@ -1204,7 +1204,7 @@ func PhpRequestStartup() int {
 
 		PhpHashEnvironment()
 		zend.ZendActivateModules()
-		PG(modules_activated) = 1
+		PG__().modules_activated = 1
 	} else {
 		zend.EG__().SetBailout(__orig_bailout)
 		retval = types.FAILURE
@@ -1216,7 +1216,7 @@ func PhpRequestStartup() int {
 func PhpRequestShutdown(dummy any) {
 	var report_memleaks types.ZendBool
 	zend.EG__().AddFlags(zend.EG_FLAGS_IN_SHUTDOWN)
-	report_memleaks = PG(report_memleaks)
+	report_memleaks = PG__().report_memleaks
 
 	/* EG(current_execute_data) points into nirvana and therefore cannot be safely accessed
 	 * inside zend_executor callback functions.
@@ -1227,7 +1227,7 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 1. Call all possible shutdown functions registered with register_shutdown_function() */
 
-	if PG(modules_activated) {
+	if PG__().modules_activated {
 		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
 		zend.EG__().SetBailout(&__bailout)
@@ -1254,7 +1254,7 @@ func PhpRequestShutdown(dummy any) {
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var send_buffer types.ZendBool = b.Cond(SG__().request_info.headers_only, 0, 1)
-		if zend.CG__().GetUncleanShutdown() != 0 && PG(last_error_type) == zend.E_ERROR && int(PG(memory_limit) < zend.ZendMemoryUsage(1)) != 0 {
+		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == zend.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
 		}
 		if send_buffer == 0 {
@@ -1277,7 +1277,7 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 5. Call all extensions RSHUTDOWN functions */
 
-	if PG(modules_activated) {
+	if PG__().modules_activated {
 		zend.ZendDeactivateModules()
 	}
 
@@ -1293,7 +1293,7 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 7. Free shutdown functions */
 
-	if PG(modules_activated) {
+	if PG__().modules_activated {
 		standard.PhpFreeShutdownFunctions()
 	}
 
@@ -1305,7 +1305,7 @@ func PhpRequestShutdown(dummy any) {
 	if zend.SETJMP(__bailout) == 0 {
 		var i int
 		for i = 0; i < NUM_TRACK_VARS; i++ {
-			zend.ZvalPtrDtor(&PG(http_globals)[i])
+			zend.ZvalPtrDtor(&PG__().http_globals[i])
 		}
 	}
 	zend.EG__().SetBailout(__orig_bailout)
@@ -1366,7 +1366,7 @@ func PhpRequestShutdown(dummy any) {
 	/* Reset memory limit, as the reset during INI_STAGE_DEACTIVATE may have failed.
 	 * At this point, no memory beyond a single chunk should be in use. */
 
-	zend.ZendSetMemoryLimit(PG(memory_limit))
+	zend.ZendSetMemoryLimit(PG__().memory_limit)
 
 	/* 16. Deactivate Zend signals */
 
@@ -1481,8 +1481,8 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	zend.REGISTER_MAIN_DOUBLE_CONSTANT("PHP_FLOAT_MAX", DBL_MAX, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_MAIN_DOUBLE_CONSTANT("PHP_FLOAT_MIN", DBL_MIN, zend.CONST_PERSISTENT|zend.CONST_CS)
 	PhpBinaryInit()
-	if PG(php_binary) {
-		zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_BINARY", PG(php_binary), zend.CONST_PERSISTENT|zend.CONST_CS|zend.CONST_NO_FILE_CACHE)
+	if PG__().php_binary {
+		zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_BINARY", PG__().php_binary, zend.CONST_PERSISTENT|zend.CONST_CS|zend.CONST_NO_FILE_CACHE)
 	} else {
 		zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_BINARY", "", zend.CONST_PERSISTENT|zend.CONST_CS|zend.CONST_NO_FILE_CACHE)
 	}
@@ -1507,10 +1507,10 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* Disable realpath cache if an open_basedir is set */
 
-	if PG(open_basedir) && (*PG)(open_basedir) {
+	if PG__().open_basedir && *PG__().open_basedir {
 		zend.CWDG(realpath_cache_size_limit) = 0
 	}
-	PG(have_called_openlog) = 0
+	PG__().have_called_openlog = 0
 
 	/* initialize stream wrappers registry
 	 * (this uses configuration parameters from php.ini)
@@ -1686,7 +1686,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var realfile []byte
-		PG(during_request_startup) = 0
+		PG__().during_request_startup = 0
 		if primary_file.GetFilename() != nil && (SG__().options&SAPI_OPTION_NO_CHDIR) == 0 {
 			PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, OLD_CWD_SIZE-1))
 			zend.VCWD_CHDIR_FILE(primary_file.GetFilename())
@@ -1702,19 +1702,19 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 				zend.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primary_file.GetOpenedPath())
 			}
 		}
-		if PG(auto_prepend_file) && PG(auto_prepend_file)[0] {
-			prepend_file.InitFilename(PG(auto_prepend_file))
+		if PG__().auto_prepend_file && PG__().auto_prepend_file[0] {
+			prepend_file.InitFilename(PG__().auto_prepend_file)
 			prepend_file_p = &prepend_file
 		} else {
 			prepend_file_p = nil
 		}
-		if PG(auto_append_file) && PG(auto_append_file)[0] {
-			append_file.InitFilename(PG(auto_append_file))
+		if PG__().auto_append_file && PG__().auto_append_file[0] {
+			append_file.InitFilename(PG__().auto_append_file)
 			append_file_p = &append_file
 		} else {
 			append_file_p = nil
 		}
-		if PG(max_input_time) != -1 {
+		if PG__().max_input_time != -1 {
 			zend.ZendSetTimeout(zend.INI_INT("max_execution_time"), 0)
 		}
 
@@ -1758,9 +1758,9 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	return retval
 }
 func PhpHandleAbortedConnection() {
-	PG(connection_status) = PHP_CONNECTION_ABORTED
+	PG__().connection_status = PHP_CONNECTION_ABORTED
 	PhpOutputSetStatus(PHP_OUTPUT_DISABLED)
-	if !(PG(ignore_user_abort)) {
+	if !(PG__().ignore_user_abort) {
 		zend.ZendBailout()
 	}
 }

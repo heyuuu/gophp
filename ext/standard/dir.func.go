@@ -426,7 +426,7 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		   query is senseless on windows. For instance while *.txt
 		   is a pretty valid filename on EXT3, it's invalid on NTFS. */
 
-		if core.PG(open_basedir) && (*core.PG)(open_basedir) {
+		if core.PG__().open_basedir && *core.PG__().open_basedir {
 			if core.PhpCheckOpenBasedirEx(pattern, 0) != 0 {
 				return_value.SetFalse()
 				return
@@ -437,7 +437,7 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	zend.ArrayInit(return_value)
 	for n = 0; n < int(globbuf.gl_pathc); n++ {
-		if core.PG(open_basedir) && (*core.PG)(open_basedir) {
+		if core.PG__().open_basedir && *core.PG__().open_basedir {
 			if core.PhpCheckOpenBasedirEx(globbuf.gl_pathv[n], 0) != 0 {
 				basedir_limit = 1
 				continue

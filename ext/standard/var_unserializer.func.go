@@ -848,7 +848,7 @@ yy18:
 
 		/* Check for unserialize callback */
 
-		if core.PG(unserialize_callback_func) == nil || core.PG(unserialize_callback_func)[0] == '0' {
+		if core.PG__().unserialize_callback_func == nil || core.PG__().unserialize_callback_func[0] == '0' {
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			break
@@ -856,7 +856,7 @@ yy18:
 
 		/* Call unserialize callback */
 
-		user_func.SetRawString(b.CastStrAuto(core.PG(unserialize_callback_func)))
+		user_func.SetRawString(b.CastStrAuto(core.PG__().unserialize_callback_func))
 		args[0].SetStringCopy(class_name)
 		BG__().serialize_lock++
 		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {

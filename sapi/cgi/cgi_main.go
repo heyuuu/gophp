@@ -490,7 +490,7 @@ func main(argc int, argv []*byte) int {
 				 */
 
 				if !(core.SG__().request_info.query_string) && argc > PhpOptind {
-					var slen int = strlen(core.PG(arg_separator).input)
+					var slen int = strlen(core.PG__().arg_separator.input)
 					len_ = 0
 					for i = PhpOptind; i < argc; i++ {
 						if i < argc-1 {
@@ -505,7 +505,7 @@ func main(argc int, argv []*byte) int {
 					for i = PhpOptind; i < argc; i++ {
 						strlcat(s, argv[i], len_)
 						if i < argc-1 {
-							strlcat(s, core.PG(arg_separator).input, len_)
+							strlcat(s, core.PG__().arg_separator.input, len_)
 						}
 					}
 					core.SG__().request_info.query_string = s
@@ -607,7 +607,7 @@ func main(argc int, argv []*byte) int {
 				core.PhpExecuteScript(&file_handle)
 				break
 			case PHP_MODE_LINT:
-				core.PG(during_request_startup) = 0
+				core.PG__().during_request_startup = 0
 				exit_status = core.PhpLintScript(&file_handle)
 				if exit_status == types.SUCCESS {
 					zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())

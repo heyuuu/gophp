@@ -19,14 +19,14 @@ func PhpSyslog(priority int, format string, _ ...any) {
 	 * correct parameters!
 	 */
 
-	if !(PG(have_called_openlog)) {
-		PhpOpenlog(PG(syslog_ident), 0, PG(syslog_facility))
+	if !(PG__().have_called_openlog) {
+		PhpOpenlog(PG__().syslog_ident, 0, PG__().syslog_facility)
 	}
 	va_start(args, format)
 	zend.ZendPrintfToSmartStr(&fbuf, format, args)
 	fbuf.ZeroTail()
 	va_end(args)
-	if PG(syslog_filter) == PHP_SYSLOG_FILTER_RAW {
+	if PG__().syslog_filter == PHP_SYSLOG_FILTER_RAW {
 
 		/* Just send it directly to the syslog */
 
@@ -45,12 +45,12 @@ func PhpSyslog(priority int, format string, _ ...any) {
 
 		if 0x20 <= c && c <= 0x7e {
 			sbuf.AppendByte(c)
-		} else if c >= 0x80 && PG(syslog_filter) != PHP_SYSLOG_FILTER_ASCII {
+		} else if c >= 0x80 && PG__().syslog_filter != PHP_SYSLOG_FILTER_ASCII {
 			sbuf.AppendByte(c)
 		} else if c == '\n' {
 			syslog(priority, "%.*s", int(sbuf.GetLen()), sbuf.GetC())
 			sbuf.Reset()
-		} else if c < 0x20 && PG(syslog_filter) == PHP_SYSLOG_FILTER_ALL {
+		} else if c < 0x20 && PG__().syslog_filter == PHP_SYSLOG_FILTER_ALL {
 			sbuf.AppendByte(c)
 		} else {
 			var xdigits []byte = "0123456789abcdef"

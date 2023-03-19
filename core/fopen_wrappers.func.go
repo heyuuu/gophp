@@ -234,7 +234,7 @@ func PhpCheckOpenBasedir(path *byte) int { return PhpCheckOpenBasedirEx(path, 1)
 func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 	/* Only check when open_basedir is available */
 
-	if PG(open_basedir) && (*PG)(open_basedir) {
+	if PG__().open_basedir && *PG__().open_basedir {
 		var pathbuf *byte
 		var ptr *byte
 		var end *byte
@@ -247,7 +247,7 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 			errno = EINVAL
 			return -1
 		}
-		pathbuf = zend.Estrdup(PG(open_basedir))
+		pathbuf = zend.Estrdup(PG__().open_basedir)
 		ptr = pathbuf
 		for ptr != nil && (*ptr) {
 			end = strchr(ptr, zend.DEFAULT_DIR_SEPARATOR)
@@ -262,7 +262,7 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 			ptr = end
 		}
 		if warn != 0 {
-			PhpErrorDocref(nil, zend.E_WARNING, "open_basedir restriction in effect. File(%s) is not within the allowed path(s): (%s)", path, PG(open_basedir))
+			PhpErrorDocref(nil, zend.E_WARNING, "open_basedir restriction in effect. File(%s) is not within the allowed path(s): (%s)", path, PG__().open_basedir)
 		}
 		zend.Efree(pathbuf)
 		errno = EPERM
@@ -300,7 +300,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 	var length int
 	var orig_display_errors types.ZendBool
 	path_info = SG__().request_info.request_uri
-	if PG(user_dir) && (*PG)(user_dir) && path_info != nil && '/' == path_info[0] && '~' == path_info[1] {
+	if PG__().user_dir && *PG__().user_dir && path_info != nil && '/' == path_info[0] && '~' == path_info[1] {
 		var s *byte = strchr(path_info+2, '/')
 		if s != nil {
 			var user []byte
@@ -313,15 +313,15 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 			user[length] = '0'
 			pw = getpwnam(user)
 			if pw != nil && pw.pw_dir {
-				Spprintf(&filename, 0, "%s%c%s%c%s", pw.pw_dir, PHP_DIR_SEPARATOR, PG(user_dir), PHP_DIR_SEPARATOR, s+1)
+				Spprintf(&filename, 0, "%s%c%s%c%s", pw.pw_dir, PHP_DIR_SEPARATOR, PG__().user_dir, PHP_DIR_SEPARATOR, s+1)
 			} else {
 				filename = SG__().request_info.path_translated
 			}
 		}
-	} else if PG(doc_root) && path_info != nil && b.Assign(&length, strlen(PG(doc_root))) && zend.IS_ABSOLUTE_PATH(PG(doc_root), length) {
+	} else if PG__().doc_root && path_info != nil && b.Assign(&length, strlen(PG__().doc_root)) && zend.IS_ABSOLUTE_PATH(PG__().doc_root, length) {
 		var path_len int = strlen(path_info)
 		filename = zend.Emalloc(length + path_len + 2)
-		memcpy(filename, PG(doc_root), length)
+		memcpy(filename, PG__().doc_root, length)
 		if !(zend.IS_SLASH(filename[length-1])) {
 			filename[b.PostInc(&length)] = PHP_DIR_SEPARATOR
 		}
@@ -353,10 +353,10 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 		}
 		return types.FAILURE
 	}
-	orig_display_errors = PG(display_errors)
-	PG(display_errors) = 0
+	orig_display_errors = PG__().display_errors
+	PG__().display_errors = 0
 	if zend.ZendStreamOpen(filename, file_handle) == types.FAILURE {
-		PG(display_errors) = orig_display_errors
+		PG__().display_errors = orig_display_errors
 		if SG__().request_info.path_translated != filename {
 			if filename != nil {
 				zend.Efree(filename)
@@ -368,7 +368,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 		}
 		return types.FAILURE
 	}
-	PG(display_errors) = orig_display_errors
+	PG__().display_errors = orig_display_errors
 	if SG__().request_info.path_translated != filename {
 		if SG__().request_info.path_translated {
 			zend.Efree(SG__().request_info.path_translated)

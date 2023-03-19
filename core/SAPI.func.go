@@ -135,7 +135,7 @@ func SapiReadStandardFormData() {
 		PhpErrorDocref(nil, zend.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
 		return
 	}
-	SG__().request_info.request_body = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG(upload_tmp_dir))
+	SG__().request_info.request_body = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG__().upload_tmp_dir)
 	if SM__().GetReadPost() != nil {
 		var read_bytes int
 		for {
@@ -268,7 +268,7 @@ func SapiActivate() {
 	/* Handle request method */
 
 	if SG__().server_context {
-		if PG(enable_post_data_reading) && SG__().request_info.content_type && SG__().request_info.request_method && !(strcmp(SG__().request_info.request_method, "POST")) {
+		if PG__().enable_post_data_reading && SG__().request_info.content_type && SG__().request_info.request_method && !(strcmp(SG__().request_info.request_method, "POST")) {
 
 			/* HTTP POST may contain form data to be processed into variables
 			 * depending on given content type */

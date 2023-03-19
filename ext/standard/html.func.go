@@ -29,8 +29,8 @@ func SjisTrail(c uint8) bool {
 	return c >= 0x40 && c != 0x7f && c < 0xfd
 }
 func GetDefaultCharset() *byte {
-	if core.PG(internal_encoding) && core.PG(internal_encoding)[0] {
-		return core.PG(internal_encoding)
+	if core.PG__().internal_encoding && core.PG__().internal_encoding[0] {
+		return core.PG__().internal_encoding
 	} else if core.SG__().default_charset && core.SG__().default_charset[0] {
 		return core.SG__().default_charset
 	}

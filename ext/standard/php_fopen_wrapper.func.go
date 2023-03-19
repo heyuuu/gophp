@@ -137,7 +137,7 @@ func PhpStreamUrlWrapPhp(
 	}
 	if !(strcasecmp(path, "input")) {
 		var input *PhpStreamInputT
-		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG(allow_url_include)) {
+		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
 			if (options & core.REPORT_ERRORS) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "URL file-access is disabled in the server configuration")
 			}
@@ -147,13 +147,13 @@ func PhpStreamUrlWrapPhp(
 		if b.Assign(&(input.GetBody()), core.SG__().request_info.request_body) {
 			core.PhpStreamRewind(input.GetBody())
 		} else {
-			input.SetBody(core.PhpStreamTempCreateEx(core.TEMP_STREAM_DEFAULT, core.SAPI_POST_BLOCK_SIZE, core.PG(upload_tmp_dir)))
+			input.SetBody(core.PhpStreamTempCreateEx(core.TEMP_STREAM_DEFAULT, core.SAPI_POST_BLOCK_SIZE, core.PG__().upload_tmp_dir))
 			core.SG__().request_info.request_body = input.GetBody()
 		}
 		return core.PhpStreamAlloc(&PhpStreamInputOps, input, 0, "rb")
 	}
 	if !(strcasecmp(path, "stdin")) {
-		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG(allow_url_include)) {
+		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
 			if (options & core.REPORT_ERRORS) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "URL file-access is disabled in the server configuration")
 			}
@@ -208,7 +208,7 @@ func PhpStreamUrlWrapPhp(
 			}
 			return nil
 		}
-		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG(allow_url_include)) {
+		if (options&core.STREAM_OPEN_FOR_INCLUDE) != 0 && !(core.PG__().allow_url_include) {
 			if (options & core.REPORT_ERRORS) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "URL file-access is disabled in the server configuration")
 			}

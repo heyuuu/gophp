@@ -452,7 +452,7 @@ again:
 		}
 		buf.AppendLong(struc.GetLval())
 	case types.IS_DOUBLE:
-		core.PhpGcvt(struc.GetDval(), int(core.PG(serialize_precision)), '.', 'E', tmp_str)
+		core.PhpGcvt(struc.GetDval(), int(core.PG__().serialize_precision), '.', 'E', tmp_str)
 		buf.AppendString(b.CastStrAuto(tmp_str))
 
 		/* Without a decimal point, PHP treats a number literal as an int.
@@ -919,7 +919,7 @@ again:
 	case types.IS_DOUBLE:
 		var tmp_str []byte
 		buf.AppendString("d:")
-		core.PhpGcvt(struc.GetDval(), int(core.PG(serialize_precision)), '.', 'E', tmp_str)
+		core.PhpGcvt(struc.GetDval(), int(core.PG__().serialize_precision), '.', 'E', tmp_str)
 		buf.AppendString(b.CastStrAuto(tmp_str))
 		buf.AppendByte(';')
 		return

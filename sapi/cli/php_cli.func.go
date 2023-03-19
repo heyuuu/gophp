@@ -462,7 +462,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			}
 		}
 		zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER"))
-		core.PG(during_request_startup) = 0
+		core.PG__().during_request_startup = 0
 		switch behavior {
 		case PHP_MODE_STANDARD:
 			if strcmp(file_handle.GetFilename(), "Standard input code") {

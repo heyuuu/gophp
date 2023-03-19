@@ -34,7 +34,7 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 	if type_ == zend.MODULE_PERSISTENT {
 		extension_dir = zend.INI_STR("extension_dir")
 	} else {
-		extension_dir = core.PG(extension_dir)
+		extension_dir = core.PG__().extension_dir
 	}
 	if type_ == zend.MODULE_TEMPORARY {
 		error_type = zend.E_WARNING

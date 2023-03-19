@@ -117,7 +117,7 @@ func PhpStreamDisplayWrapperErrors(wrapper *core.PhpStreamWrapper, path *byte, c
 			var br *byte
 			var err_buf_p **byte
 			var pos zend.ZendLlistPosition
-			if core.PG(html_errors) {
+			if core.PG__().html_errors {
 				brlen = 7
 				br = "<br />\n"
 			} else {
@@ -1682,12 +1682,12 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 		}
 		return plain_files_wrapper
 	}
-	if wrapper != nil && wrapper.GetIsUrl() != 0 && (options&core.STREAM_DISABLE_URL_PROTECTION) == 0 && (!(core.PG(allow_url_fopen)) || ((options&core.STREAM_OPEN_FOR_INCLUDE) != 0 || core.PG(in_user_include)) && !(core.PG(allow_url_include))) {
+	if wrapper != nil && wrapper.GetIsUrl() != 0 && (options&core.STREAM_DISABLE_URL_PROTECTION) == 0 && (!(core.PG__().allow_url_fopen) || ((options&core.STREAM_OPEN_FOR_INCLUDE) != 0 || core.PG__().in_user_include) && !(core.PG__().allow_url_include)) {
 		if (options & core.REPORT_ERRORS) != 0 {
 
 			/* protocol[n] probably isn't '\0' */
 
-			if !(core.PG(allow_url_fopen)) {
+			if !(core.PG__().allow_url_fopen) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_fopen=0", int(n), protocol)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_include=0", int(n), protocol)
