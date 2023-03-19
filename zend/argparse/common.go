@@ -11,6 +11,10 @@ func CheckNumArgsNone(executeData ExecuteData, flags int) bool {
 
 func CheckNumArgs(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
 	numArgs := executeData.NumArgs()
+	return CheckNumArgsEx(numArgs, executeData, minNumArgs, maxNumArgs, flags)
+}
+
+func CheckNumArgsEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
 	// 检查参数个数，若检查通过直接返回
 	if numArgs >= minNumArgs && (numArgs <= maxNumArgs || maxNumArgs < 0) {
 		return true

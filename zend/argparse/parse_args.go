@@ -6,129 +6,100 @@ import (
 	"sik/zend/types"
 )
 
-func ParseVaArgs(num_args int, type_spec string, va []any, flags int) int {
-	var spec_walk *byte
-	var c int
-	var i int
-	var min_num_args int = -1
-	var max_num_args int = 0
-	var post_varargs int = 0
-	var arg *types.Zval
-	var arg_count int
-	var have_varargs types.ZendBool = 0
-	var varargs **types.Zval = nil
-	var n_varargs *int = nil
-	for spec_walk = type_spec; *spec_walk; spec_walk++ {
-		c = *spec_walk
+func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs int, ok bool) {
+	minNumArgs = -1
+	maxNumArgs = 0
+	postVarargs = 0
+	haveVarargs := false
+	for _, c := range []byte(typeSpec) {
 		switch c {
-		case 'l':
-		case 'd':
-		case 's':
-		case 'b':
-		case 'r':
-		case 'a':
-		case 'o':
-		case 'O':
-		case 'z':
-		case 'Z':
-		case 'C':
-		case 'h':
-		case 'f':
-		case 'A':
-		case 'H':
-		case 'p':
-		case 'S':
-		case 'P':
-		case 'L':
-			max_num_args++
-			break
+		case 'l', 'd', 's', 'b', 'r', 'a', 'o', 'O', 'z', 'Z', 'C', 'h', 'f', 'A', 'H', 'p', 'S', 'P', 'L':
+			maxNumArgs++
 		case '|':
-			min_num_args = max_num_args
-			break
-		case '/':
-
-		case '!':
-
+			minNumArgs = maxNumArgs
+		case '/', '!':
 			/* Pass */
-
-			break
-		case '*':
-
-		case '+':
-			if have_varargs != 0 {
+		case '*', '+':
+			if haveVarargs {
 				zend.ZendParseParametersDebugError("only one varargs specifier (* or +) is permitted")
-				return types.FAILURE
+				return
 			}
-			have_varargs = 1
+			haveVarargs = true
 
 			/* we expect at least one parameter in varargs */
-
 			if c == '+' {
-				max_num_args++
+				maxNumArgs++
 			}
 
 			/* mark the beginning of varargs */
-
-			post_varargs = max_num_args
-			break
+			postVarargs = maxNumArgs
 		default:
 			zend.ZendParseParametersDebugError("bad type specifier while parsing parameters")
-			return types.FAILURE
+			return
 		}
 	}
-	if min_num_args < 0 {
-		min_num_args = max_num_args
+	if minNumArgs < 0 {
+		minNumArgs = maxNumArgs
 	}
-	if have_varargs != 0 {
-
+	if haveVarargs {
 		/* calculate how many required args are at the end of the specifier list */
-
-		post_varargs = max_num_args - post_varargs
-		max_num_args = -1
+		postVarargs = maxNumArgs - postVarargs
+		maxNumArgs = -1
 	}
-	if num_args < min_num_args || num_args > max_num_args && max_num_args >= 0 {
-		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-			var active_function *zend.ZendFunction = zend.CurrEX().GetFunc()
-			var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-			var throw_exception = zend.CurrEX().IsArgUseStrictTypes() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
-			zend.ZendInternalArgumentCountError(throw_exception, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
-		}
+
+	ok = true
+	return
+}
+
+func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
+	minNumArgs, maxNumArgs, postVarargs, ok := checkTypeSpec(typeSpec)
+	if !ok {
 		return types.FAILURE
 	}
-	arg_count = zend.CurrEX().NumArgs()
-	if num_args > arg_count {
+	if !CheckNumArgsEx(numArgs, zend.CurrEX(), minNumArgs, maxNumArgs, flags) {
+		return types.FAILURE
+	}
+	argCount := zend.CurrEX().NumArgs()
+	if numArgs > argCount {
 		zend.ZendParseParametersDebugError("could not obtain parameters for parsing")
 		return types.FAILURE
 	}
+
+	var i int
+	var arg *types.Zval
+	var varargs **types.Zval = nil
+	var nVarargs *int = nil
 	i = 0
-	for b.PostDec(&num_args) > 0 {
-		if (*type_spec) == '|' {
-			type_spec++
+
+	r := strReader{typeSpec}
+
+	for b.PostDec(&numArgs) > 0 {
+		if r.curr() == '|' {
+			r.inc()
 		}
-		if (*type_spec) == '*' || (*type_spec) == '+' {
-			var num_varargs int = num_args + 1 - post_varargs
+		if r.curr() == '*' || r.curr() == '+' {
+			var num_varargs int = numArgs + 1 - postVarargs
 
 			/* eat up the passed in storage even if it won't be filled in with varargs */
+			varargs = vaArg[*types.Zval](&va)
+			nVarargs = vaArg[int](&va)
+			r.inc()
 
-			varargs = __va_arg(*va, (**types.Zval)(_))
-			n_varargs = __va_arg(*va, (*int)(_))
-			type_spec++
 			if num_varargs > 0 {
-				*n_varargs = num_varargs
+				*nVarargs = num_varargs
 				*varargs = zend.CurrEX().Arg(i + 1)
 
 				/* adjust how many args we have left and restart loop */
-
-				num_args += 1 - num_varargs
+				numArgs += 1 - num_varargs
 				i += num_varargs
 				continue
 			} else {
 				*varargs = nil
-				*n_varargs = 0
+				*nVarargs = 0
 			}
 		}
 		arg = zend.CurrEX().Arg(i + 1)
-		if ZendParseArg(i+1, arg, va, &type_spec, flags) == types.FAILURE {
+		if ZendParseArg(i+1, arg, va, &typeSpec, flags) == types.FAILURE {
 
 			/* clean up varargs array if it was used */
 
