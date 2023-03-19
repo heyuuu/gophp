@@ -79,7 +79,7 @@ func (this *SplPtrHeap) SetIsHeapCorrupted(cond bool) { this.SwitchFlags(SPL_HEA
 type SplHeapObject struct {
 	heap            *SplPtrHeap
 	flags           int
-	ce_get_iterator *zend.ZendClassEntry
+	ce_get_iterator *types.ClassEntry
 	fptr_cmp        *zend.ZendFunction
 	fptr_count      *zend.ZendFunction
 	std             types.ZendObject
@@ -88,7 +88,7 @@ type SplHeapObject struct {
 //             func MakeSplHeapObject(
 // heap *SplPtrHeap,
 // flags int,
-// ce_get_iterator *zend.ZendClassEntry,
+// ce_get_iterator *zend.ClassEntry,
 // fptr_cmp *zend.ZendFunction,
 // fptr_count *zend.ZendFunction,
 // std zend.ZendObject,
@@ -105,10 +105,10 @@ type SplHeapObject struct {
 func (this *SplHeapObject) GetHeap() *SplPtrHeap                        { return this.heap }
 func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                   { this.heap = value }
 func (this *SplHeapObject) GetFlags() int                               { return this.flags }
-func (this *SplHeapObject) SetFlags(value int)                          { this.flags = value }
-func (this *SplHeapObject) GetCeGetIterator() *zend.ZendClassEntry      { return this.ce_get_iterator }
-func (this *SplHeapObject) SetCeGetIterator(value *zend.ZendClassEntry) { this.ce_get_iterator = value }
-func (this *SplHeapObject) GetFptrCmp() *zend.ZendFunction              { return this.fptr_cmp }
+func (this *SplHeapObject) SetFlags(value int)                       { this.flags = value }
+func (this *SplHeapObject) GetCeGetIterator() *types.ClassEntry      { return this.ce_get_iterator }
+func (this *SplHeapObject) SetCeGetIterator(value *types.ClassEntry) { this.ce_get_iterator = value }
+func (this *SplHeapObject) GetFptrCmp() *zend.ZendFunction           { return this.fptr_cmp }
 func (this *SplHeapObject) SetFptrCmp(value *zend.ZendFunction)         { this.fptr_cmp = value }
 func (this *SplHeapObject) GetFptrCount() *zend.ZendFunction            { return this.fptr_count }
 func (this *SplHeapObject) SetFptrCount(value *zend.ZendFunction)       { this.fptr_count = value }

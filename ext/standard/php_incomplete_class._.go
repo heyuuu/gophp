@@ -3,7 +3,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/php_incomplete_class.h>
@@ -26,6 +26,6 @@ import (
    +----------------------------------------------------------------------+
 */
 
-const PHP_IC_ENTRY *zend.ZendClassEntry = BG__().incomplete_class
+const PHP_IC_ENTRY *types.ClassEntry = BG__().incomplete_class
 const INCOMPLETE_CLASS = "__PHP_Incomplete_Class"
 const MAGIC_MEMBER = "__PHP_Incomplete_Class_Name"

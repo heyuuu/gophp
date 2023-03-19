@@ -55,7 +55,7 @@ const PRINT_ZVAL_INDENT = 4
 
 /* true multithread-shared globals */
 
-var ZendStandardClassDef *ZendClassEntry = nil
+var ZendStandardClassDef *types.ClassEntry = nil
 var ZendPostStartupCb func() int = nil
 var ZendPostShutdownCb func() = nil
 var ZendPreloadAutoload func(filename *types.ZendString) int = nil

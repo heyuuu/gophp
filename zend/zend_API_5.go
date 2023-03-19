@@ -52,7 +52,7 @@ func ZendCollectModuleHandlers() {
 	var startup_count int = 0
 	var shutdown_count int = 0
 	var post_deactivate_count int = 0
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var class_count int = 0
 
 	/* Collect extensions with request startup/shutdown handlers */
@@ -106,7 +106,7 @@ func ZendCollectModuleHandlers() {
 			class_count++
 		}
 	}
-	ClassCleanupHandlers = (**ZendClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
+	ClassCleanupHandlers = (**types.ClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
 		var __ht *types.HashTable = CG__().GetClassTable()
@@ -187,7 +187,7 @@ func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
 	module.SetType(MODULE_PERSISTENT)
 	return ZendRegisterModuleEx(module)
 }
-func ZendCheckMagicMethodImplementation(ce *ZendClassEntry, fptr *ZendFunction, error_type int) {
+func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *ZendFunction, error_type int) {
 	var lcname []byte
 	var name_len int
 	if fptr.GetFunctionName().GetVal()[0] != '_' || fptr.GetFunctionName().GetVal()[1] != '_' {
@@ -246,7 +246,7 @@ func ZendCheckMagicMethodImplementation(ce *ZendClassEntry, fptr *ZendFunction, 
 		ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
 	var ptr *ZendFunctionEntry = functions
 	var count int = 0
 	var unload int = 0

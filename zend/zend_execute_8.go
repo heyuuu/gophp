@@ -260,7 +260,7 @@ func ZendSwapOperands(op *ZendOp) {
 func ZendInitDynamicCallString(function *types.ZendString, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
 	var func_ *types.Zval
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var lcname *types.ZendString
 	var colon *byte
 	if b.Assign(&colon, ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
@@ -322,7 +322,7 @@ func ZendInitDynamicCallString(function *types.ZendString, num_args uint32) *Zen
 func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
 	var object_or_called_scope any
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var object *types.ZendObject
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
 	if types.Z_OBJ_HT(*function).GetGetClosure() != nil && types.Z_OBJ_HT(*function).GetGetClosure()(function, &called_scope, &fbc, &object) == types.SUCCESS {
@@ -378,7 +378,7 @@ func ZendInitDynamicCallArray(function *types.ZendArray, num_args uint32) *ZendE
 			return nil
 		}
 		if obj.IsString() {
-			var called_scope *ZendClassEntry = ZendFetchClassByName(obj.GetStr(), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			var called_scope *types.ClassEntry = ZendFetchClassByName(obj.GetStr(), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if called_scope == nil {
 				return nil
 			}

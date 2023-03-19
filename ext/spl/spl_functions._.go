@@ -3,7 +3,6 @@
 package spl
 
 import (
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -27,7 +26,7 @@ import (
    +----------------------------------------------------------------------+
 */
 
-type CreateObjectFuncT func(class_type *zend.ZendClassEntry) *types.ZendObject
+type CreateObjectFuncT func(class_type *types.ClassEntry) *types.ZendObject
 
 /* sub: whether to allow subclasses/interfaces
    allow = 0: allow all classes and interfaces

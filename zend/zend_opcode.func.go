@@ -94,7 +94,7 @@ func ZendFunctionDtor(zv *types.Zval) {
 		}
 	}
 }
-func ZendCleanupInternalClassData(ce *ZendClassEntry) {
+func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 	if CE_STATIC_MEMBERS(ce) != nil {
 		var static_members *types.Zval = CE_STATIC_MEMBERS(ce)
 		var p *types.Zval = static_members
@@ -181,7 +181,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 		}
 	}
 }
-func _destroyZendClassTraitsInfo(ce *ZendClassEntry) {
+func _destroyZendClassTraitsInfo(ce *types.ClassEntry) {
 	var i uint32
 	for i = 0; i < ce.GetNumTraits(); i++ {
 		types.ZendStringReleaseEx(ce.GetTraitNames()[i].GetName(), 0)
@@ -222,7 +222,7 @@ func _destroyZendClassTraitsInfo(ce *ZendClassEntry) {
 }
 func DestroyZendClass(zv *types.Zval) {
 	var prop_info *ZendPropertyInfo
-	var ce *ZendClassEntry = zv.GetPtr()
+	var ce *types.ClassEntry = zv.GetPtr()
 	var fn *ZendFunction
 	if ce.HasCeFlags(ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED) {
 		var op_array *ZendOpArray
@@ -411,7 +411,7 @@ func DestroyZendClass(zv *types.Zval) {
 	}
 }
 func ZendClassAddRef(zv *types.Zval) {
-	var ce *ZendClassEntry = zv.GetPtr()
+	var ce *types.ClassEntry = zv.GetPtr()
 	if !ce.IsImmutable() {
 		ce.GetRefcount()++
 	}

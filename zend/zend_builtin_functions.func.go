@@ -8,7 +8,7 @@ import (
 )
 
 func ZmStartupCore(type_ int, module_number int) int {
-	var class_entry ZendClassEntry
+	var class_entry types.ClassEntry
 	memset(&class_entry, 0, b.SizeOf("zend_class_entry"))
 	class_entry.SetName(types.ZendStringInitInterned("stdClass", b.SizeOf("\"stdClass\"")-1, 1))
 	class_entry.SetBuiltinFunctions(nil)
@@ -649,7 +649,7 @@ func ZifGetClass(executeData *ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if obj == nil {
-		var scope *ZendClassEntry = ZendGetExecutedScope()
+		var scope *types.ClassEntry = ZendGetExecutedScope()
 		if scope != nil {
 			return_value.SetStringCopy(scope.GetName())
 			return
@@ -663,7 +663,7 @@ func ZifGetClass(executeData *ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifGetCalledClass(executeData *ZendExecuteData, return_value *types.Zval) {
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	if ZendParseParametersNone() == types.FAILURE {
 		return
 	}
@@ -672,7 +672,7 @@ func ZifGetCalledClass(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetStringCopy(called_scope.GetName())
 		return
 	} else {
-		var scope *ZendClassEntry = ZendGetExecutedScope()
+		var scope *types.ClassEntry = ZendGetExecutedScope()
 		if scope == nil {
 			ZendError(E_WARNING, "get_called_class() called from outside a class")
 		}
@@ -682,7 +682,7 @@ func ZifGetCalledClass(executeData *ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGetParentClass(executeData *ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
-	var ce *ZendClassEntry = nil
+	var ce *types.ClassEntry = nil
 	if ZendParseParameters(executeData.NumArgs(), "|z", &arg) == types.FAILURE {
 		return
 	}
@@ -712,8 +712,8 @@ func ZifGetParentClass(executeData *ZendExecuteData, return_value *types.Zval) {
 func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subclass types.ZendBool) {
 	var obj *types.Zval
 	var class_name *types.ZendString
-	var instance_ce *ZendClassEntry
-	var ce *ZendClassEntry
+	var instance_ce *types.ClassEntry
+	var ce *types.ClassEntry
 	var allow_string types.ZendBool = only_subclass
 	var retval types.ZendBool
 	for {
@@ -778,7 +778,7 @@ func ZifIsSubclassOf(executeData *ZendExecuteData, return_value *types.Zval) {
 func ZifIsA(executeData *ZendExecuteData, return_value *types.Zval) {
 	IsAImpl(executeData, return_value, 0)
 }
-func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return_value *types.Zval) {
+func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, return_value *types.Zval) {
 	var prop_info *ZendPropertyInfo
 	var prop *types.Zval
 	var prop_copy types.Zval
@@ -834,8 +834,8 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 }
 func ZifGetClassVars(executeData *ZendExecuteData, return_value *types.Zval) {
 	var class_name *types.ZendString
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	if ZendParseParameters(executeData.NumArgs(), "S", &class_name) == types.FAILURE {
 		return
 	}
@@ -997,8 +997,8 @@ func SameName(key *types.ZendString, name *types.ZendString) int {
 func ZifGetClassMethods(executeData *ZendExecuteData, return_value *types.Zval) {
 	var klass *types.Zval
 	var method_name types.Zval
-	var ce *ZendClassEntry = nil
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry = nil
+	var scope *types.ClassEntry
 	var mptr *ZendFunction
 	var key *types.ZendString
 	if ZendParseParameters(executeData.NumArgs(), "z", &klass) == types.FAILURE {
@@ -1036,7 +1036,7 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 	var klass *types.Zval
 	var method_name *types.ZendString
 	var lcname *types.ZendString
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var func_ *ZendFunction
 	for {
 		var _flags int = 0
@@ -1101,7 +1101,7 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 func ZifPropertyExists(executeData *ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval
 	var property *types.ZendString
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var property_info *ZendPropertyInfo
 	var property_z types.Zval
 	if ZendParseParameters(executeData.NumArgs(), "zS", &object, &property) == types.FAILURE {
@@ -1140,7 +1140,7 @@ func ZifPropertyExists(executeData *ZendExecuteData, return_value *types.Zval) {
 func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, flags int, skip_flags int) {
 	var name *types.ZendString
 	var lcname *types.ZendString
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var autoload types.ZendBool = 1
 	for {
 		var _flags int = 0
@@ -1235,7 +1235,7 @@ func ZifFunctionExists(executeData *ZendExecuteData, return_value *types.Zval) {
 func ZifClassAlias(executeData *ZendExecuteData, return_value *types.Zval) {
 	var class_name *types.ZendString
 	var alias_name *byte
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var alias_name_len int
 	var autoload types.ZendBool = 1
 	if ZendParseParameters(executeData.NumArgs(), "Ss|b", &class_name, &alias_name, &alias_name_len, &autoload) == types.FAILURE {
@@ -1393,7 +1393,7 @@ func ZifRestoreExceptionHandler(executeData *ZendExecuteData, return_value *type
 	return_value.SetTrue()
 	return
 }
-func CopyClassOrInterfaceName(array *types.Zval, key *types.ZendString, ce *ZendClassEntry) {
+func CopyClassOrInterfaceName(array *types.Zval, key *types.ZendString, ce *types.ClassEntry) {
 	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameName(key, ce.GetName()) != 0 {
 		key = ce.GetName()
 	}
@@ -1401,7 +1401,7 @@ func CopyClassOrInterfaceName(array *types.Zval, key *types.ZendString, ce *Zend
 }
 func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval, flags int, skip_flags int) {
 	var key *types.ZendString
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	if ZendParseParametersNone() == types.FAILURE {
 		return
 	}
@@ -1876,7 +1876,7 @@ func ZifDebugPrintBacktrace(executeData *ZendExecuteData, return_value *types.Zv
 			var zend_function_name *types.ZendString
 			func_ = call.GetFunc()
 			if func_.GetScope() != nil && func_.GetScope().GetTraitAliases() != nil {
-				zend_function_name = ZendResolveMethodName(b.CondF(object != nil, func() *ZendClassEntry { return object.GetCe() }, func() *ZendClassEntry { return func_.GetScope() }), func_)
+				zend_function_name = ZendResolveMethodName(b.CondF(object != nil, func() *types.ClassEntry { return object.GetCe() }, func() *types.ClassEntry { return func_.GetScope() }), func_)
 			} else {
 				zend_function_name = func_.GetFunctionName()
 			}
@@ -2091,7 +2091,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 		if call != nil && call.GetFunc() != nil {
 			func_ = call.GetFunc()
 			if func_.GetScope() != nil && func_.GetScope().GetTraitAliases() != nil {
-				function_name = ZendResolveMethodName(b.CondF(object != nil, func() *ZendClassEntry { return object.GetCe() }, func() *ZendClassEntry { return func_.GetScope() }), func_)
+				function_name = ZendResolveMethodName(b.CondF(object != nil, func() *types.ClassEntry { return object.GetCe() }, func() *types.ClassEntry { return func_.GetScope() }), func_)
 			} else {
 				function_name = func_.GetFunctionName()
 			}

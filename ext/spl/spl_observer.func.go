@@ -120,9 +120,9 @@ func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *types.Zval, othe
 	}
 	intern.SetIndex(0)
 }
-func SplObjectStorageNewEx(class_type *zend.ZendClassEntry, orig *types.Zval) *types.ZendObject {
+func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *types.ZendObject {
 	var intern *spl_SplObjectStorage
-	var parent *zend.ZendClassEntry = class_type
+	var parent *types.ClassEntry = class_type
 	intern = zend.Emalloc(b.SizeOf("spl_SplObjectStorage") + zend.ZendObjectPropertiesSize(parent))
 	memset(intern, 0, b.SizeOf("spl_SplObjectStorage")-b.SizeOf("zval"))
 	intern.SetPos(0)
@@ -228,7 +228,7 @@ func SplObjectStorageCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	}
 	return zend.ZendHashCompare(Z_SPLOBJSTORAGE_P(o1).GetStorage(), Z_SPLOBJSTORAGE_P(o2).GetStorage(), types.CompareFuncT(SplObjectStorageCompareInfo), 0)
 }
-func spl_SplObjectStorage_new(class_type *zend.ZendClassEntry) *types.ZendObject {
+func spl_SplObjectStorage_new(class_type *types.ClassEntry) *types.ZendObject {
 	return SplObjectStorageNewEx(class_type, nil)
 }
 func SplObjectStorageContains(intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval) int {

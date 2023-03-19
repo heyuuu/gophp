@@ -24,7 +24,7 @@ func ZendWeakrefsNotify(object *types.ZendObject) {
 	ZendHashIndexDel(EG__().GetWeakrefs(), ZendUlong(object))
 }
 func ZendWeakrefsShutdown() { EG__().GetWeakrefs().Destroy() }
-func ZendWeakrefNew(ce *ZendClassEntry) *types.ZendObject {
+func ZendWeakrefNew(ce *types.ClassEntry) *types.ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
 	ZendObjectStdInit(wr.GetStd(), ZendCeWeakref)
 	wr.GetStd().SetHandlers(&ZendWeakrefHandlers)
@@ -132,7 +132,7 @@ func zim_WeakReference_get(executeData *ZendExecuteData, return_value *types.Zva
 	ZendWeakrefGet(getThis(), return_value)
 }
 func ZendRegisterWeakrefCe() {
-	var ce ZendClassEntry
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("WeakReference", b.SizeOf("\"WeakReference\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendWeakrefMethods)

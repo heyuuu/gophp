@@ -1,5 +1,3 @@
-// <<generate>>
-
 package types
 
 import (
@@ -21,9 +19,9 @@ func (this ZendType) Name() *ZendString {
 	var ptr = this &^ 0x3
 	return b.CastPtr[ZendString](ptr)
 }
-func (this ZendType) Ce() *zend.ZendClassEntry {
+func (this ZendType) Ce() *ClassEntry {
 	var ptr = this &^ 0x3
-	return b.CastPtr[zend.ZendClassEntry](ptr)
+	return b.CastPtr[ClassEntry](ptr)
 }
 func (this ZendType) Code() int       { return this >> int64(2) }
 func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
@@ -53,7 +51,7 @@ func (this *HashTableIterator) SetPos(value HashPosition) { this.pos = value }
 type ZendObject struct {
 	ZendRefcounted
 	handle           uint32
-	ce               *zend.ZendClassEntry
+	ce               *ClassEntry
 	handlers         *zend.ZendObjectHandlers
 	properties       *HashTable
 	properties_table []Zval
@@ -62,10 +60,10 @@ type ZendObject struct {
 var _ IRefcounted = &ZendObject{}
 
 func (this *ZendObject) GetHandle() uint32                          { return this.handle }
-func (this *ZendObject) SetHandle(value uint32)                     { this.handle = value }
-func (this *ZendObject) GetCe() *zend.ZendClassEntry                { return this.ce }
-func (this *ZendObject) SetCe(value *zend.ZendClassEntry)           { this.ce = value }
-func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return this.handlers }
+func (this *ZendObject) SetHandle(value uint32)                { this.handle = value }
+func (this *ZendObject) GetCe() *ClassEntry                    { return this.ce }
+func (this *ZendObject) SetCe(value *ClassEntry)               { this.ce = value }
+func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers { return this.handlers }
 func (this *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { this.handlers = value }
 func (this *ZendObject) GetProperties() *HashTable                  { return this.properties }
 func (this *ZendObject) SetProperties(value *HashTable)             { this.properties = value }

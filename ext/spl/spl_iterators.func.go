@@ -82,7 +82,7 @@ func SplRecursiveItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval)
 func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval) {
 	var iterator *zend.ZendObjectIterator
 	var zobject *types.Zval
-	var ce *zend.ZendClassEntry
+	var ce *types.ClassEntry
 	var retval types.Zval
 	var child types.Zval
 	var sub_iter *zend.ZendObjectIterator
@@ -286,7 +286,7 @@ func SplRecursiveItMoveForward(iter *zend.ZendObjectIterator) {
 func SplRecursiveItRewind(iter *zend.ZendObjectIterator) {
 	SplRecursiveItRewindEx(Z_SPLRECURSIVE_IT_P(iter.GetData()), iter.GetData())
 }
-func SplRecursiveItGetIterator(ce *zend.ZendClassEntry, zobject *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplRecursiveItGetIterator(ce *types.ClassEntry, zobject *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplRecursiveItIterator
 	var object *SplRecursiveItObject
 	if by_ref != 0 {
@@ -304,11 +304,11 @@ func SplRecursiveItGetIterator(ce *zend.ZendClassEntry, zobject *types.Zval, by_
 	iterator.GetIntern().SetFuncs(&SplRecursiveItIteratorFuncs)
 	return (*zend.ZendObjectIterator)(iterator)
 }
-func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *types.Zval, ce_base *zend.ZendClassEntry, ce_inner *zend.ZendClassEntry, rit_type RecursiveItItType) {
+func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *types.Zval, ce_base *types.ClassEntry, ce_inner *types.ClassEntry, rit_type RecursiveItItType) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplRecursiveItObject
 	var iterator *types.Zval
-	var ce_iterator *zend.ZendClassEntry
+	var ce_iterator *types.ClassEntry
 	var mode zend.ZendLong
 	var flags zend.ZendLong
 	var error_handling zend.ZendErrorHandling
@@ -520,7 +520,7 @@ func zim_spl_RecursiveIteratorIterator_endIteration(executeData *zend.ZendExecut
 }
 func zim_spl_RecursiveIteratorIterator_callHasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	var ce *zend.ZendClassEntry
+	var ce *types.ClassEntry
 	var zobject *types.Zval
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
@@ -548,7 +548,7 @@ func zim_spl_RecursiveIteratorIterator_callHasChildren(executeData *zend.ZendExe
 }
 func zim_spl_RecursiveIteratorIterator_callGetChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	var ce *zend.ZendClassEntry
+	var ce *types.ClassEntry
 	var zobject *types.Zval
 	if zend.ZendParseParametersNone() == types.FAILURE {
 		return
@@ -664,7 +664,7 @@ func spl_RecursiveIteratorIterator_free_storage(_object *types.ZendObject) {
 	object.GetPrefix()[5].Free()
 	object.GetPostfix()[0].Free()
 }
-func spl_RecursiveIteratorIterator_new_ex(class_type *zend.ZendClassEntry, init_prefix int) *types.ZendObject {
+func spl_RecursiveIteratorIterator_new_ex(class_type *types.ClassEntry, init_prefix int) *types.ZendObject {
 	var intern *SplRecursiveItObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_recursive_it_object"), class_type)
 	if init_prefix != 0 {
@@ -681,10 +681,10 @@ func spl_RecursiveIteratorIterator_new_ex(class_type *zend.ZendClassEntry, init_
 	intern.GetStd().SetHandlers(&SplHandlersRecItIt)
 	return intern.GetStd()
 }
-func spl_RecursiveIteratorIterator_new(class_type *zend.ZendClassEntry) *types.ZendObject {
+func spl_RecursiveIteratorIterator_new(class_type *types.ClassEntry) *types.ZendObject {
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 0)
 }
-func spl_RecursiveTreeIterator_new(class_type *zend.ZendClassEntry) *types.ZendObject {
+func spl_RecursiveTreeIterator_new(class_type *types.ClassEntry) *types.ZendObject {
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 1)
 }
 func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_value *types.Zval) {
@@ -950,11 +950,11 @@ func SplCitCheckFlags(flags zend.ZendLong) int {
 		return types.FAILURE
 	}
 }
-func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Zval, ce_base *zend.ZendClassEntry, ce_inner *zend.ZendClassEntry, dit_type DualItType) *SplDualItObject {
+func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Zval, ce_base *types.ClassEntry, ce_inner *types.ClassEntry, dit_type DualItType) *SplDualItObject {
 	var zobject *types.Zval
 	var retval types.Zval
 	var intern *SplDualItObject
-	var ce *zend.ZendClassEntry = nil
+	var ce *types.ClassEntry = nil
 	var inc_refcount int = 1
 	var error_handling zend.ZendErrorHandling
 	intern = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -992,7 +992,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 		intern.AddUCachingFlags(flags & CIT_PUBLIC)
 		zend.ArrayInit(intern.GetZcache())
 	case DIT_IteratorIterator:
-		var ce_cast *zend.ZendClassEntry
+		var ce_cast *types.ClassEntry
 		var class_name *types.ZendString
 		if zend.ZendParseParametersThrow(executeData.NumArgs(), "O|S", &zobject, ce_inner, &class_name) == types.FAILURE {
 			return nil
@@ -1715,7 +1715,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 	}
 	zend.ZendObjectStdDtor(object.GetStd())
 }
-func SplDualItNew(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplDualItNew(class_type *types.ClassEntry) *types.ZendObject {
 	var intern *SplDualItObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_dual_it_object"), class_type)
 	intern.SetDitType(DIT_Unknown)
@@ -2506,7 +2506,7 @@ func zim_spl_AppendIterator_getArrayIterator(executeData *zend.ZendExecuteData, 
 }
 func SplIteratorApply(obj *types.Zval, apply_func SplIteratorApplyFuncT, puser any) int {
 	var iter *zend.ZendObjectIterator
-	var ce *zend.ZendClassEntry = types.Z_OBJCE_P(obj)
+	var ce *types.ClassEntry = types.Z_OBJCE_P(obj)
 	iter = ce.GetGetIterator()(ce, obj, 0)
 	if zend.EG__().GetException() != nil {
 		goto done

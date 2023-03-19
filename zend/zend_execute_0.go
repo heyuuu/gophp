@@ -196,7 +196,7 @@ func CACHED_POLYMORPHIC_PTR_EX(slot __auto__, ce __auto__) __auto__ {
 		return nil
 	}
 }
-func CACHE_POLYMORPHIC_PTR_EX(slot *any, ce *ZendClassEntry, ptr any) {
+func CACHE_POLYMORPHIC_PTR_EX(slot *any, ce *types.ClassEntry, ptr any) {
 	slot[0] = ce
 	slot[1] = ptr
 }
@@ -214,7 +214,7 @@ func SKIP_EXT_OPLINE(opline __auto__) {
 		opline--
 	}
 }
-func ZEND_CLASS_HAS_TYPE_HINTS(ce *ZendClassEntry) bool {
+func ZEND_CLASS_HAS_TYPE_HINTS(ce *types.ClassEntry) bool {
 	return (ce.GetCeFlags() & ZEND_ACC_HAS_TYPE_HINTS) == ZEND_ACC_HAS_TYPE_HINTS
 }
 func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo) {

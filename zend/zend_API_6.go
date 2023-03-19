@@ -25,7 +25,7 @@ func ZendUnregisterFunctions(functions []ZendFunctionEntry, count int, functionT
 }
 
 func CleanModuleClass(el *types.Zval, arg any) int {
-	var ce *ZendClassEntry = (*ZendClassEntry)(el.GetPtr())
+	var ce *types.ClassEntry = (*types.ClassEntry)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == module_number {
 		return ZEND_HASH_APPLY_REMOVE
@@ -104,7 +104,7 @@ func ZendDeactivateModules() {
 	EG__().SetBailout(__orig_bailout)
 }
 func ZendCleanupInternalClasses() {
-	var p **ZendClassEntry = ClassCleanupHandlers
+	var p **types.ClassEntry = ClassCleanupHandlers
 	for (*p) != nil {
 		ZendCleanupInternalClassData(*p)
 		p++
@@ -165,8 +165,8 @@ func ZendPostDeactivateModules() {
 func ZendNextFreeModule() int {
 	return ModuleRegistry.GetNNumOfElements() + 1
 }
-func DoRegisterInternalClass(orig_class_entry *ZendClassEntry, ce_flags uint32) *ZendClassEntry {
-	var class_entry *ZendClassEntry = Malloc(b.SizeOf("zend_class_entry"))
+func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
+	var class_entry *types.ClassEntry = Malloc(b.SizeOf("zend_class_entry"))
 	var lowercase_name *types.ZendString
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
@@ -182,8 +182,8 @@ func DoRegisterInternalClass(orig_class_entry *ZendClassEntry, ce_flags uint32) 
 	types.ZendStringReleaseEx(lowercase_name, 1)
 	return class_entry
 }
-func ZendRegisterInternalClassEx(class_entry *ZendClassEntry, parent_ce *ZendClassEntry) *ZendClassEntry {
-	var register_class *ZendClassEntry
+func ZendRegisterInternalClassEx(class_entry *types.ClassEntry, parent_ce *types.ClassEntry) *types.ClassEntry {
+	var register_class *types.ClassEntry
 	register_class = ZendRegisterInternalClass(class_entry)
 	if parent_ce != nil {
 		ZendDoInheritance(register_class, parent_ce)
@@ -191,23 +191,23 @@ func ZendRegisterInternalClassEx(class_entry *ZendClassEntry, parent_ce *ZendCla
 	}
 	return register_class
 }
-func ZendClassImplements(class_entry *ZendClassEntry, num_interfaces int, _ ...any) {
-	var interface_entry *ZendClassEntry
+func ZendClassImplements(class_entry *types.ClassEntry, num_interfaces int, _ ...any) {
+	var interface_entry *types.ClassEntry
 	var interface_list va_list
 	va_start(interface_list, num_interfaces)
 	for b.PostDec(&num_interfaces) {
-		interface_entry = __va_arg(interface_list, (*ZendClassEntry)(_))
+		interface_entry = __va_arg(interface_list, (*types.ClassEntry)(_))
 		ZendDoImplementInterface(class_entry, interface_entry)
 	}
 	va_end(interface_list)
 }
-func ZendRegisterInternalClass(orig_class_entry *ZendClassEntry) *ZendClassEntry {
+func ZendRegisterInternalClass(orig_class_entry *types.ClassEntry) *types.ClassEntry {
 	return DoRegisterInternalClass(orig_class_entry, 0)
 }
-func ZendRegisterInternalInterface(orig_class_entry *ZendClassEntry) *ZendClassEntry {
+func ZendRegisterInternalInterface(orig_class_entry *types.ClassEntry) *types.ClassEntry {
 	return DoRegisterInternalClass(orig_class_entry, ZEND_ACC_INTERFACE)
 }
-func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, persistent int) int {
+func ZendRegisterClassAliasEx(name *byte, name_len int, ce *types.ClassEntry, persistent int) int {
 	var lcname *types.ZendString
 	var zv types.Zval
 	var ret *types.Zval

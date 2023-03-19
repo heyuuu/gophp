@@ -53,7 +53,7 @@ func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
 	assert_globals_p.SetCb(nil)
 }
 func ZmStartupAssert(type_ int, module_number int) int {
-	var ce zend.ZendClassEntry
+	var ce types.ClassEntry
 	PhpAssertInitGlobals(&AssertGlobals)
 	zend.REGISTER_INI_ENTRIES(module_number)
 	zend.REGISTER_LONG_CONSTANT("ASSERT_ACTIVE", ASSERT_ACTIVE, zend.CONST_CS|zend.CONST_PERSISTENT)

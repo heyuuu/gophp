@@ -16,7 +16,7 @@ type ZendInternalFunction struct {
 	arg_flags         []types.ZendUchar
 	fn_flags          uint32
 	function_name     *types.ZendString
-	scope             *ZendClassEntry
+	scope             *types.ClassEntry
 	prototype         *ZendFunction
 	num_args          uint32
 	required_num_args uint32
@@ -60,8 +60,8 @@ func (this *ZendInternalFunction) SetFunctionName(value *types.ZendString) {
 	this.function_name = value
 }
 
-// func (this *ZendInternalFunction)  GetScope() *ZendClassEntry      { return this.scope }
-func (this *ZendInternalFunction) SetScope(value *ZendClassEntry) { this.scope = value }
+// func (this *ZendInternalFunction)  GetScope() *ClassEntry      { return this.scope }
+func (this *ZendInternalFunction) SetScope(value *types.ClassEntry) { this.scope = value }
 
 // func (this *ZendInternalFunction)  GetPrototype() *ZendFunction      { return this.prototype }
 func (this *ZendInternalFunction) SetPrototype(value *ZendFunction) { this.prototype = value }

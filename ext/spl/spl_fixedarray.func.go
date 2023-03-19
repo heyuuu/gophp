@@ -116,9 +116,9 @@ func SplFixedarrayObjectFreeStorage(object *types.ZendObject) {
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
 }
-func SplFixedarrayObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplFixedarrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
 	var intern *SplFixedarrayObject
-	var parent *zend.ZendClassEntry = class_type
+	var parent *types.ClassEntry = class_type
 	var inherited int = 0
 	var funcs_ptr *zend.ZendClassIteratorFuncs
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_fixedarray_object"), parent)
@@ -190,7 +190,7 @@ func SplFixedarrayObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval,
 	}
 	return intern.GetStd()
 }
-func SplFixedarrayNew(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplFixedarrayNew(class_type *types.ClassEntry) *types.ZendObject {
 	return SplFixedarrayObjectNewEx(class_type, nil, 0)
 }
 func SplFixedarrayObjectClone(zobject *types.Zval) *types.ZendObject {
@@ -699,7 +699,7 @@ func zim_spl_SplFixedArray_current(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 }
-func SplFixedarrayGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplFixedarrayIt
 	if by_ref != 0 {
 		zend.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)

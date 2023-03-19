@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_array.h>
@@ -26,9 +27,9 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var spl_ce_ArrayObject *zend.ZendClassEntry
-var spl_ce_ArrayIterator *zend.ZendClassEntry
-var spl_ce_RecursiveArrayIterator *zend.ZendClassEntry
+var spl_ce_ArrayObject *types.ClassEntry
+var spl_ce_ArrayIterator *types.ClassEntry
+var spl_ce_RecursiveArrayIterator *types.ClassEntry
 
 // Source: <ext/spl/spl_array.c>
 

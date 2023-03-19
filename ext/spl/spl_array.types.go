@@ -20,7 +20,7 @@ type SplArrayObject struct {
 	fptr_offset_has *zend.ZendFunction
 	fptr_offset_del *zend.ZendFunction
 	fptr_count      *zend.ZendFunction
-	ce_get_iterator *zend.ZendClassEntry
+	ce_get_iterator *types.ClassEntry
 	std             types.ZendObject
 }
 
@@ -34,7 +34,7 @@ type SplArrayObject struct {
 // fptr_offset_has *zend.ZendFunction,
 // fptr_offset_del *zend.ZendFunction,
 // fptr_count *zend.ZendFunction,
-// ce_get_iterator *zend.ZendClassEntry,
+// ce_get_iterator *zend.ClassEntry,
 // std zend.ZendObject,
 // ) SplArrayObject {
 //                 return SplArrayObject{
@@ -70,9 +70,9 @@ func (this *SplArrayObject) SetFptrOffsetHas(value *zend.ZendFunction) { this.fp
 func (this *SplArrayObject) GetFptrOffsetDel() *zend.ZendFunction      { return this.fptr_offset_del }
 func (this *SplArrayObject) SetFptrOffsetDel(value *zend.ZendFunction) { this.fptr_offset_del = value }
 func (this *SplArrayObject) GetFptrCount() *zend.ZendFunction          { return this.fptr_count }
-func (this *SplArrayObject) SetFptrCount(value *zend.ZendFunction)     { this.fptr_count = value }
-func (this *SplArrayObject) GetCeGetIterator() *zend.ZendClassEntry    { return this.ce_get_iterator }
-func (this *SplArrayObject) SetCeGetIterator(value *zend.ZendClassEntry) {
+func (this *SplArrayObject) SetFptrCount(value *zend.ZendFunction) { this.fptr_count = value }
+func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry   { return this.ce_get_iterator }
+func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
 func (this *SplArrayObject) GetStd() types.ZendObject { return this.std }

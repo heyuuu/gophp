@@ -203,11 +203,11 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 }
 
 // @see Micro: Z_PARAM_CLASS，Old: 'C'
-func (p *FastParser) ParseClass(baseCe *zend.ZendClassEntry) (dest *zend.ZendClassEntry) {
+func (p *FastParser) ParseClass(baseCe *types.ClassEntry) (dest *types.ClassEntry) {
 	return p.ParseClassEx(baseCe, false)
 }
 
-func (p *FastParser) ParseClassEx(baseCe *zend.ZendClassEntry, checkNull bool) (dest *zend.ZendClassEntry) {
+func (p *FastParser) ParseClassEx(baseCe *types.ClassEntry, checkNull bool) (dest *types.ClassEntry) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
@@ -362,11 +362,11 @@ func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_OBJECT_OF_CLASS，Old: 'O'
-func (p *FastParser) ParseObjectOfClass(ce *zend.ZendClassEntry) (dest *types.Zval) {
+func (p *FastParser) ParseObjectOfClass(ce *types.ClassEntry) (dest *types.Zval) {
 	dest, _ = p.ParseObjectOfClassEx(ce, false)
 	return
 }
-func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return

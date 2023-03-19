@@ -7,7 +7,7 @@ import (
 	"sik/zend/types"
 )
 
-func ObjectPropertiesInit(object *types.ZendObject, class_type *ZendClassEntry) {
+func ObjectPropertiesInit(object *types.ZendObject, class_type *types.ClassEntry) {
 	object.SetProperties(nil)
 	_objectPropertiesInit(object, class_type)
 }
@@ -61,7 +61,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable)
 				var prop_name_len int
 				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == types.SUCCESS {
 					var pname *types.ZendString = types.ZendStringInit(prop_name, prop_name_len, 0)
-					var prev_scope *ZendClassEntry = EG__().GetFakeScope()
+					var prev_scope *types.ClassEntry = EG__().GetFakeScope()
 					if class_name != nil && class_name[0] != '*' {
 						var cname *types.ZendString = types.ZendStringInit(class_name, strlen(class_name), 0)
 						EG__().SetFakeScope(ZendLookupClass(cname))
@@ -101,7 +101,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable)
 		}
 	}
 }
-func _objectAndPropertiesInit(arg *types.Zval, class_type *ZendClassEntry, properties *types.HashTable) int {
+func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.HashTable) int {
 	if class_type.HasCeFlags(ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) {
 		if class_type.IsInterface() {
 			ZendThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
@@ -134,10 +134,10 @@ func _objectAndPropertiesInit(arg *types.Zval, class_type *ZendClassEntry, prope
 	}
 	return types.SUCCESS
 }
-func ObjectAndPropertiesInit(arg *types.Zval, class_type *ZendClassEntry, properties *types.HashTable) int {
+func ObjectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.HashTable) int {
 	return _objectAndPropertiesInit(arg, class_type, properties)
 }
-func ObjectInitEx(arg *types.Zval, class_type *ZendClassEntry) int {
+func ObjectInitEx(arg *types.Zval, class_type *types.ClassEntry) int {
 	return _objectAndPropertiesInit(arg, class_type, nil)
 }
 func ObjectInit(arg *types.Zval) int {

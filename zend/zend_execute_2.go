@@ -88,8 +88,8 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
 		ZendTypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	}
 }
-func ZendResolveClassType(type_ *types.ZendType, self_ce *ZendClassEntry) types.ZendBool {
-	var ce *ZendClassEntry
+func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
+	var ce *types.ClassEntry
 	var name *types.ZendString = type_.Name()
 	if types.ZendStringEqualsLiteralCi(name, "self") {
 
@@ -164,10 +164,10 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types.Zval, val
 func ZendCheckType(
 	type_ types.ZendType,
 	arg *types.Zval,
-	ce **ZendClassEntry,
+	ce **types.ClassEntry,
 	cache_slot *any,
 	default_value *types.Zval,
-	scope *ZendClassEntry,
+	scope *types.ClassEntry,
 	is_return_type types.ZendBool,
 ) types.ZendBool {
 	var ref *types.ZendReference = nil
@@ -180,7 +180,7 @@ func ZendCheckType(
 	}
 	if type_.IsClass() {
 		if *cache_slot {
-			*ce = (*ZendClassEntry)(*cache_slot)
+			*ce = (*types.ClassEntry)(*cache_slot)
 		} else {
 			*ce = ZendFetchClass(type_.Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
@@ -218,7 +218,7 @@ func ZendCheckType(
 }
 func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	if arg_num <= zf.GetNumArgs() {
 		cur_arg_info = zf.GetArgInfo()[arg_num-1]
 	} else if zf.IsVariadic() {
@@ -235,7 +235,7 @@ func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, defaul
 }
 func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo = zf.GetArgInfo()[arg_num-1]
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	b.Assert(arg_num <= zf.GetNumArgs())
 	cur_arg_info = zf.GetArgInfo()[arg_num-1]
 	ce = nil
@@ -247,7 +247,7 @@ func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, de
 }
 func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	b.Assert(arg_num > zf.GetNumArgs())
 	b.Assert(zf.IsVariadic())
 	cur_arg_info = zf.GetArgInfo()[zf.GetNumArgs()]
@@ -281,7 +281,7 @@ func ZendMissingArgError(executeData *ZendExecuteData) {
 		ZendThrowError(ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
 	}
 }
-func ZendVerifyReturnError(zf *ZendFunction, ce *ZendClassEntry, value *types.Zval) {
+func ZendVerifyReturnError(zf *ZendFunction, ce *types.ClassEntry, value *types.Zval) {
 	var arg_info *ZendArgInfo = zf.GetArgInfo()[-1]
 	var fname *byte
 	var fsep *byte
@@ -296,7 +296,7 @@ func ZendVerifyReturnError(zf *ZendFunction, ce *ZendClassEntry, value *types.Zv
 }
 func ZendVerifyReturnType(zf *ZendFunction, ret *types.Zval, cache_slot *any) {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
-	var ce *ZendClassEntry = nil
+	var ce *types.ClassEntry = nil
 	if ZendCheckType(ret_info.GetType(), ret, &ce, cache_slot, nil, nil, 1) == 0 {
 		ZendVerifyReturnError(zf, ce, ret)
 	}
@@ -304,10 +304,10 @@ func ZendVerifyReturnType(zf *ZendFunction, ret *types.Zval, cache_slot *any) {
 func ZendVerifyMissingReturnType(zf *ZendFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
 	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types.IS_VOID {
-		var ce *ZendClassEntry = nil
+		var ce *types.ClassEntry = nil
 		if ret_info.GetType().IsClass() {
 			if *cache_slot {
-				ce = (*ZendClassEntry)(*cache_slot)
+				ce = (*types.ClassEntry)(*cache_slot)
 			} else {
 				ce = ZendFetchClass(ret_info.GetType().Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {

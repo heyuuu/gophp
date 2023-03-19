@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/assert.c>
@@ -28,7 +29,7 @@ import (
 */
 
 var AssertGlobals ZendAssertGlobals
-var AssertionErrorCe *zend.ZendClassEntry
+var AssertionErrorCe *types.ClassEntry
 
 const (
 	ASSERT_ACTIVE = 1

@@ -77,7 +77,7 @@ type YY_BUFFER_STATE *__struct__yy_buffer_state
 
 const INADDR_NONE = zend_ulong - 1
 
-var IncompleteClassEntry *zend.ZendClassEntry = nil
+var IncompleteClassEntry *types.ClassEntry = nil
 
 /* some prototypes for local functions */
 

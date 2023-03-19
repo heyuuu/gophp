@@ -254,7 +254,7 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 }
 func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	var op_array *ZendOpArray = CG__().GetActiveOpArray()
-	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	switch ast.GetAttr() {
 	case T_LINE:
 		zv.SetLong(ast.GetLineno())

@@ -389,7 +389,7 @@ func ZendRegisterStandardIniEntries() {
 	REGISTER_INI_ENTRIES(0)
 }
 func ZendResolvePropertyTypes() {
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var prop_info *ZendPropertyInfo
 	var __ht *types.HashTable = CG__().GetClassTable()
 	for _, _p := range __ht.foreachData() {
@@ -408,7 +408,7 @@ func ZendResolvePropertyTypes() {
 				if prop_info.GetType().IsName() {
 					var type_name *types.ZendString = prop_info.GetType().Name()
 					var lc_type_name *types.ZendString = ZendStringTolower(type_name)
-					var prop_ce *ZendClassEntry = ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
+					var prop_ce *types.ClassEntry = ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
 					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 					types.ZendStringRelease(lc_type_name)
@@ -563,11 +563,11 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 	var retval types.Zval
 	var orig_user_error_handler types.Zval
 	var in_compilation types.ZendBool
-	var saved_class_entry *ZendClassEntry
+	var saved_class_entry *types.ClassEntry
 	var loop_var_stack ZendStack
 	var delayed_oplines_stack ZendStack
 	var symbol_table *types.ZendArray
-	var orig_fake_scope *ZendClassEntry
+	var orig_fake_scope *types.ClassEntry
 
 	/* Report about uncaught exception in case of fatal errors */
 
@@ -824,7 +824,7 @@ func ZendErrorNoreturn(type_ int, format string, _ ...any) {
 
 	/* Should never reach this. */
 }
-func ZendThrowError(exception_ce *ZendClassEntry, format string, args ...any) {
+func ZendThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
 	if exception_ce != nil {
 		if InstanceofFunction(exception_ce, ZendCeError) == 0 {
 			ZendError(E_NOTICE, "Error exceptions must be derived from Error")

@@ -35,7 +35,7 @@ func CleanNonPersistentFunctionFull(zv *types.Zval) int {
 	}
 }
 func CleanNonPersistentClassFull(zv *types.Zval) int {
-	var ce *ZendClassEntry = zv.GetPtr()
+	var ce *types.ClassEntry = zv.GetPtr()
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		return ZEND_HASH_APPLY_KEEP
 	} else {
@@ -104,7 +104,7 @@ func ZendUncleanZvalPtrDtor(zv *types.Zval) {
 	}
 	IZvalPtrDtor(zv)
 }
-func ZendThrowOrError(fetch_type int, exception_ce *ZendClassEntry, format string, args ...any) {
+func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
 	message := ZendSprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
 		ZendThrowError(exception_ce, "%s", message)
@@ -194,7 +194,7 @@ func ShutdownExecutor() {
 			var _z types.Zval = _p.GetVal()
 
 			zv = _z
-			var ce *ZendClassEntry = zv.GetPtr()
+			var ce *types.ClassEntry = zv.GetPtr()
 			if ce.GetDefaultStaticMembersCount() != 0 {
 				ZendCleanupInternalClassData(ce)
 			}
@@ -410,7 +410,7 @@ func ZendGetExecutedLineno() uint32 {
 		return 0
 	}
 }
-func ZendGetExecutedScope() *ZendClassEntry {
+func ZendGetExecutedScope() *types.ClassEntry {
 	var ex *ZendExecuteData = CurrEX()
 	for true {
 		if ex == nil {
@@ -453,7 +453,7 @@ func ZendUseUndefinedConstant(name *types.ZendString, attr ZendAstAttr, result *
 	}
 	return types.SUCCESS
 }
-func ZvalUpdateConstantEx(p *types.Zval, scope *ZendClassEntry) int {
+func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 	if p.IsConstant() {
 		var ast *ZendAst = types.Z_ASTVAL_P(p)
 		if ast.GetKind() == ZEND_AST_CONSTANT {
@@ -733,15 +733,15 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	}
 	return types.SUCCESS
 }
-func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint32) *ZendClassEntry {
-	var ce *ZendClassEntry = nil
+func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint32) *types.ClassEntry {
+	var ce *types.ClassEntry = nil
 	var args []types.Zval
 	var zv *types.Zval
 	var local_retval types.Zval
 	var lc_name *types.ZendString
 	var fcall_info ZendFcallInfo
 	var fcall_cache ZendFcallInfoCache
-	var orig_fake_scope *ZendClassEntry
+	var orig_fake_scope *types.ClassEntry
 	if key != nil {
 		lc_name = key
 	} else {
@@ -760,7 +760,7 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 		if key == nil {
 			types.ZendStringReleaseEx(lc_name, 0)
 		}
-		ce = (*ZendClassEntry)(zv.GetPtr())
+		ce = (*types.ClassEntry)(zv.GetPtr())
 		if !ce.IsLinked() {
 			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.IsNearlyLinked() {
 				ce.SetIsHasUnlinkedUses(true)
@@ -842,8 +842,8 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 	}
 	return ce
 }
-func ZendLookupClass(name *types.ZendString) *ZendClassEntry { return ZendLookupClassEx(name, nil, 0) }
-func ZendGetCalledScope(ex *ZendExecuteData) *ZendClassEntry {
+func ZendLookupClass(name *types.ZendString) *types.ClassEntry { return ZendLookupClassEx(name, nil, 0) }
+func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 	for ex != nil {
 		if ex.GetThis().IsObject() {
 			return types.Z_OBJCE(ex.GetThis())
@@ -1034,9 +1034,9 @@ func ZendUnsetTimeout() {
 	}
 	EG__().SetTimedOut(0)
 }
-func ZendFetchClass(class_name *types.ZendString, fetch_type int) *ZendClassEntry {
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+func ZendFetchClass(class_name *types.ZendString, fetch_type int) *types.ClassEntry {
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var fetch_sub_type int = fetch_type & ZEND_FETCH_CLASS_MASK
 check_fetch_type:
 	switch fetch_sub_type {
@@ -1085,8 +1085,8 @@ check_fetch_type:
 	}
 	return ce
 }
-func ZendFetchClassByName(class_name *types.ZendString, key *types.ZendString, fetch_type int) *ZendClassEntry {
-	var ce *ZendClassEntry
+func ZendFetchClassByName(class_name *types.ZendString, key *types.ZendString, fetch_type int) *types.ClassEntry {
+	var ce *types.ClassEntry
 	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
 		return ZendLookupClassEx(class_name, key, fetch_type)
 	} else if b.Assign(&ce, ZendLookupClassEx(class_name, key, fetch_type)) == nil {

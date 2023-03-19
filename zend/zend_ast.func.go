@@ -422,7 +422,7 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 	ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
 	return types.FAILURE
 }
-func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *ZendClassEntry) int {
+func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) int {
 	var op1 types.Zval
 	var op2 types.Zval
 	var ret int = types.SUCCESS

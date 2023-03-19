@@ -2594,7 +2594,7 @@ func IsSmallerOrEqualFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zv
 	types.ZVAL_BOOL(result, result.GetLval() <= 0)
 	return types.SUCCESS
 }
-func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.ZendBool {
+func InstanceofClass(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {
 	for {
 		if instance_ce == ce {
 			return 1
@@ -2606,7 +2606,7 @@ func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.Zend
 	}
 	return 0
 }
-func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.ZendBool {
+func InstanceofInterface(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {
 	var i uint32
 	if instance_ce.GetNumInterfaces() != 0 {
 		b.Assert(instance_ce.IsResolvedInterfaces())
@@ -2618,7 +2618,7 @@ func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.
 	}
 	return instance_ce == ce
 }
-func InstanceofFunctionEx(instance_ce *ZendClassEntry, ce *ZendClassEntry, is_interface types.ZendBool) types.ZendBool {
+func InstanceofFunctionEx(instance_ce *types.ClassEntry, ce *types.ClassEntry, is_interface types.ZendBool) types.ZendBool {
 	if is_interface != 0 {
 		b.Assert(ce.IsInterface())
 		return InstanceofInterface(instance_ce, ce)
@@ -2627,7 +2627,7 @@ func InstanceofFunctionEx(instance_ce *ZendClassEntry, ce *ZendClassEntry, is_in
 		return InstanceofClass(instance_ce, ce)
 	}
 }
-func InstanceofFunction(instance_ce *ZendClassEntry, ce *ZendClassEntry) types.ZendBool {
+func InstanceofFunction(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {
 	if ce.IsInterface() {
 		return InstanceofInterface(instance_ce, ce)
 	} else {

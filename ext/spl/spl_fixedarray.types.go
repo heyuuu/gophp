@@ -38,7 +38,7 @@ type SplFixedarrayObject struct {
 	fptr_count      *zend.ZendFunction
 	current         int
 	flags           int
-	ce_get_iterator *zend.ZendClassEntry
+	ce_get_iterator *types.ClassEntry
 	std             types.ZendObject
 }
 
@@ -51,7 +51,7 @@ type SplFixedarrayObject struct {
 // fptr_count *zend.ZendFunction,
 // current int,
 // flags int,
-// ce_get_iterator *zend.ZendClassEntry,
+// ce_get_iterator *zend.ClassEntry,
 // std zend.ZendObject,
 // ) SplFixedarrayObject {
 //                 return SplFixedarrayObject{
@@ -91,9 +91,9 @@ func (this *SplFixedarrayObject) GetCurrent() int                       { return
 func (this *SplFixedarrayObject) SetCurrent(value int)                  { this.current = value }
 
 // func (this *SplFixedarrayObject)  GetFlags() int      { return this.flags }
-func (this *SplFixedarrayObject) SetFlags(value int)                     { this.flags = value }
-func (this *SplFixedarrayObject) GetCeGetIterator() *zend.ZendClassEntry { return this.ce_get_iterator }
-func (this *SplFixedarrayObject) SetCeGetIterator(value *zend.ZendClassEntry) {
+func (this *SplFixedarrayObject) SetFlags(value int)                  { this.flags = value }
+func (this *SplFixedarrayObject) GetCeGetIterator() *types.ClassEntry { return this.ce_get_iterator }
+func (this *SplFixedarrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
 func (this *SplFixedarrayObject) GetStd() types.ZendObject { return this.std }

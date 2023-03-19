@@ -116,12 +116,12 @@ func (this *ZendFcallInfo) SetParamCount(value uint32)           { this.param_co
  */
 type ZendFcallInfoCache struct {
 	function_handler *ZendFunction
-	calling_scope    *ZendClassEntry
-	called_scope     *ZendClassEntry
+	calling_scope    *types.ClassEntry
+	called_scope     *types.ClassEntry
 	object           *types.ZendObject
 }
 
-func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *ZendClassEntry, called_scope *ZendClassEntry, object *types.ZendObject) ZendFcallInfoCache {
+func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *types.ClassEntry, called_scope *types.ClassEntry, object *types.ZendObject) ZendFcallInfoCache {
 	return ZendFcallInfoCache{
 		function_handler: function_handler,
 		calling_scope:    calling_scope,
@@ -133,9 +133,9 @@ func (this *ZendFcallInfoCache) GetFunctionHandler() *ZendFunction { return this
 func (this *ZendFcallInfoCache) SetFunctionHandler(value *ZendFunction) {
 	this.function_handler = value
 }
-func (this *ZendFcallInfoCache) GetCallingScope() *ZendClassEntry      { return this.calling_scope }
-func (this *ZendFcallInfoCache) SetCallingScope(value *ZendClassEntry) { this.calling_scope = value }
-func (this *ZendFcallInfoCache) GetCalledScope() *ZendClassEntry       { return this.called_scope }
-func (this *ZendFcallInfoCache) SetCalledScope(value *ZendClassEntry)  { this.called_scope = value }
-func (this *ZendFcallInfoCache) GetObject() *types.ZendObject          { return this.object }
+func (this *ZendFcallInfoCache) GetCallingScope() *types.ClassEntry      { return this.calling_scope }
+func (this *ZendFcallInfoCache) SetCallingScope(value *types.ClassEntry) { this.calling_scope = value }
+func (this *ZendFcallInfoCache) GetCalledScope() *types.ClassEntry       { return this.called_scope }
+func (this *ZendFcallInfoCache) SetCalledScope(value *types.ClassEntry)  { this.called_scope = value }
+func (this *ZendFcallInfoCache) GetObject() *types.ZendObject            { return this.object }
 func (this *ZendFcallInfoCache) SetObject(value *types.ZendObject)     { this.object = value }

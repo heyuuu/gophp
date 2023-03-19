@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_iterators.h>
 
 /*
@@ -48,5 +50,5 @@ package zend
    +----------------------------------------------------------------------+
 */
 
-var ZendIteratorClassEntry ZendClassEntry
+var ZendIteratorClassEntry types.ClassEntry
 var IteratorObjectHandlers ZendObjectHandlers = MakeZendObjectHandlers(0, IterWrapperFree, IterWrapperDtor, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, IterWrapperGetGc, nil, nil)

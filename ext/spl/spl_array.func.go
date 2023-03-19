@@ -76,9 +76,9 @@ func SplArrayObjectFreeStorage(object *types.ZendObject) {
 	zend.ZendObjectStdDtor(intern.GetStd())
 	zend.ZvalPtrDtor(intern.GetArray())
 }
-func SplArrayObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
 	var intern *SplArrayObject
-	var parent *zend.ZendClassEntry = class_type
+	var parent *types.ClassEntry = class_type
 	var inherited int = 0
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_array_object"), parent)
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
@@ -176,7 +176,7 @@ func SplArrayObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clon
 	intern.SetHtIter(uint32 - 1)
 	return intern.GetStd()
 }
-func SplArrayObjectNew(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplArrayObjectNew(class_type *types.ClassEntry) *types.ZendObject {
 	return SplArrayObjectNewEx(class_type, nil, 0)
 }
 func SplArrayObjectClone(zobject *types.Zval) *types.ZendObject {
@@ -645,7 +645,7 @@ func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) 
 func SplArrayGetDebugInfo(obj *types.Zval) *types.HashTable {
 	var storage *types.Zval
 	var zname *types.ZendString
-	var base *zend.ZendClassEntry
+	var base *types.ClassEntry
 	var intern *SplArrayObject = Z_SPLARRAY_P(obj)
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
@@ -886,7 +886,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 	intern.AddArFlags(ar_flags)
 	intern.SetHtIter(uint32 - 1)
 }
-func SplArrayGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplArrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *zend.ZendUserIterator
 	var array_object *SplArrayObject = Z_SPLARRAY_P(object)
 	if by_ref != 0 && array_object.IsOverloadedCurrent() {
@@ -907,7 +907,7 @@ func zim_spl_Array___construct(executeData *zend.ZendExecuteData, return_value *
 	var intern *SplArrayObject
 	var array *types.Zval
 	var ar_flags zend.ZendLong = 0
-	var ce_get_iterator *zend.ZendClassEntry = spl_ce_ArrayIterator
+	var ce_get_iterator *types.ClassEntry = spl_ce_ArrayIterator
 	if executeData.NumArgs() == 0 {
 		return
 	}
@@ -1456,7 +1456,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
 	if iterator_class_zv != nil && iterator_class_zv.IsType(types.IS_STRING) {
-		var ce *zend.ZendClassEntry = zend.ZendLookupClass(iterator_class_zv.GetStr())
+		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.GetStr())
 		if ce == nil {
 			zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", types.Z_STR_P(iterator_class_zv).GetVal())
 			return

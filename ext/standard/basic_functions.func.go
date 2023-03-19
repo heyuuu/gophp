@@ -303,7 +303,7 @@ func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
 func ZifConstant(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var const_name *types.ZendString
 	var c *types.Zval
-	var scope *zend.ZendClassEntry
+	var scope *types.ClassEntry
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1280,7 +1280,7 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 	var retval types.Zval
 	var fci zend.ZendFcallInfo
 	var fci_cache zend.ZendFcallInfoCache
-	var called_scope *zend.ZendClassEntry
+	var called_scope *types.ClassEntry
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1328,7 +1328,7 @@ func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *
 	var retval types.Zval
 	var fci zend.ZendFcallInfo
 	var fci_cache zend.ZendFcallInfoCache
-	var called_scope *zend.ZendClassEntry
+	var called_scope *types.ClassEntry
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2

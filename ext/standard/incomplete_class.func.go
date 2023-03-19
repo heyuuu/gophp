@@ -49,15 +49,15 @@ func IncompleteClassGetMethod(object **types.ZendObject, method *types.ZendStrin
 	IncompleteClassMessage(&zobject, zend.E_ERROR)
 	return nil
 }
-func PhpCreateIncompleteObject(class_type *zend.ZendClassEntry) *types.ZendObject {
+func PhpCreateIncompleteObject(class_type *types.ClassEntry) *types.ZendObject {
 	var object *types.ZendObject
 	object = zend.ZendObjectsNew(class_type)
 	object.SetHandlers(&PhpIncompleteObjectHandlers)
 	zend.ObjectPropertiesInit(object, class_type)
 	return object
 }
-func PhpCreateIncompleteClass() *zend.ZendClassEntry {
-	var incomplete_class zend.ZendClassEntry
+func PhpCreateIncompleteClass() *types.ClassEntry {
+	var incomplete_class types.ClassEntry
 	memset(&incomplete_class, 0, b.SizeOf("zend_class_entry"))
 	incomplete_class.SetName(types.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1))
 	incomplete_class.SetBuiltinFunctions(nil)

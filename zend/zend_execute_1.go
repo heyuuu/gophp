@@ -306,7 +306,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 func ZendVerifyTypeErrorCommon(
 	zf *ZendFunction,
 	arg_info *ZendArgInfo,
-	ce *ZendClassEntry,
+	ce *types.ClassEntry,
 	value *types.Zval,
 	fname **byte,
 	fsep **byte,
@@ -380,7 +380,7 @@ func ZendVerifyTypeErrorCommon(
 		*given_kind = ""
 	}
 }
-func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *ZendClassEntry, value *types.Zval) {
+func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *types.ClassEntry, value *types.Zval) {
 	var ptr *ZendExecuteData = CurrEX().GetPrevExecuteData()
 	var fname *byte
 	var fsep *byte
@@ -416,7 +416,7 @@ func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce
 		ZendMissingArgError(ptr)
 	}
 }
-func IsNullConstant(scope *ZendClassEntry, default_value *types.Zval) int {
+func IsNullConstant(scope *types.ClassEntry, default_value *types.Zval) int {
 	if default_value.IsConstant() {
 		var constant types.Zval
 		types.ZVAL_COPY(&constant, default_value)

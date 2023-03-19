@@ -7,7 +7,7 @@ import (
 	"sik/zend/types"
 )
 
-func _zendObjectStdInit(object *types.ZendObject, ce *ZendClassEntry) {
+func _zendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
 	object.SetRefcount(1)
 	object.GetGcTypeInfo() = types.IS_OBJECT | types.GC_COLLECTABLE<<types.GC_FLAGS_SHIFT
 	object.SetCe(ce)
@@ -17,7 +17,7 @@ func _zendObjectStdInit(object *types.ZendObject, ce *ZendClassEntry) {
 		(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount()).SetUndef()
 	}
 }
-func ZendObjectStdInit(object *types.ZendObject, ce *ZendClassEntry) { _zendObjectStdInit(object, ce) }
+func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) { _zendObjectStdInit(object, ce) }
 func ZendObjectStdDtor(object *types.ZendObject) {
 	var p *types.Zval
 	var end *types.Zval
@@ -66,7 +66,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 	var destructor *ZendFunction = object.GetCe().GetDestructor()
 	if destructor != nil {
 		var old_exception *types.ZendObject
-		var orig_fake_scope *ZendClassEntry
+		var orig_fake_scope *types.ClassEntry
 		var fci ZendFcallInfo
 		var fcic ZendFcallInfoCache
 		var ret types.Zval
@@ -77,7 +77,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				 */
 
 				if CurrEX() != nil {
-					var scope *ZendClassEntry = ZendGetExecutedScope()
+					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
 						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
@@ -96,7 +96,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				 */
 
 				if CurrEX() != nil {
-					var scope *ZendClassEntry = ZendGetExecutedScope()
+					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
 						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
@@ -153,7 +153,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		EG__().SetFakeScope(orig_fake_scope)
 	}
 }
-func ZendObjectsNew(ce *ZendClassEntry) *types.ZendObject {
+func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject {
 	var object *types.ZendObject = Emalloc(b.SizeOf("zend_object") + ZendObjectPropertiesSize(ce))
 	_zendObjectStdInit(object, ce)
 	object.SetHandlers(&StdObjectHandlers)

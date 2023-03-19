@@ -1132,7 +1132,7 @@ send_again:
 			arg_num++
 		}
 	} else if args.IsObject() {
-		var ce *ZendClassEntry = types.Z_OBJCE_P(args)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(args)
 		var iter *ZendObjectIterator
 		if ce == nil || ce.GetGetIterator() == nil {
 			ZendError(E_WARNING, "Only arrays and Traversables can be unpacked")
@@ -1395,7 +1395,7 @@ add_unpack_again:
 			}
 		}
 	} else if op1.IsObject() {
-		var ce *ZendClassEntry = types.Z_OBJCE_P(op1)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(op1)
 		var iter *ZendObjectIterator
 		if ce == nil || ce.GetGetIterator() == nil {
 			ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
@@ -1456,7 +1456,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var varname *types.Zval
 	var name *types.ZendString
 	var tmp_name *types.ZendString = nil
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var free_op1 ZendFreeOp
 	if opline.GetOp2Type() == IS_CONST {
 		ce = CACHED_PTR(opline.GetExtendedValue())
@@ -1589,7 +1589,7 @@ func ZEND_EXT_FCALL_END_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var zv *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var opline *ZendOp = executeData.GetOpline()
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
@@ -2698,8 +2698,8 @@ func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var ce *ZendClassEntry
-	var catch_ce *ZendClassEntry
+	var ce *types.ClassEntry
+	var catch_ce *types.ClassEntry
 	var exception *types.ZendObject
 	var ex *types.Zval
 
@@ -2825,8 +2825,8 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var obj *types.Zval
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = RT_CONSTANT(opline, opline.GetOp1())
@@ -3290,7 +3290,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		generator.GetValues().GetFePos() = 0
 	} else if IS_CONST != IS_CONST && val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
-		var ce *ZendClassEntry = types.Z_OBJCE_P(val)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_CONST != IS_TMP_VAR {
@@ -4360,7 +4360,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -4486,7 +4486,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -4576,7 +4576,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -4671,8 +4671,8 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var c *ZendClassConstant
 	var value *types.Zval
 	var zv *types.Zval
@@ -4973,7 +4973,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 	var opline *ZendOp = executeData.GetOpline()
 	var lcname *types.Zval
 	var zv *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
 		lcname = RT_CONSTANT(opline, opline.GetOp1())
@@ -6387,7 +6387,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var free_op2 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -6516,7 +6516,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -6611,7 +6611,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -7381,7 +7381,7 @@ func ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteD
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -7471,7 +7471,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -7510,7 +7510,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var result *types.Zval
 	var constructor *ZendFunction
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call *ZendExecuteData
 	if IS_CONST == IS_CONST {
 		ce = CACHED_PTR(opline.GetOp2().GetNum())
@@ -7750,7 +7750,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	var func_ *ZendFunction
 	var zfunc *types.Zval
 	var object *types.Zval
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	func_ = CACHED_PTR(opline.GetExtendedValue())
 	if func_ == nil {
 		zfunc = EG__().GetFunctionTable().KeyFind(RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetStr())
@@ -8567,7 +8567,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -8693,7 +8693,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -8783,7 +8783,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -11388,8 +11388,8 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var obj *types.Zval
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
@@ -12390,7 +12390,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -12713,7 +12713,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 try_instanceof:
 	if expr.IsObject() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if IS_CONST == IS_CONST {
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
@@ -13687,7 +13687,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var free_op2 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -14022,7 +14022,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 try_instanceof:
 	if expr.IsObject() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if IS_VAR == IS_CONST {
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
@@ -14237,7 +14237,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 try_instanceof:
 	if expr.IsObject() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if IS_UNUSED == IS_CONST {
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
@@ -14809,7 +14809,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -15757,7 +15757,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 		generator.GetValues().GetFePos() = 0
 	} else if IS_TMP_VAR != IS_CONST && val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
-		var ce *ZendClassEntry = types.Z_OBJCE_P(val)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_TMP_VAR != IS_TMP_VAR {
@@ -18918,7 +18918,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		generator.GetValues().GetFePos() = 0
 		ZvalPtrDtorNogc(free_op1)
 	} else if IS_VAR != IS_CONST && val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
-		var ce *ZendClassEntry = types.Z_OBJCE_P(val)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_VAR != IS_TMP_VAR {
@@ -20509,7 +20509,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExec
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -20599,7 +20599,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -20628,8 +20628,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var c *ZendClassConstant
 	var value *types.Zval
 	var zv *types.Zval
@@ -22580,7 +22580,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExe
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -22675,7 +22675,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -23991,7 +23991,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -24081,7 +24081,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -24120,7 +24120,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var result *types.Zval
 	var constructor *ZendFunction
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call *ZendExecuteData
 	if IS_VAR == IS_CONST {
 		ce = CACHED_PTR(opline.GetOp2().GetNum())
@@ -25988,7 +25988,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecute
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -26078,7 +26078,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -26605,8 +26605,8 @@ func ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_QUICK_HANDLER(executeData *ZendExecuteData)
 func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var obj *types.Zval
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = &(executeData.GetThis())
@@ -26656,8 +26656,8 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var fetch_type uint32
-	var called_scope *ZendClassEntry
-	var scope *ZendClassEntry
+	var called_scope *types.ClassEntry
+	var scope *types.ClassEntry
 	var opline *ZendOp = executeData.GetOpline()
 	fetch_type = opline.GetOp1().GetNum()
 	scope = executeData.GetFunc().op_array.scope
@@ -27665,7 +27665,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 		EX_VAR(opline.GetResult().GetVar()).SetCe(ZendFetchClass(nil, opline.GetOp1().GetNum()))
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else if IS_CONST == IS_CONST {
-		var ce *ZendClassEntry = CACHED_PTR(opline.GetExtendedValue())
+		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
 			class_name = RT_CONSTANT(opline, opline.GetOp2())
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), opline.GetOp1().GetNum())
@@ -27700,7 +27700,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -27826,7 +27826,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -27916,7 +27916,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -27956,8 +27956,8 @@ func ZEND_FETCH_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var c *ZendClassConstant
 	var value *types.Zval
 	var zv *types.Zval
@@ -29258,7 +29258,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		EX_VAR(opline.GetResult().GetVar()).SetCe(ZendFetchClass(nil, opline.GetOp1().GetNum()))
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else if (IS_TMP_VAR | IS_VAR) == IS_CONST {
-		var ce *ZendClassEntry = CACHED_PTR(opline.GetExtendedValue())
+		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
 			class_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), opline.GetOp1().GetNum())
@@ -29295,7 +29295,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var free_op2 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -29424,7 +29424,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -29519,7 +29519,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -29949,7 +29949,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) i
 		EX_VAR(opline.GetResult().GetVar()).SetCe(ZendFetchClass(nil, opline.GetOp1().GetNum()))
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else if IS_UNUSED == IS_CONST {
-		var ce *ZendClassEntry = CACHED_PTR(opline.GetExtendedValue())
+		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
 			class_name = nil
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), opline.GetOp1().GetNum())
@@ -29981,7 +29981,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) i
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -30071,7 +30071,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -30110,7 +30110,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var result *types.Zval
 	var constructor *ZendFunction
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call *ZendExecuteData
 	if IS_UNUSED == IS_CONST {
 		ce = CACHED_PTR(opline.GetOp2().GetNum())
@@ -31475,7 +31475,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 		EX_VAR(opline.GetResult().GetVar()).SetCe(ZendFetchClass(nil, opline.GetOp1().GetNum()))
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else if IS_CV == IS_CONST {
-		var ce *ZendClassEntry = CACHED_PTR(opline.GetExtendedValue())
+		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
 			class_name = EX_VAR(opline.GetOp2().GetVar())
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), opline.GetOp1().GetNum())
@@ -31510,7 +31510,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -31636,7 +31636,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var call_info uint32
 	var fbc *ZendFunction
 	var call *ZendExecuteData
@@ -31726,7 +31726,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 	}
 	if !fbc.IsStatic() {
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
-			ce = (*ZendClassEntry)(executeData.GetThis().GetObj())
+			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
 			ZendNonStaticMethodCall(fbc)
@@ -32695,8 +32695,8 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var obj *types.Zval
-	var ce *ZendClassEntry
-	var scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var scope *types.ClassEntry
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = EX_VAR(opline.GetOp1().GetVar())
@@ -33155,7 +33155,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		generator.GetValues().GetFePos() = 0
 	} else if IS_CV != IS_CONST && val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
-		var ce *ZendClassEntry = types.Z_OBJCE_P(val)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_CV != IS_TMP_VAR {
@@ -35617,7 +35617,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -36090,7 +36090,7 @@ func ZEND_INSTANCEOF_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	expr = EX_VAR(opline.GetOp1().GetVar())
 try_instanceof:
 	if expr.IsObject() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if IS_CONST == IS_CONST {
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
@@ -38683,7 +38683,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var free_op2 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
@@ -39476,7 +39476,7 @@ func ZEND_INSTANCEOF_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 	expr = EX_VAR(opline.GetOp1().GetVar())
 try_instanceof:
 	if expr.IsObject() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if IS_VAR == IS_CONST {
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
@@ -40536,7 +40536,7 @@ func ZEND_INSTANCEOF_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	expr = EX_VAR(opline.GetOp1().GetVar())
 try_instanceof:
 	if expr.IsObject() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if IS_UNUSED == IS_CONST {
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
@@ -43116,7 +43116,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	var free_op1 ZendFreeOp
 	var object *types.Zval
 	var fbc *ZendFunction
-	var called_scope *ZendClassEntry
+	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32

@@ -109,7 +109,7 @@ func SplFilesystemObjectFreeStorage(object *types.ZendObject) {
 		SplFilesystemFileFreeLine(intern)
 	}
 }
-func SplFilesystemObjectNewEx(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplFilesystemObjectNewEx(class_type *types.ClassEntry) *types.ZendObject {
 	var intern *SplFilesystemObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_filesystem_object"), class_type)
 
@@ -122,10 +122,10 @@ func SplFilesystemObjectNewEx(class_type *zend.ZendClassEntry) *types.ZendObject
 	intern.GetStd().SetHandlers(&SplFilesystemObjectHandlers)
 	return intern.GetStd()
 }
-func SplFilesystemObjectNew(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplFilesystemObjectNew(class_type *types.ClassEntry) *types.ZendObject {
 	return SplFilesystemObjectNewEx(class_type)
 }
-func SplFilesystemObjectNewCheck(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplFilesystemObjectNewCheck(class_type *types.ClassEntry) *types.ZendObject {
 	var ret *SplFilesystemObject = SplFilesystemFromObj(SplFilesystemObjectNewEx(class_type))
 	ret.GetStd().SetHandlers(&SplFilesystemObjectCheckHandlers)
 	return ret.GetStd()
@@ -340,7 +340,7 @@ func SplFilesystemObjectCreateInfo(
 	file_path *byte,
 	file_path_len int,
 	use_copy int,
-	ce *zend.ZendClassEntry,
+	ce *types.ClassEntry,
 	return_value *types.Zval,
 ) *SplFilesystemObject {
 	var intern *SplFilesystemObject
@@ -373,7 +373,7 @@ func SplFilesystemObjectCreateInfo(
 	zend.ZendRestoreErrorHandling(&error_handling)
 	return intern
 }
-func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ int, ce *zend.ZendClassEntry, return_value *types.Zval) *SplFilesystemObject {
+func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ int, ce *types.ClassEntry, return_value *types.Zval) *SplFilesystemObject {
 	var intern *SplFilesystemObject
 	var use_include_path types.ZendBool = 0
 	var arg1 types.Zval
@@ -1123,7 +1123,7 @@ func zim_spl_SplFileInfo_openFile(executeData *zend.ZendExecuteData, return_valu
 }
 func zim_spl_SplFileInfo_setFileClass(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var ce *zend.ZendClassEntry = spl_ce_SplFileObject
+	var ce *types.ClassEntry = spl_ce_SplFileObject
 	var error_handling zend.ZendErrorHandling
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_UnexpectedValueException, &error_handling)
 	if zend.ZendParseParameters(executeData.NumArgs(), "|C", &ce) == types.SUCCESS {
@@ -1133,7 +1133,7 @@ func zim_spl_SplFileInfo_setFileClass(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_SplFileInfo_setInfoClass(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var ce *zend.ZendClassEntry = spl_ce_SplFileInfo
+	var ce *types.ClassEntry = spl_ce_SplFileInfo
 	var error_handling zend.ZendErrorHandling
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_UnexpectedValueException, &error_handling)
 	if zend.ZendParseParameters(executeData.NumArgs(), "|C", &ce) == types.SUCCESS {
@@ -1143,7 +1143,7 @@ func zim_spl_SplFileInfo_setInfoClass(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_SplFileInfo_getFileInfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var ce *zend.ZendClassEntry = intern.GetInfoClass()
+	var ce *types.ClassEntry = intern.GetInfoClass()
 	var error_handling zend.ZendErrorHandling
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_UnexpectedValueException, &error_handling)
 	if zend.ZendParseParameters(executeData.NumArgs(), "|C", &ce) == types.SUCCESS {
@@ -1153,7 +1153,7 @@ func zim_spl_SplFileInfo_getFileInfo(executeData *zend.ZendExecuteData, return_v
 }
 func zim_spl_SplFileInfo_getPathInfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var ce *zend.ZendClassEntry = intern.GetInfoClass()
+	var ce *types.ClassEntry = intern.GetInfoClass()
 	var error_handling zend.ZendErrorHandling
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_UnexpectedValueException, &error_handling)
 	if zend.ZendParseParameters(executeData.NumArgs(), "|C", &ce) == types.SUCCESS {
@@ -1314,7 +1314,7 @@ func zim_spl_GlobIterator_count(executeData *zend.ZendExecuteData, return_value 
 
 	}
 }
-func SplFilesystemDirGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplFilesystemDirGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplFilesystemIterator
 	var dir_object *SplFilesystemObject
 	if by_ref != 0 {
@@ -1440,7 +1440,7 @@ func SplFilesystemTreeItRewind(iter *zend.ZendObjectIterator) {
 		iterator.GetCurrent().SetUndef()
 	}
 }
-func SplFilesystemTreeGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplFilesystemTreeGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplFilesystemIterator
 	var dir_object *SplFilesystemObject
 	if by_ref != 0 {

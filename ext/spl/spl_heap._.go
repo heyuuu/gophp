@@ -27,10 +27,10 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var spl_ce_SplHeap *zend.ZendClassEntry
-var spl_ce_SplMinHeap *zend.ZendClassEntry
-var spl_ce_SplMaxHeap *zend.ZendClassEntry
-var spl_ce_SplPriorityQueue *zend.ZendClassEntry
+var spl_ce_SplHeap *types.ClassEntry
+var spl_ce_SplMinHeap *types.ClassEntry
+var spl_ce_SplMaxHeap *types.ClassEntry
+var spl_ce_SplPriorityQueue *types.ClassEntry
 
 // Source: <ext/spl/spl_heap.c>
 

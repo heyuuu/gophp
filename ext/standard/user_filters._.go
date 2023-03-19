@@ -3,9 +3,9 @@
 package standard
 
 import (
-	b "sik/builtin"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/user_filters.c>
@@ -60,7 +60,7 @@ var UserFilterClassFuncs []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntryEx("onCreate", 0, ZifUserFilterNop, arginfo_php_user_filter_onCreate),
 	zend.MakeZendFunctionEntryEx("onClose", 0, ZifUserFilterNop, arginfo_php_user_filter_onClose),
 }
-var UserFilterClassEntry zend.ZendClassEntry
+var UserFilterClassEntry types.ClassEntry
 var UserfilterOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(UserfilterFilter, UserfilterDtor, "user-filter")
 var UserFilterFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(UserFilterFactoryCreate)
 

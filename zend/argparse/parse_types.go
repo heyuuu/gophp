@@ -282,7 +282,7 @@ func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool)
 	}
 }
 
-func ParseObject(arg *types.Zval, ce *zend.ZendClassEntry, checkNull bool) (dest *types.Zval, ok bool) {
+func ParseObject(arg *types.Zval, ce *types.ClassEntry, checkNull bool) (dest *types.Zval, ok bool) {
 	if arg.IsObject() && (ce == nil || zend.InstanceofFunction(types.Z_OBJCE_P(arg), ce) != 0) {
 		return arg, true
 	} else if checkNull && arg.IsNull() {
@@ -322,7 +322,7 @@ func ParseZvalDeref(arg *types.Zval, checkNull bool) (dest *types.Zval) {
 	}
 }
 
-func ParseClass(arg *types.Zval, baseCe *zend.ZendClassEntry, num int, checkNull bool) (ce *zend.ZendClassEntry, ok bool) {
+func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bool) (ce *types.ClassEntry, ok bool) {
 	if checkNull && arg.IsNull() {
 		return nil, true
 	}

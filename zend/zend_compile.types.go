@@ -313,7 +313,7 @@ type ZendPropertyInfo struct {
 	flags       uint32
 	name        *types.ZendString
 	doc_comment *types.ZendString
-	ce          *ZendClassEntry
+	ce          *types.ClassEntry
 	type_       types.ZendType
 }
 
@@ -325,8 +325,8 @@ func (this *ZendPropertyInfo) GetName() *types.ZendString            { return th
 func (this *ZendPropertyInfo) SetName(value *types.ZendString)       { this.name = value }
 func (this *ZendPropertyInfo) GetDocComment() *types.ZendString      { return this.doc_comment }
 func (this *ZendPropertyInfo) SetDocComment(value *types.ZendString) { this.doc_comment = value }
-func (this *ZendPropertyInfo) GetCe() *ZendClassEntry                { return this.ce }
-func (this *ZendPropertyInfo) SetCe(value *ZendClassEntry)           { this.ce = value }
+func (this *ZendPropertyInfo) GetCe() *types.ClassEntry              { return this.ce }
+func (this *ZendPropertyInfo) SetCe(value *types.ClassEntry)         { this.ce = value }
 func (this *ZendPropertyInfo) GetType() types.ZendType               { return this.type_ }
 func (this *ZendPropertyInfo) SetType(value types.ZendType)          { this.type_ = value }
 
@@ -358,10 +358,10 @@ func (this *ZendPropertyInfo) SetIsChanged(cond bool)   { this.SwitchFlags(ZEND_
 type ZendClassConstant struct {
 	value       types.Zval
 	doc_comment *types.ZendString
-	ce          *ZendClassEntry
+	ce          *types.ClassEntry
 }
 
-// func MakeZendClassConstant(value Zval, doc_comment *ZendString, ce *ZendClassEntry) ZendClassConstant {
+// func MakeZendClassConstant(value Zval, doc_comment *ZendString, ce *ClassEntry) ZendClassConstant {
 //     return ZendClassConstant{
 //         value:value,
 //         doc_comment:doc_comment,
@@ -373,8 +373,8 @@ func (this *ZendClassConstant) GetValue() types.Zval { return this.value }
 // func (this *ZendClassConstant) SetValue(value Zval) { this.value = value }
 func (this *ZendClassConstant) GetDocComment() *types.ZendString      { return this.doc_comment }
 func (this *ZendClassConstant) SetDocComment(value *types.ZendString) { this.doc_comment = value }
-func (this *ZendClassConstant) GetCe() *ZendClassEntry                { return this.ce }
-func (this *ZendClassConstant) SetCe(value *ZendClassEntry)           { this.ce = value }
+func (this *ZendClassConstant) GetCe() *types.ClassEntry              { return this.ce }
+func (this *ZendClassConstant) SetCe(value *types.ClassEntry)         { this.ce = value }
 
 /**
  * ZendArgInfo
@@ -451,7 +451,7 @@ type ZendOpArray struct {
 	arg_flags                 []types.ZendUchar
 	fn_flags                  uint32
 	function_name             *types.ZendString
-	scope                     *ZendClassEntry
+	scope                     *types.ClassEntry
 	prototype                 *ZendFunction
 	num_args                  uint32
 	required_num_args         uint32
@@ -484,7 +484,7 @@ type ZendOpArray struct {
 // arg_flags []ZendUchar,
 // fn_flags uint32,
 // function_name *ZendString,
-// scope *ZendClassEntry,
+// scope *ClassEntry,
 // prototype *ZendFunction,
 // num_args uint32,
 // required_num_args uint32,
@@ -553,8 +553,8 @@ func (this *ZendOpArray) GetFnFlags() uint32                      { return this.
 func (this *ZendOpArray) SetFnFlags(value uint32)                 { this.fn_flags = value }
 func (this *ZendOpArray) GetFunctionName() *types.ZendString      { return this.function_name }
 func (this *ZendOpArray) SetFunctionName(value *types.ZendString) { this.function_name = value }
-func (this *ZendOpArray) GetScope() *ZendClassEntry               { return this.scope }
-func (this *ZendOpArray) SetScope(value *ZendClassEntry)          { this.scope = value }
+func (this *ZendOpArray) GetScope() *types.ClassEntry             { return this.scope }
+func (this *ZendOpArray) SetScope(value *types.ClassEntry)        { this.scope = value }
 
 // func (this *ZendOpArray)  GetPrototype() *ZendFunction      { return this.prototype }
 func (this *ZendOpArray) SetPrototype(value *ZendFunction) { this.prototype = value }

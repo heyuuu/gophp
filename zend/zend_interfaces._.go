@@ -2,6 +2,8 @@
 
 package zend
 
+import "sik/zend/types"
+
 // Source: <Zend/zend_interfaces.h>
 
 /*
@@ -22,12 +24,12 @@ package zend
    +----------------------------------------------------------------------+
 */
 
-var ZendCeTraversable *ZendClassEntry
-var ZendCeAggregate *ZendClassEntry
-var ZendCeIterator *ZendClassEntry
-var ZendCeArrayaccess *ZendClassEntry
-var ZendCeSerializable *ZendClassEntry
-var ZendCeCountable *ZendClassEntry
+var ZendCeTraversable *types.ClassEntry
+var ZendCeAggregate *types.ClassEntry
+var ZendCeIterator *types.ClassEntry
+var ZendCeArrayaccess *types.ClassEntry
+var ZendCeSerializable *types.ClassEntry
+var ZendCeCountable *types.ClassEntry
 
 // Source: <Zend/zend_interfaces.c>
 

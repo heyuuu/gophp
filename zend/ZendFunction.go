@@ -13,7 +13,7 @@ type functionHeader struct {
 	typ             uint8
 	fnFlags         uint32
 	functionName    string
-	scope           *ZendClassEntry
+	scope           *types.ClassEntry
 	prototype       *ZendFunction
 	requiredNumArgs uint32
 	argInfos        []ArgInfo
@@ -33,7 +33,7 @@ type ZendFunction struct /* union */ {
 	functionHeader
 	common struct {
 		function_name *types.ZendString
-		scope         *ZendClassEntry
+		scope         *types.ClassEntry
 		prototype     *ZendFunction
 		arg_info      *ZendArgInfo
 	}
@@ -68,10 +68,10 @@ func (this *ZendFunction) CheckArgSendType(argNum1 uint32, mask uint8) bool {
 
 func (this *ZendFunction) GetCommonType() types.ZendUchar            { return this.GetType() }
 func (this *ZendFunction) GetFunctionName() *types.ZendString        { return this.common.function_name }
-func (this *ZendFunction) SetFunctionName(value *types.ZendString)   { this.common.function_name = value }
-func (this *ZendFunction) GetScope() *ZendClassEntry                 { return this.common.scope }
-func (this *ZendFunction) SetScope(value *ZendClassEntry)            { this.common.scope = value }
-func (this *ZendFunction) GetPrototype() *ZendFunction               { return this.common.prototype }
+func (this *ZendFunction) SetFunctionName(value *types.ZendString) { this.common.function_name = value }
+func (this *ZendFunction) GetScope() *types.ClassEntry             { return this.common.scope }
+func (this *ZendFunction) SetScope(value *types.ClassEntry)        { this.common.scope = value }
+func (this *ZendFunction) GetPrototype() *ZendFunction             { return this.common.prototype }
 func (this *ZendFunction) SetPrototype(value *ZendFunction)          { this.common.prototype = value }
 func (this *ZendFunction) GetArgInfo() *ZendArgInfo                  { return this.common.arg_info }
 func (this *ZendFunction) SetArgInfo(value *ZendArgInfo)             { this.common.arg_info = value }

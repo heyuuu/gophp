@@ -546,7 +546,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		case PHP_MODE_REFLECTION_EXTENSION:
 
 		case PHP_MODE_REFLECTION_ZEND_EXTENSION:
-			var pce *zend.ZendClassEntry = nil
+			var pce *types.ClassEntry = nil
 			var arg types.Zval
 			var ref types.Zval
 			var executeData zend.ZendExecuteData

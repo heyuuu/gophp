@@ -24,5 +24,5 @@ var ModuleRegistry types.HashTable
 var ModuleRequestStartupHandlers **ZendModuleEntry
 var ModuleRequestShutdownHandlers **ZendModuleEntry
 var ModulePostDeactivateHandlers **ZendModuleEntry
-var ClassCleanupHandlers **ZendClassEntry
+var ClassCleanupHandlers **types.ClassEntry
 var DisabledClassNew []ZendFunctionEntry = []ZendFunctionEntry{}

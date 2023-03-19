@@ -213,9 +213,9 @@ func SplDllistObjectFreeStorage(object *types.ZendObject) {
 	SplPtrLlistDestroy(intern.GetLlist())
 	SPL_LLIST_CHECK_DELREF(intern.GetTraversePointer())
 }
-func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
 	var intern *SplDllistObject
-	var parent *zend.ZendClassEntry = class_type
+	var parent *types.ClassEntry = class_type
 	var inherited int = 0
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_dllist_object"), parent)
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
@@ -283,7 +283,7 @@ func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clo
 	}
 	return intern.GetStd()
 }
-func SplDllistObjectNew(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplDllistObjectNew(class_type *types.ClassEntry) *types.ZendObject {
 	return SplDllistObjectNewEx(class_type, nil, 0)
 }
 func SplDllistObjectClone(zobject *types.Zval) *types.ZendObject {
@@ -960,7 +960,7 @@ func zim_spl_SplDoublyLinkedList___debugInfo(executeData *zend.ZendExecuteData, 
 	return_value.SetArray(SplDllistObjectGetDebugInfo(zend.getThis()))
 	return
 }
-func SplDllistGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplDllistIt
 	var dllist_object *SplDllistObject = Z_SPLDLLIST_P(object)
 	if by_ref != 0 {

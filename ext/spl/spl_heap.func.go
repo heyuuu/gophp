@@ -268,9 +268,9 @@ func SplHeapObjectFreeStorage(object *types.ZendObject) {
 	zend.ZendObjectStdDtor(intern.GetStd())
 	SplPtrHeapDestroy(intern.GetHeap())
 }
-func SplHeapObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
+func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
 	var intern *SplHeapObject
-	var parent *zend.ZendClassEntry = class_type
+	var parent *types.ClassEntry = class_type
 	var inherited int = 0
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_heap_object"), parent)
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
@@ -319,7 +319,7 @@ func SplHeapObjectNewEx(class_type *zend.ZendClassEntry, orig *types.Zval, clone
 	}
 	return intern.GetStd()
 }
-func SplHeapObjectNew(class_type *zend.ZendClassEntry) *types.ZendObject {
+func SplHeapObjectNew(class_type *types.ClassEntry) *types.ZendObject {
 	return SplHeapObjectNewEx(class_type, nil, 0)
 }
 func SplHeapObjectClone(zobject *types.Zval) *types.ZendObject {
@@ -346,7 +346,7 @@ func SplHeapObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 	*count = intern.GetHeap().GetCount()
 	return types.SUCCESS
 }
-func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *types.Zval) *types.HashTable {
+func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.HashTable {
 	var intern *SplHeapObject = Z_SPLHEAP_P(obj)
 	var tmp types.Zval
 	var heap_array types.Zval
@@ -714,7 +714,7 @@ func zim_spl_SplPriorityQueue___debugInfo(executeData *zend.ZendExecuteData, ret
 	return_value.SetArray(SplHeapObjectGetDebugInfo(spl_ce_SplPriorityQueue, zend.getThis()))
 	return
 }
-func SplHeapGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplHeapGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplHeapIt
 	var heap_object *SplHeapObject = Z_SPLHEAP_P(object)
 	if by_ref != 0 {
@@ -731,7 +731,7 @@ func SplHeapGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int)
 	iterator.GetIntern().GetValue().SetUndef()
 	return iterator.GetIntern().GetIt()
 }
-func SplPqueueGetIterator(ce *zend.ZendClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
+func SplPqueueGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplHeapIt
 	var heap_object *SplHeapObject = Z_SPLHEAP_P(object)
 	if by_ref != 0 {

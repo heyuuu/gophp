@@ -152,7 +152,7 @@ func ZendUndefinedIndexWrite(ht *types.HashTable, offset *types.ZendString) int 
 	}
 	return types.SUCCESS
 }
-func ZendUndefinedMethod(ce *ZendClassEntry, method *types.ZendString) {
+func ZendUndefinedMethod(ce *types.ClassEntry, method *types.ZendString) {
 	ZendThrowError(nil, "Call to undefined method %s::%s()", ce.GetName().GetVal(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
@@ -420,7 +420,7 @@ func ZendFetchDimensionAddress(
 		}
 		retval = types.Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
 		if retval == EG__().GetUninitializedZval() {
-			var ce *ZendClassEntry = types.Z_OBJCE_P(container)
+			var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 			result.SetNull()
 			ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
 		} else if retval != nil && retval.GetType() != types.IS_UNDEF {
@@ -430,7 +430,7 @@ func ZendFetchDimensionAddress(
 					retval = result
 				}
 				if retval.GetType() != types.IS_OBJECT {
-					var ce *ZendClassEntry = types.Z_OBJCE_P(container)
+					var ce *types.ClassEntry = types.Z_OBJCE_P(container)
 					ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
 				}
 			} else if retval.GetRefcount() == 1 {

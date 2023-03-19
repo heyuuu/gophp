@@ -148,7 +148,7 @@ func DoBindFunction(lcname *types.Zval) int {
 	return types.SUCCESS
 }
 func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var rtd_key *types.Zval
 	var zv *types.Zval
 	rtd_key = lcname + 1
@@ -176,7 +176,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
 
 	/* Register the derived class */
 
-	ce = (*ZendClassEntry)(zv.GetPtr())
+	ce = (*types.ClassEntry)(zv.GetPtr())
 	zv = ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
 	if zv == nil {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
@@ -249,9 +249,9 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 			var lcname *types.Zval = RT_CONSTANT(opline, opline.GetOp1())
 			var zv *types.Zval = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 			if zv != nil {
-				var ce *ZendClassEntry = zv.GetCe()
+				var ce *types.ClassEntry = zv.GetCe()
 				var lc_parent_name *types.ZendString = RT_CONSTANT(opline, opline.GetOp2()).GetStr()
-				var parent_ce *ZendClassEntry = ZendHashFindExPtr(EG__().GetClassTable(), lc_parent_name, 1)
+				var parent_ce *types.ClassEntry = ZendHashFindExPtr(EG__().GetClassTable(), lc_parent_name, 1)
 				if parent_ce != nil {
 					if ZendTryEarlyBind(ce, parent_ce, lcname.GetStr(), zv) != 0 {
 
@@ -409,7 +409,7 @@ func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
 }
 func ZendEnsureValidClassFetchType(fetch_type uint32) {
 	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() != 0 {
-		var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+		var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 		if ce == nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
 		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && !(ce.GetParentName()) {
@@ -451,13 +451,13 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 
 	}
 }
-func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *ZendClassEntry) types.ZendBool {
+func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *types.ClassEntry) types.ZendBool {
 	if (c.GetValue().GetAccessFlags() & ZEND_ACC_PUBLIC) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) != 0 {
 		return c.GetCe() == scope
 	} else {
-		var ce *ZendClassEntry = c.GetCe()
+		var ce *types.ClassEntry = c.GetCe()
 		for true {
 			if ce == scope {
 				return 1
@@ -490,7 +490,7 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.ZendString, name 
 	if ClassNameRefersToActiveCe(class_name, fetch_type) != 0 {
 		cc = ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name)
 	} else if fetch_type == ZEND_FETCH_CLASS_DEFAULT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0 {
-		var ce *ZendClassEntry = ZendHashFindPtrLc(CG__().GetClassTable(), class_name.GetVal(), class_name.GetLen())
+		var ce *types.ClassEntry = ZendHashFindPtrLc(CG__().GetClassTable(), class_name.GetVal(), class_name.GetLen())
 		if ce != nil {
 			cc = ZendHashFindPtr(ce.GetConstantsTable(), name)
 		} else {
@@ -612,7 +612,7 @@ func Zendlex(elem *ZendParserStackElem) int {
 	b.Assert(EG__().GetException() == nil || ret == T_ERROR)
 	return ret
 }
-func ZendInitializeClassData(ce *ZendClassEntry, nullify_handlers types.ZendBool) {
+func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBool) {
 	var persistent_hashes types.ZendBool = ce.GetType() == ZEND_INTERNAL_CLASS
 	ce.SetRefcount(1)
 	ce.SetCeFlags(ZEND_ACC_CONSTANTS_UPDATED)

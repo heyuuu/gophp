@@ -12,7 +12,7 @@ import (
  */
 type ZendCompilerGlobals struct {
 	loop_var_stack     ZendStack
-	active_class_entry *ZendClassEntry
+	active_class_entry *types.ClassEntry
 	compiled_filename  *types.ZendString
 	zend_lineno        int
 	active_op_array    *ZendOpArray
@@ -66,10 +66,10 @@ func (this *ZendCompilerGlobals) DestroyTables() {
 
 func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
 func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
-func (this *ZendCompilerGlobals) GetActiveClassEntry() *ZendClassEntry {
+func (this *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
 	return this.active_class_entry
 }
-func (this *ZendCompilerGlobals) SetActiveClassEntry(value *ZendClassEntry) {
+func (this *ZendCompilerGlobals) SetActiveClassEntry(value *types.ClassEntry) {
 	this.active_class_entry = value
 }
 func (this *ZendCompilerGlobals) GetCompiledFilename() *types.ZendString {
@@ -205,7 +205,7 @@ type ZendExecutorGlobals struct {
 	vm_stack                            ZendVmStack
 	vm_stack_page_size                  int
 	current_execute_data                *ZendExecuteData
-	fake_scope                          *ZendClassEntry
+	fake_scope                          *types.ClassEntry
 	precision                           ZendLong
 	ticks_count                         int
 	persistent_constants_count          uint32
@@ -227,7 +227,7 @@ type ZendExecutorGlobals struct {
 	user_error_handlers                 ZendStack
 	user_exception_handlers             ZendStack
 	error_handling                      ZendErrorHandlingT
-	exception_class                     *ZendClassEntry
+	exception_class                     *types.ClassEntry
 	timeout_seconds                     ZendLong
 	lambda_count                        int
 	ini_directives                      *types.HashTable
@@ -330,9 +330,9 @@ func (this *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
 func (this *ZendExecutorGlobals) SetCurrentExecuteData(value *ZendExecuteData) {
 	this.current_execute_data = value
 }
-func (this *ZendExecutorGlobals) GetFakeScope() *ZendClassEntry      { return this.fake_scope }
-func (this *ZendExecutorGlobals) SetFakeScope(value *ZendClassEntry) { this.fake_scope = value }
-func (this *ZendExecutorGlobals) GetPrecision() ZendLong             { return this.precision }
+func (this *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return this.fake_scope }
+func (this *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { this.fake_scope = value }
+func (this *ZendExecutorGlobals) GetPrecision() ZendLong               { return this.precision }
 func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)        { this.precision = value }
 func (this *ZendExecutorGlobals) GetTicksCount() int                 { return this.ticks_count }
 func (this *ZendExecutorGlobals) SetTicksCount(value int)            { this.ticks_count = value }
@@ -414,8 +414,8 @@ func (this *ZendExecutorGlobals) GetErrorHandling() ZendErrorHandlingT { return 
 func (this *ZendExecutorGlobals) SetErrorHandling(value ZendErrorHandlingT) {
 	this.error_handling = value
 }
-func (this *ZendExecutorGlobals) GetExceptionClass() *ZendClassEntry { return this.exception_class }
-func (this *ZendExecutorGlobals) SetExceptionClass(value *ZendClassEntry) {
+func (this *ZendExecutorGlobals) GetExceptionClass() *types.ClassEntry { return this.exception_class }
+func (this *ZendExecutorGlobals) SetExceptionClass(value *types.ClassEntry) {
 	this.exception_class = value
 }
 func (this *ZendExecutorGlobals) GetTimeoutSeconds() ZendLong        { return this.timeout_seconds }

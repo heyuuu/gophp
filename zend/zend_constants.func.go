@@ -162,7 +162,7 @@ func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
 		return nil
 	}
 }
-func ZendVerifyConstAccess(c *ZendClassConstant, scope *ZendClassEntry) int {
+func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) int {
 	if (c.GetValue().GetAccessFlags() & ZEND_ACC_PUBLIC) != 0 {
 		return 1
 	} else if (c.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) != 0 {
@@ -237,10 +237,10 @@ func IsAccessDeprecated(c *ZendConstant, access_name *byte) types.ZendBool {
 
 	}
 }
-func ZendGetConstantEx(cname *types.ZendString, scope *ZendClassEntry, flags uint32) *types.Zval {
+func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags uint32) *types.Zval {
 	var c *ZendConstant
 	var colon *byte
-	var ce *ZendClassEntry = nil
+	var ce *types.ClassEntry = nil
 	var name *byte = cname.GetVal()
 	var name_len int = cname.GetLen()
 

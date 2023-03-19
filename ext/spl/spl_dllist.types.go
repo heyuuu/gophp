@@ -79,7 +79,7 @@ type SplDllistObject struct {
 	fptr_offset_has   *zend.ZendFunction
 	fptr_offset_del   *zend.ZendFunction
 	fptr_count        *zend.ZendFunction
-	ce_get_iterator   *zend.ZendClassEntry
+	ce_get_iterator   *types.ClassEntry
 	gc_data           *types.Zval
 	gc_data_count     int
 	std               types.ZendObject
@@ -95,7 +95,7 @@ type SplDllistObject struct {
 // fptr_offset_has *zend.ZendFunction,
 // fptr_offset_del *zend.ZendFunction,
 // fptr_count *zend.ZendFunction,
-// ce_get_iterator *zend.ZendClassEntry,
+// ce_get_iterator *zend.ClassEntry,
 // gc_data *zend.Zval,
 // gc_data_count int,
 // std zend.ZendObject,
@@ -135,9 +135,9 @@ func (this *SplDllistObject) SetFptrOffsetHas(value *zend.ZendFunction) { this.f
 func (this *SplDllistObject) GetFptrOffsetDel() *zend.ZendFunction      { return this.fptr_offset_del }
 func (this *SplDllistObject) SetFptrOffsetDel(value *zend.ZendFunction) { this.fptr_offset_del = value }
 func (this *SplDllistObject) GetFptrCount() *zend.ZendFunction          { return this.fptr_count }
-func (this *SplDllistObject) SetFptrCount(value *zend.ZendFunction)     { this.fptr_count = value }
-func (this *SplDllistObject) GetCeGetIterator() *zend.ZendClassEntry    { return this.ce_get_iterator }
-func (this *SplDllistObject) SetCeGetIterator(value *zend.ZendClassEntry) {
+func (this *SplDllistObject) SetFptrCount(value *zend.ZendFunction) { this.fptr_count = value }
+func (this *SplDllistObject) GetCeGetIterator() *types.ClassEntry   { return this.ce_get_iterator }
+func (this *SplDllistObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
 func (this *SplDllistObject) GetGcData() *types.Zval      { return this.gc_data }

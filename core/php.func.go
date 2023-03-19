@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 func PHP_STRLCPY(dst []char, src __auto__, size int, src_size int) {
@@ -25,7 +26,7 @@ func STR_PRINT(str *byte) string {
 }
 func PhpIgnoreValue(x __auto__) { zend.ZEND_IGNORE_VALUE(x) }
 func PhpLogErr(msg *byte)       { PhpLogErrWithSeverity(msg, LOG_NOTICE) }
-func PhpSetErrorHandling(error_handling error_handling_t, exception_class *zend.ZendClassEntry) {
+func PhpSetErrorHandling(error_handling error_handling_t, exception_class *types.ClassEntry) {
 	zend.ZendReplaceErrorHandling(error_handling, exception_class, nil)
 }
 func PhpStdErrorHandling() {}

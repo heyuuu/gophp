@@ -106,7 +106,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	return 1
 }
 func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) types.ZendBool {
-	var ce *ZendClassEntry = types.Z_OBJCE_P(array_ptr)
+	var ce *types.ClassEntry = types.Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
 	var is_empty types.ZendBool
 	if iter == nil || EG__().GetException() != nil {

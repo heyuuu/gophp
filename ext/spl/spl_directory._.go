@@ -3,8 +3,8 @@
 package spl
 
 import (
-	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_directory.h>
@@ -27,13 +27,13 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var spl_ce_SplFileInfo *zend.ZendClassEntry
-var spl_ce_DirectoryIterator *zend.ZendClassEntry
-var spl_ce_FilesystemIterator *zend.ZendClassEntry
-var spl_ce_RecursiveDirectoryIterator *zend.ZendClassEntry
-var spl_ce_GlobIterator *zend.ZendClassEntry
-var spl_ce_SplFileObject *zend.ZendClassEntry
-var spl_ce_SplTempFileObject *zend.ZendClassEntry
+var spl_ce_SplFileInfo *types.ClassEntry
+var spl_ce_DirectoryIterator *types.ClassEntry
+var spl_ce_FilesystemIterator *types.ClassEntry
+var spl_ce_RecursiveDirectoryIterator *types.ClassEntry
+var spl_ce_GlobIterator *types.ClassEntry
+var spl_ce_SplFileObject *types.ClassEntry
+var spl_ce_SplTempFileObject *types.ClassEntry
 
 type SPL_FS_OBJ_TYPE = int
 

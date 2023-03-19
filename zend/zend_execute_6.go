@@ -250,7 +250,7 @@ func ZendFetchStaticPropertyAddressEx(
 	var free_op1 ZendFreeOp
 	var name *types.ZendString
 	var tmp_name *types.ZendString
-	var ce *ZendClassEntry
+	var ce *types.ClassEntry
 	var property_info *ZendPropertyInfo
 	var op1_type types.ZendUchar = opline.GetOp1Type()
 	var op2_type types.ZendUchar = opline.GetOp2Type()
@@ -370,7 +370,7 @@ func ZendThrowConflictingCoercionError(prop1 *ZendPropertyInfo, prop2 *ZendPrope
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
 	ZendTypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.IsObject(), func() []byte { return types.Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop2.GetName()), prop2_type1, prop2_type2)
 }
-func IZendVerifyTypeAssignableZval(type_ptr *types.ZendType, self_ce *ZendClassEntry, zv *types.Zval, strict types.ZendBool) int {
+func IZendVerifyTypeAssignableZval(type_ptr *types.ZendType, self_ce *types.ClassEntry, zv *types.Zval, strict types.ZendBool) int {
 	var type_ types.ZendType = *type_ptr
 	var type_code types.ZendUchar
 	var zv_type types.ZendUchar = zv.GetType()

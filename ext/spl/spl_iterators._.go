@@ -30,32 +30,32 @@ import (
 // failed # include "ext/pcre/php_pcre.h"
 
 const spl_ce_Traversable = zend.ZendCeTraversable
-const spl_ce_Iterator *zend.ZendClassEntry = zend.ZendCeIterator
+const spl_ce_Iterator *types.ClassEntry = zend.ZendCeIterator
 const spl_ce_Aggregate = zend.ZendCeAggregate
 const spl_ce_ArrayAccess = zend.ZendCeArrayaccess
 const spl_ce_Serializable = zend.ZendCeSerializable
 const spl_ce_Countable = zend.ZendCeCountable
 
-var spl_ce_RecursiveIterator *zend.ZendClassEntry
-var spl_ce_RecursiveIteratorIterator *zend.ZendClassEntry
-var spl_ce_RecursiveTreeIterator *zend.ZendClassEntry
-var spl_ce_FilterIterator *zend.ZendClassEntry
-var spl_ce_RecursiveFilterIterator *zend.ZendClassEntry
-var spl_ce_ParentIterator *zend.ZendClassEntry
-var spl_ce_SeekableIterator *zend.ZendClassEntry
-var spl_ce_LimitIterator *zend.ZendClassEntry
-var spl_ce_CachingIterator *zend.ZendClassEntry
-var spl_ce_RecursiveCachingIterator *zend.ZendClassEntry
-var spl_ce_OuterIterator *zend.ZendClassEntry
-var spl_ce_IteratorIterator *zend.ZendClassEntry
-var spl_ce_NoRewindIterator *zend.ZendClassEntry
-var spl_ce_InfiniteIterator *zend.ZendClassEntry
-var spl_ce_EmptyIterator *zend.ZendClassEntry
-var spl_ce_AppendIterator *zend.ZendClassEntry
-var spl_ce_RegexIterator *zend.ZendClassEntry
-var spl_ce_RecursiveRegexIterator *zend.ZendClassEntry
-var spl_ce_CallbackFilterIterator *zend.ZendClassEntry
-var spl_ce_RecursiveCallbackFilterIterator *zend.ZendClassEntry
+var spl_ce_RecursiveIterator *types.ClassEntry
+var spl_ce_RecursiveIteratorIterator *types.ClassEntry
+var spl_ce_RecursiveTreeIterator *types.ClassEntry
+var spl_ce_FilterIterator *types.ClassEntry
+var spl_ce_RecursiveFilterIterator *types.ClassEntry
+var spl_ce_ParentIterator *types.ClassEntry
+var spl_ce_SeekableIterator *types.ClassEntry
+var spl_ce_LimitIterator *types.ClassEntry
+var spl_ce_CachingIterator *types.ClassEntry
+var spl_ce_RecursiveCachingIterator *types.ClassEntry
+var spl_ce_OuterIterator *types.ClassEntry
+var spl_ce_IteratorIterator *types.ClassEntry
+var spl_ce_NoRewindIterator *types.ClassEntry
+var spl_ce_InfiniteIterator *types.ClassEntry
+var spl_ce_EmptyIterator *types.ClassEntry
+var spl_ce_AppendIterator *types.ClassEntry
+var spl_ce_RegexIterator *types.ClassEntry
+var spl_ce_RecursiveRegexIterator *types.ClassEntry
+var spl_ce_CallbackFilterIterator *types.ClassEntry
+var spl_ce_RecursiveCallbackFilterIterator *types.ClassEntry
 
 type DualItType = int
 

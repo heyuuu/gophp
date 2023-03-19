@@ -4,7 +4,6 @@ package streams
 
 import (
 	"sik/core"
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -14,11 +13,11 @@ import (
 type PhpUserStreamWrapper struct {
 	protoname *byte
 	classname *byte
-	ce        *zend.ZendClassEntry
+	ce        *types.ClassEntry
 	wrapper   core.PhpStreamWrapper
 }
 
-// func MakePhpUserStreamWrapper(protoname *byte, classname *byte, ce *zend.ZendClassEntry, wrapper core.PhpStreamWrapper) PhpUserStreamWrapper {
+// func MakePhpUserStreamWrapper(protoname *byte, classname *byte, ce *zend.ClassEntry, wrapper core.PhpStreamWrapper) PhpUserStreamWrapper {
 //     return PhpUserStreamWrapper{
 //         protoname:protoname,
 //         classname:classname,
@@ -29,10 +28,10 @@ type PhpUserStreamWrapper struct {
 func (this *PhpUserStreamWrapper) GetProtoname() *byte         { return this.protoname }
 func (this *PhpUserStreamWrapper) SetProtoname(value *byte)    { this.protoname = value }
 func (this *PhpUserStreamWrapper) GetClassname() *byte         { return this.classname }
-func (this *PhpUserStreamWrapper) SetClassname(value *byte)    { this.classname = value }
-func (this *PhpUserStreamWrapper) GetCe() *zend.ZendClassEntry { return this.ce }
+func (this *PhpUserStreamWrapper) SetClassname(value *byte) { this.classname = value }
+func (this *PhpUserStreamWrapper) GetCe() *types.ClassEntry { return this.ce }
 
-// func (this *PhpUserStreamWrapper) SetCe(value *zend.ZendClassEntry) { this.ce = value }
+// func (this *PhpUserStreamWrapper) SetCe(value *zend.ClassEntry) { this.ce = value }
 func (this *PhpUserStreamWrapper) GetWrapper() core.PhpStreamWrapper { return this.wrapper }
 
 // func (this *PhpUserStreamWrapper) SetWrapper(value core.PhpStreamWrapper) { this.wrapper = value }

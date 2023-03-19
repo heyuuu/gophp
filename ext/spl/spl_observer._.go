@@ -27,10 +27,10 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var spl_ce_SplObserver *zend.ZendClassEntry
-var spl_ce_SplSubject *zend.ZendClassEntry
-var spl_ce_SplObjectStorage *zend.ZendClassEntry
-var spl_ce_MultipleIterator *zend.ZendClassEntry
+var spl_ce_SplObserver *types.ClassEntry
+var spl_ce_SplSubject *types.ClassEntry
+var spl_ce_SplObjectStorage *types.ClassEntry
+var spl_ce_MultipleIterator *types.ClassEntry
 
 // Source: <ext/spl/spl_observer.c>
 

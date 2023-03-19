@@ -434,7 +434,7 @@ func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.H
 		return nil
 	}
 }
-func ZendGeneratorCreate(class_type *ZendClassEntry) *types.ZendObject {
+func ZendGeneratorCreate(class_type *types.ClassEntry) *types.ZendObject {
 	var generator *ZendGenerator
 	generator = Emalloc(b.SizeOf("zend_generator"))
 	memset(generator, 0, b.SizeOf("zend_generator"))
@@ -1089,7 +1089,7 @@ func ZendGeneratorIteratorRewind(iterator *ZendObjectIterator) {
 	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	ZendGeneratorRewind(generator)
 }
-func ZendGeneratorGetIterator(ce *ZendClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator {
+func ZendGeneratorGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator {
 	var iterator *ZendObjectIterator
 	var generator *ZendGenerator = (*ZendGenerator)(object.GetObj())
 	if generator.GetExecuteData() == nil {
@@ -1109,7 +1109,7 @@ func ZendGeneratorGetIterator(ce *ZendClassEntry, object *types.Zval, by_ref int
 	return iterator
 }
 func ZendRegisterGeneratorCe() {
-	var ce ZendClassEntry
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("Generator", b.SizeOf("\"Generator\"")-1, 1))
 	ce.SetBuiltinFunctions(GeneratorFunctions)

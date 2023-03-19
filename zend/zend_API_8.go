@@ -304,11 +304,11 @@ func ZvalMakeInternedString(zv *types.Zval) *types.ZendString {
 
 	return zv.GetStr()
 }
-func IsPersistentClass(ce *ZendClassEntry) types.ZendBool {
+func IsPersistentClass(ce *types.ClassEntry) types.ZendBool {
 	return (ce.GetType()&ZEND_INTERNAL_CLASS) != 0 && ce.GetModule().GetType() == MODULE_PERSISTENT
 }
 func ZendDeclareTypedProperty(
-	ce *ZendClassEntry,
+	ce *types.ClassEntry,
 	name *types.ZendString,
 	property *types.Zval,
 	access_type int,

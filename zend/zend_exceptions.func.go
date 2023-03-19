@@ -14,21 +14,21 @@ func ZendRethrowException(executeData *ZendExecuteData) {
 		executeData.GetOpline() = EG__().GetExceptionOp()
 	}
 }
-func ZendImplementThrowable(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
+func ZendImplementThrowable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
 	if InstanceofFunction(class_type, ZendCeException) != 0 || InstanceofFunction(class_type, ZendCeError) != 0 {
 		return types.SUCCESS
 	}
 	ZendErrorNoreturn(E_ERROR, "Class %s cannot implement interface %s, extend %s or %s instead", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeException.GetName().GetVal(), ZendCeError.GetName().GetVal())
 	return types.FAILURE
 }
-func IGetExceptionBase(object *types.Zval) *ZendClassEntry {
+func IGetExceptionBase(object *types.Zval) *types.ClassEntry {
 	if InstanceofFunction(types.Z_OBJCE_P(object), ZendCeException) != 0 {
 		return ZendCeException
 	} else {
 		return ZendCeError
 	}
 }
-func ZendGetExceptionBase(object *types.Zval) *ZendClassEntry { return IGetExceptionBase(object) }
+func ZendGetExceptionBase(object *types.Zval) *types.ClassEntry { return IGetExceptionBase(object) }
 func ZendExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendObject) {
 	var previous *types.Zval
 	var ancestor *types.Zval
@@ -36,7 +36,7 @@ func ZendExceptionSetPrevious(exception *types.ZendObject, add_previous *types.Z
 	var pv types.Zval
 	var zv types.Zval
 	var rv types.Zval
-	var base_ce *ZendClassEntry
+	var base_ce *types.ClassEntry
 	if exception == nil || add_previous == nil {
 		return
 	}
@@ -144,12 +144,12 @@ func ZendClearException() {
 		CurrEX().SetOpline(EG__().GetOplineBeforeException())
 	}
 }
-func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) *types.ZendObject {
+func ZendDefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *types.ZendObject {
 	var obj types.Zval
 	var tmp types.Zval
 	var object *types.ZendObject
 	var trace types.Zval
-	var base_ce *ZendClassEntry
+	var base_ce *types.ClassEntry
 	var filename *types.ZendString
 	object = ZendObjectsNew(class_type)
 	obj.SetObj(object)
@@ -177,10 +177,10 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_TRACE, &trace)
 	return object
 }
-func ZendDefaultExceptionNew(class_type *ZendClassEntry) *types.ZendObject {
+func ZendDefaultExceptionNew(class_type *types.ClassEntry) *types.ZendObject {
 	return ZendDefaultExceptionNewEx(class_type, 0)
 }
-func ZendErrorExceptionNew(class_type *ZendClassEntry) *types.ZendObject {
+func ZendErrorExceptionNew(class_type *types.ClassEntry) *types.ZendObject {
 	return ZendDefaultExceptionNewEx(class_type, 2)
 }
 func ZimExceptionClone(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -196,12 +196,12 @@ func ZimExceptionConstruct(executeData *ZendExecuteData, return_value *types.Zva
 	var tmp types.Zval
 	var object *types.Zval
 	var previous *types.Zval = nil
-	var base_ce *ZendClassEntry
+	var base_ce *types.ClassEntry
 	var argc int = executeData.NumArgs()
 	object = ZEND_THIS(executeData)
 	base_ce = IGetExceptionBase(object)
 	if ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, argc, "|SlO!", &message, &code, &previous, ZendCeThrowable) == types.FAILURE {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
 			ce = types.Z_OBJCE(executeData.GetThis())
 		} else if executeData.GetThis().GetCe() != nil {
@@ -256,7 +256,7 @@ func ZimErrorExceptionConstruct(executeData *ZendExecuteData, return_value *type
 	var previous *types.Zval = nil
 	var argc int = executeData.NumArgs()
 	if ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, argc, "|SllSlO!", &message, &code, &severity, &filename, &lineno, &previous, ZendCeThrowable) == types.FAILURE {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
 			ce = types.Z_OBJCE(executeData.GetThis())
 		} else if executeData.GetThis().GetCe() != nil {
@@ -476,7 +476,7 @@ func zim_exception_getTraceAsString(executeData *ZendExecuteData, return_value *
 	var rv types.Zval
 	var index ZendUlong
 	var object *types.Zval
-	var base_ce *ZendClassEntry
+	var base_ce *types.ClassEntry
 	var str SmartStr = MakeSmartStr(0)
 	var num uint32 = 0
 	if ZendParseParametersNone() == types.FAILURE {
@@ -518,7 +518,7 @@ func zim_exception_getPrevious(executeData *ZendExecuteData, return_value *types
 func zim_exception___toString(executeData *ZendExecuteData, return_value *types.Zval) {
 	var trace types.Zval
 	var exception *types.Zval
-	var base_ce *ZendClassEntry
+	var base_ce *types.ClassEntry
 	var str *types.ZendString
 	var fci ZendFcallInfo
 	var rv types.Zval
@@ -593,7 +593,7 @@ func zim_exception___toString(executeData *ZendExecuteData, return_value *types.
 }
 func ZendRegisterDefaultException() {
 	var ce zend_class_entry
-	var ce ZendClassEntry
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("Throwable", b.SizeOf("\"Throwable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsThrowable)
@@ -664,7 +664,7 @@ func ZendRegisterDefaultException() {
 	ZendCeDivisionByZeroError = ZendRegisterInternalClassEx(&ce, ZendCeArithmeticError)
 	ZendCeDivisionByZeroError.SetCreateObject(ZendDefaultExceptionNew)
 }
-func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendLong) *types.ZendObject {
+func ZendThrowException(exception_ce *types.ClassEntry, message string, code ZendLong) *types.ZendObject {
 	var ex types.Zval
 	var tmp types.Zval
 	if exception_ce != nil {
@@ -688,12 +688,12 @@ func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendL
 	ZendThrowExceptionInternal(&ex)
 	return ex.GetObj()
 }
-func ZendThrowExceptionEx(exception_ce *ZendClassEntry, code ZendLong, format string, args ...any) *types.ZendObject {
+func ZendThrowExceptionEx(exception_ce *types.ClassEntry, code ZendLong, format string, args ...any) *types.ZendObject {
 	message := ZendSprintf(format, args)
 	obj := ZendThrowException(exception_ce, message, code)
 	return obj
 }
-func ZendThrowErrorException(exception_ce *ZendClassEntry, message string, code ZendLong, severity int) *types.ZendObject {
+func ZendThrowErrorException(exception_ce *types.ClassEntry, message string, code ZendLong, severity int) *types.ZendObject {
 	var ex types.Zval
 	var tmp types.Zval
 	var obj = ZendThrowException(exception_ce, message, code)
@@ -717,7 +717,7 @@ func ZendErrorHelper(type_ int, filename *byte, lineno uint32, format string, _ 
 func ZendExceptionError(ex *types.ZendObject, severity int) {
 	var exception types.Zval
 	var rv types.Zval
-	var ce_exception *ZendClassEntry
+	var ce_exception *types.ClassEntry
 	exception.SetObject(ex)
 	ce_exception = ex.GetCe()
 	EG__().SetException(nil)
@@ -769,7 +769,7 @@ func ZendExceptionError(ex *types.ZendObject, severity int) {
 	OBJ_RELEASE(ex)
 }
 func ZendThrowExceptionObject(exception *types.Zval) {
-	var exception_ce *ZendClassEntry
+	var exception_ce *types.ClassEntry
 	if exception == nil || exception.GetType() != types.IS_OBJECT {
 		ZendErrorNoreturn(E_CORE_ERROR, "Need to supply an object when throwing an exception")
 	}

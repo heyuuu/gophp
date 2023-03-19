@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/standard/dir.c>
@@ -27,7 +28,7 @@ import (
 */
 
 var DirGlobals PhpDirGlobals
-var DirClassEntryPtr *zend.ZendClassEntry
+var DirClassEntryPtr *types.ClassEntry
 
 /* {{{ arginfo */
 

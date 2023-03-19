@@ -8,15 +8,15 @@ import (
 	"sik/zend/types"
 )
 
-func SplRegisterInterface(ppce **zend.ZendClassEntry, class_name string, functions *zend.ZendFunctionEntry) {
-	var ce zend.ZendClassEntry
+func SplRegisterInterface(ppce **types.ClassEntry, class_name string, functions *zend.ZendFunctionEntry) {
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
 	ce.SetBuiltinFunctions(functions)
 	*ppce = zend.ZendRegisterInternalInterface(&ce)
 }
-func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
-	var ce zend.ZendClassEntry
+func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
 	ce.SetBuiltinFunctions(function_list)
@@ -30,8 +30,8 @@ func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor
 
 	/* entries changed by initialize */
 }
-func SplRegisterSubClass(ppce **zend.ZendClassEntry, parent_ce *zend.ZendClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
-	var ce zend.ZendClassEntry
+func SplRegisterSubClass(ppce **types.ClassEntry, parent_ce *types.ClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
 	ce.SetBuiltinFunctions(function_list)
@@ -47,10 +47,10 @@ func SplRegisterSubClass(ppce **zend.ZendClassEntry, parent_ce *zend.ZendClassEn
 
 	/* entries changed by initialize */
 }
-func SplRegisterProperty(class_entry *zend.ZendClassEntry, prop_name string, prop_name_len int, prop_flags int) {
+func SplRegisterProperty(class_entry *types.ClassEntry, prop_name string, prop_name_len int, prop_flags int) {
 	zend.ZendDeclarePropertyNull(class_entry, prop_name, prop_name_len, prop_flags)
 }
-func SplAddClassName(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
+func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ce_flags int) {
 	if allow == 0 || allow > 0 && pce.HasCeFlags(ce_flags) || allow < 0 && !pce.HasCeFlags(ce_flags) {
 		var tmp *types.Zval
 		if b.Assign(&tmp, list.GetArr().KeyFind(pce.GetName().GetStr())) == nil {
@@ -60,7 +60,7 @@ func SplAddClassName(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_f
 		}
 	}
 }
-func SplAddInterfaces(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
+func SplAddInterfaces(list *types.Zval, pce *types.ClassEntry, allow int, ce_flags int) {
 	var num_interfaces uint32
 	if pce.GetNumInterfaces() != 0 {
 		b.Assert(pce.HasCeFlags(zend.ZEND_ACC_LINKED))
@@ -69,16 +69,16 @@ func SplAddInterfaces(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_
 		}
 	}
 }
-func SplAddTraits(list *types.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
+func SplAddTraits(list *types.Zval, pce *types.ClassEntry, allow int, ce_flags int) {
 	var num_traits uint32
-	var trait *zend.ZendClassEntry
+	var trait *types.ClassEntry
 	for num_traits = 0; num_traits < pce.GetNumTraits(); num_traits++ {
 		trait = zend.ZendFetchClassByName(pce.GetTraitNames()[num_traits].GetName(), pce.GetTraitNames()[num_traits].GetLcName(), zend.ZEND_FETCH_CLASS_TRAIT)
 		b.Assert(trait != nil)
 		SplAddClassName(list, trait, allow, ce_flags)
 	}
 }
-func SplAddClasses(pce *zend.ZendClassEntry, list *types.Zval, sub int, allow int, ce_flags int) int {
+func SplAddClasses(pce *types.ClassEntry, list *types.Zval, sub int, allow int, ce_flags int) int {
 	if pce == nil {
 		return 0
 	}
@@ -92,7 +92,7 @@ func SplAddClasses(pce *zend.ZendClassEntry, list *types.Zval, sub int, allow in
 	}
 	return 0
 }
-func SplGenPrivatePropName(ce *zend.ZendClassEntry, prop_name string) *types.ZendString {
+func SplGenPrivatePropName(ce *types.ClassEntry, prop_name string) *types.ZendString {
 	str := zend.ZendManglePropertyName_Ex(ce.GetName().GetStr(), prop_name)
 	return types.NewZendString(str)
 }

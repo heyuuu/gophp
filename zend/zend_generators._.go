@@ -25,8 +25,8 @@ import "sik/zend/types"
    +----------------------------------------------------------------------+
 */
 
-var ZendCeGenerator *ZendClassEntry
-var zend_ce_ClosedGeneratorException *ZendClassEntry
+var ZendCeGenerator *types.ClassEntry
+var zend_ce_ClosedGeneratorException *types.ClassEntry
 
 /* The concept of `yield from` exposes problems when accessed at different levels of the chain of delegated generators. We need to be able to reference the currently executed Generator in all cases and still being able to access the return values of finished Generators.
  * The solution to this problem is a doubly-linked tree, which all Generators referenced in maintain a reference to. It should be impossible to avoid walking the tree in all cases. This way, we only need tree walks from leaf to root in case where some part of the `yield from` chain is passed to another `yield from`. (Update of leaf node pointer and list of multi-children nodes needed when leaf gets a child in direct path from leaf to root node.) But only in that case, which should be a fairly rare case (which is then possible, but not totally cheap).

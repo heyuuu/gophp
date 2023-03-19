@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_dllist.h>
@@ -26,9 +27,9 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var spl_ce_SplDoublyLinkedList *zend.ZendClassEntry
-var spl_ce_SplQueue *zend.ZendClassEntry
-var spl_ce_SplStack *zend.ZendClassEntry
+var spl_ce_SplDoublyLinkedList *types.ClassEntry
+var spl_ce_SplQueue *types.ClassEntry
+var spl_ce_SplStack *types.ClassEntry
 
 // Source: <ext/spl/spl_dllist.c>
 

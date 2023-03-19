@@ -3,7 +3,7 @@
 package zend
 
 import (
-	b "sik/builtin"
+	"sik/zend/types"
 )
 
 // Source: <Zend/zend_closures.h>
@@ -29,7 +29,7 @@ import (
 
 /* This macro depends on zend_closure structure layout */
 
-var ZendCeClosure *ZendClassEntry
+var ZendCeClosure *types.ClassEntry
 
 // Source: <Zend/zend_closures.c>
 

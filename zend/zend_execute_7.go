@@ -156,7 +156,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 
 	}
 }
-func ZendWrongCloneCall(clone *ZendFunction, scope *ZendClassEntry) {
+func ZendWrongCloneCall(clone *ZendFunction, scope *types.ClassEntry) {
 	ZendThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
 func ExecuteInternal(executeData *ZendExecuteData, return_value *types.Zval) {

@@ -5,7 +5,7 @@ import (
 	"sik/zend/types"
 )
 
-func CE_STATIC_MEMBERS(ce *ZendClassEntry) *types.Zval {
+func CE_STATIC_MEMBERS(ce *types.ClassEntry) *types.Zval {
 	// todo
 	return (ZEND_MAP_PTR_GET(ce.static_members_table__ptr)).(*types.Zval)
 }

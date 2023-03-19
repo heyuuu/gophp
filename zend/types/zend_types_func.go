@@ -7,8 +7,8 @@ import (
 	"sik/zend"
 )
 
-func ZEND_TYPE_NAME(t ZendType) *ZendString        { return t.Name() }
-func ZEND_TYPE_CE(t ZendType) *zend.ZendClassEntry { return t.Ce() }
+func ZEND_TYPE_NAME(t ZendType) *ZendString { return t.Name() }
+func ZEND_TYPE_CE(t ZendType) *ClassEntry   { return t.Ce() }
 
 func ZEND_TYPE_ENCODE(code uint32, allow_null int) ZendType {
 	if allow_null != 0 {
@@ -17,7 +17,7 @@ func ZEND_TYPE_ENCODE(code uint32, allow_null int) ZendType {
 		return ZendType(code<<2 | 0x0)
 	}
 }
-func ZEND_TYPE_ENCODE_CE(ce *zend.ZendClassEntry, allow_null bool) ZendType {
+func ZEND_TYPE_ENCODE_CE(ce *ClassEntry, allow_null bool) ZendType {
 	var ptr = b.CastUintptr(ce)
 	if allow_null {
 		return ZendType(ptr | 0x3)
@@ -87,8 +87,8 @@ func Z_OBJ(zval Zval) *ZendObject                      { return zval.GetObj() }
 func Z_OBJ_P(zval_p *Zval) *ZendObject                 { return zval_p.GetObj() }
 func Z_OBJ_HT(zval Zval) *zend.ZendObjectHandlers      { return Z_OBJ(zval).GetHandlers() }
 func Z_OBJ_HT_P(zval_p *Zval) *zend.ZendObjectHandlers { return Z_OBJ_HT(*zval_p) }
-func Z_OBJCE(zval Zval) *zend.ZendClassEntry           { return zval.GetObj().GetCe() }
-func Z_OBJCE_P(zval_p *Zval) *zend.ZendClassEntry      { return zval_p.GetObj().GetCe() }
+func Z_OBJCE(zval Zval) *ClassEntry                    { return zval.GetObj().GetCe() }
+func Z_OBJCE_P(zval_p *Zval) *ClassEntry               { return zval_p.GetObj().GetCe() }
 func Z_OBJPROP(zval Zval) *HashTable {
 	return Z_OBJ_HT(zval).GetGetProperties()(&zval)
 }
@@ -107,9 +107,9 @@ func GC_AST(p *ZendAstRef) *zend.ZendAst    { return p.GcAst() }
 func Z_ASTVAL(zval Zval) *zend.ZendAst      { return GC_AST(zval.GetAst()) }
 func Z_ASTVAL_P(zval_p *Zval) *zend.ZendAst { return Z_ASTVAL(*zval_p) }
 func Z_INDIRECT(zval Zval) *Zval            { return zval.GetZv() }
-func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.GetZv() }
-func Z_CE(zval Zval) *zend.ZendClassEntry   { return zval.GetCe() }
-func Z_PTR(zval Zval) any                   { return zval.GetPtr() }
+func Z_INDIRECT_P(zval_p *Zval) *Zval { return zval_p.GetZv() }
+func Z_CE(zval Zval) *ClassEntry      { return zval.GetCe() }
+func Z_PTR(zval Zval) any             { return zval.GetPtr() }
 
 func ZVAL_BOOL(z *Zval, b int)                 { z.SetBool(b != 0) }
 func ZVAL_LONG(z *Zval, l zend.ZendLong)       { z.SetLong(l) }
@@ -137,7 +137,7 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 func ZVAL_AST(z *Zval, ast *ZendAstRef) { z.SetConstantAst(ast) }
 func ZVAL_INDIRECT(z *Zval, v *Zval)    { z.SetIndirect(v) }
 func ZVAL_PTR(z *Zval, p any)           { z.SetAsPtr(p) }
-func ZVAL_ALIAS_PTR(z *Zval, p *zend.ZendClassEntry) {
+func ZVAL_ALIAS_PTR(z *Zval, p *ClassEntry) {
 	z.SetPtr(p)
 	z.SetTypeInfo(IS_ALIAS_PTR)
 }

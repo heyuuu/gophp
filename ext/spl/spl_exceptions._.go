@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_exceptions.h>
@@ -26,19 +27,19 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var spl_ce_LogicException *zend.ZendClassEntry
-var spl_ce_BadFunctionCallException *zend.ZendClassEntry
-var spl_ce_BadMethodCallException *zend.ZendClassEntry
-var spl_ce_DomainException *zend.ZendClassEntry
-var spl_ce_InvalidArgumentException *zend.ZendClassEntry
-var spl_ce_LengthException *zend.ZendClassEntry
-var spl_ce_OutOfRangeException *zend.ZendClassEntry
-var spl_ce_RuntimeException *zend.ZendClassEntry
-var spl_ce_OutOfBoundsException *zend.ZendClassEntry
-var spl_ce_OverflowException *zend.ZendClassEntry
-var spl_ce_RangeException *zend.ZendClassEntry
-var spl_ce_UnderflowException *zend.ZendClassEntry
-var spl_ce_UnexpectedValueException *zend.ZendClassEntry
+var spl_ce_LogicException *types.ClassEntry
+var spl_ce_BadFunctionCallException *types.ClassEntry
+var spl_ce_BadMethodCallException *types.ClassEntry
+var spl_ce_DomainException *types.ClassEntry
+var spl_ce_InvalidArgumentException *types.ClassEntry
+var spl_ce_LengthException *types.ClassEntry
+var spl_ce_OutOfRangeException *types.ClassEntry
+var spl_ce_RuntimeException *types.ClassEntry
+var spl_ce_OutOfBoundsException *types.ClassEntry
+var spl_ce_OverflowException *types.ClassEntry
+var spl_ce_RangeException *types.ClassEntry
+var spl_ce_UnderflowException *types.ClassEntry
+var spl_ce_UnexpectedValueException *types.ClassEntry
 
 // Source: <ext/spl/spl_exceptions.c>
 
@@ -60,6 +61,6 @@ var spl_ce_UnexpectedValueException *zend.ZendClassEntry
    +----------------------------------------------------------------------+
 */
 
-const spl_ce_Exception *zend.ZendClassEntry = zend.ZendCeException
+const spl_ce_Exception *types.ClassEntry = zend.ZendCeException
 
 /* {{{ PHP_MINIT_FUNCTION(spl_exceptions) */

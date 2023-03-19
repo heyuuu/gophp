@@ -113,7 +113,7 @@ func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *
 		}
 	case 'O':
 		objPtr := va.Pop().(**types.Zval)
-		ce := va.Pop().(*zend.ZendClassEntry)
+		ce := va.Pop().(*types.ClassEntry)
 		if obj, ok := ParseObject(arg, ce, check_null != 0); ok {
 			*objPtr = obj
 		} else {
@@ -124,12 +124,12 @@ func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *
 			}
 		}
 	case 'C':
-		pce := va.Pop().(**zend.ZendClassEntry)
+		pce := va.Pop().(**types.ClassEntry)
 		baseCe := *pce
 
 		// todo 待替换为 ParseClass
 
-		var lookup *zend.ZendClassEntry
+		var lookup *types.ClassEntry
 		if checkNull && arg.IsNull() {
 			*pce = nil
 			break

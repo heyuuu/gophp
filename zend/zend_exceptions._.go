@@ -6,16 +6,16 @@ import (
 	"sik/zend/types"
 )
 
-var ZendCeThrowable *ZendClassEntry
-var ZendCeException *ZendClassEntry
-var ZendCeErrorException *ZendClassEntry
-var ZendCeError *ZendClassEntry
-var ZendCeCompileError *ZendClassEntry
-var ZendCeParseError *ZendClassEntry
-var ZendCeTypeError *ZendClassEntry
-var ZendCeArgumentCountError *ZendClassEntry
-var ZendCeArithmeticError *ZendClassEntry
-var ZendCeDivisionByZeroError *ZendClassEntry
+var ZendCeThrowable *types.ClassEntry
+var ZendCeException *types.ClassEntry
+var ZendCeErrorException *types.ClassEntry
+var ZendCeError *types.ClassEntry
+var ZendCeCompileError *types.ClassEntry
+var ZendCeParseError *types.ClassEntry
+var ZendCeTypeError *types.ClassEntry
+var ZendCeArgumentCountError *types.ClassEntry
+var ZendCeArithmeticError *types.ClassEntry
+var ZendCeDivisionByZeroError *types.ClassEntry
 var ZendThrowExceptionHook func(ex *types.Zval)
 
 var DefaultExceptionHandlers ZendObjectHandlers

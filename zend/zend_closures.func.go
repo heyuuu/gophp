@@ -25,7 +25,7 @@ func zim_Closure___invoke(executeData *ZendExecuteData, return_value *types.Zval
 	types.ZendStringReleaseEx(func_.GetInternalFunction().GetFunctionName(), 0)
 	Efree(func_)
 }
-func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *ZendClassEntry) types.ZendBool {
+func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *types.ClassEntry) types.ZendBool {
 	var func_ *ZendFunction = closure.GetFunc()
 	var is_fake_closure types.ZendBool = func_.IsFakeClosure()
 	if newthis != nil {
@@ -153,8 +153,8 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 	var zclosure *types.Zval
 	var scope_arg *types.Zval = nil
 	var closure *ZendClosure
-	var ce *ZendClassEntry
-	var called_scope *ZendClassEntry
+	var ce *types.ClassEntry
+	var called_scope *types.ClassEntry
 	if ZendParseMethodParameters(executeData.NumArgs(), getThis(executeData), "Oo!|z", &zclosure, ZendCeClosure, &newthis, &scope_arg) == types.FAILURE {
 		return
 	}
@@ -366,7 +366,7 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 		ZvalPtrDtor(closure.GetThisPtr())
 	}
 }
-func ZendClosureNew(class_type *ZendClassEntry) *types.ZendObject {
+func ZendClosureNew(class_type *types.ClassEntry) *types.ZendObject {
 	var closure *ZendClosure
 	closure = Emalloc(b.SizeOf("zend_closure"))
 	memset(closure, 0, b.SizeOf("zend_closure"))
@@ -380,7 +380,7 @@ func ZendClosureClone(zobject *types.Zval) *types.ZendObject {
 	ZendCreateClosure(&result, closure.GetFunc(), closure.GetFunc().GetScope(), closure.GetCalledScope(), closure.GetThisPtr())
 	return result.GetObj()
 }
-func ZendClosureGetClosure(obj *types.Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int {
+func ZendClosureGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int {
 	var closure *ZendClosure = (*ZendClosure)(obj.GetObj())
 	*fptr_ptr = closure.GetFunc()
 	*ce_ptr = closure.GetCalledScope()
@@ -471,7 +471,7 @@ func zim_Closure___construct(executeData *ZendExecuteData, return_value *types.Z
 	ZendThrowError(nil, "Instantiation of 'Closure' is not allowed")
 }
 func ZendRegisterClosureCe() {
-	var ce ZendClassEntry
+	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("Closure", b.SizeOf("\"Closure\"")-1, 1))
 	ce.SetBuiltinFunctions(ClosureFunctions)
@@ -501,7 +501,7 @@ func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *type
 	OBJ_RELEASE((*types.ZendObject)(closure))
 	executeData.GetFunc() = nil
 }
-func ZendCreateClosure(res *types.Zval, func_ *ZendFunction, scope *ZendClassEntry, called_scope *ZendClassEntry, this_ptr *types.Zval) {
+func ZendCreateClosure(res *types.Zval, func_ *ZendFunction, scope *types.ClassEntry, called_scope *types.ClassEntry, this_ptr *types.Zval) {
 	var closure *ZendClosure
 	ObjectInitEx(res, ZendCeClosure)
 	closure = (*ZendClosure)(res.GetObj())
@@ -594,7 +594,7 @@ func ZendCreateClosure(res *types.Zval, func_ *ZendFunction, scope *ZendClassEnt
 		}
 	}
 }
-func ZendCreateFakeClosure(res *types.Zval, func_ *ZendFunction, scope *ZendClassEntry, called_scope *ZendClassEntry, this_ptr *types.Zval) {
+func ZendCreateFakeClosure(res *types.Zval, func_ *ZendFunction, scope *types.ClassEntry, called_scope *types.ClassEntry, this_ptr *types.Zval) {
 	var closure *ZendClosure
 	ZendCreateClosure(res, func_, scope, called_scope, this_ptr)
 	closure = (*ZendClosure)(res.GetObj())

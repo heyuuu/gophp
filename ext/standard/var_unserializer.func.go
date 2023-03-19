@@ -487,7 +487,7 @@ func FinishNestedData(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 	*p++
 	return 1
 }
-func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, ce *zend.ZendClassEntry) int {
+func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, ce *types.ClassEntry) int {
 	var datalen zend.ZendLong
 	datalen = ParseIv2((*p)+2, p)
 	*p += 2
@@ -785,7 +785,7 @@ yy18:
 	var elements zend_long
 	var str *byte
 	var class_name *types.ZendString
-	var ce *zend.ZendClassEntry
+	var ce *types.ClassEntry
 	var incomplete_class types.ZendBool = 0
 	var custom_object types.ZendBool = 0
 	var has_unserialize types.ZendBool = 0

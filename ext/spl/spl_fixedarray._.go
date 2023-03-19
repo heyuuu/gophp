@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/zend"
+	"sik/zend/types"
 )
 
 // Source: <ext/spl/spl_fixedarray.h>
@@ -27,7 +28,7 @@ import (
   +----------------------------------------------------------------------+
 */
 
-var spl_ce_SplFixedArray *zend.ZendClassEntry
+var spl_ce_SplFixedArray *types.ClassEntry
 
 // Source: <ext/spl/spl_fixedarray.c>
 

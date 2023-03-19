@@ -62,10 +62,10 @@ type AutoloadFuncInfo struct {
 	func_ptr *zend.ZendFunction
 	obj      types.Zval
 	closure  types.Zval
-	ce       *zend.ZendClassEntry
+	ce       *types.ClassEntry
 }
 
-// func MakeAutoloadFuncInfo(func_ptr *zend.ZendFunction, obj zend.Zval, closure zend.Zval, ce *zend.ZendClassEntry) AutoloadFuncInfo {
+// func MakeAutoloadFuncInfo(func_ptr *zend.ZendFunction, obj zend.Zval, closure zend.Zval, ce *zend.ClassEntry) AutoloadFuncInfo {
 //     return AutoloadFuncInfo{
 //         func_ptr:func_ptr,
 //         obj:obj,
@@ -81,5 +81,5 @@ func (this *AutoloadFuncInfo) GetObj() types.Zval                  { return this
 func (this *AutoloadFuncInfo) GetClosure() types.Zval { return this.closure }
 
 // func (this *AutoloadFuncInfo) SetClosure(value zend.Zval) { this.closure = value }
-func (this *AutoloadFuncInfo) GetCe() *zend.ZendClassEntry      { return this.ce }
-func (this *AutoloadFuncInfo) SetCe(value *zend.ZendClassEntry) { this.ce = value }
+func (this *AutoloadFuncInfo) GetCe() *types.ClassEntry      { return this.ce }
+func (this *AutoloadFuncInfo) SetCe(value *types.ClassEntry) { this.ce = value }

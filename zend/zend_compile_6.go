@@ -175,7 +175,7 @@ func ZendCompileImplicitClosureUses(info *ClosureInfo) {
 	}
 }
 func ZendBeginMethodDecl(op_array *ZendOpArray, name *types.ZendString, has_body types.ZendBool) {
-	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var in_interface types.ZendBool = ce.IsInterface()
 	var in_trait types.ZendBool = ce.IsTrait()
 	var is_public types.ZendBool = op_array.IsPublic()
@@ -396,7 +396,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	var stmt_ast *ZendAst = decl.GetChild()[2]
 	var return_type_ast *ZendAst = decl.GetChild()[3]
 	var is_method types.ZendBool = decl.GetKind() == ZEND_AST_METHOD
-	var orig_class_entry *ZendClassEntry = CG__().GetActiveClassEntry()
+	var orig_class_entry *types.ClassEntry = CG__().GetActiveClassEntry()
 	var orig_op_array *ZendOpArray = CG__().GetActiveOpArray()
 	var op_array *ZendOpArray = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 	var orig_oparray_context ZendOparrayContext
@@ -488,7 +488,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 }
 func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 	var list *ZendAstList = ZendAstGetList(ast)
-	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	var children uint32 = list.GetChildren()
 	if ce.IsInterface() {
@@ -562,7 +562,7 @@ func ZendCompilePropGroup(list *ZendAst) {
 }
 func ZendCompileClassConstDecl(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
-	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	if ce.IsTrait() {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Traits cannot have constants")
@@ -638,7 +638,7 @@ func ZendCompileTraitAlias(ast *ZendAst) {
 func ZendCompileUseTrait(ast *ZendAst) {
 	var traits *ZendAstList = ZendAstGetList(ast.GetChild()[0])
 	var adaptations *ZendAstList = b.CondF1(ast.GetChild()[1] != nil, func() *ZendAstList { return ZendAstGetList(ast.GetChild()[1]) }, nil)
-	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var i uint32
 	ce.SetIsImplementTraits(true)
 	ce.SetTraitNames(Erealloc(ce.GetTraitNames(), b.SizeOf("zend_class_name")*(ce.GetNumTraits()+traits.GetChildren())))
@@ -677,7 +677,7 @@ func ZendCompileUseTrait(ast *ZendAst) {
 }
 func ZendCompileImplements(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
-	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var interface_names *ZendClassName
 	var i uint32
 	interface_names = Emalloc(b.SizeOf("zend_class_name") * list.GetChildren())
@@ -707,9 +707,9 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	var stmt_ast *ZendAst = decl.GetChild()[2]
 	var name *types.ZendString
 	var lcname *types.ZendString
-	var ce *ZendClassEntry = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_entry"))
+	var ce *types.ClassEntry = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_entry"))
 	var opline *ZendOp
-	var original_ce *ZendClassEntry = CG__().GetActiveClassEntry()
+	var original_ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	if !decl.IsAnonClass() {
 		var unqualified_name *types.ZendString = decl.GetName()
 		if CG__().GetActiveClassEntry() != nil {
@@ -831,7 +831,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	}
 	if toplevel != 0 && !ce.HasCeFlags(ZEND_ACC_IMPLEMENT_INTERFACES|ZEND_ACC_IMPLEMENT_TRAITS) && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
 		if extends_ast != nil {
-			var parent_ce *ZendClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (parent_ce.GetType() != ZEND_INTERNAL_CLASS || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (parent_ce.GetType() != ZEND_USER_CLASS || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
 				CG__().SetZendLineno(decl.GetEndLineno())
 				if ZendTryEarlyBind(ce, parent_ce, lcname, nil) != 0 {

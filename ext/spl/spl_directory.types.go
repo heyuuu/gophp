@@ -66,8 +66,8 @@ type SplFilesystemObject struct {
 	file_name_len int
 	type_         SPL_FS_OBJ_TYPE
 	flags         zend.ZendLong
-	file_class    *zend.ZendClassEntry
-	info_class    *zend.ZendClassEntry
+	file_class    *types.ClassEntry
+	info_class    *types.ClassEntry
 	u             struct /* union */ {
 		dir struct {
 			dirp         *core.PhpStream
@@ -118,12 +118,12 @@ func (this *SplFilesystemObject) SetFileNameLen(value int)                { this
 func (this *SplFilesystemObject) GetType() SPL_FS_OBJ_TYPE                { return this.type_ }
 func (this *SplFilesystemObject) SetType(value SPL_FS_OBJ_TYPE)           { this.type_ = value }
 func (this *SplFilesystemObject) GetFlags() zend.ZendLong                 { return this.flags }
-func (this *SplFilesystemObject) SetFlags(value zend.ZendLong)            { this.flags = value }
-func (this *SplFilesystemObject) GetFileClass() *zend.ZendClassEntry      { return this.file_class }
-func (this *SplFilesystemObject) SetFileClass(value *zend.ZendClassEntry) { this.file_class = value }
-func (this *SplFilesystemObject) GetInfoClass() *zend.ZendClassEntry      { return this.info_class }
-func (this *SplFilesystemObject) SetInfoClass(value *zend.ZendClassEntry) { this.info_class = value }
-func (this *SplFilesystemObject) GetDirp() *core.PhpStream                { return this.u.dir.dirp }
+func (this *SplFilesystemObject) SetFlags(value zend.ZendLong)         { this.flags = value }
+func (this *SplFilesystemObject) GetFileClass() *types.ClassEntry      { return this.file_class }
+func (this *SplFilesystemObject) SetFileClass(value *types.ClassEntry) { this.file_class = value }
+func (this *SplFilesystemObject) GetInfoClass() *types.ClassEntry      { return this.info_class }
+func (this *SplFilesystemObject) SetInfoClass(value *types.ClassEntry) { this.info_class = value }
+func (this *SplFilesystemObject) GetDirp() *core.PhpStream             { return this.u.dir.dirp }
 func (this *SplFilesystemObject) SetDirp(value *core.PhpStream)           { this.u.dir.dirp = value }
 func (this *SplFilesystemObject) GetEntry() core.PhpStreamDirent          { return this.u.dir.entry }
 

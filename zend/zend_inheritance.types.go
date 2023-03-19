@@ -35,7 +35,7 @@ func (this *ZendAbstractInfo) SetCtor(value int) { this.ctor = value }
 type VarianceObligation struct {
 	type_ VarianceObligationType
 	__0   struct /* union */ {
-		dependency_ce *ZendClassEntry
+		dependency_ce *types.ClassEntry
 		__0           struct {
 			parent_fn    ZendFunction
 			child_fn     ZendFunction
@@ -50,8 +50,8 @@ type VarianceObligation struct {
 
 func (this *VarianceObligation) GetType() VarianceObligationType      { return this.type_ }
 func (this *VarianceObligation) SetType(value VarianceObligationType) { this.type_ = value }
-func (this *VarianceObligation) GetDependencyCe() *ZendClassEntry     { return this.__0.dependency_ce }
-func (this *VarianceObligation) SetDependencyCe(value *ZendClassEntry) {
+func (this *VarianceObligation) GetDependencyCe() *types.ClassEntry   { return this.__0.dependency_ce }
+func (this *VarianceObligation) SetDependencyCe(value *types.ClassEntry) {
 	this.__0.dependency_ce = value
 }
 func (this *VarianceObligation) GetParentFn() ZendFunction { return this.__0.__0.parent_fn }

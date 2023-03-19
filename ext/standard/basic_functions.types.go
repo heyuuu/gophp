@@ -42,7 +42,7 @@ type PhpBasicGlobals struct {
 	mt_rand_is_seeded            types.ZendBool
 	mt_rand_mode                 zend.ZendLong
 	syslog_device                *byte
-	incomplete_class             *zend.ZendClassEntry
+	incomplete_class             *types.ClassEntry
 	serialize_lock               unsigned
 	serialize                    struct {
 		data  *PhpSerializeData
@@ -123,8 +123,8 @@ type PhpBasicGlobals struct {
 // func (this *PhpBasicGlobals) SetMtRandMode(value zend.ZendLong) { this.mt_rand_mode = value }
 // func (this *PhpBasicGlobals)  GetSyslogDevice() *byte      { return this.syslog_device }
 // func (this *PhpBasicGlobals) SetSyslogDevice(value *byte) { this.syslog_device = value }
-// func (this *PhpBasicGlobals)  GetIncompleteClass() *zend.ZendClassEntry      { return this.incomplete_class }
-// func (this *PhpBasicGlobals) SetIncompleteClass(value *zend.ZendClassEntry) { this.incomplete_class = value }
+// func (this *PhpBasicGlobals)  GetIncompleteClass() *zend.ClassEntry      { return this.incomplete_class }
+// func (this *PhpBasicGlobals) SetIncompleteClass(value *zend.ClassEntry) { this.incomplete_class = value }
 // func (this *PhpBasicGlobals)  GetSerializeLock() unsigned      { return this.serialize_lock }
 // func (this *PhpBasicGlobals) SetSerializeLock(value unsigned) { this.serialize_lock = value }
 // func (this *PhpBasicGlobals)  GetSerializeData() *PhpSerializeData      { return this.serialize.data }

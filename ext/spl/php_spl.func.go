@@ -17,8 +17,8 @@ func ZmGlobalsCtorSpl(spl_globals *ZendSplGlobals) {
 	spl_globals.SetAutoloadFunctions(nil)
 	spl_globals.SetAutoloadRunning(0)
 }
-func SplFindCeByName(name *types.ZendString, autoload types.ZendBool) *zend.ZendClassEntry {
-	var ce *zend.ZendClassEntry
+func SplFindCeByName(name *types.ZendString, autoload types.ZendBool) *types.ClassEntry {
+	var ce *types.ClassEntry
 	if autoload == 0 {
 		var lc_name *types.ZendString = zend.ZendStringTolower(name)
 		ce = zend.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name)
@@ -34,8 +34,8 @@ func SplFindCeByName(name *types.ZendString, autoload types.ZendBool) *zend.Zend
 }
 func ZifClassParents(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
-	var parent_class *zend.ZendClassEntry
-	var ce *zend.ZendClassEntry
+	var parent_class *types.ClassEntry
+	var ce *types.ClassEntry
 	var autoload types.ZendBool = 1
 	if zend.ZendParseParameters(executeData.NumArgs(), "z|b", &obj, &autoload) == types.FAILURE {
 		return_value.SetFalse()
@@ -64,7 +64,7 @@ func ZifClassParents(executeData *zend.ZendExecuteData, return_value *types.Zval
 func ZifClassImplements(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
 	var autoload types.ZendBool = 1
-	var ce *zend.ZendClassEntry
+	var ce *types.ClassEntry
 	if zend.ZendParseParameters(executeData.NumArgs(), "z|b", &obj, &autoload) == types.FAILURE {
 		return_value.SetFalse()
 		return
@@ -88,7 +88,7 @@ func ZifClassImplements(executeData *zend.ZendExecuteData, return_value *types.Z
 func ZifClassUses(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
 	var autoload types.ZendBool = 1
-	var ce *zend.ZendClassEntry
+	var ce *types.ClassEntry
 	if zend.ZendParseParameters(executeData.NumArgs(), "z|b", &obj, &autoload) == types.FAILURE {
 		return_value.SetFalse()
 		return
@@ -302,7 +302,7 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 		var func_ *zend.ZendFunction
 		var fci zend.ZendFcallInfo
 		var fcic zend.ZendFcallInfoCache
-		var called_scope *zend.ZendClassEntry = zend.ZendGetCalledScope(executeData)
+		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
 		var l_autoload_running int = SPL_G(autoload_running)
 		SPL_G(autoload_running) = 1
 		lc_name = zend.ZendStringTolower(class_name.GetStr())

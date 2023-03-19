@@ -4,7 +4,7 @@ package zend
 
 import "sik/zend/types"
 
-var ZendCeWeakref *ZendClassEntry
+var ZendCeWeakref *types.ClassEntry
 
 var ZendWeakrefHandlers ZendObjectHandlers
 var ZendWeakrefCreateArginfo = []ArgInfo{

@@ -30,10 +30,10 @@ func ZendObjectRelease(obj *types.ZendObject) {
 		GcPossibleRoot((*types.ZendRefcounted)(obj))
 	}
 }
-func ZendObjectPropertiesSize(ce *ZendClassEntry) int {
+func ZendObjectPropertiesSize(ce *types.ClassEntry) int {
 	return b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() - b.Cond(ce.IsUseGuards(), 0, 1))
 }
-func ZendObjectAlloc(obj_size int, ce *ZendClassEntry) any {
+func ZendObjectAlloc(obj_size int, ce *types.ClassEntry) any {
 	var obj any = Emalloc(obj_size + ZendObjectPropertiesSize(ce))
 
 	/* Subtraction of sizeof(zval) is necessary, because zend_object_properties_size() may be

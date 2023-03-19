@@ -9,11 +9,11 @@ import "sik/zend/types"
  */
 type ZendUserIterator struct {
 	it    ZendObjectIterator
-	ce    *ZendClassEntry
+	ce    *types.ClassEntry
 	value types.Zval
 }
 
-// func MakeZendUserIterator(it ZendObjectIterator, ce *ZendClassEntry, value Zval) ZendUserIterator {
+// func MakeZendUserIterator(it ZendObjectIterator, ce *ClassEntry, value Zval) ZendUserIterator {
 //     return ZendUserIterator{
 //         it:it,
 //         ce:ce,
@@ -23,8 +23,8 @@ type ZendUserIterator struct {
 func (this *ZendUserIterator) GetIt() ZendObjectIterator { return this.it }
 
 // func (this *ZendUserIterator) SetIt(value ZendObjectIterator) { this.it = value }
-func (this *ZendUserIterator) GetCe() *ZendClassEntry      { return this.ce }
-func (this *ZendUserIterator) SetCe(value *ZendClassEntry) { this.ce = value }
-func (this *ZendUserIterator) GetValue() types.Zval        { return this.value }
+func (this *ZendUserIterator) GetCe() *types.ClassEntry      { return this.ce }
+func (this *ZendUserIterator) SetCe(value *types.ClassEntry) { this.ce = value }
+func (this *ZendUserIterator) GetValue() types.Zval          { return this.value }
 
 // func (this *ZendUserIterator) SetValue(value Zval) { this.value = value }

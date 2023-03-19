@@ -96,12 +96,12 @@ func (this *ZendUtilityValues) SetHtmlErrors(value types.ZendBool) { this.html_e
  */
 type ZendErrorHandling struct {
 	handling     ZendErrorHandlingT
-	exception    *ZendClassEntry
+	exception    *types.ClassEntry
 	user_handler types.Zval
 }
 
 func (this *ZendErrorHandling) GetHandling() ZendErrorHandlingT      { return this.handling }
 func (this *ZendErrorHandling) SetHandling(value ZendErrorHandlingT) { this.handling = value }
-func (this *ZendErrorHandling) GetException() *ZendClassEntry        { return this.exception }
-func (this *ZendErrorHandling) SetException(value *ZendClassEntry)   { this.exception = value }
+func (this *ZendErrorHandling) GetException() *types.ClassEntry      { return this.exception }
+func (this *ZendErrorHandling) SetException(value *types.ClassEntry) { this.exception = value }
 func (this *ZendErrorHandling) GetUserHandler() types.Zval           { return this.user_handler }

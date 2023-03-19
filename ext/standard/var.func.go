@@ -736,7 +736,7 @@ func PhpVarSerializeTryAddSleepProp(ht *types.HashTable, props *types.HashTable,
 	return types.SUCCESS
 }
 func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_retval *types.HashTable) int {
-	var ce *zend.ZendClassEntry = types.Z_OBJCE_P(struc)
+	var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
 	var props *types.HashTable = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
 	var retval int = types.SUCCESS
@@ -927,7 +927,7 @@ again:
 		PhpVarSerializeString(buf, struc.GetStr().GetVal(), struc.GetStr().GetLen())
 		return
 	case types.IS_OBJECT:
-		var ce *zend.ZendClassEntry = types.Z_OBJCE_P(struc)
+		var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
 		var incomplete_class types.ZendBool
 		var count uint32
 		if zend.ZendHashStrExists(ce.GetFunctionTable(), "__serialize", b.SizeOf("\"__serialize\"")-1) != 0 {

@@ -38,7 +38,7 @@ func (this *_spl_cbfilter_it_intern) SetObject(value *types.ZendObject) { this.o
 type SplDualItObject struct {
 	inner struct {
 		zobject  types.Zval
-		ce       *zend.ZendClassEntry
+		ce       *types.ClassEntry
 		object   *types.ZendObject
 		iterator *zend.ZendObjectIterator
 	}
@@ -79,8 +79,8 @@ type SplDualItObject struct {
 func (this *SplDualItObject) GetZobject() types.Zval { return this.inner.zobject }
 
 // func (this *SplDualItObject) SetZobject(value zend.Zval) { this.inner.zobject = value }
-func (this *SplDualItObject) GetCe() *zend.ZendClassEntry      { return this.inner.ce }
-func (this *SplDualItObject) SetCe(value *zend.ZendClassEntry) { this.inner.ce = value }
+func (this *SplDualItObject) GetCe() *types.ClassEntry      { return this.inner.ce }
+func (this *SplDualItObject) SetCe(value *types.ClassEntry) { this.inner.ce = value }
 
 // func (this *SplDualItObject)  GetObject() *zend.ZendObject      { return this.inner.object }
 func (this *SplDualItObject) SetObject(value *types.ZendObject)          { this.inner.object = value }
@@ -236,11 +236,11 @@ func (this *SplDualItObject) SwitchUseFlags(value int, cond bool) {
 type SplSubIterator struct {
 	iterator *zend.ZendObjectIterator
 	zobject  types.Zval
-	ce       *zend.ZendClassEntry
+	ce       *types.ClassEntry
 	state    RecursiveIteratorState
 }
 
-// func MakeSplSubIterator(iterator *zend.ZendObjectIterator, zobject zend.Zval, ce *zend.ZendClassEntry, state RecursiveIteratorState) SplSubIterator {
+// func MakeSplSubIterator(iterator *zend.ZendObjectIterator, zobject zend.Zval, ce *zend.ClassEntry, state RecursiveIteratorState) SplSubIterator {
 //     return SplSubIterator{
 //         iterator:iterator,
 //         zobject:zobject,
@@ -253,9 +253,9 @@ func (this *SplSubIterator) SetIterator(value *zend.ZendObjectIterator) { this.i
 func (this *SplSubIterator) GetZobject() types.Zval                     { return this.zobject }
 
 // func (this *SplSubIterator) SetZobject(value zend.Zval) { this.zobject = value }
-func (this *SplSubIterator) GetCe() *zend.ZendClassEntry           { return this.ce }
-func (this *SplSubIterator) SetCe(value *zend.ZendClassEntry)      { this.ce = value }
-func (this *SplSubIterator) GetState() RecursiveIteratorState      { return this.state }
+func (this *SplSubIterator) GetCe() *types.ClassEntry         { return this.ce }
+func (this *SplSubIterator) SetCe(value *types.ClassEntry)    { this.ce = value }
+func (this *SplSubIterator) GetState() RecursiveIteratorState { return this.state }
 func (this *SplSubIterator) SetState(value RecursiveIteratorState) { this.state = value }
 
 /**
@@ -275,7 +275,7 @@ type SplRecursiveItObject struct {
 	beginChildren   *zend.ZendFunction
 	endChildren     *zend.ZendFunction
 	nextElement     *zend.ZendFunction
-	ce              *zend.ZendClassEntry
+	ce              *types.ClassEntry
 	prefix          []zend.SmartStr
 	postfix         []zend.SmartStr
 	std             types.ZendObject
@@ -295,7 +295,7 @@ type SplRecursiveItObject struct {
 // beginChildren *zend.ZendFunction,
 // endChildren *zend.ZendFunction,
 // nextElement *zend.ZendFunction,
-// ce *zend.ZendClassEntry,
+// ce *zend.ClassEntry,
 // prefix []zend.SmartStr,
 // postfix []zend.SmartStr,
 // std zend.ZendObject,
@@ -361,8 +361,8 @@ func (this *SplRecursiveItObject) GetEndChildren() *zend.ZendFunction      { ret
 func (this *SplRecursiveItObject) SetEndChildren(value *zend.ZendFunction) { this.endChildren = value }
 func (this *SplRecursiveItObject) GetNextElement() *zend.ZendFunction      { return this.nextElement }
 func (this *SplRecursiveItObject) SetNextElement(value *zend.ZendFunction) { this.nextElement = value }
-func (this *SplRecursiveItObject) GetCe() *zend.ZendClassEntry             { return this.ce }
-func (this *SplRecursiveItObject) SetCe(value *zend.ZendClassEntry)        { this.ce = value }
+func (this *SplRecursiveItObject) GetCe() *types.ClassEntry                { return this.ce }
+func (this *SplRecursiveItObject) SetCe(value *types.ClassEntry)           { this.ce = value }
 func (this *SplRecursiveItObject) GetPrefix() []zend.SmartStr              { return this.prefix }
 
 // func (this *SplRecursiveItObject) SetPrefix(value []zend.SmartStr) { this.prefix = value }

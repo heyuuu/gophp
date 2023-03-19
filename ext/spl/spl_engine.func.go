@@ -8,19 +8,19 @@ import (
 	"sik/zend/types"
 )
 
-func SplInstantiateArgEx1(pce *zend.ZendClassEntry, retval *types.Zval, arg1 *types.Zval) int {
+func SplInstantiateArgEx1(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval) int {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetVal(), func_.GetFunctionName().GetLen(), nil, 1, arg1, nil)
 	return 0
 }
-func SplInstantiateArgEx2(pce *zend.ZendClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
+func SplInstantiateArgEx2(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetVal(), func_.GetFunctionName().GetLen(), nil, 2, arg1, arg2)
 	return 0
 }
-func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
+func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
 	var func_ *zend.ZendFunction = pce.GetConstructor()
 	var fci zend.ZendFcallInfo
 	var fcc zend.ZendFcallInfoCache
@@ -38,7 +38,7 @@ func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *types.Zval, argc int, 
 	fcc.SetObject(retval.GetObj())
 	zend.ZendCallFunction(&fci, &fcc)
 }
-func SplInstantiate(pce *zend.ZendClassEntry, object *types.Zval) { zend.ObjectInitEx(object, pce) }
+func SplInstantiate(pce *types.ClassEntry, object *types.Zval) { zend.ObjectInitEx(object, pce) }
 func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 	var idx zend.ZendUlong
 try_again:

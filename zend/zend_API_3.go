@@ -34,7 +34,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 		return argparse.ParseVaArgs(num_args, type_spec, args, 0)
 	} else {
 		object := args[0].(**types.Zval)
-		ce := args[1].(*ZendClassEntry)
+		ce := args[1].(*types.ClassEntry)
 		*object = this_ptr
 		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
 			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
@@ -47,7 +47,7 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *types.Zval, 
 		return argparse.ParseVaArgs(num_args, type_spec, args, flags)
 	} else {
 		object := args[0].(**types.Zval)
-		ce := args[1].(*ZendClassEntry)
+		ce := args[1].(*types.ClassEntry)
 		*object = this_ptr
 		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
 			if (flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
@@ -60,7 +60,7 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *types.Zval, 
 }
 func ZendMergeProperties(obj *types.Zval, properties *types.HashTable) {
 	var obj_ht *ZendObjectHandlers = types.Z_OBJ_HT_P(obj)
-	var old_scope *ZendClassEntry = EG__().GetFakeScope()
+	var old_scope *types.ClassEntry = EG__().GetFakeScope()
 	var key *types.ZendString
 	var value *types.Zval
 	EG__().SetFakeScope(types.Z_OBJCE_P(obj))
@@ -79,9 +79,9 @@ func ZendMergeProperties(obj *types.Zval, properties *types.HashTable) {
 	}
 	EG__().SetFakeScope(old_scope)
 }
-func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
+func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 	if !class_type.IsConstantsUpdated() {
-		var ce *ZendClassEntry
+		var ce *types.ClassEntry
 		var c *ZendClassConstant
 		var val *types.Zval
 		var prop_info *ZendPropertyInfo
@@ -146,7 +146,7 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 	}
 	return types.SUCCESS
 }
-func _objectPropertiesInit(object *types.ZendObject, class_type *ZendClassEntry) {
+func _objectPropertiesInit(object *types.ZendObject, class_type *types.ClassEntry) {
 	if class_type.GetDefaultPropertiesCount() != 0 {
 		var src *types.Zval = class_type.GetDefaultPropertiesTable()
 		var dst *types.Zval = object.GetPropertiesTable()

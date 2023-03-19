@@ -132,7 +132,7 @@ type ZendObjectCastT func(readobj *types.Zval, retval *types.Zval, type_ int) in
  * Returns FAILURE if the object does not have any sense of overloaded dimensions */
 
 type ZendObjectCountElementsT func(object *types.Zval, count *ZendLong) int
-type ZendObjectGetClosureT func(obj *types.Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int
+type ZendObjectGetClosureT func(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int
 type ZendObjectGetGcT func(object *types.Zval, table **types.Zval, n *int) *types.HashTable
 type ZendObjectDoOperationT func(opcode types.ZendUchar, result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 
