@@ -92,13 +92,13 @@ func (p *FastParser) triggerError(errorCode int, err string) {
 	if !p.isQuiet() {
 		switch errorCode {
 		case ZPP_ERROR_WRONG_CALLBACK:
-			zend.WrongCallbackError(p.idx, err, p.isThrow())
+			WrongCallbackError(p.idx, err, p.isThrow())
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
-			zend.WrongParamClassError(p.idx, name, p.arg, p.isThrow())
+			WrongParamClassError(p.idx, name, p.arg, p.isThrow())
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
-			zend.WrongParamTypeError(p.idx, expectedType, p.arg, p.isThrow())
+			WrongParamTypeError(p.idx, expectedType, p.arg, p.isThrow())
 		}
 	}
 }
@@ -258,7 +258,7 @@ func (p *FastParser) ParseFuncEx(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInf
 			p.triggerError(ZPP_ERROR_WRONG_CALLBACK, *err)
 		}
 	} else if err != nil {
-		zend.ZendWrongCallbackDeprecated(p.idx, *err)
+		ZendWrongCallbackDeprecated(p.idx, *err)
 	}
 
 	return

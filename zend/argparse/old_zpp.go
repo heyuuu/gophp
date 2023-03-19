@@ -1,11 +1,8 @@
 package argparse
 
 import (
-	"sik/zend"
 	"sik/zend/types"
 )
-
-func CurrExecuteData() ExecuteData { return zend.CurrEX() }
 
 type OldParser struct {
 	numArgs  int
@@ -33,9 +30,9 @@ func OldParseStart(numArgs int, typeSpec string, va []any, flags int) *OldParser
 	if !ok {
 		return nil
 	}
-	executeData := CurrExecuteData()
+	executeData := currExecuteData()
 	if numArgs > executeData.NumArgs() {
-		zend.ZendParseParametersDebugError("could not obtain parameters for parsing")
+		ZendParseParametersDebugError("could not obtain parameters for parsing")
 		return nil
 	}
 
@@ -76,13 +73,13 @@ func (p *OldParser) triggerError(errorCode int, err string) {
 	if !p.isQuiet() {
 		switch errorCode {
 		case ZPP_ERROR_WRONG_CALLBACK:
-			zend.WrongCallbackError(p.idx, err, p.isThrow())
+			WrongCallbackError(p.idx, err, p.isThrow())
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
-			zend.WrongParamClassError(p.idx, name, p.arg, p.isThrow())
+			WrongParamClassError(p.idx, name, p.arg, p.isThrow())
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
-			zend.WrongParamTypeError(p.idx, expectedType, p.arg, p.isThrow())
+			WrongParamTypeError(p.idx, expectedType, p.arg, p.isThrow())
 		}
 	}
 }

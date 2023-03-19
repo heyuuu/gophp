@@ -21,7 +21,7 @@ func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs
 			/* Pass */
 		case '*', '+':
 			if haveVarargs {
-				zend.ZendParseParametersDebugError("only one varargs specifier (* or +) is permitted")
+				ZendParseParametersDebugError("only one varargs specifier (* or +) is permitted")
 				return
 			}
 			haveVarargs = true
@@ -34,7 +34,7 @@ func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs
 			/* mark the beginning of varargs */
 			postVarargs = maxNumArgs
 		default:
-			zend.ZendParseParametersDebugError("bad type specifier while parsing parameters")
+			ZendParseParametersDebugError("bad type specifier while parsing parameters")
 			return
 		}
 	}

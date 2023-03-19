@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -3389,7 +3390,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				var str *types.ZendString
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
-				if ZendParseArgStrWeak(&tmp, &str) != 0 {
+				if argparse.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
@@ -11523,7 +11524,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				var str *types.ZendString
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
-				if ZendParseArgStrWeak(&tmp, &str) != 0 {
+				if argparse.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
@@ -33254,7 +33255,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				var str *types.ZendString
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
-				if ZendParseArgStrWeak(&tmp, &str) != 0 {
+				if argparse.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break

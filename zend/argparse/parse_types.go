@@ -8,8 +8,6 @@ import (
 	"sik/zend/types"
 )
 
-func isArgUseWeakTypes() bool { return !zend.CurrEX().IsArgUseStrictTypes() }
-
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
 
 func ParseBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
@@ -87,7 +85,7 @@ func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 	return dest, true
 }
 
-func parseArgWeak_DvalToLval(dval float64, cap bool) (zend.ZendLong, bool) {
+func parseArgWeak_DvalToLval(dval float64, cap bool) (int, bool) {
 	if math.IsNaN(dval) {
 		return 0, false
 	}

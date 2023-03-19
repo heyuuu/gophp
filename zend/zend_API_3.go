@@ -1,19 +1,10 @@
-// <<generate>>
-
 package zend
 
 import (
-	b "sik/builtin"
 	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
-
-func ZendParseParametersDebugError(msg string) {
-	var active_function *ZendFunction = CurrEX().GetFunc()
-	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
-}
 
 func ZendParseParametersEx(flags int, num_args int, type_spec string, args ...any) int {
 	return argparse.ParseVaArgs(num_args, type_spec, args, flags)

@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -12,7 +13,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 	switch type_hint {
 	case types._IS_BOOL:
 		var dest types.ZendBool
-		if ZendParseArgBoolWeak(arg, &dest) == 0 {
+		if argparse.ZendParseArgBoolWeak(arg, &dest) == 0 {
 			return 0
 		}
 		ZvalPtrDtor(arg)
@@ -20,7 +21,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 		return 1
 	case types.IS_LONG:
 		var dest ZendLong
-		if ZendParseArgLongWeak(arg, &dest) == 0 {
+		if argparse.ZendParseArgLongWeak(arg, &dest) == 0 {
 			return 0
 		}
 		ZvalPtrDtor(arg)
@@ -28,7 +29,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 		return 1
 	case types.IS_DOUBLE:
 		var dest float64
-		if ZendParseArgDoubleWeak(arg, &dest) == 0 {
+		if argparse.ZendParseArgDoubleWeak(arg, &dest) == 0 {
 			return 0
 		}
 		ZvalPtrDtor(arg)
@@ -39,7 +40,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 
 		/* on success "arg" is converted to IS_STRING */
 
-		return ZendParseArgStrWeak(arg, &dest)
+		return argparse.ZendParseArgStrWeak(arg, &dest)
 
 	/* on success "arg" is converted to IS_STRING */
 

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -21,7 +22,7 @@ func ZendParseParametersNone() types.ZEND_RESULT_CODE {
 	if executeData.NumArgs() == 0 {
 		return types.SUCCESS
 	} else {
-		CheckNumArgsNoneError()
+		argparse.CheckNumArgsNoneError()
 		return types.FAILURE
 	}
 }
@@ -29,7 +30,7 @@ func ZendParseParametersNoneThrow() types.ZEND_RESULT_CODE {
 	if executeData.NumArgs() == 0 {
 		return types.SUCCESS
 	} else {
-		CheckNumArgsNoneException()
+		argparse.CheckNumArgsNoneException()
 		return types.FAILURE
 	}
 }

@@ -504,7 +504,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var algo *types.ZendString
 	if executeData.NumArgs() != 0 {
-		zend.CheckNumArgsNoneError()
+		argparse.CheckNumArgsNoneError()
 		return
 	}
 	zend.ArrayInit(return_value)

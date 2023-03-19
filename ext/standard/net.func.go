@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -81,7 +82,7 @@ func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *types.
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
 	if executeData.NumArgs() != 0 {
-		zend.CheckNumArgsNoneError()
+		argparse.CheckNumArgsNoneError()
 		return
 	}
 	if getifaddrs(&addrs) {
