@@ -52,19 +52,15 @@ func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs
 }
 
 func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
-	minNumArgs, maxNumArgs, postVarargs, ok := checkTypeSpec(typeSpec)
-	if !ok {
-		return types.FAILURE
-	}
-	if !CheckNumArgsEx(numArgs, zend.CurrEX(), minNumArgs, maxNumArgs, flags) {
-		return types.FAILURE
-	}
-	argCount := zend.CurrEX().NumArgs()
-	if numArgs > argCount {
-		zend.ZendParseParametersDebugError("could not obtain parameters for parsing")
+	parser := OldParseStart(numArgs, typeSpec, va, flags)
+	if parser == nil || parser.HasError() {
 		return types.FAILURE
 	}
 
+	return parser.ParseVaArgs(numArgs, typeSpec, va, flags)
+}
+
+func (p *OldParser) ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
 	var i int
 	var arg *types.Zval
 	var varargs **types.Zval = nil
@@ -78,7 +74,7 @@ func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
 			r.inc()
 		}
 		if r.curr() == '*' || r.curr() == '+' {
-			var num_varargs int = numArgs + 1 - postVarargs
+			var num_varargs int = numArgs + 1 - p.postVarargs
 
 			/* eat up the passed in storage even if it won't be filled in with varargs */
 			varargs = vaArg[*types.Zval](&va)
@@ -99,7 +95,7 @@ func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
 			}
 		}
 		arg = zend.CurrEX().Arg(i + 1)
-		if ZendParseArg(i+1, arg, va, &typeSpec, flags) == types.FAILURE {
+		if p.ZendParseArg(i+1, arg, va, &typeSpec, flags) == types.FAILURE {
 
 			/* clean up varargs array if it was used */
 

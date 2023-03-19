@@ -21,8 +21,8 @@ func parseError(severity int, format string, args ...any) *parseArgError {
 	return &parseArgError{severity: severity, message: fmt.Sprintf(format, args...)}
 }
 
-func ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader, flags int) int {
-	err := ZendParseArgImpl(arg, va, spec)
+func (p *OldParser) ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader, flags int) int {
+	err := p.ZendParseArgImpl(arg, va, spec)
 	if err != nil {
 		if zend.EG__().GetException() != nil {
 			return types.FAILURE
@@ -38,31 +38,22 @@ func ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceiver, spec *b.StrR
 	return types.SUCCESS
 }
 
-func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *parseArgError {
-	specWalk := spec.Copy()
-	c := specWalk.Read()
-	var check_null int = 0
-	var separate int = 0
-	var real_arg *types.Zval = arg
-
+func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *typeSpecReader) *parseArgError {
 	/* scan through modifiers */
+	typ, checkNull, separateBool := spec.Next()
+	check_null := types.IntBool(checkNull)
+	separate := types.IntBool(separateBool)
 
+	real_arg := arg
 	arg = types.ZVAL_DEREF(arg)
-	for true {
-		if specWalk.Curr() == '/' {
-			types.SEPARATE_ZVAL_NOREF(arg)
-			real_arg = arg
-			separate = 1
-		} else if specWalk.Curr() == '!' {
-			check_null = 1
-		} else {
-			break
-		}
-		specWalk.Next()
+	if separateBool {
+		types.SEPARATE_ZVAL_NOREF(arg)
+		real_arg = arg
 	}
-	switch c {
+
+	switch typ {
 	case 'l', 'L':
-		if val, isNull, ok := ParseLong(arg, check_null != 0, c == 'L'); ok {
+		if val, isNull, ok := ParseLong(arg, check_null != 0, typ == 'L'); ok {
 			va.Long(val)
 			if check_null != 0 {
 				va.Bool(isNull)
@@ -118,12 +109,12 @@ func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *p
 		}
 	case 'A', 'a':
 		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgArray(arg, p, check_null, c == 'A') == 0 {
+		if ZendParseArgArray(arg, p, check_null, typ == 'A') == 0 {
 			return parseTypeError(arg, "array")
 		}
 	case 'H', 'h':
 		var p **types.HashTable = __va_arg(*va, (**types.HashTable)(_))
-		if ZendParseArgArrayHt(arg, p, check_null, c == 'H', separate) == 0 {
+		if ZendParseArgArrayHt(arg, p, check_null, typ == 'H', separate) == 0 {
 			return parseTypeError(arg, "array")
 		}
 	case 'o':
@@ -177,7 +168,6 @@ func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *p
 		}
 		if zend.ZendFcallInfoInit(arg, 0, fci, fcc, nil, &is_callable_error) == types.SUCCESS {
 			if is_callable_error != nil {
-				*spec = *specWalk
 				return parseError(zend.E_DEPRECATED, "to be a valid callback, %s", is_callable_error)
 			}
 			break
@@ -193,10 +183,9 @@ func ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader) *p
 		ZendParseArgZvalDeref(real_arg, p, check_null)
 	case 'Z':
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
-		b.Assert(c != 'Z')
+		b.Assert(typ != 'Z')
 	default:
 		return parseTypeError(arg, "unknown")
 	}
-	*spec = *specWalk
 	return nil
 }

@@ -372,7 +372,7 @@ func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull boo
 
 	if ZendParseArgObject(p.arg, &dest, ce, types.IntBool(checkNull)) == 0 {
 		if ce != nil {
-			p.triggerError(ZPP_ERROR_FAILURE, ce.Name())
+			p.triggerError(ZPP_ERROR_WRONG_CLASS, ce.Name())
 		} else {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_OBJECT)
 		}

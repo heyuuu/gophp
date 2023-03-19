@@ -2,6 +2,41 @@ package argparse
 
 import "log"
 
+type typeSpecReader struct{ str string }
+
+func (r *typeSpecReader) curr() byte {
+	if r.str != "" {
+		return r.str[0]
+	}
+	return 0
+}
+
+func (r *typeSpecReader) read() byte {
+	if r.str != "" {
+		c := r.str[0]
+		r.str = r.str[1:]
+		return c
+	}
+	return 0
+}
+func (r *typeSpecReader) Next() (typ byte, checkNull bool, separate bool) {
+	typ = r.read()
+	if typ == '|' {
+		typ = r.read()
+	}
+	for {
+		if r.curr() == '/' {
+			separate = true
+		} else if r.curr() == '!' {
+			checkNull = true
+		} else {
+			break
+		}
+		r.read()
+	}
+	return
+}
+
 type strReader struct {
 	str string
 }
