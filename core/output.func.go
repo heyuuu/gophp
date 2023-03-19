@@ -921,7 +921,7 @@ func ZifObStart(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifObFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if !(OG(active)) {
@@ -938,7 +938,7 @@ func ZifObFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifObClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if !(OG(active)) {
@@ -955,7 +955,7 @@ func ZifObClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if !(OG(active)) {
@@ -967,7 +967,7 @@ func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	return
 }
 func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if !(OG(active)) {
@@ -979,7 +979,7 @@ func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	return
 }
 func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if PhpOutputGetContents(return_value) == types.FAILURE {
@@ -992,7 +992,7 @@ func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 }
 func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if !(OG(active)) {
@@ -1009,7 +1009,7 @@ func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 }
 func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if PhpOutputGetContents(return_value) == types.FAILURE {
@@ -1018,14 +1018,14 @@ func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 }
 func ZifObGetLevel(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(PhpOutputGetLevel())
 	return
 }
 func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if PhpOutputGetLength(return_value) == types.FAILURE {
@@ -1034,7 +1034,7 @@ func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	}
 }
 func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -1067,7 +1067,7 @@ func ZifObImplicitFlush(executeData *zend.ZendExecuteData, return_value *types.Z
 	PhpOutputSetImplicitFlush(flag)
 }
 func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if standard.PhpUrlScannerResetVars() == types.SUCCESS {

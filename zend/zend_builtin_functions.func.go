@@ -42,7 +42,7 @@ func ZifGcEnabled() bool { return true }
 //@zif -c 0
 func ZifGcEnable(executeData *ZendExecuteData, return_value *types.Zval) {
 	var key *types.ZendString
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	key = types.ZendStringInit("zend.enable_gc", b.SizeOf("\"zend.enable_gc\"")-1, 0)
@@ -51,7 +51,7 @@ func ZifGcEnable(executeData *ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGcDisable(executeData *ZendExecuteData, return_value *types.Zval) {
 	var key *types.ZendString
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	key = types.ZendStringInit("zend.enable_gc", b.SizeOf("\"zend.enable_gc\"")-1, 0)
@@ -59,7 +59,7 @@ func ZifGcDisable(executeData *ZendExecuteData, return_value *types.Zval) {
 	types.ZendStringReleaseEx(key, 0)
 }
 func ZifGcStatus(executeData *ZendExecuteData, return_value *types.Zval) {
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	ArrayInitSize(return_value, 3)
@@ -70,7 +70,7 @@ func ZifGcStatus(executeData *ZendExecuteData, return_value *types.Zval) {
 }
 func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 	var ex *ZendExecuteData = executeData.GetPrevExecuteData()
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
@@ -665,7 +665,7 @@ func ZifGetClass(executeData *ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGetCalledClass(executeData *ZendExecuteData, return_value *types.Zval) {
 	var called_scope *types.ClassEntry
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	called_scope = ZendGetCalledScope(executeData)
@@ -1266,7 +1266,7 @@ func ZifClassAlias(executeData *ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGetIncludedFiles(executeData *ZendExecuteData, return_value *types.Zval) {
 	var entry *types.ZendString
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	ArrayInit(return_value)
@@ -1332,7 +1332,7 @@ func ZifSetErrorHandler(executeData *ZendExecuteData, return_value *types.Zval) 
 	EG__().SetUserErrorHandlerErrorReporting(int(error_type))
 }
 func ZifRestoreErrorHandler(executeData *ZendExecuteData, return_value *types.Zval) {
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if EG__().GetUserErrorHandler().GetType() != types.IS_UNDEF {
@@ -1378,7 +1378,7 @@ func ZifSetExceptionHandler(executeData *ZendExecuteData, return_value *types.Zv
 	types.ZVAL_COPY(EG__().GetUserExceptionHandler(), exception_handler)
 }
 func ZifRestoreExceptionHandler(executeData *ZendExecuteData, return_value *types.Zval) {
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
@@ -1403,7 +1403,7 @@ func CopyClassOrInterfaceName(array *types.Zval, key *types.ZendString, ce *type
 func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval, flags int, skip_flags int) {
 	var key *types.ZendString
 	var ce *types.ClassEntry
-	if ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	ArrayInit(return_value)

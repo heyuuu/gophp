@@ -423,14 +423,14 @@ func zim_spl_RecursiveIteratorIterator___construct(executeData *zend.ZendExecute
 }
 func zim_spl_RecursiveIteratorIterator_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplRecursiveItRewindEx(object, zend.ZEND_THIS(executeData))
 }
 func zim_spl_RecursiveIteratorIterator_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	types.ZVAL_BOOL(return_value, SplRecursiveItValidEx(object, zend.ZEND_THIS(executeData)) == types.SUCCESS)
@@ -439,7 +439,7 @@ func zim_spl_RecursiveIteratorIterator_valid(executeData *zend.ZendExecuteData, 
 func zim_spl_RecursiveIteratorIterator_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var iterator *zend.ZendObjectIterator
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SPL_FETCH_SUB_ITERATOR(iterator, object)
@@ -454,7 +454,7 @@ func zim_spl_RecursiveIteratorIterator_current(executeData *zend.ZendExecuteData
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var iterator *zend.ZendObjectIterator
 	var data *types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SPL_FETCH_SUB_ITERATOR(iterator, object)
@@ -465,14 +465,14 @@ func zim_spl_RecursiveIteratorIterator_current(executeData *zend.ZendExecuteData
 }
 func zim_spl_RecursiveIteratorIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplRecursiveItMoveForwardEx(object, zend.ZEND_THIS(executeData))
 }
 func zim_spl_RecursiveIteratorIterator_getDepth(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(object.GetLevel())
@@ -499,7 +499,7 @@ func zim_spl_RecursiveIteratorIterator_getSubIterator(executeData *zend.ZendExec
 func zim_spl_RecursiveIteratorIterator_getInnerIterator(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var zobject *types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -510,12 +510,12 @@ func zim_spl_RecursiveIteratorIterator_getInnerIterator(executeData *zend.ZendEx
 	types.ZVAL_COPY_DEREF(return_value, zobject)
 }
 func zim_spl_RecursiveIteratorIterator_beginIteration(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
 func zim_spl_RecursiveIteratorIterator_endIteration(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
@@ -523,7 +523,7 @@ func zim_spl_RecursiveIteratorIterator_callHasChildren(executeData *zend.ZendExe
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var ce *types.ClassEntry
 	var zobject *types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -551,7 +551,7 @@ func zim_spl_RecursiveIteratorIterator_callGetChildren(executeData *zend.ZendExe
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
 	var ce *types.ClassEntry
 	var zobject *types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -571,17 +571,17 @@ func zim_spl_RecursiveIteratorIterator_callGetChildren(executeData *zend.ZendExe
 	}
 }
 func zim_spl_RecursiveIteratorIterator_beginChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
 func zim_spl_RecursiveIteratorIterator_endChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
 func zim_spl_RecursiveIteratorIterator_nextElement(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
@@ -601,7 +601,7 @@ func zim_spl_RecursiveIteratorIterator_setMaxDepth(executeData *zend.ZendExecute
 }
 func zim_spl_RecursiveIteratorIterator_getMaxDepth(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetMaxDepth() == -1 {
@@ -762,7 +762,7 @@ func zim_spl_RecursiveTreeIterator_setPrefixPart(executeData *zend.ZendExecuteDa
 }
 func zim_spl_RecursiveTreeIterator_getPrefix(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -783,7 +783,7 @@ func zim_spl_RecursiveTreeIterator_setPostfix(executeData *zend.ZendExecuteData,
 }
 func zim_spl_RecursiveTreeIterator_getEntry(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -794,7 +794,7 @@ func zim_spl_RecursiveTreeIterator_getEntry(executeData *zend.ZendExecuteData, r
 }
 func zim_spl_RecursiveTreeIterator_getPostfix(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -810,7 +810,7 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 	var postfix types.Zval
 	var ptr *byte
 	var str *types.ZendString
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if object.GetIterators() == nil {
@@ -865,7 +865,7 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	var key_copy types.Zval
 	var ptr *byte
 	var str *types.ZendString
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SPL_FETCH_SUB_ITERATOR(iterator, object)
@@ -1100,7 +1100,7 @@ func zim_spl_CallbackFilterIterator___construct(executeData *zend.ZendExecuteDat
 }
 func zim_spl_dual_it_getInnerIterator(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1195,7 +1195,7 @@ func SplDualItNext(intern *SplDualItObject, do_free int) {
 }
 func ZimSplDualItRewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1209,7 +1209,7 @@ func ZimSplDualItRewind(executeData *zend.ZendExecuteData, return_value *types.Z
 }
 func ZimSplDualItValid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1223,7 +1223,7 @@ func ZimSplDualItValid(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func ZimSplDualItKey(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1242,7 +1242,7 @@ func ZimSplDualItKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 }
 func ZimSplDualItCurrent(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1261,7 +1261,7 @@ func ZimSplDualItCurrent(executeData *zend.ZendExecuteData, return_value *types.
 }
 func ZimSplDualItNext(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1301,7 +1301,7 @@ func SplFilterItNext(zthis *types.Zval, intern *SplDualItObject) {
 }
 func zim_spl_FilterIterator_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1314,7 +1314,7 @@ func zim_spl_FilterIterator_rewind(executeData *zend.ZendExecuteData, return_val
 }
 func zim_spl_FilterIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1334,7 +1334,7 @@ func zim_spl_RecursiveFilterIterator___construct(executeData *zend.ZendExecuteDa
 func zim_spl_RecursiveFilterIterator_hasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
 	var retval types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1355,7 +1355,7 @@ func zim_spl_RecursiveFilterIterator_hasChildren(executeData *zend.ZendExecuteDa
 func zim_spl_RecursiveFilterIterator_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
 	var retval types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1373,7 +1373,7 @@ func zim_spl_RecursiveFilterIterator_getChildren(executeData *zend.ZendExecuteDa
 func zim_spl_RecursiveCallbackFilterIterator_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
 	var retval types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1399,7 +1399,7 @@ func zim_spl_CallbackFilterIterator_accept(executeData *zend.ZendExecuteData, re
 	var fci *types.ZendFcallInfo = intern.GetCbfilter().GetFci()
 	var fcc *types.ZendFcallInfoCache = intern.GetCbfilter().GetFcc()
 	var params []types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if intern.GetData().IsType(types.IS_UNDEF) || intern.GetKey().IsType(types.IS_UNDEF) {
@@ -1437,7 +1437,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 	var match_data *pcre2_match_data
 	var re *pcre2_code
 	var rc int
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1515,7 +1515,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 }
 func zim_spl_RegexIterator_getRegex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1529,7 +1529,7 @@ func zim_spl_RegexIterator_getRegex(executeData *zend.ZendExecuteData, return_va
 }
 func zim_spl_RegexIterator_getMode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1561,7 +1561,7 @@ func zim_spl_RegexIterator_setMode(executeData *zend.ZendExecuteData, return_val
 }
 func zim_spl_RegexIterator_getFlags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1589,7 +1589,7 @@ func zim_spl_RegexIterator_setFlags(executeData *zend.ZendExecuteData, return_va
 }
 func zim_spl_RegexIterator_getPregFlags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1627,7 +1627,7 @@ func zim_spl_RecursiveRegexIterator___construct(executeData *zend.ZendExecuteDat
 func zim_spl_RecursiveRegexIterator_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
 	var retval types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1652,7 +1652,7 @@ func zim_spl_RecursiveRegexIterator_getChildren(executeData *zend.ZendExecuteDat
 }
 func zim_spl_RecursiveRegexIterator_accept(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1934,7 +1934,7 @@ func zim_spl_CachingIterator___construct(executeData *zend.ZendExecuteData, retu
 }
 func zim_spl_CachingIterator_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1947,7 +1947,7 @@ func zim_spl_CachingIterator_rewind(executeData *zend.ZendExecuteData, return_va
 }
 func zim_spl_CachingIterator_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1961,7 +1961,7 @@ func zim_spl_CachingIterator_valid(executeData *zend.ZendExecuteData, return_val
 }
 func zim_spl_CachingIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1974,7 +1974,7 @@ func zim_spl_CachingIterator_next(executeData *zend.ZendExecuteData, return_valu
 }
 func zim_spl_CachingIterator_hasNext(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2097,7 +2097,7 @@ func zim_spl_CachingIterator_offsetExists(executeData *zend.ZendExecuteData, ret
 }
 func zim_spl_CachingIterator_getCache(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2114,7 +2114,7 @@ func zim_spl_CachingIterator_getCache(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_CachingIterator_getFlags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2163,7 +2163,7 @@ func zim_spl_CachingIterator_setFlags(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_CachingIterator_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2184,7 +2184,7 @@ func zim_spl_RecursiveCachingIterator___construct(executeData *zend.ZendExecuteD
 }
 func zim_spl_RecursiveCachingIterator_hasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2198,7 +2198,7 @@ func zim_spl_RecursiveCachingIterator_hasChildren(executeData *zend.ZendExecuteD
 }
 func zim_spl_RecursiveCachingIterator_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2222,13 +2222,13 @@ func zim_spl_NoRewindIterator___construct(executeData *zend.ZendExecuteData, ret
 	SplDualItConstruct(executeData, return_value, spl_ce_NoRewindIterator, zend.ZendCeIterator, DIT_NoRewindIterator)
 }
 func zim_spl_NoRewindIterator_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
 func zim_spl_NoRewindIterator_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2242,7 +2242,7 @@ func zim_spl_NoRewindIterator_valid(executeData *zend.ZendExecuteData, return_va
 }
 func zim_spl_NoRewindIterator_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2261,7 +2261,7 @@ func zim_spl_NoRewindIterator_key(executeData *zend.ZendExecuteData, return_valu
 func zim_spl_NoRewindIterator_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
 	var data *types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2277,7 +2277,7 @@ func zim_spl_NoRewindIterator_current(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_NoRewindIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2293,7 +2293,7 @@ func zim_spl_InfiniteIterator___construct(executeData *zend.ZendExecuteData, ret
 }
 func zim_spl_InfiniteIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2313,31 +2313,31 @@ func zim_spl_InfiniteIterator_next(executeData *zend.ZendExecuteData, return_val
 	}
 }
 func zim_spl_EmptyIterator_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
 func zim_spl_EmptyIterator_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetFalse()
 	return
 }
 func zim_spl_EmptyIterator_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	faults.ThrowException(spl_ce_BadMethodCallException, "Accessing the key of an EmptyIterator", 0)
 }
 func zim_spl_EmptyIterator_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	faults.ThrowException(spl_ce_BadMethodCallException, "Accessing the value of an EmptyIterator", 0)
 }
 func zim_spl_EmptyIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 }
@@ -2415,7 +2415,7 @@ func zim_spl_AppendIterator_append(executeData *zend.ZendExecuteData, return_val
 }
 func zim_spl_AppendIterator_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2435,7 +2435,7 @@ func zim_spl_AppendIterator_current(executeData *zend.ZendExecuteData, return_va
 }
 func zim_spl_AppendIterator_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2451,7 +2451,7 @@ func zim_spl_AppendIterator_rewind(executeData *zend.ZendExecuteData, return_val
 }
 func zim_spl_AppendIterator_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2465,7 +2465,7 @@ func zim_spl_AppendIterator_valid(executeData *zend.ZendExecuteData, return_valu
 }
 func zim_spl_AppendIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2478,7 +2478,7 @@ func zim_spl_AppendIterator_next(executeData *zend.ZendExecuteData, return_value
 }
 func zim_spl_AppendIterator_getIteratorIndex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -2493,7 +2493,7 @@ func zim_spl_AppendIterator_getIteratorIndex(executeData *zend.ZendExecuteData, 
 func zim_spl_AppendIterator_getArrayIterator(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
 	var value *types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))

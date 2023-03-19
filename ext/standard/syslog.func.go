@@ -99,7 +99,7 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifCloselog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	closelog()

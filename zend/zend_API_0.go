@@ -2,7 +2,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -18,22 +17,6 @@ func ZendGetParametersArray(ht uint32, param_count int, argument_array *types.Zv
 func ZendGetParametersArrayEx(param_count int, argument_array *types.Zval) int {
 	return _zendGetParametersArrayEx(param_count, argument_array)
 }
-func ZendParseParametersNone() types.ZEND_RESULT_CODE {
-	if executeData.NumArgs() == 0 {
-		return types.SUCCESS
-	} else {
-		argparse.CheckNumArgsNoneError()
-		return types.FAILURE
-	}
-}
-func ZendParseParametersNoneThrow() types.ZEND_RESULT_CODE {
-	if executeData.NumArgs() == 0 {
-		return types.SUCCESS
-	} else {
-		argparse.CheckNumArgsNoneException()
-		return types.FAILURE
-	}
-}
 func getThis(executeData *ZendExecuteData) *types.Zval {
 	if ZEND_THIS(executeData).IsObject() {
 		return ZEND_THIS(executeData)
@@ -43,29 +26,29 @@ func getThis(executeData *ZendExecuteData) *types.Zval {
 }
 func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.ZendNewArray(0)) }
 func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.ZendNewArray(size)) }
-func AddAssocLong(__arg *types.Zval, __key string, __n ZendLong) int {
-	return AddAssocLongEx(__arg, __key, __n)
+func AddAssocLong(arg *types.Zval, key string, n ZendLong) int {
+	return AddAssocLongEx(arg, key, n)
 }
-func AddAssocNull(__arg *types.Zval, __key string) int {
-	return AddAssocNullEx(__arg, __key)
+func AddAssocNull(arg *types.Zval, key string) int {
+	return AddAssocNullEx(arg, key)
 }
-func AddAssocBool(__arg *types.Zval, __key string, __b int) int {
-	return AddAssocBoolEx(__arg, __key, __b)
+func AddAssocBool(arg *types.Zval, key string, __b int) int {
+	return AddAssocBoolEx(arg, key, __b)
 }
-func AddAssocDouble(__arg *types.Zval, __key string, __d float64) int {
-	return AddAssocDoubleEx(__arg, __key, __d)
+func AddAssocDouble(arg *types.Zval, key string, __d float64) int {
+	return AddAssocDoubleEx(arg, key, __d)
 }
-func AddAssocStr(__arg *types.Zval, __key string, __str string) int {
-	return AddAssocStrEx(__arg, __key, __str)
+func AddAssocStr(arg *types.Zval, key string, __str string) int {
+	return AddAssocStrEx(arg, key, __str)
 }
-func AddAssocString(__arg *types.Zval, __key string, __str *byte) int {
-	return AddAssocStrEx(__arg, __key, b.CastStrAuto(__str))
+func AddAssocString(arg *types.Zval, key string, __str *byte) int {
+	return AddAssocStrEx(arg, key, b.CastStrAuto(__str))
 }
-func AddAssocStringl(__arg *types.Zval, __key string, __str *byte, __length int) int {
-	return AddAssocStringlEx(__arg, __key, b.CastStr(__str, __length))
+func AddAssocStringl(arg *types.Zval, key string, __str *byte, __length int) int {
+	return AddAssocStringlEx(arg, key, b.CastStr(__str, __length))
 }
-func AddAssocZval(__arg *types.Zval, __key string, __value *types.Zval) int {
-	return AddAssocZvalEx(__arg, __key, __value)
+func AddAssocZval(arg *types.Zval, key string, __value *types.Zval) int {
+	return AddAssocZvalEx(arg, key, __value)
 }
 func AddIndexZval(arg *types.Zval, index ZendUlong, value *types.Zval) int {
 	if arg.GetArr().IndexUpdateH(index, value) != nil {
@@ -81,23 +64,23 @@ func AddNextIndexZval(arg *types.Zval, value *types.Zval) int {
 		return types.FAILURE
 	}
 }
-func AddPropertyLong(__arg *types.Zval, __key string, __n ZendLong) int {
-	return AddPropertyLongEx(__arg, __key, __n)
+func AddPropertyLong(arg *types.Zval, key string, n ZendLong) int {
+	return AddPropertyLongEx(arg, key, n)
 }
-func AddPropertyNull(__arg *types.Zval, __key string) int {
-	return AddPropertyNullEx(__arg, __key)
+func AddPropertyNull(arg *types.Zval, key string) int {
+	return AddPropertyNullEx(arg, key)
 }
-func AddPropertyResource(__arg *types.Zval, __key string, __r *types.ZendResource) int {
-	return AddPropertyResourceEx(__arg, __key, __r)
+func AddPropertyResource(arg *types.Zval, key string, r *types.ZendResource) int {
+	return AddPropertyResourceEx(arg, key, r)
 }
-func AddPropertyString(__arg *types.Zval, __key string, __str string) int {
-	return AddPropertyStrEx(__arg, __key, __str)
+func AddPropertyString(arg *types.Zval, key string, __str string) int {
+	return AddPropertyStrEx(arg, key, __str)
 }
-func AddPropertyStringl(__arg *types.Zval, __key string, __str string) int {
-	return AddPropertyStrEx(__arg, __key, __str)
+func AddPropertyStringl(arg *types.Zval, key string, __str string) int {
+	return AddPropertyStrEx(arg, key, __str)
 }
-func AddPropertyZval(__arg *types.Zval, __key string, __value *types.Zval) int {
-	return AddPropertyZvalEx(__arg, __key, __value)
+func AddPropertyZval(arg *types.Zval, key string, __value *types.Zval) int {
+	return AddPropertyZvalEx(arg, key, __value)
 }
 func CallUserFunction(object *types.Zval, function_name *types.Zval, retval_ptr *types.Zval, param_count uint32, params []types.Zval) int {
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)

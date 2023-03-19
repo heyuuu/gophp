@@ -360,7 +360,7 @@ func GET_PROPERTY_SILENT(object *types.Zval, id *types.ZendString) *types.Zval {
 func zim_exception_getFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prop *types.Zval
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	prop = GET_PROPERTY(zend.ZEND_THIS(executeData), types.ZSTR_FILE)
@@ -370,7 +370,7 @@ func zim_exception_getFile(executeData *zend.ZendExecuteData, return_value *type
 func zim_exception_getLine(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prop *types.Zval
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	prop = GET_PROPERTY(zend.ZEND_THIS(executeData), types.ZSTR_LINE)
@@ -380,7 +380,7 @@ func zim_exception_getLine(executeData *zend.ZendExecuteData, return_value *type
 func zim_exception_getMessage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prop *types.Zval
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	prop = GET_PROPERTY(zend.ZEND_THIS(executeData), types.ZSTR_MESSAGE)
@@ -390,7 +390,7 @@ func zim_exception_getMessage(executeData *zend.ZendExecuteData, return_value *t
 func zim_exception_getCode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prop *types.Zval
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	prop = GET_PROPERTY(zend.ZEND_THIS(executeData), types.ZSTR_CODE)
@@ -400,7 +400,7 @@ func zim_exception_getCode(executeData *zend.ZendExecuteData, return_value *type
 func zim_exception_getTrace(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prop *types.Zval
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	prop = GET_PROPERTY(zend.ZEND_THIS(executeData), types.ZSTR_TRACE)
@@ -410,7 +410,7 @@ func zim_exception_getTrace(executeData *zend.ZendExecuteData, return_value *typ
 func zim_error_exception_getSeverity(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prop *types.Zval
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	prop = GET_PROPERTY(zend.ZEND_THIS(executeData), types.ZSTR_SEVERITY)
@@ -537,7 +537,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 	var base_ce *types.ClassEntry
 	var str zend.SmartStr = MakeSmartStr(0)
 	var num uint32 = 0
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	object = zend.ZEND_THIS(executeData)
@@ -568,7 +568,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 }
 func zim_exception_getPrevious(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var rv types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	types.ZVAL_COPY(return_value, GET_PROPERTY_SILENT(zend.ZEND_THIS(executeData), types.ZSTR_PREVIOUS))
@@ -582,7 +582,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	var rv types.Zval
 	var tmp types.Zval
 	var fname *types.ZendString
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	str = types.ZSTR_EMPTY_ALLOC()

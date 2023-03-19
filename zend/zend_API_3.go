@@ -34,43 +34,6 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 		return argparse.ParseVaArgs(num_args, type_spec[1:], args[2:], 0)
 	}
 }
-func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *types.Zval, type_spec string, args ...any) int {
-	if this_ptr == nil {
-		return argparse.ParseVaArgs(num_args, type_spec, args, flags)
-	} else {
-		object := args[0].(**types.Zval)
-		ce := args[1].(*types.ClassEntry)
-		*object = this_ptr
-		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
-			if (flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName())
-			}
-			return types.FAILURE
-		}
-		return argparse.ParseVaArgs(num_args, type_spec[1:], args[2:], flags)
-	}
-}
-func ZendMergeProperties(obj *types.Zval, properties *types.HashTable) {
-	var obj_ht *ZendObjectHandlers = types.Z_OBJ_HT_P(obj)
-	var old_scope *types.ClassEntry = EG__().GetFakeScope()
-	var key *types.ZendString
-	var value *types.Zval
-	EG__().SetFakeScope(types.Z_OBJCE_P(obj))
-
-	var __ht *types.HashTable = properties
-	for _, _p := range __ht.foreachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		key = _p.GetKey()
-		value = _z
-		if key != nil {
-			var member types.Zval
-			member.SetString(key)
-			obj_ht.GetWriteProperty()(obj, &member, value, nil)
-		}
-	}
-	EG__().SetFakeScope(old_scope)
-}
 func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 	if !class_type.IsConstantsUpdated() {
 		var ce *types.ClassEntry

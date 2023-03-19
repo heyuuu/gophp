@@ -913,7 +913,7 @@ func ZmShutdownCgi(type_ int, module_number int) int {
 }
 func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
 func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() != 0 {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -1043,7 +1043,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 	}
 }
 func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)

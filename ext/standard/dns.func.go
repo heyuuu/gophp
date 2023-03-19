@@ -13,7 +13,7 @@ import (
 
 func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var buf []byte
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if gethostname(buf, b.SizeOf("buf")) {

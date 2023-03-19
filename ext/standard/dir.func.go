@@ -249,7 +249,7 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var path []byte
 	var ret *byte = nil
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	ret = zend.VCWD_GETCWD(path, core.MAXPATHLEN)

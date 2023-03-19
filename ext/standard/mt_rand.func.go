@@ -212,7 +212,7 @@ func ZifMtRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifMtGetrandmax(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 

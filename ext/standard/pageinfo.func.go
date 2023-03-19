@@ -33,7 +33,7 @@ func PhpGetgid() zend.ZendLong {
 }
 func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var uid zend.ZendLong
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	uid = PhpGetuid()
@@ -47,7 +47,7 @@ func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGetmygid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var gid zend.ZendLong
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	gid = PhpGetgid()
@@ -61,7 +61,7 @@ func ZifGetmygid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGetmypid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var pid zend.ZendLong
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	pid = getpid()
@@ -74,7 +74,7 @@ func ZifGetmypid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 }
 func ZifGetmyinode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	PhpStatpage()
@@ -92,7 +92,7 @@ func PhpGetlastmod() int64 {
 }
 func ZifGetlastmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var lm zend.ZendLong
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	lm = PhpGetlastmod()

@@ -50,7 +50,7 @@ func ZmStartupLcg(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZifLcgValue(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetDouble(PhpCombinedLcg())

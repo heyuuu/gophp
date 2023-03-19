@@ -639,7 +639,7 @@ func ZifPhpcredits(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	return
 }
 func ZifPhpSapiName(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetRawString(core.SM__().Name())
@@ -669,7 +669,7 @@ func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifPhpIniScannedFiles(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if PhpIniScannedFiles != nil {
@@ -681,7 +681,7 @@ func ZifPhpIniScannedFiles(executeData *zend.ZendExecuteData, return_value *type
 	}
 }
 func ZifPhpIniLoadedFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if PhpIniOpenedPath != nil {

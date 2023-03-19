@@ -557,7 +557,7 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *types
 func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream_xport_hash *types.HashTable
 	var stream_xport *types.ZendString
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
@@ -577,7 +577,7 @@ func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *typ
 func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var url_stream_wrappers_hash *types.HashTable
 	var stream_protocol *types.ZendString
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {

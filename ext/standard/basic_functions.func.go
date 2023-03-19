@@ -867,7 +867,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	FreeArgv(argv, argc)
 }
 func ZifFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	core.SapiFlush()
@@ -1024,7 +1024,7 @@ func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *types.Zv
 	return
 }
 func ZifGetCurrentUser(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetRawString(b.CastStrAuto(core.PhpGetCurrentUser()))
@@ -1095,14 +1095,14 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 }
 func ZifGetMagicQuotesRuntime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetFalse()
 	return
 }
 func ZifGetMagicQuotesGpc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetFalse()
@@ -1184,7 +1184,7 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 	return types.SUCCESS
 }
 func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if core.PG__().last_error_message {
@@ -1200,7 +1200,7 @@ func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 }
 func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if core.PG__().last_error_message {
@@ -1902,7 +1902,7 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	str = zend.ZendIniString("include_path", b.SizeOf("\"include_path\"")-1, 0)
@@ -1915,7 +1915,7 @@ func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func ZifRestoreIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var key *types.ZendString
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	key = types.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
@@ -2441,7 +2441,7 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func ZifSysGetloadavg(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var load []float64
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if getloadavg(load, 3) == -1 {

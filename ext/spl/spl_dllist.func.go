@@ -384,7 +384,7 @@ func zim_spl_SplDoublyLinkedList_unshift(executeData *zend.ZendExecuteData, retu
 }
 func zim_spl_SplDoublyLinkedList_pop(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -397,7 +397,7 @@ func zim_spl_SplDoublyLinkedList_pop(executeData *zend.ZendExecuteData, return_v
 }
 func zim_spl_SplDoublyLinkedList_shift(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -411,7 +411,7 @@ func zim_spl_SplDoublyLinkedList_shift(executeData *zend.ZendExecuteData, return
 func zim_spl_SplDoublyLinkedList_top(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var value *types.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -425,7 +425,7 @@ func zim_spl_SplDoublyLinkedList_top(executeData *zend.ZendExecuteData, return_v
 func zim_spl_SplDoublyLinkedList_bottom(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var value *types.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -439,7 +439,7 @@ func zim_spl_SplDoublyLinkedList_bottom(executeData *zend.ZendExecuteData, retur
 func zim_spl_SplDoublyLinkedList_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var count zend.ZendLong
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	count = SplPtrLlistCount(intern.GetLlist())
@@ -448,7 +448,7 @@ func zim_spl_SplDoublyLinkedList_count(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_SplDoublyLinkedList_isEmpty(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var count zend.ZendLong
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplDllistObjectCountElements(zend.ZEND_THIS(executeData), &count)
@@ -472,7 +472,7 @@ func zim_spl_SplDoublyLinkedList_setIteratorMode(executeData *zend.ZendExecuteDa
 }
 func zim_spl_SplDoublyLinkedList_getIteratorMode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -702,7 +702,7 @@ func SplDllistItMoveForward(iter *zend.ZendObjectIterator) {
 }
 func zim_spl_SplDoublyLinkedList_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(intern.GetTraversePosition())
@@ -710,21 +710,21 @@ func zim_spl_SplDoublyLinkedList_key(executeData *zend.ZendExecuteData, return_v
 }
 func zim_spl_SplDoublyLinkedList_prev(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplDllistItHelperMoveForward(intern.GetTraversePointer(), intern.GetTraversePosition(), intern.GetLlist(), intern.GetFlags()^SPL_DLLIST_IT_LIFO)
 }
 func zim_spl_SplDoublyLinkedList_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplDllistItHelperMoveForward(intern.GetTraversePointer(), intern.GetTraversePosition(), intern.GetLlist(), intern.GetFlags())
 }
 func zim_spl_SplDoublyLinkedList_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	types.ZVAL_BOOL(return_value, intern.GetTraversePointer() != nil)
@@ -732,7 +732,7 @@ func zim_spl_SplDoublyLinkedList_valid(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_SplDoublyLinkedList_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplDllistItHelperRewind(intern.GetTraversePointer(), intern.GetTraversePosition(), intern.GetLlist(), intern.GetFlags())
@@ -740,7 +740,7 @@ func zim_spl_SplDoublyLinkedList_rewind(executeData *zend.ZendExecuteData, retur
 func zim_spl_SplDoublyLinkedList_current(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var element *SplPtrLlistElement = intern.GetTraversePointer()
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if element == nil || element.GetData().IsUndef() {
@@ -758,7 +758,7 @@ func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, re
 	var next *SplPtrLlistElement
 	var flags types.Zval
 	var var_hash standard.PhpSerializeDataT
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	standard.PHP_VAR_SERIALIZE_INIT(var_hash)
@@ -846,7 +846,7 @@ func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, 
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var tmp types.Zval
-	if zend.ZendParseParametersNoneThrow() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(true) {
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -955,7 +955,7 @@ func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_v
 	}
 }
 func zim_spl_SplDoublyLinkedList___debugInfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetArray(SplDllistObjectGetDebugInfo(zend.getThis()))

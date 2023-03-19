@@ -410,7 +410,7 @@ func PhpHeadApplyHeaderListToHash(data any, arg any) {
 	}
 }
 func ZifHeadersList(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)

@@ -1165,7 +1165,7 @@ func PhpIfStat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpStat(filename, filename_len, FS_STAT, return_value)
 }
 func ZifRealpathCacheSize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(zend.RealpathCacheSize())
@@ -1174,7 +1174,7 @@ func ZifRealpathCacheSize(executeData *zend.ZendExecuteData, return_value *types
 func ZifRealpathCacheGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var buckets **zend.RealpathCacheBucket = zend.RealpathCacheGetBuckets()
 	var end ***zend.RealpathCacheBucket = buckets + zend.RealpathCacheMaxBuckets()
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)

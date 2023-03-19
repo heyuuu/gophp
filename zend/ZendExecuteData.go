@@ -119,6 +119,10 @@ func (this *ZendExecuteData) CheckNumArgs(minNumArgs int, maxNumArgs int, forceS
 	}
 }
 
+func (this *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
+	return this.CheckNumArgs(0, 0, forceStrict)
+}
+
 /**
  * Getter/Setter
  */

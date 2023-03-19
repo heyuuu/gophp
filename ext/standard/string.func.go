@@ -4936,7 +4936,7 @@ func ZifLocaleconv(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 
 	/* We don't need no stinkin' parameters... */
 
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)

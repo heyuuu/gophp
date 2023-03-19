@@ -111,7 +111,7 @@ func ZifClassUses(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	SplAddTraits(return_value, ce, 1, zend.ZEND_ACC_TRAIT)
 }
 func ZifSplClasses(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -643,7 +643,7 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *t
 func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var fptr *zend.ZendFunction
 	var alfi *AutoloadFuncInfo
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if zend.EG__().GetAutoloadFunc() == nil {

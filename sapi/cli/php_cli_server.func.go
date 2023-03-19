@@ -92,7 +92,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ty
 	var key *types.ZendString
 	var value *byte
 	var tmp types.Zval
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	client = core.SG__().server_context
@@ -136,7 +136,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 	}
 }
 func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)

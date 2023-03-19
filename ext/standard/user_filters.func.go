@@ -483,7 +483,7 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Z
 func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filter_name *types.ZendString
 	var filters_hash *types.HashTable
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)

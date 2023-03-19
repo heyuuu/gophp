@@ -696,7 +696,7 @@ func ZifTempnam(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func PhpIfTmpfile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	stream = streams._phpStreamFopenTmpfile(0)
@@ -2545,7 +2545,7 @@ func ZifFnmatch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifSysGetTempDir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetRawString(b.CastStrAuto((*byte)(core.PhpGetTemporaryDirectory())))

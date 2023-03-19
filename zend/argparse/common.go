@@ -9,11 +9,6 @@ import (
 func CheckNumArgsNone(executeData ExecuteData, flags int) bool {
 	return CheckNumArgs(executeData, 0, 0, flags)
 }
-func CheckNumArgsNoneError() bool { return CheckNumArgsNone(currExecuteData(), 0) }
-func CheckNumArgsNoneException() bool {
-	return CheckNumArgsNone(currExecuteData(), ZEND_PARSE_PARAMS_THROW)
-}
-
 func CheckNumArgs(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
 	numArgs := executeData.NumArgs()
 	return CheckNumArgsEx(numArgs, executeData, minNumArgs, maxNumArgs, flags)

@@ -952,7 +952,7 @@ func zim_spl_Array_setIteratorClass(executeData *zend.ZendExecuteData, return_va
 func zim_spl_Array_getIteratorClass(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	intern.GetCeGetIterator().GetName().AddRefcount()
@@ -962,7 +962,7 @@ func zim_spl_Array_getIteratorClass(executeData *zend.ZendExecuteData, return_va
 func zim_spl_Array_getFlags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(intern.GetArFlags() & ^SPL_ARRAY_INT_MASK)
@@ -994,7 +994,7 @@ func zim_spl_Array_exchangeArray(executeData *zend.ZendExecuteData, return_value
 func zim_spl_Array_getIterator(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetObject(SplArrayObjectNewEx(intern.GetCeGetIterator(), object, 0))
@@ -1002,7 +1002,7 @@ func zim_spl_Array_getIterator(executeData *zend.ZendExecuteData, return_value *
 func zim_spl_Array_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplArrayRewind(intern)
@@ -1078,7 +1078,7 @@ func SplArrayObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 }
 func zim_spl_Array_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS(executeData))
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(SplArrayObjectCountElementsHelper(intern))
@@ -1153,7 +1153,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var entry *types.Zval
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
@@ -1168,7 +1168,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	types.ZVAL_COPY_DEREF(return_value, entry)
 }
 func zim_spl_Array_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplArrayIteratorKey(zend.ZEND_THIS(executeData), return_value)
@@ -1182,7 +1182,7 @@ func zim_spl_Array_next(executeData *zend.ZendExecuteData, return_value *types.Z
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	SplArrayNextEx(intern, aht)
@@ -1191,7 +1191,7 @@ func zim_spl_Array_valid(executeData *zend.ZendExecuteData, return_value *types.
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS)
@@ -1202,7 +1202,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 	var entry *types.Zval
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
@@ -1222,7 +1222,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	var flags types.Zval
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
@@ -1252,7 +1252,7 @@ func zim_spl_Array_serialize(executeData *zend.ZendExecuteData, return_value *ty
 	var flags types.Zval
 	var var_hash standard.PhpSerializeDataT
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	standard.PHP_VAR_SERIALIZE_INIT(var_hash)
@@ -1393,7 +1393,7 @@ outexcept:
 func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS(executeData))
 	var tmp types.Zval
-	if zend.ZendParseParametersNoneThrow() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(true) {
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -1470,7 +1470,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	}
 }
 func zim_spl_Array___debugInfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	if zend.ZendParseParametersNone() == types.FAILURE {
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetArray(SplArrayGetDebugInfo(zend.getThis()))

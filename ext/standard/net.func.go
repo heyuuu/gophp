@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
@@ -81,8 +80,7 @@ func IfaceAppendUnicast(
 func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
-	if executeData.NumArgs() != 0 {
-		argparse.CheckNumArgsNoneError()
+	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if getifaddrs(&addrs) {
