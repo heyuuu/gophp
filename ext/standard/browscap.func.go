@@ -229,7 +229,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
 				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.GetStr().GetVal())) {
-					faults.ZendError(faults.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
+					faults.Error(faults.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
@@ -282,7 +282,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	}
 	fh.InitFp(zend.VCWD_FOPEN(filename, "r"), filename)
 	if fh.GetFp() == nil {
-		faults.ZendError(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
+		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return types.FAILURE
 	}
 	browdata.SetHtab(zend.Pemalloc(sizeof*browdata.GetHtab(), persistent))

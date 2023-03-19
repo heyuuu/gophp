@@ -146,7 +146,7 @@ func UserWrapperOpener(
 	} else {
 		zend.EG__().SetBailout(__orig_bailout)
 		standard.FG(user_stream_current_filename) = nil
-		faults.ZendBailout()
+		faults.Bailout()
 	}
 	zend.EG__().SetBailout(__orig_bailout)
 	if call_result == types.SUCCESS && zretval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&zretval) != 0 {

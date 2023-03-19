@@ -50,7 +50,7 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *types.ZendString, new_name *t
 	if types.ZendStringEqualsCi(old_name, check_name) {
 		return
 	}
-	faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
+	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 }
 func ZendCompileUse(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
@@ -83,9 +83,9 @@ func ZendCompileUse(ast *ZendAst) {
 				new_name = old_name.Copy()
 				if current_ns == nil {
 					if type_ == T_CLASS && types.ZendStringEqualsLiteral(new_name, "strict") {
-						faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "You seem to be trying to use a different language...")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "You seem to be trying to use a different language...")
 					}
-					faults.ZendError(faults.E_WARNING, "The use statement with non-compound name '%s' "+"has no effect", new_name.GetVal())
+					faults.Error(faults.E_WARNING, "The use statement with non-compound name '%s' "+"has no effect", new_name.GetVal())
 				}
 			}
 		}
@@ -95,7 +95,7 @@ func ZendCompileUse(ast *ZendAst) {
 			lookup_name = ZendStringTolower(new_name)
 		}
 		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name) != 0 {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
 		if current_ns != nil {
 			var ns_name *types.ZendString = types.ZendStringAlloc(current_ns.GetLen()+1+new_name.GetLen(), 0)
@@ -114,7 +114,7 @@ func ZendCompileUse(ast *ZendAst) {
 		old_name.AddRefcount()
 		old_name = types.ZendNewInternedString(old_name)
 		if !(ZendHashAddPtr(current_import, lookup_name, old_name)) {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
 		types.ZendStringReleaseEx(lookup_name, 0)
 		types.ZendStringReleaseEx(new_name, 0)
@@ -156,14 +156,14 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		value_node.SetOpType(IS_CONST)
 		ZendConstExprToZval(value_zv, value_ast)
 		if ZendLookupReservedConst(unqualified_name.GetVal(), unqualified_name.GetLen()) != nil {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
 		}
 		name = ZendPrefixWithNs(unqualified_name)
 		name = types.ZendNewInternedString(name)
 		if FC__().GetImportsConst() != nil {
 			var import_name *types.ZendString = ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
 			if import_name != nil && types.ZendStringEquals(import_name, name) == 0 {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 			}
 		}
 		name_node.SetOpType(IS_CONST)
@@ -186,7 +186,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 			/* previous namespace declarations were unbracketed */
 
 			if with_bracket != 0 {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
 			}
 
 			/* previous namespace declarations were unbracketed */
@@ -197,9 +197,9 @@ func ZendCompileNamespace(ast *ZendAst) {
 		/* previous namespace declarations were bracketed */
 
 		if with_bracket == 0 {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
 		} else if FC__().GetCurrentNamespace() != nil || FC__().GetInNamespace() != 0 {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declarations cannot be nested")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declarations cannot be nested")
 		}
 
 		/* previous namespace declarations were bracketed */
@@ -214,7 +214,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 			num--
 		}
 		if num > 0 {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declaration statement has to be "+"the very first statement or after any declare call in the script")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Namespace declaration statement has to be "+"the very first statement or after any declare call in the script")
 		}
 	}
 	if FC__().GetCurrentNamespace() != nil {
@@ -223,7 +223,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 	if name_ast != nil {
 		name = ZendAstGetStr(name_ast)
 		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name.GetVal())
 		}
 		FC__().SetCurrentNamespace(name.Copy())
 	} else {
@@ -246,7 +246,7 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 	var name *types.ZendString
 	var const_name = "__COMPILER_HALT_OFFSET__"
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
 	}
 	filename = ZendGetCompiledFilename()
 	name = ZendManglePropertyName_ZStr(const_name, filename.GetStr(), false)
@@ -390,7 +390,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 	var i uint32
 	var is_constant types.ZendBool = 1
 	if ast.GetAttr() == ZEND_ARRAY_SYNTAX_LIST {
-		faults.ZendError(faults.E_COMPILE_ERROR, "Cannot use list() as standalone expression")
+		faults.Error(faults.E_COMPILE_ERROR, "Cannot use list() as standalone expression")
 	}
 
 	/* First ensure that *all* child nodes are constant and by-val */
@@ -404,7 +404,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			if last_elem_ast != nil {
 				CG__().SetZendLineno(ZendAstGetLineno(last_elem_ast))
 			}
-			faults.ZendError(faults.E_COMPILE_ERROR, "Cannot use empty array elements in arrays")
+			faults.Error(faults.E_COMPILE_ERROR, "Cannot use empty array elements in arrays")
 		}
 		if elem_ast.GetKind() != ZEND_AST_UNPACK {
 			ZendEvalConstExpr(elem_ast.GetChild()[0])
@@ -445,7 +445,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 					key = _p.GetKey()
 					val = _z
 					if key != nil {
-						faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
 					if result.GetArr().NextIndexInsert(val) == nil {
 						ZvalPtrDtor(result)
@@ -455,7 +455,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 				}
 				continue
 			} else {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Only arrays and Traversables can be unpacked")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Only arrays and Traversables can be unpacked")
 			}
 		}
 		value.TryAddRefcount()
@@ -476,7 +476,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			case types.IS_NULL:
 				result.GetArr().KeyUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), value)
 			default:
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal offset type")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal offset type")
 			}
 		} else {
 			if result.GetArr().NextIndexInsert(value) == nil {
@@ -493,10 +493,10 @@ func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
 	var right_ast *ZendAst = ast.GetChild()[1]
 	var opcode uint32 = ast.GetAttr()
 	if (opcode == ZEND_ADD || opcode == ZEND_SUB) && left_ast.GetKind() == ZEND_AST_BINARY_OP && left_ast.GetAttr() == ZEND_CONCAT {
-		faults.ZendError(faults.E_DEPRECATED, "The behavior of unparenthesized expressions containing both '.' and '+'/'-' will change in PHP 8: '+'/'-' will take a higher precedence")
+		faults.Error(faults.E_DEPRECATED, "The behavior of unparenthesized expressions containing both '.' and '+'/'-' will change in PHP 8: '+'/'-' will take a higher precedence")
 	}
 	if (opcode == ZEND_SL || opcode == ZEND_SR) && (left_ast.GetKind() == ZEND_AST_BINARY_OP && left_ast.GetAttr() == ZEND_CONCAT || right_ast.GetKind() == ZEND_AST_BINARY_OP && right_ast.GetAttr() == ZEND_CONCAT) {
-		faults.ZendError(faults.E_DEPRECATED, "The behavior of unparenthesized expressions containing both '.' and '>>'/'<<' will change in PHP 8: '<<'/'>>' will take a higher precedence")
+		faults.Error(faults.E_DEPRECATED, "The behavior of unparenthesized expressions containing both '.' and '>>'/'<<' will change in PHP 8: '<<'/'>>' will take a higher precedence")
 	}
 	if opcode == ZEND_PARENTHESIZED_CONCAT {
 		opcode = ZEND_CONCAT

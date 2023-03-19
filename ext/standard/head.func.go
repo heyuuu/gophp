@@ -83,22 +83,22 @@ func PhpSetcookie(
 	var result int
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	if name.GetLen() == 0 {
-		faults.ZendError(faults.E_WARNING, "Cookie names must not be empty")
+		faults.Error(faults.E_WARNING, "Cookie names must not be empty")
 		return types.FAILURE
 	} else if strpbrk(name.GetVal(), "=,; \t\r\n013014") != nil {
-		faults.ZendError(faults.E_WARNING, "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\013\\014'")
+		faults.Error(faults.E_WARNING, "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if url_encode == 0 && value != nil && strpbrk(value.GetVal(), ",; \t\r\n013014") != nil {
-		faults.ZendError(faults.E_WARNING, "Cookie values cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
+		faults.Error(faults.E_WARNING, "Cookie values cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if path != nil && strpbrk(path.GetVal(), ",; \t\r\n013014") != nil {
-		faults.ZendError(faults.E_WARNING, "Cookie paths cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
+		faults.Error(faults.E_WARNING, "Cookie paths cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if domain != nil && strpbrk(domain.GetVal(), ",; \t\r\n013014") != nil {
-		faults.ZendError(faults.E_WARNING, "Cookie domains cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
+		faults.Error(faults.E_WARNING, "Cookie domains cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if value == nil || value.GetLen() == 0 {
@@ -139,7 +139,7 @@ func PhpSetcookie(
 			if p == nil || (*(p + 5)) != ' ' {
 				types.ZendStringFree(dt)
 				buf.Free()
-				faults.ZendError(faults.E_WARNING, "Expiry date cannot have a year greater than 9999")
+				faults.Error(faults.E_WARNING, "Expiry date cannot have a year greater than 9999")
 				return types.FAILURE
 			}
 			buf.AppendString(dt.GetStr())

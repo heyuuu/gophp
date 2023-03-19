@@ -1021,7 +1021,7 @@ func _phpMathBasetozval(arg *types.Zval, base int, ret *types.Zval) int {
 		}
 	}
 	if invalidchars > 0 {
-		faults.ZendError(faults.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
+		faults.Error(faults.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
 	}
 	if mode == 1 {
 		ret.SetDouble(fnum)
@@ -1514,14 +1514,14 @@ func ZifIntdiv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if divisor == 0 {
-		faults.ZendThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Division by zero")
+		faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Division by zero")
 		return
 	} else if divisor == -1 && dividend == zend.ZEND_LONG_MIN {
 
 		/* Prevent overflow error/crash ... really should not happen:
 		   We don't return a float here as that violates function contract */
 
-		faults.ZendThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
+		faults.ThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
 		return
 	}
 	return_value.SetLong(dividend / divisor)

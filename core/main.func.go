@@ -106,7 +106,7 @@ func OnChangeMemoryLimit(
 		 * shut down and the minimal amount of memory is used. */
 
 		if stage != zend.ZEND_INI_STAGE_DEACTIVATE {
-			faults.ZendError(faults.E_WARNING, "Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true))
+			faults.Error(faults.E_WARNING, "Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true))
 			return types.FAILURE
 		}
 
@@ -841,7 +841,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			 */
 
 			if zend.EG__().GetException() == nil {
-				faults.ZendThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
+				faults.ThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
 			}
 			zend.Efree(buffer)
 			return
@@ -994,7 +994,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 				zend.ZendSetMemoryLimit(PG__().memory_limit)
 				zend.Efree(buffer)
 				zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
-				faults.ZendBailout()
+				faults.Bailout()
 				return
 			}
 
@@ -1614,7 +1614,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 			for (*p) != nil {
 				var value zend.ZendLong
 				if CfgGetLong((*byte)(*p), &value) == types.SUCCESS && value != 0 {
-					faults.ZendError(directives[i].error_level, directives[i].phrase, *p)
+					faults.Error(directives[i].error_level, directives[i].phrase, *p)
 				}
 				p++
 			}
@@ -1748,7 +1748,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		var __bailout JMP_BUF
 		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			faults.ZendExceptionError(zend.EG__().GetException(), faults.E_ERROR)
+			faults.ExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 		}
 		zend.EG__().SetBailout(__orig_bailout)
 	}
@@ -1762,7 +1762,7 @@ func PhpHandleAbortedConnection() {
 	PG__().connection_status = PHP_CONNECTION_ABORTED
 	PhpOutputSetStatus(PHP_OUTPUT_DISABLED)
 	if !(PG__().ignore_user_abort) {
-		faults.ZendBailout()
+		faults.Bailout()
 	}
 }
 func PhpHandleAuthData(auth *byte) int {
@@ -1815,7 +1815,7 @@ func PhpLintScript(file *zend.ZendFileHandle) int {
 	}
 	zend.EG__().SetBailout(__orig_bailout)
 	if zend.EG__().GetException() != nil {
-		faults.ZendExceptionError(zend.EG__().GetException(), faults.E_ERROR)
+		faults.ExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 	}
 	return retval
 }

@@ -1656,7 +1656,7 @@ func PhpExtractRefIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) 
 				continue
 			}
 			if types.ZendStringEqualsLiteral(var_name, "this") {
-				faults.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
 			if entry.IsReference() {
@@ -1705,7 +1705,7 @@ func PhpExtractIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zen
 				continue
 			}
 			if types.ZendStringEqualsLiteral(var_name, "this") {
-				faults.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
 			entry = types.ZVAL_DEREF(entry)
@@ -1741,7 +1741,7 @@ func PhpExtractRefOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray)
 			continue
 		}
 		if types.ZendStringEqualsLiteral(var_name, "this") {
-			faults.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		}
 		orig_var = symbol_table.KeyFind(var_name.GetStr())
@@ -1794,7 +1794,7 @@ func PhpExtractOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) ze
 			continue
 		}
 		if types.ZendStringEqualsLiteral(var_name, "this") {
-			faults.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		}
 		orig_var = symbol_table.KeyFind(var_name.GetStr())
@@ -1857,7 +1857,7 @@ func PhpExtractRefPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendA
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					faults.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					if entry.IsReference() {
@@ -1915,7 +1915,7 @@ func PhpExtractPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArra
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					faults.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					entry = types.ZVAL_DEREF(entry)
@@ -1982,7 +1982,7 @@ func PhpExtractRefPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					faults.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					if entry.IsReference() {
@@ -2058,7 +2058,7 @@ func PhpExtractPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, p
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					faults.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					entry = types.ZVAL_DEREF(entry)
@@ -2125,7 +2125,7 @@ func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray,
 		}
 		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-				faults.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
 				if entry.IsReference() {
@@ -2180,7 +2180,7 @@ func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, pr
 		}
 		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-				faults.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
 				entry = types.ZVAL_DEREF(entry)
@@ -2243,7 +2243,7 @@ func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendAr
 			}
 		}
 		if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-			faults.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
 			if entry.IsReference() {
@@ -2305,7 +2305,7 @@ func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray
 			}
 		}
 		if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-			faults.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
 			entry = types.ZVAL_DEREF(entry)

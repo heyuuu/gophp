@@ -493,7 +493,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 	datalen = ParseIv2((*p)+2, p)
 	*p += 2
 	if datalen < 0 || max-(*p) <= datalen {
-		faults.ZendError(faults.E_WARNING, "Insufficient data for unserializing - "+zend.ZEND_LONG_FMT+" required, "+zend.ZEND_LONG_FMT+" present", datalen, zend_long(max-(*p)))
+		faults.Error(faults.E_WARNING, "Insufficient data for unserializing - "+zend.ZEND_LONG_FMT+" required, "+zend.ZEND_LONG_FMT+" present", datalen, zend_long(max-(*p)))
 		return 0
 	}
 
@@ -505,7 +505,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 		return 0
 	}
 	if ce.GetUnserialize() == nil {
-		faults.ZendError(faults.E_WARNING, "Class %s has no unserializer", ce.GetName().GetVal())
+		faults.Error(faults.E_WARNING, "Class %s has no unserializer", ce.GetName().GetVal())
 		zend.ObjectInitEx(rval, ce)
 	} else if ce.GetUnserialize()(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != types.SUCCESS {
 		return 0
@@ -909,7 +909,7 @@ yy18:
 		return ret
 	}
 	if (*p) >= max-2 {
-		faults.ZendError(faults.E_WARNING, "Bad unserialize data")
+		faults.Error(faults.E_WARNING, "Bad unserialize data")
 		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
@@ -927,7 +927,7 @@ yy18:
 	 * depending on the serialization format. */
 
 	if ce.GetSerialize() != nil && has_unserialize == 0 {
-		faults.ZendError(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
+		faults.Error(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
 		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}

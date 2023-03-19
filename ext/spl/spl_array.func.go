@@ -197,7 +197,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 		return zend.EG__().GetUninitializedZval()
 	}
 	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW) && intern.GetNApplyCount() > 0 {
-		faults.ZendError(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return zend.EG__().GetErrorZval()
 	}
 try_again:
@@ -215,14 +215,14 @@ try_again:
 				if retval.IsType(types.IS_UNDEF) {
 					switch type_ {
 					case zend.BP_VAR_R:
-						faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 						fallthrough
 					case zend.BP_VAR_UNSET:
 						fallthrough
 					case zend.BP_VAR_IS:
 						retval = zend.EG__().GetUninitializedZval()
 					case zend.BP_VAR_RW:
-						faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 						fallthrough
 					case zend.BP_VAR_W:
 						retval.SetNull()
@@ -232,14 +232,14 @@ try_again:
 		} else {
 			switch type_ {
 			case zend.BP_VAR_R:
-				faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.EG__().GetUninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
@@ -249,7 +249,7 @@ try_again:
 		}
 		return retval
 	case types.IS_RESOURCE:
-		faults.ZendError(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_P(offset).GetHandle(), types.Z_RES_P(offset).GetHandle())
+		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_P(offset).GetHandle(), types.Z_RES_P(offset).GetHandle())
 		index = types.Z_RES_P(offset).GetHandle()
 		goto num_index
 	case types.IS_DOUBLE:
@@ -267,14 +267,14 @@ try_again:
 		if b.Assign(&retval, ht.IndexFindH(index)) == nil {
 			switch type_ {
 			case zend.BP_VAR_R:
-				faults.ZendError(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 				fallthrough
 			case zend.BP_VAR_UNSET:
 				fallthrough
 			case zend.BP_VAR_IS:
 				retval = zend.EG__().GetUninitializedZval()
 			case zend.BP_VAR_RW:
-				faults.ZendError(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 				fallthrough
 			case zend.BP_VAR_W:
 				var value types.Zval
@@ -287,7 +287,7 @@ try_again:
 		offset = types.ZVAL_DEREF(offset)
 		goto try_again
 	default:
-		faults.ZendError(faults.E_WARNING, "Illegal offset type")
+		faults.Error(faults.E_WARNING, "Illegal offset type")
 		if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
 			return zend.EG__().GetErrorZval()
 		} else {
@@ -352,7 +352,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *t
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
-		faults.ZendError(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
 	value.TryAddRefcount()
@@ -393,7 +393,7 @@ try_again:
 		offset = types.ZVAL_DEREF(offset)
 		goto try_again
 	default:
-		faults.ZendError(faults.E_WARNING, "Illegal offset type")
+		faults.Error(faults.E_WARNING, "Illegal offset type")
 		zend.ZvalPtrDtor(value)
 		return
 	}
@@ -412,7 +412,7 @@ func SplArrayUnsetDimensionEx(check_inherited int, object *types.Zval, offset *t
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
-		faults.ZendError(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
 try_again:
@@ -421,7 +421,7 @@ try_again:
 		ht = SplArrayGetHashTable(intern)
 		if ht == zend.EG__().GetSymbolTable() {
 			if zend.ZendDeleteGlobalVariable(offset.GetStr()) != 0 {
-				faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 			}
 		} else {
 			var data *types.Zval = ht.SymtableFind(offset.GetStr().GetStr())
@@ -429,7 +429,7 @@ try_again:
 				if data.IsType(types.IS_INDIRECT) {
 					data = data.GetZv()
 					if data.IsType(types.IS_UNDEF) {
-						faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
+						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 					} else {
 						zend.ZvalPtrDtor(data)
 						data.SetUndef()
@@ -440,10 +440,10 @@ try_again:
 						}
 					}
 				} else if ht.SymtableDel(offset.GetStr().GetStr()) == types.FAILURE {
-					faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
+					faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 				}
 			} else {
-				faults.ZendError(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
+				faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 			}
 		}
 	case types.IS_DOUBLE:
@@ -463,13 +463,13 @@ try_again:
 	num_index:
 		ht = SplArrayGetHashTable(intern)
 		if zend.ZendHashIndexDel(ht, index) == types.FAILURE {
-			faults.ZendError(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
+			faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
 		}
 	case types.IS_REFERENCE:
 		offset = types.ZVAL_DEREF(offset)
 		goto try_again
 	default:
-		faults.ZendError(faults.E_WARNING, "Illegal offset type")
+		faults.Error(faults.E_WARNING, "Illegal offset type")
 		return
 	}
 }
@@ -536,7 +536,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 			offset = types.ZVAL_DEREF(offset)
 			goto try_again
 		default:
-			faults.ZendError(faults.E_WARNING, "Illegal offset type")
+			faults.Error(faults.E_WARNING, "Illegal offset type")
 			return 0
 		}
 		if check_empty != 0 && check_inherited != 0 && intern.GetFptrOffsetGet() != nil {
@@ -584,7 +584,7 @@ func zim_spl_Array_offsetSet(executeData *zend.ZendExecuteData, return_value *ty
 func SplArrayIteratorAppend(object *types.Zval, append_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	if SplArrayIsObject(intern) != 0 {
-		faults.ZendThrowError(nil, "Cannot append properties to objects, use %s::offsetSet() instead", types.Z_OBJCE_P(object).GetName().GetVal())
+		faults.ThrowError(nil, "Cannot append properties to objects, use %s::offsetSet() instead", types.Z_OBJCE_P(object).GetName().GetVal())
 		return
 	}
 	SplArrayWriteDimension(object, nil, append_value)
@@ -843,7 +843,7 @@ func SplArrayItRewind(iter *zend.ZendObjectIterator) {
 }
 func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Zval, ar_flags zend.ZendLong, just_array int) {
 	if array.GetType() != types.IS_OBJECT && array.GetType() != types.IS_ARRAY {
-		faults.ZendThrowException(spl_ce_InvalidArgumentException, "Passed variable is not an array or object", 0)
+		faults.ThrowException(spl_ce_InvalidArgumentException, "Passed variable is not an array or object", 0)
 		return
 	}
 	if array.IsType(types.IS_ARRAY) {
@@ -876,7 +876,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 		} else {
 			var handler zend.ZendObjectGetPropertiesT = types.Z_OBJ_HT(*array).GetGetProperties()
 			if handler != zend.ZendStdGetProperties {
-				faults.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", types.Z_OBJCE_P(array).GetName().GetVal(), intern.GetStd().GetCe().GetName().GetVal())
+				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", types.Z_OBJCE_P(array).GetName().GetVal(), intern.GetStd().GetCe().GetName().GetVal())
 				return
 			}
 			zend.ZvalPtrDtor(intern.GetArray())
@@ -891,7 +891,7 @@ func SplArrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *
 	var iterator *zend.ZendUserIterator
 	var array_object *SplArrayObject = Z_SPLARRAY_P(object)
 	if by_ref != 0 && array_object.IsOverloadedCurrent() {
-		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	iterator = zend.Emalloc(b.SizeOf("zend_user_iterator"))
@@ -985,7 +985,7 @@ func zim_spl_Array_exchangeArray(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
-		faults.ZendError(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
 	return_value.SetArray(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
@@ -1028,7 +1028,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 			return
 		}
 	}
-	faults.ZendThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", opos)
+	faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", opos)
 }
 func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
@@ -1100,7 +1100,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		intern.GetNApplyCount()--
 	} else if use_arg == SPL_ARRAY_METHOD_MAY_USER_ARG {
 		if zend.ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|z", &arg) == types.FAILURE {
-			faults.ZendThrowException(spl_ce_BadMethodCallException, "Function expects one argument at most", 0)
+			faults.ThrowException(spl_ce_BadMethodCallException, "Function expects one argument at most", 0)
 			goto exit
 		}
 		if arg != nil {
@@ -1111,7 +1111,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		intern.GetNApplyCount()--
 	} else {
 		if executeData.NumArgs() != 1 || zend.ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "z", &arg) == types.FAILURE {
-			faults.ZendThrowException(spl_ce_BadMethodCallException, "Function expects exactly one argument", 0)
+			faults.ThrowException(spl_ce_BadMethodCallException, "Function expects exactly one argument", 0)
 			goto exit
 		}
 		types.ZVAL_COPY_VALUE(&params[1], arg)
@@ -1305,7 +1305,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
-		faults.ZendError(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
+		faults.Error(faults.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
 
@@ -1387,7 +1387,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 	return
 outexcept:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+	faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 	return
 }
 func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1443,7 +1443,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	members_zv = data.IndexFindH(2)
 	iterator_class_zv = data.IndexFindH(3)
 	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != types.IS_LONG || members_zv.GetType() != types.IS_ARRAY || iterator_class_zv != nil && (iterator_class_zv.GetType() != types.IS_NULL && iterator_class_zv.GetType() != types.IS_STRING) {
-		faults.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
+		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
 	flags = flags_zv.GetLval()
@@ -1459,10 +1459,10 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	if iterator_class_zv != nil && iterator_class_zv.IsType(types.IS_STRING) {
 		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.GetStr())
 		if ce == nil {
-			faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", types.Z_STR_P(iterator_class_zv).GetVal())
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", types.Z_STR_P(iterator_class_zv).GetVal())
 			return
 		} else if zend.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
-			faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", types.Z_STR_P(iterator_class_zv).GetVal())
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", types.Z_STR_P(iterator_class_zv).GetVal())
 			return
 		} else {
 			intern.SetCeGetIterator(ce)

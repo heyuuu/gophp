@@ -114,7 +114,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 			if ex.GetFunc() != nil && zend.ZEND_USER_CODE(ex.GetFunc().GetCommonType()) {
 				if (zend.ZEND_CALL_INFO(ex)&zend.ZEND_CALL_HAS_SYMBOL_TABLE) != 0 && ex.GetSymbolTable() == symtable1 {
 					if memcmp(var_, "this", b.SizeOf("\"this\"")-1) == 0 {
-						faults.ZendThrowError(nil, "Cannot re-assign $this")
+						faults.ThrowError(nil, "Cannot re-assign $this")
 						zend.ZvalPtrDtorNogc(val)
 						zend.FreeAlloca(var_orig, use_heap)
 						return

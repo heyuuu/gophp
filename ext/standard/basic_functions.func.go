@@ -1309,7 +1309,7 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 		break
 	}
 	if !(executeData.GetPrevExecuteData().func_.common.scope) {
-		faults.ZendThrowError(nil, "Cannot call forward_static_call() when no class scope is active")
+		faults.ThrowError(nil, "Cannot call forward_static_call() when no class scope is active")
 		return
 	}
 	fci.SetRetval(&retval)

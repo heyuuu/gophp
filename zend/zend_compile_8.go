@@ -139,7 +139,7 @@ func ZendCompileCast(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_CAST, &expr_node, nil)
 	opline.SetExtendedValue(ast.GetAttr())
 	if ast.GetAttr() == types.IS_NULL {
-		faults.ZendError(faults.E_DEPRECATED, "The (unset) cast is deprecated")
+		faults.Error(faults.E_DEPRECATED, "The (unset) cast is deprecated")
 	}
 }
 func ZendCompileShorthandConditional(result *Znode, ast *ZendAst) {
@@ -176,13 +176,13 @@ func ZendCompileConditional(result *Znode, ast *ZendAst) {
 	if cond_ast.GetKind() == ZEND_AST_CONDITIONAL && cond_ast.GetAttr() != ZEND_PARENTHESIZED_CONDITIONAL {
 		if cond_ast.GetChild()[1] != nil {
 			if true_ast != nil {
-				faults.ZendError(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ? d : e` is deprecated. "+"Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`")
+				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ? d : e` is deprecated. "+"Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)`")
 			} else {
-				faults.ZendError(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ?: d` is deprecated. "+"Use either `(a ? b : c) ?: d` or `a ? b : (c ?: d)`")
+				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ? b : c ?: d` is deprecated. "+"Use either `(a ? b : c) ?: d` or `a ? b : (c ?: d)`")
 			}
 		} else {
 			if true_ast != nil {
-				faults.ZendError(faults.E_DEPRECATED, "Unparenthesized `a ?: b ? c : d` is deprecated. "+"Use either `(a ?: b) ? c : d` or `a ?: (b ? c : d)`")
+				faults.Error(faults.E_DEPRECATED, "Unparenthesized `a ?: b ? c : d` is deprecated. "+"Use either `(a ?: b) ? c : d` or `a ?: (b ? c : d)`")
 			}
 		}
 	}
@@ -253,7 +253,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	var orig_memoize_mode int = CG__().GetMemoizeMode()
 	ZendEnsureWritableVariable(var_ast)
 	if IsThisFetch(var_ast) != 0 {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ALLOC_HASHTABLE(CG__().GetMemoizedExprs())
 	ZendHashInit(CG__().GetMemoizedExprs(), 0, nil, ZnodeDtor, 0)
@@ -382,7 +382,7 @@ func ZendCompileYieldFrom(result *Znode, ast *ZendAst) {
 	var expr_node Znode
 	ZendMarkFunctionAsGenerator()
 	if CG__().GetActiveOpArray().IsReturnReference() {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"yield from\" inside a by-reference generator")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"yield from\" inside a by-reference generator")
 	}
 	ZendCompileExpr(&expr_node, expr_ast)
 	ZendEmitOpTmp(result, ZEND_YIELD_FROM, &expr_node, nil)
@@ -439,7 +439,7 @@ func ZendCompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 			ZendCompileExpr(result, not_ast)
 			return
 		} else {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use isset() on the result of an expression "+"(you can use \"null !== expression\" instead)")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use isset() on the result of an expression "+"(you can use \"null !== expression\" instead)")
 		}
 	}
 	switch var_ast.GetKind() {
@@ -526,7 +526,7 @@ func ZendCompileArray(result *Znode, ast *ZendAst) {
 		var key_node Znode
 		var key_node_ptr *Znode = nil
 		if elem_ast == nil {
-			faults.ZendError(faults.E_COMPILE_ERROR, "Cannot use empty array elements in arrays")
+			faults.Error(faults.E_COMPILE_ERROR, "Cannot use empty array elements in arrays")
 		}
 		value_ast = elem_ast.GetChild()[0]
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {

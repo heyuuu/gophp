@@ -33,7 +33,7 @@ func ZendResolveClassName(name *types.ZendString, type_ uint32) *types.ZendStrin
 		/* Ensure that \self, \parent and \static are not used */
 
 		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "'\\%s' is an invalid class name", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'\\%s' is an invalid class name", name.GetVal())
 		}
 		return name
 	}
@@ -68,7 +68,7 @@ func ZendResolveClassName(name *types.ZendString, type_ uint32) *types.ZendStrin
 func ZendResolveClassNameAst(ast *ZendAst) *types.ZendString {
 	var class_name *types.Zval = ZendAstGetZval(ast)
 	if class_name.GetType() != types.IS_STRING {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
 	return ZendResolveClassName(class_name.GetStr(), ast.GetAttr())
 }
@@ -121,9 +121,9 @@ func DoBindFunctionError(lcname *types.ZendString, op_array *ZendOpArray, compil
 	b.Assert(zv != nil)
 	old_function = (*ZendFunction)(zv.GetPtr())
 	if old_function.GetType() == ZEND_USER_FUNCTION && old_function.GetOpArray().GetLast() > 0 {
-		faults.ZendErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
+		faults.ErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
 	} else {
-		faults.ZendErrorNoreturn(error_level, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }))
+		faults.ErrorNoreturn(error_level, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }))
 	}
 }
 func DoBindFunction(lcname *types.Zval) int {
@@ -157,7 +157,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
 	if zv == nil {
 		ce = ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr())
 		if ce != nil {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			return types.FAILURE
 		} else {
 			for {
@@ -168,7 +168,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
 						break
 					}
 				}
-				faults.ZendErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.GetStr().GetVal())
+				faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.GetStr().GetVal())
 				return types.FAILURE
 				break
 			}
@@ -180,7 +180,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
 	ce = (*types.ClassEntry)(zv.GetPtr())
 	zv = ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
 	if zv == nil {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 		return types.FAILURE
 	}
 	if ZendDoLinkClass(ce, lc_parent_name) == types.FAILURE {
@@ -195,17 +195,17 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.ZendString) int {
 }
 func ZendMarkFunctionAsGenerator() {
 	if CG__().GetActiveOpArray().GetFunctionName() == nil {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "The \"yield\" expression can only be used inside a function")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The \"yield\" expression can only be used inside a function")
 	}
 	if CG__().GetActiveOpArray().IsHasReturnType() {
 		var return_info ZendArgInfo = CG__().GetActiveOpArray().GetArgInfo()[-1]
 		if return_info.GetType().Code() != types.IS_ITERABLE {
 			var msg *byte = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
 			if !(return_info.GetType().IsClass()) {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, msg, ZendGetTypeByConst(return_info.GetType().Code()))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, ZendGetTypeByConst(return_info.GetType().Code()))
 			}
 			if !(types.ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Traversable")) && !(types.ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Iterator")) && !(types.ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Generator")) {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZEND_TYPE_NAME(return_info.GetType()).GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZEND_TYPE_NAME(return_info.GetType()).GetVal())
 			}
 		}
 	}
@@ -286,7 +286,7 @@ func ZendUnmanglePropertyName_Ex(name string) (className string, propName string
 		return "", name, true
 	}
 	if len(name) < 3 || name[1] == '\000' {
-		faults.ZendError(faults.E_NOTICE, "Illegal member variable name")
+		faults.Error(faults.E_NOTICE, "Illegal member variable name")
 		return "", name, false
 	}
 	/*
@@ -301,7 +301,7 @@ func ZendUnmanglePropertyName_Ex(name string) (className string, propName string
 	case 3:
 		return parts[0], parts[2], true
 	default:
-		faults.ZendError(faults.E_NOTICE, "Corrupt member variable name")
+		faults.Error(faults.E_NOTICE, "Corrupt member variable name")
 		return "", name, false
 	}
 }
@@ -412,9 +412,9 @@ func ZendEnsureValidClassFetchType(fetch_type uint32) {
 	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() != 0 {
 		var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 		if ce == nil {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
 		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && !(ce.GetParentName()) {
-			faults.ZendError(faults.E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
+			faults.Error(faults.E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
 		}
 	}
 }
@@ -422,11 +422,11 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	var fetch_type uint32
 	var class_name *types.Zval
 	if class_ast.GetKind() != ZEND_AST_ZVAL {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use ::class with dynamic class name")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use ::class with dynamic class name")
 	}
 	class_name = ZendAstGetZval(class_ast)
 	if class_name.GetType() != types.IS_STRING {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
 	fetch_type = ZendGetClassFetchType(class_name.GetStr())
 	ZendEnsureValidClassFetchType(fetch_type)
@@ -707,7 +707,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 }
 func ZendVerifyNamespace() {
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")
 	}
 }
 func ZendDirname(path *byte, len_ int) int {

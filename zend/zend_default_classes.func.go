@@ -6,7 +6,7 @@ import "sik/zend/faults"
 
 func ZendRegisterDefaultClasses() {
 	ZendRegisterInterfaces()
-	faults.ZendRegisterDefaultException()
+	faults.RegisterDefaultException()
 	ZendRegisterIteratorWrapper()
 	ZendRegisterClosureCe()
 	ZendRegisterGeneratorCe()

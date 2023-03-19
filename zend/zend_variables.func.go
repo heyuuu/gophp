@@ -63,7 +63,7 @@ func ZvalInternalPtrDtor(zval_ptr *types.Zval) {
 				//b.Assert((str.GetGcFlags() & types.IS_STR_PERSISTENT) != 0)
 				//Free(str)
 			} else {
-				faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")
+				faults.ErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")
 			}
 		}
 	}

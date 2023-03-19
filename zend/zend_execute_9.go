@@ -91,7 +91,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 		}
 		Efree(fbc)
 		ZendVmStackFreeCallFrame(call)
-		faults.ZendThrowError(nil, "Cannot call overloaded function for non-object")
+		faults.ThrowError(nil, "Cannot call overloaded function for non-object")
 		return 0
 	}
 	object = call.GetThis().GetObj()
@@ -115,7 +115,7 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 			OBJ_RELEASE(iter.GetStd())
 		}
 		if EG__().GetException() == nil {
-			faults.ZendThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+			faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 		}
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		return 1
@@ -179,10 +179,10 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
 				}
 
-				faults.ZendError(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal(), EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal())
+				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal(), EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal())
 
 			} else {
-				faults.ZendThrowError(nil, "Undefined constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+				faults.ThrowError(nil, "Undefined constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			}
 		}
@@ -223,7 +223,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 				is_deprecated = memcmp(c.GetName().GetVal()+shortname_offset, (orig_key-1).GetStr().GetVal()+shortname_offset, shortname_len) != 0
 			}
 			if is_deprecated != 0 {
-				faults.ZendError(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
+				faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 				return types.SUCCESS
 			}
 		}

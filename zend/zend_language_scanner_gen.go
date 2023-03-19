@@ -4979,7 +4979,7 @@ func _lexScan(zendlval *types.Zval, elem *ZendParserStackElem, sc *LangScanner) 
 			sc.resetLen()
 			{
 				if sc.isParserMode() {
-					faults.ZendError(faults.E_DEPRECATED, "The (real) cast is deprecated, use (float) instead")
+					faults.Error(faults.E_DEPRECATED, "The (real) cast is deprecated, use (float) instead")
 				}
 				return sc.token(T_DOUBLE_CAST)
 			}

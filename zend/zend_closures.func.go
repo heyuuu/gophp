@@ -12,7 +12,7 @@ func ZEND_CLOSURE_OBJECT(op_array *ZendFunction) *types.ZendObject {
 	return (*types.ZendObject)((*byte)(op_array - b.SizeOf("zend_object")))
 }
 func ZEND_CLOSURE_PROPERTY_ERROR() {
-	faults.ZendThrowError(nil, "Closure object cannot have properties")
+	faults.ThrowError(nil, "Closure object cannot have properties")
 }
 func zim_Closure___invoke(executeData *ZendExecuteData, return_value *types.Zval) {
 	var func_ *ZendFunction = executeData.GetFunc()
@@ -31,28 +31,28 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 	var is_fake_closure types.ZendBool = func_.IsFakeClosure()
 	if newthis != nil {
 		if func_.IsStatic() {
-			faults.ZendError(faults.E_WARNING, "Cannot bind an instance to a static closure")
+			faults.Error(faults.E_WARNING, "Cannot bind an instance to a static closure")
 			return 0
 		}
 		if is_fake_closure != 0 && func_.GetScope() != nil && InstanceofFunction(types.Z_OBJCE_P(newthis), func_.GetScope()) == 0 {
 
 			/* Binding incompatible $this to an internal method is not supported. */
 
-			faults.ZendError(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().GetName().GetVal(), func_.GetFunctionName().GetVal(), types.Z_OBJCE_P(newthis).GetName().GetVal())
+			faults.Error(faults.E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().GetName().GetVal(), func_.GetFunctionName().GetVal(), types.Z_OBJCE_P(newthis).GetName().GetVal())
 			return 0
 		}
 	} else if is_fake_closure != 0 && func_.GetScope() != nil && !func_.IsStatic() {
 		if func_.GetType() == ZEND_INTERNAL_FUNCTION {
-			faults.ZendError(faults.E_WARNING, "Cannot unbind $this of internal method")
+			faults.Error(faults.E_WARNING, "Cannot unbind $this of internal method")
 			return 0
 		} else {
-			faults.ZendError(faults.E_DEPRECATED, "Unbinding $this of a method is deprecated")
+			faults.Error(faults.E_DEPRECATED, "Unbinding $this of a method is deprecated")
 		}
 	} else if is_fake_closure == 0 && !(closure.GetThisPtr().IsUndef()) && func_.IsUsesThis() {
 
 		// TODO: Only deprecate if it had $this *originally*?
 
-		faults.ZendError(faults.E_DEPRECATED, "Unbinding $this of closure is deprecated")
+		faults.Error(faults.E_DEPRECATED, "Unbinding $this of closure is deprecated")
 
 		// TODO: Only deprecate if it had $this *originally*?
 
@@ -61,14 +61,14 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *t
 
 		/* rebinding to internal class is not allowed */
 
-		faults.ZendError(faults.E_WARNING, "Cannot bind closure to scope of internal class %s", scope.GetName().GetVal())
+		faults.Error(faults.E_WARNING, "Cannot bind closure to scope of internal class %s", scope.GetName().GetVal())
 		return 0
 	}
 	if is_fake_closure != 0 && scope != func_.GetScope() {
 		if func_.GetScope() == nil {
-			faults.ZendError(faults.E_WARNING, "Cannot rebind scope of closure created from function")
+			faults.Error(faults.E_WARNING, "Cannot rebind scope of closure created from function")
 		} else {
-			faults.ZendError(faults.E_WARNING, "Cannot rebind scope of closure created from method")
+			faults.Error(faults.E_WARNING, "Cannot rebind scope of closure created from method")
 		}
 		return 0
 	}
@@ -171,7 +171,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 			if types.ZendStringEqualsLiteral(class_name, "static") {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
-				faults.ZendError(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
+				faults.Error(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
 				ZendTmpStringRelease(tmp_class_name)
 				return_value.SetNull()
 				return
@@ -285,15 +285,15 @@ func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *types.
 	EG__().SetCurrentExecuteData(executeData)
 	if success == types.FAILURE || error != nil {
 		if error != nil {
-			faults.ZendTypeError("Failed to create closure from callable: %s", error)
+			faults.TypeError("Failed to create closure from callable: %s", error)
 			Efree(error)
 		} else {
-			faults.ZendTypeError("Failed to create closure from callable")
+			faults.TypeError("Failed to create closure from callable")
 		}
 	}
 }
 func ZendClosureGetConstructor(object *types.ZendObject) *ZendFunction {
-	faults.ZendThrowError(nil, "Instantiation of 'Closure' is not allowed")
+	faults.ThrowError(nil, "Instantiation of 'Closure' is not allowed")
 	return nil
 }
 func ZendClosureCompareObjects(o1 *types.Zval, o2 *types.Zval) int { return o1.GetObj() != o2.GetObj() }
@@ -469,7 +469,7 @@ func ZendClosureGetGc(obj *types.Zval, table **types.Zval, n *int) *types.HashTa
 	}
 }
 func zim_Closure___construct(executeData *ZendExecuteData, return_value *types.Zval) {
-	faults.ZendThrowError(nil, "Instantiation of 'Closure' is not allowed")
+	faults.ThrowError(nil, "Instantiation of 'Closure' is not allowed")
 }
 func ZendRegisterClosureCe() {
 	var ce types.ClassEntry

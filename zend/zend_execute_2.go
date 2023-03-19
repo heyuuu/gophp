@@ -84,9 +84,9 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
 	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
 	void(prop_type1)
 	if info.GetType().IsClass() {
-		faults.ZendTypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	} else {
-		faults.ZendTypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		faults.TypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsObject(), func() []byte { return types.Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	}
 }
 func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
@@ -98,13 +98,13 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 		 * later using the wrong "self" when the trait is used in a class. */
 
 		if self_ce.IsTrait() {
-			faults.ZendThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(type_.AllowNull(), " non-null", ""))
+			faults.ThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(type_.AllowNull(), " non-null", ""))
 			return 0
 		}
 		ce = self_ce
 	} else if types.ZendStringEqualsLiteralCi(name, "parent") {
 		if !(self_ce.GetParent()) {
-			faults.ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
+			faults.ThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 			return 0
 		}
 		ce = self_ce.GetParent()
@@ -277,9 +277,9 @@ func ZendVerifyInternalArgTypes(fbc *ZendFunction, call *ZendExecuteData) int {
 func ZendMissingArgError(executeData *ZendExecuteData) {
 	var ptr *ZendExecuteData = executeData.GetPrevExecuteData()
 	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetCommonType()) {
-		faults.ZendThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed in %s on line %d and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
+		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed in %s on line %d and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
 	} else {
-		faults.ZendThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
+		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
 	}
 }
 func ZendVerifyReturnError(zf *ZendFunction, ce *types.ClassEntry, value *types.Zval) {
@@ -293,7 +293,7 @@ func ZendVerifyReturnError(zf *ZendFunction, ce *types.ClassEntry, value *types.
 	var given_msg *byte
 	var given_kind *byte
 	ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
-	faults.ZendTypeError("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
+	faults.TypeError("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
 }
 func ZendVerifyReturnType(zf *ZendFunction, ret *types.Zval, cache_slot *any) {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
@@ -322,10 +322,10 @@ func ZendVerifyMissingReturnType(zf *ZendFunction, cache_slot *any) int {
 	return 1
 }
 func ZendUseObjectAsArray() {
-	faults.ZendThrowError(nil, "Cannot use object as array")
+	faults.ThrowError(nil, "Cannot use object as array")
 }
 func ZendIllegalOffset() {
-	faults.ZendError(faults.E_WARNING, "Illegal offset type")
+	faults.Error(faults.E_WARNING, "Illegal offset type")
 }
 func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	types.Z_OBJ_HT_P(object).GetWriteDimension()(object, dim, value)
@@ -421,7 +421,7 @@ try_again:
 				break
 			}
 			if type_ != BP_VAR_UNSET {
-				faults.ZendError(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
+				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
 			}
 		case types.IS_UNDEF:
 			ZVAL_UNDEFINED_OP2()
@@ -433,7 +433,7 @@ try_again:
 		case types.IS_FALSE:
 			fallthrough
 		case types.IS_TRUE:
-			faults.ZendError(faults.E_NOTICE, "String offset cast occurred")
+			faults.Error(faults.E_NOTICE, "String offset cast occurred")
 		case types.IS_REFERENCE:
 			dim = types.Z_REFVAL_P(dim)
 			goto try_again

@@ -79,7 +79,7 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 	return types.SUCCESS
 }
 func ZendWrongParamCount() {
-	faults.ZendInternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
+	faults.InternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
 }
 func ZendGetTypeByConst(type_ types.ZendUchar) string {
 	switch type_ {

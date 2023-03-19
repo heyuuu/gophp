@@ -159,7 +159,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 		if cond_ast == nil {
 			if has_default_case != 0 {
 				CG__().SetZendLineno(case_ast.GetLineno())
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Switch statements may only contain one default clause")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Switch statements may only contain one default clause")
 			}
 			has_default_case = 1
 			continue
@@ -240,7 +240,7 @@ func ZendCompileTry(ast *ZendAst) {
 	var orig_fast_call_var uint32 = CG__().GetContext().GetFastCallVar()
 	var orig_try_catch_offset uint32 = CG__().GetContext().GetTryCatchOffset()
 	if catches.GetChildren() == 0 && finally_ast == nil {
-		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use try without catch or finally")
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use try without catch or finally")
 	}
 
 	/* label: try { } must not be equal to try { label: } */
@@ -293,7 +293,7 @@ func ZendCompileTry(ast *ZendAst) {
 			var class_ast *ZendAst = classes.GetChild()[j]
 			var is_last_class types.ZendBool = j+1 == classes.GetChildren()
 			if ZendIsConstDefaultClassRef(class_ast) == 0 {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Bad class name in the catch statement")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Bad class name in the catch statement")
 			}
 			opnum_catch = GetNextOpNumber()
 			if i == 0 && j == 0 {
@@ -305,7 +305,7 @@ func ZendCompileTry(ast *ZendAst) {
 			opline.GetOp1().SetConstant(ZendAddClassNameLiteral(ZendResolveClassNameAst(class_ast)))
 			opline.SetExtendedValue(ZendAllocCacheSlot())
 			if types.ZendStringEqualsLiteral(var_name, "this") {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 			}
 			opline.SetResultType(IS_CV)
 			opline.GetResult().SetVar(LookupCv(var_name))
@@ -416,7 +416,7 @@ func ZendCompileDeclare(ast *ZendAst) {
 		var value_ast *ZendAst = declare_ast.GetChild()[1]
 		var name *types.ZendString = ZendAstGetStr(name_ast)
 		if value_ast.GetKind() != ZEND_AST_ZVAL {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
 		}
 		if types.ZendStringEqualsLiteralCi(name, "ticks") {
 			var value_zv types.Zval
@@ -425,25 +425,25 @@ func ZendCompileDeclare(ast *ZendAst) {
 			ZvalPtrDtorNogc(&value_zv)
 		} else if types.ZendStringEqualsLiteralCi(name, "encoding") {
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")
 			}
 		} else if types.ZendStringEqualsLiteralCi(name, "strict_types") {
 			var value_zv types.Zval
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must be "+"the very first statement in the script")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must be "+"the very first statement in the script")
 			}
 			if ast.GetChild()[1] != nil {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not "+"use block mode")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must not "+"use block mode")
 			}
 			ZendConstExprToZval(&value_zv, value_ast)
 			if value_zv.GetType() != types.IS_LONG || value_zv.GetLval() != 0 && value_zv.GetLval() != 1 {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must have 0 or 1 as its value")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must have 0 or 1 as its value")
 			}
 			if value_zv.GetLval() == 1 {
 				CG__().GetActiveOpArray().SetIsStrictTypes(true)
 			}
 		} else {
-			faults.ZendError(faults.E_COMPILE_WARNING, "Unsupported declare '%s'", name.GetVal())
+			faults.Error(faults.E_COMPILE_WARNING, "Unsupported declare '%s'", name.GetVal())
 		}
 	}
 	if stmt_ast != nil {
@@ -473,7 +473,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 		var type_code types.ZendUchar = ZendLookupBuiltinTypeByName(class_name)
 		if type_code != 0 {
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", ZendStringTolower(class_name).GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type declaration '%s' must be unqualified", ZendStringTolower(class_name).GetVal())
 			}
 			type_ = types.ZEND_TYPE_ENCODE(type_code, allow_null)
 		} else {
@@ -506,7 +506,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 			op_array.IsReturnReference(),
 		)
 		if arg_infos.GetType().Code() == types.IS_VOID && arg_infos.GetType().AllowNull() {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Void type cannot be nullable")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Void type cannot be nullable")
 		}
 		arg_infos++
 		op_array.SetIsHasReturnType(true)
@@ -530,24 +530,24 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var opline *ZendOp
 		var arg_info *ZendArgInfo
 		if ZendIsAutoGlobal(name) != 0 {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign auto-global variable %s", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign auto-global variable %s", name.GetVal())
 		}
 		var_node.SetOpType(IS_CV)
 		var_node.GetOp().SetVar(LookupCv(name))
 		if EX_VAR_TO_NUM(var_node.GetOp().GetVar()) != i {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Redefinition of parameter $%s", name.GetVal())
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Redefinition of parameter $%s", name.GetVal())
 		} else if types.ZendStringEqualsLiteral(name, "this") {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as parameter")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as parameter")
 		}
 		if op_array.IsVariadic() {
-			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Only the last parameter can be variadic")
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Only the last parameter can be variadic")
 		}
 		if is_variadic != 0 {
 			opcode = ZEND_RECV_VARIADIC
 			default_node.SetOpType(IS_UNUSED)
 			op_array.SetIsVariadic(true)
 			if default_ast != nil {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Variadic parameter cannot have a default value")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Variadic parameter cannot have a default value")
 			}
 		} else if default_ast != nil {
 
@@ -577,38 +577,38 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 			op_array.SetIsHasTypeHints(true)
 			arg_info.SetType(ZendCompileTypename(type_ast, has_null_default))
 			if arg_info.GetType().Code() == types.IS_VOID {
-				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "void cannot be used as a parameter type")
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "void cannot be used as a parameter type")
 			}
 			if type_ast.GetKind() == ZEND_AST_TYPE {
 				if arg_info.GetType().Code() == types.IS_ARRAY {
 					if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types.IS_ARRAY && default_node.GetConstant().GetType() != types.IS_CONSTANT_AST {
-						faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with array type can only be an array or NULL")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with array type can only be an array or NULL")
 					}
 				} else if arg_info.GetType().Code() == types.IS_CALLABLE && default_ast != nil {
 					if has_null_default == 0 && default_node.GetConstant().GetType() != types.IS_CONSTANT_AST {
-						faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with callable type can only be NULL")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with callable type can only be NULL")
 					}
 				}
 			} else {
 				if default_ast != nil && has_null_default == 0 && default_node.GetConstant().GetType() != types.IS_CONSTANT_AST {
 					if arg_info.GetType().IsClass() {
-						faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a class type can only be NULL")
+						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a class type can only be NULL")
 					} else {
 						switch arg_info.GetType().Code() {
 						case types.IS_DOUBLE:
 							if default_node.GetConstant().GetType() != types.IS_DOUBLE && default_node.GetConstant().GetType() != types.IS_LONG {
-								faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
 							}
 							ConvertToDouble(default_node.GetConstant())
 						case types.IS_ITERABLE:
 							if default_node.GetConstant().GetType() != types.IS_ARRAY {
-								faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")
 							}
 						case types.IS_OBJECT:
-							faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
+							faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
 						default:
 							if !(types.ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().GetType())) {
-								faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", ZendGetTypeByConst(arg_info.GetType().Code()), ZendGetTypeByConst(arg_info.GetType().Code()))
+								faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", ZendGetTypeByConst(arg_info.GetType().Code()), ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
 						}
 					}

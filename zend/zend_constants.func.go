@@ -261,16 +261,16 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		var ret_constant *types.Zval = nil
 		if types.ZendStringEqualsLiteralCi(class_name, "self") {
 			if scope == nil {
-				faults.ZendThrowError(nil, "Cannot access self:: when no class scope is active")
+				faults.ThrowError(nil, "Cannot access self:: when no class scope is active")
 				goto failure
 			}
 			ce = scope
 		} else if types.ZendStringEqualsLiteralCi(class_name, "parent") {
 			if scope == nil {
-				faults.ZendThrowError(nil, "Cannot access parent:: when no class scope is active")
+				faults.ThrowError(nil, "Cannot access parent:: when no class scope is active")
 				goto failure
 			} else if !(scope.GetParent()) {
-				faults.ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
+				faults.ThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 				goto failure
 			} else {
 				ce = scope.GetParent()
@@ -278,7 +278,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		} else if types.ZendStringEqualsLiteralCi(class_name, "static") {
 			ce = ZendGetCalledScope(CurrEX())
 			if ce == nil {
-				faults.ZendThrowError(nil, "Cannot access static:: when no class scope is active")
+				faults.ThrowError(nil, "Cannot access static:: when no class scope is active")
 				goto failure
 			}
 		} else {
@@ -288,14 +288,14 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 			c = ZendHashFindPtr(ce.GetConstantsTable(), constant_name)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-					faults.ZendThrowError(nil, "Undefined class constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
+					faults.ThrowError(nil, "Undefined class constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
 					goto failure
 				}
 				ret_constant = nil
 			} else {
 				if ZendVerifyConstAccess(c, scope) == 0 {
 					if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-						faults.ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), class_name.GetVal(), constant_name.GetVal())
+						faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), class_name.GetVal(), constant_name.GetVal())
 					}
 					goto failure
 				}
@@ -305,7 +305,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		if ret_constant != nil && ret_constant.IsConstant() {
 			var ret int
 			if IS_CONSTANT_VISITED(ret_constant) != 0 {
-				faults.ZendThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
+				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
 				ret_constant = nil
 				goto failure
 			}
@@ -376,7 +376,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
 		if (ZEND_CONSTANT_FLAGS(c)&(CONST_CS|CONST_CT_SUBST)) == 0 && IsAccessDeprecated(c, name) != 0 {
-			faults.ZendError(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
+			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 		}
 	}
 	return c.GetValue()
@@ -420,7 +420,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 		if c.GetName().GetVal()[0] == '0' && c.GetName().GetLen() > b.SizeOf("\"\\0__COMPILER_HALT_OFFSET__\"")-1 && memcmp(name.GetVal(), "0__COMPILER_HALT_OFFSET__", b.SizeOf("\"\\0__COMPILER_HALT_OFFSET__\"")) == 0 {
 
 		}
-		faults.ZendError(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
+		faults.Error(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
 		types.ZendStringRelease(c.GetName())
 		if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
 			ZvalPtrDtorNogc(c.GetValue())

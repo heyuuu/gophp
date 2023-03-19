@@ -28,7 +28,7 @@ func (p *OldParser) ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceive
 		}
 		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 			var throwException = zend.CurrEX().IsArgUseStrictTypes() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
-			faults.ZendInternalTypeError(throwException, "%s() expects parameter %d %s", zend.GetActiveCalleeName(), arg_num, err.Error())
+			faults.InternalTypeError(throwException, "%s() expects parameter %d %s", zend.GetActiveCalleeName(), arg_num, err.Error())
 		}
 		if err.severity != faults.E_DEPRECATED {
 			return types.FAILURE

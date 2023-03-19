@@ -351,7 +351,7 @@ func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
 				valid = false
 			}
 			if !valid { // 没找到或为 ${} 形式
-				faults.ZendThrowException(faults.ZendCeParseError, "Invalid UTF-8 codepoint escape sequence", 0)
+				faults.ThrowException(faults.ZendCeParseError, "Invalid UTF-8 codepoint escape sequence", 0)
 				sc.zendlval.SetUndef()
 				return false
 			}
@@ -374,7 +374,7 @@ func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
 				buf.WriteByte(uint8(codepoint&0x3f + 0x80))
 			} else {
 				/* per RFC 3629, UTF-8 can only represent 21 bits */
-				faults.ZendThrowException(faults.ZendCeParseError, "Invalid UTF-8 codepoint escape sequence: Codepoint too large", 0)
+				faults.ThrowException(faults.ZendCeParseError, "Invalid UTF-8 codepoint escape sequence: Codepoint too large", 0)
 				sc.zendlval.SetUndef()
 				return false
 			}
@@ -393,7 +393,7 @@ func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
 				}
 				if octal > 0377 && !sc.heredocScanAhead {
 					/* 3 octit values must not overflow 0xFF (\377) */
-					faults.ZendError(faults.E_COMPILE_WARNING, "Octal escape sequence overflow \\%s is greater than \\377", str[start:i+1])
+					faults.Error(faults.E_COMPILE_WARNING, "Octal escape sequence overflow \\%s is greater than \\377", str[start:i+1])
 				}
 				buf.WriteByte(byte(octal))
 			} else {

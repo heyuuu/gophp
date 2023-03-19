@@ -106,7 +106,7 @@ again:
 
 				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
 
-				faults.ZendClearException()
+				faults.ClearException()
 
 				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
 
@@ -399,7 +399,7 @@ func ZendDeclareTypedProperty(
 		case types.IS_OBJECT:
 
 		case types.IS_RESOURCE:
-			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
 			break
 		default:
 			break

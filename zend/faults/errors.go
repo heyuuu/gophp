@@ -30,11 +30,11 @@ const E_CORE = E_CORE_ERROR | E_CORE_WARNING
 /**
  * functions
  */
-func ZendBailout() { _zendBailout(__FILE__, __LINE__) }
+func Bailout() { _zendBailout(__FILE__, __LINE__) }
 
 func _zendBailout(filename *byte, lineno uint32) {
 	if zend.EG__().GetBailout() == nil {
-		ZendOutputDebugString(1, "%s(%d) : Bailed out without a bailout address!", filename, lineno)
+		OutputDebugString(1, "%s(%d) : Bailed out without a bailout address!", filename, lineno)
 		exit(-1)
 	}
 	zend.GcProtect(1)
@@ -42,10 +42,10 @@ func _zendBailout(filename *byte, lineno uint32) {
 	zend.CG__().SetActiveClassEntry(nil)
 	zend.CG__().SetInCompilation(0)
 	zend.EG__().SetCurrentExecuteData(nil)
-	zend.LONGJMP((*zend.EG__)().bailout, types.FAILURE)
+	zend.LONGJMP(*zend.EG__().GetBailout(), types.FAILURE)
 }
 
-func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format string, args ...any) {
+func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format string, args ...any) {
 	var usr_copy va_list
 	var params []types.Zval
 	var retval types.Zval
@@ -82,7 +82,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			if ex != nil && ex.GetOpline().GetOpcode() == zend.ZEND_HANDLE_EXCEPTION && zend.EG__().GetOplineBeforeException() != nil {
 				opline = zend.EG__().GetOplineBeforeException()
 			}
-			ZendExceptionError(zend.EG__().GetException(), E_WARNING)
+			ExceptionError(zend.EG__().GetException(), E_WARNING)
 			zend.EG__().SetException(nil)
 			if opline != nil {
 				ex.SetOpline(opline)
@@ -263,33 +263,33 @@ func GetFilenameLineno(type_ int, filename **byte, lineno *uint32) {
 		*filename = "Unknown"
 	}
 }
-func ZendErrorAt(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
+func ErrorAt(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
 	var args va_list
 	if filename == nil {
 		var dummy_lineno uint32
 		GetFilenameLineno(type_, &filename, &dummy_lineno)
 	}
 	va_start(args, format)
-	ZendErrorVaList(type_, filename, lineno, format, args)
+	ErrorVaList(type_, filename, lineno, format, args)
 	va_end(args)
 }
-func ZendErrorEx(typ int, message string) {
+func ErrorEx(typ int, message string) {
 	// todo
 }
-func ZendError(type_ int, format string, args ...any) {
+func Error(type_ int, format string, args ...any) {
 	var filename *byte
 	var lineno uint32
 	GetFilenameLineno(type_, &filename, &lineno)
-	ZendErrorVaList(type_, filename, lineno, format, args)
+	ErrorVaList(type_, filename, lineno, format, args)
 }
-func ZendErrorAtNoreturn(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
+func ErrorAtNoreturn(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
 	var args va_list
 	if filename == nil {
 		var dummy_lineno uint32
 		GetFilenameLineno(type_, &filename, &dummy_lineno)
 	}
 	va_start(args, format)
-	ZendErrorVaList(type_, filename, lineno, format, args)
+	ErrorVaList(type_, filename, lineno, format, args)
 	va_end(args)
 
 	/* Should never reach this. */
@@ -298,13 +298,13 @@ func ZendErrorAtNoreturn(type_ int, filename *byte, lineno uint32, format string
 
 	/* Should never reach this. */
 }
-func ZendErrorNoreturn(type_ int, format string, _ ...any) {
+func ErrorNoreturn(type_ int, format string, _ ...any) {
 	var filename *byte
 	var lineno uint32
 	var args va_list
 	GetFilenameLineno(type_, &filename, &lineno)
 	va_start(args, format)
-	ZendErrorVaList(type_, filename, lineno, format, args)
+	ErrorVaList(type_, filename, lineno, format, args)
 	va_end(args)
 
 	/* Should never reach this. */
@@ -313,10 +313,10 @@ func ZendErrorNoreturn(type_ int, format string, _ ...any) {
 
 	/* Should never reach this. */
 }
-func ZendThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
+func ThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
 	if exception_ce != nil {
 		if zend.InstanceofFunction(exception_ce, ZendCeError) == 0 {
-			ZendError(E_NOTICE, "Error exceptions must be derived from Error")
+			Error(E_NOTICE, "Error exceptions must be derived from Error")
 			exception_ce = ZendCeError
 		}
 	} else {
@@ -334,38 +334,38 @@ func ZendThrowError(exception_ce *types.ClassEntry, format string, args ...any) 
 	//TODO: we can't convert compile-time errors to exceptions yet???
 
 	if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
-		ZendThrowException(exception_ce, message, 0)
+		ThrowException(exception_ce, message, 0)
 	} else {
-		ZendError(E_ERROR, "%s", message)
+		Error(E_ERROR, "%s", message)
 	}
 }
-func ZendTypeError(format string, args ...any) {
+func TypeError(format string, args ...any) {
 	message := zend.ZendSprintf(format, args...)
-	ZendThrowException(ZendCeTypeError, message, 0)
+	ThrowException(ZendCeTypeError, message, 0)
 	zend.Efree(message)
 }
 
-func ZendInternalTypeErrorEx(throwException bool, message string) {
+func InternalTypeErrorEx(throwException bool, message string) {
 	if throwException {
-		ZendThrowException(ZendCeTypeError, message, 0)
+		ThrowException(ZendCeTypeError, message, 0)
 	} else {
-		ZendError(E_WARNING, "%s", message)
+		Error(E_WARNING, "%s", message)
 	}
 }
-func ZendInternalTypeError(throw_exception bool, format string, args ...any) {
+func InternalTypeError(throw_exception bool, format string, args ...any) {
 	message := zend.ZendSprintf(format, args...)
 	if throw_exception {
-		ZendThrowException(ZendCeTypeError, message, 0)
+		ThrowException(ZendCeTypeError, message, 0)
 	} else {
-		ZendError(E_WARNING, "%s", message)
+		Error(E_WARNING, "%s", message)
 	}
 }
-func ZendInternalArgumentCountError(throw_exception bool, format string, args ...any) {
+func InternalArgumentCountError(throw_exception bool, format string, args ...any) {
 	message := zend.ZendSprintf(format, args...)
 	if throw_exception {
-		ZendThrowException(ZendCeArgumentCountError, message, 0)
+		ThrowException(ZendCeArgumentCountError, message, 0)
 	} else {
-		ZendError(E_WARNING, "%s", message)
+		Error(E_WARNING, "%s", message)
 	}
 }
-func ZendOutputDebugString(trigger_break types.ZendBool, format string, _ ...any) {}
+func OutputDebugString(trigger_break types.ZendBool, format string, _ ...any) {}

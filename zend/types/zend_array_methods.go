@@ -351,7 +351,7 @@ func (this *HashTable) doResize() {
 		// 无内存复制，仅扩充尺寸标识
 		this.nTableSize *= 2
 	} else {
-		faults.ZendErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
+		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
 	}
 }
 

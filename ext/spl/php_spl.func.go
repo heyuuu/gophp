@@ -398,7 +398,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			if zcallable.IsType(types.IS_ARRAY) {
 				if obj_ptr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 					if do_throw != 0 {
-						faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error)
+						faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error)
 					}
 					if error != nil {
 						zend.Efree(error)
@@ -407,7 +407,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 					return_value.SetFalse()
 					return
 				} else if do_throw != 0 {
-					faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(obj_ptr == nil, "static ", ""), error)
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(obj_ptr == nil, "static ", ""), error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -417,7 +417,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 				return
 			} else if zcallable.IsType(types.IS_STRING) {
 				if do_throw != 0 {
-					faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -427,7 +427,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 				return
 			} else {
 				if do_throw != 0 {
-					faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error)
+					faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -438,7 +438,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			}
 		} else if fcc.GetFunctionHandler().GetType() == zend.ZEND_INTERNAL_FUNCTION && fcc.GetFunctionHandler().GetInternalFunction().GetHandler() == ZifSplAutoloadCall {
 			if do_throw != 0 {
-				faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
+				faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
 			}
 			if error != nil {
 				zend.Efree(error)
@@ -566,7 +566,7 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *t
 		return
 	}
 	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &func_name, &fcc, &error) == 0 {
-		faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error)
+		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error)
 		if error != nil {
 			zend.Efree(error)
 		}

@@ -345,7 +345,7 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 	if nSize <= types.HT_MIN_SIZE {
 		return types.HT_MIN_SIZE
 	} else if nSize >= types.HT_MAX_SIZE {
-		faults.ZendErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", nSize, b.SizeOf("Bucket"), b.SizeOf("Bucket"))
+		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", nSize, b.SizeOf("Bucket"), b.SizeOf("Bucket"))
 	}
 	nSize -= 1
 	nSize |= nSize >> 1
@@ -877,7 +877,7 @@ func ZendHashCompare(ht1 *types.HashTable, ht2 *types.HashTable, compar types.Co
 	 */
 
 	if ht1.IsRecursive() {
-		faults.ZendErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
+		faults.ErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
 	}
 
 	ht1.TryProtectRecursive()

@@ -76,7 +76,7 @@ const PhpSleep = sleep
 
 var Environ **byte
 
-const PhpError = faults.ZendError
+const PhpError = faults.Error
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 

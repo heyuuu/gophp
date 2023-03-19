@@ -147,7 +147,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 
 	/* Discard parse errors thrown during tokenization */
 
-	faults.ZendClearException()
+	faults.ClearException()
 
 	/* Discard parse errors thrown during tokenization */
 }
@@ -207,7 +207,7 @@ func ZendStrip() {
 
 	/* Discard parse errors thrown during tokenization */
 
-	faults.ZendClearException()
+	faults.ClearException()
 
 	/* Discard parse errors thrown during tokenization */
 }

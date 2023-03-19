@@ -122,7 +122,7 @@ func PhpStreamUrlWrapPhp(
 			path += 11
 			max_memory = zend.ZEND_STRTOL(path, nil, 10)
 			if max_memory < 0 {
-				faults.ZendThrowError(nil, "Max memory must be >= 0")
+				faults.ThrowError(nil, "Max memory must be >= 0")
 				return nil
 			}
 		}
@@ -244,7 +244,7 @@ func PhpStreamUrlWrapPhp(
 		pathdup = zend.Estrndup(path+6, strlen(path+6))
 		p = strstr(pathdup, "/resource=")
 		if p == nil {
-			faults.ZendThrowError(nil, "No URL resource specified")
+			faults.ThrowError(nil, "No URL resource specified")
 			zend.Efree(pathdup)
 			return nil
 		}

@@ -479,7 +479,7 @@ again:
 		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			if myht.IsRecursive() {
 				buf.AppendString("NULL")
-				faults.ZendError(faults.E_WARNING, "var_export does not handle circular references")
+				faults.Error(faults.E_WARNING, "var_export does not handle circular references")
 				return
 			}
 			myht.AddRefcount()
@@ -517,7 +517,7 @@ again:
 		if myht != nil {
 			if myht.IsRecursive() {
 				buf.AppendString("NULL")
-				faults.ZendError(faults.E_WARNING, "var_export does not handle circular references")
+				faults.Error(faults.E_WARNING, "var_export does not handle circular references")
 				zend.ZendReleaseProperties(myht)
 				return
 			} else {
@@ -709,7 +709,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	}
 	if retval.GetType() != types.IS_ARRAY {
 		zend.ZvalPtrDtor(retval)
-		faults.ZendTypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).GetName().GetVal())
+		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).GetName().GetVal())
 		return types.FAILURE
 	}
 	return types.SUCCESS

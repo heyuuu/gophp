@@ -356,7 +356,7 @@ func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_se
 func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
 	var str *types.ZendString
 	if zend.EG__().GetCurrentModule() == nil {
-		faults.ZendError(faults.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
+		faults.Error(faults.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
@@ -368,7 +368,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 	var rev types.HashTable
 	var rev_ptr *types.HashTable = nil
 	if zend.EG__().GetCurrentModule() == nil {
-		faults.ZendError(faults.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
+		faults.Error(faults.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return types.FAILURE
 	}
 	if nil != b.Assign(&rev_ptr, zend.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
@@ -396,7 +396,7 @@ func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT 
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *types.ZendString
 	if zend.EG__().GetCurrentModule() == nil {
-		faults.ZendError(faults.E_ERROR, "Cannot register an output handler alias outside of MINIT")
+		faults.Error(faults.E_ERROR, "Cannot register an output handler alias outside of MINIT")
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)

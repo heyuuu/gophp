@@ -108,7 +108,7 @@ func ZendForbidDynamicCall(func_name string) int {
 	var ex *ZendExecuteData = CurrEX()
 	b.Assert(ex != nil && ex.GetFunc() != nil)
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_DYNAMIC) != 0 {
-		faults.ZendError(faults.E_WARNING, "Cannot call %s dynamically", func_name)
+		faults.Error(faults.E_WARNING, "Cannot call %s dynamically", func_name)
 		return types.FAILURE
 	}
 	return types.SUCCESS

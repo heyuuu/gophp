@@ -4295,7 +4295,7 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		tmp.SetArray(symbol_table)
 		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
 		if zend.ZendHashDel(symbol_table, types.ZSTR_THIS) == types.SUCCESS {
-			faults.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {
 		arrayArg = zend.ZendTryArrayInit(arrayArg)

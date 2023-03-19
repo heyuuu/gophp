@@ -199,7 +199,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 
-			faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Failed to open directory \"%s\"", path)
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Failed to open directory \"%s\"", path)
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 
@@ -220,14 +220,14 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	if tmp.IsType(types.IS_TRUE) {
 		intern.SetOpenMode(nil)
 		intern.SetFileName(nil)
-		faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Cannot use SplFileObject with directories")
+		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Cannot use SplFileObject with directories")
 		return types.FAILURE
 	}
 	intern.SetContext(streams.PhpStreamContextFromZval(intern.GetZcontext(), 0))
 	intern.SetStream(core.PhpStreamOpenWrapperEx(intern.GetFileName(), intern.GetOpenMode(), b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, intern.GetContext()))
 	if intern.GetFileNameLen() == 0 || intern.GetStream() == nil {
 		if zend.EG__().GetException() == nil {
-			faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", b.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
+			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", b.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
 		}
 		intern.SetFileName(nil)
 		intern.SetOpenMode(nil)
@@ -388,7 +388,7 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 
 	case SPL_FS_DIR:
 		if !(source.GetEntry().GetDName()[0]) {
-			faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Could not open file")
+			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Could not open file")
 			zend.ZendRestoreErrorHandling(&error_handling)
 			return nil
 		}
@@ -458,7 +458,7 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 		}
 	case SPL_FS_DIR:
 		zend.ZendRestoreErrorHandling(&error_handling)
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Operation not supported")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Operation not supported")
 		return nil
 	}
 	zend.ZendRestoreErrorHandling(&error_handling)
@@ -586,7 +586,7 @@ func SplFilesystemObjectConstruct(executeData *zend.ZendExecuteData, return_valu
 		return
 	}
 	if len_ == 0 {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Directory name must not be empty.")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Directory name must not be empty.")
 		zend.ZendRestoreErrorHandling(&error_handling)
 		return
 	}
@@ -688,7 +688,7 @@ func zim_spl_DirectoryIterator_seek(executeData *zend.ZendExecuteData, return_va
 		valid = zend.ZendIsTrue(&retval)
 		zend.ZvalPtrDtor(&retval)
 		if valid == 0 {
-			faults.ZendThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", pos)
+			faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", pos)
 			return
 		}
 		zend.ZendCallMethodWith0Params(zend.ZEND_THIS(executeData), types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), intern.GetFuncNext(), "next", nil)
@@ -1083,7 +1083,7 @@ func zim_spl_SplFileInfo_getLinkTarget(executeData *zend.ZendExecuteData, return
 		ret = zend.PhpSysReadlink(intern.GetFileName(), buff, core.MAXPATHLEN-1)
 	}
 	if ret == -1 {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Unable to read link %s, error: %s", intern.GetFileName(), strerror(errno))
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Unable to read link %s, error: %s", intern.GetFileName(), strerror(errno))
 		return_value.SetFalse()
 	} else {
 
@@ -1177,7 +1177,7 @@ func zim_spl_SplFileInfo___debugInfo(executeData *zend.ZendExecuteData, return_v
 	return
 }
 func zim_spl_SplFileInfo__bad_state_ex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "The parent constructor was not called: the object is in an "+"invalid state ")
+	faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The parent constructor was not called: the object is in an "+"invalid state ")
 }
 func zim_spl_FilesystemIterator___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	SplFilesystemObjectConstruct(executeData, return_value, DIT_CTOR_FLAGS|SPL_FILE_DIR_SKIPDOTS)
@@ -1319,7 +1319,7 @@ func SplFilesystemDirGetIterator(ce *types.ClassEntry, object *types.Zval, by_re
 	var iterator *SplFilesystemIterator
 	var dir_object *SplFilesystemObject
 	if by_ref != 0 {
-		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	dir_object = Z_SPLFILESYSTEM_P(object)
@@ -1445,7 +1445,7 @@ func SplFilesystemTreeGetIterator(ce *types.ClassEntry, object *types.Zval, by_r
 	var iterator *SplFilesystemIterator
 	var dir_object *SplFilesystemObject
 	if by_ref != 0 {
-		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	dir_object = Z_SPLFILESYSTEM_P(object)
@@ -1485,7 +1485,7 @@ func SplFilesystemFileRead(intern *SplFilesystemObject, silent int) int {
 	SplFilesystemFileFreeLine(intern)
 	if core.PhpStreamEof(intern.GetStream()) != 0 {
 		if silent == 0 {
-			faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot read from file %s", intern.GetFileName())
+			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot read from file %s", intern.GetFileName())
 		}
 		return types.FAILURE
 	}
@@ -1528,7 +1528,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 	var result int
 	var num_args int = pass_num_args + b.Cond(arg2 != nil, 2, 1)
 	if zresource_ptr.IsUndef() {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return types.FAILURE
 	}
 	params = (*types.Zval)(zend.SafeEmalloc(num_args, b.SizeOf("zval"), 0))
@@ -1593,7 +1593,7 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 	if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 || intern.GetFuncGetCurr().GetScope() != spl_ce_SplFileObject {
 		if core.PhpStreamEof(intern.GetStream()) != 0 {
 			if silent == 0 {
-				faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot read from file %s", intern.GetFileName())
+				faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot read from file %s", intern.GetFileName())
 			}
 			return types.FAILURE
 		}
@@ -1663,11 +1663,11 @@ func SplFilesystemFileReadLine(this_ptr *types.Zval, intern *SplFilesystemObject
 }
 func SplFilesystemFileRewind(this_ptr *types.Zval, intern *SplFilesystemObject) {
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if -1 == core.PhpStreamRewind(intern.GetStream()) {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot rewind file %s", intern.GetFileName())
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot rewind file %s", intern.GetFileName())
 	} else {
 		SplFilesystemFileFreeLine(intern)
 		intern.SetCurrentLineNum(0)
@@ -1754,7 +1754,7 @@ func zim_spl_SplFileObject_eof(executeData *zend.ZendExecuteData, return_value *
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	types.ZVAL_BOOL(return_value, core.PhpStreamEof(intern.GetStream()) != 0)
@@ -1782,7 +1782,7 @@ func zim_spl_SplFileObject_fgets(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if SplFilesystemFileRead(intern, 0) == types.FAILURE {
@@ -1798,7 +1798,7 @@ func zim_spl_SplFileObject_current(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if intern.GetCurrentLine() == nil && intern.GetCurrentZval().IsUndef() {
@@ -1861,7 +1861,7 @@ func zim_spl_SplFileObject_setMaxLineLen(executeData *zend.ZendExecuteData, retu
 		return
 	}
 	if max_len < 0 {
-		faults.ZendThrowExceptionEx(spl_ce_DomainException, 0, "Maximum line length must be greater than or equal zero")
+		faults.ThrowExceptionEx(spl_ce_DomainException, 0, "Maximum line length must be greater than or equal zero")
 		return
 	}
 	intern.SetMaxLineLen(max_len)
@@ -1899,7 +1899,7 @@ func zim_spl_SplFileObject_fgetcsv(executeData *zend.ZendExecuteData, return_val
 	var esc_len int = 0
 	if zend.ZendParseParameters(executeData.NumArgs(), "|sss", &delim, &d_len, &enclo, &e_len, &esc, &esc_len) == types.SUCCESS {
 		if intern.GetStream() == nil {
-			faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+			faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 			return
 		}
 		switch executeData.NumArgs() {
@@ -2068,7 +2068,7 @@ func zim_spl_SplFileObject_flock(executeData *zend.ZendExecuteData, return_value
 	var func_ptr *zend.ZendFunction
 	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "flock", b.SizeOf("\"flock\"")-1))
 	if func_ptr == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "flock")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "flock")
 		return
 	}
 	SplFilesystemFileCall(intern, func_ptr, executeData.NumArgs(), return_value, nil)
@@ -2076,7 +2076,7 @@ func zim_spl_SplFileObject_flock(executeData *zend.ZendExecuteData, return_value
 func zim_spl_SplFileObject_fflush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	types.ZVAL_BOOL(return_value, core.PhpStreamFlush(intern.GetStream()) == 0)
@@ -2086,7 +2086,7 @@ func zim_spl_SplFileObject_ftell(executeData *zend.ZendExecuteData, return_value
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var ret zend.ZendLong
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	ret = intern.GetStream().GetPosition()
@@ -2106,7 +2106,7 @@ func zim_spl_SplFileObject_fseek(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	SplFilesystemFileFreeLine(intern)
@@ -2118,7 +2118,7 @@ func zim_spl_SplFileObject_fgetc(executeData *zend.ZendExecuteData, return_value
 	var buf []byte
 	var result int
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	SplFilesystemFileFreeLine(intern)
@@ -2139,7 +2139,7 @@ func zim_spl_SplFileObject_fgetss(executeData *zend.ZendExecuteData, return_valu
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var arg2 types.Zval
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if intern.GetMaxLineLen() > 0 {
@@ -2152,7 +2152,7 @@ func zim_spl_SplFileObject_fgetss(executeData *zend.ZendExecuteData, return_valu
 	var func_ptr *zend.ZendFunction
 	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fgetss", b.SizeOf("\"fgetss\"")-1))
 	if func_ptr == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fgetss")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fgetss")
 		return
 	}
 	SplFilesystemFileCall(intern, func_ptr, executeData.NumArgs(), return_value, &arg2)
@@ -2160,7 +2160,7 @@ func zim_spl_SplFileObject_fgetss(executeData *zend.ZendExecuteData, return_valu
 func zim_spl_SplFileObject_fpassthru(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	return_value.SetLong(core.PhpStreamPassthru(intern.GetStream()))
@@ -2169,7 +2169,7 @@ func zim_spl_SplFileObject_fpassthru(executeData *zend.ZendExecuteData, return_v
 func zim_spl_SplFileObject_fscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	SplFilesystemFileFreeLine(intern)
@@ -2177,7 +2177,7 @@ func zim_spl_SplFileObject_fscanf(executeData *zend.ZendExecuteData, return_valu
 	var func_ptr *zend.ZendFunction
 	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fscanf", b.SizeOf("\"fscanf\"")-1))
 	if func_ptr == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fscanf")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fscanf")
 		return
 	}
 	SplFilesystemFileCall(intern, func_ptr, executeData.NumArgs(), return_value, nil)
@@ -2192,7 +2192,7 @@ func zim_spl_SplFileObject_fwrite(executeData *zend.ZendExecuteData, return_valu
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if executeData.NumArgs() > 1 {
@@ -2228,7 +2228,7 @@ func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if length <= 0 {
@@ -2249,7 +2249,7 @@ func zim_spl_SplFileObject_fstat(executeData *zend.ZendExecuteData, return_value
 	var func_ptr *zend.ZendFunction
 	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fstat", b.SizeOf("\"fstat\"")-1))
 	if func_ptr == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fstat")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fstat")
 		return
 	}
 	SplFilesystemFileCall(intern, func_ptr, executeData.NumArgs(), return_value, nil)
@@ -2261,11 +2261,11 @@ func zim_spl_SplFileObject_ftruncate(executeData *zend.ZendExecuteData, return_v
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if core.PhpStreamTruncateSupported(intern.GetStream()) == 0 {
-		faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Can't truncate file %s", intern.GetFileName())
+		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Can't truncate file %s", intern.GetFileName())
 		return_value.SetFalse()
 		return
 	}
@@ -2279,11 +2279,11 @@ func zim_spl_SplFileObject_seek(executeData *zend.ZendExecuteData, return_value 
 		return
 	}
 	if intern.GetStream() == nil {
-		faults.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
+		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
 	if line_pos < 0 {
-		faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Can't seek file %s to negative line "+zend.ZEND_LONG_FMT, intern.GetFileName(), line_pos)
+		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Can't seek file %s to negative line "+zend.ZEND_LONG_FMT, intern.GetFileName(), line_pos)
 		return_value.SetFalse()
 		return
 	}

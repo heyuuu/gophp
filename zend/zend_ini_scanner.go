@@ -205,7 +205,7 @@ func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 	/* Sanity check */
 
 	if scanner_mode != ZEND_INI_SCANNER_NORMAL && scanner_mode != ZEND_INI_SCANNER_RAW && scanner_mode != ZEND_INI_SCANNER_TYPED {
-		faults.ZendError(faults.E_WARNING, "Invalid scanner mode")
+		faults.Error(faults.E_WARNING, "Invalid scanner mode")
 		return types.FAILURE
 	}
 	SCNG(lineno) = 1

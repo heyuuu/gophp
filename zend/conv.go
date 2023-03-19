@@ -93,7 +93,7 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrRe
 			return
 		}
 		if mode == ConvertNoticeOnErrors {
-			faults.ZendError(faults.E_NOTICE, "A non well formed numeric value encountered")
+			faults.Error(faults.E_NOTICE, "A non well formed numeric value encountered")
 			if EG__().GetException() != nil {
 				return
 			}

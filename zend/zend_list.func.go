@@ -16,7 +16,7 @@ func ZendListInsert(ptr any, type_ int) *types.Zval {
 	if index == 0 {
 		index = 1
 	} else if index == core.INT_MAX {
-		faults.ZendErrorNoreturn(faults.E_ERROR, "Resource ID space overflow")
+		faults.ErrorNoreturn(faults.E_ERROR, "Resource ID space overflow")
 	}
 	zv.SetNewResource(index, ptr, type_)
 	return EG__().GetRegularList().IndexAddNewH(index, &zv)
@@ -46,7 +46,7 @@ func ZendResourceDtor(res *types.ZendResource) {
 			ld.GetListDtorEx()(&r)
 		}
 	} else {
-		faults.ZendError(faults.E_WARNING, "Unknown list entry type (%d)", r.GetType())
+		faults.Error(faults.E_WARNING, "Unknown list entry type (%d)", r.GetType())
 	}
 }
 func ZendListClose(res *types.ZendResource) int {
@@ -72,7 +72,7 @@ func ZendFetchResource2(res *types.ZendResource, resource_type_name string, reso
 		}
 	}
 	if resource_type_name {
-		faults.ZendError(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+		faults.Error(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
 	}
 	return nil
 }
@@ -81,20 +81,20 @@ func ZendFetchResource(res *types.ZendResource, resource_type_name *byte, resour
 		return res.GetPtr()
 	}
 	if resource_type_name != nil {
-		faults.ZendError(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+		faults.Error(faults.E_WARNING, "%s(): supplied resource is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
 	}
 	return nil
 }
 func ZendFetchResourceEx(res *types.Zval, resource_type_name string, resource_type int) any {
 	if res == nil {
 		if resource_type_name {
-			faults.ZendError(faults.E_WARNING, "%s(): no %s resource supplied", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): no %s resource supplied", GetActiveCalleeName(), resource_type_name)
 		}
 		return nil
 	}
 	if res.GetType() != types.IS_RESOURCE {
 		if resource_type_name {
-			faults.ZendError(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
 		}
 		return nil
 	}
@@ -103,13 +103,13 @@ func ZendFetchResourceEx(res *types.Zval, resource_type_name string, resource_ty
 func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res == nil {
 		if resource_type_name {
-			faults.ZendError(faults.E_WARNING, "%s(): no %s resource supplied", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): no %s resource supplied", GetActiveCalleeName(), resource_type_name)
 		}
 		return nil
 	}
 	if res.GetType() != types.IS_RESOURCE {
 		if resource_type_name {
-			faults.ZendError(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
+			faults.Error(faults.E_WARNING, "%s(): supplied argument is not a valid %s resource", GetActiveCalleeName(), resource_type_name)
 		}
 		return nil
 	}
@@ -133,7 +133,7 @@ func PlistEntryDestructor(zv *types.Zval) {
 				ld.GetPlistDtorEx()(res)
 			}
 		} else {
-			faults.ZendError(faults.E_WARNING, "Unknown list entry type (%d)", res.GetType())
+			faults.Error(faults.E_WARNING, "Unknown list entry type (%d)", res.GetType())
 		}
 	}
 	Free(res)

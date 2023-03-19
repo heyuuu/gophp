@@ -212,7 +212,7 @@ func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *types
 	return prop
 }
 func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
-	faults.ZendError(faults.E_NOTICE, "Only variables should be assigned by reference")
+	faults.Error(faults.E_NOTICE, "Only variables should be assigned by reference")
 	if EG__().GetException() != nil {
 		return EG__().GetUninitializedZval()
 	}
@@ -242,16 +242,16 @@ func ZendThrowAutoInitInPropError(prop *ZendPropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.ZendTypeError("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError("Cannot auto-initialize an %s inside property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowAutoInitInRefError(prop *ZendPropertyInfo, type_ string) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	faults.ZendTypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+	faults.TypeError("Cannot auto-initialize an %s inside a reference held by property %s::$%s of type %s%s", type_, prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowAccessUninitPropByRefError(prop *ZendPropertyInfo) {
-	faults.ZendThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()))
+	faults.ThrowError(nil, "Cannot access uninitialized non-nullable property %s::$%s by reference", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()))
 }
 func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
 	var obj *types.ZendObject
@@ -265,11 +265,11 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 			var tmp_property_name *types.ZendString
 			var property_name *types.ZendString = ZvalGetTmpString(property, &tmp_property_name)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
-				faults.ZendError(faults.E_WARNING, "Attempt to increment/decrement property '%s' of non-object", property_name.GetVal())
+				faults.Error(faults.E_WARNING, "Attempt to increment/decrement property '%s' of non-object", property_name.GetVal())
 			} else if opline.GetOpcode() == ZEND_FETCH_OBJ_W || opline.GetOpcode() == ZEND_FETCH_OBJ_RW || opline.GetOpcode() == ZEND_FETCH_OBJ_FUNC_ARG || opline.GetOpcode() == ZEND_ASSIGN_OBJ_REF {
-				faults.ZendError(faults.E_WARNING, "Attempt to modify property '%s' of non-object", property_name.GetVal())
+				faults.Error(faults.E_WARNING, "Attempt to modify property '%s' of non-object", property_name.GetVal())
 			} else {
-				faults.ZendError(faults.E_WARNING, "Attempt to assign property '%s' of non-object", property_name.GetVal())
+				faults.Error(faults.E_WARNING, "Attempt to assign property '%s' of non-object", property_name.GetVal())
 			}
 			ZendTmpStringRelease(tmp_property_name)
 		}
@@ -290,7 +290,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 	ObjectInit(object)
 	object.AddRefcount()
 	obj = object.GetObj()
-	faults.ZendError(faults.E_WARNING, "Creating default object from empty value")
+	faults.Error(faults.E_WARNING, "Creating default object from empty value")
 	if obj.GetRefcount() == 1 {
 
 		/* the enclosing container was deleted, obj is unreferenced */
@@ -406,12 +406,12 @@ func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce
 		ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
 		if zf.GetCommonType() == ZEND_USER_FUNCTION {
 			if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetCommonType()) {
-				faults.ZendTypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given, called in %s on line %d", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind, ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno())
+				faults.TypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given, called in %s on line %d", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind, ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno())
 			} else {
-				faults.ZendTypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
+				faults.TypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
 			}
 		} else {
-			faults.ZendTypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
+			faults.TypeError("Argument %d passed to %s%s%s() must %s%s%s, %s%s given", arg_num, fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
 		}
 	} else {
 		ZendMissingArgError(ptr)

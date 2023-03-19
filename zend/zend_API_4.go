@@ -105,11 +105,11 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable)
 func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.HashTable) int {
 	if class_type.HasCeFlags(ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) {
 		if class_type.IsInterface() {
-			faults.ZendThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
+			faults.ThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
 		} else if class_type.IsTrait() {
-			faults.ZendThrowError(nil, "Cannot instantiate trait %s", class_type.GetName().GetVal())
+			faults.ThrowError(nil, "Cannot instantiate trait %s", class_type.GetName().GetVal())
 		} else {
-			faults.ZendThrowError(nil, "Cannot instantiate abstract class %s", class_type.GetName().GetVal())
+			faults.ThrowError(nil, "Cannot instantiate abstract class %s", class_type.GetName().GetVal())
 		}
 		arg.SetNull()
 		arg.SetObj(nil)
@@ -298,7 +298,7 @@ func ArraySetZvalKey(ht *types.HashTable, key *types.Zval, value *types.Zval) in
 		result = ht.SymtableUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), value)
 		break
 	case types.IS_RESOURCE:
-		faults.ZendError(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(key), types.Z_RES_HANDLE_P(key))
+		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(key), types.Z_RES_HANDLE_P(key))
 		result = ht.IndexUpdate(types.Z_RES_HANDLE_P(key), value)
 		break
 	case types.IS_FALSE:
@@ -314,7 +314,7 @@ func ArraySetZvalKey(ht *types.HashTable, key *types.Zval, value *types.Zval) in
 		result = ht.IndexUpdate(ZendDvalToLval(key.GetDval()), value)
 		break
 	default:
-		faults.ZendError(faults.E_WARNING, "Illegal offset type")
+		faults.Error(faults.E_WARNING, "Illegal offset type")
 		result = nil
 	}
 	if result != nil {
@@ -364,7 +364,7 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 
 					/* TODO: Check version relationship */
 
-					faults.ZendError(faults.E_CORE_WARNING, "Cannot load module '%s' because required module '%s' is not loaded", module.GetName(), dep.GetName())
+					faults.Error(faults.E_CORE_WARNING, "Cannot load module '%s' because required module '%s' is not loaded", module.GetName(), dep.GetName())
 					module.SetModuleStarted(0)
 					return types.FAILURE
 				}
@@ -384,7 +384,7 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 	if module.GetModuleStartupFunc() != nil {
 		EG__().SetCurrentModule(module)
 		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
-			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.GetName())
+			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.GetName())
 			EG__().SetCurrentModule(nil)
 			return types.FAILURE
 		}

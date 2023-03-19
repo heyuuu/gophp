@@ -129,14 +129,14 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if zend.ZendEvalStringl(myeval, assertion.GetStr().GetLen(), &retval, compiled_string_description) == types.FAILURE {
 			zend.Efree(compiled_string_description)
 			if description == nil {
-				faults.ZendThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
+				faults.ThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
 			} else {
 				var str *types.ZendString = zend.ZvalGetString(description)
-				faults.ZendThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
+				faults.ThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
 				types.ZendStringReleaseEx(str, 0)
 			}
 			if ASSERTG(bail) {
-				faults.ZendBailout()
+				faults.Bailout()
 			}
 			return_value.SetFalse()
 			return
@@ -184,13 +184,13 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if ASSERTG(exception) {
 		if description == nil {
-			faults.ZendThrowException(AssertionErrorCe, nil, faults.E_ERROR)
+			faults.ThrowException(AssertionErrorCe, nil, faults.E_ERROR)
 		} else if description.IsType(types.IS_OBJECT) && zend.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
 			description.AddRefcount()
-			faults.ZendThrowExceptionObject(description)
+			faults.ThrowExceptionObject(description)
 		} else {
 			var str *types.ZendString = zend.ZvalGetString(description)
-			faults.ZendThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
+			faults.ThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
 			types.ZendStringReleaseEx(str, 0)
 		}
 	} else if ASSERTG(warning) {
@@ -211,7 +211,7 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	}
 	if ASSERTG(bail) {
-		faults.ZendBailout()
+		faults.Bailout()
 	}
 	return_value.SetFalse()
 	return

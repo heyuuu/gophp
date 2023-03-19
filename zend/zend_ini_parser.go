@@ -235,7 +235,7 @@ func IniError(msg *byte) {
 	if CG__().GetIniParserUnbufferedErrors() != 0 {
 		log.Printf("PHP:  %s", error_buf)
 	} else {
-		faults.ZendError(faults.E_WARNING, "%s", error_buf)
+		faults.Error(faults.E_WARNING, "%s", error_buf)
 	}
 	Efree(error_buf)
 }

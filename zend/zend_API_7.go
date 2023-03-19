@@ -25,7 +25,7 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 			}
 		}
 	}
-	faults.ZendError(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
+	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
 	return intern
 }
 func ZendDisableClass(class_name *byte, class_name_length int) int {
@@ -353,9 +353,9 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *ZendFca
 					}
 				} else if retval != 0 {
 					if severity == faults.E_ERROR {
-						faults.ZendThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+						faults.ThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
 					} else {
-						faults.ZendError(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+						faults.Error(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
 					}
 				}
 			}

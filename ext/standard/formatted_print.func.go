@@ -61,14 +61,14 @@ func PhpSprintfAppendstring(
 	}
 	m_width = b.Max(min_width, copy_len)
 	if m_width > core.INT_MAX-(*pos)-1 {
-		faults.ZendErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", m_width)
+		faults.ErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", m_width)
 	}
 	req_size = (*pos) + m_width + 1
 	if req_size > buffer.GetLen() {
 		var size int = buffer.GetLen()
 		for req_size > size {
 			if size > types.ZEND_SIZE_MAX/2 {
-				faults.ZendErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", req_size)
+				faults.ErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", req_size)
 			}
 			size <<= 1
 		}

@@ -456,7 +456,7 @@ func ZendGeneratorCreate(class_type *types.ClassEntry) *types.ZendObject {
 	return (*types.ZendObject)(generator)
 }
 func ZendGeneratorGetConstructor(object *types.ZendObject) *ZendFunction {
-	faults.ZendThrowError(nil, "The \"Generator\" class is reserved for internal use and cannot be manually instantiated")
+	faults.ThrowError(nil, "The \"Generator\" class is reserved for internal use and cannot be manually instantiated")
 	return nil
 }
 func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {
@@ -497,9 +497,9 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *types.Zval
 	EG__().SetCurrentExecuteData(generator.GetExecuteData())
 	generator.GetExecuteData().GetOpline()--
 	if exception != nil {
-		faults.ZendThrowExceptionObject(exception)
+		faults.ThrowExceptionObject(exception)
 	} else {
-		faults.ZendRethrowException(CurrEX())
+		faults.RethrowException(CurrEX())
 	}
 	generator.GetExecuteData().GetOpline()++
 	EG__().SetCurrentExecuteData(original_execute_data)
@@ -643,7 +643,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 							generator.GetExecuteFake().SetPrevExecuteData(original_execute_data)
 						}
 						root.GetExecuteData().GetOpline()--
-						faults.ZendThrowException(zend_ce_ClosedGeneratorException, "Generator yielded from aborted, no return value available", 0)
+						faults.ThrowException(zend_ce_ClosedGeneratorException, "Generator yielded from aborted, no return value available", 0)
 						EG__().SetCurrentExecuteData(original_execute_data)
 						if (b.Cond(old_root != nil, old_root, generator).flags & ZEND_GENERATOR_CURRENTLY_RUNNING) == 0 {
 							leaf.GetNode().SetRoot(root)
@@ -770,7 +770,7 @@ func ZendGeneratorResume(orig_generator *ZendGenerator) {
 	}
 try_again:
 	if generator.IsCurrentlyRunning() {
-		faults.ZendThrowError(nil, "Cannot resume an already running generator")
+		faults.ThrowError(nil, "Cannot resume an already running generator")
 		return
 	}
 	if orig_generator.IsDoInit() && !(generator.GetValue().IsUndef()) {
@@ -852,9 +852,9 @@ try_again:
 		if generator == orig_generator {
 			ZendGeneratorClose(generator, 0)
 			if CurrEX() == nil {
-				faults.ZendThrowExceptionInternal(nil)
+				faults.ThrowExceptionInternal(nil)
 			} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) {
-				faults.ZendRethrowException(CurrEX())
+				faults.RethrowException(CurrEX())
 			}
 		} else {
 			generator = ZendGeneratorGetCurrent(orig_generator)
@@ -884,7 +884,7 @@ func ZendGeneratorEnsureInitialized(generator *ZendGenerator) {
 func ZendGeneratorRewind(generator *ZendGenerator) {
 	ZendGeneratorEnsureInitialized(generator)
 	if !generator.IsAtFirstYield() {
-		faults.ZendThrowException(nil, "Cannot rewind a generator that was already run", 0)
+		faults.ThrowException(nil, "Cannot rewind a generator that was already run", 0)
 	}
 }
 func zim_Generator_rewind(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -1021,7 +1021,7 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		/* If the generator is already closed throw the exception in the
 		 * current context */
 
-		faults.ZendThrowExceptionObject(exception)
+		faults.ThrowExceptionObject(exception)
 
 		/* If the generator is already closed throw the exception in the
 		 * current context */
@@ -1042,7 +1042,7 @@ func zim_Generator_getReturn(executeData *ZendExecuteData, return_value *types.Z
 
 		/* Generator hasn't returned yet -> error! */
 
-		faults.ZendThrowException(nil, "Cannot get return value of a generator that hasn't returned", 0)
+		faults.ThrowException(nil, "Cannot get return value of a generator that hasn't returned", 0)
 		return
 	}
 	types.ZVAL_COPY(return_value, generator.GetRetval())
@@ -1094,11 +1094,11 @@ func ZendGeneratorGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	var iterator *ZendObjectIterator
 	var generator *ZendGenerator = (*ZendGenerator)(object.GetObj())
 	if generator.GetExecuteData() == nil {
-		faults.ZendThrowException(nil, "Cannot traverse an already closed generator", 0)
+		faults.ThrowException(nil, "Cannot traverse an already closed generator", 0)
 		return nil
 	}
 	if by_ref != 0 && !generator.GetExecuteData().GetFunc().GetOpArray().IsReturnReference() {
-		faults.ZendThrowException(nil, "You can only iterate a generator by-reference if it declared that it yields by-reference", 0)
+		faults.ThrowException(nil, "You can only iterate a generator by-reference if it declared that it yields by-reference", 0)
 		return nil
 	}
 	generator.SetIterator(Emalloc(b.SizeOf("zend_object_iterator")))

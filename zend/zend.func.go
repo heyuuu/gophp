@@ -33,7 +33,7 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	assertions := EG__().assertions
 	val := ZendAtolEx(*new_value)
 	if stage != ZEND_INI_STAGE_STARTUP && stage != ZEND_INI_STAGE_SHUTDOWN && assertions != val && (assertions < 0 || val < 0) {
-		faults.ZendError(faults.E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
+		faults.Error(faults.E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
 		return false
 	}
 	EG__().assertions = val
@@ -462,7 +462,7 @@ func Zenderror(error *byte) {
 		/* An exception was thrown in the lexer, don't throw another in the parser. */
 
 	}
-	faults.ZendThrowException(faults.ZendCeParseError, error, 0)
+	faults.ThrowException(faults.ZendCeParseError, error, 0)
 }
 func ZendAppendVersionInfo(extension *ZendExtension) {
 	ZendVersionInfo += fmt.Sprintf("    with %s v%s, %s, by %s\n", extension.GetNameStr(), extension.GetVersionStr(), extension.GetCopyrightStr(), extension.GetAuthorStr())
@@ -583,13 +583,13 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 		ZendDestroyFileHandle(file_handle)
 		if op_array != nil {
 			ZendExecute(op_array, retval)
-			faults.ZendExceptionRestore()
+			faults.ExceptionRestore()
 			if EG__().GetException() != nil {
 				if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
 					ZendUserExceptionHandler()
 				}
 				if EG__().GetException() != nil {
-					faults.ZendExceptionError(EG__().GetException(), faults.E_ERROR)
+					faults.ExceptionError(EG__().GetException(), faults.E_ERROR)
 				}
 			}
 			DestroyOpArray(op_array)
