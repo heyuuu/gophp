@@ -939,22 +939,12 @@ func zim_spl_ArrayIterator___construct(executeData *zend.ZendExecuteData, return
 func zim_spl_Array_setIteratorClass(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var ce_get_iterator *zend.ZendClassEntry = spl_ce_ArrayIterator
-	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
 
-		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			ce_get_iterator = fp.ParseClass()
-			if fp.HasError() {
-				fp.HandleError()
-				return
-			}
-			break
-		}
-		break
+	fp := argparse.FastParseStart(executeData, 1, 1, 0)
+	ce_get_iterator := fp.ParseClass(spl_ce_ArrayIterator)
+	if fp.HasError() {
+		fp.HandleError()
+		return
 	}
 	intern.SetCeGetIterator(ce_get_iterator)
 }

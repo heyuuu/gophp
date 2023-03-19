@@ -142,20 +142,6 @@ func ZendIsCallableEx(
 func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **types.ZendString) types.ZendBool {
 	return ZendIsCallableEx(callable, nil, check_flags, callable_name, nil, nil)
 }
-func ZendMakeCallable(callable *types.Zval, callable_name **types.ZendString) types.ZendBool {
-	var fcc ZendFcallInfoCache
-	if ZendIsCallableEx(callable, nil, IS_CALLABLE_STRICT, callable_name, &fcc, nil) != 0 {
-		if callable.IsString() && fcc.GetCallingScope() != nil {
-			ZvalPtrDtorStr(callable)
-			ArrayInit(callable)
-			AddNextIndexStr(callable, fcc.GetCallingScope().GetName().Copy())
-			AddNextIndexStr(callable, fcc.GetFunctionHandler().GetFunctionName().Copy())
-		}
-		ZendReleaseFcallInfoCache(&fcc)
-		return 1
-	}
-	return 0
-}
 func ZendFcallInfoInit(
 	callable *types.Zval,
 	check_flags uint32,

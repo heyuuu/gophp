@@ -155,7 +155,8 @@ func (p *FastParser) ParseArrayEx2(checkNull bool, deref bool, separate bool) (d
 		return
 	}
 
-	if ZendParseArgArray(p.arg, &dest, types.IntBool(checkNull), 0) == 0 {
+	dest, ok := ParseArray(p.arg, checkNull, false)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
 	}
 
@@ -174,7 +175,8 @@ func (p *FastParser) ParseArrayOrObjectEx(checkNull bool, separate bool) (dest *
 		return
 	}
 
-	if ZendParseArgArray(p.arg, &dest, types.IntBool(checkNull), 1) == 0 {
+	dest, ok := ParseArray(p.arg, checkNull, true)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
 	}
 
@@ -192,24 +194,27 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 		return
 	}
 
-	if ZendParseArgBool(p.arg, &dest, &isNull, types.IntBool(checkNull)) == 0 {
+	val, valIsNull, ok := ParseBool(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_BOOL)
 	}
 
-	return
+	return types.IntBool(val), types.IntBool(valIsNull)
 }
 
 // @see Micro: Z_PARAM_CLASS，Old: 'C'
-func (p *FastParser) ParseClass() (dest *zend.ZendClassEntry) {
-	return p.ParseClassEx(false)
+func (p *FastParser) ParseClass(baseCe *zend.ZendClassEntry) (dest *zend.ZendClassEntry) {
+	return p.ParseClassEx(baseCe, false)
 }
-func (p *FastParser) ParseClassEx(checkNull bool) (dest *zend.ZendClassEntry) {
+
+func (p *FastParser) ParseClassEx(baseCe *zend.ZendClassEntry, checkNull bool) (dest *zend.ZendClassEntry) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	if ZendParseArgClass(p.arg, &dest, p.idx, types.IntBool(checkNull)) == 0 {
+	dest, ok := ParseClass(p.arg, baseCe, p.idx, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_FAILURE, "")
 	}
 
@@ -227,11 +232,12 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 		return
 	}
 
-	if ZendParseArgDouble(p.arg, &dest, &isNull, types.IntBool(checkNull)) == 0 {
+	val, valIsNull, ok := ParseDouble(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_DOUBLE)
 	}
 
-	return
+	return val, types.IntBool(valIsNull)
 }
 
 // @see Micro: Z_PARAM_FUNC，Old: 'f'
@@ -244,8 +250,8 @@ func (p *FastParser) ParseFuncEx(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInf
 		return
 	}
 
-	var err *string
-	if ZendParseArgFunc(p.arg, fci, fcc, types.IntBool(checkNull), &err) == 0 {
+	err, ok := ParseFunc(p.arg, fci, fcc, checkNull)
+	if !ok {
 		if err == nil {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_FUNC)
 		} else {
@@ -267,9 +273,12 @@ func (p *FastParser) ParseArrayHtEx(checkNull bool, separate bool) (dest *types.
 	if p.IsFinish() {
 		return
 	}
-	if ZendParseArgArrayHt(p.arg, &dest, types.IntBool(checkNull), 0, types.IntBool(separate)) == 0 {
+
+	dest, ok := ParseArrayHt(p.arg, checkNull, false, separate)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
 	}
+
 	return
 }
 
@@ -284,7 +293,8 @@ func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest
 		return
 	}
 
-	if ZendParseArgArrayHt(p.arg, &dest, types.IntBool(checkNull), 1, types.IntBool(separate)) == 0 {
+	dest, ok := ParseArrayHt(p.arg, checkNull, true, separate)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
 	}
 
@@ -335,16 +345,16 @@ func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.Z
 
 // @see Micro: Z_PARAM_OBJECT，Old: 'o'
 func (p *FastParser) ParseObject() (dest *types.Zval) {
-	dest, _ = p.ParseObjectEx(false)
-	return
+	return p.ParseObjectEx(false)
 }
-func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	if ZendParseArgObject(p.arg, &dest, nil, types.IntBool(checkNull)) == 0 {
+	dest, ok := ParseObject(p.arg, nil, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_OBJECT)
 	}
 
@@ -362,7 +372,8 @@ func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull boo
 		return
 	}
 
-	if ZendParseArgObject(p.arg, &dest, ce, types.IntBool(checkNull)) == 0 {
+	dest, ok := ParseObject(p.arg, ce, checkNull)
+	if !ok {
 		if ce != nil {
 			p.triggerError(ZPP_ERROR_WRONG_CLASS, ce.Name())
 		} else {
@@ -383,7 +394,8 @@ func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int) {
 		return
 	}
 
-	if ZendParseArgPath(p.arg, &dest, &destLen, types.IntBool(checkNull)) == 0 {
+	dest, destLen, ok := ParsePathStrPtr(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 	}
 
@@ -400,7 +412,8 @@ func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString) {
 		return
 	}
 
-	if ZendParseArgPathStr(p.arg, &dest, types.IntBool(checkNull)) == 0 {
+	dest, ok := ParsePathStr(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 	}
 
@@ -417,7 +430,8 @@ func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
 		return
 	}
 
-	if ZendParseArgResource(p.arg, &dest, types.IntBool(checkNull)) == 0 {
+	dest, ok := ParseResource(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_RESOURCE)
 	}
 
@@ -434,11 +448,12 @@ func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
 		return
 	}
 
-	if ZendParseArgString(p.arg, &dest, &destLen, types.IntBool(checkNull)) == 0 {
+	s, l, ok := ParseStrPtr(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}
 
-	return
+	return s, l
 }
 
 // @see Micro: Z_PARAM_STR，Old: 'S'
@@ -451,11 +466,12 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
 		return
 	}
 
-	if ZendParseArgStr(p.arg, &dest, types.IntBool(checkNull)) == 0 {
+	val, ok := ParseZStr(p.arg, checkNull)
+	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}
 
-	return
+	return val
 }
 
 // @see Micro: Z_PARAM_ZVAL，Old: 'z'
@@ -468,25 +484,20 @@ func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval) {
 		return
 	}
 
-	ZendParseArgZvalDeref(p.arg, &dest, types.IntBool(checkNull))
-
-	return
+	return ParseZvalDeref(p.arg, checkNull)
 }
 
 // @see Micro: Z_PARAM_ZVAL_DEREF, Old: ""
 func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
-	dest, _ = p.ParseZvalDerefEx(false)
-	return
+	return p.ParseZvalDerefEx(false)
 }
-func (p *FastParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+func (p *FastParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval) {
 	p.parsePrologue(true, false)
 	if p.IsFinish() {
 		return
 	}
 
-	ZendParseArgZvalDeref(p.arg, &dest, types.IntBool(checkNull))
-
-	return
+	return ParseZvalDeref(p.arg, checkNull)
 }
 
 // @see Micro: Z_PARAM_VARIADIC | Z_PARAM_VARIADIC_EX, Old: '+ and '*'

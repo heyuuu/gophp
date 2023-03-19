@@ -14,15 +14,13 @@ type parseArgError struct {
 
 func (p parseArgError) Error() string { return p.message }
 
-func parseTypeError(arg *types.Zval, expectedType string) *parseArgError {
-	return parseError(0, "to be %s, %s given", expectedType, zend.ZendZvalTypeName(arg))
-}
 func parseError(severity int, format string, args ...any) *parseArgError {
 	return &parseArgError{severity: severity, message: fmt.Sprintf(format, args...)}
 }
 
-func (p *OldParser) ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceiver, spec *b.StrReader, flags int) int {
-	err := p.ZendParseArgImpl(arg, va, spec)
+func (p *OldParser) ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceiver, spec *typeSpecReader, flags int) int {
+	p.ZendParseArgImpl(arg, va, spec)
+	err := p.err
 	if err != nil {
 		if zend.EG__().GetException() != nil {
 			return types.FAILURE
@@ -38,15 +36,14 @@ func (p *OldParser) ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceive
 	return types.SUCCESS
 }
 
-func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *typeSpecReader) *parseArgError {
+func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *typeSpecReader) {
 	/* scan through modifiers */
-	typ, checkNull, separateBool := spec.Next()
+	typ, checkNull, separate := spec.Next()
 	check_null := types.IntBool(checkNull)
-	separate := types.IntBool(separateBool)
 
 	real_arg := arg
 	arg = types.ZVAL_DEREF(arg)
-	if separateBool {
+	if separate {
 		types.SEPARATE_ZVAL_NOREF(arg)
 		real_arg = arg
 	}
@@ -58,121 +55,128 @@ func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *
 	case 'd':
 		p.parseDouble(checkNull)
 	case 's':
-		var p **byte = __va_arg(*va, (**byte)(_))
-		var pl *int = __va_arg(*va, (*int)(_))
-		if ZendParseArgString(arg, p, pl, check_null) == 0 {
-			return parseTypeError(arg, "string")
+		if s, l, ok := ParseStrPtr(arg, checkNull); ok {
+			va.StrPtr(s, l)
+		} else {
+			p.parseTypeError(arg, "string")
 		}
 	case 'p':
-		var p **byte = __va_arg(*va, (**byte)(_))
-		var pl *int = __va_arg(*va, (*int)(_))
-		if ZendParseArgPath(arg, p, pl, check_null) == 0 {
-			return parseTypeError(arg, "a valid path")
+		if s, l, ok := ParsePathStrPtr(arg, checkNull); ok {
+			va.StrPtr(s, l)
+		} else {
+			p.parseTypeError(arg, "a valid path")
 		}
 	case 'P':
-		var str **types.ZendString = __va_arg(*va, (**types.ZendString)(_))
-		if ZendParseArgPathStr(arg, str, check_null) == 0 {
-			return parseTypeError(arg, "a valid path")
-		}
-	case 'S':
-		if val, ok := ParseZStr(arg, check_null != 0); ok {
+		if val, ok := ParsePathStr(arg, checkNull); ok {
 			va.ZStr(val)
 		} else {
-			return parseTypeError(arg, "string")
+			p.parseTypeError(arg, "a valid path")
+		}
+	case 'S':
+		if val, ok := ParseZStr(arg, checkNull); ok {
+			va.ZStr(val)
+		} else {
+			p.parseTypeError(arg, "string")
 		}
 	case 'b':
-		if val, isNull, ok := ParseBool(arg, check_null != 0); ok {
+		if val, isNull, ok := ParseBool(arg, checkNull); ok {
 			va.Bool(val)
-			if check_null != 0 {
+			if checkNull {
 				va.Bool(isNull)
 			}
 		} else {
-			return parseTypeError(arg, "bool")
+			p.parseTypeError(arg, "bool")
 		}
 	case 'r':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgResource(arg, p, check_null) == 0 {
-			return parseTypeError(arg, "resource")
+		if res, ok := ParseResource(p.arg, checkNull); ok {
+			va.Zval(res)
+		} else {
+			p.parseTypeError(arg, "resource")
 		}
 	case 'A', 'a':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgArray(arg, p, check_null, typ == 'A') == 0 {
-			return parseTypeError(arg, "array")
+		if val, ok := ParseArray(arg, checkNull, typ == 'A'); ok {
+			va.Zval(val)
+		} else {
+			p.parseTypeError(arg, "array")
 		}
 	case 'H', 'h':
-		var p **types.HashTable = __va_arg(*va, (**types.HashTable)(_))
-		if ZendParseArgArrayHt(arg, p, check_null, typ == 'H', separate) == 0 {
-			return parseTypeError(arg, "array")
+		if ht, ok := ParseArrayHt(arg, checkNull, typ == 'H', separate); ok {
+			va.Array(ht)
+		} else {
+			p.parseTypeError(arg, "array")
 		}
 	case 'o':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		if ZendParseArgObject(arg, p, nil, check_null) == 0 {
-			return parseTypeError(arg, "object")
+		if obj, ok := ParseObject(arg, nil, check_null != 0); ok {
+			va.Zval(obj)
+		} else {
+			p.parseTypeError(arg, "object")
 		}
 	case 'O':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		var ce *zend.ZendClassEntry = __va_arg(*va, (*zend.ZendClassEntry)(_))
-		if ZendParseArgObject(arg, p, ce, check_null) == 0 {
+		objPtr := va.Pop().(**types.Zval)
+		ce := va.Pop().(*zend.ZendClassEntry)
+		if obj, ok := ParseObject(arg, ce, check_null != 0); ok {
+			*objPtr = obj
+		} else {
 			if ce != nil {
-				return ce.GetName().GetVal()
+				p.parseTypeError(arg, ce.Name())
 			} else {
-				return parseTypeError(arg, "object")
+				p.parseTypeError(arg, "object")
 			}
 		}
 	case 'C':
+		pce := va.Pop().(**zend.ZendClassEntry)
+		baseCe := *pce
+
+		// todo 待替换为 ParseClass
+
 		var lookup *zend.ZendClassEntry
-		var pce **zend.ZendClassEntry = __va_arg(*va, (**zend.ZendClassEntry)(_))
-		var ce_base *zend.ZendClassEntry = *pce
-		if check_null != 0 && arg.IsNull() {
+		if checkNull && arg.IsNull() {
 			*pce = nil
 			break
 		}
 		if zend.TryConvertToString(arg) == 0 {
 			*pce = nil
-			return parseTypeError(arg, "valid class name")
+			p.parseTypeError(arg, "valid class name")
+			break
 		}
 		if b.Assign(&lookup, zend.ZendLookupClass(arg.GetStr())) == nil {
 			*pce = nil
 		} else {
 			*pce = lookup
 		}
-		if ce_base != nil {
-			if (*pce) == nil || zend.InstanceofFunction(*pce, ce_base) == 0 {
-				return parseError(0, "to be a class name derived from %s, '%s' given", ce_base.Name(), arg.GetRawStr())
+		if baseCe != nil {
+			if (*pce) == nil || zend.InstanceofFunction(*pce, baseCe) == 0 {
+				p.parseError(0, "to be a class name derived from %s, '%s' given", baseCe.Name(), arg.GetRawStr())
+				break
 			}
 		}
 		if (*pce) == nil {
-			return parseError(0, "to be a valid class name, '%s' given", arg.GetRawStr())
+			p.parseError(0, "to be a valid class name, '%s' given", arg.GetRawStr())
+			break
 		}
 	case 'f':
-		var fci *zend.ZendFcallInfo = __va_arg(*va, (*zend.ZendFcallInfo)(_))
-		var fcc *zend.ZendFcallInfoCache = __va_arg(*va, (*zend.ZendFcallInfoCache)(_))
-		var is_callable_error *byte = nil
-		if check_null != 0 && arg.IsNull() {
-			fci.SetSize(0)
-			fcc.SetFunctionHandler(0)
-			break
-		}
-		if zend.ZendFcallInfoInit(arg, 0, fci, fcc, nil, &is_callable_error) == types.SUCCESS {
-			if is_callable_error != nil {
-				return parseError(zend.E_DEPRECATED, "to be a valid callback, %s", is_callable_error)
-			}
-			break
-		} else {
-			if is_callable_error != nil {
-				return parseError(zend.E_ERROR, "to be a valid callback, %s", is_callable_error)
+		fci := va.Pop().(*zend.ZendFcallInfo)
+		fcc := va.Pop().(*zend.ZendFcallInfoCache)
+
+		err, ok := ParseFunc(arg, fci, fcc, checkNull)
+		if !ok {
+			if err != nil {
+				p.parseError(zend.E_ERROR, "to be a valid callback, %s", err)
 			} else {
-				return parseTypeError(arg, "valid callback")
+				p.parseTypeError(arg, "valid callback")
+			}
+		} else {
+			if err != nil {
+				p.parseError(zend.E_DEPRECATED, "to be a valid callback, %s", err)
 			}
 		}
 	case 'z':
-		var p **types.Zval = __va_arg(*va, (**types.Zval)(_))
-		ZendParseArgZvalDeref(real_arg, p, check_null)
+		zv := ParseZvalDeref(real_arg, checkNull)
+		va.Zval(zv)
 	case 'Z':
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
 		b.Assert(typ != 'Z')
 	default:
-		return parseTypeError(arg, "unknown")
+		p.parseTypeError(arg, "unknown")
 	}
-	return nil
 }

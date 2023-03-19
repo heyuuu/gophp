@@ -42,6 +42,7 @@ func (zs *ZendString) GetHash() uint {
 }
 
 func (zs *ZendString) GetVal() []byte      { return zs.val }           // todo remove
+func (zs *ZendString) GetValPtr() *byte    { return zs.val }           // todo remove
 func (zs *ZendString) SetLen(value int)    { zs.str = zs.str[:value] } // todo remove
 func (zs *ZendString) SetVal(value []byte) { zs.str = string(value) }  // todo remove
 func (zs *ZendString) Free()               {}                          // todo remove

@@ -2,6 +2,7 @@ package argparse
 
 import (
 	"math"
+	b "sik/builtin"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -9,8 +10,6 @@ import (
 func isArgUseWeakTypes() bool { return !zend.CurrEX().IsArgUseStrictTypes() }
 
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
-func parseArgNull[T any]() (T, bool, bool)      { var temp T; return temp, true, true }
-func parseArgFail[T any]() (T, bool, bool)      { var temp T; return temp, false, false }
 
 func ParseBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
 	// check null
@@ -207,4 +206,140 @@ func ParseZStrWeak(arg *types.Zval) (*types.ZendString, bool) {
 	} else {
 		return nil, false
 	}
+}
+
+func ParseStrPtr(arg *types.Zval, checkNull bool) (str *byte, len_ int, ok bool) {
+	val, ok := ParseZStr(arg, checkNull)
+	if !ok {
+		return nil, 0, false
+	}
+
+	if checkNull && val == nil {
+		return nil, 0, true
+	} else {
+		return val.GetValPtr(), val.GetLen(), true
+	}
+}
+
+// @see Micro CHECK_NULL_PATH
+func checkNullPath(s string) bool {
+	// todo 待确认此逻辑的生效方式 (当前代码一直为false)
+	// 可能生效方式: 确认字符串是二进制安全的(即不包含 \0 字符)
+	return len(s) != b.Strlen(s)
+}
+
+func ParsePathStr(arg *types.Zval, checkNull bool) (dest *types.ZendString, ok bool) {
+	dest, ok = ParseZStr(arg, checkNull)
+	if !ok {
+		return
+	}
+
+	if dest != nil && checkNullPath(dest.GetStr()) {
+		return nil, false
+	}
+
+	return
+}
+
+func ParsePathStrPtr(arg *types.Zval, checkNull bool) (str *byte, len_ int, ok bool) {
+	val, ok := ParsePathStr(arg, checkNull)
+	if !ok {
+		return nil, 0, false
+	}
+
+	if checkNull && val == nil {
+		return nil, 0, true
+	} else {
+		return val.GetValPtr(), val.GetLen(), true
+	}
+}
+
+func ParseArray(arg *types.Zval, checkNull bool, orObject bool) (dest *types.Zval, ok bool) {
+	if arg.IsArray() || (orObject && arg.IsObject()) {
+		return arg, true
+	} else if checkNull && arg.IsNull() {
+		return nil, true
+	} else {
+		return nil, false
+	}
+}
+
+func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool) (dest *types.HashTable, ok bool) {
+	if arg.IsArray() {
+		return arg.GetArr(), true
+	} else if orObject && arg.IsObject() {
+		if separate && types.Z_OBJ_P(arg).GetProperties() != nil && types.Z_OBJ_P(arg).GetProperties().GetRefcount() > 1 {
+			if (types.Z_OBJ_P(arg).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+				types.Z_OBJ_P(arg).GetProperties().DelRefcount()
+			}
+			types.Z_OBJ_P(arg).SetProperties(zend.ZendArrayDup(types.Z_OBJ_P(arg).GetProperties()))
+		}
+		return types.Z_OBJ_HT_P(arg).GetGetProperties()(arg), true
+	} else if checkNull && arg.IsNull() {
+		return nil, true
+	} else {
+		return nil, false
+	}
+}
+
+func ParseObject(arg *types.Zval, ce *zend.ZendClassEntry, checkNull bool) (dest *types.Zval, ok bool) {
+	if arg.IsObject() && (ce == nil || zend.InstanceofFunction(types.Z_OBJCE_P(arg), ce) != 0) {
+		return arg, true
+	} else if checkNull && arg.IsNull() {
+		return nil, true
+	} else {
+		return nil, false
+	}
+}
+
+func ParseResource(arg *types.Zval, checkNull bool) (dest *types.Zval, ok bool) {
+	if arg.IsResource() {
+		return arg, true
+	} else if checkNull && arg.IsNull() {
+		return nil, true
+	} else {
+		return nil, false
+	}
+}
+
+func ParseFunc(arg *types.Zval, dest_fci *zend.ZendFcallInfo, dest_fcc *zend.ZendFcallInfoCache, checkNull bool) (error *string, ok bool) {
+	if checkNull && arg.IsNull() {
+		dest_fci.SetSize(0)
+		dest_fcc.SetFunctionHandler(nil)
+		return nil, true
+	}
+
+	// notice: 此处在成功时 error 也有可能不为 nil (例如在产生 Deprecated 信息时)
+	state := zend.ZendFcallInfoInit(arg, 0, dest_fci, dest_fcc, nil, &error)
+	return error, state == types.SUCCESS
+}
+
+func ParseZvalDeref(arg *types.Zval, checkNull bool) (dest *types.Zval) {
+	if checkNull && arg.IsNull() {
+		return nil
+	} else {
+		return arg
+	}
+}
+
+func ParseClass(arg *types.Zval, baseCe *zend.ZendClassEntry, num int, checkNull bool) (ce *zend.ZendClassEntry, ok bool) {
+	if checkNull && arg.IsNull() {
+		return nil, true
+	}
+
+	if zend.TryConvertToString(arg) == 0 {
+		return nil, false
+	}
+	ce = zend.ZendLookupClass(arg.GetStr())
+	if baseCe != nil {
+		if ce == nil || zend.InstanceofFunction(ce, baseCe) == 0 {
+			zend.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.GetRawStr())
+			return nil, false
+		}
+	}
+	if ce == nil {
+		zend.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.GetStr().GetVal())
+		return nil, false
+	}
+	return ce, true
 }
