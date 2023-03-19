@@ -15,7 +15,7 @@ type baseParser struct {
 	flags       int
 	errorCode   int
 	finish      bool // 解析已终止 (可能是已解析完成或出现错误)
-	idx         int
+	idx         int  // 已读取的 Arg 位置，需注意它的值是从 1 开始的，范围是 [1, numArgs]
 	arg         *types.Zval
 }
 
@@ -66,16 +66,24 @@ func (p *baseParser) triggerError(errorCode int, err string) {
 		case ZPP_ERROR_FAILURE:
 			// pass
 		case ZPP_ERROR_WRONG_CALLBACK:
-			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", zend.GetActiveCalleeName(), p.idx, err)
+			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.executeData.CalleeName(), p.idx, err)
 			faults.InternalTypeErrorEx(p.isThrowEx(), message)
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
-			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", zend.GetActiveCalleeName(), p.idx, name, zend.ZendZvalTypeName(p.arg))
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, name, zend.ZendZvalTypeName(p.arg))
 			faults.InternalTypeErrorEx(p.isThrowEx(), message)
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
-			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", zend.GetActiveCalleeName(), p.idx, expectedType, zend.ZendZvalTypeName(p.arg))
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, expectedType, zend.ZendZvalTypeName(p.arg))
 			faults.InternalTypeErrorEx(p.isThrowEx(), message)
 		}
+	}
+}
+
+func (p *baseParser) triggerDeprecated(errorCode int, err string) {
+	switch errorCode {
+	case ZPP_ERROR_WRONG_CALLBACK:
+		message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.executeData.CalleeName(), p.idx, err)
+		faults.ErrorEx(faults.E_DEPRECATED, message)
 	}
 }

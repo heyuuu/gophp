@@ -208,7 +208,7 @@ func (p *FastParser) ParseFuncEx(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInf
 			p.triggerError(ZPP_ERROR_WRONG_CALLBACK, *err)
 		}
 	} else if err != nil {
-		ZendWrongCallbackDeprecated(p.idx, *err)
+		p.triggerDeprecated(ZPP_ERROR_WRONG_CALLBACK, *err)
 	}
 
 	return
