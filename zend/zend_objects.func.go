@@ -17,7 +17,9 @@ func _zendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
 		(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount()).SetUndef()
 	}
 }
-func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) { _zendObjectStdInit(object, ce) }
+func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
+	_zendObjectStdInit(object, ce)
+}
 func ZendObjectStdDtor(object *types.ZendObject) {
 	var p *types.Zval
 	var end *types.Zval

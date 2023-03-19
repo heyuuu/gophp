@@ -60,10 +60,10 @@ type ZendObject struct {
 var _ IRefcounted = &ZendObject{}
 
 func (this *ZendObject) GetHandle() uint32                          { return this.handle }
-func (this *ZendObject) SetHandle(value uint32)                { this.handle = value }
-func (this *ZendObject) GetCe() *ClassEntry                    { return this.ce }
-func (this *ZendObject) SetCe(value *ClassEntry)               { this.ce = value }
-func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers { return this.handlers }
+func (this *ZendObject) SetHandle(value uint32)                     { this.handle = value }
+func (this *ZendObject) GetCe() *ClassEntry                         { return this.ce }
+func (this *ZendObject) SetCe(value *ClassEntry)                    { this.ce = value }
+func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return this.handlers }
 func (this *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { this.handlers = value }
 func (this *ZendObject) GetProperties() *HashTable                  { return this.properties }
 func (this *ZendObject) SetProperties(value *HashTable)             { this.properties = value }

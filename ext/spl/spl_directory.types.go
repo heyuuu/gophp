@@ -101,31 +101,31 @@ type SplFilesystemObject struct {
 	std types.ZendObject
 }
 
-func (this *SplFilesystemObject) GetOth() any                             { return this.oth }
-func (this *SplFilesystemObject) SetOth(value any)                        { this.oth = value }
-func (this *SplFilesystemObject) GetOthHandler() *SplOtherHandler         { return this.oth_handler }
-func (this *SplFilesystemObject) SetOthHandler(value *SplOtherHandler)    { this.oth_handler = value }
-func (this *SplFilesystemObject) GetPath() *byte                          { return this._path }
-func (this *SplFilesystemObject) SetPath(value *byte)                     { this._path = value }
-func (this *SplFilesystemObject) GetPathLen() int                         { return this._path_len }
-func (this *SplFilesystemObject) SetPathLen(value int)                    { this._path_len = value }
-func (this *SplFilesystemObject) GetOrigPath() *byte                      { return this.orig_path }
-func (this *SplFilesystemObject) SetOrigPath(value *byte)                 { this.orig_path = value }
-func (this *SplFilesystemObject) GetFileName() *byte                      { return this.file_name }
-func (this *SplFilesystemObject) SetFileName(value *byte)                 { this.file_name = value }
-func (this *SplFilesystemObject) GetFileNameLen() int                     { return this.file_name_len }
-func (this *SplFilesystemObject) SetFileNameLen(value int)                { this.file_name_len = value }
-func (this *SplFilesystemObject) GetType() SPL_FS_OBJ_TYPE                { return this.type_ }
-func (this *SplFilesystemObject) SetType(value SPL_FS_OBJ_TYPE)           { this.type_ = value }
-func (this *SplFilesystemObject) GetFlags() zend.ZendLong                 { return this.flags }
+func (this *SplFilesystemObject) GetOth() any                          { return this.oth }
+func (this *SplFilesystemObject) SetOth(value any)                     { this.oth = value }
+func (this *SplFilesystemObject) GetOthHandler() *SplOtherHandler      { return this.oth_handler }
+func (this *SplFilesystemObject) SetOthHandler(value *SplOtherHandler) { this.oth_handler = value }
+func (this *SplFilesystemObject) GetPath() *byte                       { return this._path }
+func (this *SplFilesystemObject) SetPath(value *byte)                  { this._path = value }
+func (this *SplFilesystemObject) GetPathLen() int                      { return this._path_len }
+func (this *SplFilesystemObject) SetPathLen(value int)                 { this._path_len = value }
+func (this *SplFilesystemObject) GetOrigPath() *byte                   { return this.orig_path }
+func (this *SplFilesystemObject) SetOrigPath(value *byte)              { this.orig_path = value }
+func (this *SplFilesystemObject) GetFileName() *byte                   { return this.file_name }
+func (this *SplFilesystemObject) SetFileName(value *byte)              { this.file_name = value }
+func (this *SplFilesystemObject) GetFileNameLen() int                  { return this.file_name_len }
+func (this *SplFilesystemObject) SetFileNameLen(value int)             { this.file_name_len = value }
+func (this *SplFilesystemObject) GetType() SPL_FS_OBJ_TYPE             { return this.type_ }
+func (this *SplFilesystemObject) SetType(value SPL_FS_OBJ_TYPE)        { this.type_ = value }
+func (this *SplFilesystemObject) GetFlags() zend.ZendLong              { return this.flags }
 func (this *SplFilesystemObject) SetFlags(value zend.ZendLong)         { this.flags = value }
 func (this *SplFilesystemObject) GetFileClass() *types.ClassEntry      { return this.file_class }
 func (this *SplFilesystemObject) SetFileClass(value *types.ClassEntry) { this.file_class = value }
 func (this *SplFilesystemObject) GetInfoClass() *types.ClassEntry      { return this.info_class }
 func (this *SplFilesystemObject) SetInfoClass(value *types.ClassEntry) { this.info_class = value }
 func (this *SplFilesystemObject) GetDirp() *core.PhpStream             { return this.u.dir.dirp }
-func (this *SplFilesystemObject) SetDirp(value *core.PhpStream)           { this.u.dir.dirp = value }
-func (this *SplFilesystemObject) GetEntry() core.PhpStreamDirent          { return this.u.dir.entry }
+func (this *SplFilesystemObject) SetDirp(value *core.PhpStream)        { this.u.dir.dirp = value }
+func (this *SplFilesystemObject) GetEntry() core.PhpStreamDirent       { return this.u.dir.entry }
 
 // func (this *SplFilesystemObject) SetEntry(value core.PhpStreamDirent) { this.u.dir.entry = value }
 func (this *SplFilesystemObject) GetSubPath() *byte       { return this.u.dir.sub_path }

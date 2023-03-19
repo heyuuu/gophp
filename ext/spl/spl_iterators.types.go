@@ -253,9 +253,9 @@ func (this *SplSubIterator) SetIterator(value *zend.ZendObjectIterator) { this.i
 func (this *SplSubIterator) GetZobject() types.Zval                     { return this.zobject }
 
 // func (this *SplSubIterator) SetZobject(value zend.Zval) { this.zobject = value }
-func (this *SplSubIterator) GetCe() *types.ClassEntry         { return this.ce }
-func (this *SplSubIterator) SetCe(value *types.ClassEntry)    { this.ce = value }
-func (this *SplSubIterator) GetState() RecursiveIteratorState { return this.state }
+func (this *SplSubIterator) GetCe() *types.ClassEntry              { return this.ce }
+func (this *SplSubIterator) SetCe(value *types.ClassEntry)         { this.ce = value }
+func (this *SplSubIterator) GetState() RecursiveIteratorState      { return this.state }
 func (this *SplSubIterator) SetState(value RecursiveIteratorState) { this.state = value }
 
 /**

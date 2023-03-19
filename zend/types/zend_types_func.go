@@ -107,9 +107,9 @@ func GC_AST(p *ZendAstRef) *zend.ZendAst    { return p.GcAst() }
 func Z_ASTVAL(zval Zval) *zend.ZendAst      { return GC_AST(zval.GetAst()) }
 func Z_ASTVAL_P(zval_p *Zval) *zend.ZendAst { return Z_ASTVAL(*zval_p) }
 func Z_INDIRECT(zval Zval) *Zval            { return zval.GetZv() }
-func Z_INDIRECT_P(zval_p *Zval) *Zval { return zval_p.GetZv() }
-func Z_CE(zval Zval) *ClassEntry      { return zval.GetCe() }
-func Z_PTR(zval Zval) any             { return zval.GetPtr() }
+func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.GetZv() }
+func Z_CE(zval Zval) *ClassEntry            { return zval.GetCe() }
+func Z_PTR(zval Zval) any                   { return zval.GetPtr() }
 
 func ZVAL_BOOL(z *Zval, b int)                 { z.SetBool(b != 0) }
 func ZVAL_LONG(z *Zval, l zend.ZendLong)       { z.SetLong(l) }

@@ -842,7 +842,9 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 	}
 	return ce
 }
-func ZendLookupClass(name *types.ZendString) *types.ClassEntry { return ZendLookupClassEx(name, nil, 0) }
+func ZendLookupClass(name *types.ZendString) *types.ClassEntry {
+	return ZendLookupClassEx(name, nil, 0)
+}
 func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 	for ex != nil {
 		if ex.GetThis().IsObject() {

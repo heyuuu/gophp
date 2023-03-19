@@ -70,8 +70,8 @@ func (this *SplArrayObject) SetFptrOffsetHas(value *zend.ZendFunction) { this.fp
 func (this *SplArrayObject) GetFptrOffsetDel() *zend.ZendFunction      { return this.fptr_offset_del }
 func (this *SplArrayObject) SetFptrOffsetDel(value *zend.ZendFunction) { this.fptr_offset_del = value }
 func (this *SplArrayObject) GetFptrCount() *zend.ZendFunction          { return this.fptr_count }
-func (this *SplArrayObject) SetFptrCount(value *zend.ZendFunction) { this.fptr_count = value }
-func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry   { return this.ce_get_iterator }
+func (this *SplArrayObject) SetFptrCount(value *zend.ZendFunction)     { this.fptr_count = value }
+func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry       { return this.ce_get_iterator }
 func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }

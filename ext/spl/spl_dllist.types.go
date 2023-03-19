@@ -135,8 +135,8 @@ func (this *SplDllistObject) SetFptrOffsetHas(value *zend.ZendFunction) { this.f
 func (this *SplDllistObject) GetFptrOffsetDel() *zend.ZendFunction      { return this.fptr_offset_del }
 func (this *SplDllistObject) SetFptrOffsetDel(value *zend.ZendFunction) { this.fptr_offset_del = value }
 func (this *SplDllistObject) GetFptrCount() *zend.ZendFunction          { return this.fptr_count }
-func (this *SplDllistObject) SetFptrCount(value *zend.ZendFunction) { this.fptr_count = value }
-func (this *SplDllistObject) GetCeGetIterator() *types.ClassEntry   { return this.ce_get_iterator }
+func (this *SplDllistObject) SetFptrCount(value *zend.ZendFunction)     { this.fptr_count = value }
+func (this *SplDllistObject) GetCeGetIterator() *types.ClassEntry       { return this.ce_get_iterator }
 func (this *SplDllistObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }

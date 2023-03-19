@@ -48,10 +48,10 @@ func (this *ZendValue) SetAst(value *ZendAstRef)         { this.ast = value }
 func (this *ZendValue) GetZv() *Zval                     { return this.zv }
 func (this *ZendValue) SetZv(value *Zval)                { this.zv = value }
 func (this *ZendValue) GetPtr() any                      { return this.ptr }
-func (this *ZendValue) SetPtr(value any)            { this.ptr = value }
-func (this *ZendValue) GetCe() *ClassEntry          { return this.ce }
-func (this *ZendValue) SetCe(value *ClassEntry)     { this.ce = value }
-func (this *ZendValue) GetFunc() *zend.ZendFunction { return this.func_ }
+func (this *ZendValue) SetPtr(value any)                 { this.ptr = value }
+func (this *ZendValue) GetCe() *ClassEntry               { return this.ce }
+func (this *ZendValue) SetCe(value *ClassEntry)          { this.ce = value }
+func (this *ZendValue) GetFunc() *zend.ZendFunction      { return this.func_ }
 func (this *ZendValue) SetFunc(value *zend.ZendFunction) { this.func_ = value }
 func (this *ZendValue) GetW1() uint32                    { return this.ww.w1 }
 func (this *ZendValue) SetW1(value uint32)               { this.ww.w1 = value }
@@ -113,10 +113,10 @@ func (this *Zval) SetAst(value *ZendAstRef)         { this.value.ast = value }
 func (this *Zval) GetZv() *Zval                     { return this.value.zv }
 func (this *Zval) SetZv(value *Zval)                { this.value.zv = value }
 func (this *Zval) GetPtr() any                      { return this.value.ptr }
-func (this *Zval) SetPtr(value any)            { this.value.ptr = value }
-func (this *Zval) GetCe() *ClassEntry          { return this.value.ce }
-func (this *Zval) SetCe(value *ClassEntry)     { this.value.ce = value }
-func (this *Zval) GetFunc() *zend.ZendFunction { return this.value.func_ }
+func (this *Zval) SetPtr(value any)                 { this.value.ptr = value }
+func (this *Zval) GetCe() *ClassEntry               { return this.value.ce }
+func (this *Zval) SetCe(value *ClassEntry)          { this.value.ce = value }
+func (this *Zval) GetFunc() *zend.ZendFunction      { return this.value.func_ }
 func (this *Zval) SetFunc(value *zend.ZendFunction) { this.value.func_ = value }
 func (this *Zval) GetW1() uint32                    { return this.value.ww.w1 }
 func (this *Zval) SetW1(value uint32)               { this.value.ww.w1 = value }

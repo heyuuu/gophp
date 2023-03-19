@@ -138,4 +138,4 @@ func (this *ZendFcallInfoCache) SetCallingScope(value *types.ClassEntry) { this.
 func (this *ZendFcallInfoCache) GetCalledScope() *types.ClassEntry       { return this.called_scope }
 func (this *ZendFcallInfoCache) SetCalledScope(value *types.ClassEntry)  { this.called_scope = value }
 func (this *ZendFcallInfoCache) GetObject() *types.ZendObject            { return this.object }
-func (this *ZendFcallInfoCache) SetObject(value *types.ZendObject)     { this.object = value }
+func (this *ZendFcallInfoCache) SetObject(value *types.ZendObject)       { this.object = value }

@@ -25,9 +25,9 @@ type PhpUserStreamWrapper struct {
 //         wrapper:wrapper,
 //     }
 // }
-func (this *PhpUserStreamWrapper) GetProtoname() *byte         { return this.protoname }
-func (this *PhpUserStreamWrapper) SetProtoname(value *byte)    { this.protoname = value }
-func (this *PhpUserStreamWrapper) GetClassname() *byte         { return this.classname }
+func (this *PhpUserStreamWrapper) GetProtoname() *byte      { return this.protoname }
+func (this *PhpUserStreamWrapper) SetProtoname(value *byte) { this.protoname = value }
+func (this *PhpUserStreamWrapper) GetClassname() *byte      { return this.classname }
 func (this *PhpUserStreamWrapper) SetClassname(value *byte) { this.classname = value }
 func (this *PhpUserStreamWrapper) GetCe() *types.ClassEntry { return this.ce }
 

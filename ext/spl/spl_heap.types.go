@@ -102,17 +102,17 @@ type SplHeapObject struct {
 //                     std:std,
 //                 }
 //             }
-func (this *SplHeapObject) GetHeap() *SplPtrHeap                        { return this.heap }
-func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                   { this.heap = value }
-func (this *SplHeapObject) GetFlags() int                               { return this.flags }
+func (this *SplHeapObject) GetHeap() *SplPtrHeap                     { return this.heap }
+func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                { this.heap = value }
+func (this *SplHeapObject) GetFlags() int                            { return this.flags }
 func (this *SplHeapObject) SetFlags(value int)                       { this.flags = value }
 func (this *SplHeapObject) GetCeGetIterator() *types.ClassEntry      { return this.ce_get_iterator }
 func (this *SplHeapObject) SetCeGetIterator(value *types.ClassEntry) { this.ce_get_iterator = value }
 func (this *SplHeapObject) GetFptrCmp() *zend.ZendFunction           { return this.fptr_cmp }
-func (this *SplHeapObject) SetFptrCmp(value *zend.ZendFunction)         { this.fptr_cmp = value }
-func (this *SplHeapObject) GetFptrCount() *zend.ZendFunction            { return this.fptr_count }
-func (this *SplHeapObject) SetFptrCount(value *zend.ZendFunction)       { this.fptr_count = value }
-func (this *SplHeapObject) GetStd() types.ZendObject                    { return this.std }
+func (this *SplHeapObject) SetFptrCmp(value *zend.ZendFunction)      { this.fptr_cmp = value }
+func (this *SplHeapObject) GetFptrCount() *zend.ZendFunction         { return this.fptr_count }
+func (this *SplHeapObject) SetFptrCount(value *zend.ZendFunction)    { this.fptr_count = value }
+func (this *SplHeapObject) GetStd() types.ZendObject                 { return this.std }
 
 // func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
 

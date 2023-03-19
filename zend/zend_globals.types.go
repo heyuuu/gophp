@@ -333,9 +333,9 @@ func (this *ZendExecutorGlobals) SetCurrentExecuteData(value *ZendExecuteData) {
 func (this *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return this.fake_scope }
 func (this *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { this.fake_scope = value }
 func (this *ZendExecutorGlobals) GetPrecision() ZendLong               { return this.precision }
-func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)        { this.precision = value }
-func (this *ZendExecutorGlobals) GetTicksCount() int                 { return this.ticks_count }
-func (this *ZendExecutorGlobals) SetTicksCount(value int)            { this.ticks_count = value }
+func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)          { this.precision = value }
+func (this *ZendExecutorGlobals) GetTicksCount() int                   { return this.ticks_count }
+func (this *ZendExecutorGlobals) SetTicksCount(value int)              { this.ticks_count = value }
 func (this *ZendExecutorGlobals) GetPersistentConstantsCount() uint32 {
 	return this.persistent_constants_count
 }
