@@ -13,33 +13,6 @@ func CheckNumArgsNoneException() bool {
 	return CheckNumArgsNone(zend.CurrEX(), ZEND_PARSE_PARAMS_THROW)
 }
 
-func WrongParamTypeError(num int, expectedType string, arg *types.Zval, forceStrict bool) {
-	if zend.EG__().GetException() != nil {
-		return
-	}
-	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", zend.GetActiveCalleeName(), num, expectedType, zend.ZendZvalTypeName(arg))
-	throwException := forceStrict || zend.CurrEX().IsArgUseStrictTypes()
-	faults.InternalTypeErrorEx(throwException, message)
-}
-
-func WrongParamClassError(num int, name string, arg *types.Zval, forceStrict bool) {
-	if zend.EG__().GetException() != nil {
-		return
-	}
-	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", zend.GetActiveCalleeName(), num, name, zend.ZendZvalTypeName(arg))
-	throwException := forceStrict || zend.CurrEX().IsArgUseStrictTypes()
-	faults.InternalTypeErrorEx(throwException, message)
-}
-
-func WrongCallbackError(num int, error string, forceStrict bool) {
-	if zend.EG__().GetException() != nil {
-		return
-	}
-	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", zend.GetActiveCalleeName(), num, error)
-	throwException := forceStrict || zend.CurrEX().IsArgUseStrictTypes()
-	faults.InternalTypeErrorEx(throwException, message)
-}
-
 func ZendWrongCallbackDeprecated(num int, error string) {
 	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", zend.GetActiveCalleeName(), num, error)
 	faults.ErrorEx(faults.E_DEPRECATED, message)

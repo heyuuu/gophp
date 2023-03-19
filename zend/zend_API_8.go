@@ -107,9 +107,6 @@ again:
 				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
 
 				faults.ClearException()
-
-				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
-
 			}
 		}
 		if error != nil {

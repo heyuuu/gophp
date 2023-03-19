@@ -43,75 +43,25 @@ import (
  * | 	* 	| Z_PARAM_VARIADIC('*', dest, num) 	| dest - zval*, num int 								|
  */
 type FastParser struct {
-	executeData ExecuteData
-	numArgs     int
-	minNumArgs  int
-	maxNumArgs  int
-	flags       int
-	errorCode   int
-	finish      bool // 解析已终止 (可能是已解析完成或出现错误)
-	optional    bool
-	idx         int
-	arg         *types.Zval
+	baseParser
+	optional bool
 }
 
 // @see Micro: ZEND_PARSE_PARAMETERS_START | ZEND_PARSE_PARAMETERS_START_EX
 func FastParseStart(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParser {
 	// new
 	p := &FastParser{
-		executeData: executeData,
-		numArgs:     executeData.NumArgs(),
-		minNumArgs:  minNumArgs,
-		maxNumArgs:  maxNumArgs,
-		flags:       flags,
+		baseParser: makeBaseParser(executeData, executeData.NumArgs(), minNumArgs, maxNumArgs, flags),
 	}
 
 	// check num args
-	if !CheckNumArgs(executeData, minNumArgs, maxNumArgs, flags) {
-		p.triggerError(ZPP_ERROR_FAILURE, "")
-	}
+	p.start()
 
 	return p
 }
 
-func (p *FastParser) currArg() *types.Zval {
-	return p.executeData.Arg(p.idx)
-}
-
-func (p *FastParser) isQuiet() bool { return p.flags&ZEND_PARSE_PARAMS_QUIET != 0 }
-func (p *FastParser) isThrow() bool { return p.flags&ZEND_PARSE_PARAMS_THROW != 0 }
-
-func (p *FastParser) triggerError(errorCode int, err string) {
-	// 记录错误信息
-	p.errorCode = errorCode
-	if errorCode != ZPP_ERROR_OK {
-		p.finish = true
-	}
-
-	// 触发错误或异常
-	if !p.isQuiet() {
-		switch errorCode {
-		case ZPP_ERROR_WRONG_CALLBACK:
-			WrongCallbackError(p.idx, err, p.isThrow())
-		case ZPP_ERROR_WRONG_CLASS:
-			name := err
-			WrongParamClassError(p.idx, name, p.arg, p.isThrow())
-		case ZPP_ERROR_WRONG_ARG:
-			expectedType := err
-			WrongParamTypeError(p.idx, expectedType, p.arg, p.isThrow())
-		}
-	}
-}
-
+// todo delete
 func (p *FastParser) HandleError() {}
-
-func (p *FastParser) HasError() bool {
-	return p.errorCode != ZPP_ERROR_OK
-}
-
-func (p *FastParser) IsFinish() bool {
-	return p.finish
-}
 
 // @see Micro: Z_PARAM_OPTIONAL
 func (p *FastParser) StartOptional() {

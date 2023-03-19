@@ -1,8 +1,6 @@
 package argparse
 
 import (
-	b "sik/builtin"
-	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -52,59 +50,10 @@ func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs
 }
 
 func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
-	parser := OldParseStart(numArgs, typeSpec, va, flags)
+	parser := TypeSpecParseStart(numArgs, typeSpec, va, flags)
 	if parser == nil || parser.HasError() {
 		return types.FAILURE
 	}
 
-	return parser.ParseVaArgs(numArgs, typeSpec, va, flags)
-}
-
-func (p *OldParser) ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
-	var i int
-	var arg *types.Zval
-	var varargs **types.Zval = nil
-	var nVarargs *int = nil
-	i = 0
-
-	r := strReader{typeSpec}
-
-	for b.PostDec(&numArgs) > 0 {
-		if r.curr() == '|' {
-			r.inc()
-		}
-		if r.curr() == '*' || r.curr() == '+' {
-			var num_varargs int = numArgs + 1 - p.postVarargs
-
-			/* eat up the passed in storage even if it won't be filled in with varargs */
-			varargs = vaArg[*types.Zval](&va)
-			nVarargs = vaArg[int](&va)
-			r.inc()
-
-			if num_varargs > 0 {
-				*nVarargs = num_varargs
-				*varargs = zend.CurrEX().Arg(i + 1)
-
-				/* adjust how many args we have left and restart loop */
-				numArgs += 1 - num_varargs
-				i += num_varargs
-				continue
-			} else {
-				*varargs = nil
-				*nVarargs = 0
-			}
-		}
-		arg = zend.CurrEX().Arg(i + 1)
-		if p.ZendParseArg(i+1, arg, va, &typeSpec, flags) == types.FAILURE {
-
-			/* clean up varargs array if it was used */
-
-			if varargs != nil && (*varargs) != nil {
-				*varargs = nil
-			}
-			return types.FAILURE
-		}
-		i++
-	}
-	return types.SUCCESS
+	return parser.parseVaArgs(numArgs, typeSpec, va, flags)
 }
