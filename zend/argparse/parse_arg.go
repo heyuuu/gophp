@@ -7,14 +7,6 @@ import (
 	"sik/zend/types"
 )
 
-type ParseArgFlag int
-
-const (
-	_ ParseArgFlag = 1 << iota
-	ParseArgsQuite
-	ParseArgsThrow
-)
-
 type parseArgError struct {
 	message  string
 	severity int

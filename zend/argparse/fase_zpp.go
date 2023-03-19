@@ -43,7 +43,7 @@ import (
  * | 	* 	| Z_PARAM_VARIADIC('*', dest, num) 	| dest - zval*, num int 								|
  */
 type FastParser struct {
-	executeData *zend.ZendExecuteData
+	executeData ExecuteData
 	numArgs     int
 	minNumArgs  int
 	maxNumArgs  int
@@ -56,7 +56,7 @@ type FastParser struct {
 }
 
 // @see Micro: ZEND_PARSE_PARAMETERS_START | ZEND_PARSE_PARAMETERS_START_EX
-func FastParseStart(executeData *zend.ZendExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParser {
+func FastParseStart(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParser {
 	// new
 	p := &FastParser{
 		executeData: executeData,
