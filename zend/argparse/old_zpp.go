@@ -22,6 +22,10 @@ type OldParser struct {
 	finish    bool // 解析已终止 (可能是已解析完成或出现错误)
 	idx       int
 	arg       *types.Zval
+
+	err *parseArgError
+
+	vaReceiver *VaArgsReceiver
 }
 
 func OldParseStart(numArgs int, typeSpec string, va []any, flags int) *OldParser {
@@ -89,4 +93,8 @@ func (p *OldParser) HasError() bool {
 
 func (p *OldParser) IsFinish() bool {
 	return p.finish
+}
+
+func (p *OldParser) parsePrologue(deref bool, separate bool) {
+	// todo
 }

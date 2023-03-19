@@ -50,26 +50,13 @@ func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *
 		types.SEPARATE_ZVAL_NOREF(arg)
 		real_arg = arg
 	}
+	p.arg = arg
 
 	switch typ {
 	case 'l', 'L':
-		if val, isNull, ok := ParseLong(arg, check_null != 0, typ == 'L'); ok {
-			va.Long(val)
-			if check_null != 0 {
-				va.Bool(isNull)
-			}
-		} else {
-			return parseTypeError(arg, "int")
-		}
+		p.parseLong(checkNull, typ == 'L')
 	case 'd':
-		if val, isNull, ok := ParseDouble(arg, check_null != 0); ok {
-			va.Double(val)
-			if check_null != 0 {
-				va.Bool(isNull)
-			}
-		} else {
-			return parseTypeError(arg, "float")
-		}
+		p.parseDouble(checkNull)
 	case 's':
 		var p **byte = __va_arg(*va, (**byte)(_))
 		var pl *int = __va_arg(*va, (*int)(_))

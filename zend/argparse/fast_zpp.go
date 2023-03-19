@@ -135,26 +135,20 @@ func (p *FastParser) parsePrologue(deref bool, separate bool) {
 
 	p.arg = p.currArg()
 	if deref {
-		if p.arg.IsReference() {
-			p.arg = types.Z_REFVAL_P(p.arg)
-		}
+		p.arg = types.ZVAL_DEREF(p.arg)
 	}
 	if separate {
 		types.SEPARATE_ZVAL_NOREF(p.arg)
 	}
 }
 
-// @see Micro: Z_PARAM_ARRAY
+// @see Micro: Z_PARAM_ARRAY，Old: 'a'
 func (p *FastParser) ParseArray() (dest *types.Zval) {
 	return p.ParseArrayEx(false, false)
 }
-
-// @see Micro: Z_PARAM_ARRAY_EX
 func (p *FastParser) ParseArrayEx(checkNull bool, separate bool) (dest *types.Zval) {
 	return p.ParseArrayEx2(checkNull, separate, separate)
 }
-
-// @see Micro: Z_PARAM_ARRAY_EX2
 func (p *FastParser) ParseArrayEx2(checkNull bool, deref bool, separate bool) (dest *types.Zval) {
 	p.parsePrologue(deref, separate)
 	if p.IsFinish() {
@@ -168,7 +162,7 @@ func (p *FastParser) ParseArrayEx2(checkNull bool, deref bool, separate bool) (d
 	return
 }
 
-// @see Micro: Z_PARAM_ARRAY_OR_OBJECT
+// @see Micro: Z_PARAM_ARRAY_OR_OBJECT，Old: 'A'
 func (p *FastParser) ParseArrayOrObject() (dest *types.Zval) {
 	return p.ParseArrayOrObjectEx(false, false)
 }
@@ -187,13 +181,11 @@ func (p *FastParser) ParseArrayOrObjectEx(checkNull bool, separate bool) (dest *
 	return
 }
 
-// @see Micro: Z_PARAM_BOOL
+// @see Micro: Z_PARAM_BOOL，Old: 'b'
 func (p *FastParser) ParseBool() (dest types.ZendBool) {
 	dest, _ = p.ParseBoolEx(false)
 	return
 }
-
-// @see Micro: Z_PARAM_BOOL_EX
 func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull types.ZendBool) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
@@ -207,7 +199,7 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 	return
 }
 
-// @see Micro: Z_PARAM_CLASS
+// @see Micro: Z_PARAM_CLASS，Old: 'C'
 func (p *FastParser) ParseClass() (dest *zend.ZendClassEntry) {
 	return p.ParseClassEx(false)
 }
@@ -224,7 +216,7 @@ func (p *FastParser) ParseClassEx(checkNull bool) (dest *zend.ZendClassEntry) {
 	return
 }
 
-// @see Micro: Z_PARAM_DOUBLE
+// @see Micro: Z_PARAM_DOUBLE，Old: 'd'
 func (p *FastParser) ParseDouble() (dest float64) {
 	dest, _ = p.ParseDoubleEx(false)
 	return
@@ -242,7 +234,7 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 	return
 }
 
-// @see Micro: Z_PARAM_FUNC
+// @see Micro: Z_PARAM_FUNC，Old: 'f'
 func (p *FastParser) ParseFunc(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInfoCache) {
 	p.ParseFuncEx(fci, fcc, false)
 }
@@ -266,7 +258,7 @@ func (p *FastParser) ParseFuncEx(fci *zend.ZendFcallInfo, fcc *zend.ZendFcallInf
 	return
 }
 
-// @see Micro: Z_PARAM_ARRAY_HT
+// @see Micro: Z_PARAM_ARRAY_HT，Old: 'h'
 func (p *FastParser) ParseArrayHt() (dest *types.ZendArray) {
 	return p.ParseArrayHtEx(false, false)
 }
@@ -281,7 +273,7 @@ func (p *FastParser) ParseArrayHtEx(checkNull bool, separate bool) (dest *types.
 	return
 }
 
-// @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT
+// @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT，Old: 'H'
 func (p *FastParser) ParseArrayOrObjectHt() (dest *types.ZendArray) {
 	dest, _ = p.ParseArrayOrObjectHtEx(false, false)
 	return
@@ -299,7 +291,7 @@ func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest
 	return
 }
 
-// @see Micro: Z_PARAM_LONG
+// @see Micro: Z_PARAM_LONG，Old: 'l'
 func (p *FastParser) ParseLong() (dest int) {
 	dest, _ = p.ParseLongEx(false)
 	return
@@ -320,7 +312,7 @@ func (p *FastParser) ParseLongEx(checkNull bool) (dest int, isNull types.ZendBoo
 	return
 }
 
-// @see Micro: Z_PARAM_STRICT_LONG
+// @see Micro: Z_PARAM_STRICT_LONG，Old: 'L'
 func (p *FastParser) ParseStrictLong() (dest int) {
 	dest, _ = p.ParseStrictLongEx(false)
 	return
@@ -341,7 +333,7 @@ func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.Z
 	return
 }
 
-// @see Micro: Z_PARAM_OBJECT
+// @see Micro: Z_PARAM_OBJECT，Old: 'o'
 func (p *FastParser) ParseObject() (dest *types.Zval) {
 	dest, _ = p.ParseObjectEx(false)
 	return
@@ -359,7 +351,7 @@ func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval, isNull typ
 	return
 }
 
-// @see Micro: Z_PARAM_OBJECT_OF_CLASS
+// @see Micro: Z_PARAM_OBJECT_OF_CLASS，Old: 'O'
 func (p *FastParser) ParseObjectOfClass(ce *zend.ZendClassEntry) (dest *types.Zval) {
 	dest, _ = p.ParseObjectOfClassEx(ce, false)
 	return
@@ -381,7 +373,7 @@ func (p *FastParser) ParseObjectOfClassEx(ce *zend.ZendClassEntry, checkNull boo
 	return
 }
 
-// @see Micro: Z_PARAM_PATH
+// @see Micro: Z_PARAM_PATH，Old: 'p'
 func (p *FastParser) ParsePath() (dest *byte, destLen int) {
 	return p.ParsePathEx(false)
 }
@@ -398,7 +390,7 @@ func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int) {
 	return
 }
 
-// @see Micro: Z_PARAM_PATH_STR
+// @see Micro: Z_PARAM_PATH_STR，Old: 'P'
 func (p *FastParser) ParsePathStr() (dest *types.ZendString) {
 	return p.ParsePathStrEx(false)
 }
@@ -415,7 +407,7 @@ func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString) {
 	return
 }
 
-// @see Micro: Z_PARAM_RESOURCE
+// @see Micro: Z_PARAM_RESOURCE，Old: 'r'
 func (p *FastParser) ParseResource() (dest *types.Zval) {
 	return p.ParseResourceEx(false)
 }
@@ -432,7 +424,7 @@ func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
 	return
 }
 
-// @see Micro: Z_PARAM_STRING
+// @see Micro: Z_PARAM_STRING，Old: 's'
 func (p *FastParser) ParseString() (dest *byte, destLen int) {
 	return p.ParseStringEx(false)
 }
@@ -449,7 +441,7 @@ func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
 	return
 }
 
-// @see Micro: Z_PARAM_STR
+// @see Micro: Z_PARAM_STR，Old: 'S'
 func (p *FastParser) ParseStr() (dest *types.ZendString) {
 	return p.ParseStrEx(false)
 }
@@ -466,7 +458,7 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
 	return
 }
 
-// @see Micro: Z_PARAM_ZVAL
+// @see Micro: Z_PARAM_ZVAL，Old: 'z'
 func (p *FastParser) ParseZval() (dest *types.Zval) {
 	return p.ParseZvalEx(false)
 }
@@ -481,7 +473,7 @@ func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval) {
 	return
 }
 
-// @see Micro: Z_PARAM_ZVAL_DEREF
+// @see Micro: Z_PARAM_ZVAL_DEREF, Old: ""
 func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
 	dest, _ = p.ParseZvalDerefEx(false)
 	return
@@ -497,7 +489,7 @@ func (p *FastParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval, isNull 
 	return
 }
 
-// @see Micro: Z_PARAM_VARIADIC | Z_PARAM_VARIADIC_EX, Old: "+" and "*"
+// @see Micro: Z_PARAM_VARIADIC | Z_PARAM_VARIADIC_EX, Old: '+ and '*'
 func (p *FastParser) ParseVariadic() []*types.Zval {
 	return p.ParseVariadicEx(0)
 }
