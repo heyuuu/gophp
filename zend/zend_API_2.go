@@ -6,13 +6,9 @@ import (
 	"sik/zend/types"
 )
 
-func CheckNumArgsNoneError() bool     { return CurrEX().CheckNumArgsError(0, 0) }
-func CheckNumArgsNoneException() bool { return CurrEX().CheckNumArgsException(0, 0) }
-func CheckNumArgsError(minNumArgs int, maxNumArgs int) bool {
-	return CurrEX().CheckNumArgsError(minNumArgs, maxNumArgs)
-}
-func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
-	return CurrEX().CheckNumArgsException(minNumArgs, maxNumArgs)
+func CheckNumArgsNoneError() bool { return argparse.CheckNumArgsNone(CurrEX(), 0) }
+func CheckNumArgsNoneException() bool {
+	return argparse.CheckNumArgsNone(CurrEX(), argparse.ZEND_PARSE_PARAMS_THROW)
 }
 
 func WrongParamTypeError(num int, expectedType string, arg *types.Zval, forceStrict bool) {

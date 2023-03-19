@@ -67,14 +67,7 @@ func FastParseStart(executeData ExecuteData, minNumArgs int, maxNumArgs int, fla
 	}
 
 	// check num args
-	if p.numArgs < minNumArgs || p.numArgs > maxNumArgs && maxNumArgs >= 0 {
-		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-			if (flags & ZEND_PARSE_PARAMS_THROW) != 0 {
-				zend.CheckNumArgsException(minNumArgs, maxNumArgs)
-			} else {
-				zend.CheckNumArgsError(minNumArgs, maxNumArgs)
-			}
-		}
+	if !CheckNumArgs(executeData, minNumArgs, maxNumArgs, flags) {
 		p.triggerError(ZPP_ERROR_FAILURE, "")
 	}
 

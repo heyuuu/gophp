@@ -3,8 +3,7 @@
 package zend
 
 import (
-	"math"
-	b "sik/builtin"
+	"sik/zend/argparse"
 	"sik/zend/types"
 )
 
@@ -112,39 +111,12 @@ func (this *ZendExecuteData) VarNum(n int) *types.Zval {
 }
 func (this *ZendExecuteData) Arg(n int) *types.Zval { return this.VarNum(n - 1) }
 
-func (this *ZendExecuteData) CheckNumArgsError(minNumArgs int, maxNumArgs int) bool {
-	return this.CheckNumArgs(minNumArgs, maxNumArgs, false)
-}
-func (this *ZendExecuteData) CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
-	return this.CheckNumArgs(minNumArgs, maxNumArgs, true)
-}
-func (this *ZendExecuteData) CheckMinNumArgs(minNumArgs int, forceStrict bool) bool {
-	return this.CheckNumArgs(minNumArgs, math.MaxInt, forceStrict)
-}
 func (this *ZendExecuteData) CheckNumArgs(minNumArgs int, maxNumArgs int, forceStrict bool) bool {
-	// 检查参数个数，若检查通过直接返回
-	return this.CheckNumArgsEx(this.NumArgs(), minNumArgs, maxNumArgs, forceStrict)
-}
-
-func (this *ZendExecuteData) CheckNumArgsEx(numArgs int, minNumArgs int, maxNumArgs int, forceStrict bool) bool {
-	// 检查参数个数，若检查通过直接返回
-	if numArgs >= minNumArgs && numArgs <= maxNumArgs {
-		return true
+	if forceStrict {
+		return argparse.CheckNumArgs(this, minNumArgs, maxNumArgs, argparse.ZEND_PARSE_PARAMS_THROW)
+	} else {
+		return argparse.CheckNumArgs(this, minNumArgs, maxNumArgs, 0)
 	}
-
-	// 判断是否为 strict 模式
-	var throwException = forceStrict || this.IsArgUseStrictTypes()
-
-	// 构建错误信息
-	callee := this.CalleeName()
-	if minNumArgs == maxNumArgs {
-		ZendInternalArgumentCountError(throwException, "%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
-	} else if numArgs < minNumArgs {
-		ZendInternalArgumentCountError(throwException, "%s() expects at least %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
-	} else { // numArgs > maxNumArgs
-		ZendInternalArgumentCountError(throwException, "%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, b.Cond(maxNumArgs == 1, "", "s"), numArgs)
-	}
-	return false
 }
 
 /**
