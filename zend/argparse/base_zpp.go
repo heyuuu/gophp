@@ -34,9 +34,11 @@ func (p *baseParser) currArg() *types.Zval {
 }
 
 func (p *baseParser) isQuiet() bool { return p.flags&ZEND_PARSE_PARAMS_QUIET != 0 }
-func (p *baseParser) isThrow() bool { return p.flags&ZEND_PARSE_PARAMS_THROW != 0 }
-func (p *baseParser) isThrowEx() bool {
+func (p *baseParser) isThrow() bool {
 	return p.flags&ZEND_PARSE_PARAMS_THROW != 0 || p.executeData.IsArgUseStrictTypes()
+}
+func (p *baseParser) useWeakTypes() bool {
+	return !p.executeData.IsArgUseStrictTypes()
 }
 
 func (p *baseParser) IsFinish() bool {
@@ -66,15 +68,15 @@ func (p *baseParser) triggerError(errorCode int, err string) {
 			// pass
 		case ZPP_ERROR_WRONG_CALLBACK:
 			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.executeData.CalleeName(), p.idx, err)
-			faults.InternalTypeErrorEx(p.isThrowEx(), message)
+			faults.InternalTypeErrorEx(p.isThrow(), message)
 		case ZPP_ERROR_WRONG_CLASS:
 			name := err
 			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, name, types.ZendZvalTypeName(p.arg))
-			faults.InternalTypeErrorEx(p.isThrowEx(), message)
+			faults.InternalTypeErrorEx(p.isThrow(), message)
 		case ZPP_ERROR_WRONG_ARG:
 			expectedType := err
 			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, expectedType, types.ZendZvalTypeName(p.arg))
-			faults.InternalTypeErrorEx(p.isThrowEx(), message)
+			faults.InternalTypeErrorEx(p.isThrow(), message)
 		}
 	}
 }

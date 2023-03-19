@@ -143,7 +143,7 @@ func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull ty
 		return
 	}
 
-	val, valIsNull, ok := ParseBool(p.arg, checkNull)
+	val, valIsNull, ok := ParseBool(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_BOOL)
 	}
@@ -181,7 +181,7 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 		return
 	}
 
-	val, valIsNull, ok := ParseDouble(p.arg, checkNull)
+	val, valIsNull, ok := ParseDouble(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_DOUBLE)
 	}
@@ -261,7 +261,7 @@ func (p *FastParser) ParseLongEx(checkNull bool) (dest int, isNull types.ZendBoo
 		return
 	}
 
-	dest, isNullBool, ok := ParseLong(p.arg, checkNull, false)
+	dest, isNullBool, ok := ParseLong(p.arg, checkNull, false, p.useWeakTypes())
 	isNull = types.IntBool(isNullBool)
 
 	if !ok {
@@ -282,7 +282,7 @@ func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.Z
 		return
 	}
 
-	dest, isNullBool, ok := ParseLong(p.arg, checkNull, true)
+	dest, isNullBool, ok := ParseLong(p.arg, checkNull, true, p.useWeakTypes())
 	isNull = types.IntBool(isNullBool)
 
 	if !ok {
@@ -343,7 +343,7 @@ func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int) {
 		return
 	}
 
-	dest, destLen, ok := ParsePathStrPtr(p.arg, checkNull)
+	dest, destLen, ok := ParsePathStrPtr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 	}
@@ -361,7 +361,7 @@ func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString) {
 		return
 	}
 
-	dest, ok := ParsePathStr(p.arg, checkNull)
+	dest, ok := ParsePathStr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 	}
@@ -397,7 +397,7 @@ func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
 		return
 	}
 
-	s, l, ok := ParseStrPtr(p.arg, checkNull)
+	s, l, ok := ParseStrPtr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}
@@ -415,7 +415,7 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
 		return
 	}
 
-	val, ok := ParseZStr(p.arg, checkNull)
+	val, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}

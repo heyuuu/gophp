@@ -10,7 +10,7 @@ import (
 
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }
 
-func ParseBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool) {
+func ParseBool(arg *types.Zval, checkNull bool, weak bool) (dest bool, isNull bool, ok bool) {
 	// check null
 	if checkNull && arg.IsNull() {
 		return dest, true, true
@@ -24,7 +24,7 @@ func ParseBool(arg *types.Zval, checkNull bool) (dest bool, isNull bool, ok bool
 	}
 
 	// weak parse
-	if isArgUseWeakTypes() {
+	if weak {
 		dest, ok = ParseBoolWeak(arg)
 	}
 
@@ -38,7 +38,7 @@ func ParseBoolWeak(arg *types.Zval) (dest bool, ok bool) {
 	return false, false
 }
 
-func ParseLong(arg *types.Zval, checkNull bool, cap bool) (dest int, isNull bool, ok bool) {
+func ParseLong(arg *types.Zval, checkNull bool, cap bool, weak bool) (dest int, isNull bool, ok bool) {
 	// check null
 	if checkNull && arg.IsNull() {
 		return dest, true, true
@@ -50,7 +50,7 @@ func ParseLong(arg *types.Zval, checkNull bool, cap bool) (dest int, isNull bool
 	}
 
 	// weak parse
-	if isArgUseWeakTypes() {
+	if weak {
 		dest, ok = ParseLongWeak(arg, cap)
 	}
 
@@ -99,7 +99,7 @@ func parseArgWeak_DvalToLval(dval float64, cap bool) (int, bool) {
 	}
 }
 
-func ParseDouble(arg *types.Zval, checkNull bool) (dest float64, isNull bool, ok bool) {
+func ParseDouble(arg *types.Zval, checkNull bool, weak bool) (dest float64, isNull bool, ok bool) {
 	// check null
 	if checkNull && arg.IsNull() {
 		return dest, true, true
@@ -113,7 +113,7 @@ func ParseDouble(arg *types.Zval, checkNull bool) (dest float64, isNull bool, ok
 	}
 
 	// weak parse
-	if isArgUseWeakTypes() {
+	if weak {
 		dest, ok = ParseDoubleWeak(arg)
 	}
 
@@ -151,7 +151,7 @@ func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 /**
  * 与 int/float 等类型不同，为空时 *dest 直接为 nil，不需单独的 is_null 字符安
  */
-func ParseZStr(arg *types.Zval, checkNull bool) (dest *types.ZendString, ok bool) {
+func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.ZendString, ok bool) {
 	// check null
 	if checkNull && arg.IsNull() {
 		return nil, true
@@ -163,7 +163,7 @@ func ParseZStr(arg *types.Zval, checkNull bool) (dest *types.ZendString, ok bool
 	}
 
 	// weak parse
-	if isArgUseWeakTypes() {
+	if weak {
 		return ParseZStrWeak(arg)
 	}
 
@@ -207,8 +207,8 @@ func ParseZStrWeak(arg *types.Zval) (*types.ZendString, bool) {
 	}
 }
 
-func ParseStrPtr(arg *types.Zval, checkNull bool) (str *byte, len_ int, ok bool) {
-	val, ok := ParseZStr(arg, checkNull)
+func ParseStrPtr(arg *types.Zval, checkNull bool, weak bool) (str *byte, len_ int, ok bool) {
+	val, ok := ParseZStr(arg, checkNull, weak)
 	if !ok {
 		return nil, 0, false
 	}
@@ -227,8 +227,8 @@ func checkNullPath(s string) bool {
 	return len(s) != b.Strlen(s)
 }
 
-func ParsePathStr(arg *types.Zval, checkNull bool) (dest *types.ZendString, ok bool) {
-	dest, ok = ParseZStr(arg, checkNull)
+func ParsePathStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.ZendString, ok bool) {
+	dest, ok = ParseZStr(arg, checkNull, weak)
 	if !ok {
 		return
 	}
@@ -240,8 +240,8 @@ func ParsePathStr(arg *types.Zval, checkNull bool) (dest *types.ZendString, ok b
 	return
 }
 
-func ParsePathStrPtr(arg *types.Zval, checkNull bool) (str *byte, len_ int, ok bool) {
-	val, ok := ParsePathStr(arg, checkNull)
+func ParsePathStrPtr(arg *types.Zval, checkNull bool, weak bool) (str *byte, len_ int, ok bool) {
+	val, ok := ParsePathStr(arg, checkNull, weak)
 	if !ok {
 		return nil, 0, false
 	}

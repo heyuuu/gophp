@@ -150,7 +150,7 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 
 	switch typ {
 	case 'l', 'L':
-		if val, isNull, ok := ParseLong(p.arg, checkNull, typ == 'L'); ok {
+		if val, isNull, ok := ParseLong(p.arg, checkNull, typ == 'L', p.useWeakTypes()); ok {
 			va.Long(val)
 			if checkNull {
 				va.Bool(isNull)
@@ -159,7 +159,7 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_LONG)
 		}
 	case 'd':
-		if val, isNull, ok := ParseDouble(p.arg, checkNull); ok {
+		if val, isNull, ok := ParseDouble(p.arg, checkNull, p.useWeakTypes()); ok {
 			va.Double(val)
 			if checkNull {
 				va.Bool(isNull)
@@ -168,31 +168,31 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_DOUBLE)
 		}
 	case 's':
-		if s, l, ok := ParseStrPtr(p.arg, checkNull); ok {
+		if s, l, ok := ParseStrPtr(p.arg, checkNull, p.useWeakTypes()); ok {
 			va.StrPtr(s, l)
 		} else {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 		}
 	case 'p':
-		if s, l, ok := ParsePathStrPtr(p.arg, checkNull); ok {
+		if s, l, ok := ParsePathStrPtr(p.arg, checkNull, p.useWeakTypes()); ok {
 			va.StrPtr(s, l)
 		} else {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 		}
 	case 'P':
-		if val, ok := ParsePathStr(p.arg, checkNull); ok {
+		if val, ok := ParsePathStr(p.arg, checkNull, p.useWeakTypes()); ok {
 			va.ZStr(val)
 		} else {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 		}
 	case 'S':
-		if val, ok := ParseZStr(p.arg, checkNull); ok {
+		if val, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes()); ok {
 			va.ZStr(val)
 		} else {
 			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 		}
 	case 'b':
-		if val, isNull, ok := ParseBool(p.arg, checkNull); ok {
+		if val, isNull, ok := ParseBool(p.arg, checkNull, p.useWeakTypes()); ok {
 			va.Bool(val)
 			if checkNull {
 				va.Bool(isNull)

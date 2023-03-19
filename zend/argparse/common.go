@@ -2,13 +2,16 @@ package argparse
 
 import (
 	b "sik/builtin"
-	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
 )
 
 func CheckNumArgsNone(executeData ExecuteData, flags int) bool {
 	return CheckNumArgs(executeData, 0, 0, flags)
+}
+func CheckNumArgsNoneError() bool { return CheckNumArgsNone(currExecuteData(), 0) }
+func CheckNumArgsNoneException() bool {
+	return CheckNumArgsNone(currExecuteData(), ZEND_PARSE_PARAMS_THROW)
 }
 
 func CheckNumArgs(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
@@ -41,11 +44,6 @@ func CheckNumArgsEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNum
 	return false
 }
 
-func CheckNumArgsNoneError() bool { return CheckNumArgsNone(zend.CurrEX(), 0) }
-func CheckNumArgsNoneException() bool {
-	return CheckNumArgsNone(zend.CurrEX(), ZEND_PARSE_PARAMS_THROW)
-}
-
 func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
 	if val, ok := ParseBoolWeak(arg); ok {
 		*dest = types.IntBool(val)
@@ -53,7 +51,7 @@ func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
 	}
 	return 0
 }
-func ZendParseArgLongWeak(arg *types.Zval, dest *zend.ZendLong) int {
+func ZendParseArgLongWeak(arg *types.Zval, dest *int) int {
 	if val, ok := ParseLongWeak(arg, false); ok {
 		*dest = val
 		return 1
