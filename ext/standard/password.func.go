@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -61,18 +62,18 @@ func PhpPasswordMakeSalt(length int) *types.ZendString {
 	var ret *types.ZendString
 	var buffer *types.ZendString
 	if length > core.INT_MAX/3 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Length is too large to safely generate")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Length is too large to safely generate")
 		return nil
 	}
 	buffer = types.ZendStringAlloc(length*3/4+1, 0)
 	if types.FAILURE == PhpRandomBytesSilent(buffer.GetVal(), buffer.GetLen()) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to generate salt")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to generate salt")
 		types.ZendStringReleaseEx(buffer, 0)
 		return nil
 	}
 	ret = types.ZendStringAlloc(length, 0)
 	if PhpPasswordSaltTo64(buffer.GetVal(), buffer.GetLen(), length, ret.GetVal()) == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Generated salt too short")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Generated salt too short")
 		types.ZendStringReleaseEx(buffer, 0)
 		types.ZendStringReleaseEx(ret, 0)
 		return nil
@@ -87,7 +88,7 @@ func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *typ
 	if options == nil || !(b.Assign(&option_buffer, options.KeyFind("salt"))) {
 		return PhpPasswordMakeSalt(required_salt_len)
 	}
-	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
+	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch option_buffer.GetType() {
 	case types.IS_STRING:
 		buffer = option_buffer.GetStr().Copy()
@@ -111,7 +112,7 @@ func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *typ
 	case types.IS_ARRAY:
 		fallthrough
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Non-string salt parameter supplied")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Non-string salt parameter supplied")
 		return nil
 	}
 
@@ -120,19 +121,19 @@ func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *typ
 	   the > INT_MAX check. */
 
 	if zend.ZEND_SIZE_T_INT_OVFL(buffer.GetLen()) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Supplied salt is too long")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Supplied salt is too long")
 		types.ZendStringReleaseEx(buffer, 0)
 		return nil
 	}
 	if buffer.GetLen() < required_salt_len {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Provided salt is too short: %zd expecting %zd", buffer.GetLen(), required_salt_len)
 		types.ZendStringReleaseEx(buffer, 0)
 		return nil
 	}
 	if PhpPasswordSaltIsAlphabet(buffer.GetVal(), buffer.GetLen()) == types.FAILURE {
 		var salt *types.ZendString = types.ZendStringAlloc(required_salt_len, 0)
 		if PhpPasswordSaltTo64(buffer.GetVal(), buffer.GetLen(), required_salt_len, salt.GetVal()) == types.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Provided salt is too short: %zd", buffer.GetLen())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Provided salt is too short: %zd", buffer.GetLen())
 			types.ZendStringReleaseEx(salt, 0)
 			types.ZendStringReleaseEx(buffer, 0)
 			return nil
@@ -219,7 +220,7 @@ func PhpPasswordBcryptHash(password *types.ZendString, options *types.ZendArray)
 		cost = zend.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
 		return nil
 	}
 	hash_format_len = core.Snprintf(hash_format, b.SizeOf("hash_format"), "$2y$%02"+zend.ZEND_LONG_FMT_SPEC+"$", cost)
@@ -484,7 +485,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 	algo = PhpPasswordAlgoFindZval(zalgo)
 	if algo == nil {
 		var algostr *types.ZendString = zend.ZvalGetString(zalgo)
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown password hashing algorithm: %s", algostr.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown password hashing algorithm: %s", algostr.GetVal())
 		types.ZendStringRelease(algostr)
 		return_value.SetNull()
 		return

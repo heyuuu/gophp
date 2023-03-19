@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"strings"
 )
@@ -69,7 +70,7 @@ func ZendActivateModules() {
 	for (*p) != nil {
 		var module *ZendModuleEntry = *p
 		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
-			ZendError(E_WARNING, "request_startup() for %s module failed", module.GetName())
+			faults.ZendError(faults.E_WARNING, "request_startup() for %s module failed", module.GetName())
 			exit(1)
 		}
 		p++
@@ -263,7 +264,7 @@ func ZendSetHashSymbol(
 	return types.SUCCESS
 }
 func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
-	ZendError(E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
+	faults.ZendError(faults.E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
 	var func_ *ZendInternalFunction

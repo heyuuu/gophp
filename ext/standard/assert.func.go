@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -65,7 +66,7 @@ func ZmStartupAssert(type_ int, module_number int) int {
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("AssertionError", b.SizeOf("\"AssertionError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
-	AssertionErrorCe = zend.ZendRegisterInternalClassEx(&ce, zend.ZendCeError)
+	AssertionErrorCe = zend.ZendRegisterInternalClassEx(&ce, faults.ZendCeError)
 	return types.SUCCESS
 }
 func ZmShutdownAssert(type_ int, module_number int) int {
@@ -118,7 +119,7 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
 		myeval = assertion.GetStr().GetVal()
 		if ASSERTG(quiet_eval) {
 			old_error_reporting = zend.EG__().GetErrorReporting()
@@ -128,14 +129,14 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if zend.ZendEvalStringl(myeval, assertion.GetStr().GetLen(), &retval, compiled_string_description) == types.FAILURE {
 			zend.Efree(compiled_string_description)
 			if description == nil {
-				zend.ZendThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
+				faults.ZendThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
 			} else {
 				var str *types.ZendString = zend.ZvalGetString(description)
-				zend.ZendThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
+				faults.ZendThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
 				types.ZendStringReleaseEx(str, 0)
 			}
 			if ASSERTG(bail) {
-				zend.ZendBailout()
+				faults.ZendBailout()
 			}
 			return_value.SetFalse()
 			return
@@ -183,34 +184,34 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if ASSERTG(exception) {
 		if description == nil {
-			zend.ZendThrowException(AssertionErrorCe, nil, zend.E_ERROR)
-		} else if description.IsType(types.IS_OBJECT) && zend.InstanceofFunction(types.Z_OBJCE_P(description), zend.ZendCeThrowable) != 0 {
+			faults.ZendThrowException(AssertionErrorCe, nil, faults.E_ERROR)
+		} else if description.IsType(types.IS_OBJECT) && zend.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
 			description.AddRefcount()
-			zend.ZendThrowExceptionObject(description)
+			faults.ZendThrowExceptionObject(description)
 		} else {
 			var str *types.ZendString = zend.ZvalGetString(description)
-			zend.ZendThrowException(AssertionErrorCe, str.GetVal(), zend.E_ERROR)
+			faults.ZendThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
 			types.ZendStringReleaseEx(str, 0)
 		}
 	} else if ASSERTG(warning) {
 		if description == nil {
 			if myeval != nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Assertion \"%s\" failed", myeval)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Assertion \"%s\" failed", myeval)
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Assertion failed")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Assertion failed")
 			}
 		} else {
 			var str *types.ZendString = zend.ZvalGetString(description)
 			if myeval != nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s failed", str.GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "%s failed", str.GetVal())
 			}
 			types.ZendStringReleaseEx(str, 0)
 		}
 	}
 	if ASSERTG(bail) {
-		zend.ZendBailout()
+		faults.ZendBailout()
 	}
 	return_value.SetFalse()
 	return
@@ -324,7 +325,7 @@ func ZifAssertOptions(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return_value.SetLong(oldint)
 		return
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
 	}
 	return_value.SetFalse()
 	return

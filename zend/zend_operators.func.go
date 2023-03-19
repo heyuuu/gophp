@@ -7,6 +7,7 @@ import (
 	b "sik/builtin"
 	. "sik/builtin/ctype"
 	"sik/core"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"strings"
 )
@@ -448,7 +449,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func f
 	dst.SetUndef()
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
 		if types.Z_OBJ_HT_P(op).GetCastObject()(op, dst, ctype) == types.FAILURE {
-			ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), ZendGetTypeByConst(ctype))
+			faults.ZendError(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", types.Z_OBJCE_P(op).GetName().GetVal(), ZendGetTypeByConst(ctype))
 		}
 	} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
 		var newop *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, dst)
@@ -470,7 +471,7 @@ try_again:
 		if b.Assign(&(op.GetTypeInfo()), IsNumericString(str.GetStr(), &(op.GetLval()), &(op.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
 			op.SetLong(0)
 			if silent == 0 {
-				ZendError(E_WARNING, "A non-numeric value encountered")
+				faults.ZendError(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
 		types.ZendStringReleaseEx(str, 0)
@@ -513,7 +514,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		if b.Assign(&(holder.GetTypeInfo()), IsNumericString(op.GetStr().GetStr(), &(holder.GetLval()), &(holder.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
 			holder.SetLong(0)
 			if silent == 0 {
-				ZendError(E_WARNING, "A non-numeric value encountered")
+				faults.ZendError(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
 		return holder
@@ -740,7 +741,7 @@ try_again:
 
 		op.SetString(str)
 	case types.IS_ARRAY:
-		ZendError(E_NOTICE, "Array to string conversion")
+		faults.ZendError(faults.E_NOTICE, "Array to string conversion")
 		ZvalPtrDtor(op)
 		op.SetInternedString(types.ZSTR_ARRAY_CAPITALIZED)
 	case types.IS_OBJECT:
@@ -763,7 +764,7 @@ try_again:
 			ZvalPtrDtor(z)
 		}
 		if EG__().GetException() == nil {
-			ZendThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
+			faults.ZendThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
 		}
 		ZvalPtrDtor(op)
 		ZVAL_EMPTY_STRING(op)
@@ -887,7 +888,7 @@ try_again:
 		var dval float64
 		if 0 == b.Assign(&type_, IsNumericString(op.GetStr().GetStr(), &lval, &dval, b.Cond(silent != 0, 1, -1))) {
 			if silent == 0 {
-				ZendError(E_WARNING, "A non-numeric value encountered")
+				faults.ZendError(faults.E_WARNING, "A non-numeric value encountered")
 			}
 			return 0
 		} else if type_ == types.IS_LONG {
@@ -989,7 +990,7 @@ try_again:
 	case types.IS_DOUBLE:
 		return ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), op.GetDval())
 	case types.IS_ARRAY:
-		ZendError(E_NOTICE, "Array to string conversion")
+		faults.ZendError(faults.E_NOTICE, "Array to string conversion")
 		if try != 0 && EG__().GetException() != nil {
 			return nil
 		} else {
@@ -1012,7 +1013,7 @@ try_again:
 			ZvalPtrDtor(z)
 		}
 		if EG__().GetException() == nil {
-			ZendThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
+			faults.ZendThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
 		}
 		if try != 0 {
 			return nil
@@ -1114,7 +1115,7 @@ func AddFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if result != op1 {
 				result.SetUndef()
 			}
-			ZendThrowError(nil, "Unsupported operand types")
+			faults.ZendThrowError(nil, "Unsupported operand types")
 			return types.FAILURE
 		}
 		if AddFunctionFast(result, op1, op2) == types.SUCCESS {
@@ -1191,7 +1192,7 @@ func SubFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			if result != op1 {
 				result.SetUndef()
 			}
-			ZendThrowError(nil, "Unsupported operand types")
+			faults.ZendThrowError(nil, "Unsupported operand types")
 			return types.FAILURE
 		}
 		if SubFunctionFast(result, op1, op2) == types.SUCCESS {
@@ -1270,7 +1271,7 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				if result != op1 {
 					result.SetUndef()
 				}
-				ZendThrowError(nil, "Unsupported operand types")
+				faults.ZendThrowError(nil, "Unsupported operand types")
 				return types.FAILURE
 			}
 		}
@@ -1397,7 +1398,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				if result != op1 {
 					result.SetUndef()
 				}
-				ZendThrowError(nil, "Unsupported operand types")
+				faults.ZendThrowError(nil, "Unsupported operand types")
 				return types.FAILURE
 			}
 		}
@@ -1411,7 +1412,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		var type_pair types.ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_LONG) {
 			if op2.GetLval() == 0 {
-				ZendError(E_WARNING, "Division by zero")
+				faults.ZendError(faults.E_WARNING, "Division by zero")
 				result.SetDouble(float64(op1.GetLval() / float64(op2.GetLval())))
 				return types.SUCCESS
 			} else if op2.GetLval() == -1 && op1.GetLval() == ZEND_LONG_MIN {
@@ -1429,19 +1430,19 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			return types.SUCCESS
 		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE) {
 			if op2.GetDval() == 0 {
-				ZendError(E_WARNING, "Division by zero")
+				faults.ZendError(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(op1.GetDval() / op2.GetDval())
 			return types.SUCCESS
 		} else if type_pair == TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG) {
 			if op2.GetLval() == 0 {
-				ZendError(E_WARNING, "Division by zero")
+				faults.ZendError(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(op1.GetDval() / float64(op2.GetLval()))
 			return types.SUCCESS
 		} else if type_pair == TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE) {
 			if op2.GetDval() == 0 {
-				ZendError(E_WARNING, "Division by zero")
+				faults.ZendError(faults.E_WARNING, "Division by zero")
 			}
 			result.SetDouble(float64(op1.GetLval() / op2.GetDval()))
 			return types.SUCCESS
@@ -1485,7 +1486,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				if result != op1 {
 					result.SetUndef()
 				}
-				ZendThrowError(nil, "Unsupported operand types")
+				faults.ZendThrowError(nil, "Unsupported operand types")
 				return types.FAILURE
 			}
 		}
@@ -1558,9 +1559,9 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		/* modulus by zero */
 
 		if CurrEX() != nil && CG__().GetInCompilation() == 0 {
-			ZendThrowExceptionEx(ZendCeDivisionByZeroError, 0, "Modulo by zero")
+			faults.ZendThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Modulo by zero")
 		} else {
-			ZendErrorNoreturn(E_ERROR, "Modulo by zero")
+			faults.ZendErrorNoreturn(faults.E_ERROR, "Modulo by zero")
 		}
 		if op1 != result {
 			result.SetUndef()
@@ -1698,7 +1699,7 @@ try_again:
 		if result != op1 {
 			result.SetUndef()
 		}
-		ZendThrowError(nil, "Unsupported operand types")
+		faults.ZendThrowError(nil, "Unsupported operand types")
 		return types.FAILURE
 	}
 }
@@ -2031,9 +2032,9 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			return types.SUCCESS
 		} else {
 			if CurrEX() != nil && CG__().GetInCompilation() == 0 {
-				ZendThrowExceptionEx(ZendCeArithmeticError, 0, "Bit shift by negative number")
+				faults.ZendThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Bit shift by negative number")
 			} else {
-				ZendErrorNoreturn(E_ERROR, "Bit shift by negative number")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Bit shift by negative number")
 			}
 			if op1 != result {
 				result.SetUndef()
@@ -2124,9 +2125,9 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			return types.SUCCESS
 		} else {
 			if CurrEX() != nil && CG__().GetInCompilation() == 0 {
-				ZendThrowExceptionEx(ZendCeArithmeticError, 0, "Bit shift by negative number")
+				faults.ZendThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Bit shift by negative number")
 			} else {
-				ZendErrorNoreturn(E_ERROR, "Bit shift by negative number")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Bit shift by negative number")
 			}
 			if op1 != result {
 				result.SetUndef()
@@ -2231,7 +2232,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		var result_len int = op1_len + op2_len
 		var result_str *types.ZendString
 		if op1_len > types.ZSTR_MAX_LEN-op2_len {
-			ZendThrowError(nil, "String size overflow")
+			faults.ZendThrowError(nil, "String size overflow")
 			ZvalPtrDtorStr(&op1_copy)
 			ZvalPtrDtorStr(&op2_copy)
 			if orig_op1 != result {
@@ -2511,7 +2512,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				return types.SUCCESS
 			} else {
 				b.Assert(false)
-				ZendThrowError(nil, "Unsupported operand types")
+				faults.ZendThrowError(nil, "Unsupported operand types")
 				if result != op1 {
 					result.SetUndef()
 				}
@@ -2837,7 +2838,7 @@ func ZendObjectIsTrue(op *types.Zval) int {
 		if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types._IS_BOOL) == types.SUCCESS {
 			return tmp.IsTrue()
 		}
-		ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", types.Z_OBJ_P(op).GetCe().GetName().GetVal())
+		faults.ZendError(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", types.Z_OBJ_P(op).GetCe().GetName().GetVal())
 	} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
 		var result int
 		var rv types.Zval

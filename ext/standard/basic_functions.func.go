@@ -9,6 +9,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -331,7 +332,7 @@ func ZifConstant(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	} else {
 		if zend.EG__().GetException() == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Couldn't find constant %s", const_name.GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Couldn't find constant %s", const_name.GetVal())
 		}
 		return_value.SetNull()
 		return
@@ -552,7 +553,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if setting_len == 0 || setting[0] == '=' {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid parameter syntax")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid parameter syntax")
 		return_value.SetFalse()
 		return
 	}
@@ -891,7 +892,7 @@ func ZifSleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if num < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Number of seconds must be greater than or equal to 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of seconds must be greater than or equal to 0")
 		return_value.SetFalse()
 		return
 	}
@@ -917,7 +918,7 @@ func ZifUsleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if num < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Number of microseconds must be greater than or equal to 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of microseconds must be greater than or equal to 0")
 		return_value.SetFalse()
 		return
 	}
@@ -946,12 +947,12 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *types.Zva
 		break
 	}
 	if tv_sec < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The seconds value must be greater than 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The seconds value must be greater than 0")
 		return_value.SetFalse()
 		return
 	}
 	if tv_nsec < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The nanoseconds value must be greater than 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The nanoseconds value must be greater than 0")
 		return_value.SetFalse()
 		return
 	}
@@ -966,7 +967,7 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *types.Zva
 		zend.AddAssocLongEx(return_value, "nanoseconds", php_rem.tv_nsec)
 		return
 	} else if errno == EINVAL {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "nanoseconds was not in the range 0 to 999 999 999 or seconds was negative")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "nanoseconds was not in the range 0 to 999 999 999 or seconds was negative")
 	}
 	return_value.SetFalse()
 	return
@@ -1003,7 +1004,7 @@ func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *types.Zv
 	target_ns = uint64(target_secs * ns_per_sec)
 	current_ns = uint64(tm.tv_sec)*ns_per_sec + uint64(tm.tv_usec)*1000
 	if target_ns < current_ns {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Sleep until to time is less than current time")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Sleep until to time is less than current time")
 		return_value.SetFalse()
 		return
 	}
@@ -1159,7 +1160,7 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 			return types.FAILURE
 		}
 	case 2:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "TCP/IP option not available!")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "TCP/IP option not available!")
 		return types.FAILURE
 	case 3:
 		stream = core.PhpStreamOpenWrapper(opt, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
@@ -1308,7 +1309,7 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 		break
 	}
 	if !(executeData.GetPrevExecuteData().func_.common.scope) {
-		zend.ZendThrowError(nil, "Cannot call forward_static_call() when no class scope is active")
+		faults.ZendThrowError(nil, "Cannot call forward_static_call() when no class scope is active")
 		return
 	}
 	fci.SetRetval(&retval)
@@ -1381,7 +1382,7 @@ func UserShutdownFunctionCall(zv *types.Zval) int {
 	var retval types.Zval
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
 		var function_name *types.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
-		core.PhpError(zend.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
+		core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
 		types.ZendStringReleaseEx(function_name, 0)
 		return 0
 	}
@@ -1404,11 +1405,11 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 			var obj *types.Zval
 			var method *types.Zval
 			if function.IsType(types.IS_STRING) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s() - function does not exist", function.GetStr().GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s() - function does not exist", function.GetStr().GetVal())
 			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFindH(0)) != nil && b.Assign(&method, function.GetArr().IndexFindH(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call tick function")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call tick function")
 			}
 		}
 		tick_fe.SetCalling(0)
@@ -1433,7 +1434,7 @@ func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTick
 		ret = 0
 	}
 	if ret != 0 && tick_fe1.GetCalling() != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to delete tick function executed at the moment")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to delete tick function executed at the moment")
 		return 0
 	}
 	return ret
@@ -1488,7 +1489,7 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
 		var callback_name *types.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
 		types.ZendStringReleaseEx(callback_name, 0)
 		return_value.SetFalse()
@@ -1650,7 +1651,7 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *types.Z
 	if i != 0 {
 		core.PhpOutputStartDefault()
 	}
-	zend.EG__().SetErrorReporting(zend.E_ERROR)
+	zend.EG__().SetErrorReporting(faults.E_ERROR)
 	PhpGetHighlight(&syntax_highlighter_ini)
 	hicompiled_string_description = zend.ZendMakeCompiledStringDescription("highlighted code")
 	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == types.FAILURE {
@@ -1733,7 +1734,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	zend.ZendIniSortEntries()
 	if extname != nil {
 		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, extname, extname_len)) == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find extension '%s'", extname)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", extname)
 			return_value.SetFalse()
 			return
 		}
@@ -2127,7 +2128,7 @@ func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	if zend.ZendIsCallable(tick_fe.GetArguments()[0], 0, &function_name) == 0 {
 		zend.Efree(tick_fe.GetArguments())
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
 		types.ZendStringReleaseEx(function_name, 0)
 		return_value.SetFalse()
 		return
@@ -2254,7 +2255,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		umask(oldmask)
 		ret = zend.VCWD_CHMOD(new_path, 0666 & ^oldmask)
 		if ret == -1 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		}
 	} else if PhpCopyFileEx(path, new_path, core.STREAM_DISABLE_OPEN_BASEDIR) == types.SUCCESS {
 		zend.VCWD_UNLINK(path)
@@ -2263,7 +2264,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 	if successful != 0 {
 		zend.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, path, path_len)
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
 	types.ZVAL_BOOL(return_value, successful != 0)
 	return
@@ -2362,7 +2363,7 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *types.Zval
 		break
 	}
 	if filename_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Filename cannot be empty!")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Filename cannot be empty!")
 		return_value.SetFalse()
 		return
 	}

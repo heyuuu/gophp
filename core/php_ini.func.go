@@ -7,6 +7,7 @@ import (
 	r "sik/builtin/file"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -275,7 +276,7 @@ func PhpLoadZendExtensionCb(arg any) {
 			}
 			handle = any(standard.PhpLoadShlib(libpath, &err2))
 			if !handle {
-				PhpError(zend.E_CORE_WARNING, "Failed loading Zend extension '%s' (tried: %s (%s), %s (%s))", filename, orig_libpath, err1, libpath, err2)
+				PhpError(faults.E_CORE_WARNING, "Failed loading Zend extension '%s' (tried: %s (%s), %s (%s))", filename, orig_libpath, err1, libpath, err2)
 				zend.Efree(orig_libpath)
 				zend.Efree(err1)
 				zend.Efree(libpath)

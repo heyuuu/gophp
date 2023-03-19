@@ -7,6 +7,7 @@ import (
 	r "sik/builtin/file"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -133,7 +134,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		   -> lets bail
 		*/
 
-		core.PhpErrorDocref(nil, zend.E_ERROR, "fopencookie failed")
+		core.PhpErrorDocref(nil, faults.E_ERROR, "fopencookie failed")
 		return types.FAILURE
 		if !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, nil) == types.SUCCESS {
 			if types.FAILURE == stream.GetOps().GetCast()(stream, castas, ret) {
@@ -173,7 +174,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 	}
 	if PhpStreamIsFiltered(stream) {
 		if show_err != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "cannot cast a filtered stream on this system")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "cannot cast a filtered stream on this system")
 		}
 		return types.FAILURE
 	} else if stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, ret) == types.SUCCESS {
@@ -184,7 +185,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		/* these names depend on the values of the PHP_STREAM_AS_XXX defines in php_streams.h */
 
 		var cast_names []*byte = []*byte{"STDIO FILE*", "File Descriptor", "Socket Descriptor", "select()able descriptor"}
-		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas])
+		core.PhpErrorDocref(nil, faults.E_WARNING, "cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas])
 	}
 	return types.FAILURE
 exit_success:
@@ -194,7 +195,7 @@ exit_success:
 		 * will be accessing the stream.  Emit a warning so that the end-user will
 		 * know that they should try something else */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, zend.ZEND_LONG_FMT+" bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos()))
+		core.PhpErrorDocref(nil, faults.E_WARNING, zend.ZEND_LONG_FMT+" bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos()))
 
 		/* the data we have buffered will be lost to the third party library that
 		 * will be accessing the stream.  Emit a warning so that the end-user will

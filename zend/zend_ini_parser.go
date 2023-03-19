@@ -5,6 +5,7 @@ package zend
 import (
 	"log"
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -234,7 +235,7 @@ func IniError(msg *byte) {
 	if CG__().GetIniParserUnbufferedErrors() != 0 {
 		log.Printf("PHP:  %s", error_buf)
 	} else {
-		ZendError(E_WARNING, "%s", error_buf)
+		faults.ZendError(faults.E_WARNING, "%s", error_buf)
 	}
 	Efree(error_buf)
 }

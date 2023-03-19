@@ -9,6 +9,7 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"sort"
 	"strings"
@@ -580,7 +581,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				var msg *types.Zval
 				var rv types.Zval
 				tmp.SetObject(zend.EG__().GetException())
-				msg = zend.ZendReadProperty(zend.ZendCeException, &tmp, "message", b.SizeOf("\"message\"")-1, 0, &rv)
+				msg = zend.ZendReadProperty(faults.ZendCeException, &tmp, "message", b.SizeOf("\"message\"")-1, 0, &rv)
 				zend.ZendPrintf("Exception: %s\n", msg.GetStr().GetVal())
 				zend.ZvalPtrDtor(&tmp)
 				zend.EG__().SetException(nil)

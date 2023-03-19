@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -141,7 +142,7 @@ func ZendSigaction(signo int, act *__struct__sigaction, oldact *__struct__sigact
 			sa.sa_mask = GlobalSigmask
 		}
 		if sigaction(signo, &sa, nil) < 0 {
-			ZendErrorNoreturn(E_ERROR, "Error installing signal handler for %d", signo)
+			faults.ZendErrorNoreturn(faults.E_ERROR, "Error installing signal handler for %d", signo)
 		}
 
 		/* unsure this signal is not blocked */
@@ -176,7 +177,7 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 		sa.sa_sigaction = handler
 		sa.sa_mask = GlobalSigmask
 		if sigaction(signo, &sa, nil) < 0 {
-			ZendErrorNoreturn(E_ERROR, "Error installing signal handler for %d", signo)
+			faults.ZendErrorNoreturn(faults.E_ERROR, "Error installing signal handler for %d", signo)
 		}
 		return types.SUCCESS
 	}
@@ -198,7 +199,7 @@ func ZendSignalDeactivate() {
 		var x int
 		var sa __struct__sigaction
 		if SIGG(depth) != 0 {
-			ZendError(E_CORE_WARNING, "zend_signal: shutdown with non-zero blocking depth (%d)", SIGG(depth))
+			faults.ZendError(faults.E_CORE_WARNING, "zend_signal: shutdown with non-zero blocking depth (%d)", SIGG(depth))
 		}
 
 		/* did anyone steal our installed handler */
@@ -206,7 +207,7 @@ func ZendSignalDeactivate() {
 		for x = 0; x < b.SizeOf("zend_sigs")/b.SizeOf("* zend_sigs"); x++ {
 			sigaction(ZendSigs[x], nil, &sa)
 			if sa.sa_sigaction != ZendSignalHandlerDefer && sa.sa_sigaction != any(SIG_IGN) {
-				ZendError(E_CORE_WARNING, "zend_signal: handler was replaced for signal (%d) after startup", ZendSigs[x])
+				faults.ZendError(faults.E_CORE_WARNING, "zend_signal: handler was replaced for signal (%d) after startup", ZendSigs[x])
 			}
 		}
 

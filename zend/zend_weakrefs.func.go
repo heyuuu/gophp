@@ -5,6 +5,7 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -62,7 +63,7 @@ func ZendWeakrefFree(zo *types.ZendObject) {
 	ZendObjectStdDtor(wr.GetStd())
 }
 func ZendWeakrefUnsupported(thing string) {
-	ZendThrowError(nil, "WeakReference objects do not support "+thing)
+	faults.ZendThrowError(nil, "WeakReference objects do not support "+thing)
 }
 func ZendWeakrefNoWrite(object *types.Zval, member *types.Zval, value *types.Zval, rtc *any) *types.Zval {
 	ZendWeakrefUnsupported("properties")
@@ -88,7 +89,7 @@ func ZendWeakrefNoUnset(object *types.Zval, member *types.Zval, rtc *any) {
 	ZendWeakrefUnsupported("properties")
 }
 func zim_WeakReference___construct(executeData *ZendExecuteData, return_value *types.Zval) {
-	ZendThrowError(nil, "Direct instantiation of 'WeakReference' is not allowed, "+"use WeakReference::create instead")
+	faults.ZendThrowError(nil, "Direct instantiation of 'WeakReference' is not allowed, "+"use WeakReference::create instead")
 }
 func zim_WeakReference_create(executeData *ZendExecuteData, return_value *types.Zval) {
 	var referent *types.Zval

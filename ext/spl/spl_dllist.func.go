@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -257,7 +258,7 @@ func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, zend.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
+		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
 	}
 	if inherited != 0 {
 		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetget", b.SizeOf("\"offsetget\"")-1))
@@ -389,7 +390,7 @@ func zim_spl_SplDoublyLinkedList_pop(executeData *zend.ZendExecuteData, return_v
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	SplPtrLlistPop(intern.GetLlist(), return_value)
 	if return_value.IsUndef() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't pop from an empty datastructure", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't pop from an empty datastructure", 0)
 		return_value.SetNull()
 		return
 	}
@@ -402,7 +403,7 @@ func zim_spl_SplDoublyLinkedList_shift(executeData *zend.ZendExecuteData, return
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	SplPtrLlistShift(intern.GetLlist(), return_value)
 	if return_value.IsUndef() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't shift from an empty datastructure", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't shift from an empty datastructure", 0)
 		return_value.SetNull()
 		return
 	}
@@ -416,7 +417,7 @@ func zim_spl_SplDoublyLinkedList_top(executeData *zend.ZendExecuteData, return_v
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	value = SplPtrLlistLast(intern.GetLlist())
 	if value == nil || value.IsUndef() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
 		return
 	}
 	types.ZVAL_COPY_DEREF(return_value, value)
@@ -430,7 +431,7 @@ func zim_spl_SplDoublyLinkedList_bottom(executeData *zend.ZendExecuteData, retur
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	value = SplPtrLlistFirst(intern.GetLlist())
 	if value == nil || value.IsUndef() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
 		return
 	}
 	types.ZVAL_COPY_DEREF(return_value, value)
@@ -462,7 +463,7 @@ func zim_spl_SplDoublyLinkedList_setIteratorMode(executeData *zend.ZendExecuteDa
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if intern.IsItFix() && (intern.GetFlags()&SPL_DLLIST_IT_LIFO) != (value&SPL_DLLIST_IT_LIFO) {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Iterators' LIFO/FIFO modes for SplStack/SplQueue objects are frozen", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Iterators' LIFO/FIFO modes for SplStack/SplQueue objects are frozen", 0)
 		return
 	}
 	intern.SetFlags(value&SPL_DLLIST_IT_MASK | intern.GetFlags()&SPL_DLLIST_IT_FIX)
@@ -501,7 +502,7 @@ func zim_spl_SplDoublyLinkedList_offsetGet(executeData *zend.ZendExecuteData, re
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
 	if index < 0 || index >= intern.GetLlist().GetCount() {
-		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 		return
 	}
 	element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
@@ -509,7 +510,7 @@ func zim_spl_SplDoublyLinkedList_offsetGet(executeData *zend.ZendExecuteData, re
 		var value *types.Zval = element.GetData()
 		types.ZVAL_COPY_DEREF(return_value, value)
 	} else {
-		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
+		faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
 	}
 }
 func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -536,7 +537,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 		var element *SplPtrLlistElement
 		index = SplOffsetConvertToLong(zindex)
 		if index < 0 || index >= intern.GetLlist().GetCount() {
-			zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
+			faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 			return
 		}
 		element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
@@ -564,7 +565,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 
 		} else {
 			zend.ZvalPtrDtor(value)
-			zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
+			faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
 			return
 		}
 	}
@@ -582,7 +583,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(executeData *zend.ZendExecuteData, 
 	index = SplOffsetConvertToLong(zindex)
 	llist = intern.GetLlist()
 	if index < 0 || index >= intern.GetLlist().GetCount() {
-		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset out of range", 0)
+		faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset out of range", 0)
 		return
 	}
 	element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
@@ -620,7 +621,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(executeData *zend.ZendExecuteData, 
 		element.GetData().SetUndef()
 		SPL_LLIST_DELREF(element)
 	} else {
-		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
+		faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
 		return
 	}
 }
@@ -838,7 +839,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, 
 	return
 error:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
+	faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
 	return
 }
 func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -885,7 +886,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 	storage_zv = data.IndexFindH(1)
 	members_zv = data.IndexFindH(2)
 	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != types.IS_LONG || storage_zv.GetType() != types.IS_ARRAY || members_zv.GetType() != types.IS_ARRAY {
-		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
+		faults.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
 	intern.SetFlags(int(flags_zv.GetLval()))
@@ -910,7 +911,7 @@ func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_v
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
 	if index < 0 || index > intern.GetLlist().GetCount() {
-		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 		return
 	}
 	value.TryAddRefcount()
@@ -964,7 +965,7 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	var iterator *SplDllistIt
 	var dllist_object *SplDllistObject = Z_SPLDLLIST_P(object)
 	if by_ref != 0 {
-		zend.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))

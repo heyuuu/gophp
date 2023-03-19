@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -367,7 +368,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	switch offset.GetType() {
 	case types.IS_UNDEF:
 		if result.GetArr().NextIndexInsert(expr) == nil {
-			ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
+			faults.ZendError(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
 	case types.IS_STRING:
@@ -384,10 +385,10 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IS_DOUBLE:
 		result.GetArr().IndexUpdateH(ZendDvalToLval(offset.GetDval()), expr)
 	case types.IS_RESOURCE:
-		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(offset), types.Z_RES_HANDLE_P(offset))
+		faults.ZendError(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(offset), types.Z_RES_HANDLE_P(offset))
 		result.GetArr().IndexUpdateH(types.Z_RES_HANDLE_P(offset), expr)
 	default:
-		ZendThrowError(nil, "Illegal offset type")
+		faults.ZendThrowError(nil, "Illegal offset type")
 		return types.FAILURE
 	}
 	return types.SUCCESS
@@ -404,11 +405,11 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 			key = _p.GetKey()
 			val = _z
 			if key != nil {
-				ZendThrowError(nil, "Cannot unpack array with string keys")
+				faults.ZendThrowError(nil, "Cannot unpack array with string keys")
 				return types.FAILURE
 			} else {
 				if result.GetArr().NextIndexInsert(val) == nil {
-					ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
+					faults.ZendError(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 					break
 				}
 				val.TryAddRefcount()
@@ -419,7 +420,7 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 
 	/* Objects or references cannot occur in a constant expression. */
 
-	ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
+	faults.ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
 	return types.FAILURE
 }
 func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) int {
@@ -484,14 +485,14 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		}
 	case ZEND_AST_CLASS_NAME:
 		if scope == nil {
-			ZendThrowError(nil, "Cannot use \"self\" when no class scope is active")
+			faults.ZendThrowError(nil, "Cannot use \"self\" when no class scope is active")
 			return types.FAILURE
 		}
 		if ast.GetAttr() == ZEND_FETCH_CLASS_SELF {
 			result.SetStringCopy(scope.GetName())
 		} else if ast.GetAttr() == ZEND_FETCH_CLASS_PARENT {
 			if !(scope.GetParent()) {
-				ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
+				faults.ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 				return types.FAILURE
 			}
 			result.SetStringCopy(scope.GetParent().name)
@@ -632,7 +633,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		}
 	case ZEND_AST_DIM:
 		if ast.GetChild()[1] == nil {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for reading")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use [] for reading")
 		}
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
@@ -645,7 +646,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			ZvalPtrDtorNogc(&op2)
 		}
 	default:
-		ZendThrowError(nil, "Unsupported constant expression")
+		faults.ZendThrowError(nil, "Unsupported constant expression")
 		ret = types.FAILURE
 	}
 	return ret

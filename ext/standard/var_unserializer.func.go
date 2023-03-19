@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -290,7 +291,7 @@ func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 	/* number too long or overflow */
 
 	if p-start > zend.MAX_LENGTH_OF_LONG-1 || zend.SIZEOF_ZEND_LONG == 4 && p-start == zend.MAX_LENGTH_OF_LONG-1 && (*start) > '2' || result > zend.ZEND_LONG_MAX+neg {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Numerical result out of range")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Numerical result out of range")
 		if neg == 0 {
 			return zend.ZEND_LONG_MAX
 		} else {
@@ -325,7 +326,7 @@ func ProcessNestedData(
 ) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
 			return 0
 		}
 		var_hash.GetCurDepth()++
@@ -492,7 +493,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 	datalen = ParseIv2((*p)+2, p)
 	*p += 2
 	if datalen < 0 || max-(*p) <= datalen {
-		zend.ZendError(zend.E_WARNING, "Insufficient data for unserializing - "+zend.ZEND_LONG_FMT+" required, "+zend.ZEND_LONG_FMT+" present", datalen, zend_long(max-(*p)))
+		faults.ZendError(faults.E_WARNING, "Insufficient data for unserializing - "+zend.ZEND_LONG_FMT+" required, "+zend.ZEND_LONG_FMT+" present", datalen, zend_long(max-(*p)))
 		return 0
 	}
 
@@ -504,7 +505,7 @@ func ObjectCustom(rval *types.Zval, p **uint8, max *uint8, var_hash *PhpUnserial
 		return 0
 	}
 	if ce.GetUnserialize() == nil {
-		zend.ZendError(zend.E_WARNING, "Class %s has no unserializer", ce.GetName().GetVal())
+		faults.ZendError(faults.E_WARNING, "Class %s has no unserializer", ce.GetName().GetVal())
 		zend.ObjectInitEx(rval, ce)
 	} else if ce.GetUnserialize()(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != types.SUCCESS {
 		return 0
@@ -748,7 +749,7 @@ yy13:
 
 	/* this is the case where we have less data than planned */
 
-	core.PhpErrorDocref(nil, zend.E_NOTICE, "Unexpected end of serialized data")
+	core.PhpErrorDocref(nil, faults.E_NOTICE, "Unexpected end of serialized data")
 	return 0
 yy15:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -867,7 +868,7 @@ yy18:
 				zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref(nil, zend.E_WARNING, "defined (%s) but not found", user_func.GetStr().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "defined (%s) but not found", user_func.GetStr().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 			zend.ZvalPtrDtor(&user_func)
@@ -887,7 +888,7 @@ yy18:
 
 		BG__().serialize_lock++
 		if b.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.GetStr().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Function %s() hasn't defined the class it was called for", user_func.GetStr().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
 		}
@@ -908,7 +909,7 @@ yy18:
 		return ret
 	}
 	if (*p) >= max-2 {
-		zend.ZendError(zend.E_WARNING, "Bad unserialize data")
+		faults.ZendError(faults.E_WARNING, "Bad unserialize data")
 		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
@@ -926,7 +927,7 @@ yy18:
 	 * depending on the serialization format. */
 
 	if ce.GetSerialize() != nil && has_unserialize == 0 {
-		zend.ZendError(zend.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
+		faults.ZendError(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
 		types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}

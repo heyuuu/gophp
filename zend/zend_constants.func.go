@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -80,22 +81,22 @@ func CleanModuleConstants(module_number int) {
 	ZendHashApplyWithArgument(EG__().GetZendConstants(), CleanModuleConstant, any(&module_number))
 }
 func ZendRegisterStandardConstants() {
-	REGISTER_MAIN_LONG_CONSTANT("E_ERROR", E_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_RECOVERABLE_ERROR", E_RECOVERABLE_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_WARNING", E_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_PARSE", E_PARSE, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_NOTICE", E_NOTICE, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_STRICT", E_STRICT, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_DEPRECATED", E_DEPRECATED, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_CORE_ERROR", E_CORE_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_CORE_WARNING", E_CORE_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_COMPILE_ERROR", E_COMPILE_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_COMPILE_WARNING", E_COMPILE_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_ERROR", E_USER_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_WARNING", E_USER_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_NOTICE", E_USER_NOTICE, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_DEPRECATED", E_USER_DEPRECATED, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_ALL", E_ALL, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_ERROR", faults.E_ERROR, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_RECOVERABLE_ERROR", faults.E_RECOVERABLE_ERROR, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_WARNING", faults.E_WARNING, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_PARSE", faults.E_PARSE, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_NOTICE", faults.E_NOTICE, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_STRICT", faults.E_STRICT, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_DEPRECATED", faults.E_DEPRECATED, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_CORE_ERROR", faults.E_CORE_ERROR, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_CORE_WARNING", faults.E_CORE_WARNING, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_COMPILE_ERROR", faults.E_COMPILE_ERROR, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_COMPILE_WARNING", faults.E_COMPILE_WARNING, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_USER_ERROR", faults.E_USER_ERROR, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_USER_WARNING", faults.E_USER_WARNING, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_USER_NOTICE", faults.E_USER_NOTICE, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_USER_DEPRECATED", faults.E_USER_DEPRECATED, CONST_PERSISTENT|CONST_CS)
+	REGISTER_MAIN_LONG_CONSTANT("E_ALL", faults.E_ALL, CONST_PERSISTENT|CONST_CS)
 	REGISTER_MAIN_LONG_CONSTANT("DEBUG_BACKTRACE_PROVIDE_OBJECT", DEBUG_BACKTRACE_PROVIDE_OBJECT, CONST_PERSISTENT|CONST_CS)
 	REGISTER_MAIN_LONG_CONSTANT("DEBUG_BACKTRACE_IGNORE_ARGS", DEBUG_BACKTRACE_IGNORE_ARGS, CONST_PERSISTENT|CONST_CS)
 
@@ -260,16 +261,16 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		var ret_constant *types.Zval = nil
 		if types.ZendStringEqualsLiteralCi(class_name, "self") {
 			if scope == nil {
-				ZendThrowError(nil, "Cannot access self:: when no class scope is active")
+				faults.ZendThrowError(nil, "Cannot access self:: when no class scope is active")
 				goto failure
 			}
 			ce = scope
 		} else if types.ZendStringEqualsLiteralCi(class_name, "parent") {
 			if scope == nil {
-				ZendThrowError(nil, "Cannot access parent:: when no class scope is active")
+				faults.ZendThrowError(nil, "Cannot access parent:: when no class scope is active")
 				goto failure
 			} else if !(scope.GetParent()) {
-				ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
+				faults.ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 				goto failure
 			} else {
 				ce = scope.GetParent()
@@ -277,7 +278,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		} else if types.ZendStringEqualsLiteralCi(class_name, "static") {
 			ce = ZendGetCalledScope(CurrEX())
 			if ce == nil {
-				ZendThrowError(nil, "Cannot access static:: when no class scope is active")
+				faults.ZendThrowError(nil, "Cannot access static:: when no class scope is active")
 				goto failure
 			}
 		} else {
@@ -287,14 +288,14 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 			c = ZendHashFindPtr(ce.GetConstantsTable(), constant_name)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-					ZendThrowError(nil, "Undefined class constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
+					faults.ZendThrowError(nil, "Undefined class constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
 					goto failure
 				}
 				ret_constant = nil
 			} else {
 				if ZendVerifyConstAccess(c, scope) == 0 {
 					if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-						ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), class_name.GetVal(), constant_name.GetVal())
+						faults.ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), class_name.GetVal(), constant_name.GetVal())
 					}
 					goto failure
 				}
@@ -304,7 +305,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		if ret_constant != nil && ret_constant.IsConstant() {
 			var ret int
 			if IS_CONSTANT_VISITED(ret_constant) != 0 {
-				ZendThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
+				faults.ZendThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
 				ret_constant = nil
 				goto failure
 			}
@@ -375,7 +376,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
 		if (ZEND_CONSTANT_FLAGS(c)&(CONST_CS|CONST_CT_SUBST)) == 0 && IsAccessDeprecated(c, name) != 0 {
-			ZendError(E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
+			faults.ZendError(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 		}
 	}
 	return c.GetValue()
@@ -419,7 +420,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 		if c.GetName().GetVal()[0] == '0' && c.GetName().GetLen() > b.SizeOf("\"\\0__COMPILER_HALT_OFFSET__\"")-1 && memcmp(name.GetVal(), "0__COMPILER_HALT_OFFSET__", b.SizeOf("\"\\0__COMPILER_HALT_OFFSET__\"")) == 0 {
 
 		}
-		ZendError(E_NOTICE, "Constant %s already defined", name.GetVal())
+		faults.ZendError(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
 		types.ZendStringRelease(c.GetName())
 		if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
 			ZvalPtrDtorNogc(c.GetValue())

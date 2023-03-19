@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -478,7 +479,7 @@ again:
 		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			if myht.IsRecursive() {
 				buf.AppendString("NULL")
-				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
+				faults.ZendError(faults.E_WARNING, "var_export does not handle circular references")
 				return
 			}
 			myht.AddRefcount()
@@ -516,7 +517,7 @@ again:
 		if myht != nil {
 			if myht.IsRecursive() {
 				buf.AppendString("NULL")
-				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
+				faults.ZendError(faults.E_WARNING, "var_export does not handle circular references")
 				zend.ZendReleaseProperties(myht)
 				return
 			} else {
@@ -689,7 +690,7 @@ func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	}
 	if !(zend.HASH_OF(retval)) {
 		zend.ZvalPtrDtor(retval)
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
 		return types.FAILURE
 	}
 	return types.SUCCESS
@@ -708,7 +709,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	}
 	if retval.GetType() != types.IS_ARRAY {
 		zend.ZvalPtrDtor(retval)
-		zend.ZendTypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).GetName().GetVal())
+		faults.ZendTypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).GetName().GetVal())
 		return types.FAILURE
 	}
 	return types.SUCCESS
@@ -729,7 +730,7 @@ func PhpVarSerializeTryAddSleepProp(ht *types.HashTable, props *types.HashTable,
 		}
 	}
 	if ht.KeyAdd(name.GetStr(), val) == nil {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
 		return types.SUCCESS
 	}
 	val.TryAddRefcount()
@@ -761,7 +762,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 		var prot_name *types.ZendString
 		name_val = types.ZVAL_DEREF(name_val)
 		if name_val.GetType() != types.IS_STRING {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
 		}
 		name = zend.ZvalGetTmpString(name_val, &tmp_name)
 		if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
@@ -797,7 +798,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 			retval = types.FAILURE
 			break
 		}
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
 		ht.KeyAdd(name.GetStr(), zend.EG__().GetUninitializedZval())
 		zend.ZendTmpStringRelease(tmp_name)
 	}
@@ -1169,7 +1170,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		var max_depth *types.Zval
 		classes = zend.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
 		if classes != nil && classes.GetType() != types.IS_ARRAY && classes.GetType() != types.IS_TRUE && classes.GetType() != types.IS_FALSE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "allowed_classes option should be array or boolean")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "allowed_classes option should be array or boolean")
 			return_value.SetFalse()
 			goto cleanup
 		}
@@ -1204,12 +1205,12 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		max_depth = zend.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
 		if max_depth != nil {
 			if max_depth.GetType() != types.IS_LONG {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "max_depth should be int")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth should be int")
 				return_value.SetFalse()
 				goto cleanup
 			}
 			if max_depth.GetLval() < 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "max_depth cannot be negative")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth cannot be negative")
 				return_value.SetFalse()
 				goto cleanup
 			}
@@ -1232,7 +1233,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	}
 	if PhpVarUnserialize(retval, &p, p+buf_len, &var_hash) == 0 {
 		if zend.EG__().GetException() == nil {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
 		if BG__().unserialize.level <= 1 {
 			zend.ZvalPtrDtor(return_value)

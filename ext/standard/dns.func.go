@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -16,7 +17,7 @@ func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		return
 	}
 	if gethostname(buf, b.SizeOf("buf")) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to fetch host [%d]: %s", errno, strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to fetch host [%d]: %s", errno, strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -45,7 +46,7 @@ func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 	hostname = PhpGethostbyaddr(addr)
 	if hostname == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Address is not a valid IPv4 or IPv6 address")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Address is not a valid IPv4 or IPv6 address")
 		return_value.SetFalse()
 	} else {
 		return_value.SetString(hostname)
@@ -90,7 +91,7 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zva
 
 		/* name too long, protect from CVE-2015-0235 */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
 		return_value.SetRawString(b.CastStr(hostname, hostname_len))
 		return
 	}
@@ -123,7 +124,7 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zv
 
 		/* name too long, protect from CVE-2015-0235 */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
 		return_value.SetFalse()
 		return
 	}
@@ -197,7 +198,7 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zv
 		break
 	}
 	if hostname_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Host cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Host cannot be empty")
 		return_value.SetFalse()
 		return
 	}
@@ -229,7 +230,7 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zv
 		} else if !(strcasecmp("A6", rectype)) {
 			type_ = DNS_T_A6
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Type '%s' not supported", rectype)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Type '%s' not supported", rectype)
 			return_value.SetFalse()
 			return
 		}
@@ -715,13 +716,13 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	if raw == 0 {
 		if (type_param & ^PHP_DNS_ALL) != 0 && type_param != PHP_DNS_ANY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Type '"+zend.ZEND_LONG_FMT+"' not supported", type_param)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Type '"+zend.ZEND_LONG_FMT+"' not supported", type_param)
 			return_value.SetFalse()
 			return
 		}
 	} else {
 		if type_param < 1 || type_param > 0xffff {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Numeric DNS record type must be between 1 and 65535, '"+zend.ZEND_LONG_FMT+"' given", type_param)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Numeric DNS record type must be between 1 and 65535, '"+zend.ZEND_LONG_FMT+"' given", type_param)
 			return_value.SetFalse()
 			return
 		}
@@ -859,11 +860,11 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 				case HOST_NOT_FOUND:
 					continue
 				case NO_RECOVERY:
-					core.PhpErrorDocref(nil, zend.E_WARNING, "An unexpected server failure occurred.")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "An unexpected server failure occurred.")
 				case TRY_AGAIN:
-					core.PhpErrorDocref(nil, zend.E_WARNING, "A temporary server error occurred.")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "A temporary server error occurred.")
 				default:
-					core.PhpErrorDocref(nil, zend.E_WARNING, "DNS Query failed")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "DNS Query failed")
 				}
 				return_value.GetArr().DestroyEx()
 				return_value.SetFalse()
@@ -882,7 +883,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 			for b.PostDec(&qd) > 0 {
 				n = dn_skipname(cp, end)
 				if n < 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to parse DNS data received")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to parse DNS data received")
 					return_value.GetArr().DestroyEx()
 					PhpDnsFreeHandle(handle)
 					return_value.SetFalse()

@@ -3,6 +3,7 @@ package types
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/faults"
 	"sort"
 )
 
@@ -350,7 +351,7 @@ func (this *HashTable) doResize() {
 		// 无内存复制，仅扩充尺寸标识
 		this.nTableSize *= 2
 	} else {
-		zend.ZendErrorNoreturn(zend.E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
+		faults.ZendErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
 	}
 }
 

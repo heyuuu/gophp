@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -105,7 +106,7 @@ again:
 
 				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
 
-				ZendClearException()
+				faults.ZendClearException()
 
 				/* Discard exceptions thrown from Z_OBJ_HANDLER_P(callable, get_closure) */
 
@@ -398,7 +399,7 @@ func ZendDeclareTypedProperty(
 		case types.IS_OBJECT:
 
 		case types.IS_RESOURCE:
-			ZendErrorNoreturn(E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
 			break
 		default:
 			break

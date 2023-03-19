@@ -6,6 +6,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -30,7 +31,7 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	case 'K':
 
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown source charset: %c", from)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown source charset: %c", from)
 	}
 	switch toupper(int(uint8(to))) {
 	case 'W':
@@ -46,7 +47,7 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	case 'K':
 
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown destination charset: %c", to)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown destination charset: %c", to)
 	}
 	if str == nil {
 		return (*byte)(str)

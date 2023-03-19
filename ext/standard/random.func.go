@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -34,7 +35,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 			fd = open("/dev/urandom", O_RDONLY)
 			if fd < 0 {
 				if should_throw != 0 {
-					zend.ZendThrowException(zend.ZendCeException, "Cannot open source device", 0)
+					faults.ZendThrowException(faults.ZendCeException, "Cannot open source device", 0)
 				}
 				return types.FAILURE
 			}
@@ -44,7 +45,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 			if fstat(fd, &st) != 0 || !(S_ISCHR(st.st_mode)) {
 				close(fd)
 				if should_throw != 0 {
-					zend.ZendThrowException(zend.ZendCeException, "Error reading from source device", 0)
+					faults.ZendThrowException(faults.ZendCeException, "Error reading from source device", 0)
 				}
 				return types.FAILURE
 			}
@@ -58,7 +59,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 		}
 		if read_bytes < size {
 			if should_throw != 0 {
-				zend.ZendThrowException(zend.ZendCeException, "Could not gather sufficient random data", 0)
+				faults.ZendThrowException(faults.ZendCeException, "Could not gather sufficient random data", 0)
 			}
 			return types.FAILURE
 		}
@@ -85,7 +86,7 @@ func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		break
 	}
 	if size < 1 {
-		zend.ZendThrowException(zend.ZendCeError, "Length must be greater than 0", 0)
+		faults.ZendThrowException(faults.ZendCeError, "Length must be greater than 0", 0)
 		return
 	}
 	bytes = types.ZendStringAlloc(size, 0)
@@ -164,7 +165,7 @@ func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if min > max {
-		zend.ZendThrowException(zend.ZendCeError, "Minimum value must be less than or equal to the maximum value", 0)
+		faults.ZendThrowException(faults.ZendCeError, "Minimum value must be less than or equal to the maximum value", 0)
 		return
 	}
 	if PhpRandomIntThrow(min, max, &result) == types.FAILURE {

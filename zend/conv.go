@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	. "sik/builtin/ctype"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"strconv"
 	"strings"
@@ -92,7 +93,7 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrRe
 			return
 		}
 		if mode == ConvertNoticeOnErrors {
-			ZendError(E_NOTICE, "A non well formed numeric value encountered")
+			faults.ZendError(faults.E_NOTICE, "A non well formed numeric value encountered")
 			if EG__().GetException() != nil {
 				return
 			}

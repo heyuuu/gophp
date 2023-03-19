@@ -4,6 +4,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -73,7 +74,7 @@ func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
-		ZendError(E_WARNING, "func_num_args():  Called from the global scope - no function context")
+		faults.ZendError(faults.E_WARNING, "func_num_args():  Called from the global scope - no function context")
 		return_value.SetLong(-1)
 		return
 	}
@@ -94,13 +95,13 @@ func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if requested_offset < 0 {
-		ZendError(E_WARNING, "func_get_arg():  The argument number should be >= 0")
+		faults.ZendError(faults.E_WARNING, "func_get_arg():  The argument number should be >= 0")
 		return_value.SetFalse()
 		return
 	}
 	ex = executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
-		ZendError(E_WARNING, "func_get_arg():  Called from the global scope - no function context")
+		faults.ZendError(faults.E_WARNING, "func_get_arg():  Called from the global scope - no function context")
 		return_value.SetFalse()
 		return
 	}
@@ -110,7 +111,7 @@ func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
 	}
 	arg_count = ex.NumArgs()
 	if ZendUlong(requested_offset >= arg_count) != 0 {
-		ZendError(E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", requested_offset)
+		faults.ZendError(faults.E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", requested_offset)
 		return_value.SetFalse()
 		return
 	}
@@ -132,7 +133,7 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 	var i uint32
 	var ex *ZendExecuteData = executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
-		ZendError(E_WARNING, "func_get_args():  Called from the global scope - no function context")
+		faults.ZendError(faults.E_WARNING, "func_get_args():  Called from the global scope - no function context")
 		return_value.SetFalse()
 		return
 	}
@@ -266,7 +267,7 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if len_ < 0 {
-		ZendError(E_WARNING, "Length must be greater than or equal to 0")
+		faults.ZendError(faults.E_WARNING, "Length must be greater than or equal to 0")
 		return_value.SetFalse()
 		return
 	}
@@ -319,7 +320,7 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if len_ < 0 {
-		ZendError(E_WARNING, "Length must be greater than or equal to 0")
+		faults.ZendError(faults.E_WARNING, "Length must be greater than or equal to 0")
 		return_value.SetFalse()
 		return
 	}
@@ -337,12 +338,12 @@ func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if EG__().GetEachDeprecationThrown() == 0 {
-		ZendError(E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")
+		faults.ZendError(faults.E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")
 		EG__().SetEachDeprecationThrown(1)
 	}
 	target_hash = HASH_OF(array)
 	if target_hash == nil {
-		ZendError(E_WARNING, "Variable passed to each() is not an array or object")
+		faults.ZendError(faults.E_WARNING, "Variable passed to each() is not an array or object")
 		return
 	}
 	for true {
@@ -463,7 +464,7 @@ func ValidateConstantArray(ht *types.HashTable) int {
 			if val.IsArray() {
 				if val.IsRefcounted() {
 					if val.IsRecursive() {
-						ZendError(E_WARNING, "Constants cannot be recursive arrays")
+						faults.ZendError(faults.E_WARNING, "Constants cannot be recursive arrays")
 						ret = 0
 						break
 					} else if ValidateConstantArray(val.GetArr()) == 0 {
@@ -472,7 +473,7 @@ func ValidateConstantArray(ht *types.HashTable) int {
 					}
 				}
 			} else if val.GetType() != types.IS_STRING && val.GetType() != types.IS_RESOURCE {
-				ZendError(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
+				faults.ZendError(faults.E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
 				ret = 0
 				break
 			}
@@ -547,7 +548,7 @@ func ZifDefine(executeData *ZendExecuteData, return_value *types.Zval) {
 		case_sensitive = 0
 	}
 	if ZendMemnstr(name.GetVal(), "::", b.SizeOf("\"::\"")-1, name.GetVal()+name.GetLen()) != nil {
-		ZendError(E_WARNING, "Class constants cannot be defined or redefined")
+		faults.ZendError(faults.E_WARNING, "Class constants cannot be defined or redefined")
 		return_value.SetFalse()
 		return
 	}
@@ -592,7 +593,7 @@ repeat:
 		}
 		fallthrough
 	default:
-		ZendError(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
+		faults.ZendError(faults.E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
 		ZvalPtrDtor(&val_free)
 		return_value.SetFalse()
 		return
@@ -601,7 +602,7 @@ repeat:
 	ZvalPtrDtor(&val_free)
 register_constant:
 	if non_cs != 0 {
-		ZendError(E_DEPRECATED, "define(): Declaration of case-insensitive constants is deprecated")
+		faults.ZendError(faults.E_DEPRECATED, "define(): Declaration of case-insensitive constants is deprecated")
 	}
 
 	/* non persistent */
@@ -654,7 +655,7 @@ func ZifGetClass(executeData *ZendExecuteData, return_value *types.Zval) {
 			return_value.SetStringCopy(scope.GetName())
 			return
 		} else {
-			ZendError(E_WARNING, "get_class() called without object from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_class() called without object from outside a class")
 			return_value.SetFalse()
 			return
 		}
@@ -674,7 +675,7 @@ func ZifGetCalledClass(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else {
 		var scope *types.ClassEntry = ZendGetExecutedScope()
 		if scope == nil {
-			ZendError(E_WARNING, "get_called_class() called from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_called_class() called from outside a class")
 		}
 	}
 	return_value.SetFalse()
@@ -1120,7 +1121,7 @@ func ZifPropertyExists(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else if object.IsObject() {
 		ce = types.Z_OBJCE_P(object)
 	} else {
-		ZendError(E_WARNING, "First parameter must either be an object or the name of an existing class")
+		faults.ZendError(faults.E_WARNING, "First parameter must either be an object or the name of an existing class")
 		return_value.SetNull()
 		return
 	}
@@ -1248,17 +1249,17 @@ func ZifClassAlias(executeData *ZendExecuteData, return_value *types.Zval) {
 				return_value.SetTrue()
 				return
 			} else {
-				ZendError(E_WARNING, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), alias_name)
+				faults.ZendError(faults.E_WARNING, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), alias_name)
 				return_value.SetFalse()
 				return
 			}
 		} else {
-			ZendError(E_WARNING, "First argument of class_alias() must be a name of user defined class")
+			faults.ZendError(faults.E_WARNING, "First argument of class_alias() must be a name of user defined class")
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		ZendError(E_WARNING, "Class '%s' not found", class_name.GetVal())
+		faults.ZendError(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
 		return_value.SetFalse()
 		return
 	}
@@ -1280,40 +1281,40 @@ func ZifGetIncludedFiles(executeData *ZendExecuteData, return_value *types.Zval)
 	}
 }
 func ZifTriggerError(executeData *ZendExecuteData, return_value *types.Zval) {
-	var error_type ZendLong = E_USER_NOTICE
+	var error_type ZendLong = faults.E_USER_NOTICE
 	var message *byte
 	var message_len int
 	if ZendParseParameters(executeData.NumArgs(), "s|l", &message, &message_len, &error_type) == types.FAILURE {
 		return
 	}
 	switch error_type {
-	case E_USER_ERROR:
+	case faults.E_USER_ERROR:
 		fallthrough
-	case E_USER_WARNING:
+	case faults.E_USER_WARNING:
 		fallthrough
-	case E_USER_NOTICE:
+	case faults.E_USER_NOTICE:
 		fallthrough
-	case E_USER_DEPRECATED:
+	case faults.E_USER_DEPRECATED:
 
 	default:
-		ZendError(E_WARNING, "Invalid error type specified")
+		faults.ZendError(faults.E_WARNING, "Invalid error type specified")
 		return_value.SetFalse()
 		return
 	}
-	ZendError(int(error_type), "%s", message)
+	faults.ZendError(int(error_type), "%s", message)
 	return_value.SetTrue()
 	return
 }
 func ZifSetErrorHandler(executeData *ZendExecuteData, return_value *types.Zval) {
 	var error_handler *types.Zval
-	var error_type ZendLong = E_ALL
+	var error_type ZendLong = faults.E_ALL
 	if ZendParseParameters(executeData.NumArgs(), "z|l", &error_handler, &error_type) == types.FAILURE {
 		return
 	}
 	if error_handler.GetType() != types.IS_NULL {
 		if ZendIsCallable(error_handler, 0, nil) == 0 {
 			var error_handler_name *types.ZendString = ZendGetCallableName(error_handler)
-			ZendError(E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(error_handler_name != nil, func() []byte { return error_handler_name.GetVal() }, "unknown"))
+			faults.ZendError(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(error_handler_name != nil, func() []byte { return error_handler_name.GetVal() }, "unknown"))
 			types.ZendStringReleaseEx(error_handler_name, 0)
 			return
 		}
@@ -1361,7 +1362,7 @@ func ZifSetExceptionHandler(executeData *ZendExecuteData, return_value *types.Zv
 	if exception_handler.GetType() != types.IS_NULL {
 		if ZendIsCallable(exception_handler, 0, nil) == 0 {
 			var exception_handler_name *types.ZendString = ZendGetCallableName(exception_handler)
-			ZendError(E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exception_handler_name != nil, func() []byte { return exception_handler_name.GetVal() }, "unknown"))
+			faults.ZendError(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exception_handler_name != nil, func() []byte { return exception_handler_name.GetVal() }, "unknown"))
 			types.ZendStringReleaseEx(exception_handler_name, 0)
 			return
 		}
@@ -1500,7 +1501,7 @@ func ZifCreateFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 		var static_variables *types.HashTable
 		func_ = ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
 		if func_ == nil {
-			ZendErrorNoreturn(E_CORE_ERROR, "Unexpected inconsistency in create_function()")
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Unexpected inconsistency in create_function()")
 			return_value.SetFalse()
 			return
 		}
@@ -1581,7 +1582,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else {
 		var id int = ZendFetchListDtorId(type_.GetVal())
 		if id <= 0 {
-			ZendError(E_WARNING, "get_resources():  Unknown resource type '%s'", type_.GetVal())
+			faults.ZendError(faults.E_WARNING, "get_resources():  Unknown resource type '%s'", type_.GetVal())
 			return_value.SetFalse()
 			return
 		}

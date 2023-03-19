@@ -7,6 +7,7 @@ import (
 	"sik/core/streams"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -66,9 +67,9 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 				types.ZendStringReleaseEx(*error_string, 0)
 			}
 			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
-			PhpErrorDocref(nil, zend.E_WARNING, "%s", error_string.GetVal())
+			PhpErrorDocref(nil, faults.E_WARNING, "%s", error_string.GetVal())
 		} else {
-			PhpErrorDocref(nil, zend.E_WARNING, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
+			PhpErrorDocref(nil, faults.E_WARNING, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
 		}
 		return 0
 	} else if res == nil {
@@ -80,9 +81,9 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 				types.ZendStringReleaseEx(*error_string, 0)
 			}
 			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
-			PhpErrorDocref(nil, zend.E_WARNING, "%s", error_string.GetVal())
+			PhpErrorDocref(nil, faults.E_WARNING, "%s", error_string.GetVal())
 		} else {
-			PhpErrorDocref(nil, zend.E_WARNING, "php_network_getaddresses: getaddrinfo failed (null result pointer)")
+			PhpErrorDocref(nil, faults.E_WARNING, "php_network_getaddresses: getaddrinfo failed (null result pointer)")
 		}
 		return 0
 	}
@@ -337,7 +338,7 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 	n = PhpNetworkGetaddresses(tmp, SOCK_DGRAM, &psal, &errstr)
 	if n == 0 {
 		if errstr != nil {
-			PhpErrorDocref(nil, zend.E_WARNING, "Failed to resolve `%s': %s", tmp, errstr.GetVal())
+			PhpErrorDocref(nil, faults.E_WARNING, "Failed to resolve `%s': %s", tmp, errstr.GetVal())
 			types.ZendStringReleaseEx(errstr, 0)
 		}
 		goto out
@@ -538,7 +539,7 @@ func PhpNetworkConnectSocketToHost(
 					in4.sin_family = sa.sa_family
 					in4.sin_port = htons(bindport)
 					if !(inet_aton(bindto, in4.sin_addr)) {
-						PhpErrorDocref(nil, zend.E_WARNING, "Invalid IP Address: %s", bindto)
+						PhpErrorDocref(nil, faults.E_WARNING, "Invalid IP Address: %s", bindto)
 						goto skip_bind
 					}
 					memset(&(in4.sin_zero), 0, b.SizeOf("in4 -> sin_zero"))
@@ -549,12 +550,12 @@ func PhpNetworkConnectSocketToHost(
 					in6.sin6_family = sa.sa_family
 					in6.sin6_port = htons(bindport)
 					if inet_pton(AF_INET6, bindto, in6.sin6_addr) < 1 {
-						PhpErrorDocref(nil, zend.E_WARNING, "Invalid IP Address: %s", bindto)
+						PhpErrorDocref(nil, faults.E_WARNING, "Invalid IP Address: %s", bindto)
 						goto skip_bind
 					}
 				}
 				if local_address == nil || bind(sock, local_address, local_address_len) {
-					PhpErrorDocref(nil, zend.E_WARNING, "failed to bind to '%s:%d', system said: %s", bindto, bindport, strerror(errno))
+					PhpErrorDocref(nil, faults.E_WARNING, "failed to bind to '%s:%d', system said: %s", bindto, bindport, strerror(errno))
 				}
 			skip_bind:
 				if local_address != nil {
@@ -689,6 +690,6 @@ func PhpSetSockBlocking(socketd PhpSocketT, block int) int {
 	return ret
 }
 func _phpEmitFdSetsizeWarning(max_fd int) {
-	PhpErrorDocref(nil, zend.E_WARNING, "You MUST recompile PHP with a larger value of FD_SETSIZE.\n"+"It is set to %d, but you have descriptors numbered at least as high as %d.\n"+" --enable-fd-setsize=%d is recommended, but you may want to set it\n"+"to equal the maximum number of open files supported by your system,\n"+"in order to avoid seeing this error again at a later date.", FD_SETSIZE, max_fd, max_fd + 1024 & ^1023)
+	PhpErrorDocref(nil, faults.E_WARNING, "You MUST recompile PHP with a larger value of FD_SETSIZE.\n"+"It is set to %d, but you have descriptors numbered at least as high as %d.\n"+" --enable-fd-setsize=%d is recommended, but you may want to set it\n"+"to equal the maximum number of open files supported by your system,\n"+"in order to avoid seeing this error again at a later date.", FD_SETSIZE, max_fd, max_fd + 1024 & ^1023)
 }
 func PhpNetworkGethostbyname(name *byte) *__struct__hostent { return gethostbyname(name) }

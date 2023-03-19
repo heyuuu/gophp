@@ -8,6 +8,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -107,7 +108,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 
 					/* error consistently about invalid DES fallbacks */
 
-					core.PhpErrorDocref(nil, zend.E_DEPRECATED, DES_INVALID_SALT_ERROR)
+					core.PhpErrorDocref(nil, faults.E_DEPRECATED, DES_INVALID_SALT_ERROR)
 
 					/* error consistently about invalid DES fallbacks */
 
@@ -169,7 +170,7 @@ func ZifCrypt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if salt_in != nil {
 		memcpy(salt, salt_in, cli.MIN(PHP_MAX_SALT_LEN, salt_in_len))
 	} else {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "No salt parameter was specified. You must use a randomly generated salt and a strong hash function to produce a secure hash.")
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "No salt parameter was specified. You must use a randomly generated salt and a strong hash function to produce a secure hash.")
 	}
 
 	/* The automatic salt generation covers standard DES, md5-crypt and Blowfish (simple) */

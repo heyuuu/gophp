@@ -2,9 +2,11 @@
 
 package zend
 
+import "sik/zend/faults"
+
 func ZendRegisterDefaultClasses() {
 	ZendRegisterInterfaces()
-	ZendRegisterDefaultException()
+	faults.ZendRegisterDefaultException()
 	ZendRegisterIteratorWrapper()
 	ZendRegisterClosureCe()
 	ZendRegisterGeneratorCe()

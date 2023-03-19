@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -72,7 +73,7 @@ func zend_mul_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 }
 func zend_mod_by_zero_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZendThrowExceptionEx(ZendCeDivisionByZeroError, 0, "Modulo by zero")
+	faults.ZendThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Modulo by zero")
 	EX_VAR(opline.GetResult().GetVar()).SetUndef()
 	HANDLE_EXCEPTION()
 }
@@ -292,7 +293,7 @@ func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 }
 func zend_this_not_in_object_context_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZendThrowError(nil, "Using $this when not in object context")
+	faults.ZendThrowError(nil, "Using $this when not in object context")
 	if (opline + 1).GetOpcode() == ZEND_OP_DATA {
 		FREE_UNFETCHED_OP((opline + 1).GetOp1Type(), (opline + 1).GetOp1().GetVar())
 	}
@@ -304,7 +305,7 @@ func zend_undefined_function_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	function_name = RT_CONSTANT(opline, opline.GetOp2())
-	ZendThrowError(nil, "Call to undefined function %s()", function_name.GetStr().GetVal())
+	faults.ZendThrowError(nil, "Call to undefined function %s()", function_name.GetStr().GetVal())
 	HANDLE_EXCEPTION()
 }
 func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -412,7 +413,7 @@ func ZEND_FETCH_STATIC_PROP_IS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func zend_use_tmp_in_write_context_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZendThrowError(nil, "Cannot use temporary expression in write context")
+	faults.ZendThrowError(nil, "Cannot use temporary expression in write context")
 	FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	EX_VAR(opline.GetResult().GetVar()).SetUndef()
@@ -420,7 +421,7 @@ func zend_use_tmp_in_write_context_helper_SPEC(executeData *ZendExecuteData) int
 }
 func zend_use_undef_in_read_context_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZendThrowError(nil, "Cannot use [] for reading")
+	faults.ZendThrowError(nil, "Cannot use [] for reading")
 	FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	EX_VAR(opline.GetResult().GetVar()).SetUndef()
@@ -574,7 +575,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EG__().SetVmStackTop((*types.Zval)(executeData))
 		executeData = executeData.GetPrevExecuteData()
 		if EG__().GetException() != nil {
-			ZendRethrowException(executeData)
+			faults.ZendRethrowException(executeData)
 			HANDLE_EXCEPTION_LEAVE()
 		}
 		LOAD_NEXT_OPLINE()
@@ -599,7 +600,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		executeData = executeData.GetPrevExecuteData()
 		ZendVmStackFreeCallFrameEx(call_info, old_execute_data)
 		if EG__().GetException() != nil {
-			ZendRethrowException(executeData)
+			faults.ZendRethrowException(executeData)
 			HANDLE_EXCEPTION_LEAVE()
 		}
 		LOAD_NEXT_OPLINE()
@@ -614,7 +615,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		ZendVmStackFreeCallFrameEx(call_info, old_execute_data)
 		ZendAttachSymbolTable(executeData)
 		if EG__().GetException() != nil {
-			ZendRethrowException(executeData)
+			faults.ZendRethrowException(executeData)
 			HANDLE_EXCEPTION_LEAVE()
 		}
 		LOAD_NEXT_OPLINE()
@@ -672,7 +673,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	ZendVmStackFreeCallFrame(call)
 	IZvalPtrDtor(ret)
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = opline + 1
@@ -696,7 +697,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	ZendVmStackFreeCallFrame(call)
 
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = opline + 1
@@ -772,7 +773,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 		IZvalPtrDtor(ret)
 	}
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = opline + 1
@@ -820,7 +821,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 
 	}
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = opline + 1
@@ -899,7 +900,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	}
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = opline + 1
@@ -977,7 +978,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = opline + 1
@@ -1061,7 +1062,7 @@ func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var arg *types.Zval
 	var arg_num uint32 = opline.GetOp2().GetNum()
-	ZendThrowError(nil, "Cannot pass parameter %d by reference", arg_num)
+	faults.ZendThrowError(nil, "Cannot pass parameter %d by reference", arg_num)
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	arg.SetUndef()
@@ -1105,7 +1106,7 @@ send_again:
 			name = _p.GetKey()
 			arg = _z
 			if name != nil {
-				ZendThrowError(nil, "Cannot unpack array with string keys")
+				faults.ZendThrowError(nil, "Cannot unpack array with string keys")
 				FREE_OP(free_op1)
 				HANDLE_EXCEPTION()
 			}
@@ -1135,13 +1136,13 @@ send_again:
 		var ce *types.ClassEntry = types.Z_OBJCE_P(args)
 		var iter *ZendObjectIterator
 		if ce == nil || ce.GetGetIterator() == nil {
-			ZendError(E_WARNING, "Only arrays and Traversables can be unpacked")
+			faults.ZendError(faults.E_WARNING, "Only arrays and Traversables can be unpacked")
 		} else {
 			iter = ce.GetGetIterator()(ce, args, 0)
 			if iter == nil {
 				FREE_OP(free_op1)
 				if EG__().GetException() == nil {
-					ZendThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ZendThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
 				HANDLE_EXCEPTION()
 			}
@@ -1165,13 +1166,13 @@ send_again:
 						break
 					}
 					if key.GetType() != types.IS_LONG {
-						ZendThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
+						faults.ZendThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
 						ZvalPtrDtor(&key)
 						break
 					}
 				}
 				if ARG_MUST_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
-					ZendError(E_WARNING, "Cannot pass by-reference argument %d of %s%s%s()"+" by unpacking a Traversable, passing by-value instead", arg_num, b.CondF1(executeData.GetCall().func_.common.scope, func() []byte { return executeData.GetCall().func_.common.scope.name.GetVal() }, ""), b.Cond(executeData.GetCall().func_.common.scope, "::", ""), executeData.GetCall().func_.common.function_name.GetVal())
+					faults.ZendError(faults.E_WARNING, "Cannot pass by-reference argument %d of %s%s%s()"+" by unpacking a Traversable, passing by-value instead", arg_num, b.CondF1(executeData.GetCall().func_.common.scope, func() []byte { return executeData.GetCall().func_.common.scope.name.GetVal() }, ""), b.Cond(executeData.GetCall().func_.common.scope, "::", ""), executeData.GetCall().func_.common.function_name.GetVal())
 				}
 				arg = types.ZVAL_DEREF(arg)
 				arg.TryAddRefcount()
@@ -1191,7 +1192,7 @@ send_again:
 		if opline.GetOp1Type() == IS_CV && args.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}
-		ZendError(E_WARNING, "Only arrays and Traversables can be unpacked")
+		faults.ZendError(faults.E_WARNING, "Only arrays and Traversables can be unpacked")
 	}
 	FREE_OP(free_op1)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -1208,7 +1209,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 				goto send_array
 			}
 		}
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "call_user_func_array() expects parameter 2 to be array, %s given", ZendGetTypeByConst(args.GetType()))
+		faults.ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "call_user_func_array() expects parameter 2 to be array, %s given", ZendGetTypeByConst(args.GetType()))
 		if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_CLOSURE) != 0 {
 			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetCall().func_))
 		} else if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_RELEASE_THIS) != 0 {
@@ -1379,7 +1380,7 @@ add_unpack_again:
 			key = _p.GetKey()
 			val = _z
 			if key != nil {
-				ZendThrowError(nil, "Cannot unpack array with string keys")
+				faults.ZendThrowError(nil, "Cannot unpack array with string keys")
 				FREE_OP(free_op1)
 				HANDLE_EXCEPTION()
 			} else {
@@ -1398,13 +1399,13 @@ add_unpack_again:
 		var ce *types.ClassEntry = types.Z_OBJCE_P(op1)
 		var iter *ZendObjectIterator
 		if ce == nil || ce.GetGetIterator() == nil {
-			ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
+			faults.ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
 		} else {
 			iter = ce.GetGetIterator()(ce, op1, 0)
 			if iter == nil {
 				FREE_OP(free_op1)
 				if EG__().GetException() == nil {
-					ZendThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ZendThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
 				HANDLE_EXCEPTION()
 			}
@@ -1427,7 +1428,7 @@ add_unpack_again:
 						break
 					}
 					if key.GetType() != types.IS_LONG {
-						ZendThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
+						faults.ZendThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
 						ZvalPtrDtor(&key)
 						break
 					}
@@ -1446,7 +1447,7 @@ add_unpack_again:
 		op1 = types.Z_REFVAL_P(op1)
 		goto add_unpack_again
 	} else {
-		ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
+		faults.ZendThrowError(nil, "Only arrays and Traversables can be unpacked")
 	}
 	FREE_OP(free_op1)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -1530,7 +1531,7 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		}
 		FREE_OP(free_op1)
 	}
-	ZendBailout()
+	faults.ZendBailout()
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -1604,7 +1605,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 						break
 					}
 				}
-				ZendErrorNoreturn(E_ERROR, "Anonymous class wasn't preloaded")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Anonymous class wasn't preloaded")
 				break
 			}
 		}
@@ -1683,7 +1684,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 
 			if fast_call.GetObj() != nil {
 				if ex != nil {
-					ZendExceptionSetPrevious(ex, fast_call.GetObj())
+					faults.ZendExceptionSetPrevious(ex, fast_call.GetObj())
 				} else {
 					EG__().SetException(fast_call.GetObj())
 				}
@@ -1798,7 +1799,7 @@ func ZEND_USER_OPCODE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func zend_yield_in_closed_generator_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZendThrowError(nil, "Cannot yield from finally in a force-closed generator")
+	faults.ZendThrowError(nil, "Cannot yield from finally in a force-closed generator")
 	FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	UNDEF_RESULT()
@@ -1975,7 +1976,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {
-		ZendRethrowException(executeData)
+		faults.ZendRethrowException(executeData)
 		HANDLE_EXCEPTION_LEAVE()
 	}
 	ZEND_VM_INC_OPCODE()
@@ -2042,7 +2043,7 @@ try_function_name:
 				HANDLE_EXCEPTION()
 			}
 		}
-		ZendThrowError(nil, "Function name must be a string")
+		faults.ZendThrowError(nil, "Function name must be a string")
 		call = nil
 	}
 	if call == nil {
@@ -2186,7 +2187,7 @@ try_function_name:
 				HANDLE_EXCEPTION()
 			}
 		}
-		ZendThrowError(nil, "Function name must be a string")
+		faults.ZendThrowError(nil, "Function name must be a string")
 		call = nil
 	}
 	ZvalPtrDtorNogc(free_op2)
@@ -2305,7 +2306,7 @@ try_function_name:
 				HANDLE_EXCEPTION()
 			}
 		}
-		ZendThrowError(nil, "Function name must be a string")
+		faults.ZendThrowError(nil, "Function name must be a string")
 		call = nil
 	}
 	if call == nil {
@@ -2581,7 +2582,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			/* Not supposed to happen, but we'll allow it */
 
-			ZendError(E_NOTICE, "Only variable references should be returned by reference")
+			faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 			retval_ptr = RT_CONSTANT(opline, opline.GetOp1())
 			if !(executeData.GetReturnValue()) {
 
@@ -2602,7 +2603,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if IS_CONST == IS_VAR {
 			b.Assert(retval_ptr != EG__().GetUninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
-				ZendError(E_NOTICE, "Only variable references should be returned by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
 						SetNewRef(retval_ptr)
@@ -2683,17 +2684,17 @@ func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Can only throw objects")
+			faults.ZendThrowError(nil, "Can only throw objects")
 			HANDLE_EXCEPTION()
 		}
 		break
 	}
-	ZendExceptionSave()
+	faults.ZendExceptionSave()
 	if IS_CONST != IS_TMP_VAR {
 		value.TryAddRefcount()
 	}
-	ZendThrowExceptionObject(value)
-	ZendExceptionRestore()
+	faults.ZendThrowExceptionObject(value)
+	faults.ZendExceptionRestore()
 	HANDLE_EXCEPTION()
 }
 func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -2705,7 +2706,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	/* Check whether an exception has been thrown, if not, jump over code */
 
-	ZendExceptionRestore()
+	faults.ZendExceptionRestore()
 	if EG__().GetException() == nil {
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
@@ -2718,7 +2719,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if ce != catch_ce {
 		if catch_ce == nil || InstanceofFunction(ce, catch_ce) == 0 {
 			if (opline.GetExtendedValue() & ZEND_LAST_CATCH) != 0 {
-				ZendRethrowException(executeData)
+				faults.ZendRethrowException(executeData)
 				HANDLE_EXCEPTION()
 			}
 			ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -2848,7 +2849,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "__clone method called on non-object")
+			faults.ZendThrowError(nil, "__clone method called on non-object")
 			HANDLE_EXCEPTION()
 		}
 		break
@@ -2857,7 +2858,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	clone = ce.GetClone()
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
-		ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
+		faults.ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		HANDLE_EXCEPTION()
 	}
@@ -3014,7 +3015,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		DestroyOpArray(new_op_array)
 		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		if EG__().GetException() != nil {
-			ZendRethrowException(executeData)
+			faults.ZendRethrowException(executeData)
 			UNDEF_RESULT()
 			HANDLE_EXCEPTION()
 		}
@@ -3068,7 +3069,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
@@ -3152,7 +3153,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		if IS_CONST == IS_VAR {
@@ -3279,7 +3280,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
 	if generator.IsForcedClose() {
-		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
 	}
@@ -3298,7 +3299,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
-					ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
+					faults.ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
 					ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					HANDLE_EXCEPTION()
@@ -3306,7 +3307,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					ZendGeneratorYieldFrom(generator, new_gen)
 				}
 			} else if new_gen.GetExecuteData() == nil {
-				ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
+				faults.ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
 				ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -3320,7 +3321,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -3337,7 +3338,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
 	}
@@ -3396,7 +3397,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				ZendInternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
+				faults.ZendInternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
 			}
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			break
@@ -4384,7 +4385,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			HANDLE_EXCEPTION()
 			break
 		}
@@ -4534,7 +4535,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -4562,11 +4563,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -4657,7 +4658,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
+		faults.ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			HANDLE_EXCEPTION()
@@ -4713,7 +4714,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			c = zv.GetPtr()
 			scope = executeData.GetFunc().op_array.scope
 			if ZendVerifyConstAccess(c, scope) == 0 {
-				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+				faults.ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 				HANDLE_EXCEPTION()
 			}
@@ -4727,7 +4728,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+			faults.ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -4982,7 +4983,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			ce = zv.GetCe()
 			zv = ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
 			if zv == nil {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			} else {
 				if ZendDoLinkClass(ce, RT_CONSTANT(opline, opline.GetOp2()).GetStr()) == types.FAILURE {
 
@@ -5047,7 +5048,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CONST & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CONST {
@@ -5065,7 +5066,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CONST == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -6298,7 +6299,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -6411,7 +6412,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
 			break
@@ -6567,7 +6568,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					ZvalPtrDtorNogc(free_op2)
 					HANDLE_EXCEPTION()
 					break
@@ -6597,11 +6598,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -6695,7 +6696,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
+		faults.ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
 		Efree(error)
 		ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
@@ -6976,7 +6977,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CONST & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CONST {
@@ -6994,7 +6995,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CONST == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -7133,7 +7134,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CONST & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CONST {
@@ -7151,7 +7152,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CONST == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -7305,7 +7306,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 		} else if type_ == BP_VAR_IS {
 			retval = EG__().GetUninitializedZval()
 		} else {
-			ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
+			faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
 				retval = target_symbol_table.KeyUpdate(name.GetStr(), EG__().GetUninitializedZval())
 			} else {
@@ -7323,7 +7324,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 			} else if type_ == BP_VAR_IS {
 				retval = EG__().GetUninitializedZval()
 			} else {
-				ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
+				faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {
@@ -7429,7 +7430,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -7457,11 +7458,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -7798,7 +7799,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CONST & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CONST {
@@ -7816,7 +7817,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CONST == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -7979,7 +7980,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			count = 1
 		}
-		ZendError(E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
+		faults.ZendError(faults.E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
 		break
 	}
 	EX_VAR(opline.GetResult().GetVar()).SetLong(count)
@@ -7989,7 +7990,7 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	var opline *ZendOp = executeData.GetOpline()
 	if IS_CONST == IS_UNUSED {
 		if !(executeData.GetFunc().common.scope) {
-			ZendError(E_WARNING, "get_class() called without object from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_class() called without object from outside a class")
 			EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -8009,7 +8010,7 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 				if IS_CONST == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				ZendError(E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.ZendError(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -8480,7 +8481,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -8591,7 +8592,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			HANDLE_EXCEPTION()
 			break
 		}
@@ -8741,7 +8742,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -8769,11 +8770,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -8864,7 +8865,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
+		faults.ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			HANDLE_EXCEPTION()
@@ -9135,7 +9136,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CONST & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CONST {
@@ -9153,7 +9154,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CONST == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -11411,7 +11412,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "__clone method called on non-object")
+			faults.ZendThrowError(nil, "__clone method called on non-object")
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 		}
@@ -11421,7 +11422,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	clone = ce.GetClone()
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
-		ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
+		faults.ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		ZvalPtrDtorNogc(free_op1)
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		HANDLE_EXCEPTION()
@@ -11485,7 +11486,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 		DestroyOpArray(new_op_array)
 		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		if EG__().GetException() != nil {
-			ZendRethrowException(executeData)
+			faults.ZendRethrowException(executeData)
 			UNDEF_RESULT()
 			HANDLE_EXCEPTION()
 		}
@@ -11530,7 +11531,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				ZendInternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
+				faults.ZendInternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
 			}
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			break
@@ -12302,7 +12303,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -12415,7 +12416,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 			break
@@ -12903,7 +12904,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -13712,7 +13713,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			ZvalPtrDtorNogc(free_op2)
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
@@ -14098,7 +14099,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 		} else if type_ == BP_VAR_IS {
 			retval = EG__().GetUninitializedZval()
 		} else {
-			ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
+			faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
 				retval = target_symbol_table.KeyUpdate(name.GetStr(), EG__().GetUninitializedZval())
 			} else {
@@ -14116,7 +14117,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 			} else if type_ == BP_VAR_IS {
 				retval = EG__().GetUninitializedZval()
 			} else {
-				ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
+				faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {
@@ -14323,7 +14324,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			count = 1
 		}
-		ZendError(E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
+		faults.ZendError(faults.E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
 		break
 	}
 	EX_VAR(opline.GetResult().GetVar()).SetLong(count)
@@ -14334,7 +14335,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var opline *ZendOp = executeData.GetOpline()
 	if (IS_TMP_VAR | IS_VAR) == IS_UNUSED {
 		if !(executeData.GetFunc().common.scope) {
-			ZendError(E_WARNING, "get_class() called without object from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_class() called without object from outside a class")
 			EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -14355,7 +14356,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 				if (IS_TMP_VAR|IS_VAR) == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				ZendError(E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.ZendError(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -14426,7 +14427,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -14834,7 +14835,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 			break
@@ -15201,7 +15202,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 			/* Not supposed to happen, but we'll allow it */
 
-			ZendError(E_NOTICE, "Only variable references should be returned by reference")
+			faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 			retval_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 			if !(executeData.GetReturnValue()) {
 				ZvalPtrDtorNogc(free_op1)
@@ -15222,7 +15223,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		if IS_TMP_VAR == IS_VAR {
 			b.Assert(retval_ptr != EG__().GetUninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
-				ZendError(E_NOTICE, "Only variable references should be returned by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
 						SetNewRef(retval_ptr)
@@ -15305,18 +15306,18 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Can only throw objects")
+			faults.ZendThrowError(nil, "Can only throw objects")
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 		}
 		break
 	}
-	ZendExceptionSave()
+	faults.ZendExceptionSave()
 	if IS_TMP_VAR != IS_TMP_VAR {
 		value.TryAddRefcount()
 	}
-	ZendThrowExceptionObject(value)
-	ZendExceptionRestore()
+	faults.ZendThrowExceptionObject(value)
+	faults.ZendExceptionRestore()
 	HANDLE_EXCEPTION()
 }
 func ZEND_SEND_VAL_EX_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
@@ -15519,7 +15520,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		ZvalPtrDtorNogc(free_op1)
@@ -15607,7 +15608,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		if IS_TMP_VAR == IS_VAR {
@@ -15745,7 +15746,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
-		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
@@ -15765,7 +15766,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
-					ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
+					faults.ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
 					ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					HANDLE_EXCEPTION()
@@ -15773,7 +15774,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					ZendGeneratorYieldFrom(generator, new_gen)
 				}
 			} else if new_gen.GetExecuteData() == nil {
-				ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
+				faults.ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
 				ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -15788,7 +15789,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			ZvalPtrDtorNogc(free_op1)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -15805,7 +15806,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
 		ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
@@ -16103,7 +16104,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_TMP_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CONST {
@@ -16121,7 +16122,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 					if IS_TMP_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -16557,7 +16558,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_TMP_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CONST {
@@ -16575,7 +16576,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(executeData *ZendExecuteData) int {
 					if IS_TMP_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -16715,7 +16716,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_TMP_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CONST {
@@ -16733,7 +16734,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 					if IS_TMP_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -17002,7 +17003,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_TMP_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CONST {
@@ -17020,7 +17021,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if IS_TMP_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -17391,7 +17392,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_TMP_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CONST {
@@ -17409,7 +17410,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 					if IS_TMP_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -17833,7 +17834,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			/* Not supposed to happen, but we'll allow it */
 
-			ZendError(E_NOTICE, "Only variable references should be returned by reference")
+			faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 			retval_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 			if !(executeData.GetReturnValue()) {
 				ZvalPtrDtorNogc(free_op1)
@@ -17854,7 +17855,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		if IS_VAR == IS_VAR {
 			b.Assert(retval_ptr != EG__().GetUninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
-				ZendError(E_NOTICE, "Only variable references should be returned by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
 						SetNewRef(retval_ptr)
@@ -17944,18 +17945,18 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Can only throw objects")
+			faults.ZendThrowError(nil, "Can only throw objects")
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 		}
 		break
 	}
-	ZendExceptionSave()
+	faults.ZendExceptionSave()
 	if IS_VAR != IS_TMP_VAR {
 		value.TryAddRefcount()
 	}
-	ZendThrowExceptionObject(value)
-	ZendExceptionRestore()
+	faults.ZendThrowExceptionObject(value)
+	faults.ZendExceptionRestore()
 	ZvalPtrDtorNogc(free_op1)
 	HANDLE_EXCEPTION()
 }
@@ -18005,7 +18006,7 @@ func ZEND_SEND_VAR_NO_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	}
 	arg.SetNewRef(arg)
-	ZendError(E_NOTICE, "Only variables should be passed by reference")
+	faults.ZendError(faults.E_NOTICE, "Only variables should be passed by reference")
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -18024,7 +18025,7 @@ func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int 
 		ZEND_VM_NEXT_OPCODE()
 	}
 	arg.SetNewRef(arg)
-	ZendError(E_NOTICE, "Only variables should be passed by reference")
+	faults.ZendError(faults.E_NOTICE, "Only variables should be passed by reference")
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData) int {
@@ -18043,7 +18044,7 @@ func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData
 		ZEND_VM_NEXT_OPCODE()
 	}
 	arg.SetNewRef(arg)
-	ZendError(E_NOTICE, "Only variables should be passed by reference")
+	faults.ZendError(faults.E_NOTICE, "Only variables should be passed by reference")
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -18329,7 +18330,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		ZvalPtrDtorNogc(free_op1)
@@ -18427,7 +18428,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		if IS_VAR == IS_VAR {
@@ -18754,7 +18755,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			value_type = value.GetTypeInfo()
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		if EG__().GetException() != nil {
 			UNDEF_RESULT()
 			HANDLE_EXCEPTION()
@@ -18905,7 +18906,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
-		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
@@ -18927,7 +18928,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			ZvalPtrDtorNogc(free_op1)
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
-					ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
+					faults.ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
 					ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					HANDLE_EXCEPTION()
@@ -18935,7 +18936,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					ZendGeneratorYieldFrom(generator, new_gen)
 				}
 			} else if new_gen.GetExecuteData() == nil {
-				ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
+				faults.ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
 				ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -18950,7 +18951,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			ZvalPtrDtorNogc(free_op1)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -18967,7 +18968,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
 		ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
@@ -19501,7 +19502,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	dim = RT_CONSTANT(opline, opline.GetOp2())
 	if IS_VAR == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT && !(container.IsReference()) {
-		ZendError(E_NOTICE, "Attempting to set reference to non referenceable value")
+		faults.ZendError(faults.E_NOTICE, "Attempting to set reference to non referenceable value")
 		zend_fetch_dimension_address_LIST_r(container, dim, IS_CONST, opline, executeData)
 	} else {
 		zend_fetch_dimension_address_W(container, dim, IS_CONST, opline, executeData)
@@ -20557,7 +20558,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -20585,11 +20586,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -20670,7 +20671,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			c = zv.GetPtr()
 			scope = executeData.GetFunc().op_array.scope
 			if ZendVerifyConstAccess(c, scope) == 0 {
-				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+				faults.ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 				HANDLE_EXCEPTION()
 			}
@@ -20684,7 +20685,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+			faults.ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -20860,7 +20861,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				key = types.ZSTR_EMPTY_ALLOC()
 				goto str_index_dim
 			} else {
-				ZendError(E_WARNING, "Illegal offset type in unset")
+				faults.ZendError(faults.E_WARNING, "Illegal offset type in unset")
 			}
 			break
 		} else if container.IsReference() {
@@ -20881,7 +20882,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if IS_VAR != IS_UNUSED && container.IsString() {
-			ZendThrowError(nil, "Cannot unset string offsets")
+			faults.ZendThrowError(nil, "Cannot unset string offsets")
 		}
 		break
 	}
@@ -20948,7 +20949,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CONST {
@@ -20966,7 +20967,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 					if IS_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -21591,7 +21592,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if IS_VAR == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT && !(container.IsReference()) {
-		ZendError(E_NOTICE, "Attempting to set reference to non referenceable value")
+		faults.ZendError(faults.E_NOTICE, "Attempting to set reference to non referenceable value")
 		zend_fetch_dimension_address_LIST_r(container, dim, IS_TMP_VAR|IS_VAR, opline, executeData)
 	} else {
 		zend_fetch_dimension_address_W(container, dim, IS_TMP_VAR|IS_VAR, opline, executeData)
@@ -22631,7 +22632,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					ZvalPtrDtorNogc(free_op2)
 					HANDLE_EXCEPTION()
 					break
@@ -22661,11 +22662,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -22873,7 +22874,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				key = types.ZSTR_EMPTY_ALLOC()
 				goto str_index_dim
 			} else {
-				ZendError(E_WARNING, "Illegal offset type in unset")
+				faults.ZendError(faults.E_WARNING, "Illegal offset type in unset")
 			}
 			break
 		} else if container.IsReference() {
@@ -22894,7 +22895,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if IS_VAR != IS_UNUSED && container.IsString() {
-			ZendThrowError(nil, "Cannot unset string offsets")
+			faults.ZendThrowError(nil, "Cannot unset string offsets")
 		}
 		break
 	}
@@ -23036,7 +23037,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CONST {
@@ -23054,7 +23055,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 					if IS_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -23251,7 +23252,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if IS_VAR == IS_VAR && variable_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_VAR == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT {
-		ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
+		faults.ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_VAR == IS_VAR && value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
@@ -23297,7 +23298,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CONST {
@@ -23315,7 +23316,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 					if IS_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -24039,7 +24040,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -24067,11 +24068,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -24330,7 +24331,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CONST {
@@ -24348,7 +24349,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if IS_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -24953,7 +24954,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	dim = EX_VAR(opline.GetOp2().GetVar())
 	if IS_VAR == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT && !(container.IsReference()) {
-		ZendError(E_NOTICE, "Attempting to set reference to non referenceable value")
+		faults.ZendError(faults.E_NOTICE, "Attempting to set reference to non referenceable value")
 		zend_fetch_dimension_address_LIST_r(container, dim, IS_CV, opline, executeData)
 	} else {
 		zend_fetch_dimension_address_W(container, dim, IS_CV, opline, executeData)
@@ -25902,7 +25903,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	if IS_VAR == IS_VAR && variable_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_VAR == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT {
-		ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
+		faults.ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_CV == IS_VAR && value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
@@ -26036,7 +26037,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -26064,11 +26065,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -26273,7 +26274,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				key = types.ZSTR_EMPTY_ALLOC()
 				goto str_index_dim
 			} else {
-				ZendError(E_WARNING, "Illegal offset type in unset")
+				faults.ZendError(faults.E_WARNING, "Illegal offset type in unset")
 			}
 			break
 		} else if container.IsReference() {
@@ -26294,7 +26295,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if IS_VAR != IS_UNUSED && container.IsString() {
-			ZendThrowError(nil, "Cannot unset string offsets")
+			faults.ZendThrowError(nil, "Cannot unset string offsets")
 		}
 		break
 	}
@@ -26361,7 +26362,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_VAR & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CONST {
@@ -26379,7 +26380,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 					if IS_VAR == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -26628,7 +26629,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "__clone method called on non-object")
+			faults.ZendThrowError(nil, "__clone method called on non-object")
 			HANDLE_EXCEPTION()
 		}
 		break
@@ -26637,7 +26638,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	clone = ce.GetClone()
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
-		ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
+		faults.ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		HANDLE_EXCEPTION()
 	}
@@ -26662,7 +26663,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	fetch_type = opline.GetOp1().GetNum()
 	scope = executeData.GetFunc().op_array.scope
 	if scope == nil {
-		ZendThrowError(nil, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
+		faults.ZendThrowError(nil, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		HANDLE_EXCEPTION()
 	}
@@ -26671,7 +26672,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetName())
 	case ZEND_FETCH_CLASS_PARENT:
 		if scope.GetParent() == nil {
-			ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
+			faults.ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -27689,7 +27690,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Class name must be a valid object or a string")
+			faults.ZendThrowError(nil, "Class name must be a valid object or a string")
 		}
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -27724,7 +27725,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			HANDLE_EXCEPTION()
 			break
 		}
@@ -27874,7 +27875,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -27902,11 +27903,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -27998,7 +27999,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			c = zv.GetPtr()
 			scope = executeData.GetFunc().op_array.scope
 			if ZendVerifyConstAccess(c, scope) == 0 {
-				ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+				faults.ZendThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
 				HANDLE_EXCEPTION()
 			}
@@ -28012,7 +28013,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
-			ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+			faults.ZendThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
@@ -28122,7 +28123,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_UNUSED & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = nil
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CONST {
@@ -28140,7 +28141,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 					if IS_UNUSED == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -29282,7 +29283,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Class name must be a valid object or a string")
+			faults.ZendThrowError(nil, "Class name must be a valid object or a string")
 		}
 	}
 	ZvalPtrDtorNogc(free_op2)
@@ -29319,7 +29320,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
 			break
@@ -29475,7 +29476,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					ZvalPtrDtorNogc(free_op2)
 					HANDLE_EXCEPTION()
 					break
@@ -29505,11 +29506,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -29652,7 +29653,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_UNUSED & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = nil
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CONST {
@@ -29670,7 +29671,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(executeData *ZendExecuteData) int {
 					if IS_UNUSED == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -29809,7 +29810,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_UNUSED & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = nil
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CONST {
@@ -29827,7 +29828,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
 					if IS_UNUSED == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -29973,7 +29974,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) i
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Class name must be a valid object or a string")
+			faults.ZendThrowError(nil, "Class name must be a valid object or a string")
 		}
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -30029,7 +30030,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -30057,11 +30058,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -30217,7 +30218,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_UNUSED & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = nil
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CONST {
@@ -30235,7 +30236,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if IS_UNUSED == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -30368,7 +30369,7 @@ func ZEND_GET_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var opline *ZendOp = executeData.GetOpline()
 	if IS_UNUSED == IS_UNUSED {
 		if !(executeData.GetFunc().common.scope) {
-			ZendError(E_WARNING, "get_class() called without object from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_class() called without object from outside a class")
 			EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -30388,7 +30389,7 @@ func ZEND_GET_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int
 				if IS_UNUSED == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				ZendError(E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.ZendError(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -30405,7 +30406,7 @@ func ZEND_GET_CALLED_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteDa
 	} else {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
 		if !(executeData.GetFunc().common.scope) {
-			ZendError(E_WARNING, "get_called_class() called from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_called_class() called from outside a class")
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	}
@@ -31499,7 +31500,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Class name must be a valid object or a string")
+			faults.ZendThrowError(nil, "Class name must be a valid object or a string")
 		}
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -31534,7 +31535,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			HANDLE_EXCEPTION()
 			break
 		}
@@ -31684,7 +31685,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 							HANDLE_EXCEPTION()
 						}
 					}
-					ZendThrowError(nil, "Function name must be a string")
+					faults.ZendThrowError(nil, "Function name must be a string")
 					HANDLE_EXCEPTION()
 					break
 				}
@@ -31712,11 +31713,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 		}
 	} else {
 		if ce.GetConstructor() == nil {
-			ZendThrowError(nil, "Cannot call constructor")
+			faults.ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
-			ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
+			faults.ZendThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
 		fbc = ce.GetConstructor()
@@ -31855,7 +31856,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_UNUSED & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = nil
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CONST {
@@ -31873,7 +31874,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 					if IS_UNUSED == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -32422,7 +32423,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 
 			/* Not supposed to happen, but we'll allow it */
 
-			ZendError(E_NOTICE, "Only variable references should be returned by reference")
+			faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 			retval_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 			if !(executeData.GetReturnValue()) {
 
@@ -32443,7 +32444,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		if IS_CV == IS_VAR {
 			b.Assert(retval_ptr != EG__().GetUninitializedZval())
 			if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(retval_ptr.IsReference()) {
-				ZendError(E_NOTICE, "Only variable references should be returned by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be returned by reference")
 				if executeData.GetReturnValue() {
 					executeData.GetReturnValue().
 						SetNewRef(retval_ptr)
@@ -32524,17 +32525,17 @@ func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Can only throw objects")
+			faults.ZendThrowError(nil, "Can only throw objects")
 			HANDLE_EXCEPTION()
 		}
 		break
 	}
-	ZendExceptionSave()
+	faults.ZendExceptionSave()
 	if IS_CV != IS_TMP_VAR {
 		value.TryAddRefcount()
 	}
-	ZendThrowExceptionObject(value)
-	ZendExceptionRestore()
+	faults.ZendThrowExceptionObject(value)
+	faults.ZendExceptionRestore()
 	HANDLE_EXCEPTION()
 }
 func ZEND_SEND_VAR_SPEC_CV_INLINE_HANDLER(executeData *ZendExecuteData) int {
@@ -32718,7 +32719,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "__clone method called on non-object")
+			faults.ZendThrowError(nil, "__clone method called on non-object")
 			HANDLE_EXCEPTION()
 		}
 		break
@@ -32727,7 +32728,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	clone = ce.GetClone()
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
-		ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
+		faults.ZendThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		HANDLE_EXCEPTION()
 	}
@@ -32884,7 +32885,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		DestroyOpArray(new_op_array)
 		EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 		if EG__().GetException() != nil {
-			ZendRethrowException(executeData)
+			faults.ZendRethrowException(executeData)
 			UNDEF_RESULT()
 			HANDLE_EXCEPTION()
 		}
@@ -32938,7 +32939,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
@@ -33022,7 +33023,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	} else {
-		ZendError(E_WARNING, "Invalid argument supplied for foreach()")
+		faults.ZendError(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 		if IS_CV == IS_VAR {
@@ -33144,7 +33145,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	val = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if generator.IsForcedClose() {
-		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
+		faults.ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
 	}
@@ -33163,7 +33164,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
-					ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
+					faults.ZendThrowError(nil, "Impossible to yield from the Generator being currently run")
 					ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					HANDLE_EXCEPTION()
@@ -33171,7 +33172,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					ZendGeneratorYieldFrom(generator, new_gen)
 				}
 			} else if new_gen.GetExecuteData() == nil {
-				ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
+				faults.ZendThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
 				ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -33185,7 +33186,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
-					ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
+					faults.ZendThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
 				UNDEF_RESULT()
 				HANDLE_EXCEPTION()
@@ -33202,7 +33203,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			generator.GetValues().SetObject(iter.GetStd())
 		}
 	} else {
-		ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
+		faults.ZendThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
 	}
@@ -33261,7 +33262,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
-				ZendInternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
+				faults.ZendInternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", ZendGetTypeByConst(value.GetType()))
 			}
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			break
@@ -33477,7 +33478,7 @@ func ZEND_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -35530,7 +35531,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -35641,7 +35642,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			HANDLE_EXCEPTION()
 			break
 		}
@@ -35902,7 +35903,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				key = types.ZSTR_EMPTY_ALLOC()
 				goto str_index_dim
 			} else {
-				ZendError(E_WARNING, "Illegal offset type in unset")
+				faults.ZendError(faults.E_WARNING, "Illegal offset type in unset")
 			}
 			break
 		} else if container.IsReference() {
@@ -35923,7 +35924,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if IS_CV != IS_UNUSED && container.IsString() {
-			ZendThrowError(nil, "Cannot unset string offsets")
+			faults.ZendThrowError(nil, "Cannot unset string offsets")
 		}
 		break
 	}
@@ -36148,7 +36149,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CV & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CONST {
@@ -36166,7 +36167,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CV == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -38707,7 +38708,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
 			break
@@ -38974,7 +38975,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				key = types.ZSTR_EMPTY_ALLOC()
 				goto str_index_dim
 			} else {
-				ZendError(E_WARNING, "Illegal offset type in unset")
+				faults.ZendError(faults.E_WARNING, "Illegal offset type in unset")
 			}
 			break
 		} else if container.IsReference() {
@@ -38995,7 +38996,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if IS_CV != IS_UNUSED && container.IsString() {
-			ZendThrowError(nil, "Cannot unset string offsets")
+			faults.ZendThrowError(nil, "Cannot unset string offsets")
 		}
 		break
 	}
@@ -39250,7 +39251,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CV & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CONST {
@@ -39268,7 +39269,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CV == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -39452,7 +39453,7 @@ func ZEND_ASSIGN_REF_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if IS_CV == IS_VAR && variable_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_CV == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT {
-		ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
+		faults.ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_VAR == IS_VAR && value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
@@ -39534,7 +39535,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CV & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CONST {
@@ -39552,7 +39553,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CV == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -39783,7 +39784,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 		} else if type_ == BP_VAR_IS {
 			retval = EG__().GetUninitializedZval()
 		} else {
-			ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
+			faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
 				retval = target_symbol_table.KeyUpdate(name.GetStr(), EG__().GetUninitializedZval())
 			} else {
@@ -39801,7 +39802,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 			} else if type_ == BP_VAR_IS {
 				retval = EG__().GetUninitializedZval()
 			} else {
-				ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
+				faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", name.GetVal())
 				if type_ == BP_VAR_RW {
 					retval.SetNull()
 				} else {
@@ -40594,7 +40595,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CV & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CONST {
@@ -40612,7 +40613,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CV == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -40859,7 +40860,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			count = 1
 		}
-		ZendError(E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
+		faults.ZendError(faults.E_WARNING, "%s(): Parameter must be an array or an object that implements Countable", b.Cond(opline.GetExtendedValue() != 0, "sizeof", "count"))
 		break
 	}
 	EX_VAR(opline.GetResult().GetVar()).SetLong(count)
@@ -40869,7 +40870,7 @@ func ZEND_GET_CLASS_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if IS_CV == IS_UNUSED {
 		if !(executeData.GetFunc().common.scope) {
-			ZendError(E_WARNING, "get_class() called without object from outside a class")
+			faults.ZendError(faults.E_WARNING, "get_class() called without object from outside a class")
 			EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -40889,7 +40890,7 @@ func ZEND_GET_CLASS_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				if IS_CV == IS_CV && op1.IsUndef() {
 					ZVAL_UNDEFINED_OP1()
 				}
-				ZendError(E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
+				faults.ZendError(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
 			break
@@ -40959,7 +40960,7 @@ func ZEND_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > types.ZSTR_MAX_LEN-op2_str.GetLen() {
-				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Integer overflow in memory allocation")
 			}
 			str = types.ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -42926,7 +42927,7 @@ func ZEND_ASSIGN_REF_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	if IS_CV == IS_VAR && variable_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_CV == IS_VAR && EX_VAR(opline.GetOp1().GetVar()).GetType() != types.IS_INDIRECT {
-		ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
+		faults.ZendThrowError(nil, "Cannot assign by reference to an array dimension of an object")
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if IS_CV == IS_VAR && value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
@@ -43140,7 +43141,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 					HANDLE_EXCEPTION()
 				}
 			}
-			ZendThrowError(nil, "Method name must be a string")
+			faults.ZendThrowError(nil, "Method name must be a string")
 			HANDLE_EXCEPTION()
 			break
 		}
@@ -43401,7 +43402,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				key = types.ZSTR_EMPTY_ALLOC()
 				goto str_index_dim
 			} else {
-				ZendError(E_WARNING, "Illegal offset type in unset")
+				faults.ZendError(faults.E_WARNING, "Illegal offset type in unset")
 			}
 			break
 		} else if container.IsReference() {
@@ -43422,7 +43423,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if IS_CV != IS_UNUSED && container.IsString() {
-			ZendThrowError(nil, "Cannot unset string offsets")
+			faults.ZendThrowError(nil, "Cannot unset string offsets")
 		}
 		break
 	}
@@ -43607,7 +43608,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 
 			if (IS_CV & (IS_CONST | IS_TMP_VAR)) != 0 {
 				var value *types.Zval
-				ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+				faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CONST {
@@ -43625,7 +43626,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 					if IS_CV == IS_VAR {
 						b.Assert(value_ptr != EG__().GetUninitializedZval())
 						if opline.GetExtendedValue() == ZEND_RETURNS_FUNCTION && !(value_ptr.IsReference()) {
-							ZendError(E_NOTICE, "Only variable references should be yielded by reference")
+							faults.ZendError(faults.E_NOTICE, "Only variable references should be yielded by reference")
 							types.ZVAL_COPY(generator.GetValue(), value_ptr)
 							break
 						}
@@ -43740,7 +43741,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_NULL_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZendErrorNoreturn(E_ERROR, "Invalid opcode %d/%d/%d.", OPLINE.opcode, OPLINE.op1_type, OPLINE.op2_type)
+	faults.ZendErrorNoreturn(faults.E_ERROR, "Invalid opcode %d/%d/%d.", OPLINE.opcode, OPLINE.op1_type, OPLINE.op2_type)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ExecuteEx(ex *ZendExecuteData) {
@@ -43757,7 +43758,7 @@ func ExecuteEx(ex *ZendExecuteData) {
 			}
 		}
 	}
-	ZendErrorNoreturn(E_CORE_ERROR, "Arrived at end of main loop which shouldn't happen")
+	faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Arrived at end of main loop which shouldn't happen")
 }
 func ZendExecute(op_array *ZendOpArray, return_value *types.Zval) {
 	var executeData *ZendExecuteData

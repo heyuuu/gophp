@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/zend"
+	"sik/zend/faults"
 )
 
 // Source: <main/php.h>
@@ -75,7 +76,7 @@ const PhpSleep = sleep
 
 var Environ **byte
 
-const PhpError = zend.ZendError
+const PhpError = faults.ZendError
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 

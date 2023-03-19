@@ -9,6 +9,7 @@ import (
 	"sik/core/streams"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -43,7 +44,7 @@ func PhpStreamFtpStreamClose(wrapper *core.PhpStreamWrapper, stream *core.PhpStr
 
 			result = GET_FTP_RESULT(controlstream)
 			if result != 226 && result != 250 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "FTP server error %d:%s", result, tmp_line)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "FTP server error %d:%s", result, tmp_line)
 				ret = r.EOF
 			}
 		}
@@ -872,13 +873,13 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 	stream = PhpFtpFopenConnect(wrapper, url, "r", 0, nil, context, nil, &resource, nil, nil)
 	if stream == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", url)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to connect to %s", url)
 		}
 		goto unlink_errexit
 	}
 	if resource.GetPath() == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path provided in %s", url)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto unlink_errexit
 	}
@@ -889,7 +890,7 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Error Deleting file: %s", tmp_line)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Error Deleting file: %s", tmp_line)
 		}
 		goto unlink_errexit
 	}
@@ -924,7 +925,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)
 	if stream == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", resource_from.GetHost().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to connect to %s", resource_from.GetHost().GetVal())
 		}
 		goto rename_errexit
 	}
@@ -935,7 +936,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	result = GET_FTP_RESULT(stream)
 	if result < 300 || result > 399 {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Error Renaming file: %s", tmp_line)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Error Renaming file: %s", tmp_line)
 		}
 		goto rename_errexit
 	}
@@ -946,7 +947,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Error Renaming file: %s", tmp_line)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Error Renaming file: %s", tmp_line)
 		}
 		goto rename_errexit
 	}
@@ -975,13 +976,13 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 	stream = PhpFtpFopenConnect(wrapper, url, "r", 0, nil, context, nil, &resource, nil, nil)
 	if stream == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", url)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to connect to %s", url)
 		}
 		goto mkdir_errexit
 	}
 	if resource.GetPath() == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path provided in %s", url)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto mkdir_errexit
 	}
@@ -1025,7 +1026,7 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 					result = GET_FTP_RESULT(stream)
 					if result < 200 || result > 299 {
 						if (options & core.REPORT_ERRORS) != 0 {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "%s", tmp_line)
+							core.PhpErrorDocref(nil, faults.E_WARNING, "%s", tmp_line)
 						}
 						break
 					}
@@ -1067,13 +1068,13 @@ func PhpStreamFtpRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 	stream = PhpFtpFopenConnect(wrapper, url, "r", 0, nil, context, nil, &resource, nil, nil)
 	if stream == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", url)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to connect to %s", url)
 		}
 		goto rmdir_errexit
 	}
 	if resource.GetPath() == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path provided in %s", url)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto rmdir_errexit
 	}
@@ -1081,7 +1082,7 @@ func PhpStreamFtpRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s", tmp_line)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s", tmp_line)
 		}
 		goto rmdir_errexit
 	}

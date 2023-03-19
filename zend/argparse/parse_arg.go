@@ -4,6 +4,7 @@ import (
 	"fmt"
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -27,9 +28,9 @@ func (p *OldParser) ZendParseArg(arg_num int, arg *types.Zval, va *VaArgsReceive
 		}
 		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 			var throwException = zend.CurrEX().IsArgUseStrictTypes() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
-			zend.ZendInternalTypeError(throwException, "%s() expects parameter %d %s", zend.GetActiveCalleeName(), arg_num, err.Error())
+			faults.ZendInternalTypeError(throwException, "%s() expects parameter %d %s", zend.GetActiveCalleeName(), arg_num, err.Error())
 		}
-		if err.severity != zend.E_DEPRECATED {
+		if err.severity != faults.E_DEPRECATED {
 			return types.FAILURE
 		}
 	}
@@ -161,13 +162,13 @@ func (p *OldParser) ZendParseArgImpl(arg *types.Zval, va *VaArgsReceiver, spec *
 		err, ok := ParseFunc(arg, fci, fcc, checkNull)
 		if !ok {
 			if err != nil {
-				p.parseError(zend.E_ERROR, "to be a valid callback, %s", err)
+				p.parseError(faults.E_ERROR, "to be a valid callback, %s", err)
 			} else {
 				p.parseTypeError(arg, "valid callback")
 			}
 		} else {
 			if err != nil {
-				p.parseError(zend.E_DEPRECATED, "to be a valid callback, %s", err)
+				p.parseError(faults.E_DEPRECATED, "to be a valid callback, %s", err)
 			}
 		}
 	case 'z':

@@ -8,6 +8,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -93,11 +94,11 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.ZendString, val *types
 	switch val.GetType() {
 	case types.IS_STRING:
 		if PhpMailBuildHeadersCheckFieldName(key) != types.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field name (%s) contains invalid chars", key.GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field name (%s) contains invalid chars", key.GetVal())
 			return
 		}
 		if PhpMailBuildHeadersCheckFieldValue(val) != types.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.GetStr().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.GetStr().GetVal())
 			return
 		}
 		s.AppendString(key.GetStr())
@@ -107,7 +108,7 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.ZendString, val *types
 	case types.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "headers array elements must be string or array (%s)", key.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "headers array elements must be string or array (%s)", key.GetVal())
 	}
 }
 func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.ZendString, val *types.Zval) {
@@ -120,11 +121,11 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.ZendString, val *type
 		tmp_key = _p.GetKey()
 		tmp_val = _z
 		if tmp_key != nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
 			continue
 		}
 		if tmp_val.GetType() != types.IS_STRING {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
 			continue
 		}
 		PhpMailBuildHeadersElem(s, key, tmp_val)
@@ -144,7 +145,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.ZendString {
 		key = _p.GetKey()
 		val = _z
 		if key == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", idx)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", idx)
 			continue
 		}
 
@@ -177,7 +178,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.ZendString {
 			}
 		case b.SizeOf("\"to\"") - 1:
 			if !(strncasecmp("to", key.GetVal(), key.GetLen())) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'To' header")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header cannot contain 'To' header")
 				continue
 			}
 			if !(strncasecmp("cc", key.GetVal(), key.GetLen())) {
@@ -207,7 +208,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.ZendString {
 			}
 		case b.SizeOf("\"subject\"") - 1:
 			if !(strncasecmp("subject", key.GetVal(), key.GetLen())) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'Subject' header")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Extra header cannot contain 'Subject' header")
 				continue
 			}
 			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
@@ -281,7 +282,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		case types.IS_ARRAY:
 			str_headers = PhpMailBuildHeaders(headers)
 		default:
-			core.PhpErrorDocref(nil, zend.E_WARNING, "headers parameter must be string or array")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "headers parameter must be string or array")
 			return_value.SetFalse()
 			return
 		}
@@ -470,7 +471,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		types.ZendStringReleaseEx(f, 0)
 	}
 	if hdr != nil && PhpMailDetectMultipleCrlf(hdr) != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple or malformed newlines found in additional_header")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple or malformed newlines found in additional_header")
 		if hdr != headers {
 			zend.Efree(hdr)
 		}
@@ -499,7 +500,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 	}
 	if sendmail != nil {
 		if EACCES == errno {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Permission denied: unable to execute shell to run mail delivery binary '%s'", sendmail_path)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Permission denied: unable to execute shell to run mail delivery binary '%s'", sendmail_path)
 			pclose(sendmail)
 			if hdr != headers {
 				zend.Efree(hdr)
@@ -525,7 +526,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			return 1
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute mail delivery program '%s'", sendmail_path)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Could not execute mail delivery program '%s'", sendmail_path)
 		if hdr != headers {
 			zend.Efree(hdr)
 		}

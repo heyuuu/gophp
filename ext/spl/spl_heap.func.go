@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -305,7 +306,7 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, zend.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
+		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
 	}
 	if inherited != 0 {
 		intern.SetFptrCmp(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "compare", b.SizeOf("\"compare\"")-1))
@@ -425,7 +426,7 @@ func zim_spl_SplHeap_insert(executeData *zend.ZendExecuteData, return_value *typ
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
 	if intern.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	value.TryAddRefcount()
@@ -440,11 +441,11 @@ func zim_spl_SplHeap_extract(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
 	if intern.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	if SplPtrHeapDeleteTop(intern.GetHeap(), return_value, zend.ZEND_THIS(executeData)) == types.FAILURE {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't extract from an empty heap", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't extract from an empty heap", 0)
 		return
 	}
 }
@@ -458,7 +459,7 @@ func zim_spl_SplPriorityQueue_insert(executeData *zend.ZendExecuteData, return_v
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
 	if intern.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	types.ZVAL_COPY(elem.GetData(), data)
@@ -475,11 +476,11 @@ func zim_spl_SplPriorityQueue_extract(executeData *zend.ZendExecuteData, return_
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
 	if intern.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	if SplPtrHeapDeleteTop(intern.GetHeap(), &elem, zend.ZEND_THIS(executeData)) == types.FAILURE {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't extract from an empty heap", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't extract from an empty heap", 0)
 		return
 	}
 	SplPqueueExtractHelper(return_value, &elem, intern.GetFlags())
@@ -493,12 +494,12 @@ func zim_spl_SplPriorityQueue_top(executeData *zend.ZendExecuteData, return_valu
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
 	if intern.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	elem = SplPtrHeapTop(intern.GetHeap())
 	if elem == nil {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty heap", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty heap", 0)
 		return
 	}
 	SplPqueueExtractHelper(return_value, elem, intern.GetFlags())
@@ -511,7 +512,7 @@ func zim_spl_SplPriorityQueue_setExtractFlags(executeData *zend.ZendExecuteData,
 	}
 	value &= SPL_PQUEUE_EXTR_MASK
 	if value == 0 {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Must specify at least one extract flag", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Must specify at least one extract flag", 0)
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
@@ -564,12 +565,12 @@ func zim_spl_SplHeap_top(executeData *zend.ZendExecuteData, return_value *types.
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
 	if intern.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	value = SplPtrHeapTop(intern.GetHeap())
 	if value == nil {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty heap", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty heap", 0)
 		return
 	}
 	types.ZVAL_COPY_DEREF(return_value, value)
@@ -608,7 +609,7 @@ func SplHeapItValid(iter *zend.ZendObjectIterator) int {
 func SplHeapItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 	var object *SplHeapObject = Z_SPLHEAP_P(iter.GetData())
 	if object.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return nil
 	}
 	if object.GetHeap().GetCount() == 0 {
@@ -621,7 +622,7 @@ func SplPqueueItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 	var user_it *zend.ZendUserIterator = (*zend.ZendUserIterator)(iter)
 	var object *SplHeapObject = Z_SPLHEAP_P(iter.GetData())
 	if object.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return nil
 	}
 	if object.GetHeap().GetCount() == 0 {
@@ -640,7 +641,7 @@ func SplHeapItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval) {
 func SplHeapItMoveForward(iter *zend.ZendObjectIterator) {
 	var object *SplHeapObject = Z_SPLHEAP_P(iter.GetData())
 	if object.GetHeap().IsHeapCorrupted() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
 	SplPtrHeapDeleteTop(object.GetHeap(), nil, iter.GetData())
@@ -718,7 +719,7 @@ func SplHeapGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *z
 	var iterator *SplHeapIt
 	var heap_object *SplHeapObject = Z_SPLHEAP_P(object)
 	if by_ref != 0 {
-		zend.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
@@ -735,7 +736,7 @@ func SplPqueueGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	var iterator *SplHeapIt
 	var heap_object *SplHeapObject = Z_SPLHEAP_P(object)
 	if by_ref != 0 {
-		zend.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))

@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -306,7 +307,7 @@ func ZendInitDynamicCallString(function *types.ZendString, num_args uint32) *Zen
 			lcname = ZendStringTolower(function)
 		}
 		if b.Assign(&func_, EG__().GetFunctionTable().KeyFind(lcname.GetStr())) == nil {
-			ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
+			faults.ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
 			types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
@@ -346,7 +347,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 			object_or_called_scope = object
 		}
 	} else {
-		ZendThrowError(nil, "Function name must be a string")
+		faults.ZendThrowError(nil, "Function name must be a string")
 		return nil
 	}
 	if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -364,17 +365,17 @@ func ZendInitDynamicCallArray(function *types.ZendArray, num_args uint32) *ZendE
 		obj = function.IndexFindH(0)
 		method = function.IndexFindH(1)
 		if obj == nil || method == nil {
-			ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
+			faults.ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil
 		}
 		obj = types.ZVAL_DEREF(obj)
 		if obj.GetType() != types.IS_STRING && obj.GetType() != types.IS_OBJECT {
-			ZendThrowError(nil, "First array member is not a valid class name or object")
+			faults.ZendThrowError(nil, "First array member is not a valid class name or object")
 			return nil
 		}
 		method = types.ZVAL_DEREF(method)
 		if method.GetType() != types.IS_STRING {
-			ZendThrowError(nil, "Second array member is not a valid method")
+			faults.ZendThrowError(nil, "Second array member is not a valid method")
 			return nil
 		}
 		if obj.IsString() {
@@ -418,7 +419,7 @@ func ZendInitDynamicCallArray(function *types.ZendArray, num_args uint32) *ZendE
 			}
 		}
 	} else {
-		ZendThrowError(nil, "Function name must be a string")
+		faults.ZendThrowError(nil, "Function name must be a string")
 		return nil
 	}
 	if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {

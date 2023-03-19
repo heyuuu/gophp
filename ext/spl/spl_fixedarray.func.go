@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -141,7 +142,7 @@ func SplFixedarrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, cl
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, zend.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplFixedArray")
+		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplFixedArray")
 	}
 	funcs_ptr = class_type.GetIteratorFuncsPtr()
 	if funcs_ptr.GetZfCurrent() == nil {
@@ -208,7 +209,7 @@ func SplFixedarrayObjectReadDimensionHelper(intern *SplFixedarrayObject, offset 
 	 * ZE duplicating uninitialized_zval_ptr */
 
 	if offset == nil {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return nil
 	}
 	if offset.GetType() != types.IS_LONG {
@@ -217,7 +218,7 @@ func SplFixedarrayObjectReadDimensionHelper(intern *SplFixedarrayObject, offset 
 		index = offset.GetLval()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return nil
 	} else if intern.GetArray().GetElements()[index].IsUndef() {
 		return nil
@@ -254,7 +255,7 @@ func SplFixedarrayObjectWriteDimensionHelper(intern *SplFixedarrayObject, offset
 
 		/* '$array[] = value' syntax is not supported */
 
-		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return
 	}
 	if offset.GetType() != types.IS_LONG {
@@ -263,7 +264,7 @@ func SplFixedarrayObjectWriteDimensionHelper(intern *SplFixedarrayObject, offset
 		index = offset.GetLval()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return
 	} else {
 
@@ -303,7 +304,7 @@ func SplFixedarrayObjectUnsetDimensionHelper(intern *SplFixedarrayObject, offset
 		index = offset.GetLval()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
-		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return
 	} else {
 		zend.ZvalPtrDtor(&intern.GetArray().GetElements()[index])
@@ -386,7 +387,7 @@ func zim_spl_SplFixedArray___construct(executeData *zend.ZendExecuteData, return
 		return
 	}
 	if size < 0 {
-		zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array size cannot be less than zero")
+		faults.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array size cannot be less than zero")
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)
@@ -486,7 +487,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 			num_index = _p.GetH()
 			str_index = _p.GetKey()
 			if str_index != nil || zend.ZendLong(num_index < 0) != 0 {
-				zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
+				faults.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
 				return
 			}
 			if num_index > max_index {
@@ -495,7 +496,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		}
 		tmp = max_index + 1
 		if tmp <= 0 {
-			zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "integer overflow detected")
+			faults.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "integer overflow detected")
 			return
 		}
 		SplFixedarrayInit(&array, tmp)
@@ -545,7 +546,7 @@ func zim_spl_SplFixedArray_setSize(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	if size < 0 {
-		zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array size cannot be less than zero")
+		faults.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array size cannot be less than zero")
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)
@@ -702,7 +703,7 @@ func zim_spl_SplFixedArray_current(executeData *zend.ZendExecuteData, return_val
 func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplFixedarrayIt
 	if by_ref != 0 {
-		zend.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
+		faults.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_fixedarray_it"))

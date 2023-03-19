@@ -5,6 +5,7 @@ package core
 import (
 	r "sik/builtin/file"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -118,7 +119,7 @@ func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **types.ZendString
 		/* Use default temporary directory. */
 
 		if (flags & PHP_TMP_FILE_SILENT) == 0 {
-			PhpErrorDocref(nil, zend.E_NOTICE, "file created in the system's temporary directory")
+			PhpErrorDocref(nil, faults.E_NOTICE, "file created in the system's temporary directory")
 		}
 		goto def_tmp
 	}

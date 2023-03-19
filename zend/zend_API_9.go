@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -117,11 +118,11 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.ZendString, va
 	var c *ZendClassConstant
 	if ce.IsInterface() {
 		if access_type != ZEND_ACC_PUBLIC {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
 		}
 	}
 	if types.ZendStringEqualsLiteralCi(name, "class") {
-		ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, E_CORE_ERROR, E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
+		faults.ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
 	if value.IsString() {
 		ZvalMakeInternedString(value)
@@ -139,7 +140,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.ZendString, va
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !(ZendHashAddPtr(ce.GetConstantsTable(), name, c)) {
-		ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, E_CORE_ERROR, E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
+		faults.ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
 	}
 	return types.SUCCESS
 }

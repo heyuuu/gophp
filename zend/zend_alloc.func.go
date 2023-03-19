@@ -5,6 +5,7 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -47,7 +48,7 @@ func IsZendMm() int                                        { return 0 }
 func ZendStrndup(s *byte, length int) *byte {
 	var p *byte
 	if length+1 == 0 {
-		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (1 * %zu + 1)", length)
+		faults.ZendErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (1 * %zu + 1)", length)
 	}
 	var str = b.CastStr(s, length)
 	return b.CastStrPtr(str)

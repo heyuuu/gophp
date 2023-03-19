@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -16,7 +17,7 @@ func _timerInit() int {
 }
 func ZmStartupHrtime(type_ int, module_number int) int {
 	if 0 > _timerInit() {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to initialize high-resolution timer")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to initialize high-resolution timer")
 		return types.FAILURE
 	}
 	return types.SUCCESS

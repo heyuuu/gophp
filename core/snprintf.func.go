@@ -5,6 +5,7 @@ package core
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -876,7 +877,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 
 				continue
 			fmt_error:
-				PhpError(zend.E_ERROR, "Illegal length modifier specified '%c' in s[np]printf call", *fmt)
+				PhpError(faults.E_ERROR, "Illegal length modifier specified '%c' in s[np]printf call", *fmt)
 			default:
 				char_buf[0] = '%'
 				char_buf[1] = *fmt

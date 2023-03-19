@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -29,12 +30,12 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	var name *types.ZendString
 	var fetch_type int
 	if class_ast.GetKind() != ZEND_AST_ZVAL {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
 	}
 	class_name = ZendAstGetStr(class_ast)
 	fetch_type = ZendGetClassFetchType(class_name)
 	if ZEND_FETCH_CLASS_STATIC == fetch_type {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "\"static::\" is not allowed in compile-time constants")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "\"static::\" is not allowed in compile-time constants")
 	}
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		class_name = ZendResolveClassNameAst(class_ast)
@@ -63,7 +64,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 		ast.SetAttr(fetch_type)
 		return
 	case ZEND_FETCH_CLASS_STATIC:
-		ZendErrorNoreturn(E_COMPILE_ERROR, "static::class cannot be used for compile-time class name resolution")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "static::class cannot be used for compile-time class name resolution")
 		return
 	default:
 
@@ -101,7 +102,7 @@ func ZendCompileConstExpr(ast_ptr **ZendAst) {
 		return
 	}
 	if ZendIsAllowedInConstExpr(ast.GetKind()) == 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Constant expression contains invalid operations")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Constant expression contains invalid operations")
 	}
 	switch ast.GetKind() {
 	case ZEND_AST_CLASS_CONST:
@@ -418,7 +419,7 @@ func ZendCompileVar(result *Znode, ast *ZendAst, type_ uint32, by_ref int) *Zend
 		return nil
 	default:
 		if type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use temporary expression in write context")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use temporary expression in write context")
 		}
 		ZendCompileExpr(result, ast)
 		return nil
@@ -564,11 +565,11 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		var container *types.Zval
 		var dim *types.Zval
 		if ast.GetChild()[1] == nil {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for reading")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use [] for reading")
 		}
 		if (ast.GetAttr() & ZEND_DIM_ALTERNATIVE_SYNTAX) != 0 {
 			ast.SetAttr(ast.GetAttr() &^ ZEND_DIM_ALTERNATIVE_SYNTAX)
-			ZendError(E_DEPRECATED, "Array and string offset access syntax with curly braces is deprecated")
+			faults.ZendError(faults.E_DEPRECATED, "Array and string offset access syntax with curly braces is deprecated")
 		}
 
 		/* Set isset fetch indicator here, opcache disallows runtime altering of the AST */

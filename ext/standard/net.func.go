@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -84,7 +85,7 @@ func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *types.
 		return
 	}
 	if getifaddrs(&addrs) {
-		core.PhpError(zend.E_WARNING, "getifaddrs() failed %d: %s", errno, strerror(errno))
+		core.PhpError(faults.E_WARNING, "getifaddrs() failed %d: %s", errno, strerror(errno))
 		return_value.SetFalse()
 		return
 	}

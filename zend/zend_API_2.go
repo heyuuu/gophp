@@ -3,6 +3,7 @@ package zend
 import (
 	"fmt"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -17,7 +18,7 @@ func WrongParamTypeError(num int, expectedType string, arg *types.Zval, forceStr
 	}
 	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, expectedType, ZendZvalTypeName(arg))
 	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
-	ZendInternalTypeErrorEx(throwException, message)
+	faults.ZendInternalTypeErrorEx(throwException, message)
 }
 
 func WrongParamClassError(num int, name string, arg *types.Zval, forceStrict bool) {
@@ -26,7 +27,7 @@ func WrongParamClassError(num int, name string, arg *types.Zval, forceStrict boo
 	}
 	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, name, ZendZvalTypeName(arg))
 	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
-	ZendInternalTypeErrorEx(throwException, message)
+	faults.ZendInternalTypeErrorEx(throwException, message)
 }
 
 func WrongCallbackError(num int, error string, forceStrict bool) {
@@ -35,12 +36,12 @@ func WrongCallbackError(num int, error string, forceStrict bool) {
 	}
 	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
 	throwException := forceStrict || CurrEX().IsArgUseStrictTypes()
-	ZendInternalTypeErrorEx(throwException, message)
+	faults.ZendInternalTypeErrorEx(throwException, message)
 }
 
 func ZendWrongCallbackDeprecated(num int, error string) {
 	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
-	ZendErrorEx(E_DEPRECATED, message)
+	faults.ZendErrorEx(faults.E_DEPRECATED, message)
 }
 func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
 	if val, ok := argparse.ParseBoolWeak(arg); ok {

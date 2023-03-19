@@ -5,6 +5,7 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -107,9 +108,9 @@ func ZendUncleanZvalPtrDtor(zv *types.Zval) {
 func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
 	message := ZendSprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
-		ZendThrowError(exception_ce, "%s", message)
+		faults.ZendThrowError(exception_ce, "%s", message)
 	} else {
-		ZendError(E_ERROR, "%s", message)
+		faults.ZendError(faults.E_ERROR, "%s", message)
 	}
 }
 func ShutdownDestructors() {
@@ -429,10 +430,10 @@ func ZendUseUndefinedConstant(name *types.ZendString, attr ZendAstAttr, result *
 	if EG__().GetException() != nil {
 		return types.FAILURE
 	} else if b.Assign(&colon, (*byte)(ZendMemrchr(name.GetVal(), ':', name.GetLen()))) {
-		ZendThrowError(nil, "Undefined class constant '%s'", name.GetVal())
+		faults.ZendThrowError(nil, "Undefined class constant '%s'", name.GetVal())
 		return types.FAILURE
 	} else if (attr & IS_CONSTANT_UNQUALIFIED) == 0 {
-		ZendThrowError(nil, "Undefined constant '%s'", name.GetVal())
+		faults.ZendThrowError(nil, "Undefined constant '%s'", name.GetVal())
 		return types.FAILURE
 	} else {
 		var actual *byte = name.GetVal()
@@ -442,7 +443,7 @@ func ZendUseUndefinedConstant(name *types.ZendString, attr ZendAstAttr, result *
 			actual = slash + 1
 			actual_len -= actual - name.GetVal()
 		}
-		ZendError(E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", actual, actual)
+		faults.ZendError(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", actual, actual)
 		if EG__().GetException() != nil {
 			return types.FAILURE
 		} else {
@@ -544,7 +545,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		if ZendIsCallableEx(fci.GetFunctionName(), fci.GetObject(), IS_CALLABLE_CHECK_SILENT, nil, fci_cache, &error) == 0 {
 			if error != nil {
 				var callable_name *types.ZendString = ZendGetCallableNameEx(fci.GetFunctionName(), fci.GetObject())
-				ZendError(E_WARNING, "Invalid callback %s, %s", callable_name.GetVal(), error)
+				faults.ZendError(faults.E_WARNING, "Invalid callback %s, %s", callable_name.GetVal(), error)
 				Efree(error)
 				types.ZendStringReleaseEx(callable_name, 0)
 			}
@@ -559,7 +560,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 			if error[0] >= 'a' && error[0] <= 'z' {
 				error[0] += 'A' - 'a'
 			}
-			ZendError(E_DEPRECATED, "%s", error)
+			faults.ZendError(faults.E_DEPRECATED, "%s", error)
 			Efree(error)
 			if EG__().GetException() != nil {
 				if CurrEX() == &dummy_execute_data {
@@ -581,12 +582,12 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, fci.GetParamCount(), object_or_called_scope)
 	if func_.IsDeprecated() {
-		ZendError(E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
+		faults.ZendError(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
 		if EG__().GetException() != nil {
 			ZendVmStackFreeCallFrame(call)
 			if CurrEX() == &dummy_execute_data {
 				EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
-				ZendRethrowException(CurrEX())
+				faults.ZendRethrowException(CurrEX())
 			}
 			return types.FAILURE
 		}
@@ -610,7 +611,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 					/* By-value send is not allowed -- emit a warning,
 					 * and perform the call with the value wrapped in a reference. */
 
-					ZendError(E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
+					faults.ZendError(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", i+1, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
 					must_wrap = 1
 					if EG__().GetException() != nil {
 						call.NumArgs() = i
@@ -708,7 +709,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 			fci.GetObject().GetHandlers().GetCallMethod()(func_.GetFunctionName(), fci.GetObject(), call, fci.GetRetval())
 			EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 		} else {
-			ZendThrowError(nil, "Cannot call overloaded function for non-object")
+			faults.ZendThrowError(nil, "Cannot call overloaded function for non-object")
 		}
 		ZendVmStackFreeArgs(call)
 		if func_.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
@@ -726,9 +727,9 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	}
 	if EG__().GetException() != nil {
 		if CurrEX() == nil {
-			ZendThrowExceptionInternal(nil)
+			faults.ZendThrowExceptionInternal(nil)
 		} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) {
-			ZendRethrowException(CurrEX())
+			faults.ZendRethrowException(CurrEX())
 		}
 	}
 	return types.SUCCESS
@@ -827,11 +828,11 @@ func ZendLookupClassEx(name *types.ZendString, key *types.ZendString, flags uint
 	fcall_cache.SetObject(nil)
 	orig_fake_scope = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
-	ZendExceptionSave()
+	faults.ZendExceptionSave()
 	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
 		ce = ZendHashFindPtr(EG__().GetClassTable(), lc_name)
 	}
-	ZendExceptionRestore()
+	faults.ZendExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
 	ZvalPtrDtor(&args[0])
 	ZvalPtrDtorStr(fcall_info.GetFunctionName())
@@ -907,7 +908,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			EG__().SetBailout(__orig_bailout)
 			DestroyOpArray(new_op_array)
 			EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
-			ZendBailout()
+			faults.ZendBailout()
 		}
 		EG__().SetBailout(__orig_bailout)
 		if local_retval.GetType() != types.IS_UNDEF {
@@ -938,7 +939,7 @@ func ZendEvalStringlEx(str *byte, str_len int, retval_ptr *types.Zval, string_na
 	var result int
 	result = ZendEvalStringl(str, str_len, retval_ptr, string_name)
 	if handle_exceptions != 0 && EG__().GetException() != nil {
-		ZendExceptionError(EG__().GetException(), E_ERROR)
+		faults.ZendExceptionError(EG__().GetException(), faults.E_ERROR)
 		result = types.FAILURE
 	}
 	return result
@@ -949,7 +950,7 @@ func ZendEvalStringEx(str *byte, retval_ptr *types.Zval, string_name string, han
 func ZendTimeout(dummy int) {
 	EG__().SetTimedOut(0)
 	ZendSetTimeoutEx(0, 1)
-	ZendErrorNoreturn(E_ERROR, "Maximum execution time of "+ZEND_LONG_FMT+" second%s exceeded", EG__().GetTimeoutSeconds(), b.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
+	faults.ZendErrorNoreturn(faults.E_ERROR, "Maximum execution time of "+ZEND_LONG_FMT+" second%s exceeded", EG__().GetTimeoutSeconds(), b.Cond(EG__().GetTimeoutSeconds() == 1, "", "s"))
 }
 func ZendTimeoutHandler(dummy int) {
 	if EG__().GetTimedOut() != 0 {
@@ -1101,9 +1102,9 @@ func ZendFetchClassByName(class_name *types.ZendString, key *types.ZendString, f
 				var exception_zv types.Zval
 				exception_zv.SetObject(EG__().GetException())
 				exception_zv.AddRefcount()
-				ZendClearException()
+				faults.ZendClearException()
 				exception_str = ZvalGetString(&exception_zv)
-				ZendErrorNoreturn(E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())
+				faults.ZendErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())
 			}
 			return nil
 		}

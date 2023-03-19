@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -256,9 +257,9 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit typ
 		if return_info.GetType().Code() == types.IS_VOID {
 			if expr != nil {
 				if expr.GetOpType() == IS_CONST && expr.GetConstant().IsNull() {
-					ZendErrorNoreturn(E_COMPILE_ERROR, "A void function must not return a value "+"(did you mean \"return;\" instead of \"return null;\"?)")
+					faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "A void function must not return a value "+"(did you mean \"return;\" instead of \"return null;\"?)")
 				} else {
-					ZendErrorNoreturn(E_COMPILE_ERROR, "A void function must not return a value")
+					faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "A void function must not return a value")
 				}
 			}
 
@@ -271,9 +272,9 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit typ
 		}
 		if expr == nil && implicit == 0 {
 			if return_info.GetType().AllowNull() {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "A function with return type must return a value "+"(did you mean \"return null;\" instead of \"return;\"?)")
+				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value "+"(did you mean \"return null;\" instead of \"return;\"?)")
 			} else {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "A function with return type must return a value")
+				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "A function with return type must return a value")
 			}
 		}
 		if expr != nil && expr.GetOpType() == IS_CONST {
@@ -389,7 +390,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 		if name_node.GetOpType() == IS_CONST {
 			var name *types.ZendString
 			if name_node.GetConstant().GetType() != types.IS_STRING {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal class name")
+				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
 			name = name_node.GetConstant().GetStr()
 			fetch_type = ZendGetClassFetchType(name)
@@ -497,7 +498,7 @@ func ZendSeparateIfCallAndWrite(node *Znode, ast *ZendAst, type_ uint32) {
 			opline.SetResultType(IS_VAR)
 			opline.GetResult().SetVar(opline.GetOp1().GetVar())
 		} else {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use result of built-in function in write context")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use result of built-in function in write context")
 		}
 	}
 }
@@ -509,7 +510,7 @@ func ZendEmitAssignZnode(var_ast *ZendAst, value_node *Znode) {
 }
 func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
 	if ast.GetAttr() == ZEND_DIM_ALTERNATIVE_SYNTAX {
-		ZendError(E_DEPRECATED, "Array and string offset access syntax with curly braces is deprecated")
+		faults.ZendError(faults.E_DEPRECATED, "Array and string offset access syntax with curly braces is deprecated")
 	}
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var dim_ast *ZendAst = ast.GetChild()[1]
@@ -523,10 +524,10 @@ func ZendDelayedCompileDim(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
 	ZendSeparateIfCallAndWrite(&var_node, var_ast, type_)
 	if dim_ast == nil {
 		if type_ == BP_VAR_R || type_ == BP_VAR_IS {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for reading")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use [] for reading")
 		}
 		if type_ == BP_VAR_UNSET {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for unsetting")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use [] for unsetting")
 		}
 		dim_node.SetOpType(IS_UNUSED)
 	} else {
@@ -617,13 +618,13 @@ func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int
 func ZendVerifyListAssignTarget(var_ast *ZendAst, old_style types.ZendBool) {
 	if var_ast.GetKind() == ZEND_AST_ARRAY {
 		if var_ast.GetAttr() == ZEND_ARRAY_SYNTAX_LONG {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot assign to array(), use [] instead")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot assign to array(), use [] instead")
 		}
 		if old_style != var_ast.GetAttr() {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot mix [] and list()")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot mix [] and list()")
 		}
 	} else if ZendCanWriteToVariable(var_ast) == 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Assignments can only happen to writable values")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Assignments can only happen to writable values")
 	}
 }
 func ZendPropagateListRefs(ast *ZendAst) types.ZendBool {
@@ -659,25 +660,25 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 		var opline *ZendOp
 		if elem_ast == nil {
 			if is_keyed != 0 {
-				ZendError(E_COMPILE_ERROR, "Cannot use empty array entries in keyed array assignment")
+				faults.ZendError(faults.E_COMPILE_ERROR, "Cannot use empty array entries in keyed array assignment")
 			} else {
 				continue
 			}
 		}
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {
-			ZendError(E_COMPILE_ERROR, "Spread operator is not supported in assignments")
+			faults.ZendError(faults.E_COMPILE_ERROR, "Spread operator is not supported in assignments")
 		}
 		var_ast = elem_ast.GetChild()[0]
 		key_ast = elem_ast.GetChild()[1]
 		has_elems = 1
 		if is_keyed != 0 {
 			if key_ast == nil {
-				ZendError(E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
+				faults.ZendError(faults.E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
 			}
 			ZendCompileExpr(&dim_node, key_ast)
 		} else {
 			if key_ast != nil {
-				ZendError(E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
+				faults.ZendError(faults.E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
 			}
 			dim_node.SetOpType(IS_CONST)
 			dim_node.GetConstant().SetLong(i)
@@ -708,7 +709,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 		}
 	}
 	if has_elems == 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use empty list")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use empty list")
 	}
 	if result != nil {
 		*result = *expr_node
@@ -718,10 +719,10 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 }
 func ZendEnsureWritableVariable(ast *ZendAst) {
 	if ast.GetKind() == ZEND_AST_CALL {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Can't use function return value in write context")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Can't use function return value in write context")
 	}
 	if ast.GetKind() == ZEND_AST_METHOD_CALL || ast.GetKind() == ZEND_AST_STATIC_CALL {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Can't use method return value in write context")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Can't use method return value in write context")
 	}
 }
 func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
@@ -749,7 +750,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	var opline *ZendOp
 	var offset uint32
 	if IsThisFetch(var_ast) != 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot re-assign $this")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ZendEnsureWritableVariable(var_ast)
 	switch var_ast.GetKind() {
@@ -799,7 +800,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	case ZEND_AST_ARRAY:
 		if ZendPropagateListRefs(var_ast) != 0 {
 			if ZendIsVariableOrCall(expr_ast) == 0 {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot assign reference to non referencable value")
+				faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot assign reference to non referencable value")
 			}
 			ZendCompileVar(&expr_node, expr_ast, BP_VAR_W, 1)
 

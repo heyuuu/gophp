@@ -8,6 +8,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -60,14 +61,14 @@ func PhpSprintfAppendstring(
 	}
 	m_width = b.Max(min_width, copy_len)
 	if m_width > core.INT_MAX-(*pos)-1 {
-		zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", m_width)
+		faults.ZendErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", m_width)
 	}
 	req_size = (*pos) + m_width + 1
 	if req_size > buffer.GetLen() {
 		var size int = buffer.GetLen()
 		for req_size > size {
 			if size > types.ZEND_SIZE_MAX/2 {
-				zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", req_size)
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Field width %zd is too long", req_size)
 			}
 			size <<= 1
 		}
@@ -188,7 +189,7 @@ func PhpSprintfAppenddouble(
 	if (adjust & ADJ_PRECISION) == 0 {
 		precision = FLOAT_PRECISION
 	} else if precision > MAX_FLOAT_PRECISION {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION)
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION)
 		precision = MAX_FLOAT_PRECISION
 	}
 	if core.ZendIsNaN(number) {
@@ -352,7 +353,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 					argnum = PhpSprintfGetnumber(&format, &format_len)
 					if argnum <= 0 {
 						types.ZendStringEfree(result)
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Argument number must be greater than zero")
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Argument number must be greater than zero")
 						return nil
 					}
 					argnum--
@@ -388,7 +389,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				if isdigit(int(*format)) {
 					if b.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
 						zend.Efree(result)
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
 						return nil
 					}
 					adjusting |= ADJ_WIDTH
@@ -404,7 +405,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 					if isdigit(int(*format)) {
 						if b.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
 							zend.Efree(result)
-							core.PhpErrorDocref(nil, zend.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
+							core.PhpErrorDocref(nil, faults.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
 							return nil
 						}
 						adjusting |= ADJ_PRECISION
@@ -418,7 +419,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 			}
 			if argnum >= argc {
 				zend.Efree(result)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Too few arguments")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Too few arguments")
 				return nil
 			}
 			if (*format) == 'l' {

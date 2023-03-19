@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -81,11 +82,11 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
-						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+						faults.ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}
 				} else {
-					ZendError(E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
+					faults.ZendError(faults.E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
 					return
 				}
 
@@ -100,11 +101,11 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
-						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+						faults.ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}
 				} else {
-					ZendError(E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
+					faults.ZendError(faults.E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
 					return
 				}
 
@@ -123,7 +124,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		old_exception = nil
 		if EG__().GetException() != nil {
 			if EG__().GetException() == object {
-				ZendErrorNoreturn(E_CORE_ERROR, "Attempt to destruct pending exception")
+				faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Attempt to destruct pending exception")
 			} else {
 				old_exception = EG__().GetException()
 				EG__().SetException(nil)
@@ -146,7 +147,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		ZvalPtrDtor(&ret)
 		if old_exception != nil {
 			if EG__().GetException() != nil {
-				ZendExceptionSetPrevious(EG__().GetException(), old_exception)
+				faults.ZendExceptionSetPrevious(EG__().GetException(), old_exception)
 			} else {
 				EG__().SetException(old_exception)
 			}

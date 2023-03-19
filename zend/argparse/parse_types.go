@@ -4,6 +4,7 @@ import (
 	"math"
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -333,12 +334,12 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 	ce = zend.ZendLookupClass(arg.GetStr())
 	if baseCe != nil {
 		if ce == nil || zend.InstanceofFunction(ce, baseCe) == 0 {
-			zend.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.GetRawStr())
+			faults.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.GetRawStr())
 			return nil, false
 		}
 	}
 	if ce == nil {
-		zend.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.GetStr().GetVal())
+		faults.ZendInternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.GetStr().GetVal())
 		return nil, false
 	}
 	return ce, true

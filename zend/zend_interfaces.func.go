@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -91,7 +92,7 @@ func ZendCallMethod(
 
 					/* error at c-level */
 
-					ZendErrorNoreturn(E_CORE_ERROR, "Couldn't find implementation for method %s::%s", obj_ce.GetName().GetVal(), function_name)
+					faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for method %s::%s", obj_ce.GetName().GetVal(), function_name)
 
 					/* error at c-level */
 
@@ -102,7 +103,7 @@ func ZendCallMethod(
 
 					/* error at c-level */
 
-					ZendErrorNoreturn(E_CORE_ERROR, "Couldn't find implementation for function %s", function_name)
+					faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Couldn't find implementation for function %s", function_name)
 
 					/* error at c-level */
 
@@ -143,7 +144,7 @@ func ZendCallMethod(
 			}
 		}
 		if EG__().GetException() == nil {
-			ZendErrorNoreturn(E_CORE_ERROR, "Couldn't execute method %s%s%s", b.CondF1(obj_ce != nil, func() []byte { return obj_ce.GetName().GetVal() }, ""), b.Cond(obj_ce != nil, "::", ""), function_name)
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Couldn't execute method %s%s%s", b.CondF1(obj_ce != nil, func() []byte { return obj_ce.GetName().GetVal() }, ""), b.Cond(obj_ce != nil, "::", ""), function_name)
 		}
 	}
 	if retval_ptr == nil {
@@ -202,7 +203,7 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *types.Zval) {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
 		if EG__().GetException() == nil {
-			ZendError(E_WARNING, "Nothing returned from %s::key()", iter.GetCe().GetName().GetVal())
+			faults.ZendError(faults.E_WARNING, "Nothing returned from %s::key()", iter.GetCe().GetName().GetVal())
 		}
 		key.SetLong(0)
 	}
@@ -222,7 +223,7 @@ func ZendUserItRewind(_iter *ZendObjectIterator) {
 func ZendUserItGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) *ZendObjectIterator {
 	var iterator *ZendUserIterator
 	if by_ref != 0 {
-		ZendThrowError(nil, "An iterator cannot be used with foreach by reference")
+		faults.ZendThrowError(nil, "An iterator cannot be used with foreach by reference")
 		return nil
 	}
 	iterator = Emalloc(b.SizeOf("zend_user_iterator"))
@@ -246,7 +247,7 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.GetObj() == object.GetObj() {
 		if EG__().GetException() == nil {
-			ZendThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return types.Z_OBJCE_P(object).GetName().GetVal() }))
+			faults.ZendThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return types.Z_OBJCE_P(object).GetName().GetVal() }))
 		}
 		ZvalPtrDtor(&iterator)
 		return nil
@@ -270,7 +271,7 @@ func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.Cl
 			}
 		}
 	}
-	ZendErrorNoreturn(E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.GetName().GetVal(), ZendCeTraversable.GetName().GetVal(), ZendCeIterator.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
+	faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Class %s must implement interface %s as part of either %s or %s", class_type.GetName().GetVal(), ZendCeTraversable.GetName().GetVal(), ZendCeIterator.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
 	return types.FAILURE
 }
 func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
@@ -294,7 +295,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 				b.Assert(class_type.IsResolvedInterfaces())
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.GetInterfaces()[i] == ZendCeIterator {
-						ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeIterator.GetName().GetVal())
+						faults.ZendErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeIterator.GetName().GetVal())
 						return types.FAILURE
 					}
 					if class_type.GetInterfaces()[i] == ZendCeTraversable {
@@ -347,7 +348,7 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			/* c-level get_iterator cannot be changed */
 
 			if class_type.GetGetIterator() == ZendUserItGetNewIterator {
-				ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
+				faults.ZendErrorNoreturn(faults.E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeAggregate.GetName().GetVal())
 			}
 			return types.FAILURE
 		}
@@ -413,7 +414,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 		ZvalPtrDtor(&retval)
 	}
 	if result == types.FAILURE && EG__().GetException() == nil {
-		ZendThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.GetName().GetVal())
+		faults.ZendThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.GetName().GetVal())
 	}
 	return result
 }
@@ -433,11 +434,11 @@ func ZendUserUnserialize(object *types.Zval, ce *types.ClassEntry, buf *uint8, b
 }
 func ZendClassSerializeDeny(object *types.Zval, buffer **uint8, buf_len *int, data *ZendSerializeData) int {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
-	ZendThrowExceptionEx(nil, 0, "Serialization of '%s' is not allowed", ce.GetName().GetVal())
+	faults.ZendThrowExceptionEx(nil, 0, "Serialization of '%s' is not allowed", ce.GetName().GetVal())
 	return types.FAILURE
 }
 func ZendClassUnserializeDeny(object *types.Zval, ce *types.ClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
-	ZendThrowExceptionEx(nil, 0, "Unserialization of '%s' is not allowed", ce.GetName().GetVal())
+	faults.ZendThrowExceptionEx(nil, 0, "Unserialization of '%s' is not allowed", ce.GetName().GetVal())
 	return types.FAILURE
 }
 func ZendImplementSerializable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {

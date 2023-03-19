@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -557,7 +558,7 @@ func PhpStreamUrlWrapHttpEx(
 				ua[ua_len] = 0
 				req_buf.AppendString(b.CastStr(ua, ua_len))
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot construct User-agent header")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot construct User-agent header")
 			}
 			zend.Efree(ua)
 		}
@@ -592,7 +593,7 @@ func PhpStreamUrlWrapHttpEx(
 		}
 		if (have_header & HTTP_HEADER_TYPE) == 0 {
 			req_buf.AppendString("Content-Type: application/x-www-form-urlencoded\r\n")
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "Content-type not specified assuming application/x-www-form-urlencoded")
 		}
 		req_buf.AppendString("\r\n")
 		req_buf.AppendString(tmpzval.GetStr().GetStr())

@@ -9,6 +9,7 @@ import (
 	"sik/ext/standard"
 	"sik/sapi/cli"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -158,7 +159,7 @@ func PhpStreamDisplayWrapperErrors(wrapper *core.PhpStreamWrapper, path *byte, c
 		msg = "no suitable wrapper could be found"
 	}
 	core.PhpStripUrlPasswd(tmp)
-	core.PhpErrorDocref1(nil, tmp, zend.E_WARNING, "%s: %s", caption, msg)
+	core.PhpErrorDocref1(nil, tmp, faults.E_WARNING, "%s: %s", caption, msg)
 	zend.Efree(tmp)
 	if free_msg != 0 {
 		zend.Efree(msg)
@@ -182,7 +183,7 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 	core.Vspprintf(&buffer, 0, fmt, args)
 	va_end(args)
 	if (options&core.REPORT_ERRORS) != 0 || wrapper == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", buffer)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", buffer)
 		zend.Efree(buffer)
 	} else {
 		var list *zend.ZendLlist = nil
@@ -1106,7 +1107,7 @@ func _phpStreamWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	}
 	b.Assert(buf != nil)
 	if stream.GetOps().GetWrite() == nil {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "Stream is not writable")
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "Stream is not writable")
 		return ssize_t - 1
 	}
 	if stream.GetWritefilters().GetHead() != nil {
@@ -1203,7 +1204,7 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 		stream.SetEof(0)
 		return 0
 	}
-	core.PhpErrorDocref(nil, zend.E_WARNING, "stream does not support seeking")
+	core.PhpErrorDocref(nil, faults.E_WARNING, "stream does not support seeking")
 	return -1
 }
 func _phpStreamSetOption(stream *core.PhpStream, option int, value int, ptrparam any) int {
@@ -1613,7 +1614,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 					n = b.SizeOf("wrapper_name") - 1
 				}
 				core.PHP_STRLCPY(wrapper_name, protocol, b.SizeOf("wrapper_name"), n)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find the wrapper \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find the wrapper \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
 				wrapper = nil
 				protocol = nil
 			}
@@ -1635,7 +1636,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 			}
 			if localhost == 0 && path[n+3] != '0' && path[n+3] != '/' {
 				if (options & core.REPORT_ERRORS) != 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "remote host file access not supported, %s", path)
+					core.PhpErrorDocref(nil, faults.E_WARNING, "remote host file access not supported, %s", path)
 				}
 				return nil
 			}
@@ -1676,7 +1677,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 				return wrapper
 			}
 			if (options & core.REPORT_ERRORS) != 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "file:// wrapper is disabled in the server configuration")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "file:// wrapper is disabled in the server configuration")
 			}
 			return nil
 		}
@@ -1688,9 +1689,9 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 			/* protocol[n] probably isn't '\0' */
 
 			if !(core.PG__().allow_url_fopen) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_fopen=0", int(n), protocol)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_fopen=0", int(n), protocol)
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_include=0", int(n), protocol)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "%.*s:// wrapper is disabled in the server configuration by allow_url_include=0", int(n), protocol)
 			}
 
 			/* protocol[n] probably isn't '\0' */
@@ -1811,7 +1812,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 		*opened_path = nil
 	}
 	if path == nil || !(*path) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Filename cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Filename cannot be empty")
 		return nil
 	}
 	if (options & core.USE_PATH) != 0 {
@@ -1831,7 +1832,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 	path_to_open = path
 	wrapper = PhpStreamLocateUrlWrapper(path, &path_to_open, options)
 	if (options&core.STREAM_USE_URL) != 0 && (wrapper == nil || wrapper.GetIsUrl() == 0) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "This function may only be used against URLs")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "This function may only be used against URLs")
 		return nil
 	}
 	if wrapper != nil {
@@ -1881,7 +1882,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 			if (options & core.REPORT_ERRORS) != 0 {
 				var tmp *byte = zend.Estrdup(path)
 				core.PhpStripUrlPasswd(tmp)
-				core.PhpErrorDocref1(nil, tmp, zend.E_WARNING, "could not make seekable - %s", tmp)
+				core.PhpErrorDocref1(nil, tmp, faults.E_WARNING, "could not make seekable - %s", tmp)
 				zend.Efree(tmp)
 				options ^= core.REPORT_ERRORS
 			}

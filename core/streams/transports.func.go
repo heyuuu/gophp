@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -24,14 +25,14 @@ func ERR_REPORT(out_err **types.ZendString, fmt string, arg []byte) {
 	if out_err != nil {
 		*out_err = core.Strpprintf(0, fmt, arg)
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, arg)
+		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, arg)
 	}
 }
 func ERR_RETURN(out_err **types.ZendString, local_err *types.ZendString, fmt string) {
 	if out_err != nil {
 		*out_err = local_err
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
 		if local_err != nil {
 			types.ZendStringReleaseEx(local_err, 0)
 			local_err = nil
@@ -114,7 +115,7 @@ func _phpStreamXportCreate(
 
 		/* should never happen */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not find a factory !?")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Could not find a factory !?")
 		return nil
 	}
 	stream = factory(protocol, n, (*byte)(name), namelen, persistent_id, options, flags, timeout, context)
@@ -338,7 +339,7 @@ func PhpStreamXportCryptoSetup(stream *core.PhpStream, crypto_method PhpStreamXp
 	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		return param.GetReturncode()
 	}
-	core.PhpErrorDocref("streams.crypto", zend.E_WARNING, "this stream does not support SSL/crypto")
+	core.PhpErrorDocref("streams.crypto", faults.E_WARNING, "this stream does not support SSL/crypto")
 	return ret
 }
 func PhpStreamXportCryptoEnable(stream *core.PhpStream, activate int) int {
@@ -351,7 +352,7 @@ func PhpStreamXportCryptoEnable(stream *core.PhpStream, activate int) int {
 	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		return param.GetReturncode()
 	}
-	core.PhpErrorDocref("streams.crypto", zend.E_WARNING, "this stream does not support SSL/crypto")
+	core.PhpErrorDocref("streams.crypto", faults.E_WARNING, "this stream does not support SSL/crypto")
 	return ret
 }
 func PhpStreamXportRecvfrom(
@@ -414,7 +415,7 @@ func PhpStreamXportSendto(
 	var oob int
 	oob = (flags & STREAM_OOB) == STREAM_OOB
 	if (oob != 0 || addr) && stream.GetWritefilters().GetHead() != nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot write OOB data, or data to a targeted address on a filtered stream")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "cannot write OOB data, or data to a targeted address on a filtered stream")
 		return -1
 	}
 	memset(&param, 0, b.SizeOf("param"))

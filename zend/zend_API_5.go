@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -152,7 +153,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 
 					/* TODO: Check version relationship */
 
-					ZendError(E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
+					faults.ZendError(faults.E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
 					return nil
 				}
 				types.ZendStringEfree(lcname)
@@ -165,7 +166,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
 	lcname = types.ZendNewInternedString(lcname)
 	if b.Assign(&module_ptr, ZendHashAddMem(&ModuleRegistry, lcname, module, b.SizeOf("zend_module_entry"))) == nil {
-		ZendError(E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
+		faults.ZendError(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
 		types.ZendStringRelease(lcname)
 		return nil
 	}
@@ -175,7 +176,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 		ZendHashDel(&ModuleRegistry, lcname)
 		types.ZendStringRelease(lcname)
 		EG__().SetCurrentModule(nil)
-		ZendError(E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
+		faults.ZendError(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
 		return nil
 	}
 	EG__().SetCurrentModule(nil)
@@ -201,49 +202,49 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *ZendFunction
 	ZendStrTolowerCopy(lcname, fptr.GetFunctionName().GetVal(), b.Min(name_len, b.SizeOf("lcname")-1))
 	lcname[b.SizeOf("lcname")-1] = '0'
 	if name_len == b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DESTRUCTOR_FUNC_NAME, b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DESTRUCTOR_FUNC_NAME)
+		faults.ZendError(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DESTRUCTOR_FUNC_NAME)
 	} else if name_len == b.SizeOf("ZEND_CLONE_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CLONE_FUNC_NAME, b.SizeOf("ZEND_CLONE_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Method %s::%s() cannot accept any arguments", ce.GetName().GetVal(), ZEND_CLONE_FUNC_NAME)
+		faults.ZendError(error_type, "Method %s::%s() cannot accept any arguments", ce.GetName().GetVal(), ZEND_CLONE_FUNC_NAME)
 	} else if name_len == b.SizeOf("ZEND_GET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_GET_FUNC_NAME, b.SizeOf("ZEND_GET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 1 {
-			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_GET_FUNC_NAME)
 		}
 	} else if name_len == b.SizeOf("ZEND_SET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_SET_FUNC_NAME, b.SizeOf("ZEND_SET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 2 {
-			ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_SET_FUNC_NAME)
 		}
 	} else if name_len == b.SizeOf("ZEND_UNSET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_UNSET_FUNC_NAME, b.SizeOf("ZEND_UNSET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 1 {
-			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_UNSET_FUNC_NAME)
 		}
 	} else if name_len == b.SizeOf("ZEND_ISSET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_ISSET_FUNC_NAME, b.SizeOf("ZEND_ISSET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 1 {
-			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_ISSET_FUNC_NAME)
 		}
 	} else if name_len == b.SizeOf("ZEND_CALL_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CALL_FUNC_NAME, b.SizeOf("ZEND_CALL_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 2 {
-			ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
+			faults.ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), ZEND_CALL_FUNC_NAME)
 		}
 	} else if name_len == b.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CALLSTATIC_FUNC_NAME, b.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 2 {
-			ZendError(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ce.GetName().GetVal())
+			faults.ZendError(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ce.GetName().GetVal())
 		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
-			ZendError(error_type, "Method %s::__callStatic() cannot take arguments by reference", ce.GetName().GetVal())
+			faults.ZendError(error_type, "Method %s::__callStatic() cannot take arguments by reference", ce.GetName().GetVal())
 		}
 	} else if name_len == b.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_TOSTRING_FUNC_NAME, b.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_TOSTRING_FUNC_NAME)
+		faults.ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_TOSTRING_FUNC_NAME)
 	} else if name_len == b.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DEBUGINFO_FUNC_NAME, b.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
+		faults.ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
 func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
@@ -270,9 +271,9 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 	var lc_class_name *byte = nil
 	var class_name_len int = 0
 	if type_ == MODULE_PERSISTENT {
-		error_type = E_CORE_WARNING
+		error_type = faults.E_CORE_WARNING
 	} else {
-		error_type = E_WARNING
+		error_type = faults.E_WARNING
 	}
 	if target_function_table == nil {
 		target_function_table = CG__().GetFunctionTable()
@@ -301,7 +302,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 		if ptr.GetFlags() != 0 {
 			if !ptr.IsPppMask() {
 				if ptr.GetFlags() != ZEND_ACC_DEPRECATED && scope != nil {
-					ZendError(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+					faults.ZendError(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 				}
 				internal_function.SetFnFlags(ZEND_ACC_PUBLIC | ptr.GetFlags())
 			} else {
@@ -342,7 +343,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 						type_name++
 					}
 					if scope == nil && (!(strcasecmp(type_name, "self")) || !(strcasecmp(type_name, "parent"))) {
-						ZendErrorNoreturn(E_CORE_ERROR, "Cannot declare a return type of %s outside of a class scope", type_name)
+						faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Cannot declare a return type of %s outside of a class scope", type_name)
 					}
 				}
 				internal_function.SetIsHasReturnType(true)
@@ -369,19 +370,19 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 				}
 			}
 			if ptr.IsStatic() && (scope == nil || !scope.IsInterface()) {
-				ZendError(error_type, "Static function %s%s%s() cannot be abstract", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+				faults.ZendError(error_type, "Static function %s%s%s() cannot be abstract", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 		} else {
 			if scope != nil && scope.IsInterface() {
 				Efree((*byte)(lc_class_name))
-				ZendError(error_type, "Interface %s cannot contain non abstract method %s()", scope.GetName().GetVal(), ptr.GetFname())
+				faults.ZendError(error_type, "Interface %s cannot contain non abstract method %s()", scope.GetName().GetVal(), ptr.GetFname())
 				return types.FAILURE
 			}
 			if internal_function.GetHandler() == nil {
 				if scope != nil {
 					Efree((*byte)(lc_class_name))
 				}
-				ZendError(error_type, "Method %s%s%s() cannot be a NULL function", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+				faults.ZendError(error_type, "Method %s%s%s() cannot be a NULL function", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 				ZendUnregisterFunctions(functions, count, target_function_table)
 				return types.FAILURE
 			}
@@ -456,7 +457,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_DESTRUCTOR_FUNC_NAME) {
 				dtor = reg_function
 				if internal_function.GetNumArgs() != 0 {
-					ZendError(error_type, "Destructor %s::%s() cannot take arguments", scope.GetName().GetVal(), ptr.GetFname())
+					faults.ZendError(error_type, "Destructor %s::%s() cannot take arguments", scope.GetName().GetVal(), ptr.GetFname())
 				}
 			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CLONE_FUNC_NAME) {
 				clone = reg_function
@@ -500,7 +501,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 			lowercase_name = types.ZendStringAlloc(fname_len, 0)
 			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
 			if ZendHashExists(target_function_table, lowercase_name) != 0 {
-				ZendError(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
+				faults.ZendError(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			types.ZendStringEfree(lowercase_name)
 			ptr++
@@ -525,78 +526,78 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *ZendFunctionEntry
 		if ctor != nil {
 			ctor.SetIsCtor(true)
 			if ctor.IsStatic() {
-				ZendError(error_type, "Constructor %s::%s() cannot be static", scope.GetName().GetVal(), ctor.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Constructor %s::%s() cannot be static", scope.GetName().GetVal(), ctor.GetFunctionName().GetVal())
 			}
 			ctor.SetIsAllowStatic(false)
 		}
 		if dtor != nil {
 			dtor.SetIsDtor(true)
 			if dtor.IsStatic() {
-				ZendError(error_type, "Destructor %s::%s() cannot be static", scope.GetName().GetVal(), dtor.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Destructor %s::%s() cannot be static", scope.GetName().GetVal(), dtor.GetFunctionName().GetVal())
 			}
 			dtor.SetIsAllowStatic(false)
 		}
 		if clone != nil {
 			if clone.IsStatic() {
-				ZendError(error_type, "%s::%s() cannot be static", scope.GetName().GetVal(), clone.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "%s::%s() cannot be static", scope.GetName().GetVal(), clone.GetFunctionName().GetVal())
 			}
 			clone.SetIsAllowStatic(false)
 		}
 		if __call != nil {
 			if __call.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __call.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __call.GetFunctionName().GetVal())
 			}
 			__call.SetIsAllowStatic(false)
 		}
 		if __callstatic != nil {
 			if !__callstatic.IsStatic() {
-				ZendError(error_type, "Method %s::%s() must be static", scope.GetName().GetVal(), __callstatic.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() must be static", scope.GetName().GetVal(), __callstatic.GetFunctionName().GetVal())
 			}
 			__callstatic.SetIsStatic(true)
 		}
 		if __tostring != nil {
 			if __tostring.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __tostring.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __tostring.GetFunctionName().GetVal())
 			}
 			__tostring.SetIsAllowStatic(false)
 		}
 		if __get != nil {
 			if __get.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __get.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __get.GetFunctionName().GetVal())
 			}
 			__get.SetIsAllowStatic(false)
 		}
 		if __set != nil {
 			if __set.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __set.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __set.GetFunctionName().GetVal())
 			}
 			__set.SetIsAllowStatic(false)
 		}
 		if __unset != nil {
 			if __unset.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __unset.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __unset.GetFunctionName().GetVal())
 			}
 			__unset.SetIsAllowStatic(false)
 		}
 		if __isset != nil {
 			if __isset.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __isset.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __isset.GetFunctionName().GetVal())
 			}
 			__isset.SetIsAllowStatic(false)
 		}
 		if __debugInfo != nil {
 			if __debugInfo.IsStatic() {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __debugInfo.GetFunctionName().GetVal())
+				faults.ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __debugInfo.GetFunctionName().GetVal())
 			}
 		}
 		if ctor != nil && ctor.IsHasReturnType() {
-			ZendErrorNoreturn(E_CORE_ERROR, "Constructor %s::%s() cannot declare a return type", scope.GetName().GetVal(), ctor.GetFunctionName().GetVal())
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Constructor %s::%s() cannot declare a return type", scope.GetName().GetVal(), ctor.GetFunctionName().GetVal())
 		}
 		if dtor != nil && dtor.IsHasReturnType() {
-			ZendErrorNoreturn(E_CORE_ERROR, "Destructor %s::%s() cannot declare a return type", scope.GetName().GetVal(), dtor.GetFunctionName().GetVal())
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Destructor %s::%s() cannot declare a return type", scope.GetName().GetVal(), dtor.GetFunctionName().GetVal())
 		}
 		if clone != nil && clone.IsHasReturnType() {
-			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() cannot declare a return type", scope.GetName().GetVal(), clone.GetFunctionName().GetVal())
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() cannot declare a return type", scope.GetName().GetVal(), clone.GetFunctionName().GetVal())
 		}
 		Efree((*byte)(lc_class_name))
 	}

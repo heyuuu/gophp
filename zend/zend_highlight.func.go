@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -146,7 +147,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 
 	/* Discard parse errors thrown during tokenization */
 
-	ZendClearException()
+	faults.ZendClearException()
 
 	/* Discard parse errors thrown during tokenization */
 }
@@ -206,7 +207,7 @@ func ZendStrip() {
 
 	/* Discard parse errors thrown during tokenization */
 
-	ZendClearException()
+	faults.ZendClearException()
 
 	/* Discard parse errors thrown during tokenization */
 }

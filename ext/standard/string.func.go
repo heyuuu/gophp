@@ -8,6 +8,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -137,13 +138,13 @@ func ZifHex2bin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if data.GetLen()%2 != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Hexadecimal input string must have an even length")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Hexadecimal input string must have an even length")
 		return_value.SetFalse()
 		return
 	}
 	result = PhpHex2bin((*uint8)(data.GetVal()), data.GetLen())
 	if result == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Input string must be hexadecimal string")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Input string must be hexadecimal string")
 		return_value.SetFalse()
 		return
 	}
@@ -255,24 +256,24 @@ func PhpCharmask(input *uint8, len_ int, mask *byte) int {
 			   (a range ending/starting with '.' won't be captured here) */
 
 			if end-len_ >= input {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
 				result = types.FAILURE
 				continue
 			}
 			if input+2 >= end {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
 				result = types.FAILURE
 				continue
 			}
 			if input[-1] > input[2] {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
 				result = types.FAILURE
 				continue
 			}
 
 			/* FIXME: better error (a..b..c is the only left possibility?) */
 
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid '..'-range")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range")
 			result = types.FAILURE
 			continue
 		} else {
@@ -430,12 +431,12 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if breakchar_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Break string cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Break string cannot be empty")
 		return_value.SetFalse()
 		return
 	}
 	if linelength == 0 && docut != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Can't force cut when width is zero")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Can't force cut when width is zero")
 		return_value.SetFalse()
 		return
 	}
@@ -646,7 +647,7 @@ func ZifExplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if delim.GetLen() == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Empty delimiter")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty delimiter")
 		return_value.SetFalse()
 		return
 	}
@@ -798,7 +799,7 @@ func ZifImplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if arg2 == nil {
 		if arg1.GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Argument must be an array")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Argument must be an array")
 			return
 		}
 		glue = types.ZSTR_EMPTY_ALLOC()
@@ -808,12 +809,12 @@ func ZifImplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if arg1.IsType(types.IS_ARRAY) {
 			glue = zend.ZvalGetTmpString(arg2, &tmp_glue)
 			pieces = arg1
-			core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
+			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
 		} else if arg2.IsType(types.IS_ARRAY) {
 			glue = zend.ZvalGetTmpString(arg1, &tmp_glue)
 			pieces = arg2
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid arguments passed")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid arguments passed")
 			return
 		}
 	}
@@ -1139,7 +1140,7 @@ func ZifDirname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		/* Default case */
 
 	} else if levels < 1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid argument, levels must be >= 1")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid argument, levels must be >= 1")
 		types.ZendStringEfree(ret)
 		return
 	} else {
@@ -1297,7 +1298,7 @@ func PhpNeedleChar(needle *types.Zval, target *byte) int {
 		*target = byte(zend.ZvalGetLong(needle))
 		return types.SUCCESS
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "needle is not a string or an integer")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
 		return types.FAILURE
 	}
 }
@@ -1332,7 +1333,7 @@ func ZifStristr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if needle.IsType(types.IS_STRING) {
 		var orig_needle *byte
 		if needle.GetStr().GetLen() == 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Empty needle")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
 			zend.Efree(haystack_dup)
 			return_value.SetFalse()
 			return
@@ -1347,7 +1348,7 @@ func ZifStristr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return
 		}
 		needle_char[1] = 0
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		found = PhpStristr(haystack_dup, needle_char, haystack.GetLen(), 1)
 	}
 	if found != nil {
@@ -1390,7 +1391,7 @@ func ZifStrstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if needle.IsType(types.IS_STRING) {
 		if needle.GetStr().GetLen() == 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Empty needle")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
 			return_value.SetFalse()
 			return
 		}
@@ -1401,7 +1402,7 @@ func ZifStrstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return
 		}
 		needle_char[1] = 0
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		found = core.PhpMemnstr(haystack.GetVal(), needle_char, 1, haystack.GetVal()+haystack.GetLen())
 	}
 	if found != nil {
@@ -1446,13 +1447,13 @@ func ZifStrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		offset += zend.ZendLong(haystack.GetLen())
 	}
 	if offset < 0 || int(offset > haystack.GetLen()) != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Offset not contained in string")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
 		return_value.SetFalse()
 		return
 	}
 	if needle.IsType(types.IS_STRING) {
 		if needle.GetStr().GetLen() == 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Empty needle")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
 			return_value.SetFalse()
 			return
 		}
@@ -1463,7 +1464,7 @@ func ZifStrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return
 		}
 		needle_char[1] = 0
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		found = (*byte)(core.PhpMemnstr(haystack.GetVal()+offset, needle_char, 1, haystack.GetVal()+haystack.GetLen()))
 	}
 	if found != nil {
@@ -1505,7 +1506,7 @@ func ZifStripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		offset += zend.ZendLong(haystack.GetLen())
 	}
 	if offset < 0 || int(offset > haystack.GetLen()) != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Offset not contained in string")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
 		return_value.SetFalse()
 		return
 	}
@@ -1526,7 +1527,7 @@ func ZifStripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		haystack_dup = PhpStringTolower(haystack)
 		needle_char[0] = tolower(needle_char[0])
 		needle_char[1] = '0'
@@ -1580,7 +1581,7 @@ func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		ord_needle[1] = '0'
 		needle = ord_needle
 		needle_len = 1
@@ -1591,7 +1592,7 @@ func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if offset >= 0 {
 		if int(offset > haystack.GetLen()) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
 			return_value.SetFalse()
 			return
 		}
@@ -1599,7 +1600,7 @@ func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		e = haystack.GetVal() + haystack.GetLen()
 	} else {
 		if offset < -core.INT_MAX || size_t(-offset) > haystack.GetLen() {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
 			return_value.SetFalse()
 			return
 		}
@@ -1657,7 +1658,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		ord_needle.GetVal()[1] = '0'
 		needle = ord_needle
 	}
@@ -1674,7 +1675,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if offset >= 0 {
 			if int(offset > haystack.GetLen()) != 0 {
 				ord_needle.Free()
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
 				return_value.SetFalse()
 				return
 			}
@@ -1684,7 +1685,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			p = haystack.GetVal()
 			if offset < -core.INT_MAX || size_t(-offset) > haystack.GetLen() {
 				ord_needle.Free()
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
 				return_value.SetFalse()
 				return
 			}
@@ -1711,7 +1712,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if int(offset > haystack.GetLen()) != 0 {
 			types.ZendStringReleaseEx(haystack_dup, 0)
 			ord_needle.Free()
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
 			return_value.SetFalse()
 			return
 		}
@@ -1721,7 +1722,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if offset < -core.INT_MAX || size_t(-offset) > haystack.GetLen() {
 			types.ZendStringReleaseEx(haystack_dup, 0)
 			ord_needle.Free()
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
 			return_value.SetFalse()
 			return
 		}
@@ -1776,7 +1777,7 @@ func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
 		found = zend.ZendMemrchr(haystack.GetVal(), needle_chr, haystack.GetLen())
 	}
 	if found != nil {
@@ -1855,7 +1856,7 @@ func ZifChunkSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		break
 	}
 	if chunklen <= 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Chunk length should be greater than zero")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Chunk length should be greater than zero")
 		return_value.SetFalse()
 		return
 	}
@@ -2043,13 +2044,13 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 	if str.IsType(types.IS_STRING) {
 		if argc == 3 && from.IsType(types.IS_ARRAY) || argc == 4 && from.GetType() != len_.GetType() {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
 			return_value.SetStringCopy(str.GetStr())
 			return
 		}
 		if argc == 4 && from.IsType(types.IS_ARRAY) {
 			if types.Z_ARRVAL_P(from).GetNNumOfElements() != types.Z_ARRVAL_P(len_).GetNNumOfElements() {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "'start' and 'length' should have the same number of elements")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should have the same number of elements")
 				return_value.SetStringCopy(str.GetStr())
 				return
 			}
@@ -2114,7 +2115,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			return_value.SetString(result)
 			return
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Functionality of 'start' and 'length' as arrays is not implemented")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Functionality of 'start' and 'length' as arrays is not implemented")
 			return_value.SetStringCopy(str.GetStr())
 			return
 		}
@@ -3057,7 +3058,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if ac == 2 && from.GetType() != types.IS_ARRAY {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The second argument is not an array")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The second argument is not an array")
 		return_value.SetFalse()
 		return
 	}
@@ -4208,7 +4209,7 @@ func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			loc = nil
 		} else {
 			if loc.GetLen() >= 255 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Specified locale name is too long")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Specified locale name is too long")
 				types.ZendStringReleaseEx(loc, 0)
 				break
 			}
@@ -4289,12 +4290,12 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			zend.Efree(res)
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
 		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
 		if zend.ZendHashDel(symbol_table, types.ZSTR_THIS) == types.SUCCESS {
-			zend.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ZendThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {
 		arrayArg = zend.ZendTryArrayInit(arrayArg)
@@ -4773,7 +4774,7 @@ func ZifStrRepeat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if mult < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Second argument has to be greater than or equal to 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be greater than or equal to 0")
 		return
 	}
 
@@ -4844,7 +4845,7 @@ func ZifCountChars(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		break
 	}
 	if mymode < 0 || mymode > 4 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown mode")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown mode")
 		return_value.SetFalse()
 		return
 	}
@@ -5012,7 +5013,7 @@ func ZifSubstrCount(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		break
 	}
 	if needle_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Empty substring")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty substring")
 		return_value.SetFalse()
 		return
 	}
@@ -5022,7 +5023,7 @@ func ZifSubstrCount(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		offset += zend.ZendLong(haystack_len)
 	}
 	if offset < 0 || int(offset > haystack_len) != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Offset not contained in string")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
 		return_value.SetFalse()
 		return
 	}
@@ -5032,7 +5033,7 @@ func ZifSubstrCount(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			length += haystack_len - offset
 		}
 		if length < 0 || int(length > haystack_len-offset) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid length value")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid length value")
 			return_value.SetFalse()
 			return
 		}
@@ -5098,16 +5099,16 @@ func ZifStrPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if pad_str_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Padding string cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding string cannot be empty")
 		return
 	}
 	if pad_type_val < STR_PAD_LEFT || pad_type_val > STR_PAD_BOTH {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
 		return
 	}
 	num_pad_chars = pad_length - input.GetLen()
 	if num_pad_chars >= core.INT_MAX {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Padding length is too long")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding length is too long")
 		return
 	}
 	result = types.ZendStringSafeAlloc(1, input.GetLen(), num_pad_chars, 0)
@@ -5316,7 +5317,7 @@ func ZifStrWordCount(executeData *zend.ZendExecuteData, return_value *types.Zval
 		/* nothing to be done */
 
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, type_)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, type_)
 		return_value.SetFalse()
 		return
 	}
@@ -5394,7 +5395,7 @@ func ZifMoneyFormat(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			check = 1
 			p++
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Only a single %%i or %%n token can be used")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Only a single %%i or %%n token can be used")
 			return_value.SetFalse()
 			return
 		}
@@ -5434,7 +5435,7 @@ func ZifStrSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if split_length <= 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The length of each segment must be greater than zero")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The length of each segment must be greater than zero")
 		return_value.SetFalse()
 		return
 	}
@@ -5478,7 +5479,7 @@ func ZifStrpbrk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if char_list.GetLen() == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The character list cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The character list cannot be empty")
 		return_value.SetFalse()
 		return
 	}
@@ -5528,7 +5529,7 @@ func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *types.Zva
 			return_value.SetLong(0)
 			return
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "The length must be greater than or equal to zero")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "The length must be greater than or equal to zero")
 			return_value.SetFalse()
 			return
 		}
@@ -5542,7 +5543,7 @@ func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *types.Zva
 		}
 	}
 	if int(offset > s1.GetLen()) != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The start position cannot exceed initial string length")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The start position cannot exceed initial string length")
 		return_value.SetFalse()
 		return
 	}

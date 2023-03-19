@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -64,7 +65,7 @@ func ReferenceLevdist(
 	return c0
 }
 func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
-	core.PhpErrorDocref(nil, zend.E_WARNING, "The general Levenshtein support is not there yet")
+	core.PhpErrorDocref(nil, faults.E_WARNING, "The general Levenshtein support is not there yet")
 
 	/* not there yet */
 
@@ -105,7 +106,7 @@ func ZifLevenshtein(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		return
 	}
 	if distance < 0 && executeData.NumArgs() != 3 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Argument string(s) too long")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Argument string(s) too long")
 	}
 	return_value.SetLong(distance)
 	return

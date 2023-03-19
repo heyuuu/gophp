@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -188,7 +189,7 @@ func ZendIsReservedClassName(name *types.ZendString) types.ZendBool {
 }
 func ZendAssertValidClassName(name *types.ZendString) {
 	if ZendIsReservedClassName(name) != 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", name.GetVal())
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", name.GetVal())
 	}
 }
 func ZendLookupBuiltinTypeByName(name *types.ZendString) types.ZendUchar {
@@ -574,15 +575,15 @@ func ZendDoFree(op1 *Znode) {
 func ZendAddClassModifier(flags uint32, new_flag uint32) uint32 {
 	var new_flags uint32 = flags | new_flag
 	if (flags&ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 && (new_flag&ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 {
-		ZendThrowException(ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
 		return 0
 	}
 	if (flags&ZEND_ACC_FINAL) != 0 && (new_flag&ZEND_ACC_FINAL) != 0 {
-		ZendThrowException(ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
 		return 0
 	}
 	if (new_flags&ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 && (new_flags&ZEND_ACC_FINAL) != 0 {
-		ZendThrowException(ZendCeCompileError, "Cannot use the final modifier on an abstract class", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Cannot use the final modifier on an abstract class", 0)
 		return 0
 	}
 	return new_flags
@@ -590,23 +591,23 @@ func ZendAddClassModifier(flags uint32, new_flag uint32) uint32 {
 func ZendAddMemberModifier(flags uint32, new_flag uint32) uint32 {
 	var new_flags uint32 = flags | new_flag
 	if (flags&ZEND_ACC_PPP_MASK) != 0 && (new_flag&ZEND_ACC_PPP_MASK) != 0 {
-		ZendThrowException(ZendCeCompileError, "Multiple access type modifiers are not allowed", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Multiple access type modifiers are not allowed", 0)
 		return 0
 	}
 	if (flags&ZEND_ACC_ABSTRACT) != 0 && (new_flag&ZEND_ACC_ABSTRACT) != 0 {
-		ZendThrowException(ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
 		return 0
 	}
 	if (flags&ZEND_ACC_STATIC) != 0 && (new_flag&ZEND_ACC_STATIC) != 0 {
-		ZendThrowException(ZendCeCompileError, "Multiple static modifiers are not allowed", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Multiple static modifiers are not allowed", 0)
 		return 0
 	}
 	if (flags&ZEND_ACC_FINAL) != 0 && (new_flag&ZEND_ACC_FINAL) != 0 {
-		ZendThrowException(ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
 		return 0
 	}
 	if (new_flags&ZEND_ACC_ABSTRACT) != 0 && (new_flags&ZEND_ACC_FINAL) != 0 {
-		ZendThrowException(ZendCeCompileError, "Cannot use the final modifier on an abstract class member", 0)
+		faults.ZendThrowException(faults.ZendCeCompileError, "Cannot use the final modifier on an abstract class member", 0)
 		return 0
 	}
 	return new_flags

@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -78,7 +79,7 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 	return types.SUCCESS
 }
 func ZendWrongParamCount() {
-	ZendInternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
+	faults.ZendInternalArgumentCountError(CurrEX().IsArgUseStrictTypes(), "Wrong parameter count for %s()", GetActiveCalleeName())
 }
 func ZendGetTypeByConst(type_ types.ZendUchar) string {
 	switch type_ {

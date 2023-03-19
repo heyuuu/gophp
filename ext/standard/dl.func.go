@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -37,9 +38,9 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		extension_dir = core.PG__().extension_dir
 	}
 	if type_ == zend.MODULE_TEMPORARY {
-		error_type = zend.E_WARNING
+		error_type = faults.E_WARNING
 	} else {
-		error_type = zend.E_CORE_WARNING
+		error_type = faults.E_CORE_WARNING
 	}
 
 	/* Check if passed filename contains directory separators */
@@ -49,7 +50,7 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		/* Passing modules with full path is not supported for dynamically loaded extensions */
 
 		if type_ == zend.MODULE_TEMPORARY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Temporary module name should contain only filename")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Temporary module name should contain only filename")
 			return types.FAILURE
 		}
 		libpath = zend.Estrdup(filename)

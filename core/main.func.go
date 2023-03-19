@@ -9,6 +9,7 @@ import (
 	"sik/core/streams"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -105,7 +106,7 @@ func OnChangeMemoryLimit(
 		 * shut down and the minimal amount of memory is used. */
 
 		if stage != zend.ZEND_INI_STAGE_DEACTIVATE {
-			zend.ZendError(zend.E_WARNING, "Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true))
+			faults.ZendError(faults.E_WARNING, "Failed to set memory limit to %zd bytes (Current memory usage is %zd bytes)", value, zend.ZendMemoryUsage(true))
 			return types.FAILURE
 		}
 
@@ -807,29 +808,29 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 	if zend.EG__().GetErrorHandling() == zend.EH_THROW {
 		switch type_ {
-		case zend.E_ERROR:
+		case faults.E_ERROR:
 			fallthrough
-		case zend.E_CORE_ERROR:
+		case faults.E_CORE_ERROR:
 			fallthrough
-		case zend.E_COMPILE_ERROR:
+		case faults.E_COMPILE_ERROR:
 			fallthrough
-		case zend.E_USER_ERROR:
+		case faults.E_USER_ERROR:
 			fallthrough
-		case zend.E_PARSE:
+		case faults.E_PARSE:
 
 		/* fatal errors are real errors and cannot be made exceptions */
 
-		case zend.E_STRICT:
+		case faults.E_STRICT:
 			fallthrough
-		case zend.E_DEPRECATED:
+		case faults.E_DEPRECATED:
 			fallthrough
-		case zend.E_USER_DEPRECATED:
+		case faults.E_USER_DEPRECATED:
 
 		/* for the sake of BC to old damaged code */
 
-		case zend.E_NOTICE:
+		case faults.E_NOTICE:
 			fallthrough
-		case zend.E_USER_NOTICE:
+		case faults.E_USER_NOTICE:
 
 			/* notices are no errors and are not treated as such like E_WARNINGS */
 
@@ -840,7 +841,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 			 */
 
 			if zend.EG__().GetException() == nil {
-				zend.ZendThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
+				faults.ZendThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
 			}
 			zend.Efree(buffer)
 			return
@@ -871,45 +872,45 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 	/* display/log the error if necessary */
 
-	if display != 0 && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&zend.E_CORE) != 0) && (PG__().log_errors || PG__().display_errors || ModuleInitialized == 0) {
+	if display != 0 && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&faults.E_CORE) != 0) && (PG__().log_errors || PG__().display_errors || ModuleInitialized == 0) {
 		var error_type_str *byte
 		var syslog_type_int int = LOG_NOTICE
 		switch type_ {
-		case zend.E_ERROR:
+		case faults.E_ERROR:
 			fallthrough
-		case zend.E_CORE_ERROR:
+		case faults.E_CORE_ERROR:
 			fallthrough
-		case zend.E_COMPILE_ERROR:
+		case faults.E_COMPILE_ERROR:
 			fallthrough
-		case zend.E_USER_ERROR:
+		case faults.E_USER_ERROR:
 			error_type_str = "Fatal error"
 			syslog_type_int = LOG_ERR
-		case zend.E_RECOVERABLE_ERROR:
+		case faults.E_RECOVERABLE_ERROR:
 			error_type_str = "Recoverable fatal error"
 			syslog_type_int = LOG_ERR
-		case zend.E_WARNING:
+		case faults.E_WARNING:
 			fallthrough
-		case zend.E_CORE_WARNING:
+		case faults.E_CORE_WARNING:
 			fallthrough
-		case zend.E_COMPILE_WARNING:
+		case faults.E_COMPILE_WARNING:
 			fallthrough
-		case zend.E_USER_WARNING:
+		case faults.E_USER_WARNING:
 			error_type_str = "Warning"
 			syslog_type_int = LOG_WARNING
-		case zend.E_PARSE:
+		case faults.E_PARSE:
 			error_type_str = "Parse error"
 			syslog_type_int = LOG_ERR
-		case zend.E_NOTICE:
+		case faults.E_NOTICE:
 			fallthrough
-		case zend.E_USER_NOTICE:
+		case faults.E_USER_NOTICE:
 			error_type_str = "Notice"
 			syslog_type_int = LOG_NOTICE
-		case zend.E_STRICT:
+		case faults.E_STRICT:
 			error_type_str = "Strict Standards"
 			syslog_type_int = LOG_INFO
-		case zend.E_DEPRECATED:
+		case faults.E_DEPRECATED:
 			fallthrough
-		case zend.E_USER_DEPRECATED:
+		case faults.E_USER_DEPRECATED:
 			error_type_str = "Deprecated"
 			syslog_type_int = LOG_INFO
 		default:
@@ -928,7 +929,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 				var prepend_string *byte = zend.INI_STR("error_prepend_string")
 				var append_string *byte = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
-					if type_ == zend.E_ERROR || type_ == zend.E_PARSE {
+					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
 						var buf *types.ZendString = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
 						types.ZendStringFree(buf)
@@ -955,7 +956,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	/* Bail out if we can't recover */
 
 	switch type_ {
-	case zend.E_CORE_ERROR:
+	case faults.E_CORE_ERROR:
 		if ModuleInitialized == 0 {
 
 			/* bad error in module startup - no way we can live with this */
@@ -966,15 +967,15 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 		}
 		fallthrough
-	case zend.E_ERROR:
+	case faults.E_ERROR:
 		fallthrough
-	case zend.E_RECOVERABLE_ERROR:
+	case faults.E_RECOVERABLE_ERROR:
 		fallthrough
-	case zend.E_PARSE:
+	case faults.E_PARSE:
 		fallthrough
-	case zend.E_COMPILE_ERROR:
+	case faults.E_COMPILE_ERROR:
 		fallthrough
-	case zend.E_USER_ERROR:
+	case faults.E_USER_ERROR:
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
 			if !(PG__().display_errors) && !(SG__().headers_sent) && SG__().sapi_headers.http_response_code == 200 {
@@ -986,14 +987,14 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 			/* the parser would return 1 (failure), we can bail out nicely */
 
-			if type_ != zend.E_PARSE {
+			if type_ != faults.E_PARSE {
 
 				/* restore memory limit */
 
 				zend.ZendSetMemoryLimit(PG__().memory_limit)
 				zend.Efree(buffer)
 				zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
-				zend.ZendBailout()
+				faults.ZendBailout()
 				return
 			}
 
@@ -1122,11 +1123,11 @@ func PhpFreeRequestGlobals() {
 func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 	switch message {
 	case zend.ZMSG_FAILED_INCLUDE_FOPEN:
-		PhpErrorDocref("function.include", zend.E_WARNING, "Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
+		PhpErrorDocref("function.include", faults.E_WARNING, "Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
 	case zend.ZMSG_FAILED_REQUIRE_FOPEN:
-		PhpErrorDocref("function.require", zend.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
+		PhpErrorDocref("function.require", faults.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG__().include_path))
 	case zend.ZMSG_FAILED_HIGHLIGHT_FOPEN:
-		PhpErrorDocref(nil, zend.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
+		PhpErrorDocref(nil, faults.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
 	case zend.ZMSG_MEMORY_LEAK_DETECTED:
 		fallthrough
 	case zend.ZMSG_MEMORY_LEAK_REPEATED:
@@ -1254,7 +1255,7 @@ func PhpRequestShutdown(dummy any) {
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var send_buffer types.ZendBool = b.Cond(SG__().request_info.headers_only, 0, 1)
-		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == zend.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
+		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == faults.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
 		}
 		if send_buffer == 0 {
@@ -1590,12 +1591,12 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 		directives  []*byte
 	}{
 		{
-			zend.E_DEPRECATED,
+			faults.E_DEPRECATED,
 			"Directive '%s' is deprecated",
 			{"track_errors", "allow_url_include", nil},
 		},
 		{
-			zend.E_CORE_ERROR,
+			faults.E_CORE_ERROR,
 			"Directive '%s' is no longer available in PHP",
 			{"allow_call_time_pass_reference", "asp_tags", "define_syslog_variables", "highlight.bg", "magic_quotes_gpc", "magic_quotes_runtime", "magic_quotes_sybase", "register_globals", "register_long_arrays", "safe_mode", "safe_mode_gid", "safe_mode_include_dir", "safe_mode_exec_dir", "safe_mode_allowed_env_vars", "safe_mode_protected_env_vars", "zend.ze1_compatibility_mode", nil},
 		},
@@ -1613,7 +1614,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 			for (*p) != nil {
 				var value zend.ZendLong
 				if CfgGetLong((*byte)(*p), &value) == types.SUCCESS && value != 0 {
-					zend.ZendError(directives[i].error_level, directives[i].phrase, *p)
+					faults.ZendError(directives[i].error_level, directives[i].phrase, *p)
 				}
 				p++
 			}
@@ -1747,7 +1748,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		var __bailout JMP_BUF
 		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			zend.ZendExceptionError(zend.EG__().GetException(), zend.E_ERROR)
+			faults.ZendExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 		}
 		zend.EG__().SetBailout(__orig_bailout)
 	}
@@ -1761,7 +1762,7 @@ func PhpHandleAbortedConnection() {
 	PG__().connection_status = PHP_CONNECTION_ABORTED
 	PhpOutputSetStatus(PHP_OUTPUT_DISABLED)
 	if !(PG__().ignore_user_abort) {
-		zend.ZendBailout()
+		faults.ZendBailout()
 	}
 }
 func PhpHandleAuthData(auth *byte) int {
@@ -1814,7 +1815,7 @@ func PhpLintScript(file *zend.ZendFileHandle) int {
 	}
 	zend.EG__().SetBailout(__orig_bailout)
 	if zend.EG__().GetException() != nil {
-		zend.ZendExceptionError(zend.EG__().GetException(), zend.E_ERROR)
+		faults.ZendExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 	}
 	return retval
 }

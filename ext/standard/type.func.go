@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -92,9 +93,9 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			zend.ZvalPtrDtor(&tmp)
 		}
 		if types.ZendStringEqualsLiteralCi(type_, "resource") {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot convert to resource type")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot convert to resource type")
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid type")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid type")
 		}
 		return_value.SetFalse()
 		return

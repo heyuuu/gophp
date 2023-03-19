@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -82,22 +83,22 @@ func PhpSetcookie(
 	var result int
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	if name.GetLen() == 0 {
-		zend.ZendError(zend.E_WARNING, "Cookie names must not be empty")
+		faults.ZendError(faults.E_WARNING, "Cookie names must not be empty")
 		return types.FAILURE
 	} else if strpbrk(name.GetVal(), "=,; \t\r\n013014") != nil {
-		zend.ZendError(zend.E_WARNING, "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\013\\014'")
+		faults.ZendError(faults.E_WARNING, "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if url_encode == 0 && value != nil && strpbrk(value.GetVal(), ",; \t\r\n013014") != nil {
-		zend.ZendError(zend.E_WARNING, "Cookie values cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
+		faults.ZendError(faults.E_WARNING, "Cookie values cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if path != nil && strpbrk(path.GetVal(), ",; \t\r\n013014") != nil {
-		zend.ZendError(zend.E_WARNING, "Cookie paths cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
+		faults.ZendError(faults.E_WARNING, "Cookie paths cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if domain != nil && strpbrk(domain.GetVal(), ",; \t\r\n013014") != nil {
-		zend.ZendError(zend.E_WARNING, "Cookie domains cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
+		faults.ZendError(faults.E_WARNING, "Cookie domains cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return types.FAILURE
 	}
 	if value == nil || value.GetLen() == 0 {
@@ -138,7 +139,7 @@ func PhpSetcookie(
 			if p == nil || (*(p + 5)) != ' ' {
 				types.ZendStringFree(dt)
 				buf.Free()
-				zend.ZendError(zend.E_WARNING, "Expiry date cannot have a year greater than 9999")
+				faults.ZendError(faults.E_WARNING, "Expiry date cannot have a year greater than 9999")
 				return types.FAILURE
 			}
 			buf.AppendString(dt.GetStr())
@@ -213,17 +214,17 @@ func PhpHeadParseCookieOptionsArray(
 				*samesite = zend.ZvalGetString(value)
 				found++
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unrecognized key '%s' found in the options array", key.GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unrecognized key '%s' found in the options array", key.GetVal())
 			}
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Numeric key found in the options array")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Numeric key found in the options array")
 		}
 	}
 
 	/* Array is not empty but no valid keys were found */
 
 	if found == 0 && types.Z_ARRVAL_P(options).GetNNumOfElements() > 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "No valid options were found in the given array")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "No valid options were found in the given array")
 	}
 
 	/* Array is not empty but no valid keys were found */
@@ -264,7 +265,7 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if expires_or_options != nil {
 		if expires_or_options.IsType(types.IS_ARRAY) {
 			if executeData.NumArgs() > 3 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
 				return
 			}
@@ -328,7 +329,7 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *types.Zval
 	if expires_or_options != nil {
 		if expires_or_options.IsType(types.IS_ARRAY) {
 			if executeData.NumArgs() > 3 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot pass arguments after the options array")
 				return_value.SetFalse()
 				return
 			}

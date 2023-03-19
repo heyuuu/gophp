@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -16,7 +17,7 @@ func ZendCompileAssignRef(result *Znode, ast *ZendAst) {
 	var offset uint32
 	var flags uint32
 	if IsThisFetch(target_ast) != 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot re-assign $this")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ZendEnsureWritableVariable(target_ast)
 	offset = ZendDelayedCompileBegin()
@@ -43,7 +44,7 @@ func ZendCompileAssignRef(result *Znode, ast *ZendAst) {
 	}
 	opline = ZendDelayedCompileEnd(offset)
 	if source_node.GetOpType() != IS_VAR && ZendIsCall(source_ast) != 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use result of built-in function in write context")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use result of built-in function in write context")
 	}
 	if ZendIsCall(source_ast) != 0 {
 		flags = ZEND_RETURNS_FUNCTION
@@ -148,7 +149,7 @@ func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
 			continue
 		}
 		if uses_arg_unpack != 0 {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use positional argument after argument unpacking")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use positional argument after argument unpacking")
 		}
 		arg_count++
 		if ZendIsVariableOrCall(arg) != 0 {
@@ -246,7 +247,7 @@ func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
 				if fbc != nil {
 					opcode = ZEND_SEND_VAL
 					if ARG_MUST_BE_SENT_BY_REF(fbc, arg_num) != 0 {
-						ZendErrorNoreturn(E_COMPILE_ERROR, "Only variables can be passed by reference")
+						faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Only variables can be passed by reference")
 					}
 				} else {
 					opcode = ZEND_SEND_VAL_EX

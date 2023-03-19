@@ -9,6 +9,7 @@ import (
 	"sik/core/streams"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -32,7 +33,7 @@ func PhpDiskTotalSpace(path *byte, space *float64) int {
 	var bytestotal float64 = 0
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		return types.FAILURE
 	}
 	if buf.f_frsize {
@@ -83,7 +84,7 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 	var bytesfree float64 = 0
 	var buf __struct__statvfs
 	if statvfs(path, &buf) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		return types.FAILURE
 	}
 	if buf.f_frsize {
@@ -175,7 +176,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = group.GetStr().GetVal()
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
 				return_value.SetFalse()
 				return
 			}
@@ -190,7 +191,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 
 			/* On Windows, we expect regular chgrp to fail silently by default */
 
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call chgrp() for a non-standard stream")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Can not call chgrp() for a non-standard stream")
 			return_value.SetFalse()
 			return
 		}
@@ -199,12 +200,12 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		gid = gid_t(group.GetLval())
 	} else if group.IsType(types.IS_STRING) {
 		if PhpGetGidByName(group.GetStr().GetVal(), &gid) != types.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find gid for %s", group.GetStr().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find gid for %s", group.GetStr().GetVal())
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
 		return_value.SetFalse()
 		return
 	}
@@ -221,7 +222,7 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		ret = zend.VCWD_CHOWN(filename, -1, gid)
 	}
 	if ret == -1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -278,7 +279,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = user.GetStr().GetVal()
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
 				return_value.SetFalse()
 				return
 			}
@@ -293,7 +294,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 
 			/* On Windows, we expect regular chown to fail silently by default */
 
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call chown() for a non-standard stream")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Can not call chown() for a non-standard stream")
 			return_value.SetFalse()
 			return
 		}
@@ -302,12 +303,12 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		uid = uid_t(user.GetLval())
 	} else if user.IsType(types.IS_STRING) {
 		if PhpGetUidByName(user.GetStr().GetVal(), &uid) != types.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find uid for %s", user.GetStr().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find uid for %s", user.GetStr().GetVal())
 			return_value.SetFalse()
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
 		return_value.SetFalse()
 		return
 	}
@@ -324,7 +325,7 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 		ret = zend.VCWD_CHOWN(filename, uid, -1)
 	}
 	if ret == -1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -373,7 +374,7 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				return
 			}
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call chmod() for a non-standard stream")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Can not call chmod() for a non-standard stream")
 			return_value.SetFalse()
 			return
 		}
@@ -388,7 +389,7 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	imode = mode_t(mode)
 	ret = zend.VCWD_CHMOD(filename, imode)
 	if ret == -1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -458,7 +459,7 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		} else {
 			var stream *core.PhpStream
 			if argc > 1 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call touch() for a non-standard stream")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Can not call touch() for a non-standard stream")
 				return_value.SetFalse()
 				return
 			}
@@ -486,7 +487,7 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if zend.VCWD_ACCESS(filename, F_OK) != 0 {
 		file = zend.VCWD_FOPEN(filename, "w")
 		if file == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to create file %s because %s", filename, strerror(errno))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to create file %s because %s", filename, strerror(errno))
 			return_value.SetFalse()
 			return
 		}
@@ -494,7 +495,7 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	ret = zend.VCWD_UTIME(filename, newtime)
 	if ret == -1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Utime failed: %s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Utime failed: %s", strerror(errno))
 		return_value.SetFalse()
 		return
 	}
@@ -607,7 +608,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		/* Error Occurred */
 
 		if !(IS_EXISTS_CHECK(type_)) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%sstat failed for %s", b.Cond(IS_LINK_OPERATION(type_), "L", ""), filename)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%sstat failed for %s", b.Cond(IS_LINK_OPERATION(type_), "L", ""), filename)
 		}
 		return_value.SetFalse()
 		return
@@ -706,7 +707,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 			return_value.SetRawString("file")
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT)
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT)
 		return_value.SetRawString("unknown")
 		return
 	case FS_IS_W:
@@ -781,7 +782,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[12]), &stat_blocks)
 		return
 	}
-	core.PhpErrorDocref(nil, zend.E_WARNING, "Didn't understand stat call")
+	core.PhpErrorDocref(nil, faults.E_WARNING, "Didn't understand stat call")
 	return_value.SetFalse()
 	return
 }

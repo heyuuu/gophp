@@ -8,6 +8,7 @@ import (
 	"sik/ext/standard"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -27,7 +28,7 @@ func SplFindCeByName(name *types.ZendString, autoload types.ZendBool) *types.Cla
 		ce = zend.ZendLookupClass(name)
 	}
 	if ce == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Class %s does not exist%s", name.GetVal(), b.Cond(autoload != 0, " and could not be loaded", ""))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Class %s does not exist%s", name.GetVal(), b.Cond(autoload != 0, " and could not be loaded", ""))
 		return nil
 	}
 	return ce
@@ -42,7 +43,7 @@ func ZifClassParents(executeData *zend.ZendExecuteData, return_value *types.Zval
 		return
 	}
 	if obj.GetType() != types.IS_OBJECT && obj.GetType() != types.IS_STRING {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
 		return_value.SetFalse()
 		return
 	}
@@ -70,7 +71,7 @@ func ZifClassImplements(executeData *zend.ZendExecuteData, return_value *types.Z
 		return
 	}
 	if obj.GetType() != types.IS_OBJECT && obj.GetType() != types.IS_STRING {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
 		return_value.SetFalse()
 		return
 	}
@@ -94,7 +95,7 @@ func ZifClassUses(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if obj.GetType() != types.IS_OBJECT && obj.GetType() != types.IS_STRING {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "object or string expected")
 		return_value.SetFalse()
 		return
 	}
@@ -397,7 +398,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			if zcallable.IsType(types.IS_ARRAY) {
 				if obj_ptr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 					if do_throw != 0 {
-						zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error)
+						faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error)
 					}
 					if error != nil {
 						zend.Efree(error)
@@ -406,7 +407,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 					return_value.SetFalse()
 					return
 				} else if do_throw != 0 {
-					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(obj_ptr == nil, "static ", ""), error)
+					faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(obj_ptr == nil, "static ", ""), error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -416,7 +417,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 				return
 			} else if zcallable.IsType(types.IS_STRING) {
 				if do_throw != 0 {
-					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
+					faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -426,7 +427,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 				return
 			} else {
 				if do_throw != 0 {
-					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error)
+					faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Illegal value passed (%s)", error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -437,7 +438,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			}
 		} else if fcc.GetFunctionHandler().GetType() == zend.ZEND_INTERNAL_FUNCTION && fcc.GetFunctionHandler().GetInternalFunction().GetHandler() == ZifSplAutoloadCall {
 			if do_throw != 0 {
-				zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
+				faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
 			}
 			if error != nil {
 				zend.Efree(error)
@@ -565,7 +566,7 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *t
 		return
 	}
 	if zend.ZendIsCallableEx(zcallable, nil, zend.IS_CALLABLE_CHECK_SYNTAX_ONLY, &func_name, &fcc, &error) == 0 {
-		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error)
+		faults.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Unable to unregister invalid function (%s)", error)
 		if error != nil {
 			zend.Efree(error)
 		}

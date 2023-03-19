@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -180,7 +181,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	opline = ZendEmitOp(nil, ZEND_INIT_METHOD_CALL, &obj_node, nil)
 	if method_node.GetOpType() == IS_CONST {
 		if method_node.GetConstant().GetType() != types.IS_STRING {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Method name must be a string")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		opline.SetOp2Type(IS_CONST)
 		opline.GetOp2().SetConstant(ZendAddFuncNameLiteral(method_node.GetConstant().GetStr()))
@@ -229,7 +230,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	if method_node.GetOpType() == IS_CONST {
 		var name *types.Zval = method_node.GetConstant()
 		if name.GetType() != types.IS_STRING {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Method name must be a string")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		if ZendIsConstructor(name.GetStr()) != 0 {
 			ZvalPtrDtor(name)
@@ -334,7 +335,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 		ConvertToString(name_node.GetConstant())
 	}
 	if IsThisFetch(var_ast) != 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use $this as global variable")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as global variable")
 	} else if ZendTryCompileCv(&result, var_ast) == types.SUCCESS {
 		var opline *ZendOp = ZendEmitOp(nil, ZEND_BIND_GLOBAL, &result, &name_node)
 		opline.SetExtendedValue(ZendAllocCacheSlot())
@@ -362,7 +363,7 @@ func ZendCompileStaticVarCommon(var_name *types.ZendString, value *types.Zval, m
 	}
 	value = CG__().GetActiveOpArray().GetStaticVariables().KeyUpdate(var_name.GetStr(), value)
 	if types.ZendStringEqualsLiteral(var_name, "this") {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use $this as static variable")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as static variable")
 	}
 	opline = ZendEmitOp(nil, ZEND_BIND_STATIC, nil, nil)
 	opline.SetOp1Type(IS_CV)
@@ -388,7 +389,7 @@ func ZendCompileUnset(ast *ZendAst) {
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
 		if IsThisFetch(var_ast) != 0 {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot unset $this")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unset $this")
 		} else if ZendTryCompileCv(&var_node, var_ast) == types.SUCCESS {
 			opline = ZendEmitOp(nil, ZEND_UNSET_CV, &var_node, nil)
 		} else {
@@ -578,21 +579,21 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 	if depth_ast != nil {
 		var depth_zv *types.Zval
 		if depth_ast.GetKind() != ZEND_AST_ZVAL {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator with non-integer operand "+"is no longer supported", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth_zv = ZendAstGetZval(depth_ast)
 		if depth_zv.GetType() != types.IS_LONG || depth_zv.GetLval() < 1 {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' operator accepts only positive integers", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 		}
 		depth = depth_zv.GetLval()
 	} else {
 		depth = 1
 	}
 	if CG__().GetContext().GetCurrentBrkCont() == -1 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "'%s' not in the 'loop' or 'switch' context", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"))
 	} else {
 		if ZendHandleLoopsAndFinallyEx(depth, nil) == 0 {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"), depth, b.Cond(depth == 1, "", "s"))
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot '%s' "+ZEND_LONG_FMT+" level%s", b.Cond(ast.GetKind() == ZEND_AST_BREAK, "break", "continue"), depth, b.Cond(depth == 1, "", "s"))
 		}
 	}
 	if ast.GetKind() == ZEND_AST_CONTINUE {
@@ -604,9 +605,9 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 		}
 		if CG__().GetContext().GetBrkContArray()[cur].GetIsSwitch() != 0 {
 			if depth == 1 {
-				ZendError(E_WARNING, "\"continue\" targeting switch is equivalent to \"break\". "+"Did you mean to use \"continue "+ZEND_LONG_FMT+"\"?", depth+1)
+				faults.ZendError(faults.E_WARNING, "\"continue\" targeting switch is equivalent to \"break\". "+"Did you mean to use \"continue "+ZEND_LONG_FMT+"\"?", depth+1)
 			} else {
-				ZendError(E_WARNING, "\"continue "+ZEND_LONG_FMT+"\" targeting switch is equivalent to \"break "+ZEND_LONG_FMT+"\". "+"Did you mean to use \"continue "+ZEND_LONG_FMT+"\"?", depth, depth, depth+1)
+				faults.ZendError(faults.E_WARNING, "\"continue "+ZEND_LONG_FMT+"\" targeting switch is equivalent to \"break "+ZEND_LONG_FMT+"\". "+"Did you mean to use \"continue "+ZEND_LONG_FMT+"\"?", depth, depth, depth+1)
 			}
 		}
 	}
@@ -625,7 +626,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		CG__().SetZendLineno(opline.GetLineno())
-		ZendErrorNoreturn(E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.GetStr().GetVal())
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' to undefined label '%s'", label.GetStr().GetVal())
 	}
 	ZvalPtrDtorStr(label)
 	label.SetNull()
@@ -635,7 +636,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 			CG__().SetInCompilation(1)
 			CG__().SetActiveOpArray(op_array)
 			CG__().SetZendLineno(opline.GetLineno())
-			ZendErrorNoreturn(E_COMPILE_ERROR, "'goto' into loop or switch statement is disallowed")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "'goto' into loop or switch statement is disallowed")
 		}
 		if CG__().GetContext().GetBrkContArray()[current].GetStart() >= 0 {
 			remove_oplines--
@@ -687,7 +688,7 @@ func ZendCompileLabel(ast *ZendAst) {
 	dest.SetBrkCont(CG__().GetContext().GetCurrentBrkCont())
 	dest.SetOplineNum(GetNextOpNumber())
 	if !(ZendHashAddMem(CG__().GetContext().GetLabels(), label, &dest, b.SizeOf("zend_label"))) {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Label '%s' already defined", label.GetVal())
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Label '%s' already defined", label.GetVal())
 	}
 }
 func ZendCompileWhile(ast *ZendAst) {
@@ -776,10 +777,10 @@ func ZendCompileForeach(ast *ZendAst) {
 	var opnum_fetch uint32
 	if key_ast != nil {
 		if key_ast.GetKind() == ZEND_AST_REF {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Key element cannot be a reference")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Key element cannot be a reference")
 		}
 		if key_ast.GetKind() == ZEND_AST_ARRAY {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use list as key element")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use list as key element")
 		}
 	}
 	if by_ref != 0 {
@@ -802,7 +803,7 @@ func ZendCompileForeach(ast *ZendAst) {
 	opnum_fetch = GetNextOpNumber()
 	opline = ZendEmitOp(nil, b.Cond(by_ref != 0, ZEND_FE_FETCH_RW, ZEND_FE_FETCH_R), &reset_node, nil)
 	if IsThisFetch(value_ast) != 0 {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot re-assign $this")
+		faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	} else if value_ast.GetKind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == types.SUCCESS {
 		opline.SetOp2Type(value_node.GetOpType())
 		if value_node.GetOpType() == IS_CONST {

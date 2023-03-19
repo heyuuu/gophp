@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -56,7 +57,7 @@ func ZendFetchDimensionAddressRead(
 					result.SetNull()
 					return
 				}
-				ZendError(E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
+				faults.ZendError(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
 			case types.IS_UNDEF:
 				ZVAL_UNDEFINED_OP2()
 				fallthrough
@@ -68,7 +69,7 @@ func ZendFetchDimensionAddressRead(
 				fallthrough
 			case types.IS_TRUE:
 				if type_ != BP_VAR_IS {
-					ZendError(E_NOTICE, "String offset cast occurred")
+					faults.ZendError(faults.E_NOTICE, "String offset cast occurred")
 				}
 			case types.IS_REFERENCE:
 				dim = types.Z_REFVAL_P(dim)
@@ -82,7 +83,7 @@ func ZendFetchDimensionAddressRead(
 		}
 		if container.GetStr().GetLen() < b.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
-				ZendError(E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
+				faults.ZendError(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
 				ZVAL_EMPTY_STRING(result)
 			} else {
 				result.SetNull()
@@ -124,7 +125,7 @@ func ZendFetchDimensionAddressRead(
 			ZVAL_UNDEFINED_OP2()
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {
-			ZendError(E_NOTICE, "Trying to access array offset on value of type %s", ZendZvalTypeName(container))
+			faults.ZendError(faults.E_NOTICE, "Trying to access array offset on value of type %s", ZendZvalTypeName(container))
 		}
 		result.SetNull()
 	}
@@ -170,7 +171,7 @@ func ZendFindArrayDimSlow(ht *types.HashTable, offset *types.Zval, executeData *
 		ZVAL_UNDEFINED_OP2()
 		goto str_idx
 	} else {
-		ZendError(E_WARNING, "Illegal offset type in isset or empty")
+		faults.ZendError(faults.E_WARNING, "Illegal offset type in isset or empty")
 		return nil
 	}
 }
@@ -281,13 +282,13 @@ try_again:
 		str = types.ZSTR_EMPTY_ALLOC()
 		goto str_key
 	} else {
-		ZendError(E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")
+		faults.ZendError(faults.E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")
 		return types.IS_FALSE
 	}
 }
 func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
 	if subject.IsObject() {
-		ZendError(E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
+		faults.ZendError(faults.E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
 		var ht *types.HashTable = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
 		var result uint32 = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 		ZendReleaseProperties(ht)
@@ -299,7 +300,7 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp
 		if subject.GetTypeInfo() == types.IS_UNDEF {
 			ZVAL_UNDEFINED_OP2()
 		}
-		ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", ZendGetTypeByConst(subject.GetType()))
+		faults.ZendInternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", ZendGetTypeByConst(subject.GetType()))
 		return types.IS_NULL
 	}
 }

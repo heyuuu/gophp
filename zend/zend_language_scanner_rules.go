@@ -3,6 +3,7 @@ package zend
 import (
 	"math"
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"strings"
 )
@@ -25,7 +26,7 @@ func (sc *LangScanner) parseNumStr(str string, base int) (lVal int, dVal float64
 		}
 
 		if digit >= base {
-			ZendThrowException(ZendCeParseError, "Invalid numeric literal", 0)
+			faults.ZendThrowException(faults.ZendCeParseError, "Invalid numeric literal", 0)
 		}
 
 		// 预期数字会越界时，改用浮点数
@@ -51,7 +52,7 @@ func (sc *LangScanner) tokenWithNumStr(offset int, base int) (int, bool) {
 	if base == 8 {
 		for i, c := range str {
 			if c == '8' || c == '9' {
-				ZendThrowException(ZendCeParseError, "Invalid numeric literal", 0)
+				faults.ZendThrowException(faults.ZendCeParseError, "Invalid numeric literal", 0)
 				if sc.isParserMode() {
 					sc.zendlval.SetUndef()
 					return sc.token(T_ERROR)
@@ -195,7 +196,7 @@ func (sc *LangScanner) lexerRule17() (int, bool) {
 	if sc.canRead() {
 		sc.skip()
 	} else if !sc.heredocScanAhead {
-		ZendError(E_COMPILE_WARNING, "Unterminated comment starting line %d", CG__().zend_lineno)
+		faults.ZendError(faults.E_COMPILE_WARNING, "Unterminated comment starting line %d", CG__().zend_lineno)
 	}
 
 	sc.resetLen()
@@ -337,7 +338,7 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 	if sc.peekStrIs(label) {
 		if !(isLabelSuccessor(sc.peekOffset(len(label)))) {
 			if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
-				ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
+				faults.ZendThrowException(faults.ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 				if sc.isParserMode() {
 					return sc.token(T_ERROR)
 				}
@@ -363,11 +364,11 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 		sc.onEvent = nil
 		CG__().doc_comment = nil
 		currentState.heredocLabelStack.ApplyReverse(CopyHeredocLabelStack)
-		ZendExceptionSave()
+		faults.ZendExceptionSave()
 		for heredocNestingLevel != 0 {
 			retval, _ := sc.LexScan(nil)
 			if EG__().exception != nil {
-				ZendClearException()
+				faults.ZendClearException()
 				break
 			}
 			if firstToken == 0 {
@@ -382,9 +383,9 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 				heredocNestingLevel = 0
 			}
 		}
-		ZendExceptionRestore()
+		faults.ZendExceptionRestore()
 		if b.EqualsAny(firstToken, T_VARIABLE, T_DOLLAR_OPEN_CURLY_BRACES, T_CURLY_OPEN) && sc.heredocIndentation != 0 {
-			ZendThrowExceptionEx(ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", sc.heredocIndentation)
+			faults.ZendThrowExceptionEx(faults.ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", sc.heredocIndentation)
 			errno = 1
 		}
 		heredocLabel.indentation = sc.heredocIndentation
@@ -532,7 +533,7 @@ func (sc *LangScanner) lexerRule25() (int, bool) {
 					continue
 				}
 				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
-					ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
+					faults.ZendThrowException(faults.ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 					if sc.isParserMode() {
 						return sc.token(T_ERROR)
 					}
@@ -638,7 +639,7 @@ func (sc *LangScanner) lexerRule26() (int, bool) {
 					continue
 				}
 				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
-					ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
+					faults.ZendThrowException(faults.ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 					if sc.isParserMode() {
 						return sc.token(T_ERROR)
 					}
@@ -679,7 +680,7 @@ func (sc *LangScanner) lexerRule27() (int, bool) {
 		return sc.token(END)
 	}
 	if !sc.heredocScanAhead {
-		ZendError(E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", sc.yyText0(), sc.yyText0(), sc.state)
+		faults.ZendError(faults.E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", sc.yyText0(), sc.yyText0(), sc.state)
 	}
 	if sc.isParserMode() {
 		return 0, true

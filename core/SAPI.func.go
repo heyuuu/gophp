@@ -3,6 +3,7 @@ package core
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"strings"
 )
@@ -30,7 +31,7 @@ func SapiRunHeaderCallback(callback *types.Zval) {
 		}
 	} else {
 	callback_failed:
-		PhpErrorDocref(nil, zend.E_WARNING, "Could not call the sapi_header_callback")
+		PhpErrorDocref(nil, faults.E_WARNING, "Could not call the sapi_header_callback")
 	}
 	if callback_error != nil {
 		zend.Efree(callback_error)
@@ -89,7 +90,7 @@ func SapiReadPostData() {
 			/* no default reader ? */
 
 			SG__().request_info.content_type_dup = nil
-			SM__().SapiError(zend.E_WARNING, "Unsupported content type:  '%s'", content_type)
+			SM__().SapiError(faults.E_WARNING, "Unsupported content type:  '%s'", content_type)
 			return
 		}
 	}
@@ -132,7 +133,7 @@ func SapiReadPostBlock(buffer *byte, buflen int) int {
 }
 func SapiReadStandardFormData() {
 	if SG__().post_max_size > 0 && SG__().request_info.content_length > SG__().post_max_size {
-		PhpErrorDocref(nil, zend.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
+		PhpErrorDocref(nil, faults.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
 		return
 	}
 	SG__().request_info.request_body = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG__().upload_tmp_dir)
@@ -147,12 +148,12 @@ func SapiReadStandardFormData() {
 					/* if parts of the stream can't be written, purge it completely */
 
 					PhpStreamTruncateSetSize(SG__().request_info.request_body, 0)
-					PhpErrorDocref(nil, zend.E_WARNING, "POST data can't be buffered; all data discarded")
+					PhpErrorDocref(nil, faults.E_WARNING, "POST data can't be buffered; all data discarded")
 					break
 				}
 			}
 			if SG__().post_max_size > 0 && SG__().read_post_bytes > SG__().post_max_size {
-				PhpErrorDocref(nil, zend.E_WARNING, "Actual POST length does not match Content-Length, and exceeds "+zend.ZEND_LONG_FMT+" bytes", SG__().post_max_size)
+				PhpErrorDocref(nil, faults.E_WARNING, "Actual POST length does not match Content-Length, and exceeds "+zend.ZEND_LONG_FMT+" bytes", SG__().post_max_size)
 				break
 			}
 			if read_bytes < SAPI_POST_BLOCK_SIZE {
@@ -430,9 +431,9 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		var output_start_filename *byte = PhpOutputGetStartFilename()
 		var output_start_lineno int = PhpOutputGetStartLineno()
 		if output_start_filename != nil {
-			SM__().SapiError(zend.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", output_start_filename, output_start_lineno)
+			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", output_start_filename, output_start_lineno)
 		} else {
-			SM__().SapiError(zend.E_WARNING, "Cannot modify header information - headers already sent")
+			SM__().SapiError(faults.E_WARNING, "Cannot modify header information - headers already sent")
 		}
 		return types.FAILURE
 	}
@@ -475,7 +476,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	if op == SAPI_HEADER_DELETE {
 		if strchr(header_line, ':') {
 			zend.Efree(header_line)
-			SM__().SapiError(zend.E_WARNING, "Header to delete may not contain colon.")
+			SM__().SapiError(faults.E_WARNING, "Header to delete may not contain colon.")
 			return types.FAILURE
 		}
 
@@ -496,12 +497,12 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 
 			if header_line[i] == '\n' || header_line[i] == '\r' {
 				zend.Efree(header_line)
-				SM__().SapiError(zend.E_WARNING, "Header may not contain "+"more than a single header, new line detected")
+				SM__().SapiError(faults.E_WARNING, "Header may not contain "+"more than a single header, new line detected")
 				return types.FAILURE
 			}
 			if header_line[i] == '0' {
 				zend.Efree(header_line)
-				SM__().SapiError(zend.E_WARNING, "Header may not contain NUL bytes")
+				SM__().SapiError(faults.E_WARNING, "Header may not contain NUL bytes")
 				return types.FAILURE
 			}
 		}

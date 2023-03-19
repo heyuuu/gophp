@@ -8,6 +8,7 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -80,7 +81,7 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		fcc.SetCalledScope(types.Z_OBJCE_P(object))
 		fcc.SetObject(object.GetObj())
 		if zend.ZendCallFunction(&fci, &fcc) == types.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().GetName().GetVal(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().GetName().GetVal(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
 			zend.ZvalPtrDtor(object)
 			object.SetUndef()
 		} else {
@@ -145,7 +146,7 @@ func UserWrapperOpener(
 	} else {
 		zend.EG__().SetBailout(__orig_bailout)
 		standard.FG(user_stream_current_filename) = nil
-		zend.ZendBailout()
+		faults.ZendBailout()
 	}
 	zend.EG__().SetBailout(__orig_bailout)
 	if call_result == types.SUCCESS && zretval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&zretval) != 0 {
@@ -281,12 +282,12 @@ func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *t
 			/* We failed.  But why? */
 
 			if zend.ZendHashExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol) != 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
 
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", classname.GetVal(), protocol.GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", classname.GetVal(), protocol.GetVal())
 
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
 
@@ -296,7 +297,7 @@ func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *t
 
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "class '%s' is undefined", classname.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "class '%s' is undefined", classname.GetVal())
 	}
 	zend.ZendListDelete(rsrc)
 	return_value.SetFalse()
@@ -312,7 +313,7 @@ func ZifStreamWrapperUnregister(executeData *zend.ZendExecuteData, return_value 
 
 		/* We failed */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to unregister protocol %s://", protocol.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to unregister protocol %s://", protocol.GetVal())
 		return_value.SetFalse()
 		return
 	}
@@ -330,13 +331,13 @@ func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
 	if b.Assign(&wrapper, zend.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
 		return_value.SetFalse()
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
 	if wrapper_hash == global_wrapper_hash || zend.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
 		return_value.SetTrue()
 		return
 	}
@@ -345,7 +346,7 @@ func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *ty
 
 	PhpUnregisterUrlStreamWrapperVolatile(protocol)
 	if PhpRegisterUrlStreamWrapperVolatile(protocol, wrapper) == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to restore original %s:// wrapper", protocol.GetVal())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to restore original %s:// wrapper", protocol.GetVal())
 		return_value.SetFalse()
 		return
 	}
@@ -376,14 +377,14 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 			didwrite = retval.GetLval()
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_WRITE+" is not implemented!", us.GetWrapper().GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_WRITE+" is not implemented!", us.GetWrapper().GetClassname())
 		didwrite = -1
 	}
 
 	/* don't allow strange buffer overruns due to bogus return */
 
 	if didwrite > 0 && didwrite > count {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_WRITE+" wrote "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" written, "+zend.ZEND_LONG_FMT+" max)", us.GetWrapper().GetClassname(), zend_long(didwrite-count), zend.ZendLong(didwrite), zend.ZendLong(count))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_WRITE+" wrote "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" written, "+zend.ZEND_LONG_FMT+" max)", us.GetWrapper().GetClassname(), zend_long(didwrite-count), zend.ZendLong(didwrite), zend.ZendLong(count))
 		didwrite = count
 	}
 	zend.ZvalPtrDtor(&retval)
@@ -406,7 +407,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		return -1
 	}
 	if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_READ+" is not implemented!", us.GetWrapper().GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_READ+" is not implemented!", us.GetWrapper().GetClassname())
 		return -1
 	}
 	if retval.IsType(types.IS_FALSE) {
@@ -418,7 +419,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	didread = retval.GetStr().GetLen()
 	if didread > 0 {
 		if didread > count {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" read, "+zend.ZEND_LONG_FMT+" max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" read, "+zend.ZEND_LONG_FMT+" max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
 			didread = count
 		}
 		memcpy(buf, retval.GetStr().GetVal(), didread)
@@ -438,7 +439,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&retval) != 0 {
 		stream.SetEof(1)
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_EOF+" is not implemented! Assuming EOF", us.GetWrapper().GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_EOF+" is not implemented! Assuming EOF", us.GetWrapper().GetClassname())
 		stream.SetEof(1)
 	}
 	zend.ZvalPtrDtor(&retval)
@@ -519,7 +520,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 		*newoffs = retval.GetLval()
 		ret = 0
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_TELL+" is not implemented!", us.GetWrapper().GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_TELL+" is not implemented!", us.GetWrapper().GetClassname())
 		ret = -1
 	} else {
 		ret = -1
@@ -591,7 +592,7 @@ func PhpUserstreamopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int
 		}
 	} else {
 		if call_result == types.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_STAT+" is not implemented!", us.GetWrapper().GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_STAT+" is not implemented!", us.GetWrapper().GetClassname())
 		}
 	}
 	zend.ZvalPtrDtor(&retval)
@@ -617,7 +618,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 			}
 		} else {
 			ret = core.PHP_STREAM_OPTION_RETURN_ERR
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_EOF+" is not implemented! Assuming EOF", us.GetWrapper().GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_EOF+" is not implemented! Assuming EOF", us.GetWrapper().GetClassname())
 		}
 		zend.ZvalPtrDtor(&retval)
 		zend.ZvalPtrDtor(&func_name)
@@ -651,7 +652,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 				/* lock support test (TODO: more check) */
 
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_LOCK+" is not implemented!", us.GetWrapper().GetClassname())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_LOCK+" is not implemented!", us.GetWrapper().GetClassname())
 				ret = core.PHP_STREAM_OPTION_RETURN_ERR
 			}
 		}
@@ -680,10 +681,10 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 							ret = core.PHP_STREAM_OPTION_RETURN_ERR
 						}
 					} else {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_TRUNCATE+" did not return a boolean!", us.GetWrapper().GetClassname())
+						core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_TRUNCATE+" did not return a boolean!", us.GetWrapper().GetClassname())
 					}
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_TRUNCATE+" is not implemented!", us.GetWrapper().GetClassname())
+					core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_TRUNCATE+" is not implemented!", us.GetWrapper().GetClassname())
 				}
 				zend.ZvalPtrDtor(&retval)
 				zend.ZvalPtrDtor(&args[0])
@@ -724,7 +725,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		}
 		call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 3, args, 0)
 		if call_result == types.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_SET_OPTION+" is not implemented!", us.GetWrapper().GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_SET_OPTION+" is not implemented!", us.GetWrapper().GetClassname())
 			ret = core.PHP_STREAM_OPTION_RETURN_ERR
 		} else if zend.ZendIsTrue(&retval) != 0 {
 			ret = core.PHP_STREAM_OPTION_RETURN_OK
@@ -763,7 +764,7 @@ func UserWrapperUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 	if call_result == types.SUCCESS && (zretval.IsType(types.IS_FALSE) || zretval.IsType(types.IS_TRUE)) {
 		ret = zretval.IsType(types.IS_TRUE)
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_UNLINK+" is not implemented!", uwrap.GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_UNLINK+" is not implemented!", uwrap.GetClassname())
 	}
 
 	/* clean up */
@@ -799,7 +800,7 @@ func UserWrapperRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *b
 	if call_result == types.SUCCESS && (zretval.IsType(types.IS_FALSE) || zretval.IsType(types.IS_TRUE)) {
 		ret = zretval.IsType(types.IS_TRUE)
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_RENAME+" is not implemented!", uwrap.GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_RENAME+" is not implemented!", uwrap.GetClassname())
 	}
 
 	/* clean up */
@@ -837,7 +838,7 @@ func UserWrapperMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, optio
 	if call_result == types.SUCCESS && (zretval.IsType(types.IS_FALSE) || zretval.IsType(types.IS_TRUE)) {
 		ret = zretval.IsType(types.IS_TRUE)
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_MKDIR+" is not implemented!", uwrap.GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_MKDIR+" is not implemented!", uwrap.GetClassname())
 	}
 
 	/* clean up */
@@ -875,7 +876,7 @@ func UserWrapperRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, co
 	if call_result == types.SUCCESS && (zretval.IsType(types.IS_FALSE) || zretval.IsType(types.IS_TRUE)) {
 		ret = zretval.IsType(types.IS_TRUE)
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_RMDIR+" is not implemented!", uwrap.GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_RMDIR+" is not implemented!", uwrap.GetClassname())
 	}
 
 	/* clean up */
@@ -914,7 +915,7 @@ func UserWrapperMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int, 
 	case core.PHP_STREAM_META_OWNER_NAME:
 		args[2].SetRawString(b.CastStrAuto(value))
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown option %d for "+USERSTREAM_METADATA, option)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown option %d for "+USERSTREAM_METADATA, option)
 		zend.ZvalPtrDtor(&args[2])
 		return ret
 	}
@@ -936,7 +937,7 @@ func UserWrapperMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int, 
 	if call_result == types.SUCCESS && (zretval.IsType(types.IS_FALSE) || zretval.IsType(types.IS_TRUE)) {
 		ret = zretval.IsType(types.IS_TRUE)
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_METADATA+" is not implemented!", uwrap.GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_METADATA+" is not implemented!", uwrap.GetClassname())
 	}
 
 	/* clean up */
@@ -983,7 +984,7 @@ func UserWrapperStatUrl(wrapper *core.PhpStreamWrapper, url *byte, flags int, ss
 
 	} else {
 		if call_result == types.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_STATURL+" is not implemented!", uwrap.GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_STATURL+" is not implemented!", uwrap.GetClassname())
 		}
 	}
 
@@ -1016,7 +1017,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 		core.PHP_STRLCPY(ent.GetDName(), retval.GetStr().GetVal(), b.SizeOf("ent -> d_name"), retval.GetStr().GetLen())
 		didread = b.SizeOf("php_stream_dirent")
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_DIR_READ+" is not implemented!", us.GetWrapper().GetClassname())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_DIR_READ+" is not implemented!", us.GetWrapper().GetClassname())
 	}
 	zend.ZvalPtrDtor(&retval)
 	zend.ZvalPtrDtor(&func_name)
@@ -1064,7 +1065,7 @@ func PhpUserstreamopCast(stream *core.PhpStream, castas int, retptr *any) int {
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
 	for {
 		if call_result == types.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_CAST+" is not implemented!", us.GetWrapper().GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_CAST+" is not implemented!", us.GetWrapper().GetClassname())
 			break
 		}
 		if zend.ZendIsTrue(&retval) == 0 {
@@ -1072,11 +1073,11 @@ func PhpUserstreamopCast(stream *core.PhpStream, castas int, retptr *any) int {
 		}
 		core.PhpStreamFromZvalNoVerify(intstream, &retval)
 		if intstream == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_CAST+" must return a stream resource", us.GetWrapper().GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_CAST+" must return a stream resource", us.GetWrapper().GetClassname())
 			break
 		}
 		if intstream == stream {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_CAST+" must not return itself", us.GetWrapper().GetClassname())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_CAST+" must not return itself", us.GetWrapper().GetClassname())
 			intstream = nil
 			break
 		}

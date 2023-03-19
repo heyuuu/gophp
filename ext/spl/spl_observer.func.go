@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -32,7 +33,7 @@ func SplObjectStorageGetHash(key *types.ZendHashKey, intern *spl_SplObjectStorag
 				key.SetKey(rv.GetStr())
 				return types.SUCCESS
 			} else {
-				zend.ZendThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
+				faults.ZendThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
 				zend.ZvalPtrDtor(&rv)
 				return types.FAILURE
 			}
@@ -286,7 +287,7 @@ func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, retur
 	element = SplObjectStorageGet(intern, &key)
 	SplObjectStorageFreeHash(intern, &key)
 	if element == nil {
-		zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Object not found")
+		faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Object not found")
 	} else {
 		var value *types.Zval = element.GetInf()
 		types.ZVAL_COPY_DEREF(return_value, value)
@@ -610,7 +611,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 	return
 outexcept:
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
-	zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
+	faults.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
 	return
 }
 func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -656,11 +657,11 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 	storage_zv = data.IndexFindH(0)
 	members_zv = data.IndexFindH(1)
 	if storage_zv == nil || members_zv == nil || storage_zv.GetType() != types.IS_ARRAY || members_zv.GetType() != types.IS_ARRAY {
-		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
+		faults.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
 	if types.Z_ARRVAL_P(storage_zv).GetNNumOfElements()%2 != 0 {
-		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Odd number of elements", 0)
+		faults.ZendThrowException(spl_ce_UnexpectedValueException, "Odd number of elements", 0)
 		return
 	}
 	key = nil
@@ -671,7 +672,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 		val = _z
 		if key != nil {
 			if key.GetType() != types.IS_OBJECT {
-				zend.ZendThrowException(spl_ce_UnexpectedValueException, "Non-object key", 0)
+				faults.ZendThrowException(spl_ce_UnexpectedValueException, "Non-object key", 0)
 				return
 			}
 			SplObjectStorageAttach(intern, zend.ZEND_THIS(executeData), key, val)
@@ -724,13 +725,13 @@ func zim_spl_MultipleIterator_attachIterator(executeData *zend.ZendExecuteData, 
 	if info != nil {
 		var element *spl_SplObjectStorageElement
 		if info.GetType() != types.IS_LONG && info.GetType() != types.IS_STRING {
-			zend.ZendThrowException(spl_ce_InvalidArgumentException, "Info must be NULL, integer or string", 0)
+			faults.ZendThrowException(spl_ce_InvalidArgumentException, "Info must be NULL, integer or string", 0)
 			return
 		}
 		zend.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
 		for b.Assign(&element, zend.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil {
 			if zend.FastIsIdenticalFunction(info, element.GetInf()) != 0 {
-				zend.ZendThrowException(spl_ce_InvalidArgumentException, "Key duplication error", 0)
+				faults.ZendThrowException(spl_ce_InvalidArgumentException, "Key duplication error", 0)
 				return
 			}
 			zend.ZendHashMoveForwardEx(intern.GetStorage(), intern.GetPos())
@@ -836,14 +837,14 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 				zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
 			}
 			if retval.IsUndef() {
-				zend.ZendThrowException(spl_ce_RuntimeException, "Failed to call sub iterator method", 0)
+				faults.ZendThrowException(spl_ce_RuntimeException, "Failed to call sub iterator method", 0)
 				return
 			}
 		} else if intern.IsNeedAll() {
 			if SPL_MULTIPLE_ITERATOR_GET_ALL_CURRENT == get_type {
-				zend.ZendThrowException(spl_ce_RuntimeException, "Called current() with non valid sub iterator", 0)
+				faults.ZendThrowException(spl_ce_RuntimeException, "Called current() with non valid sub iterator", 0)
 			} else {
-				zend.ZendThrowException(spl_ce_RuntimeException, "Called key() with non valid sub iterator", 0)
+				faults.ZendThrowException(spl_ce_RuntimeException, "Called key() with non valid sub iterator", 0)
 			}
 			return
 		} else {
@@ -857,7 +858,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 				return_value.GetArr().SymtableUpdate(element.GetInf().GetStr().GetStr(), &retval)
 			default:
 				zend.ZvalPtrDtor(&retval)
-				zend.ZendThrowException(spl_ce_InvalidArgumentException, "Sub-Iterator is associated with NULL", 0)
+				faults.ZendThrowException(spl_ce_InvalidArgumentException, "Sub-Iterator is associated with NULL", 0)
 				return
 			}
 		} else {

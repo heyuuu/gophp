@@ -9,6 +9,7 @@ import (
 	"sik/core/streams"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -46,7 +47,7 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *types.
 	}
 	if 0 != socketpair(int(domain), int(type_), int(protocol), pair) {
 		var errbuf []byte
-		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to create sockets: [%d]: %s", core.PhpSocketErrno(), core.PhpSocketStrerror(core.PhpSocketErrno(), errbuf, b.SizeOf("errbuf")))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "failed to create sockets: [%d]: %s", core.PhpSocketErrno(), core.PhpSocketStrerror(core.PhpSocketErrno(), errbuf, b.SizeOf("errbuf")))
 		return_value.SetFalse()
 		return
 	}
@@ -122,7 +123,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *type
 		/* host might contain binary characters */
 
 		var quoted_host *types.ZendString = PhpAddslashes(host)
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 		types.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
@@ -191,7 +192,7 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *type
 	}
 	stream = streams.PhpStreamXportCreate(host, host_len, core.REPORT_ERRORS, streams.STREAM_XPORT_SERVER|int(flags), nil, nil, context, &errstr, &err)
 	if stream == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", host, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", host, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 	}
 	if stream == nil {
 		if zerrno != nil {
@@ -256,7 +257,7 @@ func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *type
 		if peername != nil {
 			types.ZendStringRelease(peername)
 		}
-		core.PhpErrorDocref(nil, zend.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
 		return_value.SetFalse()
 	}
 	if errstr != nil {
@@ -335,7 +336,7 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *type
 		/* parse the address */
 
 		if types.FAILURE == core.PhpNetworkParseNetworkAddressWithPort(target_addr, target_addr_len, (*__struct__sockaddr)(&sa), &sl) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to parse `%s' into a valid network address", target_addr)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to parse `%s' into a valid network address", target_addr)
 			return_value.SetFalse()
 			return
 		}
@@ -381,7 +382,7 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ty
 		zend.ZEND_TRY_ASSIGN_REF_NULL(zremote)
 	}
 	if to_read <= 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter must be greater than 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
 		return_value.SetFalse()
 		return
 	}
@@ -427,7 +428,7 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *types
 		break
 	}
 	if maxlen < 0 && maxlen != ssize_t(core.PHP_STREAM_COPY_ALL) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Length must be greater than or equal to zero, or -1")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Length must be greater than or equal to zero, or -1")
 		return_value.SetFalse()
 		return
 	}
@@ -454,7 +455,7 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *types
 
 		}
 		if seek_res != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", desiredpos)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", desiredpos)
 			return_value.SetFalse()
 			return
 		}
@@ -500,7 +501,7 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *type
 	core.PhpStreamFromZval(src, zsrc)
 	core.PhpStreamFromZval(dest, zdest)
 	if pos > 0 && core.PhpStreamSeek(src, pos, r.SEEK_SET) < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", pos)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", pos)
 		return_value.SetFalse()
 		return
 	}
@@ -822,7 +823,7 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 		sets += set_count
 	}
 	if sets == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "No stream arrays were passed")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "No stream arrays were passed")
 		return_value.SetFalse()
 		return
 	}
@@ -832,11 +833,11 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 
 	if secnull == 0 {
 		if sec < 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "The seconds parameter must be greater than 0")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "The seconds parameter must be greater than 0")
 			return_value.SetFalse()
 			return
 		} else if usec < 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "The microseconds parameter must be greater than 0")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "The microseconds parameter must be greater than 0")
 			return_value.SetFalse()
 			return
 		}
@@ -869,7 +870,7 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	retval = PhpSelect(max_fd+1, &rfds, &wfds, &efds, tv_p)
 	if retval == -1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to select [%d]: %s (max_fd=%d)", errno, strerror(errno), max_fd)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to select [%d]: %s (max_fd=%d)", errno, strerror(errno), max_fd)
 		return_value.SetFalse()
 		return
 	}
@@ -910,7 +911,7 @@ func UserSpaceStreamNotifier(
 	zvs[4].SetLong(bytes_sofar)
 	zvs[5].SetLong(bytes_max)
 	if types.FAILURE == zend.CallUserFunctionEx(nil, callback, &retval, 6, zvs, 0) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to call user notifier")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "failed to call user notifier")
 	}
 	for i = 0; i < 6; i++ {
 		zend.ZvalPtrDtor(&zvs[i])
@@ -948,7 +949,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 				}
 			}
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "options should have the form [\"wrappername\"][\"optionname\"] = $value")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "options should have the form [\"wrappername\"][\"optionname\"] = $value")
 		}
 	}
 	return ret
@@ -970,7 +971,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int 
 		if tmp.IsType(types.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 		}
 	}
 	return ret
@@ -1019,7 +1020,7 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 	}
 	context = DecodeContextParam(zcontext)
 	if context == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 		return_value.SetFalse()
 		return
 	}
@@ -1050,7 +1051,7 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 		/* figure out where the context is coming from exactly */
 
 		if !(b.Assign(&context, DecodeContextParam(zcontext))) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 			return_value.SetFalse()
 			return
 		}
@@ -1085,7 +1086,7 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 		/* figure out where the context is coming from exactly */
 
 		if !(b.Assign(&context, DecodeContextParam(zcontext))) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 			return_value.SetFalse()
 			return
 		}
@@ -1117,7 +1118,7 @@ func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *
 	}
 	context = DecodeContextParam(zcontext)
 	if context == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 		return_value.SetFalse()
 		return
 	}
@@ -1145,7 +1146,7 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 	}
 	context = DecodeContextParam(zcontext)
 	if context == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid stream/context parameter")
 		return_value.SetFalse()
 		return
 	}
@@ -1364,17 +1365,17 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *type
 	}
 	filter = zend.ZendFetchResource(zfilter.GetRes(), nil, streams.PhpFileLeStreamFilter())
 	if filter == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid resource given, not a stream filter")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid resource given, not a stream filter")
 		return_value.SetFalse()
 		return
 	}
 	if streams.PhpStreamFilterFlush(filter, 1) == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to flush filter, not removing")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to flush filter, not removing")
 		return_value.SetFalse()
 		return
 	}
 	if zend.ZendListClose(zfilter.GetRes()) == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not invalidate filter, not removing")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Could not invalidate filter, not removing")
 		return_value.SetFalse()
 		return
 	} else {
@@ -1411,7 +1412,7 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *types.Zva
 		break
 	}
 	if max_length < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The maximum allowed length must be greater than or equal to zero")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The maximum allowed length must be greater than or equal to zero")
 		return_value.SetFalse()
 		return
 	}
@@ -1558,7 +1559,7 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *type
 		break
 	}
 	if csize <= 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The chunk size must be a positive integer, given "+zend.ZEND_LONG_FMT, csize)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The chunk size must be a positive integer, given "+zend.ZEND_LONG_FMT, csize)
 		return_value.SetFalse()
 		return
 	}
@@ -1569,7 +1570,7 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *type
 	 */
 
 	if csize > core.INT_MAX {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The chunk size cannot be larger than %d", core.INT_MAX)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The chunk size cannot be larger than %d", core.INT_MAX)
 		return_value.SetFalse()
 		return
 	}
@@ -1650,7 +1651,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 		if cryptokindnull != 0 {
 			var val *types.Zval
 			if !(GET_CTX_OPT(stream, "ssl", "crypto_method", val)) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "When enabling encryption you must specify the crypto type")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "When enabling encryption you must specify the crypto type")
 				return_value.SetFalse()
 				return
 			}
@@ -1834,7 +1835,7 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ty
 		break
 	}
 	if how != streams.STREAM_SHUT_RD && how != streams.STREAM_SHUT_WR && how != streams.STREAM_SHUT_RDWR {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Second parameter $how needs to be one of STREAM_SHUT_RD, STREAM_SHUT_WR or STREAM_SHUT_RDWR")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Second parameter $how needs to be one of STREAM_SHUT_RD, STREAM_SHUT_WR or STREAM_SHUT_RDWR")
 		return_value.SetFalse()
 		return
 	}

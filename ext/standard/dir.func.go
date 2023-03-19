@@ -8,6 +8,7 @@ import (
 	"sik/core/streams"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -135,7 +136,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		myself = zend.getThis()
 		if myself != nil {
 			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
 			}
@@ -156,7 +157,7 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
 		return_value.SetFalse()
 		return
 	}
@@ -189,14 +190,14 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	ret = chroot(str)
 	if ret != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s (errno %d)", strerror(errno), errno)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s (errno %d)", strerror(errno), errno)
 		return_value.SetFalse()
 		return
 	}
 	PhpClearStatCache(1, nil, 0)
 	ret = chdir("/")
 	if ret != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s (errno %d)", strerror(errno), errno)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s (errno %d)", strerror(errno), errno)
 		return_value.SetFalse()
 		return
 	}
@@ -230,7 +231,7 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	ret = zend.VCWD_CHDIR(str)
 	if ret != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s (errno %d)", strerror(errno), errno)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s (errno %d)", strerror(errno), errno)
 		return_value.SetFalse()
 		return
 	}
@@ -286,7 +287,7 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		myself = zend.getThis()
 		if myself != nil {
 			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
 			}
@@ -307,7 +308,7 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
 		return_value.SetFalse()
 		return
 	}
@@ -340,7 +341,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		myself = zend.getThis()
 		if myself != nil {
 			if b.Assign(&tmp, types.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find my handle property")
 				return_value.SetFalse()
 				return
 			}
@@ -361,7 +362,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
 		return_value.SetFalse()
 		return
 	}
@@ -400,12 +401,12 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if pattern_len >= core.MAXPATHLEN {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
 		return_value.SetFalse()
 		return
 	}
 	if (GLOB_AVAILABLE_FLAGS & flags) != flags {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "At least one of the passed flags is invalid or not supported on this platform")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "At least one of the passed flags is invalid or not supported on this platform")
 		return_value.SetFalse()
 		return
 	}
@@ -500,7 +501,7 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if dirn_len < 1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Directory name cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Directory name cannot be empty")
 		return_value.SetFalse()
 		return
 	}
@@ -515,7 +516,7 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		n = core.PhpStreamScandir(dirn, &namelist, context, any(streams.PhpStreamDirentAlphasortr))
 	}
 	if n < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "(errno %d): %s", errno, strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "(errno %d): %s", errno, strerror(errno))
 		return_value.SetFalse()
 		return
 	}

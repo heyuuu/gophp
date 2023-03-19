@@ -8,6 +8,7 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -133,7 +134,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 	var inst *PhpStripTagsFilter
 	var filter *core.PhpStreamFilter = nil
 	var allowed_tags *types.ZendString = nil
-	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "The string.strip_tags filter is deprecated")
+	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "The string.strip_tags filter is deprecated")
 	if filterparams != nil {
 		if filterparams.IsType(types.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
@@ -1193,13 +1194,13 @@ func StrfilterConvertAppendBucket(
 			err = PhpConvConvert(inst.GetCd(), &pt, &tcnt, &pd, &ocnt)
 			switch err {
 			case PHP_CONV_ERR_INVALID_SEQ:
-				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
 				goto out_failure
 			case PHP_CONV_ERR_MORE:
 				if ps != nil {
 					if icnt > 0 {
 						if inst.GetStubLen() >= b.SizeOf("inst -> stub") {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
+							core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
 							goto out_failure
 						}
 						inst.GetStub()[b.PostInc(&(inst.GetStubLen()))] = *(b.PostInc(&ps))
@@ -1212,7 +1213,7 @@ func StrfilterConvertAppendBucket(
 					}
 				}
 			case PHP_CONV_ERR_UNEXPECTED_EOS:
-				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unexpected end of stream", inst.GetFiltername())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): unexpected end of stream", inst.GetFiltername())
 				goto out_failure
 			case PHP_CONV_ERR_TOO_BIG:
 				var new_out_buf *byte
@@ -1238,7 +1239,7 @@ func StrfilterConvertAppendBucket(
 					out_buf_size = new_out_buf_size
 				}
 			case PHP_CONV_ERR_UNKNOWN:
-				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
 				goto out_failure
 			default:
 
@@ -1255,12 +1256,12 @@ func StrfilterConvertAppendBucket(
 		}
 		switch err {
 		case PHP_CONV_ERR_INVALID_SEQ:
-			core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
 			goto out_failure
 		case PHP_CONV_ERR_MORE:
 			if ps != nil {
 				if icnt > b.SizeOf("inst -> stub") {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
+					core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): insufficient buffer", inst.GetFiltername())
 					goto out_failure
 				}
 				memcpy(inst.GetStub(), ps, icnt)
@@ -1268,7 +1269,7 @@ func StrfilterConvertAppendBucket(
 				ps += icnt
 				icnt = 0
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unexpected octet values", inst.GetFiltername())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): unexpected octet values", inst.GetFiltername())
 				goto out_failure
 			}
 		case PHP_CONV_ERR_TOO_BIG:
@@ -1295,7 +1296,7 @@ func StrfilterConvertAppendBucket(
 				out_buf_size = new_out_buf_size
 			}
 		case PHP_CONV_ERR_UNKNOWN:
-			core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
 			goto out_failure
 		default:
 			if ps == nil {
@@ -1362,7 +1363,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	var dot *byte
 	var conv_mode int = 0
 	if filterparams != nil && filterparams.GetType() != types.IS_ARRAY {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid filter parameter", filtername)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "stream filter (%s): invalid filter parameter", filtername)
 		return nil
 	}
 	if b.Assign(&dot, strchr(filtername, '.')) == nil {

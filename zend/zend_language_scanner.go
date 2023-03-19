@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -13,7 +14,7 @@ func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
 		if !(EG__().exception) {
 			if type_ == ZEND_REQUIRE {
 				ZendMessageDispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.filename)
-				ZendBailout()
+				faults.ZendBailout()
 			} else {
 				ZendMessageDispatcher(ZMSG_FAILED_INCLUDE_FOPEN, file_handle.filename)
 			}

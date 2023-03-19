@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -151,7 +152,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fallthrough
 		case '@':
 			if arg < 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: '*' ignored", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: '*' ignored", code)
 				arg = 1
 			}
 		case 'a':
@@ -166,7 +167,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if currentarg >= num_args {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough arguments", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: not enough arguments", code)
 				return_value.SetFalse()
 				return
 			}
@@ -246,14 +247,14 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			too_few_args:
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: too few arguments", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: too few arguments", code)
 				return_value.SetFalse()
 				return
 			}
 		default:
 			zend.Efree(formatcodes)
 			zend.Efree(formatargs)
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: unknown format code", code)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: unknown format code", code)
 			return_value.SetFalse()
 			return
 		}
@@ -261,7 +262,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		formatargs[formatcount] = arg
 	}
 	if currentarg < num_args {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d arguments unused", num_args-currentarg)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%d arguments unused", num_args-currentarg)
 	}
 
 	/* Calculate output length and upper bound while processing*/
@@ -276,7 +277,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if (arg+arg%2)/2 < 0 || (core.INT_MAX-outputpos)/int(1) < (arg+arg%2)/2 {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -295,7 +296,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(1) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -310,7 +311,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(2) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -321,7 +322,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("int")) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -336,7 +337,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(4) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -351,7 +352,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(8) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -364,7 +365,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("float")) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -377,7 +378,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("double")) < arg {
 				zend.Efree(formatcodes)
 				zend.Efree(formatargs)
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow in format string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow in format string", code)
 				return_value.SetFalse()
 				return
 			}
@@ -385,7 +386,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		case 'X':
 			outputpos -= arg
 			if outputpos < 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: outside of string", code)
 				outputpos = 0
 			}
 		case '@':
@@ -427,7 +428,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var v *byte = str.GetVal()
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough characters in string", code)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: not enough characters in string", code)
 				arg = str.GetLen()
 			}
 			for b.PostDec(&arg) > 0 {
@@ -439,7 +440,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				} else if n >= 'a' && n <= 'f' {
 					n -= 'a' - 10
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: illegal hex digit %c", code, n)
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: illegal hex digit %c", code, n)
 					n = 0
 				}
 				if b.PostDec(&first) {
@@ -637,7 +638,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	inputlen = inputarg.GetLen()
 	inputpos = 0
 	if offset < 0 || offset > inputlen {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Offset "+zend.ZEND_LONG_FMT+" is out of input range", offset)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset "+zend.ZEND_LONG_FMT+" is out of input range", offset)
 		return_value.SetFalse()
 		return
 	}
@@ -686,7 +687,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		case 'X':
 			size = -1
 			if arg < 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: '*' ignored", type_)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: '*' ignored", type_)
 				arg = 1
 			}
 		case '@':
@@ -754,13 +755,13 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		case 'E':
 			size = b.SizeOf("double")
 		default:
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid format type %c", type_)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format type %c", type_)
 			return_value.GetArr().DestroyEx()
 			return_value.SetFalse()
 			return
 		}
 		if size != 0 && size != -1 && size < 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow", type_)
 			return_value.GetArr().DestroyEx()
 			return_value.SetFalse()
 			return
@@ -791,7 +792,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 			}
 			if size != 0 && size != -1 && core.INT_MAX-size+1 < inputpos {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow", type_)
 				return_value.GetArr().DestroyEx()
 				return_value.SetFalse()
 				return
@@ -1027,21 +1028,21 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 						inputpos = -size
 						i = arg - 1
 						if arg >= 0 {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", type_)
+							core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: outside of string", type_)
 						}
 					}
 				case '@':
 					if arg <= inputlen {
 						inputpos = arg
 					} else {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", type_)
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: outside of string", type_)
 					}
 					i = arg - 1
 				}
 				inputpos += size
 				if inputpos < 0 {
 					if size != -1 {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", type_)
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: outside of string", type_)
 					}
 					inputpos = 0
 				}
@@ -1054,7 +1055,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				/* Reached end of input for '*' repeater */
 
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
 				return_value.GetArr().DestroyEx()
 				return_value.SetFalse()
 				return

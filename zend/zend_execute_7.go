@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -135,7 +136,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 			result.AddRefcount()
 		} else {
 			result.SetNull()
-			ZendError(E_NOTICE, "Undefined variable: this")
+			faults.ZendError(faults.E_NOTICE, "Undefined variable: this")
 		}
 	case BP_VAR_IS:
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
@@ -148,16 +149,16 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 		fallthrough
 	case BP_VAR_W:
 		result.SetUndef()
-		ZendThrowError(nil, "Cannot re-assign $this")
+		faults.ZendThrowError(nil, "Cannot re-assign $this")
 	case BP_VAR_UNSET:
 		result.SetUndef()
-		ZendThrowError(nil, "Cannot unset $this")
+		faults.ZendThrowError(nil, "Cannot unset $this")
 	default:
 
 	}
 }
 func ZendWrongCloneCall(clone *ZendFunction, scope *types.ClassEntry) {
-	ZendThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+	faults.ZendThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
 func ExecuteInternal(executeData *ZendExecuteData, return_value *types.Zval) {
 	executeData.GetFunc().GetInternalFunction().GetHandler()(executeData, return_value)

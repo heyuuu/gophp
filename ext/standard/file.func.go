@@ -10,6 +10,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -138,7 +139,7 @@ func ZifFlock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PHP_STREAM_TO_ZVAL(stream, res)
 	act = operation & 3
 	if act < 1 || act > 3 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Illegal operation argument")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Illegal operation argument")
 		return_value.SetFalse()
 		return
 	}
@@ -374,7 +375,7 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *types.Z
 		break
 	}
 	if executeData.NumArgs() == 5 && maxlen < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "length must be greater than or equal to zero")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "length must be greater than or equal to zero")
 		return_value.SetFalse()
 		return
 	}
@@ -385,7 +386,7 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *types.Z
 		return
 	}
 	if offset != 0 && core.PhpStreamSeek(stream, offset, b.Cond(offset > 0, r.SEEK_SET, r.SEEK_END)) < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", offset)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", offset)
 		core.PhpStreamClose(stream)
 		return_value.SetFalse()
 		return
@@ -440,7 +441,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 
 		if core.PhpMemnstr(filename, "://", b.SizeOf("\"://\"")-1, filename+filename_len) {
 			if strncasecmp(filename, "file://", b.SizeOf("\"file://\"")-1) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Exclusive locks may only be set for regular files")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Exclusive locks may only be set for regular files")
 				return_value.SetFalse()
 				return
 			}
@@ -455,7 +456,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 	if (flags&LOCK_EX) != 0 && (core.PhpStreamSupportsLock(stream) == 0 || core.PhpStreamLock(stream, LOCK_EX) != 0) {
 		core.PhpStreamClose(stream)
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Exclusive locks are not supported for this stream")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Exclusive locks are not supported for this stream")
 		return_value.SetFalse()
 		return
 	}
@@ -469,7 +470,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 			numbytes = -1
 		} else {
 			if len_ > zend.ZEND_LONG_MAX {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "content truncated from %zu to "+zend.ZEND_LONG_FMT+" bytes", len_, zend.ZEND_LONG_MAX)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "content truncated from %zu to "+zend.ZEND_LONG_FMT+" bytes", len_, zend.ZEND_LONG_MAX)
 				len_ = zend.ZEND_LONG_MAX
 			}
 			numbytes = len_
@@ -489,7 +490,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 		if data.GetStr().GetLen() != 0 {
 			numbytes = core.PhpStreamWrite(stream, data.GetStr().GetVal(), data.GetStr().GetLen())
 			if numbytes != data.GetStr().GetLen() {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.GetStr().GetLen())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.GetStr().GetLen())
 				numbytes = -1
 			}
 		}
@@ -508,7 +509,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 					numbytes += str.GetLen()
 					bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
 					if bytes_written != str.GetLen() {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
 						zend.ZendTmpStringRelease(t)
 						numbytes = -1
 						break
@@ -523,7 +524,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 			if zend.ZendStdCastObjectTostring(data, &out, types.IS_STRING) == types.SUCCESS {
 				numbytes = core.PhpStreamWrite(stream, out.GetStr().GetVal(), out.GetStr().GetLen())
 				if numbytes != out.GetStr().GetLen() {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.GetStr().GetLen())
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.GetStr().GetLen())
 					numbytes = -1
 				}
 				zend.ZvalPtrDtorStr(&out)
@@ -581,7 +582,7 @@ func ZifFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if flags < 0 || flags > (PHP_FILE_USE_INCLUDE_PATH|PHP_FILE_IGNORE_NEW_LINES|PHP_FILE_SKIP_EMPTY_LINES|PHP_FILE_NO_DEFAULT_CONTEXT) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "'"+zend.ZEND_LONG_FMT+"' flag is not supported", flags)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "'"+zend.ZEND_LONG_FMT+"' flag is not supported", flags)
 		return_value.SetFalse()
 		return
 	}
@@ -766,7 +767,7 @@ func ZifFclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	PHP_STREAM_TO_ZVAL(stream, res)
 	if stream.HasFlags(core.PHP_STREAM_FLAG_NO_FCLOSE) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid stream resource", stream.GetRes().GetHandle())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%d is not a valid stream resource", stream.GetRes().GetHandle())
 		return_value.SetFalse()
 		return
 	}
@@ -806,14 +807,14 @@ func ZifPopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	fp = zend.VCWD_POPEN(command, posix_mode)
 	if fp == nil {
-		core.PhpErrorDocref2(nil, command, posix_mode, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref2(nil, command, posix_mode, faults.E_WARNING, "%s", strerror(errno))
 		zend.Efree(posix_mode)
 		return_value.SetFalse()
 		return
 	}
 	stream = streams.PhpStreamFopenFromPipe(fp, mode)
 	if stream == nil {
-		core.PhpErrorDocref2(nil, command, mode, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref2(nil, command, mode, faults.E_WARNING, "%s", strerror(errno))
 		return_value.SetFalse()
 	} else {
 		core.PhpStreamToZval(stream, return_value)
@@ -920,7 +921,7 @@ func ZifFgets(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		zend.Efree(buf)
 	} else if argc > 1 {
 		if len_ <= 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter must be greater than 0")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
 			return_value.SetFalse()
 			return
 		}
@@ -1010,7 +1011,7 @@ func ZifFgetss(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PHP_STREAM_TO_ZVAL(stream, fd)
 	if executeData.NumArgs() >= 2 {
 		if bytes <= 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter must be greater than 0")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
 			return_value.SetFalse()
 			return
 		}
@@ -1259,7 +1260,7 @@ func PhpMkdirEx(dir *byte, mode zend.ZendLong, options int) int {
 		return -1
 	}
 	if b.Assign(&ret, zend.VCWD_MKDIR(dir, mode_t(mode))) < 0 && (options&core.REPORT_ERRORS) != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s", strerror(errno))
 	}
 	return ret
 }
@@ -1454,17 +1455,17 @@ func ZifRename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	wrapper = streams.PhpStreamLocateUrlWrapper(old_name, nil, 0)
 	if wrapper == nil || wrapper.GetWops() == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to locate stream wrapper")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to locate stream wrapper")
 		return_value.SetFalse()
 		return
 	}
 	if wrapper.GetWops().GetRename() == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s wrapper does not support renaming", b.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Source"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s wrapper does not support renaming", b.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Source"))
 		return_value.SetFalse()
 		return
 	}
 	if wrapper != streams.PhpStreamLocateUrlWrapper(new_name, nil, 0) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot rename a file across wrapper types")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot rename a file across wrapper types")
 		return_value.SetFalse()
 		return
 	}
@@ -1500,12 +1501,12 @@ func ZifUnlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
 	wrapper = streams.PhpStreamLocateUrlWrapper(filename, nil, 0)
 	if wrapper == nil || wrapper.GetWops() == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to locate stream wrapper")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to locate stream wrapper")
 		return_value.SetFalse()
 		return
 	}
 	if wrapper.GetWops().GetUnlink() == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s does not allow unlinking", b.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Wrapper"))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s does not allow unlinking", b.CondF1(wrapper.GetWops().GetLabel() != nil, func() *byte { return wrapper.GetWops().GetLabel() }, "Wrapper"))
 		return_value.SetFalse()
 		return
 	}
@@ -1535,13 +1536,13 @@ func PhpIfFtruncate(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		break
 	}
 	if size < 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Negative size is not supported")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Negative size is not supported")
 		return_value.SetFalse()
 		return
 	}
 	PHP_STREAM_TO_ZVAL(stream, fp)
 	if core.PhpStreamTruncateSupported(stream) == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Can't truncate this stream!")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Can't truncate this stream!")
 		return_value.SetFalse()
 		return
 	}
@@ -1696,7 +1697,7 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 		return ret
 	}
 	if zend.S_ISDIR(src_s.GetSb().st_mode) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The first argument to copy() function cannot be a directory")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument to copy() function cannot be a directory")
 		return types.FAILURE
 	}
 	switch core.PhpStreamStatPathEx(dest, core.PHP_STREAM_URL_STAT_QUIET|core.PHP_STREAM_URL_STAT_NOCACHE, &dest_s, ctx) {
@@ -1711,7 +1712,7 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 		return ret
 	}
 	if zend.S_ISDIR(dest_s.GetSb().st_mode) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The second argument to copy() function cannot be a directory")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The second argument to copy() function cannot be a directory")
 		return types.FAILURE
 	}
 	if !(src_s.GetSb().st_ino) || !(dest_s.GetSb().st_ino) {
@@ -1781,7 +1782,7 @@ func ZifFread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	PHP_STREAM_TO_ZVAL(stream, res)
 	if len_ <= 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter must be greater than 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
 		return_value.SetFalse()
 		return
 	}
@@ -1875,11 +1876,11 @@ func ZifFputcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		/* Make sure that there is at least one character in string */
 
 		if delimiter_str_len < 1 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "delimiter must be a character")
 			return_value.SetFalse()
 			return
 		} else if delimiter_str_len > 1 {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "delimiter must be a single character")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "delimiter must be a single character")
 		}
 
 		/* use first character from string */
@@ -1891,11 +1892,11 @@ func ZifFputcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if enclosure_str != nil {
 		if enclosure_str_len < 1 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "enclosure must be a character")
 			return_value.SetFalse()
 			return
 		} else if enclosure_str_len > 1 {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "enclosure must be a single character")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "enclosure must be a single character")
 		}
 
 		/* use first character from string */
@@ -1907,7 +1908,7 @@ func ZifFputcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if escape_str != nil {
 		if escape_str_len > 1 {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "escape must be empty or a single character")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "escape must be empty or a single character")
 		}
 		if escape_str_len < 1 {
 			escape_char = PHP_CSV_NO_ESCAPE
@@ -2024,11 +2025,11 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		/* Make sure that there is at least one character in string */
 
 		if delimiter_str_len < 1 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "delimiter must be a character")
 			return_value.SetFalse()
 			return
 		} else if delimiter_str_len > 1 {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "delimiter must be a single character")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "delimiter must be a single character")
 		}
 
 		/* use first character from string */
@@ -2040,11 +2041,11 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if enclosure_str != nil {
 		if enclosure_str_len < 1 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "enclosure must be a character")
 			return_value.SetFalse()
 			return
 		} else if enclosure_str_len > 1 {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "enclosure must be a single character")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "enclosure must be a single character")
 		}
 
 		/* use first character from string */
@@ -2056,7 +2057,7 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if escape_str != nil {
 		if escape_str_len > 1 {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "escape must be empty or a single character")
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "escape must be empty or a single character")
 		}
 		if escape_str_len < 1 {
 			escape = PHP_CSV_NO_ESCAPE
@@ -2067,7 +2068,7 @@ func ZifFgetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if len_zv != nil && len_zv.GetType() != types.IS_NULL {
 		len_ = zend.ZvalGetLong(len_zv)
 		if len_ < 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter may not be negative")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter may not be negative")
 			return_value.SetFalse()
 			return
 		} else if len_ == 0 {
@@ -2531,12 +2532,12 @@ func ZifFnmatch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if filename_len >= core.MAXPATHLEN {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Filename exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Filename exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
 		return_value.SetFalse()
 		return
 	}
 	if pattern_len >= core.MAXPATHLEN {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
 		return_value.SetFalse()
 		return
 	}

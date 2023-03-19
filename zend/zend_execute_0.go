@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -354,7 +355,7 @@ func _getZvalPtrVarDeref(var_ uint32, should_free *ZendFreeOp, executeData *Zend
 func ZvalUndefinedCv(var_ uint32, executeData *ZendExecuteData) *types.Zval {
 	if EG__().GetException() == nil {
 		var cv *types.ZendString = CV_DEF_OF(EX_VAR_TO_NUM(var_))
-		ZendError(E_NOTICE, "Undefined variable: %s", cv.GetVal())
+		faults.ZendError(faults.E_NOTICE, "Undefined variable: %s", cv.GetVal())
 	}
 	return EG__().GetUninitializedZval()
 }

@@ -3,7 +3,7 @@
 package spl
 
 import (
-	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -61,6 +61,6 @@ var spl_ce_UnexpectedValueException *types.ClassEntry
    +----------------------------------------------------------------------+
 */
 
-const spl_ce_Exception *types.ClassEntry = zend.ZendCeException
+const spl_ce_Exception *types.ClassEntry = faults.ZendCeException
 
 /* {{{ PHP_MINIT_FUNCTION(spl_exceptions) */

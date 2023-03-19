@@ -10,6 +10,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -267,7 +268,7 @@ func GetValidArgString(zv *types.Zval, elem_num int) *types.ZendString {
 		return nil
 	}
 	if strlen(str.GetVal()) != str.GetLen() {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Command array element %d contains a null byte", elem_num)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Command array element %d contains a null byte", elem_num)
 		types.ZendStringRelease(str)
 		return nil
 	}
@@ -322,7 +323,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var arg_zv *types.Zval
 		var num_elems uint32 = types.Z_ARRVAL_P(command_zv).GetNNumOfElements()
 		if num_elems == 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Command array must have at least one element")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Command array must have at least one element")
 			return_value.SetFalse()
 			return
 		}
@@ -374,7 +375,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		descitem = _z
 		var ztype *types.Zval
 		if str_index != nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "descriptor spec must be an integer indexed array")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "descriptor spec must be an integer indexed array")
 			goto exit_fail
 		}
 		descriptors[ndesc].SetIndex(int(nindex))
@@ -390,12 +391,12 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			descriptors[ndesc].SetChildend(dup(fd))
 			if descriptors[ndesc].GetChildend() < 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "unable to dup File-Handle for descriptor "+zend.ZEND_ULONG_FMT+" - %s", nindex, strerror(errno))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "unable to dup File-Handle for descriptor "+zend.ZEND_ULONG_FMT+" - %s", nindex, strerror(errno))
 				goto exit_fail
 			}
 			descriptors[ndesc].SetMode(DESC_FILE)
 		} else if descitem.GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Descriptor item must be either an array or a File-Handle")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Descriptor item must be either an array or a File-Handle")
 			goto exit_fail
 		} else {
 			if b.Assign(&ztype, descitem.GetArr().IndexFindH(0)) != nil {
@@ -403,7 +404,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 					goto exit_fail
 				}
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Missing handle qualifier in array")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Missing handle qualifier in array")
 				goto exit_fail
 			}
 			if strcmp(ztype.GetStr().GetVal(), "pipe") == 0 {
@@ -414,12 +415,12 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 						goto exit_fail
 					}
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing mode parameter for 'pipe'")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Missing mode parameter for 'pipe'")
 					goto exit_fail
 				}
 				descriptors[ndesc].SetMode(DESC_PIPE)
 				if 0 != pipe(newpipe) {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "unable to create pipe %s", strerror(errno))
+					core.PhpErrorDocref(nil, faults.E_WARNING, "unable to create pipe %s", strerror(errno))
 					goto exit_fail
 				}
 				if strncmp(zmode.GetStr().GetVal(), "w", 1) != 0 {
@@ -446,7 +447,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 						goto exit_fail
 					}
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing file name parameter for 'file'")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Missing file name parameter for 'file'")
 					goto exit_fail
 				}
 				if b.Assign(&zmode, descitem.GetArr().IndexFindH(2)) != nil {
@@ -454,7 +455,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 						goto exit_fail
 					}
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing mode parameter for 'file'")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Missing mode parameter for 'file'")
 					goto exit_fail
 				}
 
@@ -473,11 +474,11 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				var target *PhpProcOpenDescriptorItem = nil
 				var childend PhpFileDescriptorT
 				if ztarget == nil {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing redirection target")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Missing redirection target")
 					goto exit_fail
 				}
 				if ztarget.GetType() != types.IS_LONG {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target must be an integer")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Redirection target must be an integer")
 					goto exit_fail
 				}
 				for i = 0; i < ndesc; i++ {
@@ -490,7 +491,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 					childend = target.GetChildend()
 				} else {
 					if ztarget.GetLval() < 0 || ztarget.GetLval() > 2 {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target "+zend.ZEND_LONG_FMT+" not found", ztarget.GetLval())
+						core.PhpErrorDocref(nil, faults.E_WARNING, "Redirection target "+zend.ZEND_LONG_FMT+" not found", ztarget.GetLval())
 						goto exit_fail
 					}
 
@@ -505,22 +506,22 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				}
 				descriptors[ndesc].SetChildend(dup(childend))
 				if descriptors[ndesc].GetChildend() < 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to dup() for descriptor "+zend.ZEND_LONG_FMT+" - %s", nindex, strerror(errno))
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to dup() for descriptor "+zend.ZEND_LONG_FMT+" - %s", nindex, strerror(errno))
 					goto exit_fail
 				}
 				descriptors[ndesc].SetMode(DESC_REDIRECT)
 			} else if strcmp(ztype.GetStr().GetVal(), "null") == 0 {
 				descriptors[ndesc].SetChildend(open("/dev/null", O_RDWR))
 				if descriptors[ndesc].GetChildend() < 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to open /dev/null - %s", strerror(errno))
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to open /dev/null - %s", strerror(errno))
 					goto exit_fail
 				}
 				descriptors[ndesc].SetMode(DESC_FILE)
 			} else if strcmp(ztype.GetStr().GetVal(), "pty") == 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "pty pseudo terminal not supported on this system")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "pty pseudo terminal not supported on this system")
 				goto exit_fail
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s is not a valid descriptor spec/mode", ztype.GetStr().GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "%s is not a valid descriptor spec/mode", ztype.GetStr().GetVal())
 				goto exit_fail
 			}
 		}
@@ -579,7 +580,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				close(descriptors[i].GetParentend())
 			}
 		}
-		core.PhpErrorDocref(nil, zend.E_WARNING, "fork failed - %s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "fork failed - %s", strerror(errno))
 		goto exit_fail
 	}
 

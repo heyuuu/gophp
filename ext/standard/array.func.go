@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -510,7 +511,7 @@ func PhpCountRecursive(ht *types.HashTable) zend.ZendLong {
 	var element *types.Zval
 	if (ht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 		if ht.IsRecursive() {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return 0
 		}
 		ht.ProtectRecursive()
@@ -555,7 +556,7 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	switch array.GetType() {
 	case types.IS_NULL:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter must be an array or an object that implements Countable")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(0)
 		return
 	case types.IS_ARRAY:
@@ -594,11 +595,11 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 		/* If There's no handler and it doesn't implement Countable then add a warning */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter must be an array or an object that implements Countable")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(1)
 		return
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter must be an array or an object that implements Countable")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(1)
 		return
 	}
@@ -790,7 +791,7 @@ func PhpArrayUserCompare(a any, b any) int {
 }
 func PHP_ARRAY_CMP_FUNC_CHECK(func_name **types.Zval) {
 	if zend.ZendIsCallable(*func_name, 0, nil) == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid comparison function")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid comparison function")
 		BG__().user_compare_fci = old_user_compare_fci
 		BG__().user_compare_fci_cache = old_user_compare_fci_cache
 		return_value.SetFalse()
@@ -1088,13 +1089,13 @@ func ZifMin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if argc == 1 {
 		var result *types.Zval
 		if args[0].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "When only one parameter is given, it must be an array")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "When only one parameter is given, it must be an array")
 			return_value.SetNull()
 		} else {
 			if b.Assign(&result, zend.ZendHashMinmax(args[0].GetArr(), PhpArrayDataCompare, 0)) != nil {
 				types.ZVAL_COPY_DEREF(return_value, result)
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Array must contain at least one element")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Array must contain at least one element")
 				return_value.SetFalse()
 			}
 		}
@@ -1142,13 +1143,13 @@ func ZifMax(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if argc == 1 {
 		var result *types.Zval
 		if args[0].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "When only one parameter is given, it must be an array")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "When only one parameter is given, it must be an array")
 			return_value.SetNull()
 		} else {
 			if b.Assign(&result, zend.ZendHashMinmax(args[0].GetArr(), PhpArrayDataCompare, 1)) != nil {
 				types.ZVAL_COPY_DEREF(return_value, result)
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Array must contain at least one element")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Array must contain at least one element")
 				return_value.SetFalse()
 			}
 		}
@@ -1257,7 +1258,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 			types.SEPARATE_ARRAY(zv)
 			thash = zv.GetArr()
 			if thash.IsRecursive() {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 				result = types.FAILURE
 				break
 			}
@@ -1314,7 +1315,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 			target_hash = types.Z_OBJPROP_P(array)
 			pos = zend.ZendHashIteratorPos(ht_iter, target_hash)
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Iterated value is no longer an array or object")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Iterated value is no longer an array or object")
 			result = types.FAILURE
 			break
 		}
@@ -1655,7 +1656,7 @@ func PhpExtractRefIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) 
 				continue
 			}
 			if types.ZendStringEqualsLiteral(var_name, "this") {
-				zend.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
 			if entry.IsReference() {
@@ -1704,7 +1705,7 @@ func PhpExtractIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zen
 				continue
 			}
 			if types.ZendStringEqualsLiteral(var_name, "this") {
-				zend.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
 			entry = types.ZVAL_DEREF(entry)
@@ -1740,7 +1741,7 @@ func PhpExtractRefOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray)
 			continue
 		}
 		if types.ZendStringEqualsLiteral(var_name, "this") {
-			zend.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ZendThrowError(nil, "Cannot re-assign $this")
 			return -1
 		}
 		orig_var = symbol_table.KeyFind(var_name.GetStr())
@@ -1793,7 +1794,7 @@ func PhpExtractOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) ze
 			continue
 		}
 		if types.ZendStringEqualsLiteral(var_name, "this") {
-			zend.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ZendThrowError(nil, "Cannot re-assign $this")
 			return -1
 		}
 		orig_var = symbol_table.KeyFind(var_name.GetStr())
@@ -1856,7 +1857,7 @@ func PhpExtractRefPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendA
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					zend.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					if entry.IsReference() {
@@ -1914,7 +1915,7 @@ func PhpExtractPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArra
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					zend.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					entry = types.ZVAL_DEREF(entry)
@@ -1981,7 +1982,7 @@ func PhpExtractRefPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					zend.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					if entry.IsReference() {
@@ -2057,7 +2058,7 @@ func PhpExtractPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, p
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 				if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-					zend.ZendThrowError(nil, "Cannot re-assign $this")
+					faults.ZendThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
 					entry = types.ZVAL_DEREF(entry)
@@ -2124,7 +2125,7 @@ func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray,
 		}
 		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-				zend.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
 				if entry.IsReference() {
@@ -2179,7 +2180,7 @@ func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, pr
 		}
 		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-				zend.ZendThrowError(nil, "Cannot re-assign $this")
+				faults.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
 				entry = types.ZVAL_DEREF(entry)
@@ -2242,7 +2243,7 @@ func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendAr
 			}
 		}
 		if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-			zend.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ZendThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
 			if entry.IsReference() {
@@ -2304,7 +2305,7 @@ func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray
 			}
 		}
 		if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
-			zend.ZendThrowError(nil, "Cannot re-assign $this")
+			faults.ZendThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
 			entry = types.ZVAL_DEREF(entry)
@@ -2453,11 +2454,11 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	extract_type &= 0xff
 	if extract_type < EXTR_OVERWRITE || extract_type > EXTR_IF_EXISTS {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid extract type")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid extract type")
 		return
 	}
 	if extract_type > EXTR_SKIP && extract_type <= EXTR_PREFIX_IF_EXISTS && executeData.NumArgs() < 3 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "specified extract type requires the prefix parameter")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "specified extract type requires the prefix parameter")
 		return
 	}
 	if prefix != nil {
@@ -2465,7 +2466,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return
 		}
 		if prefix.GetStr().GetLen() != 0 && PhpValidVarName(prefix.GetStr().GetVal(), prefix.GetStr().GetLen()) == 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "prefix is not a valid identifier")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "prefix is not a valid identifier")
 			return
 		}
 	}
@@ -2534,12 +2535,12 @@ func PhpCompactVar(eg_active_symbol_table *types.HashTable, return_value *types.
 				return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), &data)
 			}
 		} else {
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "Undefined variable: %s", types.Z_STR_P(entry).GetVal())
+			core.PhpErrorDocref(nil, faults.E_NOTICE, "Undefined variable: %s", types.Z_STR_P(entry).GetVal())
 		}
 	} else if entry.IsType(types.IS_ARRAY) {
 		if entry.IsRefcounted() {
 			if entry.IsRecursive() {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 				return
 			}
 			entry.ProtectRecursive()
@@ -2627,11 +2628,11 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if num > 0 {
 		if b.SizeOf("num") > 4 && num > 0x7fffffff {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Too many elements")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Too many elements")
 			return_value.SetFalse()
 			return
 		} else if start_key > zend.ZEND_LONG_MAX-num+1 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot add element to the array as the next element is already occupied")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			return_value.SetFalse()
 			return
 		} else if start_key >= 0 && start_key < num {
@@ -2680,7 +2681,7 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		zend.ZVAL_EMPTY_ARRAY(return_value)
 		return
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Number of elements can't be negative")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Number of elements can't be negative")
 		return_value.SetFalse()
 		return
 	}
@@ -2767,7 +2768,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 				/* bad number */
 
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid range string - must be numeric")
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range string - must be numeric")
 				return_value.SetFalse()
 				return
 			}
@@ -2875,7 +2876,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		low = zend.ZvalGetDouble(zlow)
 		high = zend.ZvalGetDouble(zhigh)
 		if core.ZendIsInf(high) || core.ZendIsInf(low) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
 			return_value.SetFalse()
 			return
 		}
@@ -2886,7 +2887,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			var __calc_size float64 = (low-high)/step + 1
 			if __calc_size >= float64(types.HT_MAX_SIZE) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", high, low)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", high, low)
 				return_value.SetFalse()
 				return
 			}
@@ -2919,7 +2920,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			var __calc_size float64 = (high-low)/step + 1
 			if __calc_size >= float64(types.HT_MAX_SIZE) {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start=%0.0f end=%0.0f", low, high)
 				return_value.SetFalse()
 				return
 			}
@@ -2978,7 +2979,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			var __calc_size zend.ZendUlong = zend.ZendUlong(low-high) / lstep
 			if __calc_size >= types.HT_MAX_SIZE-1 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "The supplied range exceeds the maximum array size: start="+zend.ZEND_LONG_FMT+" end="+zend.ZEND_LONG_FMT, high, low)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start="+zend.ZEND_LONG_FMT+" end="+zend.ZEND_LONG_FMT, high, low)
 				return_value.SetFalse()
 				return
 			}
@@ -3007,7 +3008,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			var __calc_size zend.ZendUlong = zend.ZendUlong(high-low) / lstep
 			if __calc_size >= types.HT_MAX_SIZE-1 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "The supplied range exceeds the maximum array size: start="+zend.ZEND_LONG_FMT+" end="+zend.ZEND_LONG_FMT, low, high)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "The supplied range exceeds the maximum array size: start="+zend.ZEND_LONG_FMT+" end="+zend.ZEND_LONG_FMT, low, high)
 				return_value.SetFalse()
 				return
 			}
@@ -3037,7 +3038,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 err:
 	if err != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "step exceeds the specified range")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "step exceeds the specified range")
 		return_value.SetFalse()
 		return
 	}
@@ -3338,7 +3339,7 @@ func ZifArrayPush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		types.ZVAL_COPY(&new_var, &args[i])
 		if stack.GetArr().NextIndexInsert(&new_var) == nil {
 			new_var.TryDelRefcount()
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot add element to the array as the next element is already occupied")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			return_value.SetFalse()
 			return
 		}
@@ -3791,7 +3792,7 @@ func PhpArrayMergeRecursive(dest *types.HashTable, src *types.HashTable) int {
 					thash = nil
 				}
 				if thash != nil && thash.IsRecursive() || src_entry == dest_entry && dest_entry.IsReference() && dest_entry.GetRefcount()%2 != 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
+					core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 					return 0
 				}
 				b.Assert(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
@@ -3917,7 +3918,7 @@ func PhpArrayReplaceRecursive(dest *types.HashTable, src *types.HashTable) int {
 		dest_zval = dest_entry
 		dest_zval = types.ZVAL_DEREF(dest_zval)
 		if dest_zval.IsRecursive() || src_zval.IsRecursive() || src_entry.IsReference() && dest_entry.IsReference() && src_entry.GetRef() == dest_entry.GetRef() && dest_entry.GetRefcount()%2 != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return 0
 		}
 		b.Assert(!(dest_entry.IsReference()) || dest_entry.GetRefcount() > 1)
@@ -3967,7 +3968,7 @@ func PhpArrayReplaceWrapper(executeData *zend.ZendExecuteData, return_value *typ
 	for i = 0; i < argc; i++ {
 		var arg *types.Zval = args + i
 		if arg.GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(arg))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(arg))
 			return_value.SetNull()
 			return
 		}
@@ -4022,7 +4023,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 	for i = 0; i < argc; i++ {
 		var arg *types.Zval = args + i
 		if arg.GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(arg))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(arg))
 			return_value.SetNull()
 			return
 		}
@@ -4432,7 +4433,7 @@ func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *types.
 				tmp.GetLval()++
 			}
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Can only count STRING and INTEGER values!")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only count STRING and INTEGER values!")
 		}
 	}
 }
@@ -4453,7 +4454,7 @@ func ArrayColumnParamHelper(param *types.Zval, name string) types.ZendBool {
 	case types.IS_STRING:
 		return 1
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The %s key should be either a string or an integer", name)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The %s key should be either a string or an integer", name)
 		return 0
 	}
 }
@@ -4719,7 +4720,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	input_size = types.Z_ARRVAL_P(input).GetNNumOfElements()
 	pad_size_abs = zend.ZEND_ABS(pad_size)
 	if pad_size_abs < 0 || pad_size_abs-input_size > int64(1048576) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "You may only pad up to 1048576 elements at a time")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "You may only pad up to 1048576 elements at a time")
 		return_value.SetFalse()
 		return
 	}
@@ -4868,7 +4869,7 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			}
 			return_value.GetArr().SymtableUpdate(entry.GetStr().GetStr(), &data)
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Can only flip STRING and INTEGER values!")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Can only flip STRING and INTEGER values!")
 		}
 	}
 }
@@ -5109,7 +5110,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 		}
 	}
 	if argc < req_args {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, argc)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, argc)
 		return
 	}
 	if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &argc, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.FAILURE {
@@ -5117,7 +5118,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 	}
 	for i = 0; i < argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			return_value.SetNull()
 			return
 		}
@@ -5207,11 +5208,11 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 			param_spec = "+f"
 			intersect_data_compare_func = PhpArrayUserCompare
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
 			return
 		}
 		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
 		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == types.FAILURE {
@@ -5265,18 +5266,18 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fci_key = &fci2
 			fci_key_cache = &fci2_cache
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
 			return
 		}
 		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
 		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == types.FAILURE {
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "behavior is %d. This should never happen. Please report as a bug", behavior)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "behavior is %d. This should never happen. Please report as a bug", behavior)
 		return
 	}
 	PHP_ARRAY_CMP_FUNC_BACKUP()
@@ -5294,7 +5295,7 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 	}
 	for i = 0; i < arr_argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			arr_argc = i
 			goto out
 		}
@@ -5491,7 +5492,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 	argc = executeData.NumArgs()
 	if data_compare_type == DIFF_COMP_DATA_USER {
 		if argc < 3 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 3 parameters are required, %d given", executeData.NumArgs())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "at least 3 parameters are required, %d given", executeData.NumArgs())
 			return
 		}
 		if zend.ZendParseParameters(executeData.NumArgs(), "+f", &args, &argc, &(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.FAILURE {
@@ -5500,7 +5501,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 		diff_data_compare_func = ZvalUserCompare
 	} else {
 		if argc < 2 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
 			return
 		}
 		if zend.ZendParseParameters(executeData.NumArgs(), "+", &args, &argc) == types.FAILURE {
@@ -5512,7 +5513,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	for i = 0; i < argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			return_value.SetNull()
 			return
 		}
@@ -5602,11 +5603,11 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 			param_spec = "+f"
 			diff_data_compare_func = PhpArrayUserCompare
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. This should never happen. Please report as a bug", data_compare_type)
 			return
 		}
 		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
 		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache) == types.FAILURE {
@@ -5660,18 +5661,18 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 			fci_key = &fci2
 			fci_key_cache = &fci2_cache
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "data_compare_type is %d. key_compare_type is %d. This should never happen. Please report as a bug", data_compare_type, key_compare_type)
 			return
 		}
 		if executeData.NumArgs() < req_args {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "at least %d parameters are required, %d given", req_args, executeData.NumArgs())
 			return
 		}
 		if zend.ZendParseParameters(executeData.NumArgs(), param_spec, &args, &arr_argc, &fci1, &fci1_cache, &fci2, &fci2_cache) == types.FAILURE {
 			return
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "behavior is %d. This should never happen. Please report as a bug", behavior)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "behavior is %d. This should never happen. Please report as a bug", behavior)
 		return
 	}
 	PHP_ARRAY_CMP_FUNC_BACKUP()
@@ -5689,7 +5690,7 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 	}
 	for i = 0; i < arr_argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			arr_argc = i
 			goto out
 		}
@@ -5873,7 +5874,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var idx zend.ZendLong
 	var dummy types.Zval
 	if executeData.NumArgs() < 2 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
+		core.PhpErrorDocref(nil, faults.E_WARNING, "at least 2 parameters are required, %d given", executeData.NumArgs())
 		return
 	}
 	for {
@@ -5893,7 +5894,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if args[0].GetType() != types.IS_ARRAY {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter 1 to be an array, %s given", zend.ZendZvalTypeName(&args[0]))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter 1 to be an array, %s given", zend.ZendZvalTypeName(&args[0]))
 		return_value.SetNull()
 		return
 	}
@@ -5901,7 +5902,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if num == 0 {
 		for i = 1; i < argc; i++ {
 			if args[i].GetType() != types.IS_ARRAY {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 				return_value.SetNull()
 				return
 			}
@@ -5928,7 +5929,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if value == nil {
 			for i = 1; i < argc; i++ {
 				if args[i].GetType() != types.IS_ARRAY {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 					return_value.SetNull()
 					return
 				}
@@ -5939,7 +5940,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		search_str = zend.ZvalGetTmpString(value, &tmp_search_str)
 		for i = 1; i < argc; i++ {
 			if args[i].GetType() != types.IS_ARRAY {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 				return_value.SetNull()
 				return
 			}
@@ -5978,7 +5979,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	num = 0
 	for i = 1; i < argc; i++ {
 		if args[i].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			return_value.SetNull()
 			return
 		}
@@ -6175,7 +6176,7 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *types.Zv
 					}
 					parse_state[MULTISORT_ORDER] = 0
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
 					zend.Efree(func_)
 					zend.Efree(arrays)
 					return_value.SetFalse()
@@ -6200,21 +6201,21 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *types.Zv
 					sort_type = int(arg.GetLval())
 					parse_state[MULTISORT_TYPE] = 0
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or sorting flag that has not already been specified", i+1)
 					zend.Efree(func_)
 					zend.Efree(arrays)
 					return_value.SetFalse()
 					return
 				}
 			default:
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Argument #%d is an unknown sort flag", i+1)
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is an unknown sort flag", i+1)
 				zend.Efree(func_)
 				zend.Efree(arrays)
 				return_value.SetFalse()
 				return
 			}
 		} else {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Argument #%d is expected to be an array or a sort flag", i+1)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Argument #%d is expected to be an array or a sort flag", i+1)
 			zend.Efree(func_)
 			zend.Efree(arrays)
 			return_value.SetFalse()
@@ -6231,7 +6232,7 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *types.Zv
 	array_size = types.Z_ARRVAL_P(arrays[0]).GetNNumOfElements()
 	for i = 0; i < num_arrays; i++ {
 		if types.Z_ARRVAL_P(arrays[i]).GetNNumOfElements() != uint32(array_size) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Array sizes are inconsistent")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Array sizes are inconsistent")
 			zend.Efree(func_)
 			zend.Efree(arrays)
 			return_value.SetFalse()
@@ -6344,7 +6345,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	num_avail = types.Z_ARRVAL_P(input).GetNNumOfElements()
 	if num_avail == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Array is empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Array is empty")
 		return
 	}
 	if num_req == 1 {
@@ -6402,7 +6403,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 	}
 	if num_req <= 0 || num_req > num_avail {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Second argument has to be between 1 and the number of elements in the array")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be between 1 and the number of elements in the array")
 		return
 	}
 
@@ -6757,7 +6758,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var arg types.Zval
 		var ret int
 		if arrays[0].GetType() != types.IS_ARRAY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter 2 to be an array, %s given", zend.ZendZvalTypeName(&arrays[0]))
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter 2 to be an array, %s given", zend.ZendZvalTypeName(&arrays[0]))
 			return
 		}
 		maxlen = types.Z_ARRVAL(arrays[0]).GetNNumOfElements()
@@ -6806,7 +6807,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var array_pos *uint32 = (*types.HashPosition)(zend.Ecalloc(n_arrays, b.SizeOf("HashPosition")))
 		for i = 0; i < n_arrays; i++ {
 			if arrays[i].GetType() != types.IS_ARRAY {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+2, zend.ZendZvalTypeName(&arrays[i]))
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+2, zend.ZendZvalTypeName(&arrays[i]))
 				zend.Efree(array_pos)
 				return
 			}
@@ -6925,7 +6926,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zv
 		ht = array.GetArr()
 	} else {
 		ht = zend.ZendGetPropertiesFor(array, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
-		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
 	}
 	switch key.GetType() {
 	case types.IS_STRING:
@@ -6935,7 +6936,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zv
 	case types.IS_NULL:
 		types.ZVAL_BOOL(return_value, ht.KeyExistsInd(types.ZSTR_EMPTY_ALLOC().GetStr()))
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The first argument should be either a string or an integer")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument should be either a string or an integer")
 		return_value.SetFalse()
 	}
 	if array.GetType() != types.IS_ARRAY {
@@ -6975,7 +6976,7 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	/* Do bounds checking for size parameter. */
 
 	if size < 1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Size parameter expected to be greater than 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Size parameter expected to be greater than 0")
 		return
 	}
 	num_in = types.Z_ARRVAL_P(input).GetNNumOfElements()
@@ -7064,7 +7065,7 @@ func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *types.Zval
 	num_keys = keys.GetNNumOfElements()
 	num_values = values.GetNNumOfElements()
 	if num_keys != num_values {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Both parameters should have an equal number of elements")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Both parameters should have an equal number of elements")
 		return_value.SetFalse()
 		return
 	}

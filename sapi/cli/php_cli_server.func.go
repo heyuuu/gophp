@@ -11,6 +11,7 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 	"strconv"
 	"strings"
@@ -498,15 +499,15 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 	var append_error_message types.ZendBool = 0
 	if core.PG__().last_error_message {
 		switch core.PG__().last_error_type {
-		case zend.E_ERROR:
+		case faults.E_ERROR:
 
-		case zend.E_CORE_ERROR:
+		case faults.E_CORE_ERROR:
 
-		case zend.E_COMPILE_ERROR:
+		case faults.E_COMPILE_ERROR:
 
-		case zend.E_USER_ERROR:
+		case faults.E_USER_ERROR:
 
-		case zend.E_PARSE:
+		case faults.E_PARSE:
 			if status == 200 {
 
 				/* the status code isn't changed by a fatal error, so fake it */

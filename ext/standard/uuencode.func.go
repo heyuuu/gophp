@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -206,7 +207,7 @@ func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *types.Z
 		return
 	}
 	if b.Assign(&dest, PhpUudecode(src.GetVal(), src.GetLen())) == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "The given parameter is not a valid uuencoded string")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The given parameter is not a valid uuencoded string")
 		return_value.SetFalse()
 		return
 	}

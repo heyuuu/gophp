@@ -8,6 +8,7 @@ import (
 	"sik/core/streams"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -151,14 +152,14 @@ func UserfilterFilter(
 		zend.ConvertToLong(&retval)
 		ret = int(retval.GetLval())
 	} else if call_result == types.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to call filter function")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "failed to call filter function")
 	}
 	if bytes_consumed != nil {
 		*bytes_consumed = zend.ZvalGetLong(&args[2])
 	}
 	if buckets_in.GetHead() != nil {
 		var bucket *streams.PhpStreamBucket = buckets_in.GetHead()
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unprocessed filter buckets remaining on input brigade")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unprocessed filter buckets remaining on input brigade")
 		for b.Assign(&bucket, buckets_in.GetHead()) {
 
 			/* Remove unconsumed buckets from the brigade */
@@ -203,7 +204,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	/* some sanity checks */
 
 	if persistent != 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot use a user-space filter with a persistent stream")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "cannot use a user-space filter with a persistent stream")
 		return nil
 	}
 	len_ = strlen(filtername)
@@ -240,7 +241,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 			zend.Efree(wildcard)
 		}
 		if fdat == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Err, filter \"%s\" is not in the user-filter map, but somehow the user-filter-factory was invoked for it!?", filtername)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Err, filter \"%s\" is not in the user-filter map, but somehow the user-filter-factory was invoked for it!?", filtername)
 			return nil
 		}
 	}
@@ -249,7 +250,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	if fdat.GetCe() == nil {
 		if nil == b.Assign(&(fdat.GetCe()), zend.ZendLookupClass(fdat.GetClassname())) {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "user-filter \"%s\" requires class \"%s\", but that class is not defined", filtername, fdat.GetClassname().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "user-filter \"%s\" requires class \"%s\", but that class is not defined", filtername, fdat.GetClassname().GetVal())
 			return nil
 		}
 	}
@@ -389,7 +390,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		break
 	}
 	if nil == b.Assign(&pzbucket, zend.ZendHashStrFindDeref(types.Z_OBJPROP_P(zobject), "bucket", b.SizeOf("\"bucket\"")-1)) {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Object has no bucket property")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Object has no bucket property")
 		return_value.SetFalse()
 		return
 	}
@@ -523,11 +524,11 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	return_value.SetFalse()
 	if filtername.GetLen() == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Filter name cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Filter name cannot be empty")
 		return
 	}
 	if classname.GetLen() == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Class name cannot be empty")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Class name cannot be empty")
 		return
 	}
 	if !(BG__().user_filter_map) {

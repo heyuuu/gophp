@@ -8,6 +8,7 @@ import (
 	"sik/sapi/cli"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -228,7 +229,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
 				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.GetStr().GetVal())) {
-					zend.ZendError(zend.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
+					faults.ZendError(faults.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
@@ -247,7 +248,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
 			break
 		}
 		if persistent != 0 {
@@ -281,7 +282,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	}
 	fh.InitFp(zend.VCWD_FOPEN(filename, "r"), filename)
 	if fh.GetFp() == nil {
-		zend.ZendError(zend.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
+		faults.ZendError(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return types.FAILURE
 	}
 	browdata.SetHtab(zend.Pemalloc(sizeof*browdata.GetHtab(), persistent))
@@ -529,7 +530,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		}
 	} else {
 		if GlobalBdata.GetHtab() == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "browscap ini directive not set")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "browscap ini directive not set")
 			return_value.SetFalse()
 			return
 		}
@@ -559,7 +560,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			http_user_agent = core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr().KeyFind("HTTP_USER_AGENT")
 		}
 		if http_user_agent == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
 			return_value.SetFalse()
 			return
 		}

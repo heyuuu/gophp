@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -524,12 +525,12 @@ func ZendCheckFinallyBreakout(op_array *ZendOpArray, op_num uint32, dst_num uint
 			CG__().SetInCompilation(1)
 			CG__().SetActiveOpArray(op_array)
 			CG__().SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
-			ZendErrorNoreturn(E_COMPILE_ERROR, "jump into a finally block is disallowed")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "jump into a finally block is disallowed")
 		} else if op_num >= op_array.GetTryCatchArray()[i].GetFinallyOp() && op_num <= op_array.GetTryCatchArray()[i].GetFinallyEnd() && (dst_num > op_array.GetTryCatchArray()[i].GetFinallyEnd() || dst_num < op_array.GetTryCatchArray()[i].GetFinallyOp()) {
 			CG__().SetInCompilation(1)
 			CG__().SetActiveOpArray(op_array)
 			CG__().SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
-			ZendErrorNoreturn(E_COMPILE_ERROR, "jump out of a finally block is disallowed")
+			faults.ZendErrorNoreturn(faults.E_COMPILE_ERROR, "jump out of a finally block is disallowed")
 		}
 	}
 }

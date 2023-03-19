@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -24,7 +25,7 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 			}
 		}
 	}
-	ZendError(E_WARNING, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
+	faults.ZendError(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
 	return intern
 }
 func ZendDisableClass(class_name *byte, class_name_length int) int {
@@ -333,13 +334,13 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *ZendFca
 				var severity int
 				var verb *byte
 				if fcc.GetFunctionHandler().IsAllowStatic() {
-					severity = E_DEPRECATED
+					severity = faults.E_DEPRECATED
 					verb = "should not"
 				} else {
 
 					/* An internal function assumes $this is present and won't check that. So PHP would crash by allowing the call. */
 
-					severity = E_ERROR
+					severity = faults.E_ERROR
 					verb = "cannot"
 				}
 				if (check_flags & IS_CALLABLE_CHECK_IS_STATIC) != 0 {
@@ -347,14 +348,14 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *ZendFca
 				}
 				if error != nil {
 					ZendSpprintf(error, 0, "non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
-					if severity != E_DEPRECATED {
+					if severity != faults.E_DEPRECATED {
 						retval = 0
 					}
 				} else if retval != 0 {
-					if severity == E_ERROR {
-						ZendThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+					if severity == faults.E_ERROR {
+						faults.ZendThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
 					} else {
-						ZendError(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+						faults.ZendError(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
 					}
 				}
 			}

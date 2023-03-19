@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -801,7 +802,7 @@ func ZifLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if base <= 0.0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "base must be greater than 0")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "base must be greater than 0")
 		return_value.SetFalse()
 		return
 	}
@@ -942,7 +943,7 @@ func _phpMathBasetolong(arg *types.Zval, base int) zend.ZendLong {
 		if num > onum {
 			continue
 		}
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Number '%s' is too big to fit in long", s)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Number '%s' is too big to fit in long", s)
 		return zend.ZEND_LONG_MAX
 	}
 	return num
@@ -1020,7 +1021,7 @@ func _phpMathBasetozval(arg *types.Zval, base int, ret *types.Zval) int {
 		}
 	}
 	if invalidchars > 0 {
-		zend.ZendError(zend.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
+		faults.ZendError(faults.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
 	}
 	if mode == 1 {
 		ret.SetDouble(fnum)
@@ -1066,7 +1067,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.ZendString {
 		/* Don't try to convert +/- infinity */
 
 		if fvalue == zend.ZEND_INFINITY || fvalue == -zend.ZEND_INFINITY {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Number too large")
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Number too large")
 			return types.ZSTR_EMPTY_ALLOC()
 		}
 		ptr = buf + b.SizeOf("buf") - 1
@@ -1261,12 +1262,12 @@ func ZifBaseConvert(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		return
 	}
 	if frombase < 2 || frombase > 36 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid `from base' ("+zend.ZEND_LONG_FMT+")", frombase)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid `from base' ("+zend.ZEND_LONG_FMT+")", frombase)
 		return_value.SetFalse()
 		return
 	}
 	if tobase < 2 || tobase > 36 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid `to base' ("+zend.ZEND_LONG_FMT+")", tobase)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid `to base' ("+zend.ZEND_LONG_FMT+")", tobase)
 		return_value.SetFalse()
 		return
 	}
@@ -1513,14 +1514,14 @@ func ZifIntdiv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if divisor == 0 {
-		zend.ZendThrowExceptionEx(zend.ZendCeDivisionByZeroError, 0, "Division by zero")
+		faults.ZendThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Division by zero")
 		return
 	} else if divisor == -1 && dividend == zend.ZEND_LONG_MIN {
 
 		/* Prevent overflow error/crash ... really should not happen:
 		   We don't return a float here as that violates function contract */
 
-		zend.ZendThrowExceptionEx(zend.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
+		faults.ZendThrowExceptionEx(faults.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
 		return
 	}
 	return_value.SetLong(dividend / divisor)

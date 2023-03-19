@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -62,7 +63,7 @@ func ZvalInternalPtrDtor(zval_ptr *types.Zval) {
 				//b.Assert((str.GetGcFlags() & types.IS_STR_PERSISTENT) != 0)
 				//Free(str)
 			} else {
-				ZendErrorNoreturn(E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")
+				faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")
 			}
 		}
 	}

@@ -5,13 +5,14 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
 func ZendParseParametersDebugError(msg string) {
 	var active_function *ZendFunction = CurrEX().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendErrorNoreturn(E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
+	faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
 }
 
 func ZendParseParametersEx(flags int, num_args int, type_spec string, args ...any) int {
@@ -37,7 +38,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 		ce := args[1].(*types.ClassEntry)
 		*object = this_ptr
 		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
-			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
+			faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
 		}
 		return argparse.ParseVaArgs(num_args, type_spec[1:], args[2:], 0)
 	}
@@ -51,7 +52,7 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *types.Zval, 
 		*object = this_ptr
 		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
 			if (flags & argparse.ZEND_PARSE_PARAMS_QUIET) == 0 {
-				ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName())
+				faults.ZendErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName())
 			}
 			return types.FAILURE
 		}

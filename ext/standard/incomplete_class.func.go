@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -20,7 +21,7 @@ func IncompleteClassMessage(object *types.Zval, error_type int) {
 	}
 }
 func IncompleteClassGetProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
-	IncompleteClassMessage(object, zend.E_NOTICE)
+	IncompleteClassMessage(object, faults.E_NOTICE)
 	if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
 		rv.IsError()
 		return rv
@@ -29,24 +30,24 @@ func IncompleteClassGetProperty(object *types.Zval, member *types.Zval, type_ in
 	}
 }
 func IncompleteClassWriteProperty(object *types.Zval, member *types.Zval, value *types.Zval, cache_slot *any) *types.Zval {
-	IncompleteClassMessage(object, zend.E_NOTICE)
+	IncompleteClassMessage(object, faults.E_NOTICE)
 	return value
 }
 func IncompleteClassGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int, cache_slot *any) *types.Zval {
-	IncompleteClassMessage(object, zend.E_NOTICE)
+	IncompleteClassMessage(object, faults.E_NOTICE)
 	return zend.EG__().GetErrorZval()
 }
 func IncompleteClassUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *any) {
-	IncompleteClassMessage(object, zend.E_NOTICE)
+	IncompleteClassMessage(object, faults.E_NOTICE)
 }
 func IncompleteClassHasProperty(object *types.Zval, member *types.Zval, check_empty int, cache_slot *any) int {
-	IncompleteClassMessage(object, zend.E_NOTICE)
+	IncompleteClassMessage(object, faults.E_NOTICE)
 	return 0
 }
 func IncompleteClassGetMethod(object **types.ZendObject, method *types.ZendString, key *types.Zval) *zend.ZendFunction {
 	var zobject types.Zval
 	zobject.SetObject(*object)
-	IncompleteClassMessage(&zobject, zend.E_ERROR)
+	IncompleteClassMessage(&zobject, faults.E_ERROR)
 	return nil
 }
 func PhpCreateIncompleteObject(class_type *types.ClassEntry) *types.ZendObject {

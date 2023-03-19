@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -132,19 +133,19 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 
 	}
 	b.Assert(msg != nil)
-	ZendThrowError(nil, "%s", msg)
+	faults.ZendThrowError(nil, "%s", msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
 	var tmp_property_name *types.ZendString
 	var property_name *types.ZendString = ZvalGetTmpString(property, &tmp_property_name)
-	ZendError(E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
+	faults.ZendError(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
 	ZendTmpStringRelease(tmp_property_name)
 }
 func ZendDeprecatedFunction(fbc *ZendFunction) {
-	ZendError(E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().GetName().GetVal() }, ""), b.Cond(fbc.GetScope() != nil, "::", ""), fbc.GetFunctionName().GetVal())
+	faults.ZendError(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().GetName().GetVal() }, ""), b.Cond(fbc.GetScope() != nil, "::", ""), fbc.GetFunctionName().GetVal())
 }
 func ZendAbstractMethod(fbc *ZendFunction) {
-	ZendThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
+	faults.ZendThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
 }
 func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var c types.ZendUchar
@@ -159,7 +160,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	}
 	if offset < -ZendLong(str.GetStr().GetLen()) {
 
-		ZendError(E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
+		faults.ZendError(faults.E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
 		if RETURN_VALUE_USED(opline) {
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 		}
@@ -187,7 +188,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		/* Error on empty input string */
 
-		ZendError(E_WARNING, "Cannot assign an empty string to a string offset")
+		faults.ZendError(faults.E_WARNING, "Cannot assign an empty string to a string offset")
 		if RETURN_VALUE_USED(opline) {
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 		}
@@ -253,10 +254,10 @@ func ZendThrowIncdecRefError(ref *types.ZendReference, opline *ZendOp) ZendLong 
 
 	b.Assert(error_prop != nil)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		ZendTypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		faults.ZendTypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MAX
 	} else {
-		ZendTypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		faults.ZendTypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
 		return ZEND_LONG_MIN
 	}
 }
@@ -265,10 +266,10 @@ func ZendThrowIncdecPropError(prop *ZendPropertyInfo, opline *ZendOp) ZendLong {
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		ZendTypeError("Cannot increment property %s::$%s of type %s%s past its maximal value", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+		faults.ZendTypeError("Cannot increment property %s::$%s of type %s%s past its maximal value", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 		return ZEND_LONG_MAX
 	} else {
-		ZendTypeError("Cannot decrement property %s::$%s of type %s%s past its minimal value", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+		faults.ZendTypeError("Cannot decrement property %s::$%s of type %s%s past its minimal value", prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 		return ZEND_LONG_MIN
 	}
 }

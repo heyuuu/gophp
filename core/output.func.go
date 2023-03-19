@@ -7,6 +7,7 @@ import (
 	r "sik/builtin/file"
 	"sik/ext/standard"
 	"sik/zend"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -274,7 +275,7 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 			zend.Efree(user)
 		}
 		if error != nil {
-			PhpErrorDocref("ref.outcontrol", zend.E_WARNING, "%s", error)
+			PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "%s", error)
 			zend.Efree(error)
 		}
 		if handler_name != nil {
@@ -344,9 +345,9 @@ func PhpOutputHandlerStarted(name *byte, name_len int) int {
 func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_set *byte, handler_set_len int) int {
 	if PhpOutputHandlerStarted(handler_set, handler_set_len) != 0 {
 		if handler_new_len != handler_set_len || memcmp(handler_new, handler_set, handler_set_len) {
-			PhpErrorDocref("ref.outcontrol", zend.E_WARNING, "output handler '%s' conflicts with '%s'", handler_new, handler_set)
+			PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "output handler '%s' conflicts with '%s'", handler_new, handler_set)
 		} else {
-			PhpErrorDocref("ref.outcontrol", zend.E_WARNING, "output handler '%s' cannot be used twice", handler_new)
+			PhpErrorDocref("ref.outcontrol", faults.E_WARNING, "output handler '%s' cannot be used twice", handler_new)
 		}
 		return 1
 	}
@@ -355,7 +356,7 @@ func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_se
 func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
 	var str *types.ZendString
 	if zend.EG__().GetCurrentModule() == nil {
-		zend.ZendError(zend.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
+		faults.ZendError(faults.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
@@ -367,7 +368,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 	var rev types.HashTable
 	var rev_ptr *types.HashTable = nil
 	if zend.EG__().GetCurrentModule() == nil {
-		zend.ZendError(zend.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
+		faults.ZendError(faults.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return types.FAILURE
 	}
 	if nil != b.Assign(&rev_ptr, zend.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
@@ -395,7 +396,7 @@ func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT 
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *types.ZendString
 	if zend.EG__().GetCurrentModule() == nil {
-		zend.ZendError(zend.E_ERROR, "Cannot register an output handler alias outside of MINIT")
+		faults.ZendError(faults.E_ERROR, "Cannot register an output handler alias outside of MINIT")
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
@@ -467,7 +468,7 @@ func PhpOutputLockError(op int) int {
 		/* fatal error */
 
 		PhpOutputDeactivate()
-		PhpErrorDocref("ref.outcontrol", zend.E_ERROR, "Cannot use output buffering in output buffering display handlers")
+		PhpErrorDocref("ref.outcontrol", faults.E_ERROR, "Cannot use output buffering in output buffering display handlers")
 		return 1
 	}
 	return 0
@@ -826,12 +827,12 @@ func PhpOutputStackPop(flags int) int {
 	var orphan **PhpOutputHandler = OG(active)
 	if orphan == nil {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to %s buffer. No buffer to %s", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer. No buffer to %s", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
 		}
 		return 0
 	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.GetName().GetVal(), orphan.GetLevel())
+			PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), orphan.GetName().GetVal(), orphan.GetLevel())
 		}
 		return 0
 	} else {
@@ -912,7 +913,7 @@ func ZifObStart(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		chunk_size = 0
 	}
 	if PhpOutputStartUser(output_handler, chunk_size, flags) == types.FAILURE {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to create buffer")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to create buffer")
 		return_value.SetFalse()
 		return
 	}
@@ -924,12 +925,12 @@ func ZifObFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if !(OG(active)) {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to flush buffer. No buffer to flush")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to flush buffer. No buffer to flush")
 		return_value.SetFalse()
 		return
 	}
 	if types.SUCCESS != PhpOutputFlush() {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to flush buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to flush buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 		return_value.SetFalse()
 		return
 	}
@@ -941,12 +942,12 @@ func ZifObClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if !(OG(active)) {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer. No buffer to delete")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer. No buffer to delete")
 		return_value.SetFalse()
 		return
 	}
 	if types.SUCCESS != PhpOutputClean() {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 		return_value.SetFalse()
 		return
 	}
@@ -958,7 +959,7 @@ func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	if !(OG(active)) {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush")
 		return_value.SetFalse()
 		return
 	}
@@ -970,7 +971,7 @@ func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	if !(OG(active)) {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer. No buffer to delete")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer. No buffer to delete")
 		return_value.SetFalse()
 		return
 	}
@@ -982,12 +983,12 @@ func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	if PhpOutputGetContents(return_value) == types.FAILURE {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete and flush buffer. No buffer to delete or flush")
 		return_value.SetFalse()
 		return
 	}
 	if types.SUCCESS != PhpOutputEnd() {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
 func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -999,12 +1000,12 @@ func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	if PhpOutputGetContents(return_value) == types.FAILURE {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer. No buffer to delete")
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer. No buffer to delete")
 		return_value.SetFalse()
 		return
 	}
 	if types.SUCCESS != PhpOutputDiscard() {
-		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
+		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
 func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *types.Zval) {

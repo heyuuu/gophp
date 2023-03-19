@@ -7,6 +7,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -203,7 +204,7 @@ func ZifMtRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if max < min {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
 		return_value.SetFalse()
 		return
 	}

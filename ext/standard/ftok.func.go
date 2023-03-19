@@ -6,6 +6,7 @@ import (
 	"sik/core"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -33,12 +34,12 @@ func ZifFtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if pathname_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Pathname is invalid")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Pathname is invalid")
 		return_value.SetLong(-1)
 		return
 	}
 	if proj_len != 1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Project identifier is invalid")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Project identifier is invalid")
 		return_value.SetLong(-1)
 		return
 	}
@@ -48,7 +49,7 @@ func ZifFtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	k = ftok(pathname, proj[0])
 	if k == -1 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "ftok() failed - %s", strerror(errno))
+		core.PhpErrorDocref(nil, faults.E_WARNING, "ftok() failed - %s", strerror(errno))
 	}
 	return_value.SetLong(k)
 	return

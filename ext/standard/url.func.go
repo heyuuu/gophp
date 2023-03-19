@@ -8,6 +8,7 @@ import (
 	"sik/core/streams"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -364,7 +365,7 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				return_value.SetStringCopy(resource.GetFragment())
 			}
 		default:
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
 			return_value.SetFalse()
 		}
 		goto done

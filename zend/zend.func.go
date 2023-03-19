@@ -6,19 +6,19 @@ import (
 	"fmt"
 	b "sik/builtin"
 	r "sik/builtin/file"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
 func USED_RET() bool {
 	return !(executeData.GetPrevExecuteData()) || !(ZEND_USER_CODE(executeData.GetPrevExecuteData().func_.common.type_)) || executeData.GetPrevExecuteData().opline.result_type != IS_UNUSED
 }
-func ZendBailout()             { _zendBailout(__FILE__, __LINE__) }
 func ZEND_PUTS(str string) int { return ZendWrite(str) }
 func ZEND_PUTC(c byte) int     { return ZendWrite(string([]byte{c})) }
 
 func OnUpdateErrorReportingEx(entry *ZendIniEntry, newValue *string, stage int) bool {
 	if newValue == nil {
-		EG__().SetErrorReporting(E_ALL & ^E_NOTICE & ^E_STRICT & ^E_DEPRECATED)
+		EG__().SetErrorReporting(faults.E_ALL & ^faults.E_NOTICE & ^faults.E_STRICT & ^faults.E_DEPRECATED)
 	} else {
 		EG__().SetErrorReporting(b.Atoi(*newValue))
 	}
@@ -33,7 +33,7 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	assertions := EG__().assertions
 	val := ZendAtolEx(*new_value)
 	if stage != ZEND_INI_STAGE_STARTUP && stage != ZEND_INI_STAGE_SHUTDOWN && assertions != val && (assertions < 0 || val < 0) {
-		ZendError(E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
+		faults.ZendError(faults.E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
 		return false
 	}
 	EG__().assertions = val
@@ -349,7 +349,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	ZendExecuteEx = ExecuteEx
 	ZendExecuteInternal = nil
 	ZendCompileString = CompileString
-	ZendThrowExceptionHook = nil
+	faults.ZendThrowExceptionHook = nil
 
 	/* Set up the default garbage collection implementation. */
 
@@ -374,7 +374,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	CG__().SetMapPtrBase(nil)
 	CG__().SetMapPtrSize(0)
 	CG__().SetMapPtrLast(0)
-	EG__().SetErrorReporting(E_ALL & ^E_NOTICE)
+	EG__().SetErrorReporting(faults.E_ALL & ^faults.E_NOTICE)
 	types.ZendInternedStringsInit()
 	ZendStartupBuiltinFunctions()
 	ZendRegisterStandardConstants()
@@ -462,19 +462,7 @@ func Zenderror(error *byte) {
 		/* An exception was thrown in the lexer, don't throw another in the parser. */
 
 	}
-	ZendThrowException(ZendCeParseError, error, 0)
-}
-func _zendBailout(filename *byte, lineno uint32) {
-	if EG__().GetBailout() == nil {
-		ZendOutputDebugString(1, "%s(%d) : Bailed out without a bailout address!", filename, lineno)
-		exit(-1)
-	}
-	GcProtect(1)
-	CG__().SetUncleanShutdown(1)
-	CG__().SetActiveClassEntry(nil)
-	CG__().SetInCompilation(0)
-	EG__().SetCurrentExecuteData(nil)
-	LONGJMP((*EG__)().bailout, types.FAILURE)
+	faults.ZendThrowException(faults.ZendCeParseError, error, 0)
 }
 func ZendAppendVersionInfo(extension *ZendExtension) {
 	ZendVersionInfo += fmt.Sprintf("    with %s v%s, %s, by %s\n", extension.GetNameStr(), extension.GetVersionStr(), extension.GetCopyrightStr(), extension.GetAuthorStr())
@@ -557,336 +545,6 @@ func RESTORE_STACK(stack ZendStack) {
 		memcpy(CG__().stack, &stack, b.SizeOf("zend_stack"))
 	}
 }
-func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format string, args ...any) {
-	var usr_copy va_list
-	var params []types.Zval
-	var retval types.Zval
-	var orig_user_error_handler types.Zval
-	var in_compilation types.ZendBool
-	var saved_class_entry *types.ClassEntry
-	var loop_var_stack ZendStack
-	var delayed_oplines_stack ZendStack
-	var symbol_table *types.ZendArray
-	var orig_fake_scope *types.ClassEntry
-
-	/* Report about uncaught exception in case of fatal errors */
-
-	if EG__().GetException() != nil {
-		var ex *ZendExecuteData
-		var opline *ZendOp
-		switch type_ {
-		case E_CORE_ERROR:
-
-		case E_ERROR:
-
-		case E_RECOVERABLE_ERROR:
-
-		case E_PARSE:
-
-		case E_COMPILE_ERROR:
-
-		case E_USER_ERROR:
-			ex = CurrEX()
-			opline = nil
-			for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
-				ex = ex.GetPrevExecuteData()
-			}
-			if ex != nil && ex.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION && EG__().GetOplineBeforeException() != nil {
-				opline = EG__().GetOplineBeforeException()
-			}
-			ZendExceptionError(EG__().GetException(), E_WARNING)
-			EG__().SetException(nil)
-			if opline != nil {
-				ex.SetOpline(opline)
-			}
-			break
-		default:
-			break
-		}
-	}
-
-	/* if we don't have a user defined error handler */
-
-	if EG__().GetUserErrorHandler().IsUndef() || (EG__().GetUserErrorHandlerErrorReporting()&type_) == 0 || EG__().GetErrorHandling() != EH_NORMAL {
-		ZendErrorCb(type_, error_filename, error_lineno, format, args)
-	} else {
-		switch type_ {
-		case E_ERROR:
-
-		case E_PARSE:
-
-		case E_CORE_ERROR:
-
-		case E_CORE_WARNING:
-
-		case E_COMPILE_ERROR:
-
-		case E_COMPILE_WARNING:
-
-			/* The error may not be safe to handle in user-space */
-
-			ZendErrorCb(type_, error_filename, error_lineno, format, args)
-			break
-		default:
-
-			/* Handle the error in user space */
-
-			VaCopy(usr_copy, args)
-			params[1].SetString(ZendStrpprintf(0, format, usr_copy))
-			va_end(usr_copy)
-			params[0].SetLong(type_)
-			if error_filename != nil {
-				params[2].SetRawString(b.CastStrAuto(error_filename))
-			} else {
-				params[2].SetNull()
-			}
-			params[3].SetLong(error_lineno)
-			symbol_table = ZendRebuildSymbolTable()
-
-			/* during shutdown the symbol table table can be still null */
-
-			if symbol_table == nil {
-				params[4].SetNull()
-			} else {
-				params[4].SetArray(ZendArrayDup(symbol_table))
-			}
-			types.ZVAL_COPY_VALUE(&orig_user_error_handler, EG__().GetUserErrorHandler())
-			EG__().GetUserErrorHandler().SetUndef()
-
-			/* User error handler may include() additinal PHP files.
-			 * If an error was generated during comilation PHP will compile
-			 * such scripts recursively, but some CG() variables may be
-			 * inconsistent. */
-
-			in_compilation = CG__().GetInCompilation()
-			if in_compilation != 0 {
-				saved_class_entry = CG__().GetActiveClassEntry()
-				CG__().SetActiveClassEntry(nil)
-				SAVE_STACK(loop_var_stack)
-				SAVE_STACK(delayed_oplines_stack)
-				CG__().SetInCompilation(0)
-			}
-			orig_fake_scope = EG__().GetFakeScope()
-			EG__().SetFakeScope(nil)
-			if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == types.SUCCESS {
-				if retval.GetType() != types.IS_UNDEF {
-					if retval.IsFalse() {
-						ZendErrorCb(type_, error_filename, error_lineno, format, args)
-					}
-					ZvalPtrDtor(&retval)
-				}
-			} else if EG__().GetException() == nil {
-
-				/* The user error handler failed, use built-in error handler */
-
-				ZendErrorCb(type_, error_filename, error_lineno, format, args)
-
-				/* The user error handler failed, use built-in error handler */
-
-			}
-			EG__().SetFakeScope(orig_fake_scope)
-			if in_compilation != 0 {
-				CG__().SetActiveClassEntry(saved_class_entry)
-				RESTORE_STACK(loop_var_stack)
-				RESTORE_STACK(delayed_oplines_stack)
-				CG__().SetInCompilation(1)
-			}
-			ZvalPtrDtor(&params[4])
-			ZvalPtrDtor(&params[2])
-			ZvalPtrDtor(&params[1])
-			if EG__().GetUserErrorHandler().IsUndef() {
-				types.ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), &orig_user_error_handler)
-			} else {
-				ZvalPtrDtor(&orig_user_error_handler)
-			}
-			break
-		}
-	}
-	if type_ == E_PARSE {
-
-		/* eval() errors do not affect exit_status */
-
-		if !(CurrEX() != nil && CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) && CurrEX().GetOpline().GetOpcode() == ZEND_INCLUDE_OR_EVAL && CurrEX().GetOpline().GetExtendedValue() == ZEND_EVAL) {
-			EG__().SetExitStatus(255)
-		}
-
-		/* eval() errors do not affect exit_status */
-
-	}
-}
-func GetFilenameLineno(type_ int, filename **byte, lineno *uint32) {
-	/* Obtain relevant filename and lineno */
-
-	switch type_ {
-	case E_CORE_ERROR:
-
-	case E_CORE_WARNING:
-		*filename = nil
-		*lineno = 0
-		break
-	case E_PARSE:
-
-	case E_COMPILE_ERROR:
-
-	case E_COMPILE_WARNING:
-
-	case E_ERROR:
-
-	case E_NOTICE:
-
-	case E_STRICT:
-
-	case E_DEPRECATED:
-
-	case E_WARNING:
-
-	case E_USER_ERROR:
-
-	case E_USER_WARNING:
-
-	case E_USER_NOTICE:
-
-	case E_USER_DEPRECATED:
-
-	case E_RECOVERABLE_ERROR:
-		if ZendIsCompiling() != 0 {
-			*filename = ZendGetCompiledFilename().GetVal()
-			*lineno = ZendGetCompiledLineno()
-		} else if ZendIsExecuting() != 0 {
-			*filename = ZendGetExecutedFilename()
-			if (*filename)[0] == '[' {
-				*filename = nil
-				*lineno = 0
-			} else {
-				*lineno = ZendGetExecutedLineno()
-			}
-		} else {
-			*filename = nil
-			*lineno = 0
-		}
-		break
-	default:
-		*filename = nil
-		*lineno = 0
-		break
-	}
-	if (*filename) == nil {
-		*filename = "Unknown"
-	}
-}
-func ZendErrorAt(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
-	var args va_list
-	if filename == nil {
-		var dummy_lineno uint32
-		GetFilenameLineno(type_, &filename, &dummy_lineno)
-	}
-	va_start(args, format)
-	ZendErrorVaList(type_, filename, lineno, format, args)
-	va_end(args)
-}
-func ZendErrorEx(typ int, message string) {
-	// todo
-}
-func ZendError(type_ int, format string, args ...any) {
-	var filename *byte
-	var lineno uint32
-	GetFilenameLineno(type_, &filename, &lineno)
-	ZendErrorVaList(type_, filename, lineno, format, args)
-}
-func ZendErrorAtNoreturn(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
-	var args va_list
-	if filename == nil {
-		var dummy_lineno uint32
-		GetFilenameLineno(type_, &filename, &dummy_lineno)
-	}
-	va_start(args, format)
-	ZendErrorVaList(type_, filename, lineno, format, args)
-	va_end(args)
-
-	/* Should never reach this. */
-
-	abort()
-
-	/* Should never reach this. */
-}
-func ZendErrorNoreturn(type_ int, format string, _ ...any) {
-	var filename *byte
-	var lineno uint32
-	var args va_list
-	GetFilenameLineno(type_, &filename, &lineno)
-	va_start(args, format)
-	ZendErrorVaList(type_, filename, lineno, format, args)
-	va_end(args)
-
-	/* Should never reach this. */
-
-	abort()
-
-	/* Should never reach this. */
-}
-func ZendThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
-	if exception_ce != nil {
-		if InstanceofFunction(exception_ce, ZendCeError) == 0 {
-			ZendError(E_NOTICE, "Error exceptions must be derived from Error")
-			exception_ce = ZendCeError
-		}
-	} else {
-		exception_ce = ZendCeError
-	}
-
-	/* Marker used to disable exception generation during preloading. */
-
-	if EG__().GetException() == any(uintPtr-1) {
-		return
-	}
-
-	message := ZendSprintf(format, args...)
-
-	//TODO: we can't convert compile-time errors to exceptions yet???
-
-	if CurrEX() != nil && CG__().GetInCompilation() == 0 {
-		ZendThrowException(exception_ce, message, 0)
-	} else {
-		ZendError(E_ERROR, "%s", message)
-	}
-}
-func ZendTypeError(format string, args ...any) {
-	message := ZendSprintf(format, args...)
-	ZendThrowException(ZendCeTypeError, message, 0)
-	Efree(message)
-}
-
-func ZendInternalTypeErrorEx(throwException bool, message string) {
-	if throwException {
-		ZendThrowException(ZendCeTypeError, message, 0)
-	} else {
-		ZendError(E_WARNING, "%s", message)
-	}
-}
-func ZendInternalTypeError(throw_exception bool, format string, args ...any) {
-	message := ZendSprintf(format, args...)
-	if throw_exception {
-		ZendThrowException(ZendCeTypeError, message, 0)
-	} else {
-		ZendError(E_WARNING, "%s", message)
-	}
-}
-func ZendInternalArgumentCountErrorEx(throwException bool, message string) {
-	if throwException {
-		ZendThrowException(ZendCeArgumentCountError, message, 0)
-	} else {
-		ZendError(E_WARNING, "%s", message)
-	}
-}
-func ZendInternalArgumentCountError(throw_exception bool, format string, args ...any) {
-	message := ZendSprintf(format, args...)
-	if throw_exception {
-		ZendThrowException(ZendCeArgumentCountError, message, 0)
-	} else {
-		ZendError(E_WARNING, "%s", message)
-	}
-}
-func ZendOutputDebugString(trigger_break types.ZendBool, format string, _ ...any) {}
 func ZendUserExceptionHandler() {
 	var orig_user_exception_handler types.Zval
 	var params []types.Zval
@@ -925,13 +583,13 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 		ZendDestroyFileHandle(file_handle)
 		if op_array != nil {
 			ZendExecute(op_array, retval)
-			ZendExceptionRestore()
+			faults.ZendExceptionRestore()
 			if EG__().GetException() != nil {
 				if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
 					ZendUserExceptionHandler()
 				}
 				if EG__().GetException() != nil {
-					ZendExceptionError(EG__().GetException(), E_ERROR)
+					faults.ZendExceptionError(EG__().GetException(), faults.E_ERROR)
 				}
 			}
 			DestroyOpArray(op_array)

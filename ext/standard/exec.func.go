@@ -10,6 +10,7 @@ import (
 	"sik/core/streams"
 	"sik/zend"
 	"sik/zend/argparse"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -31,7 +32,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 	var bufl int = 0
 	fp = zend.VCWD_POPEN(cmd, "r")
 	if fp == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to fork [%s]", cmd)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to fork [%s]", cmd)
 		goto err
 	}
 	stream = streams.PhpStreamFopenFromPipe(fp, "rb")
@@ -157,12 +158,12 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 		break
 	}
 	if cmd_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot execute a blank command")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot execute a blank command")
 		return_value.SetFalse()
 		return
 	}
 	if strlen(cmd) != cmd_len {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "NULL byte detected. Possible attack")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "NULL byte detected. Possible attack")
 		return_value.SetFalse()
 		return
 	}
@@ -204,7 +205,7 @@ func PhpEscapeShellCmd(str *byte) *types.ZendString {
 	/* max command line length - two single quotes - \0 byte length */
 
 	if l > CmdMaxLen-2-1 {
-		core.PhpErrorDocref(nil, zend.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref(nil, faults.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		return types.ZSTR_EMPTY_ALLOC()
 	}
 	cmd = types.ZendStringSafeAlloc(2, l, 0, 0)
@@ -284,7 +285,7 @@ func PhpEscapeShellCmd(str *byte) *types.ZendString {
 	}
 	cmd.GetVal()[y] = '0'
 	if y > CmdMaxLen+1 {
-		core.PhpErrorDocref(nil, zend.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		types.ZendStringReleaseEx(cmd, 0)
 		return types.ZSTR_EMPTY_ALLOC()
 	}
@@ -312,7 +313,7 @@ func PhpEscapeShellArg(str *byte) *types.ZendString {
 	/* max command line length - two single quotes - \0 byte length */
 
 	if l > CmdMaxLen-2-1 {
-		core.PhpErrorDocref(nil, zend.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref(nil, faults.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		return types.ZSTR_EMPTY_ALLOC()
 	}
 	cmd = types.ZendStringSafeAlloc(4, l, 2, 0)
@@ -343,7 +344,7 @@ func PhpEscapeShellArg(str *byte) *types.ZendString {
 	cmd.GetVal()[b.PostInc(&y)] = '\''
 	cmd.GetVal()[y] = '0'
 	if y > CmdMaxLen+1 {
-		core.PhpErrorDocref(nil, zend.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
+		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		types.ZendStringReleaseEx(cmd, 0)
 		return types.ZSTR_EMPTY_ALLOC()
 	}
@@ -382,7 +383,7 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zv
 	}
 	if command_len != 0 {
 		if command_len != strlen(command) {
-			core.PhpErrorDocref(nil, zend.E_ERROR, "Input string contains NULL bytes")
+			core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
 			return
 		}
 		return_value.SetString(PhpEscapeShellCmd(command))
@@ -411,7 +412,7 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zv
 	}
 	if argument != nil {
 		if argument_len != strlen(argument) {
-			core.PhpErrorDocref(nil, zend.E_ERROR, "Input string contains NULL bytes")
+			core.PhpErrorDocref(nil, faults.E_ERROR, "Input string contains NULL bytes")
 			return
 		}
 		return_value.SetString(PhpEscapeShellArg(argument))
@@ -440,17 +441,17 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if command_len == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot execute a blank command")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot execute a blank command")
 		return_value.SetFalse()
 		return
 	}
 	if strlen(command) != command_len {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "NULL byte detected. Possible attack")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "NULL byte detected. Possible attack")
 		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&in, zend.VCWD_POPEN(command, "r")) == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to execute '%s'", command)
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to execute '%s'", command)
 		return_value.SetFalse()
 		return
 	}
@@ -483,7 +484,7 @@ func ZifProcNice(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	errno = 0
 	core.PhpIgnoreValue(nice(pri))
 	if errno {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Only a super user may attempt to increase the priority of a process")
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Only a super user may attempt to increase the priority of a process")
 		return_value.SetFalse()
 		return
 	}
