@@ -7,8 +7,23 @@ import (
 	f "sik/internal/cmd/sikgen/astutil"
 )
 
+var (
+	typeEx   = f.RefType(f.Type("ZendExecuteData"))
+	typeZval = f.RefType(f.PkgIdent("types", "Zval"))
+)
+
 func genFileNode(name *ast.Ident, infos []*ZifInfo) *ast.File {
 	var decls []ast.Decl
+
+	decls = append(decls, &ast.GenDecl{
+		Tok: token.IMPORT,
+		Specs: []ast.Spec{
+			&ast.ImportSpec{
+				Path: f.StrLit("sik/zend/types"),
+			},
+		},
+	})
+
 	for _, zifInfo := range infos {
 		docComment := &ast.CommentGroup{
 			List: []*ast.Comment{
@@ -60,8 +75,8 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	// type
 	funcType := &ast.FuncType{
 		Params: f.Fields(
-			f.Field(executeDataIdent, f.RefType(f.Type("ZendExecuteData"))),
-			f.Field(returnValueIdent, f.RefType(f.Type("Zval"))),
+			f.Field(executeDataIdent, typeEx),
+			f.Field(returnValueIdent, typeZval),
 		),
 	}
 
@@ -69,7 +84,16 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	var args []ast.Expr
 	var stmts []ast.Stmt
 
-	if zifInfo.maxNumArgs >= 0 {
+	if zifInfo.minNumArgs == 0 && zifInfo.maxNumArgs <= 0 {
+		stmts = append(stmts, &ast.IfStmt{
+			Cond: f.Not(
+				f.MethodCallExpr(executeDataIdent, "CheckNumArgsNone", []ast.Expr{
+					f.BoolLit(zifInfo.strict),
+				}),
+			),
+			Body: f.BlockStmt(&ast.ReturnStmt{}),
+		})
+	} else if zifInfo.maxNumArgs >= 0 {
 		stmts = append(stmts, &ast.IfStmt{
 			Cond: f.Not(
 				f.MethodCallExpr(executeDataIdent, "CheckNumArgs", []ast.Expr{

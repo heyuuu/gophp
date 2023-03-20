@@ -544,7 +544,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 
 				if !(strncmp(ptr, "image/", b.SizeOf("\"image/\"")-1)) {
 					var key *types.ZendString = types.ZendStringInit("zlib.output_compression", b.SizeOf("\"zlib.output_compression\"")-1, 0)
-					zend.ZendAlterIniEntryChars(key, "0", b.SizeOf("\"0\"")-1, PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
+					zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 					types.ZendStringReleaseEx(key, 0)
 				}
 				mimetype = zend.Estrdup(ptr)
@@ -572,7 +572,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				 * enabled globally. See req #44164 */
 
 				var key *types.ZendString = types.ZendStringInit("zlib.output_compression", b.SizeOf("\"zlib.output_compression\"")-1, 0)
-				zend.ZendAlterIniEntryChars(key, "0", b.SizeOf("\"0\"")-1, PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
+				zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 				types.ZendStringReleaseEx(key, 0)
 			} else if !(strcasecmp(header_line, "Location")) {
 				if (SG__().sapi_headers.http_response_code < 300 || SG__().sapi_headers.http_response_code > 399) && SG__().sapi_headers.http_response_code != 201 {

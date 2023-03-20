@@ -162,29 +162,11 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 func ZendUnregisterIniEntries(module_number int) {
 	types.ZendHashApplyWithArgument(RegisteredZendIniDirectives, ZendRemoveIniEntries, any(&module_number))
 }
-func ZendAlterIniEntry(name *types.ZendString, new_value *types.ZendString, modify_type int, stage int) int {
-	return ZendAlterIniEntryEx(name, new_value, modify_type, stage, 0)
-}
-func ZendAlterIniEntryChars(name *types.ZendString, value string, value_length int, modify_type int, stage int) int {
+func ZendAlterIniEntryChars(name string, value string, modify_type int, stage int) int {
 	var ret int
 	var new_value *types.ZendString
-	new_value = types.ZendStringInit(value, value_length, !(stage & ZEND_INI_STAGE_IN_REQUEST))
+	new_value = types.NewZendString(value)
 	ret = ZendAlterIniEntryEx(name, new_value, modify_type, stage, 0)
-	types.ZendStringRelease(new_value)
-	return ret
-}
-func ZendAlterIniEntryCharsEx(
-	name *types.ZendString,
-	value *byte,
-	value_length int,
-	modify_type int,
-	stage int,
-	force_change int,
-) int {
-	var ret int
-	var new_value *types.ZendString
-	new_value = types.ZendStringInit(value, value_length, !(stage & ZEND_INI_STAGE_IN_REQUEST))
-	ret = ZendAlterIniEntryEx(name, new_value, modify_type, stage, force_change)
 	types.ZendStringRelease(new_value)
 	return ret
 }

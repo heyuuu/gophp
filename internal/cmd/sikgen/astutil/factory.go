@@ -13,6 +13,12 @@ var (
 )
 
 func Ident(name string) *ast.Ident { return &ast.Ident{Name: name} }
+func PkgIdent(pkg string, name string) *ast.SelectorExpr {
+	return &ast.SelectorExpr{
+		X:   &ast.Ident{Name: pkg},
+		Sel: &ast.Ident{Name: name},
+	}
+}
 
 func NilLit() *ast.Ident { return nilIdent }
 func IntLit(val int) *ast.BasicLit {

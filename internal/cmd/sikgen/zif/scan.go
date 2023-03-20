@@ -103,7 +103,7 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (zifInfo *ZifInfo, ok bool) {
 
 	zifInfo = &ZifInfo{
 		funcName:      funcName,
-		defName:       funcName + "Def",
+		defName:       "Def" + funcName,
 		name:          zifName,
 		minNumArgs:    annoArgs.minNumArgs,
 		maxNumArgs:    annoArgs.maxNumArgs,

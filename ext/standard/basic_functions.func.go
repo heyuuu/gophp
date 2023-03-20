@@ -1984,7 +1984,7 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Z
 	old_setting = uint16(core.PG__().ignore_user_abort)
 	if executeData.NumArgs() != 0 {
 		var key *types.ZendString = types.ZendStringInit("ignore_user_abort", b.SizeOf("\"ignore_user_abort\"")-1, 0)
-		zend.ZendAlterIniEntryChars(key, b.Cond(arg != 0, "1", "0"), 1, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
+		zend.ZendAlterIniEntryChars(key.GetStr(), b.CastStr(b.Cond(arg != 0, "1", "0"), 1), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 		types.ZendStringReleaseEx(key, 0)
 	}
 	return_value.SetLong(old_setting)

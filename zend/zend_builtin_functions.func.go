@@ -27,36 +27,15 @@ func ZendStartupBuiltinFunctions() int {
 	}
 }
 
-//@zif -c 0
-func ZifZendVersion() string { return ZEND_VERSION }
-
-//@zif -c 0
-func ZifGcMemCaches() int { return ZendMmGc(ZendMmGetHeap()) }
-
-//@zif -c 0
+func ZifZendVersion() string  { return ZEND_VERSION }
+func ZifGcMemCaches() int     { return ZendMmGc(ZendMmGetHeap()) }
 func ZifGcCollectCycles() int { return 0 }
-
-//@zif -c 0
-func ZifGcEnabled() bool { return true }
-
-//@zif -c 0
-func ZifGcEnable(executeData *ZendExecuteData, return_value *types.Zval) {
-	var key *types.ZendString
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	key = types.ZendStringInit("zend.enable_gc", b.SizeOf("\"zend.enable_gc\"")-1, 0)
-	ZendAlterIniEntryChars(key, "1", b.SizeOf("\"1\"")-1, ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
-	types.ZendStringReleaseEx(key, 0)
+func ZifGcEnabled() bool      { return true }
+func ZifGcEnable() {
+	ZendAlterIniEntryChars("zend.enable_gc", "1", ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
 }
-func ZifGcDisable(executeData *ZendExecuteData, return_value *types.Zval) {
-	var key *types.ZendString
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	key = types.ZendStringInit("zend.enable_gc", b.SizeOf("\"zend.enable_gc\"")-1, 0)
-	ZendAlterIniEntryChars(key, "0", b.SizeOf("\"0\"")-1, ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
-	types.ZendStringReleaseEx(key, 0)
+func ZifGcDisable() {
+	ZendAlterIniEntryChars("zend.enable_gc", "0", ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
 }
 
 func IZifGcStatus() map[string]int {
@@ -68,15 +47,13 @@ func IZifGcStatus() map[string]int {
 	}
 }
 
-func ZifGcStatus(executeData *ZendExecuteData, return_value *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
+func ZifGcStatus() map[string]int {
+	return map[string]int{
+		"runs":      0,
+		"collected": 0,
+		"threshold": 0,
+		"roots":     0,
 	}
-	ArrayInitSize(return_value, 3)
-	AddAssocLongEx(return_value, "runs", 0)
-	AddAssocLongEx(return_value, "collected", 0)
-	AddAssocLongEx(return_value, "threshold", 0)
-	AddAssocLongEx(return_value, "roots", 0)
 }
 
 func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
