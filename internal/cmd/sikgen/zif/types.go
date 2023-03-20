@@ -1,48 +1,72 @@
 package zif
 
-import "go/ast"
+import (
+	"go/ast"
+	"strconv"
+)
 
 type ZifInfo struct {
 	funcName      string
 	defName       string
 	name          string
-	handler       ast.Expr
 	minNumArgs    int
 	maxNumArgs    int
 	useArgNames   bool
 	argNames      []string
 	argInfos      []ArgInfo
+	argNeedEx     bool
+	argNeedRet    bool
 	returnArgInfo *ArgInfo
 	strict        bool
 }
 
 type ArgInfo struct {
 	name       string
-	typ        ZvalType
+	typ        ZppType
 	isVariadic bool
 }
 
-type ZvalType string
+type ZppType int
+
+func (z ZppType) String() string { return strconv.Itoa(int(z)) }
 
 const (
-	ZvalTypeBool   ZvalType = "bool"
-	ZvalTypeInt    ZvalType = "int"
-	ZvalTypeDouble ZvalType = "double"
-	ZvalTypeString ZvalType = "string"
+	_ ZppType = iota
+	ZppTypeBool
+	ZppTypeLong
+	ZppTypeDouble
+	ZppTypeString
+	ZppTypeZendBool
+	ZppTypeZendString
+	ZppTypeZendArray
+	// special
+	ZppTypeEx
+	ZppTypeRet
 )
 
-func asZvalType(typ ast.Expr) (ZvalType, bool) {
+func toZppType(typ ast.Expr) (zpp ZppType, ok bool) {
 	typName := printNode(typ)
 	switch typName {
 	case "bool":
-		return ZvalTypeBool, true
+		return ZppTypeBool, true
 	case "int":
-		return ZvalTypeInt, true
+		return ZppTypeLong, true
 	case "float64":
-		return ZvalTypeDouble, true
+		return ZppTypeDouble, true
 	case "string":
-		return ZvalTypeString, true
+		return ZppTypeString, true
+	case "types.ZendBool":
+		return ZppTypeZendBool, true
+	case "*types.Array":
+		return ZppTypeZendArray, true
+	case "*types.String":
+		return ZppTypeZendString, true
+	// special
+	case "zpp.DefEx":
+		return ZppTypeEx, true
+	case "zpp.DefRet":
+		return ZppTypeRet, true
 	default:
-		return "", false
+		return 0, false
 	}
 }

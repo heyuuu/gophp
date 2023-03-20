@@ -56,42 +56,6 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (zifInfo *ZifInfo, ok bool) {
 	params := funcDecl.Type.Params.List
 	returns := funcDecl.Type.Results
 
-	// 从参数类型获取信息
-	var argNames []string
-	var argInfos []ArgInfo
-	var returnArgInfo *ArgInfo
-	for _, param := range params {
-		paramName := param.Names[0].Name
-		paramType, ok := asZvalType(param.Type)
-		if !ok {
-			typeDesc := printNode(param.Type)
-			if typeDesc == "*ZendExecuteData" {
-				//log.Println("Zif函数未简化: " + funcName)
-			} else {
-				log.Fatalf("Zif函数错误，参数类型不合法: func=%s, type=%s\n", funcName, typeDesc)
-			}
-			return nil, false
-		}
-		argNames = append(argNames, paramName)
-		argInfos = append(argInfos, ArgInfo{
-			name: paramName,
-			typ:  paramType,
-		})
-	}
-
-	// 从返回类型获取信息
-	if returns != nil && len(returns.List) == 1 {
-		returnType, ok := asZvalType(returns.List[0].Type)
-		if !ok {
-			typeDesc := returns.List[0].Type
-			log.Fatalf("Zif函数错误，返回值类型不合法: func=%s, type=%s\n", funcName, typeDesc)
-			return nil, false
-		}
-		returnArgInfo = &ArgInfo{
-			typ: returnType,
-		}
-	}
-
 	// 从注解获取信息
 	annoArgs := getAnnoArgs(funcDecl.Doc)
 
@@ -102,16 +66,59 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (zifInfo *ZifInfo, ok bool) {
 	}
 
 	zifInfo = &ZifInfo{
-		funcName:      funcName,
-		defName:       "Def" + funcName,
-		name:          zifName,
-		minNumArgs:    annoArgs.minNumArgs,
-		maxNumArgs:    annoArgs.maxNumArgs,
-		useArgNames:   true,
-		argNames:      argNames,
-		argInfos:      argInfos,
-		returnArgInfo: returnArgInfo,
-		strict:        annoArgs.strict,
+		funcName:   funcName,
+		defName:    "Def" + funcName,
+		name:       zifName,
+		minNumArgs: annoArgs.minNumArgs,
+		maxNumArgs: annoArgs.maxNumArgs,
+		strict:     annoArgs.strict,
+	}
+
+	// 从参数类型获取信息
+	for _, param := range params {
+		paramName := param.Names[0].Name
+		paramType, ok := toZppType(param.Type)
+		if !ok {
+			typeDesc := printNode(param.Type)
+			if typeDesc == "*ZendExecuteData" || typeDesc == "*zend.ZendExecuteData" {
+				//log.Println("Zif函数未简化: " + funcName)
+			} else {
+				log.Fatalf("Zif函数错误，参数类型不合法: func=%s, type=%s\n", funcName, typeDesc)
+			}
+			return nil, false
+		}
+		switch paramType {
+		case ZppTypeEx:
+			if len(zifInfo.argInfos) > 0 {
+				typeDesc := printNode(param.Type)
+				log.Fatalf("Zif函数错误，参数类型不合法, DefEx 必须在所有实际参数前: func=%s, type=%s\n", funcName, typeDesc)
+			}
+			zifInfo.argNeedEx = true
+		case ZppTypeRet:
+			if len(zifInfo.argInfos) > 0 {
+				typeDesc := printNode(param.Type)
+				log.Fatalf("Zif函数错误，参数类型不合法, DefRet 必须在所有实际参数前: func=%s, type=%s\n", funcName, typeDesc)
+			}
+			zifInfo.argNeedRet = true
+		default:
+			zifInfo.argInfos = append(zifInfo.argInfos, ArgInfo{
+				name: paramName,
+				typ:  paramType,
+			})
+		}
+	}
+
+	// 从返回类型获取信息
+	if returns != nil && len(returns.List) == 1 {
+		returnType, ok := toZppType(returns.List[0].Type)
+		if !ok {
+			typeDesc := returns.List[0].Type
+			log.Fatalf("Zif函数错误，返回值类型不合法: func=%s, type=%s\n", funcName, typeDesc)
+			return nil, false
+		}
+		zifInfo.returnArgInfo = &ArgInfo{
+			typ: returnType,
+		}
 	}
 
 	return zifInfo, true

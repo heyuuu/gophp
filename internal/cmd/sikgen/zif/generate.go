@@ -62,9 +62,9 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	}
 
 	// body
-	var args []ast.Expr
 	var stmts []ast.Stmt
 
+	// check num args
 	if zifInfo.minNumArgs == 0 && zifInfo.maxNumArgs <= 0 {
 		method := "CheckNumArgsNoneError"
 		if zifInfo.strict {
@@ -101,6 +101,17 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 		})
 	}
 
+	var args []ast.Expr
+	if zifInfo.argNeedEx {
+		args = append(args, executeDataIdent)
+	}
+	if zifInfo.argNeedRet {
+		args = append(args, returnValueIdent)
+	}
+	for _, argInfo := range zifInfo.argInfos {
+		args = append(args, f.Ident(argInfo.name))
+	}
+
 	if zifInfo.returnArgInfo == nil {
 		stmts = append(stmts,
 			f.ExprStmt(f.CallExpr(zifInfo.funcName, args)),
@@ -108,16 +119,16 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	} else {
 		var setter string
 		switch zifInfo.returnArgInfo.typ {
-		case ZvalTypeBool:
+		case ZppTypeBool:
 			setter = "SetBool"
-		case ZvalTypeInt:
+		case ZppTypeLong:
 			setter = "SetLong"
-		case ZvalTypeDouble:
+		case ZppTypeDouble:
 			setter = "SetDouble"
-		case ZvalTypeString:
+		case ZppTypeString:
 			setter = "SetRawString"
 		default:
-			log.Fatalln("此 ZvalType 未设置对应 Setter: " + zifInfo.returnArgInfo.typ)
+			log.Fatalln("此 ZppType 未设置对应 Setter: " + zifInfo.returnArgInfo.typ.String())
 		}
 
 		stmts = append(stmts,

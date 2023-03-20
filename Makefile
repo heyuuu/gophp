@@ -8,7 +8,7 @@ lexer:
 
 sikgen-func:
 	${GOBIN} build ./internal/cmd/sikgen
-	./sikgen -cmd gen-func -d zend
+	./sikgen -cmd gen-func
 
 sikgen-func-clear:
 	${GOBIN} build ./internal/cmd/sikgen

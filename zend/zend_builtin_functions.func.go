@@ -38,32 +38,16 @@ func ZifGcDisable() {
 	ZendAlterIniEntryChars("zend.enable_gc", "0", ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
 }
 
-func IZifGcStatus() map[string]int {
-	return map[string]int{
-		"runs":      0,
-		"collected": 0,
-		"threshold": 0,
-		"roots":     0,
-	}
+func ZifGcStatus(ret zpp.DefRet) {
+	ArrayInitSize(ret, 3)
+	AddAssocLongEx(ret, "runs", 0)
+	AddAssocLongEx(ret, "collected", 0)
+	AddAssocLongEx(ret, "threshold", 0)
+	AddAssocLongEx(ret, "roots", 0)
 }
 
-func ZifGcStatus() {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	ArrayInitSize(return_value, 3)
-	AddAssocLongEx(return_value, "runs", 0)
-	AddAssocLongEx(return_value, "collected", 0)
-	AddAssocLongEx(return_value, "threshold", 0)
-	AddAssocLongEx(return_value, "roots", 0)
-}
-
-func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	result := IZifFuncNumArgs(executeData)
-	return_value.SetLong(result)
+func ZifFuncNumArgs(executeData zpp.DefEx) int {
+	return IZifFuncNumArgs(executeData)
 }
 
 func IZifFuncNumArgs(executeData *ZendExecuteData) int {
@@ -78,12 +62,13 @@ func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 	return ex.NumArgs()
 }
 
-func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
-	var arg_count uint32
-	var first_extra_arg uint32
-	var arg *types.Zval
-	var requested_offset ZendLong
-	var ex *ZendExecuteData
+func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	requested_offset := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+
 	if ZendParseParameters(executeData.NumArgs(), "l", &requested_offset) == types.FAILURE {
 		return
 	}
@@ -92,7 +77,8 @@ func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	ex = executeData.GetPrevExecuteData()
+
+	ex := executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		faults.Error(faults.E_WARNING, "func_get_arg():  Called from the global scope - no function context")
 		return_value.SetFalse()
@@ -102,18 +88,22 @@ func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	arg_count = ex.NumArgs()
-	if ZendUlong(requested_offset >= arg_count) != 0 {
+
+	arg_count := ex.NumArgs()
+	if requested_offset >= arg_count {
 		faults.Error(faults.E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", requested_offset)
 		return_value.SetFalse()
 		return
 	}
-	first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
-	if ZendUlong(requested_offset >= first_extra_arg && ex.NumArgs() > first_extra_arg) != 0 {
-		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar()+ex.GetFunc().GetOpArray().GetT()) + (requested_offset - first_extra_arg)
+
+	var arg *types.Zval
+	first_extra_arg := int(ex.GetFunc().GetOpArray().GetNumArgs())
+	if requested_offset >= first_extra_arg && ex.NumArgs() > first_extra_arg {
+		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + (requested_offset - first_extra_arg))
 	} else {
 		arg = ex.Arg(requested_offset + 1)
 	}
+
 	if !(arg.IsUndef()) {
 		types.ZVAL_COPY_DEREF(return_value, arg)
 	}

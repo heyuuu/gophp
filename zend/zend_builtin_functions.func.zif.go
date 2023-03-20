@@ -62,5 +62,22 @@ var DefZifGcStatus = DefFunc(DefFuncOpts{name: "gc_status", handler: func(execut
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifGcStatus()
+	ZifGcStatus(returnValue)
+}})
+
+// generate by ZifFuncNumArgs
+var DefZifFuncNumArgs = DefFunc(DefFuncOpts{name: "func_num_args", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ret := ZifFuncNumArgs(executeData)
+	returnValue.SetLong(ret)
+}})
+
+// generate by ZifFuncGetArg
+var DefZifFuncGetArg = DefFunc(DefFuncOpts{name: "func_get_arg", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifFuncGetArg(executeData, returnValue)
 }})

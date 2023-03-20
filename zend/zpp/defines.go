@@ -10,8 +10,8 @@ import (
  */
 type (
 	DefOpt any
-	DefEx  *zend.ZendExecuteData
-	DefRet *types.Zval
+	DefEx  = *zend.ZendExecuteData
+	DefRet = *types.Zval
 	// Type: 'L', FAST_ZPP: Z_PARAM_STRICT_LONG
 	DefStrictLong = int
 )
