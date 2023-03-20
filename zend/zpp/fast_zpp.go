@@ -28,9 +28,6 @@ func FastParseStart(executeData ExecuteData, minNumArgs int, maxNumArgs int, fla
 	return p
 }
 
-// todo delete
-func (p *FastParser) HandleError() {}
-
 // @see Micro: Z_PARAM_OPTIONAL
 func (p *FastParser) StartOptional() {
 	p.optional = true
