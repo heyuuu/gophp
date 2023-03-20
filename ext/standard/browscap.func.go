@@ -547,7 +547,6 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			agent_name = fp.ParseStrEx(true)
 			return_array = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

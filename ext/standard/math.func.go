@@ -195,7 +195,6 @@ func ZifAbs(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			value = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -229,7 +228,6 @@ func ZifCeil(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			value = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -258,7 +256,6 @@ func ZifFloor(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			value = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -294,7 +291,6 @@ func ZifRound(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			precision = fp.ParseLong()
 			mode = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -352,7 +348,6 @@ func ZifSin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -373,7 +368,6 @@ func ZifCos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -394,7 +388,6 @@ func ZifTan(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -415,7 +408,6 @@ func ZifAsin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -436,7 +428,6 @@ func ZifAcos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -457,7 +448,6 @@ func ZifAtan(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -480,7 +470,6 @@ func ZifAtan2(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			num1 = fp.ParseDouble()
 			num2 = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -501,7 +490,6 @@ func ZifSinh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -522,7 +510,6 @@ func ZifCosh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -543,7 +530,6 @@ func ZifTanh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -564,7 +550,6 @@ func ZifAsinh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -585,7 +570,6 @@ func ZifAcosh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -606,7 +590,6 @@ func ZifAtanh(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -631,7 +614,6 @@ func ZifIsFinite(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			dval = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -652,7 +634,6 @@ func ZifIsInfinite(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			dval = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -673,7 +654,6 @@ func ZifIsNan(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			dval = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -696,7 +676,6 @@ func ZifPow(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			zbase = fp.ParseZval()
 			zexp = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -716,7 +695,6 @@ func ZifExp(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -737,7 +715,6 @@ func ZifExpm1(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -758,7 +735,6 @@ func ZifLog1p(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -782,7 +758,6 @@ func ZifLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			base = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -820,7 +795,6 @@ func ZifLog10(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -841,7 +815,6 @@ func ZifSqrt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -864,7 +837,6 @@ func ZifHypot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			num1 = fp.ParseDouble()
 			num2 = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -885,7 +857,6 @@ func ZifDeg2rad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			deg = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -906,7 +877,6 @@ func ZifRad2deg(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			rad = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1095,7 +1065,6 @@ func ZifBindec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1119,7 +1088,6 @@ func ZifHexdec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1143,7 +1111,6 @@ func ZifOctdec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1168,7 +1135,6 @@ func ZifDecbin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1194,7 +1160,6 @@ func ZifDecoct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1220,7 +1185,6 @@ func ZifDechex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1251,7 +1215,6 @@ func ZifBaseConvert(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			frombase = fp.ParseLong()
 			tobase = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1441,7 +1404,6 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *types.Zval
 			dec_point, dec_point_len = fp.ParseStringEx(true)
 			thousand_sep, thousand_sep_len = fp.ParseStringEx(true)
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1483,7 +1445,6 @@ func ZifFmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			num1 = fp.ParseDouble()
 			num2 = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1506,7 +1467,6 @@ func ZifIntdiv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			dividend = fp.ParseLong()
 			divisor = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

@@ -167,7 +167,6 @@ func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Z
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			src = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -194,7 +193,6 @@ func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *types.Z
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			src = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

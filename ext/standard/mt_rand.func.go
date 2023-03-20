@@ -108,7 +108,6 @@ func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			seed = fp.ParseLong()
 			mode = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -196,7 +195,6 @@ func ZifMtRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			min = fp.ParseLong()
 			max = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

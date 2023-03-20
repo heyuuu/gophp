@@ -1352,7 +1352,6 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 			hint_charset = fp.ParseStrEx(true)
 			double_encode = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1397,7 +1396,6 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 			fp.StartOptional()
 			quote_style = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1430,7 +1428,6 @@ func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *types.
 			quote_style = fp.ParseLong()
 			hint_charset = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1519,7 +1516,6 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 			flags = fp.ParseLong()
 			charset_hint, charset_hint_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

@@ -594,7 +594,6 @@ func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			fp.StartOptional()
 			ext_name, ext_name_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -627,7 +626,6 @@ func ZifPhpcredits(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			fp.StartOptional()
 			flag = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -658,7 +656,6 @@ func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			mode, modelen = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

@@ -27,7 +27,6 @@ func ZifSha1(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -65,7 +64,6 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

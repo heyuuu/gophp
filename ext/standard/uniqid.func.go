@@ -28,7 +28,6 @@ func ZifUniqid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			prefix, prefix_len = fp.ParseString()
 			more_entropy = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

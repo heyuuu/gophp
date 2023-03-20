@@ -27,7 +27,6 @@ func ZifSoundex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

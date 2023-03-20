@@ -37,7 +37,6 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *types.
 			type_ = fp.ParseLong()
 			protocol = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -93,7 +92,6 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *type
 			flags = fp.ParseLong()
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -172,7 +170,6 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *type
 			flags = fp.ParseLong()
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -233,7 +230,6 @@ func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *type
 			timeout = fp.ParseDouble()
 			zpeername = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -279,7 +275,6 @@ func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *typ
 			zstream = fp.ParseResource()
 			want_peer = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -322,7 +317,6 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *type
 			flags = fp.ParseLong()
 			target_addr, target_addr_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -369,7 +363,6 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ty
 			flags = fp.ParseLong()
 			zremote = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -419,7 +412,6 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *types
 			maxlen = fp.ParseLong()
 			desiredpos = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -490,7 +482,6 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *type
 			maxlen = fp.ParseLong()
 			pos = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -525,7 +516,6 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *types
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zstream = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -791,7 +781,6 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp.StartOptional()
 			usec = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1010,7 +999,6 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1040,7 +1028,6 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 				zcontext = fp.ParseResource()
 				options = fp.ParseArray()
 				if fp.HasError() {
-					fp.HandleError()
 					return
 				}
 				break
@@ -1074,7 +1061,6 @@ func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *
 				optionname, optionlen = fp.ParseString()
 				zvalue = fp.ParseZval()
 				if fp.HasError() {
-					fp.HandleError()
 					return_value.SetFalse()
 					return
 				}
@@ -1108,7 +1094,6 @@ func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *
 			zcontext = fp.ParseResource()
 			params = fp.ParseArray()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1136,7 +1121,6 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1171,7 +1155,6 @@ func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value 
 			fp.StartOptional()
 			params = fp.ParseArray()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1200,7 +1183,6 @@ func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value 
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			options = fp.ParseArray()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1229,7 +1211,6 @@ func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *typ
 			options = fp.ParseArrayEx(true, false)
 			params = fp.ParseArrayEx(true, false)
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1269,7 +1250,6 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 			read_write = fp.ParseLong()
 			filterparams = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1355,7 +1335,6 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *type
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zfilter = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1403,7 +1382,6 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp.StartOptional()
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1442,7 +1420,6 @@ func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *types
 			zstream = fp.ParseResource()
 			block = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1476,7 +1453,6 @@ func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *types.
 			fp.StartOptional()
 			microseconds = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1514,7 +1490,6 @@ func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *ty
 			arg1 = fp.ParseResource()
 			arg2 = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1550,7 +1525,6 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *type
 			zstream = fp.ParseResource()
 			csize = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1595,7 +1569,6 @@ func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *typ
 			arg1 = fp.ParseResource()
 			arg2 = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1638,7 +1611,6 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 			cryptokind, cryptokindnull = fp.ParseLongEx(true)
 			zsessstream = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1691,7 +1663,6 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1719,7 +1690,6 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zstream = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1759,7 +1729,6 @@ func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *type
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zsrc = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1788,7 +1757,6 @@ func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zsrc = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1826,7 +1794,6 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ty
 			zstream = fp.ParseResource()
 			how = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

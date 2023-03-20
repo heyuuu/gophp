@@ -713,7 +713,6 @@ func ZifSplObjectId(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseObject()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

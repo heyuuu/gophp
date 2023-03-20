@@ -944,7 +944,6 @@ func zim_spl_Array_setIteratorClass(executeData *zend.ZendExecuteData, return_va
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	ce_get_iterator := fp.ParseClass(spl_ce_ArrayIterator)
 	if fp.HasError() {
-		fp.HandleError()
 		return
 	}
 	intern.SetCeGetIterator(ce_get_iterator)

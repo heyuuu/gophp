@@ -162,7 +162,6 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *t
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg1 = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -243,7 +242,6 @@ func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *t
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

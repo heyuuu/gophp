@@ -24,7 +24,6 @@ func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			phones = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

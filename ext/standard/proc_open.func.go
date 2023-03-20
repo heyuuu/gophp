@@ -150,7 +150,6 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp.StartOptional()
 			sig_no = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -182,7 +181,6 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zproc = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -220,7 +218,6 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zproc = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -310,7 +307,6 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			environment = fp.ParseArrayEx(true, false)
 			other_options = fp.ParseArrayEx(true, false)
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

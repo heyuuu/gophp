@@ -26,7 +26,6 @@ func ZifFtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			pathname, pathname_len = fp.ParsePath()
 			proj, proj_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

@@ -339,7 +339,6 @@ func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_valu
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zbrigade = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -381,7 +380,6 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 			zbrigade = fp.ParseResource()
 			zobject = fp.ParseObject()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -454,7 +452,6 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Z
 			zstream = fp.ParseZval()
 			buffer, buffer_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -514,7 +511,6 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 			filtername = fp.ParseStr()
 			classname = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

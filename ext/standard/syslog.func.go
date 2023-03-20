@@ -79,7 +79,6 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			option = fp.ParseLong()
 			facility = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -124,7 +123,6 @@ func ZifSyslog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			priority = fp.ParseLong()
 			message, message_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

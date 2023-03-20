@@ -22,7 +22,6 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp.StartOptional()
 			get_as_float = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -70,7 +69,6 @@ func ZifGetrusage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			pwho = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

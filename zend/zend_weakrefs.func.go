@@ -102,7 +102,6 @@ func zim_WeakReference_create(executeData *ZendExecuteData, return_value *types.
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			referent = fp.ParseObject()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -123,7 +122,6 @@ func zim_WeakReference_get(executeData *ZendExecuteData, return_value *types.Zva
 		for {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

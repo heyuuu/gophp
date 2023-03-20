@@ -153,7 +153,6 @@ func ZifCrypt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			salt_in, salt_in_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

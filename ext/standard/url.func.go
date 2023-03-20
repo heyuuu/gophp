@@ -315,7 +315,6 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			key = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -470,7 +469,6 @@ func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -492,7 +490,6 @@ func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -558,7 +555,6 @@ func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -580,7 +576,6 @@ func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -630,7 +625,6 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			format = fp.ParseLong()
 			zcontext = fp.ParseResourceEx(true)
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

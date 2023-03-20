@@ -883,7 +883,6 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *typ
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			p_image_type = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -907,7 +906,6 @@ func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *ty
 			fp.StartOptional()
 			inc_dot = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1138,7 +1136,6 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 			fp.StartOptional()
 			info = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

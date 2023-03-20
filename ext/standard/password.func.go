@@ -356,7 +356,6 @@ func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *types.Z
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hash = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -405,7 +404,6 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 			fp.StartOptional()
 			options = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -445,7 +443,6 @@ func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *types.Zv
 			password = fp.ParseStr()
 			hash = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -475,7 +472,6 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp.StartOptional()
 			options = fp.ParseArrayOrObjectHt()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

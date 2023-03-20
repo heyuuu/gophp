@@ -79,7 +79,6 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, 
 			fp.StartOptional()
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -125,7 +124,6 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			id = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -180,7 +178,6 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -217,7 +214,6 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -276,7 +272,6 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			id = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -330,7 +325,6 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			id = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -393,7 +387,6 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			flags = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -493,7 +486,6 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			flags = fp.ParseLong()
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

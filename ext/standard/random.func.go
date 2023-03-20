@@ -78,7 +78,6 @@ func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			size = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -157,7 +156,6 @@ func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			min = fp.ParseLong()
 			max = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

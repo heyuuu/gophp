@@ -85,7 +85,6 @@ func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *types.
 			fr_cs, fr_cs_len = fp.ParseString()
 			to_cs, to_cs_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

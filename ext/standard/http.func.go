@@ -251,7 +251,6 @@ func ZifHttpBuildQuery(executeData *zend.ZendExecuteData, return_value *types.Zv
 			arg_sep, arg_sep_len = fp.ParseString()
 			enc_type = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

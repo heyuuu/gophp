@@ -519,7 +519,6 @@ func ZifUserSprintf(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			format = fp.ParseZval()
 			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -550,7 +549,6 @@ func ZifVsprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -583,7 +581,6 @@ func ZifUserPrintf(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			format = fp.ParseZval()
 			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -618,7 +615,6 @@ func ZifVprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -660,7 +656,6 @@ func ZifFprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			format = fp.ParseZval()
 			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -701,7 +696,6 @@ func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

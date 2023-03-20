@@ -41,7 +41,6 @@ func ZifStrptime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			ts, ts_length = fp.ParseString()
 			format, format_length = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

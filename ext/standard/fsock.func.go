@@ -42,7 +42,6 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 			zerrstr = fp.ParseZval()
 			timeout = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

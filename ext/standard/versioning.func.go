@@ -208,7 +208,6 @@ func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp.StartOptional()
 			op, op_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

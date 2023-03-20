@@ -108,7 +108,6 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			format, formatlen = fp.ParseString()
 			argv, num_args = fp.ParseVariadic0()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -625,7 +624,6 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			offset = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

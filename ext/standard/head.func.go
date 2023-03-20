@@ -27,7 +27,6 @@ func ZifHeader(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			rep = fp.ParseBool()
 			ctr.GetResponseCode() = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -50,7 +49,6 @@ func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fp.StartOptional()
 			ctr.GetLine(), len_ = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -255,7 +253,6 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			secure = fp.ParseBool()
 			httponly = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -319,7 +316,6 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *types.Zval
 			secure = fp.ParseBool()
 			httponly = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -373,7 +369,6 @@ func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			arg1 = fp.ParseZval()
 			arg2 = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -428,7 +423,6 @@ func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *types.
 			fp.StartOptional()
 			response_code = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

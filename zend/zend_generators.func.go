@@ -956,7 +956,6 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			value = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -997,7 +996,6 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			exception = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

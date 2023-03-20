@@ -314,7 +314,6 @@ func ZifConstant(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			const_name = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -352,7 +351,6 @@ func ZifInetNtop(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			address, address_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -388,7 +386,6 @@ func PhpInetPton(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			address, address_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -424,7 +421,6 @@ func ZifIp2long(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			addr, addr_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -452,7 +448,6 @@ func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			sip = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -488,7 +483,6 @@ func ZifGetenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			str, str_len = fp.ParseString()
 			local_only = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -545,7 +539,6 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			setting, setting_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -672,7 +665,6 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			p_longopts = fp.ParseArray()
 			zoptind = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -883,7 +875,6 @@ func ZifSleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -910,7 +901,6 @@ func ZifUsleep(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			num = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -939,7 +929,6 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *types.Zva
 			tv_sec = fp.ParseLong()
 			tv_nsec = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -990,7 +979,6 @@ func ZifTimeSleepUntil(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			target_secs = fp.ParseDouble()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1072,7 +1060,6 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			varname, varname_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1131,7 +1118,6 @@ func ZifErrorLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			opt, opt_len = fp.ParsePath()
 			headers, headers_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1230,7 +1216,6 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval
 			fci.SetParams(__arg)
 			fci.SetParamCount(uint32(__arg_len))
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1260,7 +1245,6 @@ func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *types
 			fp.ParseFunc(&fci, &fci_cache)
 			params = fp.ParseArray()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1301,7 +1285,6 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 				fci.SetParamCount(0)
 			}
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1340,7 +1323,6 @@ func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *
 			fp.ParseFunc(&fci, &fci_cache)
 			params = fp.ParseArray()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1551,7 +1533,6 @@ func ZifHighlightFile(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp.StartOptional()
 			i = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1597,7 +1578,6 @@ func ZifPhpStripWhitespace(executeData *zend.ZendExecuteData, return_value *type
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1637,7 +1617,6 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *types.Z
 			fp.StartOptional()
 			i = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1685,7 +1664,6 @@ func ZifIniGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			varname = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1724,7 +1702,6 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			extname, extname_len = fp.ParseStringEx(true)
 			details = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1800,7 +1777,6 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			varname = fp.ParseStr()
 			new_value = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1853,7 +1829,6 @@ func ZifIniRestore(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			varname = fp.ParseStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1875,7 +1850,6 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			new_value = fp.ParsePathStr()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -1936,7 +1910,6 @@ func ZifPrintR(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			do_return = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -1974,7 +1947,6 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Z
 			fp.StartOptional()
 			arg = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2006,7 +1978,6 @@ func ZifGetservbyname(executeData *zend.ZendExecuteData, return_value *types.Zva
 			name, name_len = fp.ParseString()
 			proto, proto_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2040,7 +2011,6 @@ func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *types.Zva
 			port = fp.ParseLong()
 			proto, proto_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2068,7 +2038,6 @@ func ZifGetprotobyname(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name, name_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2095,7 +2064,6 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *types.
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			proto = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2162,7 +2130,6 @@ func ZifUnregisterTickFunction(executeData *zend.ZendExecuteData, return_value *
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			function = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2197,7 +2164,6 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			path, path_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2234,7 +2200,6 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 			path, path_len = fp.ParseString()
 			new_path, new_path_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -2354,7 +2319,6 @@ func ZifParseIniFile(executeData *zend.ZendExecuteData, return_value *types.Zval
 			process_sections = fp.ParseBool()
 			scanner_mode = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -2406,7 +2370,6 @@ func ZifParseIniString(executeData *zend.ZendExecuteData, return_value *types.Zv
 			process_sections = fp.ParseBool()
 			scanner_mode = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

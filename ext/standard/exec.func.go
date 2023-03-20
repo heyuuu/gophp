@@ -149,7 +149,6 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 			}
 			ret_code = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}
@@ -374,7 +373,6 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			command, command_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -403,7 +401,6 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zv
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			argument, argument_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -433,7 +430,6 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			command, command_len = fp.ParseString()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -473,7 +469,6 @@ func ZifProcNice(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			pri = fp.ParseLong()
 			if fp.HasError() {
-				fp.HandleError()
 				return_value.SetFalse()
 				return
 			}

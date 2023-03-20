@@ -26,7 +26,6 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			link, link_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -65,7 +64,6 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			link, link_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -110,7 +108,6 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			topath, topath_len = fp.ParsePath()
 			frompath, frompath_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -174,7 +171,6 @@ func ZifLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			topath, topath_len = fp.ParsePath()
 			frompath, frompath_len = fp.ParsePath()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

@@ -36,7 +36,6 @@ func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -74,7 +73,6 @@ func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break

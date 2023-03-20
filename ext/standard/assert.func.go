@@ -105,7 +105,6 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			description = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
@@ -233,7 +232,6 @@ func ZifAssertOptions(executeData *zend.ZendExecuteData, return_value *types.Zva
 			fp.StartOptional()
 			value = fp.ParseZval()
 			if fp.HasError() {
-				fp.HandleError()
 				return
 			}
 			break
