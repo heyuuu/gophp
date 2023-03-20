@@ -72,14 +72,14 @@ func (l *vaList) Pop() any {
 	return arg
 }
 
-func (l *vaList) Bool(val bool)              { PutVaArg(l, types.IntBool(val)) }
-func (l *vaList) ZendBool(val int)           { PutVaArg(l, val) }
-func (l *vaList) Long(val int)               { PutVaArg(l, val) }
-func (l *vaList) Double(val float64)         { PutVaArg(l, val) }
-func (l *vaList) Str(val string)             { PutVaArg(l, types.NewString(val)) }
-func (l *vaList) ZStr(val *types.String)     { PutVaArg(l, val) }
-func (l *vaList) Array(val *types.ZendArray) { PutVaArg(l, val) }
-func (l *vaList) Zval(val *types.Zval)       { PutVaArg(l, val) }
+func (l *vaList) Bool(val bool)          { PutVaArg(l, types.IntBool(val)) }
+func (l *vaList) ZendBool(val int)       { PutVaArg(l, val) }
+func (l *vaList) Long(val int)           { PutVaArg(l, val) }
+func (l *vaList) Double(val float64)     { PutVaArg(l, val) }
+func (l *vaList) Str(val string)         { PutVaArg(l, types.NewString(val)) }
+func (l *vaList) ZStr(val *types.String) { PutVaArg(l, val) }
+func (l *vaList) Array(val *types.Array) { PutVaArg(l, val) }
+func (l *vaList) Zval(val *types.Zval)   { PutVaArg(l, val) }
 func (l *vaList) StrPtr(str *byte, len int) {
 	PutVaArg[*byte](l, str)
 	PutVaArg[int](l, len)

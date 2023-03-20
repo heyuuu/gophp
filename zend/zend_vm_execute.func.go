@@ -636,7 +636,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 			}
 			return -1
 		} else {
-			var symbol_table *types.ZendArray = executeData.GetSymbolTable()
+			var symbol_table *types.Array = executeData.GetSymbolTable()
 			ZendDetachSymbolTable(executeData)
 			old_execute_data = executeData.GetPrevExecuteData()
 			for old_execute_data != nil {
@@ -1869,7 +1869,7 @@ func ZEND_ASSERT_CHECK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	}
 }
 func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var args *types.ZendArray = nil
+	var args *types.Array = nil
 	var fbc *ZendFunction = executeData.GetFunc()
 	var ret *types.Zval = executeData.GetReturnValue()
 	var call_info uint32 = EX_CALL_INFO() & (ZEND_CALL_NESTED | ZEND_CALL_TOP | ZEND_CALL_RELEASE_THIS)
@@ -8034,7 +8034,7 @@ func ZEND_GET_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var ht *types.ZendArray
+	var ht *types.Array
 	var arg_count uint32
 	var result_size uint32
 	var skip uint32
@@ -30420,7 +30420,7 @@ func ZEND_FUNC_NUM_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 }
 func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var ht *types.ZendArray
+	var ht *types.Array
 	var arg_count uint32
 	var result_size uint32
 	var skip uint32

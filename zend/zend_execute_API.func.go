@@ -1122,9 +1122,9 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 func ZendDeleteGlobalVariable(name *types.String) int {
 	return types.ZendHashDelInd(EG__().GetSymbolTable(), name)
 }
-func ZendRebuildSymbolTable() *types.ZendArray {
+func ZendRebuildSymbolTable() *types.Array {
 	var ex *ZendExecuteData
-	var symbol_table *types.ZendArray
+	var symbol_table *types.Array
 
 	/* Search for last called user function */
 
@@ -1257,7 +1257,7 @@ func ZendSetLocalVar(name *types.String, value *types.Zval, force int) int {
 				}
 			}
 			if force != 0 {
-				var symbol_table *types.ZendArray = ZendRebuildSymbolTable()
+				var symbol_table *types.Array = ZendRebuildSymbolTable()
 				if symbol_table != nil {
 					symbol_table.KeyUpdate(name.GetStr(), value)
 					return types.SUCCESS
@@ -1296,7 +1296,7 @@ func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 				}
 			}
 			if force != 0 {
-				var symbol_table *types.ZendArray = ZendRebuildSymbolTable()
+				var symbol_table *types.Array = ZendRebuildSymbolTable()
 				if symbol_table != nil {
 					symbol_table.KeyUpdate(name, value)
 					return types.SUCCESS

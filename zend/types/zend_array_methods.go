@@ -105,7 +105,7 @@ func (this *HashTable) SetBucketKey(b *Bucket, key string) *Zval {
 	return b.GetVal()
 }
 
-func (this *ZendArray) addHash(key ZendArrayKey, pos uint32) {
+func (this *Array) addHash(key ZendArrayKey, pos uint32) {
 	if key.IsStrKey() {
 		this.keyMap[key.GetKey()] = pos
 	} else {
@@ -113,7 +113,7 @@ func (this *ZendArray) addHash(key ZendArrayKey, pos uint32) {
 	}
 }
 
-func (this *ZendArray) deleteHash(key ZendArrayKey) {
+func (this *Array) deleteHash(key ZendArrayKey) {
 	if key.IsStrKey() {
 		delete(this.keyMap, key.GetKey())
 	} else {
@@ -436,9 +436,9 @@ func (this *HashTable) IsValidPos(pos uint32) bool {
 
 // ----
 
-func (this *ZendArray) IsWithoutHoles() bool { return this.GetNNumUsed() == this.nNumOfElements }
+func (this *Array) IsWithoutHoles() bool { return this.GetNNumUsed() == this.nNumOfElements }
 
-func (this *ZendArray) appendBucket(bucket *Bucket) *Bucket {
+func (this *Array) appendBucket(bucket *Bucket) *Bucket {
 	// 尝试 resize
 	this.ifFullDoResize()
 
@@ -465,12 +465,12 @@ func (this *ZendArray) appendBucket(bucket *Bucket) *Bucket {
 	return &this.data[idx]
 }
 
-func (this *ZendArray) appendBucketStr(strKey string, zv *Zval) *Bucket {
+func (this *Array) appendBucketStr(strKey string, zv *Zval) *Bucket {
 	var bucket = NewBucketStr(strKey, zv)
 	return this.appendBucket(bucket)
 }
 
-func (this *ZendArray) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
+func (this *Array) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
 	var bucket = NewBucketIndex(indexKey, zv)
 	return this.appendBucket(bucket)
 }

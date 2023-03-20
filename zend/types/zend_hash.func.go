@@ -7,7 +7,7 @@ import (
 )
 
 func ZVAL_EMPTY_ARRAY(z *Zval) {
-	z.SetArr((*ZendArray)(&ZendEmptyArray))
+	z.SetArr((*Array)(&ZendEmptyArray))
 	z.SetTypeInfo(IS_ARRAY)
 }
 func ZendHashInit(ht *HashTable, nSize uint32, pHashFunction any, pDestructor DtorFuncT, persistent ZendBool) {

@@ -188,10 +188,10 @@ func (this *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
 type ZendExecutorGlobals struct {
 	uninitialized_zval                  types.Zval
 	error_zval                          types.Zval
-	symtable_cache                      []*types.ZendArray
-	symtable_cache_limit                **types.ZendArray
-	symtable_cache_ptr                  **types.ZendArray
-	symbol_table                        types.ZendArray
+	symtable_cache                      []*types.Array
+	symtable_cache_limit                **types.Array
+	symtable_cache_ptr                  **types.Array
+	symbol_table                        types.Array
 	included_files                      types.HashTable
 	bailout                             *JMP_BUF
 	error_reporting                     int
@@ -277,26 +277,26 @@ func (this *ZendExecutorGlobals) GetUninitializedZval() types.Zval { return this
 func (this *ZendExecutorGlobals) SetUninitializedZval(value types.Zval) {
 	this.uninitialized_zval = value
 }
-func (this *ZendExecutorGlobals) GetErrorZval() types.Zval             { return this.error_zval }
-func (this *ZendExecutorGlobals) SetErrorZval(value types.Zval)        { this.error_zval = value }
-func (this *ZendExecutorGlobals) GetSymtableCache() []*types.ZendArray { return this.symtable_cache }
-func (this *ZendExecutorGlobals) SetSymtableCache(value []*types.ZendArray) {
+func (this *ZendExecutorGlobals) GetErrorZval() types.Zval         { return this.error_zval }
+func (this *ZendExecutorGlobals) SetErrorZval(value types.Zval)    { this.error_zval = value }
+func (this *ZendExecutorGlobals) GetSymtableCache() []*types.Array { return this.symtable_cache }
+func (this *ZendExecutorGlobals) SetSymtableCache(value []*types.Array) {
 	this.symtable_cache = value
 }
-func (this *ZendExecutorGlobals) GetSymtableCacheLimit() **types.ZendArray {
+func (this *ZendExecutorGlobals) GetSymtableCacheLimit() **types.Array {
 	return this.symtable_cache_limit
 }
-func (this *ZendExecutorGlobals) SetSymtableCacheLimit(value **types.ZendArray) {
+func (this *ZendExecutorGlobals) SetSymtableCacheLimit(value **types.Array) {
 	this.symtable_cache_limit = value
 }
-func (this *ZendExecutorGlobals) GetSymtableCachePtr() **types.ZendArray {
+func (this *ZendExecutorGlobals) GetSymtableCachePtr() **types.Array {
 	return this.symtable_cache_ptr
 }
-func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **types.ZendArray) {
+func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **types.Array) {
 	this.symtable_cache_ptr = value
 }
-func (this *ZendExecutorGlobals) GetSymbolTable() *types.ZendArray       { return &this.symbol_table }
-func (this *ZendExecutorGlobals) SetSymbolTable(value types.ZendArray)   { this.symbol_table = value }
+func (this *ZendExecutorGlobals) GetSymbolTable() *types.Array           { return &this.symbol_table }
+func (this *ZendExecutorGlobals) SetSymbolTable(value types.Array)       { this.symbol_table = value }
 func (this *ZendExecutorGlobals) GetIncludedFiles() *types.HashTable     { return &this.included_files }
 func (this *ZendExecutorGlobals) SetIncludedFiles(value types.HashTable) { this.included_files = value }
 func (this *ZendExecutorGlobals) GetBailout() *JMP_BUF                   { return this.bailout }

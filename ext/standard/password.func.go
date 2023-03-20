@@ -166,7 +166,7 @@ func PhpPasswordBcryptGetInfo(return_value *types.Zval, hash *types.String) int 
 	zend.AddAssocLong(return_value, "cost", cost)
 	return types.SUCCESS
 }
-func PhpPasswordBcryptNeedsRehash(hash *types.String, options *types.ZendArray) types.ZendBool {
+func PhpPasswordBcryptNeedsRehash(hash *types.String, options *types.Array) types.ZendBool {
 	var znew_cost *types.Zval
 	var old_cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	var new_cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
@@ -208,7 +208,7 @@ func PhpPasswordBcryptVerify(password *types.String, hash *types.String) types.Z
 	types.ZendStringFree(ret)
 	return status == 0
 }
-func PhpPasswordBcryptHash(password *types.String, options *types.ZendArray) *types.String {
+func PhpPasswordBcryptHash(password *types.String, options *types.Array) *types.String {
 	var hash_format []byte
 	var hash_format_len int
 	var result *types.String
@@ -392,7 +392,7 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 	var new_algo *PhpPasswordAlgo
 	var hash *types.String
 	var znew_algo *types.Zval
-	var options *types.ZendArray = 0
+	var options *types.Array = 0
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -462,7 +462,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var digest *types.String = nil
 	var zalgo *types.Zval
 	var algo *PhpPasswordAlgo
-	var options *types.ZendArray = nil
+	var options *types.Array = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2

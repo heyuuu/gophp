@@ -115,7 +115,7 @@ func ZVAL_ZVAL(z *types.Zval, zv *types.Zval, copy int, dtor int) {
 		}
 	}
 }
-func HASH_OF(p *types.Zval) *types.ZendArray {
+func HASH_OF(p *types.Zval) *types.Array {
 	if p.IsArray() {
 		return p.GetArr()
 	} else {

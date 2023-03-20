@@ -48,7 +48,7 @@ func ZendTryAssignTypedRefStringl(ref *types.ZendReference, string *byte, len_ i
 	tmp.SetRawString(b.CastStr(string, len_))
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefArr(ref *types.ZendReference, arr *types.ZendArray) int {
+func ZendTryAssignTypedRefArr(ref *types.ZendReference, arr *types.Array) int {
 	var tmp types.Zval
 	tmp.SetArray(arr)
 	return ZendTryAssignTypedRef(ref, &tmp)

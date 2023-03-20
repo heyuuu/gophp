@@ -1380,7 +1380,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *types.Zval, persiste
 	} else if strcasecmp(dot, "quoted-printable-decode") == 0 {
 		conv_mode = PHP_CONV_QPRINT_DECODE
 	}
-	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *types.ZendArray { return filterparams.GetArr() }, nil), filtername, persistent) != types.SUCCESS {
+	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *types.Array { return filterparams.GetArr() }, nil), filtername, persistent) != types.SUCCESS {
 		goto out
 	}
 	retval = streams.PhpStreamFilterAlloc(&StrfilterConvertOps, inst, persistent)

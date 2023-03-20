@@ -355,7 +355,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 	}
 	return ZendVmStackPushCallFrame(call_info, fbc, num_args, object_or_called_scope)
 }
-func ZendInitDynamicCallArray(function *types.ZendArray, num_args uint32) *ZendExecuteData {
+func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
 	var object_or_called_scope any
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC

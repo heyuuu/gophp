@@ -26,8 +26,8 @@ func ZvalDtor(zvalue *types.Zval)         { ZvalPtrDtorNogc(zvalue) }
 func RcDtorFunc(p types.IRefcounted) {
 	b.Assert(p.GetGcType() <= types.IS_CONSTANT_AST)
 	switch p.(type) {
-	case *types.ZendArray:
-		arr := p.(*types.ZendArray)
+	case *types.Array:
+		arr := p.(*types.Array)
 		arr.DestroyEx()
 	case *types.ZendObject:
 		obj := p.(*types.ZendObject)

@@ -17,7 +17,7 @@ type ZendExecuteData struct {
 	func_           *ZendFunction
 	This            types.Zval
 	prevExecuteData *ZendExecuteData
-	symbolTable     *types.ZendArray
+	symbolTable     *types.Array
 	//runTimeCache    *any
 	// Ex
 	runTimeCache []types.Zval
@@ -140,8 +140,8 @@ func (this *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return this
 func (this *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
 	this.prevExecuteData = value
 }
-func (this *ZendExecuteData) GetSymbolTable() *types.ZendArray      { return this.symbolTable }
-func (this *ZendExecuteData) SetSymbolTable(value *types.ZendArray) { this.symbolTable = value }
+func (this *ZendExecuteData) GetSymbolTable() *types.Array      { return this.symbolTable }
+func (this *ZendExecuteData) SetSymbolTable(value *types.Array) { this.symbolTable = value }
 
 func (this *ZendExecuteData) GetRunTimeCache() any      { return this.runTimeCache }
 func (this *ZendExecuteData) SetRunTimeCache(value any) { this.symbolTable = value }

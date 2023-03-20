@@ -101,7 +101,7 @@ const (
 
 /* The return value must be released using zend_release_properties(). */
 
-type ZendObjectGetPropertiesForT func(object *types.Zval, purpose ZendPropPurpose) *types.ZendArray
+type ZendObjectGetPropertiesForT func(object *types.Zval, purpose ZendPropPurpose) *types.Array
 
 /* Used to call methods */
 

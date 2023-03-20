@@ -12,7 +12,7 @@ type ZendValue struct /* union */ {
 	dval    float64
 	counted *ZendRefcounted
 	str     *String
-	arr     *ZendArray
+	arr     *Array
 	obj     *ZendObject
 	res     *ZendResource
 	ref     *ZendReference
@@ -35,8 +35,8 @@ func (this *ZendValue) GetCounted() *ZendRefcounted      { return this.counted }
 func (this *ZendValue) SetCounted(value *ZendRefcounted) { this.counted = value }
 func (this *ZendValue) GetStr() *String                  { return this.str }
 func (this *ZendValue) SetStr(value *String)             { this.str = value }
-func (this *ZendValue) GetArr() *ZendArray               { return this.arr }
-func (this *ZendValue) SetArr(value *ZendArray)          { this.arr = value }
+func (this *ZendValue) GetArr() *Array                   { return this.arr }
+func (this *ZendValue) SetArr(value *Array)              { this.arr = value }
 func (this *ZendValue) GetObj() *ZendObject              { return this.obj }
 func (this *ZendValue) SetObj(value *ZendObject)         { this.obj = value }
 func (this *ZendValue) GetRes() *ZendResource            { return this.res }
@@ -100,8 +100,8 @@ func (this *Zval) GetCounted() *ZendRefcounted      { return this.value.counted 
 func (this *Zval) SetCounted(value *ZendRefcounted) { this.value.counted = value }
 func (this *Zval) GetStr() *String                  { return this.value.str }
 func (this *Zval) SetStr(value *String)             { this.value.str = value }
-func (this *Zval) GetArr() *ZendArray               { return this.value.arr }
-func (this *Zval) SetArr(value *ZendArray)          { this.value.arr = value }
+func (this *Zval) GetArr() *Array                   { return this.value.arr }
+func (this *Zval) SetArr(value *Array)              { this.value.arr = value }
 func (this *Zval) GetObj() *ZendObject              { return this.value.obj }
 func (this *Zval) SetObj(value *ZendObject)         { this.value.obj = value }
 func (this *Zval) GetRes() *ZendResource            { return this.value.res }
@@ -264,7 +264,7 @@ func (this *Zval) SetStringCopy(s *String) {
 	this.SetString(s)
 }
 
-func (this *Zval) SetArray(arr *ZendArray) {
+func (this *Zval) SetArray(arr *Array) {
 	this.SetArr(arr)
 	this.SetTypeInfo(IS_ARRAY_EX)
 }

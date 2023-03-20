@@ -54,7 +54,7 @@ func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format st
 	var saved_class_entry *types.ClassEntry
 	var loop_var_stack zend.ZendStack
 	var delayed_oplines_stack zend.ZendStack
-	var symbol_table *types.ZendArray
+	var symbol_table *types.Array
 	var orig_fake_scope *types.ClassEntry
 
 	/* Report about uncaught exception in case of fatal errors */

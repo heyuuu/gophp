@@ -1450,7 +1450,7 @@ func ZifGetDefinedFunctions(executeData *ZendExecuteData, return_value *types.Zv
 	return_value.GetArr().KeyAddNew("user", &user)
 }
 func ZifGetDefinedVars(executeData *ZendExecuteData, return_value *types.Zval) {
-	var symbol_table *types.ZendArray
+	var symbol_table *types.Array
 	if ZendForbidDynamicCall("get_defined_vars()") == types.FAILURE {
 		return
 	}

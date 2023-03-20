@@ -810,7 +810,7 @@ func PHP_ARRAY_CMP_FUNC_RESTORE() {
 }
 func PhpUsort(executeData *zend.ZendExecuteData, return_value *types.Zval, compare_func types.CompareFuncT, renumber types.ZendBool) {
 	var array *types.Zval
-	var arr *types.ZendArray
+	var arr *types.Array
 	var retval types.ZendBool
 	var old_user_compare_fci types.ZendFcallInfo
 	var old_user_compare_fci_cache types.ZendFcallInfoCache
@@ -1622,7 +1622,7 @@ func PhpPrefixVarname(result *types.Zval, prefix *types.Zval, var_name *byte, va
 	memcpy(result.GetStr().GetVal()+prefix.GetStr().GetLen()+b.Cond(add_underscore != 0, 1, 0), var_name, var_name_len+1)
 	return types.SUCCESS
 }
-func PhpExtractRefIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
+func PhpExtractRefIfExists(arr *types.Array, symbol_table *types.Array) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -1671,7 +1671,7 @@ func PhpExtractRefIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) 
 	}
 	return count
 }
-func PhpExtractIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
+func PhpExtractIfExists(arr *types.Array, symbol_table *types.Array) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -1718,7 +1718,7 @@ func PhpExtractIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zen
 	}
 	return count
 }
-func PhpExtractRefOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
+func PhpExtractRefOverwrite(arr *types.Array, symbol_table *types.Array) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -1771,7 +1771,7 @@ func PhpExtractRefOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray)
 	}
 	return count
 }
-func PhpExtractOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
+func PhpExtractOverwrite(arr *types.Array, symbol_table *types.Array) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -1819,7 +1819,7 @@ func PhpExtractOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) ze
 	}
 	return count
 }
-func PhpExtractRefPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractRefPrefixIfExists(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -1882,7 +1882,7 @@ func PhpExtractRefPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendA
 	}
 	return count
 }
-func PhpExtractPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractPrefixIfExists(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -1940,7 +1940,7 @@ func PhpExtractPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArra
 	}
 	return count
 }
-func PhpExtractRefPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractRefPrefixSame(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -2021,7 +2021,7 @@ func PhpExtractRefPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray
 	}
 	return count
 }
-func PhpExtractPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractPrefixSame(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -2094,7 +2094,7 @@ func PhpExtractPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, p
 	}
 	return count
 }
-func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractRefPrefixAll(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var num_key zend.ZendUlong
@@ -2149,7 +2149,7 @@ func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray,
 	}
 	return count
 }
-func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractPrefixAll(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var num_key zend.ZendUlong
@@ -2204,7 +2204,7 @@ func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, pr
 	}
 	return count
 }
-func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractRefPrefixInvalid(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var num_key zend.ZendUlong
@@ -2266,7 +2266,7 @@ func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendAr
 	}
 	return count
 }
-func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
+func PhpExtractPrefixInvalid(arr *types.Array, symbol_table *types.Array, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var num_key zend.ZendUlong
@@ -2328,7 +2328,7 @@ func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray
 	}
 	return count
 }
-func PhpExtractRefSkip(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
+func PhpExtractRefSkip(arr *types.Array, symbol_table *types.Array) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -2379,7 +2379,7 @@ func PhpExtractRefSkip(arr *types.ZendArray, symbol_table *types.ZendArray) zend
 	}
 	return count
 }
-func PhpExtractSkip(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
+func PhpExtractSkip(arr *types.Array, symbol_table *types.Array) zend.ZendLong {
 	var count zend.ZendLong = 0
 	var var_name *types.String
 	var entry *types.Zval
@@ -2428,7 +2428,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var extract_refs zend.ZendLong
 	var extract_type zend.ZendLong = EXTR_OVERWRITE
 	var count zend.ZendLong
-	var symbol_table *types.ZendArray
+	var symbol_table *types.Array
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -2566,7 +2566,7 @@ func ZifCompact(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var args *types.Zval = nil
 	var num_args uint32
 	var i uint32
-	var symbol_table *types.ZendArray
+	var symbol_table *types.Array
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -3665,7 +3665,7 @@ func ZifArraySplice(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 	/* Perform splice */
 
-	PhpSplice(array.GetArr(), offset, length, b.CondF1(repl_array != nil, func() *types.ZendArray { return repl_array.GetArr() }, nil), rem_hash)
+	PhpSplice(array.GetArr(), offset, length, b.CondF1(repl_array != nil, func() *types.Array { return repl_array.GetArr() }, nil), rem_hash)
 
 	/* Perform splice */
 }
@@ -4146,7 +4146,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var strict types.ZendBool = 0
 	var num_idx zend.ZendUlong
 	var str_idx *types.String
-	var arrval *types.ZendArray
+	var arrval *types.Array
 	var elem_count zend.ZendUlong
 	for {
 		var _flags int = 0
@@ -4318,7 +4318,7 @@ func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *types.Zval
 func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var input *types.Zval
 	var entry *types.Zval
-	var arrval *types.ZendArray
+	var arrval *types.Array
 	var arrlen zend.ZendLong
 	for {
 		var _flags int = 0

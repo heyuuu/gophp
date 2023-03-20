@@ -27,7 +27,7 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var PhpPasswordAlgos types.ZendArray
+var PhpPasswordAlgos types.Array
 
 /* bcrypt implementation */
 

@@ -4285,7 +4285,7 @@ func ZifParseStr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	res = zend.Estrndup(arg, arglen)
 	if arrayArg == nil {
 		var tmp types.Zval
-		var symbol_table *types.ZendArray
+		var symbol_table *types.Array
 		if zend.ZendForbidDynamicCall("parse_str() with a single argument") == types.FAILURE {
 			zend.Efree(res)
 			return

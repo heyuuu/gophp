@@ -214,10 +214,10 @@ func (p *FastParser) ParseFuncEx(fci *types.ZendFcallInfo, fcc *types.ZendFcallI
 }
 
 // @see Micro: Z_PARAM_ARRAY_HT，Old: 'h'
-func (p *FastParser) ParseArrayHt() (dest *types.ZendArray) {
+func (p *FastParser) ParseArrayHt() (dest *types.Array) {
 	return p.ParseArrayHtEx(false, false)
 }
-func (p *FastParser) ParseArrayHtEx(checkNull bool, separate bool) (dest *types.ZendArray) {
+func (p *FastParser) ParseArrayHtEx(checkNull bool, separate bool) (dest *types.Array) {
 	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
@@ -232,11 +232,11 @@ func (p *FastParser) ParseArrayHtEx(checkNull bool, separate bool) (dest *types.
 }
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT，Old: 'H'
-func (p *FastParser) ParseArrayOrObjectHt() (dest *types.ZendArray) {
+func (p *FastParser) ParseArrayOrObjectHt() (dest *types.Array) {
 	dest, _ = p.ParseArrayOrObjectHtEx(false, false)
 	return
 }
-func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest *types.ZendArray, isNull types.ZendBool) {
+func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest *types.Array, isNull types.ZendBool) {
 	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
