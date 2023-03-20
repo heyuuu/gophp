@@ -58,6 +58,16 @@ func ZifGcDisable(executeData *ZendExecuteData, return_value *types.Zval) {
 	ZendAlterIniEntryChars(key, "0", b.SizeOf("\"0\"")-1, ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
 	types.ZendStringReleaseEx(key, 0)
 }
+
+func IZifGcStatus() map[string]int {
+	return map[string]int{
+		"runs":      0,
+		"collected": 0,
+		"threshold": 0,
+		"roots":     0,
+	}
+}
+
 func ZifGcStatus(executeData *ZendExecuteData, return_value *types.Zval) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -68,6 +78,7 @@ func ZifGcStatus(executeData *ZendExecuteData, return_value *types.Zval) {
 	AddAssocLongEx(return_value, "threshold", 0)
 	AddAssocLongEx(return_value, "roots", 0)
 }
+
 func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -75,6 +86,7 @@ func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 	result := IZifFuncNumArgs(executeData)
 	return_value.SetLong(result)
 }
+
 func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 	var ex = executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
@@ -86,6 +98,7 @@ func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 	}
 	return ex.NumArgs()
 }
+
 func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
 	var arg_count uint32
 	var first_extra_arg uint32

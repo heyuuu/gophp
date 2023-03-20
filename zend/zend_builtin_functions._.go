@@ -155,7 +155,7 @@ var ArginfoExtensionLoaded []ArgInfo = []ArgInfo{
 	MakeArgInfo("extension_name"),
 }
 var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	ZifZendVersionDef,
+	DefZifZendVersion,
 	types.MakeZendFunctionEntryEx("func_num_args", 0, ZifFuncNumArgs, ArginfoZendVoid),
 	types.MakeZendFunctionEntryEx("func_get_arg", 0, ZifFuncGetArg, ArginfoFuncGetArg),
 	types.MakeZendFunctionEntryEx("func_get_args", 0, ZifFuncGetArgs, ArginfoZendVoid),
@@ -206,9 +206,9 @@ var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("get_defined_constants", 0, ZifGetDefinedConstants, ArginfoGetDefinedConstants),
 	types.MakeZendFunctionEntryEx("debug_backtrace", 0, ZifDebugBacktrace, ArginfoDebugBacktrace),
 	types.MakeZendFunctionEntryEx("debug_print_backtrace", 0, ZifDebugPrintBacktrace, ArginfoDebugPrintBacktrace),
-	ZifGcMemCachesDef,
-	ZifGcCollectCyclesDef,
-	ZifGcEnabledDef,
+	DefZifGcMemCaches,
+	DefZifGcCollectCycles,
+	DefZifGcEnabled,
 	types.MakeZendFunctionEntryEx("gc_enable", 0, ZifGcEnable, ArginfoZendVoid),
 	types.MakeZendFunctionEntryEx("gc_disable", 0, ZifGcDisable, ArginfoZendVoid),
 	types.MakeZendFunctionEntryEx("gc_status", 0, ZifGcStatus, ArginfoZendVoid),

@@ -73,7 +73,7 @@ func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) 
 }
 func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *zend.ZendUlong) bool {
 	var str = b.CastStr(key, length)
-	if number, ok := zendParseNumericStr(str); ok {
+	if number, ok := ZendParseNumericStr(str); ok {
 		*idx = zend.ZendUlong(number)
 		return true
 	} else {
@@ -82,7 +82,7 @@ func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *zend.ZendUlong) bool {
 }
 func ZEND_HANDLE_NUMERIC(key *ZendString, idx *zend.ZendUlong) bool {
 	var str = key.GetStr()
-	if number, ok := zendParseNumericStr(str); ok {
+	if number, ok := ZendParseNumericStr(str); ok {
 		*idx = zend.ZendUlong(number)
 		return true
 	} else {
@@ -907,7 +907,7 @@ func ZendHashMinmax(ht *HashTable, compar CompareFuncT, flag uint32) *Zval {
 	return res.GetVal()
 }
 
-func zendParseNumericStr(str string) (int, bool) {
+func ZendParseNumericStr(str string) (int, bool) {
 	// 首字符非数字快速失败
 	if len(str) == 0 {
 		return 0, false
