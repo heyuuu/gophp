@@ -59,6 +59,15 @@ func CallExpr(name string, args []ast.Expr) ast.Expr {
 		Args: args,
 	}
 }
+func PkgCallExpr(pkg string, method string, args []ast.Expr) ast.Expr {
+	return &ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			X:   Ident(pkg),
+			Sel: Ident(method),
+		},
+		Args: args,
+	}
+}
 
 func MethodCallExpr(instance ast.Expr, method string, args []ast.Expr) ast.Expr {
 	return &ast.CallExpr{

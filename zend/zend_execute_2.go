@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import (
@@ -12,61 +10,40 @@ import (
 func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) types.ZendBool {
 	switch type_hint {
 	case types.IS_BOOL:
-		var dest types.ZendBool
-		if zpp.ZendParseArgBoolWeak(arg, &dest) == 0 {
-			return 0
+		if val, ok := zpp.ParseBoolWeak(arg); ok {
+			ZvalPtrDtor(arg)
+			arg.SetBool(val)
+			return 1
 		}
-		ZvalPtrDtor(arg)
-		types.ZVAL_BOOL(arg, dest != 0)
-		return 1
 	case types.IS_LONG:
-		var dest ZendLong
-		if zpp.ZendParseArgLongWeak(arg, &dest) == 0 {
-			return 0
+		if val, ok := zpp.ParseLongWeak(arg, false); ok {
+			ZvalPtrDtor(arg)
+			arg.SetLong(val)
+			return 1
 		}
-		ZvalPtrDtor(arg)
-		arg.SetLong(dest)
-		return 1
 	case types.IS_DOUBLE:
-		var dest float64
-		if zpp.ZendParseArgDoubleWeak(arg, &dest) == 0 {
-			return 0
+		if val, ok := zpp.ParseDoubleWeak(arg); ok {
+			ZvalPtrDtor(arg)
+			arg.SetDouble(val)
+			return 1
 		}
-		ZvalPtrDtor(arg)
-		arg.SetDouble(dest)
-		return 1
 	case types.IS_STRING:
-		var dest *types.String
-
-		/* on success "arg" is converted to IS_STRING */
-
-		return zpp.ZendParseArgStrWeak(arg, &dest)
-
-	/* on success "arg" is converted to IS_STRING */
-
-	default:
-		return 0
+		if val, ok := zpp.ParseZStrWeak(arg); ok {
+			arg.SetString(val)
+			return 1
+		}
 	}
+	return 0
 }
 func ZendVerifyScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval, strict types.ZendBool) types.ZendBool {
 	if strict != 0 {
-
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
-
 		if type_hint != types.IS_DOUBLE || arg.GetType() != types.IS_LONG {
 			return 0
 		}
-
-		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
-
 	} else if arg.IsNull() {
-
 		/* NULL may be accepted only by nullable hints (this is already checked) */
-
 		return 0
-
-		/* NULL may be accepted only by nullable hints (this is already checked) */
-
 	}
 	return ZendVerifyWeakScalarTypeHint(type_hint, arg)
 }

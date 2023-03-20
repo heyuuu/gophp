@@ -111,16 +111,12 @@ func (this *ZendExecuteData) VarNum(n int) *types.Zval {
 }
 func (this *ZendExecuteData) Arg(n int) *types.Zval { return this.VarNum(n - 1) }
 
-func (this *ZendExecuteData) CheckNumArgs(minNumArgs int, maxNumArgs int, forceStrict bool) bool {
-	if forceStrict {
-		return zpp.CheckNumArgs(this, minNumArgs, maxNumArgs, zpp.ZEND_PARSE_PARAMS_THROW)
-	} else {
-		return zpp.CheckNumArgs(this, minNumArgs, maxNumArgs, 0)
-	}
-}
-
 func (this *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
-	return this.CheckNumArgs(0, 0, forceStrict)
+	if forceStrict {
+		zpp.CheckNumArgsNoneException(this)
+	} else {
+		zpp.CheckNumArgsNoneError(this)
+	}
 }
 
 /**

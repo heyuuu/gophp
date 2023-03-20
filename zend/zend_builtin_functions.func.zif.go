@@ -1,10 +1,13 @@
 package zend
 
-import "sik/zend/types"
+import (
+	"sik/zend/types"
+	"sik/zend/zpp"
+)
 
 // generate by ZifZendVersion
 var DefZifZendVersion = DefFunc(DefFuncOpts{name: "zend_version", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
 	ret := ZifZendVersion()
@@ -13,7 +16,7 @@ var DefZifZendVersion = DefFunc(DefFuncOpts{name: "zend_version", handler: func(
 
 // generate by ZifGcMemCaches
 var DefZifGcMemCaches = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
 	ret := ZifGcMemCaches()
@@ -22,7 +25,7 @@ var DefZifGcMemCaches = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func
 
 // generate by ZifGcCollectCycles
 var DefZifGcCollectCycles = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
 	ret := ZifGcCollectCycles()
@@ -31,7 +34,7 @@ var DefZifGcCollectCycles = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handl
 
 // generate by ZifGcEnabled
 var DefZifGcEnabled = DefFunc(DefFuncOpts{name: "gc_enabled", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
 	ret := ZifGcEnabled()
@@ -40,7 +43,7 @@ var DefZifGcEnabled = DefFunc(DefFuncOpts{name: "gc_enabled", handler: func(exec
 
 // generate by ZifGcEnable
 var DefZifGcEnable = DefFunc(DefFuncOpts{name: "gc_enable", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
 	ZifGcEnable()
@@ -48,8 +51,16 @@ var DefZifGcEnable = DefFunc(DefFuncOpts{name: "gc_enable", handler: func(execut
 
 // generate by ZifGcDisable
 var DefZifGcDisable = DefFunc(DefFuncOpts{name: "gc_disable", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !executeData.CheckNumArgsNone(false) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
 	ZifGcDisable()
+}})
+
+// generate by ZifGcStatus
+var DefZifGcStatus = DefFunc(DefFuncOpts{name: "gc_status", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGcStatus()
 }})

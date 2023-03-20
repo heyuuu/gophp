@@ -6,8 +6,11 @@ import (
 	"sik/zend/types"
 )
 
-func CheckNumArgsNone(executeData ExecuteData, flags int) bool {
-	return CheckNumArgs(executeData, 0, 0, flags)
+func CheckNumArgsNoneError(executeData ExecuteData) bool {
+	return CheckNumArgs(executeData, 0, 0, 0)
+}
+func CheckNumArgsNoneException(executeData ExecuteData) bool {
+	return CheckNumArgs(executeData, 0, 0, ZEND_PARSE_PARAMS_THROW)
 }
 func CheckNumArgs(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
 	numArgs := executeData.NumArgs()
@@ -37,28 +40,6 @@ func CheckNumArgsEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNum
 	}
 
 	return false
-}
-
-func ZendParseArgBoolWeak(arg *types.Zval, dest *types.ZendBool) int {
-	if val, ok := ParseBoolWeak(arg); ok {
-		*dest = types.IntBool(val)
-		return 1
-	}
-	return 0
-}
-func ZendParseArgLongWeak(arg *types.Zval, dest *int) int {
-	if val, ok := ParseLongWeak(arg, false); ok {
-		*dest = val
-		return 1
-	}
-	return 0
-}
-func ZendParseArgDoubleWeak(arg *types.Zval, dest *float64) int {
-	if val, ok := ParseDoubleWeak(arg); ok {
-		*dest = val
-		return 1
-	}
-	return 0
 }
 
 func ZendParseArgStrWeak(arg *types.Zval, dest **types.String) int {

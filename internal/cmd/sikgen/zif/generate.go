@@ -14,6 +14,7 @@ var (
 func genFileNode(name string, infos []*ZifInfo) *ast.File {
 	fb := f.NewFileBuilder(name)
 	fb.AddImport("sik/zend/types")
+	fb.AddImport("sik/zend/zpp")
 
 	for _, zifInfo := range infos {
 		fb.AddDecl(
@@ -65,10 +66,14 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	var stmts []ast.Stmt
 
 	if zifInfo.minNumArgs == 0 && zifInfo.maxNumArgs <= 0 {
+		method := "CheckNumArgsNoneError"
+		if zifInfo.strict {
+			method = "CheckNumArgsNoneException"
+		}
 		stmts = append(stmts, &ast.IfStmt{
 			Cond: f.Not(
-				f.MethodCallExpr(executeDataIdent, "CheckNumArgsNone", []ast.Expr{
-					f.BoolLit(zifInfo.strict),
+				f.PkgCallExpr("zpp", method, []ast.Expr{
+					executeDataIdent,
 				}),
 			),
 			Body: f.BlockStmt(&ast.ReturnStmt{}),
