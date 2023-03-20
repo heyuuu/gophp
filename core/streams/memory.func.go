@@ -435,7 +435,7 @@ func PhpStreamUrlWrapRfc2397(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream
@@ -451,7 +451,7 @@ func PhpStreamUrlWrapRfc2397(
 	var newoffs zend.ZendOffT
 	var meta types.Zval
 	var base64 int = 0
-	var base64_comma *types.ZendString = nil
+	var base64_comma *types.String = nil
 	meta.SetNull()
 	if memcmp(path, "data:", 5) {
 		return nil

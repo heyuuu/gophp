@@ -19,7 +19,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *ZendOpArray, uses_ast *
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.GetChild()[i]
-		var var_name *types.ZendString = ZvalMakeInternedString(ZendAstGetZval(var_name_ast))
+		var var_name *types.String = ZvalMakeInternedString(ZendAstGetZval(var_name_ast))
 		var mode uint32 = var_name_ast.GetAttr()
 		var opline *ZendOp
 		var value *types.Zval
@@ -47,7 +47,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 	if ast.GetKind() == ZEND_AST_VAR {
 		var name_ast *ZendAst = ast.GetChild()[0]
 		if name_ast.GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(name_ast).IsString() {
-			var name *types.ZendString = ZendAstGetStr(name_ast)
+			var name *types.String = ZendAstGetStr(name_ast)
 			if ZendIsAutoGlobal(name) != 0 {
 
 				/* These is no need to explicitly import auto-globals. */
@@ -120,7 +120,7 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 	/* Remove variables that are parameters */
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ZendOpArray) {
-	var var_name *types.ZendString
+	var var_name *types.String
 	var opline *ZendOp
 
 	/* TODO We might want to use a special binding mode if varvars_used is set. */
@@ -150,7 +150,7 @@ func ZendCompileClosureUses(ast *ZendAst) {
 	var i uint32
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_ast *ZendAst = list.GetChild()[i]
-		var var_name *types.ZendString = ZendAstGetStr(var_ast)
+		var var_name *types.String = ZendAstGetStr(var_ast)
 		var zv types.Zval
 		zv.SetNull()
 		var i int
@@ -164,7 +164,7 @@ func ZendCompileClosureUses(ast *ZendAst) {
 	}
 }
 func ZendCompileImplicitClosureUses(info *ClosureInfo) {
-	var var_name *types.ZendString
+	var var_name *types.String
 	var __ht *types.HashTable = info.GetUses()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -175,13 +175,13 @@ func ZendCompileImplicitClosureUses(info *ClosureInfo) {
 		ZendCompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
 	}
 }
-func ZendBeginMethodDecl(op_array *ZendOpArray, name *types.ZendString, has_body types.ZendBool) {
+func ZendBeginMethodDecl(op_array *ZendOpArray, name *types.String, has_body types.ZendBool) {
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	var in_interface types.ZendBool = ce.IsInterface()
 	var in_trait types.ZendBool = ce.IsTrait()
 	var is_public types.ZendBool = op_array.IsPublic()
 	var is_static types.ZendBool = op_array.IsStatic()
-	var lcname *types.ZendString
+	var lcname *types.String
 	if in_interface != 0 {
 		if is_public == 0 || op_array.HasFnFlags(ZEND_ACC_FINAL|ZEND_ACC_ABSTRACT) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface method "+"%s::%s() must be omitted", ce.GetName().GetVal(), name.GetVal())
@@ -327,17 +327,17 @@ func ZendBeginMethodDecl(op_array *ZendOpArray, name *types.ZendString, has_body
 }
 func ZendBeginFuncDecl(result *Znode, op_array *ZendOpArray, decl *ZendAstDecl, toplevel types.ZendBool) {
 	var params_ast *ZendAst = decl.GetChild()[0]
-	var unqualified_name *types.ZendString
-	var name *types.ZendString
-	var lcname *types.ZendString
-	var key *types.ZendString
+	var unqualified_name *types.String
+	var name *types.String
+	var lcname *types.String
+	var key *types.String
 	var opline *ZendOp
 	unqualified_name = decl.GetName()
 	name = ZendPrefixWithNs(unqualified_name)
 	op_array.SetFunctionName(name)
 	lcname = ZendStringTolower(name)
 	if FC__().GetImportsFunction() != nil {
-		var import_name *types.ZendString = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
+		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
 		if import_name != nil && !(types.ZendStringEqualsCi(lcname, import_name)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare function %s "+"because the name is already in use", name.GetVal())
 		}
@@ -503,8 +503,8 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		var name_ast *ZendAst = prop_ast.GetChild()[0]
 		var value_ast *ZendAst = prop_ast.GetChild()[1]
 		var doc_comment_ast *ZendAst = prop_ast.GetChild()[2]
-		var name *types.ZendString = ZvalMakeInternedString(ZendAstGetZval(name_ast))
-		var doc_comment *types.ZendString = nil
+		var name *types.String = ZvalMakeInternedString(ZendAstGetZval(name_ast))
+		var doc_comment *types.String = nil
 		var value_zv types.Zval
 		var type_ types.ZendType = 0
 		if type_ast != nil {
@@ -574,8 +574,8 @@ func ZendCompileClassConstDecl(ast *ZendAst) {
 		var name_ast *ZendAst = const_ast.GetChild()[0]
 		var value_ast *ZendAst = const_ast.GetChild()[1]
 		var doc_comment_ast *ZendAst = const_ast.GetChild()[2]
-		var name *types.ZendString = ZvalMakeInternedString(ZendAstGetZval(name_ast))
-		var doc_comment *types.ZendString = b.CondF1(doc_comment_ast != nil, func() *types.ZendString { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
+		var name *types.String = ZvalMakeInternedString(ZendAstGetZval(name_ast))
+		var doc_comment *types.String = b.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
 		if (ast.GetAttr() & (ZEND_ACC_STATIC | ZEND_ACC_ABSTRACT | ZEND_ACC_FINAL)) != 0 {
 			if (ast.GetAttr() & ZEND_ACC_STATIC) != 0 {
@@ -645,7 +645,7 @@ func ZendCompileUseTrait(ast *ZendAst) {
 	ce.SetTraitNames(Erealloc(ce.GetTraitNames(), b.SizeOf("zend_class_name")*(ce.GetNumTraits()+traits.GetChildren())))
 	for i = 0; i < traits.GetChildren(); i++ {
 		var trait_ast *ZendAst = traits.GetChild()[i]
-		var name *types.ZendString = ZendAstGetStr(trait_ast)
+		var name *types.String = ZendAstGetStr(trait_ast)
 		if ce.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.GetName().GetVal())
 		}
@@ -684,7 +684,7 @@ func ZendCompileImplements(ast *ZendAst) {
 	interface_names = Emalloc(b.SizeOf("zend_class_name") * list.GetChildren())
 	for i = 0; i < list.GetChildren(); i++ {
 		var class_ast *ZendAst = list.GetChild()[i]
-		var name *types.ZendString = ZendAstGetStr(class_ast)
+		var name *types.String = ZendAstGetStr(class_ast)
 		if ZendIsConstDefaultClassRef(class_ast) == 0 {
 			Efree(interface_names)
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as interface name as it is reserved", name.GetVal())
@@ -696,9 +696,9 @@ func ZendCompileImplements(ast *ZendAst) {
 	ce.SetNumInterfaces(list.GetChildren())
 	ce.SetInterfaceNames(interface_names)
 }
-func ZendGenerateAnonClassName(start_lineno uint32) *types.ZendString {
-	var filename *types.ZendString = CG__().GetActiveOpArray().GetFilename()
-	var result *types.ZendString = ZendStrpprintf(0, "class@anonymous%c%s:%"+"u"+"$%"+PRIx32, '0', filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
+	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
+	var result *types.String = ZendStrpprintf(0, "class@anonymous%c%s:%"+"u"+"$%"+PRIx32, '0', filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.ZendNewInternedString(result)
 }
 func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
@@ -706,13 +706,13 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	var extends_ast *ZendAst = decl.GetChild()[0]
 	var implements_ast *ZendAst = decl.GetChild()[1]
 	var stmt_ast *ZendAst = decl.GetChild()[2]
-	var name *types.ZendString
-	var lcname *types.ZendString
+	var name *types.String
+	var lcname *types.String
 	var ce *types.ClassEntry = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_entry"))
 	var opline *ZendOp
 	var original_ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	if !decl.IsAnonClass() {
-		var unqualified_name *types.ZendString = decl.GetName()
+		var unqualified_name *types.String = decl.GetName()
 		if CG__().GetActiveClassEntry() != nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class declarations may not be nested")
 		}
@@ -721,7 +721,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		name = types.ZendNewInternedString(name)
 		lcname = ZendStringTolower(name)
 		if FC__().GetImports() != nil {
-			var import_name *types.ZendString = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
+			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
 			if import_name != nil && !(types.ZendStringEqualsCi(lcname, import_name)) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare class %s "+"because the name is already in use", name.GetVal())
 			}
@@ -767,7 +767,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	}
 	if extends_ast != nil {
 		var extends_node Znode
-		var extends_name *types.ZendString
+		var extends_name *types.String
 		if ZendIsConstDefaultClassRef(extends_ast) == 0 {
 			extends_name = ZendAstGetStr(extends_ast)
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", extends_name.GetVal())
@@ -856,7 +856,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 
 		/* Lowercased parent name */
 
-		var lc_parent_name *types.ZendString = ZendStringTolower(ce.GetParentName())
+		var lc_parent_name *types.String = ZendStringTolower(ce.GetParentName())
 		opline.SetOp2Type(IS_CONST)
 		LITERAL_STR(opline.GetOp2(), lc_parent_name)
 	}
@@ -880,7 +880,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 
 		/* Generate RTD keys until we find one that isn't in use yet. */
 
-		var key *types.ZendString = nil
+		var key *types.String = nil
 		for {
 			ZendTmpStringRelease(key)
 			key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())

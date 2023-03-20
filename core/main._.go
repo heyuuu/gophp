@@ -11,7 +11,7 @@ var CoreGlobals PhpCoreGlobals
 var PhpInternalEncodingChanged func() = nil
 var OnChangeBrowscap func(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,

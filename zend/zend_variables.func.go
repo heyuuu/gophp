@@ -56,7 +56,7 @@ func ZvalInternalPtrDtor(zval_ptr *types.Zval) {
 		if ref.DelRefcount() == 0 {
 			if zval_ptr.IsString() {
 				// todo remove
-				//var str *types.ZendString = (*types.ZendString)(ref)
+				//var str *types.String = (*types.String)(ref)
 				//b.Assert(true)
 				//b.Assert((str.GetGcFlags() & types.IS_STR_PERSISTENT) != 0)
 				//Free(str)

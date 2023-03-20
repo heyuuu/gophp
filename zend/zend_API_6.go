@@ -115,7 +115,7 @@ func ZendPostDeactivateModules() {
 	if EG__().GetFullTablesCleanup() != 0 {
 		var module *ZendModuleEntry
 		var zv *types.Zval
-		var key *types.ZendString
+		var key *types.String
 		var __ht *types.HashTable = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -168,7 +168,7 @@ func ZendNextFreeModule() int {
 }
 func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
 	var class_entry *types.ClassEntry = Malloc(b.SizeOf("zend_class_entry"))
-	var lowercase_name *types.ZendString
+	var lowercase_name *types.String
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
@@ -209,7 +209,7 @@ func ZendRegisterInternalInterface(orig_class_entry *types.ClassEntry) *types.Cl
 	return DoRegisterInternalClass(orig_class_entry, ZEND_ACC_INTERFACE)
 }
 func ZendRegisterClassAliasEx(name *byte, name_len int, ce *types.ClassEntry, persistent int) int {
-	var lcname *types.ZendString
+	var lcname *types.String
 	var zv types.Zval
 	var ret *types.Zval
 

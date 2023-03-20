@@ -154,7 +154,7 @@ func ZendIniDoOp(type_ byte, result *types.Zval, op1 *types.Zval, op2 *types.Zva
 		i_result = 0
 	}
 	str_len = sprintf(str_result, "%d", i_result)
-	result.SetString(types.ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
+	result.SetString(types.ZendStringInit(b.CastStr(str_result, str_len)))
 }
 
 /* }}} */
@@ -173,8 +173,8 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 		if ZEND_SYSTEM_INI != 0 {
-			var tmp_str *types.ZendString
-			var str *types.ZendString = ZvalGetTmpString(op1, &tmp_str)
+			var tmp_str *types.String
+			var str *types.String = ZvalGetTmpString(op1, &tmp_str)
 			op1.SetRawString(str.GetStr())
 			ZendTmpStringRelease(tmp_str)
 		} else {
@@ -208,7 +208,7 @@ func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
 			ConvertToString(&tmp)
 			c = &tmp
 		}
-		result.SetString(types.ZendStringInit(c.GetStr().GetVal(), c.GetStr().GetLen(), ZEND_SYSTEM_INI))
+		result.SetString(types.ZendStringInit(c.GetStr().GetStr()))
 		if c == &tmp {
 			types.ZendStringRelease(tmp.GetStr())
 		}

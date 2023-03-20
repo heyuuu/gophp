@@ -297,10 +297,10 @@ func PhpArrayReverseDataCompareString(a any, b any) int { return PhpArrayDataCom
 func PhpArrayNaturalGeneralCompare(a any, b any, fold_case int) int {
 	var f *types.Bucket = (*types.Bucket)(a)
 	var s *types.Bucket = (*types.Bucket)(b)
-	var tmp_str1 *types.ZendString
-	var tmp_str2 *types.ZendString
-	var str1 *types.ZendString = zend.ZvalGetTmpString(f.GetVal(), &tmp_str1)
-	var str2 *types.ZendString = zend.ZvalGetTmpString(s.GetVal(), &tmp_str2)
+	var tmp_str1 *types.String
+	var tmp_str2 *types.String
+	var str1 *types.String = zend.ZvalGetTmpString(f.GetVal(), &tmp_str1)
+	var str2 *types.String = zend.ZvalGetTmpString(s.GetVal(), &tmp_str2)
 	var result int = StrnatcmpEx(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen(), fold_case)
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
@@ -1407,7 +1407,7 @@ func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *types.Zval,
 	var array *types.Zval
 	var entry *types.Zval
 	var num_idx zend.ZendUlong
-	var str_idx *types.ZendString
+	var str_idx *types.String
 	var strict types.ZendBool = 0
 	for {
 		var _flags int = 0
@@ -1624,7 +1624,7 @@ func PhpPrefixVarname(result *types.Zval, prefix *types.Zval, var_name *byte, va
 }
 func PhpExtractRefIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var __ht *types.HashTable = arr
@@ -1673,7 +1673,7 @@ func PhpExtractRefIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) 
 }
 func PhpExtractIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var __ht *types.HashTable = arr
@@ -1720,7 +1720,7 @@ func PhpExtractIfExists(arr *types.ZendArray, symbol_table *types.ZendArray) zen
 }
 func PhpExtractRefOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var __ht *types.HashTable = arr
@@ -1773,7 +1773,7 @@ func PhpExtractRefOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray)
 }
 func PhpExtractOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var __ht *types.HashTable = arr
@@ -1821,7 +1821,7 @@ func PhpExtractOverwrite(arr *types.ZendArray, symbol_table *types.ZendArray) ze
 }
 func PhpExtractRefPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var final_name types.Zval
@@ -1884,7 +1884,7 @@ func PhpExtractRefPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendA
 }
 func PhpExtractPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var final_name types.Zval
@@ -1942,7 +1942,7 @@ func PhpExtractPrefixIfExists(arr *types.ZendArray, symbol_table *types.ZendArra
 }
 func PhpExtractRefPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var final_name types.Zval
@@ -2023,7 +2023,7 @@ func PhpExtractRefPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray
 }
 func PhpExtractPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var final_name types.Zval
@@ -2096,7 +2096,7 @@ func PhpExtractPrefixSame(arr *types.ZendArray, symbol_table *types.ZendArray, p
 }
 func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var num_key zend.ZendUlong
 	var entry *types.Zval
 	var orig_var *types.Zval
@@ -2119,7 +2119,7 @@ func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray,
 			}
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 		} else {
-			var str *types.ZendString = zend.ZendLongToStr(num_key)
+			var str *types.String = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			types.ZendStringReleaseEx(str, 0)
 		}
@@ -2151,7 +2151,7 @@ func PhpExtractRefPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray,
 }
 func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var num_key zend.ZendUlong
 	var entry *types.Zval
 	var orig_var *types.Zval
@@ -2174,7 +2174,7 @@ func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, pr
 			}
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 		} else {
-			var str *types.ZendString = zend.ZendLongToStr(num_key)
+			var str *types.String = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			types.ZendStringReleaseEx(str, 0)
 		}
@@ -2206,7 +2206,7 @@ func PhpExtractPrefixAll(arr *types.ZendArray, symbol_table *types.ZendArray, pr
 }
 func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var num_key zend.ZendUlong
 	var entry *types.Zval
 	var orig_var *types.Zval
@@ -2234,7 +2234,7 @@ func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendAr
 				final_name.SetStringCopy(var_name)
 			}
 		} else {
-			var str *types.ZendString = zend.ZendLongToStr(num_key)
+			var str *types.String = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			types.ZendStringReleaseEx(str, 0)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
@@ -2268,7 +2268,7 @@ func PhpExtractRefPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendAr
 }
 func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray, prefix *types.Zval) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var num_key zend.ZendUlong
 	var entry *types.Zval
 	var orig_var *types.Zval
@@ -2296,7 +2296,7 @@ func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray
 				final_name.SetStringCopy(var_name)
 			}
 		} else {
-			var str *types.ZendString = zend.ZendLongToStr(num_key)
+			var str *types.String = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
 			types.ZendStringReleaseEx(str, 0)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
@@ -2330,7 +2330,7 @@ func PhpExtractPrefixInvalid(arr *types.ZendArray, symbol_table *types.ZendArray
 }
 func PhpExtractRefSkip(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var __ht *types.HashTable = arr
@@ -2381,7 +2381,7 @@ func PhpExtractRefSkip(arr *types.ZendArray, symbol_table *types.ZendArray) zend
 }
 func PhpExtractSkip(arr *types.ZendArray, symbol_table *types.ZendArray) zend.ZendLong {
 	var count zend.ZendLong = 0
-	var var_name *types.ZendString
+	var var_name *types.String
 	var entry *types.Zval
 	var orig_var *types.Zval
 	var __ht *types.HashTable = arr
@@ -2721,8 +2721,8 @@ func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *types.Zva
 		if entry.IsType(types.IS_LONG) {
 			return_value.GetArr().IndexUpdateH(entry.GetLval(), val)
 		} else {
-			var tmp_key *types.ZendString
-			var key *types.ZendString = zend.ZvalGetTmpString(entry, &tmp_key)
+			var tmp_key *types.String
+			var key *types.String = zend.ZvalGetTmpString(entry, &tmp_key)
 			return_value.GetArr().SymtableUpdate(key.GetStr(), val)
 			zend.ZendTmpStringRelease(tmp_key)
 		}
@@ -3532,7 +3532,7 @@ func ZifArrayUnshift(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var new_hash types.HashTable
 	var argc int
 	var i int
-	var key *types.ZendString
+	var key *types.String
 	var value *types.Zval
 	for {
 		var _flags int = 0
@@ -3678,7 +3678,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var preserve_keys types.ZendBool = 0
 	var num_in int
 	var pos int
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	for {
 		var _flags int = 0
@@ -3770,7 +3770,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 func PhpArrayMergeRecursive(dest *types.HashTable, src *types.HashTable) int {
 	var src_entry *types.Zval
 	var dest_entry *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var __ht *types.HashTable = src
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -3839,7 +3839,7 @@ func PhpArrayMergeRecursive(dest *types.HashTable, src *types.HashTable) int {
 }
 func PhpArrayMerge(dest *types.HashTable, src *types.HashTable) int {
 	var src_entry *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	if dest.HasUFlags(types.HASH_FLAG_PACKED) && src.HasUFlags(types.HASH_FLAG_PACKED) {
 		dest.Extend(dest.GetNNumOfElements() + src.GetNNumOfElements())
 		var __fill_ht *types.HashTable = dest
@@ -3890,7 +3890,7 @@ func PhpArrayReplaceRecursive(dest *types.HashTable, src *types.HashTable) int {
 	var dest_entry *types.Zval
 	var src_zval *types.Zval
 	var dest_zval *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	var ret int
 	var __ht *types.HashTable = src
@@ -4044,7 +4044,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 				}
 			} else {
 				var copy types.ZendBool = 1
-				var string_key *types.ZendString
+				var string_key *types.String
 				var __ht *types.HashTable = ret.GetArr()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
@@ -4095,7 +4095,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 		__fill_ht.SetNNextFreeElement(__fill_idx)
 		__fill_ht.SetNInternalPointer(0)
 	} else {
-		var string_key *types.ZendString
+		var string_key *types.String
 		types.ZendHashRealInitMixed(dest)
 		var __ht *types.HashTable = src
 		for _, _p := range __ht.foreachData() {
@@ -4145,7 +4145,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var new_val types.Zval
 	var strict types.ZendBool = 0
 	var num_idx zend.ZendUlong
-	var str_idx *types.ZendString
+	var str_idx *types.String
 	var arrval *types.ZendArray
 	var elem_count zend.ZendUlong
 	for {
@@ -4580,8 +4580,8 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 					case types.IS_LONG:
 						return_value.GetArr().IndexUpdateH(keyval.GetLval(), colval)
 					case types.IS_OBJECT:
-						var tmp_key *types.ZendString
-						var key *types.ZendString = zend.ZvalGetTmpString(keyval, &tmp_key)
+						var tmp_key *types.String
+						var key *types.String = zend.ZvalGetTmpString(keyval, &tmp_key)
 						return_value.GetArr().SymtableUpdate(key.GetStr(), colval)
 						zend.ZendTmpStringRelease(tmp_key)
 					case types.IS_NULL:
@@ -4615,7 +4615,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var input *types.Zval
 	var entry *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	var preserve_keys types.ZendBool = 0
 	for {
@@ -4694,7 +4694,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var input_size zend.ZendLong
 	var num_pads zend.ZendLong
 	var i zend.ZendLong
-	var key *types.ZendString
+	var key *types.String
 	var value *types.Zval
 	for {
 		var _flags int = 0
@@ -4828,7 +4828,7 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var entry *types.Zval
 	var data types.Zval
 	var num_idx zend.ZendUlong
-	var str_idx *types.ZendString
+	var str_idx *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -4876,8 +4876,8 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifArrayChangeKeyCase(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var array *types.Zval
 	var entry *types.Zval
-	var string_key *types.ZendString
-	var new_key *types.ZendString
+	var string_key *types.String
+	var new_key *types.String
 	var num_key zend.ZendUlong
 	var change_to_upper zend.ZendLong = 0
 	for {
@@ -4963,7 +4963,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	if sort_type == PHP_SORT_STRING {
 		var seen types.HashTable
 		var num_key zend.ZendLong
-		var str_key *types.ZendString
+		var str_key *types.String
 		var val *types.Zval
 		types.ZendHashInit(&seen, types.Z_ARRVAL_P(array).GetNNumOfElements(), nil, nil, 0)
 		zend.ArrayInit(return_value)
@@ -4983,8 +4983,8 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			if val.IsType(types.IS_STRING) {
 				retval = types.ZendHashAddEmptyElement(&seen, val.GetStr())
 			} else {
-				var tmp_str_val *types.ZendString
-				var str_val *types.ZendString = zend.ZvalGetTmpString(val, &tmp_str_val)
+				var tmp_str_val *types.String
+				var str_val *types.String = zend.ZvalGetTmpString(val, &tmp_str_val)
 				retval = types.ZendHashAddEmptyElement(&seen, str_val)
 				zend.ZendTmpStringRelease(tmp_str_val)
 			}
@@ -5868,9 +5868,9 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var num uint32
 	var exclude types.HashTable
 	var value *types.Zval
-	var str *types.ZendString
-	var tmp_str *types.ZendString
-	var key *types.ZendString
+	var str *types.String
+	var tmp_str *types.String
+	var key *types.String
 	var idx zend.ZendLong
 	var dummy types.Zval
 	if executeData.NumArgs() < 2 {
@@ -5911,8 +5911,8 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	} else if num == 1 {
 		var found int = 0
-		var search_str *types.ZendString
-		var tmp_search_str *types.ZendString
+		var search_str *types.String
+		var tmp_search_str *types.String
 		value = nil
 		var __ht *types.HashTable = args[0].GetArr()
 		for _, _p := range __ht.foreachData() {
@@ -6318,7 +6318,7 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *types.Zv
 func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var input *types.Zval
 	var num_req zend.ZendLong = 1
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	var i int
 	var num_avail int
@@ -6624,7 +6624,7 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var retval types.Zval
 	var have_callback types.ZendBool = 0
 	var use_type zend.ZendLong = 0
-	var string_key *types.ZendString
+	var string_key *types.String
 	var fci types.ZendFcallInfo = zend.EmptyFcallInfo
 	var fci_cache types.ZendFcallInfoCache = zend.EmptyFcallInfoCache
 	var num_key zend.ZendUlong
@@ -6753,7 +6753,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetNull()
 	if n_arrays == 1 {
 		var num_key zend.ZendUlong
-		var str_key *types.ZendString
+		var str_key *types.String
 		var zv *types.Zval
 		var arg types.Zval
 		var ret int
@@ -6947,7 +6947,7 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var num_in int
 	var size zend.ZendLong
 	var current zend.ZendLong = 0
-	var str_key *types.ZendString
+	var str_key *types.String
 	var num_key zend.ZendUlong
 	var preserve_keys types.ZendBool = 0
 	var input *types.Zval = nil
@@ -7087,8 +7087,8 @@ func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *types.Zval
 				if entry_keys.IsType(types.IS_LONG) {
 					entry_values = return_value.GetArr().IndexUpdateH(entry_keys.GetLval(), entry_values)
 				} else {
-					var tmp_key *types.ZendString
-					var key *types.ZendString = zend.ZvalGetTmpString(entry_keys, &tmp_key)
+					var tmp_key *types.String
+					var key *types.String = zend.ZvalGetTmpString(entry_keys, &tmp_key)
 					entry_values = return_value.GetArr().SymtableUpdate(key.GetStr(), entry_values)
 					zend.ZendTmpStringRelease(tmp_key)
 				}

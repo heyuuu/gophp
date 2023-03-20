@@ -296,7 +296,7 @@ func PhpInitConfig() int {
 	var php_ini_scanned_path_len int
 	var open_basedir *byte
 	var free_ini_search_path int = 0
-	var opened_path *types.ZendString = nil
+	var opened_path *types.String = nil
 	var fp *r.FILE
 	var filename *byte
 	Config().Init()
@@ -434,7 +434,7 @@ func PhpInitConfig() int {
 		RESET_ACTIVE_INI_HASH()
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 		var tmp types.Zval
-		tmp.SetString(types.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
+		tmp.SetString(types.ZendStringInit(fh.GetFilename()))
 		Config().Set("cfg_file_path", fh.GetFilenameStr())
 		if opened_path != nil {
 			types.ZendStringReleaseEx(opened_path, 0)
@@ -616,7 +616,7 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.H
 	return types.FAILURE
 }
 func PhpIniActivateConfig(source_hash *types.HashTable, modify_type int, stage int) {
-	var str *types.ZendString
+	var str *types.String
 	var data *types.Zval
 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */

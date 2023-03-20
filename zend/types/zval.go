@@ -11,7 +11,7 @@ type ZendValue struct /* union */ {
 	lval    zend.ZendLong
 	dval    float64
 	counted *ZendRefcounted
-	str     *ZendString
+	str     *String
 	arr     *ZendArray
 	obj     *ZendObject
 	res     *ZendResource
@@ -33,8 +33,8 @@ func (this *ZendValue) GetDval() float64                 { return this.dval }
 func (this *ZendValue) SetDval(value float64)            { this.dval = value }
 func (this *ZendValue) GetCounted() *ZendRefcounted      { return this.counted }
 func (this *ZendValue) SetCounted(value *ZendRefcounted) { this.counted = value }
-func (this *ZendValue) GetStr() *ZendString              { return this.str }
-func (this *ZendValue) SetStr(value *ZendString)         { this.str = value }
+func (this *ZendValue) GetStr() *String                  { return this.str }
+func (this *ZendValue) SetStr(value *String)             { this.str = value }
 func (this *ZendValue) GetArr() *ZendArray               { return this.arr }
 func (this *ZendValue) SetArr(value *ZendArray)          { this.arr = value }
 func (this *ZendValue) GetObj() *ZendObject              { return this.obj }
@@ -98,8 +98,8 @@ func (this *Zval) GetDval() float64                 { return this.value.dval }
 func (this *Zval) SetDval(value float64)            { this.value.dval = value }
 func (this *Zval) GetCounted() *ZendRefcounted      { return this.value.counted }
 func (this *Zval) SetCounted(value *ZendRefcounted) { this.value.counted = value }
-func (this *Zval) GetStr() *ZendString              { return this.value.str }
-func (this *Zval) SetStr(value *ZendString)         { this.value.str = value }
+func (this *Zval) GetStr() *String                  { return this.value.str }
+func (this *Zval) SetStr(value *String)             { this.value.str = value }
 func (this *Zval) GetArr() *ZendArray               { return this.value.arr }
 func (this *Zval) SetArr(value *ZendArray)          { this.value.arr = value }
 func (this *Zval) GetObj() *ZendObject              { return this.value.obj }
@@ -243,23 +243,23 @@ func (this *Zval) SetDouble(d float64) {
 }
 
 func (this *Zval) SetRawString(s string) {
-	this.SetString(NewZendString(s))
+	this.SetString(NewString(s))
 }
 
-func (this *Zval) SetString(s *ZendString) {
+func (this *Zval) SetString(s *String) {
 	this.SetStr(s)
 	this.SetTypeInfo(IS_STRING_EX)
 }
 func (this *Zval) SetStringVal(str string) {
-	s := NewZendString(str)
+	s := NewString(str)
 	this.SetStr(s)
 	this.SetTypeInfo(IS_STRING_EX)
 }
-func (this *Zval) SetInternedString(s *ZendString) {
+func (this *Zval) SetInternedString(s *String) {
 	this.SetStr(s)
 	this.SetTypeInfo(IS_INTERNED_STRING_EX)
 }
-func (this *Zval) SetStringCopy(s *ZendString) {
+func (this *Zval) SetStringCopy(s *String) {
 	s.AddRefcount()
 	this.SetString(s)
 }

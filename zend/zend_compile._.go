@@ -326,7 +326,7 @@ const ZEND_FUNCTION_DTOR types.DtorFuncT = ZendFunctionDtor
 const ZEND_CLASS_DTOR types.DtorFuncT = DestroyZendClass
 
 type ZendNeedsLiveRangeCb func(op_array *ZendOpArray, opline *ZendOp) types.ZendBool
-type ZendAutoGlobalCallback func(name *types.ZendString) types.ZendBool
+type ZendAutoGlobalCallback func(name *types.String) types.ZendBool
 
 /* BEGIN: OPCODES */
 

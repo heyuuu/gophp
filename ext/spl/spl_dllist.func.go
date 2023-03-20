@@ -317,7 +317,7 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.HashTable {
 	var next *SplPtrLlistElement
 	var tmp types.Zval
 	var dllist_array types.Zval
-	var pnstr *types.ZendString
+	var pnstr *types.String
 	var i int = 0
 	var debug_info *types.HashTable
 	if intern.GetStd().GetProperties() == nil {

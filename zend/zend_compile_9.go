@@ -25,9 +25,9 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var const_ast *ZendAst = ast.GetChild()[1]
-	var class_name *types.ZendString
-	var const_name *types.ZendString = ZendAstGetStr(const_ast)
-	var name *types.ZendString
+	var class_name *types.String
+	var const_name *types.String = ZendAstGetStr(const_ast)
+	var name *types.String
 	var fetch_type int
 	if class_ast.GetKind() != ZEND_AST_ZVAL {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
@@ -50,7 +50,7 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
-	var class_name *types.ZendString = ZendAstGetStr(class_ast)
+	var class_name *types.String = ZendAstGetStr(class_ast)
 	var fetch_type uint32 = ZendGetClassFetchType(class_name)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
@@ -73,10 +73,10 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 func ZendCompileConstExprConst(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var name_ast *ZendAst = ast.GetChild()[0]
-	var orig_name *types.ZendString = ZendAstGetStr(name_ast)
+	var orig_name *types.String = ZendAstGetStr(name_ast)
 	var is_fully_qualified types.ZendBool
 	var result types.Zval
-	var resolved_name *types.ZendString
+	var resolved_name *types.String
 	resolved_name = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
 	if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) != 0 {
 		types.ZendStringReleaseEx(resolved_name, 0)
@@ -632,7 +632,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_CONST:
 		var name_ast *ZendAst = ast.GetChild()[0]
 		var is_fully_qualified types.ZendBool
-		var resolved_name *types.ZendString = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
+		var resolved_name *types.String = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
 		if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) == 0 {
 			types.ZendStringReleaseEx(resolved_name, 0)
 			return
@@ -641,7 +641,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	case ZEND_AST_CLASS_CONST:
 		var class_ast *ZendAst
 		var name_ast *ZendAst
-		var resolved_name *types.ZendString
+		var resolved_name *types.String
 		ZendEvalConstExpr(ast.GetChild()[0])
 		ZendEvalConstExpr(ast.GetChild()[1])
 		class_ast = ast.GetChild()[0]

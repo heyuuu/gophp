@@ -99,8 +99,8 @@ func _phpStreamFopenFromFileInt(file *r.FILE, mode *byte) *core.PhpStream {
 	self.SetFd(fileno(file))
 	return core.PhpStreamAllocRel(&PhpStreamStdioOps, self, 0, mode)
 }
-func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **types.ZendString) *core.PhpStream {
-	var opened_path *types.ZendString = nil
+func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **types.String) *core.PhpStream {
+	var opened_path *types.String = nil
 	var fd int
 	fd = core.PhpOpenTemporaryFd(dir, pfx, &opened_path)
 	if fd != -1 {
@@ -558,7 +558,7 @@ func PhpPlainFilesDirOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var dir *DIR = nil
@@ -578,7 +578,7 @@ func PhpPlainFilesDirOpener(
 	}
 	return stream
 }
-func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.ZendString, options int) *core.PhpStream {
+func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, options int) *core.PhpStream {
 	var realpath []byte
 	var open_flags int
 	var fd int
@@ -604,7 +604,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.ZendString,
 
 				//TODO: avoid reallocation???
 
-				*opened_path = types.ZendStringInit(realpath, strlen(realpath), 0)
+				*opened_path = types.ZendStringInit(realpath)
 
 				//TODO: avoid reallocation???
 
@@ -624,7 +624,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.ZendString,
 		}
 		if ret != nil {
 			if opened_path != nil {
-				*opened_path = types.ZendStringInit(realpath, strlen(realpath), 0)
+				*opened_path = types.ZendStringInit(realpath)
 			}
 			if persistent_id != nil {
 				zend.Efree(persistent_id)
@@ -676,7 +676,7 @@ func PhpPlainFilesStreamOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
@@ -921,7 +921,7 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	standard.PhpClearStatCache(0, nil, 0)
 	return 1
 }
-func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path **types.ZendString, options int) *core.PhpStream {
+func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path **types.String, options int) *core.PhpStream {
 	/* code ripped off from fopen_wrappers.c */
 
 	var pathbuf *byte
@@ -930,7 +930,7 @@ func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path
 	var trypath []byte
 	var stream *core.PhpStream
 	var filename_length int
-	var exec_filename *types.ZendString
+	var exec_filename *types.String
 	if opened_path != nil {
 		*opened_path = nil
 	}

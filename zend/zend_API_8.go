@@ -127,7 +127,7 @@ func ZendIsCallableEx(
 	callable *types.Zval,
 	object *types.ZendObject,
 	check_flags uint32,
-	callable_name **types.ZendString,
+	callable_name **types.String,
 	fcc *types.ZendFcallInfoCache,
 	error **byte,
 ) types.ZendBool {
@@ -137,7 +137,7 @@ func ZendIsCallableEx(
 	}
 	return ret
 }
-func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **types.ZendString) types.ZendBool {
+func ZendIsCallable(callable *types.Zval, check_flags uint32, callable_name **types.String) types.ZendBool {
 	return ZendIsCallableEx(callable, nil, check_flags, callable_name, nil, nil)
 }
 func ZendFcallInfoInit(
@@ -145,7 +145,7 @@ func ZendFcallInfoInit(
 	check_flags uint32,
 	fci *types.ZendFcallInfo,
 	fcc *types.ZendFcallInfoCache,
-	callable_name **types.ZendString,
+	callable_name **types.String,
 	error **byte,
 ) int {
 	if ZendIsCallableEx(callable, nil, check_flags, callable_name, fcc, error) == 0 {
@@ -283,7 +283,7 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 	return result
 }
 func ZendGetModuleVersion(module_name *byte) *byte {
-	var lname *types.ZendString
+	var lname *types.String
 	var name_len int = strlen(module_name)
 	var module *ZendModuleEntry
 	lname = types.ZendStringAlloc(name_len, 0)
@@ -296,7 +296,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 		return nil
 	}
 }
-func ZvalMakeInternedString(zv *types.Zval) *types.ZendString {
+func ZvalMakeInternedString(zv *types.Zval) *types.String {
 	b.Assert(zv.IsString())
 	zv.SetStr(types.ZendNewInternedString(zv.GetStr()))
 
@@ -307,10 +307,10 @@ func IsPersistentClass(ce *types.ClassEntry) types.ZendBool {
 }
 func ZendDeclareTypedProperty(
 	ce *types.ClassEntry,
-	name *types.ZendString,
+	name *types.String,
 	property *types.Zval,
 	access_type int,
-	doc_comment *types.ZendString,
+	doc_comment *types.String,
 	type_ types.ZendType,
 ) int {
 	var property_info *ZendPropertyInfo
@@ -414,10 +414,10 @@ func ZendDeclareTypedProperty(
 	if (access_type & ZEND_ACC_PUBLIC) != 0 {
 		property_info.SetName(name.Copy())
 	} else if (access_type & ZEND_ACC_PRIVATE) != 0 {
-		property_info.SetName(ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr(), IsPersistentClass(ce) != 0))
+		property_info.SetName(ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr()))
 	} else {
 		b.Assert((access_type & ZEND_ACC_PROTECTED) != 0)
-		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr(), IsPersistentClass(ce) != 0))
+		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr()))
 	}
 	property_info.SetName(types.ZendNewInternedString(property_info.GetName()))
 	property_info.SetFlags(access_type)

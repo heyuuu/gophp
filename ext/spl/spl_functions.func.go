@@ -92,7 +92,7 @@ func SplAddClasses(pce *types.ClassEntry, list *types.Zval, sub int, allow int, 
 	}
 	return 0
 }
-func SplGenPrivatePropName(ce *types.ClassEntry, prop_name string) *types.ZendString {
+func SplGenPrivatePropName(ce *types.ClassEntry, prop_name string) *types.String {
 	str := zend.ZendManglePropertyName_Ex(ce.GetName().GetStr(), prop_name)
-	return types.NewZendString(str)
+	return types.NewString(str)
 }

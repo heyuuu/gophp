@@ -10,27 +10,27 @@ import (
  * BrowscapKv
  */
 type BrowscapKv struct {
-	key   *types.ZendString
-	value *types.ZendString
+	key   *types.String
+	value *types.String
 }
 
-// func MakeBrowscapKv(key *zend.ZendString, value *zend.ZendString) BrowscapKv {
+// func MakeBrowscapKv(key *zend.String, value *zend.String) BrowscapKv {
 //     return BrowscapKv{
 //         key:key,
 //         value:value,
 //     }
 // }
-func (this *BrowscapKv) GetKey() *types.ZendString        { return this.key }
-func (this *BrowscapKv) SetKey(value *types.ZendString)   { this.key = value }
-func (this *BrowscapKv) GetValue() *types.ZendString      { return this.value }
-func (this *BrowscapKv) SetValue(value *types.ZendString) { this.value = value }
+func (this *BrowscapKv) GetKey() *types.String        { return this.key }
+func (this *BrowscapKv) SetKey(value *types.String)   { this.key = value }
+func (this *BrowscapKv) GetValue() *types.String      { return this.value }
+func (this *BrowscapKv) SetValue(value *types.String) { this.value = value }
 
 /**
  * BrowscapEntry
  */
 type BrowscapEntry struct {
-	pattern        *types.ZendString
-	parent         *types.ZendString
+	pattern        *types.String
+	parent         *types.String
 	kv_start       uint32
 	kv_end         uint32
 	contains_start []uint16
@@ -39,8 +39,8 @@ type BrowscapEntry struct {
 }
 
 //             func MakeBrowscapEntry(
-// pattern *zend.ZendString,
-// parent *zend.ZendString,
+// pattern *zend.String,
+// parent *zend.String,
 // kv_start uint32,
 // kv_end uint32,
 // contains_start []uint16,
@@ -57,15 +57,15 @@ type BrowscapEntry struct {
 //                     prefix_len:prefix_len,
 //                 }
 //             }
-func (this *BrowscapEntry) GetPattern() *types.ZendString      { return this.pattern }
-func (this *BrowscapEntry) SetPattern(value *types.ZendString) { this.pattern = value }
-func (this *BrowscapEntry) GetParent() *types.ZendString       { return this.parent }
-func (this *BrowscapEntry) SetParent(value *types.ZendString)  { this.parent = value }
-func (this *BrowscapEntry) GetKvStart() uint32                 { return this.kv_start }
-func (this *BrowscapEntry) SetKvStart(value uint32)            { this.kv_start = value }
-func (this *BrowscapEntry) GetKvEnd() uint32                   { return this.kv_end }
-func (this *BrowscapEntry) SetKvEnd(value uint32)              { this.kv_end = value }
-func (this *BrowscapEntry) GetContainsStart() []uint16         { return this.contains_start }
+func (this *BrowscapEntry) GetPattern() *types.String      { return this.pattern }
+func (this *BrowscapEntry) SetPattern(value *types.String) { this.pattern = value }
+func (this *BrowscapEntry) GetParent() *types.String       { return this.parent }
+func (this *BrowscapEntry) SetParent(value *types.String)  { this.parent = value }
+func (this *BrowscapEntry) GetKvStart() uint32             { return this.kv_start }
+func (this *BrowscapEntry) SetKvStart(value uint32)        { this.kv_start = value }
+func (this *BrowscapEntry) GetKvEnd() uint32               { return this.kv_end }
+func (this *BrowscapEntry) SetKvEnd(value uint32)          { this.kv_end = value }
+func (this *BrowscapEntry) GetContainsStart() []uint16     { return this.contains_start }
 
 // func (this *BrowscapEntry) SetContainsStart(value []uint16) { this.contains_start = value }
 func (this *BrowscapEntry) GetContainsLen() []uint8 { return this.contains_len }
@@ -127,11 +127,11 @@ type ZendBrowscapGlobals struct {
 type BrowscapParserCtx struct {
 	bdata                *BrowserData
 	current_entry        *BrowscapEntry
-	current_section_name *types.ZendString
+	current_section_name *types.String
 	str_interned         types.HashTable
 }
 
-func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *types.ZendString, str_interned types.HashTable) BrowscapParserCtx {
+func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *types.String, str_interned types.HashTable) BrowscapParserCtx {
 	return BrowscapParserCtx{
 		bdata:                bdata,
 		current_entry:        current_entry,
@@ -143,10 +143,10 @@ func (this *BrowscapParserCtx) GetBdata() *BrowserData               { return th
 func (this *BrowscapParserCtx) SetBdata(value *BrowserData)          { this.bdata = value }
 func (this *BrowscapParserCtx) GetCurrentEntry() *BrowscapEntry      { return this.current_entry }
 func (this *BrowscapParserCtx) SetCurrentEntry(value *BrowscapEntry) { this.current_entry = value }
-func (this *BrowscapParserCtx) GetCurrentSectionName() *types.ZendString {
+func (this *BrowscapParserCtx) GetCurrentSectionName() *types.String {
 	return this.current_section_name
 }
-func (this *BrowscapParserCtx) SetCurrentSectionName(value *types.ZendString) {
+func (this *BrowscapParserCtx) SetCurrentSectionName(value *types.String) {
 	this.current_section_name = value
 }
 func (this *BrowscapParserCtx) GetStrInterned() types.HashTable { return this.str_interned }

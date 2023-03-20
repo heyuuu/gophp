@@ -23,7 +23,7 @@ func PhpUrlEncodeHashEx(
 	arg_sep *byte,
 	enc_type int,
 ) int {
-	var key *types.ZendString = nil
+	var key *types.String = nil
 	var newprefix *byte
 	var p *byte
 	var prop_name *byte
@@ -95,7 +95,7 @@ func PhpUrlEncodeHashEx(
 		zdata = types.ZVAL_DEREF(zdata)
 		if zdata.IsType(types.IS_ARRAY) || zdata.IsType(types.IS_OBJECT) {
 			if key != nil {
-				var ekey *types.ZendString
+				var ekey *types.String
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(prop_name, prop_len)
 				} else {
@@ -176,7 +176,7 @@ func PhpUrlEncodeHashEx(
 				formstr.AppendString(b.CastStr(key_prefix, key_prefix_len))
 			}
 			if key != nil {
-				var ekey *types.ZendString
+				var ekey *types.String
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(prop_name, prop_len)
 				} else {
@@ -199,7 +199,7 @@ func PhpUrlEncodeHashEx(
 			formstr.AppendString("=")
 			switch zdata.GetType() {
 			case types.IS_STRING:
-				var ekey *types.ZendString
+				var ekey *types.String
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(zdata.GetStr().GetVal(), zdata.GetStr().GetLen())
 				} else {
@@ -214,9 +214,9 @@ func PhpUrlEncodeHashEx(
 			case types.IS_TRUE:
 				formstr.AppendString("1")
 			default:
-				var ekey *types.ZendString
-				var tmp *types.ZendString
-				var str *types.ZendString = zend.ZvalGetTmpString(zdata, &tmp)
+				var ekey *types.String
+				var tmp *types.String
+				var str *types.String = zend.ZvalGetTmpString(zdata, &tmp)
 				if enc_type == PHP_QUERY_RFC3986 {
 					ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
 				} else {

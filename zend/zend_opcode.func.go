@@ -853,7 +853,7 @@ func PassTwo(op_array *ZendOpArray) int {
 		}
 	}
 	if CG__().GetContext().GetVarsSize() != op_array.GetLastVar() {
-		op_array.SetVars((**types.ZendString)(Erealloc(op_array.GetVars(), b.SizeOf("zend_string *")*op_array.GetLastVar())))
+		op_array.SetVars((**types.String)(Erealloc(op_array.GetVars(), b.SizeOf("zend_string *")*op_array.GetLastVar())))
 		CG__().GetContext().SetVarsSize(op_array.GetLastVar())
 	}
 	op_array.SetOpcodes((*ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))

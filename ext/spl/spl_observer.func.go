@@ -163,8 +163,8 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.HashTable {
 	var props *types.HashTable
 	var tmp types.Zval
 	var storage types.Zval
-	var md5str *types.ZendString
-	var zname *types.ZendString
+	var md5str *types.String
+	var zname *types.String
 	var debug_info *types.HashTable
 	props = types.Z_OBJPROP_P(obj)
 	debug_info = types.ZendNewArray(props.GetNNumOfElements() + 1)

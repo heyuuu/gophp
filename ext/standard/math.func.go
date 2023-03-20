@@ -1030,7 +1030,7 @@ func _phpMathBasetozval(arg *types.Zval, base int, ret *types.Zval) int {
 	}
 	return types.SUCCESS
 }
-func _phpMathLongtobase(arg *types.Zval, base int) *types.ZendString {
+func _phpMathLongtobase(arg *types.Zval, base int) *types.String {
 	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
 	var buf []byte
 	var ptr *byte
@@ -1051,9 +1051,9 @@ func _phpMathLongtobase(arg *types.Zval, base int) *types.ZendString {
 			break
 		}
 	}
-	return types.ZendStringInit(ptr, end-ptr, 0)
+	return types.ZendStringInit(b.CastStr(ptr, end-ptr))
 }
-func _phpMathZvaltobase(arg *types.Zval, base int) *types.ZendString {
+func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
 	if arg.GetType() != types.IS_LONG && arg.GetType() != types.IS_DOUBLE || base < 2 || base > 36 {
 		return types.ZSTR_EMPTY_ALLOC()
@@ -1080,7 +1080,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.ZendString {
 				break
 			}
 		}
-		return types.ZendStringInit(ptr, end-ptr, 0)
+		return types.ZendStringInit(b.CastStr(ptr, end-ptr))
 	}
 	return _phpMathLongtobase(arg, base)
 }
@@ -1158,7 +1158,7 @@ func ZifOctdec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifDecbin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1184,7 +1184,7 @@ func ZifDecbin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifDecoct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1210,7 +1210,7 @@ func ZifDecoct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifDechex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1239,7 +1239,7 @@ func ZifBaseConvert(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var temp types.Zval
 	var frombase zend.ZendLong
 	var tobase zend.ZendLong
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 3
@@ -1278,7 +1278,7 @@ func ZifBaseConvert(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	result = _phpMathZvaltobase(&temp, int(tobase))
 	return_value.SetString(result)
 }
-func _phpMathNumberFormat(d float64, dec int, dec_point byte, thousand_sep byte) *types.ZendString {
+func _phpMathNumberFormat(d float64, dec int, dec_point byte, thousand_sep byte) *types.String {
 	return _phpMathNumberFormatEx(d, dec, &dec_point, 1, &thousand_sep, 1)
 }
 func _phpMathNumberFormatEx(
@@ -1288,9 +1288,9 @@ func _phpMathNumberFormatEx(
 	dec_point_len int,
 	thousand_sep *byte,
 	thousand_sep_len int,
-) *types.ZendString {
-	var res *types.ZendString
-	var tmpbuf *types.ZendString
+) *types.String {
+	var res *types.String
+	var tmpbuf *types.String
 	var s *byte
 	var t *byte
 	var dp *byte

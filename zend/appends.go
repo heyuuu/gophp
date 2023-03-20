@@ -20,13 +20,13 @@ func strToD(str string) float64 {
 	return value
 }
 
-func castZendStringPtr(str *string) *types.ZendString {
+func castZendStringPtr(str *string) *types.String {
 	if str != nil {
-		return types.NewZendString(*str)
+		return types.NewString(*str)
 	}
 	return nil
 }
-func castStrPtr(str *types.ZendString) *string {
+func castStrPtr(str *types.String) *string {
 	if str != nil {
 		var s = str.GetStr()
 		return &s

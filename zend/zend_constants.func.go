@@ -185,7 +185,7 @@ func ZendGetConstantStrImpl(name string) *ZendConstant {
 	}
 	return c
 }
-func ZendGetConstantImpl(name *types.ZendString) *ZendConstant {
+func ZendGetConstantImpl(name *types.String) *ZendConstant {
 	var zv *types.Zval
 	var c *ZendConstant
 	zv = EG__().GetZendConstants().KeyFind(name.GetStr())
@@ -207,7 +207,7 @@ func ZendGetConstantImpl(name *types.ZendString) *ZendConstant {
 		return (*ZendConstant)(zv.GetPtr())
 	}
 }
-func ZendGetConstant(name *types.ZendString) *types.Zval {
+func ZendGetConstant(name *types.String) *types.Zval {
 	var c *ZendConstant = ZendGetConstantImpl(name)
 	if c != nil {
 		return c.Value()
@@ -234,7 +234,7 @@ func IsAccessDeprecated(c *ZendConstant, access_name *byte) types.ZendBool {
 
 	}
 }
-func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags uint32) *types.Zval {
+func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint32) *types.Zval {
 	var c *ZendConstant
 	var colon *byte
 	var ce *types.ClassEntry = nil
@@ -251,8 +251,8 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 	if b.Assign(&colon, ZendMemrchr(name, ':', name_len)) && colon > name && (*(colon - 1)) == ':' {
 		var class_name_len int = colon - name - 1
 		var const_name_len int = name_len - class_name_len - 2
-		var constant_name *types.ZendString = types.ZendStringInit(colon+1, const_name_len, 0)
-		var class_name *types.ZendString = types.ZendStringInit(name, class_name_len, 0)
+		var constant_name *types.String = types.ZendStringInit(b.CastStr(colon+1, const_name_len))
+		var class_name *types.String = types.ZendStringInit(b.CastStr(name, class_name_len))
 		var c *ZendClassConstant = nil
 		var ret_constant *types.Zval = nil
 		if types.ZendStringEqualsLiteralCi(class_name, "self") {
@@ -377,7 +377,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 	}
 	return c.Value()
 }
-func ZendHashAddConstant(ht *types.HashTable, key *types.ZendString, c *ZendConstant) any {
+func ZendHashAddConstant(ht *types.HashTable, key *types.String, c *ZendConstant) any {
 	var ret any
 	var copy *ZendConstant = Pemalloc(b.SizeOf("zend_constant"), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
 	memcpy(copy, c, b.SizeOf("zend_constant"))
@@ -389,8 +389,8 @@ func ZendHashAddConstant(ht *types.HashTable, key *types.ZendString, c *ZendCons
 }
 
 func ZendRegisterConstant(c *ZendConstant) int {
-	var lowercase_name *types.ZendString = nil
-	var name *types.ZendString
+	var lowercase_name *types.String = nil
+	var name *types.String
 	var ret int = types.SUCCESS
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) == 0 {
 		lowercase_name = ZendStringTolowerEx(c.GetName(), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
@@ -399,7 +399,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 	} else {
 		var slash *byte = strrchr(c.GetName().GetVal(), '\\')
 		if slash != nil {
-			lowercase_name = types.ZendStringInit(c.GetName().GetVal(), c.GetName().GetLen(), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
+			lowercase_name = types.ZendStringInit(c.GetName().GetStr())
 			ZendStrTolower(lowercase_name.GetVal(), slash-c.GetName().GetVal())
 			lowercase_name = types.ZendNewInternedString(lowercase_name)
 			name = lowercase_name

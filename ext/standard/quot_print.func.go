@@ -20,7 +20,7 @@ func PhpHex2int(c int) byte {
 		return -1
 	}
 }
-func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.ZendString {
+func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.String {
 	var i int
 	var p1 *uint8
 	var p2 *uint8
@@ -28,7 +28,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.Zen
 	var l_nbl uint
 	var decoded_len int
 	var buf_size int
-	var retval *types.ZendString
+	var retval *types.String
 	var hexval_tbl []uint = []uint{64, 64, 64, 64, 64, 64, 64, 64, 64, 32, 16, 64, 64, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 32, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 64, 64, 64, 64, 64, 64, 64, 10, 11, 12, 13, 14, 15, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 10, 11, 12, 13, 14, 15, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64}
 	if replace_us_by_ws != 0 {
 		replace_us_by_ws = '_'
@@ -105,12 +105,12 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *types.Zen
 	retval.SetLen(decoded_len)
 	return retval
 }
-func PhpQuotPrintEncode(str *uint8, length int) *types.ZendString {
+func PhpQuotPrintEncode(str *uint8, length int) *types.String {
 	var lp zend.ZendUlong = 0
 	var c uint8
 	var d *uint8
 	var hex *byte = "0123456789ABCDEF"
-	var ret *types.ZendString
+	var ret *types.String
 	ret = types.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
 	d = (*uint8)(ret.GetVal())
 	for b.PostDec(&length) {
@@ -147,9 +147,9 @@ func PhpQuotPrintEncode(str *uint8, length int) *types.ZendString {
 	return ret
 }
 func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg1 *types.ZendString
+	var arg1 *types.String
 	var str_in *byte
-	var str_out *types.ZendString
+	var str_out *types.String
 	var i int = 0
 	var j int = 0
 	var k int
@@ -232,8 +232,8 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *t
 	return_value.SetString(str_out)
 }
 func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
-	var new_str *types.ZendString
+	var str *types.String
+	var new_str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1

@@ -58,7 +58,7 @@ func ZifEzmlmHash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) types.ZendBool {
 	var len_ int = 0
-	var value *types.ZendString = val.GetStr()
+	var value *types.String = val.GetStr()
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
 
@@ -77,7 +77,7 @@ func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) types.ZendBool {
 	}
 	return types.SUCCESS
 }
-func PhpMailBuildHeadersCheckFieldName(key *types.ZendString) types.ZendBool {
+func PhpMailBuildHeadersCheckFieldName(key *types.String) types.ZendBool {
 	var len_ int = 0
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2 */
@@ -90,7 +90,7 @@ func PhpMailBuildHeadersCheckFieldName(key *types.ZendString) types.ZendBool {
 	}
 	return types.SUCCESS
 }
-func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.ZendString, val *types.Zval) {
+func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zval) {
 	switch val.GetType() {
 	case types.IS_STRING:
 		if PhpMailBuildHeadersCheckFieldName(key) != types.SUCCESS {
@@ -111,8 +111,8 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.ZendString, val *types
 		core.PhpErrorDocref(nil, faults.E_WARNING, "headers array elements must be string or array (%s)", key.GetVal())
 	}
 }
-func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.ZendString, val *types.Zval) {
-	var tmp_key *types.ZendString
+func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.String, val *types.Zval) {
+	var tmp_key *types.String
 	var tmp_val *types.Zval
 	var __ht *types.HashTable = val.GetArr()
 	for _, _p := range __ht.foreachData() {
@@ -131,9 +131,9 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.ZendString, val *type
 		PhpMailBuildHeadersElem(s, key, tmp_val)
 	}
 }
-func PhpMailBuildHeaders(headers *types.Zval) *types.ZendString {
+func PhpMailBuildHeaders(headers *types.Zval) *types.String {
 	var idx zend.ZendUlong
-	var key *types.ZendString
+	var key *types.String
 	var val *types.Zval
 	var s zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(headers.IsType(types.IS_ARRAY))
@@ -232,9 +232,9 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var to *byte = nil
 	var message *byte = nil
 	var subject *byte = nil
-	var extra_cmd *types.ZendString = nil
-	var str_headers *types.ZendString = nil
-	var tmp_headers *types.ZendString
+	var extra_cmd *types.String = nil
+	var str_headers *types.String = nil
+	var tmp_headers *types.String
 	var headers *types.Zval = nil
 	var to_len int
 	var message_len int
@@ -275,7 +275,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if headers != nil {
 		switch headers.GetType() {
 		case types.IS_STRING:
-			tmp_headers = types.ZendStringInit(headers.GetStr().GetVal(), headers.GetStr().GetLen(), 0)
+			tmp_headers = types.ZendStringInit(headers.GetStr().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = PhpTrim(tmp_headers, nil, 0, 2)
 			types.ZendStringReleaseEx(tmp_headers, 0)
@@ -448,7 +448,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 
 			var tmp *byte
 			var curtime int64
-			var date_str *types.ZendString
+			var date_str *types.String
 			var len_ int
 			time(&curtime)
 			date_str = php_format_date("d-M-Y H:i:s e", 13, curtime, 1)
@@ -461,7 +461,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 	}
 	if core.PG__().mail_x_header {
 		var tmp *byte = zend.ZendGetExecutedFilename()
-		var f *types.ZendString
+		var f *types.String
 		f = PhpBasename(tmp, strlen(tmp), nil, 0)
 		if headers != nil && (*headers) {
 			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s\n%s", PhpGetuid(), f.GetVal(), headers)

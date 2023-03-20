@@ -85,10 +85,10 @@ func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *ZendOpArray, opline *ZendOp, node Z
 func RUN_TIME_CACHE(op_array __auto__) any {
 	return ZEND_MAP_PTR_GET(op_array.run_time_cache)
 }
-func ZendUnmanglePropertyName(mangled_property *types.ZendString, class_name **byte, prop_name **byte) int {
+func ZendUnmanglePropertyName(mangled_property *types.String, class_name **byte, prop_name **byte) int {
 	return ZendUnmanglePropertyNameEx(mangled_property, class_name, prop_name, nil)
 }
-func ZendGetUnmangledPropertyName(mangled_prop *types.ZendString) *byte {
+func ZendGetUnmangledPropertyName(mangled_prop *types.String) *byte {
 	var class_name *byte
 	var prop_name *byte
 	ZendUnmanglePropertyName(mangled_prop, &class_name, &prop_name)
@@ -161,12 +161,12 @@ func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
 	types.ZendStringRelease(property_info.GetName())
 	Free(property_info)
 }
-func ZendBuildRuntimeDefinitionKey(name *types.ZendString, start_lineno uint32) *types.ZendString {
-	var filename *types.ZendString = CG__().GetActiveOpArray().GetFilename()
-	var result *types.ZendString = ZendStrpprintf(0, "%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
+	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
+	var result *types.String = ZendStrpprintf(0, "%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.ZendNewInternedString(result)
 }
-func ZendGetUnqualifiedName(name *types.ZendString, result **byte, result_len *int) types.ZendBool {
+func ZendGetUnqualifiedName(name *types.String, result **byte, result_len *int) types.ZendBool {
 	var ns_separator *byte = ZendMemrchr(name.GetVal(), '\\', name.GetLen())
 	if ns_separator != nil {
 		*result = ns_separator + 1
@@ -175,7 +175,7 @@ func ZendGetUnqualifiedName(name *types.ZendString, result **byte, result_len *i
 	}
 	return 0
 }
-func ZendIsReservedClassName(name *types.ZendString) types.ZendBool {
+func ZendIsReservedClassName(name *types.String) types.ZendBool {
 	var reserved *ReservedClassName = ReservedClassNames
 	var uqname *byte = name.GetVal()
 	var uqname_len int = name.GetLen()
@@ -187,12 +187,12 @@ func ZendIsReservedClassName(name *types.ZendString) types.ZendBool {
 	}
 	return 0
 }
-func ZendAssertValidClassName(name *types.ZendString) {
+func ZendAssertValidClassName(name *types.String) {
 	if ZendIsReservedClassName(name) != 0 {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", name.GetVal())
 	}
 }
-func ZendLookupBuiltinTypeByName(name *types.ZendString) types.ZendUchar {
+func ZendLookupBuiltinTypeByName(name *types.String) types.ZendUchar {
 	var info *BuiltinTypeInfo = &BuiltinTypes[0]
 	for ; info.GetName() != nil; info++ {
 		if name.GetLen() == info.GetNameLen() && ZendBinaryStrcasecmp(name.GetVal(), name.GetLen(), info.GetName(), info.GetNameLen()) == 0 {
@@ -275,7 +275,7 @@ func ZendInitCompilerDataStructures() {
 	CG__().SetMemoizedExprs(nil)
 	CG__().SetMemoizeMode(0)
 }
-func ZendRegisterSeenSymbol(name *types.ZendString, kind uint32) {
+func ZendRegisterSeenSymbol(name *types.String, kind uint32) {
 	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	if zv != nil {
 		zv.SetLval(zv.GetLval() | kind)
@@ -285,7 +285,7 @@ func ZendRegisterSeenSymbol(name *types.ZendString, kind uint32) {
 		FC__().GetSeenSymbols().KeyAddNew(name.GetStr(), &tmp)
 	}
 }
-func ZendHaveSeenSymbol(name *types.ZendString, kind uint32) types.ZendBool {
+func ZendHaveSeenSymbol(name *types.String, kind uint32) types.ZendBool {
 	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	return zv != nil && (zv.GetLval()&kind) != 0
 }
@@ -321,16 +321,16 @@ func ZendSetCompiledFilename(new_compiled_filename string) {
 		CG__().filenamesTable[new_compiled_filename] = new_compiled_filename
 	}
 }
-func ZendRestoreCompiledFilename(original_compiled_filename *types.ZendString) {
+func ZendRestoreCompiledFilename(original_compiled_filename *types.String) {
 	CG__().SetCompiledFilename(original_compiled_filename)
 }
-func ZendGetCompiledFilename() *types.ZendString { return CG__().GetCompiledFilename() }
-func ZendGetCompiledLineno() int                 { return CG__().GetZendLineno() }
-func ZendIsCompiling() types.ZendBool            { return CG__().GetInCompilation() }
+func ZendGetCompiledFilename() *types.String { return CG__().GetCompiledFilename() }
+func ZendGetCompiledLineno() int             { return CG__().GetZendLineno() }
+func ZendIsCompiling() types.ZendBool        { return CG__().GetInCompilation() }
 func GetTemporaryVariable() uint32 {
 	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }
-func LookupCv(name *types.ZendString) int {
+func LookupCv(name *types.String) int {
 	var op_array *ZendOpArray = CG__().GetActiveOpArray()
 	var i int = 0
 	var hash_value ZendUlong = name.GetHash()
@@ -378,7 +378,7 @@ func ZendAddLiteral(zv *types.Zval) int {
 	ZendInsertLiteral(op_array, zv, i)
 	return i
 }
-func ZendAddLiteralString(str **types.ZendString) int {
+func ZendAddLiteralString(str **types.String) int {
 	var ret int
 	var zv types.Zval
 	zv.SetString(*str)
@@ -386,18 +386,18 @@ func ZendAddLiteralString(str **types.ZendString) int {
 	*str = zv.GetStr()
 	return ret
 }
-func ZendAddFuncNameLiteral(name *types.ZendString) int {
+func ZendAddFuncNameLiteral(name *types.String) int {
 	/* Original name */
 
 	var ret int = ZendAddLiteralString(&name)
 
 	/* Lowercased name */
 
-	var lc_name *types.ZendString = ZendStringTolower(name)
+	var lc_name *types.String = ZendStringTolower(name)
 	ZendAddLiteralString(&lc_name)
 	return ret
 }
-func ZendAddNsFuncNameLiteral(name *types.ZendString) int {
+func ZendAddNsFuncNameLiteral(name *types.String) int {
 	var unqualified_name *byte
 	var unqualified_name_len int
 
@@ -407,7 +407,7 @@ func ZendAddNsFuncNameLiteral(name *types.ZendString) int {
 
 	/* Lowercased name */
 
-	var lc_name *types.ZendString = ZendStringTolower(name)
+	var lc_name *types.String = ZendStringTolower(name)
 	ZendAddLiteralString(&lc_name)
 
 	/* Lowercased unqualfied name */
@@ -419,19 +419,19 @@ func ZendAddNsFuncNameLiteral(name *types.ZendString) int {
 	}
 	return ret
 }
-func ZendAddClassNameLiteral(name *types.ZendString) int {
+func ZendAddClassNameLiteral(name *types.String) int {
 	/* Original name */
 
 	var ret int = ZendAddLiteralString(&name)
 
 	/* Lowercased name */
 
-	var lc_name *types.ZendString = ZendStringTolower(name)
+	var lc_name *types.String = ZendStringTolower(name)
 	ZendAddLiteralString(&lc_name)
 	return ret
 }
-func ZendAddConstNameLiteral(name *types.ZendString, unqualified types.ZendBool) int {
-	var tmp_name *types.ZendString
+func ZendAddConstNameLiteral(name *types.String, unqualified types.ZendBool) int {
+	var tmp_name *types.String
 	var ret int = ZendAddLiteralString(&name)
 	var ns_len int = 0
 	var after_ns_len int = name.GetLen()
@@ -443,7 +443,7 @@ func ZendAddConstNameLiteral(name *types.ZendString, unqualified types.ZendBool)
 
 		/* lowercased namespace name & original constant name */
 
-		tmp_name = types.ZendStringInit(name.GetVal(), name.GetLen(), 0)
+		tmp_name = types.ZendStringInit(name.GetStr())
 		ZendStrTolower(tmp_name.GetVal(), ns_len)
 		ZendAddLiteralString(&tmp_name)
 
@@ -460,7 +460,7 @@ func ZendAddConstNameLiteral(name *types.ZendString, unqualified types.ZendBool)
 
 	/* original unqualified constant name */
 
-	tmp_name = types.ZendStringInit(after_ns, after_ns_len, 0)
+	tmp_name = types.ZendStringInit(b.CastStr(after_ns, after_ns_len))
 	ZendAddLiteralString(&tmp_name)
 
 	/* lowercased unqualified constant name */
@@ -470,7 +470,7 @@ func ZendAddConstNameLiteral(name *types.ZendString, unqualified types.ZendBool)
 	ZendAddLiteralString(&tmp_name)
 	return ret
 }
-func LITERAL_STR(op ZnodeOp, str *types.ZendString) {
+func LITERAL_STR(op ZnodeOp, str *types.String) {
 	var _c types.Zval
 	_c.SetString(str)
 	op.SetConstant(ZendAddLiteral(&_c))
@@ -617,21 +617,21 @@ func ZendConcat3(
 	str2_len int,
 	str3 *byte,
 	str3_len int,
-) *types.ZendString {
+) *types.String {
 	var len_ int = str1_len + str2_len + str3_len
-	var res *types.ZendString = types.ZendStringAlloc(len_, 0)
+	var res *types.String = types.ZendStringAlloc(len_, 0)
 	memcpy(res.GetVal(), str1, str1_len)
 	memcpy(res.GetVal()+str1_len, str2, str2_len)
 	memcpy(res.GetVal()+str1_len+str2_len, str3, str3_len)
 	res.GetVal()[len_] = '0'
 	return res
 }
-func ZendConcatNames(name1 *byte, name1_len int, name2 *byte, name2_len int) *types.ZendString {
+func ZendConcatNames(name1 *byte, name1_len int, name2 *byte, name2_len int) *types.String {
 	return ZendConcat3(name1, name1_len, "\\", 1, name2, name2_len)
 }
-func ZendPrefixWithNs(name *types.ZendString) *types.ZendString {
+func ZendPrefixWithNs(name *types.String) *types.String {
 	if FC__().GetCurrentNamespace() != nil {
-		var ns *types.ZendString = FC__().GetCurrentNamespace()
+		var ns *types.String = FC__().GetCurrentNamespace()
 		return ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
 	} else {
 		return name.Copy()
@@ -639,14 +639,14 @@ func ZendPrefixWithNs(name *types.ZendString) *types.ZendString {
 }
 func ZendHashFindPtrLc(ht *types.HashTable, str *byte, len_ int) any {
 	var result any
-	var lcname *types.ZendString
+	var lcname *types.String
 	types.ZSTR_ALLOCA_ALLOC(lcname, len_)
 	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
 	result = types.ZendHashFindPtr(ht, lcname)
 	lcname.Free()
 	return result
 }
-func ZendResolveNonClassName(name *types.ZendString, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.HashTable) *types.ZendString {
+func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.HashTable) *types.String {
 	var compound *byte
 	*is_fully_qualified = 0
 	if name.GetVal()[0] == '\\' {
@@ -654,7 +654,7 @@ func ZendResolveNonClassName(name *types.ZendString, type_ uint32, is_fully_qual
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
 
 		*is_fully_qualified = 1
-		return types.ZendStringInit(name.GetVal()+1, name.GetLen()-1, 0)
+		return types.ZendStringInit(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 	}
 	if type_ == ZEND_NAME_FQ {
 		*is_fully_qualified = 1
@@ -668,7 +668,7 @@ func ZendResolveNonClassName(name *types.ZendString, type_ uint32, is_fully_qual
 
 		/* If an unqualified name is a function/const alias, replace it. */
 
-		var import_name *types.ZendString
+		var import_name *types.String
 		if case_sensitive != 0 {
 			import_name = types.ZendHashFindPtr(current_import_sub, name)
 		} else {
@@ -688,7 +688,7 @@ func ZendResolveNonClassName(name *types.ZendString, type_ uint32, is_fully_qual
 		/* If the first part of a qualified name is an alias, substitute it. */
 
 		var len_ int = compound - name.GetVal()
-		var import_name *types.ZendString = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
+		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
 		if import_name != nil {
 			return ZendConcatNames(import_name.GetVal(), import_name.GetLen(), name.GetVal()+len_+1, name.GetLen()-len_-1)
 		}

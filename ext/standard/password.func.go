@@ -33,7 +33,7 @@ func PhpPasswordSaltIsAlphabet(str *byte, len_ int) int {
 }
 func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 	var pos int = 0
-	var buffer *types.ZendString
+	var buffer *types.String
 	if int(str_len < 0) != 0 {
 		return types.FAILURE
 	}
@@ -58,9 +58,9 @@ func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 	types.ZendStringFree(buffer)
 	return types.SUCCESS
 }
-func PhpPasswordMakeSalt(length int) *types.ZendString {
-	var ret *types.ZendString
-	var buffer *types.ZendString
+func PhpPasswordMakeSalt(length int) *types.String {
+	var ret *types.String
+	var buffer *types.String
 	if length > core.INT_MAX/3 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Length is too large to safely generate")
 		return nil
@@ -82,8 +82,8 @@ func PhpPasswordMakeSalt(length int) *types.ZendString {
 	ret.GetVal()[length] = 0
 	return ret
 }
-func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *types.HashTable) *types.ZendString {
-	var buffer *types.ZendString
+func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *types.HashTable) *types.String {
+	var buffer *types.String
 	var option_buffer *types.Zval
 	if options == nil || !(b.Assign(&option_buffer, options.KeyFind("salt"))) {
 		return PhpPasswordMakeSalt(required_salt_len)
@@ -131,7 +131,7 @@ func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *typ
 		return nil
 	}
 	if PhpPasswordSaltIsAlphabet(buffer.GetVal(), buffer.GetLen()) == types.FAILURE {
-		var salt *types.ZendString = types.ZendStringAlloc(required_salt_len, 0)
+		var salt *types.String = types.ZendStringAlloc(required_salt_len, 0)
 		if PhpPasswordSaltTo64(buffer.GetVal(), buffer.GetLen(), required_salt_len, salt.GetVal()) == types.FAILURE {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Provided salt is too short: %zd", buffer.GetLen())
 			types.ZendStringReleaseEx(salt, 0)
@@ -141,17 +141,17 @@ func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *typ
 		types.ZendStringReleaseEx(buffer, 0)
 		return salt
 	} else {
-		var salt *types.ZendString = types.ZendStringAlloc(required_salt_len, 0)
+		var salt *types.String = types.ZendStringAlloc(required_salt_len, 0)
 		memcpy(salt.GetVal(), buffer.GetVal(), required_salt_len)
 		types.ZendStringReleaseEx(buffer, 0)
 		return salt
 	}
 }
-func PhpPasswordBcryptValid(hash *types.ZendString) types.ZendBool {
+func PhpPasswordBcryptValid(hash *types.String) types.ZendBool {
 	var h *byte = hash.GetVal()
 	return hash.GetLen() == 60 && h[0] == '$' && h[1] == '2' && h[2] == 'y'
 }
-func PhpPasswordBcryptGetInfo(return_value *types.Zval, hash *types.ZendString) int {
+func PhpPasswordBcryptGetInfo(return_value *types.Zval, hash *types.String) int {
 	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	if PhpPasswordBcryptValid(hash) == 0 {
 
@@ -166,7 +166,7 @@ func PhpPasswordBcryptGetInfo(return_value *types.Zval, hash *types.ZendString) 
 	zend.AddAssocLong(return_value, "cost", cost)
 	return types.SUCCESS
 }
-func PhpPasswordBcryptNeedsRehash(hash *types.ZendString, options *types.ZendArray) types.ZendBool {
+func PhpPasswordBcryptNeedsRehash(hash *types.String, options *types.ZendArray) types.ZendBool {
 	var znew_cost *types.Zval
 	var old_cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	var new_cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
@@ -185,10 +185,10 @@ func PhpPasswordBcryptNeedsRehash(hash *types.ZendString, options *types.ZendArr
 	}
 	return old_cost != new_cost
 }
-func PhpPasswordBcryptVerify(password *types.ZendString, hash *types.ZendString) types.ZendBool {
+func PhpPasswordBcryptVerify(password *types.String, hash *types.String) types.ZendBool {
 	var i int
 	var status int = 0
-	var ret *types.ZendString = PhpCrypt(password.GetVal(), int(password.GetLen()), hash.GetVal(), int(hash.GetLen()), 1)
+	var ret *types.String = PhpCrypt(password.GetVal(), int(password.GetLen()), hash.GetVal(), int(hash.GetLen()), 1)
 	if ret == nil {
 		return 0
 	}
@@ -208,12 +208,12 @@ func PhpPasswordBcryptVerify(password *types.ZendString, hash *types.ZendString)
 	types.ZendStringFree(ret)
 	return status == 0
 }
-func PhpPasswordBcryptHash(password *types.ZendString, options *types.ZendArray) *types.ZendString {
+func PhpPasswordBcryptHash(password *types.String, options *types.ZendArray) *types.String {
 	var hash_format []byte
 	var hash_format_len int
-	var result *types.ZendString
-	var hash *types.ZendString
-	var salt *types.ZendString
+	var result *types.String
+	var hash *types.String
+	var salt *types.String
 	var zcost *types.Zval
 	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	if options != nil && b.Assign(&zcost, options.KeyFind("cost")) != nil {
@@ -261,12 +261,12 @@ func ZmShutdownPassword(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func PhpPasswordAlgoDefault() *PhpPasswordAlgo { return &PhpPasswordAlgoBcrypt }
-func PhpPasswordAlgoFind(ident *types.ZendString) *PhpPasswordAlgo {
+func PhpPasswordAlgoFind(ident *types.String) *PhpPasswordAlgo {
 	var tmp *types.Zval
 	if ident == nil {
 		return nil
 	}
-	tmp = PhpPasswordAlgos.KeyFind((*types.ZendString)(ident).GetStr())
+	tmp = PhpPasswordAlgos.KeyFind((*types.String)(ident).GetStr())
 	if tmp == nil || tmp.GetType() != types.IS_PTR {
 		return nil
 	}
@@ -283,12 +283,12 @@ func PhpPasswordAlgoFindZvalEx(arg *types.Zval, default_algo *PhpPasswordAlgo) *
 		case 1:
 			return &PhpPasswordAlgoBcrypt
 		case 2:
-			var n *types.ZendString = types.ZendStringInit("argon2i", b.SizeOf("\"argon2i\"")-1, 0)
+			var n *types.String = types.ZendStringInit("argon2i")
 			var ret *PhpPasswordAlgo = PhpPasswordAlgoFind(n)
 			types.ZendStringRelease(n)
 			return ret
 		case 3:
-			var n *types.ZendString = types.ZendStringInit("argon2id", b.SizeOf("\"argon2id\"")-1, 0)
+			var n *types.String = types.ZendStringInit("argon2id")
 			var ret *PhpPasswordAlgo = PhpPasswordAlgoFind(n)
 			types.ZendStringRelease(n)
 			return ret
@@ -303,7 +303,7 @@ func PhpPasswordAlgoFindZvalEx(arg *types.Zval, default_algo *PhpPasswordAlgo) *
 func PhpPasswordAlgoFindZval(arg *types.Zval) *PhpPasswordAlgo {
 	return PhpPasswordAlgoFindZvalEx(arg, PhpPasswordAlgoDefault())
 }
-func PhpPasswordAlgoExtractIdent(hash *types.ZendString) *types.ZendString {
+func PhpPasswordAlgoExtractIdent(hash *types.String) *types.String {
 	var ident *byte
 	var ident_end *byte
 	if hash == nil || hash.GetLen() < 3 {
@@ -326,11 +326,11 @@ func PhpPasswordAlgoExtractIdent(hash *types.ZendString) *types.ZendString {
 		/* No terminating '$' */
 
 	}
-	return types.ZendStringInit(ident, ident_end-ident, 0)
+	return types.ZendStringInit(b.CastStr(ident, ident_end-ident))
 }
-func PhpPasswordAlgoIdentifyEx(hash *types.ZendString, default_algo *PhpPasswordAlgo) *PhpPasswordAlgo {
+func PhpPasswordAlgoIdentifyEx(hash *types.String, default_algo *PhpPasswordAlgo) *PhpPasswordAlgo {
 	var algo *PhpPasswordAlgo
-	var ident *types.ZendString = PhpPasswordAlgoExtractIdent(hash)
+	var ident *types.String = PhpPasswordAlgoExtractIdent(hash)
 	if ident == nil {
 		return default_algo
 	}
@@ -344,8 +344,8 @@ func PhpPasswordAlgoIdentifyEx(hash *types.ZendString, default_algo *PhpPassword
 }
 func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var algo *PhpPasswordAlgo
-	var hash *types.ZendString
-	var ident *types.ZendString
+	var hash *types.String
+	var ident *types.String
 	var options types.Zval
 	for {
 		var _flags int = 0
@@ -390,7 +390,7 @@ func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *types.Z
 func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var old_algo *PhpPasswordAlgo
 	var new_algo *PhpPasswordAlgo
-	var hash *types.ZendString
+	var hash *types.String
 	var znew_algo *types.Zval
 	var options *types.ZendArray = 0
 	for {
@@ -432,8 +432,8 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 	return
 }
 func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var password *types.ZendString
-	var hash *types.ZendString
+	var password *types.String
+	var hash *types.String
 	var algo *PhpPasswordAlgo
 	for {
 		var _flags int = 0
@@ -458,8 +458,8 @@ func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *types.Zv
 	return
 }
 func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var password *types.ZendString
-	var digest *types.ZendString = nil
+	var password *types.String
+	var digest *types.String = nil
 	var zalgo *types.Zval
 	var algo *PhpPasswordAlgo
 	var options *types.ZendArray = nil
@@ -484,7 +484,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 	}
 	algo = PhpPasswordAlgoFindZval(zalgo)
 	if algo == nil {
-		var algostr *types.ZendString = zend.ZvalGetString(zalgo)
+		var algostr *types.String = zend.ZvalGetString(zalgo)
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown password hashing algorithm: %s", algostr.GetVal())
 		types.ZendStringRelease(algostr)
 		return_value.SetNull()
@@ -502,7 +502,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 	return
 }
 func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var algo *types.ZendString
+	var algo *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

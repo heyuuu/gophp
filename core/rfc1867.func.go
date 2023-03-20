@@ -109,7 +109,7 @@ func RegisterHttpPostFilesVariableEx(var_ *byte, val *types.Zval, http_post_file
 	SafePhpRegisterVariableEx(var_, val, http_post_files, override_protection)
 }
 func FreeFilename(el *types.Zval) {
-	var filename *types.ZendString = el.GetStr()
+	var filename *types.String = el.GetStr()
 	types.ZendStringReleaseEx(filename, 0)
 }
 func DestroyUploadedFilesHash() {
@@ -119,7 +119,7 @@ func DestroyUploadedFilesHash() {
 		var _z *types.Zval = _p.GetVal()
 
 		el = _z
-		var filename *types.ZendString = el.GetStr()
+		var filename *types.String = el.GetStr()
 		zend.VCWD_UNLINK(filename.GetVal())
 	}
 	SG__().rfc1867_uploaded_files.Destroy()
@@ -521,7 +521,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	var array_index *byte = nil
 	var lbuf *byte = nil
 	var abuf *byte = nil
-	var temp_filename *types.ZendString = nil
+	var temp_filename *types.String = nil
 	var boundary_len int = 0
 	var cancel_upload int = 0
 	var is_arr_upload int = 0

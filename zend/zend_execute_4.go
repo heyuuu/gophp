@@ -116,7 +116,7 @@ func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *typ
 func ZendUndefinedOffset(lval ZendLong) {
 	faults.Error(faults.E_NOTICE, "Undefined offset: "+ZEND_LONG_FMT, lval)
 }
-func ZendUndefinedIndex(offset *types.ZendString) {
+func ZendUndefinedIndex(offset *types.String) {
 	faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetVal())
 }
 func ZendUndefinedOffsetWrite(ht *types.HashTable, lval ZendLong) int {
@@ -136,7 +136,7 @@ func ZendUndefinedOffsetWrite(ht *types.HashTable, lval ZendLong) int {
 	}
 	return types.SUCCESS
 }
-func ZendUndefinedIndexWrite(ht *types.HashTable, offset *types.ZendString) int {
+func ZendUndefinedIndexWrite(ht *types.HashTable, offset *types.String) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
@@ -153,7 +153,7 @@ func ZendUndefinedIndexWrite(ht *types.HashTable, offset *types.ZendString) int 
 	}
 	return types.SUCCESS
 }
-func ZendUndefinedMethod(ce *types.ClassEntry, method *types.ZendString) {
+func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
 	faults.ThrowError(nil, "Call to undefined method %s::%s()", ce.GetName().GetVal(), method.GetVal())
 }
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
@@ -235,7 +235,7 @@ func SlowIndexConvert(ht *types.HashTable, dim *types.Zval, value *types.ZendVal
 }
 func ZendFetchDimensionAddressInner(ht *types.HashTable, dim *types.Zval, dim_type int, type_ int, executeData *ZendExecuteData) *types.Zval {
 	var retval *types.Zval = nil
-	var offset_key *types.ZendString
+	var offset_key *types.String
 	var hval ZendUlong
 try_again:
 	if dim.IsLong() {

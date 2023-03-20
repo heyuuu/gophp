@@ -22,7 +22,7 @@ type PhpStdioStreamData struct {
 	is_seekable      unsigned
 	_reserved        unsigned
 	lock_flag        int
-	temp_name        *types.ZendString
+	temp_name        *types.String
 	last_op          byte
 	last_mapped_addr *byte
 	last_mapped_len  int
@@ -40,7 +40,7 @@ type PhpStdioStreamData struct {
 // is_seekable unsigned,
 // _reserved unsigned,
 // lock_flag int,
-// temp_name *zend.ZendString,
+// temp_name *zend.String,
 // last_op byte,
 // last_mapped_addr *byte,
 // last_mapped_len int,
@@ -86,15 +86,15 @@ func (this *PhpStdioStreamData) SetIsSeekable(value unsigned)     { this.is_seek
 // func (this *PhpStdioStreamData)  GetReserved() unsigned      { return this._reserved }
 // func (this *PhpStdioStreamData) SetReserved(value unsigned) { this._reserved = value }
 // func (this *PhpStdioStreamData)  GetLockFlag() int      { return this.lock_flag }
-func (this *PhpStdioStreamData) SetLockFlag(value int)               { this.lock_flag = value }
-func (this *PhpStdioStreamData) GetTempName() *types.ZendString      { return this.temp_name }
-func (this *PhpStdioStreamData) SetTempName(value *types.ZendString) { this.temp_name = value }
-func (this *PhpStdioStreamData) GetLastOp() byte                     { return this.last_op }
-func (this *PhpStdioStreamData) SetLastOp(value byte)                { this.last_op = value }
-func (this *PhpStdioStreamData) GetLastMappedAddr() *byte            { return this.last_mapped_addr }
-func (this *PhpStdioStreamData) SetLastMappedAddr(value *byte)       { this.last_mapped_addr = value }
-func (this *PhpStdioStreamData) GetLastMappedLen() int               { return this.last_mapped_len }
-func (this *PhpStdioStreamData) SetLastMappedLen(value int)          { this.last_mapped_len = value }
-func (this *PhpStdioStreamData) GetSb() zend.ZendStatT               { return this.sb }
+func (this *PhpStdioStreamData) SetLockFlag(value int)           { this.lock_flag = value }
+func (this *PhpStdioStreamData) GetTempName() *types.String      { return this.temp_name }
+func (this *PhpStdioStreamData) SetTempName(value *types.String) { this.temp_name = value }
+func (this *PhpStdioStreamData) GetLastOp() byte                 { return this.last_op }
+func (this *PhpStdioStreamData) SetLastOp(value byte)            { this.last_op = value }
+func (this *PhpStdioStreamData) GetLastMappedAddr() *byte        { return this.last_mapped_addr }
+func (this *PhpStdioStreamData) SetLastMappedAddr(value *byte)   { this.last_mapped_addr = value }
+func (this *PhpStdioStreamData) GetLastMappedLen() int           { return this.last_mapped_len }
+func (this *PhpStdioStreamData) SetLastMappedLen(value int)      { this.last_mapped_len = value }
+func (this *PhpStdioStreamData) GetSb() zend.ZendStatT           { return this.sb }
 
 // func (this *PhpStdioStreamData) SetSb(value zend.ZendStatT) { this.sb = value }

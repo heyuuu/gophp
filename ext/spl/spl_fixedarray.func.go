@@ -476,7 +476,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 	num = types.Z_ARRVAL_P(data).GetNNumOfElements()
 	if num > 0 && save_indexes != 0 {
 		var element *types.Zval
-		var str_index *types.ZendString
+		var str_index *types.String
 		var num_index zend.ZendUlong
 		var max_index zend.ZendUlong = 0
 		var tmp zend.ZendLong

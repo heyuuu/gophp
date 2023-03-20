@@ -97,7 +97,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var formatcount int = 0
 	var outputpos int = 0
 	var outputsize int = 0
-	var output *types.ZendString
+	var output *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -412,8 +412,8 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fallthrough
 		case 'Z':
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
-			var tmp_str *types.ZendString
-			var str *types.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var tmp_str *types.String
+			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			memset(&output.GetVal()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
 			memcpy(&output.GetVal()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
@@ -423,8 +423,8 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		case 'H':
 			var nibbleshift int = b.Cond(code == 'h', 0, 4)
 			var first int = 1
-			var tmp_str *types.ZendString
-			var str *types.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
+			var tmp_str *types.String
+			var str *types.String = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			var v *byte = str.GetVal()
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
@@ -606,8 +606,8 @@ func PhpUnpack(data *byte, size int, issigned int, map_ *int) zend.ZendLong {
 func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var format *byte
 	var input *byte
-	var formatarg *types.ZendString
-	var inputarg *types.ZendString
+	var formatarg *types.String
+	var inputarg *types.String
 	var formatlen zend.ZendLong
 	var inputpos zend.ZendLong
 	var inputlen zend.ZendLong
@@ -868,7 +868,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 					var len_ zend.ZendLong = (inputlen - inputpos) * 2
 					var nibbleshift int = b.Cond(type_ == 'h', 0, 4)
 					var first int = 1
-					var buf *types.ZendString
+					var buf *types.String
 					var ipos zend.ZendLong
 					var opos zend.ZendLong
 

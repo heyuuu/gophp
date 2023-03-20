@@ -15,7 +15,7 @@ type ZendInternalFunction struct {
 	type_             types.ZendUchar
 	arg_flags         []types.ZendUchar
 	fn_flags          uint32
-	function_name     *types.ZendString
+	function_name     *types.String
 	scope             *types.ClassEntry
 	prototype         *ZendFunction
 	num_args          uint32
@@ -32,7 +32,7 @@ func NewInternalFunction() *ZendInternalFunction {
 
 func NewInternalFunctionEx(funcName string, handler ZifHandler) *ZendInternalFunction {
 	return &ZendInternalFunction{
-		function_name: types.NewZendString(funcName),
+		function_name: types.NewString(funcName),
 		handler:       handler,
 	}
 }
@@ -43,7 +43,7 @@ func MakeInternalFunctionSimplify(handler ZifHandler) ZendInternalFunction {
 
 func (this *ZendInternalFunction) InitByEntry(entry *types.ZendFunctionEntry) {
 	this.handler = entry.Handler()
-	this.function_name = types.NewZendString(entry.FuncName())
+	this.function_name = types.NewString(entry.FuncName())
 	this.prototype = nil
 }
 
@@ -54,9 +54,9 @@ func (this *ZendInternalFunction) SetType(value types.ZendUchar) { this.type_ = 
 // func (this *ZendInternalFunction)  GetArgFlags() []ZendUchar      { return this.arg_flags }
 // func (this *ZendInternalFunction) SetArgFlags(value []ZendUchar) { this.arg_flags = value }
 // func (this *ZendInternalFunction)  GetFnFlags() uint32      { return this.fn_flags }
-func (this *ZendInternalFunction) SetFnFlags(value uint32)            { this.fn_flags = value }
-func (this *ZendInternalFunction) GetFunctionName() *types.ZendString { return this.function_name }
-func (this *ZendInternalFunction) SetFunctionName(value *types.ZendString) {
+func (this *ZendInternalFunction) SetFnFlags(value uint32)        { this.fn_flags = value }
+func (this *ZendInternalFunction) GetFunctionName() *types.String { return this.function_name }
+func (this *ZendInternalFunction) SetFunctionName(value *types.String) {
 	this.function_name = value
 }
 

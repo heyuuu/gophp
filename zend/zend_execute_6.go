@@ -249,8 +249,8 @@ func ZendFetchStaticPropertyAddressEx(
 	executeData *ZendExecuteData,
 ) int {
 	var free_op1 ZendFreeOp
-	var name *types.ZendString
-	var tmp_name *types.ZendString
+	var name *types.String
+	var tmp_name *types.String
 	var ce *types.ClassEntry
 	var property_info *ZendPropertyInfo
 	var op1_type types.ZendUchar = opline.GetOp1Type()

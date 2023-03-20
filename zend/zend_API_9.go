@@ -33,7 +33,7 @@ func ZendTryAssignTypedRefEmptyString(ref *types.ZendReference) int {
 	ZVAL_EMPTY_STRING(&tmp)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
-func ZendTryAssignTypedRefStr(ref *types.ZendReference, str *types.ZendString) int {
+func ZendTryAssignTypedRefStr(ref *types.ZendReference, str *types.String) int {
 	var tmp types.Zval
 	tmp.SetString(str)
 	return ZendTryAssignTypedRef(ref, &tmp)
@@ -68,11 +68,11 @@ func ZendTryAssignTypedRefZvalEx(ref *types.ZendReference, zv *types.Zval, stric
 	types.ZVAL_COPY_VALUE(&tmp, zv)
 	return ZendTryAssignTypedRefEx(ref, &tmp, strict)
 }
-func ZendDeclarePropertyEx(ce *types.ClassEntry, name *types.ZendString, property *types.Zval, access_type int, doc_comment *types.ZendString) int {
+func ZendDeclarePropertyEx(ce *types.ClassEntry, name *types.String, property *types.Zval, access_type int, doc_comment *types.String) int {
 	return ZendDeclareTypedProperty(ce, name, property, access_type, doc_comment, 0)
 }
 func ZendDeclareProperty(ce *types.ClassEntry, name *byte, name_length int, property *types.Zval, access_type int) int {
-	var key *types.ZendString = types.ZendStringInit(name, name_length, IsPersistentClass(ce))
+	var key *types.String = types.ZendStringInit(b.CastStr(name, name_length))
 	var ret int = ZendDeclarePropertyEx(ce, key, property, access_type, nil)
 	types.ZendStringRelease(key)
 	return ret
@@ -99,7 +99,7 @@ func ZendDeclarePropertyDouble(ce *types.ClassEntry, name *byte, name_length int
 }
 func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length int, value string, access_type int) int {
 	var property types.Zval
-	property.SetString(types.ZendStringInit(value, strlen(value), ce.GetType()&ZEND_INTERNAL_CLASS))
+	property.SetString(types.ZendStringInit(value))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclarePropertyStringl(
@@ -111,10 +111,10 @@ func ZendDeclarePropertyStringl(
 	access_type int,
 ) int {
 	var property types.Zval
-	property.SetString(types.ZendStringInit(value, value_len, ce.GetType()&ZEND_INTERNAL_CLASS))
+	property.SetString(types.ZendStringInit(b.CastStr(value, value_len)))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
-func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.ZendString, value *types.Zval, access_type int, doc_comment *types.ZendString) int {
+func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, access_type int, doc_comment *types.String) int {
 	var c *ZendClassConstant
 	if ce.IsInterface() {
 		if access_type != ZEND_ACC_PUBLIC {
@@ -146,11 +146,11 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.ZendString, va
 }
 func ZendDeclareClassConstant(ce *types.ClassEntry, name *byte, name_length int, value *types.Zval) int {
 	var ret int
-	var key *types.ZendString
+	var key *types.String
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		key = types.ZendStringInitInterned(name, name_length, 1)
 	} else {
-		key = types.ZendStringInit(name, name_length, 0)
+		key = types.ZendStringInit(b.CastStr(name, name_length))
 	}
 	ret = ZendDeclareClassConstantEx(ce, key, value, ZEND_ACC_PUBLIC, nil)
 	types.ZendStringRelease(key)
@@ -178,13 +178,13 @@ func ZendDeclareClassConstantDouble(ce *types.ClassEntry, name *byte, name_lengt
 }
 func ZendDeclareClassConstantStringl(ce *types.ClassEntry, name *byte, name_length int, value *byte, value_length int) int {
 	var constant types.Zval
-	constant.SetString(types.ZendStringInit(value, value_length, ce.GetType()&ZEND_INTERNAL_CLASS))
+	constant.SetString(types.ZendStringInit(b.CastStr(value, value_length)))
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 func ZendDeclareClassConstantString(ce *types.ClassEntry, name *byte, name_length int, value *byte) int {
 	return ZendDeclareClassConstantStringl(ce, name, name_length, value, strlen(value))
 }
-func ZendUpdatePropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.ZendString, value *types.Zval) {
+func ZendUpdatePropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.String, value *types.Zval) {
 	var property types.Zval
 	var old_scope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
@@ -230,7 +230,7 @@ func ZendUpdatePropertyDouble(scope *types.ClassEntry, object *types.Zval, name 
 	tmp.SetDouble(value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
-func ZendUpdatePropertyStr(scope *types.ClassEntry, object *types.Zval, name *byte, name_length int, value *types.ZendString) {
+func ZendUpdatePropertyStr(scope *types.ClassEntry, object *types.Zval, name *byte, name_length int, value *types.String) {
 	var tmp types.Zval
 	tmp.SetString(value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
@@ -254,7 +254,7 @@ func ZendUpdatePropertyStringl(
 	tmp.SetRefcount(0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
-func ZendUpdateStaticPropertyEx(scope *types.ClassEntry, name *types.ZendString, value *types.Zval) int {
+func ZendUpdateStaticPropertyEx(scope *types.ClassEntry, name *types.String, value *types.Zval) int {
 	var property *types.Zval
 	var tmp types.Zval
 	var prop_info *ZendPropertyInfo
@@ -284,7 +284,7 @@ func ZendUpdateStaticPropertyEx(scope *types.ClassEntry, name *types.ZendString,
 	return types.SUCCESS
 }
 func ZendUpdateStaticProperty(scope *types.ClassEntry, name *byte, name_length int, value *types.Zval) int {
-	var key *types.ZendString = types.ZendStringInit(name, name_length, 0)
+	var key *types.String = types.ZendStringInit(b.CastStr(name, name_length))
 	var retval int = ZendUpdateStaticPropertyEx(scope, key, value)
 	types.ZendStringEfree(key)
 	return retval
@@ -321,7 +321,7 @@ func ZendUpdateStaticPropertyStringl(scope *types.ClassEntry, name *byte, name_l
 	tmp.SetRefcount(0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
-func ZendReadPropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.ZendString, silent types.ZendBool, rv *types.Zval) *types.Zval {
+func ZendReadPropertyEx(scope *types.ClassEntry, object *types.Zval, name *types.String, silent types.ZendBool, rv *types.Zval) *types.Zval {
 	var property types.Zval
 	var value *types.Zval
 	var old_scope *types.ClassEntry = EG__().GetFakeScope()
@@ -340,13 +340,13 @@ func ZendReadProperty(
 	rv *types.Zval,
 ) *types.Zval {
 	var value *types.Zval
-	var str *types.ZendString
-	str = types.ZendStringInit(name, name_length, 0)
+	var str *types.String
+	str = types.ZendStringInit(b.CastStr(name, name_length))
 	value = ZendReadPropertyEx(scope, object, str, silent, rv)
 	types.ZendStringReleaseEx(str, 0)
 	return value
 }
-func ZendReadStaticPropertyEx(scope *types.ClassEntry, name *types.ZendString, silent types.ZendBool) *types.Zval {
+func ZendReadStaticPropertyEx(scope *types.ClassEntry, name *types.String, silent types.ZendBool) *types.Zval {
 	var property *types.Zval
 	var old_scope *types.ClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
@@ -355,7 +355,7 @@ func ZendReadStaticPropertyEx(scope *types.ClassEntry, name *types.ZendString, s
 	return property
 }
 func ZendReadStaticProperty(scope *types.ClassEntry, name *byte, name_length int, silent types.ZendBool) *types.Zval {
-	var key *types.ZendString = types.ZendStringInit(name, name_length, 0)
+	var key *types.String = types.ZendStringInit(b.CastStr(name, name_length))
 	var property *types.Zval = ZendReadStaticPropertyEx(scope, key, silent)
 	types.ZendStringEfree(key)
 	return property
@@ -377,7 +377,7 @@ func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
 	EG__().SetErrorHandling(saved.GetHandling())
 	EG__().SetExceptionClass(saved.GetException())
 }
-func ZendFindAliasName(ce *types.ClassEntry, name *types.ZendString) *types.ZendString {
+func ZendFindAliasName(ce *types.ClassEntry, name *types.String) *types.String {
 	var alias *ZendTraitAlias
 	var alias_ptr **ZendTraitAlias
 	if b.Assign(&alias_ptr, ce.GetTraitAliases()) {
@@ -392,10 +392,10 @@ func ZendFindAliasName(ce *types.ClassEntry, name *types.ZendString) *types.Zend
 	}
 	return name
 }
-func ZendResolveMethodName(ce *types.ClassEntry, f *ZendFunction) *types.ZendString {
+func ZendResolveMethodName(ce *types.ClassEntry, f *ZendFunction) *types.String {
 	var func_ *ZendFunction
 	var function_table *types.HashTable
-	var name *types.ZendString
+	var name *types.String
 	if f.GetCommonType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
 		return f.GetFunctionName()
 	}

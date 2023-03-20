@@ -64,7 +64,7 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *types.
 	zend.AddNextIndexResource(return_value, s2.GetRes())
 }
 func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var host *types.ZendString
+	var host *types.String
 	var zerrno *types.Zval = nil
 	var zerrstr *types.Zval = nil
 	var zcontext *types.Zval = nil
@@ -75,7 +75,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *type
 	var stream *core.PhpStream = nil
 	var err int
 	var flags zend.ZendLong = PHP_STREAM_CLIENT_CONNECT
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	var context *core.PhpStreamContext = nil
 	return_value.SetFalse()
 	for {
@@ -122,7 +122,7 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *type
 
 		/* host might contain binary characters */
 
-		var quoted_host *types.ZendString = PhpAddslashes(host)
+		var quoted_host *types.String = PhpAddslashes(host)
 		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 		types.ZendStringReleaseEx(quoted_host, 0)
 	}
@@ -155,7 +155,7 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *type
 	var stream *core.PhpStream = nil
 	var err int = 0
 	var flags zend.ZendLong = streams.STREAM_XPORT_BIND | streams.STREAM_XPORT_LISTEN
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	var context *core.PhpStreamContext = nil
 	return_value.SetFalse()
 	for {
@@ -214,13 +214,13 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *type
 func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var timeout float64 = float64(FG(default_socket_timeout))
 	var zpeername *types.Zval = nil
-	var peername *types.ZendString = nil
+	var peername *types.String = nil
 	var conv PhpTimeoutUll
 	var tv __struct__timeval
 	var stream *core.PhpStream = nil
 	var clistream *core.PhpStream = nil
 	var zstream *types.Zval
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -268,7 +268,7 @@ func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *typ
 	var stream *core.PhpStream
 	var zstream *types.Zval
 	var want_peer types.ZendBool
-	var name *types.ZendString = nil
+	var name *types.String = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -351,9 +351,9 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ty
 	var stream *core.PhpStream
 	var zstream *types.Zval
 	var zremote *types.Zval = nil
-	var remote_addr *types.ZendString = nil
+	var remote_addr *types.String = nil
 	var to_read zend.ZendLong = 0
-	var read_buf *types.ZendString
+	var read_buf *types.String
 	var flags zend.ZendLong = 0
 	var recvd int
 	for {
@@ -406,7 +406,7 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *types
 	var zsrc *types.Zval
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
 	var desiredpos zend.ZendLong = -1
-	var contents *types.ZendString
+	var contents *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -556,7 +556,7 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *types
 }
 func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream_xport_hash *types.HashTable
-	var stream_xport *types.ZendString
+	var stream_xport *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -576,7 +576,7 @@ func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *typ
 }
 func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var url_stream_wrappers_hash *types.HashTable
-	var stream_protocol *types.ZendString
+	var stream_protocol *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -653,7 +653,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	var ht *types.HashTable
 	var stream *core.PhpStream
 	var ret int = 0
-	var key *types.ZendString
+	var key *types.String
 	var num_ind zend.ZendUlong
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
@@ -713,7 +713,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	var stream *core.PhpStream
 	var ret int = 0
 	var num_ind zend.ZendUlong
-	var key *types.ZendString
+	var key *types.String
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
@@ -927,8 +927,8 @@ func UserSpaceStreamNotifierDtor(notifier *streams.PhpStreamNotifier) {
 func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) int {
 	var wval *types.Zval
 	var oval *types.Zval
-	var wkey *types.ZendString
-	var okey *types.ZendString
+	var wkey *types.String
+	var okey *types.String
 	var ret int = types.SUCCESS
 	var __ht *types.HashTable = options.GetArr()
 	for _, _p := range __ht.foreachData() {
@@ -1389,7 +1389,7 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var str_len int = 0
 	var max_length zend.ZendLong
 	var zstream *types.Zval
-	var buf *types.ZendString
+	var buf *types.String
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0

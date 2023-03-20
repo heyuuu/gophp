@@ -140,7 +140,7 @@ func EAT_TRAILING_WHITESPACE_EX(ch char) {
 
 func EAT_TRAILING_WHITESPACE() { EAT_TRAILING_WHITESPACE_EX('X') }
 func ZendIniCopyValue(retval *types.Zval, str *byte, len_ int) {
-	retval.SetString(types.ZendStringInit(str, len_, ZEND_SYSTEM_INI))
+	retval.SetString(types.ZendStringInit(b.CastStr(str, len_)))
 }
 
 // #define RETURN_TOKEN(type,str,len) { if ( SCNG ( scanner_mode ) == ZEND_INI_SCANNER_TYPED && ( YYSTATE == STATE ( ST_VALUE ) || YYSTATE == STATE ( ST_RAW ) ) ) { zend_ini_copy_typed_value ( ini_lval , type , str , len ) ; } else { zend_ini_copy_value ( ini_lval , str , len ) ; } return type ; }

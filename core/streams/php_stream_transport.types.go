@@ -31,8 +31,8 @@ type PhpStreamXportParam struct {
 		client     *core.PhpStream
 		addr       *__struct__sockaddr
 		addrlen    socklen_t
-		textaddr   *types.ZendString
-		error_text *types.ZendString
+		textaddr   *types.String
+		error_text *types.String
 		returncode int
 		error_code int
 	}
@@ -74,11 +74,11 @@ func (this *PhpStreamXportParam) GetOutputsAddr() *__struct__sockaddr     { retu
 func (this *PhpStreamXportParam) GetOutputsAddrlen() socklen_t { return this.outputs.addrlen }
 
 // func (this *PhpStreamXportParam) SetOutputsAddrlen(value socklen_t) { this.outputs.addrlen = value }
-func (this *PhpStreamXportParam) GetTextaddr() *types.ZendString { return this.outputs.textaddr }
+func (this *PhpStreamXportParam) GetTextaddr() *types.String { return this.outputs.textaddr }
 
-// func (this *PhpStreamXportParam) SetTextaddr(value *zend.ZendString) { this.outputs.textaddr = value }
-func (this *PhpStreamXportParam) GetErrorText() *types.ZendString { return this.outputs.error_text }
-func (this *PhpStreamXportParam) SetErrorText(value *types.ZendString) {
+// func (this *PhpStreamXportParam) SetTextaddr(value *zend.String) { this.outputs.textaddr = value }
+func (this *PhpStreamXportParam) GetErrorText() *types.String { return this.outputs.error_text }
+func (this *PhpStreamXportParam) SetErrorText(value *types.String) {
 	this.outputs.error_text = value
 }
 func (this *PhpStreamXportParam) GetReturncode() int      { return this.outputs.returncode }

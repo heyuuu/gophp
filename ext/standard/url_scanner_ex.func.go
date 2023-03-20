@@ -12,7 +12,7 @@ import (
 func TagDtor(zv *types.Zval) { zend.Free(zv.GetPtr()) }
 func PhpIniOnUpdateTags(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -45,13 +45,13 @@ func PhpIniOnUpdateTags(
 		if val != nil {
 			var q *byte
 			var keylen int
-			var str *types.ZendString
+			var str *types.String
 			b.PostInc(&(*val)) = '0'
 			for q = key; *q; q++ {
 				*q = tolower(*q)
 			}
 			keylen = q - key
-			str = types.ZendStringInit(key, keylen, 1)
+			str = types.ZendStringInit(b.CastStr(key, keylen))
 			types.GC_MAKE_PERSISTENT_LOCAL(str)
 			types.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
 			types.ZendStringReleaseEx(str, 1)
@@ -62,7 +62,7 @@ func PhpIniOnUpdateTags(
 }
 func OnUpdateSessionTags(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -72,7 +72,7 @@ func OnUpdateSessionTags(
 }
 func OnUpdateOutputTags(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -82,7 +82,7 @@ func OnUpdateOutputTags(
 }
 func PhpIniOnUpdateHosts(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -105,14 +105,14 @@ func PhpIniOnUpdateHosts(
 	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var keylen int
-		var tmp_key *types.ZendString
+		var tmp_key *types.String
 		var q *byte
 		for q = key; *q; q++ {
 			*q = tolower(*q)
 		}
 		keylen = q - key
 		if keylen > 0 {
-			tmp_key = types.ZendStringInit(key, keylen, 0)
+			tmp_key = types.ZendStringInit(b.CastStr(key, keylen))
 			types.ZendHashAddEmptyElement(hosts, tmp_key)
 			types.ZendStringReleaseEx(tmp_key, 0)
 		}
@@ -122,7 +122,7 @@ func PhpIniOnUpdateHosts(
 }
 func OnUpdateSessionHosts(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -132,7 +132,7 @@ func OnUpdateSessionHosts(
 }
 func OnUpdateOutputHosts(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -171,7 +171,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	/* Check host whitelist. If it's not listed, do nothing. */
 
 	if url_parts.GetHost() != nil {
-		var tmp *types.ZendString = zend.ZendStringTolower(url_parts.GetHost())
+		var tmp *types.String = zend.ZendStringTolower(url_parts.GetHost())
 		if types.ZendHashExists(&(BG__().url_adapt_session_hosts_ht), tmp) == 0 {
 			types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
@@ -263,12 +263,12 @@ func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 func CheckHttpHost(target *byte) int {
 	var host *types.Zval
 	var tmp *types.Zval
-	var host_tmp *types.ZendString
+	var host_tmp *types.String
 	var colon *byte
 	if b.Assign(&tmp, zend.EG__().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(types.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(types.IS_STRING) {
-		host_tmp = types.ZendStringInit(host.GetStr().GetVal(), host.GetStr().
+		host_tmp = types.ZendStringInit(host.GetStr().GetStr(),
 
-			/* HTTP_HOST could be 'localhost:8888' etc. */ GetLen(), 0)
+		/* HTTP_HOST could be 'localhost:8888' etc. */)
 
 		colon = strchr(host_tmp.GetVal(), ':')
 		if colon != nil {
@@ -825,7 +825,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	var surl zend.SmartStr = zend.MakeSmartStr(0)
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	var url_app zend.SmartStr = zend.MakeSmartStr(0)
-	var encoded *types.ZendString
+	var encoded *types.String
 	surl.AppendString(b.CastStr(url, urllen))
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, strlen(name))
@@ -954,7 +954,7 @@ func PhpUrlScannerAddVarImpl(
 	var svalue zend.SmartStr = zend.MakeSmartStr(0)
 	var hname zend.SmartStr = zend.MakeSmartStr(0)
 	var hvalue zend.SmartStr = zend.MakeSmartStr(0)
-	var encoded *types.ZendString
+	var encoded *types.String
 	var url_state *UrlAdaptStateExT
 	var handler core.PhpOutputHandlerFuncT
 	if type_ != 0 {
@@ -1033,7 +1033,7 @@ func PhpUrlScannerResetVars() int {
 	PhpUrlScannerResetVarsImpl(0)
 	return types.SUCCESS
 }
-func PhpUrlScannerResetVarImpl(name *types.ZendString, encode int, type_ int) int {
+func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	var start *byte
 	var end *byte
 	var limit *byte
@@ -1042,7 +1042,7 @@ func PhpUrlScannerResetVarImpl(name *types.ZendString, encode int, type_ int) in
 	var hname zend.SmartStr = zend.MakeSmartStr(0)
 	var url_app zend.SmartStr = zend.MakeSmartStr(0)
 	var form_app zend.SmartStr = zend.MakeSmartStr(0)
-	var encoded *types.ZendString
+	var encoded *types.String
 	var ret int = types.SUCCESS
 	var sep_removed types.ZendBool = 0
 	var url_state *UrlAdaptStateExT
@@ -1155,10 +1155,10 @@ finish:
 	hname.Free()
 	return ret
 }
-func PhpUrlScannerResetSessionVar(name *types.ZendString, encode int) int {
+func PhpUrlScannerResetSessionVar(name *types.String, encode int) int {
 	return PhpUrlScannerResetVarImpl(name, encode, 1)
 }
-func PhpUrlScannerResetVar(name *types.ZendString, encode int) int {
+func PhpUrlScannerResetVar(name *types.String, encode int) int {
 	return PhpUrlScannerResetVarImpl(name, encode, 0)
 }
 func ZmStartupUrlScanner(type_ int, module_number int) int {

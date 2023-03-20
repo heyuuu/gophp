@@ -100,8 +100,8 @@ type ZendAstDecl struct {
 	end_lineno   uint32
 	flags        uint32
 	lex_pos      *uint8
-	doc_comment  *types.ZendString
-	name         *types.ZendString
+	doc_comment  *types.String
+	name         *types.String
 	child        []*ZendAst
 }
 
@@ -112,8 +112,8 @@ type ZendAstDecl struct {
 // end_lineno uint32,
 // flags uint32,
 // lex_pos *uint8,
-// doc_comment *ZendString,
-// name *ZendString,
+// doc_comment *String,
+// name *String,
 // child []*ZendAst,
 // ) ZendAstDecl {
 //                 return ZendAstDecl{
@@ -141,12 +141,12 @@ func (this *ZendAstDecl) GetFlags() uint32            { return this.flags }
 func (this *ZendAstDecl) SetFlags(value uint32)       { this.flags = value }
 
 // func (this *ZendAstDecl)  GetLexPos() *uint8      { return this.lex_pos }
-func (this *ZendAstDecl) SetLexPos(value *uint8)                { this.lex_pos = value }
-func (this *ZendAstDecl) GetDocComment() *types.ZendString      { return this.doc_comment }
-func (this *ZendAstDecl) SetDocComment(value *types.ZendString) { this.doc_comment = value }
-func (this *ZendAstDecl) GetName() *types.ZendString            { return this.name }
-func (this *ZendAstDecl) SetName(value *types.ZendString)       { this.name = value }
-func (this *ZendAstDecl) GetChild() []*ZendAst                  { return this.child }
+func (this *ZendAstDecl) SetLexPos(value *uint8)            { this.lex_pos = value }
+func (this *ZendAstDecl) GetDocComment() *types.String      { return this.doc_comment }
+func (this *ZendAstDecl) SetDocComment(value *types.String) { this.doc_comment = value }
+func (this *ZendAstDecl) GetName() *types.String            { return this.name }
+func (this *ZendAstDecl) SetName(value *types.String)       { this.name = value }
+func (this *ZendAstDecl) GetChild() []*ZendAst              { return this.child }
 
 // func (this *ZendAstDecl) SetChild(value []*ZendAst) { this.child = value }
 

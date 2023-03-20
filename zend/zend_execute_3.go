@@ -136,8 +136,8 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	faults.ThrowError(nil, "%s", msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
-	var tmp_property_name *types.ZendString
-	var property_name *types.ZendString = ZvalGetTmpString(property, &tmp_property_name)
+	var tmp_property_name *types.String
+	var property_name *types.String = ZvalGetTmpString(property, &tmp_property_name)
 	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
 	ZendTmpStringRelease(tmp_property_name)
 }
@@ -170,7 +170,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		/* Convert to string, just the time to pick the 1st byte */
 
-		var tmp *types.ZendString = ZvalTryGetStringFunc(value)
+		var tmp *types.String = ZvalTryGetStringFunc(value)
 		if tmp == nil {
 			if RETURN_VALUE_USED(opline) {
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
@@ -204,10 +204,10 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		memset(str.GetStr().GetVal()+old_len, ' ', offset-old_len)
 		str.GetStr().GetVal()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
-		str.SetString(types.ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
+		str.SetString(types.ZendStringInit(str.GetStr().GetStr()))
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		str.SetString(types.ZendStringInit(str.GetStr().GetVal(), str.GetStr().GetLen(), 0))
+		str.SetString(types.ZendStringInit(str.GetStr().GetStr()))
 	} else {
 		types.ZendStringForgetHashVal(str.GetStr())
 	}

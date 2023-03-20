@@ -151,7 +151,7 @@ func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 /**
  * 与 int/float 等类型不同，为空时 *dest 直接为 nil，不需单独的 is_null 字符安
  */
-func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.ZendString, ok bool) {
+func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, ok bool) {
 	// check null
 	if checkNull && arg.IsNull() {
 		return nil, true
@@ -171,7 +171,7 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.ZendStri
 	return
 }
 
-func ParseZStrWeak(arg *types.Zval) (*types.ZendString, bool) {
+func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	if arg.GetType() < types.IS_STRING {
 		zend.ConvertToString(arg)
 		return arg.GetStr(), true
@@ -227,7 +227,7 @@ func checkNullPath(s string) bool {
 	return len(s) != b.Strlen(s)
 }
 
-func ParsePathStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.ZendString, ok bool) {
+func ParsePathStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, ok bool) {
 	dest, ok = ParseZStr(arg, checkNull, weak)
 	if !ok {
 		return

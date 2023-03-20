@@ -101,7 +101,7 @@ func PhpStreamUrlWrapPhp(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var fd int = -1

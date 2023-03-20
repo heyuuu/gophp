@@ -191,7 +191,7 @@ func SplArrayObjectClone(zobject *types.Zval) *types.ZendObject {
 func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset *types.Zval, type_ int) *types.Zval {
 	var retval *types.Zval
 	var index zend.ZendLong
-	var offset_key *types.ZendString
+	var offset_key *types.String
 	var ht *types.HashTable = SplArrayGetHashTable(intern)
 	if offset == nil || offset.IsUndef() || ht == nil {
 		return zend.EG__().GetUninitializedZval()
@@ -645,7 +645,7 @@ func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) 
 }
 func SplArrayGetDebugInfo(obj *types.Zval) *types.HashTable {
 	var storage *types.Zval
-	var zname *types.ZendString
+	var zname *types.String
 	var base *types.ClassEntry
 	var intern *SplArrayObject = Z_SPLARRAY_P(obj)
 	if intern.GetStd().GetProperties() == nil {
@@ -740,7 +740,7 @@ func SplArrayCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	return result
 }
 func SplArraySkipProtected(intern *SplArrayObject, aht *types.HashTable) int {
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	var data *types.Zval
 	if SplArrayIsObject(intern) != 0 {
@@ -1034,7 +1034,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 	var aht *types.HashTable = SplArrayGetHashTable(intern)
 	if SplArrayIsObject(intern) != 0 {
 		var count zend.ZendLong = 0
-		var key *types.ZendString
+		var key *types.String
 		var val *types.Zval
 
 		/* Count public/dynamic properties */

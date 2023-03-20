@@ -105,8 +105,8 @@ type ZendObjectGetPropertiesForT func(object *types.Zval, purpose ZendPropPurpos
 
 /* Used to call methods */
 
-type ZendObjectCallMethodT func(method *types.ZendString, object *types.ZendObject, executeData *ZendExecuteData, return_value *types.Zval) int
-type ZendObjectGetMethodT func(object **types.ZendObject, method *types.ZendString, key *types.Zval) *ZendFunction
+type ZendObjectCallMethodT func(method *types.String, object *types.ZendObject, executeData *ZendExecuteData, return_value *types.Zval) int
+type ZendObjectGetMethodT func(object **types.ZendObject, method *types.String, key *types.Zval) *ZendFunction
 type ZendObjectGetConstructorT func(object *types.ZendObject) *ZendFunction
 
 /* Object maintenance/destruction */
@@ -118,7 +118,7 @@ type ZendObjectCloneObjT func(object *types.Zval) *types.ZendObject
 /* Get class name for display in var_dump and other debugging functions.
  * Must be defined and must return a non-NULL value. */
 
-type ZendObjectGetClassNameT func(object *types.ZendObject) *types.ZendString
+type ZendObjectGetClassNameT func(object *types.ZendObject) *types.String
 type ZendObjectCompareT func(object1 *types.Zval, object2 *types.Zval) int
 type ZendObjectCompareZvalsT func(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 

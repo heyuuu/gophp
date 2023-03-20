@@ -39,8 +39,8 @@ func (this *ZendConstant) Value() *types.Zval { return &this.value }
 func (this *ZendConstant) Flags() uint8       { return uint8(this.value.GetConstantFlags() & 0xff) }
 func (this *ZendConstant) ModuleNumber() int  { return int(this.value.GetConstantFlags() << 8) }
 
-func (this *ZendConstant) GetName() *types.ZendString      { return types.NewZendString(this.name) }
-func (this *ZendConstant) SetName(value *types.ZendString) { this.name = value.GetStr() }
+func (this *ZendConstant) GetName() *types.String      { return types.NewString(this.name) }
+func (this *ZendConstant) SetName(value *types.String) { this.name = value.GetStr() }
 
 /**
  * functions

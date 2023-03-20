@@ -83,7 +83,7 @@ func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval { return this.zoh }
  * PhpOutputHandler
  */
 type PhpOutputHandler struct {
-	name   *types.ZendString
+	name   *types.String
 	flags  int
 	level  int
 	size   int
@@ -96,15 +96,15 @@ type PhpOutputHandler struct {
 	}
 }
 
-func (this *PhpOutputHandler) GetName() *types.ZendString      { return this.name }
-func (this *PhpOutputHandler) SetName(value *types.ZendString) { this.name = value }
-func (this *PhpOutputHandler) GetFlags() int                   { return this.flags }
-func (this *PhpOutputHandler) SetFlags(value int)              { this.flags = value }
-func (this *PhpOutputHandler) GetLevel() int                   { return this.level }
-func (this *PhpOutputHandler) SetLevel(value int)              { this.level = value }
-func (this *PhpOutputHandler) GetSize() int                    { return this.size }
-func (this *PhpOutputHandler) SetSize(value int)               { this.size = value }
-func (this *PhpOutputHandler) GetBuffer() PhpOutputBuffer      { return this.buffer }
+func (this *PhpOutputHandler) GetName() *types.String      { return this.name }
+func (this *PhpOutputHandler) SetName(value *types.String) { this.name = value }
+func (this *PhpOutputHandler) GetFlags() int               { return this.flags }
+func (this *PhpOutputHandler) SetFlags(value int)          { this.flags = value }
+func (this *PhpOutputHandler) GetLevel() int               { return this.level }
+func (this *PhpOutputHandler) SetLevel(value int)          { this.level = value }
+func (this *PhpOutputHandler) GetSize() int                { return this.size }
+func (this *PhpOutputHandler) SetSize(value int)           { this.size = value }
+func (this *PhpOutputHandler) GetBuffer() PhpOutputBuffer  { return this.buffer }
 
 // func (this *PhpOutputHandler) SetBuffer(value PhpOutputBuffer) { this.buffer = value }
 func (this *PhpOutputHandler) GetOpaq() any                              { return this.opaq }

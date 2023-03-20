@@ -61,7 +61,7 @@ func ZendParseArgDoubleWeak(arg *types.Zval, dest *float64) int {
 	return 0
 }
 
-func ZendParseArgStrWeak(arg *types.Zval, dest **types.ZendString) int {
+func ZendParseArgStrWeak(arg *types.Zval, dest **types.String) int {
 	if val, ok := ParseZStrWeak(arg); ok {
 		*dest = val
 		return 1

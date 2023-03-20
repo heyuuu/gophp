@@ -11,29 +11,29 @@ import (
  * ZendClassName
  */
 type ZendClassName struct {
-	name    *types.ZendString
-	lc_name *types.ZendString
+	name    *types.String
+	lc_name *types.String
 }
 
-func (this *ZendClassName) GetName() *types.ZendString        { return this.name }
-func (this *ZendClassName) SetName(value *types.ZendString)   { this.name = value }
-func (this *ZendClassName) GetLcName() *types.ZendString      { return this.lc_name }
-func (this *ZendClassName) SetLcName(value *types.ZendString) { this.lc_name = value }
+func (this *ZendClassName) GetName() *types.String        { return this.name }
+func (this *ZendClassName) SetName(value *types.String)   { this.name = value }
+func (this *ZendClassName) GetLcName() *types.String      { return this.lc_name }
+func (this *ZendClassName) SetLcName(value *types.String) { this.lc_name = value }
 
 /**
  * ZendTraitMethodReference
  */
 type ZendTraitMethodReference struct {
-	method_name *types.ZendString
-	class_name  *types.ZendString
+	method_name *types.String
+	class_name  *types.String
 }
 
-func (this *ZendTraitMethodReference) GetMethodName() *types.ZendString { return this.method_name }
-func (this *ZendTraitMethodReference) SetMethodName(value *types.ZendString) {
+func (this *ZendTraitMethodReference) GetMethodName() *types.String { return this.method_name }
+func (this *ZendTraitMethodReference) SetMethodName(value *types.String) {
 	this.method_name = value
 }
-func (this *ZendTraitMethodReference) GetClassName() *types.ZendString      { return this.class_name }
-func (this *ZendTraitMethodReference) SetClassName(value *types.ZendString) { this.class_name = value }
+func (this *ZendTraitMethodReference) GetClassName() *types.String      { return this.class_name }
+func (this *ZendTraitMethodReference) SetClassName(value *types.String) { this.class_name = value }
 
 /**
  * ZendTraitPrecedence
@@ -41,13 +41,13 @@ func (this *ZendTraitMethodReference) SetClassName(value *types.ZendString) { th
 type ZendTraitPrecedence struct {
 	trait_method        ZendTraitMethodReference
 	num_excludes        uint32
-	exclude_class_names []*types.ZendString
+	exclude_class_names []*types.String
 }
 
 func (this *ZendTraitPrecedence) GetTraitMethod() ZendTraitMethodReference { return this.trait_method }
 func (this *ZendTraitPrecedence) GetNumExcludes() uint32                   { return this.num_excludes }
 func (this *ZendTraitPrecedence) SetNumExcludes(value uint32)              { this.num_excludes = value }
-func (this *ZendTraitPrecedence) GetExcludeClassNames() []*types.ZendString {
+func (this *ZendTraitPrecedence) GetExcludeClassNames() []*types.String {
 	return this.exclude_class_names
 }
 
@@ -56,13 +56,13 @@ func (this *ZendTraitPrecedence) GetExcludeClassNames() []*types.ZendString {
  */
 type ZendTraitAlias struct {
 	trait_method ZendTraitMethodReference
-	alias        *types.ZendString
+	alias        *types.String
 	modifiers    uint32
 }
 
 func (this *ZendTraitAlias) GetTraitMethod() ZendTraitMethodReference { return this.trait_method }
-func (this *ZendTraitAlias) GetAlias() *types.ZendString              { return this.alias }
-func (this *ZendTraitAlias) SetAlias(value *types.ZendString)         { this.alias = value }
+func (this *ZendTraitAlias) GetAlias() *types.String                  { return this.alias }
+func (this *ZendTraitAlias) SetAlias(value *types.String)             { this.alias = value }
 func (this *ZendTraitAlias) GetModifiers() uint32                     { return this.modifiers }
 func (this *ZendTraitAlias) SetModifiers(value uint32)                { this.modifiers = value }
 

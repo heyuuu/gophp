@@ -31,8 +31,8 @@ func RegisterStringConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("LC_MONETARY", LC_MONETARY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("LC_ALL", LC_ALL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 }
-func PhpBin2hex(old *uint8, oldlen int) *types.ZendString {
-	var result *types.ZendString
+func PhpBin2hex(old *uint8, oldlen int) *types.String {
+	var result *types.String
 	var i int
 	var j int
 	result = types.ZendStringSafeAlloc(oldlen, 2*b.SizeOf("char"), 0, 0)
@@ -45,9 +45,9 @@ func PhpBin2hex(old *uint8, oldlen int) *types.ZendString {
 	result.GetVal()[j] = '0'
 	return result
 }
-func PhpHex2bin(old *uint8, oldlen int) *types.ZendString {
+func PhpHex2bin(old *uint8, oldlen int) *types.String {
 	var target_length int = oldlen >> 1
-	var str *types.ZendString = types.ZendStringAlloc(target_length, 0)
+	var str *types.String = types.ZendStringAlloc(target_length, 0)
 	var ret *uint8 = (*uint8)(str.GetVal())
 	var i int
 	var j int
@@ -92,8 +92,8 @@ func LocaleconvR(out *__struct__lconv) *__struct__lconv {
 	return out
 }
 func ZifBin2hex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var result *types.ZendString
-	var data *types.ZendString
+	var result *types.String
+	var data *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -119,8 +119,8 @@ func ZifBin2hex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifHex2bin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var result *types.ZendString
-	var data *types.ZendString
+	var result *types.String
+	var data *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -151,8 +151,8 @@ func ZifHex2bin(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetString(result)
 }
 func PhpSpnCommonHandler(executeData *zend.ZendExecuteData, return_value *types.Zval, behavior int) {
-	var s11 *types.ZendString
-	var s22 *types.ZendString
+	var s11 *types.String
+	var s22 *types.String
 	var start zend.ZendLong = 0
 	var len_ zend.ZendLong = 0
 	for {
@@ -218,8 +218,8 @@ func ZifStrcspn(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpSpnCommonHandler(executeData, return_value, STR_STRCSPN)
 }
 func ZifStrcoll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var s1 *types.ZendString
-	var s2 *types.ZendString
+	var s1 *types.String
+	var s2 *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -282,7 +282,7 @@ func PhpCharmask(input *uint8, len_ int, mask *byte) int {
 	}
 	return result
 }
-func PhpTrimInt(str *types.ZendString, what *byte, what_len int, mode int) *types.ZendString {
+func PhpTrimInt(str *types.String, what *byte, what_len int, mode int) *types.String {
 	var start *byte = str.GetVal()
 	var end *byte = start + str.GetLen()
 	var mask []byte
@@ -355,15 +355,15 @@ func PhpTrimInt(str *types.ZendString, what *byte, what_len int, mode int) *type
 	} else if end-start == 0 {
 		return types.ZSTR_EMPTY_ALLOC()
 	} else {
-		return types.ZendStringInit(start, end-start, 0)
+		return types.ZendStringInit(b.CastStr(start, end-start))
 	}
 }
-func PhpTrim(str *types.ZendString, what *byte, what_len int, mode int) *types.ZendString {
+func PhpTrim(str *types.String, what *byte, what_len int, mode int) *types.String {
 	return PhpTrimInt(str, what, what_len, mode)
 }
 func PhpDoTrim(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
-	var str *types.ZendString
-	var what *types.ZendString = nil
+	var str *types.String
+	var what *types.String = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -394,7 +394,7 @@ func ZifLtrim(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpDoTrim(executeData, return_value, 1)
 }
 func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var text *types.ZendString
+	var text *types.String
 	var breakchar *byte = "\n"
 	var newtextlen int
 	var chk int
@@ -405,7 +405,7 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var lastspace zend.ZendLong = 0
 	var linelength zend.ZendLong = 75
 	var docut types.ZendBool = 0
-	var newtext *types.ZendString
+	var newtext *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -445,7 +445,7 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	   additional storage space */
 
 	if breakchar_len == 1 && docut == 0 {
-		newtext = types.ZendStringInit(text.GetVal(), text.GetLen(), 0)
+		newtext = types.ZendStringInit(text.GetStr())
 		lastspace = 0
 		laststart = lastspace
 		for current = 0; current < zend.ZendLong(text.GetLen()); current++ {
@@ -552,7 +552,7 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	/* Special case for a single-character break as it needs no
 	   additional storage space */
 }
-func PhpExplode(delim *types.ZendString, str *types.ZendString, return_value *types.Zval, limit zend.ZendLong) {
+func PhpExplode(delim *types.String, str *types.String, return_value *types.Zval, limit zend.ZendLong) {
 	var p1 *byte = str.GetVal()
 	var endp *byte = str.GetVal() + str.GetLen()
 	var p2 *byte = core.PhpMemnstr(str.GetVal(), delim.GetVal(), delim.GetLen(), endp)
@@ -583,7 +583,7 @@ func PhpExplode(delim *types.ZendString, str *types.ZendString, return_value *ty
 		}
 	}
 }
-func PhpExplodeNegativeLimit(delim *types.ZendString, str *types.ZendString, return_value *types.Zval, limit zend.ZendLong) {
+func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_value *types.Zval, limit zend.ZendLong) {
 	// #define EXPLODE_ALLOC_STEP       64
 
 	var p1 *byte = str.GetVal()
@@ -623,8 +623,8 @@ func PhpExplodeNegativeLimit(delim *types.ZendString, str *types.ZendString, ret
 	}
 }
 func ZifExplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
-	var delim *types.ZendString
+	var str *types.String
+	var delim *types.String
 	var limit zend.ZendLong = zend.ZEND_LONG_MAX
 	var tmp types.Zval
 	for {
@@ -668,18 +668,18 @@ func ZifExplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return_value.GetArr().IndexAddNewH(0, &tmp)
 	}
 }
-func PhpImplode(glue *types.ZendString, pieces *types.Zval, return_value *types.Zval) {
+func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval) {
 	var tmp *types.Zval
 	var numelems int
-	var str *types.ZendString
+	var str *types.String
 	var cptr *byte
 	var len_ int = 0
 	var strings *struct {
-		str  *types.ZendString
+		str  *types.String
 		lval zend.ZendLong
 	}
 	var ptr *struct {
-		str  *types.ZendString
+		str  *types.String
 		lval zend.ZendLong
 	}
 	numelems = types.Z_ARRVAL_P(pieces).GetNNumOfElements()
@@ -777,8 +777,8 @@ func ZifImplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg1 *types.Zval
 	var arg2 *types.Zval = nil
 	var pieces *types.Zval
-	var glue *types.ZendString
-	var tmp_glue *types.ZendString
+	var glue *types.String
+	var tmp_glue *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -823,8 +823,8 @@ func ZifImplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func STRTOK_TABLE(p *byte) __auto__ { return BG__().strtok_table[uint8(*p)] }
 func ZifStrtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
-	var tok *types.ZendString = nil
+	var str *types.String
+	var tok *types.String = nil
 	var token *byte
 	var token_end *byte
 	var p *byte
@@ -918,7 +918,7 @@ func PhpStrtoupper(s *byte, len_ int) *byte {
 	}
 	return s
 }
-func PhpStringToupper(s *types.ZendString) *types.ZendString {
+func PhpStringToupper(s *types.String) *types.String {
 	var c *uint8
 	var e *uint8
 	c = (*uint8)(s.GetVal())
@@ -926,7 +926,7 @@ func PhpStringToupper(s *types.ZendString) *types.ZendString {
 	for c < e {
 		if islower(*c) {
 			var r *uint8
-			var res *types.ZendString = types.ZendStringAlloc(s.GetLen(), 0)
+			var res *types.String = types.ZendStringAlloc(s.GetLen(), 0)
 			if c != (*uint8)(s.GetVal()) {
 				memcpy(res.GetVal(), s.GetVal(), c-(*uint8)(s.GetVal()))
 			}
@@ -944,7 +944,7 @@ func PhpStringToupper(s *types.ZendString) *types.ZendString {
 	return s.Copy()
 }
 func ZifStrtoupper(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *types.ZendString
+	var arg *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -975,7 +975,7 @@ func PhpStrtolower(s *byte, len_ int) *byte {
 	}
 	return s
 }
-func PhpStringTolower(s *types.ZendString) *types.ZendString {
+func PhpStringTolower(s *types.String) *types.String {
 	var c *uint8
 	var e *uint8
 	c = (*uint8)(s.GetVal())
@@ -983,7 +983,7 @@ func PhpStringTolower(s *types.ZendString) *types.ZendString {
 	for c < e {
 		if isupper(*c) {
 			var r *uint8
-			var res *types.ZendString = types.ZendStringAlloc(s.GetLen(), 0)
+			var res *types.String = types.ZendStringAlloc(s.GetLen(), 0)
 			if c != (*uint8)(s.GetVal()) {
 				memcpy(res.GetVal(), s.GetVal(), c-(*uint8)(s.GetVal()))
 			}
@@ -1001,7 +1001,7 @@ func PhpStringTolower(s *types.ZendString) *types.ZendString {
 	return s.Copy()
 }
 func ZifStrtolower(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1021,14 +1021,14 @@ func ZifStrtolower(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	return_value.SetString(PhpStringTolower(str))
 	return
 }
-func PhpBasename(s *byte, len_ int, suffix *byte, sufflen int) *types.ZendString {
+func PhpBasename(s *byte, len_ int, suffix *byte, sufflen int) *types.String {
 	var c *byte
 	var comp *byte
 	var cend *byte
 	var inc_len int
 	var cnt int
 	var state int
-	var ret *types.ZendString
+	var ret *types.String
 	c = (*byte)(s)
 	cend = c
 	comp = cend
@@ -1077,7 +1077,7 @@ quit_loop:
 		cend -= sufflen
 	}
 	len_ = cend - comp
-	ret = types.ZendStringInit(comp, len_, 0)
+	ret = types.ZendStringInit(b.CastStr(comp, len_))
 	return ret
 }
 func ZifBasename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1110,7 +1110,7 @@ func PhpDirname(path *byte, len_ int) int { return zend.ZendDirname(path, len_) 
 func ZifDirname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var str *byte
 	var str_len int
-	var ret *types.ZendString
+	var ret *types.String
 	var levels zend.ZendLong = 1
 	for {
 		var _flags int = 0
@@ -1130,7 +1130,7 @@ func ZifDirname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	ret = types.ZendStringInit(str, str_len, 0)
+	ret = types.ZendStringInit(b.CastStr(str, str_len))
 	if levels == 1 {
 
 		/* Default case */
@@ -1167,7 +1167,7 @@ func ZifPathinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var path_len int
 	var have_basename int
 	var opt zend.ZendLong = PHP_PATHINFO_ALL
-	var ret *types.ZendString = nil
+	var ret *types.String = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1304,7 +1304,7 @@ func PhpNeedleChar(needle *types.Zval, target *byte) int {
 }
 func ZifStristr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var needle *types.Zval
-	var haystack *types.ZendString
+	var haystack *types.String
 	var found *byte = nil
 	var found_offset int
 	var haystack_dup *byte
@@ -1365,7 +1365,7 @@ func ZifStristr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifStrstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var needle *types.Zval
-	var haystack *types.ZendString
+	var haystack *types.String
 	var found *byte = nil
 	var needle_char []byte
 	var found_offset zend.ZendLong
@@ -1420,7 +1420,7 @@ func ZifStrstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifStrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var needle *types.Zval
-	var haystack *types.ZendString
+	var haystack *types.String
 	var found *byte = nil
 	var needle_char []byte
 	var offset zend.ZendLong = 0
@@ -1477,12 +1477,12 @@ func ZifStrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifStripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var found *byte = nil
-	var haystack *types.ZendString
+	var haystack *types.String
 	var offset zend.ZendLong = 0
 	var needle_char []byte
 	var needle *types.Zval
-	var needle_dup *types.ZendString = nil
-	var haystack_dup *types.ZendString
+	var needle_dup *types.String = nil
+	var haystack_dup *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1545,7 +1545,7 @@ func ZifStripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var zneedle *types.Zval
-	var haystack *types.ZendString
+	var haystack *types.String
 	var needle_len int
 	var offset zend.ZendLong = 0
 	var ord_needle []byte
@@ -1620,15 +1620,15 @@ func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var zneedle *types.Zval
-	var needle *types.ZendString
-	var haystack *types.ZendString
+	var needle *types.String
+	var haystack *types.String
 	var offset zend.ZendLong = 0
 	var p *byte
 	var e *byte
 	var found *byte
-	var needle_dup *types.ZendString
-	var haystack_dup *types.ZendString
-	var ord_needle *types.ZendString = nil
+	var needle_dup *types.String
+	var haystack_dup *types.String
+	var ord_needle *types.String = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1749,7 +1749,7 @@ func ZifStrripos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var needle *types.Zval
-	var haystack *types.ZendString
+	var haystack *types.String
 	var found *byte = nil
 	var found_offset zend.ZendLong
 	for {
@@ -1789,13 +1789,13 @@ func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *types.ZendString {
+func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *types.String {
 	var q *byte
 	var p *byte
 	var chunks int
 	var restlen int
 	var out_len int
-	var dest *types.ZendString
+	var dest *types.String
 	chunks = srclen / chunklen
 	restlen = srclen - chunks*chunklen
 	if chunks > core.INT_MAX-1 {
@@ -1831,11 +1831,11 @@ func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *
 	return dest
 }
 func ZifChunkSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var end *byte = "\r\n"
 	var endlen int = 2
 	var chunklen zend.ZendLong = 76
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1885,7 +1885,7 @@ func ZifChunkSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 }
 func ZifSubstr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var l zend.ZendLong = 0
 	var f zend.ZendLong
 	var argc int = executeData.NumArgs()
@@ -1988,7 +1988,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var l zend.ZendLong = 0
 	var f zend.ZendLong
 	var argc int = executeData.NumArgs()
-	var result *types.ZendString
+	var result *types.String
 	var from_idx types.HashPosition
 	var repl_idx types.HashPosition
 	var len_idx types.HashPosition
@@ -2058,8 +2058,8 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 	if str.GetType() != types.IS_ARRAY {
 		if from.GetType() != types.IS_ARRAY {
-			var repl_str *types.ZendString
-			var tmp_repl_str *types.ZendString = nil
+			var repl_str *types.String
+			var tmp_repl_str *types.String = nil
 			f = from.GetLval()
 
 			/* if "from" position is negative, count start position from the end
@@ -2120,7 +2120,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			return
 		}
 	} else {
-		var str_index *types.ZendString = nil
+		var str_index *types.String = nil
 		var result_len int
 		var num_index zend.ZendUlong
 		zend.ArrayInit(return_value)
@@ -2139,8 +2139,8 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			num_index = _p.GetH()
 			str_index = _p.GetKey()
 			tmp_str = _z
-			var tmp_orig_str *types.ZendString
-			var orig_str *types.ZendString = zend.ZvalGetTmpString(tmp_str, &tmp_orig_str)
+			var tmp_orig_str *types.String
+			var orig_str *types.String = zend.ZvalGetTmpString(tmp_str, &tmp_orig_str)
 			if from.IsType(types.IS_ARRAY) {
 				for from_idx < types.Z_ARRVAL_P(from).GetNNumUsed() {
 					tmp_from = types.Z_ARRVAL_P(from).GetArData()[from_idx].GetVal()
@@ -2214,8 +2214,8 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 					repl_idx++
 				}
 				if repl_idx < types.Z_ARRVAL_P(repl).GetNNumUsed() {
-					var tmp_repl_str *types.ZendString
-					var repl_str *types.ZendString = zend.ZvalGetTmpString(tmp_repl, &tmp_repl_str)
+					var tmp_repl_str *types.String
+					var repl_str *types.String = zend.ZvalGetTmpString(tmp_repl, &tmp_repl_str)
 					result_len += repl_str.GetLen()
 					repl_idx++
 					result = types.ZendStringSafeAlloc(1, result_len, 0, 0)
@@ -2248,12 +2248,12 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 }
 func ZifQuotemeta(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var old *types.ZendString
+	var old *types.String
 	var old_end *byte
 	var p *byte
 	var q *byte
 	var c byte
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -2313,7 +2313,7 @@ func ZifQuotemeta(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifOrd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -2354,19 +2354,19 @@ func ZifChr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	c &= 0xff
 	return_value.SetInternedString(types.ZSTR_CHAR(c))
 }
-func PhpUcfirst(str *types.ZendString) *types.ZendString {
+func PhpUcfirst(str *types.String) *types.String {
 	var ch uint8 = str.GetVal()[0]
 	var r uint8 = toupper(ch)
 	if r == ch {
 		return str.Copy()
 	} else {
-		var s *types.ZendString = types.ZendStringInit(str.GetVal(), str.GetLen(), 0)
+		var s *types.String = types.ZendStringInit(str.GetStr())
 		s.GetVal()[0] = r
 		return s
 	}
 }
 func ZifUcfirst(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -2390,18 +2390,18 @@ func ZifUcfirst(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetString(PhpUcfirst(str))
 	return
 }
-func PhpLcfirst(str *types.ZendString) *types.ZendString {
+func PhpLcfirst(str *types.String) *types.String {
 	var r uint8 = tolower(str.GetVal()[0])
 	if r == str.GetVal()[0] {
 		return str.Copy()
 	} else {
-		var s *types.ZendString = types.ZendStringInit(str.GetVal(), str.GetLen(), 0)
+		var s *types.String = types.ZendStringInit(str.GetStr())
 		s.GetVal()[0] = r
 		return s
 	}
 }
 func ZifLcfirst(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -2426,7 +2426,7 @@ func ZifLcfirst(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifUcwords(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var delims *byte = " \t\r\nfv"
 	var r *byte
 	var r_end *byte
@@ -2494,8 +2494,8 @@ func PhpStrtr(str *byte, len_ int, str_from *byte, str_to *byte, trlen int) *byt
 	}
 	return str
 }
-func PhpStrtrEx(str *types.ZendString, str_from *byte, str_to *byte, trlen int) *types.ZendString {
-	var new_str *types.ZendString = nil
+func PhpStrtrEx(str *types.String, str_from *byte, str_to *byte, trlen int) *types.String {
+	var new_str *types.String = nil
 	var i int
 	if trlen < 1 {
 		return str.Copy()
@@ -2547,11 +2547,11 @@ func PhpStrtrEx(str *types.ZendString, str_from *byte, str_to *byte, trlen int) 
 	new_str.GetVal()[new_str.GetLen()] = 0
 	return new_str
 }
-func PhpStrtrArray(return_value *types.Zval, input *types.ZendString, pats *types.HashTable) {
+func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.HashTable) {
 	var str *byte = input.GetVal()
 	var slen int = input.GetLen()
 	var num_key zend.ZendUlong
-	var str_key *types.ZendString
+	var str_key *types.String
 	var len_ int
 	var pos int
 	var old_pos int
@@ -2608,7 +2608,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.ZendString, pats *type
 		}
 	}
 	if num_keys != 0 {
-		var key_used *types.ZendString
+		var key_used *types.String
 
 		/* we have to rebuild HashTable with numeric keys */
 
@@ -2690,8 +2690,8 @@ func PhpStrtrArray(return_value *types.Zval, input *types.ZendString, pats *type
 				if (num_bitset[len_/b.SizeOf("zend_ulong")] & uint64(1) << len_ % b.SizeOf("zend_ulong")) != 0 {
 					entry = pats.KeyFind(b.CastStr(key, len_))
 					if entry != nil {
-						var tmp *types.ZendString
-						var s *types.ZendString = zend.ZvalGetTmpString(entry, &tmp)
+						var tmp *types.String
+						var s *types.String = zend.ZvalGetTmpString(entry, &tmp)
 						result.AppendString(b.CastStr(str+old_pos, pos-old_pos))
 						result.AppendString(s.GetStr())
 						old_pos = pos + len_
@@ -2719,14 +2719,14 @@ func PhpStrtrArray(return_value *types.Zval, input *types.ZendString, pats *type
 	zend.Efree(num_bitset)
 }
 func PhpCharToStrEx(
-	str *types.ZendString,
+	str *types.String,
 	from byte,
 	to *byte,
 	to_len int,
 	case_sensitivity int,
 	replace_count *zend.ZendLong,
-) *types.ZendString {
-	var result *types.ZendString
+) *types.String {
+	var result *types.String
 	var char_count int = 0
 	var lc_from int = 0
 	var source *byte
@@ -2793,14 +2793,14 @@ func PhpCharToStrEx(
 	return result
 }
 func PhpStrToStrEx(
-	haystack *types.ZendString,
+	haystack *types.String,
 	needle *byte,
 	needle_len int,
 	str *byte,
 	str_len int,
 	replace_count *zend.ZendLong,
-) *types.ZendString {
-	var new_str *types.ZendString
+) *types.String {
+	var new_str *types.String
 	if needle_len < haystack.GetLen() {
 		var end *byte
 		var p *byte
@@ -2811,7 +2811,7 @@ func PhpStrToStrEx(
 			end = haystack.GetVal() + haystack.GetLen()
 			for p = haystack.GetVal(); b.Assign(&r, (*byte)(core.PhpMemnstr(p, needle, needle_len, end))); p = r + needle_len {
 				if new_str == nil {
-					new_str = types.ZendStringInit(haystack.GetVal(), haystack.GetLen(), 0)
+					new_str = types.ZendStringInit(haystack.GetStr())
 				}
 				memcpy(new_str.GetVal()+(r-haystack.GetVal()), str, str_len)
 				*replace_count++
@@ -2868,22 +2868,22 @@ func PhpStrToStrEx(
 		} else if str_len == 1 {
 			new_str = types.ZSTR_CHAR(zend_uchar(*str))
 		} else {
-			new_str = types.ZendStringInit(str, str_len, 0)
+			new_str = types.ZendStringInit(b.CastStr(str, str_len))
 		}
 		*replace_count++
 		return new_str
 	}
 }
 func PhpStrToStrIEx(
-	haystack *types.ZendString,
+	haystack *types.String,
 	lc_haystack *byte,
-	needle *types.ZendString,
+	needle *types.String,
 	str *byte,
 	str_len int,
 	replace_count *zend.ZendLong,
-) *types.ZendString {
-	var new_str *types.ZendString = nil
-	var lc_needle *types.ZendString
+) *types.String {
+	var new_str *types.String = nil
+	var lc_needle *types.String
 	if needle.GetLen() < haystack.GetLen() {
 		var end *byte
 		var p *byte
@@ -2894,7 +2894,7 @@ func PhpStrToStrIEx(
 			end = lc_haystack + haystack.GetLen()
 			for p = lc_haystack; b.Assign(&r, (*byte)(core.PhpMemnstr(p, lc_needle.GetVal(), lc_needle.GetLen(), end))); p = r + lc_needle.GetLen() {
 				if new_str == nil {
-					new_str = types.ZendStringInit(haystack.GetVal(), haystack.GetLen(), 0)
+					new_str = types.ZendStringInit(haystack.GetStr())
 				}
 				memcpy(new_str.GetVal()+(r-lc_haystack), str, str_len)
 				*replace_count++
@@ -2954,7 +2954,7 @@ func PhpStrToStrIEx(
 			goto nothing_todo
 		}
 		types.ZendStringReleaseEx(lc_needle, 0)
-		new_str = types.ZendStringInit(str, str_len, 0)
+		new_str = types.ZendStringInit(b.CastStr(str, str_len))
 		*replace_count++
 		return new_str
 	}
@@ -2966,8 +2966,8 @@ func PhpStrToStr(
 	needle_len int,
 	str string,
 	str_len int,
-) *types.ZendString {
-	var new_str *types.ZendString
+) *types.String {
+	var new_str *types.String
 	if needle_len < length {
 		var end *byte
 		var s *byte
@@ -2975,7 +2975,7 @@ func PhpStrToStr(
 		var e *byte
 		var r *byte
 		if needle_len == str_len {
-			new_str = types.ZendStringInit(haystack, length, 0)
+			new_str = types.ZendStringInit(b.CastStr(haystack, length))
 			end = new_str.GetVal() + length
 			for p = new_str.GetVal(); b.Assign(&r, (*byte)(core.PhpMemnstr(p, needle, needle_len, end))); p = r + needle_len {
 				memcpy(r, str, str_len)
@@ -2997,7 +2997,7 @@ func PhpStrToStr(
 
 					/* Needle doesn't occur, shortcircuit the actual replacement. */
 
-					new_str = types.ZendStringInit(haystack, length, 0)
+					new_str = types.ZendStringInit(b.CastStr(haystack, length))
 					return new_str
 				} else {
 					if str_len > needle_len {
@@ -3025,16 +3025,16 @@ func PhpStrToStr(
 			return new_str
 		}
 	} else if needle_len > length || memcmp(haystack, needle, length) {
-		new_str = types.ZendStringInit(haystack, length, 0)
+		new_str = types.ZendStringInit(b.CastStr(haystack, length))
 		return new_str
 	} else {
-		new_str = types.ZendStringInit(str, str_len, 0)
+		new_str = types.ZendStringInit(b.CastStr(str, str_len))
 		return new_str
 	}
 }
 func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var from *types.Zval
-	var str *types.ZendString
+	var str *types.String
 	var to *byte = nil
 	var to_len int = 0
 	var ac int = executeData.NumArgs()
@@ -3076,10 +3076,10 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return
 		} else if pats.GetNNumOfElements() == 1 {
 			var num_key zend.ZendLong
-			var str_key *types.ZendString
-			var tmp_str *types.ZendString
-			var replace *types.ZendString
-			var tmp_replace *types.ZendString
+			var str_key *types.String
+			var tmp_str *types.String
+			var replace *types.String
+			var tmp_replace *types.String
 			var entry *types.Zval
 			var __ht *types.HashTable = pats
 			for _, _p := range __ht.foreachData() {
@@ -3123,11 +3123,11 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 }
 func ZifStrrev(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var s *byte
 	var e *byte
 	var p *byte
-	var n *types.ZendString
+	var n *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -3205,8 +3205,8 @@ func PhpSimilarChar(txt1 *byte, len1 int, txt2 *byte, len2 int) int {
 	return sum
 }
 func ZifSimilarText(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var t1 *types.ZendString
-	var t2 *types.ZendString
+	var t1 *types.String
+	var t2 *types.String
 	var percent *types.Zval = nil
 	var ac int = executeData.NumArgs()
 	var sim int
@@ -3244,8 +3244,8 @@ func ZifSimilarText(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	return
 }
 func ZifAddcslashes(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
-	var what *types.ZendString
+	var str *types.String
+	var what *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -3275,7 +3275,7 @@ func ZifAddcslashes(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	return
 }
 func ZifAddslashes(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -3300,7 +3300,7 @@ func ZifAddslashes(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	return
 }
 func ZifStripcslashes(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -3321,7 +3321,7 @@ func ZifStripcslashes(executeData *zend.ZendExecuteData, return_value *types.Zva
 	PhpStripcslashes(return_value.GetStr())
 }
 func ZifStripslashes(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -3341,7 +3341,7 @@ func ZifStripslashes(executeData *zend.ZendExecuteData, return_value *types.Zval
 	return_value.SetRawString(str.GetStr())
 	PhpStripslashes(return_value.GetStr())
 }
-func PhpStripcslashes(str *types.ZendString) {
+func PhpStripcslashes(str *types.String) {
 	var source *byte
 	var end *byte
 	var target *byte
@@ -3419,14 +3419,14 @@ func PhpStripcslashes(str *types.ZendString) {
 	}
 	str.SetLen(nlen)
 }
-func PhpAddcslashesStr(str *byte, len_ int, what *byte, wlength int) *types.ZendString {
+func PhpAddcslashesStr(str *byte, len_ int, what *byte, wlength int) *types.String {
 	var flags []byte
 	var target *byte
 	var source *byte
 	var end *byte
 	var c byte
 	var newlen int
-	var new_str *types.ZendString = types.ZendStringSafeAlloc(4, len_, 0, 0)
+	var new_str *types.String = types.ZendStringSafeAlloc(4, len_, 0, 0)
 	PhpCharmask((*uint8)(what), wlength, flags)
 	source = str
 	end = source + len_
@@ -3467,17 +3467,17 @@ func PhpAddcslashesStr(str *byte, len_ int, what *byte, wlength int) *types.Zend
 	}
 	return new_str
 }
-func PhpAddcslashes(str *types.ZendString, what string, wlength int) *types.ZendString {
+func PhpAddcslashes(str *types.String, what string, wlength int) *types.String {
 	return PhpAddcslashesStr(str.GetVal(), str.GetLen(), what, wlength)
 }
-func PhpAddslashes(str *types.ZendString) *types.ZendString {
+func PhpAddslashes(str *types.String) *types.String {
 	/* maximum string length, worst case situation */
 
 	var target *byte
 	var source *byte
 	var end *byte
 	var offset int
-	var new_str *types.ZendString
+	var new_str *types.String
 	if str == nil {
 		return types.ZSTR_EMPTY_ALLOC()
 	}
@@ -3551,7 +3551,7 @@ func PhpStripslashesImpl(str *byte, out *byte, len_ int) *byte {
 	}
 	return out
 }
-func PhpStripslashes(str *types.ZendString) {
+func PhpStripslashes(str *types.String) {
 	var t *byte = PhpStripslashesImpl(str.GetVal(), str.GetVal(), str.GetLen())
 	if t != str.GetVal()+str.GetLen() {
 		str.SetLen(t - str.GetVal())
@@ -3581,13 +3581,13 @@ func _isnewline(c byte) int {
 }
 func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *types.Zval, result *types.Zval, case_sensitivity int) zend.ZendLong {
 	var search_entry *types.Zval
-	var tmp_result *types.ZendString
-	var tmp_subject_str *types.ZendString
+	var tmp_result *types.String
+	var tmp_subject_str *types.String
 	var replace_value *byte = nil
 	var replace_len int = 0
 	var replace_count zend.ZendLong = 0
-	var subject_str *types.ZendString
-	var lc_subject_str *types.ZendString = nil
+	var subject_str *types.String
+	var lc_subject_str *types.String = nil
 	var replace_idx uint32
 
 	/* Make sure we're dealing with strings. */
@@ -3631,10 +3631,10 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 
 			/* Make sure we're dealing with strings. */
 
-			var tmp_search_str *types.ZendString
-			var search_str *types.ZendString = zend.ZvalGetTmpString(search_entry, &tmp_search_str)
-			var replace_entry_str *types.ZendString
-			var tmp_replace_entry_str *types.ZendString = nil
+			var tmp_search_str *types.String
+			var search_str *types.String = zend.ZvalGetTmpString(search_entry, &tmp_search_str)
+			var replace_entry_str *types.String
+			var tmp_replace_entry_str *types.String = nil
 
 			/* If replace is an array. */
 
@@ -3743,7 +3743,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 	var subject_entry *types.Zval
 	var zcount *types.Zval = nil
 	var result types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	var count zend.ZendLong = 0
 	var argc int = executeData.NumArgs()
@@ -3853,7 +3853,7 @@ func PhpHebrev(executeData *zend.ZendExecuteData, return_value *types.Zval, conv
 	var end int
 	var orig_begin int
 	var str_len int
-	var broken_str *types.ZendString
+	var broken_str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -4020,11 +4020,11 @@ func ZifNl2br(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 	var tmp *byte
 	var end *byte
-	var str *types.ZendString
+	var str *types.String
 	var target *byte
 	var repl_cnt int = 0
 	var is_xhtml types.ZendBool = 1
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -4099,8 +4099,8 @@ func ZifNl2br(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var buf *types.ZendString
-	var str *types.ZendString
+	var buf *types.String
+	var str *types.String
 	var allow *types.Zval = nil
 	var allowed_tags *byte = nil
 	var allowed_tags_len int = 0
@@ -4126,7 +4126,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if allow != nil {
 		if allow.IsType(types.IS_ARRAY) {
 			var tmp *types.Zval
-			var tag *types.ZendString
+			var tag *types.String
 			var __ht *types.HashTable = allow.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
@@ -4152,7 +4152,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			allowed_tags_len = allow.GetStr().GetLen()
 		}
 	}
-	buf = types.ZendStringInit(str.GetVal(), str.GetLen(), 0)
+	buf = types.ZendStringInit(str.GetStr())
 	buf.SetLen(PhpStripTagsEx(buf.GetVal(), str.GetLen(), nil, allowed_tags, allowed_tags_len, 0))
 	tags_ss.Free()
 	return_value.SetString(buf)
@@ -4161,7 +4161,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var args *types.Zval = nil
 	var plocale *types.Zval
-	var loc *types.ZendString
+	var loc *types.String
 	var retval *byte
 	var cat zend.ZendLong
 	var num_args int
@@ -4231,7 +4231,7 @@ func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 						return_value.SetString(BG__().locale_string)
 						return
 					} else {
-						BG__().locale_string = types.ZendStringInit(retval, len_, 0)
+						BG__().locale_string = types.ZendStringInit(b.CastStr(retval, len_))
 						types.ZendStringReleaseEx(loc, 0)
 						return_value.SetStringCopy(BG__().locale_string)
 						return
@@ -4702,7 +4702,7 @@ finish:
 	return size_t(rp - rbuf)
 }
 func ZifStrGetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var delim byte = ','
 	var enc byte = '"'
 	var esc int = uint8('\\')
@@ -4752,9 +4752,9 @@ func ZifStrGetcsv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
 func ZifStrRepeat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var input_str *types.ZendString
+	var input_str *types.String
 	var mult zend.ZendLong
-	var result *types.ZendString
+	var result *types.String
 	var result_len int
 	for {
 		var _flags int = 0
@@ -4818,7 +4818,7 @@ func ZifStrRepeat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifCountChars(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var input *types.ZendString
+	var input *types.String
 	var chars []int
 	var mymode zend.ZendLong = 0
 	var buf *uint8
@@ -4887,8 +4887,8 @@ func ZifCountChars(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 }
 func PhpStrnatcmp(executeData *zend.ZendExecuteData, return_value *types.Zval, fold_case int) {
-	var s1 *types.ZendString
-	var s2 *types.ZendString
+	var s1 *types.String
+	var s2 *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -4910,10 +4910,10 @@ func PhpStrnatcmp(executeData *zend.ZendExecuteData, return_value *types.Zval, f
 	return
 }
 func StringNaturalCompareFunctionEx(result *types.Zval, op1 *types.Zval, op2 *types.Zval, case_insensitive types.ZendBool) int {
-	var tmp_str1 *types.ZendString
-	var tmp_str2 *types.ZendString
-	var str1 *types.ZendString = zend.ZvalGetTmpString(op1, &tmp_str1)
-	var str2 *types.ZendString = zend.ZvalGetTmpString(op2, &tmp_str2)
+	var tmp_str1 *types.String
+	var tmp_str2 *types.String
+	var str1 *types.String = zend.ZvalGetTmpString(op1, &tmp_str1)
+	var str2 *types.String = zend.ZvalGetTmpString(op2, &tmp_str2)
 	result.SetLong(StrnatcmpEx(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen(), case_insensitive))
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
@@ -5057,7 +5057,7 @@ func ZifSubstrCount(executeData *zend.ZendExecuteData, return_value *types.Zval)
 func ZifStrPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	/* Input arguments */
 
-	var input *types.ZendString
+	var input *types.String
 	var pad_length zend.ZendLong
 
 	/* Helper variables */
@@ -5069,7 +5069,7 @@ func ZifStrPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var i int
 	var left_pad int = 0
 	var right_pad int = 0
-	var result *types.ZendString = nil
+	var result *types.String = nil
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -5180,8 +5180,8 @@ func ZifSscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func PhpStrRot13(str *types.ZendString) *types.ZendString {
-	var ret *types.ZendString
+func PhpStrRot13(str *types.String) *types.String {
+	var ret *types.String
 	var p *byte
 	var e *byte
 	var target *byte
@@ -5206,7 +5206,7 @@ func PhpStrRot13(str *types.ZendString) *types.ZendString {
 	return ret
 }
 func ZifStrRot13(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *types.ZendString
+	var arg *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -5249,7 +5249,7 @@ func PhpStringShuffle(str *byte, len_ zend.ZendLong) {
 	}
 }
 func ZifStrShuffle(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *types.ZendString
+	var arg *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -5272,7 +5272,7 @@ func ZifStrShuffle(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 }
 func ZifStrWordCount(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var char_list *byte = nil
 	var ch []*byte
 	var p *byte
@@ -5367,7 +5367,7 @@ func ZifMoneyFormat(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var e *byte
 	var value float64
 	var check types.ZendBool = 0
-	var str *types.ZendString
+	var str *types.String
 	var res_len ssize_t
 	for {
 		var _flags int = 0
@@ -5412,7 +5412,7 @@ func ZifMoneyFormat(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	return
 }
 func ZifStrSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var split_length zend.ZendLong = 1
 	var p *byte
 	var n_reg_segments int
@@ -5456,8 +5456,8 @@ func ZifStrSplit(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 }
 func ZifStrpbrk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var haystack *types.ZendString
-	var char_list *types.ZendString
+	var haystack *types.String
+	var char_list *types.String
 	var haystack_ptr *byte
 	var cl_ptr *byte
 	for {
@@ -5495,8 +5495,8 @@ func ZifStrpbrk(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return
 }
 func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var s1 *types.ZendString
-	var s2 *types.ZendString
+	var s1 *types.String
+	var s2 *types.String
 	var offset zend.ZendLong
 	var len_ zend.ZendLong = 0
 	var len_is_default types.ZendBool = 1
@@ -5560,9 +5560,9 @@ func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return
 	}
 }
-func PhpUtf8Encode(s *byte, len_ int) *types.ZendString {
+func PhpUtf8Encode(s *byte, len_ int) *types.String {
 	var pos int = len_
-	var str *types.ZendString
+	var str *types.String
 	var c uint8
 	str = types.ZendStringSafeAlloc(len_, 2, 0, 0)
 	str.SetLen(0)
@@ -5585,10 +5585,10 @@ func PhpUtf8Encode(s *byte, len_ int) *types.ZendString {
 	str = types.ZendStringTruncate(str, str.GetLen(), 0)
 	return str
 }
-func PhpUtf8Decode(s *byte, len_ int) *types.ZendString {
+func PhpUtf8Decode(s *byte, len_ int) *types.String {
 	var pos int = 0
 	var c uint
-	var str *types.ZendString
+	var str *types.String
 	str = types.ZendStringAlloc(len_, 0)
 	str.SetLen(0)
 	for pos < len_ {

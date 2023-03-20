@@ -300,7 +300,7 @@ func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
-func ZendFetchFunction(name *types.ZendString) *ZendFunction {
+func ZendFetchFunction(name *types.String) *ZendFunction {
 	var zv *types.Zval = EG__().GetFunctionTable().KeyFind(name.GetStr())
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()

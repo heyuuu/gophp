@@ -11,7 +11,7 @@ import (
 )
 
 func IncompleteClassMessage(object *types.Zval, error_type int) {
-	var class_name *types.ZendString
+	var class_name *types.String
 	class_name = PhpLookupClassName(object)
 	if class_name != nil {
 		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
@@ -44,7 +44,7 @@ func IncompleteClassHasProperty(object *types.Zval, member *types.Zval, check_em
 	IncompleteClassMessage(object, faults.E_NOTICE)
 	return 0
 }
-func IncompleteClassGetMethod(object **types.ZendObject, method *types.ZendString, key *types.Zval) *zend.ZendFunction {
+func IncompleteClassGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
 	var zobject types.Zval
 	zobject.SetObject(*object)
 	IncompleteClassMessage(&zobject, faults.E_ERROR)
@@ -72,7 +72,7 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 	PhpIncompleteObjectHandlers.SetGetMethod(IncompleteClassGetMethod)
 	return zend.ZendRegisterInternalClass(&incomplete_class)
 }
-func PhpLookupClassName(object *types.Zval) *types.ZendString {
+func PhpLookupClassName(object *types.Zval) *types.String {
 	var val *types.Zval
 	var object_properties *types.HashTable
 	object_properties = types.Z_OBJPROP_P(object)

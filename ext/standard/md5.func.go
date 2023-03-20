@@ -21,7 +21,7 @@ func MakeDigestEx(md5str *byte, digest *uint8, len_ int) {
 	md5str[len_*2] = '0'
 }
 func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *types.ZendString
+	var arg *types.String
 	var raw_output types.ZendBool = 0
 	var context PHP_MD5_CTX
 	var digest []uint8

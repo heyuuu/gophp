@@ -102,7 +102,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var marker uint
 	var done uint = 0
 	var inx int
-	var spoolbuf *types.ZendString = nil
+	var spoolbuf *types.String = nil
 	var poi *uint8 = nil
 	var sb zend.ZendStatT
 	var written types.ZendBool = 0

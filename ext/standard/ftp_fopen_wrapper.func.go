@@ -59,7 +59,7 @@ func PhpFtpFopenConnect(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 	preuseid **core.PhpStream,
 	presource **PhpUrl,
@@ -382,7 +382,7 @@ func PhpStreamUrlWrapFtp(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream = nil
@@ -402,7 +402,7 @@ func PhpStreamUrlWrapFtp(
 	var read_write int8_t = 0
 	var transport *byte
 	var transport_len int
-	var error_message *types.ZendString = nil
+	var error_message *types.String = nil
 	tmp_line[0] = '0'
 	if strpbrk(mode, "r+") {
 		read_write = 1
@@ -616,7 +616,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ent *core.PhpStreamDirent = (*core.PhpStreamDirent)(buf)
 	var innerstream *core.PhpStream
 	var tmp_len int
-	var basename *types.ZendString
+	var basename *types.String
 	innerstream = (*PhpFtpDirstreamData)(stream.GetAbstract()).GetDatastream()
 	if count != b.SizeOf("php_stream_dirent") {
 		return -1
@@ -663,7 +663,7 @@ func PhpStreamFtpOpendir(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream

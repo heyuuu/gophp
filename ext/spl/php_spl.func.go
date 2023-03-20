@@ -18,10 +18,10 @@ func ZmGlobalsCtorSpl(spl_globals *ZendSplGlobals) {
 	spl_globals.SetAutoloadFunctions(nil)
 	spl_globals.SetAutoloadRunning(0)
 }
-func SplFindCeByName(name *types.ZendString, autoload types.ZendBool) *types.ClassEntry {
+func SplFindCeByName(name *types.String, autoload types.ZendBool) *types.ClassEntry {
 	var ce *types.ClassEntry
 	if autoload == 0 {
-		var lc_name *types.ZendString = zend.ZendStringTolower(name)
+		var lc_name *types.String = zend.ZendStringTolower(name)
 		ce = types.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name)
 		types.ZendStringRelease(lc_name)
 	} else {
@@ -171,7 +171,7 @@ func ZifSplClasses(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	SplAddClasses(spl_ce_UnderflowException, return_value, 0, 0, 0)
 	SplAddClasses(spl_ce_UnexpectedValueException, return_value, 0, 0, 0)
 }
-func SplAutoload(class_name *types.ZendString, lc_name *types.ZendString, ext *byte, ext_len int) int {
+func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext_len int) int {
 	var class_file *byte
 	var class_file_len int
 	var dummy types.Zval
@@ -182,9 +182,9 @@ func SplAutoload(class_name *types.ZendString, lc_name *types.ZendString, ext *b
 	class_file_len = int(core.Spprintf(&class_file, 0, "%s%.*s", lc_name.GetVal(), ext_len, ext))
 	ret = core.PhpStreamOpenForZendEx(class_file, &file_handle, core.USE_PATH|core.STREAM_OPEN_FOR_INCLUDE)
 	if ret == types.SUCCESS {
-		var opened_path *types.ZendString
+		var opened_path *types.String
 		if file_handle.GetOpenedPath() == nil {
-			file_handle.SetOpenedPath(types.ZendStringInit(class_file, class_file_len, 0))
+			file_handle.SetOpenedPath(types.ZendStringInit(b.CastStr(class_file, class_file_len)))
 		}
 		opened_path = file_handle.GetOpenedPath().Copy()
 		dummy.SetNull()
@@ -216,9 +216,9 @@ func ZifSplAutoload(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var pos1_len int
 	var pos *byte
 	var pos1 *byte
-	var class_name *types.ZendString
-	var lc_name *types.ZendString
-	var file_exts *types.ZendString = SPL_G(autoload_extensions)
+	var class_name *types.String
+	var lc_name *types.String
+	var file_exts *types.String = SPL_G(autoload_extensions)
 	if zend.ZendParseParameters(executeData.NumArgs(), "S|S", &class_name, &file_exts) == types.FAILURE {
 		return_value.SetFalse()
 		return
@@ -255,7 +255,7 @@ func ZifSplAutoload(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	types.ZendStringRelease(lc_name)
 }
 func ZifSplAutoloadExtensions(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var file_exts *types.ZendString = nil
+	var file_exts *types.String = nil
 	if zend.ZendParseParameters(executeData.NumArgs(), "|S", &file_exts) == types.FAILURE {
 		return
 	}
@@ -291,8 +291,8 @@ func AutoloadFuncInfoDtor(element *types.Zval) {
 func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var class_name *types.Zval
 	var retval types.Zval
-	var lc_name *types.ZendString
-	var func_name *types.ZendString
+	var lc_name *types.String
+	var func_name *types.String
 	var alfi *AutoloadFuncInfo
 	if zend.ZendParseParameters(executeData.NumArgs(), "z", &class_name) == types.FAILURE || class_name.GetType() != types.IS_STRING {
 		return
@@ -377,9 +377,9 @@ func HT_MOVE_TAIL_TO_HEAD(ht *types.HashTable) {
 	ht.Rehash()
 }
 func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var func_name *types.ZendString
+	var func_name *types.String
 	var error *byte = nil
-	var lc_name *types.ZendString
+	var lc_name *types.String
 	var zcallable *types.Zval = nil
 	var do_throw types.ZendBool = 1
 	var prepend types.ZendBool = 0
@@ -554,9 +554,9 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 	return
 }
 func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var func_name *types.ZendString = nil
+	var func_name *types.String = nil
 	var error *byte = nil
-	var lc_name *types.ZendString
+	var lc_name *types.String
 	var zcallable *types.Zval
 	var success int = types.FAILURE
 	var spl_func_ptr *zend.ZendFunction
@@ -659,7 +659,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	fptr = SplAutoloadCallFn
 	if zend.EG__().GetAutoloadFunc() == fptr {
-		var key *types.ZendString
+		var key *types.String
 		zend.ArrayInit(return_value)
 		var __ht *types.HashTable = SPL_G(autoload_functions)
 		for _, _p := range __ht.foreachData() {
@@ -723,7 +723,7 @@ func ZifSplObjectId(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	return_value.SetLong(zend.ZendLong(zend.Z_OBJ_HANDLE_P(obj)))
 	return
 }
-func PhpSplObjectHash(obj *types.Zval) *types.ZendString {
+func PhpSplObjectHash(obj *types.Zval) *types.String {
 	var hash_handle intPtr
 	var hash_handlers intPtr
 	if !(SPL_G(hash_mask_init)) {

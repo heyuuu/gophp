@@ -11,7 +11,7 @@ func PHP_SET_CLASS_ATTRIBUTES(struc *types.Zval) {
 	if types.Z_OBJCE_P(struc) == BG__().incomplete_class {
 		class_name = PhpLookupClassName(struc)
 		if !class_name {
-			class_name = types.ZendStringInit(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 0)
+			class_name = types.ZendStringInit(INCOMPLETE_CLASS)
 		}
 		incomplete_class = 1
 	} else {

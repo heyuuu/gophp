@@ -121,7 +121,7 @@ func PhpGlobStreamOpener(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var pglob *GlobST
@@ -131,7 +131,7 @@ func PhpGlobStreamOpener(
 	if !(strncmp(path, "glob://", b.SizeOf("\"glob://\"")-1)) {
 		path += b.SizeOf("\"glob://\"") - 1
 		if opened_path != nil {
-			*opened_path = types.ZendStringInit(path, strlen(path), 0)
+			*opened_path = types.ZendStringInit(path)
 		}
 	}
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {

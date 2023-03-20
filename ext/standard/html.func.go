@@ -811,7 +811,7 @@ func TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(oldlen int) int { return oldlen + oldlen/
 func TraverseForEntities(
 	old *byte,
 	oldlen int,
-	ret *types.ZendString,
+	ret *types.String,
 	all int,
 	flags int,
 	inv_map *EntityHt,
@@ -969,8 +969,8 @@ func DetermineEntityTable(all int, doctype int) EntityTableOpt {
 	}
 	return retval
 }
-func PhpUnescapeHtmlEntities(str *types.ZendString, all int, flags int, hint_charset *byte) *types.ZendString {
-	var ret *types.ZendString
+func PhpUnescapeHtmlEntities(str *types.String, all int, flags int, hint_charset *byte) *types.String {
+	var ret *types.String
 	var charset EntityCharset
 	var inverse_map *EntityHt
 	var new_size int
@@ -1003,7 +1003,7 @@ func PhpUnescapeHtmlEntities(str *types.ZendString, all int, flags int, hint_cha
 	TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
 	return ret
 }
-func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *types.ZendString {
+func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *types.String {
 	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, 1)
 }
 func FindEntityForChar(
@@ -1082,11 +1082,11 @@ func PhpEscapeHtmlEntitiesEx(
 	flags int,
 	hint_charset string,
 	double_encode types.ZendBool,
-) *types.ZendString {
+) *types.String {
 	var cursor int
 	var maxlen int
 	var len_ int
-	var replaced *types.ZendString
+	var replaced *types.String
 	var charset EntityCharset = DetermineCharset(hint_charset)
 	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	var entity_table EntityTableOpt
@@ -1333,11 +1333,11 @@ func PhpEscapeHtmlEntitiesEx(
 	return replaced
 }
 func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval, all int) {
-	var str *types.ZendString
-	var hint_charset *types.ZendString = nil
+	var str *types.String
+	var hint_charset *types.String = nil
 	var default_charset *byte
 	var flags zend.ZendLong = ENT_COMPAT
-	var replaced *types.ZendString
+	var replaced *types.String
 	var double_encode types.ZendBool = 1
 	for {
 		var _flags int = 0
@@ -1383,9 +1383,9 @@ func ZifHtmlspecialchars(executeData *zend.ZendExecuteData, return_value *types.
 	PhpHtmlEntities(executeData, return_value, 0)
 }
 func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
+	var str *types.String
 	var quote_style zend.ZendLong = ENT_COMPAT
-	var replaced *types.ZendString
+	var replaced *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1413,11 +1413,11 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 	return
 }
 func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
-	var hint_charset *types.ZendString = nil
+	var str *types.String
+	var hint_charset *types.String = nil
 	var default_charset *byte
 	var quote_style zend.ZendLong = ENT_COMPAT
-	var replaced *types.ZendString
+	var replaced *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1

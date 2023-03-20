@@ -11,7 +11,7 @@ import (
 	"sik/zend/types"
 )
 
-func PhpArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.ZendString, level int) {
+func PhpArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
 	if key == nil {
 		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', index)
 	} else {
@@ -21,7 +21,7 @@ func PhpArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.ZendSt
 	}
 	PhpVarDump(zv, level+2)
 }
-func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, index zend.ZendUlong, key *types.ZendString, level int) {
+func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
 	var prop_name *byte
 	var class_name *byte
 	if key == nil {
@@ -45,7 +45,7 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, ind
 	if zv.IsType(types.IS_UNDEF) {
 		b.Assert(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
-			return b.CondF(prop_info.GetType().IsCe(), func() *types.ZendString { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.ZendString { return prop_info.GetType().Name() }).GetVal()
+			return b.CondF(prop_info.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.String { return prop_info.GetType().Name() }).GetVal()
 		}, func() *byte { return types.ZendGetTypeByConst(prop_info.GetType().Code()) }))
 	} else {
 		PhpVarDump(zv, level+2)
@@ -53,10 +53,10 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, ind
 }
 func PhpVarDump(struc *types.Zval, level int) {
 	var myht *types.HashTable
-	var class_name *types.ZendString
+	var class_name *types.String
 	var is_ref int = 0
 	var num zend.ZendUlong
-	var key *types.ZendString
+	var key *types.String
 	var val *types.Zval
 	var count uint32
 	if level > 1 {
@@ -128,7 +128,7 @@ again:
 		types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			var num zend.ZendUlong
-			var key *types.ZendString
+			var key *types.String
 			var val *types.Zval
 			var __ht *types.HashTable = myht
 			for _, _p := range __ht.foreachData() {
@@ -195,7 +195,7 @@ func ZifVarDump(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		PhpVarDump(&args[i], 1)
 	}
 }
-func ZvalArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.ZendString, level int) {
+func ZvalArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
 	if key == nil {
 		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', index)
 	} else {
@@ -205,7 +205,7 @@ func ZvalArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.ZendS
 	}
 	PhpDebugZvalDump(zv, level+2)
 }
-func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, index zend.ZendUlong, key *types.ZendString, level int) {
+func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
 	var prop_name *byte
 	var class_name *byte
 	if key == nil {
@@ -227,7 +227,7 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, in
 	if prop_info != nil && zv.IsType(types.IS_UNDEF) {
 		b.Assert(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
-			return b.CondF(prop_info.GetType().IsCe(), func() *types.ZendString { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.ZendString { return prop_info.GetType().Name() }).GetVal()
+			return b.CondF(prop_info.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.String { return prop_info.GetType().Name() }).GetVal()
 		}, func() *byte { return types.ZendGetTypeByConst(prop_info.GetType().Code()) }))
 	} else {
 		PhpDebugZvalDump(zv, level+2)
@@ -235,10 +235,10 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, in
 }
 func PhpDebugZvalDump(struc *types.Zval, level int) {
 	var myht *types.HashTable = nil
-	var class_name *types.ZendString
+	var class_name *types.String
 	var is_ref int = 0
 	var index zend.ZendUlong
-	var key *types.ZendString
+	var key *types.String
 	var val *types.Zval
 	var count uint32
 	if level > 1 {
@@ -384,14 +384,14 @@ func BufferAppendSpaces(buf *zend.SmartStr, num_spaces int) {
 	buf.AppendString(b.CastStr(tmp_spaces, tmp_spaces_len))
 	zend.Efree(tmp_spaces)
 }
-func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.ZendString, level int, buf *zend.SmartStr) {
+func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.String, level int, buf *zend.SmartStr) {
 	if key == nil {
 		BufferAppendSpaces(buf, level+1)
 		buf.AppendLong(zend.ZendLong(index))
 		buf.AppendString(" => ")
 	} else {
-		var tmp_str *types.ZendString
-		var ckey *types.ZendString = PhpAddcslashes(key, "'\\", 2)
+		var tmp_str *types.String
+		var ckey *types.String = PhpAddcslashes(key, "'\\", 2)
 		tmp_str = PhpStrToStr(ckey.GetVal(), ckey.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
 		BufferAppendSpaces(buf, level+1)
 		buf.AppendByte('\'')
@@ -404,13 +404,13 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Zend
 	buf.AppendByte(',')
 	buf.AppendByte('\n')
 }
-func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.ZendString, level int, buf *zend.SmartStr) {
+func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.String, level int, buf *zend.SmartStr) {
 	BufferAppendSpaces(buf, level+2)
 	if key != nil {
 		var class_name *byte
 		var prop_name *byte
 		var prop_name_len int
-		var pname_esc *types.ZendString
+		var pname_esc *types.String
 		zend.ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len)
 		pname_esc = PhpAddcslashesStr(prop_name, prop_name_len, "'\\", 2)
 		buf.AppendByte('\'')
@@ -428,10 +428,10 @@ func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Zen
 func PhpVarExportEx(struc *types.Zval, level int, buf *zend.SmartStr) {
 	var myht *types.HashTable
 	var tmp_str []byte
-	var ztmp *types.ZendString
-	var ztmp2 *types.ZendString
+	var ztmp *types.String
+	var ztmp2 *types.String
 	var index zend.ZendUlong
-	var key *types.ZendString
+	var key *types.String
 	var val *types.Zval
 again:
 	switch struc.GetType() {
@@ -665,7 +665,7 @@ func PhpVarSerializeString(buf *zend.SmartStr, str *byte, len_ int) {
 	buf.AppendString("\";")
 }
 func PhpVarSerializeClassName(buf *zend.SmartStr, struc *types.Zval) types.ZendBool {
-	var class_name *types.ZendString
+	var class_name *types.String
 	var incomplete_class types.ZendBool = 0
 	PHP_SET_CLASS_ATTRIBUTES(struc)
 	buf.AppendString("O:")
@@ -714,7 +714,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	}
 	return types.SUCCESS
 }
-func PhpVarSerializeTryAddSleepProp(ht *types.HashTable, props *types.HashTable, name *types.ZendString, error_name *types.ZendString, struc *types.Zval) int {
+func PhpVarSerializeTryAddSleepProp(ht *types.HashTable, props *types.HashTable, name *types.String, error_name *types.String, struc *types.Zval) int {
 	var val *types.Zval = props.KeyFind(name.GetStr())
 	if val == nil {
 		return types.FAILURE
@@ -756,10 +756,10 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 			}
 		}
 		name_val = _z
-		var name *types.ZendString
-		var tmp_name *types.ZendString
-		var priv_name *types.ZendString
-		var prot_name *types.ZendString
+		var name *types.String
+		var tmp_name *types.String
+		var priv_name *types.String
+		var prot_name *types.String
 		name_val = types.ZVAL_DEREF(name_val)
 		if name_val.GetType() != types.IS_STRING {
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
@@ -774,7 +774,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 			retval = types.FAILURE
 			break
 		}
-		priv_name = zend.ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr(), ce.GetType()&zend.ZEND_INTERNAL_CLASS != 0)
+		priv_name = zend.ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == types.SUCCESS {
 			zend.ZendTmpStringRelease(tmp_name)
 			types.ZendStringRelease(priv_name)
@@ -786,7 +786,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 			retval = types.FAILURE
 			break
 		}
-		prot_name = zend.ZendManglePropertyName_ZStr("*", name.GetStr(), ce.GetType()&zend.ZEND_INTERNAL_CLASS != 0)
+		prot_name = zend.ZendManglePropertyName_ZStr("*", name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == types.SUCCESS {
 			zend.ZendTmpStringRelease(tmp_name)
 			types.ZendStringRelease(prot_name)
@@ -816,7 +816,7 @@ func PhpVarSerializeNestedData(
 	buf.AppendUlong(count)
 	buf.AppendString(":{")
 	if count > 0 {
-		var key *types.ZendString
+		var key *types.String
 		var data *types.Zval
 		var index zend.ZendUlong
 		var __ht *types.HashTable = ht
@@ -934,7 +934,7 @@ again:
 		if types.ZendHashStrExists(ce.GetFunctionTable(), "__serialize", b.SizeOf("\"__serialize\"")-1) != 0 {
 			var retval types.Zval
 			var obj types.Zval
-			var key *types.ZendString
+			var key *types.String
 			var data *types.Zval
 			var index zend.ZendUlong
 			struc.AddRefcount()
@@ -1180,7 +1180,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		}
 		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
 			var entry *types.Zval
-			var lcname *types.ZendString
+			var lcname *types.String
 			var __ht *types.HashTable = classes.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()

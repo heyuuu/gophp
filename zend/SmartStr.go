@@ -77,9 +77,9 @@ func (this *SmartStr) AppendUlong(num ZendUlong) {
  * todo 待移除方法
  */
 
-func (this *SmartStr) GetS() *types.ZendString {
+func (this *SmartStr) GetS() *types.String {
 	// todo 需要确认是否兼容 ZendStringAlloc() 但未使用时的空 []byte
-	return types.NewZendString(this.GetStr())
+	return types.NewString(this.GetStr())
 }
 func (this *SmartStr) GetC() *byte {
 	// todo 仅占位，实际使用需替换

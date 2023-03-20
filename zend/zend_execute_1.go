@@ -262,8 +262,8 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 	}
 	if object.GetType() > types.IS_FALSE && (object.GetType() != types.IS_STRING || object.GetStr().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
-			var tmp_property_name *types.ZendString
-			var property_name *types.ZendString = ZvalGetTmpString(property, &tmp_property_name)
+			var tmp_property_name *types.String
+			var property_name *types.String = ZvalGetTmpString(property, &tmp_property_name)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
 				faults.Error(faults.E_WARNING, "Attempt to increment/decrement property '%s' of non-object", property_name.GetVal())
 			} else if opline.GetOpcode() == ZEND_FETCH_OBJ_W || opline.GetOpcode() == ZEND_FETCH_OBJ_RW || opline.GetOpcode() == ZEND_FETCH_OBJ_FUNC_ARG || opline.GetOpcode() == ZEND_ASSIGN_OBJ_REF {

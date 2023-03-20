@@ -16,7 +16,7 @@ type PhpBasicGlobals struct {
 	putenv_ht                    types.HashTable
 	strtok_zval                  types.Zval
 	strtok_string                *byte
-	locale_string                *types.ZendString
+	locale_string                *types.String
 	locale_changed               types.ZendBool
 	strtok_last                  *byte
 	strtok_table                 []byte
@@ -71,8 +71,8 @@ type PhpBasicGlobals struct {
 // func (this *PhpBasicGlobals) SetStrtokZval(value zend.Zval) { this.strtok_zval = value }
 // func (this *PhpBasicGlobals)  GetStrtokString() *byte      { return this.strtok_string }
 // func (this *PhpBasicGlobals) SetStrtokString(value *byte) { this.strtok_string = value }
-// func (this *PhpBasicGlobals)  GetLocaleString() *zend.ZendString      { return this.locale_string }
-// func (this *PhpBasicGlobals) SetLocaleString(value *zend.ZendString) { this.locale_string = value }
+// func (this *PhpBasicGlobals)  GetLocaleString() *zend.String      { return this.locale_string }
+// func (this *PhpBasicGlobals) SetLocaleString(value *zend.String) { this.locale_string = value }
 // func (this *PhpBasicGlobals)  GetLocaleChanged() zend.ZendBool      { return this.locale_changed }
 // func (this *PhpBasicGlobals) SetLocaleChanged(value zend.ZendBool) { this.locale_changed = value }
 // func (this *PhpBasicGlobals)  GetStrtokLast() *byte      { return this.strtok_last }

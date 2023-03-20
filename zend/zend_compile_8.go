@@ -590,8 +590,8 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	var opline *ZendOp
 	var is_fully_qualified types.ZendBool
-	var orig_name *types.ZendString = ZendAstGetStr(name_ast)
-	var resolved_name *types.ZendString = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
+	var orig_name *types.String = ZendAstGetStr(name_ast)
+	var resolved_name *types.String = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
 	if types.ZendStringEqualsLiteral(resolved_name, "__COMPILER_HALT_OFFSET__") || name_ast.GetAttr() != ZEND_NAME_RELATIVE && types.ZendStringEqualsLiteral(orig_name, "__COMPILER_HALT_OFFSET__") {
 		var last *ZendAst = CG__().GetAst()
 		for last != nil && last.GetKind() == ZEND_AST_STMT_LIST {
@@ -639,7 +639,7 @@ func ZendCompileClassConst(result *Znode, ast *ZendAst) {
 	class_ast = ast.GetChild()[0]
 	const_ast = ast.GetChild()[1]
 	if class_ast.GetKind() == ZEND_AST_ZVAL {
-		var resolved_name *types.ZendString
+		var resolved_name *types.String
 		resolved_name = ZendResolveClassNameAst(class_ast)
 		if const_ast.GetKind() == ZEND_AST_ZVAL && ZendTryCtEvalClassConst(result.GetConstant(), resolved_name, ZendAstGetStr(const_ast)) != 0 {
 			result.SetOpType(IS_CONST)

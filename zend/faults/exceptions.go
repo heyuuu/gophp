@@ -211,7 +211,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	var object *types.ZendObject
 	var trace types.Zval
 	var base_ce *types.ClassEntry
-	var filename *types.ZendString
+	var filename *types.String
 	object = zend.ZendObjectsNew(class_type)
 	obj.SetObj(object)
 	types.Z_OBJ_HT(obj) = &DefaultExceptionHandlers
@@ -249,7 +249,7 @@ func ZimExceptionClone(executeData *zend.ZendExecuteData, return_value *types.Zv
 	ThrowException(nil, "Cannot clone object using __clone()", 0)
 }
 func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var message *types.ZendString = nil
+	var message *types.String = nil
 	var code zend.ZendLong = 0
 	var tmp types.Zval
 	var object *types.Zval
@@ -282,7 +282,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 		zend.ZendUpdatePropertyEx(base_ce, object, types.ZSTR_PREVIOUS, previous)
 	}
 }
-func CHECK_EXC_TYPE(object *types.Zval, id *types.ZendString, type_ types.ZendUchar, value *types.Zval) {
+func CHECK_EXC_TYPE(object *types.Zval, id *types.String, type_ types.ZendUchar, value *types.Zval) {
 	pvalue := zend.ZendReadPropertyEx(GetExceptionBase(object), object, id, 1, value)
 	if pvalue.GetType() != types.IS_NULL && pvalue.GetType() != type_ {
 		zend.ZendUnsetProperty(GetExceptionBase(object), object, id.GetVal(), id.GetLen())
@@ -304,8 +304,8 @@ func ZimExceptionWakeup(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 }
 func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var message *types.ZendString = nil
-	var filename *types.ZendString = nil
+	var message *types.String = nil
+	var filename *types.String = nil
 	var code zend.ZendLong = 0
 	var severity zend.ZendLong = E_ERROR
 	var lineno zend.ZendLong
@@ -351,10 +351,10 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.ZSTR_LINE, &tmp)
 	}
 }
-func GET_PROPERTY(object *types.Zval, id *types.ZendString) *types.Zval {
+func GET_PROPERTY(object *types.Zval, id *types.String) *types.Zval {
 	return zend.ZendReadPropertyEx(GetExceptionBase(object), object, id, 0, &rv)
 }
-func GET_PROPERTY_SILENT(object *types.Zval, id *types.ZendString) *types.Zval {
+func GET_PROPERTY_SILENT(object *types.Zval, id *types.String) *types.Zval {
 	return zend.ZendReadPropertyEx(GetExceptionBase(object), object, id, 1, &rv)
 }
 func zim_exception_getFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -417,7 +417,7 @@ func zim_error_exception_getSeverity(executeData *zend.ZendExecuteData, return_v
 	prop = types.ZVAL_DEREF(prop)
 	types.ZVAL_COPY(return_value, prop)
 }
-func TRACE_APPEND_KEY(key *types.ZendString) {
+func TRACE_APPEND_KEY(key *types.String) {
 	tmp = ht.KeyFind(key.GetStr())
 	if tmp {
 		if tmp.GetType() != types.IS_STRING {
@@ -464,7 +464,7 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 	case types.IS_ARRAY:
 		str.AppendString("Array, ")
 	case types.IS_OBJECT:
-		var class_name *types.ZendString = types.Z_OBJ_HT(*arg).GetGetClassName()(types.Z_OBJ_P(arg))
+		var class_name *types.String = types.Z_OBJ_HT(*arg).GetGetClassName()(types.Z_OBJ_P(arg))
 		str.AppendString("Object(")
 		str.AppendString(b.CastStrAuto(class_name.GetVal()))
 		str.AppendString("), ")
@@ -577,11 +577,11 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	var trace types.Zval
 	var exception *types.Zval
 	var base_ce *types.ClassEntry
-	var str *types.ZendString
+	var str *types.String
 	var fci types.ZendFcallInfo
 	var rv types.Zval
 	var tmp types.Zval
-	var fname *types.ZendString
+	var fname *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -589,9 +589,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	exception = zend.ZEND_THIS(executeData)
 	fname = types.ZendStringInit("gettraceasstring", b.SizeOf("\"gettraceasstring\"")-1, 0)
 	for exception != nil && exception.IsObject() && zend.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
-		var prev_str *types.ZendString = str
-		var message *types.ZendString = zend.ZvalGetString(GET_PROPERTY(exception, types.ZSTR_MESSAGE))
-		var file *types.ZendString = zend.ZvalGetString(GET_PROPERTY(exception, types.ZSTR_FILE))
+		var prev_str *types.String = str
+		var message *types.String = zend.ZvalGetString(GET_PROPERTY(exception, types.ZSTR_MESSAGE))
+		var file *types.String = zend.ZvalGetString(GET_PROPERTY(exception, types.ZSTR_FILE))
 		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY(exception, types.ZSTR_LINE))
 		fci.SetSize(b.SizeOf("fci"))
 		fci.GetFunctionName().SetString(fname)
@@ -606,7 +606,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			trace.SetUndef()
 		}
 		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
-			var real_message *types.ZendString = zend.ZendStrpprintf(0, "%s and defined", message.GetVal())
+			var real_message *types.String = zend.ZendStrpprintf(0, "%s and defined", message.GetVal())
 			types.ZendStringReleaseEx(message, 0)
 			message = real_message
 		}
@@ -779,16 +779,16 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 	ce_exception = ex.GetCe()
 	zend.EG__().SetException(nil)
 	if ce_exception == ZendCeParseError || ce_exception == ZendCeCompileError {
-		var message *types.ZendString = zend.ZvalGetString(GET_PROPERTY(&exception, types.ZSTR_MESSAGE))
-		var file *types.ZendString = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.ZSTR_FILE))
+		var message *types.String = zend.ZvalGetString(GET_PROPERTY(&exception, types.ZSTR_MESSAGE))
+		var file *types.String = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.ZSTR_FILE))
 		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.ZSTR_LINE))
 		ErrorHelper(b.Cond(ce_exception == ZendCeParseError, E_PARSE, E_COMPILE_ERROR), file.GetVal(), line, "%s", message.GetVal())
 		types.ZendStringReleaseEx(file, 0)
 		types.ZendStringReleaseEx(message, 0)
 	} else if zend.InstanceofFunction(ce_exception, ZendCeThrowable) != 0 {
 		var tmp types.Zval
-		var str *types.ZendString
-		var file *types.ZendString = nil
+		var str *types.String
+		var file *types.String = nil
 		var line zend.ZendLong = 0
 		zend.ZendCallMethodWith0Params(&exception, ce_exception, ex.GetCe().GetTostring(), "__tostring", &tmp)
 		if zend.EG__().GetException() == nil {

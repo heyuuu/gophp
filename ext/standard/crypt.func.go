@@ -36,9 +36,9 @@ func PhpTo64(s *byte, n int) {
 		s++
 	}
 }
-func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet types.ZendBool) *types.ZendString {
+func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet types.ZendBool) *types.String {
 	var crypt_res *byte
-	var result *types.ZendString
+	var result *types.String
 	if salt[0] == '*' && (salt[1] == '0' || salt[1] == '1') {
 		return nil
 	}
@@ -52,7 +52,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 		var out *byte
 		out = PhpMd5CryptR(password, salt, output)
 		if out != nil {
-			return types.ZendStringInit(out, strlen(out), 0)
+			return types.ZendStringInit(out)
 		}
 		return nil
 	} else if salt[0] == '$' && salt[1] == '6' && salt[2] == '$' {
@@ -64,7 +64,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 			zend.Efree(output)
 			return nil
 		} else {
-			result = types.ZendStringInit(output, strlen(output), 0)
+			result = types.ZendStringInit(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -78,7 +78,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 			zend.Efree(output)
 			return nil
 		} else {
-			result = types.ZendStringInit(output, strlen(output), 0)
+			result = types.ZendStringInit(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -91,7 +91,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return nil
 		} else {
-			result = types.ZendStringInit(output, strlen(output), 0)
+			result = types.ZendStringInit(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return result
 		}
@@ -124,14 +124,14 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 		if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 			return nil
 		} else {
-			result = types.ZendStringInit(crypt_res, strlen(crypt_res), 0)
+			result = types.ZendStringInit(crypt_res)
 			return result
 		}
 	}
 	if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 		return nil
 	} else {
-		result = types.ZendStringInit(crypt_res, strlen(crypt_res), 0)
+		result = types.ZendStringInit(crypt_res)
 		return result
 	}
 }
@@ -141,7 +141,7 @@ func ZifCrypt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var salt_in *byte = nil
 	var str_len int
 	var salt_in_len int = 0
-	var result *types.ZendString
+	var result *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1

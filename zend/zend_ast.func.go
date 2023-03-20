@@ -69,12 +69,12 @@ func ZendAstGetZval(ast *ZendAst) *types.Zval {
 	b.Assert(ast.GetKind() == ZEND_AST_ZVAL)
 	return (*ZendAstZval)(ast).GetVal()
 }
-func ZendAstGetStr(ast *ZendAst) *types.ZendString {
+func ZendAstGetStr(ast *ZendAst) *types.String {
 	var zv *types.Zval = ZendAstGetZval(ast)
 	b.Assert(zv.IsString())
 	return zv.GetStr()
 }
-func ZendAstGetConstantName(ast *ZendAst) *types.ZendString {
+func ZendAstGetConstantName(ast *ZendAst) *types.String {
 	b.Assert(ast.GetKind() == ZEND_AST_CONSTANT)
 	b.Assert((*ZendAstZval)(ast).GetVal().IsString())
 	return (*ZendAstZval)(ast).GetVal().GetStr()
@@ -148,7 +148,7 @@ func ZendAstCreateZvalEx(zv *types.Zval, attr ZendAstAttr) *ZendAst {
 func ZendAstCreateZval(zv *types.Zval) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, CG__().GetZendLineno())
 }
-func ZendAstCreateZvalFromStr(str *types.ZendString) *ZendAst {
+func ZendAstCreateZvalFromStr(str *types.String) *ZendAst {
 	var zv types.Zval
 	zv.SetString(str)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
@@ -158,7 +158,7 @@ func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
 	zv.SetLong(lval)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
-func ZendAstCreateConstant(name *types.ZendString, attr ZendAstAttr) *ZendAst {
+func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
 	var ast *ZendAstZval
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_zval"))
 	ast.SetKind(ZEND_AST_CONSTANT)
@@ -168,7 +168,7 @@ func ZendAstCreateConstant(name *types.ZendString, attr ZendAstAttr) *ZendAst {
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {
-	var name_str *types.ZendString = ZendAstGetStr(name)
+	var name_str *types.String = ZendAstGetStr(name)
 	if types.ZendStringEqualsLiteralCi(name_str, "class") {
 		types.ZendStringRelease(name_str)
 		return ZendAstCreate(ZEND_AST_CLASS_NAME, class_name)
@@ -180,8 +180,8 @@ func ZendAstCreateDecl(
 	kind ZendAstKind,
 	flags uint32,
 	start_lineno uint32,
-	doc_comment *types.ZendString,
-	name *types.ZendString,
+	doc_comment *types.String,
+	name *types.String,
 	child0 *ZendAst,
 	child1 *ZendAst,
 	child2 *ZendAst,
@@ -397,7 +397,7 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 	if expr.IsArray() {
 		var ht *types.HashTable = expr.GetArr()
 		var val *types.Zval
-		var key *types.ZendString
+		var key *types.String
 		var __ht *types.HashTable = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -469,7 +469,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		var zv *types.Zval = ZendAstGetZval(ast)
 		types.ZVAL_COPY(result, zv)
 	case ZEND_AST_CONSTANT:
-		var name *types.ZendString = ZendAstGetConstantName(ast)
+		var name *types.String = ZendAstGetConstantName(ast)
 		var zv *types.Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
 		if zv == nil {
 			result.SetUndef()
@@ -795,7 +795,7 @@ func ZendAstApply(ast *ZendAst, fn ZendAstApplyFunc) {
 		}
 	}
 }
-func ZendAstExportStr(str *SmartStr, s *types.ZendString) {
+func ZendAstExportStr(str *SmartStr, s *types.String) {
 	var i int
 	for i = 0; i < s.GetLen(); i++ {
 		var c uint8 = s.GetVal()[i]
@@ -807,7 +807,7 @@ func ZendAstExportStr(str *SmartStr, s *types.ZendString) {
 		}
 	}
 }
-func ZendAstExportQstr(str *SmartStr, quote byte, s *types.ZendString) {
+func ZendAstExportQstr(str *SmartStr, quote byte, s *types.String) {
 	var i int
 	for i = 0; i < s.GetLen(); i++ {
 		var c uint8 = s.GetVal()[i]
@@ -1055,7 +1055,7 @@ tail_call:
 }
 func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) {
 	var idx ZendLong
-	var key *types.ZendString
+	var key *types.String
 	var val *types.Zval
 	var first int
 	zv = types.ZVAL_DEREF(zv)
@@ -1171,7 +1171,7 @@ tail_call:
 	case ZEND_AST_ZVAL:
 		ZendAstExportZval(str, ZendAstGetZval(ast), priority, indent)
 	case ZEND_AST_CONSTANT:
-		var name *types.ZendString = ZendAstGetConstantName(ast)
+		var name *types.String = ZendAstGetConstantName(ast)
 		str.AppendString(name.GetStr())
 	case ZEND_AST_CONSTANT_CLASS:
 		str.AppendString("__CLASS__")
@@ -2001,7 +2001,7 @@ append_default_value:
 	}
 	return
 }
-func ZendAstExport(prefix string, ast *ZendAst, suffix string) *types.ZendString {
+func ZendAstExport(prefix string, ast *ZendAst, suffix string) *types.String {
 	var str SmartStr = MakeSmartStr(0)
 	str.AppendString(b.CastStrAuto(prefix))
 	ZendAstExportEx(&str, ast, 0, 0)

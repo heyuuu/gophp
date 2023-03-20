@@ -250,7 +250,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 	}
 }
 func ZendArrayKeyExistsFast(ht *types.HashTable, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
-	var str *types.ZendString
+	var str *types.String
 	var hval ZendUlong
 try_again:
 	if key.IsString() {

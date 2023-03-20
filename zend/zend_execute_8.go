@@ -212,7 +212,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					}
 					ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_ROPE {
-					var rope **types.ZendString = (**types.ZendString)(var_)
+					var rope **types.String = (**types.String)(var_)
 					var last *ZendOp = executeData.GetFunc().op_array.opcodes + op_num
 					for last.GetOpcode() != ZEND_ROPE_ADD && last.GetOpcode() != ZEND_ROPE_INIT || last.GetResult().GetVar() != var_num {
 						b.Assert(last >= executeData.GetFunc().op_array.opcodes)
@@ -258,23 +258,23 @@ func ZendSwapOperands(op *ZendOp) {
 	op.SetOp2(tmp)
 	op.SetOp2Type(tmp_type)
 }
-func ZendInitDynamicCallString(function *types.ZendString, num_args uint32) *ZendExecuteData {
+func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExecuteData {
 	var fbc *ZendFunction
 	var func_ *types.Zval
 	var called_scope *types.ClassEntry
-	var lcname *types.ZendString
+	var lcname *types.String
 	var colon *byte
 	if b.Assign(&colon, ZendMemrchr(function.GetVal(), ':', function.GetLen())) != nil && colon > function.GetVal() && (*(colon - 1)) == ':' {
-		var mname *types.ZendString
+		var mname *types.String
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)
-		lcname = types.ZendStringInit(function.GetVal(), cname_length, 0)
+		lcname = types.ZendStringInit(b.CastStr(function.GetVal(), cname_length))
 		called_scope = ZendFetchClassByName(lcname, nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 		if called_scope == nil {
 			types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		mname = types.ZendStringInit(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length, 0)
+		mname = types.ZendStringInit(b.CastStr(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length))
 		if called_scope.GetGetStaticMethod() != nil {
 			fbc = called_scope.GetGetStaticMethod()(called_scope, mname)
 		} else {

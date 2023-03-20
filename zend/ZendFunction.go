@@ -32,7 +32,7 @@ func (this *functionHeader) GetRequiredNumArgs() uint32 { return this.requiredNu
 type ZendFunction struct /* union */ {
 	functionHeader
 	common struct {
-		function_name *types.ZendString
+		function_name *types.String
 		scope         *types.ClassEntry
 		prototype     *ZendFunction
 		arg_info      *ZendArgInfo
@@ -67,8 +67,8 @@ func (this *ZendFunction) CheckArgSendType(argNum1 uint32, mask uint8) bool {
 }
 
 func (this *ZendFunction) GetCommonType() types.ZendUchar            { return this.GetType() }
-func (this *ZendFunction) GetFunctionName() *types.ZendString        { return this.common.function_name }
-func (this *ZendFunction) SetFunctionName(value *types.ZendString)   { this.common.function_name = value }
+func (this *ZendFunction) GetFunctionName() *types.String            { return this.common.function_name }
+func (this *ZendFunction) SetFunctionName(value *types.String)       { this.common.function_name = value }
 func (this *ZendFunction) GetScope() *types.ClassEntry               { return this.common.scope }
 func (this *ZendFunction) SetScope(value *types.ClassEntry)          { this.common.scope = value }
 func (this *ZendFunction) GetPrototype() *ZendFunction               { return this.common.prototype }

@@ -70,7 +70,7 @@ func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, p
 		buffer.AppendString("\r\n")
 	}
 	if !(gettimeofday(&tv, nil)) {
-		var dt *types.ZendString = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
+		var dt *types.String = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
 		buffer.AppendString("Date: ")
 		buffer.AppendString(b.CastStrAuto(dt.GetVal()))
 		buffer.AppendString(" GMT\r\n")
@@ -89,7 +89,7 @@ func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var client *PhpCliServerClient
 	var headers *types.HashTable
-	var key *types.ZendString
+	var key *types.String
 	var value *byte
 	var tmp types.Zval
 	if !executeData.CheckNumArgsNone(false) {
@@ -579,7 +579,7 @@ func PhpCliServerLogf(type_ int, format string, _ ...any) {
 	SapiCliServerLogWrite(type_, buf)
 	zend.Efree(buf)
 }
-func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, socklen *socklen_t, errstr **types.ZendString) core.PhpSocketT {
+func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, socklen *socklen_t, errstr **types.String) core.PhpSocketT {
 	var retval core.PhpSocketT = core.SOCK_ERR
 	var err int = 0
 	var sa *__struct__sockaddr = nil
@@ -755,7 +755,7 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetSock(client_sock)
 	client.SetAddr(addr)
 	client.SetAddrLen(addr_len)
-	var addr_str *types.ZendString = 0
+	var addr_str *types.String = 0
 	core.PhpNetworkPopulateNameFromSockaddr(addr, addr_len, &addr_str, nil, 0)
 	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen(), 1))
 	client.SetAddrStrLen(addr_str.GetLen())
@@ -790,7 +790,7 @@ func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClien
 	types.ZendHashIndexDel(server.GetClients(), client.GetSock())
 }
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
-	var escaped_request_uri *types.ZendString = nil
+	var escaped_request_uri *types.String = nil
 	var status_string *byte = GetStatusString(status)
 	var content_template string = GetTemplateString(status)
 	var errstr *byte = GetLastError()
@@ -1139,7 +1139,7 @@ func parseServerAddr(addr string) (host string, port int, ok bool) {
 
 func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, router string) bool {
 	var retval int = types.SUCCESS
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	var _router *byte = nil
 	var err int = 0
 	var server_sock core.PhpSocketT = core.SOCK_ERR

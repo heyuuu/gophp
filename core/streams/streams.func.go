@@ -661,8 +661,8 @@ func _phpStreamRead(stream *core.PhpStream, buf *byte, size int) ssize_t {
 	}
 	return didread
 }
-func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *types.ZendString {
-	var str *types.ZendString = types.ZendStringAlloc(len_, 0)
+func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *types.String {
+	var str *types.String = types.ZendStringAlloc(len_, 0)
 	var read ssize_t = core.PhpStreamRead(stream, str.GetVal(), len_)
 	if read < 0 {
 		types.ZendStringEfree(str)
@@ -731,7 +731,7 @@ func _phpStreamStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	}
 	return stream.GetOps().GetStat()(stream, ssb)
 }
-func PhpStreamLocateEol(stream *core.PhpStream, buf *types.ZendString) *byte {
+func PhpStreamLocateEol(stream *core.PhpStream, buf *types.String) *byte {
 	var avail int
 	var cr *byte
 	var lf *byte
@@ -896,8 +896,8 @@ func _phpStreamSearchDelim(stream *core.PhpStream, maxlen int, skiplen int, deli
 		return core.PhpMemnstr((*byte)(stream.GetReadbuf()[stream.GetReadpos()+skiplen]), delim, delim_len, (*byte)(stream.GetReadbuf()[stream.GetReadpos()+seek_len]))
 	}
 }
-func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *types.ZendString {
-	var ret_buf *types.ZendString
+func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *types.String {
+	var ret_buf *types.String
 	var found_delim *byte = nil
 	var buffered_len int
 	var tent_ret_len int
@@ -1280,7 +1280,7 @@ func _phpStreamPassthru(stream *core.PhpStream) ssize_t {
 	}
 	return bcount
 }
-func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *types.ZendString {
+func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *types.String {
 	var ret ssize_t = 0
 	var ptr *byte
 	var len_ int = 0
@@ -1288,7 +1288,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *types
 	var step int = CHUNK_SIZE
 	var min_room int = CHUNK_SIZE / 4
 	var ssbuf core.PhpStreamStatbuf
-	var result *types.ZendString
+	var result *types.String
 	if maxlen == 0 {
 		return types.ZSTR_EMPTY_ALLOC()
 	}
@@ -1546,7 +1546,7 @@ func PhpStreamWrapperSchemeValidate(protocol *byte, protocol_len uint) int {
 func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper) int {
 	var protocol_len uint = uint(strlen(protocol))
 	var ret int
-	var str *types.ZendString
+	var str *types.String
 	if PhpStreamWrapperSchemeValidate(protocol, protocol_len) == types.FAILURE {
 		return types.FAILURE
 	}
@@ -1567,7 +1567,7 @@ func CloneWrapperHash() {
 	types.ZendHashInit(standard.FG(stream_wrappers), UrlStreamWrappersHash.GetNNumOfElements(), nil, nil, 0)
 	types.ZendHashCopy(standard.FG(stream_wrappers), &UrlStreamWrappersHash, nil)
 }
-func PhpRegisterUrlStreamWrapperVolatile(protocol *types.ZendString, wrapper *core.PhpStreamWrapper) int {
+func PhpRegisterUrlStreamWrapperVolatile(protocol *types.String, wrapper *core.PhpStreamWrapper) int {
 	if PhpStreamWrapperSchemeValidate(protocol.GetVal(), protocol.GetLen()) == types.FAILURE {
 		return types.FAILURE
 	}
@@ -1580,7 +1580,7 @@ func PhpRegisterUrlStreamWrapperVolatile(protocol *types.ZendString, wrapper *co
 		return types.FAILURE
 	}
 }
-func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.ZendString) int {
+func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.String) int {
 	if !(standard.FG(stream_wrappers)) {
 		CloneWrapperHash()
 	}
@@ -1801,7 +1801,7 @@ func _phpStreamReaddir(dirstream *core.PhpStream, ent *core.PhpStreamDirent) *co
 	}
 	return nil
 }
-func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **types.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **types.String, context *core.PhpStreamContext) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var wrapper *core.PhpStreamWrapper = nil
 	var path_to_open *byte
@@ -1987,16 +1987,16 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	wrapperhash.GetArr().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
 	return types.SUCCESS
 }
-func PhpStreamDirentAlphasort(a **types.ZendString, b **types.ZendString) int {
+func PhpStreamDirentAlphasort(a **types.String, b **types.String) int {
 	return strcoll(a.GetVal(), b.GetVal())
 }
-func PhpStreamDirentAlphasortr(a **types.ZendString, b **types.ZendString) int {
+func PhpStreamDirentAlphasortr(a **types.String, b **types.String) int {
 	return strcoll(b.GetVal(), a.GetVal())
 }
-func _phpStreamScandir(dirname *byte, namelist []**types.ZendString, flags int, context *core.PhpStreamContext, compare func(a **types.ZendString, b **types.ZendString) int) int {
+func _phpStreamScandir(dirname *byte, namelist []**types.String, flags int, context *core.PhpStreamContext, compare func(a **types.String, b **types.String) int) int {
 	var stream *core.PhpStream
 	var sdp core.PhpStreamDirent
-	var vector **types.ZendString = nil
+	var vector **types.String = nil
 	var vector_size uint = 0
 	var nfiles uint = 0
 	if !namelist {
@@ -2021,9 +2021,9 @@ func _phpStreamScandir(dirname *byte, namelist []**types.ZendString, flags int, 
 				}
 				vector_size *= 2
 			}
-			vector = (**types.ZendString)(zend.SafeErealloc(vector, vector_size, b.SizeOf("char *"), 0))
+			vector = (**types.String)(zend.SafeErealloc(vector, vector_size, b.SizeOf("char *"), 0))
 		}
-		vector[nfiles] = types.ZendStringInit(sdp.GetDName(), strlen(sdp.GetDName()), 0)
+		vector[nfiles] = types.ZendStringInit(sdp.GetDName())
 		nfiles++
 		if vector_size < 10 || nfiles == 0 {
 

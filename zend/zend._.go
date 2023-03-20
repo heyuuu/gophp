@@ -58,7 +58,7 @@ const PRINT_ZVAL_INDENT = 4
 var ZendStandardClassDef *types.ClassEntry = nil
 var ZendPostStartupCb func() int = nil
 var ZendPostShutdownCb func() = nil
-var ZendPreloadAutoload func(filename *types.ZendString) int = nil
+var ZendPreloadAutoload func(filename *types.String) int = nil
 var ZendMessageDispatcherP func(message ZendLong, data any)
 var ZendGetConfigurationDirectiveP func(name string) *types.Zval
 

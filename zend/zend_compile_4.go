@@ -29,9 +29,9 @@ func ZendCompileFuncArrayKeyExists(result *Znode, args *ZendAstList) int {
 }
 func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 	if CG__().GetActiveOpArray().GetFunctionName() != nil && args.GetChildren() == 2 && args.GetChild()[0].GetKind() == ZEND_AST_CALL && args.GetChild()[0].GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0].GetChild()[0]).IsString() && args.GetChild()[0].GetChild()[1].GetKind() == ZEND_AST_ARG_LIST && args.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
-		var orig_name *types.ZendString = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
+		var orig_name *types.String = ZendAstGetStr(args.GetChild()[0].GetChild()[0])
 		var is_fully_qualified types.ZendBool
-		var name *types.ZendString = ZendResolveFunctionName(orig_name, args.GetChild()[0].GetChild()[0].GetAttr(), &is_fully_qualified)
+		var name *types.String = ZendResolveFunctionName(orig_name, args.GetChild()[0].GetChild()[0].GetAttr(), &is_fully_qualified)
 		var list *ZendAstList = ZendAstGetList(args.GetChild()[0].GetChild()[1])
 		var zv *types.Zval = ZendAstGetZval(args.GetChild()[1])
 		var first Znode
@@ -46,7 +46,7 @@ func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 	}
 	return types.FAILURE
 }
-func ZendTryCompileSpecialFunc(result *Znode, lcname *types.ZendString, args *ZendAstList, fbc *ZendFunction, type_ uint32) int {
+func ZendTryCompileSpecialFunc(result *Znode, lcname *types.String, args *ZendAstList, fbc *ZendFunction, type_ uint32) int {
 	if fbc.GetInternalFunction().GetHandler() == ZifDisplayDisabledFunction {
 		return types.FAILURE
 	}
@@ -133,7 +133,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 		return
 	}
 	var name *types.Zval = name_node.GetConstant()
-	var lcname *types.ZendString
+	var lcname *types.String
 	var fbc *ZendFunction
 	var opline *ZendOp
 	lcname = ZendStringTolower(name.GetStr())
@@ -198,7 +198,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	/* Check if this calls a known method on $this */
 
 	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
-		var lcname *types.ZendString = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
+		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 		fbc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetFunctionTable(), lcname)
 
 		/* We only know the exact method that is being called if it is either private or final.
@@ -214,7 +214,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	}
 	ZendCompileCallCommon(result, args_ast, fbc)
 }
-func ZendIsConstructor(name *types.ZendString) types.ZendBool {
+func ZendIsConstructor(name *types.String) types.ZendBool {
 	return types.ZendStringEqualsLiteralCi(name, ZEND_CONSTRUCTOR_FUNC_NAME)
 }
 func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
@@ -261,7 +261,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	if opline.GetOp2Type() == IS_CONST {
 		var ce *types.ClassEntry = nil
 		if opline.GetOp1Type() == IS_CONST {
-			var lcname *types.ZendString = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
+			var lcname *types.String = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
 			ce = types.ZendHashFindPtr(CG__().GetClassTable(), lcname)
 			if ce == nil && CG__().GetActiveClassEntry() != nil && types.ZendStringEqualsCi(CG__().GetActiveClassEntry().GetName(), lcname) {
 				ce = CG__().GetActiveClassEntry()
@@ -270,7 +270,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 			ce = CG__().GetActiveClassEntry()
 		}
 		if ce != nil {
-			var lcname *types.ZendString = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
+			var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 			fbc = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname)
 			if fbc != nil && !fbc.IsPublic() {
 				if ce != CG__().GetActiveClassEntry() && (fbc.IsPrivate() || !fbc.GetScope().IsLinked() || CG__().GetActiveClassEntry() != nil && !CG__().GetActiveClassEntry().IsLinked() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), CG__().GetActiveClassEntry()) == 0) {
@@ -353,7 +353,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 		ZendEmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
 	}
 }
-func ZendCompileStaticVarCommon(var_name *types.ZendString, value *types.Zval, mode uint32) {
+func ZendCompileStaticVarCommon(var_name *types.String, value *types.Zval, mode uint32) {
 	var opline *ZendOp
 	if CG__().GetActiveOpArray().GetStaticVariables() == nil {
 		if CG__().GetActiveOpArray().GetScope() != nil {
@@ -679,7 +679,7 @@ func ZendCompileGoto(ast *ZendAst) {
 	opline.SetExtendedValue(CG__().GetContext().GetCurrentBrkCont())
 }
 func ZendCompileLabel(ast *ZendAst) {
-	var label *types.ZendString = ZendAstGetStr(ast.GetChild()[0])
+	var label *types.String = ZendAstGetStr(ast.GetChild()[0])
 	var dest ZendLabel
 	if CG__().GetContext().GetLabels() == nil {
 		ALLOC_HASHTABLE(CG__().GetContext().GetLabels())

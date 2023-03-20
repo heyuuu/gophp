@@ -16,7 +16,7 @@ func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.HashTabl
 	object.SetProperties(properties)
 	if object.GetCe().GetDefaultPropertiesCount() != 0 {
 		var prop *types.Zval
-		var key *types.ZendString
+		var key *types.String
 		var property_info *ZendPropertyInfo
 		var __ht *types.HashTable = properties
 		for _, _p := range __ht.foreachData() {
@@ -45,7 +45,7 @@ func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.HashTabl
 func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable) {
 	var prop *types.Zval
 	var tmp types.Zval
-	var key *types.ZendString
+	var key *types.String
 	var h ZendLong
 	var property_info *ZendPropertyInfo
 	var __ht *types.HashTable = properties
@@ -61,10 +61,10 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable)
 				var prop_name *byte
 				var prop_name_len int
 				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == types.SUCCESS {
-					var pname *types.ZendString = types.ZendStringInit(prop_name, prop_name_len, 0)
+					var pname *types.String = types.ZendStringInit(b.CastStr(prop_name, prop_name_len))
 					var prev_scope *types.ClassEntry = EG__().GetFakeScope()
 					if class_name != nil && class_name[0] != '*' {
-						var cname *types.ZendString = types.ZendStringInit(class_name, strlen(class_name), 0)
+						var cname *types.String = types.ZendStringInit(class_name)
 						EG__().SetFakeScope(ZendLookupClass(cname))
 						types.ZendStringReleaseEx(cname, 0)
 					}
@@ -205,7 +205,7 @@ func AddIndexDouble(arg *types.Zval, index ZendUlong, d float64) int {
 	arg.GetArr().IndexUpdateH(index, &tmp)
 	return types.SUCCESS
 }
-func AddIndexStr(arg *types.Zval, index ZendUlong, str *types.ZendString) int {
+func AddIndexStr(arg *types.Zval, index ZendUlong, str *types.String) int {
 	zv := types.NewZvalString(str.GetStr())
 	arg.GetArr().IndexUpdateH(index, zv)
 	return types.SUCCESS
@@ -261,7 +261,7 @@ func AddNextIndexDouble(arg *types.Zval, d float64) int {
 		return types.FAILURE
 	}
 }
-func AddNextIndexStr(arg *types.Zval, str *types.ZendString) int {
+func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 	var tmp types.Zval
 	tmp.SetString(str)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
@@ -343,7 +343,7 @@ func AddPropertyZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 }
 func ZendStartupModuleEx(module *ZendModuleEntry) int {
 	var name_len int
-	var lcname *types.ZendString
+	var lcname *types.String
 	if module.GetModuleStarted() != 0 {
 		return types.SUCCESS
 	}

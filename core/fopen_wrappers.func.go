@@ -13,7 +13,7 @@ import (
 
 func OnUpdateBaseDir(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -276,7 +276,7 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 
 	/* Nothing to check... */
 }
-func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.ZendString) *r.FILE {
+func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.String) *r.FILE {
 	var fp *r.FILE
 	if PhpCheckOpenBasedir((*byte)(path)) != 0 {
 		return nil
@@ -288,7 +288,7 @@ func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.ZendS
 
 		var tmp *byte = ExpandFilepathWithMode(path, nil, nil, 0, zend.CWD_EXPAND)
 		if tmp != nil {
-			*opened_path = types.ZendStringInit(tmp, strlen(tmp), 0)
+			*opened_path = types.ZendStringInit(tmp)
 			zend.Efree(tmp)
 		}
 	}
@@ -378,7 +378,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 	}
 	return types.SUCCESS
 }
-func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, path *byte) *types.ZendString {
+func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, path *byte) *types.String {
 	var resolved_path []byte
 	var trypath []byte
 	var ptr *byte
@@ -386,7 +386,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 	var p *byte
 	var actual_path *byte
 	var wrapper *PhpStreamWrapper
-	var exec_filename *types.ZendString
+	var exec_filename *types.String
 
 	/* Don't resolve paths which contain protocol (except of file://) */
 
@@ -397,14 +397,14 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 		wrapper = PhpStreamLocateUrlWrapper(filenamePtr, &actual_path, STREAM_OPEN_FOR_INCLUDE)
 		if wrapper == &streams.PhpPlainFilesWrapper {
 			if zend.TsrmRealpath(actual_path, resolved_path) != nil {
-				return types.ZendStringInit(resolved_path, strlen(resolved_path), 0)
+				return types.ZendStringInit(resolved_path)
 			}
 		}
 		return nil
 	}
 	if (*filenamePtr) == '.' && (zend.IS_SLASH(filenamePtr[1]) || filenamePtr[1] == '.' && zend.IS_SLASH(filenamePtr[2])) || zend.IS_ABSOLUTE_PATH(filenamePtr, filename_length) || path == nil || !(*path) {
 		if zend.TsrmRealpath(filenamePtr, resolved_path) != nil {
-			return types.ZendStringInit(resolved_path, strlen(resolved_path), 0)
+			return types.ZendStringInit(resolved_path)
 		} else {
 			return nil
 		}
@@ -459,7 +459,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 				if wrapper.GetWops().GetUrlStat() != nil {
 					var ssb PhpStreamStatbuf
 					if types.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
-						return types.ZendStringInit(trypath, strlen(trypath), 0)
+						return types.ZendStringInit(trypath)
 					}
 					if zend.EG__().GetException() != nil {
 						return nil
@@ -469,7 +469,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 			}
 		}
 		if zend.TsrmRealpath(actual_path, resolved_path) != nil {
-			return types.ZendStringInit(resolved_path, strlen(resolved_path), 0)
+			return types.ZendStringInit(resolved_path)
 		}
 	}
 
@@ -500,7 +500,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 					if wrapper.GetWops().GetUrlStat() != nil {
 						var ssb PhpStreamStatbuf
 						if types.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
-							return types.ZendStringInit(trypath, strlen(trypath), 0)
+							return types.ZendStringInit(trypath)
 						}
 						if zend.EG__().GetException() != nil {
 							return nil
@@ -510,20 +510,20 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 				}
 			}
 			if zend.TsrmRealpath(actual_path, resolved_path) != nil {
-				return types.ZendStringInit(resolved_path, strlen(resolved_path), 0)
+				return types.ZendStringInit(resolved_path)
 			}
 		}
 	}
 	return nil
 }
-func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **types.ZendString) *r.FILE {
+func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **types.String) *r.FILE {
 	var pathbuf *byte
 	var ptr *byte
 	var end *byte
 	var trypath []byte
 	var fp *r.FILE
 	var filename_length int
-	var exec_filename *types.ZendString
+	var exec_filename *types.String
 	if opened_path != nil {
 		*opened_path = nil
 	}

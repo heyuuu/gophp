@@ -7,10 +7,10 @@ import "sik/zend"
  */
 type ClassEntry struct {
 	type_ byte
-	name  *ZendString
+	name  *String
 	__0   struct /* union */ {
 		parent      *ClassEntry
-		parent_name *ZendString
+		parent_name *String
 	}
 	refcount                     int
 	ce_flags                     uint32
@@ -42,7 +42,7 @@ type ClassEntry struct {
 		interface_gets_implemented func(iface *ClassEntry, class_type *ClassEntry) int
 	}
 	get_iterator      func(ce *ClassEntry, object *Zval, by_ref int) *zend.ZendObjectIterator
-	get_static_method func(ce *ClassEntry, method *ZendString) *zend.ZendFunction
+	get_static_method func(ce *ClassEntry, method *String) *zend.ZendFunction
 	serialize         func(object *Zval, buffer **uint8, buf_len *int, data *zend.ZendSerializeData) int
 	unserialize       func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int
 	num_interfaces    uint32
@@ -56,10 +56,10 @@ type ClassEntry struct {
 	trait_precedences **zend.ZendTraitPrecedence
 	info              struct /* union */ {
 		user struct {
-			filename    *ZendString
+			filename    *String
 			line_start  uint32
 			line_end    uint32
-			doc_comment *ZendString
+			doc_comment *String
 		}
 		internal struct {
 			builtin_functions *ZendFunctionEntry
@@ -105,14 +105,14 @@ func (this *ClassEntry) Name() string { return this.name.GetStr() }
  * Getter / Setter
  */
 func (this *ClassEntry) GetType() byte                   { return this.type_ }
-func (this *ClassEntry) SetType(value byte)              { this.type_ = value }
-func (this *ClassEntry) GetName() *ZendString            { return this.name }
-func (this *ClassEntry) SetName(value *ZendString)       { this.name = value }
-func (this *ClassEntry) GetParent() *ClassEntry          { return this.__0.parent }
-func (this *ClassEntry) SetParent(value *ClassEntry)     { this.__0.parent = value }
-func (this *ClassEntry) GetParentName() *ZendString      { return this.__0.parent_name }
-func (this *ClassEntry) SetParentName(value *ZendString) { this.__0.parent_name = value }
-func (this *ClassEntry) GetRefcount() int                { return this.refcount }
+func (this *ClassEntry) SetType(value byte)          { this.type_ = value }
+func (this *ClassEntry) GetName() *String            { return this.name }
+func (this *ClassEntry) SetName(value *String)       { this.name = value }
+func (this *ClassEntry) GetParent() *ClassEntry      { return this.__0.parent }
+func (this *ClassEntry) SetParent(value *ClassEntry) { this.__0.parent = value }
+func (this *ClassEntry) GetParentName() *String      { return this.__0.parent_name }
+func (this *ClassEntry) SetParentName(value *String) { this.__0.parent_name = value }
+func (this *ClassEntry) GetRefcount() int            { return this.refcount }
 func (this *ClassEntry) SetRefcount(value int)           { this.refcount = value }
 func (this *ClassEntry) GetCeFlags() uint32              { return this.ce_flags }
 func (this *ClassEntry) SetCeFlags(value uint32)         { this.ce_flags = value }
@@ -202,10 +202,10 @@ func (this *ClassEntry) GetGetIterator() func(ce *ClassEntry, object *Zval, by_r
 func (this *ClassEntry) SetGetIterator(value func(ce *ClassEntry, object *Zval, by_ref int) *zend.ZendObjectIterator) {
 	this.get_iterator = value
 }
-func (this *ClassEntry) GetGetStaticMethod() func(ce *ClassEntry, method *ZendString) *zend.ZendFunction {
+func (this *ClassEntry) GetGetStaticMethod() func(ce *ClassEntry, method *String) *zend.ZendFunction {
 	return this.get_static_method
 }
-func (this *ClassEntry) SetGetStaticMethod(value func(ce *ClassEntry, method *ZendString) *zend.ZendFunction) {
+func (this *ClassEntry) SetGetStaticMethod(value func(ce *ClassEntry, method *String) *zend.ZendFunction) {
 	this.get_static_method = value
 }
 func (this *ClassEntry) GetSerialize() func(object *Zval, buffer **uint8, buf_len *int, data *zend.ZendSerializeData) int {
@@ -240,16 +240,16 @@ func (this *ClassEntry) GetTraitPrecedences() **zend.ZendTraitPrecedence {
 func (this *ClassEntry) SetTraitPrecedences(value **zend.ZendTraitPrecedence) {
 	this.trait_precedences = value
 }
-func (this *ClassEntry) GetFilename() *ZendString      { return this.info.user.filename }
-func (this *ClassEntry) SetFilename(value *ZendString) { this.info.user.filename = value }
+func (this *ClassEntry) GetFilename() *String      { return this.info.user.filename }
+func (this *ClassEntry) SetFilename(value *String) { this.info.user.filename = value }
 
 // func (this *ClassEntry)  GetLineStart() uint32      { return this.info.user.line_start }
 func (this *ClassEntry) SetLineStart(value uint32) { this.info.user.line_start = value }
 
 // func (this *ClassEntry)  GetLineEnd() uint32      { return this.info.user.line_end }
-func (this *ClassEntry) SetLineEnd(value uint32)    { this.info.user.line_end = value }
-func (this *ClassEntry) GetDocComment() *ZendString { return this.info.user.doc_comment }
-func (this *ClassEntry) SetDocComment(value *ZendString) {
+func (this *ClassEntry) SetLineEnd(value uint32) { this.info.user.line_end = value }
+func (this *ClassEntry) GetDocComment() *String  { return this.info.user.doc_comment }
+func (this *ClassEntry) SetDocComment(value *String) {
 	this.info.user.doc_comment = value
 }
 func (this *ClassEntry) GetBuiltinFunctions() *ZendFunctionEntry {

@@ -612,7 +612,7 @@ func zim_spl_RecursiveIteratorIterator_getMaxDepth(executeData *zend.ZendExecute
 		return
 	}
 }
-func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.ZendString, key *types.Zval) *zend.ZendFunction {
+func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
 	var function_handler *zend.ZendFunction
 	var object *SplRecursiveItObject = SplRecursiveItFromObj(*zobject)
 	var level zend.ZendLong = object.GetLevel()
@@ -809,7 +809,7 @@ func zim_spl_RecursiveTreeIterator_current(executeData *zend.ZendExecuteData, re
 	var entry types.Zval
 	var postfix types.Zval
 	var ptr *byte
-	var str *types.ZendString
+	var str *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -864,7 +864,7 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	var postfix types.Zval
 	var key_copy types.Zval
 	var ptr *byte
-	var str *types.ZendString
+	var str *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -900,7 +900,7 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	return_value.SetString(str)
 	return
 }
-func SplDualItGetMethod(object **types.ZendObject, method *types.ZendString, key *types.Zval) *zend.ZendFunction {
+func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
 	var function_handler *zend.ZendFunction
 	var intern *SplDualItObject
 	intern = SplDualItFromObj(*object)
@@ -994,7 +994,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 		zend.ArrayInit(intern.GetZcache())
 	case DIT_IteratorIterator:
 		var ce_cast *types.ClassEntry
-		var class_name *types.ZendString
+		var class_name *types.String
 		if zend.ZendParseParametersThrow(executeData.NumArgs(), "O|S", &zobject, ce_inner, &class_name) == types.FAILURE {
 			return nil
 		}
@@ -1032,7 +1032,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 	case DIT_RegexIterator:
 		fallthrough
 	case DIT_RecursiveRegexIterator:
-		var regex *types.ZendString
+		var regex *types.String
 		var mode zend.ZendLong = REGIT_MODE_MATCH
 		intern.SetUseFlags(executeData.NumArgs() >= 5)
 		intern.SetURegexFlags(0)
@@ -1429,8 +1429,8 @@ func zim_spl_CallbackFilterIterator_accept(executeData *zend.ZendExecuteData, re
 }
 func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	var result *types.ZendString
-	var subject *types.ZendString
+	var result *types.String
+	var subject *types.String
 	var count int = 0
 	var zcount types.Zval
 	var rv types.Zval
@@ -1493,7 +1493,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		types.ZVAL_BOOL(return_value, count > 1)
 	case REGIT_MODE_REPLACE:
 		var replacement *types.Zval = zend.ZendReadProperty(intern.GetStd().GetCe(), zend.ZEND_THIS(executeData), "replacement", b.SizeOf("\"replacement\"")-1, 1, &rv)
-		var replacement_str *types.ZendString = zend.ZvalTryGetString(replacement)
+		var replacement_str *types.String = zend.ZvalTryGetString(replacement)
 		if replacement_str == nil {
 			return
 		}
@@ -2017,7 +2017,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 }
 func zim_spl_CachingIterator_offsetSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	var key *types.ZendString
+	var key *types.String
 	var value *types.Zval
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
 	if it.GetDitType() == DIT_Unknown {
@@ -2037,7 +2037,7 @@ func zim_spl_CachingIterator_offsetSet(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	var key *types.ZendString
+	var key *types.String
 	var value *types.Zval
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
 	if it.GetDitType() == DIT_Unknown {
@@ -2060,7 +2060,7 @@ func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_CachingIterator_offsetUnset(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	var key *types.ZendString
+	var key *types.String
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
 	if it.GetDitType() == DIT_Unknown {
 		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
@@ -2078,7 +2078,7 @@ func zim_spl_CachingIterator_offsetUnset(executeData *zend.ZendExecuteData, retu
 }
 func zim_spl_CachingIterator_offsetExists(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject
-	var key *types.ZendString
+	var key *types.String
 	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
 	if it.GetDitType() == DIT_Unknown {
 		faults.ThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")

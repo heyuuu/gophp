@@ -17,8 +17,8 @@ import (
 func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT {
 	var element *types.Zval
 	var env PhpProcessEnvT
-	var key *types.ZendString
-	var str *types.ZendString
+	var key *types.String
+	var str *types.String
 	var ep **byte
 	var p *byte
 	var cnt int
@@ -262,8 +262,8 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zva
 	zend.AddAssocLong(return_value, "stopsig", stopsig)
 }
 func CloseDescriptor(fd PhpFileDescriptorT) __auto__ { return close(fd) }
-func GetValidArgString(zv *types.Zval, elem_num int) *types.ZendString {
-	var str *types.ZendString = zend.ZvalGetString(zv)
+func GetValidArgString(zv *types.Zval, elem_num int) *types.String {
+	var str *types.String = zend.ZvalGetString(zv)
 	if str == nil {
 		return nil
 	}
@@ -287,7 +287,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ndesc int = 0
 	var i int
 	var descitem *types.Zval = nil
-	var str_index *types.ZendString
+	var str_index *types.String
 	var nindex zend.ZendUlong
 	var descriptors *PhpProcOpenDescriptorItem = nil
 	var ndescriptors_array int
@@ -334,7 +334,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var _z *types.Zval = _p.GetVal()
 
 			arg_zv = _z
-			var arg_str *types.ZendString = GetValidArgString(arg_zv, i+1)
+			var arg_str *types.String = GetValidArgString(arg_zv, i+1)
 			if arg_str == nil {
 				argv[i] = nil
 				goto exit_fail

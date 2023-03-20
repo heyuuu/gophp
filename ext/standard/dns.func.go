@@ -27,7 +27,7 @@ func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval)
 func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var addr *byte
 	var addr_len int
-	var hostname *types.ZendString
+	var hostname *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -52,7 +52,7 @@ func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return_value.SetString(hostname)
 	}
 }
-func PhpGethostbyaddr(ip *byte) *types.ZendString {
+func PhpGethostbyaddr(ip *byte) *types.String {
 	var addr6 __struct__in6_addr
 	var addr __struct__in_addr
 	var hp *__struct__hostent
@@ -64,9 +64,9 @@ func PhpGethostbyaddr(ip *byte) *types.ZendString {
 		return nil
 	}
 	if hp == nil || hp.h_name == nil || hp.h_name[0] == '0' {
-		return types.ZendStringInit(ip, strlen(ip), 0)
+		return types.ZendStringInit(ip)
 	}
-	return types.ZendStringInit(hp.h_name, strlen(hp.h_name), 0)
+	return types.ZendStringInit(hp.h_name)
 }
 func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hostname *byte
@@ -147,25 +147,25 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zv
 		zend.AddNextIndexString(return_value, inet_ntoa(in))
 	}
 }
-func PhpGethostbyname(name *byte) *types.ZendString {
+func PhpGethostbyname(name *byte) *types.String {
 	var hp *__struct__hostent
 	var h_addr_0 *__struct__in_addr
 	var in __struct__in_addr
 	var address *byte
 	hp = core.PhpNetworkGethostbyname(name)
 	if hp == nil {
-		return types.ZendStringInit(name, strlen(name), 0)
+		return types.ZendStringInit(name)
 	}
 
 	/* On macos h_addr_list entries may be misaligned. */
 
 	memcpy(&h_addr_0, hp.h_addr_list[0], b.SizeOf("struct in_addr *"))
 	if h_addr_0 == nil {
-		return types.ZendStringInit(name, strlen(name), 0)
+		return types.ZendStringInit(name)
 	}
 	memcpy(in.s_addr, h_addr_0, b.SizeOf("in . s_addr"))
 	address = inet_ntoa(in)
-	return types.ZendStringInit(address, strlen(address), 0)
+	return types.ZendStringInit(address)
 }
 func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hp *HEADER
@@ -417,7 +417,7 @@ func PhpParserr(
 		var l1 int = 0
 		var l2 int = 0
 		var entries types.Zval
-		var tp *types.ZendString
+		var tp *types.String
 		zend.AddAssocString(subarray, "type", "TXT")
 		tp = types.ZendStringAlloc(dlen, 0)
 		zend.ArrayInit(&entries)

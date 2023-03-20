@@ -42,7 +42,7 @@ func PhpStreamUrlWrapHttpEx(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 	redirect_max int,
 	flags int,
@@ -52,7 +52,7 @@ func PhpStreamUrlWrapHttpEx(
 	var resource *PhpUrl = nil
 	var use_ssl int
 	var use_proxy int = 0
-	var tmp *types.ZendString = nil
+	var tmp *types.String = nil
 	var ua_str *byte = nil
 	var ua_zval *types.Zval = nil
 	var tmpzval *types.Zval = nil
@@ -65,7 +65,7 @@ func PhpStreamUrlWrapHttpEx(
 	var file_size int = 0
 	var eol_detect int = 0
 	var transport_string *byte
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	var transport_len int
 	var have_header int = 0
 	var request_fulluri types.ZendBool = 0
@@ -406,7 +406,7 @@ func PhpStreamUrlWrapHttpEx(
 			user_headers = zend.Estrndup(tmp.GetVal(), tmp.GetLen())
 			if tmp.GetRefcount() > 1 {
 				tmp.DelRefcount()
-				tmp = types.ZendStringInit(tmp.GetVal(), tmp.GetLen(), 0)
+				tmp = types.ZendStringInit(tmp.GetStr())
 			}
 
 			/* Make lowercase for easy comparison against 'standard' headers */
@@ -486,7 +486,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		var scratch_len int = strlen(path) + 1
 		var scratch *byte = zend.Emalloc(scratch_len)
-		var stmp *types.ZendString
+		var stmp *types.String
 
 		/* decode the strings first */
 
@@ -811,7 +811,7 @@ func PhpStreamUrlWrapHttpEx(
 							s = resource.GetPath().GetVal()
 							if resource.GetPath().GetLen() == 0 {
 								types.ZendStringReleaseEx(resource.GetPath(), 0)
-								resource.SetPath(types.ZendStringInit("/", 1, 0))
+								resource.SetPath(types.ZendStringInit("/"))
 								s = resource.GetPath().GetVal()
 							} else {
 								*s = '/'
@@ -845,7 +845,7 @@ func PhpStreamUrlWrapHttpEx(
 				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid redirect URL! %s", new_path)
 				goto out
 			}
-			var CHECK_FOR_CNTRL_CHARS func(val *types.ZendString) = func(val *types.ZendString) {
+			var CHECK_FOR_CNTRL_CHARS func(val *types.String) = func(val *types.String) {
 				if val != nil {
 					var s *uint8
 					var e *uint8
@@ -921,7 +921,7 @@ func PhpStreamUrlWrapHttp(
 	path *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *core.PhpStreamContext,
 ) *core.PhpStream {
 	var stream *core.PhpStream

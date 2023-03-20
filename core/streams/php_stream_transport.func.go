@@ -15,7 +15,7 @@ func PhpStreamXportCreate(
 	persistent_id *byte,
 	timeout *__struct__timeval,
 	context *core.PhpStreamContext,
-	estr **types.ZendString,
+	estr **types.String,
 	ecode *int,
 ) *core.PhpStream {
 	return _phpStreamXportCreate(name, namelen, options, flags, persistent_id, timeout, context, estr, ecode)

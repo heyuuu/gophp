@@ -351,7 +351,7 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Has
 	var intern *SplHeapObject = Z_SPLHEAP_P(obj)
 	var tmp types.Zval
 	var heap_array types.Zval
-	var pnstr *types.ZendString
+	var pnstr *types.String
 	var debug_info *types.HashTable
 	var i int
 	if intern.GetStd().GetProperties() == nil {

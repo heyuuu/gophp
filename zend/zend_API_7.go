@@ -30,7 +30,7 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 }
 func ZendDisableClass(class_name *byte, class_name_length int) int {
 	var disabled_class *types.ClassEntry
-	var key *types.ZendString
+	var key *types.String
 	var fn *ZendFunction
 	key = types.ZendStringAlloc(class_name_length, 0)
 	ZendStrTolowerCopy(key.GetVal(), class_name, class_name_length)
@@ -53,11 +53,11 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	disabled_class.GetFunctionTable().Clean()
 	return types.SUCCESS
 }
-func ZendIsCallableCheckClass(name *types.ZendString, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error **byte) int {
+func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error **byte) int {
 	var ret int = 0
 	var ce *types.ClassEntry
 	var name_len int = name.GetLen()
-	var lcname *types.ZendString
+	var lcname *types.String
 	types.ZSTR_ALLOCA_ALLOC(lcname, name_len)
 	ZendStrTolowerCopy(lcname.GetVal(), name.GetVal(), name_len)
 	*strict_class = 0
@@ -162,9 +162,9 @@ func ZendReleaseFcallInfoCache(fcc *types.ZendFcallInfoCache) {
 func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.ZendFcallInfoCache, strict_class int, error **byte) int {
 	var ce_org *types.ClassEntry = fcc.GetCallingScope()
 	var retval int = 0
-	var mname *types.ZendString
-	var cname *types.ZendString
-	var lmname *types.ZendString
+	var mname *types.String
+	var cname *types.String
+	var lmname *types.String
 	var colon *byte
 	var clen int
 	var ftable *types.HashTable
@@ -174,7 +174,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	fcc.SetCallingScope(nil)
 	if ce_org == nil {
 		var func_ *ZendFunction
-		var lmname *types.ZendString
+		var lmname *types.String
 
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
@@ -225,7 +225,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		cname = types.ZendStringInit(callable.GetStr().GetVal(), clen, 0)
+		cname = types.ZendStringInit(b.CastStr(callable.GetStr().GetVal(), clen))
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
 			types.ZendStringReleaseEx(cname, 0)
 			return 0
@@ -238,7 +238,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			}
 			return 0
 		}
-		mname = types.ZendStringInit(callable.GetStr().GetVal()+clen+2, mlen, 0)
+		mname = types.ZendStringInit(b.CastStr(callable.GetStr().GetVal()+clen+2, mlen))
 	} else if ce_org != nil {
 
 		/* Try to fetch find static method of given class. */
@@ -395,8 +395,8 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	}
 	return retval
 }
-func ZendCreateMethodString(class_name *types.ZendString, method_name *types.ZendString) *types.ZendString {
-	var callable_name *types.ZendString = types.ZendStringAlloc(class_name.GetLen()+method_name.GetLen()+b.SizeOf("\"::\"")-1, 0)
+func ZendCreateMethodString(class_name *types.String, method_name *types.String) *types.String {
+	var callable_name *types.String = types.ZendStringAlloc(class_name.GetLen()+method_name.GetLen()+b.SizeOf("\"::\"")-1, 0)
 	var ptr *byte = callable_name.GetVal()
 	memcpy(ptr, class_name.GetVal(), class_name.GetLen())
 	ptr += class_name.GetLen()
@@ -405,7 +405,7 @@ func ZendCreateMethodString(class_name *types.ZendString, method_name *types.Zen
 	memcpy(ptr, method_name.GetVal(), method_name.GetLen()+1)
 	return callable_name
 }
-func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) *types.ZendString {
+func ZendGetCallableNameEx(callable *types.Zval, object *types.ZendObject) *types.String {
 try_again:
 	switch callable.GetType() {
 	case types.IS_STRING:
@@ -436,7 +436,7 @@ try_again:
 		var object *types.ZendObject
 		if types.Z_OBJ_HT(*callable).GetGetClosure() != nil && types.Z_OBJ_HT(*callable).GetGetClosure()(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(callable)
-			var callable_name *types.ZendString = types.ZendStringAlloc(ce.GetName().GetLen()+b.SizeOf("\"::__invoke\"")-1, 0)
+			var callable_name *types.String = types.ZendStringAlloc(ce.GetName().GetLen()+b.SizeOf("\"::__invoke\"")-1, 0)
 			memcpy(callable_name.GetVal(), ce.GetName().GetVal(), ce.GetName().GetLen())
 			memcpy(callable_name.GetVal()+ce.GetName().GetLen(), "::__invoke", b.SizeOf("\"::__invoke\""))
 			return callable_name
@@ -449,6 +449,6 @@ try_again:
 		return ZvalGetStringFunc(callable)
 	}
 }
-func ZendGetCallableName(callable *types.Zval) *types.ZendString {
+func ZendGetCallableName(callable *types.Zval) *types.String {
 	return ZendGetCallableNameEx(callable, nil)
 }

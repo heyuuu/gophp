@@ -97,7 +97,7 @@ var _phpStreamFree func(stream *PhpStream, close_options int) int
 var _phpStreamSeek func(stream *PhpStream, offset zend.ZendOffT, whence int) int
 var _phpStreamTell func(stream *PhpStream) zend.ZendOffT
 var _phpStreamRead func(stream *PhpStream, buf *byte, count int) ssize_t
-var PhpStreamReadToStr func(stream *PhpStream, len_ int) *types.ZendString
+var PhpStreamReadToStr func(stream *PhpStream, len_ int) *types.String
 var _phpStreamWrite func(stream *PhpStream, buf *byte, count int) ssize_t
 var _phpStreamFillReadBuffer func(stream *PhpStream, size int) int
 var _phpStreamPrintf func(stream *PhpStream, fmt *byte, _ ...any) ssize_t
@@ -111,7 +111,7 @@ var _phpStreamGetc func(stream *PhpStream) int
 var _phpStreamPutc func(stream *PhpStream, c int) int
 var _phpStreamFlush func(stream *PhpStream, closing int) int
 var _phpStreamGetLine func(stream *PhpStream, buf *byte, maxlen int, returned_len *int) *byte
-var PhpStreamGetRecord func(stream *PhpStream, maxlen int, delim *byte, delim_len int) *types.ZendString
+var PhpStreamGetRecord func(stream *PhpStream, maxlen int, delim *byte, delim_len int) *types.String
 
 /* CAREFUL! this is equivalent to puts NOT fputs! */
 
@@ -122,9 +122,9 @@ var _phpStreamMkdir func(path *byte, mode int, options int, context *PhpStreamCo
 var _phpStreamRmdir func(path *byte, options int, context *PhpStreamContext) int
 var _phpStreamOpendir func(path *byte, options int, context *PhpStreamContext) *PhpStream
 var _phpStreamReaddir func(dirstream *PhpStream, ent *PhpStreamDirent) *PhpStreamDirent
-var PhpStreamDirentAlphasort func(a **types.ZendString, b **types.ZendString) int
-var PhpStreamDirentAlphasortr func(a **types.ZendString, b **types.ZendString) int
-var _phpStreamScandir func(dirname *byte, namelist []**types.ZendString, flags int, context *PhpStreamContext, compare func(a **types.ZendString, b **types.ZendString) int) int
+var PhpStreamDirentAlphasort func(a **types.String, b **types.String) int
+var PhpStreamDirentAlphasortr func(a **types.String, b **types.String) int
+var _phpStreamScandir func(dirname *byte, namelist []**types.String, flags int, context *PhpStreamContext, compare func(a **types.String, b **types.String) int) int
 var _phpStreamSetOption func(stream *PhpStream, option int, value int, ptrparam any) int
 
 /* Flags for mkdir method in wrapper ops */
@@ -199,7 +199,7 @@ var _phpStreamCopyToStreamEx func(src *PhpStream, dest *PhpStream, maxlen int, l
 /* read all data from stream and put into a buffer. Caller must free buffer
  * when done. */
 
-var _phpStreamCopyToMem func(src *PhpStream, maxlen int, persistent int) *types.ZendString
+var _phpStreamCopyToMem func(src *PhpStream, maxlen int, persistent int) *types.String
 
 /* output all data from a stream */
 
@@ -309,11 +309,11 @@ var PhpShutdownStreamHashes func()
 var ZmDeactivateStreams func(type_ int, module_number int) int
 var PhpRegisterUrlStreamWrapper func(protocol *byte, wrapper *PhpStreamWrapper) int
 var PhpUnregisterUrlStreamWrapper func(protocol *byte) int
-var PhpRegisterUrlStreamWrapperVolatile func(protocol *types.ZendString, wrapper *PhpStreamWrapper) int
-var PhpUnregisterUrlStreamWrapperVolatile func(protocol *types.ZendString) int
-var _phpStreamOpenWrapperEx func(path *byte, mode *byte, options int, opened_path **types.ZendString, context *PhpStreamContext) *PhpStream
+var PhpRegisterUrlStreamWrapperVolatile func(protocol *types.String, wrapper *PhpStreamWrapper) int
+var PhpUnregisterUrlStreamWrapperVolatile func(protocol *types.String) int
+var _phpStreamOpenWrapperEx func(path *byte, mode *byte, options int, opened_path **types.String, context *PhpStreamContext) *PhpStream
 var PhpStreamLocateUrlWrapper func(path *byte, path_for_open **byte, options int) *PhpStreamWrapper
-var PhpStreamLocateEol func(stream *PhpStream, buf *types.ZendString) *byte
+var PhpStreamLocateEol func(stream *PhpStream, buf *types.String) *byte
 
 /* pushes an error message onto the stack for a wrapper instance */
 

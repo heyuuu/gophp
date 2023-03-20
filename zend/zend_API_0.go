@@ -206,7 +206,7 @@ func ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zv *types.Zval) {
 	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 1)
 }
-func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.ZendString, is_ref int) {
+func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.String, is_ref int) {
 	for {
 		var _zv *types.Zval = zv
 		if is_ref != 0 || _zv.IsReference() {
@@ -222,7 +222,7 @@ func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.ZendString, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_REF_STR(zv *types.Zval, str *types.ZendString) {
+func ZEND_TRY_ASSIGN_REF_STR(zv *types.Zval, str *types.String) {
 	b.Assert(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STR(zv, str, 1)
 }

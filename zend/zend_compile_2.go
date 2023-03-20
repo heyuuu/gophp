@@ -388,7 +388,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 		var name_node Znode
 		ZendCompileExpr(&name_node, name_ast)
 		if name_node.GetOpType() == IS_CONST {
-			var name *types.ZendString
+			var name *types.String
 			if name_node.GetConstant().GetType() != types.IS_STRING {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
@@ -431,7 +431,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 	var name_ast *ZendAst = ast.GetChild()[0]
 	if name_ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *types.Zval = ZendAstGetZval(name_ast)
-		var name *types.ZendString
+		var name *types.String
 		if zv.IsString() {
 			name = ZvalMakeInternedString(zv)
 		} else {
@@ -735,8 +735,8 @@ func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
 	if var_ast.GetKind() != ZEND_AST_VAR || var_ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 		return 0
 	}
-	var name1 *types.ZendString = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
-	var name2 *types.ZendString = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
+	var name1 *types.String = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
+	var name2 *types.String = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
 	var result types.ZendBool = types.ZendStringEquals(name1, name2)
 	types.ZendStringReleaseEx(name1, 0)
 	types.ZendStringReleaseEx(name2, 0)

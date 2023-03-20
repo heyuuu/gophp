@@ -284,7 +284,7 @@ func ZendCompileTry(ast *ZendAst) {
 		var classes *ZendAstList = ZendAstGetList(catch_ast.GetChild()[0])
 		var var_ast *ZendAst = catch_ast.GetChild()[1]
 		var stmt_ast *ZendAst = catch_ast.GetChild()[2]
-		var var_name *types.ZendString = ZvalMakeInternedString(ZendAstGetZval(var_ast))
+		var var_name *types.String = ZvalMakeInternedString(ZendAstGetZval(var_ast))
 		var is_last_catch types.ZendBool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
@@ -414,7 +414,7 @@ func ZendCompileDeclare(ast *ZendAst) {
 		var declare_ast *ZendAst = declares.GetChild()[i]
 		var name_ast *ZendAst = declare_ast.GetChild()[0]
 		var value_ast *ZendAst = declare_ast.GetChild()[1]
-		var name *types.ZendString = ZendAstGetStr(name_ast)
+		var name *types.String = ZendAstGetStr(name_ast)
 		if value_ast.GetKind() != ZEND_AST_ZVAL {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
 		}
@@ -469,7 +469,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 	if ast.GetKind() == ZEND_AST_TYPE {
 		return types.ZEND_TYPE_ENCODE(ast.GetAttr(), allow_null)
 	} else {
-		var class_name *types.ZendString = ZendAstGetStr(ast)
+		var class_name *types.String = ZendAstGetStr(ast)
 		var type_code types.ZendUchar = ZendLookupBuiltinTypeByName(class_name)
 		if type_code != 0 {
 			if (ast.GetAttr() & ZEND_NAME_NOT_FQ) != ZEND_NAME_NOT_FQ {
@@ -521,7 +521,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var type_ast *ZendAst = param_ast.GetChild()[0]
 		var var_ast *ZendAst = param_ast.GetChild()[1]
 		var default_ast *ZendAst = param_ast.GetChild()[2]
-		var name *types.ZendString = ZvalMakeInternedString(ZendAstGetZval(var_ast))
+		var name *types.String = ZvalMakeInternedString(ZendAstGetZval(var_ast))
 		var is_ref types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_REF) != 0
 		var is_variadic types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode

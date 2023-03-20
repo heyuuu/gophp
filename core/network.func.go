@@ -22,7 +22,7 @@ func PhpNetworkFreeaddresses(sal **__struct__sockaddr) {
 	}
 	zend.Efree(sal)
 }
-func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr, error_string **types.ZendString) int {
+func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr, error_string **types.String) int {
 	var sap **__struct__sockaddr
 	var n int
 	var ipv6_borked int = -1
@@ -119,7 +119,7 @@ func PhpNetworkConnectSocket(
 	addrlen socklen_t,
 	asynchronous int,
 	timeout *__struct__timeval,
-	error_string **types.ZendString,
+	error_string **types.String,
 	error_code *int,
 ) int {
 	var orig_flags PhpNonBlockingFlagsT
@@ -219,7 +219,7 @@ func PhpNetworkBindSocketToLocalAddr(
 	port unsigned,
 	socktype int,
 	sockopts long,
-	error_string **types.ZendString,
+	error_string **types.String,
 	error_code *int,
 ) PhpSocketT {
 	var num_addrs int
@@ -297,7 +297,7 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 	var in4 *__struct__sockaddr_in = (*__struct__sockaddr_in)(sa)
 	var psal **__struct__sockaddr
 	var n int
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	var in6 *__struct__sockaddr_in6 = (*__struct__sockaddr_in6)(sa)
 	memset(in6, 0, b.SizeOf("struct sockaddr_in6"))
 	if (*addr) == '[' {
@@ -363,7 +363,7 @@ out:
 	zend.Efree(tmp)
 	return ret
 }
-func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, textaddr **types.ZendString, addr **__struct__sockaddr, addrlen *socklen_t) {
+func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, textaddr **types.String, addr **__struct__sockaddr, addrlen *socklen_t) {
 	if addr != nil {
 		*addr = zend.Emalloc(sl)
 		memcpy(*addr, sa, sl)
@@ -389,7 +389,7 @@ func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, te
 		}
 	}
 }
-func PhpNetworkGetPeerName(sock PhpSocketT, textaddr **types.ZendString, addr **__struct__sockaddr, addrlen *socklen_t) int {
+func PhpNetworkGetPeerName(sock PhpSocketT, textaddr **types.String, addr **__struct__sockaddr, addrlen *socklen_t) int {
 	var sa PhpSockaddrStorage
 	var sl socklen_t = b.SizeOf("sa")
 	memset(&sa, 0, b.SizeOf("sa"))
@@ -399,7 +399,7 @@ func PhpNetworkGetPeerName(sock PhpSocketT, textaddr **types.ZendString, addr **
 	}
 	return -1
 }
-func PhpNetworkGetSockName(sock PhpSocketT, textaddr **types.ZendString, addr **__struct__sockaddr, addrlen *socklen_t) int {
+func PhpNetworkGetSockName(sock PhpSocketT, textaddr **types.String, addr **__struct__sockaddr, addrlen *socklen_t) int {
 	var sa PhpSockaddrStorage
 	var sl socklen_t = b.SizeOf("sa")
 	memset(&sa, 0, b.SizeOf("sa"))
@@ -411,11 +411,11 @@ func PhpNetworkGetSockName(sock PhpSocketT, textaddr **types.ZendString, addr **
 }
 func PhpNetworkAcceptIncoming(
 	srvsock PhpSocketT,
-	textaddr **types.ZendString,
+	textaddr **types.String,
 	addr **__struct__sockaddr,
 	addrlen *socklen_t,
 	timeout *__struct__timeval,
-	error_string **types.ZendString,
+	error_string **types.String,
 	error_code *int,
 	tcp_nodelay int,
 ) PhpSocketT {
@@ -455,7 +455,7 @@ func PhpNetworkConnectSocketToHost(
 	socktype int,
 	asynchronous int,
 	timeout *__struct__timeval,
-	error_string **types.ZendString,
+	error_string **types.String,
 	error_code *int,
 	bindto *byte,
 	bindport uint16,
@@ -643,10 +643,10 @@ func PhpSocketStrerror(err long, buf *byte, bufsize int) *byte {
 	}
 	return buf
 }
-func PhpSocketErrorStr(err long) *types.ZendString {
+func PhpSocketErrorStr(err long) *types.String {
 	var errstr *byte
 	errstr = strerror(err)
-	return types.ZendStringInit(errstr, strlen(errstr), 0)
+	return types.ZendStringInit(errstr)
 }
 func _phpStreamSockOpenFromSocket(socket PhpSocketT, persistent_id *byte) *PhpStream {
 	var stream *PhpStream

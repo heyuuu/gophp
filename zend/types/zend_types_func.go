@@ -5,8 +5,8 @@ import (
 	"sik/zend"
 )
 
-func ZEND_TYPE_NAME(t ZendType) *ZendString { return t.Name() }
-func ZEND_TYPE_CE(t ZendType) *ClassEntry   { return t.Ce() }
+func ZEND_TYPE_NAME(t ZendType) *String   { return t.Name() }
+func ZEND_TYPE_CE(t ZendType) *ClassEntry { return t.Ce() }
 
 func ZEND_TYPE_ENCODE(code uint32, allow_null int) ZendType {
 	if allow_null != 0 {
@@ -23,7 +23,7 @@ func ZEND_TYPE_ENCODE_CE(ce *ClassEntry, allow_null bool) ZendType {
 		return ZendType(ptr | 0x2)
 	}
 }
-func ZEND_TYPE_ENCODE_CLASS(class_name *ZendString, allow_null ZendBool) ZendType {
+func ZEND_TYPE_ENCODE_CLASS(class_name *String, allow_null ZendBool) ZendType {
 	var ptr = b.CastUintptr(class_name)
 	if allow_null != 0 {
 		return ZendType(ptr | 0x1)
@@ -76,9 +76,9 @@ func Z_FE_ITER_P(zval_p *Zval) uint32      { return zval_p.GetFeIterIdx() }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
 
 func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool             { return zval_p.IsRefcounted() }
-func Z_ISREF_P(zval_p *Zval) bool                      { return zval_p.IsReference() }
-func Z_STR_P(zval_p *Zval) *ZendString                 { return zval_p.GetStr() }
-func Z_STRVAL_P(zval_p *Zval) []byte                   { return zval_p.GetStr().GetVal() }
+func Z_ISREF_P(zval_p *Zval) bool    { return zval_p.IsReference() }
+func Z_STR_P(zval_p *Zval) *String   { return zval_p.GetStr() }
+func Z_STRVAL_P(zval_p *Zval) []byte { return zval_p.GetStr().GetVal() }
 func Z_ARRVAL(zval Zval) *ZendArray                    { return zval.GetArr() }
 func Z_ARRVAL_P(zval_p *Zval) *ZendArray               { return zval_p.GetArr() }
 func Z_OBJ(zval Zval) *ZendObject                      { return zval.GetObj() }
@@ -110,12 +110,12 @@ func Z_CE(zval Zval) *ClassEntry            { return zval.GetCe() }
 func Z_PTR(zval Zval) any                   { return zval.GetPtr() }
 
 func ZVAL_BOOL(z *Zval, b int)                 { z.SetBool(b != 0) }
-func ZVAL_LONG(z *Zval, l zend.ZendLong)       { z.SetLong(l) }
-func ZVAL_STR(z *Zval, s *ZendString)          { z.SetString(s) }
-func ZVAL_INTERNED_STR(z *Zval, s *ZendString) { z.SetInternedString(s) }
-func ZVAL_NEW_STR(z *Zval, s *ZendString)      { z.SetString(s) }
-func ZVAL_STR_COPY(z *Zval, s *ZendString)     { z.SetStringCopy(s) }
-func ZVAL_ARR(z *Zval, a *ZendArray)           { z.SetArray(a) }
+func ZVAL_LONG(z *Zval, l zend.ZendLong)   { z.SetLong(l) }
+func ZVAL_STR(z *Zval, s *String)          { z.SetString(s) }
+func ZVAL_INTERNED_STR(z *Zval, s *String) { z.SetInternedString(s) }
+func ZVAL_NEW_STR(z *Zval, s *String)      { z.SetString(s) }
+func ZVAL_STR_COPY(z *Zval, s *String)     { z.SetStringCopy(s) }
+func ZVAL_ARR(z *Zval, a *ZendArray)       { z.SetArray(a) }
 func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
 	var arr = NewZendArray(0)
 	z.SetArray(arr)
@@ -141,8 +141,8 @@ func ZVAL_ALIAS_PTR(z *Zval, p *ClassEntry) {
 }
 func Z_REFCOUNT_P(pz *Zval) uint32           { return pz.GetRefcount() }
 func Z_ADDREF_P(pz *Zval) uint32             { return pz.AddRefcount() }
-func Z_DELREF_P(pz *Zval) uint32             { return pz.DelRefcount() }
-func GC_MAKE_PERSISTENT_LOCAL(p *ZendString) {}
+func Z_DELREF_P(pz *Zval) uint32         { return pz.DelRefcount() }
+func GC_MAKE_PERSISTENT_LOCAL(p *String) {}
 
 func ZVAL_COPY_VALUE_EX(z *Zval, v *Zval, gc *ZendRefcounted, t uint32) {
 	z.SetCounted(gc)
@@ -308,7 +308,7 @@ func ZendZvalTypeName(arg *Zval) string {
 	arg = ZVAL_DEREF(arg)
 	return ZendGetTypeByConst(arg.GetType())
 }
-func ZendZvalGetType(arg *Zval) *ZendString {
+func ZendZvalGetType(arg *Zval) *String {
 	switch arg.GetType() {
 	case IS_NULL:
 		return ZSTR_NULL

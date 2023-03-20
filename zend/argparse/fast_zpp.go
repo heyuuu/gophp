@@ -352,10 +352,10 @@ func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int) {
 }
 
 // @see Micro: Z_PARAM_PATH_STR，Old: 'P'
-func (p *FastParser) ParsePathStr() (dest *types.ZendString) {
+func (p *FastParser) ParsePathStr() (dest *types.String) {
 	return p.ParsePathStrEx(false)
 }
-func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.ZendString) {
+func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.String) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
@@ -406,10 +406,10 @@ func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
 }
 
 // @see Micro: Z_PARAM_STR，Old: 'S'
-func (p *FastParser) ParseStr() (dest *types.ZendString) {
+func (p *FastParser) ParseStr() (dest *types.String) {
 	return p.ParseStrEx(false)
 }
-func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.ZendString) {
+func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.String) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return

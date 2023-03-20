@@ -73,9 +73,9 @@ func ZendSpprintf(message *string, max_len int, format string, args ...any) int 
 	return len(result)
 }
 
-func ZendStrpprintf(max_len int, format string, args ...any) *types.ZendString {
+func ZendStrpprintf(max_len int, format string, args ...any) *types.String {
 	result := ZendSprintfEx(max_len, format, args...)
-	return types.NewZendString(result)
+	return types.NewString(result)
 }
 
 func PrintHash(buf *SmartStr, ht *types.HashTable, indent int, is_object types.ZendBool) {
@@ -120,7 +120,7 @@ func PrintHash(buf *SmartStr, ht *types.HashTable, indent int, is_object types.Z
 }
 func PrintFlatHash(ht *types.HashTable) {
 	var tmp *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key ZendUlong
 	var i int = 0
 	var __ht *types.HashTable = ht
@@ -157,8 +157,8 @@ func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	}
 }
 func ZendPrintZval(expr *types.Zval, indent int) int {
-	var tmp_str *types.ZendString
-	var str *types.ZendString = ZvalGetTmpString(expr, &tmp_str)
+	var tmp_str *types.String
+	var str *types.String = ZvalGetTmpString(expr, &tmp_str)
 	var len_ int = str.GetLen()
 	if len_ != 0 {
 		ZendWrite(str.GetStr())
@@ -185,7 +185,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 		break
 	case types.IS_OBJECT:
 		var properties *types.HashTable
-		var class_name *types.ZendString = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
+		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		ZendPrintf("%s Object (", class_name.GetVal())
 		types.ZendStringReleaseEx(class_name, 0)
 		if expr.GetCounted().IsRecursive() {
@@ -226,7 +226,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		break
 	case types.IS_OBJECT:
 		var properties *types.HashTable
-		var class_name *types.ZendString = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
+		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		buf.AppendString(class_name.GetStr())
 		types.ZendStringReleaseEx(class_name, 0)
 		buf.AppendString(" Object\n")
@@ -252,20 +252,20 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		buf.AppendString(expr.GetStr().GetStr())
 		break
 	default:
-		var str *types.ZendString = ZvalGetStringFunc(expr)
+		var str *types.String = ZvalGetStringFunc(expr)
 		buf.AppendString(str.GetStr())
 		types.ZendStringReleaseEx(str, 0)
 		break
 	}
 }
-func ZendPrintZvalRToStr(expr *types.Zval, indent int) *types.ZendString {
+func ZendPrintZvalRToStr(expr *types.Zval, indent int) *types.String {
 	var buf SmartStr = SmartStr{}
 	ZendPrintZvalRToBuf(&buf, expr, indent)
 	buf.ZeroTail()
 	return buf.GetS()
 }
 func ZendPrintZvalR(expr *types.Zval, indent int) {
-	var str *types.ZendString = ZendPrintZvalRToStr(expr, indent)
+	var str *types.String = ZendPrintZvalRToStr(expr, indent)
 	ZendWrite(str.GetStr())
 	types.ZendStringReleaseEx(str, 0)
 }
@@ -308,7 +308,7 @@ func ModuleDestructorZval(zv *types.Zval) {
 	ModuleDestructor(module)
 	Free(module)
 }
-func PhpAutoGlobalsCreateGlobals(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateGlobals(name *types.String) types.ZendBool {
 	var globals types.Zval
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
@@ -406,8 +406,8 @@ func ZendResolvePropertyTypes() {
 
 				prop_info = _z.GetPtr()
 				if prop_info.GetType().IsName() {
-					var type_name *types.ZendString = prop_info.GetType().Name()
-					var lc_type_name *types.ZendString = ZendStringTolower(type_name)
+					var type_name *types.String = prop_info.GetType().Name()
+					var lc_type_name *types.String = ZendStringTolower(type_name)
 					var prop_ce *types.ClassEntry = types.ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
 					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
@@ -522,7 +522,7 @@ func ZendMessageDispatcher(message ZendLong, data any) {
 		ZendMessageDispatcherP(message, data)
 	}
 }
-func ZendGetConfigurationDirective(name *types.ZendString) *types.Zval {
+func ZendGetConfigurationDirective(name *types.String) *types.Zval {
 	if ZendGetConfigurationDirectiveP != nil {
 		return ZendGetConfigurationDirectiveP(name.GetStr())
 	} else {

@@ -36,7 +36,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 		arg.SetDouble(dest)
 		return 1
 	case types.IS_STRING:
-		var dest *types.ZendString
+		var dest *types.String
 
 		/* on success "arg" is converted to IS_STRING */
 
@@ -92,7 +92,7 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
 }
 func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
 	var ce *types.ClassEntry
-	var name *types.ZendString = type_.Name()
+	var name *types.String = type_.Name()
 	if types.ZendStringEqualsLiteralCi(name, "self") {
 
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and

@@ -30,7 +30,7 @@ func BrowscapEntryDtorPersistent(zvalue *types.Zval) {
 	zend.Pefree(entry, 1)
 }
 func IsPlaceholder(c byte) types.ZendBool { return c == '?' || c == '*' }
-func BrowscapComputePrefixLen(pattern *types.ZendString) uint8 {
+func BrowscapComputePrefixLen(pattern *types.String) uint8 {
 	var i int
 	for i = 0; i < pattern.GetLen(); i++ {
 		if IsPlaceholder(pattern.GetVal()[i]) != 0 {
@@ -39,7 +39,7 @@ func BrowscapComputePrefixLen(pattern *types.ZendString) uint8 {
 	}
 	return uint8(cli.MIN(i, UINT8_MAX))
 }
-func BrowscapComputeContains(pattern *types.ZendString, start_pos int, contains_start *uint16, contains_len *uint8) int {
+func BrowscapComputeContains(pattern *types.String, start_pos int, contains_start *uint16, contains_len *uint8) int {
 	var i int = start_pos
 
 	/* Find first non-placeholder character after prefix */
@@ -71,7 +71,7 @@ func BrowscapComputeContains(pattern *types.ZendString, start_pos int, contains_
 	*contains_len = uint8(cli.MIN(i-(*contains_start), UINT8_MAX))
 	return i
 }
-func BrowscapComputeRegexLen(pattern *types.ZendString) int {
+func BrowscapComputeRegexLen(pattern *types.String) int {
 	var i int
 	var len_ int = pattern.GetLen()
 	for i = 0; i < pattern.GetLen(); i++ {
@@ -94,11 +94,11 @@ func BrowscapComputeRegexLen(pattern *types.ZendString) int {
 	}
 	return len_ + b.SizeOf("\"~^$~\"") - 1
 }
-func BrowscapConvertPattern(pattern *types.ZendString, persistent int) *types.ZendString {
+func BrowscapConvertPattern(pattern *types.String, persistent int) *types.String {
 	var i int
 	var j int = 0
 	var t *byte
-	var res *types.ZendString
+	var res *types.String
 	var lc_pattern *byte
 	res = types.ZendStringAlloc(BrowscapComputeRegexLen(pattern), persistent)
 	t = res.GetVal()
@@ -144,8 +144,8 @@ func BrowscapConvertPattern(pattern *types.ZendString, persistent int) *types.Ze
 	zend.FreeAlloca(lc_pattern, use_heap)
 	return res
 }
-func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.ZendString, persistent types.ZendBool) *types.ZendString {
-	var interned *types.ZendString = types.ZendHashFindPtr(ctx.GetStrInterned(), str)
+func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String, persistent types.ZendBool) *types.String {
+	var interned *types.String = types.ZendHashFindPtr(ctx.GetStrInterned(), str)
 	if interned != nil {
 		interned.AddRefcount()
 	} else {
@@ -157,9 +157,9 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.ZendString, persistent
 	}
 	return interned
 }
-func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.ZendString, persistent types.ZendBool) *types.ZendString {
-	var lcname *types.ZendString
-	var interned *types.ZendString
+func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String, persistent types.ZendBool) *types.String {
+	var lcname *types.String
+	var interned *types.String
 	types.ZSTR_ALLOCA_ALLOC(lcname, str.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), str.GetVal(), str.GetLen())
 	interned = types.ZendHashFindPtr(ctx.GetStrInterned(), lcname)
@@ -175,7 +175,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.ZendString, persiste
 	lcname.Free()
 	return interned
 }
-func BrowscapAddKv(bdata *BrowserData, key *types.ZendString, value *types.ZendString, persistent types.ZendBool) {
+func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, persistent types.ZendBool) {
 	if bdata.GetKvUsed() == bdata.GetKvSize() {
 		bdata.SetKvSize(bdata.GetKvSize() * 2)
 		bdata.SetKv(zend.SafePerealloc(bdata.GetKv(), b.SizeOf("browscap_kv"), bdata.GetKvSize(), 0, persistent))
@@ -212,8 +212,8 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 	switch callback_type {
 	case zend.ZEND_INI_PARSER_ENTRY:
 		if ctx.GetCurrentEntry() != nil && arg2 != nil {
-			var new_key *types.ZendString
-			var new_value *types.ZendString
+			var new_key *types.String
+			var new_value *types.String
 
 			/* Set proper value for true/false settings */
 
@@ -244,7 +244,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *types.ZendString = types.Z_STR_P(arg1)
+		var pattern *types.String = types.Z_STR_P(arg1)
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
@@ -324,7 +324,7 @@ func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 }
 func OnChangeBrowscap(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -381,10 +381,10 @@ func BrowscapGetMinimumLength(entry *BrowscapEntry) int {
 	}
 	return len_
 }
-func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.ZendString, found_entry_ptr **BrowscapEntry) int {
+func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_entry_ptr **BrowscapEntry) int {
 	var found_entry *BrowscapEntry = *found_entry_ptr
-	var pattern_lc *types.ZendString
-	var regex *types.ZendString
+	var pattern_lc *types.String
+	var regex *types.String
 	var cur *byte
 	var i int
 	var re *pcre2_code
@@ -455,8 +455,8 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.ZendString, found
 			var i int
 			var prev_len int = 0
 			var curr_len int = 0
-			var previous_match *types.ZendString = found_entry.GetPattern()
-			var current_match *types.ZendString = entry.GetPattern()
+			var previous_match *types.String = found_entry.GetPattern()
+			var current_match *types.String = entry.GetPattern()
 			for i = 0; i < previous_match.GetLen(); i++ {
 				switch previous_match.GetVal()[i] {
 				case '?':
@@ -507,15 +507,15 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.ZendString, found
 }
 func BrowscapZvalCopyCtor(p *types.Zval) {
 	if p.IsRefcounted() {
-		var str *types.ZendString
+		var str *types.String
 		b.Assert(p.IsType(types.IS_STRING))
 		str = p.GetStr().Copy()
 		p.SetString(str)
 	}
 }
 func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var agent_name *types.ZendString = nil
-	var lookup_browser_name *types.ZendString
+	var agent_name *types.String = nil
+	var lookup_browser_name *types.String
 	var return_array types.ZendBool = 0
 	var bdata *BrowserData
 	var found_entry *BrowscapEntry = nil

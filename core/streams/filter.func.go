@@ -21,7 +21,7 @@ func _phpGetStreamFiltersHash() *types.HashTable {
 }
 func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilterFactory) int {
 	var ret int
-	var str *types.ZendString = types.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
+	var str *types.String = types.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
 	if types.ZendHashAddPtr(&StreamFiltersHash, str, any(factory)) {
 		ret = types.SUCCESS
 	} else {
@@ -33,7 +33,7 @@ func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilte
 func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
 	return types.ZendHashStrDel(&StreamFiltersHash, filterpattern, strlen(filterpattern))
 }
-func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.ZendString, factory *PhpStreamFilterFactory) int {
+func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
 	if !(standard.FG(stream_filters)) {
 		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
 		types.ZendHashInit(standard.FG(stream_filters), StreamFiltersHash.GetNNumOfElements()+1, nil, nil, 0)

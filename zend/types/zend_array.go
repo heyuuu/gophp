@@ -12,13 +12,13 @@ import (
  */
 type ZendHashKey struct {
 	h   zend.ZendUlong
-	key *ZendString
+	key *String
 }
 
 func (this *ZendHashKey) GetH() zend.ZendUlong      { return this.h }
 func (this *ZendHashKey) SetH(value zend.ZendUlong) { this.h = value }
-func (this *ZendHashKey) GetKey() *ZendString       { return this.key }
-func (this *ZendHashKey) SetKey(value *ZendString)  { this.key = value }
+func (this *ZendHashKey) GetKey() *String           { return this.key }
+func (this *ZendHashKey) SetKey(value *String)      { this.key = value }
 
 /**
  * ZendArrayKey
@@ -42,10 +42,10 @@ func (this ZendArrayKey) GetH() zend.ZendUlong {
 		return uint(this.index)
 	}
 }
-func (this ZendArrayKey) GetZendStringKey() *ZendString {
+func (this ZendArrayKey) GetZendStringKey() *String {
 	// todo remove
 	if this.key != nil {
-		return NewZendString(*this.key)
+		return NewString(*this.key)
 	} else {
 		return nil
 	}
@@ -108,12 +108,12 @@ func (this *Bucket) SetIndexKey(index int) {
 }
 
 func (this *Bucket) GetH() zend.ZendUlong { return this.key.GetH() }
-func (this *Bucket) GetKey() *ZendString  { return this.key.GetZendStringKey() }
+func (this *Bucket) GetKey() *String      { return this.key.GetZendStringKey() }
 func (this *Bucket) SetH(value zend.ZendUlong) {
 	// todo remove
 	b.Assert(false)
 }
-func (this *Bucket) SetKey(value *ZendString) {
+func (this *Bucket) SetKey(value *String) {
 	// todo 此方法应被替换
 	b.Assert(false)
 }

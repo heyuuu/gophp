@@ -43,7 +43,7 @@ type LangScanner struct {
 	inputFilter  func(string) string // LANG_SCNG__().input_filter  函数参数类型有差异
 	outputFilter func(string) string // LANG_SCNG__().output_filter 函数参数类型有差异
 
-	docComment *string // CG__().doc_comment *ZendString
+	docComment *string // CG__().doc_comment *String
 }
 
 func NewLangScanner(code string, skipShebang bool) *LangScanner {

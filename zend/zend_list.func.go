@@ -220,7 +220,7 @@ func ZendRsrcListGetRsrcType(res *types.ZendResource) *byte {
 		return nil
 	}
 }
-func ZendRegisterPersistentResourceEx(key *types.ZendString, rsrc_pointer any, rsrc_type int) *types.ZendResource {
+func ZendRegisterPersistentResourceEx(key *types.String, rsrc_pointer any, rsrc_type int) *types.ZendResource {
 	var zv *types.Zval
 	var tmp types.Zval
 	tmp.SetNewResourcePersistent(-1, rsrc_pointer, rsrc_type)
@@ -230,7 +230,7 @@ func ZendRegisterPersistentResourceEx(key *types.ZendString, rsrc_pointer any, r
 	return zv.GetRes()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *types.ZendResource {
-	var str *types.ZendString = types.ZendStringInit(key, key_len, 1)
+	var str *types.String = types.ZendStringInit(b.CastStr(key, key_len))
 	var ret *types.ZendResource = ZendRegisterPersistentResourceEx(str, rsrc_pointer, rsrc_type)
 	types.ZendStringReleaseEx(str, 1)
 	return ret

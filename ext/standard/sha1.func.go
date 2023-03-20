@@ -12,7 +12,7 @@ import (
 
 func MakeSha1Digest(sha1str *byte, digest *uint8) { MakeDigestEx(sha1str, digest, 20) }
 func ZifSha1(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *types.ZendString
+	var arg *types.String
 	var raw_output types.ZendBool = 0
 	var context PHP_SHA1_CTX
 	var digest []uint8

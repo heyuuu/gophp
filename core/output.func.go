@@ -251,7 +251,7 @@ func PhpOutputStartInternal(name *byte, name_len int, output_handler PhpOutputHa
 	return types.FAILURE
 }
 func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flags int) *PhpOutputHandler {
-	var handler_name *types.ZendString = nil
+	var handler_name *types.String = nil
 	var error *byte = nil
 	var handler *PhpOutputHandler = nil
 	var alias PhpOutputHandlerAliasCtorT = nil
@@ -286,7 +286,7 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 }
 func PhpOutputHandlerCreateInternal(name *byte, name_len int, output_handler PhpOutputHandlerContextFuncT, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
-	var str *types.ZendString = types.ZendStringInit(name, name_len, 0)
+	var str *types.String = types.ZendStringInit(b.CastStr(name, name_len))
 	handler = PhpOutputHandlerInit(str, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
 	handler.SetInternal(output_handler)
 	types.ZendStringReleaseEx(str, 0)
@@ -354,7 +354,7 @@ func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_se
 	return 0
 }
 func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
-	var str *types.ZendString
+	var str *types.String
 	if zend.EG__().GetCurrentModule() == nil {
 		faults.Error(faults.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
 		return types.FAILURE
@@ -378,7 +378,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 			return types.FAILURE
 		}
 	} else {
-		var str *types.ZendString
+		var str *types.String
 		types.ZendHashInit(&rev, 8, nil, nil, 1)
 		if nil == types.ZendHashNextIndexInsertPtr(&rev, check_func) {
 			rev.Destroy()
@@ -394,7 +394,7 @@ func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT 
 	return types.ZendHashStrFindPtr(&PhpOutputHandlerAliases, name, name_len)
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
-	var str *types.ZendString
+	var str *types.String
 	if zend.EG__().GetCurrentModule() == nil {
 		faults.Error(faults.E_ERROR, "Cannot register an output handler alias outside of MINIT")
 		return types.FAILURE
@@ -525,7 +525,7 @@ func PhpOutputContextDtor(context *PhpOutputContext) {
 		context.GetOut().SetData(nil)
 	}
 }
-func PhpOutputHandlerInit(name *types.ZendString, chunk_size int, flags int) *PhpOutputHandler {
+func PhpOutputHandlerInit(name *types.String, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
 	handler = zend.Ecalloc(1, b.SizeOf("php_output_handler"))
 	handler.SetName(name.Copy())

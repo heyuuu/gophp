@@ -13,7 +13,7 @@ import (
 
 func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
-	var type_ *types.ZendString
+	var type_ *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -41,7 +41,7 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var var_ *types.Zval
-	var type_ *types.ZendString
+	var type_ *types.String
 	var tmp types.Zval
 	var ptr *types.Zval
 	for {
@@ -385,7 +385,7 @@ func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var var_ *types.Zval
 	var callable_name *types.Zval = nil
-	var name *types.ZendString
+	var name *types.String
 	var error *byte
 	var retval types.ZendBool
 	var syntax_only types.ZendBool = 0

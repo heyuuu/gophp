@@ -10,25 +10,25 @@ import (
  * PhpUrl
  */
 type PhpUrl struct {
-	scheme   *types.ZendString
-	user     *types.ZendString
-	pass     *types.ZendString
-	host     *types.ZendString
+	scheme   *types.String
+	user     *types.String
+	pass     *types.String
+	host     *types.String
 	port     uint16
-	path     *types.ZendString
-	query    *types.ZendString
-	fragment *types.ZendString
+	path     *types.String
+	query    *types.String
+	fragment *types.String
 }
 
 //             func MakePhpUrl(
-// scheme *zend.ZendString,
-// user *zend.ZendString,
-// pass *zend.ZendString,
-// host *zend.ZendString,
+// scheme *zend.String,
+// user *zend.String,
+// pass *zend.String,
+// host *zend.String,
 // port uint16,
-// path *zend.ZendString,
-// query *zend.ZendString,
-// fragment *zend.ZendString,
+// path *zend.String,
+// query *zend.String,
+// fragment *zend.String,
 // ) PhpUrl {
 //                 return PhpUrl{
 //                     scheme:scheme,
@@ -41,19 +41,19 @@ type PhpUrl struct {
 //                     fragment:fragment,
 //                 }
 //             }
-func (this *PhpUrl) GetScheme() *types.ZendString        { return this.scheme }
-func (this *PhpUrl) SetScheme(value *types.ZendString)   { this.scheme = value }
-func (this *PhpUrl) GetUser() *types.ZendString          { return this.user }
-func (this *PhpUrl) SetUser(value *types.ZendString)     { this.user = value }
-func (this *PhpUrl) GetPass() *types.ZendString          { return this.pass }
-func (this *PhpUrl) SetPass(value *types.ZendString)     { this.pass = value }
-func (this *PhpUrl) GetHost() *types.ZendString          { return this.host }
-func (this *PhpUrl) SetHost(value *types.ZendString)     { this.host = value }
-func (this *PhpUrl) GetPort() uint16                     { return this.port }
-func (this *PhpUrl) SetPort(value uint16)                { this.port = value }
-func (this *PhpUrl) GetPath() *types.ZendString          { return this.path }
-func (this *PhpUrl) SetPath(value *types.ZendString)     { this.path = value }
-func (this *PhpUrl) GetQuery() *types.ZendString         { return this.query }
-func (this *PhpUrl) SetQuery(value *types.ZendString)    { this.query = value }
-func (this *PhpUrl) GetFragment() *types.ZendString      { return this.fragment }
-func (this *PhpUrl) SetFragment(value *types.ZendString) { this.fragment = value }
+func (this *PhpUrl) GetScheme() *types.String        { return this.scheme }
+func (this *PhpUrl) SetScheme(value *types.String)   { this.scheme = value }
+func (this *PhpUrl) GetUser() *types.String          { return this.user }
+func (this *PhpUrl) SetUser(value *types.String)     { this.user = value }
+func (this *PhpUrl) GetPass() *types.String          { return this.pass }
+func (this *PhpUrl) SetPass(value *types.String)     { this.pass = value }
+func (this *PhpUrl) GetHost() *types.String          { return this.host }
+func (this *PhpUrl) SetHost(value *types.String)     { this.host = value }
+func (this *PhpUrl) GetPort() uint16                 { return this.port }
+func (this *PhpUrl) SetPort(value uint16)            { this.port = value }
+func (this *PhpUrl) GetPath() *types.String          { return this.path }
+func (this *PhpUrl) SetPath(value *types.String)     { this.path = value }
+func (this *PhpUrl) GetQuery() *types.String         { return this.query }
+func (this *PhpUrl) SetQuery(value *types.String)    { this.query = value }
+func (this *PhpUrl) GetFragment() *types.String      { return this.fragment }
+func (this *PhpUrl) SetFragment(value *types.String) { this.fragment = value }

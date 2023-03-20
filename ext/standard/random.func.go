@@ -68,7 +68,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 }
 func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var size zend.ZendLong
-	var bytes *types.ZendString
+	var bytes *types.String
 	for {
 		var _flags int = argparse.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 1

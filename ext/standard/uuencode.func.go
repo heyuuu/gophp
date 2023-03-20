@@ -25,13 +25,13 @@ func PHP_UU_ENC_C3(c int) __auto__ {
 	return PHP_UU_ENC((*(c + 1))<<2&074 | (*(c + 2))>>6&3)
 }
 func PHP_UU_DEC(c char) int { return c - ' '&077 }
-func PhpUuencode(src *byte, src_len int) *types.ZendString {
+func PhpUuencode(src *byte, src_len int) *types.String {
 	var len_ int = 45
 	var p *uint8
 	var s *uint8
 	var e *uint8
 	var ee *uint8
-	var dest *types.ZendString
+	var dest *types.String
 
 	/* encoded length is ~ 38% greater than the original
 	   Use 1.5 for easier calculation.
@@ -89,14 +89,14 @@ func PhpUuencode(src *byte, src_len int) *types.ZendString {
 	dest = types.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()), 0)
 	return dest
 }
-func PhpUudecode(src *byte, src_len int) *types.ZendString {
+func PhpUudecode(src *byte, src_len int) *types.String {
 	var len_ int
 	var total_len int = 0
 	var s *byte
 	var e *byte
 	var p *byte
 	var ee *byte
-	var dest *types.ZendString
+	var dest *types.String
 	dest = types.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
 	p = dest.GetVal()
 	s = src
@@ -157,7 +157,7 @@ err:
 	return nil
 }
 func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var src *types.ZendString
+	var src *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -183,8 +183,8 @@ func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Z
 	return
 }
 func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var src *types.ZendString
-	var dest *types.ZendString
+	var src *types.String
+	var dest *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1

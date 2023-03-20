@@ -13,7 +13,7 @@ import (
 type ZendCompilerGlobals struct {
 	loop_var_stack     ZendStack
 	active_class_entry *types.ClassEntry
-	compiled_filename  *types.ZendString
+	compiled_filename  *types.String
 	zend_lineno        int
 	active_op_array    *ZendOpArray
 	function_table     *types.HashTable
@@ -30,7 +30,7 @@ type ZendCompilerGlobals struct {
 	ini_parser_param             *ZendIniParserParam
 	skip_shebang                 bool
 	increment_lineno             types.ZendBool
-	doc_comment                  *types.ZendString
+	doc_comment                  *types.String
 	extra_fn_flags               uint32
 	compiler_options             uint32
 	context                      ZendOparrayContext
@@ -72,10 +72,10 @@ func (this *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
 func (this *ZendCompilerGlobals) SetActiveClassEntry(value *types.ClassEntry) {
 	this.active_class_entry = value
 }
-func (this *ZendCompilerGlobals) GetCompiledFilename() *types.ZendString {
+func (this *ZendCompilerGlobals) GetCompiledFilename() *types.String {
 	return this.compiled_filename
 }
-func (this *ZendCompilerGlobals) SetCompiledFilename(value *types.ZendString) {
+func (this *ZendCompilerGlobals) SetCompiledFilename(value *types.String) {
 	this.compiled_filename = value
 }
 func (this *ZendCompilerGlobals) GetZendLineno() int                  { return this.zend_lineno }
@@ -120,21 +120,21 @@ func (this *ZendCompilerGlobals) GetIncrementLineno() types.ZendBool  { return t
 func (this *ZendCompilerGlobals) SetIncrementLineno(value types.ZendBool) {
 	this.increment_lineno = value
 }
-func (this *ZendCompilerGlobals) GetDocComment() *types.ZendString      { return this.doc_comment }
-func (this *ZendCompilerGlobals) SetDocComment(value *types.ZendString) { this.doc_comment = value }
-func (this *ZendCompilerGlobals) GetExtraFnFlags() uint32               { return this.extra_fn_flags }
-func (this *ZendCompilerGlobals) SetExtraFnFlags(value uint32)          { this.extra_fn_flags = value }
-func (this *ZendCompilerGlobals) GetCompilerOptions() uint32            { return this.compiler_options }
-func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32)       { this.compiler_options = value }
-func (this *ZendCompilerGlobals) GetContext() ZendOparrayContext        { return this.context }
-func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)   { this.context = value }
-func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext      { return &this.file_context }
-func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext)  { this.file_context = value }
-func (this *ZendCompilerGlobals) GetArena() *ZendArena                  { return this.arena }
-func (this *ZendCompilerGlobals) GetAst() *ZendAst                      { return this.ast }
-func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                 { this.ast = value }
-func (this *ZendCompilerGlobals) GetAstArena() *ZendArena               { return this.ast_arena }
-func (this *ZendCompilerGlobals) SetAstArena(value *ZendArena)          { this.ast_arena = value }
+func (this *ZendCompilerGlobals) GetDocComment() *types.String         { return this.doc_comment }
+func (this *ZendCompilerGlobals) SetDocComment(value *types.String)    { this.doc_comment = value }
+func (this *ZendCompilerGlobals) GetExtraFnFlags() uint32              { return this.extra_fn_flags }
+func (this *ZendCompilerGlobals) SetExtraFnFlags(value uint32)         { this.extra_fn_flags = value }
+func (this *ZendCompilerGlobals) GetCompilerOptions() uint32           { return this.compiler_options }
+func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32)      { this.compiler_options = value }
+func (this *ZendCompilerGlobals) GetContext() ZendOparrayContext       { return this.context }
+func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { this.context = value }
+func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &this.file_context }
+func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }
+func (this *ZendCompilerGlobals) GetArena() *ZendArena                 { return this.arena }
+func (this *ZendCompilerGlobals) GetAst() *ZendAst                     { return this.ast }
+func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                { this.ast = value }
+func (this *ZendCompilerGlobals) GetAstArena() *ZendArena              { return this.ast_arena }
+func (this *ZendCompilerGlobals) SetAstArena(value *ZendArena)         { this.ast_arena = value }
 func (this *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
 	return this.delayed_oplines_stack
 }

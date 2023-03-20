@@ -166,8 +166,8 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 		} else if scope_arg.IsNull() {
 			ce = nil
 		} else {
-			var tmp_class_name *types.ZendString
-			var class_name *types.ZendString = ZvalGetTmpString(scope_arg, &tmp_class_name)
+			var tmp_class_name *types.String
+			var class_name *types.String = ZvalGetTmpString(scope_arg, &tmp_class_name)
 			if types.ZendStringEqualsLiteral(class_name, "static") {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
@@ -328,7 +328,7 @@ func ZendGetClosureThisPtr(obj *types.Zval) *types.Zval {
 	var closure *ZendClosure = (*ZendClosure)(obj.GetObj())
 	return closure.GetThisPtr()
 }
-func ZendClosureGetMethod(object **types.ZendObject, method *types.ZendString, key *types.Zval) *ZendFunction {
+func ZendClosureGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *ZendFunction {
 	if types.ZendStringEqualsLiteralCi(method, ZEND_INVOKE_FUNC_NAME) {
 		return ZendGetClosureInvokeMethod(*object)
 	}
@@ -430,7 +430,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable 
 			num_args++
 		}
 		for i = 0; i < num_args; i++ {
-			var name *types.ZendString
+			var name *types.String
 			var info types.Zval
 			if arg_info.GetName() != nil {
 				if zstr_args != 0 {
@@ -601,7 +601,7 @@ func ZendCreateFakeClosure(res *types.Zval, func_ *ZendFunction, scope *types.Cl
 	closure = (*ZendClosure)(res.GetObj())
 	closure.GetFunc().SetIsFakeClosure(true)
 }
-func ZendClosureBindVar(closure_zv *types.Zval, var_name *types.ZendString, var_ *types.Zval) {
+func ZendClosureBindVar(closure_zv *types.Zval, var_name *types.String, var_ *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())
 	var static_variables *types.HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 	static_variables.KeyUpdate(var_name.GetStr(), var_)

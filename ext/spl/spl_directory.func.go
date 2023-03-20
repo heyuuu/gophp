@@ -488,7 +488,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.HashTable {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(object)
 	var tmp types.Zval
 	var rv *types.HashTable
-	var pnstr *types.ZendString
+	var pnstr *types.String
 	var path *byte
 	var path_len int
 	var stmp []byte
@@ -549,11 +549,11 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.HashTable {
 	}
 	return rv
 }
-func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.ZendString, key *types.Zval) *zend.ZendFunction {
+func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
 	var fsobj *SplFilesystemObject = SplFilesystemFromObj(*object)
 	if fsobj.GetDirp() == nil && fsobj.GetOrigPath() == nil {
 		var func_ *zend.ZendFunction
-		var tmp *types.ZendString = types.ZendStringInit("_bad_state_ex", b.SizeOf("\"_bad_state_ex\"")-1, 0)
+		var tmp *types.String = types.ZendStringInit("_bad_state_ex")
 		func_ = zend.ZendStdGetMethod(object, tmp, nil)
 		types.ZendStringReleaseEx(tmp, 0)
 		return func_
@@ -748,7 +748,7 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 	var flen int
 	var path_len int
 	var idx int
-	var ret *types.ZendString
+	var ret *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -777,7 +777,7 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var p *byte
 	var idx int
-	var fname *types.ZendString
+	var fname *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -818,7 +818,7 @@ func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, re
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var suffix *byte = 0
 	var slen int = 0
-	var fname *types.ZendString
+	var fname *types.String
 	if zend.ZendParseParameters(executeData.NumArgs(), "|s", &suffix, &slen) == types.FAILURE {
 		return
 	}
@@ -2223,7 +2223,7 @@ func zim_spl_SplFileObject_fwrite(executeData *zend.ZendExecuteData, return_valu
 func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var length zend.ZendLong = 0
-	var str *types.ZendString
+	var str *types.String
 	if zend.ZendParseParameters(executeData.NumArgs(), "l", &length) == types.FAILURE {
 		return
 	}

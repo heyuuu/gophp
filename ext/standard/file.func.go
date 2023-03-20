@@ -349,7 +349,7 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *types.Z
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
-	var contents *types.ZendString
+	var contents *types.String
 
 	/* Parse arguments */
 
@@ -503,8 +503,8 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 				var _z *types.Zval = _p.GetVal()
 
 				tmp = _z
-				var t *types.ZendString
-				var str *types.ZendString = zend.ZvalGetTmpString(tmp, &t)
+				var t *types.String
+				var str *types.String = zend.ZvalGetTmpString(tmp, &t)
 				if str.GetLen() != 0 {
 					numbytes += str.GetLen()
 					bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
@@ -558,7 +558,7 @@ func ZifFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stream *core.PhpStream
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
-	var target_buf *types.ZendString
+	var target_buf *types.String
 
 	/* Parse arguments */
 
@@ -663,9 +663,9 @@ func ZifTempnam(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prefix *byte
 	var dir_len int
 	var prefix_len int
-	var opened_path *types.ZendString
+	var opened_path *types.String
 	var fd int
-	var p *types.ZendString
+	var p *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -883,7 +883,7 @@ func ZifFgets(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var buf *byte = nil
 	var argc int = executeData.NumArgs()
 	var line_len int = 0
-	var str *types.ZendString
+	var str *types.String
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -1761,7 +1761,7 @@ func ZifFread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var res *types.Zval
 	var len_ zend.ZendLong
 	var stream *core.PhpStream
-	var str *types.ZendString
+	var str *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1944,8 +1944,8 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 		var _z *types.Zval = _p.GetVal()
 
 		field_tmp = _z
-		var tmp_field_str *types.ZendString
-		var field_str *types.ZendString = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
+		var tmp_field_str *types.String
+		var field_str *types.String = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
 
 		/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 

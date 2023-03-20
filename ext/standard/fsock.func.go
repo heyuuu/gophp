@@ -26,7 +26,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 	var err int
 	var hostname *byte = nil
 	var hostname_len int
-	var errstr *types.ZendString = nil
+	var errstr *types.String = nil
 	return_value.SetFalse()
 	for {
 		var _flags int = 0

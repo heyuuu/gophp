@@ -23,7 +23,7 @@ func SECTION(name string) {
 }
 func PhpInfoPrintHtmlEsc(str *byte, len_ int) int {
 	var written int
-	var new_str *types.ZendString
+	var new_str *types.String
 	new_str = PhpEscapeHtmlEntities((*uint8)(str), len_, 0, ENT_QUOTES, "utf-8")
 	written = core.PhpOutputWrite(new_str.GetVal(), new_str.GetLen())
 	types.ZendStringFree(new_str)
@@ -45,7 +45,7 @@ func PhpInfoPrint(str *byte) int {
 	return core.PhpOutputWrite(str, strlen(str))
 }
 func PhpInfoPrintStreamHash(name string, ht *types.HashTable) {
-	var key *types.ZendString
+	var key *types.String
 	if ht != nil {
 		if ht.GetNNumOfElements() {
 			var first int = 1
@@ -87,7 +87,7 @@ func PhpInfoPrintStreamHash(name string, ht *types.HashTable) {
 func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
 	if zend_module.GetInfoFunc() != nil || zend_module.GetVersion() != nil {
 		if core.SM__().GetPhpinfoAsText() == 0 {
-			var url_name *types.ZendString = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
+			var url_name *types.String = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
 			PhpStrtolower(url_name.GetVal(), url_name.GetLen())
 			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", url_name.GetVal(), zend_module.GetName())
 			zend.Efree(url_name)
@@ -115,10 +115,10 @@ func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
 func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var data *types.Zval
 	var tmp *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
-	var key *types.ZendString
-	key = types.ZendStringInit(name, name_length, 0)
+	var key *types.String
+	key = types.ZendStringInit(b.CastStr(name, name_length))
 	zend.ZendIsAutoGlobal(key)
 	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key)) != nil && data.IsType(types.IS_ARRAY) {
 		var __ht *types.HashTable = data.GetArr()
@@ -153,7 +153,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 			tmp = types.ZVAL_DEREF(tmp)
 			if tmp.IsType(types.IS_ARRAY) {
 				if core.SM__().GetPhpinfoAsText() == 0 {
-					var str *types.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)
+					var str *types.String = zend.ZendPrintZvalRToStr(tmp, 0)
 					PhpInfoPrint("<pre>")
 					PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
 					PhpInfoPrint("</pre>")
@@ -162,8 +162,8 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 					zend.ZendPrintZvalR(tmp, 0)
 				}
 			} else {
-				var tmp2 *types.ZendString
-				var str *types.ZendString = zend.ZvalGetTmpString(tmp, &tmp2)
+				var tmp2 *types.String
+				var str *types.String = zend.ZvalGetTmpString(tmp, &tmp2)
 				if core.SM__().GetPhpinfoAsText() == 0 {
 					if str.GetLen() == 0 {
 						PhpInfoPrint("<i>no value</i>")
@@ -189,7 +189,7 @@ func PhpInfoPrintStyle() {
 	PhpInfoPrintCss()
 	PhpInfoPrintf("</style>\n")
 }
-func PhpGetUname(mode byte) *types.ZendString {
+func PhpGetUname(mode byte) *types.String {
 	var php_uname *byte
 	var tmp_uname []byte
 	var buf __struct__utsname
@@ -211,7 +211,7 @@ func PhpGetUname(mode byte) *types.ZendString {
 			php_uname = tmp_uname
 		}
 	}
-	return types.ZendStringInit(php_uname, strlen(php_uname), 0)
+	return types.ZendStringInit(php_uname)
 }
 func PhpPrintInfoHtmlhead() {
 	PhpInfoPrint("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n")
@@ -232,7 +232,7 @@ func PhpPrintInfo(flag int) {
 	var env **byte
 	var tmp1 **byte
 	var tmp2 **byte
-	var php_uname *types.ZendString
+	var php_uname *types.String
 	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpPrintInfoHtmlhead()
 	} else {

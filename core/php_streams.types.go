@@ -128,7 +128,7 @@ type PhpStreamWrapperOps struct {
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.ZendString,
+		opened_path **types.String,
 		context *PhpStreamContext,
 	) *PhpStream
 	stream_closer func(wrapper *PhpStreamWrapper, stream *PhpStream) int
@@ -139,7 +139,7 @@ type PhpStreamWrapperOps struct {
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.ZendString,
+		opened_path **types.String,
 		context *PhpStreamContext,
 	) *PhpStream
 	label           *byte
@@ -156,7 +156,7 @@ func MakePhpStreamWrapperOps(
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.ZendString,
+		opened_path **types.String,
 		context *PhpStreamContext,
 	) *PhpStream,
 	stream_closer func(wrapper *PhpStreamWrapper, stream *PhpStream) int,
@@ -167,7 +167,7 @@ func MakePhpStreamWrapperOps(
 		filename *byte,
 		mode *byte,
 		options int,
-		opened_path **types.ZendString,
+		opened_path **types.String,
 		context *PhpStreamContext,
 	) *PhpStream,
 	label *byte,
@@ -196,7 +196,7 @@ func (this *PhpStreamWrapperOps) GetStreamOpener() func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *PhpStreamContext,
 ) *PhpStream {
 	return this.stream_opener
@@ -207,7 +207,7 @@ func (this *PhpStreamWrapperOps) SetStreamOpener(value func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *PhpStreamContext,
 ) *PhpStream) {
 	this.stream_opener = value
@@ -232,7 +232,7 @@ func (this *PhpStreamWrapperOps) GetDirOpener() func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *PhpStreamContext,
 ) *PhpStream {
 	return this.dir_opener
@@ -243,7 +243,7 @@ func (this *PhpStreamWrapperOps) SetDirOpener(value func(
 	filename *byte,
 	mode *byte,
 	options int,
-	opened_path **types.ZendString,
+	opened_path **types.String,
 	context *PhpStreamContext,
 ) *PhpStream) {
 	this.dir_opener = value

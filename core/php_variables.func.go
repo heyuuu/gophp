@@ -26,12 +26,12 @@ func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_a
 	} else if str_len == 1 {
 		new_entry.SetInternedString(types.ZSTR_CHAR(zend_uchar * strval))
 	} else {
-		new_entry.SetString(types.ZendStringInit(strval, str_len, 0))
+		new_entry.SetString(types.ZendStringInit(b.CastStr(strval, str_len)))
 	}
 	PhpRegisterVariableEx(var_, &new_entry, track_vars_array)
 }
 func PhpRegisterVariableQuick(name *byte, name_len int, val *types.Zval, ht *types.HashTable) {
-	var key *types.ZendString = types.ZendStringInitInterned(name, name_len, 0)
+	var key *types.String = types.ZendStringInitInterned(name, name_len, 0)
 	ht.KeyUpdateIndirect(key.GetStr(), val)
 	types.ZendStringReleaseEx(key, 0)
 }
@@ -504,7 +504,7 @@ func ImportEnvironmentVariable(ht *types.HashTable, env *byte) {
 	} else if len_ == 1 {
 		val.SetInternedString(types.ZSTR_CHAR(zend_uchar * p))
 	} else {
-		val.SetString(types.ZendStringInit(p, len_, 0))
+		val.SetString(types.ZendStringInit(b.CastStr(p, len_)))
 	}
 	if types.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) {
 		ht.IndexUpdateH(idx, &val)
@@ -628,7 +628,7 @@ func PhpRegisterServerVariables() {
 func PhpAutoglobalMerge(dest *types.HashTable, src *types.HashTable) {
 	var src_entry *types.Zval
 	var dest_entry *types.Zval
-	var string_key *types.ZendString
+	var string_key *types.String
 	var num_key zend.ZendUlong
 	var globals_check int = dest == zend.EG__().GetSymbolTable()
 	var __ht *types.HashTable = src
@@ -663,7 +663,7 @@ func PhpHashEnvironment() int {
 	}
 	return types.SUCCESS
 }
-func PhpAutoGlobalsCreateGet(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateGet(name *types.String) types.ZendBool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'G') || strchr(PG__().variables_order, 'g')) {
 		SM__().GetTreatData()(PARSE_GET, nil, nil)
 	} else {
@@ -674,7 +674,7 @@ func PhpAutoGlobalsCreateGet(name *types.ZendString) types.ZendBool {
 	PG__().http_globals[TRACK_VARS_GET].AddRefcount()
 	return 0
 }
-func PhpAutoGlobalsCreatePost(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreatePost(name *types.String) types.ZendBool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'P') || strchr(PG__().variables_order, 'p')) && !(SG__().headers_sent) && SG__().request_info.request_method && !(strcasecmp(SG__().request_info.request_method, "POST")) {
 		SM__().GetTreatData()(PARSE_POST, nil, nil)
 	} else {
@@ -685,7 +685,7 @@ func PhpAutoGlobalsCreatePost(name *types.ZendString) types.ZendBool {
 	PG__().http_globals[TRACK_VARS_POST].AddRefcount()
 	return 0
 }
-func PhpAutoGlobalsCreateCookie(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateCookie(name *types.String) types.ZendBool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'C') || strchr(PG__().variables_order, 'c')) {
 		SM__().GetTreatData()(PARSE_COOKIE, nil, nil)
 	} else {
@@ -696,7 +696,7 @@ func PhpAutoGlobalsCreateCookie(name *types.ZendString) types.ZendBool {
 	PG__().http_globals[TRACK_VARS_COOKIE].AddRefcount()
 	return 0
 }
-func PhpAutoGlobalsCreateFiles(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
 	if PG__().http_globals[TRACK_VARS_FILES].u1.v.type_ == types.IS_UNDEF {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_FILES])
 	}
@@ -716,7 +716,7 @@ func CheckHttpProxy(var_table *types.HashTable) {
 		}
 	}
 }
-func PhpAutoGlobalsCreateServer(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateServer(name *types.String) types.ZendBool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'S') || strchr(PG__().variables_order, 's')) {
 		PhpRegisterServerVariables()
 		if PG__().register_argc_argv {
@@ -746,7 +746,7 @@ func PhpAutoGlobalsCreateServer(name *types.ZendString) types.ZendBool {
 
 	return 0
 }
-func PhpAutoGlobalsCreateEnv(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateEnv(name *types.String) types.ZendBool {
 	zend.ZvalPtrDtorNogc(&PG__().http_globals[TRACK_VARS_ENV])
 	zend.ArrayInit(&PG__().http_globals[TRACK_VARS_ENV])
 	if PG__().variables_order && (strchr(PG__().variables_order, 'E') || strchr(PG__().variables_order, 'e')) {
@@ -757,7 +757,7 @@ func PhpAutoGlobalsCreateEnv(name *types.ZendString) types.ZendBool {
 	PG__().http_globals[TRACK_VARS_ENV].AddRefcount()
 	return 0
 }
-func PhpAutoGlobalsCreateRequest(name *types.ZendString) types.ZendBool {
+func PhpAutoGlobalsCreateRequest(name *types.String) types.ZendBool {
 	var form_variables types.Zval
 	var _gpc_flags []uint8 = []uint8{0, 0, 0}
 	var p *byte

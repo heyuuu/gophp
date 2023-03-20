@@ -302,7 +302,7 @@ func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
 	ZmInfoAssert(zend_module)
 }
 func ZifConstant(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var const_name *types.ZendString
+	var const_name *types.String
 	var c *types.Zval
 	var scope *types.ClassEntry
 	for {
@@ -712,8 +712,8 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var _z *types.Zval = _p.GetVal()
 
 			entry = _z
-			var tmp_arg_str *types.ZendString
-			var arg_str *types.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var tmp_arg_str *types.String
+			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 			zend.ZendTmpStringRelease(tmp_arg_str)
 		}
@@ -754,8 +754,8 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var _z *types.Zval = _p.GetVal()
 
 			entry = _z
-			var tmp_arg_str *types.ZendString
-			var arg_str *types.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			var tmp_arg_str *types.String
+			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			opts.SetNeedParam(0)
 			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
 			len_ = strlen(opts.GetOptName())
@@ -1030,7 +1030,7 @@ func ZifGetCurrentUser(executeData *zend.ZendExecuteData, return_value *types.Zv
 	return_value.SetRawString(b.CastStrAuto(core.PhpGetCurrentUser()))
 	return
 }
-func AddConfigEntry(h zend.ZendUlong, key *types.ZendString, entry *types.Zval, retval *types.Zval) {
+func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retval *types.Zval) {
 	if entry.IsType(types.IS_STRING) {
 		var str = entry.GetStr().Copy()
 		if key != nil {
@@ -1047,7 +1047,7 @@ func AddConfigEntry(h zend.ZendUlong, key *types.ZendString, entry *types.Zval, 
 }
 func AddConfigEntries(hash *types.HashTable, return_value *types.Zval) {
 	var h zend.ZendUlong
-	var key *types.ZendString
+	var key *types.String
 	var zv *types.Zval
 	var __ht *types.HashTable = hash
 	for _, _p := range __ht.foreachData() {
@@ -1381,7 +1381,7 @@ func UserShutdownFunctionCall(zv *types.Zval) int {
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
 	var retval types.Zval
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var function_name *types.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
 		types.ZendStringReleaseEx(function_name, 0)
 		return 0
@@ -1488,7 +1488,7 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var callback_name *types.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		var callback_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
 		types.ZendStringReleaseEx(callback_name, 0)
@@ -1674,8 +1674,8 @@ func ZifHighlightString(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 }
 func ZifIniGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var varname *types.ZendString
-	var val *types.ZendString
+	var varname *types.String
+	var val *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1711,7 +1711,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var module_number int = 0
 	var module *zend.ZendModuleEntry
 	var details types.ZendBool = 1
-	var key *types.ZendString
+	var key *types.String
 	var ini_entry *zend.ZendIniEntry
 	for {
 		var _flags int = 0
@@ -1787,9 +1787,9 @@ func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, 
 	return !(strncmp(option_name, new_option_name, option_len))
 }
 func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var varname *types.ZendString
-	var new_value *types.ZendString
-	var val *types.ZendString
+	var varname *types.String
+	var new_value *types.String
+	var val *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
@@ -1843,7 +1843,7 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 }
 func ZifIniRestore(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var varname *types.ZendString
+	var varname *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1863,9 +1863,9 @@ func ZifIniRestore(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	zend.ZendRestoreIniEntry(varname, core.PHP_INI_STAGE_RUNTIME)
 }
 func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var new_value *types.ZendString
+	var new_value *types.String
 	var old_value *byte
-	var key *types.ZendString
+	var key *types.String
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1891,7 +1891,7 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 	} else {
 		return_value.SetFalse()
 	}
-	key = types.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
+	key = types.ZendStringInit("include_path")
 	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
 		types.ZendStringReleaseEx(key, 0)
 		zend.ZvalPtrDtorStr(return_value)
@@ -1914,11 +1914,11 @@ func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 	return
 }
 func ZifRestoreIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var key *types.ZendString
+	var key *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	key = types.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
+	key = types.ZendStringInit("include_path")
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
 	types.ZendStringEfree(key)
 }
@@ -1983,7 +1983,7 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 	old_setting = uint16(core.PG__().ignore_user_abort)
 	if executeData.NumArgs() != 0 {
-		var key *types.ZendString = types.ZendStringInit("ignore_user_abort", b.SizeOf("\"ignore_user_abort\"")-1, 0)
+		var key *types.String = types.ZendStringInit("ignore_user_abort")
 		zend.ZendAlterIniEntryChars(key.GetStr(), b.CastStr(b.Cond(arg != 0, "1", "0"), 1), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 		types.ZendStringReleaseEx(key, 0)
 	}
@@ -2113,7 +2113,7 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *types.
 func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var tick_fe UserTickFunctionEntry
 	var i int
-	var function_name *types.ZendString = nil
+	var function_name *types.String = nil
 	tick_fe.SetCalling(0)
 	tick_fe.SetArgCount(executeData.NumArgs())
 	if tick_fe.GetArgCount() < 1 {

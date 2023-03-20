@@ -481,7 +481,7 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Z
 	zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 }
 func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var filter_name *types.ZendString
+	var filter_name *types.String
 	var filters_hash *types.HashTable
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -501,8 +501,8 @@ func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *types.
 	}
 }
 func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var filtername *types.ZendString
-	var classname *types.ZendString
+	var filtername *types.String
+	var classname *types.String
 	var fdat *PhpUserFilterData
 	for {
 		var _flags int = 0

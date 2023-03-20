@@ -67,7 +67,7 @@ type SplDualItObject struct {
 			flags      zend.ZendLong
 			preg_flags zend.ZendLong
 			pce        *pcre_cache_entry
-			regex      *types.ZendString
+			regex      *types.String
 			mode       RegexMode
 			use_flags  int
 		}
@@ -128,8 +128,8 @@ func (this *SplDualItObject) GetPregFlags() zend.ZendLong                { retur
 func (this *SplDualItObject) SetPregFlags(value zend.ZendLong)           { this.u.regex.preg_flags = value }
 func (this *SplDualItObject) GetPce() *pcre_cache_entry                  { return this.u.regex.pce }
 func (this *SplDualItObject) SetPce(value *pcre_cache_entry)             { this.u.regex.pce = value }
-func (this *SplDualItObject) GetURegexRegex() *types.ZendString          { return this.u.regex.regex }
-func (this *SplDualItObject) SetURegexRegex(value *types.ZendString)     { this.u.regex.regex = value }
+func (this *SplDualItObject) GetURegexRegex() *types.String              { return this.u.regex.regex }
+func (this *SplDualItObject) SetURegexRegex(value *types.String)         { this.u.regex.regex = value }
 func (this *SplDualItObject) GetMode() RegexMode                         { return this.u.regex.mode }
 func (this *SplDualItObject) SetMode(value RegexMode)                    { this.u.regex.mode = value }
 func (this *SplDualItObject) GetUseFlags() int                           { return this.u.regex.use_flags }

@@ -9,7 +9,7 @@ import (
 	"sik/zend/types"
 )
 
-func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.ZendString, val *types.Zval) {
+func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.String, val *types.Zval) {
 	for {
 		if val.IsType(types.IS_STRING) {
 			PhpMailBuildHeadersElem(&s, key, val)
@@ -25,7 +25,7 @@ func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.Zend
 		break
 	}
 }
-func PHP_MAIL_BUILD_HEADER_DEFAULT(s zend.SmartStr, key *types.ZendString, val *types.Zval) {
+func PHP_MAIL_BUILD_HEADER_DEFAULT(s zend.SmartStr, key *types.String, val *types.Zval) {
 	if val.IsType(types.IS_STRING) {
 		PhpMailBuildHeadersElem(&s, key, val)
 	} else if val.IsType(types.IS_ARRAY) {

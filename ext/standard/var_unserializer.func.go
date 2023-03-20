@@ -211,10 +211,10 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 		zend.FREE_HASHTABLE(var_hashx.GetRefProps())
 	}
 }
-func UnserializeStr(p **uint8, len_ int, maxlen int) *types.ZendString {
+func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 	var i int
 	var j int
-	var str *types.ZendString = types.ZendStringSafeAlloc(1, len_, 0, 0)
+	var str *types.String = types.ZendStringSafeAlloc(1, len_, 0, 0)
 	var end *uint8 = *((**uint8)(p + maxlen))
 	if end < (*p) {
 		types.ZendStringEfree(str)
@@ -250,9 +250,9 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.ZendString {
 	str.SetLen(i)
 	return str
 }
-func UnserializeAllowedClass(class_name *types.ZendString, var_hashx *PhpUnserializeDataT) int {
+func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserializeDataT) int {
 	var classes *types.HashTable = var_hashx.GetAllowedClasses()
-	var lcname *types.ZendString
+	var lcname *types.String
 	var res int
 	if classes == nil {
 		return 1
@@ -380,26 +380,26 @@ func ProcessNestedData(
 			string_key:
 				if obj != nil && obj.GetCe().GetPropertiesInfo().GetNNumOfElements() > 0 {
 					var existing_propinfo *zend.ZendPropertyInfo
-					var new_key *types.ZendString
+					var new_key *types.String
 					var unmangled_class *byte = nil
 					var unmangled_prop *byte
 					var unmangled_prop_len int
-					var unmangled *types.ZendString
+					var unmangled *types.String
 					if zend.ZendUnmanglePropertyNameEx(key.GetStr(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
 						zend.ZvalPtrDtor(&key)
 						goto failure
 					}
-					unmangled = types.ZendStringInit(unmangled_prop, unmangled_prop_len, 0)
+					unmangled = types.ZendStringInit(b.CastStr(unmangled_prop, unmangled_prop_len))
 					existing_propinfo = types.ZendHashFindPtr(obj.GetCe().GetPropertiesInfo(), unmangled)
 					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.ZEND_ACC_PPP_MASK) {
 						if existing_propinfo.HasFlags(zend.ZEND_ACC_PROTECTED) {
-							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr(), false)
+							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr())
 							types.ZendStringReleaseEx(unmangled, 0)
 						} else if existing_propinfo.HasFlags(zend.ZEND_ACC_PRIVATE) {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
-								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr(), false)
+								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr())
 							} else {
-								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().GetName().GetStr(), unmangled.GetStr(), false)
+								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().GetName().GetStr(), unmangled.GetStr())
 							}
 							types.ZendStringReleaseEx(unmangled, 0)
 						} else {
@@ -785,7 +785,7 @@ yy18:
 	var maxlen int
 	var elements zend_long
 	var str *byte
-	var class_name *types.ZendString
+	var class_name *types.String
 	var ce *types.ClassEntry
 	var incomplete_class types.ZendBool = 0
 	var custom_object types.ZendBool = 0
@@ -821,7 +821,7 @@ yy18:
 		*p = YYCURSOR + len3 - len_
 		return 0
 	}
-	class_name = types.ZendStringInit(str, len_, 0)
+	class_name = types.ZendStringInit(b.CastStr(str, len_))
 	for {
 		if UnserializeAllowedClass(class_name, var_hash) == 0 {
 			incomplete_class = 1

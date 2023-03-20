@@ -12,7 +12,7 @@ import (
 func ZifUniqid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prefix *byte = ""
 	var more_entropy types.ZendBool = 0
-	var uniqid *types.ZendString
+	var uniqid *types.String
 	var sec int
 	var usec int
 	var prefix_len int = 0

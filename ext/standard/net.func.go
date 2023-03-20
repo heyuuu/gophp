@@ -10,7 +10,7 @@ import (
 	"sik/zend/types"
 )
 
-func PhpInetNtop(addr *__struct__sockaddr) *types.ZendString {
+func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 	var addrlen socklen_t = b.SizeOf("struct sockaddr_in")
 	if addr == nil {
 		return nil
@@ -20,7 +20,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.ZendString {
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *types.ZendString = types.ZendStringAlloc(INET_ADDRSTRLEN, 0)
+		var ret *types.String = types.ZendStringAlloc(INET_ADDRSTRLEN, 0)
 		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
 			ret.SetLen(strlen(ret.GetVal()))
 			return ret
@@ -32,7 +32,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.ZendString {
 
 	switch addr.sa_family {
 	case AF_INET:
-		var ret *types.ZendString = types.ZendStringAlloc(NI_MAXHOST, 0)
+		var ret *types.String = types.ZendStringAlloc(NI_MAXHOST, 0)
 		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == types.SUCCESS {
 
 			/* Also demangle numeric host with %name suffix */
@@ -56,7 +56,7 @@ func IfaceAppendUnicast(
 	broadcast *__struct__sockaddr,
 	ptp *__struct__sockaddr,
 ) {
-	var host *types.ZendString
+	var host *types.String
 	var u types.Zval
 	zend.ArrayInit(&u)
 	zend.AddAssocLong(&u, "flags", flags)

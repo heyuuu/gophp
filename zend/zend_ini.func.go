@@ -164,15 +164,15 @@ func ZendUnregisterIniEntries(module_number int) {
 }
 func ZendAlterIniEntryChars(name string, value string, modify_type int, stage int) int {
 	var ret int
-	var new_value *types.ZendString
-	new_value = types.NewZendString(value)
+	var new_value *types.String
+	new_value = types.NewString(value)
 	ret = ZendAlterIniEntryEx(name, new_value, modify_type, stage, 0)
 	types.ZendStringRelease(new_value)
 	return ret
 }
-func ZendAlterIniEntryEx(name *types.ZendString, new_value *types.ZendString, modify_type int, stage int, force_change int) int {
+func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_type int, stage int, force_change int) int {
 	var ini_entry *ZendIniEntry
-	var duplicate *types.ZendString
+	var duplicate *types.String
 	var modifiable uint8
 	var modified types.ZendBool
 	if b.Assign(&ini_entry, types.ZendHashFindPtr(EG__().GetIniDirectives(), name)) == nil {
@@ -210,7 +210,7 @@ func ZendAlterIniEntryEx(name *types.ZendString, new_value *types.ZendString, mo
 	}
 	return types.SUCCESS
 }
-func ZendRestoreIniEntry(name *types.ZendString, stage int) int {
+func ZendRestoreIniEntry(name *types.String, stage int) int {
 	var ini_entry *ZendIniEntry
 	if b.Assign(&ini_entry, types.ZendHashFindPtr(EG__().GetIniDirectives(), name)) == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
 		return types.FAILURE
@@ -303,7 +303,7 @@ func ZendIniString(name string, name_length int, orig int) *byte {
 	}
 	return return_value
 }
-func ZendIniGetValue(name *types.ZendString) *types.ZendString {
+func ZendIniGetValue(name *types.String) *types.String {
 	var ini_entry *ZendIniEntry
 	ini_entry = types.ZendHashFindPtr(EG__().GetIniDirectives(), name)
 	if ini_entry != nil {
@@ -323,7 +323,7 @@ func ZendIniStringParseBool(str string) bool {
 		return b.Atoi(str) != 0
 	}
 }
-func ZendIniParseBool(str *types.ZendString) types.ZendBool {
+func ZendIniParseBool(str *types.String) types.ZendBool {
 	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
 		return 1
 	} else {
@@ -332,7 +332,7 @@ func ZendIniParseBool(str *types.ZendString) types.ZendBool {
 }
 func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	var value int
-	var tmp_value *types.ZendString
+	var tmp_value *types.String
 	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
 		if ini_entry.GetOrigValue() != nil {
 			tmp_value = ini_entry.GetOrigValue()
@@ -380,7 +380,7 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 }
 func OnUpdateBool(
 	entry *ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -394,7 +394,7 @@ func OnUpdateBool(
 }
 func OnUpdateLong(
 	entry *ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -408,7 +408,7 @@ func OnUpdateLong(
 }
 func OnUpdateLongGEZero(
 	entry *ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -427,7 +427,7 @@ func OnUpdateLongGEZero(
 }
 func OnUpdateReal(
 	entry *ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -441,7 +441,7 @@ func OnUpdateReal(
 }
 func OnUpdateString(
 	entry *ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -459,7 +459,7 @@ func OnUpdateString(
 }
 func OnUpdateStringUnempty(
 	entry *ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,

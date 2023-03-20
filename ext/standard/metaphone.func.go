@@ -10,8 +10,8 @@ import (
 )
 
 func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var str *types.ZendString
-	var result *types.ZendString = nil
+	var str *types.String
+	var result *types.String = nil
 	var phones zend.ZendLong = 0
 	for {
 		var _flags int = 0
@@ -84,7 +84,7 @@ func Phonize(c byte) {
 	phoned_word.GetLen() = p_idx
 }
 func Isbreak(c byte) bool { return !(isalpha(c)) }
-func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_word **types.ZendString, traditional int) int {
+func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_word **types.String, traditional int) int {
 	var w_idx int = 0
 	var p_idx int = 0
 	var max_buffer_len int = 0

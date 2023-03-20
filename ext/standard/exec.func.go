@@ -194,12 +194,12 @@ func ZifSystem(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifPassthru(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PhpExecEx(executeData, return_value, 3)
 }
-func PhpEscapeShellCmd(str *byte) *types.ZendString {
+func PhpEscapeShellCmd(str *byte) *types.String {
 	var x int
 	var y int
 	var l int = strlen(str)
 	var estimate uint64 = 2*uint64(l) + 1
-	var cmd *types.ZendString
+	var cmd *types.String
 	var p *byte = nil
 
 	/* max command line length - two single quotes - \0 byte length */
@@ -303,11 +303,11 @@ func PhpEscapeShellCmd(str *byte) *types.ZendString {
 	cmd.SetLen(y)
 	return cmd
 }
-func PhpEscapeShellArg(str *byte) *types.ZendString {
+func PhpEscapeShellArg(str *byte) *types.String {
 	var x int
 	var y int = 0
 	var l int = strlen(str)
-	var cmd *types.ZendString
+	var cmd *types.String
 	var estimate uint64 = 4*uint64(l) + 3
 
 	/* max command line length - two single quotes - \0 byte length */
@@ -422,7 +422,7 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var in *r.FILE
 	var command *byte
 	var command_len int
-	var ret *types.ZendString
+	var ret *types.String
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0

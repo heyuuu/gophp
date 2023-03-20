@@ -11,7 +11,7 @@ import (
  * ZendSplGlobals
  */
 type ZendSplGlobals struct {
-	autoload_extensions *types.ZendString
+	autoload_extensions *types.String
 	autoload_functions  *types.HashTable
 	hash_mask_handle    intPtr
 	hash_mask_handlers  intPtr
@@ -20,7 +20,7 @@ type ZendSplGlobals struct {
 }
 
 //             func MakeZendSplGlobals(
-// autoload_extensions *zend.ZendString,
+// autoload_extensions *zend.String,
 // autoload_functions *zend.HashTable,
 // hash_mask_handle intPtr,
 // hash_mask_handlers intPtr,
@@ -36,8 +36,8 @@ type ZendSplGlobals struct {
 //                     autoload_running:autoload_running,
 //                 }
 //             }
-// func (this *ZendSplGlobals)  GetAutoloadExtensions() *zend.ZendString      { return this.autoload_extensions }
-func (this *ZendSplGlobals) SetAutoloadExtensions(value *types.ZendString) {
+// func (this *ZendSplGlobals)  GetAutoloadExtensions() *zend.String      { return this.autoload_extensions }
+func (this *ZendSplGlobals) SetAutoloadExtensions(value *types.String) {
 	this.autoload_extensions = value
 }
 

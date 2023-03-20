@@ -41,7 +41,7 @@ func GetSafeCharsetHint() *byte {
 }
 func OnSetFacility(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -52,7 +52,7 @@ func OnSetFacility(
 }
 func OnSetPrecision(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -69,7 +69,7 @@ func OnSetPrecision(
 }
 func OnSetSerializePrecision(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -86,7 +86,7 @@ func OnSetSerializePrecision(
 }
 func OnChangeMemoryLimit(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -121,7 +121,7 @@ func OnChangeMemoryLimit(
 }
 func OnSetLogFilter(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -245,7 +245,7 @@ func PhpBinaryInit() {
 }
 func OnUpdateTimeout(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -306,7 +306,7 @@ func PhpGetDisplayErrorsMode(value *byte, value_length int) int {
 }
 func OnUpdateDisplayErrors(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -360,7 +360,7 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 }
 func OnUpdateDefaultCharset(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -380,7 +380,7 @@ func OnUpdateDefaultCharset(
 }
 func OnUpdateDefaultMimeTye(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -393,7 +393,7 @@ func OnUpdateDefaultMimeTye(
 }
 func OnUpdateInternalEncoding(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -410,7 +410,7 @@ func OnUpdateInternalEncoding(
 }
 func OnUpdateInputEncoding(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -427,7 +427,7 @@ func OnUpdateInputEncoding(
 }
 func OnUpdateOutputEncoding(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -444,7 +444,7 @@ func OnUpdateOutputEncoding(
 }
 func OnUpdateErrorLog(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -462,7 +462,7 @@ func OnUpdateErrorLog(
 }
 func OnUpdateMailLog(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -480,7 +480,7 @@ func OnUpdateMailLog(
 }
 func OnChangeMailForceExtra(
 	entry *zend.ZendIniEntry,
-	new_value *types.ZendString,
+	new_value *types.String,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
@@ -521,7 +521,7 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 		if fd != -1 {
 			var tmp *byte
 			var len_ int
-			var error_time_str *types.ZendString
+			var error_time_str *types.String
 			time(&error_time)
 			error_time_str = php_format_date("d-M-Y H:i:s e", 13, error_time, 1)
 			len_ = Spprintf(&tmp, 0, "[%s] %s%s", error_time_str.GetVal(), log_message, PHP_EOL)
@@ -554,8 +554,8 @@ func PhpPrintf(format string, _ ...any) int {
 	return ret
 }
 func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any) {
-	var replace_buffer *types.ZendString = nil
-	var replace_origin *types.ZendString = nil
+	var replace_buffer *types.String = nil
+	var replace_origin *types.String = nil
 	var buffer *byte = nil
 	var docref_buf *byte = nil
 	var target *byte = nil
@@ -930,7 +930,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 				var append_string *byte = zend.INI_STR("error_append_string")
 				if PG__().html_errors {
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
-						var buf *types.ZendString = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
+						var buf *types.String = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
 						types.ZendStringFree(buf)
 					} else {
@@ -1046,7 +1046,7 @@ func PhpGetCurrentUser() *byte {
 	}
 }
 func PhpFopenWrapperForZend(filename string, opened_path *string) *r.FILE {
-	var opened_path_zstr **types.ZendString
+	var opened_path_zstr **types.String
 	f := streams.PhpStreamOpenWrapperAsFile((*byte)(filename), "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path_zstr)
 	*opened_path = (*opened_path_zstr).GetStr()
 	return f
@@ -1071,7 +1071,7 @@ func PhpStreamOpenForZend(filename string, handle *zend.ZendFileHandle) int {
 	return PhpStreamOpenForZendEx(filename, handle, USE_PATH|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE)
 }
 func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode int) int {
-	var opened_path *types.ZendString
+	var opened_path *types.String
 	var stream *PhpStream = PhpStreamOpenWrapper((*byte)(filename), "rb", mode, &opened_path)
 	if stream != nil {
 		memset(handle, 0, b.SizeOf("zend_file_handle"))
@@ -1699,7 +1699,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 
 		if primary_file.GetFilename() != nil && strcmp("Standard input code", primary_file.GetFilename()) && primary_file.GetOpenedPath() == nil && primary_file.GetType() != zend.ZEND_HANDLE_FILENAME {
 			if ExpandFilepath(primary_file.GetFilename(), realfile) != nil {
-				primary_file.SetOpenedPath(types.ZendStringInit(realfile, strlen(realfile), 0))
+				primary_file.SetOpenedPath(types.ZendStringInit(realfile))
 				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primary_file.GetOpenedPath())
 			}
 		}
@@ -1770,7 +1770,7 @@ func PhpHandleAuthData(auth *byte) int {
 	var auth_len int = b.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
 	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(auth, auth_len, "Basic ", b.SizeOf("\"Basic \"")-1, b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
-		var user *types.ZendString
+		var user *types.String
 		user = standard.PhpBase64Decode((*uint8)(auth+6), auth_len-6)
 		if user != nil {
 			pass = strchr(user.GetVal(), ':')

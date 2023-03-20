@@ -84,7 +84,7 @@ func StrfilterToupperCreate(filtername *byte, filterparams *types.Zval, persiste
 func StrfilterTolowerCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	return streams.PhpStreamFilterAlloc(&StrfilterTolowerOps, nil, persistent)
 }
-func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.ZendString, persistent int) int {
+func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *types.String, persistent int) int {
 	if allowed_tags != nil {
 		if nil == b.Assign(&(inst.GetAllowedTags()), zend.Pemalloc(allowed_tags.GetLen()+1, persistent)) {
 			return types.FAILURE
@@ -133,7 +133,7 @@ func StrfilterStripTagsDtor(thisfilter *core.PhpStreamFilter) {
 func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpStripTagsFilter
 	var filter *core.PhpStreamFilter = nil
-	var allowed_tags *types.ZendString = nil
+	var allowed_tags *types.String = nil
 	core.PhpErrorDocref(nil, faults.E_DEPRECATED, "The string.strip_tags filter is deprecated")
 	if filterparams != nil {
 		if filterparams.IsType(types.IS_ARRAY) {
@@ -960,8 +960,8 @@ func PhpConvGetStringPropEx(
 	*pretval = nil
 	*pretval_len = 0
 	if b.Assign(&tmpval, (*types.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
-		var tmp *types.ZendString
-		var str *types.ZendString = zend.ZvalGetTmpString(tmpval, &tmp)
+		var tmp *types.String
+		var str *types.String = zend.ZvalGetTmpString(tmpval, &tmp)
 		*pretval = zend.Pemalloc(str.GetLen()+1, persistent)
 		*pretval_len = str.GetLen()
 		memcpy(*pretval, str.GetVal(), str.GetLen()+1)

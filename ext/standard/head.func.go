@@ -68,17 +68,17 @@ func PhpHeader() int {
 	}
 }
 func PhpSetcookie(
-	name *types.ZendString,
-	value *types.ZendString,
+	name *types.String,
+	value *types.String,
 	expires int64,
-	path *types.ZendString,
-	domain *types.ZendString,
+	path *types.String,
+	domain *types.String,
 	secure int,
 	httponly int,
-	samesite *types.ZendString,
+	samesite *types.String,
 	url_encode int,
 ) int {
-	var dt *types.ZendString
+	var dt *types.String
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var result int
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -121,7 +121,7 @@ func PhpSetcookie(
 		buf.AppendString(name.GetStr())
 		buf.AppendByte('=')
 		if url_encode != 0 {
-			var encoded_value *types.ZendString = PhpRawUrlEncode(value.GetVal(), value.GetLen())
+			var encoded_value *types.String = PhpRawUrlEncode(value.GetVal(), value.GetLen())
 			buf.AppendString(encoded_value.GetStr())
 			types.ZendStringReleaseEx(encoded_value, 0)
 		} else {
@@ -179,14 +179,14 @@ func PhpSetcookie(
 func PhpHeadParseCookieOptionsArray(
 	options *types.Zval,
 	expires *zend.ZendLong,
-	path **types.ZendString,
-	domain **types.ZendString,
+	path **types.String,
+	domain **types.String,
 	secure *types.ZendBool,
 	httponly *types.ZendBool,
-	samesite **types.ZendString,
+	samesite **types.String,
 ) {
 	var found int = 0
-	var key *types.ZendString
+	var key *types.String
 	var value *types.Zval
 	var __ht *types.HashTable = options.GetArr()
 	for _, _p := range __ht.foreachData() {
@@ -231,11 +231,11 @@ func PhpHeadParseCookieOptionsArray(
 }
 func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var expires_or_options *types.Zval = nil
-	var name *types.ZendString
-	var value *types.ZendString = nil
-	var path *types.ZendString = nil
-	var domain *types.ZendString = nil
-	var samesite *types.ZendString = nil
+	var name *types.String
+	var value *types.String = nil
+	var path *types.String = nil
+	var domain *types.String = nil
+	var samesite *types.String = nil
 	var expires zend.ZendLong = 0
 	var secure types.ZendBool = 0
 	var httponly types.ZendBool = 0
@@ -295,11 +295,11 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 }
 func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var expires_or_options *types.Zval = nil
-	var name *types.ZendString
-	var value *types.ZendString = nil
-	var path *types.ZendString = nil
-	var domain *types.ZendString = nil
-	var samesite *types.ZendString = nil
+	var name *types.String
+	var value *types.String = nil
+	var path *types.String = nil
+	var domain *types.String = nil
+	var samesite *types.String = nil
 	var expires zend.ZendLong = 0
 	var secure types.ZendBool = 0
 	var httponly types.ZendBool = 0

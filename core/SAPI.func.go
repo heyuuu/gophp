@@ -543,7 +543,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				/* Disable possible output compression for images */
 
 				if !(strncmp(ptr, "image/", b.SizeOf("\"image/\"")-1)) {
-					var key *types.ZendString = types.ZendStringInit("zlib.output_compression", b.SizeOf("\"zlib.output_compression\"")-1, 0)
+					var key *types.String = types.ZendStringInit("zlib.output_compression")
 					zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 					types.ZendStringReleaseEx(key, 0)
 				}
@@ -571,7 +571,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				 * portable between setups that have and don't have zlib compression
 				 * enabled globally. See req #44164 */
 
-				var key *types.ZendString = types.ZendStringInit("zlib.output_compression", b.SizeOf("\"zlib.output_compression\"")-1, 0)
+				var key *types.String = types.ZendStringInit("zlib.output_compression")
 				zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 				types.ZendStringReleaseEx(key, 0)
 			} else if !(strcasecmp(header_line, "Location")) {
@@ -686,11 +686,11 @@ func SapiRegisterPostEntries(post_entries *SapiPostEntry) int {
 }
 func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	var ret int
-	var key *types.ZendString
+	var key *types.String
 	if SG__().sapi_started && zend.CurrEX() != nil {
 		return types.FAILURE
 	}
-	key = types.ZendStringInit(post_entry.GetContentType(), post_entry.GetContentTypeLen(), 1)
+	key = types.ZendStringInit(b.CastStr(post_entry.GetContentType(), post_entry.GetContentTypeLen()))
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
 	if types.ZendHashAddMem(&(SG__().known_post_content_types), key, any(post_entry), b.SizeOf("sapi_post_entry")) {
 		ret = types.SUCCESS

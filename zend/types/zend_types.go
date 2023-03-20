@@ -15,9 +15,9 @@ func (this ZendType) IsCode() bool  { return this > 0x3 && this <= 0x3ff }
 func (this ZendType) IsClass() bool { return this > 0x3ff }
 func (this ZendType) IsCe() bool    { return b.FlagMatch(this, 0x2) }
 func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
-func (this ZendType) Name() *ZendString {
+func (this ZendType) Name() *String {
 	var ptr = this &^ 0x3
-	return b.CastPtr[ZendString](ptr)
+	return b.CastPtr[String](ptr)
 }
 func (this ZendType) Ce() *ClassEntry {
 	var ptr = this &^ 0x3

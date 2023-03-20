@@ -133,7 +133,7 @@ func ZendDestroyModules() {
 }
 func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	var name_len int
-	var lcname *types.ZendString
+	var lcname *types.String
 	var module_ptr *ZendModuleEntry
 	if module == nil {
 		return nil
@@ -266,7 +266,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 	var __debugInfo *ZendFunction = nil
 	var serialize_func *ZendFunction = nil
 	var unserialize_func *ZendFunction = nil
-	var lowercase_name *types.ZendString
+	var lowercase_name *types.String
 	var fname_len int
 	var lc_class_name *byte = nil
 	var class_name_len int = 0
@@ -427,7 +427,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 				if new_arg_info[i].GetType().IsClass() {
 					var class_name *byte = (*byte)(new_arg_info[i].GetType())
 					var allow_null types.ZendBool = 0
-					var str *types.ZendString
+					var str *types.String
 					if class_name[0] == '?' {
 						class_name++
 						allow_null = 1

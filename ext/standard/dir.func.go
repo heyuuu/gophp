@@ -476,7 +476,7 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var dirn *byte
 	var dirn_len int
 	var flags zend.ZendLong = 0
-	var namelist **types.ZendString
+	var namelist **types.String
 	var n int
 	var i int
 	var zcontext *types.Zval = nil

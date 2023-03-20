@@ -210,7 +210,7 @@ exit_success:
 	}
 	return types.SUCCESS
 }
-func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.ZendString) *r.FILE {
+func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.String) *r.FILE {
 	var fp *r.FILE = nil
 	var stream *core.PhpStream = nil
 	stream = core.PhpStreamOpenWrapperRel(path, mode, options|core.STREAM_WILL_CAST, opened_path)
