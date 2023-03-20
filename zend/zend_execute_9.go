@@ -189,7 +189,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 		return types.FAILURE
 	}
 	if check_defined_only == 0 {
-		types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.GetValue())
+		types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.Value())
 		if (ZEND_CONSTANT_FLAGS(c) & (CONST_CS | CONST_CT_SUBST)) == 0 {
 			var ns_sep *byte
 			var shortname_offset int

@@ -161,9 +161,11 @@ func CliRegisterFileHandles() {
 		return
 	}
 	SInProcess = s_in
-	core.PhpStreamToZval(s_in, ic.GetValue())
-	core.PhpStreamToZval(s_out, oc.GetValue())
-	core.PhpStreamToZval(s_err, ec.GetValue())
+
+	core.PhpStreamToZval(s_in, ic.Value())
+	core.PhpStreamToZval(s_out, oc.Value())
+	core.PhpStreamToZval(s_err, ec.Value())
+
 	zend.ZEND_CONSTANT_SET_FLAGS(&ic, zend.CONST_CS, 0)
 	ic.SetName(types.ZendStringInitInterned("STDIN", b.SizeOf("\"STDIN\"")-1, 0))
 	zend.ZendRegisterConstant(&ic)

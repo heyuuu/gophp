@@ -1,53 +1,9 @@
-// <<generate>>
-
 package zend
 
 import (
 	b "sik/builtin"
 	"sik/zend/types"
 )
-
-// Source: <Zend/zend_builtin_functions.h>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   +----------------------------------------------------------------------+
-*/
-
-// Source: <Zend/zend_builtin_functions.c>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   +----------------------------------------------------------------------+
-*/
 
 var ArginfoZendVoid []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(-1),
@@ -250,25 +206,13 @@ var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("get_defined_constants", 0, ZifGetDefinedConstants, ArginfoGetDefinedConstants),
 	types.MakeZendFunctionEntryEx("debug_backtrace", 0, ZifDebugBacktrace, ArginfoDebugBacktrace),
 	types.MakeZendFunctionEntryEx("debug_print_backtrace", 0, ZifDebugPrintBacktrace, ArginfoDebugPrintBacktrace),
-	types.MakeZendFunctionEntryEx("gc_mem_caches", 0, ZifGcMemCaches, ArginfoZendVoid),
-	types.MakeZendFunctionEntryEx("gc_collect_cycles", 0, ZifGcCollectCycles, ArginfoZendVoid),
-	types.MakeZendFunctionEntryEx("gc_enabled", 0, ZifGcEnabled, ArginfoZendVoid),
+	ZifGcMemCachesDef,
+	ZifGcCollectCyclesDef,
+	ZifGcEnabledDef,
 	types.MakeZendFunctionEntryEx("gc_enable", 0, ZifGcEnable, ArginfoZendVoid),
 	types.MakeZendFunctionEntryEx("gc_disable", 0, ZifGcDisable, ArginfoZendVoid),
 	types.MakeZendFunctionEntryEx("gc_status", 0, ZifGcStatus, ArginfoZendVoid),
 }
 var ZendBuiltinModule ZendModuleEntry = MakeZendModuleEntry(b.SizeOf("zend_module_entry"), ZEND_MODULE_API_NO, 0, USING_ZTS, nil, nil, "Core", BuiltinFunctions, ZmStartupCore, nil, nil, nil, nil, ZEND_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+ZEND_BUILD_TS)
 
-/* {{{ */
-
-/* {{{ */
-
 const LAMBDA_TEMP_FUNCNAME = "__lambda_func"
-
-/* {{{ proto string create_function(string args, string code)
-   Creates an anonymous function, and returns its name (funny, eh?) */
-
-/* {{{ proto string get_resource_type(resource res)
-   Get the resource type name for a given resource */
-
-/* {{{ */

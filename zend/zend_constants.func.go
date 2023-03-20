@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import (
@@ -8,41 +6,13 @@ import (
 	"sik/zend/types"
 )
 
-func ZEND_CONSTANT_FLAGS(c *ZendConstant) int {
-	return c.GetValue().GetConstantFlags() & 0xff
-}
-func ZEND_CONSTANT_MODULE_NUMBER(c *ZendConstant) int {
-	return c.GetValue().GetConstantFlags() >> 8
-}
+func ZEND_CONSTANT_FLAGS(c *ZendConstant) uint8       { return c.Flags() }
+func ZEND_CONSTANT_MODULE_NUMBER(c *ZendConstant) int { return c.ModuleNumber() }
 func ZEND_CONSTANT_SET_FLAGS(c *ZendConstant, _flags int, _module_number int) {
-	c.GetValue().GetConstantFlags() = _flags&0xff | _module_number<<8
+	c.Value().GetConstantFlags() = _flags&0xff | _module_number<<8
 }
-func REGISTER_LONG_CONSTANT(name string, lval ZendLong, flags int) {
-	ZendRegisterLongConstant(name, b.SizeOf("name")-1, lval, flags, module_number)
-}
-func REGISTER_DOUBLE_CONSTANT(name string, dval float64, flags int) {
-	ZendRegisterDoubleConstant(name, b.SizeOf("name")-1, dval, flags, module_number)
-}
-func REGISTER_STRING_CONSTANT(name string, str *byte, flags int) {
-	ZendRegisterStringConstant(name, b.SizeOf("name")-1, str, flags, module_number)
-}
-func REGISTER_MAIN_NULL_CONSTANT(name string, flags int) {
-	ZendRegisterNullConstant(name, b.SizeOf("name")-1, flags, 0)
-}
-func REGISTER_MAIN_BOOL_CONSTANT(name string, bval types.ZendBool, flags int) {
-	ZendRegisterBoolConstant(name, b.SizeOf("name")-1, bval, flags, 0)
-}
-func REGISTER_MAIN_LONG_CONSTANT(name string, lval ZendLong, flags int) {
-	ZendRegisterLongConstant(name, b.SizeOf("name")-1, lval, flags, 0)
-}
-func REGISTER_MAIN_DOUBLE_CONSTANT(name string, dval float64, flags int) {
-	ZendRegisterDoubleConstant(name, b.SizeOf("name")-1, dval, flags, 0)
-}
-func REGISTER_MAIN_STRINGL_CONSTANT(name string, str string, flags int) {
-	ZendRegisterStringlConstant(name, str, flags, 0)
-}
-func IS_CONSTANT_VISITED(zv *types.Zval) int {
-	return zv.GetAccessFlags() & IS_CONSTANT_VISITED_MARK
+func IS_CONSTANT_VISITED(zv *types.Zval) bool {
+	return zv.GetAccessFlags()&IS_CONSTANT_VISITED_MARK != 0
 }
 func MARK_CONSTANT_VISITED(zv *types.Zval) uint32 {
 	zv.AddAccessFlags(IS_CONSTANT_VISITED_MARK)
@@ -52,16 +22,42 @@ func RESET_CONSTANT_VISITED(zv *types.Zval) uint32 {
 	zv.SubAccessFlags(IS_CONSTANT_VISITED_MARK)
 	return zv.GetAccessFlags()
 }
+
+func RegisterLongConstant(name string, lval ZendLong, flags int, module_number int) {
+	ZendRegisterLongConstant(name, lval, flags, module_number)
+}
+func RegisterDoubleConstant(name string, dval float64, flags int, module_number int) {
+	ZendRegisterDoubleConstant(name, dval, flags, module_number)
+}
+func RegisterStringConstant(name string, str *byte, flags int, module_number int) {
+	ZendRegisterStringConstant(name, str, flags, module_number)
+}
+func RegisterMainNullConstant(name string, flags int) {
+	ZendRegisterNullConstant(name, flags, 0)
+}
+func RegisterMainBoolConstant(name string, bval types.ZendBool, flags int) {
+	ZendRegisterBoolConstant(name, bval, flags, 0)
+}
+func RegisterMainLongConstant(name string, lval ZendLong, flags int) {
+	ZendRegisterLongConstant(name, lval, flags, 0)
+}
+func RegisterMainDoubleConstant(name string, dval float64, flags int) {
+	ZendRegisterDoubleConstant(name, dval, flags, 0)
+}
+func RegisterMainStringConstant(name string, str string, flags int) {
+	ZendRegisterStringlConstant(name, str, flags, 0)
+}
+
 func FreeZendConstant(zv *types.Zval) {
 	var c *ZendConstant = zv.GetPtr()
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
-		ZvalPtrDtorNogc(c.GetValue())
+		ZvalPtrDtorNogc(c.Value())
 		if c.GetName() != nil {
 			types.ZendStringReleaseEx(c.GetName(), 0)
 		}
 		Efree(c)
 	} else {
-		ZvalInternalPtrDtor(c.GetValue())
+		ZvalInternalPtrDtor(c.Value())
 		if c.GetName() != nil {
 			types.ZendStringReleaseEx(c.GetName(), 1)
 		}
@@ -81,57 +77,57 @@ func CleanModuleConstants(module_number int) {
 	types.ZendHashApplyWithArgument(EG__().GetZendConstants(), CleanModuleConstant, any(&module_number))
 }
 func ZendRegisterStandardConstants() {
-	REGISTER_MAIN_LONG_CONSTANT("E_ERROR", faults.E_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_RECOVERABLE_ERROR", faults.E_RECOVERABLE_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_WARNING", faults.E_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_PARSE", faults.E_PARSE, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_NOTICE", faults.E_NOTICE, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_STRICT", faults.E_STRICT, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_DEPRECATED", faults.E_DEPRECATED, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_CORE_ERROR", faults.E_CORE_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_CORE_WARNING", faults.E_CORE_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_COMPILE_ERROR", faults.E_COMPILE_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_COMPILE_WARNING", faults.E_COMPILE_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_ERROR", faults.E_USER_ERROR, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_WARNING", faults.E_USER_WARNING, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_NOTICE", faults.E_USER_NOTICE, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_USER_DEPRECATED", faults.E_USER_DEPRECATED, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("E_ALL", faults.E_ALL, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("DEBUG_BACKTRACE_PROVIDE_OBJECT", DEBUG_BACKTRACE_PROVIDE_OBJECT, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_LONG_CONSTANT("DEBUG_BACKTRACE_IGNORE_ARGS", DEBUG_BACKTRACE_IGNORE_ARGS, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_ERROR", faults.E_ERROR, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_RECOVERABLE_ERROR", faults.E_RECOVERABLE_ERROR, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_WARNING", faults.E_WARNING, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_PARSE", faults.E_PARSE, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_NOTICE", faults.E_NOTICE, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_STRICT", faults.E_STRICT, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_DEPRECATED", faults.E_DEPRECATED, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_CORE_ERROR", faults.E_CORE_ERROR, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_CORE_WARNING", faults.E_CORE_WARNING, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_COMPILE_ERROR", faults.E_COMPILE_ERROR, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_COMPILE_WARNING", faults.E_COMPILE_WARNING, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_USER_ERROR", faults.E_USER_ERROR, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_USER_WARNING", faults.E_USER_WARNING, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_USER_NOTICE", faults.E_USER_NOTICE, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_USER_DEPRECATED", faults.E_USER_DEPRECATED, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("E_ALL", faults.E_ALL, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("DEBUG_BACKTRACE_PROVIDE_OBJECT", DEBUG_BACKTRACE_PROVIDE_OBJECT, CONST_PERSISTENT|CONST_CS)
+	RegisterMainLongConstant("DEBUG_BACKTRACE_IGNORE_ARGS", DEBUG_BACKTRACE_IGNORE_ARGS, CONST_PERSISTENT|CONST_CS)
 
 	/* true/false constants */
 
-	REGISTER_MAIN_BOOL_CONSTANT("TRUE", 1, CONST_PERSISTENT|CONST_CT_SUBST)
-	REGISTER_MAIN_BOOL_CONSTANT("FALSE", 0, CONST_PERSISTENT|CONST_CT_SUBST)
-	REGISTER_MAIN_BOOL_CONSTANT("ZEND_THREAD_SAFE", ZTS_V, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_BOOL_CONSTANT("ZEND_DEBUG_BUILD", 0, CONST_PERSISTENT|CONST_CS)
-	REGISTER_MAIN_NULL_CONSTANT("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
+	RegisterMainBoolConstant("TRUE", 1, CONST_PERSISTENT|CONST_CT_SUBST)
+	RegisterMainBoolConstant("FALSE", 0, CONST_PERSISTENT|CONST_CT_SUBST)
+	RegisterMainBoolConstant("ZEND_THREAD_SAFE", ZTS_V, CONST_PERSISTENT|CONST_CS)
+	RegisterMainBoolConstant("ZEND_DEBUG_BUILD", 0, CONST_PERSISTENT|CONST_CS)
+	RegisterMainNullConstant("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
 }
-func ZendRegisterNullConstant(name *byte, name_len int, flags int, module_number int) {
+func ZendRegisterNullConstant(name string, flags int, module_number int) {
 	var c ZendConstant
-	c.GetValue().SetNull()
+	c.Value().SetNull()
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
-func ZendRegisterBoolConstant(name *byte, name_len int, bval types.ZendBool, flags int, module_number int) {
+func ZendRegisterBoolConstant(name string, bval types.ZendBool, flags int, module_number int) {
 	var c ZendConstant
-	types.ZVAL_BOOL(c.GetValue(), bval != 0)
+	types.ZVAL_BOOL(c.Value(), bval != 0)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
-func ZendRegisterLongConstant(name *byte, name_len int, lval ZendLong, flags int, module_number int) {
+func ZendRegisterLongConstant(name string, lval ZendLong, flags int, module_number int) {
 	var c ZendConstant
-	c.GetValue().SetLong(lval)
+	c.Value().SetLong(lval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
-func ZendRegisterDoubleConstant(name *byte, name_len int, dval float64, flags int, module_number int) {
+func ZendRegisterDoubleConstant(name string, dval float64, flags int, module_number int) {
 	var c ZendConstant
-	c.GetValue().SetDouble(dval)
+	c.Value().SetDouble(dval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
@@ -143,10 +139,10 @@ func ZendRegisterStringlConstant(name string, str string, flags int, module_numb
 	ZEND_CONSTANT_SET_FLAGS(c, flags, module_number)
 	ZendRegisterConstant(c)
 }
-func ZendRegisterStringConstant(name *byte, name_len int, strval *byte, flags int, module_number int) {
+func ZendRegisterStringConstant(name string, strval *byte, flags int, module_number int) {
 	ZendRegisterStringlConstant(name, strval, flags, module_number)
 }
-func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
+func ZendGetSpecialConstant(name string) *ZendConstant {
 	var c *ZendConstant
 	var haltoff = "__COMPILER_HALT_OFFSET__"
 	if CurrEX() == nil {
@@ -173,7 +169,7 @@ func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) int {
 		return ZendCheckProtected(c.GetCe(), scope)
 	}
 }
-func ZendGetConstantStrImpl(name *byte, name_len int) *ZendConstant {
+func ZendGetConstantStrImpl(name string) *ZendConstant {
 	var c *ZendConstant
 	if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), name, name_len)) == nil {
 		var lcname *byte = DoAlloca(name_len+1, use_heap)
@@ -214,7 +210,7 @@ func ZendGetConstantImpl(name *types.ZendString) *ZendConstant {
 func ZendGetConstant(name *types.ZendString) *types.Zval {
 	var c *ZendConstant = ZendGetConstantImpl(name)
 	if c != nil {
-		return c.GetValue()
+		return c.Value()
 	} else {
 		return nil
 	}
@@ -304,7 +300,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 		}
 		if ret_constant != nil && ret_constant.IsConstant() {
 			var ret int
-			if IS_CONSTANT_VISITED(ret_constant) != 0 {
+			if IS_CONSTANT_VISITED(ret_constant) {
 				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
 				ret_constant = nil
 				goto failure
@@ -379,7 +375,7 @@ func ZendGetConstantEx(cname *types.ZendString, scope *types.ClassEntry, flags u
 			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 		}
 	}
-	return c.GetValue()
+	return c.Value()
 }
 func ZendHashAddConstant(ht *types.HashTable, key *types.ZendString, c *ZendConstant) any {
 	var ret any
@@ -391,6 +387,7 @@ func ZendHashAddConstant(ht *types.HashTable, key *types.ZendString, c *ZendCons
 	}
 	return ret
 }
+
 func ZendRegisterConstant(c *ZendConstant) int {
 	var lowercase_name *types.ZendString = nil
 	var name *types.ZendString
@@ -423,7 +420,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 		faults.Error(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
 		types.ZendStringRelease(c.GetName())
 		if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
-			ZvalPtrDtorNogc(c.GetValue())
+			ZvalPtrDtorNogc(c.Value())
 		}
 		ret = types.FAILURE
 	}

@@ -225,7 +225,7 @@ func ZifMtGetrandmax(executeData *zend.ZendExecuteData, return_value *types.Zval
 	return
 }
 func ZmStartupMtRand(type_ int, module_number int) int {
-	zend.REGISTER_LONG_CONSTANT("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.RegisterLongConstant("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	return types.SUCCESS
 }

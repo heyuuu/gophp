@@ -5007,10 +5007,10 @@ func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	var c ZendConstant
 	name = RT_CONSTANT(opline, opline.GetOp1())
 	val = RT_CONSTANT(opline, opline.GetOp2())
-	types.ZVAL_COPY(c.GetValue(), val)
-	if c.GetValue().IsConstant() {
-		if ZvalUpdateConstantEx(c.GetValue(), executeData.GetFunc().op_array.scope) != types.SUCCESS {
-			ZvalPtrDtorNogc(c.GetValue())
+	types.ZVAL_COPY(c.Value(), val)
+	if c.Value().IsConstant() {
+		if ZvalUpdateConstantEx(c.Value(), executeData.GetFunc().op_array.scope) != types.SUCCESS {
+			ZvalPtrDtorNogc(c.Value())
 			HANDLE_EXCEPTION()
 		}
 	}
@@ -27951,7 +27951,7 @@ func ZEND_FETCH_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData)
 	var c *ZendConstant
 	c = CACHED_PTR(opline.GetExtendedValue())
 	if c != nil && IS_SPECIAL_CACHE_VAL(c) == 0 {
-		types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.GetValue())
+		types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.Value())
 		ZEND_VM_NEXT_OPCODE()
 	}
 	ZendQuickGetConstant(RT_CONSTANT(opline, opline.GetOp2())+1, opline.GetOp1().GetNum(), opline, executeData)

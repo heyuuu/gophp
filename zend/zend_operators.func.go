@@ -406,7 +406,7 @@ func ZendUnwrapReference(op *types.Zval) {
 }
 func ZendTolower(c int) __auto__         { return tolower(c) }
 func TYPE_PAIR(t1 uint32, t2 uint32) int { return t1<<4 | t2 }
-func ZendTolowerAscii(c uint8) uint8     { return TolowerMap[uint8(c)] }
+func ZendTolowerAscii(c uint8) uint8     { return b.ByteToLowerAscii(c) }
 func ZendAtolEx(str string) ZendLong {
 	if len(str) == 0 {
 		return 0
@@ -2899,6 +2899,7 @@ func ZendStrTolowerDupEx(source *byte, length int) *byte {
 	return nil
 }
 func ZendStringTolowerEx(str *types.ZendString, persistent int) *types.ZendString {
+
 	var p *uint8 = (*uint8)(str.GetVal())
 	var end *uint8 = p + str.GetLen()
 	for p < end {

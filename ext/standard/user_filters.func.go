@@ -52,12 +52,12 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	if LeBucketBrigade == types.FAILURE {
 		return types.FAILURE
 	}
-	zend.REGISTER_LONG_CONSTANT("PSFS_PASS_ON", streams.PSFS_PASS_ON, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("PSFS_FEED_ME", streams.PSFS_FEED_ME, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("PSFS_ERR_FATAL", streams.PSFS_ERR_FATAL, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("PSFS_FLAG_NORMAL", streams.PSFS_FLAG_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("PSFS_FLAG_FLUSH_INC", streams.PSFS_FLAG_FLUSH_INC, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("PSFS_FLAG_FLUSH_CLOSE", streams.PSFS_FLAG_FLUSH_CLOSE, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.RegisterLongConstant("PSFS_PASS_ON", streams.PSFS_PASS_ON, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("PSFS_FEED_ME", streams.PSFS_FEED_ME, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("PSFS_ERR_FATAL", streams.PSFS_ERR_FATAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("PSFS_FLAG_NORMAL", streams.PSFS_FLAG_NORMAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("PSFS_FLAG_FLUSH_INC", streams.PSFS_FLAG_FLUSH_INC, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("PSFS_FLAG_FLUSH_CLOSE", streams.PSFS_FLAG_FLUSH_CLOSE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	return types.SUCCESS
 }
 func ZmDeactivateUserFilters(type_ int, module_number int) int {

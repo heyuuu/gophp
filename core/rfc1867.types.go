@@ -49,7 +49,7 @@ func (this *MultipartEventFormdata) SetPostBytesProcessed(value int) {
 // func (this *MultipartEventFormdata)  GetName() *byte      { return this.name }
 func (this *MultipartEventFormdata) SetName(value *byte) { this.name = value }
 
-// func (this *MultipartEventFormdata)  GetValue() **byte      { return this.value }
+// func (this *MultipartEventFormdata)  Value() **byte      { return this.value }
 func (this *MultipartEventFormdata) SetValue(value **byte) { this.value = value }
 
 // func (this *MultipartEventFormdata)  GetLength() int      { return this.length }

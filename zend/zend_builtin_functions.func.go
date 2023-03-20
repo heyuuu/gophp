@@ -69,21 +69,22 @@ func ZifGcStatus(executeData *ZendExecuteData, return_value *types.Zval) {
 	AddAssocLongEx(return_value, "roots", 0)
 }
 func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
-	var ex *ZendExecuteData = executeData.GetPrevExecuteData()
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
+	result := IZifFuncNumArgs(executeData)
+	return_value.SetLong(result)
+}
+func IZifFuncNumArgs(executeData *ZendExecuteData) int {
+	var ex = executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		faults.Error(faults.E_WARNING, "func_num_args():  Called from the global scope - no function context")
-		return_value.SetLong(-1)
-		return
+		return -1
 	}
 	if ZendForbidDynamicCall("func_num_args()") == types.FAILURE {
-		return_value.SetLong(-1)
-		return
+		return -1
 	}
-	return_value.SetLong(ex.NumArgs())
-	return
+	return ex.NumArgs()
 }
 func ZifFuncGetArg(executeData *ZendExecuteData, return_value *types.Zval) {
 	var arg_count uint32
@@ -575,7 +576,7 @@ repeat:
 				return_value.SetFalse()
 				return
 			} else {
-				CopyConstantArray(c.GetValue(), val)
+				CopyConstantArray(c.Value(), val)
 				goto register_constant
 			}
 		}
@@ -598,7 +599,7 @@ repeat:
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_COPY(c.GetValue(), val)
+	types.ZVAL_COPY(c.Value(), val)
 	ZvalPtrDtor(&val_free)
 register_constant:
 	if non_cs != 0 {
@@ -1682,7 +1683,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 				ArrayInit(&modules[module_number])
 				AddAssocZval(return_value, module_names[module_number], &modules[module_number])
 			}
-			types.ZVAL_COPY_OR_DUP(&const_val, val.GetValue())
+			types.ZVAL_COPY_OR_DUP(&const_val, val.Value())
 			modules[module_number].GetArr().KeyAddNew(val.GetName().GetStr(), &const_val)
 		}
 		Efree(module_names)
@@ -1704,7 +1705,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 				/* skip special constants */
 
 			}
-			types.ZVAL_COPY_OR_DUP(&const_val, constant.GetValue())
+			types.ZVAL_COPY_OR_DUP(&const_val, constant.Value())
 			return_value.GetArr().KeyAddNew(constant.GetName().GetStr(), &const_val)
 		}
 	}

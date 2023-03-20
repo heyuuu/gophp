@@ -291,7 +291,6 @@ func ZendHaveSeenSymbol(name *types.ZendString, kind uint32) types.ZendBool {
 }
 func FileHandleDtor(fh *ZendFileHandle) { fh.Destroy() }
 func InitCompiler() {
-	CG__().SetArena(ZendArenaCreate(64 * 1024))
 	CG__().SetActiveOpArray(nil)
 	memset(CG__().GetContext(), 0, b.SizeOf("CG ( context )"))
 	ZendInitCompilerDataStructures()
@@ -306,7 +305,6 @@ func ShutdownCompiler() {
 	CG__().GetLoopVarStack().Destroy()
 	CG__().GetDelayedOplinesStack().Destroy()
 	CG__().filenamesTable = nil
-	ZendArenaDestroy(CG__().GetArena())
 	if CG__().GetDelayedVarianceObligations() != nil {
 		CG__().GetDelayedVarianceObligations().Destroy()
 		FREE_HASHTABLE(CG__().GetDelayedVarianceObligations())

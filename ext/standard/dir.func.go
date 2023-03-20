@@ -36,13 +36,13 @@ func ZmStartupDir(type_ int, module_number int) int {
 	DirClassEntryPtr = zend.ZendRegisterInternalClass(&dir_class_entry)
 	dirsep_str[0] = zend.DEFAULT_SLASH
 	dirsep_str[1] = '0'
-	zend.REGISTER_STRING_CONSTANT("DIRECTORY_SEPARATOR", dirsep_str, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.RegisterStringConstant("DIRECTORY_SEPARATOR", dirsep_str, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	pathsep_str[0] = zend.ZEND_PATHS_SEPARATOR
 	pathsep_str[1] = '0'
-	zend.REGISTER_STRING_CONSTANT("PATH_SEPARATOR", pathsep_str, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("SCANDIR_SORT_ASCENDING", PHP_SCANDIR_SORT_ASCENDING, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("SCANDIR_SORT_DESCENDING", PHP_SCANDIR_SORT_DESCENDING, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("SCANDIR_SORT_NONE", PHP_SCANDIR_SORT_NONE, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.RegisterStringConstant("PATH_SEPARATOR", pathsep_str, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("SCANDIR_SORT_ASCENDING", PHP_SCANDIR_SORT_ASCENDING, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("SCANDIR_SORT_DESCENDING", PHP_SCANDIR_SORT_DESCENDING, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("SCANDIR_SORT_NONE", PHP_SCANDIR_SORT_NONE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	const GLOB_BRACE = 0
 	const GLOB_MARK = 0
 	const GLOB_NOSORT = 0
@@ -58,8 +58,8 @@ func ZmStartupDir(type_ int, module_number int) int {
 	/* This is used for checking validity of passed flags (passing invalid flags causes segfault in glob()!! */
 
 	const GLOB_AVAILABLE_FLAGS zend.ZendLong = 0 | GLOB_BRACE | GLOB_MARK | GLOB_NOSORT | GLOB_NOCHECK | GLOB_NOESCAPE | GLOB_ERR | GLOB_ONLYDIR
-	zend.REGISTER_LONG_CONSTANT("GLOB_ONLYDIR", GLOB_ONLYDIR, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("GLOB_AVAILABLE_FLAGS", GLOB_AVAILABLE_FLAGS, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.RegisterLongConstant("GLOB_ONLYDIR", GLOB_ONLYDIR, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("GLOB_AVAILABLE_FLAGS", GLOB_AVAILABLE_FLAGS, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	return types.SUCCESS
 }
 func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, createobject int) {

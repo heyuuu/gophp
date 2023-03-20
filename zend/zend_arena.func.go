@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import (
@@ -12,13 +10,6 @@ import (
 
 type ZendArena struct{}
 
-func ZendArenaCreate(size int) *ZendArena {
-	// 仅占位，无实际功能
-	return &ZendArena{}
-}
-func ZendArenaDestroy(arena *ZendArena) {
-	// 无需操作
-}
 func ZendArenaAlloc(arena_ptr **ZendArena, size int) any {
 	// 直接申请一块内存
 	return b.Malloc(size)

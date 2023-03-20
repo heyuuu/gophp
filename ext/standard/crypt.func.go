@@ -16,13 +16,13 @@ func IS_VALID_SALT_CHARACTER(c byte) bool {
 	return c >= '.' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z'
 }
 func ZmStartupCrypt(type_ int, module_number int) int {
-	zend.REGISTER_LONG_CONSTANT("CRYPT_SALT_LENGTH", PHP_MAX_SALT_LEN, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("CRYPT_STD_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("CRYPT_EXT_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("CRYPT_MD5", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("CRYPT_BLOWFISH", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("CRYPT_SHA256", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
-	zend.REGISTER_LONG_CONSTANT("CRYPT_SHA512", 1, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.RegisterLongConstant("CRYPT_SALT_LENGTH", PHP_MAX_SALT_LEN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CRYPT_STD_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CRYPT_EXT_DES", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CRYPT_MD5", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CRYPT_BLOWFISH", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CRYPT_SHA256", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterLongConstant("CRYPT_SHA512", 1, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	PhpInitCryptR()
 	return types.SUCCESS
 }

@@ -333,8 +333,8 @@ func ZendTryCtEvalConst(zv *types.Zval, name *types.ZendString, is_fully_qualifi
 	/* Substitute case-sensitive (or lowercase) constants */
 
 	c = types.ZendHashFindPtr(EG__().GetZendConstants(), name)
-	if c != nil && ((ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT) != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && ((ZEND_CONSTANT_FLAGS(c)&CONST_NO_FILE_CACHE) == 0 || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.GetValue().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
-		types.ZVAL_COPY_OR_DUP(zv, c.GetValue())
+	if c != nil && ((ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT) != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && ((ZEND_CONSTANT_FLAGS(c)&CONST_NO_FILE_CACHE) == 0 || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
+		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
 	}
 
@@ -347,7 +347,7 @@ func ZendTryCtEvalConst(zv *types.Zval, name *types.ZendString, is_fully_qualifi
 	}
 	c = ZendLookupReservedConst(lookup_name, lookup_len)
 	if c != nil {
-		types.ZVAL_COPY_OR_DUP(zv, c.GetValue())
+		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
 	}
 	return 0

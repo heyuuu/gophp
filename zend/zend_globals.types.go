@@ -131,7 +131,6 @@ func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)   { this.c
 func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext      { return &this.file_context }
 func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext)  { this.file_context = value }
 func (this *ZendCompilerGlobals) GetArena() *ZendArena                  { return this.arena }
-func (this *ZendCompilerGlobals) SetArena(value *ZendArena)             { this.arena = value }
 func (this *ZendCompilerGlobals) GetAst() *ZendAst                      { return this.ast }
 func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                 { this.ast = value }
 func (this *ZendCompilerGlobals) GetAstArena() *ZendArena               { return this.ast_arena }

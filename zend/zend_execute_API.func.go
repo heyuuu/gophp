@@ -273,7 +273,7 @@ func ShutdownExecutor() {
 				if _idx == EG__().GetPersistentConstantsCount() {
 					break
 				}
-				ZvalPtrDtorNogc(c.GetValue())
+				ZvalPtrDtorNogc(c.Value())
 				if c.GetName() != nil {
 					types.ZendStringReleaseEx(c.GetName(), 0)
 				}
