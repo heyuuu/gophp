@@ -979,8 +979,8 @@ func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *types.Zval) {
 }
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var zvalue types.Zval
-	var key *types.String = types.ZendStringInit(b.CastStr(name, name_len))
-	zvalue.SetString(types.ZendStringInit(b.CastStr(value, value_len)))
+	var key *types.String = types.NewString(b.CastStr(name, name_len))
+	zvalue.SetString(types.NewString(b.CastStr(value, value_len)))
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
 	types.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)

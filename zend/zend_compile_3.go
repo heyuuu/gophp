@@ -314,8 +314,8 @@ func ZendCompileDynamicCall(result *Znode, name_node *Znode, args_ast *ZendAst) 
 		var colon *byte
 		var str *types.String = name_node.GetConstant().GetStr()
 		if b.Assign(&colon, ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
-			var class *types.String = types.ZendStringInit(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
-			var method *types.String = types.ZendStringInit(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
+			var class *types.String = types.NewString(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
+			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
 			var opline *ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_INIT_STATIC_METHOD_CALL)
 			opline.SetOp1Type(IS_CONST)

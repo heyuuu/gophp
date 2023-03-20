@@ -118,7 +118,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var string_key *types.String
 	var num_key zend.ZendUlong
 	var key *types.String
-	key = types.ZendStringInit(b.CastStr(name, name_length))
+	key = types.NewString(b.CastStr(name, name_length))
 	zend.ZendIsAutoGlobal(key)
 	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key)) != nil && data.IsType(types.IS_ARRAY) {
 		var __ht *types.HashTable = data.GetArr()
@@ -211,7 +211,7 @@ func PhpGetUname(mode byte) *types.String {
 			php_uname = tmp_uname
 		}
 	}
-	return types.ZendStringInit(php_uname)
+	return types.NewString(php_uname)
 }
 func PhpPrintInfoHtmlhead() {
 	PhpInfoPrint("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n")

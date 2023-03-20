@@ -61,10 +61,10 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable)
 				var prop_name *byte
 				var prop_name_len int
 				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == types.SUCCESS {
-					var pname *types.String = types.ZendStringInit(b.CastStr(prop_name, prop_name_len))
+					var pname *types.String = types.NewString(b.CastStr(prop_name, prop_name_len))
 					var prev_scope *types.ClassEntry = EG__().GetFakeScope()
 					if class_name != nil && class_name[0] != '*' {
-						var cname *types.String = types.ZendStringInit(class_name)
+						var cname *types.String = types.NewString(class_name)
 						EG__().SetFakeScope(ZendLookupClass(cname))
 						types.ZendStringReleaseEx(cname, 0)
 					}

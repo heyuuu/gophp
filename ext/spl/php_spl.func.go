@@ -184,7 +184,7 @@ func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext
 	if ret == types.SUCCESS {
 		var opened_path *types.String
 		if file_handle.GetOpenedPath() == nil {
-			file_handle.SetOpenedPath(types.ZendStringInit(b.CastStr(class_file, class_file_len)))
+			file_handle.SetOpenedPath(types.NewString(b.CastStr(class_file, class_file_len)))
 		}
 		opened_path = file_handle.GetOpenedPath().Copy()
 		dummy.SetNull()

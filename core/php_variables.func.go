@@ -26,7 +26,7 @@ func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_a
 	} else if str_len == 1 {
 		new_entry.SetInternedString(types.ZSTR_CHAR(zend_uchar * strval))
 	} else {
-		new_entry.SetString(types.ZendStringInit(b.CastStr(strval, str_len)))
+		new_entry.SetString(types.NewString(b.CastStr(strval, str_len)))
 	}
 	PhpRegisterVariableEx(var_, &new_entry, track_vars_array)
 }
@@ -504,7 +504,7 @@ func ImportEnvironmentVariable(ht *types.HashTable, env *byte) {
 	} else if len_ == 1 {
 		val.SetInternedString(types.ZSTR_CHAR(zend_uchar * p))
 	} else {
-		val.SetString(types.ZendStringInit(b.CastStr(p, len_)))
+		val.SetString(types.NewString(b.CastStr(p, len_)))
 	}
 	if types.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) {
 		ht.IndexUpdateH(idx, &val)

@@ -154,7 +154,7 @@ func ZendIniDoOp(type_ byte, result *types.Zval, op1 *types.Zval, op2 *types.Zva
 		i_result = 0
 	}
 	str_len = sprintf(str_result, "%d", i_result)
-	result.SetString(types.ZendStringInit(b.CastStr(str_result, str_len)))
+	result.SetString(types.NewString(b.CastStr(str_result, str_len)))
 }
 
 /* }}} */
@@ -208,7 +208,7 @@ func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
 			ConvertToString(&tmp)
 			c = &tmp
 		}
-		result.SetString(types.ZendStringInit(c.GetStr().GetStr()))
+		result.SetString(types.NewString(c.GetStr().GetStr()))
 		if c == &tmp {
 			types.ZendStringRelease(tmp.GetStr())
 		}

@@ -75,7 +75,7 @@ func ZendCompileUse(ast *ZendAst) {
 
 				/* The form "use A\B" is equivalent to "use A\B as B" */
 
-				new_name = types.ZendStringInit(b.CastStr(unqualified_name, unqualified_name_len))
+				new_name = types.NewString(b.CastStr(unqualified_name, unqualified_name_len))
 
 				/* The form "use A\B" is equivalent to "use A\B as B" */
 
@@ -263,7 +263,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		zv.SetStringCopy(CG__().GetCompiledFilename())
 	case T_DIR:
 		var filename *types.String = CG__().GetCompiledFilename()
-		var dirname *types.String = types.ZendStringInit(filename.GetStr())
+		var dirname *types.String = types.NewString(filename.GetStr())
 		dirname.SetLen(ZendDirname(dirname.GetVal(), dirname.GetLen()))
 		if strcmp(dirname.GetVal(), ".") == 0 {
 			dirname = types.ZendStringExtend(dirname, MAXPATHLEN, 0)

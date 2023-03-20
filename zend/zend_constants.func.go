@@ -251,8 +251,8 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 	if b.Assign(&colon, ZendMemrchr(name, ':', name_len)) && colon > name && (*(colon - 1)) == ':' {
 		var class_name_len int = colon - name - 1
 		var const_name_len int = name_len - class_name_len - 2
-		var constant_name *types.String = types.ZendStringInit(b.CastStr(colon+1, const_name_len))
-		var class_name *types.String = types.ZendStringInit(b.CastStr(name, class_name_len))
+		var constant_name *types.String = types.NewString(b.CastStr(colon+1, const_name_len))
+		var class_name *types.String = types.NewString(b.CastStr(name, class_name_len))
 		var c *ZendClassConstant = nil
 		var ret_constant *types.Zval = nil
 		if types.ZendStringEqualsLiteralCi(class_name, "self") {
@@ -399,7 +399,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 	} else {
 		var slash *byte = strrchr(c.GetName().GetVal(), '\\')
 		if slash != nil {
-			lowercase_name = types.ZendStringInit(c.GetName().GetStr())
+			lowercase_name = types.NewString(c.GetName().GetStr())
 			ZendStrTolower(lowercase_name.GetVal(), slash-c.GetName().GetVal())
 			lowercase_name = types.ZendNewInternedString(lowercase_name)
 			name = lowercase_name

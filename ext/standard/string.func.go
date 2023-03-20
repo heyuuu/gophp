@@ -355,7 +355,7 @@ func PhpTrimInt(str *types.String, what *byte, what_len int, mode int) *types.St
 	} else if end-start == 0 {
 		return types.ZSTR_EMPTY_ALLOC()
 	} else {
-		return types.ZendStringInit(b.CastStr(start, end-start))
+		return types.NewString(b.CastStr(start, end-start))
 	}
 }
 func PhpTrim(str *types.String, what *byte, what_len int, mode int) *types.String {
@@ -445,7 +445,7 @@ func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	   additional storage space */
 
 	if breakchar_len == 1 && docut == 0 {
-		newtext = types.ZendStringInit(text.GetStr())
+		newtext = types.NewString(text.GetStr())
 		lastspace = 0
 		laststart = lastspace
 		for current = 0; current < zend.ZendLong(text.GetLen()); current++ {
@@ -1077,7 +1077,7 @@ quit_loop:
 		cend -= sufflen
 	}
 	len_ = cend - comp
-	ret = types.ZendStringInit(b.CastStr(comp, len_))
+	ret = types.NewString(b.CastStr(comp, len_))
 	return ret
 }
 func ZifBasename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1130,7 +1130,7 @@ func ZifDirname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	ret = types.ZendStringInit(b.CastStr(str, str_len))
+	ret = types.NewString(b.CastStr(str, str_len))
 	if levels == 1 {
 
 		/* Default case */
@@ -2360,7 +2360,7 @@ func PhpUcfirst(str *types.String) *types.String {
 	if r == ch {
 		return str.Copy()
 	} else {
-		var s *types.String = types.ZendStringInit(str.GetStr())
+		var s *types.String = types.NewString(str.GetStr())
 		s.GetVal()[0] = r
 		return s
 	}
@@ -2395,7 +2395,7 @@ func PhpLcfirst(str *types.String) *types.String {
 	if r == str.GetVal()[0] {
 		return str.Copy()
 	} else {
-		var s *types.String = types.ZendStringInit(str.GetStr())
+		var s *types.String = types.NewString(str.GetStr())
 		s.GetVal()[0] = r
 		return s
 	}
@@ -2811,7 +2811,7 @@ func PhpStrToStrEx(
 			end = haystack.GetVal() + haystack.GetLen()
 			for p = haystack.GetVal(); b.Assign(&r, (*byte)(core.PhpMemnstr(p, needle, needle_len, end))); p = r + needle_len {
 				if new_str == nil {
-					new_str = types.ZendStringInit(haystack.GetStr())
+					new_str = types.NewString(haystack.GetStr())
 				}
 				memcpy(new_str.GetVal()+(r-haystack.GetVal()), str, str_len)
 				*replace_count++
@@ -2868,7 +2868,7 @@ func PhpStrToStrEx(
 		} else if str_len == 1 {
 			new_str = types.ZSTR_CHAR(zend_uchar(*str))
 		} else {
-			new_str = types.ZendStringInit(b.CastStr(str, str_len))
+			new_str = types.NewString(b.CastStr(str, str_len))
 		}
 		*replace_count++
 		return new_str
@@ -2894,7 +2894,7 @@ func PhpStrToStrIEx(
 			end = lc_haystack + haystack.GetLen()
 			for p = lc_haystack; b.Assign(&r, (*byte)(core.PhpMemnstr(p, lc_needle.GetVal(), lc_needle.GetLen(), end))); p = r + lc_needle.GetLen() {
 				if new_str == nil {
-					new_str = types.ZendStringInit(haystack.GetStr())
+					new_str = types.NewString(haystack.GetStr())
 				}
 				memcpy(new_str.GetVal()+(r-lc_haystack), str, str_len)
 				*replace_count++
@@ -2954,7 +2954,7 @@ func PhpStrToStrIEx(
 			goto nothing_todo
 		}
 		types.ZendStringReleaseEx(lc_needle, 0)
-		new_str = types.ZendStringInit(b.CastStr(str, str_len))
+		new_str = types.NewString(b.CastStr(str, str_len))
 		*replace_count++
 		return new_str
 	}
@@ -2975,7 +2975,7 @@ func PhpStrToStr(
 		var e *byte
 		var r *byte
 		if needle_len == str_len {
-			new_str = types.ZendStringInit(b.CastStr(haystack, length))
+			new_str = types.NewString(b.CastStr(haystack, length))
 			end = new_str.GetVal() + length
 			for p = new_str.GetVal(); b.Assign(&r, (*byte)(core.PhpMemnstr(p, needle, needle_len, end))); p = r + needle_len {
 				memcpy(r, str, str_len)
@@ -2997,7 +2997,7 @@ func PhpStrToStr(
 
 					/* Needle doesn't occur, shortcircuit the actual replacement. */
 
-					new_str = types.ZendStringInit(b.CastStr(haystack, length))
+					new_str = types.NewString(b.CastStr(haystack, length))
 					return new_str
 				} else {
 					if str_len > needle_len {
@@ -3025,10 +3025,10 @@ func PhpStrToStr(
 			return new_str
 		}
 	} else if needle_len > length || memcmp(haystack, needle, length) {
-		new_str = types.ZendStringInit(b.CastStr(haystack, length))
+		new_str = types.NewString(b.CastStr(haystack, length))
 		return new_str
 	} else {
-		new_str = types.ZendStringInit(b.CastStr(str, str_len))
+		new_str = types.NewString(b.CastStr(str, str_len))
 		return new_str
 	}
 }
@@ -4152,7 +4152,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			allowed_tags_len = allow.GetStr().GetLen()
 		}
 	}
-	buf = types.ZendStringInit(str.GetStr())
+	buf = types.NewString(str.GetStr())
 	buf.SetLen(PhpStripTagsEx(buf.GetVal(), str.GetLen(), nil, allowed_tags, allowed_tags_len, 0))
 	tags_ss.Free()
 	return_value.SetString(buf)
@@ -4231,7 +4231,7 @@ func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 						return_value.SetString(BG__().locale_string)
 						return
 					} else {
-						BG__().locale_string = types.ZendStringInit(b.CastStr(retval, len_))
+						BG__().locale_string = types.NewString(b.CastStr(retval, len_))
 						types.ZendStringReleaseEx(loc, 0)
 						return_value.SetStringCopy(BG__().locale_string)
 						return

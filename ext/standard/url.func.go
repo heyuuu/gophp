@@ -105,7 +105,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *types.ZendBool) *PhpUrl {
 			p++
 		}
 		if e+1 == ue {
-			ret.SetScheme(types.ZendStringInit(b.CastStr(s, e-s)))
+			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			return ret
 		}
@@ -128,12 +128,12 @@ func PhpUrlParseEx2(str *byte, length int, has_port *types.ZendBool) *PhpUrl {
 			if (p == ue || (*p) == '/') && p-e < 7 {
 				goto parse_port
 			}
-			ret.SetScheme(types.ZendStringInit(b.CastStr(s, e-s)))
+			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			s = e + 1
 			goto just_path
 		} else {
-			ret.SetScheme(types.ZendStringInit(b.CastStr(s, e-s)))
+			ret.SetScheme(types.NewString(b.CastStr(s, e-s)))
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
@@ -204,13 +204,13 @@ parse_host:
 
 	if b.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
 		if b.Assign(&pp, memchr(s, ':', p-s)) {
-			ret.SetUser(types.ZendStringInit(b.CastStr(s, pp-s)))
+			ret.SetUser(types.NewString(b.CastStr(s, pp-s)))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 			pp++
-			ret.SetPass(types.ZendStringInit(b.CastStr(pp, p-pp)))
+			ret.SetPass(types.NewString(b.CastStr(pp, p-pp)))
 			PhpReplaceControlcharsEx(ret.GetPass().GetVal(), ret.GetPass().GetLen())
 		} else {
-			ret.SetUser(types.ZendStringInit(b.CastStr(s, p-s)))
+			ret.SetUser(types.NewString(b.CastStr(s, p-s)))
 			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
 		}
 		s = p + 1
@@ -265,7 +265,7 @@ parse_host:
 		PhpUrlFree(ret)
 		return nil
 	}
-	ret.SetHost(types.ZendStringInit(b.CastStr(s, p-s)))
+	ret.SetHost(types.NewString(b.CastStr(s, p-s)))
 	PhpReplaceControlcharsEx(ret.GetHost().GetVal(), ret.GetHost().GetLen())
 	if e == ue {
 		return ret
@@ -277,7 +277,7 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetFragment(types.ZendStringInit(b.CastStr(p, e-p)))
+			ret.SetFragment(types.NewString(b.CastStr(p, e-p)))
 			PhpReplaceControlcharsEx(ret.GetFragment().GetVal(), ret.GetFragment().GetLen())
 		}
 		e = p - 1
@@ -286,13 +286,13 @@ just_path:
 	if p {
 		p++
 		if p < e {
-			ret.SetQuery(types.ZendStringInit(b.CastStr(p, e-p)))
+			ret.SetQuery(types.NewString(b.CastStr(p, e-p)))
 			PhpReplaceControlcharsEx(ret.GetQuery().GetVal(), ret.GetQuery().GetLen())
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
-		ret.SetPath(types.ZendStringInit(b.CastStr(s, e-s)))
+		ret.SetPath(types.NewString(b.CastStr(s, e-s)))
 		PhpReplaceControlcharsEx(ret.GetPath().GetVal(), ret.GetPath().GetLen())
 	}
 	return ret
@@ -499,7 +499,7 @@ func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	out_str = types.ZendStringInit(in_str.GetStr())
+	out_str = types.NewString(in_str.GetStr())
 	out_str.SetLen(PhpUrlDecode(out_str.GetVal(), out_str.GetLen()))
 	return_value.SetString(out_str)
 	return
@@ -587,7 +587,7 @@ func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *types.Zval
 		}
 		break
 	}
-	out_str = types.ZendStringInit(in_str.GetStr())
+	out_str = types.NewString(in_str.GetStr())
 	out_str.SetLen(PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen()))
 	return_value.SetString(out_str)
 	return

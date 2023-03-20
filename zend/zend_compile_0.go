@@ -443,7 +443,7 @@ func ZendAddConstNameLiteral(name *types.String, unqualified types.ZendBool) int
 
 		/* lowercased namespace name & original constant name */
 
-		tmp_name = types.ZendStringInit(name.GetStr())
+		tmp_name = types.NewString(name.GetStr())
 		ZendStrTolower(tmp_name.GetVal(), ns_len)
 		ZendAddLiteralString(&tmp_name)
 
@@ -460,7 +460,7 @@ func ZendAddConstNameLiteral(name *types.String, unqualified types.ZendBool) int
 
 	/* original unqualified constant name */
 
-	tmp_name = types.ZendStringInit(b.CastStr(after_ns, after_ns_len))
+	tmp_name = types.NewString(b.CastStr(after_ns, after_ns_len))
 	ZendAddLiteralString(&tmp_name)
 
 	/* lowercased unqualified constant name */
@@ -654,7 +654,7 @@ func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualifie
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
 
 		*is_fully_qualified = 1
-		return types.ZendStringInit(b.CastStr(name.GetVal()+1, name.GetLen()-1))
+		return types.NewString(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 	}
 	if type_ == ZEND_NAME_FQ {
 		*is_fully_qualified = 1

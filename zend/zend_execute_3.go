@@ -204,10 +204,10 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		memset(str.GetStr().GetVal()+old_len, ' ', offset-old_len)
 		str.GetStr().GetVal()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
-		str.SetString(types.ZendStringInit(str.GetStr().GetStr()))
+		str.SetString(types.NewString(str.GetStr().GetStr()))
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		str.SetString(types.ZendStringInit(str.GetStr().GetStr()))
+		str.SetString(types.NewString(str.GetStr().GetStr()))
 	} else {
 		types.ZendStringForgetHashVal(str.GetStr())
 	}

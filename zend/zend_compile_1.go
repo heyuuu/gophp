@@ -25,7 +25,7 @@ func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 		/* Remove \ prefix (only relevant if this is a string rather than a label) */
 
 		if name.GetVal()[0] == '\\' {
-			name = types.ZendStringInit(b.CastStr(name.GetVal()+1, name.GetLen()-1))
+			name = types.NewString(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 		} else {
 			name.AddRefcount()
 		}
@@ -690,7 +690,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 	var zv *types.Zval = ZendAstGetZval(ast)
 	if zv.IsLong() {
 		if zv.GetLval() == 0 {
-			zv.SetString(types.ZendStringInit("-0"))
+			zv.SetString(types.NewString("-0"))
 		} else {
 			b.Assert(zv.GetLval() > 0)
 			zv.SetLval(zv.GetLval() * -1)

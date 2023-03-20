@@ -2648,11 +2648,11 @@ func IncrementString(str *types.Zval) {
 		return
 	}
 	if !(str.IsRefcounted()) {
-		str.SetStr(types.ZendStringInit(str.GetStr().GetStr()))
+		str.SetStr(types.NewString(str.GetStr().GetStr()))
 		str.SetTypeInfo(types.IS_STRING_EX)
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		str.SetStr(types.ZendStringInit(str.GetStr().GetStr()))
+		str.SetStr(types.NewString(str.GetStr().GetStr()))
 	} else {
 		types.ZendStringForgetHashVal(str.GetStr())
 	}
@@ -3177,7 +3177,7 @@ func ZendLongToStr(num ZendLong) *types.String {
 	} else {
 		var buf []byte
 		var res *byte = ZendPrintLongToBuf(buf+b.SizeOf("buf")-1, num)
-		return types.ZendStringInit(b.CastStr(res, buf+b.SizeOf("buf")-1-res))
+		return types.NewString(b.CastStr(res, buf+b.SizeOf("buf")-1-res))
 	}
 }
 func IsNumericStrFunction(str *types.String, lval *ZendLong, dval *float64) types.ZendUchar {

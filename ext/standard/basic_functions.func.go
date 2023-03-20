@@ -1891,7 +1891,7 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 	} else {
 		return_value.SetFalse()
 	}
-	key = types.ZendStringInit("include_path")
+	key = types.NewString("include_path")
 	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
 		types.ZendStringReleaseEx(key, 0)
 		zend.ZvalPtrDtorStr(return_value)
@@ -1918,7 +1918,7 @@ func ZifRestoreIncludePath(executeData *zend.ZendExecuteData, return_value *type
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	key = types.ZendStringInit("include_path")
+	key = types.NewString("include_path")
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
 	types.ZendStringEfree(key)
 }
@@ -1983,7 +1983,7 @@ func ZifIgnoreUserAbort(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 	old_setting = uint16(core.PG__().ignore_user_abort)
 	if executeData.NumArgs() != 0 {
-		var key *types.String = types.ZendStringInit("ignore_user_abort")
+		var key *types.String = types.NewString("ignore_user_abort")
 		zend.ZendAlterIniEntryChars(key.GetStr(), b.CastStr(b.Cond(arg != 0, "1", "0"), 1), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 		types.ZendStringReleaseEx(key, 0)
 	}

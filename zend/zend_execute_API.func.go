@@ -447,7 +447,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 		if EG__().GetException() != nil {
 			return types.FAILURE
 		} else {
-			var result_str *types.String = types.ZendStringInit(b.CastStr(actual, actual_len))
+			var result_str *types.String = types.NewString(b.CastStr(actual, actual_len))
 			ZvalPtrDtorNogc(result)
 			result.SetString(result_str)
 		}

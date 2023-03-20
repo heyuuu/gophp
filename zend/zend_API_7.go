@@ -225,7 +225,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		cname = types.ZendStringInit(b.CastStr(callable.GetStr().GetVal(), clen))
+		cname = types.NewString(b.CastStr(callable.GetStr().GetVal(), clen))
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
 			types.ZendStringReleaseEx(cname, 0)
 			return 0
@@ -238,7 +238,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			}
 			return 0
 		}
-		mname = types.ZendStringInit(b.CastStr(callable.GetStr().GetVal()+clen+2, mlen))
+		mname = types.NewString(b.CastStr(callable.GetStr().GetVal()+clen+2, mlen))
 	} else if ce_org != nil {
 
 		/* Try to fetch find static method of given class. */

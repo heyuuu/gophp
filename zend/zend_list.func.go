@@ -230,7 +230,7 @@ func ZendRegisterPersistentResourceEx(key *types.String, rsrc_pointer any, rsrc_
 	return zv.GetRes()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *types.ZendResource {
-	var str *types.String = types.ZendStringInit(b.CastStr(key, key_len))
+	var str *types.String = types.NewString(b.CastStr(key, key_len))
 	var ret *types.ZendResource = ZendRegisterPersistentResourceEx(str, rsrc_pointer, rsrc_type)
 	types.ZendStringReleaseEx(str, 1)
 	return ret

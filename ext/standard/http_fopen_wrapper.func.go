@@ -406,7 +406,7 @@ func PhpStreamUrlWrapHttpEx(
 			user_headers = zend.Estrndup(tmp.GetVal(), tmp.GetLen())
 			if tmp.GetRefcount() > 1 {
 				tmp.DelRefcount()
-				tmp = types.ZendStringInit(tmp.GetStr())
+				tmp = types.NewString(tmp.GetStr())
 			}
 
 			/* Make lowercase for easy comparison against 'standard' headers */
@@ -811,7 +811,7 @@ func PhpStreamUrlWrapHttpEx(
 							s = resource.GetPath().GetVal()
 							if resource.GetPath().GetLen() == 0 {
 								types.ZendStringReleaseEx(resource.GetPath(), 0)
-								resource.SetPath(types.ZendStringInit("/"))
+								resource.SetPath(types.NewString("/"))
 								s = resource.GetPath().GetVal()
 							} else {
 								*s = '/'

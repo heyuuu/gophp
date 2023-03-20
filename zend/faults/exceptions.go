@@ -587,7 +587,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	}
 	str = types.ZSTR_EMPTY_ALLOC()
 	exception = zend.ZEND_THIS(executeData)
-	fname = types.ZendStringInit("gettraceasstring", b.SizeOf("\"gettraceasstring\"")-1, 0)
+	fname = types.NewString("gettraceasstring")
 	for exception != nil && exception.IsObject() && zend.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
 		var prev_str *types.String = str
 		var message *types.String = zend.ZvalGetString(GET_PROPERTY(exception, types.ZSTR_MESSAGE))

@@ -466,7 +466,7 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 			return types.SUCCESS
 		}
 		ZendUnmanglePropertyNameEx(prop_info_name, &class_name, &prop_name, &prop_name_len)
-		member = types.ZendStringInit(b.CastStr(prop_name, prop_name_len))
+		member = types.NewString(b.CastStr(prop_name, prop_name_len))
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), member, 1)
 		types.ZendStringReleaseEx(member, 0)
 		if property_info == nil || property_info == ZEND_WRONG_PROPERTY_INFO {
@@ -1158,7 +1158,7 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	//??? keep compatibility for "\0" characters
 
 	if b.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
-		func_.SetFunctionName(types.ZendStringInit(b.CastStr(method_name.GetVal(), mname_len)))
+		func_.SetFunctionName(types.NewString(b.CastStr(method_name.GetVal(), mname_len)))
 	} else {
 		func_.SetFunctionName(method_name.Copy())
 	}

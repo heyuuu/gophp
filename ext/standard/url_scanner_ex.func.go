@@ -51,7 +51,7 @@ func PhpIniOnUpdateTags(
 				*q = tolower(*q)
 			}
 			keylen = q - key
-			str = types.ZendStringInit(b.CastStr(key, keylen))
+			str = types.NewString(b.CastStr(key, keylen))
 			types.GC_MAKE_PERSISTENT_LOCAL(str)
 			types.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
 			types.ZendStringReleaseEx(str, 1)
@@ -112,7 +112,7 @@ func PhpIniOnUpdateHosts(
 		}
 		keylen = q - key
 		if keylen > 0 {
-			tmp_key = types.ZendStringInit(b.CastStr(key, keylen))
+			tmp_key = types.NewString(b.CastStr(key, keylen))
 			types.ZendHashAddEmptyElement(hosts, tmp_key)
 			types.ZendStringReleaseEx(tmp_key, 0)
 		}
@@ -266,7 +266,7 @@ func CheckHttpHost(target *byte) int {
 	var host_tmp *types.String
 	var colon *byte
 	if b.Assign(&tmp, zend.EG__().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(types.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(types.IS_STRING) {
-		host_tmp = types.ZendStringInit(host.GetStr().GetStr(),
+		host_tmp = types.NewString(host.GetStr().GetStr()
 
 		/* HTTP_HOST could be 'localhost:8888' etc. */)
 

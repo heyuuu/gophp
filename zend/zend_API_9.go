@@ -72,7 +72,7 @@ func ZendDeclarePropertyEx(ce *types.ClassEntry, name *types.String, property *t
 	return ZendDeclareTypedProperty(ce, name, property, access_type, doc_comment, 0)
 }
 func ZendDeclareProperty(ce *types.ClassEntry, name *byte, name_length int, property *types.Zval, access_type int) int {
-	var key *types.String = types.ZendStringInit(b.CastStr(name, name_length))
+	var key *types.String = types.NewString(b.CastStr(name, name_length))
 	var ret int = ZendDeclarePropertyEx(ce, key, property, access_type, nil)
 	types.ZendStringRelease(key)
 	return ret
@@ -99,7 +99,7 @@ func ZendDeclarePropertyDouble(ce *types.ClassEntry, name *byte, name_length int
 }
 func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length int, value string, access_type int) int {
 	var property types.Zval
-	property.SetString(types.ZendStringInit(value))
+	property.SetString(types.NewString(value))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclarePropertyStringl(
@@ -111,7 +111,7 @@ func ZendDeclarePropertyStringl(
 	access_type int,
 ) int {
 	var property types.Zval
-	property.SetString(types.ZendStringInit(b.CastStr(value, value_len)))
+	property.SetString(types.NewString(b.CastStr(value, value_len)))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, access_type int, doc_comment *types.String) int {
@@ -150,7 +150,7 @@ func ZendDeclareClassConstant(ce *types.ClassEntry, name *byte, name_length int,
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		key = types.ZendStringInitInterned(name, name_length, 1)
 	} else {
-		key = types.ZendStringInit(b.CastStr(name, name_length))
+		key = types.NewString(b.CastStr(name, name_length))
 	}
 	ret = ZendDeclareClassConstantEx(ce, key, value, ZEND_ACC_PUBLIC, nil)
 	types.ZendStringRelease(key)
@@ -178,7 +178,7 @@ func ZendDeclareClassConstantDouble(ce *types.ClassEntry, name *byte, name_lengt
 }
 func ZendDeclareClassConstantStringl(ce *types.ClassEntry, name *byte, name_length int, value *byte, value_length int) int {
 	var constant types.Zval
-	constant.SetString(types.ZendStringInit(b.CastStr(value, value_length)))
+	constant.SetString(types.NewString(b.CastStr(value, value_length)))
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 func ZendDeclareClassConstantString(ce *types.ClassEntry, name *byte, name_length int, value *byte) int {
@@ -284,7 +284,7 @@ func ZendUpdateStaticPropertyEx(scope *types.ClassEntry, name *types.String, val
 	return types.SUCCESS
 }
 func ZendUpdateStaticProperty(scope *types.ClassEntry, name *byte, name_length int, value *types.Zval) int {
-	var key *types.String = types.ZendStringInit(b.CastStr(name, name_length))
+	var key *types.String = types.NewString(b.CastStr(name, name_length))
 	var retval int = ZendUpdateStaticPropertyEx(scope, key, value)
 	types.ZendStringEfree(key)
 	return retval
@@ -341,7 +341,7 @@ func ZendReadProperty(
 ) *types.Zval {
 	var value *types.Zval
 	var str *types.String
-	str = types.ZendStringInit(b.CastStr(name, name_length))
+	str = types.NewString(b.CastStr(name, name_length))
 	value = ZendReadPropertyEx(scope, object, str, silent, rv)
 	types.ZendStringReleaseEx(str, 0)
 	return value
@@ -355,7 +355,7 @@ func ZendReadStaticPropertyEx(scope *types.ClassEntry, name *types.String, silen
 	return property
 }
 func ZendReadStaticProperty(scope *types.ClassEntry, name *byte, name_length int, silent types.ZendBool) *types.Zval {
-	var key *types.String = types.ZendStringInit(b.CastStr(name, name_length))
+	var key *types.String = types.NewString(b.CastStr(name, name_length))
 	var property *types.Zval = ZendReadStaticPropertyEx(scope, key, silent)
 	types.ZendStringEfree(key)
 	return property

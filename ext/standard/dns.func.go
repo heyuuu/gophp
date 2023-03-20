@@ -64,9 +64,9 @@ func PhpGethostbyaddr(ip *byte) *types.String {
 		return nil
 	}
 	if hp == nil || hp.h_name == nil || hp.h_name[0] == '0' {
-		return types.ZendStringInit(ip)
+		return types.NewString(ip)
 	}
-	return types.ZendStringInit(hp.h_name)
+	return types.NewString(hp.h_name)
 }
 func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hostname *byte
@@ -154,18 +154,18 @@ func PhpGethostbyname(name *byte) *types.String {
 	var address *byte
 	hp = core.PhpNetworkGethostbyname(name)
 	if hp == nil {
-		return types.ZendStringInit(name)
+		return types.NewString(name)
 	}
 
 	/* On macos h_addr_list entries may be misaligned. */
 
 	memcpy(&h_addr_0, hp.h_addr_list[0], b.SizeOf("struct in_addr *"))
 	if h_addr_0 == nil {
-		return types.ZendStringInit(name)
+		return types.NewString(name)
 	}
 	memcpy(in.s_addr, h_addr_0, b.SizeOf("in . s_addr"))
 	address = inet_ntoa(in)
-	return types.ZendStringInit(address)
+	return types.NewString(address)
 }
 func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var hp *HEADER

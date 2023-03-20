@@ -286,7 +286,7 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 }
 func PhpOutputHandlerCreateInternal(name *byte, name_len int, output_handler PhpOutputHandlerContextFuncT, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
-	var str *types.String = types.ZendStringInit(b.CastStr(name, name_len))
+	var str *types.String = types.NewString(b.CastStr(name, name_len))
 	handler = PhpOutputHandlerInit(str, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
 	handler.SetInternal(output_handler)
 	types.ZendStringReleaseEx(str, 0)

@@ -1919,7 +1919,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 				/* for private and protected we need to unmangle the names */
 
 				ZendUnmanglePropertyNameEx(property_info.GetName(), &class_name_unused, &pname, &pname_len)
-				prop_name = types.ZendStringInit(b.CastStr(pname, pname_len))
+				prop_name = types.NewString(b.CastStr(pname, pname_len))
 			}
 
 			/* next: check for conflicts with current class */

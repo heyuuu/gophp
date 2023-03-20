@@ -275,7 +275,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if headers != nil {
 		switch headers.GetType() {
 		case types.IS_STRING:
-			tmp_headers = types.ZendStringInit(headers.GetStr().GetStr())
+			tmp_headers = types.NewString(headers.GetStr().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = PhpTrim(tmp_headers, nil, 0, 2)
 			types.ZendStringReleaseEx(tmp_headers, 0)

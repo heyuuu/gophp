@@ -553,7 +553,7 @@ func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.
 	var fsobj *SplFilesystemObject = SplFilesystemFromObj(*object)
 	if fsobj.GetDirp() == nil && fsobj.GetOrigPath() == nil {
 		var func_ *zend.ZendFunction
-		var tmp *types.String = types.ZendStringInit("_bad_state_ex")
+		var tmp *types.String = types.NewString("_bad_state_ex")
 		func_ = zend.ZendStdGetMethod(object, tmp, nil)
 		types.ZendStringReleaseEx(tmp, 0)
 		return func_

@@ -92,7 +92,7 @@ func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *types.
 		}
 		break
 	}
-	str = types.ZendStringInit(b.CastStr(input, input_len))
+	str = types.NewString(b.CastStr(input, input_len))
 	PhpConvertCyrString((*uint8)(str.GetVal()), str.GetLen(), fr_cs[0], to_cs[0])
 	return_value.SetString(str)
 }

@@ -646,7 +646,7 @@ func PhpSocketStrerror(err long, buf *byte, bufsize int) *byte {
 func PhpSocketErrorStr(err long) *types.String {
 	var errstr *byte
 	errstr = strerror(err)
-	return types.ZendStringInit(errstr)
+	return types.NewString(errstr)
 }
 func _phpStreamSockOpenFromSocket(socket PhpSocketT, persistent_id *byte) *PhpStream {
 	var stream *PhpStream

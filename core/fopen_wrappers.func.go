@@ -288,7 +288,7 @@ func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.Strin
 
 		var tmp *byte = ExpandFilepathWithMode(path, nil, nil, 0, zend.CWD_EXPAND)
 		if tmp != nil {
-			*opened_path = types.ZendStringInit(tmp)
+			*opened_path = types.NewString(tmp)
 			zend.Efree(tmp)
 		}
 	}
@@ -397,14 +397,14 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 		wrapper = PhpStreamLocateUrlWrapper(filenamePtr, &actual_path, STREAM_OPEN_FOR_INCLUDE)
 		if wrapper == &streams.PhpPlainFilesWrapper {
 			if zend.TsrmRealpath(actual_path, resolved_path) != nil {
-				return types.ZendStringInit(resolved_path)
+				return types.NewString(resolved_path)
 			}
 		}
 		return nil
 	}
 	if (*filenamePtr) == '.' && (zend.IS_SLASH(filenamePtr[1]) || filenamePtr[1] == '.' && zend.IS_SLASH(filenamePtr[2])) || zend.IS_ABSOLUTE_PATH(filenamePtr, filename_length) || path == nil || !(*path) {
 		if zend.TsrmRealpath(filenamePtr, resolved_path) != nil {
-			return types.ZendStringInit(resolved_path)
+			return types.NewString(resolved_path)
 		} else {
 			return nil
 		}
@@ -459,7 +459,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 				if wrapper.GetWops().GetUrlStat() != nil {
 					var ssb PhpStreamStatbuf
 					if types.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
-						return types.ZendStringInit(trypath)
+						return types.NewString(trypath)
 					}
 					if zend.EG__().GetException() != nil {
 						return nil
@@ -469,7 +469,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 			}
 		}
 		if zend.TsrmRealpath(actual_path, resolved_path) != nil {
-			return types.ZendStringInit(resolved_path)
+			return types.NewString(resolved_path)
 		}
 	}
 
@@ -500,7 +500,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 					if wrapper.GetWops().GetUrlStat() != nil {
 						var ssb PhpStreamStatbuf
 						if types.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
-							return types.ZendStringInit(trypath)
+							return types.NewString(trypath)
 						}
 						if zend.EG__().GetException() != nil {
 							return nil
@@ -510,7 +510,7 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 				}
 			}
 			if zend.TsrmRealpath(actual_path, resolved_path) != nil {
-				return types.ZendStringInit(resolved_path)
+				return types.NewString(resolved_path)
 			}
 		}
 	}

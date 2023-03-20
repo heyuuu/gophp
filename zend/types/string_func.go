@@ -28,7 +28,6 @@ func ZendStringSafeAlloc(n int, m int, l int, persistent int) *String {
 	var len_ = n*m + l
 	return ZendStringAlloc(len_, persistent)
 }
-func ZendStringInit(str string) *String { return NewString(str) }
 func ZendStringExtend(s *String, len_ int, persistent int) *String {
 	b.Assert(len_ >= s.GetLen())
 	var oldStr = s.GetStr()

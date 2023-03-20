@@ -2023,7 +2023,7 @@ func _phpStreamScandir(dirname *byte, namelist []**types.String, flags int, cont
 			}
 			vector = (**types.String)(zend.SafeErealloc(vector, vector_size, b.SizeOf("char *"), 0))
 		}
-		vector[nfiles] = types.ZendStringInit(sdp.GetDName())
+		vector[nfiles] = types.NewString(sdp.GetDName())
 		nfiles++
 		if vector_size < 10 || nfiles == 0 {
 

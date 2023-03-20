@@ -604,7 +604,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 
 				//TODO: avoid reallocation???
 
-				*opened_path = types.ZendStringInit(realpath)
+				*opened_path = types.NewString(realpath)
 
 				//TODO: avoid reallocation???
 
@@ -624,7 +624,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 		}
 		if ret != nil {
 			if opened_path != nil {
-				*opened_path = types.ZendStringInit(realpath)
+				*opened_path = types.NewString(realpath)
 			}
 			if persistent_id != nil {
 				zend.Efree(persistent_id)

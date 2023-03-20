@@ -389,7 +389,7 @@ func ProcessNestedData(
 						zend.ZvalPtrDtor(&key)
 						goto failure
 					}
-					unmangled = types.ZendStringInit(b.CastStr(unmangled_prop, unmangled_prop_len))
+					unmangled = types.NewString(b.CastStr(unmangled_prop, unmangled_prop_len))
 					existing_propinfo = types.ZendHashFindPtr(obj.GetCe().GetPropertiesInfo(), unmangled)
 					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.ZEND_ACC_PPP_MASK) {
 						if existing_propinfo.HasFlags(zend.ZEND_ACC_PROTECTED) {
@@ -821,7 +821,7 @@ yy18:
 		*p = YYCURSOR + len3 - len_
 		return 0
 	}
-	class_name = types.ZendStringInit(b.CastStr(str, len_))
+	class_name = types.NewString(b.CastStr(str, len_))
 	for {
 		if UnserializeAllowedClass(class_name, var_hash) == 0 {
 			incomplete_class = 1

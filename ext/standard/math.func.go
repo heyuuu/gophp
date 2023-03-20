@@ -1051,7 +1051,7 @@ func _phpMathLongtobase(arg *types.Zval, base int) *types.String {
 			break
 		}
 	}
-	return types.ZendStringInit(b.CastStr(ptr, end-ptr))
+	return types.NewString(b.CastStr(ptr, end-ptr))
 }
 func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -1080,7 +1080,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 				break
 			}
 		}
-		return types.ZendStringInit(b.CastStr(ptr, end-ptr))
+		return types.NewString(b.CastStr(ptr, end-ptr))
 	}
 	return _phpMathLongtobase(arg, base)
 }

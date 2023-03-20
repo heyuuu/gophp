@@ -268,13 +268,13 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		var mname *types.String
 		var cname_length int = colon - function.GetVal() - 1
 		var mname_length int = function.GetLen() - cname_length - (b.SizeOf("\"::\"") - 1)
-		lcname = types.ZendStringInit(b.CastStr(function.GetVal(), cname_length))
+		lcname = types.NewString(b.CastStr(function.GetVal(), cname_length))
 		called_scope = ZendFetchClassByName(lcname, nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 		if called_scope == nil {
 			types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		mname = types.ZendStringInit(b.CastStr(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length))
+		mname = types.NewString(b.CastStr(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length))
 		if called_scope.GetGetStaticMethod() != nil {
 			fbc = called_scope.GetGetStaticMethod()(called_scope, mname)
 		} else {

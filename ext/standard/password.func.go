@@ -283,12 +283,12 @@ func PhpPasswordAlgoFindZvalEx(arg *types.Zval, default_algo *PhpPasswordAlgo) *
 		case 1:
 			return &PhpPasswordAlgoBcrypt
 		case 2:
-			var n *types.String = types.ZendStringInit("argon2i")
+			var n *types.String = types.NewString("argon2i")
 			var ret *PhpPasswordAlgo = PhpPasswordAlgoFind(n)
 			types.ZendStringRelease(n)
 			return ret
 		case 3:
-			var n *types.String = types.ZendStringInit("argon2id")
+			var n *types.String = types.NewString("argon2id")
 			var ret *PhpPasswordAlgo = PhpPasswordAlgoFind(n)
 			types.ZendStringRelease(n)
 			return ret
@@ -326,7 +326,7 @@ func PhpPasswordAlgoExtractIdent(hash *types.String) *types.String {
 		/* No terminating '$' */
 
 	}
-	return types.ZendStringInit(b.CastStr(ident, ident_end-ident))
+	return types.NewString(b.CastStr(ident, ident_end-ident))
 }
 func PhpPasswordAlgoIdentifyEx(hash *types.String, default_algo *PhpPasswordAlgo) *PhpPasswordAlgo {
 	var algo *PhpPasswordAlgo

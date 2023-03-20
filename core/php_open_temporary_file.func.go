@@ -38,7 +38,7 @@ func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **types.String)
 	}
 	fd = mkstemp(opened_path)
 	if fd != -1 && opened_path_p != nil {
-		*opened_path_p = types.ZendStringInit(opened_path)
+		*opened_path_p = types.NewString(opened_path)
 	}
 	zend.Efree(new_state.GetCwd())
 	return fd

@@ -131,7 +131,7 @@ func PhpGlobStreamOpener(
 	if !(strncmp(path, "glob://", b.SizeOf("\"glob://\"")-1)) {
 		path += b.SizeOf("\"glob://\"") - 1
 		if opened_path != nil {
-			*opened_path = types.ZendStringInit(path)
+			*opened_path = types.NewString(path)
 		}
 	}
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {

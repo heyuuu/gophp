@@ -52,7 +52,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 		var out *byte
 		out = PhpMd5CryptR(password, salt, output)
 		if out != nil {
-			return types.ZendStringInit(out)
+			return types.NewString(out)
 		}
 		return nil
 	} else if salt[0] == '$' && salt[1] == '6' && salt[2] == '$' {
@@ -64,7 +64,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 			zend.Efree(output)
 			return nil
 		} else {
-			result = types.ZendStringInit(output)
+			result = types.NewString(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -78,7 +78,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 			zend.Efree(output)
 			return nil
 		} else {
-			result = types.ZendStringInit(output)
+			result = types.NewString(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return result
@@ -91,7 +91,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return nil
 		} else {
-			result = types.ZendStringInit(output)
+			result = types.NewString(output)
 			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN+1)
 			return result
 		}
@@ -124,14 +124,14 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 		if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 			return nil
 		} else {
-			result = types.ZendStringInit(crypt_res)
+			result = types.NewString(crypt_res)
 			return result
 		}
 	}
 	if crypt_res == nil || salt[0] == '*' && salt[1] == '0' {
 		return nil
 	} else {
-		result = types.ZendStringInit(crypt_res)
+		result = types.NewString(crypt_res)
 		return result
 	}
 }
