@@ -90,8 +90,8 @@ func Z_OBJCE_P(zval_p *Zval) *ClassEntry               { return zval_p.GetObj().
 func Z_OBJPROP(zval Zval) *Array {
 	return Z_OBJ_HT(zval).GetGetProperties()(&zval)
 }
-func Z_OBJPROP_P(zval_p *Zval) *Array { return Z_OBJPROP(*zval_p) }
-func Z_RES(zval Zval) *ZendResource                     { return zval.GetRes() }
+func Z_OBJPROP_P(zval_p *Zval) *Array       { return Z_OBJPROP(*zval_p) }
+func Z_RES(zval Zval) *ZendResource         { return zval.GetRes() }
 func Z_RES_P(zval_p *Zval) *ZendResource    { return zval_p.GetRes() }
 func Z_RES_HANDLE(zval Zval) int            { return Z_RES(zval).GetHandle() }
 func Z_RES_HANDLE_P(zval_p *Zval) int       { return Z_RES_HANDLE(*zval_p) }

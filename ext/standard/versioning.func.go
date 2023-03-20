@@ -5,8 +5,8 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpCanonicalizeVersion(version *byte) *byte {
@@ -202,7 +202,7 @@ func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			v1, v1_len = fp.ParseString()
 			v2, v2_len = fp.ParseString()
 			fp.StartOptional()

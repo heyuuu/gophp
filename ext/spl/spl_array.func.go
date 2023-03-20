@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func SplArrayFromObj(obj *types.ZendObject) *SplArrayObject {
@@ -941,7 +941,7 @@ func zim_spl_Array_setIteratorClass(executeData *zend.ZendExecuteData, return_va
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 
-	fp := argparse.FastParseStart(executeData, 1, 1, 0)
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	ce_get_iterator := fp.ParseClass(spl_ce_ArrayIterator)
 	if fp.HasError() {
 		fp.HandleError()
@@ -1099,7 +1099,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		zend.CallUserFunction(nil, &function_name, return_value, 1, params)
 		intern.GetNApplyCount()--
 	} else if use_arg == SPL_ARRAY_METHOD_MAY_USER_ARG {
-		if zend.ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|z", &arg) == types.FAILURE {
+		if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|z", &arg) == types.FAILURE {
 			faults.ThrowException(spl_ce_BadMethodCallException, "Function expects one argument at most", 0)
 			goto exit
 		}
@@ -1110,7 +1110,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		zend.CallUserFunction(nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
 		intern.GetNApplyCount()--
 	} else {
-		if executeData.NumArgs() != 1 || zend.ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "z", &arg) == types.FAILURE {
+		if executeData.NumArgs() != 1 || zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "z", &arg) == types.FAILURE {
 			faults.ThrowException(spl_ce_BadMethodCallException, "Function expects exactly one argument", 0)
 			goto exit
 		}

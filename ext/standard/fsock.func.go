@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Zval, persistent int) {
@@ -34,7 +34,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		var _max_num_args int = 5
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			host, host_len = fp.ParseString()
 			fp.StartOptional()
 			port = fp.ParseLong()

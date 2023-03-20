@@ -4,8 +4,8 @@ package standard
 
 import (
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpSrand(seed zend.ZendLong) { PhpMtSrand(seed) }
@@ -24,7 +24,7 @@ func ZifRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			min = fp.ParseLong()
 			max = fp.ParseLong()
 			if fp.HasError() {

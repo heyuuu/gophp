@@ -6,8 +6,8 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpUrlEncodeHashEx(
@@ -244,7 +244,7 @@ func ZifHttpBuildQuery(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 4
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			formdata = fp.ParseArrayOrObject()
 			fp.StartOptional()
 			prefix, prefix_len = fp.ParseString()

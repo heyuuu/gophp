@@ -5,8 +5,8 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func CRC32(crc int, ch __auto__) int {
@@ -55,7 +55,7 @@ func PhpIfCrc32(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			p, nr = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()

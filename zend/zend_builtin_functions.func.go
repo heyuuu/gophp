@@ -3,9 +3,9 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZmStartupCore(type_ int, module_number int) int {
@@ -202,7 +202,7 @@ func ZifStrlen(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -223,7 +223,7 @@ func ZifStrcmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			if fp.HasError() {
@@ -247,7 +247,7 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			len_ = fp.ParseLong()
@@ -276,7 +276,7 @@ func ZifStrcasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			if fp.HasError() {
@@ -300,7 +300,7 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			len_ = fp.ParseLong()
@@ -386,7 +386,7 @@ func ZifErrorReporting(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			err = fp.ParseZval()
 			if fp.HasError() {
@@ -524,7 +524,7 @@ func ZifDefine(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
 			val = fp.ParseZval()
 			fp.StartOptional()
@@ -618,7 +618,7 @@ func ZifDefined(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -716,7 +716,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseZval()
 			class_name = fp.ParseStr()
 			fp.StartOptional()
@@ -862,7 +862,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseObject()
 			if fp.HasError() {
 				fp.HandleError()
@@ -955,7 +955,7 @@ func ZifGetMangledObjectVars(executeData *ZendExecuteData, return_value *types.Z
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseObject()
 			if fp.HasError() {
 				fp.HandleError()
@@ -1038,7 +1038,7 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			klass = fp.ParseZval()
 			method_name = fp.ParseStr()
 			if fp.HasError() {
@@ -1142,7 +1142,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
 			fp.StartOptional()
 			autoload = fp.ParseBool()
@@ -1196,7 +1196,7 @@ func ZifFunctionExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()

@@ -3,8 +3,8 @@
 package zend
 
 import (
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 /**
@@ -113,9 +113,9 @@ func (this *ZendExecuteData) Arg(n int) *types.Zval { return this.VarNum(n - 1) 
 
 func (this *ZendExecuteData) CheckNumArgs(minNumArgs int, maxNumArgs int, forceStrict bool) bool {
 	if forceStrict {
-		return argparse.CheckNumArgs(this, minNumArgs, maxNumArgs, argparse.ZEND_PARSE_PARAMS_THROW)
+		return zpp.CheckNumArgs(this, minNumArgs, maxNumArgs, zpp.ZEND_PARSE_PARAMS_THROW)
 	} else {
-		return argparse.CheckNumArgs(this, minNumArgs, maxNumArgs, 0)
+		return zpp.CheckNumArgs(this, minNumArgs, maxNumArgs, 0)
 	}
 }
 

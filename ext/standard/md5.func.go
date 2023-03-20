@@ -6,8 +6,8 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func MakeDigest(md5str *byte, digest *uint8) { MakeDigestEx(md5str, digest, 16) }
@@ -31,7 +31,7 @@ func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg = fp.ParseStr()
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
@@ -69,7 +69,7 @@ func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg, arg_len = fp.ParsePath()
 			fp.StartOptional()
 			raw_output = fp.ParseBool()

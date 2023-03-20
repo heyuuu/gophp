@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpUrlFree(theurl *PhpUrl) {
@@ -310,7 +310,7 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			key = fp.ParseLong()
@@ -467,7 +467,7 @@ func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -489,7 +489,7 @@ func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -555,7 +555,7 @@ func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -577,7 +577,7 @@ func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -624,7 +624,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			url, url_len = fp.ParsePath()
 			fp.StartOptional()
 			format = fp.ParseLong()

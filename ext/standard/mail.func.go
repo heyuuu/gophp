@@ -7,9 +7,9 @@ import (
 	r "sik/builtin/file"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func SKIP_LONG_HEADER_SEP(str *byte, pos int) {
@@ -39,7 +39,7 @@ func ZifEzmlmHash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -251,7 +251,7 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 5
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			to, to_len = fp.ParseString()
 			subject, subject_len = fp.ParseString()
 			message, message_len = fp.ParseString()

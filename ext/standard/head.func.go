@@ -6,9 +6,9 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZifHeader(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -21,7 +21,7 @@ func ZifHeader(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			ctr.GetLine(), len_ = fp.ParseString()
 			fp.StartOptional()
 			rep = fp.ParseBool()
@@ -46,7 +46,7 @@ func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			ctr.GetLine(), len_ = fp.ParseString()
 			if fp.HasError() {
@@ -245,7 +245,7 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 7
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
 			fp.StartOptional()
 			value = fp.ParseStr()
@@ -309,7 +309,7 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 7
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			name = fp.ParseStr()
 			fp.StartOptional()
 			value = fp.ParseStr()
@@ -368,7 +368,7 @@ func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			arg1 = fp.ParseZval()
 			arg2 = fp.ParseZval()
@@ -424,7 +424,7 @@ func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *types.
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			response_code = fp.ParseLong()
 			if fp.HasError() {

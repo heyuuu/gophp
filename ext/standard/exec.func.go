@@ -9,9 +9,9 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZmStartupExec(type_ int, module_number int) int {
@@ -141,7 +141,7 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 		var _max_num_args int = b.Cond(mode != 0, 2, 3)
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			cmd, cmd_len = fp.ParseString()
 			fp.StartOptional()
 			if mode == 0 {
@@ -371,7 +371,7 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			command, command_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -400,7 +400,7 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			argument, argument_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -430,7 +430,7 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			command, command_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -470,7 +470,7 @@ func ZifProcNice(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			pri = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()

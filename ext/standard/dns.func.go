@@ -6,9 +6,9 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -34,7 +34,7 @@ func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zva
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			addr, addr_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -77,7 +77,7 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zva
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hostname, hostname_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -110,7 +110,7 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hostname, hostname_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -185,7 +185,7 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
 			rectype, rectype_len = fp.ParseString()
@@ -687,7 +687,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 5
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
 			type_param = fp.ParseLong()
@@ -963,7 +963,7 @@ func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hostname, hostname_len = fp.ParseString()
 			mx_list = fp.ParseZval()
 			fp.StartOptional()

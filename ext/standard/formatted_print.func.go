@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/sapi/cli"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpSprintfAppendchar(buffer **types.String, pos *int, add byte) {
@@ -515,7 +515,7 @@ func ZifUserSprintf(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		var _max_num_args int = -1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format = fp.ParseZval()
 			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
@@ -546,7 +546,7 @@ func ZifVsprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
@@ -579,7 +579,7 @@ func ZifUserPrintf(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _max_num_args int = -1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format = fp.ParseZval()
 			args, argc = fp.ParseVariadic0()
 			if fp.HasError() {
@@ -614,7 +614,7 @@ func ZifVprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
@@ -655,7 +655,7 @@ func ZifFprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = -1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg1 = fp.ParseResource()
 			format = fp.ParseZval()
 			args, argc = fp.ParseVariadic0()
@@ -696,7 +696,7 @@ func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg1 = fp.ParseResource()
 			format = fp.ParseZval()
 			array = fp.ParseZval()

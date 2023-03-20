@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/ext/standard"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func SPL_G(v __auto__) __auto__ { return SplGlobals.v }
@@ -387,7 +387,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 	var alfi AutoloadFuncInfo
 	var obj_ptr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
-	if zend.ZendParseParametersEx(argparse.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == types.FAILURE {
+	if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == types.FAILURE {
 		return
 	}
 	if executeData.NumArgs() != 0 {
@@ -710,7 +710,7 @@ func ZifSplObjectId(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			obj = fp.ParseObject()
 			if fp.HasError() {
 				fp.HandleError()

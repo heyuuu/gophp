@@ -6,9 +6,9 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PHP_UU_ENC(c __auto__) __auto__ {
@@ -164,7 +164,7 @@ func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Z
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			src = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -191,7 +191,7 @@ func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *types.Z
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			src = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()

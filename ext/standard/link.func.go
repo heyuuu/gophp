@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -23,7 +23,7 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			link, link_len = fp.ParsePath()
 			if fp.HasError() {
 				fp.HandleError()
@@ -62,7 +62,7 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			link, link_len = fp.ParsePath()
 			if fp.HasError() {
 				fp.HandleError()
@@ -106,7 +106,7 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			topath, topath_len = fp.ParsePath()
 			frompath, frompath_len = fp.ParsePath()
 			if fp.HasError() {
@@ -170,7 +170,7 @@ func ZifLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			topath, topath_len = fp.ParsePath()
 			frompath, frompath_len = fp.ParsePath()
 			if fp.HasError() {

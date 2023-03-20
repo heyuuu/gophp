@@ -5,8 +5,8 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpBase64EncodeStr(str *types.String) *types.String {
@@ -149,7 +149,7 @@ func ZifBase64Encode(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()
@@ -174,7 +174,7 @@ func ZifBase64Decode(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			strict = fp.ParseBool()

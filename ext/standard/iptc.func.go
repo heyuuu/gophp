@@ -7,9 +7,9 @@ import (
 	r "sik/builtin/file"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpIptcPut1(fp *r.FILE, spool int, c uint8, spoolbuf **uint8) int {
@@ -112,7 +112,7 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			iptcdata, iptcdata_len = fp.ParseString()
 			jpeg_file, jpeg_file_len = fp.ParsePath()
 			fp.StartOptional()
@@ -245,7 +245,7 @@ func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				fp.HandleError()

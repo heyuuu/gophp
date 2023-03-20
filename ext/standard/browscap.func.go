@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/sapi/cli"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func BROWSCAP_G(v __auto__) __auto__ { return BrowscapGlobals.v }
@@ -542,7 +542,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			agent_name = fp.ParseStrEx(true)
 			return_array = fp.ParseBool()

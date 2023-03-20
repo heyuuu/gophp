@@ -4,9 +4,9 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZendGeneratorGetCurrent(generator *ZendGenerator) *ZendGenerator {
@@ -953,7 +953,7 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			value = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()
@@ -994,7 +994,7 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			exception = fp.ParseZval()
 			if fp.HasError() {
 				fp.HandleError()

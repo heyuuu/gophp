@@ -5,8 +5,8 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZmStartupSyslog(type_ int, module_number int) int {
@@ -74,7 +74,7 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			ident, ident_len = fp.ParseString()
 			option = fp.ParseLong()
 			facility = fp.ParseLong()
@@ -120,7 +120,7 @@ func ZifSyslog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			priority = fp.ParseLong()
 			message, message_len = fp.ParseString()
 			if fp.HasError() {

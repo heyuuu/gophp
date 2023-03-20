@@ -9,9 +9,9 @@ import (
 	"sik/core/streams"
 	"sik/sapi/cli"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT {
@@ -145,7 +145,7 @@ func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zva
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zproc = fp.ParseResource()
 			fp.StartOptional()
 			sig_no = fp.ParseLong()
@@ -179,7 +179,7 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zproc = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
@@ -217,7 +217,7 @@ func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zva
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zproc = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
@@ -301,7 +301,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 6
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			command_zv = fp.ParseZval()
 			descriptorspec = fp.ParseArray()
 			pipes = fp.ParseZval()

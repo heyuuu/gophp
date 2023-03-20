@@ -354,9 +354,9 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 	return nSize + 1
 }
 
-func ZendHashRealInit(ht *Array, packed ZendBool)        { /* ignore simplify */ ht.RealInit() }
-func ZendHashRealInitPacked(ht *Array) { /* ignore simplify */ ht.RealInit() }
-func ZendHashRealInitMixed(ht *Array)  { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInit(ht *Array, packed ZendBool) { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInitPacked(ht *Array)            { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInitMixed(ht *Array)             { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *Array) {
 	// todo 此函数不应被调用
 	b.Assert(false)

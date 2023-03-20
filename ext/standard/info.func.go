@@ -8,8 +8,8 @@ import (
 	"sik/core/streams"
 	"sik/sapi/cli"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func SECTION(name string) {
@@ -590,7 +590,7 @@ func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			ext_name, ext_name_len = fp.ParseString()
 			if fp.HasError() {
@@ -623,7 +623,7 @@ func ZifPhpcredits(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			flag = fp.ParseLong()
 			if fp.HasError() {
@@ -654,7 +654,7 @@ func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			mode, modelen = fp.ParseString()
 			if fp.HasError() {

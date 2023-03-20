@@ -7,9 +7,9 @@ import (
 	r "sik/builtin/file"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZmStartupImagetypes(type_ int, module_number int) int {
@@ -880,7 +880,7 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *typ
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			p_image_type = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
@@ -902,7 +902,7 @@ func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *ty
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			image_type = fp.ParseLong()
 			fp.StartOptional()
 			inc_dot = fp.ParseBool()
@@ -1133,7 +1133,7 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input, input_len = fp.ParseString()
 			fp.StartOptional()
 			info = fp.ParseZval()

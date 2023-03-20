@@ -5,8 +5,8 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpHex2int(c int) byte {
@@ -159,7 +159,7 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *t
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			arg1 = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -240,7 +240,7 @@ func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *t
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()

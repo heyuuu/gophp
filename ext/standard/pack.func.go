@@ -6,9 +6,9 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpPack(val *types.Zval, size int, map_ *int, output *byte) {
@@ -104,7 +104,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = -1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			format, formatlen = fp.ParseString()
 			argv, num_args = fp.ParseVariadic0()
 			if fp.HasError() {
@@ -619,7 +619,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			formatarg = fp.ParseStr()
 			inputarg = fp.ParseStr()
 			fp.StartOptional()

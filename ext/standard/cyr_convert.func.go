@@ -5,9 +5,9 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
@@ -80,7 +80,7 @@ func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *types.
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input, input_len = fp.ParseString()
 			fr_cs, fr_cs_len = fp.ParseString()
 			to_cs, to_cs_len = fp.ParseString()

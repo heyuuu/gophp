@@ -1,4 +1,4 @@
-package argparse
+package zpp
 
 import (
 	b "sik/builtin"

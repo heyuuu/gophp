@@ -5,8 +5,8 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -19,7 +19,7 @@ func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			phones = fp.ParseLong()

@@ -266,9 +266,9 @@ func CheckHttpHost(target *byte) int {
 	var host_tmp *types.String
 	var colon *byte
 	if b.Assign(&tmp, zend.EG__().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(types.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(types.IS_STRING) {
-		host_tmp = types.NewString(host.GetStr().GetStr()
+		host_tmp = types.NewString(host.GetStr().GetStr())
 
-		/* HTTP_HOST could be 'localhost:8888' etc. */)
+		/* HTTP_HOST could be 'localhost:8888' etc. */
 
 		colon = strchr(host_tmp.GetVal(), ':')
 		if colon != nil {

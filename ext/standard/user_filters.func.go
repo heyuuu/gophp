@@ -7,9 +7,9 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZifUserFilterNop(executeData *zend.ZendExecuteData, return_value *types.Zval) {}
@@ -336,7 +336,7 @@ func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_valu
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zbrigade = fp.ParseResource()
 			if fp.HasError() {
 				fp.HandleError()
@@ -377,7 +377,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zbrigade = fp.ParseResource()
 			zobject = fp.ParseObject()
 			if fp.HasError() {
@@ -450,7 +450,7 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Z
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			zstream = fp.ParseZval()
 			buffer, buffer_len = fp.ParseString()
 			if fp.HasError() {
@@ -510,7 +510,7 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filtername = fp.ParseStr()
 			classname = fp.ParseStr()
 			if fp.HasError() {

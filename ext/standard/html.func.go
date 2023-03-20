@@ -6,9 +6,9 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func LIMIT_ALL(all __auto__, doctype int, charset EntityCharset) {
@@ -1345,7 +1345,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 4
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			flags = fp.ParseLong()
@@ -1392,7 +1392,7 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			quote_style = fp.ParseLong()
@@ -1424,7 +1424,7 @@ func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *types.
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			quote_style = fp.ParseLong()
@@ -1513,7 +1513,7 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
 			all = fp.ParseLong()
 			flags = fp.ParseLong()

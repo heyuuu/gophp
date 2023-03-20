@@ -6,9 +6,9 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
@@ -353,7 +353,7 @@ func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *types.Z
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hash = fp.ParseStr()
 			if fp.HasError() {
 				fp.HandleError()
@@ -399,7 +399,7 @@ func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *typ
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			hash = fp.ParseStr()
 			znew_algo = fp.ParseZval()
 			fp.StartOptional()
@@ -441,7 +441,7 @@ func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *types.Zv
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			password = fp.ParseStr()
 			hash = fp.ParseStr()
 			if fp.HasError() {
@@ -469,7 +469,7 @@ func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *types.Zval
 		var _max_num_args int = 3
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			password = fp.ParseStr()
 			zalgo = fp.ParseZval()
 			fp.StartOptional()

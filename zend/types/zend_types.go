@@ -40,9 +40,9 @@ type HashTableIterator struct {
 	pos HashPosition
 }
 
-func (this *HashTableIterator) GetHt() *Array      { return this.ht }
-func (this *HashTableIterator) SetHt(value *Array) { this.ht = value }
-func (this *HashTableIterator) GetPos() HashPosition                 { return this.pos }
+func (this *HashTableIterator) GetHt() *Array             { return this.ht }
+func (this *HashTableIterator) SetHt(value *Array)        { this.ht = value }
+func (this *HashTableIterator) GetPos() HashPosition      { return this.pos }
 func (this *HashTableIterator) SetPos(value HashPosition) { this.pos = value }
 
 /**
@@ -64,10 +64,10 @@ func (this *ZendObject) SetHandle(value uint32)                     { this.handl
 func (this *ZendObject) GetCe() *ClassEntry                         { return this.ce }
 func (this *ZendObject) SetCe(value *ClassEntry)                    { this.ce = value }
 func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return this.handlers }
-func (this *ZendObject) SetHandlers(value *zend.ZendObjectHandlers)   { this.handlers = value }
-func (this *ZendObject) GetProperties() *Array      { return this.properties }
-func (this *ZendObject) SetProperties(value *Array) { this.properties = value }
-func (this *ZendObject) GetPropertiesTable() []Zval                   { return this.properties_table }
+func (this *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { this.handlers = value }
+func (this *ZendObject) GetProperties() *Array                      { return this.properties }
+func (this *ZendObject) SetProperties(value *Array)                 { this.properties = value }
+func (this *ZendObject) GetPropertiesTable() []Zval                 { return this.properties_table }
 func (this *ZendObject) SetPropertiesTable(value []Zval)            { this.properties_table = value }
 
 /**

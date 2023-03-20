@@ -4,9 +4,9 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func LOAD_NEXT_OPLINE() int            { return ZEND_VM_INC_OPCODE() }
@@ -587,8 +587,8 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
 
-				/* Free extra args before releasing the closure,
-				 * as that may free the op_array. */))
+			/* Free extra args before releasing the closure,
+			 * as that may free the op_array. */))
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -3390,7 +3390,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				var str *types.String
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
-				if argparse.ZendParseArgStrWeak(&tmp, &str) != 0 {
+				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
@@ -11524,7 +11524,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				var str *types.String
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
-				if argparse.ZendParseArgStrWeak(&tmp, &str) != 0 {
+				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
@@ -33255,7 +33255,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				var str *types.String
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
-				if argparse.ZendParseArgStrWeak(&tmp, &str) != 0 {
+				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break

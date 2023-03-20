@@ -1,19 +1,19 @@
 package zend
 
 import (
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZendParseParametersEx(flags int, num_args int, type_spec string, args ...any) int {
-	return argparse.ParseVaArgs(num_args, type_spec, args, flags)
+	return zpp.ParseVaArgs(num_args, type_spec, args, flags)
 }
 func ZendParseParameters(num_args int, type_spec string, args ...any) int {
-	return argparse.ParseVaArgs(num_args, type_spec, args, 0)
+	return zpp.ParseVaArgs(num_args, type_spec, args, 0)
 }
 func ZendParseParametersThrow(num_args int, type_spec string, args ...any) int {
-	return argparse.ParseVaArgs(num_args, type_spec, args, argparse.ZEND_PARSE_PARAMS_THROW)
+	return zpp.ParseVaArgs(num_args, type_spec, args, zpp.ZEND_PARSE_PARAMS_THROW)
 }
 func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec string, args ...any) int {
 	/* Just checking this_ptr is not enough, because fcall_common_helper does not set
@@ -23,7 +23,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 
 	var is_method = CurrEX().GetFunc().GetScope() != nil
 	if !is_method || this_ptr == nil || this_ptr.GetType() != types.IS_OBJECT {
-		return argparse.ParseVaArgs(num_args, type_spec, args, 0)
+		return zpp.ParseVaArgs(num_args, type_spec, args, 0)
 	} else {
 		object := args[0].(**types.Zval)
 		ce := args[1].(*types.ClassEntry)
@@ -31,7 +31,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 		if ce != nil && InstanceofFunction(types.Z_OBJCE_P(this_ptr), ce) == 0 {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "%s::%s() must be derived from %s::%s", types.Z_OBJCE_P(this_ptr).GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
 		}
-		return argparse.ParseVaArgs(num_args, type_spec[1:], args[2:], 0)
+		return zpp.ParseVaArgs(num_args, type_spec[1:], args[2:], 0)
 	}
 }
 func ZendUpdateClassConstants(class_type *types.ClassEntry) int {

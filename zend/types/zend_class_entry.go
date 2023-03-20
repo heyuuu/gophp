@@ -18,11 +18,11 @@ type ClassEntry struct {
 	default_static_members_count int
 	default_properties_table     *Zval
 	default_static_members_table *Zval
-	static_members_table__ptr **Zval
-	function_table            Array
-	properties_info           Array
-	constants_table           Array
-	properties_info_table     **zend.ZendPropertyInfo
+	static_members_table__ptr    **Zval
+	function_table               Array
+	properties_info              Array
+	constants_table              Array
+	properties_info_table        **zend.ZendPropertyInfo
 	constructor                  *zend.ZendFunction
 	destructor                   *zend.ZendFunction
 	clone                        *zend.ZendFunction
@@ -104,19 +104,19 @@ func (this *ClassEntry) Name() string { return this.name.GetStr() }
 /**
  * Getter / Setter
  */
-func (this *ClassEntry) GetType() byte                   { return this.type_ }
-func (this *ClassEntry) SetType(value byte)          { this.type_ = value }
-func (this *ClassEntry) GetName() *String            { return this.name }
-func (this *ClassEntry) SetName(value *String)       { this.name = value }
-func (this *ClassEntry) GetParent() *ClassEntry      { return this.__0.parent }
-func (this *ClassEntry) SetParent(value *ClassEntry) { this.__0.parent = value }
-func (this *ClassEntry) GetParentName() *String      { return this.__0.parent_name }
-func (this *ClassEntry) SetParentName(value *String) { this.__0.parent_name = value }
-func (this *ClassEntry) GetRefcount() int            { return this.refcount }
-func (this *ClassEntry) SetRefcount(value int)           { this.refcount = value }
-func (this *ClassEntry) GetCeFlags() uint32              { return this.ce_flags }
-func (this *ClassEntry) SetCeFlags(value uint32)         { this.ce_flags = value }
-func (this *ClassEntry) GetDefaultPropertiesCount() int  { return this.default_properties_count }
+func (this *ClassEntry) GetType() byte                  { return this.type_ }
+func (this *ClassEntry) SetType(value byte)             { this.type_ = value }
+func (this *ClassEntry) GetName() *String               { return this.name }
+func (this *ClassEntry) SetName(value *String)          { this.name = value }
+func (this *ClassEntry) GetParent() *ClassEntry         { return this.__0.parent }
+func (this *ClassEntry) SetParent(value *ClassEntry)    { this.__0.parent = value }
+func (this *ClassEntry) GetParentName() *String         { return this.__0.parent_name }
+func (this *ClassEntry) SetParentName(value *String)    { this.__0.parent_name = value }
+func (this *ClassEntry) GetRefcount() int               { return this.refcount }
+func (this *ClassEntry) SetRefcount(value int)          { this.refcount = value }
+func (this *ClassEntry) GetCeFlags() uint32             { return this.ce_flags }
+func (this *ClassEntry) SetCeFlags(value uint32)        { this.ce_flags = value }
+func (this *ClassEntry) GetDefaultPropertiesCount() int { return this.default_properties_count }
 func (this *ClassEntry) SetDefaultPropertiesCount(value int) {
 	this.default_properties_count = value
 }

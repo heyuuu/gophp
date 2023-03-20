@@ -4,9 +4,9 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func ZendWeakrefFrom(o *types.ZendObject) *ZendWeakref {
@@ -94,12 +94,12 @@ func zim_WeakReference___construct(executeData *ZendExecuteData, return_value *t
 func zim_WeakReference_create(executeData *ZendExecuteData, return_value *types.Zval) {
 	var referent *types.Zval
 	for {
-		var _flags int = argparse.ZEND_PARSE_PARAMS_THROW
+		var _flags int = zpp.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			referent = fp.ParseObject()
 			if fp.HasError() {
 				fp.HandleError()
@@ -116,12 +116,12 @@ func zim_WeakReference_create(executeData *ZendExecuteData, return_value *types.
 }
 func zim_WeakReference_get(executeData *ZendExecuteData, return_value *types.Zval) {
 	for {
-		var _flags int = argparse.ZEND_PARSE_PARAMS_THROW
+		var _flags int = zpp.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 0
 		var _max_num_args int = 0
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			if fp.HasError() {
 				fp.HandleError()
 				return

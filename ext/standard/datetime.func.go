@@ -6,8 +6,8 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpStdDate(t int64) *byte {
@@ -37,7 +37,7 @@ func ZifStrptime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			ts, ts_length = fp.ParseString()
 			format, format_length = fp.ParseString()
 			if fp.HasError() {

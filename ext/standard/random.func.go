@@ -5,9 +5,9 @@ package standard
 import (
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/argparse"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func RandomGlobalsCtor(random_globals_p *PhpRandomGlobals) { random_globals_p.SetFd(-1) }
@@ -70,12 +70,12 @@ func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var size zend.ZendLong
 	var bytes *types.String
 	for {
-		var _flags int = argparse.ZEND_PARSE_PARAMS_THROW
+		var _flags int = zpp.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			size = fp.ParseLong()
 			if fp.HasError() {
 				fp.HandleError()
@@ -148,12 +148,12 @@ func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var max zend.ZendLong
 	var result zend.ZendLong
 	for {
-		var _flags int = argparse.ZEND_PARSE_PARAMS_THROW
+		var _flags int = zpp.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 2
 		var _max_num_args int = 2
 
 		for {
-			fp := argparse.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			min = fp.ParseLong()
 			max = fp.ParseLong()
 			if fp.HasError() {
