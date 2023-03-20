@@ -47,13 +47,15 @@ func IZifGcStatus() map[string]int {
 	}
 }
 
-func ZifGcStatus() map[string]int {
-	return map[string]int{
-		"runs":      0,
-		"collected": 0,
-		"threshold": 0,
-		"roots":     0,
+func ZifGcStatus() {
+	if !executeData.CheckNumArgsNone(false) {
+		return
 	}
+	ArrayInitSize(return_value, 3)
+	AddAssocLongEx(return_value, "runs", 0)
+	AddAssocLongEx(return_value, "collected", 0)
+	AddAssocLongEx(return_value, "threshold", 0)
+	AddAssocLongEx(return_value, "roots", 0)
 }
 
 func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *types.Zval) {
