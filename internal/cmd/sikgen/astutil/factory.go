@@ -83,3 +83,34 @@ func AssignStmt(variable ast.Expr, value ast.Expr) ast.Stmt {
 func BlockStmt(list ...ast.Stmt) *ast.BlockStmt {
 	return &ast.BlockStmt{List: list}
 }
+
+func DocComment(comments ...string) *ast.CommentGroup {
+	if len(comments) == 0 {
+		return nil
+	}
+
+	var list []*ast.Comment
+	for _, comment := range comments {
+		list = append(list, &ast.Comment{
+			Text: comment,
+		})
+	}
+	return &ast.CommentGroup{List: list}
+}
+
+func ValueSpecDecl(variable *ast.Ident, value ast.Expr) *ast.GenDecl {
+	return ValueSpecDeclEx(nil, variable, value)
+}
+
+func ValueSpecDeclEx(doc *ast.CommentGroup, variable *ast.Ident, value ast.Expr) *ast.GenDecl {
+	return &ast.GenDecl{
+		Doc: doc,
+		Tok: token.VAR,
+		Specs: []ast.Spec{
+			&ast.ValueSpec{
+				Names:  []*ast.Ident{variable},
+				Values: []ast.Expr{value},
+			},
+		},
+	}
+}

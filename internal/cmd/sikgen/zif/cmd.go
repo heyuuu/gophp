@@ -21,7 +21,7 @@ func RunGenFunc(dir string) {
 		zifInfos := scanZifInFile(file)
 		if len(zifInfos) > 0 {
 			zifInfoFileName := fileName[:len(fileName)-3] + ".zif.go" // 将 .go 后缀改为 .zif.go
-			zifInfoFileCode := printNode(genFileNode(file.Name, zifInfos))
+			zifInfoFileCode := printNode(genFileNode(file.Name.Name, zifInfos))
 			err := ioutil.WriteFile(zifInfoFileName, []byte(zifInfoFileCode), 0644)
 			if err != nil {
 				log.Fatal(err)

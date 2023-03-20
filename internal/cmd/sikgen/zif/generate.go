@@ -2,7 +2,6 @@ package zif
 
 import (
 	"go/ast"
-	"go/token"
 	"log"
 	f "sik/internal/cmd/sikgen/astutil"
 )
@@ -12,43 +11,24 @@ var (
 	typeZval = f.RefType(f.PkgIdent("types", "Zval"))
 )
 
-func genFileNode(name *ast.Ident, infos []*ZifInfo) *ast.File {
-	var decls []ast.Decl
-
-	decls = append(decls, &ast.GenDecl{
-		Tok: token.IMPORT,
-		Specs: []ast.Spec{
-			&ast.ImportSpec{
-				Path: f.StrLit("sik/zend/types"),
-			},
-		},
-	})
+func genFileNode(name string, infos []*ZifInfo) *ast.File {
+	fb := f.NewFileBuilder(name)
+	fb.AddImport("sik/zend/types")
 
 	for _, zifInfo := range infos {
-		docComment := &ast.CommentGroup{
-			List: []*ast.Comment{
-				{Text: "\n// generate by " + zifInfo.funcName},
-			},
-		}
-
-		varExpr := &ast.Ident{Name: zifInfo.defName}
-		valueExpr := &ast.CallExpr{
-			Fun:  f.Ident("DefFunc"),
-			Args: []ast.Expr{genDefFuncOpts(zifInfo)},
-		}
-
-		decls = append(decls, &ast.GenDecl{
-			Doc: docComment,
-			Tok: token.VAR,
-			Specs: []ast.Spec{
-				&ast.ValueSpec{
-					Names:  []*ast.Ident{varExpr},
-					Values: []ast.Expr{valueExpr},
+		fb.AddDecl(
+			f.ValueSpecDeclEx(
+				f.DocComment("\n// generate by "+zifInfo.funcName),
+				f.Ident(zifInfo.defName),
+				&ast.CallExpr{
+					Fun:  f.Ident("DefFunc"),
+					Args: []ast.Expr{genDefFuncOpts(zifInfo)},
 				},
-			},
-		})
+			),
+		)
 	}
-	return &ast.File{Name: name, Decls: decls}
+
+	return fb.Build()
 }
 
 func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
