@@ -200,7 +200,7 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ *ZendFunction, args *ty
 	fci.SetParamCount(types.Z_ARRVAL_P(args).GetNNumOfElements())
 	params = (*types.Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval")))
 	fci.SetParams(params)
-	var __ht *types.HashTable = args.GetArr()
+	var __ht *types.Array = args.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

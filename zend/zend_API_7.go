@@ -41,7 +41,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	}
 	disabled_class.InitMethods(DisabledClassNew)
 	disabled_class.SetCreateObject(DisplayDisabledClass)
-	var __ht *types.HashTable = disabled_class.GetFunctionTable()
+	var __ht *types.Array = disabled_class.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -167,7 +167,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	var lmname *types.String
 	var colon *byte
 	var clen int
-	var ftable *types.HashTable
+	var ftable *types.Array
 	var call_via_handler int = 0
 	var scope *types.ClassEntry
 	var zv *types.Zval

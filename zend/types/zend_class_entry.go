@@ -18,11 +18,11 @@ type ClassEntry struct {
 	default_static_members_count int
 	default_properties_table     *Zval
 	default_static_members_table *Zval
-	static_members_table__ptr    **Zval
-	function_table               HashTable
-	properties_info              HashTable
-	constants_table              HashTable
-	properties_info_table        **zend.ZendPropertyInfo
+	static_members_table__ptr **Zval
+	function_table            Array
+	properties_info           Array
+	constants_table           Array
+	properties_info_table     **zend.ZendPropertyInfo
 	constructor                  *zend.ZendFunction
 	destructor                   *zend.ZendFunction
 	clone                        *zend.ZendFunction
@@ -141,9 +141,9 @@ func (this *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 func (this *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return this.static_members_table__ptr
 }
-func (this *ClassEntry) GetFunctionTable() HashTable  { return this.function_table }
-func (this *ClassEntry) GetPropertiesInfo() HashTable { return this.properties_info }
-func (this *ClassEntry) GetConstantsTable() HashTable { return this.constants_table }
+func (this *ClassEntry) GetFunctionTable() Array  { return this.function_table }
+func (this *ClassEntry) GetPropertiesInfo() Array { return this.properties_info }
+func (this *ClassEntry) GetConstantsTable() Array { return this.constants_table }
 func (this *ClassEntry) GetPropertiesInfoTable() **zend.ZendPropertyInfo {
 	return this.properties_info_table
 }

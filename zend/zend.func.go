@@ -78,7 +78,7 @@ func ZendStrpprintf(max_len int, format string, args ...any) *types.String {
 	return types.NewString(result)
 }
 
-func PrintHash(buf *SmartStr, ht *types.HashTable, indent int, is_object types.ZendBool) {
+func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendBool) {
 	for i := 0; i < indent; i++ {
 		buf.AppendByte(' ')
 	}
@@ -118,12 +118,12 @@ func PrintHash(buf *SmartStr, ht *types.HashTable, indent int, is_object types.Z
 	}
 	buf.AppendString(")\n")
 }
-func PrintFlatHash(ht *types.HashTable) {
+func PrintFlatHash(ht *types.Array) {
 	var tmp *types.Zval
 	var string_key *types.String
 	var num_key ZendUlong
 	var i int = 0
-	var __ht *types.HashTable = ht
+	var __ht *types.Array = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsIndirect() {
@@ -184,7 +184,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 		}
 		break
 	case types.IS_OBJECT:
-		var properties *types.HashTable
+		var properties *types.Array
 		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		ZendPrintf("%s Object (", class_name.GetVal())
 		types.ZendStringReleaseEx(class_name, 0)
@@ -225,7 +225,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		}
 		break
 	case types.IS_OBJECT:
-		var properties *types.HashTable
+		var properties *types.Array
 		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		buf.AppendString(class_name.GetStr())
 		types.ZendStringReleaseEx(class_name, 0)
@@ -391,7 +391,7 @@ func ZendRegisterStandardIniEntries() {
 func ZendResolvePropertyTypes() {
 	var ce *types.ClassEntry
 	var prop_info *ZendPropertyInfo
-	var __ht *types.HashTable = CG__().GetClassTable()
+	var __ht *types.Array = CG__().GetClassTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -400,7 +400,7 @@ func ZendResolvePropertyTypes() {
 			continue
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
-			var __ht *types.HashTable = ce.GetPropertiesInfo()
+			var __ht *types.Array = ce.GetPropertiesInfo()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

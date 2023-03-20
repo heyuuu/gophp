@@ -146,9 +146,9 @@ func ZendInitRsrcPlist() int {
 	types.ZendHashInitEx(EG__().GetPersistentList(), 8, nil, PlistEntryDestructor, 1, 0)
 	return types.SUCCESS
 }
-func ZendCloseRsrcList(ht *types.HashTable) {
+func ZendCloseRsrcList(ht *types.Array) {
 	var res *types.ZendResource
-	var __ht *types.HashTable = ht
+	var __ht *types.Array = ht
 	for _, _p := range __ht.foreachDataReserve() {
 		var _z types.Zval = _p.GetVal()
 
@@ -158,7 +158,7 @@ func ZendCloseRsrcList(ht *types.HashTable) {
 		}
 	}
 }
-func ZendDestroyRsrcList(ht *types.HashTable) { ht.GracefulReverseDestroy() }
+func ZendDestroyRsrcList(ht *types.Array) { ht.GracefulReverseDestroy() }
 func CleanModuleResource(zv *types.Zval, arg any) int {
 	var resource_id int = *((*int)(arg))
 	return types.Z_RES_TYPE_P(zv) == resource_id
@@ -193,7 +193,7 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 }
 func ZendFetchListDtorId(type_name *byte) int {
 	var lde *ZendRsrcListDtorsEntry
-	var __ht *types.HashTable = &ListDestructors
+	var __ht *types.Array = &ListDestructors
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

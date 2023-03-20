@@ -394,13 +394,13 @@ func ZendFindAliasName(ce *types.ClassEntry, name *types.String) *types.String {
 }
 func ZendResolveMethodName(ce *types.ClassEntry, f *ZendFunction) *types.String {
 	var func_ *ZendFunction
-	var function_table *types.HashTable
+	var function_table *types.Array
 	var name *types.String
 	if f.GetCommonType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
 		return f.GetFunctionName()
 	}
 	function_table = ce.GetFunctionTable()
-	var __ht *types.HashTable = function_table
+	var __ht *types.Array = function_table
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

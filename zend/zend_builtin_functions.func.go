@@ -139,7 +139,7 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 		ArrayInitSize(return_value, arg_count)
 		first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
 		types.ZendHashRealInitPacked(return_value.GetArr())
-		var __fill_ht *types.HashTable = return_value.GetArr()
+		var __fill_ht *types.Array = return_value.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
@@ -325,7 +325,7 @@ func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {
 	var entry *types.Zval
 	var tmp types.Zval
 	var num_key ZendUlong
-	var target_hash *types.HashTable
+	var target_hash *types.Array
 	var key *types.String
 	if ZendParseParameters(executeData.NumArgs(), "z/", &array) == types.FAILURE {
 		return
@@ -438,11 +438,11 @@ func ZifErrorReporting(executeData *ZendExecuteData, return_value *types.Zval) {
 	}
 	return_value.SetLong(old_error_reporting)
 }
-func ValidateConstantArray(ht *types.HashTable) int {
+func ValidateConstantArray(ht *types.Array) int {
 	var ret int = 1
 	var val *types.Zval
 	ht.ProtectRecursive()
-	var __ht *types.HashTable = ht
+	var __ht *types.Array = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsIndirect() {
@@ -481,7 +481,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 	var new_val *types.Zval
 	var val *types.Zval
 	ArrayInitSize(dst, types.Z_ARRVAL_P(src).GetNNumOfElements())
-	var __ht *types.HashTable = src.GetArr()
+	var __ht *types.Array = src.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsIndirect() {
@@ -777,7 +777,7 @@ func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, re
 	var prop *types.Zval
 	var prop_copy types.Zval
 	var key *types.String
-	var __ht *types.HashTable = ce.GetPropertiesInfo()
+	var __ht *types.Array = ce.GetPropertiesInfo()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -852,7 +852,7 @@ func ZifGetClassVars(executeData *ZendExecuteData, return_value *types.Zval) {
 func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
 	var value *types.Zval
-	var properties *types.HashTable
+	var properties *types.Array
 	var key *types.String
 	var zobj *types.ZendObject
 	var num_key ZendUlong
@@ -890,7 +890,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 		return
 	} else {
 		ArrayInitSize(return_value, properties.GetNNumOfElements())
-		var __ht *types.HashTable = properties
+		var __ht *types.Array = properties
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -948,7 +948,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 }
 func ZifGetMangledObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
-	var properties *types.HashTable
+	var properties *types.Array
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1009,7 +1009,7 @@ func ZifGetClassMethods(executeData *ZendExecuteData, return_value *types.Zval) 
 	}
 	ArrayInit(return_value)
 	scope = ZendGetExecutedScope()
-	var __ht *types.HashTable = ce.GetFunctionTable()
+	var __ht *types.Array = ce.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1263,7 +1263,7 @@ func ZifGetIncludedFiles(executeData *ZendExecuteData, return_value *types.Zval)
 		return
 	}
 	ArrayInit(return_value)
-	var __ht *types.HashTable = EG__().GetIncludedFiles()
+	var __ht *types.Array = EG__().GetIncludedFiles()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1400,7 +1400,7 @@ func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval
 		return
 	}
 	ArrayInit(return_value)
-	var __ht *types.HashTable = EG__().GetClassTable()
+	var __ht *types.Array = EG__().GetClassTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1432,7 +1432,7 @@ func ZifGetDefinedFunctions(executeData *ZendExecuteData, return_value *types.Zv
 	ArrayInit(&internal)
 	ArrayInit(&user)
 	ArrayInit(return_value)
-	var __ht *types.HashTable = EG__().GetFunctionTable()
+	var __ht *types.Array = EG__().GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1491,7 +1491,7 @@ func ZifCreateFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 	Efree(eval_name)
 	if retval == types.SUCCESS {
 		var func_ *ZendOpArray
-		var static_variables *types.HashTable
+		var static_variables *types.Array
 		func_ = types.ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
 		if func_ == nil {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unexpected inconsistency in create_function()")
@@ -1546,7 +1546,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 	}
 	if type_ == nil {
 		ArrayInit(return_value)
-		var __ht *types.HashTable = EG__().GetRegularList()
+		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1560,7 +1560,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 		}
 	} else if types.ZendStringEqualsLiteral(type_, "Unknown") {
 		ArrayInit(return_value)
-		var __ht *types.HashTable = EG__().GetRegularList()
+		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1580,7 +1580,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 			return
 		}
 		ArrayInit(return_value)
-		var __ht *types.HashTable = EG__().GetRegularList()
+		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1609,7 +1609,7 @@ func ZifGetLoadedExtensions(executeData *ZendExecuteData, return_value *types.Zv
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(AddZendextInfo), return_value)
 	} else {
 		var module *ZendModuleEntry
-		var __ht *types.HashTable = &ModuleRegistry
+		var __ht *types.Array = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1635,7 +1635,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 		modules = Ecalloc(ModuleRegistry.GetNNumOfElements()+2, b.SizeOf("zval"))
 		module_names = Emalloc((ModuleRegistry.GetNNumOfElements() + 2) * b.SizeOf("char *"))
 		module_names[0] = "internal"
-		var __ht *types.HashTable = &ModuleRegistry
+		var __ht *types.Array = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1644,7 +1644,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 			i++
 		}
 		module_names[i] = "user"
-		var __ht__1 *types.HashTable = EG__().GetZendConstants()
+		var __ht__1 *types.Array = EG__().GetZendConstants()
 		for _, _p := range __ht__1.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1683,7 +1683,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 	} else {
 		var constant *ZendConstant
 		var const_val types.Zval
-		var __ht *types.HashTable = EG__().GetZendConstants()
+		var __ht *types.Array = EG__().GetZendConstants()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1709,7 +1709,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		var p *types.Zval = call.Arg(1)
 		ArrayInitSize(arg_array, num_args)
 		types.ZendHashRealInitPacked(arg_array.GetArr())
-		var __fill_ht *types.HashTable = arg_array.GetArr()
+		var __fill_ht *types.Array = arg_array.GetArr()
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
@@ -1789,7 +1789,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 func DebugPrintBacktraceArgs(arg_array *types.Zval) {
 	var tmp *types.Zval
 	var i int = 0
-	var __ht *types.HashTable = arg_array.GetArr()
+	var __ht *types.Array = arg_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2228,7 +2228,7 @@ func ZifGetExtensionFuncs(executeData *ZendExecuteData, return_value *types.Zval
 	} else {
 		array = 0
 	}
-	var __ht *types.HashTable = CG__().GetFunctionTable()
+	var __ht *types.Array = CG__().GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

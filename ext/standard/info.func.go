@@ -44,7 +44,7 @@ func PhpInfoPrintf(fmt *byte, _ ...any) int {
 func PhpInfoPrint(str *byte) int {
 	return core.PhpOutputWrite(str, strlen(str))
 }
-func PhpInfoPrintStreamHash(name string, ht *types.HashTable) {
+func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 	var key *types.String
 	if ht != nil {
 		if ht.GetNNumOfElements() {
@@ -54,7 +54,7 @@ func PhpInfoPrintStreamHash(name string, ht *types.HashTable) {
 			} else {
 				PhpInfoPrintf("\nRegistered %s => ", name)
 			}
-			var __ht *types.HashTable = ht
+			var __ht *types.Array = ht
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -121,7 +121,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	key = types.NewString(b.CastStr(name, name_length))
 	zend.ZendIsAutoGlobal(key)
 	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key)) != nil && data.IsType(types.IS_ARRAY) {
-		var __ht *types.HashTable = data.GetArr()
+		var __ht *types.Array = data.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -326,12 +326,12 @@ func PhpPrintInfo(flag int) {
 		}
 	}
 	if (flag & PHP_INFO_MODULES) != 0 {
-		var sorted_registry types.HashTable
+		var sorted_registry types.Array
 		var module *zend.ZendModuleEntry
 		types.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
 		types.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		sorted_registry.SortCompatible(ModuleNameCmp, 0)
-		var __ht *types.HashTable = &sorted_registry
+		var __ht *types.Array = &sorted_registry
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -343,7 +343,7 @@ func PhpPrintInfo(flag int) {
 		SECTION("Additional Modules")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(1, "Module Name")
-		var __ht__1 *types.HashTable = &sorted_registry
+		var __ht__1 *types.Array = &sorted_registry
 		for _, _p := range __ht__1.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 

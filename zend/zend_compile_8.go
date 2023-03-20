@@ -249,7 +249,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	/* Remember expressions compiled during the initial BP_VAR_IS lookup,
 	 * to avoid double-evaluation when we compile again with BP_VAR_W. */
 
-	var orig_memoized_exprs *types.HashTable = CG__().GetMemoizedExprs()
+	var orig_memoized_exprs *types.Array = CG__().GetMemoizedExprs()
 	var orig_memoize_mode int = CG__().GetMemoizeMode()
 	ZendEnsureWritableVariable(var_ast)
 	if IsThisFetch(var_ast) != 0 {
@@ -294,7 +294,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	} else {
 		opline.SetResult(result.GetOp())
 	}
-	var __ht *types.HashTable = CG__().GetMemoizedExprs()
+	var __ht *types.Array = CG__().GetMemoizedExprs()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -310,7 +310,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	if need_frees != 0 {
 		var jump_opnum uint32 = ZendEmitJump(0)
 		ZendUpdateJumpTargetToNext(coalesce_opnum)
-		var __ht *types.HashTable = CG__().GetMemoizedExprs()
+		var __ht *types.Array = CG__().GetMemoizedExprs()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 

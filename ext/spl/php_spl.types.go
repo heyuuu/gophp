@@ -12,7 +12,7 @@ import (
  */
 type ZendSplGlobals struct {
 	autoload_extensions *types.String
-	autoload_functions  *types.HashTable
+	autoload_functions  *types.Array
 	hash_mask_handle    intPtr
 	hash_mask_handlers  intPtr
 	hash_mask_init      int
@@ -42,7 +42,7 @@ func (this *ZendSplGlobals) SetAutoloadExtensions(value *types.String) {
 }
 
 // func (this *ZendSplGlobals)  GetAutoloadFunctions() *zend.HashTable      { return this.autoload_functions }
-func (this *ZendSplGlobals) SetAutoloadFunctions(value *types.HashTable) {
+func (this *ZendSplGlobals) SetAutoloadFunctions(value *types.Array) {
 	this.autoload_functions = value
 }
 

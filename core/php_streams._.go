@@ -333,10 +333,10 @@ var _phpStreamMakeSeekable func(origstream *PhpStream, newstream **PhpStream, fl
 
 /* Give other modules access to the url_stream_wrappers_hash and stream_filters_hash */
 
-var _phpStreamGetUrlStreamWrappersHash func() *types.HashTable
-var PhpStreamGetUrlStreamWrappersHashGlobal func() *types.HashTable
-var _phpGetStreamFiltersHash func() *types.HashTable
-var PhpGetStreamFiltersHashGlobal func() *types.HashTable
+var _phpStreamGetUrlStreamWrappersHash func() *types.Array
+var PhpStreamGetUrlStreamWrappersHashGlobal func() *types.Array
+var _phpGetStreamFiltersHash func() *types.Array
+var PhpGetStreamFiltersHashGlobal func() *types.Array
 var PhpStreamUserWrapperOps *PhpStreamWrapperOps
 
 /* Definitions for user streams */

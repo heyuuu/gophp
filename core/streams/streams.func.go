@@ -16,14 +16,14 @@ import (
 func PhpFileLeStream() int       { return LeStream }
 func PhpFileLePstream() int      { return LePstream }
 func PhpFileLeStreamFilter() int { return LeStreamFilter }
-func _phpStreamGetUrlStreamWrappersHash() *types.HashTable {
+func _phpStreamGetUrlStreamWrappersHash() *types.Array {
 	if standard.FG(stream_wrappers) {
 		return standard.FG(stream_wrappers)
 	} else {
 		return &UrlStreamWrappersHash
 	}
 }
-func PhpStreamGetUrlStreamWrappersHashGlobal() *types.HashTable { return &UrlStreamWrappersHash }
+func PhpStreamGetUrlStreamWrappersHashGlobal() *types.Array { return &UrlStreamWrappersHash }
 func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 	var stream *core.PhpStream
 	var rsrc *types.ZendResource = el.GetRes()
@@ -40,7 +40,7 @@ func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 }
 func ZmDeactivateStreams(type_ int, module_number int) int {
 	var el *types.Zval
-	var __ht *types.HashTable = zend.EG__().GetPersistentList()
+	var __ht *types.Array = zend.EG__().GetPersistentList()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -67,7 +67,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 				 * regular list causes trouble (see bug #54623) */
 
 				*stream = (*core.PhpStream)(le.GetPtr())
-				var __ht *types.HashTable = zend.EG__().GetRegularList()
+				var __ht *types.Array = zend.EG__().GetRegularList()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
@@ -1587,7 +1587,7 @@ func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.String) int {
 	return types.ZendHashDel(standard.FG(stream_wrappers), protocol)
 }
 func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *core.PhpStreamWrapper {
-	var wrapper_hash *types.HashTable = b.CondF1(standard.FG(stream_wrappers), func() __auto__ { return standard.FG(stream_wrappers) }, &UrlStreamWrappersHash)
+	var wrapper_hash *types.Array = b.CondF1(standard.FG(stream_wrappers), func() __auto__ { return standard.FG(stream_wrappers) }, &UrlStreamWrappersHash)
 	var wrapper *core.PhpStreamWrapper = nil
 	var p *byte
 	var protocol *byte = nil

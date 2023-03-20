@@ -74,7 +74,7 @@ func PhpCreateIncompleteClass() *types.ClassEntry {
 }
 func PhpLookupClassName(object *types.Zval) *types.String {
 	var val *types.Zval
-	var object_properties *types.HashTable
+	var object_properties *types.Array
 	object_properties = types.Z_OBJPROP_P(object)
 	if b.Assign(&val, object_properties.KeyFind(b.CastStrAuto(MAGIC_MEMBER))) != nil && val.IsType(types.IS_STRING) {
 		return val.GetStr().Copy()

@@ -48,8 +48,8 @@ type ISapiModule interface {
 	GetForceHttp10() func() int
 	GetInputFilter() func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
 	SetInputFilter(value func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint)
-	GetIniDefaults() func(configuration_hash *types.HashTable)
-	SetIniDefaults(value func(configuration_hash *types.HashTable))
+	GetIniDefaults() func(configuration_hash *types.Array)
+	SetIniDefaults(value func(configuration_hash *types.Array))
 	GetPhpinfoAsText() int
 	SetPhpinfoAsText(value int)
 	GetIniEntries() *byte
@@ -85,7 +85,7 @@ type BaseSapiModule struct {
 	get_fd                func(fd *int) int
 	force_http_10         func() int
 	input_filter          func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
-	ini_defaults          func(configuration_hash *types.HashTable)
+	ini_defaults          func(configuration_hash *types.Array)
 	phpinfo_as_text       int
 	ini_entries           *byte
 	additional_functions  *types.ZendFunctionEntry
@@ -192,10 +192,10 @@ func (this *BaseSapiModule) GetInputFilter() func(arg int, var_ *byte, val **byt
 func (this *BaseSapiModule) SetInputFilter(value func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint) {
 	this.input_filter = value
 }
-func (this *BaseSapiModule) GetIniDefaults() func(configuration_hash *types.HashTable) {
+func (this *BaseSapiModule) GetIniDefaults() func(configuration_hash *types.Array) {
 	return this.ini_defaults
 }
-func (this *BaseSapiModule) SetIniDefaults(value func(configuration_hash *types.HashTable)) {
+func (this *BaseSapiModule) SetIniDefaults(value func(configuration_hash *types.Array)) {
 	this.ini_defaults = value
 }
 func (this *BaseSapiModule) GetPhpinfoAsText() int      { return this.phpinfo_as_text }

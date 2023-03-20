@@ -31,7 +31,7 @@ import (
 
 /* {{{ resource and registration code */
 
-var UrlStreamWrappersHash types.HashTable
+var UrlStreamWrappersHash types.Array
 var LeStream int = types.FAILURE
 var LePstream int = types.FAILURE
 var LeStreamFilter int = types.FAILURE

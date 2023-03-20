@@ -10,7 +10,7 @@ import (
  * php_cgi_globals_struct
  */
 type php_cgi_globals_struct struct {
-	user_config_cache   types.HashTable
+	user_config_cache   types.Array
 	redirect_status_env *byte
 	rfc2616_headers     types.ZendBool
 	nph                 types.ZendBool
@@ -21,7 +21,7 @@ type php_cgi_globals_struct struct {
 	fcgi_logging        types.ZendBool
 }
 
-func (this *php_cgi_globals_struct) GetUserConfigCache() types.HashTable {
+func (this *php_cgi_globals_struct) GetUserConfigCache() types.Array {
 	return this.user_config_cache
 }
 func (this *php_cgi_globals_struct) GetRedirectStatusEnv() *byte { return this.redirect_status_env }
@@ -56,10 +56,10 @@ func (this *php_cgi_globals_struct) SetFcgiLogging(value types.ZendBool) { this.
  */
 type UserConfigCacheEntry struct {
 	expires     int64
-	user_config *types.HashTable
+	user_config *types.Array
 }
 
-func (this *UserConfigCacheEntry) GetExpires() int64                    { return this.expires }
-func (this *UserConfigCacheEntry) SetExpires(value int64)               { this.expires = value }
-func (this *UserConfigCacheEntry) GetUserConfig() *types.HashTable      { return this.user_config }
-func (this *UserConfigCacheEntry) SetUserConfig(value *types.HashTable) { this.user_config = value }
+func (this *UserConfigCacheEntry) GetExpires() int64                { return this.expires }
+func (this *UserConfigCacheEntry) SetExpires(value int64)           { this.expires = value }
+func (this *UserConfigCacheEntry) GetUserConfig() *types.Array      { return this.user_config }
+func (this *UserConfigCacheEntry) SetUserConfig(value *types.Array) { this.user_config = value }

@@ -77,7 +77,7 @@ func FreeIniEntry(zv *types.Zval) {
 	Free(entry)
 }
 func ZendIniStartup() int {
-	RegisteredZendIniDirectives = (*types.HashTable)(Malloc(b.SizeOf("HashTable")))
+	RegisteredZendIniDirectives = (*types.Array)(Malloc(b.SizeOf("HashTable")))
 	EG__().SetIniDirectives(RegisteredZendIniDirectives)
 	EG__().SetModifiedIniDirectives(nil)
 	EG__().SetErrorReportingIniEntry(nil)
@@ -88,7 +88,7 @@ func ZendIniShutdown() int {
 	ZendIniDtor(EG__().GetIniDirectives())
 	return types.SUCCESS
 }
-func ZendIniDtor(ini_directives *types.HashTable) {
+func ZendIniDtor(ini_directives *types.Array) {
 	ini_directives.Destroy()
 	Free(ini_directives)
 }
@@ -100,7 +100,7 @@ func ZendIniGlobalShutdown() int {
 func ZendIniDeactivate() int {
 	if EG__().GetModifiedIniDirectives() != nil {
 		var ini_entry *ZendIniEntry
-		var __ht *types.HashTable = EG__().GetModifiedIniDirectives()
+		var __ht *types.Array = EG__().GetModifiedIniDirectives()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -137,7 +137,7 @@ func ZendIniSortEntries() {
 	EG__().GetIniDirectives().SortCompatible(IniKeyCompare, 0)
 }
 func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) int {
-	var directives *types.HashTable = RegisteredZendIniDirectives
+	var directives *types.Array = RegisteredZendIniDirectives
 	for i := range iniEntryDefs {
 		iniEntryDef := &iniEntryDefs[i]
 		p := NewZendIniEntry(iniEntryDef, moduleNumber)

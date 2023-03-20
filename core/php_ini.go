@@ -9,7 +9,7 @@ func Config() *Configuration {
 }
 
 type Configuration struct {
-	hash types.HashTable
+	hash types.Array
 }
 
 func (this *Configuration) Init() {
@@ -26,7 +26,7 @@ func (this *Configuration) KeyFind(key string) *types.Zval {
 	return this.hash.KeyFind(key)
 }
 
-func (this *Configuration) GetHash() *types.HashTable {
+func (this *Configuration) GetHash() *types.Array {
 	return &this.hash
 }
 

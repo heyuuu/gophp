@@ -5,35 +5,35 @@ import (
 	"sik/zend"
 )
 
-func (this *HashTable) SymtableClean() {
+func (this *Array) SymtableClean() {
 	// todo 这里可能不会严格对等，需要处理一下
 	b.Assert(this.pDestructor == zend.ZVAL_PTR_DTOR)
 
 	this.Clean()
 }
 
-func (ht *HashTable) SymtableAddNew(key string, pData *Zval) *Zval {
+func (ht *Array) SymtableAddNew(key string, pData *Zval) *Zval {
 	if idx, ok := ZendParseNumericStr(key); ok {
 		return ht.IndexAddNew(idx, pData)
 	} else {
 		return ht.KeyAddNew(key, pData)
 	}
 }
-func (ht *HashTable) SymtableUpdate(key string, pData *Zval) *Zval {
+func (ht *Array) SymtableUpdate(key string, pData *Zval) *Zval {
 	if idx, ok := ZendParseNumericStr(key); ok {
 		return ht.IndexUpdate(idx, pData)
 	} else {
 		return ht.KeyUpdate(key, pData)
 	}
 }
-func (ht *HashTable) SymtableUpdateInd(key string, pData *Zval) *Zval {
+func (ht *Array) SymtableUpdateInd(key string, pData *Zval) *Zval {
 	if idx, ok := ZendParseNumericStr(key); ok {
 		return ht.IndexUpdate(idx, pData)
 	} else {
 		return ht.KeyUpdateIndirect(key, pData)
 	}
 }
-func (ht *HashTable) SymtableDel(key string) int {
+func (ht *Array) SymtableDel(key string) int {
 	var result bool
 	if idx, ok := ZendParseNumericStr(key); ok {
 		result = ht.IndexDelete(idx)
@@ -42,14 +42,14 @@ func (ht *HashTable) SymtableDel(key string) int {
 	}
 	return ResultCode(result)
 }
-func (ht *HashTable) SymtableFind(key string) *Zval {
+func (ht *Array) SymtableFind(key string) *Zval {
 	if idx, ok := ZendParseNumericStr(key); ok {
 		return ht.IndexFind(idx)
 	} else {
 		return ht.KeyFind(key)
 	}
 }
-func (ht *HashTable) SymtableExists(key string) bool {
+func (ht *Array) SymtableExists(key string) bool {
 	if idx, ok := ZendParseNumericStr(key); ok {
 		return ht.IndexExists(idx)
 	} else {
@@ -57,7 +57,7 @@ func (ht *HashTable) SymtableExists(key string) bool {
 	}
 }
 
-func (ht *HashTable) SymtableExistsInd(key string) bool {
+func (ht *Array) SymtableExistsInd(key string) bool {
 	if idx, ok := ZendParseNumericStr(key); ok {
 		return ht.IndexExists(idx)
 	} else {

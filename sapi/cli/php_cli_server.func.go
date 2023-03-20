@@ -88,7 +88,7 @@ func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 }
 func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var client *PhpCliServerClient
-	var headers *types.HashTable
+	var headers *types.Array
 	var key *types.String
 	var value *byte
 	var tmp types.Zval
@@ -98,7 +98,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ty
 	client = core.SG__().server_context
 	headers = client.GetRequest().GetHeadersOriginalCase()
 	zend.ArrayInitSize(return_value, headers.GetNNumOfElements())
-	var __ht *types.HashTable = headers
+	var __ht *types.Array = headers
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

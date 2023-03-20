@@ -139,7 +139,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 		if filterparams.IsType(types.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
 			var tmp *types.Zval
-			var __ht *types.HashTable = filterparams.GetArr()
+			var __ht *types.Array = filterparams.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -949,7 +949,7 @@ func PhpConvQprintDecodeCtor(inst *PhpConvQprintDecode, lbchars *byte, lbchars_l
 	return PHP_CONV_ERR_SUCCESS
 }
 func PhpConvGetStringPropEx(
-	ht *types.HashTable,
+	ht *types.Array,
 	pretval **byte,
 	pretval_len *int,
 	field_name string,
@@ -959,7 +959,7 @@ func PhpConvGetStringPropEx(
 	var tmpval *types.Zval
 	*pretval = nil
 	*pretval_len = 0
-	if b.Assign(&tmpval, (*types.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
+	if b.Assign(&tmpval, (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
 		var tmp *types.String
 		var str *types.String = zend.ZvalGetTmpString(tmpval, &tmp)
 		*pretval = zend.Pemalloc(str.GetLen()+1, persistent)
@@ -971,8 +971,8 @@ func PhpConvGetStringPropEx(
 	}
 	return PHP_CONV_ERR_SUCCESS
 }
-func PhpConvGetUlongPropEx(ht *types.HashTable, pretval *zend.ZendUlong, field_name string, field_name_len int) PhpConvErrT {
-	var tmpval *types.Zval = (*types.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
+func PhpConvGetUlongPropEx(ht *types.Array, pretval *zend.ZendUlong, field_name string, field_name_len int) PhpConvErrT {
+	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
 		var lval zend.ZendLong = zend.ZvalGetLong(tmpval)
 		if lval < 0 {
@@ -986,8 +986,8 @@ func PhpConvGetUlongPropEx(ht *types.HashTable, pretval *zend.ZendUlong, field_n
 		return PHP_CONV_ERR_NOT_FOUND
 	}
 }
-func PhpConvGetBoolPropEx(ht *types.HashTable, pretval *int, field_name string, field_name_len int) PhpConvErrT {
-	var tmpval *types.Zval = (*types.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
+func PhpConvGetBoolPropEx(ht *types.Array, pretval *int, field_name string, field_name_len int) PhpConvErrT {
+	var tmpval *types.Zval = (*types.Array)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
 		*pretval = zend.ZendIsTrue(tmpval)
 		return PHP_CONV_ERR_SUCCESS
@@ -996,7 +996,7 @@ func PhpConvGetBoolPropEx(ht *types.HashTable, pretval *int, field_name string, 
 		return PHP_CONV_ERR_NOT_FOUND
 	}
 }
-func PhpConvGetUintPropEx(ht *types.HashTable, pretval *uint, field_name string, field_name_len int) int {
+func PhpConvGetUintPropEx(ht *types.Array, pretval *uint, field_name string, field_name_len int) int {
 	var l zend.ZendUlong
 	var err PhpConvErrT
 	*pretval = 0
@@ -1005,7 +1005,7 @@ func PhpConvGetUintPropEx(ht *types.HashTable, pretval *uint, field_name string,
 	}
 	return err
 }
-func PhpConvOpen(conv_mode int, options *types.HashTable, persistent int) *PhpConv {
+func PhpConvOpen(conv_mode int, options *types.Array, persistent int) *PhpConv {
 	/* FIXME: I'll have to replace this ugly code by something neat
 	   (factories?) in the near future. */
 
@@ -1129,7 +1129,7 @@ out_failure:
 	}
 	return nil
 }
-func PhpConvertFilterCtor(inst *PhpConvertFilter, conv_mode int, conv_opts *types.HashTable, filtername *byte, persistent int) int {
+func PhpConvertFilterCtor(inst *PhpConvertFilter, conv_mode int, conv_opts *types.Array, filtername *byte, persistent int) int {
 	inst.SetPersistent(persistent)
 	inst.SetFiltername(zend.Pestrdup(filtername, persistent))
 	inst.SetStubLen(0)

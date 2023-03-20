@@ -20,7 +20,7 @@ func ZEND_THIS(executeData *ZendExecuteData) *types.Zval {
 
 /* these variables are true statics/globals, and have to be mutex'ed on every access */
 
-var ModuleRegistry types.HashTable
+var ModuleRegistry types.Array
 var ModuleRequestStartupHandlers **ZendModuleEntry
 var ModuleRequestShutdownHandlers **ZendModuleEntry
 var ModulePostDeactivateHandlers **ZendModuleEntry

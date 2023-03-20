@@ -21,20 +21,20 @@ func (this *ZendHashKey) GetKey() *String           { return this.key }
 func (this *ZendHashKey) SetKey(value *String)      { this.key = value }
 
 /**
- * ZendArrayKey
+ * ArrayKey
  * 新增类型，表示 Array 的 Key。与原类型 ZendHashKey 作用类似，后续会取代 ZendHashKey。
  */
-type ZendArrayKey struct {
+type ArrayKey struct {
 	index int
 	key   *string
 }
 
-func NewStrKey(str string) ZendArrayKey  { return ZendArrayKey{0, &str} }
-func NewIndexKey(index int) ZendArrayKey { return ZendArrayKey{index, nil} }
-func (this ZendArrayKey) GetIndex() int  { return this.index }
-func (this ZendArrayKey) GetKey() string { return *this.key }
-func (this ZendArrayKey) IsStrKey() bool { return this.key != nil }
-func (this ZendArrayKey) GetH() zend.ZendUlong {
+func NewStrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
+func NewIndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
+func (this ArrayKey) GetIndex() int  { return this.index }
+func (this ArrayKey) GetKey() string { return *this.key }
+func (this ArrayKey) IsStrKey() bool { return this.key != nil }
+func (this ArrayKey) GetH() zend.ZendUlong {
 	// todo remove
 	if this.key != nil {
 		return b.HashStr(*this.key)
@@ -42,7 +42,7 @@ func (this ZendArrayKey) GetH() zend.ZendUlong {
 		return uint(this.index)
 	}
 }
-func (this ZendArrayKey) GetZendStringKey() *String {
+func (this ArrayKey) GetZendStringKey() *String {
 	// todo remove
 	if this.key != nil {
 		return NewString(*this.key)
@@ -51,7 +51,7 @@ func (this ZendArrayKey) GetZendStringKey() *String {
 	}
 }
 
-func (this ZendArrayKey) GetZendHashKey() ZendHashKey {
+func (this ArrayKey) GetZendHashKey() ZendHashKey {
 	return ZendHashKey{key: this.GetZendStringKey(), h: this.GetH()}
 }
 
@@ -60,10 +60,10 @@ func (this ZendArrayKey) GetZendHashKey() ZendHashKey {
  */
 type Bucket struct {
 	val Zval
-	key ZendArrayKey
+	key ArrayKey
 }
 
-func NewBucket(key ZendArrayKey, zval *Zval) *Bucket {
+func NewBucket(key ArrayKey, zval *Zval) *Bucket {
 	var bucket = &Bucket{key: key}
 	ZVAL_COPY_VALUE(&bucket.val, zval)
 	return bucket
@@ -79,22 +79,22 @@ func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
 	return NewBucket(key, zval)
 }
 
-func NewBucketPtr(key ZendArrayKey, ptr any) *Bucket {
+func NewBucketPtr(key ArrayKey, ptr any) *Bucket {
 	var bucket = &Bucket{key: key}
 	ZVAL_PTR(&bucket.val, ptr)
 	return bucket
 }
 
-func NewBucketIndirect(key ZendArrayKey, ptr *Zval) *Bucket {
+func NewBucketIndirect(key ArrayKey, ptr *Zval) *Bucket {
 	var bucket = &Bucket{key: key}
 	ZVAL_INDIRECT(&bucket.val, ptr)
 	return bucket
 }
 
-func (this *Bucket) GetVal() *Zval               { return &this.val }
-func (this *Bucket) SetVal(zval *Zval)           { ZVAL_COPY_VALUE(&this.val, zval) }
-func (this *Bucket) GetZendKey() ZendArrayKey    { return this.key }
-func (this *Bucket) SetZendKey(key ZendArrayKey) { this.key = key }
+func (this *Bucket) GetVal() *Zval           { return &this.val }
+func (this *Bucket) SetVal(zval *Zval)       { ZVAL_COPY_VALUE(&this.val, zval) }
+func (this *Bucket) GetZendKey() ArrayKey    { return this.key }
+func (this *Bucket) SetZendKey(key ArrayKey) { this.key = key }
 
 func (this *Bucket) IsStrKey() bool   { return this.key.IsStrKey() }
 func (this *Bucket) IsIndexKey() bool { return !this.key.IsStrKey() }
@@ -129,47 +129,6 @@ func (this *Bucket) IsValid() bool {
 
 func (this *Bucket) SetInvalid() {
 	this.val.SetUndef()
-}
-
-/**
- * Array
- * HashTable Data Layout
- * =====================
- *
- *                 +=============================+
- *                 | HT_HASH(ht, ht->nTableMask) |
- *                 | ...                         |
- *                 | HT_HASH(ht, -1)             |
- *                 +-----------------------------+
- * ht->arData ---> | Bucket[0]                   |
- *                 | ...                         |
- *                 | Bucket[ht->nTableSize-1]    |
- *                 +=============================+
- */
-type HashTable = Array
-type Array struct {
-	ZendRefcounted
-	u struct /* union */ {
-		v struct {
-			flags           ZendUchar
-			_unused         ZendUchar
-			nIteratorsCount ZendUchar
-			_unused2        ZendUchar
-		}
-		flags uint32
-	}
-	nNumOfElements   uint32
-	nTableSize       uint32
-	nInternalPointer uint32
-	nNextFreeElement zend.ZendLong
-	pDestructor      DtorFuncT
-
-	//
-	arData *Bucket // C 源码中存储数据的地方，实际不使用
-
-	data     []Bucket          // 实际存储数据的地方
-	indexMap map[int]uint32    // 数字索引到具体位置的映射
-	keyMap   map[string]uint32 // 字符串索引到具体位置的映射
 }
 
 var _ IRefcounted = &Array{}
@@ -568,9 +527,9 @@ func (this *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 }
 
 /**
- * Add / Update by ZendArrayKey
+ * Add / Update by ArrayKey
  */
-func (this *HashTable) Add(key ZendArrayKey, pData *Zval) *Zval {
+func (this *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return this.KeyAdd(key.GetKey(), pData)
 	} else {
@@ -578,7 +537,7 @@ func (this *HashTable) Add(key ZendArrayKey, pData *Zval) *Zval {
 	}
 }
 
-func (this *HashTable) AddIndirect(key ZendArrayKey, pData *Zval) *Zval {
+func (this *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return this.KeyAddIndirect(key.GetKey(), pData)
 	} else {
@@ -586,7 +545,7 @@ func (this *HashTable) AddIndirect(key ZendArrayKey, pData *Zval) *Zval {
 	}
 }
 
-func (this *HashTable) Update(key ZendArrayKey, pData *Zval) *Zval {
+func (this *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return this.KeyUpdate(key.GetKey(), pData)
 	} else {
@@ -594,7 +553,7 @@ func (this *HashTable) Update(key ZendArrayKey, pData *Zval) *Zval {
 	}
 }
 
-func (this *HashTable) UpdateIndirect(key ZendArrayKey, pData *Zval) *Zval {
+func (this *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return this.KeyUpdateIndirect(key.GetKey(), pData)
 	} else {
@@ -605,7 +564,7 @@ func (this *HashTable) UpdateIndirect(key ZendArrayKey, pData *Zval) *Zval {
 /**
  * Delete
  */
-func (this *HashTable) KeyDelete(key string) bool {
+func (this *Array) KeyDelete(key string) bool {
 	if idx, ok := this.keyMap[key]; ok {
 		this.deleteBucket(idx)
 		return true
@@ -613,7 +572,7 @@ func (this *HashTable) KeyDelete(key string) bool {
 	return false
 }
 
-func (this *HashTable) KeyDeleteIndirect(key string) bool {
+func (this *Array) KeyDeleteIndirect(key string) bool {
 	this.assertRc1()
 	if idx, ok := this.keyMap[key]; ok {
 		var p = &this.data[idx]
@@ -640,7 +599,7 @@ func (this *HashTable) KeyDeleteIndirect(key string) bool {
 	return false
 }
 
-func (this *HashTable) IndexDelete(index int) bool {
+func (this *Array) IndexDelete(index int) bool {
 	if idx, ok := this.indexMap[index]; ok {
 		this.deleteBucket(idx)
 		return true
@@ -689,7 +648,7 @@ func (this *Array) deleteBucket(pos uint32) {
 /**
  * Clean && Destroy
  */
-func (this *HashTable) Clean() {
+func (this *Array) Clean() {
 	this.assertRc1()
 	if this.GetNNumUsed() != 0 {
 		if this.pDestructor != nil {
@@ -701,7 +660,7 @@ func (this *HashTable) Clean() {
 	this.clearData()
 }
 
-func (this *HashTable) Destroy() {
+func (this *Array) Destroy() {
 	if this.DataSize() != 0 {
 		if this.pDestructor != nil {
 			this.eachValidBucket(func(pos uint32, p *Bucket) {
@@ -712,7 +671,7 @@ func (this *HashTable) Destroy() {
 	ZendHashIteratorsRemove(this)
 }
 
-func (this *HashTable) DestroyEx() {
+func (this *Array) DestroyEx() {
 	/* break possible cycles */
 	//GC_REMOVE_FROM_BUFFER(this)
 	this.SetGcTypeInfo(IS_NULL)
@@ -720,7 +679,7 @@ func (this *HashTable) DestroyEx() {
 	this.Destroy()
 }
 
-func (this *HashTable) GracefulReverseDestroy() {
+func (this *Array) GracefulReverseDestroy() {
 	this.assertRc1()
 	for idx := this.DataSize(); idx > 0; idx-- {
 		var p = &this.data[idx-1]

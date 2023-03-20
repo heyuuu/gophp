@@ -323,8 +323,8 @@ func ZifStreamWrapperUnregister(executeData *zend.ZendExecuteData, return_value 
 func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var protocol *types.String
 	var wrapper *core.PhpStreamWrapper
-	var global_wrapper_hash *types.HashTable
-	var wrapper_hash *types.HashTable
+	var global_wrapper_hash *types.Array
+	var wrapper_hash *types.Array
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == types.FAILURE {
 		return_value.SetFalse()
 		return

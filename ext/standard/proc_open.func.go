@@ -23,7 +23,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 	var p *byte
 	var cnt int
 	var sizeenv int = 0
-	var env_hash *types.HashTable
+	var env_hash *types.Array
 	memset(&env, 0, b.SizeOf("env"))
 	if environment == nil {
 		return env
@@ -39,7 +39,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 
 	/* first, we have to get the size of all the elements in the hash */
 
-	var __ht *types.HashTable = environment.GetArr()
+	var __ht *types.Array = environment.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -62,7 +62,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 	ep = env.GetEnvarray()
 	env.SetEnvp((*byte)(zend.Pecalloc(sizeenv+4, 1, is_persistent)))
 	p = env.GetEnvp()
-	var __ht__1 *types.HashTable = env_hash
+	var __ht__1 *types.Array = env_hash
 	for _, _p := range __ht__1.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -329,7 +329,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		argv = zend.SafeEmalloc(b.SizeOf("char *"), num_elems+1, 0)
 		i = 0
-		var __ht *types.HashTable = command_zv.GetArr()
+		var __ht *types.Array = command_zv.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -366,7 +366,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 	/* walk the descriptor spec and set up files/pipes */
 
-	var __ht *types.HashTable = descriptorspec.GetArr()
+	var __ht *types.Array = descriptorspec.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

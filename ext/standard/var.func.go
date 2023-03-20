@@ -52,7 +52,7 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, ind
 	}
 }
 func PhpVarDump(struc *types.Zval, level int) {
-	var myht *types.HashTable
+	var myht *types.Array
 	var class_name *types.String
 	var is_ref int = 0
 	var num zend.ZendUlong
@@ -92,7 +92,7 @@ again:
 		}
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) {\n", COMMON, count)
-		var __ht *types.HashTable = myht
+		var __ht *types.Array = myht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -130,7 +130,7 @@ again:
 			var num zend.ZendUlong
 			var key *types.String
 			var val *types.Zval
-			var __ht *types.HashTable = myht
+			var __ht *types.Array = myht
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -234,7 +234,7 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, in
 	}
 }
 func PhpDebugZvalDump(struc *types.Zval, level int) {
-	var myht *types.HashTable = nil
+	var myht *types.Array = nil
 	var class_name *types.String
 	var is_ref int = 0
 	var index zend.ZendUlong
@@ -274,7 +274,7 @@ again:
 		}
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return struc.GetRefcount() - 1 }, 1))
-		var __ht *types.HashTable = myht
+		var __ht *types.Array = myht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -312,7 +312,7 @@ again:
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
 		types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
-			var __ht *types.HashTable = myht
+			var __ht *types.Array = myht
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -426,7 +426,7 @@ func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Str
 	buf.AppendByte('\n')
 }
 func PhpVarExportEx(struc *types.Zval, level int, buf *zend.SmartStr) {
-	var myht *types.HashTable
+	var myht *types.Array
 	var tmp_str []byte
 	var ztmp *types.String
 	var ztmp2 *types.String
@@ -490,7 +490,7 @@ again:
 			BufferAppendSpaces(buf, level-1)
 		}
 		buf.AppendString("array (\n")
-		var __ht *types.HashTable = myht
+		var __ht *types.Array = myht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -538,7 +538,7 @@ again:
 			buf.AppendString("::__set_state(array(\n")
 		}
 		if myht != nil {
-			var __ht *types.HashTable = myht
+			var __ht *types.Array = myht
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
@@ -714,7 +714,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	}
 	return types.SUCCESS
 }
-func PhpVarSerializeTryAddSleepProp(ht *types.HashTable, props *types.HashTable, name *types.String, error_name *types.String, struc *types.Zval) int {
+func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *types.String, error_name *types.String, struc *types.Zval) int {
 	var val *types.Zval = props.KeyFind(name.GetStr())
 	if val == nil {
 		return types.FAILURE
@@ -736,9 +736,9 @@ func PhpVarSerializeTryAddSleepProp(ht *types.HashTable, props *types.HashTable,
 	val.TryAddRefcount()
 	return types.SUCCESS
 }
-func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_retval *types.HashTable) int {
+func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retval *types.Array) int {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
-	var props *types.HashTable = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
+	var props *types.Array = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
 	var retval int = types.SUCCESS
 	types.ZendHashInit(ht, sleep_retval.GetNNumOfElements(), nil, zend.ZVAL_PTR_DTOR, 0)
@@ -746,7 +746,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
 
-	var __ht *types.HashTable = sleep_retval
+	var __ht *types.Array = sleep_retval
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsType(types.IS_INDIRECT) {
@@ -808,7 +808,7 @@ func PhpVarSerializeGetSleepProps(ht *types.HashTable, struc *types.Zval, sleep_
 func PhpVarSerializeNestedData(
 	buf *zend.SmartStr,
 	struc *types.Zval,
-	ht *types.HashTable,
+	ht *types.Array,
 	count uint32,
 	incomplete_class types.ZendBool,
 	var_hash PhpSerializeDataT,
@@ -819,7 +819,7 @@ func PhpVarSerializeNestedData(
 		var key *types.String
 		var data *types.Zval
 		var index zend.ZendUlong
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -871,7 +871,7 @@ func PhpVarSerializeNestedData(
 	buf.AppendByte('}')
 }
 func PhpVarSerializeClass(buf *zend.SmartStr, struc *types.Zval, retval_ptr *types.Zval, var_hash PhpSerializeDataT) {
-	var props types.HashTable
+	var props types.Array
 	if PhpVarSerializeGetSleepProps(&props, struc, zend.HASH_OF(retval_ptr)) == types.SUCCESS {
 		PhpVarSerializeClassName(buf, struc)
 		PhpVarSerializeNestedData(buf, struc, &props, props.GetNNumOfElements(), 0, var_hash)
@@ -880,7 +880,7 @@ func PhpVarSerializeClass(buf *zend.SmartStr, struc *types.Zval, retval_ptr *typ
 }
 func PhpVarSerializeIntern(buf *zend.SmartStr, struc *types.Zval, var_hash PhpSerializeDataT) {
 	var var_already zend.ZendLong
-	var myht *types.HashTable
+	var myht *types.Array
 	if zend.EG__().GetException() != nil {
 		return
 	}
@@ -949,7 +949,7 @@ again:
 			PhpVarSerializeClassName(buf, &obj)
 			buf.AppendUlong(retval.GetArr().Count())
 			buf.AppendString(":{")
-			var __ht *types.HashTable = retval.GetArr()
+			var __ht *types.Array = retval.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
@@ -1133,8 +1133,8 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var var_hash PhpUnserializeDataT
 	var options *types.Zval = nil
 	var retval *types.Zval
-	var class_hash *types.HashTable = nil
-	var prev_class_hash *types.HashTable
+	var class_hash *types.Array = nil
+	var prev_class_hash *types.Array
 	var prev_max_depth zend.ZendLong
 	var prev_cur_depth zend.ZendLong
 	for {
@@ -1181,7 +1181,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
 			var entry *types.Zval
 			var lcname *types.String
-			var __ht *types.HashTable = classes.GetArr()
+			var __ht *types.Array = classes.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

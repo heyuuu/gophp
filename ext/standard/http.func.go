@@ -11,7 +11,7 @@ import (
 )
 
 func PhpUrlEncodeHashEx(
-	ht *types.HashTable,
+	ht *types.Array,
 	formstr *zend.SmartStr,
 	num_prefix *byte,
 	num_prefix_len int,
@@ -51,7 +51,7 @@ func PhpUrlEncodeHashEx(
 		}
 	}
 	arg_sep_len = strlen(arg_sep)
-	var __ht *types.HashTable = ht
+	var __ht *types.Array = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

@@ -67,7 +67,7 @@ type PhpCoreGlobals struct {
 	output_encoding             *byte
 	arg_separator               ArgSeparators
 	variables_order             *byte
-	rfc1867_protected_variables types.HashTable
+	rfc1867_protected_variables types.Array
 	connection_status           short
 	ignore_user_abort           types.ZendBool
 	header_is_being_sent        uint8

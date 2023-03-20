@@ -347,12 +347,12 @@ func SplHeapObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 	*count = intern.GetHeap().GetCount()
 	return types.SUCCESS
 }
-func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.HashTable {
+func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Array {
 	var intern *SplHeapObject = Z_SPLHEAP_P(obj)
 	var tmp types.Zval
 	var heap_array types.Zval
 	var pnstr *types.String
-	var debug_info *types.HashTable
+	var debug_info *types.Array
 	var i int
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
@@ -385,13 +385,13 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Has
 	types.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
 }
-func SplHeapObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.HashTable {
+func SplHeapObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {
 	var intern *SplHeapObject = Z_SPLHEAP_P(obj)
 	*gc_data = (*types.Zval)(intern.GetHeap().GetElements())
 	*gc_data_count = intern.GetHeap().GetCount()
 	return zend.ZendStdGetProperties(obj)
 }
-func SplPqueueObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.HashTable {
+func SplPqueueObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {
 	var intern *SplHeapObject = Z_SPLHEAP_P(obj)
 	*gc_data = (*types.Zval)(intern.GetHeap().GetElements())
 

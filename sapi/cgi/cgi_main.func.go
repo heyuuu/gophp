@@ -372,7 +372,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 	if b.Assign(&entry, types.ZendHashStrFindPtr(&(CGIG(user_config_cache)), path, path_len)) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"), 1)
 		new_entry.SetExpires(0)
-		new_entry.SetUserConfig((*types.HashTable)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
+		new_entry.SetUserConfig((*types.Array)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
 		types.ZendHashInit(new_entry.GetUserConfig(), 8, nil, types.DtorFuncT(core.ConfigZvalDtor), 1)
 		entry = types.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), path, path_len, new_entry)
 	}

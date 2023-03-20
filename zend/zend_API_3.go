@@ -45,7 +45,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 				return types.FAILURE
 			}
 		}
-		var __ht *types.HashTable = class_type.GetConstantsTable()
+		var __ht *types.Array = class_type.GetConstantsTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -64,7 +64,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 		}
 		ce = class_type
 		for ce != nil {
-			var __ht *types.HashTable = ce.GetPropertiesInfo()
+			var __ht *types.Array = ce.GetPropertiesInfo()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

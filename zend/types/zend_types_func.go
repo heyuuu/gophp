@@ -42,7 +42,7 @@ func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
 	return ZendType(ptr)
 }
 func HT_IDX_TO_HASH(idx uint32) uint32 { return idx }
-func HT_HASH(ht *HashTable, idx HashPosition) uint32 {
+func HT_HASH(ht *Array, idx HashPosition) uint32 {
 	// todo 待移除 - 在旧 arData 上返回通过 idx 获取对应的 pos 位置
 	return 0
 }
@@ -50,18 +50,18 @@ func HT_HASH_SIZE(nTableMask uint32) int {
 	// todo 待移除 - 旧 hash 数组内存大小
 	return 0
 }
-func HT_SIZE(ht *HashTable) int {
+func HT_SIZE(ht *Array) int {
 	// todo 待移除 - 返回 HashTable 中旧 arData 内存大小 (含 hash 内存 + item 内存)
 	return 0
 }
-func HT_USED_SIZE(ht *HashTable) int {
+func HT_USED_SIZE(ht *Array) int {
 	return HT_HASH_SIZE(ht.GetNTableMask()) + size_t(ht).nNumUsed*b.SizeOf("Bucket")
 }
-func HT_HASH_TO_BUCKET(ht *HashTable, idx uint32) *Bucket { return ht.Bucket(idx) }
-func HT_SET_DATA_ADDR(ht *HashTable, ptr __auto__) {
+func HT_HASH_TO_BUCKET(ht *Array, idx uint32) *Bucket { return ht.Bucket(idx) }
+func HT_SET_DATA_ADDR(ht *Array, ptr __auto__) {
 	ht.SetArData((*Bucket)((*byte)(ptr) + HT_HASH_SIZE(ht.GetNTableMask())))
 }
-func HT_GET_DATA_ADDR(ht *HashTable) *byte {
+func HT_GET_DATA_ADDR(ht *Array) *byte {
 	return (*byte)(ht.GetArData() - HT_HASH_SIZE(ht.GetNTableMask()))
 }
 func ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list *ZendPropertyInfoList) int { return 0x1 | uintPtr(list) }
@@ -87,11 +87,11 @@ func Z_OBJ_HT(zval Zval) *zend.ZendObjectHandlers      { return Z_OBJ(zval).GetH
 func Z_OBJ_HT_P(zval_p *Zval) *zend.ZendObjectHandlers { return Z_OBJ_HT(*zval_p) }
 func Z_OBJCE(zval Zval) *ClassEntry                    { return zval.GetObj().GetCe() }
 func Z_OBJCE_P(zval_p *Zval) *ClassEntry               { return zval_p.GetObj().GetCe() }
-func Z_OBJPROP(zval Zval) *HashTable {
+func Z_OBJPROP(zval Zval) *Array {
 	return Z_OBJ_HT(zval).GetGetProperties()(&zval)
 }
-func Z_OBJPROP_P(zval_p *Zval) *HashTable   { return Z_OBJPROP(*zval_p) }
-func Z_RES(zval Zval) *ZendResource         { return zval.GetRes() }
+func Z_OBJPROP_P(zval_p *Zval) *Array { return Z_OBJPROP(*zval_p) }
+func Z_RES(zval Zval) *ZendResource                     { return zval.GetRes() }
 func Z_RES_P(zval_p *Zval) *ZendResource    { return zval_p.GetRes() }
 func Z_RES_HANDLE(zval Zval) int            { return Z_RES(zval).GetHandle() }
 func Z_RES_HANDLE_P(zval_p *Zval) int       { return Z_RES_HANDLE(*zval_p) }

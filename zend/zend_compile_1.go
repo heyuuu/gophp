@@ -115,7 +115,7 @@ func FunctionAddRef(function *ZendFunction) {
 	}
 }
 func DoBindFunctionError(lcname *types.String, op_array *ZendOpArray, compile_time types.ZendBool) {
-	var zv *types.Zval = b.CondF(compile_time != 0, func() *types.HashTable { return CG__().GetFunctionTable() }, func() *types.HashTable { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
+	var zv *types.Zval = b.CondF(compile_time != 0, func() *types.Array { return CG__().GetFunctionTable() }, func() *types.Array { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
 	var error_level int = b.Cond(compile_time != 0, faults.E_COMPILE_ERROR, faults.E_ERROR)
 	var old_function *ZendFunction
 	b.Assert(zv != nil)
@@ -588,7 +588,7 @@ func ZendRegisterAutoGlobal(name *types.String, jit types.ZendBool, auto_global_
 }
 func ZendActivateAutoGlobals() {
 	var auto_global *ZendAutoGlobal
-	var __ht *types.HashTable = CG__().GetAutoGlobals()
+	var __ht *types.Array = CG__().GetAutoGlobals()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

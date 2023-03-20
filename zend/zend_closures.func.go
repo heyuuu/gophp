@@ -392,20 +392,20 @@ func ZendClosureGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr 
 	}
 	return types.SUCCESS
 }
-func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable {
+func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	var closure *ZendClosure = (*ZendClosure)(object.GetObj())
 	var val types.Zval
 	var arg_info *ZendArgInfo = closure.GetFunc().GetArgInfo()
-	var debug_info *types.HashTable
+	var debug_info *types.Array
 	var zstr_args types.ZendBool = closure.GetFunc().GetType() == ZEND_USER_FUNCTION || closure.GetFunc().IsUserArgInfo()
 	*is_temp = 1
 	debug_info = types.ZendNewArray(8)
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 		var var_ *types.Zval
-		var static_variables *types.HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
+		var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 		val.SetArray(types.ZendArrayDup(static_variables))
 		debug_info.KeyUpdate(types.ZSTR_STATIC.GetStr(), &val)
-		var __ht *types.HashTable = val.GetArr()
+		var __ht *types.Array = val.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -450,7 +450,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable 
 	}
 	return debug_info
 }
-func ZendClosureGetGc(obj *types.Zval, table **types.Zval, n *int) *types.HashTable {
+func ZendClosureGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array {
 	var closure *ZendClosure = (*ZendClosure)(obj.GetObj())
 	if closure.GetThisPtr().GetType() != types.IS_NULL {
 		*table = closure.GetThisPtr()
@@ -603,12 +603,12 @@ func ZendCreateFakeClosure(res *types.Zval, func_ *ZendFunction, scope *types.Cl
 }
 func ZendClosureBindVar(closure_zv *types.Zval, var_name *types.String, var_ *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())
-	var static_variables *types.HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
+	var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 	static_variables.KeyUpdate(var_name.GetStr(), var_)
 }
 func ZendClosureBindVarEx(closure_zv *types.Zval, offset uint32, val *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())
-	var static_variables *types.HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
+	var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 	var var_ *types.Zval = (*types.Zval)((*byte)(static_variables.GetArData() + offset))
 	ZvalPtrDtor(var_)
 	types.ZVAL_COPY_VALUE(var_, val)

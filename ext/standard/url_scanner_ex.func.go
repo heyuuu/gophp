@@ -89,7 +89,7 @@ func PhpIniOnUpdateHosts(
 	stage int,
 	type_ int,
 ) int {
-	var hosts *types.HashTable
+	var hosts *types.Array
 	var key *byte
 	var tmp *byte
 	var lasts *byte = nil
@@ -285,7 +285,7 @@ func CheckHttpHost(target *byte) int {
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
-	var allowed_hosts *types.HashTable = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG__().url_adapt_session_hosts_ht) }, func() *__auto__ { return &(BG__().url_adapt_output_hosts_ht) })
+	var allowed_hosts *types.Array = b.CondF(ctx.GetType() != 0, func() *__auto__ { return &(BG__().url_adapt_session_hosts_ht) }, func() *__auto__ { return &(BG__().url_adapt_output_hosts_ht) })
 	b.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.GetAttrVal().GetS() != nil && ctx.GetAttrVal().GetS().GetLen() != 0 {
 		url_parts = PhpUrlParseEx(ctx.GetAttrVal().GetS().GetVal(), ctx.GetAttrVal().GetS().GetLen())

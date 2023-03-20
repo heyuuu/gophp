@@ -12,8 +12,8 @@ import (
  * PhpBasicGlobals
  */
 type PhpBasicGlobals struct {
-	user_shutdown_function_names *types.HashTable
-	putenv_ht                    types.HashTable
+	user_shutdown_function_names *types.Array
+	putenv_ht                    types.Array
 	strtok_zval                  types.Zval
 	strtok_string                *byte
 	locale_string                *types.String
@@ -53,12 +53,12 @@ type PhpBasicGlobals struct {
 		level unsigned
 	}
 	url_adapt_session_ex       UrlAdaptStateExT
-	url_adapt_session_hosts_ht types.HashTable
+	url_adapt_session_hosts_ht types.Array
 	url_adapt_output_ex        UrlAdaptStateExT
-	url_adapt_output_hosts_ht  types.HashTable
+	url_adapt_output_hosts_ht  types.Array
 	mmap_file                  any
 	mmap_len                   int
-	user_filter_map            *types.HashTable
+	user_filter_map            *types.Array
 	umask                      int
 	unserialize_max_depth      zend.ZendLong
 }
@@ -140,7 +140,7 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionEx() UrlAdaptStateExT {
 }
 
 // func (this *PhpBasicGlobals) SetUrlAdaptSessionEx(value UrlAdaptStateExT) { this.url_adapt_session_ex = value }
-func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.HashTable {
+func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.Array {
 	return this.url_adapt_session_hosts_ht
 }
 
@@ -148,7 +148,7 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.HashTable {
 func (this *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return this.url_adapt_output_ex }
 
 // func (this *PhpBasicGlobals) SetUrlAdaptOutputEx(value UrlAdaptStateExT) { this.url_adapt_output_ex = value }
-func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.HashTable {
+func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.Array {
 	return this.url_adapt_output_hosts_ht
 }
 

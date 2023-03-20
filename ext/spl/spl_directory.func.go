@@ -484,10 +484,10 @@ func SplFilesystemObjectGetPathname(intern *SplFilesystemObject, len_ *int) *byt
 	*len_ = 0
 	return nil
 }
-func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.HashTable {
+func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(object)
 	var tmp types.Zval
-	var rv *types.HashTable
+	var rv *types.Array
 	var pnstr *types.String
 	var path *byte
 	var path_len int

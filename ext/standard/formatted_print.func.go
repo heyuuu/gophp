@@ -493,7 +493,7 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	n = types.Z_ARRVAL_P(array).GetNNumOfElements()
 	args = (*types.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
-	var __ht *types.HashTable = array.GetArr()
+	var __ht *types.Array = array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

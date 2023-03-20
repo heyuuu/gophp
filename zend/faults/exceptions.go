@@ -471,7 +471,7 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		types.ZendStringReleaseEx(class_name, 0)
 	}
 }
-func _buildTraceString(str *zend.SmartStr, ht *types.HashTable, num uint32) {
+func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 	var file *types.Zval
 	var tmp *types.Zval
 	str.AppendByte('#')
@@ -512,7 +512,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.HashTable, num uint32) {
 		if tmp.IsArray() {
 			var last_len int = str.GetS().GetLen()
 			var arg *types.Zval
-			var __ht *types.HashTable = tmp.GetArr()
+			var __ht *types.Array = tmp.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -547,7 +547,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 		return_value.SetFalse()
 		return
 	}
-	var __ht *types.HashTable = trace.GetArr()
+	var __ht *types.Array = trace.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

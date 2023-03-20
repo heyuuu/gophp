@@ -131,7 +131,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 	if op_array.GetStaticVariables() == nil {
 		op_array.SetStaticVariables(types.ZendNewArray(8))
 	}
-	var __ht *types.HashTable = info.GetUses()
+	var __ht *types.Array = info.GetUses()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -165,7 +165,7 @@ func ZendCompileClosureUses(ast *ZendAst) {
 }
 func ZendCompileImplicitClosureUses(info *ClosureInfo) {
 	var var_name *types.String
-	var __ht *types.HashTable = info.GetUses()
+	var __ht *types.Array = info.GetUses()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

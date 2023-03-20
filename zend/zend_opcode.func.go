@@ -231,7 +231,7 @@ func DestroyZendClass(zv *types.Zval) {
 			ZendCleanupInternalClassData(ce)
 		}
 		if ce.IsHasStaticInMethods() {
-			var __ht *types.HashTable = ce.GetFunctionTable()
+			var __ht *types.Array = ce.GetFunctionTable()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -295,7 +295,7 @@ func DestroyZendClass(zv *types.Zval) {
 			}
 			Efree(ce.GetDefaultStaticMembersTable())
 		}
-		var __ht *types.HashTable = ce.GetPropertiesInfo()
+		var __ht *types.Array = ce.GetPropertiesInfo()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -315,7 +315,7 @@ func DestroyZendClass(zv *types.Zval) {
 		ce.GetFunctionTable().Destroy()
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
-			var __ht *types.HashTable = ce.GetConstantsTable()
+			var __ht *types.Array = ce.GetConstantsTable()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -372,7 +372,7 @@ func DestroyZendClass(zv *types.Zval) {
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
 
-		var __ht *types.HashTable = ce.GetFunctionTable()
+		var __ht *types.Array = ce.GetFunctionTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -384,7 +384,7 @@ func DestroyZendClass(zv *types.Zval) {
 		ce.GetFunctionTable().Destroy()
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
-			var __ht *types.HashTable = ce.GetConstantsTable()
+			var __ht *types.Array = ce.GetConstantsTable()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -420,7 +420,7 @@ func ZendClassAddRef(zv *types.Zval) {
 func DestroyOpArray(op_array *ZendOpArray) {
 	var i uint32
 	if op_array.GetStaticVariables() != nil {
-		var ht *types.HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+		var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 		if ht != nil && (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 {
 			if ht.DelRefcount() == 0 {
 				ht.DestroyEx()
@@ -959,9 +959,9 @@ func PassTwo(op_array *ZendOpArray) int {
 
 			/* absolute indexes to relative offsets */
 
-			var jumptable *types.HashTable = types.Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
+			var jumptable *types.Array = types.Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
 			var zv *types.Zval
-			var __ht *types.HashTable = jumptable
+			var __ht *types.Array = jumptable
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

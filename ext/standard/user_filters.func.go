@@ -482,14 +482,14 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *types.Z
 }
 func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filter_name *types.String
-	var filters_hash *types.HashTable
+	var filters_hash *types.Array
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)
 	filters_hash = core.PhpGetStreamFiltersHash()
 	if filters_hash != nil {
-		var __ht *types.HashTable = filters_hash
+		var __ht *types.Array = filters_hash
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -532,7 +532,7 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 		return
 	}
 	if !(BG__().user_filter_map) {
-		BG__().user_filter_map = (*types.HashTable)(zend.Emalloc(b.SizeOf("HashTable")))
+		BG__().user_filter_map = (*types.Array)(zend.Emalloc(b.SizeOf("HashTable")))
 		types.ZendHashInit(BG__().user_filter_map, 8, nil, types.DtorFuncT(FilterItemDtor), 0)
 	}
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))

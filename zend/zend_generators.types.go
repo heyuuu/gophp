@@ -11,7 +11,7 @@ type ZendGeneratorNode struct {
 	parent   *ZendGenerator
 	children uint32
 	child    struct /* union */ {
-		ht     *types.HashTable
+		ht     *types.Array
 		single struct {
 			leaf  *ZendGenerator
 			child *ZendGenerator
@@ -27,8 +27,8 @@ func (this *ZendGeneratorNode) GetParent() *ZendGenerator          { return this
 func (this *ZendGeneratorNode) SetParent(value *ZendGenerator)     { this.parent = value }
 func (this *ZendGeneratorNode) GetChildren() uint32                { return this.children }
 func (this *ZendGeneratorNode) SetChildren(value uint32)           { this.children = value }
-func (this *ZendGeneratorNode) GetHt() *types.HashTable            { return this.child.ht }
-func (this *ZendGeneratorNode) SetHt(value *types.HashTable)       { this.child.ht = value }
+func (this *ZendGeneratorNode) GetHt() *types.Array                { return this.child.ht }
+func (this *ZendGeneratorNode) SetHt(value *types.Array)           { this.child.ht = value }
 func (this *ZendGeneratorNode) GetChildSingleLeaf() *ZendGenerator { return this.child.single.leaf }
 func (this *ZendGeneratorNode) SetChildSingleLeaf(value *ZendGenerator) {
 	this.child.single.leaf = value

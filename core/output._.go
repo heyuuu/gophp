@@ -38,9 +38,9 @@ var PhpOutputDevnullHandlerName []byte = "null output handler"
 
 /* {{{ aliases, conflict and reverse conflict hash tables */
 
-var PhpOutputHandlerAliases types.HashTable
-var PhpOutputHandlerConflicts types.HashTable
-var PhpOutputHandlerReverseConflicts types.HashTable
+var PhpOutputHandlerAliases types.Array
+var PhpOutputHandlerConflicts types.Array
+var PhpOutputHandlerReverseConflicts types.Array
 var PhpOutputDirect func(str *byte, str_len int) int = PhpOutputStderr
 
 /* {{{ void php_output_startup(void)

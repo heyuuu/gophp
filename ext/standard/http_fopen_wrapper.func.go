@@ -168,7 +168,7 @@ func PhpStreamUrlWrapHttpEx(
 			var p *byte
 			if tmpzval.IsType(types.IS_ARRAY) {
 				var tmpheader *types.Zval = nil
-				var __ht *types.HashTable = tmpzval.GetArr()
+				var __ht *types.Array = tmpzval.GetArr()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
@@ -372,7 +372,7 @@ func PhpStreamUrlWrapHttpEx(
 		if tmpzval.IsType(types.IS_ARRAY) {
 			var tmpheader *types.Zval = nil
 			var tmpstr zend.SmartStr = zend.MakeSmartStr(0)
-			var __ht *types.HashTable = tmpzval.GetArr()
+			var __ht *types.Array = tmpzval.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

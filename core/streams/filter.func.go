@@ -11,8 +11,8 @@ import (
 	"sik/zend/types"
 )
 
-func PhpGetStreamFiltersHashGlobal() *types.HashTable { return &StreamFiltersHash }
-func _phpGetStreamFiltersHash() *types.HashTable {
+func PhpGetStreamFiltersHashGlobal() *types.Array { return &StreamFiltersHash }
+func _phpGetStreamFiltersHash() *types.Array {
 	if standard.FG(stream_filters) {
 		return standard.FG(stream_filters)
 	} else {
@@ -150,7 +150,7 @@ func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
 	bucket.SetNext(bucket.GetPrev())
 }
 func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
-	var filter_hash *types.HashTable = b.CondF1(standard.FG(stream_filters), func() __auto__ { return standard.FG(stream_filters) }, &StreamFiltersHash)
+	var filter_hash *types.Array = b.CondF1(standard.FG(stream_filters), func() __auto__ { return standard.FG(stream_filters) }, &StreamFiltersHash)
 	var factory *PhpStreamFilterFactory = nil
 	var filter *core.PhpStreamFilter = nil
 	var n int

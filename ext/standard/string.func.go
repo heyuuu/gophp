@@ -690,7 +690,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 
 		/* loop to search the first not undefined element... */
 
-		var __ht *types.HashTable = pieces.GetArr()
+		var __ht *types.Array = pieces.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -709,7 +709,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 	}
 	strings = zend.DoAlloca(b.SizeOf("* strings")*numelems, use_heap)
 	ptr = strings
-	var __ht *types.HashTable = pieces.GetArr()
+	var __ht *types.Array = pieces.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsType(types.IS_INDIRECT) {
@@ -2127,7 +2127,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 		repl_idx = 0
 		len_idx = repl_idx
 		from_idx = len_idx
-		var __ht *types.HashTable = str.GetArr()
+		var __ht *types.Array = str.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -2547,7 +2547,7 @@ func PhpStrtrEx(str *types.String, str_from *byte, str_to *byte, trlen int) *typ
 	new_str.GetVal()[new_str.GetLen()] = 0
 	return new_str
 }
-func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.HashTable) {
+func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Array) {
 	var str *byte = input.GetVal()
 	var slen int = input.GetLen()
 	var num_key zend.ZendUlong
@@ -2558,7 +2558,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ha
 	var num_keys int = 0
 	var minlen int = 128 * 1024
 	var maxlen int = 0
-	var str_hash types.HashTable
+	var str_hash types.Array
 	var entry *types.Zval
 	var key *byte
 	var result zend.SmartStr = zend.MakeSmartStr(0)
@@ -2572,7 +2572,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ha
 
 	/* check if original array has numeric keys */
 
-	var __ht *types.HashTable = pats
+	var __ht *types.Array = pats
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2613,7 +2613,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ha
 		/* we have to rebuild HashTable with numeric keys */
 
 		types.ZendHashInit(&str_hash, pats.GetNNumOfElements(), nil, nil, 0)
-		var __ht *types.HashTable = pats
+		var __ht *types.Array = pats
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -3070,7 +3070,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	if ac == 2 {
-		var pats *types.HashTable = from.GetArr()
+		var pats *types.Array = from.GetArr()
 		if pats.GetNNumOfElements() < 1 {
 			return_value.SetStringCopy(str)
 			return
@@ -3081,7 +3081,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var replace *types.String
 			var tmp_replace *types.String
 			var entry *types.Zval
-			var __ht *types.HashTable = pats
+			var __ht *types.Array = pats
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
@@ -3618,7 +3618,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 				/* For each entry in the search array, get the entry */ GetLen()
 		}
 
-		var __ht *types.HashTable = search.GetArr()
+		var __ht *types.Array = search.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -3790,7 +3790,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 		/* For each subject entry, convert it to string, then perform replacement
 		   and add the result to the return_value array. */
 
-		var __ht *types.HashTable = subject.GetArr()
+		var __ht *types.Array = subject.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
@@ -4127,7 +4127,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if allow.IsType(types.IS_ARRAY) {
 			var tmp *types.Zval
 			var tag *types.String
-			var __ht *types.HashTable = allow.GetArr()
+			var __ht *types.Array = allow.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

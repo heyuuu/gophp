@@ -75,16 +75,16 @@ func SplFixedarrayCopy(to *SplFixedarray, from *SplFixedarray) {
 		types.ZVAL_COPY(to.GetElements()[i], from.GetElements()[i])
 	}
 }
-func SplFixedarrayObjectGetGc(obj *types.Zval, table **types.Zval, n *int) *types.HashTable {
+func SplFixedarrayObjectGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array {
 	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(obj)
-	var ht *types.HashTable = zend.ZendStdGetProperties(obj)
+	var ht *types.Array = zend.ZendStdGetProperties(obj)
 	*table = intern.GetArray().GetElements()
 	*n = int(intern.GetArray().GetSize())
 	return ht
 }
-func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.HashTable {
+func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(obj)
-	var ht *types.HashTable = zend.ZendStdGetProperties(obj)
+	var ht *types.Array = zend.ZendStdGetProperties(obj)
 	var i zend.ZendLong = 0
 	if intern.GetArray().GetSize() > 0 {
 		var j zend.ZendLong = ht.GetNNumOfElements()
@@ -404,7 +404,7 @@ func zim_spl_SplFixedArray___construct(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
-	var intern_ht *types.HashTable = zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))
+	var intern_ht *types.Array = zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))
 	var data *types.Zval
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -413,7 +413,7 @@ func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_va
 		var index int = 0
 		var size int = intern_ht.GetNNumOfElements()
 		SplFixedarrayInit(intern.GetArray(), size)
-		var __ht *types.HashTable = intern_ht
+		var __ht *types.Array = intern_ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -480,7 +480,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var num_index zend.ZendUlong
 		var max_index zend.ZendUlong = 0
 		var tmp zend.ZendLong
-		var __ht *types.HashTable = data.GetArr()
+		var __ht *types.Array = data.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -500,7 +500,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 			return
 		}
 		SplFixedarrayInit(&array, tmp)
-		var __ht__1 *types.HashTable = data.GetArr()
+		var __ht__1 *types.Array = data.GetArr()
 		for _, _p := range __ht__1.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -513,7 +513,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var element *types.Zval
 		var i zend.ZendLong = 0
 		SplFixedarrayInit(&array, num)
-		var __ht *types.HashTable = data.GetArr()
+		var __ht *types.Array = data.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 

@@ -100,8 +100,8 @@ func ZendExtensionFcallEndHandler(extension *ZendExtension, frame *ZendExecuteDa
 		extension.GetFcallEndHandler()(frame)
 	}
 }
-func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *types.HashTable {
-	var ht *types.HashTable
+func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *types.Array {
+	var ht *types.Array
 	if (fetch_type & (ZEND_FETCH_GLOBAL_LOCK | ZEND_FETCH_GLOBAL)) != 0 {
 		ht = EG__().GetSymbolTable()
 	} else {
@@ -119,7 +119,7 @@ func ZendUndefinedOffset(lval ZendLong) {
 func ZendUndefinedIndex(offset *types.String) {
 	faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetVal())
 }
-func ZendUndefinedOffsetWrite(ht *types.HashTable, lval ZendLong) int {
+func ZendUndefinedOffsetWrite(ht *types.Array, lval ZendLong) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
@@ -136,7 +136,7 @@ func ZendUndefinedOffsetWrite(ht *types.HashTable, lval ZendLong) int {
 	}
 	return types.SUCCESS
 }
-func ZendUndefinedIndexWrite(ht *types.HashTable, offset *types.String) int {
+func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
@@ -193,7 +193,7 @@ func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *Z
 		ZendUseScalarAsArray()
 	}
 }
-func SlowIndexConvert(ht *types.HashTable, dim *types.Zval, value *types.ZendValue, executeData *ZendExecuteData) types.ZendUchar {
+func SlowIndexConvert(ht *types.Array, dim *types.Zval, value *types.ZendValue, executeData *ZendExecuteData) types.ZendUchar {
 	switch dim.GetType() {
 	case types.IS_UNDEF:
 
@@ -233,7 +233,7 @@ func SlowIndexConvert(ht *types.HashTable, dim *types.Zval, value *types.ZendVal
 		return types.IS_NULL
 	}
 }
-func ZendFetchDimensionAddressInner(ht *types.HashTable, dim *types.Zval, dim_type int, type_ int, executeData *ZendExecuteData) *types.Zval {
+func ZendFetchDimensionAddressInner(ht *types.Array, dim *types.Zval, dim_type int, type_ int, executeData *ZendExecuteData) *types.Zval {
 	var retval *types.Zval = nil
 	var offset_key *types.String
 	var hval ZendUlong
@@ -343,16 +343,16 @@ try_again:
 	}
 	return retval
 }
-func zend_fetch_dimension_address_inner_W(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func zend_fetch_dimension_address_inner_W(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_inner_W_CONST(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func zend_fetch_dimension_address_inner_W_CONST(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_inner_RW(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func zend_fetch_dimension_address_inner_RW(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_RW, executeData)
 }
-func zend_fetch_dimension_address_inner_RW_CONST(ht *types.HashTable, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func zend_fetch_dimension_address_inner_RW_CONST(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_RW, executeData)
 }
 func ZendFetchDimensionAddress(

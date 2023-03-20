@@ -263,7 +263,7 @@ func ParseArray(arg *types.Zval, checkNull bool, orObject bool) (dest *types.Zva
 	}
 }
 
-func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool) (dest *types.HashTable, ok bool) {
+func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool) (dest *types.Array, ok bool) {
 	if arg.IsArray() {
 		return arg.GetArr(), true
 	} else if orObject && arg.IsObject() {

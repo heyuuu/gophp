@@ -133,7 +133,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 	var opnum_default_jmp uint32
 	var opnum_switch uint32 = uint32 - 1
 	var jumptable_type types.ZendUchar
-	var jumptable *types.HashTable = nil
+	var jumptable *types.Array = nil
 	ZendCompileExpr(&expr_node, expr_ast)
 	ZendBeginLoop(ZEND_FREE, &expr_node, 1)
 	case_node.SetOpType(IS_TMP_VAR)
@@ -247,7 +247,7 @@ func ZendCompileTry(ast *ZendAst) {
 
 	if CG__().GetContext().GetLabels() != nil {
 		var label *ZendLabel
-		var __ht *types.HashTable = CG__().GetContext().GetLabels()
+		var __ht *types.Array = CG__().GetContext().GetLabels()
 		for _, _p := range __ht.foreachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 

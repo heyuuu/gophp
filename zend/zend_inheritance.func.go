@@ -1011,7 +1011,7 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 		/* Child did not add any new properties, we are done */
 
 	}
-	var __ht *types.HashTable = ce.GetPropertiesInfo()
+	var __ht *types.Array = ce.GetPropertiesInfo()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1236,7 +1236,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			}
 		}
 	}
-	var __ht *types.HashTable = ce.GetPropertiesInfo()
+	var __ht *types.Array = ce.GetPropertiesInfo()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1251,7 +1251,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	}
 	if parent_ce.GetPropertiesInfo().GetNNumOfElements() {
 		ce.GetPropertiesInfo().Extend(ce.GetPropertiesInfo().GetNNumOfElements() + parent_ce.GetPropertiesInfo().GetNNumOfElements())
-		var __ht *types.HashTable = parent_ce.GetPropertiesInfo()
+		var __ht *types.Array = parent_ce.GetPropertiesInfo()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1263,7 +1263,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	if parent_ce.GetConstantsTable().GetNNumOfElements() {
 		var c *ZendClassConstant
 		ce.GetConstantsTable().Extend(ce.GetConstantsTable().GetNNumOfElements() + parent_ce.GetConstantsTable().GetNNumOfElements())
-		var __ht *types.HashTable = parent_ce.GetConstantsTable()
+		var __ht *types.Array = parent_ce.GetConstantsTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1275,7 +1275,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	if parent_ce.GetFunctionTable().GetNNumOfElements() {
 		ce.GetFunctionTable().Extend(ce.GetFunctionTable().GetNNumOfElements() + parent_ce.GetFunctionTable().GetNNumOfElements())
 		if checked != 0 {
-			var __ht *types.HashTable = parent_ce.GetFunctionTable()
+			var __ht *types.Array = parent_ce.GetFunctionTable()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -1284,7 +1284,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				DoInheritMethod(key, func_, ce, 0, 1)
 			}
 		} else {
-			var __ht *types.HashTable = parent_ce.GetFunctionTable()
+			var __ht *types.Array = parent_ce.GetFunctionTable()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -1302,7 +1302,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	}
 	ce.AddCeFlags(parent_ce.GetCeFlags() & (ZEND_HAS_STATIC_IN_METHODS | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_USE_GUARDS))
 }
-func DoInheritConstantCheck(child_constants_table *types.HashTable, parent_constant *ZendClassConstant, name *types.String, iface *types.ClassEntry) types.ZendBool {
+func DoInheritConstantCheck(child_constants_table *types.Array, parent_constant *ZendClassConstant, name *types.String, iface *types.ClassEntry) types.ZendBool {
 	var zv *types.Zval = child_constants_table.KeyFind(name.GetStr())
 	var old_constant *ZendClassConstant
 	if zv != nil {
@@ -1332,7 +1332,7 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 	var func_ *ZendFunction
 	var key *types.String
 	var c *ZendClassConstant
-	var __ht *types.HashTable = iface.GetConstantsTable()
+	var __ht *types.Array = iface.GetConstantsTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1340,7 +1340,7 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 		c = _z.GetPtr()
 		DoInheritIfaceConstant(key, c, ce, iface)
 	}
-	var __ht__1 *types.HashTable = iface.GetFunctionTable()
+	var __ht__1 *types.Array = iface.GetFunctionTable()
 	for _, _p := range __ht__1.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1377,7 +1377,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 
 		/* Check for attempt to redeclare interface constants */
 
-		var __ht *types.HashTable = ce.GetConstantsTable()
+		var __ht *types.Array = ce.GetConstantsTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1428,7 +1428,7 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 
 				/* skip duplications */
 
-				var __ht *types.HashTable = ce.GetConstantsTable()
+				var __ht *types.Array = ce.GetConstantsTable()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
@@ -1507,7 +1507,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe *ZendFunc
 		types.ZendStringReleaseEx(lowercase_name, 0)
 	}
 }
-func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn *ZendFunction, overridden **types.HashTable) {
+func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn *ZendFunction, overridden **types.Array) {
 	var existing_fn *ZendFunction = nil
 	var new_fn *ZendFunction
 	if b.Assign(&existing_fn, types.ZendHashFindPtr(ce.GetFunctionTable(), key)) != nil {
@@ -1598,8 +1598,8 @@ func ZendTraitsCopyFunctions(
 	fnname *types.String,
 	fn *ZendFunction,
 	ce *types.ClassEntry,
-	overridden **types.HashTable,
-	exclude_table *types.HashTable,
+	overridden **types.Array,
+	exclude_table *types.Array,
 	aliases **types.ClassEntry,
 ) {
 	var alias *ZendTraitAlias
@@ -1706,14 +1706,14 @@ func ZendCheckTraitUsage(ce *types.ClassEntry, trait *types.ClassEntry, traits *
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Required Trait %s wasn't added to %s", trait.GetName().GetVal(), ce.GetName().GetVal())
 	return 0
 }
-func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables_ptr ***types.HashTable, aliases_ptr ***types.ClassEntry) {
+func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables_ptr ***types.Array, aliases_ptr ***types.ClassEntry) {
 	var i int
 	var j int = 0
 	var precedences **ZendTraitPrecedence
 	var cur_precedence *ZendTraitPrecedence
 	var cur_method_ref *ZendTraitMethodReference
 	var lcname *types.String
-	var exclude_tables **types.HashTable = nil
+	var exclude_tables **types.Array = nil
 	var aliases **types.ClassEntry = nil
 	var trait *types.ClassEntry
 
@@ -1815,9 +1815,9 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 	*exclude_tables_ptr = exclude_tables
 	*aliases_ptr = aliases
 }
-func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables **types.HashTable, aliases **types.ClassEntry) {
+func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables **types.Array, aliases **types.ClassEntry) {
 	var i uint32
-	var overridden *types.HashTable = nil
+	var overridden *types.Array = nil
 	var key *types.String
 	var fn *ZendFunction
 	if exclude_tables != nil {
@@ -1826,7 +1826,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 
 				/* copies functions, applies defined aliasing, and excludes unused trait methods */
 
-				var __ht *types.HashTable = traits[i].GetFunctionTable()
+				var __ht *types.Array = traits[i].GetFunctionTable()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
@@ -1844,7 +1844,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 	} else {
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
-				var __ht *types.HashTable = traits[i].GetFunctionTable()
+				var __ht *types.Array = traits[i].GetFunctionTable()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
@@ -1855,7 +1855,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 			}
 		}
 	}
-	var __ht *types.HashTable = ce.GetFunctionTable()
+	var __ht *types.Array = ce.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1899,7 +1899,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 		if traits[i] == nil {
 			continue
 		}
-		var __ht *types.HashTable = traits[i].GetPropertiesInfo()
+		var __ht *types.Array = traits[i].GetPropertiesInfo()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -2049,7 +2049,7 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 	}
 }
 func ZendDoBindTraits(ce *types.ClassEntry) {
-	var exclude_tables **types.HashTable
+	var exclude_tables **types.Array
 	var aliases **types.ClassEntry
 	var traits **types.ClassEntry
 	var trait **types.ClassEntry
@@ -2154,7 +2154,7 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 	var ai ZendAbstractInfo
 	b.Assert((ce.GetCeFlags() & (ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)) == ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
 	memset(&ai, 0, b.SizeOf("ai"))
-	var __ht *types.HashTable = ce.GetFunctionTable()
+	var __ht *types.Array = ce.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2178,8 +2178,8 @@ func VarianceObligationHtDtor(zv *types.Zval) {
 	zv.GetPtr().Destroy()
 	FREE_HASHTABLE(zv.GetPtr())
 }
-func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.HashTable {
-	var ht *types.HashTable
+func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
+	var ht *types.Array
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
 		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
@@ -2197,14 +2197,14 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.HashTable {
 	return ht
 }
 func AddDependencyObligation(ce *types.ClassEntry, dependency_ce *types.ClassEntry) {
-	var obligations *types.HashTable = GetOrInitObligationsForClass(ce)
+	var obligations *types.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_DEPENDENCY)
 	obligation.SetDependencyCe(dependency_ce)
 	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func AddCompatibilityObligation(ce *types.ClassEntry, child_fn *ZendFunction, parent_fn *ZendFunction, always_error types.ZendBool) {
-	var obligations *types.HashTable = GetOrInitObligationsForClass(ce)
+	var obligations *types.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_COMPATIBILITY)
 
@@ -2224,7 +2224,7 @@ func AddCompatibilityObligation(ce *types.ClassEntry, child_fn *ZendFunction, pa
 	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPropertyInfo, parent_prop *ZendPropertyInfo) {
-	var obligations *types.HashTable = GetOrInitObligationsForClass(ce)
+	var obligations *types.Array = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_PROPERTY_COMPATIBILITY)
 	obligation.SetChildProp(child_prop)
@@ -2265,7 +2265,7 @@ func CheckVarianceObligation(zv *types.Zval) int {
 	return types.ZEND_HASH_APPLY_REMOVE
 }
 func LoadDelayedClasses() {
-	var delayed_autoloads *types.HashTable = CG__().GetDelayedAutoloads()
+	var delayed_autoloads *types.Array = CG__().GetDelayedAutoloads()
 	var name *types.String
 	if delayed_autoloads == nil {
 		return
@@ -2274,7 +2274,7 @@ func LoadDelayedClasses() {
 	/* Take ownership of this HT, to avoid concurrent modification during autoloading. */
 
 	CG__().SetDelayedAutoloads(nil)
-	var __ht *types.HashTable = delayed_autoloads
+	var __ht *types.Array = delayed_autoloads
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2285,8 +2285,8 @@ func LoadDelayedClasses() {
 	FREE_HASHTABLE(delayed_autoloads)
 }
 func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
-	var all_obligations *types.HashTable = CG__().GetDelayedVarianceObligations()
-	var obligations *types.HashTable
+	var all_obligations *types.Array = CG__().GetDelayedVarianceObligations()
+	var obligations *types.Array
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
 	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
@@ -2299,14 +2299,14 @@ func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 	}
 }
 func ReportVarianceErrors(ce *types.ClassEntry) {
-	var all_obligations *types.HashTable = CG__().GetDelayedVarianceObligations()
-	var obligations *types.HashTable
+	var all_obligations *types.Array = CG__().GetDelayedVarianceObligations()
+	var obligations *types.Array
 	var obligation *VarianceObligation
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	b.Assert(all_obligations != nil)
 	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
-	var __ht *types.HashTable = obligations
+	var __ht *types.Array = obligations
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2425,7 +2425,7 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 	var key *types.String
 	var parent_func *ZendFunction
 	var parent_info *ZendPropertyInfo
-	var __ht *types.HashTable = parent_ce.GetFunctionTable()
+	var __ht *types.Array = parent_ce.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2444,7 +2444,7 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 			}
 		}
 	}
-	var __ht__1 *types.HashTable = parent_ce.GetPropertiesInfo()
+	var __ht__1 *types.Array = parent_ce.GetPropertiesInfo()
 	for _, _p := range __ht__1.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

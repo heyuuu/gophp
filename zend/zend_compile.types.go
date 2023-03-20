@@ -78,10 +78,10 @@ type ZendFileContext struct {
 	current_namespace        *types.String
 	in_namespace             types.ZendBool
 	has_bracketed_namespaces types.ZendBool
-	imports                  *types.HashTable
-	imports_function         *types.HashTable
-	imports_const            *types.HashTable
-	seen_symbols             types.HashTable
+	imports                  *types.Array
+	imports_function         *types.Array
+	imports_const            *types.Array
+	seen_symbols             types.Array
 }
 
 func (this *ZendFileContext) GetDeclarables() ZendDeclarables      { return this.declarables }
@@ -98,15 +98,15 @@ func (this *ZendFileContext) GetHasBracketedNamespaces() types.ZendBool {
 func (this *ZendFileContext) SetHasBracketedNamespaces(value types.ZendBool) {
 	this.has_bracketed_namespaces = value
 }
-func (this *ZendFileContext) GetImports() *types.HashTable         { return this.imports }
-func (this *ZendFileContext) SetImports(value *types.HashTable)    { this.imports = value }
-func (this *ZendFileContext) GetImportsFunction() *types.HashTable { return this.imports_function }
-func (this *ZendFileContext) SetImportsFunction(value *types.HashTable) {
+func (this *ZendFileContext) GetImports() *types.Array         { return this.imports }
+func (this *ZendFileContext) SetImports(value *types.Array)    { this.imports = value }
+func (this *ZendFileContext) GetImportsFunction() *types.Array { return this.imports_function }
+func (this *ZendFileContext) SetImportsFunction(value *types.Array) {
 	this.imports_function = value
 }
-func (this *ZendFileContext) GetImportsConst() *types.HashTable      { return this.imports_const }
-func (this *ZendFileContext) SetImportsConst(value *types.HashTable) { this.imports_const = value }
-func (this *ZendFileContext) GetSeenSymbols() types.HashTable        { return this.seen_symbols }
+func (this *ZendFileContext) GetImportsConst() *types.Array      { return this.imports_const }
+func (this *ZendFileContext) SetImportsConst(value *types.Array) { this.imports_const = value }
+func (this *ZendFileContext) GetSeenSymbols() types.Array        { return this.seen_symbols }
 
 // func (this *ZendFileContext) SetSeenSymbols(value HashTable) { this.seen_symbols = value }
 
@@ -258,7 +258,7 @@ type ZendOparrayContext struct {
 	current_brk_cont int
 	last_brk_cont    int
 	brk_cont_array   *ZendBrkContElement
-	labels           *types.HashTable
+	labels           *types.Array
 }
 
 //             func MakeZendOparrayContext(
@@ -302,8 +302,8 @@ func (this *ZendOparrayContext) GetBrkContArray() *ZendBrkContElement { return t
 func (this *ZendOparrayContext) SetBrkContArray(value *ZendBrkContElement) {
 	this.brk_cont_array = value
 }
-func (this *ZendOparrayContext) GetLabels() *types.HashTable      { return this.labels }
-func (this *ZendOparrayContext) SetLabels(value *types.HashTable) { this.labels = value }
+func (this *ZendOparrayContext) GetLabels() *types.Array      { return this.labels }
+func (this *ZendOparrayContext) SetLabels(value *types.Array) { this.labels = value }
 
 /**
  * ZendPropertyInfo
@@ -462,8 +462,8 @@ type ZendOpArray struct {
 	last                      uint32
 	opcodes                   *ZendOp
 	run_time_cache__ptr       **any
-	static_variables_ptr__ptr **types.HashTable
-	static_variables          *types.HashTable
+	static_variables_ptr__ptr **types.Array
+	static_variables          *types.Array
 	vars                      **types.String
 	refcount                  *uint32
 	last_live_range           int
@@ -580,8 +580,8 @@ func (this *ZendOpArray) GetRunTimeCachePtr() **any       { return this.run_time
 // func (this *ZendOpArray) SetRunTimeCachePtr(value **any) { this.run_time_cache__ptr = value }
 // func (this *ZendOpArray)  GetStaticVariablesPtrPtr() **HashTable      { return this.static_variables_ptr__ptr }
 // func (this *ZendOpArray) SetStaticVariablesPtrPtr(value **HashTable) { this.static_variables_ptr__ptr = value }
-func (this *ZendOpArray) GetStaticVariables() *types.HashTable        { return this.static_variables }
-func (this *ZendOpArray) SetStaticVariables(value *types.HashTable)   { this.static_variables = value }
+func (this *ZendOpArray) GetStaticVariables() *types.Array            { return this.static_variables }
+func (this *ZendOpArray) SetStaticVariables(value *types.Array)       { this.static_variables = value }
 func (this *ZendOpArray) GetVars() **types.String                     { return this.vars }
 func (this *ZendOpArray) SetVars(value **types.String)                { this.vars = value }
 func (this *ZendOpArray) GetRefcount() *uint32                        { return this.refcount }
@@ -791,7 +791,7 @@ func (this *BuiltinTypeInfo) GetType() types.ZendUchar { return this.type_ }
  * ClosureInfo
  */
 type ClosureInfo struct {
-	uses         types.HashTable
+	uses         types.Array
 	varvars_used types.ZendBool
 }
 
@@ -801,7 +801,7 @@ type ClosureInfo struct {
 //         varvars_used:varvars_used,
 //     }
 // }
-func (this *ClosureInfo) GetUses() types.HashTable { return this.uses }
+func (this *ClosureInfo) GetUses() types.Array { return this.uses }
 
 // func (this *ClosureInfo) SetUses(value HashTable) { this.uses = value }
 // func (this *ClosureInfo)  GetVarvarsUsed() ZendBool      { return this.varvars_used }

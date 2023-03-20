@@ -11,7 +11,7 @@ import (
  * spl_SplObjectStorage
  */
 type spl_SplObjectStorage struct {
-	storage       types.HashTable
+	storage       types.Array
 	index         zend.ZendLong
 	pos           types.HashPosition
 	flags         zend.ZendLong
@@ -42,7 +42,7 @@ type spl_SplObjectStorage struct {
 //                     std:std,
 //                 }
 //             }
-func (this *spl_SplObjectStorage) GetStorage() types.HashTable { return this.storage }
+func (this *spl_SplObjectStorage) GetStorage() types.Array { return this.storage }
 
 // func (this *spl_SplObjectStorage) SetStorage(value zend.HashTable) { this.storage = value }
 func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong            { return this.index }

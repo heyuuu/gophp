@@ -78,14 +78,14 @@ func (this *BrowscapEntry) SetPrefixLen(value uint8) { this.prefix_len = value }
  * BrowserData
  */
 type BrowserData struct {
-	htab     *types.HashTable
+	htab     *types.Array
 	kv       *BrowscapKv
 	kv_used  uint32
 	kv_size  uint32
 	filename []byte
 }
 
-func MakeBrowserData(htab *types.HashTable, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) BrowserData {
+func MakeBrowserData(htab *types.Array, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) BrowserData {
 	return BrowserData{
 		htab:     htab,
 		kv:       kv,
@@ -94,15 +94,15 @@ func MakeBrowserData(htab *types.HashTable, kv *BrowscapKv, kv_used uint32, kv_s
 		filename: filename,
 	}
 }
-func (this *BrowserData) GetHtab() *types.HashTable      { return this.htab }
-func (this *BrowserData) SetHtab(value *types.HashTable) { this.htab = value }
-func (this *BrowserData) GetKv() *BrowscapKv             { return this.kv }
-func (this *BrowserData) SetKv(value *BrowscapKv)        { this.kv = value }
-func (this *BrowserData) GetKvUsed() uint32              { return this.kv_used }
-func (this *BrowserData) SetKvUsed(value uint32)         { this.kv_used = value }
-func (this *BrowserData) GetKvSize() uint32              { return this.kv_size }
-func (this *BrowserData) SetKvSize(value uint32)         { this.kv_size = value }
-func (this *BrowserData) GetFilename() []byte            { return this.filename }
+func (this *BrowserData) GetHtab() *types.Array      { return this.htab }
+func (this *BrowserData) SetHtab(value *types.Array) { this.htab = value }
+func (this *BrowserData) GetKv() *BrowscapKv         { return this.kv }
+func (this *BrowserData) SetKv(value *BrowscapKv)    { this.kv = value }
+func (this *BrowserData) GetKvUsed() uint32          { return this.kv_used }
+func (this *BrowserData) SetKvUsed(value uint32)     { this.kv_used = value }
+func (this *BrowserData) GetKvSize() uint32          { return this.kv_size }
+func (this *BrowserData) SetKvSize(value uint32)     { this.kv_size = value }
+func (this *BrowserData) GetFilename() []byte        { return this.filename }
 
 // func (this *BrowserData) SetFilename(value []byte) { this.filename = value }
 
@@ -128,10 +128,10 @@ type BrowscapParserCtx struct {
 	bdata                *BrowserData
 	current_entry        *BrowscapEntry
 	current_section_name *types.String
-	str_interned         types.HashTable
+	str_interned         types.Array
 }
 
-func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *types.String, str_interned types.HashTable) BrowscapParserCtx {
+func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *types.String, str_interned types.Array) BrowscapParserCtx {
 	return BrowscapParserCtx{
 		bdata:                bdata,
 		current_entry:        current_entry,
@@ -149,6 +149,6 @@ func (this *BrowscapParserCtx) GetCurrentSectionName() *types.String {
 func (this *BrowscapParserCtx) SetCurrentSectionName(value *types.String) {
 	this.current_section_name = value
 }
-func (this *BrowscapParserCtx) GetStrInterned() types.HashTable { return this.str_interned }
+func (this *BrowscapParserCtx) GetStrInterned() types.Array { return this.str_interned }
 
 // func (this *BrowscapParserCtx) SetStrInterned(value zend.HashTable) { this.str_interned = value }

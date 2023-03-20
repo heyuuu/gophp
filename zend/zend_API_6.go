@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func ZendUnregisterFunctions(functions []types.ZendFunctionEntry, count int, functionTable *types.HashTable) {
+func ZendUnregisterFunctions(functions []types.ZendFunctionEntry, count int, functionTable *types.Array) {
 	targetFunctionTable := functionTable
 	if targetFunctionTable == nil {
 		targetFunctionTable = CG__().GetFunctionTable()
@@ -84,7 +84,7 @@ func ZendDeactivateModules() {
 	if SETJMP(__bailout) == 0 {
 		if EG__().GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
-			var __ht *types.HashTable = &ModuleRegistry
+			var __ht *types.Array = &ModuleRegistry
 			for _, _p := range __ht.foreachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
@@ -116,7 +116,7 @@ func ZendPostDeactivateModules() {
 		var module *ZendModuleEntry
 		var zv *types.Zval
 		var key *types.String
-		var __ht *types.HashTable = &ModuleRegistry
+		var __ht *types.Array = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -125,7 +125,7 @@ func ZendPostDeactivateModules() {
 				module.GetPostDeactivateFunc()()
 			}
 		}
-		var __ht__1 *types.HashTable = &ModuleRegistry
+		var __ht__1 *types.Array = &ModuleRegistry
 		for _, _p := range __ht__1.foreachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
@@ -246,7 +246,7 @@ func ZendSetHashSymbol(
 	num_symbol_tables int,
 	_ ...any,
 ) int {
-	var symbol_table *types.HashTable
+	var symbol_table *types.Array
 	var symbol_table_list va_list
 	if num_symbol_tables <= 0 {
 		return types.FAILURE
@@ -256,7 +256,7 @@ func ZendSetHashSymbol(
 	}
 	va_start(symbol_table_list, num_symbol_tables)
 	for b.PostDec(&num_symbol_tables) > 0 {
-		symbol_table = __va_arg(symbol_table_list, (*types.HashTable)(_))
+		symbol_table = __va_arg(symbol_table_list, (*types.Array)(_))
 		symbol_table.KeyUpdate(b.CastStr(name, name_length), symbol)
 		symbol.TryAddRefcount()
 	}

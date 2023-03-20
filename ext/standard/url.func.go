@@ -648,7 +648,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types.HashTable = stream.GetWrapperdata().GetArr()
+	var __ht *types.Array = stream.GetWrapperdata().GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

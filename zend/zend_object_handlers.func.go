@@ -24,7 +24,7 @@ func ZendGetFunctionRootClass(fbc *ZendFunction) *types.ClassEntry {
 		return fbc.GetScope()
 	}
 }
-func ZendReleaseProperties(ht *types.HashTable) {
+func ZendReleaseProperties(ht *types.Array) {
 	if ht != nil && (ht.GetGcFlags()&types.GC_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 		ht.DestroyEx()
 	}
@@ -44,7 +44,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		zobj.SetProperties(types.ZendNewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			types.ZendHashRealInitMixed(zobj.GetProperties())
-			var __ht *types.HashTable = ce.GetPropertiesInfo()
+			var __ht *types.Array = ce.GetPropertiesInfo()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -60,7 +60,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 			if (flags & ZEND_ACC_CHANGED) != 0 {
 				for ce.GetParent() && ce.GetParent().default_properties_count {
 					ce = ce.GetParent()
-					var __ht *types.HashTable = ce.GetPropertiesInfo()
+					var __ht *types.Array = ce.GetPropertiesInfo()
 					for _, _p := range __ht.foreachData() {
 						var _z *types.Zval = _p.GetVal()
 
@@ -79,7 +79,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		}
 	}
 }
-func ZendStdGetProperties(object *types.Zval) *types.HashTable {
+func ZendStdGetProperties(object *types.Zval) *types.Array {
 	var zobj *types.ZendObject
 	zobj = object.GetObj()
 	if zobj.GetProperties() == nil {
@@ -87,7 +87,7 @@ func ZendStdGetProperties(object *types.Zval) *types.HashTable {
 	}
 	return zobj.GetProperties()
 }
-func ZendStdGetGc(object *types.Zval, table **types.Zval, n *int) *types.HashTable {
+func ZendStdGetGc(object *types.Zval, table **types.Zval, n *int) *types.Array {
 	if types.Z_OBJ_HT(*object).GetGetProperties() != ZendStdGetProperties {
 		*table = nil
 		*n = 0
@@ -109,10 +109,10 @@ func ZendStdGetGc(object *types.Zval, table **types.Zval, n *int) *types.HashTab
 		}
 	}
 }
-func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.HashTable {
+func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(object)
 	var retval types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	if ce.GetDebugInfo() == nil {
 		*is_temp = 0
 		return types.Z_OBJ_HT(*object).GetGetProperties()(object)
@@ -516,7 +516,7 @@ func ZendPropertyGuardDtor(el *types.Zval) {
 	}
 }
 func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 {
-	var guards *types.HashTable
+	var guards *types.Array
 	var zv *types.Zval
 	var ptr *uint32
 	b.Assert(zobj.GetCe().IsUseGuards())
@@ -1418,7 +1418,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 			faults.ErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
 		o1.ProtectRecursive()
-		var __ht *types.HashTable = zobj1.GetCe().GetPropertiesInfo()
+		var __ht *types.Array = zobj1.GetCe().GetPropertiesInfo()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1626,8 +1626,8 @@ func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **Ze
 	}
 	return types.SUCCESS
 }
-func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.HashTable {
-	var ht *types.HashTable
+func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Array {
+	var ht *types.Array
 	switch purpose {
 	case ZEND_PROP_PURPOSE_DEBUG:
 		if types.Z_OBJ_HT_P(obj).GetGetDebugInfo() != nil {
@@ -1658,7 +1658,7 @@ func ZendStdGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Ha
 		return nil
 	}
 }
-func ZendGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.HashTable {
+func ZendGetPropertiesFor(obj *types.Zval, purpose ZendPropPurpose) *types.Array {
 	if types.Z_OBJ_HT_P(obj).GetGetPropertiesFor() != nil {
 		return types.Z_OBJ_HT_P(obj).GetGetPropertiesFor()(obj, purpose)
 	}

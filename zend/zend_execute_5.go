@@ -149,7 +149,7 @@ func zend_fetch_dimension_address_LIST_r(container *types.Zval, dim *types.Zval,
 func ZendFetchDimensionConst(result *types.Zval, container *types.Zval, dim *types.Zval, type_ int) {
 	ZendFetchDimensionAddressRead(result, container, dim, IS_TMP_VAR, type_, 0, 0, nil)
 }
-func ZendFindArrayDimSlow(ht *types.HashTable, offset *types.Zval, executeData *ZendExecuteData) *types.Zval {
+func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var hval ZendUlong
 	if offset.IsDouble() {
 		hval = ZendDvalToLval(offset.GetDval())
@@ -249,7 +249,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 		return 1
 	}
 }
-func ZendArrayKeyExistsFast(ht *types.HashTable, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
+func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
 	var str *types.String
 	var hval ZendUlong
 try_again:
@@ -289,7 +289,7 @@ try_again:
 func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
 	if subject.IsObject() {
 		faults.Error(faults.E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
-		var ht *types.HashTable = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
+		var ht *types.Array = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
 		var result uint32 = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 		ZendReleaseProperties(ht)
 		return result

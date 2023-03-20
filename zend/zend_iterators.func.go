@@ -17,7 +17,7 @@ func IterWrapperFree(object *types.ZendObject) {
 	iter.GetFuncs().GetDtor()(iter)
 }
 func IterWrapperDtor(object *types.ZendObject) {}
-func IterWrapperGetGc(object *types.Zval, table **types.Zval, n *int) *types.HashTable {
+func IterWrapperGetGc(object *types.Zval, table **types.Zval, n *int) *types.Array {
 	/* TODO: We need a get_gc iterator handler */
 
 	*table = nil

@@ -47,10 +47,10 @@ func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
 		BG__().unserialize.data = nil
 	}
 }
-func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *types.HashTable {
+func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *types.Array {
 	return d.GetAllowedClasses()
 }
-func PhpVarUnserializeSetAllowedClasses(d PhpUnserializeDataT, classes *types.HashTable) {
+func PhpVarUnserializeSetAllowedClasses(d PhpUnserializeDataT, classes *types.Array) {
 	d.SetAllowedClasses(classes)
 }
 func PhpVarUnserializeSetMaxDepth(d PhpUnserializeDataT, max_depth zend.ZendLong) {
@@ -251,7 +251,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 	return str
 }
 func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserializeDataT) int {
-	var classes *types.HashTable = var_hashx.GetAllowedClasses()
+	var classes *types.Array = var_hashx.GetAllowedClasses()
 	var lcname *types.String
 	var res int
 	if classes == nil {
@@ -320,7 +320,7 @@ func ProcessNestedData(
 	p **uint8,
 	max *uint8,
 	var_hash *PhpUnserializeDataT,
-	ht *types.HashTable,
+	ht *types.Array,
 	elements zend.ZendLong,
 	obj *types.ZendObject,
 ) int {
@@ -521,7 +521,7 @@ func ObjectCommon(
 	elements zend.ZendLong,
 	has_unserialize types.ZendBool,
 ) int {
-	var ht *types.HashTable
+	var ht *types.Array
 	var has_wakeup types.ZendBool
 	if has_unserialize != 0 {
 		var ary types.Zval

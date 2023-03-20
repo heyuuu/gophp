@@ -12,13 +12,13 @@ func ObjectPropertiesInit(object *types.ZendObject, class_type *types.ClassEntry
 	object.SetProperties(nil)
 	_objectPropertiesInit(object, class_type)
 }
-func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.HashTable) {
+func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.Array) {
 	object.SetProperties(properties)
 	if object.GetCe().GetDefaultPropertiesCount() != 0 {
 		var prop *types.Zval
 		var key *types.String
 		var property_info *ZendPropertyInfo
-		var __ht *types.HashTable = properties
+		var __ht *types.Array = properties
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -42,13 +42,13 @@ func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.HashTabl
 		}
 	}
 }
-func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable) {
+func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 	var prop *types.Zval
 	var tmp types.Zval
 	var key *types.String
 	var h ZendLong
 	var property_info *ZendPropertyInfo
-	var __ht *types.HashTable = properties
+	var __ht *types.Array = properties
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -102,7 +102,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.HashTable)
 		}
 	}
 }
-func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.HashTable) int {
+func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.Array) int {
 	if class_type.HasCeFlags(ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) {
 		if class_type.IsInterface() {
 			faults.ThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
@@ -135,7 +135,7 @@ func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, pro
 	}
 	return types.SUCCESS
 }
-func ObjectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.HashTable) int {
+func ObjectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.Array) int {
 	return _objectAndPropertiesInit(arg, class_type, properties)
 }
 func ObjectInitEx(arg *types.Zval, class_type *types.ClassEntry) int {
@@ -288,7 +288,7 @@ func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 		return types.FAILURE
 	}
 }
-func ArraySetZvalKey(ht *types.HashTable, key *types.Zval, value *types.Zval) int {
+func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 	var result *types.Zval
 	switch key.GetType() {
 	case types.IS_STRING:

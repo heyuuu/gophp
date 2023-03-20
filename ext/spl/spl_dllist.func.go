@@ -311,7 +311,7 @@ func SplDllistObjectCountElements(object *types.Zval, count *zend.ZendLong) int 
 	*count = SplPtrLlistCount(intern.GetLlist())
 	return types.SUCCESS
 }
-func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.HashTable {
+func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.Array {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(obj)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var next *SplPtrLlistElement
@@ -319,7 +319,7 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.HashTable {
 	var dllist_array types.Zval
 	var pnstr *types.String
 	var i int = 0
-	var debug_info *types.HashTable
+	var debug_info *types.Array
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
@@ -344,7 +344,7 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.HashTable {
 	types.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
 }
-func SplDllistObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.HashTable {
+func SplDllistObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(obj)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var i int = 0
@@ -874,7 +874,7 @@ func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, 
 }
 func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
-	var data *types.HashTable
+	var data *types.Array
 	var flags_zv *types.Zval
 	var storage_zv *types.Zval
 	var members_zv *types.Zval
@@ -890,7 +890,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 		return
 	}
 	intern.SetFlags(int(flags_zv.GetLval()))
-	var __ht *types.HashTable = storage_zv.GetArr()
+	var __ht *types.Array = storage_zv.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

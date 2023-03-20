@@ -377,7 +377,7 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 	}
 	return c.Value()
 }
-func ZendHashAddConstant(ht *types.HashTable, key *types.String, c *ZendConstant) any {
+func ZendHashAddConstant(ht *types.Array, key *types.String, c *ZendConstant) any {
 	var ret any
 	var copy *ZendConstant = Pemalloc(b.SizeOf("zend_constant"), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
 	memcpy(copy, c, b.SizeOf("zend_constant"))

@@ -184,10 +184,10 @@ func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, p
 	bdata.GetKv()[bdata.GetKvUsed()].SetValue(value)
 	bdata.GetKvUsed()++
 }
-func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.HashTable {
+func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.Array {
 	var tmp types.Zval
 	var i uint32
-	var ht *types.HashTable = types.ZendNewArray(8)
+	var ht *types.Array = types.ZendNewArray(8)
 	tmp.SetString(BrowscapConvertPattern(entry.GetPattern(), 0))
 	ht.KeyAdd("browser_name_regex", &tmp)
 	tmp.SetStringCopy(entry.GetPattern())
@@ -519,7 +519,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var return_array types.ZendBool = 0
 	var bdata *BrowserData
 	var found_entry *BrowscapEntry = nil
-	var agent_ht *types.HashTable
+	var agent_ht *types.Array
 	if BROWSCAP_G(activation_bdata).filename[0] != '0' {
 		bdata = &(BROWSCAP_G(activation_bdata))
 		if bdata.GetHtab() == nil {
@@ -570,7 +570,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
 	if found_entry == nil {
 		var entry *BrowscapEntry
-		var __ht *types.HashTable = bdata.GetHtab()
+		var __ht *types.Array = bdata.GetHtab()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 

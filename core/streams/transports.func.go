@@ -11,7 +11,7 @@ import (
 	"sik/zend/types"
 )
 
-func PhpStreamXportGetHash() *types.HashTable { return &XportHash }
+func PhpStreamXportGetHash() *types.Array { return &XportHash }
 func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) int {
 	var str *types.String = types.ZendStringInitInterned(protocol, strlen(protocol), 1)
 	types.ZendHashUpdatePtr(&XportHash, str, factory)

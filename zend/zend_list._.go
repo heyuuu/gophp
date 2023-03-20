@@ -52,4 +52,4 @@ var LeIndexPtr int
 
 /* true global */
 
-var ListDestructors types.HashTable
+var ListDestructors types.Array

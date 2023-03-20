@@ -124,7 +124,7 @@ func SapiCliRegisterVariables(track_vars_array *types.Zval) {
 		core.PhpRegisterVariable("DOCUMENT_ROOT", docroot, track_vars_array)
 	}
 }
-func SapiCliIniDefaults(configuration_hash *types.HashTable) {
+func SapiCliIniDefaults(configuration_hash *types.Array) {
 	core.Config().Set("report_zend_debug", "0")
 	core.Config().Set("display_errors", "1")
 }

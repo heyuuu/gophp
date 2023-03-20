@@ -82,7 +82,7 @@ func PhpPasswordMakeSalt(length int) *types.String {
 	ret.GetVal()[length] = 0
 	return ret
 }
-func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *types.HashTable) *types.String {
+func PhpPasswordGetSalt(unused_ *types.Zval, required_salt_len int, options *types.Array) *types.String {
 	var buffer *types.String
 	var option_buffer *types.Zval
 	if options == nil || !(b.Assign(&option_buffer, options.KeyFind("salt"))) {
@@ -507,7 +507,7 @@ func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types.HashTable = &PhpPasswordAlgos
+	var __ht *types.Array = &PhpPasswordAlgos
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

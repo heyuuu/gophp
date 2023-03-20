@@ -171,7 +171,7 @@ func ShutdownExecutor() {
 		/* Release static properties and static variables prior to the final GC run,
 		 * as they may hold GC roots. */
 
-		var __ht *types.HashTable = EG__().GetFunctionTable()
+		var __ht *types.Array = EG__().GetFunctionTable()
 		for _, _p := range __ht.foreachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
@@ -181,7 +181,7 @@ func ShutdownExecutor() {
 				break
 			}
 			if op_array.GetStaticVariables() != nil {
-				var ht *types.HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+				var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 				if ht != nil {
 					if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 						ht.DestroyEx()
@@ -190,7 +190,7 @@ func ShutdownExecutor() {
 				}
 			}
 		}
-		var __ht__1 *types.HashTable = EG__().GetClassTable()
+		var __ht__1 *types.Array = EG__().GetClassTable()
 		for _, _p := range __ht__1.foreachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
@@ -201,14 +201,14 @@ func ShutdownExecutor() {
 			}
 			if ce.IsHasStaticInMethods() {
 				var op_array *ZendOpArray
-				var __ht *types.HashTable = ce.GetFunctionTable()
+				var __ht *types.Array = ce.GetFunctionTable()
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					op_array = _z.GetPtr()
 					if op_array.GetType() == ZEND_USER_FUNCTION {
 						if op_array.GetStaticVariables() != nil {
-							var ht *types.HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+							var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 							if ht != nil {
 								if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 									ht.DestroyEx()
@@ -263,7 +263,7 @@ func ShutdownExecutor() {
 			types.ZendHashReverseApply(EG__().GetFunctionTable(), CleanNonPersistentFunctionFull)
 			types.ZendHashReverseApply(EG__().GetClassTable(), CleanNonPersistentClassFull)
 		} else {
-			var __ht *types.HashTable = EG__().GetZendConstants()
+			var __ht *types.Array = EG__().GetZendConstants()
 			for _, _p := range __ht.foreachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
@@ -295,7 +295,7 @@ func ShutdownExecutor() {
 				}
 			}
 			__ht.SetNNumUsed(_idx)
-			var __ht__1 *types.HashTable = EG__().GetFunctionTable()
+			var __ht__1 *types.Array = EG__().GetFunctionTable()
 			for _, _p := range __ht__1.foreachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
@@ -323,7 +323,7 @@ func ShutdownExecutor() {
 				}
 			}
 			__ht__1.SetNNumUsed(_idx)
-			var __ht__2 *types.HashTable = EG__().GetClassTable()
+			var __ht__2 *types.Array = EG__().GetClassTable()
 			for _, _p := range __ht__2.foreachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
@@ -1171,7 +1171,7 @@ func ZendRebuildSymbolTable() *types.Array {
 }
 func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
-	var ht *types.HashTable = executeData.GetSymbolTable()
+	var ht *types.Array = executeData.GetSymbolTable()
 
 	/* copy real values from symbol table into CV slots and create
 	   INDIRECT references to CV in symbol table  */
@@ -1207,7 +1207,7 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 }
 func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
-	var ht *types.HashTable = executeData.GetSymbolTable()
+	var ht *types.Array = executeData.GetSymbolTable()
 
 	/* copy real values from CV slots into symbol table */
 

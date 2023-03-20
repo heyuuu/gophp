@@ -50,4 +50,4 @@ type OpcodeHandlerT func(executeData *ZendExecuteData) int
 
 const OPLINE = executeData.GetOpline()
 
-var ZendHandlersTable *types.HashTable = nil
+var ZendHandlersTable *types.Array = nil

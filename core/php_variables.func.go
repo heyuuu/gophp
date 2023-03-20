@@ -30,7 +30,7 @@ func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_a
 	}
 	PhpRegisterVariableEx(var_, &new_entry, track_vars_array)
 }
-func PhpRegisterVariableQuick(name *byte, name_len int, val *types.Zval, ht *types.HashTable) {
+func PhpRegisterVariableQuick(name *byte, name_len int, val *types.Zval, ht *types.Array) {
 	var key *types.String = types.ZendStringInitInterned(name, name_len, 0)
 	ht.KeyUpdateIndirect(key.GetStr(), val)
 	types.ZendStringReleaseEx(key, 0)
@@ -46,7 +46,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 	var gpc_element types.Zval
 	var gpc_element_p *types.Zval
 	var is_array types.ZendBool = 0
-	var symtable1 *types.HashTable = nil
+	var symtable1 *types.Array = nil
 	b.Assert(var_name != nil)
 	if track_vars_array != nil && track_vars_array.IsType(types.IS_ARRAY) {
 		symtable1 = track_vars_array.GetArr()
@@ -141,7 +141,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 			var index_s *byte
 			var new_idx_len int = 0
 			if b.PreInc(&nest_level) > PG__().max_input_nesting_level {
-				var ht *types.HashTable
+				var ht *types.Array
 
 				/* too many levels of nesting */
 
@@ -480,7 +480,7 @@ func ValidEnvironmentName(name *byte, end *byte) int {
 	}
 	return 1
 }
-func ImportEnvironmentVariable(ht *types.HashTable, env *byte) {
+func ImportEnvironmentVariable(ht *types.Array, env *byte) {
 	var p *byte
 	var name_len int
 	var len_ int
@@ -592,7 +592,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 func PhpRegisterServerVariables() {
 	var tmp types.Zval
 	var arr *types.Zval = &PG__().http_globals[TRACK_VARS_SERVER]
-	var ht *types.HashTable
+	var ht *types.Array
 	zend.ZvalPtrDtorNogc(arr)
 	zend.ArrayInit(arr)
 
@@ -625,13 +625,13 @@ func PhpRegisterServerVariables() {
 	tmp.SetLong(zend.ZendDvalToLval(tmp.GetDval()))
 	PhpRegisterVariableQuick("REQUEST_TIME", b.SizeOf("\"REQUEST_TIME\"")-1, &tmp, ht)
 }
-func PhpAutoglobalMerge(dest *types.HashTable, src *types.HashTable) {
+func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 	var src_entry *types.Zval
 	var dest_entry *types.Zval
 	var string_key *types.String
 	var num_key zend.ZendUlong
 	var globals_check int = dest == zend.EG__().GetSymbolTable()
-	var __ht *types.HashTable = src
+	var __ht *types.Array = src
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -704,7 +704,7 @@ func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
 	PG__().http_globals[TRACK_VARS_FILES].AddRefcount()
 	return 0
 }
-func CheckHttpProxy(var_table *types.HashTable) {
+func CheckHttpProxy(var_table *types.Array) {
 	if types.ZendHashStrExists(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1) != 0 {
 		var local_proxy *byte = getenv("HTTP_PROXY")
 		if local_proxy == nil {

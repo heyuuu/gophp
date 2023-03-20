@@ -61,7 +61,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	} else {
 		module_number = 0
 	}
-	var __ht *types.HashTable = zend.EG__().GetIniDirectives()
+	var __ht *types.Array = zend.EG__().GetIniDirectives()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -108,9 +108,9 @@ func RESET_ACTIVE_INI_HASH() {
 	ActiveIniHash = nil
 	IsSpecialSection = 0
 }
-func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, target_hash *types.HashTable) {
+func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, target_hash *types.Array) {
 	var entry *types.Zval
-	var active_hash *types.HashTable
+	var active_hash *types.Array
 	var extension_name *byte
 	if ActiveIniHash != nil {
 		active_hash = ActiveIniHash
@@ -587,7 +587,7 @@ func PhpIniRegisterExtensions() {
 	ExtensionLists.GetEngine().Destroy()
 	ExtensionLists.GetFunctions().Destroy()
 }
-func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.HashTable) int {
+func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.Array) int {
 	var sb zend.ZendStatT
 	var ini_file []byte
 	Snprintf(ini_file, MAXPATHLEN, "%s%c%s", dirname, zend.DEFAULT_SLASH, ini_filename)
@@ -615,13 +615,13 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.H
 	}
 	return types.FAILURE
 }
-func PhpIniActivateConfig(source_hash *types.HashTable, modify_type int, stage int) {
+func PhpIniActivateConfig(source_hash *types.Array, modify_type int, stage int) {
 	var str *types.String
 	var data *types.Zval
 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 
-	var __ht *types.HashTable = source_hash
+	var __ht *types.Array = source_hash
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

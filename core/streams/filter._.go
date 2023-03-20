@@ -28,7 +28,7 @@ import (
 
 /* Global filter hash, copied to FG(stream_filters) on registration of volatile filter */
 
-var StreamFiltersHash types.HashTable
+var StreamFiltersHash types.Array
 
 /* Should only be used during core initialization */
 

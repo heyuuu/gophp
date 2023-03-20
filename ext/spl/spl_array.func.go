@@ -16,7 +16,7 @@ func SplArrayFromObj(obj *types.ZendObject) *SplArrayObject {
 	return (*SplArrayObject)((*byte)(obj - zend_long((*byte)(&((*SplArrayObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLARRAY_P(zv *types.Zval) *SplArrayObject { return SplArrayFromObj(zv.GetObj()) }
-func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.HashTable {
+func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.Array {
 	//??? TODO: Delay duplication for arrays; only duplicate for write operations
 
 	if intern.IsIsSelf() {
@@ -44,11 +44,11 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **types.HashTable {
 
 	//??? TODO: Delay duplication for arrays; only duplicate for write operations
 }
-func SplArrayGetHashTable(intern *SplArrayObject) *types.HashTable {
+func SplArrayGetHashTable(intern *SplArrayObject) *types.Array {
 	return (*SplArrayGetHashTablePtr)(intern)
 }
-func SplArrayReplaceHashTable(intern *SplArrayObject, ht *types.HashTable) {
-	var ht_ptr **types.HashTable = SplArrayGetHashTablePtr(intern)
+func SplArrayReplaceHashTable(intern *SplArrayObject, ht *types.Array) {
+	var ht_ptr **types.Array = SplArrayGetHashTablePtr(intern)
 	ht_ptr.DestroyEx()
 	*ht_ptr = ht
 }
@@ -58,12 +58,12 @@ func SplArrayIsObject(intern *SplArrayObject) types.ZendBool {
 	}
 	return intern.IsIsSelf() || intern.GetArray().IsType(types.IS_OBJECT)
 }
-func SplArrayCreateHtIter(ht *types.HashTable, intern *SplArrayObject) {
+func SplArrayCreateHtIter(ht *types.Array, intern *SplArrayObject) {
 	intern.SetHtIter(types.ZendHashIteratorAdd(ht, ht.currentPosVal()))
 	types.ZendHashInternalPointerResetEx(ht, zend.EG__().GetHtIterators()[intern.GetHtIter()].GetPos())
 	SplArraySkipProtected(intern, ht)
 }
-func SplArrayGetPosPtr(ht *types.HashTable, intern *SplArrayObject) *uint32 {
+func SplArrayGetPosPtr(ht *types.Array, intern *SplArrayObject) *uint32 {
 	if intern.GetHtIter() == uint32-1 {
 		SplArrayCreateHtIter(ht, intern)
 	}
@@ -192,7 +192,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 	var retval *types.Zval
 	var index zend.ZendLong
 	var offset_key *types.String
-	var ht *types.HashTable = SplArrayGetHashTable(intern)
+	var ht *types.Array = SplArrayGetHashTable(intern)
 	if offset == nil || offset.IsUndef() || ht == nil {
 		return zend.EG__().GetUninitializedZval()
 	}
@@ -338,7 +338,7 @@ func SplArrayReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv
 func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *types.Zval, value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var index zend.ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	if check_inherited != 0 && intern.GetFptrOffsetSet() != nil {
 		var tmp types.Zval
 		if offset == nil {
@@ -403,7 +403,7 @@ func SplArrayWriteDimension(object *types.Zval, offset *types.Zval, value *types
 }
 func SplArrayUnsetDimensionEx(check_inherited int, object *types.Zval, offset *types.Zval) {
 	var index zend.ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	if check_inherited != 0 && intern.GetFptrOffsetDel() != nil {
 		types.SEPARATE_ARG_IF_REF(offset)
@@ -499,7 +499,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		}
 	}
 	if value == nil {
-		var ht *types.HashTable = SplArrayGetHashTable(intern)
+		var ht *types.Array = SplArrayGetHashTable(intern)
 	try_again:
 		switch offset.GetType() {
 		case types.IS_STRING:
@@ -609,9 +609,9 @@ func zim_spl_Array_getArrayCopy(executeData *zend.ZendExecuteData, return_value 
 	return_value.SetArray(types.ZendArrayDup(SplArrayGetHashTable(intern)))
 	return
 }
-func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) *types.HashTable {
+func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) *types.Array {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var ht *types.HashTable
+	var ht *types.Array
 	var dup types.ZendBool
 	if intern.IsStdPropList() {
 		return zend.ZendStdGetPropertiesFor(object, purpose)
@@ -643,7 +643,7 @@ func SplArrayGetPropertiesFor(object *types.Zval, purpose zend.ZendPropPurpose) 
 	}
 	return ht
 }
-func SplArrayGetDebugInfo(obj *types.Zval) *types.HashTable {
+func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 	var storage *types.Zval
 	var zname *types.String
 	var base *types.ClassEntry
@@ -654,7 +654,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.HashTable {
 	if intern.IsIsSelf() {
 		return types.ZendArrayDup(intern.GetStd().GetProperties())
 	} else {
-		var debug_info *types.HashTable
+		var debug_info *types.Array
 		debug_info = types.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
 		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
 		storage = intern.GetArray()
@@ -670,7 +670,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.HashTable {
 		return debug_info
 	}
 }
-func SplArrayGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.HashTable {
+func SplArrayGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {
 	var intern *SplArrayObject = Z_SPLARRAY_P(obj)
 	*gc_data = intern.GetArray()
 	*gc_data_count = 1
@@ -721,8 +721,8 @@ func SplArrayUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *a
 	zend.ZendStdUnsetProperty(object, member, cache_slot)
 }
 func SplArrayCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
-	var ht1 *types.HashTable
-	var ht2 *types.HashTable
+	var ht1 *types.Array
+	var ht2 *types.Array
 	var intern1 *SplArrayObject
 	var intern2 *SplArrayObject
 	var result int = 0
@@ -739,7 +739,7 @@ func SplArrayCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	}
 	return result
 }
-func SplArraySkipProtected(intern *SplArrayObject, aht *types.HashTable) int {
+func SplArraySkipProtected(intern *SplArrayObject, aht *types.Array) int {
 	var string_key *types.String
 	var num_key zend.ZendUlong
 	var data *types.Zval
@@ -765,7 +765,7 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.HashTable) int {
 	}
 	return types.FAILURE
 }
-func SplArrayNextEx(intern *SplArrayObject, aht *types.HashTable) int {
+func SplArrayNextEx(intern *SplArrayObject, aht *types.Array) int {
 	var pos_ptr *uint32 = SplArrayGetPosPtr(aht, intern)
 	types.ZendHashMoveForwardEx(aht, pos_ptr)
 	if SplArrayIsObject(intern) != 0 {
@@ -775,7 +775,7 @@ func SplArrayNextEx(intern *SplArrayObject, aht *types.HashTable) int {
 	}
 }
 func SplArrayNext(intern *SplArrayObject) int {
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	return SplArrayNextEx(intern, aht)
 }
 func SplArrayItDtor(iter *zend.ZendObjectIterator) {
@@ -784,7 +784,7 @@ func SplArrayItDtor(iter *zend.ZendObjectIterator) {
 }
 func SplArrayItValid(iter *zend.ZendObjectIterator) int {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
-	var aht *types.HashTable = SplArrayGetHashTable(object)
+	var aht *types.Array = SplArrayGetHashTable(object)
 	if object.IsOverloadedValid() {
 		return zend.ZendUserItValid(iter)
 	} else {
@@ -793,7 +793,7 @@ func SplArrayItValid(iter *zend.ZendObjectIterator) int {
 }
 func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
-	var aht *types.HashTable = SplArrayGetHashTable(object)
+	var aht *types.Array = SplArrayGetHashTable(object)
 	if object.IsOverloadedCurrent() {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
@@ -806,7 +806,7 @@ func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 }
 func SplArrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval) {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
-	var aht *types.HashTable = SplArrayGetHashTable(object)
+	var aht *types.Array = SplArrayGetHashTable(object)
 	if object.IsOverloadedKey() {
 		zend.ZendUserItGetCurrentKey(iter, key)
 	} else {
@@ -815,7 +815,7 @@ func SplArrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *types.Zval) {
 }
 func SplArrayItMoveForward(iter *zend.ZendObjectIterator) {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
-	var aht *types.HashTable = SplArrayGetHashTable(object)
+	var aht *types.Array = SplArrayGetHashTable(object)
 	if object.IsOverloadedNext() {
 		zend.ZendUserItMoveForward(iter)
 	} else {
@@ -824,7 +824,7 @@ func SplArrayItMoveForward(iter *zend.ZendObjectIterator) {
 	}
 }
 func SplArrayRewind(intern *SplArrayObject) {
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if intern.GetHtIter() == uint32-1 {
 		SplArrayGetPosPtr(aht, intern)
 	} else {
@@ -1012,7 +1012,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 	var position zend.ZendLong
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	var result int
 	if zend.ZendParseParameters(executeData.NumArgs(), "l", &position) == types.FAILURE {
 		return
@@ -1031,7 +1031,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 	faults.ThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", opos)
 }
 func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if SplArrayIsObject(intern) != 0 {
 		var count zend.ZendLong = 0
 		var key *types.String
@@ -1039,7 +1039,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 
 		/* Count public/dynamic properties */
 
-		var __ht *types.HashTable = aht
+		var __ht *types.Array = aht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1086,7 +1086,7 @@ func zim_spl_Array_count(executeData *zend.ZendExecuteData, return_value *types.
 }
 func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval, fname string, fname_len int, use_arg int) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS(executeData))
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	var function_name types.Zval
 	var params []types.Zval
 	var arg *types.Zval = nil
@@ -1120,7 +1120,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		intern.GetNApplyCount()--
 	}
 exit:
-	var new_ht *types.HashTable = types.Z_REFVAL(params[0]).GetArr()
+	var new_ht *types.Array = types.Z_REFVAL(params[0]).GetArr()
 	if aht != new_ht {
 		SplArrayReplaceHashTable(intern, new_ht)
 	} else {
@@ -1152,7 +1152,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	var entry *types.Zval
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1175,13 +1175,13 @@ func zim_spl_Array_key(executeData *zend.ZendExecuteData, return_value *types.Zv
 }
 func SplArrayIteratorKey(object *types.Zval, return_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	types.ZendHashGetCurrentKeyZvalEx(aht, return_value, SplArrayGetPosPtr(aht, intern))
 }
 func zim_spl_Array_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1190,7 +1190,7 @@ func zim_spl_Array_next(executeData *zend.ZendExecuteData, return_value *types.Z
 func zim_spl_Array_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1201,7 +1201,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 	var object *types.Zval = zend.ZEND_THIS(executeData)
 	var entry *types.Zval
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1221,7 +1221,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	var entry *types.Zval
 	var flags types.Zval
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	var aht *types.HashTable = SplArrayGetHashTable(intern)
+	var aht *types.Array = SplArrayGetHashTable(intern)
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1429,7 +1429,7 @@ func zim_spl_Array___serialize(executeData *zend.ZendExecuteData, return_value *
 }
 func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS(executeData))
-	var data *types.HashTable
+	var data *types.Array
 	var flags_zv *types.Zval
 	var storage_zv *types.Zval
 	var members_zv *types.Zval

@@ -787,7 +787,7 @@ func _tryConvertToString(op *types.Zval) types.ZendBool {
 	return 1
 }
 func ConvertScalarToArray(op *types.Zval) {
-	var ht *types.HashTable = types.ZendNewArray(1)
+	var ht *types.Array = types.ZendNewArray(1)
 	ht.IndexAddNewH(0, op)
 	op.SetArray(ht)
 }
@@ -800,9 +800,9 @@ try_again:
 		if types.Z_OBJCE_P(op) == ZendCeClosure {
 			ConvertScalarToArray(op)
 		} else {
-			var obj_ht *types.HashTable = ZendGetPropertiesFor(op, ZEND_PROP_PURPOSE_ARRAY_CAST)
+			var obj_ht *types.Array = ZendGetPropertiesFor(op, ZEND_PROP_PURPOSE_ARRAY_CAST)
 			if obj_ht != nil {
-				var new_obj_ht *types.HashTable = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
+				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
 				ZvalPtrDtor(op)
 				op.SetArray(new_obj_ht)
 				ZendReleaseProperties(obj_ht)
@@ -833,7 +833,7 @@ func ConvertToObject(op *types.Zval) {
 try_again:
 	switch op.GetType() {
 	case types.IS_ARRAY:
-		var ht *types.HashTable = types.ZendSymtableToProptable(Z_ARR_P(op))
+		var ht *types.Array = types.ZendSymtableToProptable(Z_ARR_P(op))
 		var obj *types.ZendObject
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
@@ -3151,7 +3151,7 @@ func HashZvalCompareFunction(z1 *types.Zval, z2 *types.Zval) int {
 	}
 	return result.GetLval()
 }
-func ZendCompareSymbolTables(ht1 *types.HashTable, ht2 *types.HashTable) int {
+func ZendCompareSymbolTables(ht1 *types.Array, ht2 *types.Array) int {
 	if ht1 == ht2 {
 		return 0
 	} else {

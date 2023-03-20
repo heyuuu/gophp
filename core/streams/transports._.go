@@ -26,7 +26,7 @@ import (
   +----------------------------------------------------------------------+
 */
 
-var XportHash types.HashTable
+var XportHash types.Array
 
 /* Bind the stream to a local address */
 

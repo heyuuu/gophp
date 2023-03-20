@@ -587,8 +587,8 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
 
-			/* Free extra args before releasing the closure,
-			 * as that may free the op_array. */))
+				/* Free extra args before releasing the closure,
+				 * as that may free the op_array. */))
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -1078,7 +1078,7 @@ func ZEND_SEND_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	arg_num = executeData.GetCall().NumArgs() + 1
 send_again:
 	if args.IsArray() {
-		var ht *types.HashTable = args.GetArr()
+		var ht *types.Array = args.GetArr()
 		var arg *types.Zval
 		var top *types.Zval
 		var name *types.String
@@ -1100,7 +1100,7 @@ send_again:
 				ht = args.GetArr()
 			}
 		}
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1224,7 +1224,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	} else {
 		var arg_num uint32
-		var ht *types.HashTable
+		var ht *types.Array
 		var arg *types.Zval
 		var param *types.Zval
 	send_array:
@@ -1245,7 +1245,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 				ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, len_)
 				arg_num = 1
 				param = executeData.GetCall().Arg(1)
-				var __ht *types.HashTable = ht
+				var __ht *types.Array = ht
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 
@@ -1295,7 +1295,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, ht.GetNNumOfElements())
 			arg_num = 1
 			param = executeData.GetCall().Arg(1)
-			var __ht *types.HashTable = ht
+			var __ht *types.Array = ht
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -1371,10 +1371,10 @@ func ZEND_ADD_ARRAY_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	op1 = GetZvalPtr(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 add_unpack_again:
 	if op1.IsArray() {
-		var ht *types.HashTable = op1.GetArr()
+		var ht *types.Array = op1.GetArr()
 		var val *types.Zval
 		var key *types.String
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1881,7 +1881,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		args = types.ZendNewArray(num_args)
 		types.ZendHashRealInitPacked(args)
 		for {
-			var __fill_ht *types.HashTable = args
+			var __fill_ht *types.Array = args
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
@@ -2236,7 +2236,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		ArrayInitSize(params, arg_count-arg_num+1)
 		types.ZendHashRealInitPacked(params.GetArr())
 		for {
-			var __fill_ht *types.HashTable = params.GetArr()
+			var __fill_ht *types.Array = params.GetArr()
 			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
@@ -2880,7 +2880,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
 	var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
-	var ht *types.HashTable
+	var ht *types.Array
 	expr = RT_CONSTANT(opline, opline.GetOp1())
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
@@ -2931,7 +2931,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
-				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
+				var obj_ht *types.Array = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
 				if obj_ht != nil {
 
 					/* fast copy */
@@ -3040,7 +3040,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_CONST != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
@@ -3115,7 +3115,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_CONST != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if IS_CONST == IS_VAR || IS_CONST == IS_CV {
 				if array_ptr == array_ref {
 					array_ref.SetNewRef(array_ref)
@@ -4854,7 +4854,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 	container = RT_CONSTANT(opline, opline.GetOp1())
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -4950,7 +4950,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	var opline *ZendOp = executeData.GetOpline()
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = RT_CONSTANT(opline, opline.GetOp1())
 	subject = RT_CONSTANT(opline, opline.GetOp2())
@@ -5184,7 +5184,7 @@ func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int
 	var opline *ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
-	var jumptable *types.HashTable
+	var jumptable *types.Array
 	op = RT_CONSTANT(opline, opline.GetOp1())
 	jumptable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	if op.GetType() != types.IS_LONG {
@@ -5215,7 +5215,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	var opline *ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
-	var jumptable *types.HashTable
+	var jumptable *types.Array
 	op = RT_CONSTANT(opline, opline.GetOp1())
 	jumptable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	if op.GetType() != types.IS_STRING {
@@ -5255,7 +5255,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
-	var ht *types.HashTable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	var result *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	if op1.IsString() {
@@ -5274,7 +5274,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var result_tmp types.Zval
 		var val *types.Zval
 		result = nil
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -5878,7 +5878,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecute
 	var dim *types.Zval
 	var value *types.Zval
 	var offset ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	container = RT_CONSTANT(opline, opline.GetOp1())
 	dim = EX_VAR(opline.GetOp2().GetVar())
 	if container.IsArray() {
@@ -6830,7 +6830,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 	container = RT_CONSTANT(opline, opline.GetOp1())
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -6931,7 +6931,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var free_op2 ZendFreeOp
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = RT_CONSTANT(opline, opline.GetOp1())
 	subject = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
@@ -7274,7 +7274,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	var retval *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = RT_CONSTANT(opline, opline.GetOp1())
 	if IS_CONST == IS_CONST {
 		name = varname.GetStr()
@@ -7686,7 +7686,7 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = RT_CONSTANT(opline, opline.GetOp1())
 	if IS_CONST == IS_CONST {
 		name = varname.GetStr()
@@ -7716,7 +7716,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = RT_CONSTANT(opline, opline.GetOp1())
 	if IS_CONST == IS_CONST {
 		name = varname.GetStr()
@@ -8055,7 +8055,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		ht = types.ZendNewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
-		var __fill_ht *types.HashTable = ht
+		var __fill_ht *types.Array = ht
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
@@ -8995,7 +8995,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 	container = RT_CONSTANT(opline, opline.GetOp1())
 	offset = EX_VAR(opline.GetOp2().GetVar())
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -9091,7 +9091,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	var opline *ZendOp = executeData.GetOpline()
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = RT_CONSTANT(opline, opline.GetOp1())
 	subject = EX_VAR(opline.GetOp2().GetVar())
@@ -9792,7 +9792,7 @@ func ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) 
 	var opline *ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
-	var jumptable *types.HashTable
+	var jumptable *types.Array
 	op = EX_VAR(opline.GetOp1().GetVar())
 	jumptable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	if op.GetType() != types.IS_LONG {
@@ -9823,7 +9823,7 @@ func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData
 	var opline *ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
-	var jumptable *types.HashTable
+	var jumptable *types.Array
 	op = EX_VAR(opline.GetOp1().GetVar())
 	jumptable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	if op.GetType() != types.IS_STRING {
@@ -12585,7 +12585,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -12685,7 +12685,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	var free_op1 ZendFreeOp
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	subject = RT_CONSTANT(opline, opline.GetOp2())
@@ -12757,7 +12757,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDa
 	var dim *types.Zval
 	var value *types.Zval
 	var offset ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	dim = RT_CONSTANT(opline, opline.GetOp2())
 	if container.IsArray() {
@@ -12805,7 +12805,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_TMPVARCV_HANDLER(executeData *ZendExecut
 	var dim *types.Zval
 	var value *types.Zval
 	var offset ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	dim = EX_VAR(opline.GetOp2().GetVar())
 	if container.IsArray() {
@@ -13888,7 +13888,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -13993,7 +13993,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var free_op2 ZendFreeOp
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	subject = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
@@ -14066,7 +14066,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	var retval *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		name = varname.GetStr()
@@ -14165,7 +14165,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	var free_op1 ZendFreeOp
 	varname = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
@@ -14199,7 +14199,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		name = varname.GetStr()
@@ -15004,7 +15004,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	offset = EX_VAR(opline.GetOp2().GetVar())
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -15104,7 +15104,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	var free_op1 ZendFreeOp
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	subject = EX_VAR(opline.GetOp2().GetVar())
@@ -15379,7 +15379,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
-	var ht *types.HashTable
+	var ht *types.Array
 	expr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
@@ -15430,7 +15430,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
-				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
+				var obj_ht *types.Array = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
 				if obj_ht != nil {
 
 					/* fast copy */
@@ -15490,7 +15490,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_TMP_VAR != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
@@ -15568,7 +15568,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_TMP_VAR != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if IS_TMP_VAR == IS_VAR || IS_TMP_VAR == IS_CV {
 				if array_ptr == array_ref {
 					array_ref.SetNewRef(array_ref)
@@ -16240,7 +16240,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
-	var ht *types.HashTable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	var result *types.Zval
 	op1 = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if op1.IsString() {
@@ -16259,7 +16259,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var result_tmp types.Zval
 		var val *types.Zval
 		result = nil
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -18185,7 +18185,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
-	var ht *types.HashTable
+	var ht *types.Array
 	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
@@ -18237,7 +18237,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
-				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
+				var obj_ht *types.Array = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
 				if obj_ht != nil {
 
 					/* fast copy */
@@ -18298,7 +18298,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_VAR != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
@@ -18380,7 +18380,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_VAR != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if IS_VAR == IS_VAR || IS_VAR == IS_CV {
 				if array_ptr == array_ref {
 					array_ref.SetNewRef(array_ref)
@@ -18447,7 +18447,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var array *types.Zval
 	var value *types.Zval
 	var value_type uint32
-	var fe_ht *types.HashTable
+	var fe_ht *types.Array
 	var pos types.HashPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
@@ -18606,7 +18606,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var array *types.Zval
 	var value *types.Zval
 	var value_type uint32
-	var fe_ht *types.HashTable
+	var fe_ht *types.Array
 	var pos types.HashPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
@@ -20817,7 +20817,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if container.IsArray() {
-			var ht *types.HashTable
+			var ht *types.Array
 		unset_dim_array:
 			types.SEPARATE_ARRAY(container)
 			ht = container.GetArr()
@@ -21085,7 +21085,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
-	var ht *types.HashTable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	var result *types.Zval
 	op1 = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if op1.IsString() {
@@ -21104,7 +21104,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var result_tmp types.Zval
 		var val *types.Zval
 		result = nil
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -22830,7 +22830,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	for {
 		if container.IsArray() {
-			var ht *types.HashTable
+			var ht *types.Array
 		unset_dim_array:
 			types.SEPARATE_ARRAY(container)
 			ht = container.GetArr()
@@ -26230,7 +26230,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	offset = EX_VAR(opline.GetOp2().GetVar())
 	for {
 		if container.IsArray() {
-			var ht *types.HashTable
+			var ht *types.Array
 		unset_dim_array:
 			types.SEPARATE_ARRAY(container)
 			ht = container.GetArr()
@@ -26500,7 +26500,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_UNUSED_HANDLER(executeData *ZendE
 	var value *types.Zval
 	var variable_ptr *types.Zval
 	var value_type uint32
-	var fe_ht *types.HashTable
+	var fe_ht *types.Array
 	var pos types.HashPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
@@ -26543,7 +26543,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExe
 	var value *types.Zval
 	var variable_ptr *types.Zval
 	var value_type uint32
-	var fe_ht *types.HashTable
+	var fe_ht *types.Array
 	var pos types.HashPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
@@ -30441,7 +30441,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		ht = types.ZendNewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
-		var __fill_ht *types.HashTable = ht
+		var __fill_ht *types.Array = ht
 		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
@@ -32750,7 +32750,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
 	var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
-	var ht *types.HashTable
+	var ht *types.Array
 	expr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
@@ -32801,7 +32801,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					types.ZVAL_EMPTY_ARRAY(result)
 				}
 			} else {
-				var obj_ht *types.HashTable = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
+				var obj_ht *types.Array = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
 				if obj_ht != nil {
 
 					/* fast copy */
@@ -32910,7 +32910,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_CV != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
 				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
@@ -32985,7 +32985,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else if IS_CV != IS_CONST && array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
-			var properties *types.HashTable
+			var properties *types.Array
 			if IS_CV == IS_VAR || IS_CV == IS_CV {
 				if array_ptr == array_ref {
 					array_ref.SetNewRef(array_ref)
@@ -35859,7 +35859,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if container.IsArray() {
-			var ht *types.HashTable
+			var ht *types.Array
 		unset_dim_array:
 			types.SEPARATE_ARRAY(container)
 			ht = container.GetArr()
@@ -35968,7 +35968,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 	container = EX_VAR(opline.GetOp1().GetVar())
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -36064,7 +36064,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var opline *ZendOp = executeData.GetOpline()
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = EX_VAR(opline.GetOp1().GetVar())
 	subject = RT_CONSTANT(opline, opline.GetOp2())
@@ -36367,7 +36367,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
-	var ht *types.HashTable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	var result *types.Zval
 	op1 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if op1.IsString() {
@@ -36386,7 +36386,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var result_tmp types.Zval
 		var val *types.Zval
 		result = nil
-		var __ht *types.HashTable = ht
+		var __ht *types.Array = ht
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -36410,7 +36410,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 	var dim *types.Zval
 	var value *types.Zval
 	var offset ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	container = EX_VAR(opline.GetOp1().GetVar())
 	dim = RT_CONSTANT(opline, opline.GetOp2())
 	if container.IsArray() {
@@ -36454,7 +36454,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CV_TMPVARCV_HANDLER(executeData *ZendExecuteDat
 	var dim *types.Zval
 	var value *types.Zval
 	var offset ZendLong
-	var ht *types.HashTable
+	var ht *types.Array
 	container = EX_VAR(opline.GetOp1().GetVar())
 	dim = EX_VAR(opline.GetOp2().GetVar())
 	if container.IsArray() {
@@ -38931,7 +38931,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	for {
 		if container.IsArray() {
-			var ht *types.HashTable
+			var ht *types.Array
 		unset_dim_array:
 			types.SEPARATE_ARRAY(container)
 			ht = container.GetArr()
@@ -39044,7 +39044,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 	container = EX_VAR(opline.GetOp1().GetVar())
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -39145,7 +39145,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var free_op2 ZendFreeOp
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = EX_VAR(opline.GetOp1().GetVar())
 	subject = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
@@ -39752,7 +39752,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	var retval *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = EX_VAR(opline.GetOp1().GetVar())
 	if IS_CV == IS_CONST {
 		name = varname.GetStr()
@@ -40442,7 +40442,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = EX_VAR(opline.GetOp1().GetVar())
 	if IS_CV == IS_CONST {
 		name = varname.GetStr()
@@ -40500,7 +40500,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	var varname *types.Zval
 	var name *types.String
 	var tmp_name *types.String
-	var target_symbol_table *types.HashTable
+	var target_symbol_table *types.Array
 	varname = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
 	if IS_CV == IS_CONST {
 		name = varname.GetStr()
@@ -40729,7 +40729,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var ht *types.HashTable
+	var ht *types.Array
 	var value *types.Zval
 	var variable_ptr *types.Zval
 	variable_ptr = EX_VAR(opline.GetOp1().GetVar())
@@ -43358,7 +43358,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	offset = EX_VAR(opline.GetOp2().GetVar())
 	for {
 		if container.IsArray() {
-			var ht *types.HashTable
+			var ht *types.Array
 		unset_dim_array:
 			types.SEPARATE_ARRAY(container)
 			ht = container.GetArr()
@@ -43467,7 +43467,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 	container = EX_VAR(opline.GetOp1().GetVar())
 	offset = EX_VAR(opline.GetOp2().GetVar())
 	if container.IsArray() {
-		var ht *types.HashTable
+		var ht *types.Array
 		var value *types.Zval
 		var str *types.String
 	isset_dim_obj_array:
@@ -43563,7 +43563,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	var opline *ZendOp = executeData.GetOpline()
 	var key *types.Zval
 	var subject *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var result uint32
 	key = EX_VAR(opline.GetOp1().GetVar())
 	subject = EX_VAR(opline.GetOp2().GetVar())

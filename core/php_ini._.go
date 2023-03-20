@@ -20,7 +20,7 @@ const PHP_INI_STAGE_HTACCESS = zend.ZEND_INI_STAGE_HTACCESS
 const PhpIniColorDisplayerCb = zend.ZendIniColorDisplayerCb
 
 var IsSpecialSection int = 0
-var ActiveIniHash *types.HashTable
+var ActiveIniHash *types.Array
 var HasPerDirConfig int = 0
 var HasPerHostConfig int = 0
 var PhpIniOpenedPath *byte = nil

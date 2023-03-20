@@ -87,12 +87,12 @@ type SapiGlobals struct {
 	global_stat              zend.ZendStatT
 	default_mimetype         *byte
 	default_charset          *byte
-	rfc1867_uploaded_files   *types.HashTable
+	rfc1867_uploaded_files   *types.Array
 	post_max_size            zend.ZendLong
 	options                  int
 	sapi_started             types.ZendBool
 	global_request_time      float64
-	known_post_content_types types.HashTable
+	known_post_content_types types.Array
 	callback_func            types.Zval
 	fci_cache                types.ZendFcallInfoCache
 }
@@ -112,7 +112,7 @@ func (this *SapiGlobals) Destroy() {
 func (this *SapiGlobals) GetDefaultMimetype() *byte     { return this.default_mimetype }
 func (this *SapiGlobals) GetDefaultCharset() *byte      { return this.default_charset }
 func (this *SapiGlobals) GetPostMaxSize() zend.ZendLong { return this.post_max_size }
-func (this *SapiGlobals) GetKnownPostContentTypes() types.HashTable {
+func (this *SapiGlobals) GetKnownPostContentTypes() types.Array {
 	return this.known_post_content_types
 }
 

@@ -114,7 +114,7 @@ func FreeFilename(el *types.Zval) {
 }
 func DestroyUploadedFilesHash() {
 	var el *types.Zval
-	var __ht *types.HashTable = SG__().rfc1867_uploaded_files
+	var __ht *types.Array = SG__().rfc1867_uploaded_files
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -531,7 +531,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	var skip_upload int = 0
 	var anonindex int = 0
 	var is_anonymous int
-	var uploaded_files *types.HashTable = nil
+	var uploaded_files *types.Array = nil
 	var mbuff *MultipartBuffer
 	var array_ptr *types.Zval = (*types.Zval)(arg)
 	var fd int = -1

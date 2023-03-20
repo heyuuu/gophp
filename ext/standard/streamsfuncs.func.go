@@ -555,14 +555,14 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *types
 	}
 }
 func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var stream_xport_hash *types.HashTable
+	var stream_xport_hash *types.Array
 	var stream_xport *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
 		zend.ArrayInit(return_value)
-		var __ht *types.HashTable = stream_xport_hash
+		var __ht *types.Array = stream_xport_hash
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -575,14 +575,14 @@ func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *typ
 	}
 }
 func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var url_stream_wrappers_hash *types.HashTable
+	var url_stream_wrappers_hash *types.Array
 	var stream_protocol *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	if b.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
 		zend.ArrayInit(return_value)
-		var __ht *types.HashTable = url_stream_wrappers_hash
+		var __ht *types.Array = url_stream_wrappers_hash
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -603,7 +603,7 @@ func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpS
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	var __ht *types.HashTable = stream_array.GetArr()
+	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -650,7 +650,7 @@ func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpS
 func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	var elem *types.Zval
 	var dest_elem *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var stream *core.PhpStream
 	var ret int = 0
 	var key *types.String
@@ -659,7 +659,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 		return 0
 	}
 	ht = types.ZendNewArray(types.Z_ARRVAL_P(stream_array).GetNNumOfElements())
-	var __ht *types.HashTable = stream_array.GetArr()
+	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -709,7 +709,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	var elem *types.Zval
 	var dest_elem *types.Zval
-	var ht *types.HashTable
+	var ht *types.Array
 	var stream *core.PhpStream
 	var ret int = 0
 	var num_ind zend.ZendUlong
@@ -718,7 +718,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 		return 0
 	}
 	ht = types.ZendNewArray(types.Z_ARRVAL_P(stream_array).GetNNumOfElements())
-	var __ht *types.HashTable = stream_array.GetArr()
+	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -930,7 +930,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 	var wkey *types.String
 	var okey *types.String
 	var ret int = types.SUCCESS
-	var __ht *types.HashTable = options.GetArr()
+	var __ht *types.Array = options.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -938,7 +938,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 		wval = _z
 		wval = types.ZVAL_DEREF(wval)
 		if wkey != nil && wval.IsType(types.IS_ARRAY) {
-			var __ht *types.HashTable = wval.GetArr()
+			var __ht *types.Array = wval.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

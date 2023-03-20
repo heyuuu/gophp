@@ -42,7 +42,7 @@ func PhpOutputHeader() {
 	}
 }
 func ReverseConflictDtor(zv *types.Zval) {
-	var ht *types.HashTable = zv.GetPtr()
+	var ht *types.Array = zv.GetPtr()
 	ht.Destroy()
 }
 func PhpOutputStartup() {
@@ -300,7 +300,7 @@ func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any, dtor func(a
 	handler.SetOpaq(opaq)
 }
 func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
-	var rconflicts *types.HashTable
+	var rconflicts *types.Array
 	var conflict PhpOutputHandlerConflictCheckT
 	if PhpOutputLockError(PHP_OUTPUT_HANDLER_START) != 0 || handler == nil {
 		return types.FAILURE
@@ -311,7 +311,7 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 		}
 	}
 	if nil != b.Assign(&rconflicts, types.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
-		var __ht *types.HashTable = rconflicts
+		var __ht *types.Array = rconflicts
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -365,8 +365,8 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 	return types.SUCCESS
 }
 func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
-	var rev types.HashTable
-	var rev_ptr *types.HashTable = nil
+	var rev types.Array
+	var rev_ptr *types.Array = nil
 	if zend.EG__().GetCurrentModule() == nil {
 		faults.Error(faults.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return types.FAILURE

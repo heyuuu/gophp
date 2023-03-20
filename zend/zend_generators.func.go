@@ -346,7 +346,7 @@ func CalcGcBufferSize(generator *ZendGenerator) uint32 {
 	}
 	return size
 }
-func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.HashTable {
+func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.Array {
 	var generator *ZendGenerator = (*ZendGenerator)(object.GetObj())
 	var executeData *ZendExecuteData = generator.GetExecuteData()
 	var op_array *ZendOpArray
@@ -529,7 +529,7 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 		node.SetChildSingleChild(child)
 	} else {
 		if node.GetChildren() == 1 {
-			var ht *types.HashTable = Emalloc(b.SizeOf("HashTable"))
+			var ht *types.Array = Emalloc(b.SizeOf("HashTable"))
 			types.ZendHashInit(ht, 0, nil, nil, 0)
 			types.ZendHashIndexAddPtr(ht, ZendUlong(node.GetChildSingleLeaf()), node.GetChildSingleChild())
 			node.SetHt(ht)
@@ -541,7 +541,7 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNode, child *ZendGenerator) {
 	var leaf ZendUlong
 	b.Assert(src.GetChildren() > 1)
-	var __ht *types.HashTable = src.GetHt()
+	var __ht *types.Array = src.GetHt()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -681,7 +681,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 	var value *types.Zval
 	if generator.GetValues().IsArray() {
-		var ht *types.HashTable = generator.GetValues().GetArr()
+		var ht *types.Array = generator.GetValues().GetArr()
 		var pos types.HashPosition = generator.GetValues().GetFePos()
 		var p *types.Bucket
 		for {

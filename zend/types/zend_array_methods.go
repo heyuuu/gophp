@@ -7,7 +7,7 @@ import (
 	"sort"
 )
 
-func (this *HashTable) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
+func (this *Array) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
 	this.assertRc1()
 
 	if this.nNumOfElements == 0 || (this.nNumOfElements == 1 && !renumber) {
@@ -31,7 +31,7 @@ func (this *HashTable) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber b
 	this.Rehash()
 }
 
-func (this *HashTable) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
+func (this *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
 	this.Sort(func(a *Bucket, b *Bucket) bool {
 		var compareResult = comparer(a, b)
 		return compareResult > 0
@@ -39,7 +39,7 @@ func (this *HashTable) SortCompatible(comparer CompareFuncT, renumber ZendBool) 
 	return SUCCESS
 }
 
-func (this *HashTable) SortCompatibleEx(sort_ SortFuncT) int {
+func (this *Array) SortCompatibleEx(sort_ SortFuncT) int {
 	// todo sort 转 sortFunc 需要订制处理
 	var sortFunc = *b.Cast[func([]Bucket)](&sort_)
 
@@ -62,7 +62,7 @@ func (this *HashTable) SortCompatibleEx(sort_ SortFuncT) int {
 
 // ---
 
-func (this *HashTable) posBucket(p *Bucket) (uint32, bool) {
+func (this *Array) posBucket(p *Bucket) (uint32, bool) {
 	if p.IsStrKey() {
 		if pos, ok := this.keyMap[p.StrKey()]; ok {
 			return pos, true
@@ -76,7 +76,7 @@ func (this *HashTable) posBucket(p *Bucket) (uint32, bool) {
 	}
 }
 
-func (this *HashTable) SetBucketKey(b *Bucket, key string) *Zval {
+func (this *Array) SetBucketKey(b *Bucket, key string) *Zval {
 	this.assertRc1()
 
 	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
@@ -105,7 +105,7 @@ func (this *HashTable) SetBucketKey(b *Bucket, key string) *Zval {
 	return b.GetVal()
 }
 
-func (this *Array) addHash(key ZendArrayKey, pos uint32) {
+func (this *Array) addHash(key ArrayKey, pos uint32) {
 	if key.IsStrKey() {
 		this.keyMap[key.GetKey()] = pos
 	} else {
@@ -113,7 +113,7 @@ func (this *Array) addHash(key ZendArrayKey, pos uint32) {
 	}
 }
 
-func (this *Array) deleteHash(key ZendArrayKey) {
+func (this *Array) deleteHash(key ArrayKey) {
 	if key.IsStrKey() {
 		delete(this.keyMap, key.GetKey())
 	} else {
@@ -121,7 +121,7 @@ func (this *Array) deleteHash(key ZendArrayKey) {
 	}
 }
 
-func (this *HashTable) eachBucket(handler func(pos uint32, p *Bucket)) {
+func (this *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
@@ -129,7 +129,7 @@ func (this *HashTable) eachBucket(handler func(pos uint32, p *Bucket)) {
 	}
 }
 
-func (this *HashTable) eachValidBucket(handler func(pos uint32, p *Bucket)) {
+func (this *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
@@ -140,7 +140,7 @@ func (this *HashTable) eachValidBucket(handler func(pos uint32, p *Bucket)) {
 	}
 }
 
-func (this *HashTable) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
+func (this *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
@@ -157,7 +157,7 @@ func (this *HashTable) eachValidBucketIndirect(handler func(pos uint32, p *Bucke
 	}
 }
 
-func (this *HashTable) applyValidBucket(apply_func func(p *Bucket) int) {
+func (this *Array) applyValidBucket(apply_func func(p *Bucket) int) {
 	var size = this.DataSize()
 	for idx := uint32(0); idx < size; idx++ {
 		var p = &this.data[idx]
@@ -173,7 +173,7 @@ func (this *HashTable) applyValidBucket(apply_func func(p *Bucket) int) {
 		}
 	}
 }
-func (this *HashTable) applyValidBucketReserve(apply_func func(p *Bucket) int) {
+func (this *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
 	for idx := this.DataSize(); idx > 0; idx-- {
 		var p = &this.data[idx-1]
 		if !p.IsValid() {
@@ -189,7 +189,7 @@ func (this *HashTable) applyValidBucketReserve(apply_func func(p *Bucket) int) {
 	}
 }
 
-func (this *HashTable) foreachData() []*Bucket {
+func (this *Array) foreachData() []*Bucket {
 	// todo 逐渐替换为 eachBucket 或其他更高效代码
 	var data = make([]*Bucket, 0)
 	this.eachValidBucket(func(_ uint32, p *Bucket) {
@@ -198,7 +198,7 @@ func (this *HashTable) foreachData() []*Bucket {
 	return data
 }
 
-func (this *HashTable) foreachDataReserve() []*Bucket {
+func (this *Array) foreachDataReserve() []*Bucket {
 	// todo 逐渐替换为 eachBucket 或其他更高效代码
 	var data = make([]*Bucket, 0)
 
@@ -214,7 +214,7 @@ func (this *HashTable) foreachDataReserve() []*Bucket {
 }
 
 // 移动 bucket 到新位置
-func (this *HashTable) _moveBucket(pos uint32, newPos uint32) {
+func (this *Array) _moveBucket(pos uint32, newPos uint32) {
 	b.Assert(newPos <= pos)
 	if newPos == pos {
 		return
@@ -226,7 +226,7 @@ func (this *HashTable) _moveBucket(pos uint32, newPos uint32) {
 }
 
 // 移除 this.data 数据中的 holes, 返回是否移动 bucket
-func (this *HashTable) removeHoles() bool {
+func (this *Array) removeHoles() bool {
 	var newPos uint32 = 0
 
 	if this.IsWithoutHoles() {
@@ -269,7 +269,7 @@ func (this *HashTable) removeHoles() bool {
 }
 
 // 移除 data 的 holes, 不考虑 nInternalPointer 和 Iterators 内的 pos 指针
-func (this *HashTable) removeHolesForce() bool {
+func (this *Array) removeHolesForce() bool {
 	var newPos uint32 = 0
 
 	if this.IsWithoutHoles() {
@@ -295,7 +295,7 @@ func (this *HashTable) removeHolesForce() bool {
 }
 
 // 清除 data 队尾无用数据
-func (this *HashTable) removeInvalidTail() {
+func (this *Array) removeInvalidTail() {
 	var dataSize = this.DataSize()
 
 	// 从队尾依次判断是否为无效数据，若是则缩短
@@ -311,7 +311,7 @@ func (this *HashTable) removeInvalidTail() {
 	}
 }
 
-func (this *HashTable) Rehash() {
+func (this *Array) Rehash() {
 	// 空数组快速清空
 	if this.nNumOfElements == 0 {
 		this.resetHash()
@@ -336,13 +336,13 @@ func (this *HashTable) Rehash() {
 	}
 }
 
-func (this *HashTable) ifFullDoResize() {
+func (this *Array) ifFullDoResize() {
 	if this.DataSize() >= this.nTableSize {
 		this.doResize()
 	}
 }
 
-func (this *HashTable) doResize() {
+func (this *Array) doResize() {
 	this.assertRc1()
 
 	if this.DataSize() > this.nNumOfElements+(this.nNumOfElements>>5) {
@@ -355,7 +355,7 @@ func (this *HashTable) doResize() {
 	}
 }
 
-func (this *HashTable) Extend(nSize uint32) {
+func (this *Array) Extend(nSize uint32) {
 	// todo remove 无需手动扩展
 	this.assertRc1()
 	if nSize > this.nTableSize {
@@ -364,7 +364,7 @@ func (this *HashTable) Extend(nSize uint32) {
 	}
 }
 
-func (this *HashTable) Discard(nNumUsed uint32) {
+func (this *Array) Discard(nNumUsed uint32) {
 	if nNumUsed < this.DataSize() {
 		// 裁剪数据，重新映射
 		this.data = this.data[:nNumUsed]
@@ -374,7 +374,7 @@ func (this *HashTable) Discard(nNumUsed uint32) {
 }
 
 // 重新计算有效元素个数(与 nnNumOfElements 不同，它考虑 IS_INDIRECT 元素为 IS_UNDEF 的情况)
-func (this *HashTable) RecalcElements() uint32 {
+func (this *Array) RecalcElements() uint32 {
 	var num uint32 = 0
 	for _, bucket := range this.data {
 		var val = bucket.GetVal()
@@ -389,7 +389,7 @@ func (this *HashTable) RecalcElements() uint32 {
 	return num
 }
 
-func (this *HashTable) Count() uint32 {
+func (this *Array) Count() uint32 {
 	var num uint32
 	if this.HasUFlags(HASH_FLAG_HAS_EMPTY_IND) {
 		num = this.RecalcElements()
@@ -404,21 +404,21 @@ func (this *HashTable) Count() uint32 {
 	return num
 }
 
-func (this *HashTable) currentPos() (uint32, bool) {
+func (this *Array) currentPos() (uint32, bool) {
 	return this.validPos(this.nInternalPointer)
 }
 
-func (this *HashTable) currentPosVal() uint32 {
+func (this *Array) currentPosVal() uint32 {
 	var pos, _ = this.currentPos()
 	return pos
 }
 
-func (this *HashTable) validPosVal(pos uint32) uint32 {
+func (this *Array) validPosVal(pos uint32) uint32 {
 	pos, _ = this.validPos(pos)
 	return pos
 }
 
-func (this *HashTable) validPos(pos uint32) (uint32, bool) {
+func (this *Array) validPos(pos uint32) (uint32, bool) {
 	var dataSize = this.DataSize()
 	for ; pos < dataSize; pos++ {
 		if this.IsValidPos(pos) {
@@ -429,7 +429,7 @@ func (this *HashTable) validPos(pos uint32) (uint32, bool) {
 	return pos, false
 }
 
-func (this *HashTable) IsValidPos(pos uint32) bool {
+func (this *Array) IsValidPos(pos uint32) bool {
 	b.Assert(pos < this.DataSize())
 	return !this.data[pos].GetVal().IsType(IS_UNDEF)
 }

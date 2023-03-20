@@ -203,7 +203,7 @@ func PhpStreamOpenWrapperEx(path string, mode string, options int, opened **type
 func PhpStreamMakeSeekable(origstream *PhpStream, newstream **PhpStream, flags int) int {
 	return _phpStreamMakeSeekable(origstream, newstream, flags)
 }
-func PhpStreamGetUrlStreamWrappersHash() *types.HashTable {
+func PhpStreamGetUrlStreamWrappersHash() *types.Array {
 	return _phpStreamGetUrlStreamWrappersHash()
 }
-func PhpGetStreamFiltersHash() *types.HashTable { return _phpGetStreamFiltersHash() }
+func PhpGetStreamFiltersHash() *types.Array { return _phpGetStreamFiltersHash() }

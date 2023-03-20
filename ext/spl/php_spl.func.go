@@ -370,7 +370,7 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 		zend.ZvalPtrDtor(&retval)
 	}
 }
-func HT_MOVE_TAIL_TO_HEAD(ht *types.HashTable) {
+func HT_MOVE_TAIL_TO_HEAD(ht *types.Array) {
 	var tmp types.Bucket = ht.GetArData()[ht.GetNNumUsed()-1]
 	memmove(ht.GetArData()+1, ht.GetArData(), b.SizeOf("Bucket")*(ht.GetNNumUsed()-1))
 	ht.GetArData()[0] = tmp
@@ -661,7 +661,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 	if zend.EG__().GetAutoloadFunc() == fptr {
 		var key *types.String
 		zend.ArrayInit(return_value)
-		var __ht *types.HashTable = SPL_G(autoload_functions)
+		var __ht *types.Array = SPL_G(autoload_functions)
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -804,7 +804,7 @@ func ZmInfoSpl(zend_module *zend.ZendModuleEntry) {
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, 1, zend.ZEND_ACC_INTERFACE)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
-	var __ht *types.HashTable = list.GetArr()
+	var __ht *types.Array = list.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -871,7 +871,7 @@ func ZmInfoSpl(zend_module *zend.ZendModuleEntry) {
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, -1, zend.ZEND_ACC_INTERFACE)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
-	var __ht__1 *types.HashTable = list.GetArr()
+	var __ht__1 *types.Array = list.GetArr()
 	for _, _p := range __ht__1.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

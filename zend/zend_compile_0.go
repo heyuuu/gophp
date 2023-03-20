@@ -637,7 +637,7 @@ func ZendPrefixWithNs(name *types.String) *types.String {
 		return name.Copy()
 	}
 }
-func ZendHashFindPtrLc(ht *types.HashTable, str *byte, len_ int) any {
+func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 	var result any
 	var lcname *types.String
 	types.ZSTR_ALLOCA_ALLOC(lcname, len_)
@@ -646,7 +646,7 @@ func ZendHashFindPtrLc(ht *types.HashTable, str *byte, len_ int) any {
 	lcname.Free()
 	return result
 }
-func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.HashTable) *types.String {
+func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.Array) *types.String {
 	var compound *byte
 	*is_fully_qualified = 0
 	if name.GetVal()[0] == '\\' {

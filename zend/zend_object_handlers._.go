@@ -85,8 +85,8 @@ type ZendObjectUnsetDimensionT func(object *types.Zval, offset *types.Zval)
 
 /* Used to get hash of the properties of the object, as hash of zval's */
 
-type ZendObjectGetPropertiesT func(object *types.Zval) *types.HashTable
-type ZendObjectGetDebugInfoT func(object *types.Zval, is_temp *int) *types.HashTable
+type ZendObjectGetPropertiesT func(object *types.Zval) *types.Array
+type ZendObjectGetDebugInfoT func(object *types.Zval, is_temp *int) *types.Array
 type ZendPropPurpose = int
 
 const (
@@ -133,7 +133,7 @@ type ZendObjectCastT func(readobj *types.Zval, retval *types.Zval, type_ int) in
 
 type ZendObjectCountElementsT func(object *types.Zval, count *ZendLong) int
 type ZendObjectGetClosureT func(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int
-type ZendObjectGetGcT func(object *types.Zval, table **types.Zval, n *int) *types.HashTable
+type ZendObjectGetGcT func(object *types.Zval, table **types.Zval, n *int) *types.Array
 type ZendObjectDoOperationT func(opcode types.ZendUchar, result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 
 const ZEND_PROPERTY_ISSET = 0x0

@@ -602,11 +602,11 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var ok types.ZendBool = 1
 		var val *types.Zval
 		var tmp types.Zval
-		var src *types.HashTable = array.GetConstant().GetArr()
-		var dst *types.HashTable = types.ZendNewArray(src.GetNNumOfElements())
+		var src *types.Array = array.GetConstant().GetArr()
+		var dst *types.Array = types.ZendNewArray(src.GetNNumOfElements())
 		tmp.SetTrue()
 		if strict != 0 {
-			var __ht *types.HashTable = src
+			var __ht *types.Array = src
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -622,7 +622,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				}
 			}
 		} else {
-			var __ht *types.HashTable = src
+			var __ht *types.Array = src
 			for _, _p := range __ht.foreachData() {
 				var _z *types.Zval = _p.GetVal()
 

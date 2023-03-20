@@ -707,7 +707,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *types.HashTable = args.GetArr()
+		var __ht *types.Array = args.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -749,7 +749,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *types.HashTable = p_longopts.GetArr()
+		var __ht *types.Array = p_longopts.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -1045,11 +1045,11 @@ func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retv
 		retval.GetArr().KeyUpdate(key.GetStr(), &tmp)
 	}
 }
-func AddConfigEntries(hash *types.HashTable, return_value *types.Zval) {
+func AddConfigEntries(hash *types.Array, return_value *types.Zval) {
 	var h zend.ZendUlong
 	var key *types.String
 	var zv *types.Zval
-	var __ht *types.HashTable = hash
+	var __ht *types.Array = hash
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -1741,7 +1741,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		module_number = module.GetModuleNumber()
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types.HashTable = zend.EG__().GetIniDirectives()
+	var __ht *types.Array = zend.EG__().GetIniDirectives()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

@@ -68,9 +68,9 @@ type PhpFileGlobals struct {
 	from_address                 *byte
 	user_stream_current_filename *byte
 	default_context              *core.PhpStreamContext
-	stream_wrappers              *types.HashTable
-	stream_filters               *types.HashTable
-	wrapper_errors               *types.HashTable
+	stream_wrappers              *types.Array
+	stream_filters               *types.Array
+	wrapper_errors               *types.Array
 	pclose_wait                  int
 }
 

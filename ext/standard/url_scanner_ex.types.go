@@ -25,7 +25,7 @@ type UrlAdaptStateExT struct {
 	attr_val    zend.SmartStr
 	tag_type    int
 	attr_type   int
-	tags        *types.HashTable
+	tags        *types.Array
 }
 
 //             func MakeUrlAdaptStateExT(
@@ -97,9 +97,9 @@ func (this *UrlAdaptStateExT) GetType() int       { return this.type_ }
 func (this *UrlAdaptStateExT) GetAttrVal() zend.SmartStr { return this.attr_val }
 
 // func (this *UrlAdaptStateExT) SetAttrVal(value zend.SmartStr) { this.attr_val = value }
-func (this *UrlAdaptStateExT) GetTagType() int                { return this.tag_type }
-func (this *UrlAdaptStateExT) SetTagType(value int)           { this.tag_type = value }
-func (this *UrlAdaptStateExT) GetAttrType() int               { return this.attr_type }
-func (this *UrlAdaptStateExT) SetAttrType(value int)          { this.attr_type = value }
-func (this *UrlAdaptStateExT) GetTags() *types.HashTable      { return this.tags }
-func (this *UrlAdaptStateExT) SetTags(value *types.HashTable) { this.tags = value }
+func (this *UrlAdaptStateExT) GetTagType() int            { return this.tag_type }
+func (this *UrlAdaptStateExT) SetTagType(value int)       { this.tag_type = value }
+func (this *UrlAdaptStateExT) GetAttrType() int           { return this.attr_type }
+func (this *UrlAdaptStateExT) SetAttrType(value int)      { this.attr_type = value }
+func (this *UrlAdaptStateExT) GetTags() *types.Array      { return this.tags }
+func (this *UrlAdaptStateExT) SetTags(value *types.Array) { this.tags = value }

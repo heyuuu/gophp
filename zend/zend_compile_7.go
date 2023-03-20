@@ -8,7 +8,7 @@ import (
 	"sik/zend/types"
 )
 
-func ZendGetImportHt(type_ uint32) *types.HashTable {
+func ZendGetImportHt(type_ uint32) *types.Array {
 	switch type_ {
 	case ZEND_SYMBOL_CLASS:
 		if FC__().GetImports() == nil {
@@ -57,7 +57,7 @@ func ZendCompileUse(ast *ZendAst) {
 	var i uint32
 	var current_ns *types.String = FC__().GetCurrentNamespace()
 	var type_ uint32 = ast.GetAttr()
-	var current_import *types.HashTable = ZendGetImportHt(type_)
+	var current_import *types.Array = ZendGetImportHt(type_)
 	var case_sensitive types.ZendBool = type_ == ZEND_SYMBOL_CONST
 	for i = 0; i < list.GetChildren(); i++ {
 		var use_ast *ZendAst = list.GetChild()[i]
@@ -435,10 +435,10 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 		var value *types.Zval = ZendAstGetZval(value_ast)
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {
 			if value.IsArray() {
-				var ht *types.HashTable = value.GetArr()
+				var ht *types.Array = value.GetArr()
 				var val *types.Zval
 				var key *types.String
-				var __ht *types.HashTable = ht
+				var __ht *types.Array = ht
 				for _, _p := range __ht.foreachData() {
 					var _z *types.Zval = _p.GetVal()
 

@@ -112,7 +112,7 @@ func SplObjectStorageDetach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 }
 func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *types.Zval, other *spl_SplObjectStorage) {
 	var element *spl_SplObjectStorageElement
-	var __ht *types.HashTable = other.GetStorage()
+	var __ht *types.Array = other.GetStorage()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -157,20 +157,20 @@ func SplObjectStorageClone(zobject *types.Zval) *types.ZendObject {
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
 }
-func SplObjectStorageDebugInfo(obj *types.Zval) *types.HashTable {
+func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(obj)
 	var element *spl_SplObjectStorageElement
-	var props *types.HashTable
+	var props *types.Array
 	var tmp types.Zval
 	var storage types.Zval
 	var md5str *types.String
 	var zname *types.String
-	var debug_info *types.HashTable
+	var debug_info *types.Array
 	props = types.Z_OBJPROP_P(obj)
 	debug_info = types.ZendNewArray(props.GetNNumOfElements() + 1)
 	types.ZendHashCopy(debug_info, props, types.CopyCtorFuncT(zend.ZvalAddRef))
 	zend.ArrayInit(&storage)
-	var __ht *types.HashTable = intern.GetStorage()
+	var __ht *types.Array = intern.GetStorage()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -192,7 +192,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.HashTable {
 	types.ZendStringReleaseEx(zname, 0)
 	return debug_info
 }
-func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.HashTable {
+func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array {
 	var i int = 0
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(obj)
 	var element *spl_SplObjectStorageElement
@@ -200,7 +200,7 @@ func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.H
 		intern.SetGcdataNum(intern.GetStorage().GetNNumOfElements() * 2)
 		intern.SetGcdata((*types.Zval)(zend.Erealloc(intern.GetGcdata(), b.SizeOf("zval")*intern.GetGcdataNum())))
 	}
-	var __ht *types.HashTable = intern.GetStorage()
+	var __ht *types.Array = intern.GetStorage()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -334,7 +334,7 @@ func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData,
 		return
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
-	var __ht *types.HashTable = intern.GetStorage()
+	var __ht *types.Array = intern.GetStorage()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -626,7 +626,7 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 	/* storage */
 
 	zend.ArrayInitSize(&tmp, 2*intern.GetStorage().GetNNumOfElements())
-	var __ht *types.HashTable = intern.GetStorage()
+	var __ht *types.Array = intern.GetStorage()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -646,7 +646,7 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 }
 func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
-	var data *types.HashTable
+	var data *types.Array
 	var storage_zv *types.Zval
 	var members_zv *types.Zval
 	var key *types.Zval
@@ -665,7 +665,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 		return
 	}
 	key = nil
-	var __ht *types.HashTable = storage_zv.GetArr()
+	var __ht *types.Array = storage_zv.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 

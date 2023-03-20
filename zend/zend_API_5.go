@@ -58,7 +58,7 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect extensions with request startup/shutdown handlers */
 
-	var __ht *types.HashTable = &ModuleRegistry
+	var __ht *types.Array = &ModuleRegistry
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -80,7 +80,7 @@ func ZendCollectModuleHandlers() {
 	ModulePostDeactivateHandlers = ModuleRequestShutdownHandlers + shutdown_count + 1
 	ModulePostDeactivateHandlers[post_deactivate_count] = nil
 	startup_count = 0
-	var __ht__1 *types.HashTable = &ModuleRegistry
+	var __ht__1 *types.Array = &ModuleRegistry
 	for _, _p := range __ht__1.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -98,7 +98,7 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect internal classes with static members */
 
-	var __ht__2 *types.HashTable = CG__().GetClassTable()
+	var __ht__2 *types.Array = CG__().GetClassTable()
 	for _, _p := range __ht__2.foreachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -110,7 +110,7 @@ func ZendCollectModuleHandlers() {
 	ClassCleanupHandlers = (**types.ClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
-		var __ht *types.HashTable = CG__().GetClassTable()
+		var __ht *types.Array = CG__().GetClassTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -247,11 +247,11 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *ZendFunction
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctionEntry, function_table *types.HashTable, type_ int) int {
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctionEntry, function_table *types.Array, type_ int) int {
 	var ptr *types.ZendFunctionEntry = functions
 	var count int = 0
 	var unload int = 0
-	var target_function_table *types.HashTable = function_table
+	var target_function_table *types.Array = function_table
 	var error_type int
 	var ctor *ZendFunction = nil
 	var dtor *ZendFunction = nil
