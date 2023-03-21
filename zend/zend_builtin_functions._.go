@@ -211,7 +211,7 @@ var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	DefZifGcEnabled,
 	DefZifGcEnable,
 	DefZifGcDisable,
-	types.MakeZendFunctionEntryEx("gc_status", 0, ZifGcStatus, ArginfoZendVoid),
+	DefZifGcStatus,
 }
 var ZendBuiltinModule ZendModuleEntry = MakeZendModuleEntry(b.SizeOf("zend_module_entry"), ZEND_MODULE_API_NO, 0, USING_ZTS, nil, nil, "Core", BuiltinFunctions, ZmStartupCore, nil, nil, nil, nil, ZEND_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+ZEND_BUILD_TS)
 

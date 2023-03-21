@@ -157,12 +157,13 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 		return
 	}
 
-	val, valIsNull, ok := ParseDouble(p.arg, checkNull, p.useWeakTypes())
+	dest, isNullBool, ok := ParseDouble(p.arg, checkNull, p.useWeakTypes())
+	isNull = types.IntBool(isNullBool)
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_DOUBLE)
 	}
 
-	return val, types.IntBool(valIsNull)
+	return
 }
 
 // @see Micro: Z_PARAM_FUNC，Old: 'f'
@@ -209,10 +210,9 @@ func (p *FastParser) ParseArrayHtEx(checkNull bool, separate bool) (dest *types.
 
 // @see Micro: Z_PARAM_ARRAY_OR_OBJECT_HT，Old: 'H'
 func (p *FastParser) ParseArrayOrObjectHt() (dest *types.Array) {
-	dest, _ = p.ParseArrayOrObjectHtEx(false, false)
-	return
+	return p.ParseArrayOrObjectHtEx(false, false)
 }
-func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest *types.Array, isNull types.ZendBool) {
+func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest *types.Array) {
 	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
@@ -288,10 +288,9 @@ func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_OBJECT_OF_CLASS，Old: 'O'
 func (p *FastParser) ParseObjectOfClass(ce *types.ClassEntry) (dest *types.Zval) {
-	dest, _ = p.ParseObjectOfClassEx(ce, false)
-	return
+	return p.ParseObjectOfClassEx(ce, false)
 }
-func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool) (dest *types.Zval, isNull types.ZendBool) {
+func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool) (dest *types.Zval) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
@@ -310,16 +309,16 @@ func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool) 
 }
 
 // @see Micro: Z_PARAM_PATH，Old: 'p'
-func (p *FastParser) ParsePath() (dest *byte, destLen int) {
+func (p *FastParser) ParsePath() (strPtr *byte, strLen int) {
 	return p.ParsePathEx(false)
 }
-func (p *FastParser) ParsePathEx(checkNull bool) (dest *byte, destLen int) {
+func (p *FastParser) ParsePathEx(checkNull bool) (strPtr *byte, strLen int) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	dest, destLen, ok := ParsePathStrPtr(p.arg, checkNull, p.useWeakTypes())
+	strPtr, strLen, ok := ParsePathStrPtr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
 	}
@@ -364,21 +363,21 @@ func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
 }
 
 // @see Micro: Z_PARAM_STRING，Old: 's'
-func (p *FastParser) ParseString() (dest *byte, destLen int) {
+func (p *FastParser) ParseString() (strPtr *byte, strLen int) {
 	return p.ParseStringEx(false)
 }
-func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
+func (p *FastParser) ParseStringEx(checkNull bool) (strPtr *byte, strLen int) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	s, l, ok := ParseStrPtr(p.arg, checkNull, p.useWeakTypes())
+	strPtr, strLen, ok := ParseStrPtr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}
 
-	return s, l
+	return
 }
 
 // 替代 ParseString, 使用 string 代替 *byte+len
@@ -414,12 +413,12 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.String) {
 		return
 	}
 
-	val, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes())
+	dest, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
 	}
 
-	return val
+	return
 }
 
 // @see Micro: Z_PARAM_ZVAL，Old: 'z'

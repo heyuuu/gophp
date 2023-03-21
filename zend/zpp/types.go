@@ -73,6 +73,7 @@ func (l *vaList) Pop() any {
 }
 
 func (l *vaList) Bool(val bool)          { PutVaArg(l, types.IntBool(val)) }
+func (l *vaList) IntBool(val int)        { PutVaArg(l, val) }
 func (l *vaList) ZendBool(val int)       { PutVaArg(l, val) }
 func (l *vaList) Long(val int)           { PutVaArg(l, val) }
 func (l *vaList) Double(val float64)     { PutVaArg(l, val) }

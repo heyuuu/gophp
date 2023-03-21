@@ -9,40 +9,43 @@ import (
  * 基于类型标识符字符串(Type Spec)的参数解析器
  */
 type TypeSpecParser struct {
-	baseParser
+	FastParser
 	typeSpec    string
 	va          []any
 	postVarargs int
 }
 
-func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) int {
-	parser := TypeSpecParseStart(numArgs, typeSpec, flags)
-	if parser == nil || parser.HasError() {
-		return types.FAILURE
-	}
-
-	ok := parser.parseVaArgs(va)
-	return types.IntBool(ok)
-}
-
-func TypeSpecParseStart(numArgs int, typeSpec string, flags int) *TypeSpecParser {
+func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) bool {
 	minNumArgs, maxNumArgs, postVarargs, ok := checkTypeSpec(typeSpec)
 	if !ok {
-		return nil
+		return false
 	}
-	executeData := currExecuteData()
 
+	executeData := currExecuteData()
+	if numArgs > executeData.NumArgs() {
+		ZendParseParametersDebugError("could not obtain parameters for parsing")
+		return false
+	}
+
+	parser := TypeSpecParseStart(numArgs, executeData, minNumArgs, maxNumArgs, postVarargs, typeSpec, flags)
+	if parser == nil || parser.HasError() {
+		return false
+	}
+
+	return parser.parseVaArgs(va)
+}
+
+func TypeSpecParseStart(numArgs int, executeData ExecuteData, minNumArgs int, maxNumArgs int, postVarargs int, typeSpec string, flags int) *TypeSpecParser {
 	p := &TypeSpecParser{
-		baseParser:  makeBaseParser(executeData, numArgs, minNumArgs, maxNumArgs, flags),
+		FastParser: FastParser{
+			baseParser: makeBaseParser(executeData, numArgs, minNumArgs, maxNumArgs, flags),
+		},
 		typeSpec:    typeSpec,
 		postVarargs: postVarargs,
 	}
 
+	// check num args
 	p.start()
-	if numArgs > executeData.NumArgs() {
-		ZendParseParametersDebugError("could not obtain parameters for parsing")
-		return nil
-	}
 
 	return p
 }
@@ -134,6 +137,10 @@ func (p *TypeSpecParser) parseVaArgs(args []any) bool {
 }
 
 func (p *TypeSpecParser) parsePrologue(deref bool, separate bool) {
+	// todo
+}
+
+func (p *TypeSpecParser) realParsePrologue(deref bool, separate bool) {
 	p.arg = p.currArg()
 	if deref {
 		p.arg = types.ZVAL_DEREF(p.arg)
@@ -146,119 +153,76 @@ func (p *TypeSpecParser) parsePrologue(deref bool, separate bool) {
 // 解析下一位参数，若有错误记录在 p.errorCode 上
 func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate bool) {
 	deref := typ != 'z' || separate
-	p.parsePrologue(deref, separate)
+	p.realParsePrologue(deref, separate)
 
 	switch typ {
-	case 'l', 'L':
-		if val, isNull, ok := ParseLong(p.arg, checkNull, typ == 'L', p.useWeakTypes()); ok {
-			va.Long(val)
-			if checkNull {
-				va.Bool(isNull)
-			}
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_LONG)
+	case 'l':
+		val, isNull := p.ParseLongEx(checkNull)
+		va.Long(val)
+		if checkNull {
+			va.IntBool(isNull)
+		}
+	case 'L':
+		val, isNull := p.ParseStrictLongEx(checkNull)
+		va.Long(val)
+		if checkNull {
+			va.IntBool(isNull)
 		}
 	case 'd':
-		if val, isNull, ok := ParseDouble(p.arg, checkNull, p.useWeakTypes()); ok {
-			va.Double(val)
-			if checkNull {
-				va.Bool(isNull)
-			}
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_DOUBLE)
+		val, isNull := p.ParseDoubleEx(checkNull)
+		va.Double(val)
+		if checkNull {
+			va.IntBool(isNull)
 		}
 	case 's':
-		if s, l, ok := ParseStrPtr(p.arg, checkNull, p.useWeakTypes()); ok {
-			va.StrPtr(s, l)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
-		}
+		strPtr, strLen := p.ParseStringEx(checkNull)
+		va.StrPtr(strPtr, strLen)
 	case 'p':
-		if s, l, ok := ParsePathStrPtr(p.arg, checkNull, p.useWeakTypes()); ok {
-			va.StrPtr(s, l)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
-		}
+		strPtr, strLen := p.ParsePathEx(checkNull)
+		va.StrPtr(strPtr, strLen)
 	case 'P':
-		if val, ok := ParsePathStr(p.arg, checkNull, p.useWeakTypes()); ok {
-			va.ZStr(val)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
-		}
+		str := p.ParsePathStrEx(checkNull)
+		va.ZStr(str)
 	case 'S':
-		if val, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes()); ok {
-			va.ZStr(val)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
-		}
+		str := p.ParseStrEx(checkNull)
+		va.ZStr(str)
 	case 'b':
-		if val, isNull, ok := ParseBool(p.arg, checkNull, p.useWeakTypes()); ok {
-			va.Bool(val)
-			if checkNull {
-				va.Bool(isNull)
-			}
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_BOOL)
+		val, isNull := p.ParseBoolEx(checkNull)
+		va.IntBool(val)
+		if checkNull {
+			va.IntBool(isNull)
 		}
 	case 'r':
-		if res, ok := ParseResource(p.arg, checkNull); ok {
-			va.Zval(res)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_RESOURCE)
-		}
-	case 'A', 'a':
-		if val, ok := ParseArray(p.arg, checkNull, typ == 'A'); ok {
-			va.Zval(val)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
-		}
-	case 'H', 'h':
-		if ht, ok := ParseArrayHt(p.arg, checkNull, typ == 'H', separate); ok {
-			va.Array(ht)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_ARRAY)
-		}
+		res := p.ParseResourceEx(checkNull)
+		va.Zval(res)
+	case 'a':
+		val := p.ParseArrayEx(checkNull, separate)
+		va.Zval(val)
+	case 'A':
+		val := p.ParseArrayOrObjectEx(checkNull, separate)
+		va.Zval(val)
+	case 'h':
+		ht := p.ParseArrayHtEx(checkNull, separate)
+		va.Array(ht)
+	case 'H':
+		ht := p.ParseArrayOrObjectHtEx(checkNull, separate)
+		va.Array(ht)
 	case 'o':
-		if obj, ok := ParseObject(p.arg, nil, checkNull); ok {
-			va.Zval(obj)
-		} else {
-			p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_OBJECT)
-		}
+		obj := p.ParseObjectEx(checkNull)
+		va.Zval(obj)
 	case 'O':
 		objPtr := va.Pop().(**types.Zval)
 		ce := va.Pop().(*types.ClassEntry)
-		if obj, ok := ParseObject(p.arg, ce, checkNull); ok {
-			*objPtr = obj
-		} else {
-			if ce != nil {
-				p.triggerError(ZPP_ERROR_WRONG_CLASS, ce.Name())
-			} else {
-				p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_OBJECT)
-			}
-		}
+		*objPtr = p.ParseObjectOfClassEx(ce, checkNull)
 	case 'C':
 		pce := va.Pop().(**types.ClassEntry)
-		baseCe := *pce
-		if ce, ok := ParseClass(p.arg, baseCe, p.idx, checkNull); ok {
-			*pce = ce
-		} else {
-			p.triggerError(ZPP_ERROR_FAILURE, "")
-		}
+		*pce = p.ParseClassEx(*pce, checkNull)
 	case 'f':
 		fci := va.Pop().(*types.ZendFcallInfo)
 		fcc := va.Pop().(*types.ZendFcallInfoCache)
-		err, ok := ParseFunc(p.arg, fci, fcc, checkNull)
-		if !ok {
-			if err != nil {
-				p.triggerError(ZPP_ERROR_WRONG_CALLBACK, *err)
-			} else {
-				p.triggerError(ZPP_ERROR_WRONG_ARG, "valid callback")
-			}
-		} else if err != nil {
-			p.triggerDeprecated(ZPP_ERROR_WRONG_CALLBACK, *err)
-		}
+		p.ParseFuncEx(fci, fcc, checkNull)
 	case 'z':
-		zv := ParseZvalDeref(p.arg, checkNull)
+		zv := p.ParseZvalDerefEx(checkNull)
 		va.Zval(zv)
 	case 'Z':
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
@@ -266,4 +230,13 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 	default:
 		p.triggerError(ZPP_ERROR_WRONG_ARG, "unknown")
 	}
+}
+
+func (p *TypeSpecParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval) {
+	p.parsePrologue(true, false)
+	if p.IsFinish() {
+		return
+	}
+
+	return ParseZvalDeref(p.arg, checkNull)
 }
