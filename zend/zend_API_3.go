@@ -15,7 +15,7 @@ func ZendParseParameters(num_args int, type_spec string, args ...any) int {
 	return types.IntBool(ret)
 }
 func ZendParseParametersThrow(num_args int, type_spec string, args ...any) int {
-	ret := zpp.ParseVaArgs(num_args, type_spec, args, zpp.ZEND_PARSE_PARAMS_THROW)
+	ret := zpp.ParseVaArgs(num_args, type_spec, args, zpp.FlagThrow)
 	return types.IntBool(ret)
 }
 func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec string, args ...any) int {

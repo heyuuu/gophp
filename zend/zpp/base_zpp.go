@@ -33,10 +33,14 @@ func (p *baseParser) currArg() *types.Zval {
 	return p.executeData.Arg(p.idx)
 }
 
-func (p *baseParser) isQuiet() bool { return p.flags&ZEND_PARSE_PARAMS_QUIET != 0 }
+func (p *baseParser) isQuiet() bool { return p.flags&FlagQuiet != 0 }
 func (p *baseParser) isThrow() bool {
-	return p.flags&ZEND_PARSE_PARAMS_THROW != 0 || p.executeData.IsArgUseStrictTypes()
+	return p.flags&FlagThrow != 0 || p.executeData.IsArgUseStrictTypes()
 }
+func (p *baseParser) isOldParser() bool {
+	return p.flags&FlagCompatible != 0
+}
+
 func (p *baseParser) useWeakTypes() bool {
 	return !p.executeData.IsArgUseStrictTypes()
 }

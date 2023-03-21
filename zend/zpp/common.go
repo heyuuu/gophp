@@ -10,7 +10,7 @@ func CheckNumArgsNoneError(executeData ExecuteData) bool {
 	return CheckNumArgs(executeData, 0, 0, 0)
 }
 func CheckNumArgsNoneException(executeData ExecuteData) bool {
-	return CheckNumArgs(executeData, 0, 0, ZEND_PARSE_PARAMS_THROW)
+	return CheckNumArgs(executeData, 0, 0, FlagThrow)
 }
 func CheckNumArgs(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) bool {
 	numArgs := executeData.NumArgs()
@@ -24,9 +24,9 @@ func CheckNumArgsEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNum
 	}
 
 	// 非 Quiet 模式下，触发 PHP Error
-	if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+	if (flags & FlagQuiet) == 0 {
 		// 判断是否强制抛出异常或为 strict 模式
-		var throwException = (flags&ZEND_PARSE_PARAMS_THROW) != 0 || executeData.IsArgUseStrictTypes()
+		var throwException = (flags&FlagThrow) != 0 || executeData.IsArgUseStrictTypes()
 
 		// 构建错误信息
 		callee := executeData.CalleeName()

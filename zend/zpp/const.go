@@ -2,8 +2,11 @@ package zpp
 
 /* Parameter parsing API -- andrei */
 
-const ZEND_PARSE_PARAMS_QUIET = 1 << 1
-const ZEND_PARSE_PARAMS_THROW = 1 << 2
+const (
+	FlagQuiet      = 1 << 1
+	FlagThrow      = 1 << 2
+	FlagCompatible = 1 << 3 // 标识兼容旧 TypeSpec 等价方式
+)
 
 /* Fast parameter parsing API */
 const (

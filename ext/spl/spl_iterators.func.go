@@ -322,7 +322,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 		var user_caching_it_flags *types.Zval = nil
 		mode = RIT_SELF_FIRST
 		flags = RTIT_BYPASS_KEY
-		if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "o|lzl", &iterator, &flags, &user_caching_it_flags, &mode) == types.SUCCESS {
+		if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "o|lzl", &iterator, &flags, &user_caching_it_flags, &mode) == types.SUCCESS {
 			if zend.InstanceofFunction(types.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(iterator, types.Z_OBJCE_P(iterator), types.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
@@ -346,7 +346,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 	default:
 		mode = RIT_LEAVES_ONLY
 		flags = 0
-		if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "o|ll", &iterator, &mode, &flags) == types.SUCCESS {
+		if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "o|ll", &iterator, &mode, &flags) == types.SUCCESS {
 			if zend.InstanceofFunction(types.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
 				zend.ZendCallMethodWith0Params(iterator, types.Z_OBJCE_P(iterator), types.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
@@ -2391,7 +2391,7 @@ func zim_spl_AppendIterator_append(executeData *zend.ZendExecuteData, return_val
 		return
 	}
 	intern = it__1
-	if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "O", &it, zend.ZendCeIterator) == types.FAILURE {
+	if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "O", &it, zend.ZendCeIterator) == types.FAILURE {
 		return
 	}
 	if intern.GetUAppendIterator().GetFuncs().GetValid()(intern.GetUAppendIterator()) == types.SUCCESS && SplDualItValid(intern) != types.SUCCESS {

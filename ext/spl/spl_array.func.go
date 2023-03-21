@@ -1098,7 +1098,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		zend.CallUserFunction(nil, &function_name, return_value, 1, params)
 		intern.GetNApplyCount()--
 	} else if use_arg == SPL_ARRAY_METHOD_MAY_USER_ARG {
-		if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|z", &arg) == types.FAILURE {
+		if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "|z", &arg) == types.FAILURE {
 			faults.ThrowException(spl_ce_BadMethodCallException, "Function expects one argument at most", 0)
 			goto exit
 		}
@@ -1109,7 +1109,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 		zend.CallUserFunction(nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
 		intern.GetNApplyCount()--
 	} else {
-		if executeData.NumArgs() != 1 || zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "z", &arg) == types.FAILURE {
+		if executeData.NumArgs() != 1 || zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "z", &arg) == types.FAILURE {
 			faults.ThrowException(spl_ce_BadMethodCallException, "Function expects exactly one argument", 0)
 			goto exit
 		}

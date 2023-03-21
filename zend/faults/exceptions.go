@@ -258,7 +258,7 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 	var argc int = executeData.NumArgs()
 	object = zend.ZEND_THIS(executeData)
 	base_ce = GetExceptionBase(object)
-	if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, argc, "|SlO!", &message, &code, &previous, ZendCeThrowable) == types.FAILURE {
+	if zend.ZendParseParametersEx(zpp.FlagQuiet, argc, "|SlO!", &message, &code, &previous, ZendCeThrowable) == types.FAILURE {
 		var ce *types.ClassEntry
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
 			ce = types.Z_OBJCE(executeData.GetThis())
@@ -313,7 +313,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	var object *types.Zval
 	var previous *types.Zval = nil
 	var argc int = executeData.NumArgs()
-	if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, argc, "|SllSlO!", &message, &code, &severity, &filename, &lineno, &previous, ZendCeThrowable) == types.FAILURE {
+	if zend.ZendParseParametersEx(zpp.FlagQuiet, argc, "|SllSlO!", &message, &code, &severity, &filename, &lineno, &previous, ZendCeThrowable) == types.FAILURE {
 		var ce *types.ClassEntry
 		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
 			ce = types.Z_OBJCE(executeData.GetThis())

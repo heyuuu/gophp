@@ -387,7 +387,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 	var alfi AutoloadFuncInfo
 	var obj_ptr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
-	if zend.ZendParseParametersEx(zpp.ZEND_PARSE_PARAMS_QUIET, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == types.FAILURE {
+	if zend.ZendParseParametersEx(zpp.FlagQuiet, executeData.NumArgs(), "|zbb", &zcallable, &do_throw, &prepend) == types.FAILURE {
 		return
 	}
 	if executeData.NumArgs() != 0 {

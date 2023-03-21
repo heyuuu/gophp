@@ -70,7 +70,7 @@ func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var size zend.ZendLong
 	var bytes *types.String
 	for {
-		var _flags int = zpp.ZEND_PARSE_PARAMS_THROW
+		var _flags int = zpp.FlagThrow
 		var _min_num_args int = 1
 		var _max_num_args int = 1
 
@@ -147,7 +147,7 @@ func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var max zend.ZendLong
 	var result zend.ZendLong
 	for {
-		var _flags int = zpp.ZEND_PARSE_PARAMS_THROW
+		var _flags int = zpp.FlagThrow
 		var _min_num_args int = 2
 		var _max_num_args int = 2
 
