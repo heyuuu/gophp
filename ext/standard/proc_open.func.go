@@ -303,7 +303,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			descriptorspec = fp.ParseArray()
 			pipes = fp.ParseZval()
 			fp.StartOptional()
-			cwd, cwd_len = fp.ParseStringEx(true)
+			cwd, cwd_len = fp.ParseStringEx(true, false)
 			environment = fp.ParseArrayEx(true, false)
 			other_options = fp.ParseArrayEx(true, false)
 			if fp.HasError() {

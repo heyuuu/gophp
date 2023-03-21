@@ -1699,7 +1699,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		for {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			extname, extname_len = fp.ParseStringEx(true)
+			extname, extname_len = fp.ParseStringEx(true, false)
 			details = fp.ParseBool()
 			if fp.HasError() {
 				return

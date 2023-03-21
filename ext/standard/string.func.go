@@ -5457,7 +5457,7 @@ func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *types.Zva
 			s2 = fp.ParseStr()
 			offset = fp.ParseLong()
 			fp.StartOptional()
-			len_, len_is_default = fp.ParseLongEx(true)
+			len_, len_is_default = fp.ParseLongEx(true, false)
 			cs = fp.ParseBool()
 			if fp.HasError() {
 				return_value.SetFalse()

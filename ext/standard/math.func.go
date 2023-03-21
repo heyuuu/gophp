@@ -1401,8 +1401,8 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *types.Zval
 			num = fp.ParseDouble()
 			fp.StartOptional()
 			dec = fp.ParseLong()
-			dec_point, dec_point_len = fp.ParseStringEx(true)
-			thousand_sep, thousand_sep_len = fp.ParseStringEx(true)
+			dec_point, dec_point_len = fp.ParseStringEx(true, false)
+			thousand_sep, thousand_sep_len = fp.ParseStringEx(true, false)
 			if fp.HasError() {
 				return
 			}

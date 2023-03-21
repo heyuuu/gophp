@@ -777,7 +777,7 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 			r_array = fp.ParseArrayEx2(true, true, false)
 			w_array = fp.ParseArrayEx2(true, true, false)
 			e_array = fp.ParseArrayEx2(true, true, false)
-			sec, secnull = fp.ParseLongEx(true)
+			sec, secnull = fp.ParseLongEx(true, false)
 			fp.StartOptional()
 			usec = fp.ParseLong()
 			if fp.HasError() {
@@ -1608,7 +1608,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 			zstream = fp.ParseResource()
 			enable = fp.ParseBool()
 			fp.StartOptional()
-			cryptokind, cryptokindnull = fp.ParseLongEx(true)
+			cryptokind, cryptokindnull = fp.ParseLongEx(true, false)
 			zsessstream = fp.ParseResource()
 			if fp.HasError() {
 				return_value.SetFalse()

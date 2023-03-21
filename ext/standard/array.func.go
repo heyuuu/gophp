@@ -4462,9 +4462,9 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		for {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			input = fp.ParseArrayHt()
-			column = fp.ParseZvalEx(true)
+			column = fp.ParseZvalEx(true, false)
 			fp.StartOptional()
-			index = fp.ParseZvalEx(true)
+			index = fp.ParseZvalEx(true, false)
 			if fp.HasError() {
 				return
 			}
@@ -6681,7 +6681,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 		for {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			fp.ParseFuncEx(&fci, &fci_cache, true)
+			fp.ParseFuncEx(&fci, &fci_cache, true, false)
 			arrays, n_arrays = fp.ParseVariadic0()
 			if fp.HasError() {
 				return

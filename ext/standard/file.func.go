@@ -361,7 +361,7 @@ func ZifFileGetContents(executeData *zend.ZendExecuteData, return_value *types.Z
 			filename, filename_len = fp.ParsePath()
 			fp.StartOptional()
 			use_include_path = fp.ParseBool()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			offset = fp.ParseLong()
 			maxlen = fp.ParseLong()
 			if fp.HasError() {
@@ -417,7 +417,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 			data = fp.ParseZval()
 			fp.StartOptional()
 			flags = fp.ParseLong()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return
 			}
@@ -568,7 +568,7 @@ func ZifFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			filename, filename_len = fp.ParsePath()
 			fp.StartOptional()
 			flags = fp.ParseLong()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return
 			}
@@ -721,7 +721,7 @@ func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			mode, mode_len = fp.ParseString()
 			fp.StartOptional()
 			use_include_path = fp.ParseBool()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return_value.SetFalse()
 				return
@@ -1265,7 +1265,7 @@ func ZifMkdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp.StartOptional()
 			mode = fp.ParseLong()
 			recursive = fp.ParseBool()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return_value.SetFalse()
 				return
@@ -1292,7 +1292,7 @@ func ZifRmdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			dir, dir_len = fp.ParsePath()
 			fp.StartOptional()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return_value.SetFalse()
 				return
@@ -1323,7 +1323,7 @@ func ZifReadfile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			filename, filename_len = fp.ParsePath()
 			fp.StartOptional()
 			use_include_path = fp.ParseBool()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return_value.SetFalse()
 				return
@@ -1418,7 +1418,7 @@ func ZifRename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			old_name, old_name_len = fp.ParsePath()
 			new_name, new_name_len = fp.ParsePath()
 			fp.StartOptional()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return_value.SetFalse()
 				return
@@ -1462,7 +1462,7 @@ func ZifUnlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			filename, filename_len = fp.ParsePath()
 			fp.StartOptional()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return_value.SetFalse()
 				return
@@ -1624,7 +1624,7 @@ func ZifCopy(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			source, source_len = fp.ParsePath()
 			target, target_len = fp.ParsePath()
 			fp.StartOptional()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return
 			}

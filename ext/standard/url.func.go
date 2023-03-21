@@ -623,7 +623,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			url, url_len = fp.ParsePath()
 			fp.StartOptional()
 			format = fp.ParseLong()
-			zcontext = fp.ParseResourceEx(true)
+			zcontext = fp.ParseResourceEx(true, false)
 			if fp.HasError() {
 				return
 			}

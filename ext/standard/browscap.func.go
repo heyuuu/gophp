@@ -544,7 +544,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		for {
 			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
 			fp.StartOptional()
-			agent_name = fp.ParseStrEx(true)
+			agent_name = fp.ParseStrEx(true, false)
 			return_array = fp.ParseBool()
 			if fp.HasError() {
 				return

@@ -5,16 +5,6 @@ import (
 	"sik/zend/types"
 )
 
-/**
- * 基于类型标识符字符串(Type Spec)的参数解析器
- */
-type TypeSpecParser struct {
-	FastParser
-	typeSpec    string
-	va          []any
-	postVarargs int
-}
-
 func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) bool {
 	minNumArgs, maxNumArgs, postVarargs, ok := checkTypeSpec(typeSpec)
 	if !ok {
@@ -27,27 +17,12 @@ func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) bool {
 		return false
 	}
 
-	parser := TypeSpecParseStart(numArgs, executeData, minNumArgs, maxNumArgs, postVarargs, typeSpec, flags)
-	if parser == nil || parser.HasError() {
+	parser := FastParseStartEx(numArgs, executeData, minNumArgs, maxNumArgs, flags|FlagOldMode)
+	if parser.HasError() {
 		return false
 	}
 
-	return parser.parseVaArgs(va)
-}
-
-func TypeSpecParseStart(numArgs int, executeData ExecuteData, minNumArgs int, maxNumArgs int, postVarargs int, typeSpec string, flags int) *TypeSpecParser {
-	p := &TypeSpecParser{
-		FastParser: FastParser{
-			baseParser: makeBaseParser(executeData, numArgs, minNumArgs, maxNumArgs, flags),
-		},
-		typeSpec:    typeSpec,
-		postVarargs: postVarargs,
-	}
-
-	// check num args
-	p.start()
-
-	return p
+	return parseVaArgs(parser, typeSpec, postVarargs, va)
 }
 
 func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs int, ok bool) {
@@ -95,16 +70,16 @@ func checkTypeSpec(typeSpec string) (minNumArgs int, maxNumArgs int, postVarargs
 	return
 }
 
-func (p *TypeSpecParser) parseVaArgs(args []any) bool {
+func parseVaArgs(p *FastParser, typeSpec string, postVarargs int, args []any) bool {
 	var varargs **types.Zval
 	var nVarargs *int
-	r := typeSpecReader{p.typeSpec}
+	r := typeSpecReader{typeSpec}
 	va := newVaList(args)
 	for p.idx = 1; p.idx <= p.numArgs; {
 		/* scan through modifiers */
 		typ, checkNull, separate := r.Next()
 		if typ == '*' || typ == '+' {
-			var numVarargs = p.numArgs - (p.idx - 1) - p.postVarargs
+			var numVarargs = p.numArgs - (p.idx - 1) - postVarargs
 
 			/* eat up the passed in storage even if it won't be filled in with varargs */
 			varargs = va.Pop().(**types.Zval)
@@ -121,7 +96,7 @@ func (p *TypeSpecParser) parseVaArgs(args []any) bool {
 				*nVarargs = 0
 			}
 		} else {
-			p.parseArg(va, typ, checkNull, separate)
+			parseArg(p, va, typ, checkNull, separate)
 			p.idx++
 
 			if p.HasError() {
@@ -136,64 +111,47 @@ func (p *TypeSpecParser) parseVaArgs(args []any) bool {
 	return true
 }
 
-func (p *TypeSpecParser) parsePrologue(deref bool, separate bool) {
-	// todo
-}
-
-func (p *TypeSpecParser) realParsePrologue(deref bool, separate bool) {
-	p.arg = p.currArg()
-	if deref {
-		p.arg = types.ZVAL_DEREF(p.arg)
-	}
-	if separate {
-		types.SEPARATE_ZVAL_NOREF(p.arg)
-	}
-}
-
 // 解析下一位参数，若有错误记录在 p.errorCode 上
-func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate bool) {
-	deref := typ != 'z' || separate
-	p.realParsePrologue(deref, separate)
-
+func parseArg(p *FastParser, va *vaList, typ byte, checkNull bool, separate bool) {
 	switch typ {
 	case 'l':
-		val, isNull := p.ParseLongEx(checkNull)
+		val, isNull := p.ParseLongEx(checkNull, separate)
 		va.Long(val)
 		if checkNull {
 			va.IntBool(isNull)
 		}
 	case 'L':
-		val, isNull := p.ParseStrictLongEx(checkNull)
+		val, isNull := p.ParseStrictLongEx(checkNull, separate)
 		va.Long(val)
 		if checkNull {
 			va.IntBool(isNull)
 		}
 	case 'd':
-		val, isNull := p.ParseDoubleEx(checkNull)
+		val, isNull := p.ParseDoubleEx(checkNull, separate)
 		va.Double(val)
 		if checkNull {
 			va.IntBool(isNull)
 		}
 	case 's':
-		strPtr, strLen := p.ParseStringEx(checkNull)
+		strPtr, strLen := p.ParseStringEx(checkNull, separate)
 		va.StrPtr(strPtr, strLen)
 	case 'p':
-		strPtr, strLen := p.ParsePathEx(checkNull)
+		strPtr, strLen := p.ParsePathEx(checkNull, separate)
 		va.StrPtr(strPtr, strLen)
 	case 'P':
-		str := p.ParsePathStrEx(checkNull)
+		str := p.ParsePathStrEx(checkNull, separate)
 		va.ZStr(str)
 	case 'S':
-		str := p.ParseStrEx(checkNull)
+		str := p.ParseStrEx(checkNull, separate)
 		va.ZStr(str)
 	case 'b':
-		val, isNull := p.ParseBoolEx(checkNull)
+		val, isNull := p.ParseBoolEx(checkNull, separate)
 		va.IntBool(val)
 		if checkNull {
 			va.IntBool(isNull)
 		}
 	case 'r':
-		res := p.ParseResourceEx(checkNull)
+		res := p.ParseResourceEx(checkNull, separate)
 		va.Zval(res)
 	case 'a':
 		val := p.ParseArrayEx(checkNull, separate)
@@ -208,21 +166,21 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 		ht := p.ParseArrayOrObjectHtEx(checkNull, separate)
 		va.Array(ht)
 	case 'o':
-		obj := p.ParseObjectEx(checkNull)
+		obj := p.ParseObjectEx(checkNull, separate)
 		va.Zval(obj)
 	case 'O':
 		objPtr := va.Pop().(**types.Zval)
 		ce := va.Pop().(*types.ClassEntry)
-		*objPtr = p.ParseObjectOfClassEx(ce, checkNull)
+		*objPtr = p.ParseObjectOfClassEx(ce, checkNull, separate)
 	case 'C':
 		pce := va.Pop().(**types.ClassEntry)
-		*pce = p.ParseClassEx(*pce, checkNull)
+		*pce = p.ParseClassEx(*pce, checkNull, separate)
 	case 'f':
 		fci := va.Pop().(*types.ZendFcallInfo)
 		fcc := va.Pop().(*types.ZendFcallInfoCache)
-		p.ParseFuncEx(fci, fcc, checkNull)
+		p.ParseFuncEx(fci, fcc, checkNull, false)
 	case 'z':
-		zv := p.ParseZvalDerefEx(checkNull)
+		zv := p.ParseZvalDerefEx(checkNull, separate)
 		va.Zval(zv)
 	case 'Z':
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
@@ -230,13 +188,4 @@ func (p *TypeSpecParser) parseArg(va *vaList, typ byte, checkNull bool, separate
 	default:
 		p.triggerError(ZPP_ERROR_WRONG_ARG, "unknown")
 	}
-}
-
-func (p *TypeSpecParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval) {
-	p.parsePrologue(true, false)
-	if p.IsFinish() {
-		return
-	}
-
-	return ParseZvalDeref(p.arg, checkNull)
 }

@@ -1349,7 +1349,7 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 			str = fp.ParseStr()
 			fp.StartOptional()
 			flags = fp.ParseLong()
-			hint_charset = fp.ParseStrEx(true)
+			hint_charset = fp.ParseStrEx(true, false)
 			double_encode = fp.ParseBool()
 			if fp.HasError() {
 				return

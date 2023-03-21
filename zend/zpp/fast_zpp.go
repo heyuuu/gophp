@@ -1,7 +1,9 @@
 package zpp
 
 import (
+	"fmt"
 	b "sik/builtin"
+	"sik/zend/faults"
 	"sik/zend/types"
 )
 
@@ -11,19 +13,38 @@ import (
  * FAST_ZPP 宏与原描述符对应表 (@see README.md):
  */
 type FastParser struct {
-	baseParser
-	optional bool
+	executeData ExecuteData
+	numArgs     int // 所需参数个数 (注意: numArgs 与 executeData.NumArgs() 不一定相等)
+	minNumArgs  int
+	maxNumArgs  int
+	flags       int
+	errorCode   int
+	finish      bool // 解析已终止 (可能是已解析完成或出现错误)
+	idx         int  // 已读取的 Arg 位置，需注意它的值是从 1 开始的，范围是 [1, numArgs]
+	arg         *types.Zval
+	optional    bool
 }
 
 // @see Micro: ZEND_PARSE_PARAMETERS_START | ZEND_PARSE_PARAMETERS_START_EX
 func FastParseStart(executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParser {
+	return FastParseStartEx(executeData.NumArgs(), executeData, minNumArgs, maxNumArgs, flags)
+}
+
+func FastParseStartEx(numArgs int, executeData ExecuteData, minNumArgs int, maxNumArgs int, flags int) *FastParser {
 	// new
 	p := &FastParser{
-		baseParser: makeBaseParser(executeData, executeData.NumArgs(), minNumArgs, maxNumArgs, flags),
+		executeData: executeData,
+		numArgs:     numArgs,
+		minNumArgs:  minNumArgs,
+		maxNumArgs:  maxNumArgs,
+		flags:       flags,
 	}
 
 	// check num args
-	p.start()
+	if !CheckNumArgsEx(p.numArgs, p.executeData, p.minNumArgs, p.maxNumArgs, p.flags) {
+		p.triggerError(ZPP_ERROR_FAILURE, "")
+		return p
+	}
 
 	return p
 }
@@ -33,11 +54,74 @@ func (p *FastParser) StartOptional() {
 	p.optional = true
 }
 
+func (p *FastParser) currArg() *types.Zval { return p.executeData.Arg(p.idx) }
+
+func (p *FastParser) isQuiet() bool { return p.flags&FlagQuiet != 0 }
+func (p *FastParser) isThrow() bool {
+	return p.flags&FlagThrow != 0 || p.executeData.IsArgUseStrictTypes()
+}
+func (p *FastParser) isOldMode() bool { return p.flags&FlagOldMode != 0 }
+
+func (p *FastParser) useWeakTypes() bool { return !p.executeData.IsArgUseStrictTypes() }
+
+func (p *FastParser) IsFinish() bool { return p.finish }
+
+func (p *FastParser) HasError() bool { return p.errorCode != ZPP_ERROR_OK }
+
+func (p *FastParser) triggerError(errorCode int, err string) {
+	// 记录错误信息
+	p.errorCode = errorCode
+	if errorCode != ZPP_ERROR_OK {
+		p.finish = true
+	}
+
+	// 若已有异常，不做error报错
+	if existException() {
+		return
+	}
+
+	// 触发错误或异常
+	if !p.isQuiet() {
+		switch errorCode {
+		case ZPP_ERROR_FAILURE:
+			// pass
+		case ZPP_ERROR_WRONG_CALLBACK:
+			message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.executeData.CalleeName(), p.idx, err)
+			faults.InternalTypeErrorEx(p.isThrow(), message)
+		case ZPP_ERROR_WRONG_CLASS:
+			name := err
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, name, types.ZendZvalTypeName(p.arg))
+			faults.InternalTypeErrorEx(p.isThrow(), message)
+		case ZPP_ERROR_WRONG_ARG:
+			expectedType := err
+			message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", p.executeData.CalleeName(), p.idx, expectedType, types.ZendZvalTypeName(p.arg))
+			faults.InternalTypeErrorEx(p.isThrow(), message)
+		}
+	}
+}
+
+func (p *FastParser) triggerDeprecated(errorCode int, err string) {
+	switch errorCode {
+	case ZPP_ERROR_WRONG_CALLBACK:
+		message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.executeData.CalleeName(), p.idx, err)
+		faults.ErrorEx(faults.E_DEPRECATED, message)
+	}
+}
+
 // Micro: Z_PARAM_PROLOGUE
 func (p *FastParser) parsePrologue(deref bool, separate bool) {
 	if p.IsFinish() {
 		return
 	}
+
+	if p.isOldMode() {
+		p.parsePrologueOldZpp(deref, separate)
+	} else {
+		p.parsePrologueFastZpp(deref, separate)
+	}
+}
+
+func (p *FastParser) parsePrologueFastZpp(deref bool, separate bool) {
 	p.idx++
 	b.Assert(p.idx <= p.minNumArgs || p.optional)
 	b.Assert(p.idx > p.minNumArgs || !p.optional)
@@ -48,6 +132,24 @@ func (p *FastParser) parsePrologue(deref bool, separate bool) {
 		}
 	}
 
+	p.arg = p.currArg()
+	if deref {
+		p.arg = types.ZVAL_DEREF(p.arg)
+	}
+	if separate {
+		types.SEPARATE_ZVAL_NOREF(p.arg)
+	}
+
+}
+
+func (p *FastParser) parsePrologueOldZpp(deref bool, separate bool) {
+	// 在 old zpp 模式下，未强制设置 separate 时， deref 默认值是反的
+	// todo 待确认是否可优化到 Parser 外
+	if !separate {
+		deref = !deref
+	}
+
+	p.idx++
 	p.arg = p.currArg()
 	if deref {
 		p.arg = types.ZVAL_DEREF(p.arg)
@@ -100,21 +202,21 @@ func (p *FastParser) ParseArrayOrObjectEx(checkNull bool, separate bool) (dest *
 
 // @see Micro: Z_PARAM_BOOL，Old: 'b'
 func (p *FastParser) ParseBool() (dest types.ZendBool) {
-	dest, _ = p.ParseBoolEx(false)
+	dest, _ = p.ParseBoolEx(false, false)
 	return
 }
-func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull types.ZendBool) {
-	val, valIsNull := p.ParseBoolValEx(checkNull)
+func (p *FastParser) ParseBoolEx(checkNull bool, separate bool) (dest types.ZendBool, isNull types.ZendBool) {
+	val, valIsNull := p.ParseBoolValEx(checkNull, separate)
 	return types.IntBool(val), types.IntBool(valIsNull)
 }
 
 //
 func (p *FastParser) ParseBoolVal() (dest bool) {
-	dest, _ = p.ParseBoolValEx(false)
+	dest, _ = p.ParseBoolValEx(false, false)
 	return
 }
-func (p *FastParser) ParseBoolValEx(checkNull bool) (dest bool, isNull bool) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseBoolValEx(checkNull bool, separate bool) (dest bool, isNull bool) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -129,11 +231,11 @@ func (p *FastParser) ParseBoolValEx(checkNull bool) (dest bool, isNull bool) {
 
 // @see Micro: Z_PARAM_CLASS，Old: 'C'
 func (p *FastParser) ParseClass(baseCe *types.ClassEntry) (dest *types.ClassEntry) {
-	return p.ParseClassEx(baseCe, false)
+	return p.ParseClassEx(baseCe, false, false)
 }
 
-func (p *FastParser) ParseClassEx(baseCe *types.ClassEntry, checkNull bool) (dest *types.ClassEntry) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseClassEx(baseCe *types.ClassEntry, checkNull bool, separate bool) (dest *types.ClassEntry) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -148,11 +250,11 @@ func (p *FastParser) ParseClassEx(baseCe *types.ClassEntry, checkNull bool) (des
 
 // @see Micro: Z_PARAM_DOUBLE，Old: 'd'
 func (p *FastParser) ParseDouble() (dest float64) {
-	dest, _ = p.ParseDoubleEx(false)
+	dest, _ = p.ParseDoubleEx(false, false)
 	return
 }
-func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.ZendBool) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseDoubleEx(checkNull bool, separate bool) (dest float64, isNull types.ZendBool) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -168,10 +270,10 @@ func (p *FastParser) ParseDoubleEx(checkNull bool) (dest float64, isNull types.Z
 
 // @see Micro: Z_PARAM_FUNC，Old: 'f'
 func (p *FastParser) ParseFunc(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache) {
-	p.ParseFuncEx(fci, fcc, false)
+	p.ParseFuncEx(fci, fcc, false, false)
 }
-func (p *FastParser) ParseFuncEx(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, checkNull bool) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseFuncEx(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, checkNull bool, separate bool) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -228,11 +330,11 @@ func (p *FastParser) ParseArrayOrObjectHtEx(checkNull bool, separate bool) (dest
 
 // @see Micro: Z_PARAM_LONG，Old: 'l'
 func (p *FastParser) ParseLong() (dest int) {
-	dest, _ = p.ParseLongEx(false)
+	dest, _ = p.ParseLongEx(false, false)
 	return
 }
-func (p *FastParser) ParseLongEx(checkNull bool) (dest int, isNull types.ZendBool) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseLongEx(checkNull bool, separate bool) (dest int, isNull types.ZendBool) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -249,11 +351,11 @@ func (p *FastParser) ParseLongEx(checkNull bool) (dest int, isNull types.ZendBoo
 
 // @see Micro: Z_PARAM_STRICT_LONG，Old: 'L'
 func (p *FastParser) ParseStrictLong() (dest int) {
-	dest, _ = p.ParseStrictLongEx(false)
+	dest, _ = p.ParseStrictLongEx(false, false)
 	return
 }
-func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.ZendBool) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseStrictLongEx(checkNull bool, separate bool) (dest int, isNull types.ZendBool) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -270,10 +372,10 @@ func (p *FastParser) ParseStrictLongEx(checkNull bool) (dest int, isNull types.Z
 
 // @see Micro: Z_PARAM_OBJECT，Old: 'o'
 func (p *FastParser) ParseObject() (dest *types.Zval) {
-	return p.ParseObjectEx(false)
+	return p.ParseObjectEx(false, false)
 }
-func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseObjectEx(checkNull bool, separate bool) (dest *types.Zval) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -288,10 +390,10 @@ func (p *FastParser) ParseObjectEx(checkNull bool) (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_OBJECT_OF_CLASS，Old: 'O'
 func (p *FastParser) ParseObjectOfClass(ce *types.ClassEntry) (dest *types.Zval) {
-	return p.ParseObjectOfClassEx(ce, false)
+	return p.ParseObjectOfClassEx(ce, false, false)
 }
-func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool) (dest *types.Zval) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool, separate bool) (dest *types.Zval) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -310,10 +412,10 @@ func (p *FastParser) ParseObjectOfClassEx(ce *types.ClassEntry, checkNull bool) 
 
 // @see Micro: Z_PARAM_PATH，Old: 'p'
 func (p *FastParser) ParsePath() (strPtr *byte, strLen int) {
-	return p.ParsePathEx(false)
+	return p.ParsePathEx(false, false)
 }
-func (p *FastParser) ParsePathEx(checkNull bool) (strPtr *byte, strLen int) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParsePathEx(checkNull bool, separate bool) (strPtr *byte, strLen int) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -328,10 +430,10 @@ func (p *FastParser) ParsePathEx(checkNull bool) (strPtr *byte, strLen int) {
 
 // @see Micro: Z_PARAM_PATH_STR，Old: 'P'
 func (p *FastParser) ParsePathStr() (dest *types.String) {
-	return p.ParsePathStrEx(false)
+	return p.ParsePathStrEx(false, false)
 }
-func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.String) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParsePathStrEx(checkNull bool, separate bool) (dest *types.String) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -346,10 +448,10 @@ func (p *FastParser) ParsePathStrEx(checkNull bool) (dest *types.String) {
 
 // @see Micro: Z_PARAM_RESOURCE，Old: 'r'
 func (p *FastParser) ParseResource() (dest *types.Zval) {
-	return p.ParseResourceEx(false)
+	return p.ParseResourceEx(false, false)
 }
-func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseResourceEx(checkNull bool, separate bool) (dest *types.Zval) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -364,10 +466,10 @@ func (p *FastParser) ParseResourceEx(checkNull bool) (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_STRING，Old: 's'
 func (p *FastParser) ParseString() (strPtr *byte, strLen int) {
-	return p.ParseStringEx(false)
+	return p.ParseStringEx(false, false)
 }
-func (p *FastParser) ParseStringEx(checkNull bool) (strPtr *byte, strLen int) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseStringEx(checkNull bool, separate bool) (strPtr *byte, strLen int) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -382,11 +484,11 @@ func (p *FastParser) ParseStringEx(checkNull bool) (strPtr *byte, strLen int) {
 
 // 替代 ParseString, 使用 string 代替 *byte+len
 func (p *FastParser) ParseStringVal() (dest string) {
-	dest, _ = p.ParseStringValEx(false)
+	dest, _ = p.ParseStringValEx(false, false)
 	return
 }
-func (p *FastParser) ParseStringValEx(checkNull bool) (dest string, isNull bool) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseStringValEx(checkNull bool, separate bool) (dest string, isNull bool) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -405,10 +507,10 @@ func (p *FastParser) ParseStringValEx(checkNull bool) (dest string, isNull bool)
 
 // @see Micro: Z_PARAM_STR，Old: 'S'
 func (p *FastParser) ParseStr() (dest *types.String) {
-	return p.ParseStrEx(false)
+	return p.ParseStrEx(false, false)
 }
-func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.String) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseStrEx(checkNull bool, separate bool) (dest *types.String) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -423,10 +525,10 @@ func (p *FastParser) ParseStrEx(checkNull bool) (dest *types.String) {
 
 // @see Micro: Z_PARAM_ZVAL，Old: 'z'
 func (p *FastParser) ParseZval() (dest *types.Zval) {
-	return p.ParseZvalEx(false)
+	return p.ParseZvalEx(false, false)
 }
-func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval) {
-	p.parsePrologue(false, false)
+func (p *FastParser) ParseZvalEx(checkNull bool, separate bool) (dest *types.Zval) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
@@ -436,10 +538,10 @@ func (p *FastParser) ParseZvalEx(checkNull bool) (dest *types.Zval) {
 
 // @see Micro: Z_PARAM_ZVAL_DEREF, Old: ""
 func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
-	return p.ParseZvalDerefEx(false)
+	return p.ParseZvalDerefEx(false, false)
 }
-func (p *FastParser) ParseZvalDerefEx(checkNull bool) (dest *types.Zval) {
-	p.parsePrologue(true, false)
+func (p *FastParser) ParseZvalDerefEx(checkNull bool, separate bool) (dest *types.Zval) {
+	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
 		return
 	}
