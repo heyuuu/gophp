@@ -62,9 +62,9 @@ func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 	return ex.NumArgs()
 }
 
-func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet) {
+//@zif -t "l"
+func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet, requested_offset int) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	requested_offset := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}

@@ -1,7 +1,6 @@
 package zif
 
 import (
-	"go/ast"
 	"strconv"
 )
 
@@ -11,11 +10,7 @@ type ZifInfo struct {
 	name          string
 	minNumArgs    int
 	maxNumArgs    int
-	useArgNames   bool
-	argNames      []string
 	argInfos      []ArgInfo
-	argNeedEx     bool
-	argNeedRet    bool
 	returnArgInfo *ArgInfo
 	strict        bool
 }
@@ -24,6 +19,17 @@ type ArgInfo struct {
 	name       string
 	typ        ZppType
 	isVariadic bool
+}
+
+const zifAnnoName = "@zif"
+
+type zifAnnoFlags struct {
+	name       string
+	strNumArgs string
+	minNumArgs int
+	maxNumArgs int
+	strict     bool
+	typeSpec   string
 }
 
 type ZppType int
@@ -42,11 +48,12 @@ const (
 	// special
 	ZppTypeEx
 	ZppTypeRet
+	ZppTypeOpt
+	ZppTypeVariadic
 )
 
-func toZppType(typ ast.Expr) (zpp ZppType, ok bool) {
-	typName := printNode(typ)
-	switch typName {
+func toZppType(typ string) (ZppType, bool) {
+	switch typ {
 	case "bool":
 		return ZppTypeBool, true
 	case "int":
@@ -66,7 +73,34 @@ func toZppType(typ ast.Expr) (zpp ZppType, ok bool) {
 		return ZppTypeEx, true
 	case "zpp.DefRet":
 		return ZppTypeRet, true
+	case "Zpp.DefOpt":
+		return ZppTypeOpt, true
+	case "[]*type.Zval":
+		return ZppTypeVariadic, true
 	default:
 		return 0, false
+	}
+}
+
+func toZppParseMethod(typ ZppType) (string, bool) {
+	switch typ {
+	case ZppTypeBool:
+		return "ParseBoolVal", true
+	case ZppTypeLong:
+		return "ParseLong", true
+	case ZppTypeDouble:
+		return "ParseDouble", true
+	case ZppTypeString:
+		return "ParseStringVal", true
+	case ZppTypeZendBool:
+		return "ParseBool", true
+	case ZppTypeZendString:
+		return "ParseStr", true
+	case ZppTypeZendArray:
+		return "ParseArray", true
+	case ZppTypeVariadic:
+		return "ParseVariadic", true
+	default:
+		return "", false
 	}
 }

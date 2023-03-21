@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifZendVersion
-var DefZifZendVersion = DefFunc(DefFuncOpts{name: "zend_version", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifZendVersion = DefFunc(DefFuncOpts{name: "zend_version", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -15,7 +15,7 @@ var DefZifZendVersion = DefFunc(DefFuncOpts{name: "zend_version", handler: func(
 }})
 
 // generate by ZifGcMemCaches
-var DefZifGcMemCaches = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcMemCaches = DefFunc(DefFuncOpts{name: "gc_mem_caches", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -24,7 +24,7 @@ var DefZifGcMemCaches = DefFunc(DefFuncOpts{name: "gc_mem_caches", handler: func
 }})
 
 // generate by ZifGcCollectCycles
-var DefZifGcCollectCycles = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcCollectCycles = DefFunc(DefFuncOpts{name: "gc_collect_cycles", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -33,7 +33,7 @@ var DefZifGcCollectCycles = DefFunc(DefFuncOpts{name: "gc_collect_cycles", handl
 }})
 
 // generate by ZifGcEnabled
-var DefZifGcEnabled = DefFunc(DefFuncOpts{name: "gc_enabled", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcEnabled = DefFunc(DefFuncOpts{name: "gc_enabled", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -42,7 +42,7 @@ var DefZifGcEnabled = DefFunc(DefFuncOpts{name: "gc_enabled", handler: func(exec
 }})
 
 // generate by ZifGcEnable
-var DefZifGcEnable = DefFunc(DefFuncOpts{name: "gc_enable", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcEnable = DefFunc(DefFuncOpts{name: "gc_enable", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -50,7 +50,7 @@ var DefZifGcEnable = DefFunc(DefFuncOpts{name: "gc_enable", handler: func(execut
 }})
 
 // generate by ZifGcDisable
-var DefZifGcDisable = DefFunc(DefFuncOpts{name: "gc_disable", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcDisable = DefFunc(DefFuncOpts{name: "gc_disable", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -58,7 +58,7 @@ var DefZifGcDisable = DefFunc(DefFuncOpts{name: "gc_disable", handler: func(exec
 }})
 
 // generate by ZifGcStatus
-var DefZifGcStatus = DefFunc(DefFuncOpts{name: "gc_status", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcStatus = DefFunc(DefFuncOpts{name: "gc_status", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -66,7 +66,7 @@ var DefZifGcStatus = DefFunc(DefFuncOpts{name: "gc_status", handler: func(execut
 }})
 
 // generate by ZifFuncNumArgs
-var DefZifFuncNumArgs = DefFunc(DefFuncOpts{name: "func_num_args", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFuncNumArgs = DefFunc(DefFuncOpts{name: "func_num_args", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -75,9 +75,11 @@ var DefZifFuncNumArgs = DefFunc(DefFuncOpts{name: "func_num_args", handler: func
 }})
 
 // generate by ZifFuncGetArg
-var DefZifFuncGetArg = DefFunc(DefFuncOpts{name: "func_get_arg", handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	if !zpp.CheckNumArgsNoneError(executeData) {
+var DefZifFuncGetArg = DefFunc(DefFuncOpts{name: "func_get_arg", minNumArgs: 1, maxNumArgs: 1, argInfos: []ArgInfo{{name: "requested_offset"}}, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	requested_offset := fp.ParseLong()
+	if fp.HasError() {
 		return
 	}
-	ZifFuncGetArg(executeData, returnValue)
+	ZifFuncGetArg(executeData, returnValue, requested_offset)
 }})

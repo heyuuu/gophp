@@ -33,7 +33,6 @@ func BoolLit(val bool) ast.Expr {
 func StrLit(val string) *ast.BasicLit {
 	return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(val)}
 }
-
 func KeyValue(key string, value ast.Expr) *ast.KeyValueExpr {
 	return &ast.KeyValueExpr{Key: Ident(key), Value: value}
 }
@@ -48,8 +47,9 @@ func Fields(fields ...*ast.Field) *ast.FieldList {
 	return &ast.FieldList{List: fields}
 }
 
-func Type(name string) ast.Expr     { return Ident(name) }
-func RefType(typ ast.Expr) ast.Expr { return &ast.StarExpr{X: typ} }
+func Type(name string) ast.Expr       { return Ident(name) }
+func RefType(typ ast.Expr) ast.Expr   { return &ast.StarExpr{X: typ} }
+func ArrayType(typ ast.Expr) ast.Expr { return &ast.ArrayType{Elt: typ} }
 
 func Not(expr ast.Expr) ast.Expr { return &ast.UnaryExpr{Op: token.NOT, X: expr} }
 

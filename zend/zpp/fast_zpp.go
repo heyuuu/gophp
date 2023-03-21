@@ -104,17 +104,27 @@ func (p *FastParser) ParseBool() (dest types.ZendBool) {
 	return
 }
 func (p *FastParser) ParseBoolEx(checkNull bool) (dest types.ZendBool, isNull types.ZendBool) {
+	val, valIsNull := p.ParseBoolValEx(checkNull)
+	return types.IntBool(val), types.IntBool(valIsNull)
+}
+
+//
+func (p *FastParser) ParseBoolVal() (dest bool) {
+	dest, _ = p.ParseBoolValEx(false)
+	return
+}
+func (p *FastParser) ParseBoolValEx(checkNull bool) (dest bool, isNull bool) {
 	p.parsePrologue(false, false)
 	if p.IsFinish() {
 		return
 	}
 
-	val, valIsNull, ok := ParseBool(p.arg, checkNull, p.useWeakTypes())
+	dest, isNull, ok := ParseBool(p.arg, checkNull, p.useWeakTypes())
 	if !ok {
 		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_BOOL)
 	}
 
-	return types.IntBool(val), types.IntBool(valIsNull)
+	return
 }
 
 // @see Micro: Z_PARAM_CLASS，Old: 'C'
@@ -369,6 +379,29 @@ func (p *FastParser) ParseStringEx(checkNull bool) (dest *byte, destLen int) {
 	}
 
 	return s, l
+}
+
+// 替代 ParseString, 使用 string 代替 *byte+len
+func (p *FastParser) ParseStringVal() (dest string) {
+	dest, _ = p.ParseStringValEx(false)
+	return
+}
+func (p *FastParser) ParseStringValEx(checkNull bool) (dest string, isNull bool) {
+	p.parsePrologue(false, false)
+	if p.IsFinish() {
+		return
+	}
+
+	zs, ok := ParseZStr(p.arg, checkNull, p.useWeakTypes())
+	if !ok {
+		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_STRING)
+	}
+
+	if checkNull && zs == nil {
+		return "", true
+	} else {
+		return zs.GetStr(), false
+	}
 }
 
 // @see Micro: Z_PARAM_STR，Old: 'S'

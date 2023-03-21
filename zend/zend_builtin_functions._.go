@@ -157,7 +157,7 @@ var ArginfoExtensionLoaded []ArgInfo = []ArgInfo{
 var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	DefZifZendVersion,
 	DefZifFuncNumArgs,
-	types.MakeZendFunctionEntryEx("func_get_arg", 0, ZifFuncGetArg, ArginfoFuncGetArg),
+	DefZifFuncGetArg,
 	types.MakeZendFunctionEntryEx("func_get_args", 0, ZifFuncGetArgs, ArginfoZendVoid),
 	types.MakeZendFunctionEntryEx("strlen", 0, ZifStrlen, ArginfoStrlen),
 	types.MakeZendFunctionEntryEx("strcmp", 0, ZifStrcmp, ArginfoStrcmp),
