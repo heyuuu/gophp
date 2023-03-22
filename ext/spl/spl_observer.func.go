@@ -55,7 +55,7 @@ func SplObjectStorageGet(intern *spl_SplObjectStorage, key *types.ArrayKey) *spl
 	if key.IsStrKey() {
 		return types.ZendHashFindPtr(intern.GetStorage(), key.GetZendStringKey())
 	} else {
-		return types.ZendHashIndexFindPtr(intern.GetStorage(), uint(key.GetIndex()))
+		return types.ZendHashIndexFindPtr(intern.GetStorage(), uint(key.Index()))
 	}
 }
 func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval, inf *types.Zval) *spl_SplObjectStorageElement {
@@ -84,7 +84,7 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 	if key.IsStrKey() {
 		pelement = types.ZendHashUpdateMem(intern.GetStorage(), key.GetZendStringKey(), &element, b.SizeOf("spl_SplObjectStorageElement"))
 	} else {
-		pelement = types.ZendHashIndexUpdateMem(intern.GetStorage(), key.GetIndex(), &element, b.SizeOf("spl_SplObjectStorageElement"))
+		pelement = types.ZendHashIndexUpdateMem(intern.GetStorage(), key.Index(), &element, b.SizeOf("spl_SplObjectStorageElement"))
 	}
 	return pelement
 }
@@ -97,7 +97,7 @@ func SplObjectStorageDetach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 	if key.IsStrKey() {
 		ret = types.ZendHashDel(intern.GetStorage(), key.GetZendStringKey())
 	} else {
-		ret = types.ZendHashIndexDel(intern.GetStorage(), key.GetIndex())
+		ret = types.ZendHashIndexDel(intern.GetStorage(), key.Index())
 	}
 	return ret
 }
@@ -232,7 +232,7 @@ func SplObjectStorageContains(intern *spl_SplObjectStorage, this *types.Zval, ob
 	if key.IsStrKey() {
 		found = types.ZendHashExists(intern.GetStorage(), key.GetZendStringKey())
 	} else {
-		found = types.ZendHashIndexExists(intern.GetStorage(), key.GetIndex())
+		found = types.ZendHashIndexExists(intern.GetStorage(), key.Index())
 	}
 	return found
 }

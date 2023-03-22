@@ -16,8 +16,8 @@ type ArrayKey struct {
 
 func NewStrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
 func NewIndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
-func (this ArrayKey) GetIndex() int  { return this.index }
-func (this ArrayKey) GetKey() string { return *this.key }
+func (this ArrayKey) Index() int     { return this.index }
+func (this ArrayKey) Key() string    { return *this.key }
 func (this ArrayKey) IsStrKey() bool { return this.key != nil }
 func (this ArrayKey) GetH() zend.ZendUlong {
 	// todo remove
@@ -79,8 +79,8 @@ func (this *Bucket) SetZendKey(key ArrayKey) { this.key = key }
 
 func (this *Bucket) IsStrKey() bool   { return this.key.IsStrKey() }
 func (this *Bucket) IsIndexKey() bool { return !this.key.IsStrKey() }
-func (this *Bucket) StrKey() string   { return this.key.GetKey() }
-func (this *Bucket) IndexKey() int    { return this.key.GetIndex() }
+func (this *Bucket) StrKey() string   { return this.key.Key() }
+func (this *Bucket) IndexKey() int    { return this.key.Index() }
 func (this *Bucket) SetStrKey(key string) {
 	this.key = NewStrKey(key)
 }
@@ -512,33 +512,33 @@ func (this *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
  */
 func (this *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyAdd(key.GetKey(), pData)
+		return this.KeyAdd(key.Key(), pData)
 	} else {
-		return this.IndexAdd(key.GetIndex(), pData)
+		return this.IndexAdd(key.Index(), pData)
 	}
 }
 
 func (this *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyAddIndirect(key.GetKey(), pData)
+		return this.KeyAddIndirect(key.Key(), pData)
 	} else {
-		return this.IndexAdd(key.GetIndex(), pData)
+		return this.IndexAdd(key.Index(), pData)
 	}
 }
 
 func (this *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyUpdate(key.GetKey(), pData)
+		return this.KeyUpdate(key.Key(), pData)
 	} else {
-		return this.IndexUpdate(key.GetIndex(), pData)
+		return this.IndexUpdate(key.Index(), pData)
 	}
 }
 
 func (this *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyUpdateIndirect(key.GetKey(), pData)
+		return this.KeyUpdateIndirect(key.Key(), pData)
 	} else {
-		return this.IndexUpdate(key.GetIndex(), pData)
+		return this.IndexUpdate(key.Index(), pData)
 	}
 }
 

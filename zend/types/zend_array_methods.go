@@ -107,17 +107,17 @@ func (this *Array) SetBucketKey(b *Bucket, key string) *Zval {
 
 func (this *Array) addHash(key ArrayKey, pos uint32) {
 	if key.IsStrKey() {
-		this.keyMap[key.GetKey()] = pos
+		this.keyMap[key.Key()] = pos
 	} else {
-		this.indexMap[key.GetIndex()] = pos
+		this.indexMap[key.Index()] = pos
 	}
 }
 
 func (this *Array) deleteHash(key ArrayKey) {
 	if key.IsStrKey() {
-		delete(this.keyMap, key.GetKey())
+		delete(this.keyMap, key.Key())
 	} else {
-		delete(this.indexMap, key.GetIndex())
+		delete(this.indexMap, key.Index())
 	}
 }
 
