@@ -1618,7 +1618,7 @@ func ZendTraitsCopyFunctions(
 
 			/* Scope unset or equal to the function we compare to, and the alias applies to fn */
 
-			if alias.GetAlias() != nil && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetVal(), alias.GetTraitMethod().GetMethodName().GetLen(), fnname.GetVal(), fnname.GetLen()) == 0 {
+			if alias.GetAlias() != nil && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
 				fn_copy = *fn
 
 				/* if it is 0, no modifieres has been changed */
@@ -1666,7 +1666,7 @@ func ZendTraitsCopyFunctions(
 
 				/* Scope unset or equal to the function we compare to, and the alias applies to fn */
 
-				if alias.GetAlias() == nil && alias.GetModifiers() != 0 && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetVal(), alias.GetTraitMethod().GetMethodName().GetLen(), fnname.GetVal(), fnname.GetLen()) == 0 {
+				if alias.GetAlias() == nil && alias.GetModifiers() != 0 && (aliases[i] == nil || fn.GetScope() == aliases[i]) && alias.GetTraitMethod().GetMethodName().GetLen() == fnname.GetLen() && ZendBinaryStrcasecmp(alias.GetTraitMethod().GetMethodName().GetStr(), fnname.GetStr()) == 0 {
 					fn_copy.SetFnFlags(alias.GetModifiers() | fn.GetFnFlags() ^ fn.GetFnFlags()&ZEND_ACC_PPP_MASK)
 
 					/** Record the trait from which this alias was resolved. */
@@ -2113,7 +2113,7 @@ func ZendHasDeprecatedConstructor(ce *types.ClassEntry) types.ZendBool {
 		return 0
 	}
 	constructor_name = ce.GetConstructor().GetFunctionName()
-	return !(ZendBinaryStrcasecmp(ce.GetName().GetVal(), ce.GetName().GetLen(), constructor_name.GetVal(), constructor_name.GetLen()))
+	return !(ZendBinaryStrcasecmp(ce.GetName().GetStr(), constructor_name.GetStr()))
 }
 func ZendCheckDeprecatedConstructor(ce *types.ClassEntry) {
 	if ZendHasDeprecatedConstructor(ce) != 0 {

@@ -153,7 +153,7 @@ func PhpArrayKeyCompareString(a any, b any) int {
 		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.GetH())
 		l2 = buf2 + b.SizeOf("buf2") - 1 - s2
 	}
-	return zend.ZendBinaryStrcmp(s1, l1, s2, l2)
+	return zend.ZendBinaryStrcmp(b.CastStr(s1, l1), b.CastStr(s2, l2))
 }
 func PhpArrayReverseKeyCompareString(a any, b any) int { return PhpArrayKeyCompareString(b, a) }
 func PhpArrayKeyCompareStringNaturalGeneral(a any, b any, fold_case int) int {

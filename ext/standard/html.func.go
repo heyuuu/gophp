@@ -406,7 +406,7 @@ det_charset:
 		/* now walk the charset map and look for the codeset */
 
 		for i = 0; i < b.SizeOf("charset_map")/b.SizeOf("charset_map [ 0 ]"); i++ {
-			if len_ == CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(charset_hint, len_, CharsetMap[i].codeset, len_) == 0 {
+			if len_ == CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(b.CastStr(charset_hint, len_), b.CastStr(CharsetMap[i].codeset, len_)) == 0 {
 				charset = CharsetMap[i].charset
 				found = 1
 				break

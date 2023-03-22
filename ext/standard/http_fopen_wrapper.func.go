@@ -185,7 +185,7 @@ func PhpStreamUrlWrapHttpEx(
 							}
 							if (*p) == ':' {
 								p++
-								if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(s, b.SizeOf("\"Proxy-Authorization:\"")-1, "Proxy-Authorization:", b.SizeOf("\"Proxy-Authorization:\"")-1) == 0 {
+								if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
 									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 										p++
 									}
@@ -220,7 +220,7 @@ func PhpStreamUrlWrapHttpEx(
 					}
 					if (*p) == ':' {
 						p++
-						if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(s, b.SizeOf("\"Proxy-Authorization:\"")-1, "Proxy-Authorization:", b.SizeOf("\"Proxy-Authorization:\"")-1) == 0 {
+						if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(b.CastStr(s, b.SizeOf("\"Proxy-Authorization:\"")-1), "Proxy-Authorization:") == 0 {
 							for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
 								p++
 							}

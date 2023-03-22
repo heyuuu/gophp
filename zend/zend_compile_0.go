@@ -181,7 +181,7 @@ func ZendIsReservedClassName(name *types.String) types.ZendBool {
 	var uqname_len int = name.GetLen()
 	ZendGetUnqualifiedName(name, &uqname, &uqname_len)
 	for ; reserved.GetName() != nil; reserved++ {
-		if uqname_len == reserved.GetLen() && ZendBinaryStrcasecmp(uqname, uqname_len, reserved.GetName(), reserved.GetLen()) == 0 {
+		if uqname_len == reserved.GetLen() && ZendBinaryStrcasecmp(b.CastStr(uqname, uqname_len), b.CastStr(reserved.GetName(), reserved.GetLen())) == 0 {
 			return 1
 		}
 	}
@@ -195,7 +195,7 @@ func ZendAssertValidClassName(name *types.String) {
 func ZendLookupBuiltinTypeByName(name *types.String) types.ZendUchar {
 	var info *BuiltinTypeInfo = &BuiltinTypes[0]
 	for ; info.GetName() != nil; info++ {
-		if name.GetLen() == info.GetNameLen() && ZendBinaryStrcasecmp(name.GetVal(), name.GetLen(), info.GetName(), info.GetNameLen()) == 0 {
+		if name.GetLen() == info.GetNameLen() && ZendBinaryStrcasecmp(name.GetStr(), b.CastStr(info.GetName(), info.GetNameLen())) == 0 {
 			return info.GetType()
 		}
 	}

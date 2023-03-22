@@ -2273,14 +2273,14 @@ func StringCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
 		if op1.GetStr() == op2.GetStr() {
 			return 0
 		} else {
-			return ZendBinaryStrcmp(op1.GetStr().GetVal(), op1.GetStr().GetLen(), op2.GetStr().GetVal(), op2.GetStr().GetLen())
+			return ZendBinaryStrcmp(op1.GetStr().GetStr(), op2.GetStr().GetStr())
 		}
 	} else {
 		var tmp_str1 *types.String
 		var tmp_str2 *types.String
 		var str1 *types.String = ZvalGetTmpString(op1, &tmp_str1)
 		var str2 *types.String = ZvalGetTmpString(op2, &tmp_str2)
-		var ret int = ZendBinaryStrcmp(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen())
+		var ret int = ZendBinaryStrcmp(str1.GetStr(), str2.GetStr())
 		ZendTmpStringRelease(tmp_str1)
 		ZendTmpStringRelease(tmp_str2)
 		return ret
@@ -2922,31 +2922,19 @@ func ZendStringTolowerEx(str *types.String, persistent int) *types.String {
 	}
 	return str.Copy()
 }
-func ZendBinaryStrcmp(s1 *byte, len1 int, s2 *byte, len2 int) int {
-	var retval int
-	if s1 == s2 {
-		return 0
-	}
-	retval = memcmp(s1, s2, b.Min(len1, len2))
-	if retval == 0 {
-		return int(len1 - len2)
-	} else {
-		return retval
-	}
+func ZendBinaryStrcmp(s1 string, s2 string) int {
+	return strings.Compare(s1, s2)
 }
-func ZendBinaryStrncmp(s1 *byte, len1 int, s2 *byte, len2 int, length int) int {
-	var retval int
-	if s1 == s2 {
-		return 0
+func ZendBinaryStrncmp(s1 string, s2 string, length int) int {
+	if len(s1) > length {
+		s1 = s1[:length]
 	}
-	retval = memcmp(s1, s2, b.Min(length, b.Min(len1, len2)))
-	if retval == 0 {
-		return int(b.Min(length, len1) - b.Min(length, len2))
-	} else {
-		return retval
+	if len(s2) > length {
+		s2 = s2[:length]
 	}
+	return strings.Compare(s1, s2)
 }
-func ZendBinaryStrcasecmp(s1 *byte, len1 int, s2 *byte, len2 int) int {
+func ZendBinaryStrcasecmp(s1 string, s2 string, len2 int) int {
 	var len_ int
 	var c1 int
 	var c2 int
@@ -2963,7 +2951,7 @@ func ZendBinaryStrcasecmp(s1 *byte, len1 int, s2 *byte, len2 int) int {
 	}
 	return int(len1 - len2)
 }
-func ZendBinaryStrncasecmp(s1 *byte, len1 int, s2 string, len2 int, length int) int {
+func ZendBinaryStrncasecmp(s1 string, s2 string, length int) int {
 	var len_ int
 	var c1 int
 	var c2 int
@@ -3015,7 +3003,7 @@ func ZendBinaryStrncasecmpL(s1 *byte, len1 int, s2 *byte, len2 int, length int) 
 	return int(b.Min(length, len1) - b.Min(length, len2))
 }
 func ZendBinaryZvalStrcmp(s1 *types.Zval, s2 *types.Zval) int {
-	return ZendBinaryStrcmp(s1.GetStr().GetVal(), s1.GetStr().GetLen(), s2.GetStr().GetVal(), s2.GetStr().GetLen())
+	return ZendBinaryStrcmp(s1.GetStr().GetStr(), s2.GetStr().GetStr())
 }
 func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {
 	var ret1 int
@@ -3140,7 +3128,7 @@ func ZendiSmartStrcmp(s1 *types.String, s2 *types.String) int {
 	} else {
 		var strcmp_ret int
 	string_cmp:
-		strcmp_ret = ZendBinaryStrcmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen())
+		strcmp_ret = ZendBinaryStrcmp(s1.GetStr(), s2.GetStr())
 		return ZEND_NORMALIZE_BOOL(strcmp_ret)
 	}
 }

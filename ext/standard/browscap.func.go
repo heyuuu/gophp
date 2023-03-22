@@ -400,7 +400,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 
 	/* Quickly discard patterns where the prefix doesn't match. */
 
-	if zend.ZendBinaryStrcasecmp(agent_name.GetVal(), entry.GetPrefixLen(), entry.GetPattern().GetVal(), entry.GetPrefixLen()) != 0 {
+	if zend.ZendBinaryStrcasecmp(b.CastStr(agent_name.GetVal(), entry.GetPrefixLen()), b.CastStr(entry.GetPattern().GetVal(), entry.GetPrefixLen())) != 0 {
 		return 0
 	}
 

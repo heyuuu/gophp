@@ -158,7 +158,7 @@ func ZifStrcmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	return_value.SetLong(ZendBinaryStrcmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()))
+	return_value.SetLong(ZendBinaryStrcmp(s1.GetStr(), s2.GetStr()))
 	return
 }
 func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -183,7 +183,7 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetLong(ZendBinaryStrncmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), len_))
+	return_value.SetLong(ZendBinaryStrncmp(s1.GetStr(), s2.GetStr(), len_))
 	return
 }
 func ZifStrcasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -201,7 +201,7 @@ func ZifStrcasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	return_value.SetLong(ZendBinaryStrcasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()))
+	return_value.SetLong(ZendBinaryStrcasecmp(s1.GetStr(), s2.GetStr()))
 	return
 }
 func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -226,7 +226,7 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetLong(ZendBinaryStrncasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), len_))
+	return_value.SetLong(ZendBinaryStrncasecmp(s1.GetStr(), s2.GetStr(), len_))
 	return
 }
 func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {

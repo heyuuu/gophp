@@ -1244,7 +1244,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	var func_ *types.Zval = ce.GetFunctionTable().KeyFind(lc_function_name.GetStr())
 	if func_ != nil {
 		fbc = func_.GetFunc()
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetVal(), lc_function_name.GetLen(), ce.GetName().GetVal(), lc_function_name.GetLen(), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetVal()[0] != '_' || ce.GetConstructor().GetFunctionName().GetVal()[1] != '_') {
+	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.GetName().GetVal(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetVal()[0] != '_' || ce.GetConstructor().GetFunctionName().GetVal()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
 		if key == nil {

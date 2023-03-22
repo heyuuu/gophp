@@ -185,7 +185,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		/* PATH sections */
 
-		if zend.ZendBinaryStrncasecmp(arg1.GetStr().GetVal(), arg1.GetStr().GetLen(), "PATH", b.SizeOf("\"PATH\"")-1, b.SizeOf("\"PATH\"")-1) == 0 {
+		if zend.ZendBinaryStrncasecmp(arg1.GetStr().GetStr(), "PATH", b.SizeOf("\"PATH\"")-1) == 0 {
 			key = arg1.GetStr().GetVal()
 			key = key + b.SizeOf("\"PATH\"") - 1
 			key_len = arg1.GetStr().GetLen() - b.SizeOf("\"PATH\"") + 1
@@ -196,7 +196,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 			/* make the path lowercase on Windows, for case insensitivity. Does nothing for other platforms */
 
-		} else if zend.ZendBinaryStrncasecmp(arg1.GetStr().GetVal(), arg1.GetStr().GetLen(), "HOST", b.SizeOf("\"HOST\"")-1, b.SizeOf("\"HOST\"")-1) == 0 {
+		} else if zend.ZendBinaryStrncasecmp(arg1.GetStr().GetStr(), "HOST", b.SizeOf("\"HOST\"")-1) == 0 {
 			key = arg1.GetStr().GetVal()
 			key = key + b.SizeOf("\"HOST\"") - 1
 			key_len = arg1.GetStr().GetLen() - b.SizeOf("\"HOST\"") + 1

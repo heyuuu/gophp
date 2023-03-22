@@ -130,7 +130,7 @@ func IniKeyCompare(a any, b any) int {
 	} else if s.GetKey() == nil {
 		return 1
 	} else {
-		return ZendBinaryStrcasecmp(f.GetKey().GetVal(), f.GetKey().GetLen(), s.GetKey().GetVal(), s.GetKey().GetLen())
+		return ZendBinaryStrcasecmp(f.GetKey().GetStr(), s.GetKey().GetStr())
 	}
 }
 func ZendIniSortEntries() {

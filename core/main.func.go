@@ -32,7 +32,7 @@ func GetSafeCharsetHint() *byte {
 	lastHint = hint
 	lastCodeset = nil
 	for i = 0; i < b.SizeOf("charset_map")/b.SizeOf("charset_map [ 0 ]"); i++ {
-		if len_ == standard.CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(hint, len_, standard.CharsetMap[i].codeset, len_) == 0 {
+		if len_ == standard.CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(b.CastStr(hint, len_), b.CastStr(standard.CharsetMap[i].codeset, len_)) == 0 {
 			lastCodeset = (*byte)(standard.CharsetMap[i].codeset)
 			break
 		}
@@ -1768,7 +1768,7 @@ func PhpHandleAbortedConnection() {
 func PhpHandleAuthData(auth *byte) int {
 	var ret int = -1
 	var auth_len int = b.CondF1(auth != nil, func() __auto__ { return strlen(auth) }, 0)
-	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(auth, auth_len, "Basic ", b.SizeOf("\"Basic \"")-1, b.SizeOf("\"Basic \"")-1) == 0 {
+	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
 		var user *types.String
 		user = standard.PhpBase64Decode((*uint8)(auth+6), auth_len-6)
@@ -1789,7 +1789,7 @@ func PhpHandleAuthData(auth *byte) int {
 	} else {
 		SG__().request_info.auth_digest = nil
 	}
-	if ret == -1 && auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(auth, auth_len, "Digest ", b.SizeOf("\"Digest \"")-1, b.SizeOf("\"Digest \"")-1) == 0 {
+	if ret == -1 && auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf("\"Digest \"")-1) == 0 {
 		SG__().request_info.auth_digest = zend.Estrdup(auth + 7)
 		ret = 0
 	}
