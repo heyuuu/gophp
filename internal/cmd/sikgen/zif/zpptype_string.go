@@ -15,15 +15,16 @@ func _() {
 	_ = x[ZppTypeZendBool-5]
 	_ = x[ZppTypeZendString-6]
 	_ = x[ZppTypeZendArray-7]
-	_ = x[ZppTypeEx-8]
-	_ = x[ZppTypeRet-9]
-	_ = x[ZppTypeOpt-10]
-	_ = x[ZppTypeVariadic-11]
+	_ = x[ZppTypeZval-8]
+	_ = x[ZppTypeEx-9]
+	_ = x[ZppTypeRet-10]
+	_ = x[ZppTypeOpt-11]
+	_ = x[ZppTypeVariadic-12]
 }
 
-const _ZppType_name = "ZppTypeBoolZppTypeLongZppTypeDoubleZppTypeStringZppTypeZendBoolZppTypeZendStringZppTypeZendArrayZppTypeExZppTypeRetZppTypeOptZppTypeVariadic"
+const _ZppType_name = "ZppTypeBoolZppTypeLongZppTypeDoubleZppTypeStringZppTypeZendBoolZppTypeZendStringZppTypeZendArrayZppTypeZvalZppTypeExZppTypeRetZppTypeOptZppTypeVariadic"
 
-var _ZppType_index = [...]uint8{0, 11, 22, 35, 48, 63, 80, 96, 105, 115, 125, 140}
+var _ZppType_index = [...]uint8{0, 11, 22, 35, 48, 63, 80, 96, 107, 116, 126, 136, 151}
 
 func (i ZppType) String() string {
 	i -= 1

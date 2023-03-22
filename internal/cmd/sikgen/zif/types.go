@@ -48,6 +48,7 @@ const (
 	ZppTypeZendBool
 	ZppTypeZendString
 	ZppTypeZendArray
+	ZppTypeZval
 	// special
 	ZppTypeEx
 	ZppTypeRet
@@ -71,12 +72,14 @@ func toZppType(typ string) (ZppType, bool) {
 		return ZppTypeZendArray, true
 	case "*types.String":
 		return ZppTypeZendString, true
+	case "*types.Zval":
+		return ZppTypeZval, true
 	// special
 	case "zpp.DefEx":
 		return ZppTypeEx, true
 	case "zpp.DefRet":
 		return ZppTypeRet, true
-	case "Zpp.DefOpt":
+	case "zpp.DefOpt":
 		return ZppTypeOpt, true
 	case "[]*type.Zval":
 		return ZppTypeVariadic, true
@@ -101,6 +104,8 @@ func toZppParseMethod(typ ZppType) (string, bool) {
 		return "ParseStr", true
 	case ZppTypeZendArray:
 		return "ParseArray", true
+	case ZppTypeZval:
+		return "ParseZval", true
 	case ZppTypeVariadic:
 		return "ParseVariadic", true
 	default:

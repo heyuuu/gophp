@@ -5,160 +5,145 @@ import (
 	"sik/zend/types"
 )
 
-var ArginfoStrcmp []ArgInfo = []ArgInfo{
-	MakeReturnArgInfo(2),
-	MakeArgInfo("str1"),
-	MakeArgInfo("str2"),
-}
-var ArginfoStrncmp []ArgInfo = []ArgInfo{
-	MakeReturnArgInfo(3),
-	MakeArgInfo("str1"),
-	MakeArgInfo("str2"),
-	MakeArgInfo("len"),
-}
-var ArginfoEach []ArgInfo = []ArgInfo{
+var ArginfoEach = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("arr", ArgInfoByRef(1)),
 }
-var ArginfoErrorReporting []ArgInfo = []ArgInfo{
-	MakeReturnArgInfo(0),
-	MakeArgInfo("new_error_level"),
-}
-var ArginfoDefine []ArgInfo = []ArgInfo{
+var ArginfoDefine = []ArgInfo{
 	MakeReturnArgInfo(2),
 	MakeArgInfo("constant_name"),
 	MakeArgInfo("value"),
 	MakeArgInfo("case_insensitive"),
 }
-var ArginfoDefined []ArgInfo = []ArgInfo{
+var ArginfoDefined = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("constant_name"),
 }
-var ArginfoGetClass []ArgInfo = []ArgInfo{
+var ArginfoGetClass = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("object"),
 }
-var ArginfoIsSubclassOf []ArgInfo = []ArgInfo{
+var ArginfoIsSubclassOf = []ArgInfo{
 	MakeReturnArgInfo(2),
 	MakeArgInfo("object"),
 	MakeArgInfo("class_name"),
 	MakeArgInfo("allow_string"),
 }
-var ArginfoGetClassVars []ArgInfo = []ArgInfo{
+var ArginfoGetClassVars = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("class_name"),
 }
-var ArginfoGetObjectVars []ArgInfo = []ArgInfo{
+var ArginfoGetObjectVars = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("obj"),
 }
-var ArginfoGetMangledObjectVars []ArgInfo = []ArgInfo{
+var ArginfoGetMangledObjectVars = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("obj"),
 }
-var ArginfoGetClassMethods []ArgInfo = []ArgInfo{
+var ArginfoGetClassMethods = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("class"),
 }
-var ArginfoMethodExists []ArgInfo = []ArgInfo{
+var ArginfoMethodExists = []ArgInfo{
 	MakeReturnArgInfo(2),
 	MakeArgInfo("object"),
 	MakeArgInfo("method"),
 }
-var ArginfoPropertyExists []ArgInfo = []ArgInfo{
+var ArginfoPropertyExists = []ArgInfo{
 	MakeReturnArgInfo(2),
 	MakeArgInfo("object_or_class"),
 	MakeArgInfo("property_name"),
 }
-var ArginfoClassExists []ArgInfo = []ArgInfo{
+var ArginfoClassExists = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("classname"),
 	MakeArgInfo("autoload"),
 }
-var ArginfoTraitExists []ArgInfo = []ArgInfo{
+var ArginfoTraitExists = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("traitname"),
 	MakeArgInfo("autoload"),
 }
-var ArginfoFunctionExists []ArgInfo = []ArgInfo{
+var ArginfoFunctionExists = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("function_name"),
 }
-var ArginfoClassAlias []ArgInfo = []ArgInfo{
+var ArginfoClassAlias = []ArgInfo{
 	MakeReturnArgInfo(2),
 	MakeArgInfo("user_class_name"),
 	MakeArgInfo("alias_name"),
 	MakeArgInfo("autoload"),
 }
-var ArginfoTriggerError []ArgInfo = []ArgInfo{
+var ArginfoTriggerError = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("message"),
 	MakeArgInfo("error_type"),
 }
-var ArginfoSetErrorHandler []ArgInfo = []ArgInfo{
+var ArginfoSetErrorHandler = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("error_handler"),
 	MakeArgInfo("error_types"),
 }
-var ArginfoSetExceptionHandler []ArgInfo = []ArgInfo{
+var ArginfoSetExceptionHandler = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("exception_handler"),
 }
-var ArginfoGetDefinedFunctions []ArgInfo = []ArgInfo{
+var ArginfoGetDefinedFunctions = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("exclude_disabled"),
 }
-var ArginfoCreateFunction []ArgInfo = []ArgInfo{
+var ArginfoCreateFunction = []ArgInfo{
 	MakeReturnArgInfo(2),
 	MakeArgInfo("args"),
 	MakeArgInfo("code"),
 }
-var ArginfoGetResourceType []ArgInfo = []ArgInfo{
+var ArginfoGetResourceType = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("res"),
 }
-var ArginfoGetResources []ArgInfo = []ArgInfo{
+var ArginfoGetResources = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("type"),
 }
-var ArginfoGetLoadedExtensions []ArgInfo = []ArgInfo{
+var ArginfoGetLoadedExtensions = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("zend_extensions"),
 }
-var ArginfoGetDefinedConstants []ArgInfo = []ArgInfo{
+var ArginfoGetDefinedConstants = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("categorize"),
 }
-var ArginfoDebugBacktrace []ArgInfo = []ArgInfo{
+var ArginfoDebugBacktrace = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("options"),
 	MakeArgInfo("limit"),
 }
-var ArginfoDebugPrintBacktrace []ArgInfo = []ArgInfo{
+var ArginfoDebugPrintBacktrace = []ArgInfo{
 	MakeReturnArgInfo(0),
 	MakeArgInfo("options"),
 	MakeArgInfo("limit"),
 }
-var ArginfoExtensionLoaded []ArgInfo = []ArgInfo{
+var ArginfoExtensionLoaded = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("extension_name"),
 }
-var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var BuiltinFunctions = []types.ZendFunctionEntry{
 	DefZifZendVersion,
 	DefZifFuncNumArgs,
 	DefZifFuncGetArg,
 	DefZifFuncGetArgs,
 	DefZifStrlen,
-	types.MakeZendFunctionEntryEx("strcmp", 0, ZifStrcmp, ArginfoStrcmp),
-	types.MakeZendFunctionEntryEx("strncmp", 0, ZifStrncmp, ArginfoStrncmp),
-	types.MakeZendFunctionEntryEx("strcasecmp", 0, ZifStrcasecmp, ArginfoStrcmp),
-	types.MakeZendFunctionEntryEx("strncasecmp", 0, ZifStrncasecmp, ArginfoStrncmp),
+	DefZifStrcmp,
+	DefZifStrncmp,
+	DefZifStrcasecmp,
+	DefZifStrncasecmp,
 	types.MakeZendFunctionEntryEx("each", 0, ZifEach, ArginfoEach),
-	types.MakeZendFunctionEntryEx("error_reporting", 0, ZifErrorReporting, ArginfoErrorReporting),
-	types.MakeZendFunctionEntryEx("define", 0, ZifDefine, ArginfoDefine),
-	types.MakeZendFunctionEntryEx("defined", 0, ZifDefined, ArginfoDefined),
+	DefZifErrorReporting,
+	DefZifDefine,
+	DefZifDefined,
 	types.MakeZendFunctionEntryEx("get_class", 0, ZifGetClass, ArginfoGetClass),
-	types.MakeZendFunctionEntryEx("get_called_class", 0, ZifGetCalledClass, nil),
+	DefZifGetCalledClass,
 	types.MakeZendFunctionEntryEx("get_parent_class", 0, ZifGetParentClass, ArginfoGetClass),
 	types.MakeZendFunctionEntryEx("method_exists", 0, ZifMethodExists, ArginfoMethodExists),
 	types.MakeZendFunctionEntryEx("property_exists", 0, ZifPropertyExists, ArginfoPropertyExists),
@@ -202,6 +187,6 @@ var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	DefZifGcDisable,
 	DefZifGcStatus,
 }
-var ZendBuiltinModule ZendModuleEntry = MakeZendModuleEntry(b.SizeOf("zend_module_entry"), ZEND_MODULE_API_NO, 0, USING_ZTS, nil, nil, "Core", BuiltinFunctions, ZmStartupCore, nil, nil, nil, nil, ZEND_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+ZEND_BUILD_TS)
+var ZendBuiltinModule = MakeZendModuleEntry(b.SizeOf("zend_module_entry"), ZEND_MODULE_API_NO, 0, USING_ZTS, nil, nil, "Core", BuiltinFunctions, ZmStartupCore, nil, nil, nil, nil, ZEND_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+ZEND_BUILD_TS)
 
 const LAMBDA_TEMP_FUNCNAME = "__lambda_func"

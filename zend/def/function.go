@@ -21,19 +21,19 @@ type DefFuncOpts struct {
 	Flags      uint32
 }
 
-func DefFunc(name string, minNumArgs uint32, maxNumArgs int32, opts DefFuncOpts) FuncType {
+func DefFunc(name string, minNumArgs uint32, maxNumArgs int32, argInfos []ArgInfo, handler FuncHandler) FuncType {
 	if len(name) == 0 {
 		log.Fatalf("DefFunc() 参数 name 不可为空")
-	} else if opts.Handler == nil {
+	} else if handler == nil {
 		log.Fatalf("DefFunc() 参数 handler 不可为空: name=" + name)
 	}
 
 	return types.DefFunctionEntry(
 		name,
-		opts.Handler,
+		handler,
 		minNumArgs,
-		opts.ArgInfos,
-		opts.ReturnInfo,
-		opts.Flags,
+		argInfos,
+		nil,
+		0,
 	)
 }

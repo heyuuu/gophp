@@ -2934,7 +2934,7 @@ func ZendBinaryStrncmp(s1 string, s2 string, length int) int {
 	}
 	return strings.Compare(s1, s2)
 }
-func ZendBinaryStrcasecmp(s1 string, s2 string, len2 int) int {
+func ZendBinaryStrcasecmp(s1 string, s2 string) int {
 	var len_ int
 	var c1 int
 	var c2 int

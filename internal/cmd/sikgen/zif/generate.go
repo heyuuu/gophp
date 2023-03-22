@@ -52,15 +52,6 @@ func genFileNode(name string, infos []*ZifInfo) *ast.File {
 }
 
 func genDefFuncArgs(zifInfo *ZifInfo) []ast.Expr {
-	return []ast.Expr{
-		f.StrLit(zifInfo.name),
-		f.IntLit(zifInfo.minNumArgs),
-		f.IntLit(zifInfo.maxNumArgs),
-		genDefFuncOpts(zifInfo),
-	}
-}
-
-func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
 	log.Printf("ZifInfo: %+v\n", *zifInfo)
 
 	// 构建 ArgInfos
@@ -78,16 +69,23 @@ func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
 		}
 	}
 
+	return []ast.Expr{
+		f.StrLit(zifInfo.name),
+		f.IntLit(zifInfo.minNumArgs),
+		f.IntLit(zifInfo.maxNumArgs),
+		&ast.CompositeLit{Type: f.ArrayType(typeArgInfo), Elts: realArgInfos},
+		genZifHandler(zifInfo),
+		//genDefFuncOpts(zifInfo),
+	}
+}
+
+func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
 	// 构建 DefFuncOpts 字段
 	var optElements []ast.Expr
-	if len(realArgInfos) != 0 {
-		optElements = append(optElements, f.KeyValue("ArgInfos", &ast.CompositeLit{
-			Type: f.ArrayType(typeArgInfo),
-			Elts: realArgInfos,
-		}))
-	}
 
-	optElements = append(optElements, f.KeyValue("Handler", genZifHandler(zifInfo)))
+	if len(optElements) == 0 {
+		return f.NilLit()
+	}
 
 	// 构建结构体字面量
 	return &ast.CompositeLit{
@@ -156,7 +154,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 			if argTyp == ZppTypeEx || argTyp == ZppTypeRet {
 				continue
 			} else if argTyp == ZppTypeOpt {
-				stmts = append(stmts, f.ExprStmt(f.PkgCallExpr("zpp", "StartOptional", nil)))
+				stmts = append(stmts, f.ExprStmt(f.MethodCallExpr(fpIdent, "StartOptional", nil)))
 			} else if parseMethod, ok := toZppParseMethod(argTyp); ok {
 				stmts = append(stmts, f.AssignStmt(
 					f.Ident(info.name),
