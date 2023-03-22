@@ -19,7 +19,7 @@ func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) 
 	return types.SUCCESS
 }
 func PhpStreamXportUnregister(protocol *byte) int {
-	return types.ZendHashStrDel(&XportHash, protocol, strlen(protocol))
+	return types.ZendHashStrDel(&XportHash, protocol)
 }
 func ERR_REPORT(out_err **types.String, fmt string, arg []byte) {
 	if out_err != nil {

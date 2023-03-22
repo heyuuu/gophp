@@ -66,7 +66,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 				/* $this does not need to be explicitly imported. */
 
 			}
-			types.ZendHashAddEmptyElement(info.GetUses(), name)
+			types.ZendHashAddEmptyElement(info.GetUses(), name.GetStr())
 		} else {
 			info.SetVarvarsUsed(1)
 			FindImplicitBindsRecursively(info, name_ast)
@@ -87,7 +87,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 			var uses_list *ZendAstList = ZendAstGetList(uses_ast)
 			var i uint32
 			for i = 0; i < uses_list.GetChildren(); i++ {
-				types.ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.GetChild()[i]))
+				types.ZendHashAddEmptyElement(info.GetUses(), ZendAstGetStr(uses_list.GetChild()[i]).GetStr())
 			}
 		}
 	} else if ast.GetKind() == ZEND_AST_ARROW_FUNC {
@@ -114,10 +114,11 @@ func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst
 
 	for i = 0; i < param_list.GetChildren(); i++ {
 		var param_ast *ZendAst = param_list.GetChild()[i]
-		types.ZendHashDel(info.GetUses(), ZendAstGetStr(param_ast.GetChild()[1]))
+		types.ZendHashDel(info.GetUses(), ZendAstGetStr(param_ast.GetChild()[1]).GetStr(
+
+		/* Remove variables that are parameters */))
 	}
 
-	/* Remove variables that are parameters */
 }
 func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *ZendOpArray) {
 	var var_name *types.String

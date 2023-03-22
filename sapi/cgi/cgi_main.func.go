@@ -374,7 +374,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 		new_entry.SetExpires(0)
 		new_entry.SetUserConfig((*types.Array)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
 		new_entry.GetUserConfig() = types.MakeArrayEx(8, types.DtorFuncT(core.ConfigZvalDtor), 1)
-		entry = types.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len), new_entry)
+		entry = types.ZendHashUpdatePtr(&(CGIG(user_config_cache)), b.CastStr(path, path_len), new_entry)
 	}
 
 	/* Check whether cache entry has expired and rescan if it is */

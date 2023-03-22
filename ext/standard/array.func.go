@@ -4646,11 +4646,11 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			val = _z
 			var retval *types.Zval
 			if val.IsType(types.IS_STRING) {
-				retval = types.ZendHashAddEmptyElement(&seen, val.GetStr())
+				retval = types.ZendHashAddEmptyElement(&seen, val.GetStr().GetStr())
 			} else {
 				var tmp_str_val *types.String
 				var str_val *types.String = zend.ZvalGetTmpString(val, &tmp_str_val)
-				retval = types.ZendHashAddEmptyElement(&seen, str_val)
+				retval = types.ZendHashAddEmptyElement(&seen, str_val.GetStr())
 				zend.ZendTmpStringRelease(tmp_str_val)
 			}
 			if retval != nil {
@@ -4713,7 +4713,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *types.Zval)
 				if return_value.GetArr() == zend.EG__().GetSymbolTable() {
 					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
-					types.ZendHashDel(return_value.GetArr(), p.GetKey())
+					types.ZendHashDel(return_value.GetArr(), p.GetKey().GetStr())
 				}
 			}
 		}
@@ -5038,7 +5038,7 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 					if p.GetKey() == nil {
 						types.ZendHashIndexDel(return_value.GetArr(), p.GetH())
 					} else {
-						types.ZendHashDel(return_value.GetArr(), p.GetKey())
+						types.ZendHashDel(return_value.GetArr(), p.GetKey().GetStr())
 					}
 				}
 
@@ -5059,7 +5059,7 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 				if p.GetKey() == nil {
 					types.ZendHashIndexDel(return_value.GetArr(), p.GetH())
 				} else {
-					types.ZendHashDel(return_value.GetArr(), p.GetKey())
+					types.ZendHashDel(return_value.GetArr(), p.GetKey().GetStr())
 				}
 				if b.PreInc(&ptrs[0]).val.u1.v.type_ == types.IS_UNDEF {
 					goto out
@@ -5462,7 +5462,7 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 				if p.GetKey() == nil {
 					types.ZendHashIndexDel(return_value.GetArr(), p.GetH())
 				} else {
-					types.ZendHashDel(return_value.GetArr(), p.GetKey())
+					types.ZendHashDel(return_value.GetArr(), p.GetKey().GetStr())
 				}
 				if b.PreInc(&ptrs[0]).val.u1.v.type_ == types.IS_UNDEF {
 					goto out

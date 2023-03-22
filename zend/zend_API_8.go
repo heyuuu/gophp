@@ -336,7 +336,7 @@ func ZendDeclareTypedProperty(
 		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
-			types.ZendHashDel(ce.GetPropertiesInfo(), name)
+			types.ZendHashDel(ce.GetPropertiesInfo(), name.GetStr())
 		} else {
 			ce.GetDefaultStaticMembersCount()++
 			property_info.SetOffset(ce.GetDefaultStaticMembersCount() - 1)
@@ -362,7 +362,7 @@ func ZendDeclareTypedProperty(
 		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && !property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
-			types.ZendHashDel(ce.GetPropertiesInfo(), name)
+			types.ZendHashDel(ce.GetPropertiesInfo(), name.GetStr())
 			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
 			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info

@@ -578,7 +578,7 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 		}
 		op_array = ZendCompileFile(file_handle, type_)
 		if file_handle.GetOpenedPath() != nil {
-			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath())
+			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath().GetStr())
 		}
 		ZendDestroyFileHandle(file_handle)
 		if op_array != nil {

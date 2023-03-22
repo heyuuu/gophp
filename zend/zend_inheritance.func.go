@@ -200,7 +200,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 			ALLOC_HASHTABLE(CG__().GetDelayedAutoloads())
 			CG__().GetDelayedAutoloads() = types.MakeArrayEx(0, nil, 0)
 		}
-		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name)
+		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name.GetStr())
 	} else {
 		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce != nil && ClassVisible(ce) != 0 {
@@ -1761,7 +1761,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 					ALLOC_HASHTABLE(exclude_tables[trait_num])
 					exclude_tables[trait_num] = types.MakeArrayEx(0, nil, 0)
 				}
-				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname) == nil {
+				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname.GetStr()) == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.GetName().GetVal())
 				}
 
@@ -1926,7 +1926,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 			if b.Assign(&coliding_prop, types.ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name.GetStr())) != nil {
 				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
-					types.ZendHashDel(ce.GetPropertiesInfo(), prop_name)
+					types.ZendHashDel(ce.GetPropertiesInfo(), prop_name.GetStr())
 					flags |= ZEND_ACC_CHANGED
 				} else {
 					not_compatible = 1
@@ -2475,7 +2475,7 @@ func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname 
 	var status InheritanceStatus = ZendCanEarlyBind(ce, parent_ce)
 	if status != INHERITANCE_UNRESOLVED {
 		if delayed_early_binding != nil {
-			if types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(delayed_early_binding), lcname) == nil {
+			if types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(delayed_early_binding), lcname.GetStr()) == nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 				return 0
 			}

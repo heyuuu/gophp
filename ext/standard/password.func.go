@@ -20,7 +20,7 @@ func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	return types.FAILURE
 }
 func PhpPasswordAlgoUnregister(ident *byte) {
-	types.ZendHashStrDel(&PhpPasswordAlgos, ident, strlen(ident))
+	types.ZendHashStrDel(&PhpPasswordAlgos, ident)
 }
 func PhpPasswordSaltIsAlphabet(str *byte, len_ int) int {
 	var i int = 0

@@ -95,7 +95,7 @@ func SplObjectStorageDetach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 		return ret
 	}
 	if key.IsStrKey() {
-		ret = types.ZendHashDel(intern.GetStorage(), key.GetZendStringKey())
+		ret = types.ZendHashDel(intern.GetStorage(), key.GetZendStringKey().GetStr())
 	} else {
 		ret = types.ZendHashIndexDel(intern.GetStorage(), key.Index())
 	}

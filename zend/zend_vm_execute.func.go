@@ -4961,7 +4961,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 		zv = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 		if zv != nil {
 			ce = zv.GetCe()
-			zv = types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
+			zv = types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr().GetStr())
 			if zv == nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			} else {
@@ -4970,7 +4970,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 					/* Reload bucket pointer, the hash table may have been reallocated */
 
 					zv = EG__().GetClassTable().KeyFind(lcname.GetStr().GetStr())
-					types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), (lcname + 1).GetStr())
+					types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), (lcname + 1).GetStr().GetStr())
 					HANDLE_EXCEPTION()
 				}
 			}
@@ -7686,7 +7686,7 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	types.ZendHashDelInd(target_symbol_table, name)
+	types.ZendHashDelInd(target_symbol_table, name.GetStr())
 	if IS_CONST != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -14161,7 +14161,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	types.ZendHashDelInd(target_symbol_table, name)
+	types.ZendHashDelInd(target_symbol_table, name.GetStr())
 	if (IS_TMP_VAR | IS_VAR) != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -20810,7 +20810,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					types.ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
@@ -22823,7 +22823,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					types.ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
@@ -26223,7 +26223,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					types.ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
@@ -35840,7 +35840,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					types.ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
@@ -38918,7 +38918,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					types.ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()
@@ -40430,7 +40430,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
-	types.ZendHashDelInd(target_symbol_table, name)
+	types.ZendHashDelInd(target_symbol_table, name.GetStr())
 	if IS_CV != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -43345,7 +43345,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
 				} else {
-					types.ZendHashDel(ht, key)
+					types.ZendHashDel(ht, key.GetStr())
 				}
 			} else if offset.IsLong() {
 				hval = offset.GetLval()

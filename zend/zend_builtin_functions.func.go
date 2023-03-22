@@ -1239,7 +1239,7 @@ func ZifCreateFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 		}
 		static_variables = func_.GetStaticVariables()
 		func_.SetStaticVariables(nil)
-		types.ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
+		types.ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
 		func_.SetStaticVariables(static_variables)
 		function_name = types.ZendStringAlloc(b.SizeOf("\"0lambda_\"")+MAX_LENGTH_OF_LONG, 0)
 		function_name.GetVal()[0] = '0'
@@ -1252,7 +1252,7 @@ func ZifCreateFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetString(function_name)
 		return
 	} else {
-		types.ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
+		types.ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
 		return_value.SetFalse()
 		return
 	}

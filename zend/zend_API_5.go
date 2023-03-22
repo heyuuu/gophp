@@ -173,7 +173,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	module = module_ptr
 	EG__().SetCurrentModule(module)
 	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
-		types.ZendHashDel(&ModuleRegistry, lcname)
+		types.ZendHashDel(&ModuleRegistry, lcname.GetStr())
 		types.ZendStringRelease(lcname)
 		EG__().SetCurrentModule(nil)
 		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())

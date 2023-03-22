@@ -113,7 +113,7 @@ func PhpIniOnUpdateHosts(
 		keylen = q - key
 		if keylen > 0 {
 			tmp_key = types.NewString(b.CastStr(key, keylen))
-			types.ZendHashAddEmptyElement(hosts, tmp_key)
+			types.ZendHashAddEmptyElement(hosts, tmp_key.GetStr())
 			types.ZendStringReleaseEx(tmp_key, 0)
 		}
 	}

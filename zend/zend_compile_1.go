@@ -140,7 +140,7 @@ func DoBindFunction(lcname *types.Zval) int {
 	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
 		zv = EG__().GetFunctionTable().KeyAdd(lcname.GetStr().GetStr(), zv)
 	} else {
-		zv = types.ZendHashSetBucketKey(EG__().GetFunctionTable(), (*types.Bucket)(zv), lcname.GetStr())
+		zv = types.ZendHashSetBucketKey(EG__().GetFunctionTable(), (*types.Bucket)(zv), lcname.GetStr().GetStr())
 	}
 	if zv == nil {
 		DoBindFunctionError(lcname.GetStr(), function.GetOpArray(), 0)
@@ -178,7 +178,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 	/* Register the derived class */
 
 	ce = (*types.ClassEntry)(zv.GetPtr())
-	zv = types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr())
+	zv = types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr().GetStr())
 	if zv == nil {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 		return types.FAILURE
@@ -188,7 +188,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 		/* Reload bucket pointer, the hash table may have been reallocated */
 
 		zv = EG__().GetClassTable().KeyFind(lcname.GetStr().GetStr())
-		types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), rtd_key.GetStr())
+		types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), rtd_key.GetStr().GetStr())
 		return types.FAILURE
 	}
 	return types.SUCCESS

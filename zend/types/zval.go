@@ -217,6 +217,7 @@ func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetRawString(s
 func NewZvalLong(l zend.ZendLong) *Zval       { var tmp Zval; tmp.SetLong(l); return &tmp }
 func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); return &tmp }
 func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
+func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetAsPtr(ptr); return &tmp }
 
 /**
  * init

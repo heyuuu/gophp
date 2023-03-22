@@ -1171,7 +1171,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 				entry = _z
 				zend.ConvertToStringEx(entry)
 				lcname = zend.ZendStringTolower(entry.GetStr())
-				types.ZendHashAddEmptyElement(class_hash, lcname)
+				types.ZendHashAddEmptyElement(class_hash, lcname.GetStr())
 				types.ZendStringReleaseEx(lcname, 0)
 			}
 

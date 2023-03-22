@@ -137,9 +137,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var fbc *ZendFunction
 	var opline *ZendOp
 	lcname = ZendStringTolower(name.GetStr())
-	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr
-
-	/* Special assert() handling should apply independently of compiler flags. */())
+	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr())
 
 	if fbc != nil && types.ZendStringEqualsLiteral(lcname, "assert") {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)

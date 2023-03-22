@@ -167,7 +167,7 @@ func PhpStreamDisplayWrapperErrors(wrapper *core.PhpStreamWrapper, path *byte, c
 }
 func PhpStreamTidyWrapperErrorLog(wrapper *core.PhpStreamWrapper) {
 	if wrapper != nil && standard.FG(wrapper_errors) {
-		types.ZendHashStrDel(standard.FG(wrapper_errors), (*byte)(&wrapper), b.SizeOf("wrapper"))
+		types.ZendHashStrDel(standard.FG(wrapper_errors), b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
 	}
 }
 func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
@@ -1560,7 +1560,7 @@ func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper
 	return ret
 }
 func PhpUnregisterUrlStreamWrapper(protocol string) int {
-	return types.ZendHashStrDel(&UrlStreamWrappersHash, protocol, strlen(protocol))
+	return types.ZendHashStrDel(&UrlStreamWrappersHash, protocol)
 }
 func CloneWrapperHash() {
 	zend.ALLOC_HASHTABLE(standard.FG(stream_wrappers))
@@ -1584,7 +1584,7 @@ func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.String) int {
 	if !(standard.FG(stream_wrappers)) {
 		CloneWrapperHash()
 	}
-	return types.ZendHashDel(standard.FG(stream_wrappers), protocol)
+	return types.ZendHashDel(standard.FG(stream_wrappers), protocol.GetStr())
 }
 func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *core.PhpStreamWrapper {
 	var wrapper_hash *types.Array = b.CondF1(standard.FG(stream_wrappers), func() __auto__ { return standard.FG(stream_wrappers) }, &UrlStreamWrappersHash)

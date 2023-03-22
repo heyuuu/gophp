@@ -708,7 +708,7 @@ func CheckHttpProxy(var_table *types.Array) {
 	if types.ArrayStrExists(var_table, "HTTP_PROXY") != 0 {
 		var local_proxy *byte = getenv("HTTP_PROXY")
 		if local_proxy == nil {
-			types.ZendHashStrDel(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1)
+			types.ZendHashStrDel(var_table, "HTTP_PROXY")
 		} else {
 			var local_zval types.Zval
 			local_zval.SetRawString(b.CastStrAuto(local_proxy))

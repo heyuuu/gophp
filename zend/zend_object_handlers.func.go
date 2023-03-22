@@ -1019,7 +1019,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			}
 			zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 		}
-		if types.ZendHashDel(zobj.GetProperties(), name) != types.FAILURE {
+		if types.ZendHashDel(zobj.GetProperties(), name.GetStr()) != types.FAILURE {
 			goto exit
 		}
 	} else if EG__().GetException() != nil {

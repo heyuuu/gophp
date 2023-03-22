@@ -804,7 +804,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		ALLOC_HASHTABLE(EG__().GetInAutoload())
 		EG__().GetInAutoload() = types.MakeArrayEx(8, nil, 0)
 	}
-	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
+	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name.GetStr()) == nil {
 		if key == nil {
 			types.ZendStringReleaseEx(lc_name, 0)
 		}
@@ -836,7 +836,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	EG__().SetFakeScope(orig_fake_scope)
 	ZvalPtrDtor(&args[0])
 	ZvalPtrDtorStr(fcall_info.GetFunctionName())
-	types.ZendHashDel(EG__().GetInAutoload(), lc_name)
+	types.ZendHashDel(EG__().GetInAutoload(), lc_name.GetStr())
 	ZvalPtrDtor(&local_retval)
 	if key == nil {
 		types.ZendStringReleaseEx(lc_name, 0)
@@ -1120,7 +1120,7 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 	return ce
 }
 func ZendDeleteGlobalVariable(name *types.String) int {
-	return types.ZendHashDelInd(EG__().GetSymbolTable(), name)
+	return types.ZendHashDelInd(EG__().GetSymbolTable(), name.GetStr())
 }
 func ZendRebuildSymbolTable() *types.Array {
 	var ex *ZendExecuteData
@@ -1217,7 +1217,7 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 		var var_ *types.Zval = executeData.VarNum(0)
 		for {
 			if var_.IsUndef() {
-				types.ZendHashDel(ht, *str)
+				types.ZendHashDel(ht, (*str).GetStr())
 			} else {
 				ht.KeyUpdate(str.GetStr(), var_)
 				var_.SetUndef()

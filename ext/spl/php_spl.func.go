@@ -618,12 +618,12 @@ func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *t
 
 			/* remove specific */
 
-			success = types.ZendHashDel(SPL_G(autoload_functions), lc_name)
+			success = types.ZendHashDel(SPL_G(autoload_functions), lc_name.GetStr())
 			if success != types.SUCCESS && obj_ptr != nil {
 				lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
 				memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 				lc_name.GetVal()[lc_name.GetLen()] = '0'
-				success = types.ZendHashDel(SPL_G(autoload_functions), lc_name)
+				success = types.ZendHashDel(SPL_G(autoload_functions), lc_name.GetStr())
 			}
 		}
 	} else if types.ZendStringEquals(lc_name, SplAutoloadFn.GetFunctionName()) != 0 {

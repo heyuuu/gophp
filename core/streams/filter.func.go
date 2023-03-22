@@ -31,7 +31,7 @@ func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilte
 	return ret
 }
 func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
-	return types.ZendHashStrDel(&StreamFiltersHash, filterpattern, strlen(filterpattern))
+	return types.ZendHashStrDel(&StreamFiltersHash, filterpattern)
 }
 func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
 	if !(standard.FG(stream_filters)) {

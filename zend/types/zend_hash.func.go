@@ -83,10 +83,7 @@ func ZendHashFindInd(ht *Array, key string) *Zval {
 }
 
 func ZendHashAddPtr(ht *Array, key string, pData any) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, pData)
-	zv = ht.KeyAdd(key, &tmp)
+	zv := ht.KeyAdd(key, NewZvalPtr(pData))
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -94,10 +91,7 @@ func ZendHashAddPtr(ht *Array, key string, pData any) any {
 	}
 }
 func ZendHashAddNewPtr(ht *Array, key string, pData any) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, pData)
-	zv = ht.KeyAddNew(key, &tmp)
+	zv := ht.KeyAddNew(key, NewZvalPtr(pData))
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -105,35 +99,12 @@ func ZendHashAddNewPtr(ht *Array, key string, pData any) any {
 	}
 }
 func ZendHashUpdatePtr(ht *Array, key string, pData any) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, pData)
-	zv = ht.KeyUpdate(key, &tmp)
-	return zv.GetPtr()
-}
-func ZendHashStrUpdatePtr(ht *Array, str string, pData any) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, pData)
-	zv = ht.KeyUpdate(str, &tmp)
+	zv := ht.KeyUpdate(key, NewZvalPtr(pData))
 	return zv.GetPtr()
 }
 func ZendHashAddMem(ht *Array, key string, pData any, size int) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, nil)
-	if b.Assign(&zv, ht.KeyAdd(key, &tmp)) {
-		zv.SetPtr(zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
-		memcpy(zv.GetPtr(), pData, size)
-		return zv.GetPtr()
-	}
-	return nil
-}
-func ZendHashStrAddMem(ht *Array, str string, pData any, size int) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, nil)
-	if b.Assign(&zv, ht.KeyAdd(str, &tmp)) {
+	zv := ht.KeyAdd(key, NewZvalPtr(pData))
+	if zv != nil {
 		zv.SetPtr(zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
@@ -150,7 +121,7 @@ func ZendHashStrUpdateMem(ht *Array, str string, pData any, size int) any {
 	var p any
 	p = zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	memcpy(p, pData, size)
-	return ZendHashStrUpdatePtr(ht, str, p)
+	return ZendHashUpdatePtr(ht, str, p)
 }
 func ZendHashIndexAddPtr(ht *Array, h zend.ZendUlong, pData any) any {
 	var tmp Zval
@@ -415,18 +386,18 @@ func ZendHashIteratorsAdvance(ht *Array, step HashPosition) {
 	}
 }
 
-func ZendHashAddEmptyElement(ht *Array, key *String) *Zval {
+func ZendHashAddEmptyElement(ht *Array, key string) *Zval {
 	var dummy Zval
 	(&dummy).SetUndef()
-	return ht.KeyAdd(key.GetStr(), &dummy)
+	return ht.KeyAdd(key, &dummy)
 }
-func ZendHashStrAddEmptyElement(ht *Array, str *byte, len_ int) *Zval {
+func ZendHashStrAddEmptyElement(ht *Array, str string) *Zval {
 	var dummy Zval
 	(&dummy).SetUndef()
-	return ht.KeyAdd(b.CastStr(str, len_), &dummy)
+	return ht.KeyAdd(str, &dummy)
 }
-func ZendHashSetBucketKey(ht *Array, b *Bucket, key *String) *Zval {
-	return ht.SetBucketKey(b, key.GetStr())
+func ZendHashSetBucketKey(ht *Array, b *Bucket, key string) *Zval {
+	return ht.SetBucketKey(b, key)
 }
 func ZendHashDelBucket(ht *Array, p *Bucket) {
 	ht.assertRc1()
@@ -435,23 +406,20 @@ func ZendHashDelBucket(ht *Array, p *Bucket) {
 		ht.deleteBucket(pos)
 	}
 }
-func ZendHashDel(ht *Array, key *String) int {
-	var strKey = key.GetStr()
-	if ht.KeyDelete(strKey) {
+func ZendHashDel(ht *Array, key string) int {
+	if ht.KeyDelete(key) {
 		return SUCCESS
 	}
 	return FAILURE
 }
-func ZendHashDelInd(ht *Array, key *String) int {
-	var strKey = key.GetStr()
-	if ht.KeyDeleteIndirect(strKey) {
+func ZendHashDelInd(ht *Array, key string) int {
+	if ht.KeyDeleteIndirect(key) {
 		return SUCCESS
 	}
 	return FAILURE
 }
-func ZendHashStrDel(ht *Array, str *byte, len_ int) int {
-	var strKey = b.CastStr(str, len_)
-	if ht.KeyDelete(strKey) {
+func ZendHashStrDel(ht *Array, key string) int {
+	if ht.KeyDelete(key) {
 		return SUCCESS
 	}
 	return FAILURE

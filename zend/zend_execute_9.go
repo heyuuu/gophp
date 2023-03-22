@@ -43,7 +43,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *ZendOpArray {
 			if file_handle.GetOpenedPath() == nil {
 				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
-			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath()) != nil {
+			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath().GetStr()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				if tmp_inc_filename.GetType() != types.IS_UNDEF {

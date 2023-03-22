@@ -217,7 +217,7 @@ func ZendRestoreIniEntry(name *types.String, stage int) int {
 	}
 	if EG__().GetModifiedIniDirectives() != nil {
 		if ZendRestoreIniEntryCb(ini_entry, stage) == 0 {
-			types.ZendHashDel(EG__().GetModifiedIniDirectives(), name)
+			types.ZendHashDel(EG__().GetModifiedIniDirectives(), name.GetStr())
 		} else {
 			return types.FAILURE
 		}

@@ -86,7 +86,7 @@ func NormalizeProtectedVariable(varname *byte) {
 }
 func AddProtectedVariable(varname *byte) {
 	NormalizeProtectedVariable(varname)
-	types.ZendHashStrAddEmptyElement(&(PG__().rfc1867_protected_variables), varname, strlen(varname))
+	types.ZendHashStrAddEmptyElement(&(PG__().rfc1867_protected_variables), varname)
 }
 func IsProtectedVariable(varname *byte) types.ZendBool {
 	NormalizeProtectedVariable(varname)

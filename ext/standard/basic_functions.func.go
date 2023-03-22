@@ -529,7 +529,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	pe.SetKeyLen(strlen(pe.GetKey()))
 	tsrm_env_lock()
-	types.ZendHashStrDel(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen())
+	types.ZendHashStrDel(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()))
 
 	/* find previous value */
 
@@ -544,7 +544,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		unsetenv(pe.GetPutenvString())
 	}
 	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		types.ZendHashStrAddMem(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()), &pe, b.SizeOf("putenv_entry"))
+		types.ZendHashAddMem(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()), &pe, b.SizeOf("putenv_entry"))
 		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
 			tzset()
 		}
@@ -1434,7 +1434,7 @@ func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdow
 }
 func RemoveUserShutdownFunction(function_name *byte, function_len int) types.ZendBool {
 	if BG__().user_shutdown_function_names {
-		return types.ZendHashStrDel(BG__().user_shutdown_function_names, function_name, function_len) != types.FAILURE
+		return types.ZendHashStrDel(BG__().user_shutdown_function_names, b.CastStr(function_name, function_len)) != types.FAILURE
 	}
 	return 0
 }
@@ -2095,7 +2095,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		successful = 1
 	}
 	if successful != 0 {
-		types.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, path, path_len)
+		types.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len))
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
