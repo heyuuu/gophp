@@ -1147,7 +1147,7 @@ func ZendRebuildSymbolTable() *types.Array {
 		}
 		symbol_table.Extend(ex.GetFunc().GetOpArray().GetLastVar())
 	} else {
-		ex.SetSymbolTable(types.ZendNewArray(ex.GetFunc().GetOpArray().GetLastVar()))
+		ex.SetSymbolTable(types.NewZendArray(ex.GetFunc().GetOpArray().GetLastVar()))
 		symbol_table = ex.GetSymbolTable()
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table

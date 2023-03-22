@@ -2423,7 +2423,7 @@ func PhpCompactVar(eg_active_symbol_table *types.Array, return_value *types.Zval
 	var data types.Zval
 	entry = types.ZVAL_DEREF(entry)
 	if entry.IsType(types.IS_STRING) {
-		if b.Assign(&value_ptr, types.ZendHashFindInd(eg_active_symbol_table, entry.GetStr())) != nil {
+		if b.Assign(&value_ptr, types.ZendHashFindInd(eg_active_symbol_table, entry.GetStr().GetStr())) != nil {
 			value_ptr = types.ZVAL_DEREF(value_ptr)
 			value_ptr.TryAddRefcount()
 			return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), value_ptr)
@@ -4819,7 +4819,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 		} else {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, types.ZendHashFindExInd(args[i].GetArr(), p.GetKey(), 1)) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
+				if b.Assign(&data, types.ZendHashFindExInd(args[i].GetArr(), p.GetKey().GetStr(), 1)) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
 					ok = 0
 					break
 				}
@@ -5214,7 +5214,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 		} else {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, types.ZendHashFindExInd(args[i].GetArr(), p.GetKey(), 1)) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
+				if b.Assign(&data, types.ZendHashFindExInd(args[i].GetArr(), p.GetKey().GetStr(), 1)) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
 					ok = 0
 					break
 				}
@@ -5691,7 +5691,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		key = _p.GetKey()
 		value = _z
 		str = zend.ZvalGetTmpString(value, &tmp_str)
-		if types.ZendHashExists(&exclude, str) == 0 {
+		if types.ArrayStrExists(&exclude, str.GetStr()) == 0 {
 			if key != nil {
 				value = return_value.GetArr().KeyAddNew(key.GetStr(), value)
 			} else {
@@ -6555,7 +6555,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zv
 	case types.IS_STRING:
 		types.ZVAL_BOOL(return_value, ht.SymtableExistsInd(key.GetStr().GetStr()))
 	case types.IS_LONG:
-		types.ZVAL_BOOL(return_value, types.ZendHashIndexExists(ht, key.GetLval()) != 0)
+		types.ZVAL_BOOL(return_value, types.ArrayIndexExists(ht, key.GetLval()) != 0)
 	case types.IS_NULL:
 		types.ZVAL_BOOL(return_value, ht.KeyExistsInd(types.ZSTR_EMPTY_ALLOC().GetStr()))
 	default:

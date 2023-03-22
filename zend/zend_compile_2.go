@@ -346,7 +346,7 @@ func ZendIsConstDefaultClassRef(name_ast *ZendAst) types.ZendBool {
 func ZendHandleNumericOp(node *Znode) {
 	if node.GetOpType() == IS_CONST && node.GetConstant().IsString() {
 		var index ZendUlong
-		if types.ZEND_HANDLE_NUMERIC(node.GetConstant().GetStr(), &index) {
+		if types.HandleNumericStr(node.GetConstant().GetStr().GetStr(), &index) {
 			ZvalPtrDtor(node.GetConstant())
 			node.GetConstant().SetLong(index)
 		}
@@ -355,7 +355,7 @@ func ZendHandleNumericOp(node *Znode) {
 func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 	if dim_node.GetConstant().IsString() {
 		var index ZendUlong
-		if types.ZEND_HANDLE_NUMERIC(dim_node.GetConstant().GetStr(), &index) {
+		if types.HandleNumericStr(dim_node.GetConstant().GetStr().GetStr(), &index) {
 
 			/* For numeric indexes we also keep the original value to use by ArrayAccess
 			 * See bug #63217

@@ -30,7 +30,7 @@ func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict types.
 	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
 }
 func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
-	var arr *types.Array = types.ZendNewArray(size)
+	var arr *types.Array = types.NewZendArray(size)
 	if zv.IsReference() {
 		var ref *types.ZendReference = zv.GetRef()
 		if ZEND_REF_HAS_TYPE_SOURCES(ref) {

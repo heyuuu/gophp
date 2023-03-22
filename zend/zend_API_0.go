@@ -24,8 +24,8 @@ func getThis(executeData *ZendExecuteData) *types.Zval {
 		return nil
 	}
 }
-func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.ZendNewArray(0)) }
-func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.ZendNewArray(size)) }
+func ArrayInit(arg *types.Zval)                  { arg.SetArray(types.NewZendArray(0)) }
+func ArrayInitSize(arg *types.Zval, size uint32) { arg.SetArray(types.NewZendArray(size)) }
 func AddAssocLong(arg *types.Zval, key string, n ZendLong) int {
 	return AddAssocLongEx(arg, key, n)
 }

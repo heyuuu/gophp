@@ -262,7 +262,7 @@ func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserialize
 	}
 	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
-	res = types.ZendHashExists(classes, lcname)
+	res = types.ArrayStrExists(classes, lcname.GetStr())
 	lcname.Free()
 	return res
 }
@@ -359,7 +359,7 @@ func ProcessNestedData(
 					data = ht.IndexAddNewH(idx, &d)
 				}
 			} else if key.IsType(types.IS_STRING) {
-				if types.ZEND_HANDLE_NUMERIC(key.GetStr(), &idx) {
+				if types.HandleNumericStr(key.GetStr().GetStr(), &idx) {
 					goto numeric_key
 				}
 				if b.Assign(&old_data, ht.KeyFind(key.GetStr().GetStr())) != nil {
@@ -552,7 +552,7 @@ func ObjectCommon(
 		types.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.ZendHashStrExists(types.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
+	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.ArrayStrExists(types.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup") != 0
 	ht = types.Z_OBJPROP_P(rval)
 	if elements >= zend_long(types.HT_MAX_SIZE-ht.GetNNumOfElements()) {
 		return 0
@@ -919,7 +919,7 @@ yy18:
 		return 0
 	}
 	*p += 2
-	has_unserialize = incomplete_class == 0 && types.ZendHashStrExists(ce.GetFunctionTable(), "__unserialize", b.SizeOf("\"__unserialize\"")-1) != 0
+	has_unserialize = incomplete_class == 0 && types.ArrayStrExists(ce.GetFunctionTable(), "__unserialize") != 0
 
 	/* If this class implements Serializable, it should not land here but in object_custom().
 	 * The passed string obviously doesn't descend from the regular serializer. However, if

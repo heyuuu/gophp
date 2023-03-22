@@ -204,7 +204,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		var num_key ZendUlong
 		var key *types.String
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(types.ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
+			new_object.SetProperties(types.NewZendArray(old_object.GetProperties().GetNNumOfElements()))
 			types.ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
 			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().GetNNumOfElements())

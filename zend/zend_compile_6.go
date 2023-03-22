@@ -15,7 +15,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *ZendOpArray, uses_ast *
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(types.ZendNewArray(8))
+		op_array.SetStaticVariables(types.NewZendArray(8))
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.GetChild()[i]
@@ -129,7 +129,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(types.ZendNewArray(8))
+		op_array.SetStaticVariables(types.NewZendArray(8))
 	}
 	var __ht *types.Array = info.GetUses()
 	for _, _p := range __ht.foreachData() {
@@ -522,7 +522,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if (flags & ZEND_ACC_FINAL) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.GetName().GetVal(), name.GetVal())
 		}
-		if types.ZendHashExists(ce.GetPropertiesInfo(), name) != 0 {
+		if types.ArrayStrExists(ce.GetPropertiesInfo(), name.GetStr()) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.GetName().GetVal(), name.GetVal())
 		}
 		if value_ast != nil {
@@ -738,7 +738,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			ZendTmpStringRelease(lcname)
 			name = ZendGenerateAnonClassName(decl.GetStartLineno())
 			lcname = ZendStringTolower(name)
-			if types.ZendHashExists(CG__().GetClassTable(), lcname) == 0 {
+			if types.ArrayStrExists(CG__().GetClassTable(), lcname.GetStr()) == 0 {
 				break
 			}
 		}

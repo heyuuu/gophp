@@ -359,7 +359,7 @@ func ZendCompileStaticVarCommon(var_name *types.String, value *types.Zval, mode 
 		if CG__().GetActiveOpArray().GetScope() != nil {
 			CG__().GetActiveOpArray().GetScope().SetIsHasStaticInMethods(true)
 		}
-		CG__().GetActiveOpArray().SetStaticVariables(types.ZendNewArray(8))
+		CG__().GetActiveOpArray().SetStaticVariables(types.NewZendArray(8))
 	}
 	value = CG__().GetActiveOpArray().GetStaticVariables().KeyUpdate(var_name.GetStr(), value)
 	if types.ZendStringEqualsLiteral(var_name, "this") {

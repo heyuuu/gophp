@@ -603,7 +603,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var val *types.Zval
 		var tmp types.Zval
 		var src *types.Array = array.GetConstant().GetArr()
-		var dst *types.Array = types.ZendNewArray(src.GetNNumOfElements())
+		var dst *types.Array = types.NewZendArray(src.GetNNumOfElements())
 		tmp.SetTrue()
 		if strict != 0 {
 			var __ht *types.Array = src

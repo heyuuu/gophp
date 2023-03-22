@@ -148,7 +148,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 				name_len = strlen(dep.GetName())
 				lcname = types.ZendStringAlloc(name_len, 0)
 				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if types.ZendHashExists(&ModuleRegistry, lcname) != 0 || ZendGetExtension(dep.GetName()) != nil {
+				if types.ArrayStrExists(&ModuleRegistry, lcname.GetStr()) != 0 || ZendGetExtension(dep.GetName()) != nil {
 					types.ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */
@@ -500,7 +500,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 			fname_len = strlen(ptr.GetFname())
 			lowercase_name = types.ZendStringAlloc(fname_len, 0)
 			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
-			if types.ZendHashExists(target_function_table, lowercase_name) != 0 {
+			if types.ArrayStrExists(target_function_table, lowercase_name.GetStr()) != 0 {
 				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			types.ZendStringEfree(lowercase_name)

@@ -158,7 +158,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	var zname *types.String
 	var debug_info *types.Array
 	props = types.Z_OBJPROP_P(obj)
-	debug_info = types.ZendNewArray(props.GetNNumOfElements() + 1)
+	debug_info = types.NewZendArray(props.GetNNumOfElements() + 1)
 	types.ZendHashCopy(debug_info, props, types.CopyCtorFuncT(zend.ZvalAddRef))
 	zend.ArrayInit(&storage)
 	var __ht *types.Array = intern.GetStorage()
@@ -230,9 +230,9 @@ func SplObjectStorageContains(intern *spl_SplObjectStorage, this *types.Zval, ob
 		return 0
 	}
 	if key.IsStrKey() {
-		found = types.ZendHashExists(intern.GetStorage(), key.GetZendStringKey())
+		found = types.ArrayStrExists(intern.GetStorage(), key.GetZendStringKey().GetStr())
 	} else {
-		found = types.ZendHashIndexExists(intern.GetStorage(), key.Index())
+		found = types.ArrayIndexExists(intern.GetStorage(), key.Index())
 	}
 	return found
 }

@@ -651,7 +651,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindExInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV, 1)) != nil || b.Assign(&args, types.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV, 1)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindExInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV.GetStr(), 1)) != nil || b.Assign(&args, types.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr(), 1)) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -2042,7 +2042,7 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zv
 		}
 		break
 	}
-	if types.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) != 0 {
+	if types.ArrayStrExists(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len)) != 0 {
 		return_value.SetTrue()
 		return
 	} else {
@@ -2074,7 +2074,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		}
 		break
 	}
-	if types.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) == 0 {
+	if types.ArrayStrExists(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len)) == 0 {
 		return_value.SetFalse()
 		return
 	}

@@ -90,7 +90,7 @@ func AddProtectedVariable(varname *byte) {
 }
 func IsProtectedVariable(varname *byte) types.ZendBool {
 	NormalizeProtectedVariable(varname)
-	return types.ZendHashStrExists(&(PG__().rfc1867_protected_variables), varname, strlen(varname))
+	return types.ArrayStrExists(&(PG__().rfc1867_protected_variables), varname)
 }
 func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types.Zval, override_protection types.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {

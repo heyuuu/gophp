@@ -41,7 +41,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		var prop_info *ZendPropertyInfo
 		var ce *types.ClassEntry = zobj.GetCe()
 		var flags uint32 = 0
-		zobj.SetProperties(types.ZendNewArray(ce.GetDefaultPropertiesCount()))
+		zobj.SetProperties(types.NewZendArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			types.ZendHashRealInitMixed(zobj.GetProperties())
 			var __ht *types.Array = ce.GetPropertiesInfo()
@@ -133,7 +133,7 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 		}
 	} else if retval.IsNull() {
 		*is_temp = 1
-		ht = types.ZendNewArray(0)
+		ht = types.NewZendArray(0)
 		return ht
 	}
 	faults.ErrorNoreturn(faults.E_ERROR, ZEND_DEBUGINFO_FUNC_NAME+"() must return an array")

@@ -1460,7 +1460,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				var arg *types.Zval
 				for i < first_extra_arg {
 					arg_name = call.GetFunc().GetOpArray().GetVars()[i]
-					arg = types.ZendHashFindExInd(call.GetSymbolTable(), arg_name, 1)
+					arg = types.ZendHashFindExInd(call.GetSymbolTable(), arg_name.GetStr(), 1)
 					if arg != nil {
 						if arg.IsRefcounted() {
 							arg.AddRefcount()
@@ -1914,7 +1914,7 @@ func ZifExtensionLoaded(executeData *ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	lcname = ZendStringTolower(extension_name)
-	if types.ZendHashExists(&ModuleRegistry, lcname) != 0 {
+	if types.ArrayStrExists(&ModuleRegistry, lcname.GetStr()) != 0 {
 		return_value.SetTrue()
 	} else {
 		return_value.SetFalse()

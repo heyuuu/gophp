@@ -266,7 +266,7 @@ try_again:
 	} else if dim.IsString() {
 		offset_key = dim.GetStr()
 		{
-			if types.ZEND_HANDLE_NUMERIC(offset_key, &hval) {
+			if types.HandleNumericStr(offset_key.GetStr(), &hval) {
 				goto num_index
 			}
 		}

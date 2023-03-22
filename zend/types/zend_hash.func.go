@@ -19,16 +19,12 @@ func MakeArrayEx(nSize uint32, pDestructor DtorFuncT, persistent ZendBool) Array
 	return *NewZendArrayEx(nSize, pDestructor, persistent != 0)
 }
 
-func ZendHashExists(ht *Array, key *String) ZendBool {
-	var exists = ht.KeyExists(key.GetStr())
+func ArrayStrExists(ht *Array, key string) ZendBool {
+	var exists = ht.KeyExists(key)
 	return IntBool(exists)
 }
-func ZendHashStrExists(ht *Array, str *byte, len_ int) ZendBool {
-	var exists = ht.KeyExists(b.CastStr(str, len_))
-	return IntBool(exists)
-}
-func ZendHashIndexExists(ht *Array, h zend.ZendUlong) ZendBool {
-	var exists = ht.IndexExists(int(h))
+func ArrayIndexExists(ht *Array, h int) ZendBool {
+	var exists = ht.IndexExists(h)
 	return IntBool(exists)
 }
 func ZendHashHasMoreElementsEx(ht *Array, pos *HashPosition) ZEND_RESULT_CODE {
@@ -59,36 +55,22 @@ func ZendHashInternalPointerReset(ht *Array) {
 func ZendHashInternalPointerEnd(ht *Array) {
 	ZendHashInternalPointerEndEx(ht, ht.GetNInternalPointer())
 }
-func ZendHashSort(ht *Array, compare_func CompareFuncT, renumber ZendBool) int {
-	return ht.SortCompatible(compare_func, renumber)
-}
-func ZendNewArray(size uint32) *Array { return NewZendArray(size) }
 func ZendHashIteratorsUpdate(ht *Array, from HashPosition, to HashPosition) {
 	if ht.HasIterators() {
 		_zendHashIteratorsUpdate(ht, from, to)
 	}
 }
-func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *zend.ZendUlong) bool {
-	var str = b.CastStr(key, length)
-	if number, ok := ZendParseNumericStr(str); ok {
+func HandleNumericStr(key string, idx *zend.ZendUlong) bool {
+	if number, ok := parseNumericStr(key); ok {
 		*idx = zend.ZendUlong(number)
 		return true
 	} else {
 		return false
 	}
 }
-func ZEND_HANDLE_NUMERIC(key *String, idx *zend.ZendUlong) bool {
-	var str = key.GetStr()
-	if number, ok := ZendParseNumericStr(str); ok {
-		*idx = zend.ZendUlong(number)
-		return true
-	} else {
-		return false
-	}
-}
-func ZendHashFindInd(ht *Array, key *String) *Zval {
+func ZendHashFindInd(ht *Array, key string) *Zval {
 	var zv *Zval
-	zv = ht.KeyFind(key.GetStr())
+	zv = ht.KeyFind(key)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
 			return zv.GetZv()
@@ -99,9 +81,9 @@ func ZendHashFindInd(ht *Array, key *String) *Zval {
 		return zv
 	}
 }
-func ZendHashFindExInd(ht *Array, key *String, known_hash ZendBool) *Zval {
+func ZendHashFindExInd(ht *Array, key string, known_hash ZendBool) *Zval {
 	var zv *Zval
-	zv = ht.KeyFind(key.GetStr())
+	zv = ht.KeyFind(key)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
 			return zv.GetZv()
@@ -903,7 +885,7 @@ func ZendHashMinmax(ht *Array, compar CompareFuncT, flag uint32) *Zval {
 	return res.GetVal()
 }
 
-func ZendParseNumericStr(str string) (int, bool) {
+func parseNumericStr(str string) (int, bool) {
 	// 首字符非数字快速失败
 	if len(str) == 0 {
 		return 0, false
@@ -966,7 +948,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = ZendNewArray(ht.GetNNumOfElements())
+	var new_ht *Array = NewZendArray(ht.GetNNumOfElements())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -1010,7 +992,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 		 * property table should be.
 		 */
 
-		if str_key != nil && ZEND_HANDLE_NUMERIC(str_key, &num_key) {
+		if str_key != nil && HandleNumericStr(str_key, &num_key) {
 			goto convert
 		}
 
@@ -1029,7 +1011,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = ZendNewArray(ht.GetNNumOfElements())
+	var new_ht *Array = NewZendArray(ht.GetNNumOfElements())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -1057,7 +1039,7 @@ convert:
 
 		/* Again, thank ArrayObject for `!str_key ||`. */
 
-		if str_key == nil || ZEND_HANDLE_NUMERIC(str_key, &num_key) {
+		if str_key == nil || HandleNumericStr(str_key, &num_key) {
 			new_ht.IndexUpdateH(num_key, zv)
 		} else {
 			new_ht.KeyUpdate(str_key.GetStr(), zv)
