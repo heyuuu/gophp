@@ -211,22 +211,21 @@ func SapiCliServerRegisterVariable(track_vars_array *types.Zval, key *byte, val 
 		core.PhpRegisterVariableSafe((*byte)(key), new_val, new_val_len, track_vars_array)
 	}
 }
-func SapiCliServerRegisterEntryCb(entry **byte, num_args int, args ...any, hash_key *types.ZendHashKey) int {
-	var track_vars_array *types.Zval = __va_arg(args, (*types.Zval)(_))
-	if hash_key.GetKey() != nil {
-		var real_key *byte
-		var key *byte
-		var i uint32
-		key = zend.Estrndup(hash_key.GetKey().GetVal(), hash_key.GetKey().GetLen())
-		for i = 0; i < hash_key.GetKey().GetLen(); i++ {
-			if key[i] == '-' {
-				key[i] = '_'
+func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key *types.ArrayKey) int {
+	var track_vars_array *types.Zval = b.VaArg(&va).(*types.Zval)
+	if hash_key.IsStrKey() {
+		var keyBuf strings.Builder
+		for _, c := range []byte(hash_key.GetKey()) {
+			if c == '-' {
+				keyBuf.WriteByte(c)
 			} else {
-				key[i] = toupper(key[i])
+				keyBuf.WriteByte(toupper(c))
 			}
 		}
+		key := keyBuf.String()
+		real_key := fmt.Sprintf("%s_%s", "HTTP", key)
 		core.Spprintf(&real_key, 0, "%s_%s", "HTTP", key)
-		if strcmp(key, "CONTENT_TYPE") == 0 || strcmp(key, "CONTENT_LENGTH") == 0 {
+		if key == "CONTENT_TYPE" || key == "CONTENT_LENGTH" {
 			SapiCliServerRegisterVariable(track_vars_array, key, *entry)
 		}
 		SapiCliServerRegisterVariable(track_vars_array, real_key, *entry)

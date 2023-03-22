@@ -24,13 +24,13 @@ func spl_SplObjectStorage_free_storage(object *types.ZendObject) {
 		zend.Efree(intern.GetGcdata())
 	}
 }
-func SplObjectStorageGetHash(key *types.ZendHashKey, intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval) int {
+func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval) int {
 	if intern.GetFptrGetHash() != nil {
 		var rv types.Zval
 		zend.ZendCallMethodWith1Params(this, intern.GetStd().GetCe(), intern.GetFptrGetHash(), "getHash", &rv, obj)
 		if !(rv.IsUndef()) {
 			if rv.IsType(types.IS_STRING) {
-				key.SetKey(rv.GetStr())
+				*key = types.NewStrKey(rv.GetStrVal())
 				return types.SUCCESS
 			} else {
 				faults.ThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
@@ -41,14 +41,8 @@ func SplObjectStorageGetHash(key *types.ZendHashKey, intern *spl_SplObjectStorag
 			return types.FAILURE
 		}
 	} else {
-		key.SetKey(nil)
-		key.SetH(zend.Z_OBJ_HANDLE_P(obj))
+		*key = types.NewIndexKey(int(zend.Z_OBJ_HANDLE_P(obj)))
 		return types.SUCCESS
-	}
-}
-func SplObjectStorageFreeHash(intern *spl_SplObjectStorage, key *types.ZendHashKey) {
-	if key.GetKey() != nil {
-		types.ZendStringReleaseEx(key.GetKey(), 0)
 	}
 }
 func SplObjectStorageDtor(element *types.Zval) {
@@ -57,17 +51,17 @@ func SplObjectStorageDtor(element *types.Zval) {
 	zend.ZvalPtrDtor(el.GetInf())
 	zend.Efree(el)
 }
-func SplObjectStorageGet(intern *spl_SplObjectStorage, key *types.ZendHashKey) *spl_SplObjectStorageElement {
-	if key.GetKey() != nil {
-		return types.ZendHashFindPtr(intern.GetStorage(), key.GetKey())
+func SplObjectStorageGet(intern *spl_SplObjectStorage, key *types.ArrayKey) *spl_SplObjectStorageElement {
+	if key.IsStrKey() {
+		return types.ZendHashFindPtr(intern.GetStorage(), key.GetZendStringKey())
 	} else {
-		return types.ZendHashIndexFindPtr(intern.GetStorage(), key.GetH())
+		return types.ZendHashIndexFindPtr(intern.GetStorage(), uint(key.GetIndex()))
 	}
 }
 func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval, inf *types.Zval) *spl_SplObjectStorageElement {
 	var pelement *spl_SplObjectStorageElement
 	var element spl_SplObjectStorageElement
-	var key types.ZendHashKey
+	var key types.ArrayKey
 	if SplObjectStorageGetHash(&key, intern, this, obj) == types.FAILURE {
 		return nil
 	}
@@ -79,7 +73,6 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 		} else {
 			pelement.GetInf().SetNull()
 		}
-		SplObjectStorageFreeHash(intern, &key)
 		return pelement
 	}
 	types.ZVAL_COPY(element.GetObj(), obj)
@@ -88,26 +81,24 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 	} else {
 		element.GetInf().SetNull()
 	}
-	if key.GetKey() != nil {
-		pelement = types.ZendHashUpdateMem(intern.GetStorage(), key.GetKey(), &element, b.SizeOf("spl_SplObjectStorageElement"))
+	if key.IsStrKey() {
+		pelement = types.ZendHashUpdateMem(intern.GetStorage(), key.GetZendStringKey(), &element, b.SizeOf("spl_SplObjectStorageElement"))
 	} else {
-		pelement = types.ZendHashIndexUpdateMem(intern.GetStorage(), key.GetH(), &element, b.SizeOf("spl_SplObjectStorageElement"))
+		pelement = types.ZendHashIndexUpdateMem(intern.GetStorage(), key.GetIndex(), &element, b.SizeOf("spl_SplObjectStorageElement"))
 	}
-	SplObjectStorageFreeHash(intern, &key)
 	return pelement
 }
 func SplObjectStorageDetach(intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval) int {
 	var ret int = types.FAILURE
-	var key types.ZendHashKey
+	var key types.ArrayKey
 	if SplObjectStorageGetHash(&key, intern, this, obj) == types.FAILURE {
 		return ret
 	}
-	if key.GetKey() != nil {
-		ret = types.ZendHashDel(intern.GetStorage(), key.GetKey())
+	if key.IsStrKey() {
+		ret = types.ZendHashDel(intern.GetStorage(), key.GetZendStringKey())
 	} else {
-		ret = types.ZendHashIndexDel(intern.GetStorage(), key.GetH())
+		ret = types.ZendHashIndexDel(intern.GetStorage(), key.GetIndex())
 	}
-	SplObjectStorageFreeHash(intern, &key)
 	return ret
 }
 func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *types.Zval, other *spl_SplObjectStorage) {
@@ -234,16 +225,15 @@ func spl_SplObjectStorage_new(class_type *types.ClassEntry) *types.ZendObject {
 }
 func SplObjectStorageContains(intern *spl_SplObjectStorage, this *types.Zval, obj *types.Zval) int {
 	var found int
-	var key types.ZendHashKey
+	var key types.ArrayKey
 	if SplObjectStorageGetHash(&key, intern, this, obj) == types.FAILURE {
 		return 0
 	}
-	if key.GetKey() != nil {
-		found = types.ZendHashExists(intern.GetStorage(), key.GetKey())
+	if key.IsStrKey() {
+		found = types.ZendHashExists(intern.GetStorage(), key.GetZendStringKey())
 	} else {
-		found = types.ZendHashIndexExists(intern.GetStorage(), key.GetH())
+		found = types.ZendHashIndexExists(intern.GetStorage(), key.GetIndex())
 	}
-	SplObjectStorageFreeHash(intern, &key)
 	return found
 }
 func zim_spl_SplObjectStorage_attach(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -277,7 +267,7 @@ func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, retur
 	var obj *types.Zval
 	var element *spl_SplObjectStorageElement
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
-	var key types.ZendHashKey
+	var key types.ArrayKey
 	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
 		return
 	}
@@ -285,7 +275,6 @@ func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, retur
 		return
 	}
 	element = SplObjectStorageGet(intern, &key)
-	SplObjectStorageFreeHash(intern, &key)
 	if element == nil {
 		faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Object not found")
 	} else {
@@ -537,7 +526,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 	inf.SetUndef()
 	for b.PostDec(&count) > 0 {
 		var pelement *spl_SplObjectStorageElement
-		var key types.ZendHashKey
+		var key types.ArrayKey
 		if (*p) != ';' {
 			goto outexcept
 		}
@@ -571,7 +560,6 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 			goto outexcept
 		}
 		pelement = SplObjectStorageGet(intern, &key)
-		SplObjectStorageFreeHash(intern, &key)
 		if pelement != nil {
 			if !(pelement.GetInf().IsUndef()) {
 				standard.VarPushDtor(&var_hash, pelement.GetInf())

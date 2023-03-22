@@ -1,5 +1,3 @@
-// <<generate>>
-
 package types
 
 import (
@@ -8,21 +6,8 @@ import (
 )
 
 /**
- * ZendHashKey
- */
-type ZendHashKey struct {
-	h   zend.ZendUlong
-	key *String
-}
-
-func (this *ZendHashKey) GetH() zend.ZendUlong      { return this.h }
-func (this *ZendHashKey) SetH(value zend.ZendUlong) { this.h = value }
-func (this *ZendHashKey) GetKey() *String           { return this.key }
-func (this *ZendHashKey) SetKey(value *String)      { this.key = value }
-
-/**
  * ArrayKey
- * 新增类型，表示 Array 的 Key。与原类型 ZendHashKey 作用类似，后续会取代 ZendHashKey。
+ * 新增类型，表示 Array 的 Key。与原类型 ArrayKey 作用类似，后续会取代 ArrayKey。
  */
 type ArrayKey struct {
 	index int
@@ -49,10 +34,6 @@ func (this ArrayKey) GetZendStringKey() *String {
 	} else {
 		return nil
 	}
-}
-
-func (this ArrayKey) GetZendHashKey() ZendHashKey {
-	return ZendHashKey{key: this.GetZendStringKey(), h: this.GetH()}
 }
 
 /**

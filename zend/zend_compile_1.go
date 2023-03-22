@@ -252,7 +252,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 			if zv != nil {
 				var ce *types.ClassEntry = zv.GetCe()
 				var lc_parent_name *types.String = RT_CONSTANT(opline, opline.GetOp2()).GetStr()
-				var parent_ce *types.ClassEntry = types.ZendHashFindExPtr(EG__().GetClassTable(), lc_parent_name, 1)
+				var parent_ce *types.ClassEntry = types.ZendHashFindExPtr(EG__().GetClassTable(), lc_parent_name)
 				if parent_ce != nil {
 					if ZendTryEarlyBind(ce, parent_ce, lcname.GetStr(), zv) != 0 {
 

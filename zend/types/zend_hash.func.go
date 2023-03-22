@@ -272,7 +272,7 @@ func ZendHashNextIndexInsertMem(ht *Array, pData any, size int) any {
 func ZendHashFindPtr(ht *Array, key *String) any {
 	return ht.KeyFindPtr(key.GetStr())
 }
-func ZendHashFindExPtr(ht *Array, key *String, known_hash ZendBool) any {
+func ZendHashFindExPtr(ht *Array, key *String) any {
 	return ht.KeyFindPtr(key.GetStr())
 }
 func ZendHashStrFindPtr(ht *Array, str *byte, len_ int) any {
@@ -564,8 +564,7 @@ func ZendHashApplyWithArgument(ht *Array, apply_func ApplyFuncArgT, argument any
 }
 func ZendHashApplyWithArguments(ht *Array, apply_func ApplyFuncArgsT, num_args int, args ...any) {
 	ht.applyValidBucket(func(p *Bucket) int {
-		var hash_key = p.key.GetZendHashKey()
-		return apply_func(p.GetVal(), num_args, args, &hash_key)
+		return apply_func(p.GetVal(), num_args, args, &p.key)
 	})
 }
 func ZendHashReverseApply(ht *Array, apply_func ApplyFuncT) {

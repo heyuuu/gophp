@@ -332,7 +332,7 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 	ce = zend.ZendLookupClass(arg.GetStr())
 	if baseCe != nil {
 		if ce == nil || zend.InstanceofFunction(ce, baseCe) == 0 {
-			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.GetRawStr())
+			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.GetStrVal())
 			return nil, false
 		}
 	}

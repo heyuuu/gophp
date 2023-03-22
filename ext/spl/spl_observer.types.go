@@ -59,7 +59,7 @@ func (this *spl_SplObjectStorage) GetGcdata() *types.Zval      { return this.gcd
 func (this *spl_SplObjectStorage) SetGcdata(value *types.Zval) { this.gcdata = value }
 func (this *spl_SplObjectStorage) GetGcdataNum() int           { return this.gcdata_num }
 func (this *spl_SplObjectStorage) SetGcdataNum(value int)      { this.gcdata_num = value }
-func (this *spl_SplObjectStorage) GetStd() types.ZendObject    { return this.std }
+func (this *spl_SplObjectStorage) GetStd() *types.ZendObject   { return &this.std }
 
 // func (this *spl_SplObjectStorage) SetStd(value zend.ZendObject) { this.std = value }
 

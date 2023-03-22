@@ -88,7 +88,7 @@ type Zval struct {
 	}
 }
 
-func (this *Zval) GetRawStr() string { return this.value.str.GetStr() }
+func (this *Zval) GetStrVal() string { return this.value.str.GetStr() }
 
 func (this *Zval) GetValue() ZendValue              { return this.value }
 func (this *Zval) SetValue(value ZendValue)         { this.value = value }
