@@ -6,6 +6,10 @@ import (
 	"sik/zend/faults"
 )
 
+func NewEmptyArray() *Array {
+	return NewZendArray(0)
+}
+
 func ZVAL_EMPTY_ARRAY(z *Zval) {
 	z.SetArr((*Array)(&ZendEmptyArray))
 	z.SetTypeInfo(IS_ARRAY)

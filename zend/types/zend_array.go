@@ -209,7 +209,7 @@ func (this *Array) IsIteratorsOverflow() bool { return this.GetNIteratorsCount()
 /**
  * Constructor && Init
  */
-func NewZendArray(size uint32) *Array {
+func NewZendArray(size int) *Array {
 	return NewZendArrayEx(size, zend.ZVAL_PTR_DTOR, false)
 }
 

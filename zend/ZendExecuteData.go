@@ -111,6 +111,19 @@ func (this *ZendExecuteData) VarNum(n int) *types.Zval {
 }
 func (this *ZendExecuteData) Arg(n int) *types.Zval { return this.VarNum(n - 1) }
 
+func (this *ZendExecuteData) Args(start int, len_ int) []*types.Zval {
+	if len_ <= 0 {
+		return nil
+	}
+
+	// todo 确认是否可简化为 slice 操作
+	result := make([]*types.Zval, len_)
+	for i := 0; i < len_; i++ {
+		result[i] = this.Arg(start + i)
+	}
+	return result
+}
+
 func (this *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
 	if forceStrict {
 		zpp.CheckNumArgsNoneException(this)

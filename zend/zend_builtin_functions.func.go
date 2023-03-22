@@ -100,81 +100,47 @@ func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet, requested_off
 		types.ZVAL_COPY_DEREF(return_value, arg)
 	}
 }
-func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *types.Zval) {
-	var p *types.Zval
-	var q *types.Zval
-	var first_extra_arg uint32
-	var i uint32
-	var ex *ZendExecuteData = executeData.GetPrevExecuteData()
+func ZifFuncGetArgs(executeData *ZendExecuteData) (*types.Array, bool) {
+	ex := executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		faults.Error(faults.E_WARNING, "func_get_args():  Called from the global scope - no function context")
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
 	if ZendForbidDynamicCall("func_get_args()") == types.FAILURE {
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
 
-	arg_count := ex.NumArgs()
-	if arg_count != 0 {
-		ArrayInitSize(return_value, arg_count)
-		first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
-		types.ZendHashRealInitPacked(return_value.GetArr())
-		var __fill_ht *types.Array = return_value.GetArr()
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
-		i = 0
-		p = ex.Arg(1)
-		if arg_count > first_extra_arg {
-			for i < first_extra_arg {
-				q = p
-				if q.GetTypeInfo() != types.IS_UNDEF {
-					q = types.ZVAL_DEREF(q)
-					if q.IsRefcounted() {
-						q.AddRefcount()
-					}
-					types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
-				} else {
-					__fill_bkt.GetVal().SetNull()
-				}
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
-				p++
-				i++
-			}
-			p = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + ex.GetFunc().GetOpArray().GetT())
-		}
-		for i < arg_count {
-			q = p
-			if q.GetTypeInfo() != types.IS_UNDEF {
-				q = types.ZVAL_DEREF(q)
-				if q.IsRefcounted() {
-					q.AddRefcount()
-				}
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
-			} else {
-				__fill_bkt.GetVal().SetNull()
-			}
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
-			p++
-			i++
-		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
-		types.Z_ARRVAL_P(return_value).SetNNumOfElements(arg_count)
-	} else {
-		types.ZVAL_EMPTY_ARRAY(return_value)
-		return
+	argCount := ex.NumArgs()
+	if argCount == 0 {
+		return types.NewEmptyArray(), true
 	}
+
+	first_extra_arg := int(ex.GetFunc().GetOpArray().GetNumArgs())
+	var values []*types.Zval
+	if argCount <= first_extra_arg {
+		values = executeData.Args(0, argCount)
+	} else {
+		values = executeData.Args(0, first_extra_arg)
+
+		for i := 0; i < argCount-first_extra_arg; i++ {
+			p := ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + i)
+			values = append(values, p)
+		}
+	}
+
+	arr := types.NewZendArray(argCount)
+	for _, zv := range values {
+		if zv.IsUndef() {
+			arr.NextIndexInsertNew(types.NewZvalNull())
+		} else {
+			zv = types.ZVAL_DEREF(zv)
+			if zv.IsRefcounted() {
+				zv.AddRefcount()
+			}
+			arr.NextIndexInsertNew(zv)
+		}
+	}
+	return arr, true
 }
 func ZifStrlen(executeData *ZendExecuteData, return_value *types.Zval) {
 	var s *types.String
