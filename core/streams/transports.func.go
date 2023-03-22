@@ -14,7 +14,7 @@ import (
 func PhpStreamXportGetHash() *types.Array { return &XportHash }
 func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) int {
 	var str *types.String = types.ZendStringInitInterned(protocol, strlen(protocol), 1)
-	types.ZendHashUpdatePtr(&XportHash, str, factory)
+	types.ZendHashUpdatePtr(&XportHash, str.GetStr(), factory)
 	types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }
@@ -101,7 +101,7 @@ func _phpStreamXportCreate(
 		n = 3
 	}
 	if protocol != nil {
-		if nil == b.Assign(&factory, types.ZendHashStrFindPtr(&XportHash, protocol, n)) {
+		if nil == b.Assign(&factory, types.ZendHashStrFindPtr(&XportHash, b.CastStr(protocol, n))) {
 			var wrapper_name []byte
 			if n >= b.SizeOf("wrapper_name") {
 				n = b.SizeOf("wrapper_name") - 1

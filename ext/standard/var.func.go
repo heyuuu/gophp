@@ -1151,7 +1151,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	if options != nil {
 		var classes *types.Zval
 		var max_depth *types.Zval
-		classes = types.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
+		classes = types.ZendHashStrFindDeref(options.GetArr(), "allowed_classes")
 		if classes != nil && classes.GetType() != types.IS_ARRAY && classes.GetType() != types.IS_TRUE && classes.GetType() != types.IS_FALSE {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "allowed_classes option should be array or boolean")
 			return_value.SetFalse()
@@ -1185,7 +1185,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 		}
 		var_hash.SetAllowedClasses(class_hash)
-		max_depth = types.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
+		max_depth = types.ZendHashStrFindDeref(options.GetArr(), "max_depth")
 		if max_depth != nil {
 			if max_depth.GetType() != types.IS_LONG {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "max_depth should be int")

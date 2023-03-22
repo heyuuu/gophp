@@ -1556,7 +1556,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	/* register additional functions */
 
 	if SM__().GetAdditionalFunctions() != nil {
-		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard", b.SizeOf("\"standard\"")-1)) != nil {
+		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard")) != nil {
 			zend.EG__().SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
 			zend.EG__().SetCurrentModule(nil)
@@ -1570,7 +1570,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* make core report what it should */
 
-	if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "core", b.SizeOf("\"core\"")-1)) != nil {
+	if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "core")) != nil {
 		module.SetVersion(PHP_VERSION)
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}

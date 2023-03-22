@@ -408,7 +408,7 @@ func ZendResolvePropertyTypes() {
 				if prop_info.GetType().IsName() {
 					var type_name *types.String = prop_info.GetType().Name()
 					var lc_type_name *types.String = ZendStringTolower(type_name)
-					var prop_ce *types.ClassEntry = types.ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
+					var prop_ce *types.ClassEntry = types.ZendHashFindPtr(CG__().GetClassTable(), lc_type_name.GetStr())
 					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 					types.ZendStringRelease(lc_type_name)

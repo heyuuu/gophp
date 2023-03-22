@@ -309,11 +309,11 @@ func SplHeapObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_or
 		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
 	}
 	if inherited != 0 {
-		intern.SetFptrCmp(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "compare", b.SizeOf("\"compare\"")-1))
+		intern.SetFptrCmp(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "compare"))
 		if intern.GetFptrCmp().GetScope() == parent {
 			intern.SetFptrCmp(nil)
 		}
-		intern.SetFptrCount(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count"))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}

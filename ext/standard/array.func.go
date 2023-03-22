@@ -4819,7 +4819,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 		} else {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, types.ZendHashFindExInd(args[i].GetArr(), p.GetKey().GetStr(), 1)) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
+				if b.Assign(&data, types.ZendHashFindInd(args[i].GetArr(), p.GetKey().GetStr())) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
 					ok = 0
 					break
 				}
@@ -5214,7 +5214,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 		} else {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, types.ZendHashFindExInd(args[i].GetArr(), p.GetKey().GetStr(), 1)) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
+				if b.Assign(&data, types.ZendHashFindInd(args[i].GetArr(), p.GetKey().GetStr())) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
 					ok = 0
 					break
 				}

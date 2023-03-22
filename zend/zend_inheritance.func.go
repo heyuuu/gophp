@@ -809,7 +809,7 @@ func DoInheritMethod(key *types.String, parent *ZendFunction, ce *types.ClassEnt
 		if is_interface == 0 {
 			types._zendHashAppendPtr(ce.GetFunctionTable(), key, parent)
 		} else {
-			types.ZendHashAddNewPtr(ce.GetFunctionTable(), key, parent)
+			types.ZendHashAddNewPtr(ce.GetFunctionTable(), key.GetStr(), parent)
 		}
 	}
 }
@@ -1325,7 +1325,7 @@ func DoInheritIfaceConstant(name *types.String, c *ZendClassConstant, ce *types.
 			memcpy(ct, c, b.SizeOf("zend_class_constant"))
 			c = ct
 		}
-		types.ZendHashUpdatePtr(ce.GetConstantsTable(), name, c)
+		types.ZendHashUpdatePtr(ce.GetConstantsTable(), name.GetStr(), c)
 	}
 }
 func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
@@ -1510,7 +1510,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe *ZendFunc
 func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn *ZendFunction, overridden **types.Array) {
 	var existing_fn *ZendFunction = nil
 	var new_fn *ZendFunction
-	if b.Assign(&existing_fn, types.ZendHashFindPtr(ce.GetFunctionTable(), key)) != nil {
+	if b.Assign(&existing_fn, types.ZendHashFindPtr(ce.GetFunctionTable(), key.GetStr())) != nil {
 
 		/* if it is the same function with the same visibility and has not been assigned a class scope yet, regardless
 		 * of where it is coming from there is no conflict and we do not need to add it again */
@@ -1523,7 +1523,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 			/* members from the current class override trait methods */
 
 			if (*overridden) != nil {
-				if b.Assign(&existing_fn, types.ZendHashFindPtr(*overridden, key)) != nil {
+				if b.Assign(&existing_fn, types.ZendHashFindPtr(*overridden, key.GetStr())) != nil {
 					if existing_fn.IsAbstract() {
 
 						/* Make sure the trait method is compatible with previosly declared abstract method */
@@ -1545,7 +1545,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 				ALLOC_HASHTABLE(*overridden)
 				*overridden = types.MakeArrayEx(8, OverriddenPtrDtor, 0)
 			}
-			types.ZendHashUpdateMem(*overridden, key, fn, b.SizeOf("zend_function"))
+			types.ZendHashUpdateMem(*overridden, key.GetStr(), fn, b.SizeOf("zend_function"))
 			return
 		} else if fn.IsAbstract() && !existing_fn.IsAbstract() {
 
@@ -1580,7 +1580,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 		new_fn.GetOpArray().SetIsImmutable(false)
 	}
 	FunctionAddRef(new_fn)
-	fn = types.ZendHashUpdatePtr(ce.GetFunctionTable(), key, new_fn)
+	fn = types.ZendHashUpdatePtr(ce.GetFunctionTable(), key.GetStr(), new_fn)
 	ZendAddMagicMethods(ce, key, fn)
 }
 func ZendFixupTraitMethod(fn *ZendFunction, ce *types.ClassEntry) {
@@ -1924,7 +1924,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 			/* next: check for conflicts with current class */
 
-			if b.Assign(&coliding_prop, types.ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name)) != nil {
+			if b.Assign(&coliding_prop, types.ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name.GetStr())) != nil {
 				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
 					types.ZendHashDel(ce.GetPropertiesInfo(), prop_name)
 					flags |= ZEND_ACC_CHANGED
@@ -2480,7 +2480,7 @@ func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname 
 				return 0
 			}
 		} else {
-			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) == nil {
+			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname.GetStr(), ce) == nil {
 				return 0
 			}
 		}

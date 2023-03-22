@@ -599,7 +599,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			var len_ int = strlen(reflection_what)
 			var lcname *byte = zend.ZendStrTolowerDup(reflection_what, len_)
 			var module *zend.ZendModuleEntry
-			if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname, len_)) == nil {
+			if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, b.CastStr(lcname, len_))) == nil {
 				if !(strcmp(reflection_what, "main")) {
 					core.DisplayIniEntries(nil)
 				} else {

@@ -261,23 +261,23 @@ func SplDllistObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_
 		core.PhpErrorDocref(nil, faults.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
 	}
 	if inherited != 0 {
-		intern.SetFptrOffsetGet(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetget", b.SizeOf("\"offsetget\"")-1))
+		intern.SetFptrOffsetGet(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetget"))
 		if intern.GetFptrOffsetGet().GetScope() == parent {
 			intern.SetFptrOffsetGet(nil)
 		}
-		intern.SetFptrOffsetSet(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetset", b.SizeOf("\"offsetset\"")-1))
+		intern.SetFptrOffsetSet(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetset"))
 		if intern.GetFptrOffsetSet().GetScope() == parent {
 			intern.SetFptrOffsetSet(nil)
 		}
-		intern.SetFptrOffsetHas(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetexists", b.SizeOf("\"offsetexists\"")-1))
+		intern.SetFptrOffsetHas(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetexists"))
 		if intern.GetFptrOffsetHas().GetScope() == parent {
 			intern.SetFptrOffsetHas(nil)
 		}
-		intern.SetFptrOffsetDel(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetunset", b.SizeOf("\"offsetunset\"")-1))
+		intern.SetFptrOffsetDel(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetunset"))
 		if intern.GetFptrOffsetDel().GetScope() == parent {
 			intern.SetFptrOffsetDel(nil)
 		}
-		intern.SetFptrCount(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count"))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}

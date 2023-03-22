@@ -141,7 +141,7 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 	for i := range iniEntryDefs {
 		iniEntryDef := &iniEntryDefs[i]
 		p := NewZendIniEntry(iniEntryDef, moduleNumber)
-		if types.ZendHashAddPtr(directives, p.GetName(), any(p)) == nil {
+		if types.ZendHashAddPtr(directives, p.GetName().GetStr(), any(p)) == nil {
 			if p.GetName() != nil {
 				types.ZendStringReleaseEx(p.GetName(), 1)
 			}
@@ -175,7 +175,7 @@ func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_typ
 	var duplicate *types.String
 	var modifiable uint8
 	var modified types.ZendBool
-	if b.Assign(&ini_entry, types.ZendHashFindPtr(EG__().GetIniDirectives(), name)) == nil {
+	if b.Assign(&ini_entry, types.ZendHashFindPtr(EG__().GetIniDirectives(), name.GetStr())) == nil {
 		return types.FAILURE
 	}
 	modifiable = ini_entry.GetModifiable()
@@ -196,7 +196,7 @@ func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_typ
 		ini_entry.SetOrigValue(ini_entry.GetValue())
 		ini_entry.SetOrigModifiable(modifiable)
 		ini_entry.SetModified(1)
-		types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), ini_entry.GetName(), ini_entry)
+		types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), ini_entry.GetName().GetStr(), ini_entry)
 	}
 	duplicate = new_value.Copy()
 	if ini_entry.EmitOnModify(duplicate, stage) {
@@ -212,7 +212,7 @@ func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_typ
 }
 func ZendRestoreIniEntry(name *types.String, stage int) int {
 	var ini_entry *ZendIniEntry
-	if b.Assign(&ini_entry, types.ZendHashFindPtr(EG__().GetIniDirectives(), name)) == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
+	if b.Assign(&ini_entry, types.ZendHashFindPtr(EG__().GetIniDirectives(), name.GetStr())) == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
 		return types.FAILURE
 	}
 	if EG__().GetModifiedIniDirectives() != nil {
@@ -226,7 +226,7 @@ func ZendRestoreIniEntry(name *types.String, stage int) int {
 }
 func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
 	var ini_entry *ZendIniEntry
-	ini_entry = types.ZendHashStrFindPtr(RegisteredZendIniDirectives, name, name_length)
+	ini_entry = types.ZendHashStrFindPtr(RegisteredZendIniDirectives, b.CastStr(name, name_length))
 	if ini_entry == nil {
 		return types.FAILURE
 	}
@@ -235,7 +235,7 @@ func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini
 }
 func ZendIniLong(name *byte, name_length int, orig int) ZendLong {
 	var ini_entry *ZendIniEntry
-	ini_entry = types.ZendHashStrFindPtr(EG__().GetIniDirectives(), name, name_length)
+	ini_entry = types.ZendHashStrFindPtr(EG__().GetIniDirectives(), b.CastStr(name, name_length))
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
@@ -255,7 +255,7 @@ func ZendIniLong(name *byte, name_length int, orig int) ZendLong {
 }
 func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 	var ini_entry *ZendIniEntry
-	ini_entry = types.ZendHashStrFindPtr(EG__().GetIniDirectives(), name, name_length)
+	ini_entry = types.ZendHashStrFindPtr(EG__().GetIniDirectives(), b.CastStr(name, name_length))
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			return float64(b.CondF1(ini_entry.GetOrigValue() != nil, func() float64 { return ZendStrtod(ini_entry.GetOrigValue().GetVal(), nil) }, 0.0))
@@ -267,7 +267,7 @@ func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 }
 func ZendIniStringEx(name *byte, name_length int, orig int, exists *types.ZendBool) *byte {
 	var ini_entry *ZendIniEntry
-	ini_entry = types.ZendHashStrFindPtr(EG__().GetIniDirectives(), name, name_length)
+	ini_entry = types.ZendHashStrFindPtr(EG__().GetIniDirectives(), b.CastStr(name, name_length))
 	if ini_entry != nil {
 		if exists != nil {
 			*exists = 1
@@ -305,7 +305,7 @@ func ZendIniString(name string, name_length int, orig int) *byte {
 }
 func ZendIniGetValue(name *types.String) *types.String {
 	var ini_entry *ZendIniEntry
-	ini_entry = types.ZendHashFindPtr(EG__().GetIniDirectives(), name)
+	ini_entry = types.ZendHashFindPtr(EG__().GetIniDirectives(), name.GetStr())
 	if ini_entry != nil {
 		if ini_entry.GetValue() != nil {
 			return ini_entry.GetValue()

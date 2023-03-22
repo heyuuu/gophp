@@ -890,7 +890,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				}
 				temp_filename = nil
 			} else {
-				types.ZendHashAddPtr(SG__().rfc1867_uploaded_files, temp_filename, temp_filename)
+				types.ZendHashAddPtr(SG__().rfc1867_uploaded_files, temp_filename.GetStr(), temp_filename)
 			}
 
 			/* is_arr_upload is true when name of file upload field

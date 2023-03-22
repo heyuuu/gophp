@@ -22,7 +22,7 @@ func _phpGetStreamFiltersHash() *types.Array {
 func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilterFactory) int {
 	var ret int
 	var str *types.String = types.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
-	if types.ZendHashAddPtr(&StreamFiltersHash, str, any(factory)) {
+	if types.ZendHashAddPtr(&StreamFiltersHash, str.GetStr(), any(factory)) {
 		ret = types.SUCCESS
 	} else {
 		ret = types.FAILURE
@@ -39,7 +39,7 @@ func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory
 		standard.FG(stream_filters) = types.MakeArrayEx(StreamFiltersHash.GetNNumOfElements()+1, nil, 0)
 		types.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
 	}
-	if types.ZendHashAddPtr(standard.FG(stream_filters), filterpattern, any(factory)) {
+	if types.ZendHashAddPtr(standard.FG(stream_filters), filterpattern.GetStr(), any(factory)) {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -156,7 +156,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 	var n int
 	var period *byte
 	n = strlen(filtername)
-	if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, filtername, n)) {
+	if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, b.CastStr(filtername, n))) {
 		filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 	} else if b.Assign(&period, strrchr(filtername, '.')) {
 
@@ -170,7 +170,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 			b.Assert(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
-			if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, wildname, strlen(wildname))) {
+			if nil != b.Assign(&factory, types.ZendHashStrFindPtr(filter_hash, wildname)) {
 				filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 			}
 			*period = '0'

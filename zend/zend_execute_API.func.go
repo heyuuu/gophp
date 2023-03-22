@@ -830,7 +830,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	EG__().SetFakeScope(nil)
 	faults.ExceptionSave()
 	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
-		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lc_name)
+		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lc_name.GetStr())
 	}
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)

@@ -330,13 +330,13 @@ func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *ty
 		return
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
-	if b.Assign(&wrapper, types.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
+	if b.Assign(&wrapper, types.ZendHashFindPtr(global_wrapper_hash, protocol.GetStr())) == nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
 		return_value.SetFalse()
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
-	if wrapper_hash == global_wrapper_hash || types.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
+	if wrapper_hash == global_wrapper_hash || types.ZendHashFindPtr(wrapper_hash, protocol.GetStr()) == wrapper {
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
 		return_value.SetTrue()
 		return

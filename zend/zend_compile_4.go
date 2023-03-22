@@ -137,9 +137,9 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var fbc *ZendFunction
 	var opline *ZendOp
 	lcname = ZendStringTolower(name.GetStr())
-	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname)
+	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr
 
-	/* Special assert() handling should apply independently of compiler flags. */
+	/* Special assert() handling should apply independently of compiler flags. */())
 
 	if fbc != nil && types.ZendStringEqualsLiteral(lcname, "assert") {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
@@ -199,10 +199,10 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 
 	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
 		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
-		fbc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetFunctionTable(), lcname)
+		fbc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetFunctionTable(), lcname.GetStr(
 
 		/* We only know the exact method that is being called if it is either private or final.
-		 * Otherwise an overriding method in a child class may be called. */
+		 * Otherwise an overriding method in a child class may be called. */))
 
 		if fbc != nil && !fbc.HasFnFlags(ZEND_ACC_PRIVATE|ZEND_ACC_FINAL) {
 			fbc = nil
@@ -262,7 +262,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 		var ce *types.ClassEntry = nil
 		if opline.GetOp1Type() == IS_CONST {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
-			ce = types.ZendHashFindPtr(CG__().GetClassTable(), lcname)
+			ce = types.ZendHashFindPtr(CG__().GetClassTable(), lcname.GetStr())
 			if ce == nil && CG__().GetActiveClassEntry() != nil && types.ZendStringEqualsCi(CG__().GetActiveClassEntry().GetName(), lcname) {
 				ce = CG__().GetActiveClassEntry()
 			}
@@ -271,7 +271,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 		}
 		if ce != nil {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
-			fbc = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname)
+			fbc = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname.GetStr())
 			if fbc != nil && !fbc.IsPublic() {
 				if ce != CG__().GetActiveClassEntry() && (fbc.IsPrivate() || !fbc.GetScope().IsLinked() || CG__().GetActiveClassEntry() != nil && !CG__().GetActiveClassEntry().IsLinked() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), CG__().GetActiveClassEntry()) == 0) {
 
@@ -622,7 +622,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 	var label *types.Zval
 	var opnum uint32 = opline - op_array.GetOpcodes()
 	label = CT_CONSTANT_EX(op_array, opline.GetOp2().GetConstant())
-	if CG__().GetContext().GetLabels() == nil || b.Assign(&dest, types.ZendHashFindPtr(CG__().GetContext().GetLabels(), label.GetStr())) == nil {
+	if CG__().GetContext().GetLabels() == nil || b.Assign(&dest, types.ZendHashFindPtr(CG__().GetContext().GetLabels(), label.GetStr().GetStr())) == nil {
 		CG__().SetInCompilation(1)
 		CG__().SetActiveOpArray(op_array)
 		CG__().SetZendLineno(opline.GetLineno())
@@ -687,7 +687,7 @@ func ZendCompileLabel(ast *ZendAst) {
 	}
 	dest.SetBrkCont(CG__().GetContext().GetCurrentBrkCont())
 	dest.SetOplineNum(GetNextOpNumber())
-	if !(types.ZendHashAddMem(CG__().GetContext().GetLabels(), label, &dest, b.SizeOf("zend_label"))) {
+	if !(types.ZendHashAddMem(CG__().GetContext().GetLabels(), label.GetStr(), &dest, b.SizeOf("zend_label"))) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Label '%s' already defined", label.GetVal())
 	}
 }

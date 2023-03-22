@@ -203,7 +203,7 @@ func ZendBeginMethodDecl(op_array *ZendOpArray, name *types.String, has_body typ
 	op_array.SetFunctionName(name.Copy())
 	lcname = ZendStringTolower(name)
 	lcname = types.ZendNewInternedString(lcname)
-	if types.ZendHashAddPtr(ce.GetFunctionTable(), lcname, op_array) == nil {
+	if types.ZendHashAddPtr(ce.GetFunctionTable(), lcname.GetStr(), op_array) == nil {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
 	}
 	if in_interface != 0 {
@@ -353,7 +353,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *ZendOpArray, decl *ZendAstDecl, 
 	}
 	ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_FUNCTION)
 	if toplevel != 0 {
-		if types.ZendHashAddPtr(CG__().GetFunctionTable(), lcname, op_array) == nil {
+		if types.ZendHashAddPtr(CG__().GetFunctionTable(), lcname.GetStr(), op_array) == nil {
 			DoBindFunctionError(lcname, op_array, 1)
 		}
 		types.ZendStringReleaseEx(lcname, 0)
@@ -366,7 +366,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *ZendOpArray, decl *ZendAstDecl, 
 	for {
 		ZendTmpStringRelease(key)
 		key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
-		if types.ZendHashAddPtr(CG__().GetFunctionTable(), key, op_array) {
+		if types.ZendHashAddPtr(CG__().GetFunctionTable(), key.GetStr(), op_array) {
 			break
 		}
 	}
@@ -843,7 +843,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 				CG__().SetZendLineno(ast.GetLineno())
 			}
 		} else {
-			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) != nil {
+			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname.GetStr(), ce) != nil {
 				types.ZendStringRelease(lcname)
 				ZendBuildPropertiesInfoTable(ce)
 				ce.SetIsLinked(true)
@@ -867,7 +867,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 		opline.SetResultType(IS_VAR)
 		opline.GetResult().SetVar(GetTemporaryVariable())
-		if !(types.ZendHashAddPtr(CG__().GetClassTable(), lcname, ce)) {
+		if !(types.ZendHashAddPtr(CG__().GetClassTable(), lcname.GetStr(), ce)) {
 
 			/* We checked above that the class name is not used. This really shouldn't happen. */
 
@@ -884,7 +884,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		for {
 			ZendTmpStringRelease(key)
 			key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
-			if types.ZendHashAddPtr(CG__().GetClassTable(), key, ce) {
+			if types.ZendHashAddPtr(CG__().GetClassTable(), key.GetStr(), ce) {
 				break
 			}
 		}

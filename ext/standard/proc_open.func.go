@@ -53,7 +53,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 		sizeenv += str.GetLen() + 1
 		if key != nil && key.GetLen() != 0 {
 			sizeenv += key.GetLen() + 1
-			types.ZendHashAddPtr(env_hash, key, str)
+			types.ZendHashAddPtr(env_hash, key.GetStr(), str)
 		} else {
 			types.ZendHashNextIndexInsertPtr(env_hash, str)
 		}

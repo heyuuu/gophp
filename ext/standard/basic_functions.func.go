@@ -544,7 +544,7 @@ func ZifPutenv(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		unsetenv(pe.GetPutenvString())
 	}
 	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		types.ZendHashStrAddMem(&(BG__().putenv_ht), pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
+		types.ZendHashStrAddMem(&(BG__().putenv_ht), b.CastStr(pe.GetKey(), pe.GetKeyLen()), &pe, b.SizeOf("putenv_entry"))
 		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
 			tzset()
 		}
@@ -651,7 +651,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindExInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV.GetStr(), 1)) != nil || b.Assign(&args, types.ZendHashFindExInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr(), 1)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV.GetStr())) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr())) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -1429,7 +1429,7 @@ func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdow
 		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
 		BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
 	}
-	types.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
+	types.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, b.CastStr(function_name, function_len), shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	return 1
 }
 func RemoveUserShutdownFunction(function_name *byte, function_len int) types.ZendBool {
@@ -1626,7 +1626,7 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	zend.ZendIniSortEntries()
 	if extname != nil {
-		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, extname, extname_len)) == nil {
+		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, b.CastStr(extname, extname_len))) == nil {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", extname)
 			return_value.SetFalse()
 			return

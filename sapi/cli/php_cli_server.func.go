@@ -64,7 +64,7 @@ func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_
 func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, persistent int) {
 	var val *byte
 	var tv __struct__timeval = __struct__timeval{0}
-	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host", b.SizeOf("\"host\"")-1)) {
+	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host")) {
 		buffer.AppendString("Host: ")
 		buffer.AppendString(b.CastStrAuto(val))
 		buffer.AppendString("\r\n")
@@ -185,7 +185,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 func SapiCliServerReadCookies() *byte {
 	var client *PhpCliServerClient = core.SG__().server_context
 	var val *byte
-	if nil == b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie", b.SizeOf("\"cookie\"")-1)) {
+	if nil == b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie")) {
 		return nil
 	}
 	return val
@@ -744,7 +744,7 @@ func PhpCliServerClientPopulateRequestInfo(client *PhpCliServerClient, request_i
 	request_info.SetAuthDigest(nil)
 	request_info.SetAuthPassword(request_info.GetAuthDigest())
 	request_info.SetAuthUser(request_info.GetAuthPassword())
-	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type", b.SizeOf("\"content-type\"")-1)) {
+	if nil != b.Assign(&val, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "content-type")) {
 		request_info.SetContentType(val)
 	}
 }
@@ -950,7 +950,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
 	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().request_info))
-	if nil != b.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization", b.SizeOf("\"authorization\"")-1)) {
+	if nil != b.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
 		core.PhpHandleAuthData(auth)
 	}
 	core.SG__().sapi_headers.http_response_code = 200

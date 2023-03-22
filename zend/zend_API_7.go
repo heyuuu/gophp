@@ -34,7 +34,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	var fn *ZendFunction
 	key = types.ZendStringAlloc(class_name_length, 0)
 	ZendStrTolowerCopy(key.GetVal(), class_name, class_name_length)
-	disabled_class = types.ZendHashFindPtr(CG__().GetClassTable(), key)
+	disabled_class = types.ZendHashFindPtr(CG__().GetClassTable(), key.GetStr())
 	types.ZendStringReleaseEx(key, 0)
 	if disabled_class == nil {
 		return types.FAILURE

@@ -22,7 +22,7 @@ func SplFindCeByName(name *types.String, autoload types.ZendBool) *types.ClassEn
 	var ce *types.ClassEntry
 	if autoload == 0 {
 		var lc_name *types.String = zend.ZendStringTolower(name)
-		ce = types.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name)
+		ce = types.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name.GetStr())
 		types.ZendStringRelease(lc_name)
 	} else {
 		ce = zend.ZendLookupClass(name)
@@ -504,7 +504,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			spl_alfi.GetObj().SetUndef()
 			spl_alfi.GetClosure().SetUndef()
 			spl_alfi.SetCe(nil)
-			types.ZendHashAddMem(SPL_G(autoload_functions), SplAutoloadFn.GetFunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
+			types.ZendHashAddMem(SPL_G(autoload_functions), SplAutoloadFn.GetFunctionName().GetStr(), &spl_alfi, b.SizeOf("autoload_func_info"))
 			if prepend != 0 && SPL_G(autoload_functions).nNumOfElements > 1 {
 
 				/* Move the newly created element to the head of the hashtable */
@@ -521,7 +521,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 			alfi.GetFuncPtr().SetFunctionName(nil)
 			alfi.SetFuncPtr(copy)
 		}
-		if types.ZendHashAddMem(SPL_G(autoload_functions), lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
+		if types.ZendHashAddMem(SPL_G(autoload_functions), lc_name.GetStr(), &alfi, b.SizeOf("autoload_func_info")) == nil {
 			if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 				alfi.GetObj().DelRefcount()
 			}
@@ -647,7 +647,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 		return
 	}
 	if zend.EG__().GetAutoloadFunc() == nil {
-		if b.Assign(&fptr, types.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_MAGIC_AUTOLOAD)) {
+		if b.Assign(&fptr, types.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_MAGIC_AUTOLOAD.GetStr())) {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
 			tmp.SetStringCopy(types.ZSTR_MAGIC_AUTOLOAD)
@@ -887,8 +887,8 @@ func ZmStartupSpl(type_ int, module_number int) int {
 	ZmStartupSplHeap(type_, module_number)
 	ZmStartupSplFixedarray(type_, module_number)
 	ZmStartupSplObserver(type_, module_number)
-	SplAutoloadFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload", b.SizeOf("\"spl_autoload\"")-1)
-	SplAutoloadCallFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload_call", b.SizeOf("\"spl_autoload_call\"")-1)
+	SplAutoloadFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload")
+	SplAutoloadCallFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload_call")
 	b.Assert(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
 	return types.SUCCESS
 }

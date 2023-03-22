@@ -113,7 +113,7 @@ func ZendCompileUse(ast *ZendAst) {
 		}
 		old_name.AddRefcount()
 		old_name = types.ZendNewInternedString(old_name)
-		if !(types.ZendHashAddPtr(current_import, lookup_name, old_name)) {
+		if !(types.ZendHashAddPtr(current_import, lookup_name.GetStr(), old_name)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
 		types.ZendStringReleaseEx(lookup_name, 0)
@@ -161,7 +161,7 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		name = ZendPrefixWithNs(unqualified_name)
 		name = types.ZendNewInternedString(name)
 		if FC__().GetImportsConst() != nil {
-			var import_name *types.String = types.ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
+			var import_name *types.String = types.ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name.GetStr())
 			if import_name != nil && types.ZendStringEquals(import_name, name) == 0 {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 			}

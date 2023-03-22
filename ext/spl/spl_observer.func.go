@@ -53,7 +53,7 @@ func SplObjectStorageDtor(element *types.Zval) {
 }
 func SplObjectStorageGet(intern *spl_SplObjectStorage, key *types.ArrayKey) *spl_SplObjectStorageElement {
 	if key.IsStrKey() {
-		return types.ZendHashFindPtr(intern.GetStorage(), key.GetZendStringKey())
+		return types.ZendHashFindPtr(intern.GetStorage(), key.GetZendStringKey().GetStr())
 	} else {
 		return types.ZendHashIndexFindPtr(intern.GetStorage(), uint(key.Index()))
 	}
@@ -82,7 +82,7 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 		element.GetInf().SetNull()
 	}
 	if key.IsStrKey() {
-		pelement = types.ZendHashUpdateMem(intern.GetStorage(), key.GetZendStringKey(), &element, b.SizeOf("spl_SplObjectStorageElement"))
+		pelement = types.ZendHashUpdateMem(intern.GetStorage(), key.GetZendStringKey().GetStr(), &element, b.SizeOf("spl_SplObjectStorageElement"))
 	} else {
 		pelement = types.ZendHashIndexUpdateMem(intern.GetStorage(), key.Index(), &element, b.SizeOf("spl_SplObjectStorageElement"))
 	}
@@ -125,7 +125,7 @@ func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *type
 	for parent != nil {
 		if parent == spl_ce_SplObjectStorage {
 			if class_type != spl_ce_SplObjectStorage {
-				intern.SetFptrGetHash(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "gethash", b.SizeOf("\"gethash\"")-1))
+				intern.SetFptrGetHash(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "gethash"))
 				if intern.GetFptrGetHash().GetScope() == spl_ce_SplObjectStorage {
 					intern.SetFptrGetHash(nil)
 				}

@@ -155,7 +155,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 	rtd_key = lcname + 1
 	zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
 	if zv == nil {
-		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr())
+		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr().GetStr())
 		if ce != nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			return types.FAILURE
@@ -252,7 +252,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 			if zv != nil {
 				var ce *types.ClassEntry = zv.GetCe()
 				var lc_parent_name *types.String = RT_CONSTANT(opline, opline.GetOp2()).GetStr()
-				var parent_ce *types.ClassEntry = types.ZendHashFindExPtr(EG__().GetClassTable(), lc_parent_name)
+				var parent_ce *types.ClassEntry = types.ZendHashFindPtr(EG__().GetClassTable(), lc_parent_name.GetStr())
 				if parent_ce != nil {
 					if ZendTryEarlyBind(ce, parent_ce, lcname.GetStr(), zv) != 0 {
 
@@ -332,7 +332,7 @@ func ZendTryCtEvalConst(zv *types.Zval, name *types.String, is_fully_qualified t
 
 	/* Substitute case-sensitive (or lowercase) constants */
 
-	c = types.ZendHashFindPtr(EG__().GetZendConstants(), name)
+	c = types.ZendHashFindPtr(EG__().GetZendConstants(), name.GetStr())
 	if c != nil && ((ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT) != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && ((ZEND_CONSTANT_FLAGS(c)&CONST_NO_FILE_CACHE) == 0 || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
 		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
@@ -489,11 +489,11 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *typ
 	var cc *ZendClassConstant
 	var c *types.Zval
 	if ClassNameRefersToActiveCe(class_name, fetch_type) != 0 {
-		cc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name)
+		cc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name.GetStr())
 	} else if fetch_type == ZEND_FETCH_CLASS_DEFAULT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0 {
 		var ce *types.ClassEntry = ZendHashFindPtrLc(CG__().GetClassTable(), class_name.GetVal(), class_name.GetLen())
 		if ce != nil {
-			cc = types.ZendHashFindPtr(ce.GetConstantsTable(), name)
+			cc = types.ZendHashFindPtr(ce.GetConstantsTable(), name.GetStr())
 		} else {
 			return 0
 		}
@@ -555,7 +555,7 @@ func ZendDoExtendedFcallEnd() {
 }
 func ZendIsAutoGlobalStr(name string, len_ int) types.ZendBool {
 	var auto_global *ZendAutoGlobal
-	if b.Assign(&auto_global, types.ZendHashStrFindPtr(CG__().GetAutoGlobals(), name, len_)) != nil {
+	if b.Assign(&auto_global, types.ZendHashStrFindPtr(CG__().GetAutoGlobals(), b.CastStr(name, len_))) != nil {
 		if auto_global.GetArmed() != 0 {
 			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
 		}
@@ -565,7 +565,7 @@ func ZendIsAutoGlobalStr(name string, len_ int) types.ZendBool {
 }
 func ZendIsAutoGlobal(name *types.String) types.ZendBool {
 	var auto_global *ZendAutoGlobal
-	if b.Assign(&auto_global, types.ZendHashFindPtr(CG__().GetAutoGlobals(), name)) != nil {
+	if b.Assign(&auto_global, types.ZendHashFindPtr(CG__().GetAutoGlobals(), name.GetStr())) != nil {
 		if auto_global.GetArmed() != 0 {
 			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
 		}
@@ -579,7 +579,7 @@ func ZendRegisterAutoGlobal(name *types.String, jit types.ZendBool, auto_global_
 	auto_global.SetName(name)
 	auto_global.SetAutoGlobalCallback(auto_global_callback)
 	auto_global.SetJit(jit)
-	if types.ZendHashAddMem(CG__().GetAutoGlobals(), auto_global.GetName(), &auto_global, b.SizeOf("zend_auto_global")) != nil {
+	if types.ZendHashAddMem(CG__().GetAutoGlobals(), auto_global.GetName().GetStr(), &auto_global, b.SizeOf("zend_auto_global")) != nil {
 		retval = types.SUCCESS
 	} else {
 		retval = types.FAILURE

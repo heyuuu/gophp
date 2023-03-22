@@ -452,7 +452,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	}
 	name = ZendAstGetStr(name_ast)
 	lcname = ZendStringTolower(name)
-	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname)
+	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr())
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
 		types.ZendStringReleaseEx(lcname, 0)
 		return types.FAILURE

@@ -120,7 +120,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var key *types.String
 	key = types.NewString(b.CastStr(name, name_length))
 	zend.ZendIsAutoGlobal(key)
-	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key)) != nil && data.IsType(types.IS_ARRAY) {
+	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key.GetStr())) != nil && data.IsType(types.IS_ARRAY) {
 		var __ht *types.Array = data.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()

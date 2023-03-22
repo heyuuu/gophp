@@ -157,7 +157,7 @@ func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *Zend
 		return ht.IndexFindH(hval)
 	} else if offset.IsNull() {
 	str_idx:
-		return types.ZendHashFindExInd(ht, types.ZSTR_EMPTY_ALLOC().GetStr(), 1)
+		return types.ZendHashFindInd(ht, types.ZSTR_EMPTY_ALLOC().GetStr())
 	} else if offset.IsFalse() {
 		hval = 0
 		goto num_idx

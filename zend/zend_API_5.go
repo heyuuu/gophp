@@ -165,7 +165,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
 	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
 	lcname = types.ZendNewInternedString(lcname)
-	if b.Assign(&module_ptr, types.ZendHashAddMem(&ModuleRegistry, lcname, module, b.SizeOf("zend_module_entry"))) == nil {
+	if b.Assign(&module_ptr, types.ZendHashAddMem(&ModuleRegistry, lcname.GetStr(), module, b.SizeOf("zend_module_entry"))) == nil {
 		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
 		types.ZendStringRelease(lcname)
 		return nil
@@ -391,7 +391,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 		lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = Malloc(b.SizeOf("zend_internal_function"))
 		memcpy(reg_function, &function, b.SizeOf("zend_internal_function"))
-		if types.ZendHashAddPtr(target_function_table, lowercase_name, reg_function) == nil {
+		if types.ZendHashAddPtr(target_function_table, lowercase_name.GetStr(), reg_function) == nil {
 			unload = 1
 			Free(reg_function)
 			types.ZendStringRelease(lowercase_name)

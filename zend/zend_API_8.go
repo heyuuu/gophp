@@ -288,7 +288,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 	var module *ZendModuleEntry
 	lname = types.ZendStringAlloc(name_len, 0)
 	ZendStrTolowerCopy(lname.GetVal(), module_name, name_len)
-	module = types.ZendHashFindPtr(&ModuleRegistry, lname)
+	module = types.ZendHashFindPtr(&ModuleRegistry, lname.GetStr())
 	types.ZendStringEfree(lname)
 	if module != nil {
 		return module.GetVersion()
@@ -333,7 +333,7 @@ func ZendDeclareTypedProperty(
 		access_type |= ZEND_ACC_PUBLIC
 	}
 	if (access_type & ZEND_ACC_STATIC) != 0 {
-		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name)) != nil && property_info_ptr.IsStatic() {
+		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
 			types.ZendHashDel(ce.GetPropertiesInfo(), name)
@@ -359,7 +359,7 @@ func ZendDeclareTypedProperty(
 		}
 	} else {
 		var property_default_ptr *types.Zval
-		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name)) != nil && !property_info_ptr.IsStatic() {
+		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && !property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			types.ZendHashDel(ce.GetPropertiesInfo(), name)
@@ -424,7 +424,7 @@ func ZendDeclareTypedProperty(
 	property_info.SetDocComment(doc_comment)
 	property_info.SetCe(ce)
 	property_info.SetType(type_)
-	types.ZendHashUpdatePtr(ce.GetPropertiesInfo(), name, property_info)
+	types.ZendHashUpdatePtr(ce.GetPropertiesInfo(), name.GetStr(), property_info)
 	return types.SUCCESS
 }
 func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict types.ZendBool) int {

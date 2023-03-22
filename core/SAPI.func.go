@@ -74,7 +74,7 @@ func SapiReadPostData() {
 
 	/* now try to find an appropriate POST content handler */
 
-	if b.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().known_post_content_types), content_type, content_type_length)) != nil {
+	if b.Assign(&post_entry, types.ZendHashStrFindPtr(&(SG__().known_post_content_types), b.CastStr(content_type, content_type_length))) != nil {
 
 		/* found one, register it for use */
 
@@ -692,7 +692,7 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	}
 	key = types.NewString(b.CastStr(post_entry.GetContentType(), post_entry.GetContentTypeLen()))
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
-	if types.ZendHashAddMem(&(SG__().known_post_content_types), key, any(post_entry), b.SizeOf("sapi_post_entry")) {
+	if types.ZendHashAddMem(&(SG__().known_post_content_types), key.GetStr(), any(post_entry), b.SizeOf("sapi_post_entry")) {
 		ret = types.SUCCESS
 	} else {
 		ret = types.FAILURE

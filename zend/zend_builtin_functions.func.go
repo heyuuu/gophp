@@ -241,7 +241,7 @@ func ZifErrorReporting(ret zpp.DefRet, _ zpp.DefOpt, newErrorLevel *types.Zval) 
 					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
 					EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
 				}
-				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING, p) != nil {
+				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING.GetStr(), p) != nil {
 					p.SetOrigValue(p.GetValue())
 					p.SetOrigModifiable(p.GetModifiable())
 					p.SetModified(1)
@@ -807,7 +807,7 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	lcname = ZendStringTolower(method_name)
-	func_ = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname)
+	func_ = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname.GetStr())
 	types.ZendStringReleaseEx(lcname, 0)
 	if func_ != nil {
 
@@ -864,7 +864,7 @@ func ZifPropertyExists(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetNull()
 		return
 	}
-	property_info = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property)
+	property_info = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property.GetStr())
 	if property_info != nil && (!property_info.IsPrivate() || property_info.GetCe() == ce) {
 		return_value.SetTrue()
 		return
@@ -905,7 +905,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		} else {
 			lcname = ZendStringTolower(name)
 		}
-		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname)
+		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr())
 		types.ZendStringReleaseEx(lcname, 0)
 	} else {
 		ce = ZendLookupClass(name)
@@ -951,7 +951,7 @@ func ZifFunctionExists(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else {
 		lcname = ZendStringTolower(name)
 	}
-	func_ = types.ZendHashFindPtr(EG__().GetFunctionTable(), lcname)
+	func_ = types.ZendHashFindPtr(EG__().GetFunctionTable(), lcname.GetStr())
 	types.ZendStringReleaseEx(lcname, 0)
 
 	/*
@@ -1228,7 +1228,7 @@ func ZifCreateFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 	if retval == types.SUCCESS {
 		var func_ *ZendOpArray
 		var static_variables *types.Array
-		func_ = types.ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
+		func_ = types.ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
 		if func_ == nil {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unexpected inconsistency in create_function()")
 			return_value.SetFalse()
@@ -1245,7 +1245,7 @@ func ZifCreateFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 		function_name.GetVal()[0] = '0'
 		for {
 			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(EG__().GetLambdaCount()))) + 1)
-			if types.ZendHashAddPtr(EG__().GetFunctionTable(), function_name, func_) != nil {
+			if types.ZendHashAddPtr(EG__().GetFunctionTable(), function_name.GetStr(), func_) != nil {
 				break
 			}
 		}
@@ -1460,7 +1460,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				var arg *types.Zval
 				for i < first_extra_arg {
 					arg_name = call.GetFunc().GetOpArray().GetVars()[i]
-					arg = types.ZendHashFindExInd(call.GetSymbolTable(), arg_name.GetStr(), 1)
+					arg = types.ZendHashFindInd(call.GetSymbolTable(), arg_name.GetStr())
 					if arg != nil {
 						if arg.IsRefcounted() {
 							arg.AddRefcount()
@@ -1932,10 +1932,10 @@ func ZifGetExtensionFuncs(executeData *ZendExecuteData, return_value *types.Zval
 	}
 	if strncasecmp(extension_name.GetVal(), "zend", b.SizeOf("\"zend\"")) {
 		lcname = ZendStringTolower(extension_name)
-		module = types.ZendHashFindPtr(&ModuleRegistry, lcname)
+		module = types.ZendHashFindPtr(&ModuleRegistry, lcname.GetStr())
 		types.ZendStringReleaseEx(lcname, 0)
 	} else {
-		module = types.ZendHashStrFindPtr(&ModuleRegistry, "core", b.SizeOf("\"core\"")-1)
+		module = types.ZendHashStrFindPtr(&ModuleRegistry, "core")
 	}
 	if module == nil {
 		return_value.SetFalse()

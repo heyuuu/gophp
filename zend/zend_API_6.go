@@ -179,7 +179,7 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	}
 	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), EG__().GetCurrentModule().GetType() == MODULE_PERSISTENT)
 	lowercase_name = types.ZendNewInternedString(lowercase_name)
-	types.ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name, class_entry)
+	types.ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name.GetStr(), class_entry)
 	types.ZendStringReleaseEx(lowercase_name, 1)
 	return class_entry
 }
@@ -268,7 +268,7 @@ func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *type
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
 	var func_ *ZendInternalFunction
-	if b.Assign(&func_, types.ZendHashStrFindPtr(CG__().GetFunctionTable(), function_name, function_name_length)) {
+	if b.Assign(&func_, types.ZendHashStrFindPtr(CG__().GetFunctionTable(), b.CastStr(function_name, function_name_length))) {
 		ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(ZEND_ACC_VARIADIC | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_HAS_RETURN_TYPE)
 		func_.SetNumArgs(0)

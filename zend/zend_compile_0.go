@@ -642,7 +642,7 @@ func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 	var lcname *types.String
 	types.ZSTR_ALLOCA_ALLOC(lcname, len_)
 	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
-	result = types.ZendHashFindPtr(ht, lcname)
+	result = types.ZendHashFindPtr(ht, lcname.GetStr())
 	lcname.Free()
 	return result
 }
@@ -670,7 +670,7 @@ func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualifie
 
 		var import_name *types.String
 		if case_sensitive != 0 {
-			import_name = types.ZendHashFindPtr(current_import_sub, name)
+			import_name = types.ZendHashFindPtr(current_import_sub, name.GetStr())
 		} else {
 			import_name = ZendHashFindPtrLc(current_import_sub, name.GetVal(), name.GetLen())
 		}

@@ -305,12 +305,12 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 	if PhpOutputLockError(PHP_OUTPUT_HANDLER_START) != 0 || handler == nil {
 		return types.FAILURE
 	}
-	if nil != b.Assign(&conflict, types.ZendHashFindPtr(&PhpOutputHandlerConflicts, handler.GetName())) {
+	if nil != b.Assign(&conflict, types.ZendHashFindPtr(&PhpOutputHandlerConflicts, handler.GetName().GetStr())) {
 		if types.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
 			return types.FAILURE
 		}
 	}
-	if nil != b.Assign(&rconflicts, types.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
+	if nil != b.Assign(&rconflicts, types.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName().GetStr())) {
 		var __ht *types.Array = rconflicts
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -360,7 +360,7 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
-	types.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str, check_func)
+	types.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str.GetStr(), check_func)
 	types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }
@@ -371,7 +371,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 		faults.Error(faults.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return types.FAILURE
 	}
-	if nil != b.Assign(&rev_ptr, types.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
+	if nil != b.Assign(&rev_ptr, types.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, b.CastStr(name, name_len))) {
 		if types.ZendHashNextIndexInsertPtr(rev_ptr, check_func) {
 			return types.SUCCESS
 		} else {
@@ -385,13 +385,13 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 			return types.FAILURE
 		}
 		str = types.ZendStringInitInterned(name, name_len, 1)
-		types.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str, &rev, b.SizeOf("HashTable"))
+		types.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str.GetStr(), &rev, b.SizeOf("HashTable"))
 		types.ZendStringReleaseEx(str, 1)
 		return types.SUCCESS
 	}
 }
 func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT {
-	return types.ZendHashStrFindPtr(&PhpOutputHandlerAliases, name, name_len)
+	return types.ZendHashStrFindPtr(&PhpOutputHandlerAliases, b.CastStr(name, name_len))
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *types.String
@@ -400,7 +400,7 @@ func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHand
 		return types.FAILURE
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
-	types.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str, func_)
+	types.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str.GetStr(), func_)
 	types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }

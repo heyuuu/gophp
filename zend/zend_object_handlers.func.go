@@ -535,7 +535,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 
 			/* mark pointer as "special" using low bit */
 
-			types.ZendHashAddNewPtr(guards, str, any(zend_uintptr_t&zv.GetPropertyGuard()|1))
+			types.ZendHashAddNewPtr(guards, str.GetStr(), any(zend_uintptr_t&zv.GetPropertyGuard()|1))
 			ZvalPtrDtorStr(zv)
 			zv.SetArray(guards)
 		}
@@ -557,7 +557,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 
 	ptr = (*uint32)(Emalloc(b.SizeOf("uint32_t")))
 	*ptr = 0
-	return (*uint32)(types.ZendHashAddNewPtr(guards, member, ptr))
+	return (*uint32)(types.ZendHashAddNewPtr(guards, member.GetStr(), ptr))
 }
 func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	var zobj *types.ZendObject
@@ -1307,7 +1307,7 @@ func ZendClassInitStatics(class_type *types.ClassEntry) {
 func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types.String, type_ int, property_info_ptr **ZendPropertyInfo) *types.Zval {
 	var ret *types.Zval
 	var scope *types.ClassEntry
-	var property_info *ZendPropertyInfo = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property_name)
+	var property_info *ZendPropertyInfo = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property_name.GetStr())
 	*property_info_ptr = property_info
 	if property_info == nil {
 		goto undeclared_property
