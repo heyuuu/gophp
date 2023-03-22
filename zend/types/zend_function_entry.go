@@ -17,6 +17,11 @@ type ZendFunctionEntry struct {
 	flags           uint32
 }
 
+// 只可用于 def.DefFunc 使用，后续会做不兼容修改
+func DefFunctionEntry(funcName string, handler zend.ZifHandler, requiredNumArgs uint32, argInfos []zend.ArgInfo, returnArgInfo *zend.ArgInfo, flags uint32) ZendFunctionEntry {
+	return ZendFunctionEntry{funcName: funcName, handler: handler, requiredNumArgs: requiredNumArgs, argInfos: argInfos, returnArgInfo: returnArgInfo, flags: flags}
+}
+
 func MakeZendFunctionEntryEx(funcName string, flags uint32, handler zend.ZifHandler, inputArgInfos []zend.ArgInfo) ZendFunctionEntry {
 	var requiredNumArgs int
 	var argInfos []zend.ArgInfo

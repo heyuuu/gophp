@@ -63,41 +63,41 @@ func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 }
 
 //@zif -old
-func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet, requested_offset int) {
-	if requested_offset < 0 {
+func ZifFuncGetArg(executeData zpp.DefEx, returnValue zpp.DefRet, argNum int) {
+	if argNum < 0 {
 		faults.Error(faults.E_WARNING, "func_get_arg():  The argument number should be >= 0")
-		return_value.SetFalse()
+		returnValue.SetFalse()
 		return
 	}
 
 	ex := executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		faults.Error(faults.E_WARNING, "func_get_arg():  Called from the global scope - no function context")
-		return_value.SetFalse()
+		returnValue.SetFalse()
 		return
 	}
 	if ZendForbidDynamicCall("func_get_arg()") == types.FAILURE {
-		return_value.SetFalse()
+		returnValue.SetFalse()
 		return
 	}
 
 	arg_count := ex.NumArgs()
-	if requested_offset >= arg_count {
-		faults.Error(faults.E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", requested_offset)
-		return_value.SetFalse()
+	if argNum >= arg_count {
+		faults.Error(faults.E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", argNum)
+		returnValue.SetFalse()
 		return
 	}
 
 	var arg *types.Zval
 	first_extra_arg := int(ex.GetFunc().GetOpArray().GetNumArgs())
-	if requested_offset >= first_extra_arg && ex.NumArgs() > first_extra_arg {
-		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + (requested_offset - first_extra_arg))
+	if argNum >= first_extra_arg && ex.NumArgs() > first_extra_arg {
+		arg = ex.VarNum(ex.GetFunc().GetOpArray().GetLastVar() + int(ex.GetFunc().GetOpArray().GetT()) + (argNum - first_extra_arg))
 	} else {
-		arg = ex.Arg(requested_offset + 1)
+		arg = ex.Arg(argNum + 1)
 	}
 
 	if !(arg.IsUndef()) {
-		types.ZVAL_COPY_DEREF(return_value, arg)
+		types.ZVAL_COPY_DEREF(returnValue, arg)
 	}
 }
 func ZifFuncGetArgs(executeData zpp.DefEx) (*types.Array, bool) {

@@ -195,7 +195,7 @@ func parseArgInfos(funcDecl *ast.FuncDecl) ([]ArgInfo, error) {
 			hasRealParam = true
 		}
 		argInfos = append(argInfos, ArgInfo{
-			name: paramName,
+			name: lcName(paramName),
 			typ:  paramType,
 		})
 	}

@@ -8,15 +8,30 @@ import (
 )
 
 var (
+	// pkgIdent
+	zppPkgIdent = func(name string) *ast.SelectorExpr { return f.PkgIdent("zpp", name) }
+	defPkgIdent = func(name string) *ast.SelectorExpr { return f.PkgIdent("def", name) }
 	// types
-	typeEx   = f.RefType(f.Type("ZendExecuteData"))
-	typeZval = f.RefType(f.PkgIdent("types", "Zval"))
+	typeEx         = f.RefType(f.Type("ZendExecuteData"))
+	typeZval       = f.RefType(f.PkgIdent("types", "Zval"))
+	typeArgInfo    = defPkgIdent("ArgInfo")
+	typeReturnInfo = defPkgIdent("ReturnInfo")
+
 	// variables
-	fpIdent = f.Ident("fp")
+	executeDataIdent = f.Ident("executeData")
+	returnValueIdent = f.Ident("returnValue")
+	fpIdent          = f.Ident("fp")
+	retIdent         = f.Ident("ret")
+	okIdent          = f.Ident("ok")
+	// flags
+	flagQuite   = zppPkgIdent("FlagQuiet")
+	flagThrow   = zppPkgIdent("FlagThrow")
+	flagOldMode = zppPkgIdent("FlagOldMode")
 )
 
 func genFileNode(name string, infos []*ZifInfo) *ast.File {
 	fb := f.NewFileBuilder(name)
+	fb.AddImport("sik/zend/def")
 	fb.AddImport("sik/zend/types")
 	fb.AddImport("sik/zend/zpp")
 
@@ -26,14 +41,23 @@ func genFileNode(name string, infos []*ZifInfo) *ast.File {
 				f.DocComment("\n// generate by "+zifInfo.funcName),
 				f.Ident(zifInfo.defName),
 				&ast.CallExpr{
-					Fun:  f.Ident("DefFunc"),
-					Args: []ast.Expr{genDefFuncOpts(zifInfo)},
+					Fun:  defPkgIdent("DefFunc"),
+					Args: genDefFuncArgs(zifInfo),
 				},
 			),
 		)
 	}
 
 	return fb.Build()
+}
+
+func genDefFuncArgs(zifInfo *ZifInfo) []ast.Expr {
+	return []ast.Expr{
+		f.StrLit(zifInfo.name),
+		f.IntLit(zifInfo.minNumArgs),
+		f.IntLit(zifInfo.maxNumArgs),
+		genDefFuncOpts(zifInfo),
+	}
 }
 
 func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
@@ -56,31 +80,23 @@ func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
 
 	// 构建 DefFuncOpts 字段
 	var optElements []ast.Expr
-	optElements = append(optElements, f.KeyValue("name", f.StrLit(zifInfo.name)))
-	optElements = append(optElements, f.KeyValue("minNumArgs", f.IntLit(zifInfo.minNumArgs)))
-	optElements = append(optElements, f.KeyValue("maxNumArgs", f.IntLit(zifInfo.maxNumArgs)))
 	if len(realArgInfos) != 0 {
-		optElements = append(optElements, f.KeyValue("argInfos", &ast.CompositeLit{
-			Type: f.ArrayType(f.Ident("ArgInfo")),
+		optElements = append(optElements, f.KeyValue("ArgInfos", &ast.CompositeLit{
+			Type: f.ArrayType(typeArgInfo),
 			Elts: realArgInfos,
 		}))
 	}
 
-	optElements = append(optElements, f.KeyValue("handler", genZifHandler(zifInfo)))
+	optElements = append(optElements, f.KeyValue("Handler", genZifHandler(zifInfo)))
 
 	// 构建结构体字面量
 	return &ast.CompositeLit{
-		Type: f.Ident("DefFuncOpts"),
+		Type: defPkgIdent("DefFuncOpts"),
 		Elts: optElements,
 	}
 }
 
 func genZifHandler(zifInfo *ZifInfo) ast.Expr {
-	executeDataIdent := f.Ident("executeData")
-	returnValueIdent := f.Ident("returnValue")
-	retIdent := f.Ident("ret")
-	okIdent := f.Ident("ok")
-
 	// type
 	funcType := &ast.FuncType{
 		Params: f.Fields(
@@ -110,16 +126,13 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 		// fp := FastParseStart(...)
 		var flags []ast.Expr
 		if zifInfo.quiet {
-			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagQuiet")}
-			flags = append(flags, flag)
+			flags = append(flags, flagQuite)
 		}
 		if zifInfo.strict {
-			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagThrow")}
-			flags = append(flags, flag)
+			flags = append(flags, flagThrow)
 		}
 		if zifInfo.oldMode {
-			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagOldMode")}
-			flags = append(flags, flag)
+			flags = append(flags, flagOldMode)
 		}
 		var flagsExpr ast.Expr
 		if len(flags) != 0 {
