@@ -1445,10 +1445,8 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		var p = call.Arg(1)
 		ArrayInitSize(arg_array, num_args)
 		types.ZendHashRealInitPacked(arg_array.GetArr())
-		var __fill_ht = arg_array.GetArr()
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+
+		fillScope := types.PackedFillStart(arg_array.GetArr())
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {
 			var first_extra_arg = b.Min(num_args, call.GetFunc().GetOpArray().GetNumArgs())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
@@ -1467,14 +1465,11 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 						if arg.IsRefcounted() {
 							arg.AddRefcount()
 						}
-						types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), arg)
+						fillScope.FillSet(arg)
 					} else {
-						__fill_bkt.GetVal().SetNull()
+						fillScope.FillSetNull()
 					}
-					__fill_bkt.SetH(__fill_idx)
-					__fill_bkt.SetKey(nil)
-					__fill_bkt++
-					__fill_idx++
+					fillScope.FillNext()
 					i++
 				}
 			} else {
@@ -1483,14 +1478,11 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 						if p.IsRefcounted() {
 							p.AddRefcount()
 						}
-						types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
+						fillScope.FillSet(p)
 					} else {
-						__fill_bkt.GetVal().SetNull()
+						fillScope.FillSetNull()
 					}
-					__fill_bkt.SetH(__fill_idx)
-					__fill_bkt.SetKey(nil)
-					__fill_bkt++
-					__fill_idx++
+					fillScope.FillNext()
 					p++
 					i++
 				}
@@ -1502,21 +1494,15 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				if p.IsRefcounted() {
 					p.AddRefcount()
 				}
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
+				fillScope.FillSet(p)
 			} else {
-				__fill_bkt.GetVal().SetNull()
+				fillScope.FillSetNull()
 			}
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillNext()
 			p++
 			i++
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 		types.Z_ARRVAL_P(arg_array).SetNNumOfElements(num_args)
 	} else {
 		types.ZVAL_EMPTY_ARRAY(arg_array)

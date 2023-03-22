@@ -587,8 +587,8 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
 
-			/* Free extra args before releasing the closure,
-			 * as that may free the op_array. */))
+				/* Free extra args before releasing the closure,
+				 * as that may free the op_array. */))
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -1881,25 +1881,16 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		args = types.ZendNewArray(num_args)
 		types.ZendHashRealInitPacked(args)
 		for {
-			var __fill_ht *types.Array = args
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(args)
 			for {
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSet(p)
+				fillScope.FillNext()
 				p++
 				if p == end {
 					break
 				}
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 			break
 		}
 	}
@@ -2236,10 +2227,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		ArrayInitSize(params, arg_count-arg_num+1)
 		types.ZendHashRealInitPacked(params.GetArr())
 		for {
-			var __fill_ht *types.Array = params.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(params.GetArr())
 			param = executeData.VarNum(executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T)
 			if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_HAS_TYPE_HINTS) != 0 {
 				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
@@ -2248,11 +2236,8 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if param.IsRefcounted() {
 						param.AddRefcount()
 					}
-					types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), param)
-					__fill_bkt.SetH(__fill_idx)
-					__fill_bkt.SetKey(nil)
-					__fill_bkt++
-					__fill_idx++
+					fillScope.FillSet(param)
+					fillScope.FillNext()
 					param++
 					if b.PreInc(&arg_num) > arg_count {
 						break
@@ -2263,21 +2248,15 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 					if param.IsRefcounted() {
 						param.AddRefcount()
 					}
-					types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), param)
-					__fill_bkt.SetH(__fill_idx)
-					__fill_bkt.SetKey(nil)
-					__fill_bkt++
-					__fill_idx++
+					fillScope.FillSet(param)
+					fillScope.FillNext()
 					param++
 					if b.PreInc(&arg_num) > arg_count {
 						break
 					}
 				}
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 			break
 		}
 	} else {
@@ -8055,10 +8034,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		ht = types.ZendNewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
-		var __fill_ht *types.Array = ht
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
 		var q *types.Zval
 		var i uint32 = skip
@@ -8071,14 +8047,11 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 					if q.IsRefcounted() {
 						q.AddRefcount()
 					}
-					types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
+					fillScope.FillSet(q)
 				} else {
-					__fill_bkt.GetVal().SetNull()
+					fillScope.FillSetNull()
 				}
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillNext()
 				p++
 				i++
 			}
@@ -8096,21 +8069,15 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 				if q.IsRefcounted() {
 					q.AddRefcount()
 				}
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
+				fillScope.FillSet(q)
 			} else {
-				__fill_bkt.GetVal().SetNull()
+				fillScope.FillSetNull()
 			}
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillNext()
 			p++
 			i++
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 		ht.SetNNumOfElements(result_size)
 	} else {
 		types.ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))
@@ -30441,10 +30408,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		ht = types.ZendNewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
-		var __fill_ht *types.Array = ht
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
 		var q *types.Zval
 		var i uint32 = skip
@@ -30457,14 +30421,11 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 					if q.IsRefcounted() {
 						q.AddRefcount()
 					}
-					types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
+					fillScope.FillSet(q)
 				} else {
-					__fill_bkt.GetVal().SetNull()
+					fillScope.FillSetNull()
 				}
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillNext()
 				p++
 				i++
 			}
@@ -30482,21 +30443,15 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 				if q.IsRefcounted() {
 					q.AddRefcount()
 				}
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
+				fillScope.FillSet(q)
 			} else {
-				__fill_bkt.GetVal().SetNull()
+				fillScope.FillSetNull()
 			}
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillNext()
 			p++
 			i++
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 		ht.SetNNumOfElements(result_size)
 	} else {
 		types.ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))

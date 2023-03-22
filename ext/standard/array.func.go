@@ -2697,24 +2697,15 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			zend.ArrayInitSize(return_value, uint32((low-high)/lstep+1))
 			types.ZendHashRealInitPacked(return_value.GetArr())
 			for {
-				var __fill_ht *types.Array = return_value.GetArr()
-				var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-				var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-				b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+				fillScope := types.PackedFillStart(return_value.GetArr())
 				for ; low >= high; low -= uint(lstep) {
-					__fill_bkt.GetVal().SetInternedString(types.ZSTR_CHAR(low))
-					__fill_bkt.SetH(__fill_idx)
-					__fill_bkt.SetKey(nil)
-					__fill_bkt++
-					__fill_idx++
+					fillScope.FillSetInternedStr(types.ZSTR_CHAR(low))
+					fillScope.FillNext()
 					if signed__int(low-lstep) < 0 {
 						break
 					}
 				}
-				__fill_ht.SetNNumUsed(__fill_idx)
-				__fill_ht.SetNNumOfElements(__fill_idx)
-				__fill_ht.SetNNextFreeElement(__fill_idx)
-				__fill_ht.SetNInternalPointer(0)
+				fillScope.FillEnd()
 				break
 			}
 		} else if high > low {
@@ -2725,24 +2716,15 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			zend.ArrayInitSize(return_value, uint32((high-low)/lstep+1))
 			types.ZendHashRealInitPacked(return_value.GetArr())
 			for {
-				var __fill_ht *types.Array = return_value.GetArr()
-				var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-				var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-				b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+				fillScope := types.PackedFillStart(return_value.GetArr())
 				for ; low <= high; low += uint(lstep) {
-					__fill_bkt.GetVal().SetInternedString(types.ZSTR_CHAR(low))
-					__fill_bkt.SetH(__fill_idx)
-					__fill_bkt.SetKey(nil)
-					__fill_bkt++
-					__fill_idx++
+					fillScope.FillSetInternedStr(types.ZSTR_CHAR(low))
+					fillScope.FillNext()
 					if signed__int(low+lstep) > 255 {
 						break
 					}
 				}
-				__fill_ht.SetNNumUsed(__fill_idx)
-				__fill_ht.SetNNumOfElements(__fill_idx)
-				__fill_ht.SetNNextFreeElement(__fill_idx)
-				__fill_ht.SetNInternalPointer(0)
+				fillScope.FillEnd()
 				break
 			}
 		} else {
@@ -2778,25 +2760,16 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			size = uint32(_phpMathRound(__calc_size, 0, PHP_ROUND_HALF_UP))
 			zend.ArrayInitSize(return_value, size)
 			types.ZendHashRealInitPacked(return_value.GetArr())
-			var __fill_ht *types.Array = return_value.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(return_value.GetArr())
 			i = 0
 			element = low
 			for i < size && element >= high {
-				__fill_bkt.GetVal().SetDouble(element)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSetDouble(element)
+				fillScope.FillNext()
 				i++
 				element = low - i*step
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 		} else if high > low {
 			if high-low < step || step <= 0 {
 				err = 1
@@ -2811,25 +2784,16 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			size = uint32(_phpMathRound(__calc_size, 0, PHP_ROUND_HALF_UP))
 			zend.ArrayInitSize(return_value, size)
 			types.ZendHashRealInitPacked(return_value.GetArr())
-			var __fill_ht *types.Array = return_value.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(return_value.GetArr())
 			i = 0
 			element = low
 			for i < size && element <= high {
-				__fill_bkt.GetVal().SetDouble(element)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSetDouble(element)
+				fillScope.FillNext()
 				i++
 				element = low + i*step
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 		} else {
 			zend.ArrayInit(return_value)
 			tmp.SetDouble(low)
@@ -2870,21 +2834,12 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			size = uint32(__calc_size + 1)
 			zend.ArrayInitSize(return_value, size)
 			types.ZendHashRealInitPacked(return_value.GetArr())
-			var __fill_ht *types.Array = return_value.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(return_value.GetArr())
 			for i = 0; i < size; i++ {
-				__fill_bkt.GetVal().SetLong(low - i*lstep)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSetLong(low - i*lstep)
+				fillScope.FillNext()
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 		} else if high > low {
 			if zend.ZendUlong(high-low < lstep) != 0 {
 				err = 1
@@ -2899,21 +2854,12 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			size = uint32(__calc_size + 1)
 			zend.ArrayInitSize(return_value, size)
 			types.ZendHashRealInitPacked(return_value.GetArr())
-			var __fill_ht *types.Array = return_value.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(return_value.GetArr())
 			for i = 0; i < size; i++ {
-				__fill_bkt.GetVal().SetLong(low + i*lstep)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSetLong(low + i*lstep)
+				fillScope.FillNext()
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 		} else {
 			zend.ArrayInit(return_value)
 			tmp.SetLong(low)
@@ -3699,10 +3645,7 @@ func PhpArrayMerge(dest *types.Array, src *types.Array) int {
 	var string_key *types.String
 	if dest.HasUFlags(types.HASH_FLAG_PACKED) && src.HasUFlags(types.HASH_FLAG_PACKED) {
 		dest.Extend(dest.GetNNumOfElements() + src.GetNNumOfElements())
-		var __fill_ht *types.Array = dest
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(dest)
 		var __ht *types.Array = src
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -3712,16 +3655,10 @@ func PhpArrayMerge(dest *types.Array, src *types.Array) int {
 				src_entry = types.Z_REFVAL_P(src_entry)
 			}
 			src_entry.TryAddRefcount()
-			types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), src_entry)
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillSet(src_entry)
+			fillScope.FillNext()
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 	} else {
 		var __ht *types.Array = src
 		for _, _p := range __ht.foreachData() {
@@ -3926,10 +3863,7 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 	dest = return_value.GetArr()
 	if src.HasUFlags(types.HASH_FLAG_PACKED) {
 		types.ZendHashRealInitPacked(dest)
-		var __fill_ht *types.Array = dest
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(dest)
 		var __ht *types.Array = src
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -3939,16 +3873,10 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *types
 				src_entry = types.Z_REFVAL_P(src_entry)
 			}
 			src_entry.TryAddRefcount()
-			types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), src_entry)
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillSet(src_entry)
+			fillScope.FillNext()
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 	} else {
 		var string_key *types.String
 		types.ZendHashRealInitMixed(dest)
@@ -4080,10 +4008,7 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	} else {
 		zend.ArrayInitSize(return_value, elem_count)
 		types.ZendHashRealInitPacked(return_value.GetArr())
-		var __fill_ht *types.Array = return_value.GetArr()
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(return_value.GetArr())
 
 		/* Go through input array and add keys to the return array */
 
@@ -4100,22 +4025,16 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			str_idx = _p.GetKey()
 			entry = _z
 			if str_idx != nil {
-				__fill_bkt.GetVal().SetStringCopy(str_idx)
+				fillScope.FillSetStringCopy(str_idx)
 			} else {
-				__fill_bkt.GetVal().SetLong(num_idx)
+				fillScope.FillSetLong(num_idx)
 			}
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillNext()
 		}
 
 		/* Go through input array and add keys to the return array */
 
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 	}
 
 	/* Initialize return array */
@@ -4190,10 +4109,7 @@ func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 	/* Go through input array and add values to the return array */
 
-	var __fill_ht *types.Array = return_value.GetArr()
-	var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-	var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-	b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+	fillScope := types.PackedFillStart(return_value.GetArr())
 	var __ht *types.Array = arrval
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -4203,16 +4119,10 @@ func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			entry = types.Z_REFVAL_P(entry)
 		}
 		entry.TryAddRefcount()
-		types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), entry)
-		__fill_bkt.SetH(__fill_idx)
-		__fill_bkt.SetKey(nil)
-		__fill_bkt++
-		__fill_idx++
+		fillScope.FillSet(entry)
+		fillScope.FillNext()
 	}
-	__fill_ht.SetNNumUsed(__fill_idx)
-	__fill_ht.SetNNumOfElements(__fill_idx)
-	__fill_ht.SetNNextFreeElement(__fill_idx)
-	__fill_ht.SetNInternalPointer(0)
+	fillScope.FillEnd()
 
 	/* Go through input array and add values to the return array */
 }
@@ -4351,10 +4261,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	zend.ArrayInitSize(return_value, input.GetNNumOfElements())
 	if index == nil {
 		types.ZendHashRealInitPacked(return_value.GetArr())
-		var __fill_ht *types.Array = return_value.GetArr()
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(return_value.GetArr())
 		var __ht *types.Array = input
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -4367,16 +4274,10 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			} else if b.Assign(&colval, ArrayColumnFetchProp(data, column, &rv)) == nil {
 				continue
 			}
-			types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), colval)
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillSet(colval)
+			fillScope.FillNext()
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 	} else {
 		var __ht *types.Array = input
 		for _, _p := range __ht.foreachData() {
@@ -4462,10 +4363,7 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *types.Zval
 	zend.ArrayInitSize(return_value, types.Z_ARRVAL_P(input).GetNNumOfElements())
 	if types.Z_ARRVAL_P(input).HasUFlags(types.HASH_FLAG_PACKED) && preserve_keys == 0 {
 		types.ZendHashRealInitPacked(return_value.GetArr())
-		var __fill_ht *types.Array = return_value.GetArr()
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(return_value.GetArr())
 		var __ht *types.Array = input.GetArr()
 		for _, _p := range __ht.foreachDataReserve() {
 			var _z types.Zval = _p.GetVal()
@@ -4475,16 +4373,10 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *types.Zval
 				entry = types.Z_REFVAL_P(entry)
 			}
 			entry.TryAddRefcount()
-			types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), entry)
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillSet(entry)
+			fillScope.FillNext()
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 	} else {
 		var __ht *types.Array = input.GetArr()
 		for _, _p := range __ht.foreachDataReserve() {
@@ -4554,58 +4446,31 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if types.Z_ARRVAL_P(input).HasUFlags(types.HASH_FLAG_PACKED) {
 		types.ZendHashRealInitPacked(return_value.GetArr())
 		if pad_size < 0 {
-			var __fill_ht *types.Array = return_value.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(return_value.GetArr())
 			for i = 0; i < num_pads; i++ {
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), pad_value)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSet(pad_value)
+				fillScope.FillNext()
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 		}
-		var __fill_ht *types.Array = return_value.GetArr()
-		var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+		fillScope := types.PackedFillStart(return_value.GetArr())
 		var __ht *types.Array = input.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			value = _z
 			value.TryAddRefcount()
-			types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), value)
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillSet(value)
+			fillScope.FillNext()
 		}
-		__fill_ht.SetNNumUsed(__fill_idx)
-		__fill_ht.SetNNumOfElements(__fill_idx)
-		__fill_ht.SetNNextFreeElement(__fill_idx)
-		__fill_ht.SetNInternalPointer(0)
+		fillScope.FillEnd()
 		if pad_size > 0 {
-			var __fill_ht *types.Array = return_value.GetArr()
-			var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+			fillScope := types.PackedFillStart(return_value.GetArr())
 			for i = 0; i < num_pads; i++ {
-				types.ZVAL_COPY_VALUE(__fill_bkt.GetVal(), pad_value)
-				__fill_bkt.SetH(__fill_idx)
-				__fill_bkt.SetKey(nil)
-				__fill_bkt++
-				__fill_idx++
+				fillScope.FillSet(pad_value)
+				fillScope.FillNext()
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
+			fillScope.FillEnd()
 		}
 	} else {
 		if pad_size < 0 {
@@ -6222,10 +6087,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	/* i = 0; */
 
 	types.ZendHashRealInitPacked(return_value.GetArr())
-	var __fill_ht *types.Array = return_value.GetArr()
-	var __fill_bkt *types.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-	var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-	b.Assert(__fill_ht.HasUFlags(types.HASH_FLAG_PACKED))
+	fillScope := types.PackedFillStart(return_value.GetArr())
 
 	/* We can't use zend_hash_index_find()
 	 * because the array may have string keys or gaps. */
@@ -6238,14 +6100,11 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		string_key = _p.GetKey()
 		if (zend.ZendBitsetIn(bitset, i) ^ negative_bitset) != 0 {
 			if string_key != nil {
-				__fill_bkt.GetVal().SetStringCopy(string_key)
+				fillScope.FillSetStringCopy(string_key)
 			} else {
-				__fill_bkt.GetVal().SetLong(num_key)
+				fillScope.FillSetLong(num_key)
 			}
-			__fill_bkt.SetH(__fill_idx)
-			__fill_bkt.SetKey(nil)
-			__fill_bkt++
-			__fill_idx++
+			fillScope.FillNext()
 		}
 		i++
 	}
@@ -6253,10 +6112,7 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	/* We can't use zend_hash_index_find()
 	 * because the array may have string keys or gaps. */
 
-	__fill_ht.SetNNumUsed(__fill_idx)
-	__fill_ht.SetNNumOfElements(__fill_idx)
-	__fill_ht.SetNNextFreeElement(__fill_idx)
-	__fill_ht.SetNInternalPointer(0)
+	fillScope.FillEnd()
 	zend.FreeAlloca(bitset, use_heap)
 }
 func ZifArraySum(executeData *zend.ZendExecuteData, return_value *types.Zval) {
