@@ -186,17 +186,17 @@ func ZendHashFindPtr(ht *Array, key string) any {
 func ZendHashStrFindPtr(ht *Array, key string) any {
 	return ht.KeyFindPtr(key)
 }
-func ZendHashIndexFindPtr(ht *Array, h zend.ZendUlong) any {
+func ZendHashIndexFindPtr(ht *Array, h int) any {
 	var zv *Zval
-	zv = ht.IndexFindH(h)
+	zv = ht.IndexFind(h)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
 		return nil
 	}
 }
-func ZendHashIndexFindDeref(ht *Array, h zend.ZendUlong) *Zval {
-	var zv = ht.IndexFindH(h)
+func ZendHashIndexFindDeref(ht *Array, h int) *Zval {
+	var zv = ht.IndexFind(h)
 	if zv != nil {
 		zv = ZVAL_DEREF(zv)
 	}
@@ -479,7 +479,7 @@ func ZendArrayDupElements(source *Array, target *Array) {
 		}
 
 		// 添加元素到新数组
-		var newBucket = NewBucket(p.GetZendKey(), data)
+		var newBucket = NewBucket(p.GetArrayKey(), data)
 		target.appendBucket(newBucket)
 
 		// 更新内部指针
@@ -522,14 +522,14 @@ func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT,
 	target.assertRc1()
 	if overwrite != 0 {
 		source.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
-			var t = target.UpdateIndirect(p.GetZendKey(), data)
+			var t = target.UpdateIndirect(p.GetArrayKey(), data)
 			if pCopyConstructor != nil {
 				pCopyConstructor(t)
 			}
 		})
 	} else {
 		source.eachValidBucketIndirect(func(pos uint32, p *Bucket, s *Zval) {
-			var t = target.AddIndirect(p.GetZendKey(), s)
+			var t = target.AddIndirect(p.GetArrayKey(), s)
 			if t != nil && pCopyConstructor != nil {
 				pCopyConstructor(t)
 			}

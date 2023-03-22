@@ -5,91 +5,20 @@ import (
 	"sik/zend"
 )
 
-/**
- * ArrayKey
- * 新增类型，表示 Array 的 Key。与原类型 ArrayKey 作用类似，后续会取代 ArrayKey。
- */
-type ArrayKey struct {
-	index int
-	key   *string
-}
-
-func NewStrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
-func NewIndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
-func (this ArrayKey) Index() int     { return this.index }
-func (this ArrayKey) Key() string    { return *this.key }
-func (this ArrayKey) IsStrKey() bool { return this.key != nil }
-func (this ArrayKey) GetH() zend.ZendUlong {
-	// todo remove
-	if this.key != nil {
-		return b.HashStr(*this.key)
+func (this *Bucket) GetH() uint {
+	if this.IsStrKey() {
+		return b.HashStr(this.key.KeyKey())
 	} else {
-		return uint(this.index)
+		return uint(this.key.index)
 	}
 }
-func (this ArrayKey) GetZendStringKey() *String {
-	// todo remove
-	if this.key != nil {
-		return NewString(*this.key)
+func (this *Bucket) GetKey() *String {
+	if this.IsStrKey() {
+		return NewString(this.key.KeyKey())
 	} else {
 		return nil
 	}
 }
-
-/**
- * Bucket
- */
-type Bucket struct {
-	val Zval
-	key ArrayKey
-}
-
-func NewBucket(key ArrayKey, zval *Zval) *Bucket {
-	var bucket = &Bucket{key: key}
-	ZVAL_COPY_VALUE(&bucket.val, zval)
-	return bucket
-}
-
-func NewBucketStr(strKey string, zval *Zval) *Bucket {
-	var key = NewStrKey(strKey)
-	return NewBucket(key, zval)
-}
-
-func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
-	var key = NewIndexKey(indexKey)
-	return NewBucket(key, zval)
-}
-
-func NewBucketPtr(key ArrayKey, ptr any) *Bucket {
-	var bucket = &Bucket{key: key}
-	ZVAL_PTR(&bucket.val, ptr)
-	return bucket
-}
-
-func NewBucketIndirect(key ArrayKey, ptr *Zval) *Bucket {
-	var bucket = &Bucket{key: key}
-	ZVAL_INDIRECT(&bucket.val, ptr)
-	return bucket
-}
-
-func (this *Bucket) GetVal() *Zval           { return &this.val }
-func (this *Bucket) SetVal(zval *Zval)       { ZVAL_COPY_VALUE(&this.val, zval) }
-func (this *Bucket) GetZendKey() ArrayKey    { return this.key }
-func (this *Bucket) SetZendKey(key ArrayKey) { this.key = key }
-
-func (this *Bucket) IsStrKey() bool   { return this.key.IsStrKey() }
-func (this *Bucket) IsIndexKey() bool { return !this.key.IsStrKey() }
-func (this *Bucket) StrKey() string   { return this.key.Key() }
-func (this *Bucket) IndexKey() int    { return this.key.Index() }
-func (this *Bucket) SetStrKey(key string) {
-	this.key = NewStrKey(key)
-}
-func (this *Bucket) SetIndexKey(index int) {
-	this.key = NewIndexKey(index)
-}
-
-func (this *Bucket) GetH() zend.ZendUlong { return this.key.GetH() }
-func (this *Bucket) GetKey() *String      { return this.key.GetZendStringKey() }
 func (this *Bucket) SetH(value zend.ZendUlong) {
 	// todo remove
 	b.Assert(false)
@@ -512,33 +441,33 @@ func (this *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
  */
 func (this *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyAdd(key.Key(), pData)
+		return this.KeyAdd(key.KeyKey(), pData)
 	} else {
-		return this.IndexAdd(key.Index(), pData)
+		return this.IndexAdd(key.IndexKey(), pData)
 	}
 }
 
 func (this *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyAddIndirect(key.Key(), pData)
+		return this.KeyAddIndirect(key.KeyKey(), pData)
 	} else {
-		return this.IndexAdd(key.Index(), pData)
+		return this.IndexAdd(key.IndexKey(), pData)
 	}
 }
 
 func (this *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyUpdate(key.Key(), pData)
+		return this.KeyUpdate(key.KeyKey(), pData)
 	} else {
-		return this.IndexUpdate(key.Index(), pData)
+		return this.IndexUpdate(key.IndexKey(), pData)
 	}
 }
 
 func (this *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyUpdateIndirect(key.Key(), pData)
+		return this.KeyUpdateIndirect(key.KeyKey(), pData)
 	} else {
-		return this.IndexUpdate(key.Index(), pData)
+		return this.IndexUpdate(key.IndexKey(), pData)
 	}
 }
 

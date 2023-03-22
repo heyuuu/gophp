@@ -107,17 +107,17 @@ func (this *Array) SetBucketKey(b *Bucket, key string) *Zval {
 
 func (this *Array) addHash(key ArrayKey, pos uint32) {
 	if key.IsStrKey() {
-		this.keyMap[key.Key()] = pos
+		this.keyMap[key.KeyKey()] = pos
 	} else {
-		this.indexMap[key.Index()] = pos
+		this.indexMap[key.IndexKey()] = pos
 	}
 }
 
 func (this *Array) deleteHash(key ArrayKey) {
 	if key.IsStrKey() {
-		delete(this.keyMap, key.Key())
+		delete(this.keyMap, key.KeyKey())
 	} else {
-		delete(this.indexMap, key.Index())
+		delete(this.indexMap, key.IndexKey())
 	}
 }
 
@@ -450,7 +450,7 @@ func (this *Array) appendBucket(bucket *Bucket) *Bucket {
 	// 更新 map
 	this.addHash(bucket.key, idx)
 
-	if bucket.IsIndexKey() {
+	if !bucket.IsStrKey() {
 		var indexKey = bucket.IndexKey()
 		// 更新 nNextFreeElement
 		if indexKey > this.nNextFreeElement {
@@ -466,11 +466,11 @@ func (this *Array) appendBucket(bucket *Bucket) *Bucket {
 }
 
 func (this *Array) appendBucketStr(strKey string, zv *Zval) *Bucket {
-	var bucket = NewBucketStr(strKey, zv)
+	var bucket = NewStrKeyBucket(strKey, zv)
 	return this.appendBucket(bucket)
 }
 
 func (this *Array) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
-	var bucket = NewBucketIndex(indexKey, zv)
+	var bucket = NewIndexBucket(indexKey, zv)
 	return this.appendBucket(bucket)
 }
