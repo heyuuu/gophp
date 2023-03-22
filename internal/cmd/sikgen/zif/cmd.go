@@ -58,4 +58,3 @@ func printNode(node ast.Node) string {
 	}
 	return buf.String()
 }
-
