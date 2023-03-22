@@ -13,19 +13,19 @@ func ZendGetImportHt(type_ uint32) *types.Array {
 	case ZEND_SYMBOL_CLASS:
 		if FC__().GetImports() == nil {
 			FC__().SetImports(Emalloc(b.SizeOf("HashTable")))
-			types.ZendHashInit(FC__().GetImports(), 8, nil, StrDtor, 0)
+			FC__().GetImports() = types.MakeArrayEx(8, StrDtor, 0)
 		}
 		return FC__().GetImports()
 	case ZEND_SYMBOL_FUNCTION:
 		if FC__().GetImportsFunction() == nil {
 			FC__().SetImportsFunction(Emalloc(b.SizeOf("HashTable")))
-			types.ZendHashInit(FC__().GetImportsFunction(), 8, nil, StrDtor, 0)
+			FC__().GetImportsFunction() = types.MakeArrayEx(8, StrDtor, 0)
 		}
 		return FC__().GetImportsFunction()
 	case ZEND_SYMBOL_CONST:
 		if FC__().GetImportsConst() == nil {
 			FC__().SetImportsConst(Emalloc(b.SizeOf("HashTable")))
-			types.ZendHashInit(FC__().GetImportsConst(), 8, nil, StrDtor, 0)
+			FC__().GetImportsConst() = types.MakeArrayEx(8, StrDtor, 0)
 		}
 		return FC__().GetImportsConst()
 	default:

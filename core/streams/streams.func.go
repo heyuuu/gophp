@@ -189,7 +189,7 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 		var list *zend.ZendLlist = nil
 		if !(standard.FG(wrapper_errors)) {
 			zend.ALLOC_HASHTABLE(standard.FG(wrapper_errors))
-			types.ZendHashInit(standard.FG(wrapper_errors), 8, nil, WrapperListDtor, 0)
+			standard.FG(wrapper_errors) = types.MakeArrayEx(8, WrapperListDtor, 0)
 		} else {
 			list = types.ZendHashStrFindPtr(standard.FG(wrapper_errors), (*byte)(&wrapper), b.SizeOf("wrapper"))
 		}
@@ -1519,9 +1519,9 @@ func PhpInitStreamWrappers(module_number int) int {
 	/* Filters are cleaned up by the streams they're attached to */
 
 	LeStreamFilter = zend.ZendRegisterListDestructorsEx(nil, nil, "stream filter", module_number)
-	types.ZendHashInit(&UrlStreamWrappersHash, 8, nil, nil, 1)
-	types.ZendHashInit(PhpGetStreamFiltersHashGlobal(), 8, nil, nil, 1)
-	types.ZendHashInit(PhpStreamXportGetHash(), 8, nil, nil, 1)
+	&UrlStreamWrappersHash = types.MakeArrayEx(8, nil, 1)
+	PhpGetStreamFiltersHashGlobal() = types.MakeArrayEx(8, nil, 1)
+	PhpStreamXportGetHash() = types.MakeArrayEx(8, nil, 1)
 	if PhpStreamXportRegister("tcp", PhpStreamGenericSocketFactory) == types.SUCCESS && PhpStreamXportRegister("udp", PhpStreamGenericSocketFactory) == types.SUCCESS {
 		return types.SUCCESS
 	} else {
@@ -1564,7 +1564,7 @@ func PhpUnregisterUrlStreamWrapper(protocol string) int {
 }
 func CloneWrapperHash() {
 	zend.ALLOC_HASHTABLE(standard.FG(stream_wrappers))
-	types.ZendHashInit(standard.FG(stream_wrappers), UrlStreamWrappersHash.GetNNumOfElements(), nil, nil, 0)
+	standard.FG(stream_wrappers) = types.MakeArrayEx(UrlStreamWrappersHash.GetNNumOfElements(), nil, 0)
 	types.ZendHashCopy(standard.FG(stream_wrappers), &UrlStreamWrappersHash, nil)
 }
 func PhpRegisterUrlStreamWrapperVolatile(protocol *types.String, wrapper *core.PhpStreamWrapper) int {

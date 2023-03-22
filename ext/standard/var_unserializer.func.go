@@ -425,7 +425,7 @@ func ProcessNestedData(
 
 							if var_hash.GetRefProps() == nil {
 								var_hash.SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
-								types.ZendHashInit(var_hash.GetRefProps(), 8, nil, nil, 0)
+								var_hash.GetRefProps() = types.MakeArrayEx(8, nil, 0)
 							}
 							types.ZendHashIndexUpdatePtr(var_hash.GetRefProps(), types.ZendUintptrT(data), info)
 						}

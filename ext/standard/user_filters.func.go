@@ -513,7 +513,7 @@ func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	if !(BG__().user_filter_map) {
 		BG__().user_filter_map = (*types.Array)(zend.Emalloc(b.SizeOf("HashTable")))
-		types.ZendHashInit(BG__().user_filter_map, 8, nil, types.DtorFuncT(FilterItemDtor), 0)
+		BG__().user_filter_map = types.MakeArrayEx(8, types.DtorFuncT(FilterItemDtor), 0)
 	}
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
 	fdat.SetClassname(classname.Copy())

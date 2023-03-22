@@ -607,9 +607,9 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	/* Initialize $_FILES[] */
 
-	types.ZendHashInit(&(PG__().rfc1867_protected_variables), 8, nil, nil, 0)
+	&(PG__().rfc1867_protected_variables) = types.MakeArrayEx(8, nil, 0)
 	zend.ALLOC_HASHTABLE(uploaded_files)
-	types.ZendHashInit(uploaded_files, 8, nil, FreeFilename, 0)
+	uploaded_files = types.MakeArrayEx(8, FreeFilename, 0)
 	SG__().rfc1867_uploaded_files = uploaded_files
 	if PG__().http_globals[TRACK_VARS_FILES].u1.v.type_ != types.IS_ARRAY {
 

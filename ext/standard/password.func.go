@@ -247,7 +247,7 @@ func PhpPasswordBcryptHash(password *types.String, options *types.Array) *types.
 	return result
 }
 func ZmStartupPassword(type_ int, module_number int) int {
-	types.ZendHashInit(&PhpPasswordAlgos, 4, nil, zend.ZVAL_PTR_DTOR, 1)
+	&PhpPasswordAlgos = types.MakeArrayEx(4, zend.ZVAL_PTR_DTOR, 1)
 	zend.RegisterStringConstant("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	if types.FAILURE == PhpPasswordAlgoRegister("2y", &PhpPasswordAlgoBcrypt) {
 		return types.FAILURE

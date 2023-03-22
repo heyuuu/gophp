@@ -198,7 +198,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 
 		if CG__().GetDelayedAutoloads() == nil {
 			ALLOC_HASHTABLE(CG__().GetDelayedAutoloads())
-			types.ZendHashInit(CG__().GetDelayedAutoloads(), 0, nil, nil, 0)
+			CG__().GetDelayedAutoloads() = types.MakeArrayEx(0, nil, 0)
 		}
 		types.ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name)
 	} else {
@@ -1543,7 +1543,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 				}
 			} else {
 				ALLOC_HASHTABLE(*overridden)
-				types.ZendHashInitEx(*overridden, 8, nil, OverriddenPtrDtor, 0, 0)
+				*overridden = types.MakeArrayEx(8, OverriddenPtrDtor, 0)
 			}
 			types.ZendHashUpdateMem(*overridden, key, fn, b.SizeOf("zend_function"))
 			return
@@ -1759,7 +1759,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				trait_num = ZendCheckTraitUsage(ce, exclude_ce, traits)
 				if exclude_tables[trait_num] == nil {
 					ALLOC_HASHTABLE(exclude_tables[trait_num])
-					types.ZendHashInit(exclude_tables[trait_num], 0, nil, nil, 0)
+					exclude_tables[trait_num] = types.MakeArrayEx(0, nil, 0)
 				}
 				if types.ZendHashAddEmptyElement(exclude_tables[trait_num], lcname) == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Failed to evaluate a trait precedence (%s). Method of trait %s was defined to be excluded multiple times", precedences[i].GetTraitMethod().GetMethodName().GetVal(), exclude_ce.GetName().GetVal())
@@ -2183,7 +2183,7 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 	var key ZendUlong
 	if CG__().GetDelayedVarianceObligations() == nil {
 		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
-		types.ZendHashInit(CG__().GetDelayedVarianceObligations(), 0, nil, VarianceObligationHtDtor, 0)
+		CG__().GetDelayedVarianceObligations() = types.MakeArrayEx(0, VarianceObligationHtDtor, 0)
 	}
 	key = ZendUlong(uintPtr(ce))
 	ht = types.ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
@@ -2191,7 +2191,7 @@ func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 		return ht
 	}
 	ALLOC_HASHTABLE(ht)
-	types.ZendHashInit(ht, 0, nil, VarianceObligationDtor, 0)
+	ht = types.MakeArrayEx(0, VarianceObligationDtor, 0)
 	types.ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht

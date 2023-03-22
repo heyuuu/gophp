@@ -239,7 +239,7 @@ func ZifErrorReporting(ret zpp.DefRet, _ zpp.DefOpt, newErrorLevel *types.Zval) 
 			if p.GetModified() == 0 {
 				if EG__().GetModifiedIniDirectives() == nil {
 					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
-					types.ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
+					EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
 				}
 				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING, p) != nil {
 					p.SetOrigValue(p.GetValue())

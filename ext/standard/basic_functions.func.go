@@ -47,8 +47,8 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
 	BG__().url_adapt_session_ex.type_ = 1
 	BG__().url_adapt_output_ex.type_ = 0
-	types.ZendHashInit(&(BG__().url_adapt_session_hosts_ht), 0, nil, nil, 1)
-	types.ZendHashInit(&(BG__().url_adapt_output_hosts_ht), 0, nil, nil, 1)
+	&(BG__().url_adapt_session_hosts_ht) = types.MakeArrayEx(0, nil, 1)
+	&(BG__().url_adapt_output_hosts_ht) = types.MakeArrayEx(0, nil, 1)
 	BG__().incomplete_class = IncompleteClassEntry
 	BG__().page_uid = -1
 	BG__().page_gid = -1
@@ -232,7 +232,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().page_gid = -1
 	BG__().page_inode = -1
 	BG__().page_mtime = -1
-	types.ZendHashInit(&(BG__().putenv_ht), 1, nil, PhpPutenvDestructor, 0)
+	&(BG__().putenv_ht) = types.MakeArrayEx(1, PhpPutenvDestructor, 0)
 	BG__().user_shutdown_function_names = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
@@ -1414,7 +1414,7 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 	} else {
 		if !(BG__().user_shutdown_function_names) {
 			zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-			types.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
+			BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
@@ -1427,7 +1427,7 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdown_function_entry *PhpShutdownFunctionEntry) types.ZendBool {
 	if !(BG__().user_shutdown_function_names) {
 		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-		types.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
+		BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
 	}
 	types.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, function_name, function_len, shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	return 1
@@ -1441,7 +1441,7 @@ func RemoveUserShutdownFunction(function_name *byte, function_len int) types.Zen
 func AppendUserShutdownFunction(shutdown_function_entry PhpShutdownFunctionEntry) types.ZendBool {
 	if !(BG__().user_shutdown_function_names) {
 		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-		types.ZendHashInit(BG__().user_shutdown_function_names, 0, nil, UserShutdownFunctionDtor, 0)
+		BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
 	}
 	return types.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry")) != nil
 }

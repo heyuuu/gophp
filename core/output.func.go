@@ -47,9 +47,9 @@ func ReverseConflictDtor(zv *types.Zval) {
 }
 func PhpOutputStartup() {
 	PhpOutputInitGlobals(&OutputGlobals)
-	types.ZendHashInit(&PhpOutputHandlerAliases, 8, nil, nil, 1)
-	types.ZendHashInit(&PhpOutputHandlerConflicts, 8, nil, nil, 1)
-	types.ZendHashInit(&PhpOutputHandlerReverseConflicts, 8, nil, ReverseConflictDtor, 1)
+	&PhpOutputHandlerAliases = types.MakeArrayEx(8, nil, 1)
+	&PhpOutputHandlerConflicts = types.MakeArrayEx(8, nil, 1)
+	&PhpOutputHandlerReverseConflicts = types.MakeArrayEx(8, ReverseConflictDtor, 1)
 	PhpOutputDirect = PhpOutputStdout
 }
 func PhpOutputShutdown() {
@@ -379,7 +379,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 		}
 	} else {
 		var str *types.String
-		types.ZendHashInit(&rev, 8, nil, nil, 1)
+		&rev = types.MakeArrayEx(8, nil, 1)
 		if nil == types.ZendHashNextIndexInsertPtr(&rev, check_func) {
 			rev.Destroy()
 			return types.FAILURE

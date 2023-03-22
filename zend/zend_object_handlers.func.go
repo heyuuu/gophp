@@ -531,7 +531,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			return &(zv.GetPropertyGuard())
 		} else {
 			ALLOC_HASHTABLE(guards)
-			types.ZendHashInit(guards, 8, nil, ZendPropertyGuardDtor, 0)
+			guards = types.MakeArrayEx(8, ZendPropertyGuardDtor, 0)
 
 			/* mark pointer as "special" using low bit */
 

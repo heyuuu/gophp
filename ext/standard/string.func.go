@@ -2462,7 +2462,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 
 		/* we have to rebuild HashTable with numeric keys */
 
-		types.ZendHashInit(&str_hash, pats.GetNNumOfElements(), nil, nil, 0)
+		&str_hash = types.MakeArrayEx(pats.GetNNumOfElements(), nil, 0)
 		var __ht *types.Array = pats
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()

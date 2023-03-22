@@ -373,7 +373,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"), 1)
 		new_entry.SetExpires(0)
 		new_entry.SetUserConfig((*types.Array)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
-		types.ZendHashInit(new_entry.GetUserConfig(), 8, nil, types.DtorFuncT(core.ConfigZvalDtor), 1)
+		new_entry.GetUserConfig() = types.MakeArrayEx(8, types.DtorFuncT(core.ConfigZvalDtor), 1)
 		entry = types.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), path, path_len, new_entry)
 	}
 
@@ -900,7 +900,7 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	types.ZendHashInit(php_cgi_globals.GetUserConfigCache(), 8, nil, UserConfigCacheEntryDtor, 1)
+	php_cgi_globals.GetUserConfigCache() = types.MakeArrayEx(8, UserConfigCacheEntryDtor, 1)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES(module_number)

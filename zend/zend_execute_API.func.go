@@ -60,9 +60,9 @@ func InitExecutor() {
 	EG__().SetErrorHandling(EH_NORMAL)
 	EG__().SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
-	types.ZendHashInit(EG__().GetSymbolTable(), 64, nil, ZVAL_PTR_DTOR, 0)
+	EG__().GetSymbolTable() = types.MakeArrayEx(64, ZVAL_PTR_DTOR, 0)
 	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
-	types.ZendHashInit(EG__().GetIncludedFiles(), 8, nil, nil, 0)
+	EG__().GetIncludedFiles() = types.MakeArrayEx(8, nil, 0)
 	EG__().SetTicksCount(0)
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
@@ -802,7 +802,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	}
 	if EG__().GetInAutoload() == nil {
 		ALLOC_HASHTABLE(EG__().GetInAutoload())
-		types.ZendHashInit(EG__().GetInAutoload(), 8, nil, nil, 0)
+		EG__().GetInAutoload() = types.MakeArrayEx(8, nil, 0)
 	}
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name) == nil {
 		if key == nil {

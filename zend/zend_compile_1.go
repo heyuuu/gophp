@@ -622,9 +622,9 @@ func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBo
 	}
 	ce.SetDefaultPropertiesTable(nil)
 	ce.SetDefaultStaticMembersTable(nil)
-	types.ZendHashInitEx(ce.GetPropertiesInfo(), 8, nil, b.Cond(persistent_hashes != 0, ZendDestroyPropertyInfoInternal, nil), persistent_hashes, 0)
-	types.ZendHashInitEx(ce.GetConstantsTable(), 8, nil, nil, persistent_hashes, 0)
-	types.ZendHashInitEx(ce.GetFunctionTable(), 8, nil, ZEND_FUNCTION_DTOR, persistent_hashes, 0)
+	ce.GetPropertiesInfo() = types.MakeArrayEx(8, b.Cond(persistent_hashes != 0, ZendDestroyPropertyInfoInternal, nil), persistent_hashes)
+	ce.GetConstantsTable() = types.MakeArrayEx(8, nil, persistent_hashes)
+	ce.GetFunctionTable() = types.MakeArrayEx(8, ZEND_FUNCTION_DTOR, persistent_hashes)
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
 	} else {

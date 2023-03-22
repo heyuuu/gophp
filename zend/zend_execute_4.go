@@ -241,7 +241,10 @@ try_again:
 	if dim.IsLong() {
 		hval = dim.GetLval()
 	num_index:
-		types.ZEND_HASH_INDEX_FIND(ht, hval, retval, num_undef)
+		retval = ht.IndexFindH(hval)
+		if retval == nil {
+			goto num_undef
+		}
 		return retval
 	num_undef:
 		switch type_ {

@@ -286,7 +286,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 		return types.FAILURE
 	}
 	browdata.SetHtab(zend.Pemalloc(sizeof*browdata.GetHtab(), persistent))
-	types.ZendHashInitEx(browdata.GetHtab(), 0, nil, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent, 0)
+	browdata.GetHtab() = types.MakeArrayEx(0, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent)
 	browdata.SetKvSize(16 * 1024)
 	browdata.SetKvUsed(0)
 	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv")*browdata.GetKvSize(), persistent))
@@ -296,7 +296,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	ctx.SetBdata(browdata)
 	ctx.SetCurrentEntry(nil)
 	ctx.SetCurrentSectionName(nil)
-	types.ZendHashInit(ctx.GetStrInterned(), 8, nil, StrInternedDtor, persistent)
+	ctx.GetStrInterned() = types.MakeArrayEx(8, StrInternedDtor, persistent)
 	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
 
 	/* Destroy parser context */

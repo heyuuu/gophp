@@ -328,7 +328,7 @@ func PhpPrintInfo(flag int) {
 	if (flag & PHP_INFO_MODULES) != 0 {
 		var sorted_registry types.Array
 		var module *zend.ZendModuleEntry
-		types.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
+		&sorted_registry = types.MakeArrayEx(zend.ModuleRegistry.GetNNumOfElements(), nil, 1)
 		types.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		sorted_registry.SortCompatible(ModuleNameCmp, 0)
 		var __ht *types.Array = &sorted_registry

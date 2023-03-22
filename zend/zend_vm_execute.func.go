@@ -587,8 +587,8 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
 
-				/* Free extra args before releasing the closure,
-				 * as that may free the op_array. */))
+			/* Free extra args before releasing the closure,
+			 * as that may free the op_array. */))
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -1552,7 +1552,7 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			if EG__().GetErrorReportingIniEntry().GetModified() == 0 {
 				if EG__().GetModifiedIniDirectives() == nil {
 					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
-					types.ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
+					EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
 				}
 				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING, EG__().GetErrorReportingIniEntry()) != nil {
 					EG__().GetErrorReportingIniEntry().SetOrigValue(EG__().GetErrorReportingIniEntry().GetValue())
@@ -5868,7 +5868,11 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecute
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		value = ht.IndexFindH(offset)
+		if value == nil {
+			goto fetch_dim_r_index_undef
+		}
+
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -12735,7 +12739,10 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDa
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		value = ht.IndexFindH(offset)
+		if value == nil {
+			goto fetch_dim_r_index_undef
+		}
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZvalPtrDtorNogc(free_op1)
@@ -12783,7 +12790,10 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_TMPVARCV_HANDLER(executeData *ZendExecut
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		value = ht.IndexFindH(offset)
+		if value == nil {
+			goto fetch_dim_r_index_undef
+		}
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZvalPtrDtorNogc(free_op1)
@@ -36376,7 +36386,10 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		value = ht.IndexFindH(offset)
+		if value == nil {
+			goto fetch_dim_r_index_undef
+		}
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -36420,7 +36433,10 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CV_TMPVARCV_HANDLER(executeData *ZendExecuteDat
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		types.ZEND_HASH_INDEX_FIND(ht, offset, value, fetch_dim_r_index_undef)
+		value = ht.IndexFindH(offset)
+		if value == nil {
+			goto fetch_dim_r_index_undef
+		}
 		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), value)
 		if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -47161,7 +47177,7 @@ func InitOpcodeSerialiser() {
 	var i int
 	var tmp types.Zval
 	ZendHandlersTable = Malloc(b.SizeOf("HashTable"))
-	types.ZendHashInitEx(ZendHandlersTable, ZendHandlersCount, nil, nil, 1, 0)
+	ZendHandlersTable = types.MakeArrayEx(ZendHandlersCount, nil, 1)
 	types.ZendHashRealInit(ZendHandlersTable, 0)
 	tmp.SetTypeInfo(types.IS_LONG)
 	for i = 0; i < ZendHandlersCount; i++ {

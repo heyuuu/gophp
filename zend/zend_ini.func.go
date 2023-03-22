@@ -81,7 +81,7 @@ func ZendIniStartup() int {
 	EG__().SetIniDirectives(RegisteredZendIniDirectives)
 	EG__().SetModifiedIniDirectives(nil)
 	EG__().SetErrorReportingIniEntry(nil)
-	types.ZendHashInitEx(RegisteredZendIniDirectives, 128, nil, FreeIniEntry, 1, 0)
+	RegisteredZendIniDirectives = types.MakeArrayEx(128, FreeIniEntry, 1)
 	return types.SUCCESS
 }
 func ZendIniShutdown() int {
@@ -190,7 +190,7 @@ func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_typ
 	}
 	if EG__().GetModifiedIniDirectives() == nil {
 		ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
-		types.ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
+		EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
 	}
 	if modified == 0 {
 		ini_entry.SetOrigValue(ini_entry.GetValue())

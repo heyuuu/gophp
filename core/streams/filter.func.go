@@ -36,7 +36,7 @@ func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
 func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
 	if !(standard.FG(stream_filters)) {
 		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
-		types.ZendHashInit(standard.FG(stream_filters), StreamFiltersHash.GetNNumOfElements()+1, nil, nil, 0)
+		standard.FG(stream_filters) = types.MakeArrayEx(StreamFiltersHash.GetNNumOfElements()+1, nil, 0)
 		types.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
 	}
 	if types.ZendHashAddPtr(standard.FG(stream_filters), filterpattern, any(factory)) {

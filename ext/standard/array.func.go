@@ -3005,7 +3005,7 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 
 	/* Create and initialize output hash */
 
-	types.ZendHashInit(&out_hash, b.Cond(length > 0, num_in-length, 0)+b.CondF1(replace != nil, func() __auto__ { return replace.GetNNumOfElements() }, 0), nil, zend.ZVAL_PTR_DTOR, 0)
+	&out_hash = types.MakeArrayEx(b.Cond(length > 0, num_in-length, 0)+b.CondF1(replace != nil, func() __auto__ { return replace.GetNNumOfElements() }, 0), zend.ZVAL_PTR_DTOR, 0)
 
 	/* Start at the beginning of the input hash and copy entries to output hash until offset is reached */
 
@@ -3364,7 +3364,7 @@ func ZifArrayUnshift(executeData *zend.ZendExecuteData, return_value *types.Zval
 		}
 		break
 	}
-	types.ZendHashInit(&new_hash, types.Z_ARRVAL_P(stack).GetNNumOfElements()+argc, nil, zend.ZVAL_PTR_DTOR, 0)
+	&new_hash = types.MakeArrayEx(types.Z_ARRVAL_P(stack).GetNNumOfElements()+argc, zend.ZVAL_PTR_DTOR, 0)
 	for i = 0; i < argc; i++ {
 		args[i].TryAddRefcount()
 		new_hash.NextIndexInsertNew(&args[i])
@@ -4630,7 +4630,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		var num_key zend.ZendLong
 		var str_key *types.String
 		var val *types.Zval
-		types.ZendHashInit(&seen, types.Z_ARRVAL_P(array).GetNNumOfElements(), nil, nil, 0)
+		&seen = types.MakeArrayEx(types.Z_ARRVAL_P(array).GetNNumOfElements(), nil, 0)
 		zend.ArrayInit(return_value)
 		var __ht *types.Array = array.GetArr()
 		for _, _p := range __ht.foreachData() {
@@ -5657,7 +5657,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 
 	/* create exclude map */
 
-	types.ZendHashInit(&exclude, num, nil, nil, 0)
+	&exclude = types.MakeArrayEx(num, nil, 0)
 	for i = 1; i < argc; i++ {
 		var __ht *types.Array = args[i].GetArr()
 		for _, _p := range __ht.foreachData() {

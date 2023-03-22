@@ -164,7 +164,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 
 		if b.Assign(&find_arr, active_hash.KeyFind(arg1.GetStr().GetStr())) == nil || find_arr.GetType() != types.IS_ARRAY {
 			types.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
-			types.ZendHashInit(option_arr.GetArr(), 8, nil, ConfigZvalDtor, 1)
+			option_arr.GetArr() = types.MakeArrayEx(8, ConfigZvalDtor, 1)
 			find_arr = active_hash.KeyUpdate(arg1.GetStr().GetStr(), &option_arr)
 		}
 
@@ -227,7 +227,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 			if b.Assign(&entry, target_hash.KeyFind(b.CastStr(key, key_len))) == nil {
 				var section_arr types.Zval
 				types.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
-				types.ZendHashInit(section_arr.GetArr(), 8, nil, types.DtorFuncT(ConfigZvalDtor), 1)
+				section_arr.GetArr() = types.MakeArrayEx(8, types.DtorFuncT(ConfigZvalDtor), 1)
 				entry = target_hash.KeyUpdate(b.CastStr(key, key_len), &section_arr)
 			}
 			if entry.IsType(types.IS_ARRAY) {

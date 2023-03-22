@@ -35,7 +35,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 		return env
 	}
 	zend.ALLOC_HASHTABLE(env_hash)
-	types.ZendHashInit(env_hash, cnt, nil, nil, 0)
+	env_hash = types.MakeArrayEx(cnt, nil, 0)
 
 	/* first, we have to get the size of all the elements in the hash */
 

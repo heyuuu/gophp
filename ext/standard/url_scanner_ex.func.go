@@ -38,7 +38,7 @@ func PhpIniOnUpdateTags(
 			return types.FAILURE
 		}
 	}
-	types.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
+	ctx.GetTags() = types.MakeArrayEx(0, TagDtor, 1)
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')

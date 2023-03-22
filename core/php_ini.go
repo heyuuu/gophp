@@ -13,7 +13,7 @@ type Configuration struct {
 }
 
 func (this *Configuration) Init() {
-	types.ZendHashInit(&this.hash, 8, nil, ConfigZvalDtor, 1)
+	&this.hash = types.MakeArrayEx(8, ConfigZvalDtor, 1)
 }
 
 func (this *Configuration) Set(key string, value string) *types.Zval {

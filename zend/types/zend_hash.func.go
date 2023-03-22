@@ -14,18 +14,11 @@ func ZVAL_EMPTY_ARRAY(z *Zval) {
 	z.SetArr((*Array)(&ZendEmptyArray))
 	z.SetTypeInfo(IS_ARRAY)
 }
-func ZendHashInit(ht *Array, nSize uint32, pHashFunction any, pDestructor DtorFuncT, persistent ZendBool) {
-	*ht = *NewZendArrayEx(nSize, pDestructor, persistent != 0)
+
+func MakeArrayEx(nSize uint32, pDestructor DtorFuncT, persistent ZendBool) Array {
+	return *NewZendArrayEx(nSize, pDestructor, persistent != 0)
 }
-func ZendHashInitEx(ht *Array, nSize uint32, pHashFunction any, pDestructor DtorFuncT, persistent ZendBool, bApplyProtection int) {
-	*ht = *NewZendArrayEx(nSize, pDestructor, persistent != 0)
-}
-func ZEND_HASH_INDEX_FIND(_ht *Array, _h zend.ZendUlong, _ret *Zval, _not_found __auto__) {
-	_ret = _ht.IndexFindH(_h)
-	if _ret == nil {
-		goto _not_found
-	}
-}
+
 func ZendHashExists(ht *Array, key *String) ZendBool {
 	var exists = ht.KeyExists(key.GetStr())
 	return IntBool(exists)

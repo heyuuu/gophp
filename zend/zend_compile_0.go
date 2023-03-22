@@ -259,7 +259,7 @@ func ZendFileContextBegin(prev_context *ZendFileContext) {
 	FC__().SetInNamespace(0)
 	FC__().SetHasBracketedNamespaces(0)
 	FC__().GetDeclarables().SetTicks(0)
-	types.ZendHashInit(&(FC__().GetSeenSymbols()), 8, nil, nil, 0)
+	&(FC__().GetSeenSymbols()) = types.MakeArrayEx(8, nil, 0)
 }
 func ZendFileContextEnd(prev_context *ZendFileContext) {
 	ZendEndNamespace()
