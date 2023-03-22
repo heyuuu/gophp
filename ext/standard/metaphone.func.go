@@ -14,12 +14,8 @@ func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var result *types.String = nil
 	var phones zend.ZendLong = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			phones = fp.ParseLong()

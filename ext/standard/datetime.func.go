@@ -32,12 +32,8 @@ func ZifStrptime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var parsed_time __struct__tm
 	var unparsed_part *byte
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			ts, ts_length = fp.ParseString()
 			format, format_length = fp.ParseString()
 			if fp.HasError() {

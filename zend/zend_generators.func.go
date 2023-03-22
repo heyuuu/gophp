@@ -157,7 +157,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution types.ZendB
 		if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
 			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc(
 
-			/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */ )))
+				/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */)))
 		}
 
 		if generator.GetGcBuffer() != nil {
@@ -948,12 +948,8 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *types.Zval) 
 	var generator *ZendGenerator
 	var root *ZendGenerator
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			value = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -988,12 +984,8 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 	var exception *types.Zval
 	var generator *ZendGenerator
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			exception = fp.ParseZval()
 			if fp.HasError() {
 				return

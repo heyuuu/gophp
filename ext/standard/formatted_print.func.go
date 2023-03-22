@@ -540,12 +540,8 @@ func ZifVsprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var args *types.Zval
 	var argc int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
@@ -606,12 +602,8 @@ func ZifVprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var args *types.Zval
 	var argc int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			format = fp.ParseZval()
 			array = fp.ParseZval()
 			if fp.HasError() {
@@ -686,12 +678,8 @@ func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	for {
-		var _flags int = 0
-		var _min_num_args int = 3
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 3, 3, 0)
 			arg1 = fp.ParseResource()
 			format = fp.ParseZval()
 			array = fp.ParseZval()

@@ -144,12 +144,8 @@ func ZifBase64Encode(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var str_len int
 	var result *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -168,12 +164,8 @@ func ZifBase64Decode(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var str_len int
 	var result *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			strict = fp.ParseBool()

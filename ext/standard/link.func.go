@@ -18,12 +18,8 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var buff []byte
 	var ret ssize_t
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			link, link_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -56,12 +52,8 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var sb zend.ZendStatT
 	var ret int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			link, link_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -99,12 +91,8 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var dirname []byte
 	var len_ int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			topath, topath_len = fp.ParsePath()
 			frompath, frompath_len = fp.ParsePath()
 			if fp.HasError() {
@@ -162,12 +150,8 @@ func ZifLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var source_p []byte
 	var dest_p []byte
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			topath, topath_len = fp.ParsePath()
 			frompath, frompath_len = fp.ParsePath()
 			if fp.HasError() {

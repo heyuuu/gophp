@@ -107,12 +107,8 @@ func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var sb zend.ZendStatT
 	var written types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			iptcdata, iptcdata_len = fp.ParseString()
 			jpeg_file, jpeg_file_len = fp.ParsePath()
 			fp.StartOptional()
@@ -239,12 +235,8 @@ func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var values types.Zval
 	var element *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				return

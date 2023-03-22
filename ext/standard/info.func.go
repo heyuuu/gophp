@@ -585,12 +585,8 @@ func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var ext_name *byte = nil
 	var ext_name_len int = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			ext_name, ext_name_len = fp.ParseString()
 			if fp.HasError() {
@@ -617,12 +613,8 @@ func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 func ZifPhpcredits(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var flag zend.ZendLong = PHP_CREDITS_ALL
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			flag = fp.ParseLong()
 			if fp.HasError() {
@@ -647,12 +639,8 @@ func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var mode *byte = "a"
 	var modelen int = b.SizeOf("\"a\"") - 1
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			mode, modelen = fp.ParseString()
 			if fp.HasError() {

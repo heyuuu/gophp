@@ -305,12 +305,8 @@ func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var tmp types.Zval
 	var has_port types.ZendBool
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			key = fp.ParseLong()
@@ -461,12 +457,8 @@ func PhpUrlEncode(s *byte, len_ int) *types.String {
 func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var in_str *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				return
@@ -482,12 +474,8 @@ func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var in_str *types.String
 	var out_str *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				return
@@ -547,12 +535,8 @@ func PhpRawUrlEncode(s *byte, len_ int) *types.String {
 func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var in_str *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				return
@@ -568,12 +552,8 @@ func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var in_str *types.String
 	var out_str *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			in_str = fp.ParseStr()
 			if fp.HasError() {
 				return
@@ -614,12 +594,8 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			url, url_len = fp.ParsePath()
 			fp.StartOptional()
 			format = fp.ParseLong()

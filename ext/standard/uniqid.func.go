@@ -18,12 +18,8 @@ func ZifUniqid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var prefix_len int = 0
 	var tv __struct__timeval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 2, 0)
 			fp.StartOptional()
 			prefix, prefix_len = fp.ParseString()
 			more_entropy = fp.ParseBool()

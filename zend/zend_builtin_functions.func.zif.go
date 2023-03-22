@@ -97,3 +97,14 @@ var DefZifFuncGetArgs = def.DefFunc("func_get_args", 0, 0, def.DefFuncOpts{Handl
 		returnValue.SetFalse()
 	}
 }})
+
+// generate by ZifStrlen
+var DefZifStrlen = def.DefFunc("strlen", 1, 1, def.DefFuncOpts{ArgInfos: []def.ArgInfo{{name: "str"}}, Handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStr()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifStrlen(str)
+	returnValue.SetLong(ret)
+}})

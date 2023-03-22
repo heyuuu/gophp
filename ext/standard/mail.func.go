@@ -34,12 +34,8 @@ func ZifEzmlmHash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var j int
 	var str_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -245,12 +241,8 @@ func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var p *byte
 	var e *byte
 	for {
-		var _flags int = 0
-		var _min_num_args int = 3
-		var _max_num_args int = 5
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 3, 5, 0)
 			to, to_len = fp.ParseString()
 			subject, subject_len = fp.ParseString()
 			message, message_len = fp.ParseString()

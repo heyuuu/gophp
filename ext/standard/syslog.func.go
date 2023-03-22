@@ -69,12 +69,8 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var facility zend.ZendLong
 	var ident_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 3
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 3, 3, 0)
 			ident, ident_len = fp.ParseString()
 			option = fp.ParseLong()
 			facility = fp.ParseLong()
@@ -114,12 +110,8 @@ func ZifSyslog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var message *byte
 	var message_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			priority = fp.ParseLong()
 			message, message_len = fp.ParseString()
 			if fp.HasError() {

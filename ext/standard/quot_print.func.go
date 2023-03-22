@@ -154,12 +154,8 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *t
 	var j int = 0
 	var k int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			arg1 = fp.ParseStr()
 			if fp.HasError() {
 				return
@@ -234,12 +230,8 @@ func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *t
 	var str *types.String
 	var new_str *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str = fp.ParseStr()
 			if fp.HasError() {
 				return

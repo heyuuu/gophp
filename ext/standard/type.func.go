@@ -15,12 +15,8 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
 	var type_ *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			arg = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -44,12 +40,8 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var tmp types.Zval
 	var ptr *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			var_ = fp.ParseZval()
 			type_ = fp.ParseStr()
 			if fp.HasError() {
@@ -107,12 +99,8 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var num *types.Zval
 	var base zend.ZendLong = 10
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			num = fp.ParseZval()
 			fp.StartOptional()
 			base = fp.ParseLong()
@@ -171,12 +159,8 @@ func ZifIntval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifFloatval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var num *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			num = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -191,12 +175,8 @@ func ZifFloatval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifBoolval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var val *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			val = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -211,12 +191,8 @@ func ZifBoolval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifStrval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var num *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			num = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -230,12 +206,8 @@ func ZifStrval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type_ int) {
 	var arg *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			arg = fp.ParseZval()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -269,12 +241,8 @@ func ZifIsResource(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 func ZifIsBool(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			arg = fp.ParseZval()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -305,12 +273,8 @@ func ZifIsObject(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			arg = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -341,12 +305,8 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var arg *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			arg = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -381,12 +341,8 @@ func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var syntax_only types.ZendBool = 0
 	var check_flags int = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			var_ = fp.ParseZval()
 			fp.StartOptional()
 			syntax_only = fp.ParseBool()
@@ -422,12 +378,8 @@ func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var var_ *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			var_ = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -442,12 +394,8 @@ func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var var_ *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			var_ = fp.ParseZval()
 			if fp.HasError() {
 				return

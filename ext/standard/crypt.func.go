@@ -143,12 +143,8 @@ func ZifCrypt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var salt_in_len int = 0
 	var result *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			str, str_len = fp.ParseString()
 			fp.StartOptional()
 			salt_in, salt_in_len = fp.ParseString()

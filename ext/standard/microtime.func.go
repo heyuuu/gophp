@@ -13,12 +13,8 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var get_as_float types.ZendBool = 0
 	var tp __struct__timeval = __struct__timeval{0}
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			get_as_float = fp.ParseBool()
 			if fp.HasError() {
@@ -60,12 +56,8 @@ func ZifGetrusage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var pwho zend.ZendLong = 0
 	var who int = RUSAGE_SELF
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			pwho = fp.ParseLong()
 			if fp.HasError() {

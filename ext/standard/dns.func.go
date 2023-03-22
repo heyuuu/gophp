@@ -29,12 +29,8 @@ func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var addr_len int
 	var hostname *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			addr, addr_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -71,12 +67,8 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var hostname *byte
 	var hostname_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			hostname, hostname_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -103,12 +95,8 @@ func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var in __struct__in_addr
 	var i int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			hostname, hostname_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -177,12 +165,8 @@ func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var fromsize uint32 = b.SizeOf("from")
 	var handle dns_handle_t
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
 			rectype, rectype_len = fp.ParseString()
@@ -678,12 +662,8 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var store_results int = 1
 	var raw types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 5
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 5, 0)
 			hostname, hostname_len = fp.ParseString()
 			fp.StartOptional()
 			type_param = fp.ParseLong()
@@ -953,12 +933,8 @@ func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var fromsize uint32 = b.SizeOf("from")
 	var handle dns_handle_t
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			hostname, hostname_len = fp.ParseString()
 			mx_list = fp.ParseZval()
 			fp.StartOptional()

@@ -17,12 +17,8 @@ func ZifSha1(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var context PHP_SHA1_CTX
 	var digest []uint8
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			arg = fp.ParseStr()
 			fp.StartOptional()
 			raw_output = fp.ParseBool()
@@ -54,12 +50,8 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var n ssize_t
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			arg, arg_len = fp.ParsePath()
 			fp.StartOptional()
 			raw_output = fp.ParseBool()

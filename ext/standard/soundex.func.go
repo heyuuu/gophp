@@ -19,12 +19,8 @@ func ZifSoundex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var soundex []byte
 	var soundex_table []byte = []byte{0, '1', '2', '3', 0, '1', '2', 0, 0, '2', '2', '4', '5', '5', 0, '1', '2', '6', '2', '3', 0, '1', 0, '2', 0, '2'}
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str, str_len = fp.ParseString()
 			if fp.HasError() {
 				return

@@ -19,12 +19,8 @@ func ZifRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			min = fp.ParseLong()
 			max = fp.ParseLong()
 			if fp.HasError() {

@@ -580,12 +580,8 @@ func ZifVarExport(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var return_output types.ZendBool = 0
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			var_ = fp.ParseZval()
 			fp.StartOptional()
 			return_output = fp.ParseBool()
@@ -1092,12 +1088,8 @@ func ZifSerialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var var_hash PhpSerializeDataT
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			struc = fp.ParseZval()
 			if fp.HasError() {
 				return
@@ -1134,12 +1126,8 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var prev_max_depth zend.ZendLong
 	var prev_cur_depth zend.ZendLong
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			buf, buf_len = fp.ParseString()
 			fp.StartOptional()
 			options = fp.ParseArray()
@@ -1268,12 +1256,8 @@ cleanup:
 func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var real_usage types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			real_usage = fp.ParseBool()
 			if fp.HasError() {
@@ -1290,12 +1274,8 @@ func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *types.Zv
 func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var real_usage types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			real_usage = fp.ParseBool()
 			if fp.HasError() {

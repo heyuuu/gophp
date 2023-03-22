@@ -27,12 +27,8 @@ func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *types.
 	var s2 *core.PhpStream
 	var pair []core.PhpSocketT
 	for {
-		var _flags int = 0
-		var _min_num_args int = 3
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 3, 3, 0)
 			domain = fp.ParseLong()
 			type_ = fp.ParseLong()
 			protocol = fp.ParseLong()
@@ -78,12 +74,8 @@ func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *type
 	var context *core.PhpStreamContext = nil
 	return_value.SetFalse()
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 6
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 6, 0)
 			host = fp.ParseStr()
 			fp.StartOptional()
 			zerrno = fp.ParseZval()
@@ -157,12 +149,8 @@ func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *type
 	var context *core.PhpStreamContext = nil
 	return_value.SetFalse()
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 5
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 5, 0)
 			host, host_len = fp.ParseString()
 			fp.StartOptional()
 			zerrno = fp.ParseZval()
@@ -219,12 +207,8 @@ func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *type
 	var zstream *types.Zval
 	var errstr *types.String = nil
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			zstream = fp.ParseResource()
 			fp.StartOptional()
 			timeout = fp.ParseDouble()
@@ -266,12 +250,8 @@ func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *typ
 	var want_peer types.ZendBool
 	var name *types.String = nil
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			zstream = fp.ParseResource()
 			want_peer = fp.ParseBool()
 			if fp.HasError() {
@@ -305,12 +285,8 @@ func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *type
 	var sa core.PhpSockaddrStorage
 	var sl socklen_t = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 4
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 4, 0)
 			zstream = fp.ParseResource()
 			data, datalen = fp.ParseString()
 			fp.StartOptional()
@@ -351,12 +327,8 @@ func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *ty
 	var flags zend.ZendLong = 0
 	var recvd int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 4
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 4, 0)
 			zstream = fp.ParseResource()
 			to_read = fp.ParseLong()
 			fp.StartOptional()
@@ -401,12 +373,8 @@ func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *types
 	var desiredpos zend.ZendLong = -1
 	var contents *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			zsrc = fp.ParseResource()
 			fp.StartOptional()
 			maxlen = fp.ParseLong()
@@ -470,12 +438,8 @@ func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *type
 	var len_ int
 	var ret int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 4
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 4, 0)
 			zsrc = fp.ParseResource()
 			zdest = fp.ParseResource()
 			fp.StartOptional()
@@ -508,12 +472,8 @@ func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *types
 	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zstream = fp.ParseResource()
 			if fp.HasError() {
 				return
@@ -768,12 +728,8 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var set_count int
 	var max_set_count int = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 4
-		var _max_num_args int = 5
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 4, 5, 0)
 			r_array = fp.ParseArrayEx2(true, true, false)
 			w_array = fp.ParseArrayEx2(true, true, false)
 			e_array = fp.ParseArrayEx2(true, true, false)
@@ -991,12 +947,8 @@ func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value 
 	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1085,12 +1037,8 @@ func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *
 	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			zcontext = fp.ParseResource()
 			params = fp.ParseArray()
 			if fp.HasError() {
@@ -1113,12 +1061,8 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zcontext = fp.ParseResource()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1146,12 +1090,8 @@ func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value 
 	var params *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			params = fp.ParseArray()
 			if fp.HasError() {
@@ -1175,12 +1115,8 @@ func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value 
 	var options *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			options = fp.ParseArray()
 			if fp.HasError() {
 				return
@@ -1201,12 +1137,8 @@ func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *typ
 	var params *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 2, 0)
 			fp.StartOptional()
 			options = fp.ParseArrayEx(true, false)
 			params = fp.ParseArrayEx(true, false)
@@ -1238,12 +1170,8 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 	var filter *core.PhpStreamFilter = nil
 	var ret int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 4
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 4, 0)
 			zstream = fp.ParseResource()
 			filtername, filternamelen = fp.ParseString()
 			fp.StartOptional()
@@ -1327,12 +1255,8 @@ func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *type
 	var zfilter *types.Zval
 	var filter *core.PhpStreamFilter
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zfilter = fp.ParseResource()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1371,12 +1295,8 @@ func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var buf *types.String
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			zstream = fp.ParseResource()
 			max_length = fp.ParseLong()
 			fp.StartOptional()
@@ -1411,12 +1331,8 @@ func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *types
 	var block types.ZendBool
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			zstream = fp.ParseResource()
 			block = fp.ParseBool()
 			if fp.HasError() {
@@ -1442,12 +1358,8 @@ func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *types.
 	var stream *core.PhpStream
 	var argc int = executeData.NumArgs()
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			socket = fp.ParseResource()
 			seconds = fp.ParseLong()
 			fp.StartOptional()
@@ -1481,12 +1393,8 @@ func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *ty
 	var buff int
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			arg1 = fp.ParseResource()
 			arg2 = fp.ParseLong()
 			if fp.HasError() {
@@ -1516,12 +1424,8 @@ func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *type
 	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			zstream = fp.ParseResource()
 			csize = fp.ParseLong()
 			if fp.HasError() {
@@ -1560,12 +1464,8 @@ func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *typ
 	var buff int
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			arg1 = fp.ParseResource()
 			arg2 = fp.ParseLong()
 			if fp.HasError() {
@@ -1599,12 +1499,8 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 	var cryptokindnull types.ZendBool = 1
 	var ret int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 4
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 4, 0)
 			zstream = fp.ParseResource()
 			enable = fp.ParseBool()
 			fp.StartOptional()
@@ -1655,12 +1551,8 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 	var filename_len int
 	var resolved_path *string
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1682,12 +1574,8 @@ func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var stream *core.PhpStream = nil
 	var wrapper *core.PhpStreamWrapper = nil
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zstream = fp.ParseZval()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1721,12 +1609,8 @@ func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *type
 	var stream *core.PhpStream
 	var zsrc *types.Zval
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zsrc = fp.ParseResource()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1749,12 +1633,8 @@ func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var stream *core.PhpStream
 	var fileno core.PhpSocketT
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			zsrc = fp.ParseResource()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1785,12 +1665,8 @@ func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *ty
 	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			zstream = fp.ParseResource()
 			how = fp.ParseLong()
 			if fp.HasError() {

@@ -875,12 +875,8 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var p_image_type zend.ZendLong
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			p_image_type = fp.ParseLong()
 			if fp.HasError() {
 				return
@@ -896,12 +892,8 @@ func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *ty
 	var inc_dot types.ZendBool = 1
 	var imgext *byte = nil
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			image_type = fp.ParseLong()
 			fp.StartOptional()
 			inc_dot = fp.ParseBool()
@@ -1126,12 +1118,8 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 	var input_len int
 	var argc int = executeData.NumArgs()
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			input, input_len = fp.ParseString()
 			fp.StartOptional()
 			info = fp.ParseZval()

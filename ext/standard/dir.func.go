@@ -69,12 +69,8 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, 
 	var context *core.PhpStreamContext = nil
 	var dirp *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			dirname, dir_len = fp.ParsePath()
 			fp.StartOptional()
 			zcontext = fp.ParseResource()
@@ -115,12 +111,8 @@ func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var dirp *core.PhpStream
 	var res *types.ZendResource
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			id = fp.ParseResource()
 			if fp.HasError() {
@@ -170,12 +162,8 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ret int
 	var str_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str, str_len = fp.ParsePath()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -206,12 +194,8 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ret int
 	var str_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			str, str_len = fp.ParsePath()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -263,12 +247,8 @@ func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var myself *types.Zval
 	var dirp *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			id = fp.ParseResource()
 			if fp.HasError() {
@@ -316,12 +296,8 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var dirp *core.PhpStream
 	var entry core.PhpStreamDirent
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			id = fp.ParseResource()
 			if fp.HasError() {
@@ -377,12 +353,8 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ret int
 	var basedir_limit types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			pattern, pattern_len = fp.ParsePath()
 			fp.StartOptional()
 			flags = fp.ParseLong()
@@ -475,12 +447,8 @@ func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext = nil
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			dirn, dirn_len = fp.ParsePath()
 			fp.StartOptional()
 			flags = fp.ParseLong()

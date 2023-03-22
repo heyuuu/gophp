@@ -197,12 +197,8 @@ func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var op_len int = 0
 	var compare int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			v1, v1_len = fp.ParseString()
 			v2, v2_len = fp.ParseString()
 			fp.StartOptional()

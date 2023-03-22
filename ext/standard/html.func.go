@@ -1340,12 +1340,8 @@ func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var replaced *types.String
 	var double_encode types.ZendBool = 1
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 4
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 4, 0)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			flags = fp.ParseLong()
@@ -1386,12 +1382,8 @@ func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *
 	var quote_style zend.ZendLong = ENT_COMPAT
 	var replaced *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			quote_style = fp.ParseLong()
@@ -1417,12 +1409,8 @@ func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *types.
 	var quote_style zend.ZendLong = ENT_COMPAT
 	var replaced *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			str = fp.ParseStr()
 			fp.StartOptional()
 			quote_style = fp.ParseLong()
@@ -1505,12 +1493,8 @@ func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value 
 	 * random access, not traversal */
 
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 3, 0)
 			fp.StartOptional()
 			all = fp.ParseLong()
 			flags = fp.ParseLong()

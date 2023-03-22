@@ -365,12 +365,8 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var command *byte
 	var command_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			command, command_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -393,12 +389,8 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var argument *byte
 	var argument_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			argument, argument_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -422,12 +414,8 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ret *types.String
 	var stream *core.PhpStream
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			command, command_len = fp.ParseString()
 			if fp.HasError() {
 				return
@@ -461,12 +449,8 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 func ZifProcNice(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var pri zend.ZendLong
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			pri = fp.ParseLong()
 			if fp.HasError() {
 				return_value.SetFalse()

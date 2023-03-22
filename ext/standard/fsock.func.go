@@ -29,12 +29,8 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 	var errstr *types.String = nil
 	return_value.SetFalse()
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 5
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 5, 0)
 			host, host_len = fp.ParseString()
 			fp.StartOptional()
 			port = fp.ParseLong()

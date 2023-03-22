@@ -16,12 +16,8 @@ func ZifHeader(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			ctr.GetLine(), len_ = fp.ParseString()
 			fp.StartOptional()
 			rep = fp.ParseBool()
@@ -40,12 +36,8 @@ func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			ctr.GetLine(), len_ = fp.ParseString()
 			if fp.HasError() {
@@ -238,12 +230,8 @@ func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var secure types.ZendBool = 0
 	var httponly types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 7
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 7, 0)
 			name = fp.ParseStr()
 			fp.StartOptional()
 			value = fp.ParseStr()
@@ -301,12 +289,8 @@ func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var secure types.ZendBool = 0
 	var httponly types.ZendBool = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 7
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 7, 0)
 			name = fp.ParseStr()
 			fp.StartOptional()
 			value = fp.ParseStr()
@@ -359,12 +343,8 @@ func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	var file *byte = ""
 	var line int = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 2, 0)
 			fp.StartOptional()
 			arg1 = fp.ParseZval()
 			arg2 = fp.ParseZval()
@@ -414,12 +394,8 @@ func ZifHeadersList(executeData *zend.ZendExecuteData, return_value *types.Zval)
 func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var response_code zend.ZendLong = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			response_code = fp.ParseLong()
 			if fp.HasError() {

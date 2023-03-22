@@ -142,35 +142,13 @@ func ZifFuncGetArgs(executeData zpp.DefEx) (*types.Array, bool) {
 	}
 	return arr, true
 }
-func ZifStrlen(executeData *ZendExecuteData, return_value *types.Zval) {
-	var s *types.String
-	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			s = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(s.GetLen())
-}
+func ZifStrlen(str *types.String) int { return str.GetLen() }
 func ZifStrcmp(executeData *ZendExecuteData, return_value *types.Zval) {
 	var s1 *types.String
 	var s2 *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			if fp.HasError() {
@@ -188,12 +166,8 @@ func ZifStrncmp(executeData *ZendExecuteData, return_value *types.Zval) {
 	var s2 *types.String
 	var len_ ZendLong
 	for {
-		var _flags int = 0
-		var _min_num_args int = 3
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 3, 3, 0)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			len_ = fp.ParseLong()
@@ -216,12 +190,8 @@ func ZifStrcasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 	var s1 *types.String
 	var s2 *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			if fp.HasError() {
@@ -239,12 +209,8 @@ func ZifStrncasecmp(executeData *ZendExecuteData, return_value *types.Zval) {
 	var s2 *types.String
 	var len_ ZendLong
 	for {
-		var _flags int = 0
-		var _min_num_args int = 3
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 3, 3, 0)
 			s1 = fp.ParseStr()
 			s2 = fp.ParseStr()
 			len_ = fp.ParseLong()
@@ -324,12 +290,8 @@ func ZifErrorReporting(executeData *ZendExecuteData, return_value *types.Zval) {
 	var err *types.Zval = nil
 	var old_error_reporting int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 1, 0)
 			fp.StartOptional()
 			err = fp.ParseZval()
 			if fp.HasError() {
@@ -461,12 +423,8 @@ func ZifDefine(executeData *ZendExecuteData, return_value *types.Zval) {
 	var case_sensitive int = CONST_CS
 	var c ZendConstant
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			name = fp.ParseStr()
 			val = fp.ParseZval()
 			fp.StartOptional()
@@ -554,12 +512,8 @@ register_constant:
 func ZifDefined(executeData *ZendExecuteData, return_value *types.Zval) {
 	var name *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			name = fp.ParseStr()
 			if fp.HasError() {
 				return
@@ -651,12 +605,8 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 	var allow_string types.ZendBool = only_subclass
 	var retval types.ZendBool
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			obj = fp.ParseZval()
 			class_name = fp.ParseStr()
 			fp.StartOptional()
@@ -796,12 +746,8 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 	var zobj *types.ZendObject
 	var num_key ZendUlong
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			obj = fp.ParseObject()
 			if fp.HasError() {
 				return
@@ -888,12 +834,8 @@ func ZifGetMangledObjectVars(executeData *ZendExecuteData, return_value *types.Z
 	var obj *types.Zval
 	var properties *types.Array
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			obj = fp.ParseObject()
 			if fp.HasError() {
 				return
@@ -970,12 +912,8 @@ func ZifMethodExists(executeData *ZendExecuteData, return_value *types.Zval) {
 	var ce *types.ClassEntry
 	var func_ *ZendFunction
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			klass = fp.ParseZval()
 			method_name = fp.ParseStr()
 			if fp.HasError() {
@@ -1073,12 +1011,8 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 	var ce *types.ClassEntry
 	var autoload types.ZendBool = 1
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 2, 0)
 			name = fp.ParseStr()
 			fp.StartOptional()
 			autoload = fp.ParseBool()
@@ -1126,12 +1060,8 @@ func ZifFunctionExists(executeData *ZendExecuteData, return_value *types.Zval) {
 	var func_ *ZendFunction
 	var lcname *types.String
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			name = fp.ParseStr()
 			if fp.HasError() {
 				return

@@ -613,12 +613,8 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var i int
 	var offset zend.ZendLong = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 3, 0)
 			formatarg = fp.ParseStr()
 			inputarg = fp.ParseStr()
 			fp.StartOptional()

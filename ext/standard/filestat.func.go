@@ -50,12 +50,8 @@ func ZifDiskTotalSpace(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var fullpath []*byte
 	var path_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			path, path_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -100,12 +96,8 @@ func ZifDiskFreeSpace(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var fullpath []*byte
 	var path_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			path, path_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -145,12 +137,8 @@ func PhpDoChgrp(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 	var ret int
 	var wrapper *core.PhpStreamWrapper
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			filename, filename_len = fp.ParsePath()
 			group = fp.ParseZval()
 			if fp.HasError() {
@@ -248,12 +236,8 @@ func PhpDoChown(executeData *zend.ZendExecuteData, return_value *types.Zval, do_
 	var ret int
 	var wrapper *core.PhpStreamWrapper
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			filename, filename_len = fp.ParsePath()
 			user = fp.ParseZval()
 			if fp.HasError() {
@@ -343,12 +327,8 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var imode mode_t
 	var wrapper *core.PhpStreamWrapper
 	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 2, 2, 0)
 			filename, filename_len = fp.ParsePath()
 			mode = fp.ParseLong()
 			if fp.HasError() {
@@ -403,12 +383,8 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var newtime *__struct__utimbuf = &newtimebuf
 	var wrapper *core.PhpStreamWrapper
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 3
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 3, 0)
 			filename, filename_len = fp.ParsePath()
 			fp.StartOptional()
 			filetime = fp.ParseLong()
@@ -522,12 +498,8 @@ func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *types.Zv
 	var filename *byte = nil
 	var filename_len int = 0
 	for {
-		var _flags int = 0
-		var _min_num_args int = 0
-		var _max_num_args int = 2
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 0, 2, 0)
 			fp.StartOptional()
 			clear_realpath_cache = fp.ParseBool()
 			filename, filename_len = fp.ParsePath()
@@ -783,12 +755,8 @@ func ZifFileperms(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -803,12 +771,8 @@ func ZifFileinode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -823,12 +787,8 @@ func ZifFilesize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -843,12 +803,8 @@ func ZifFileowner(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -863,12 +819,8 @@ func ZifFilegroup(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -883,12 +835,8 @@ func ZifFileatime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -903,12 +851,8 @@ func ZifFilemtime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -923,12 +867,8 @@ func ZifFilectime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -943,12 +883,8 @@ func ZifFiletype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -963,12 +899,8 @@ func ZifIsWritable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -983,12 +915,8 @@ func ZifIsReadable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1003,12 +931,8 @@ func ZifIsExecutable(executeData *zend.ZendExecuteData, return_value *types.Zval
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1023,12 +947,8 @@ func ZifIsFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1043,12 +963,8 @@ func ZifIsDir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1063,12 +979,8 @@ func ZifIsLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1083,12 +995,8 @@ func ZifFileExists(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1103,12 +1011,8 @@ func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return
@@ -1123,12 +1027,8 @@ func PhpIfStat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var filename *byte
 	var filename_len int
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			filename, filename_len = fp.ParsePath()
 			if fp.HasError() {
 				return

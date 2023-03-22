@@ -50,12 +50,8 @@ func PhpIfCrc32(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var crcinit uint32 = 0
 	var crc uint32
 	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = 1
-
 		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
+			fp := zpp.FastParseStart(executeData, 1, 1, 0)
 			p, nr = fp.ParseString()
 			if fp.HasError() {
 				return
