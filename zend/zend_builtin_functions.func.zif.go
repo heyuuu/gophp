@@ -11,7 +11,7 @@ var DefZifZendVersion = DefFunc(DefFuncOpts{name: "zend_version", minNumArgs: 0,
 		return
 	}
 	ret := ZifZendVersion()
-	returnValue.SetRawString(ret)
+	returnValue.SetStringVal(ret)
 }})
 
 // generate by ZifGcMemCaches
@@ -82,4 +82,17 @@ var DefZifFuncGetArg = DefFunc(DefFuncOpts{name: "func_get_arg", minNumArgs: 1, 
 		return
 	}
 	ZifFuncGetArg(executeData, returnValue, requested_offset)
+}})
+
+// generate by ZifFuncGetArgs
+var DefZifFuncGetArgs = DefFunc(DefFuncOpts{name: "func_get_args", minNumArgs: 0, maxNumArgs: 0, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ret, ok := ZifFuncGetArgs(executeData)
+	if ok {
+		returnValue.SetArray(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 }})

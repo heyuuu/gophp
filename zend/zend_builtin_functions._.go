@@ -158,7 +158,7 @@ var BuiltinFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	DefZifZendVersion,
 	DefZifFuncNumArgs,
 	DefZifFuncGetArg,
-	types.MakeZendFunctionEntryEx("func_get_args", 0, ZifFuncGetArgs, ArginfoZendVoid),
+	DefZifFuncGetArgs,
 	types.MakeZendFunctionEntryEx("strlen", 0, ZifStrlen, ArginfoStrlen),
 	types.MakeZendFunctionEntryEx("strcmp", 0, ZifStrcmp, ArginfoStrcmp),
 	types.MakeZendFunctionEntryEx("strncmp", 0, ZifStrncmp, ArginfoStrncmp),

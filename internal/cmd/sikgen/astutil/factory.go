@@ -97,6 +97,13 @@ func AssignStmt(variable ast.Expr, value ast.Expr) ast.Stmt {
 		Rhs: []ast.Expr{value},
 	}
 }
+func MultiAssignStmt(variables []ast.Expr, value ast.Expr) ast.Stmt {
+	return &ast.AssignStmt{
+		Lhs: variables,
+		Tok: token.DEFINE,
+		Rhs: []ast.Expr{value},
+	}
+}
 func BlockStmt(list ...ast.Stmt) *ast.BlockStmt {
 	return &ast.BlockStmt{List: list}
 }

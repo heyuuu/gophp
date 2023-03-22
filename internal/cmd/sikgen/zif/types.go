@@ -1,26 +1,27 @@
 package zif
 
-import (
-	"strconv"
-)
-
 type ZifInfo struct {
-	funcName      string
-	defName       string
-	name          string
-	minNumArgs    int
-	maxNumArgs    int
-	argInfos      []ArgInfo
-	returnArgInfo *ArgInfo
-	quiet         bool
-	strict        bool
-	oldMode       bool
+	funcName   string
+	defName    string
+	name       string
+	minNumArgs int
+	maxNumArgs int
+	argInfos   []ArgInfo
+	returnInfo *ReturnInfo
+	quiet      bool
+	strict     bool
+	oldMode    bool
 }
 
 type ArgInfo struct {
 	name       string
 	typ        ZppType
 	isVariadic bool
+}
+
+type ReturnInfo struct {
+	typ    ZppType
+	withOk bool
 }
 
 const zifAnnoName = "@zif"
@@ -35,9 +36,8 @@ type zifAnnoFlags struct {
 	oldMode    bool
 }
 
+//go:generate stringer -type=ZppType
 type ZppType int
-
-func (z ZppType) String() string { return strconv.Itoa(int(z)) }
 
 const (
 	_ ZppType = iota
@@ -103,6 +103,25 @@ func toZppParseMethod(typ ZppType) (string, bool) {
 		return "ParseArray", true
 	case ZppTypeVariadic:
 		return "ParseVariadic", true
+	default:
+		return "", false
+	}
+}
+
+func toZppSetMethod(typ ZppType) (string, bool) {
+	switch typ {
+	case ZppTypeBool:
+		return "SetBool", true
+	case ZppTypeLong:
+		return "SetLong", true
+	case ZppTypeDouble:
+		return "SetDouble", true
+	case ZppTypeString:
+		return "SetStringVal", true
+	case ZppTypeZendString:
+		return "SetString", true
+	case ZppTypeZendArray:
+		return "SetArray", true
 	default:
 		return "", false
 	}

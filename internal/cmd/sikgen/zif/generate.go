@@ -79,6 +79,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	executeDataIdent := f.Ident("executeData")
 	returnValueIdent := f.Ident("returnValue")
 	retIdent := f.Ident("ret")
+	okIdent := f.Ident("ok")
 
 	// type
 	funcType := &ast.FuncType{
@@ -106,6 +107,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 			Body: f.BlockStmt(&ast.ReturnStmt{}),
 		})
 	} else {
+		// fp := FastParseStart(...)
 		var flags []ast.Expr
 		if zifInfo.quiet {
 			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagQuiet")}
@@ -126,6 +128,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 			flagsExpr = f.IntLit(0)
 		}
 
+		// argN := fp.ParseXXX()
 		stmts = append(stmts, f.AssignStmt(
 			fpIdent,
 			f.PkgCallExpr("zpp", "FastParseStart", []ast.Expr{
@@ -156,6 +159,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 		})
 	}
 
+	// 代用内部方法
 	var args []ast.Expr
 	for _, argInfo := range zifInfo.argInfos {
 		switch argInfo.typ {
@@ -169,30 +173,42 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 			args = append(args, f.Ident(argInfo.name))
 		}
 	}
+	realCallExpr := f.CallExpr(zifInfo.funcName, args)
 
-	if zifInfo.returnArgInfo == nil {
-		stmts = append(stmts,
-			f.ExprStmt(f.CallExpr(zifInfo.funcName, args)),
-		)
+	// 处理返回值
+	retInfo := zifInfo.returnInfo
+	if retInfo == nil {
+		stmts = append(stmts, f.ExprStmt(realCallExpr))
 	} else {
-		var setter string
-		switch zifInfo.returnArgInfo.typ {
-		case ZppTypeBool:
-			setter = "SetBool"
-		case ZppTypeLong:
-			setter = "SetLong"
-		case ZppTypeDouble:
-			setter = "SetDouble"
-		case ZppTypeString:
-			setter = "SetRawString"
-		default:
-			log.Fatalln("此 ZppType 未设置对应 Setter: " + zifInfo.returnArgInfo.typ.String())
+		// 返回值setter
+		setter, ok := toZppSetMethod(retInfo.typ)
+		if !ok {
+			log.Fatalf("不支持此类型的返回值: typ=%d\n", retInfo.typ)
 		}
 
-		stmts = append(stmts,
-			f.AssignStmt(retIdent, f.CallExpr(zifInfo.funcName, args)),
-			f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, []ast.Expr{retIdent})),
-		)
+		if retInfo.withOk {
+			stmts = append(stmts,
+				// ret, ok := realCall()
+				f.MultiAssignStmt([]ast.Expr{retIdent, okIdent}, realCallExpr),
+				// if ok { returnValue.SetXXX(ret); } else { returnValue.SetFalse() }
+				&ast.IfStmt{
+					Cond: okIdent,
+					Body: f.BlockStmt(
+						f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, []ast.Expr{retIdent})),
+					),
+					Else: f.BlockStmt(
+						f.ExprStmt(f.MethodCallExpr(returnValueIdent, "SetFalse", nil)),
+					),
+				},
+			)
+		} else {
+			stmts = append(stmts,
+				// ret := realCall()
+				f.MultiAssignStmt([]ast.Expr{retIdent}, realCallExpr),
+				// returnValue.SetXXX(ret)
+				f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, []ast.Expr{retIdent})),
+			)
+		}
 	}
 
 	return &ast.FuncLit{

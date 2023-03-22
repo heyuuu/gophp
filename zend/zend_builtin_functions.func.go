@@ -100,7 +100,7 @@ func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet, requested_off
 		types.ZVAL_COPY_DEREF(return_value, arg)
 	}
 }
-func ZifFuncGetArgs(executeData *ZendExecuteData) (*types.Array, bool) {
+func ZifFuncGetArgs(executeData zpp.DefEx) (*types.Array, bool) {
 	ex := executeData.GetPrevExecuteData()
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		faults.Error(faults.E_WARNING, "func_get_args():  Called from the global scope - no function context")

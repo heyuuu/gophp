@@ -65,7 +65,6 @@ func scanZifInFile(file *ast.File) []*ZifInfo {
 
 func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 	funcName := funcDecl.Name.Name
-	returns := funcDecl.Type.Results
 
 	// 从注解获取信息
 	annoArgs := getAnnoArgs(funcDecl.Doc)
@@ -93,18 +92,11 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 	zifInfo.minNumArgs, zifInfo.maxNumArgs = calcNumArgs(argInfos)
 
 	// 从返回类型获取信息
-	if returns != nil && len(returns.List) == 1 {
-		returnTypeSpec := printNode(returns.List[0].Type)
-		returnType, ok := toZppType(returnTypeSpec)
-		if !ok {
-			typeDesc := returns.List[0].Type
-			log.Fatalf("Zif函数错误，返回值类型不合法: func=%s, type=%s\n", funcName, typeDesc)
-			return nil, false
-		}
-		zifInfo.returnArgInfo = &ArgInfo{
-			typ: returnType,
-		}
+	returnInfo, err := parseReturnInfo(funcDecl)
+	if err != nil {
+		log.Fatalf("Zif函数 %s 定义错误: %s", funcName, err.Error())
 	}
+	zifInfo.returnInfo = returnInfo
 
 	return zifInfo, true
 }
@@ -208,6 +200,36 @@ func parseArgInfos(funcDecl *ast.FuncDecl) ([]ArgInfo, error) {
 		})
 	}
 	return argInfos, nil
+}
+
+func parseReturnInfo(funcDecl *ast.FuncDecl) (*ReturnInfo, error) {
+	returns := funcDecl.Type.Results
+	if returns == nil {
+		return nil, nil
+	}
+
+	var retTypes []ZppType
+	for _, result := range returns.List {
+		returnTypeSpec := printNode(result.Type)
+		returnType, ok := toZppType(returnTypeSpec)
+		if !ok {
+			return nil, errors.New("返回值类型不合法: " + returnTypeSpec)
+		}
+		retTypes = append(retTypes, returnType)
+	}
+
+	switch len(retTypes) {
+	case 0:
+		return nil, nil
+	case 1:
+		return &ReturnInfo{typ: retTypes[0]}, nil
+	case 2:
+		if retTypes[1] == ZppTypeBool {
+			return &ReturnInfo{typ: retTypes[0], withOk: true}, nil
+		}
+	}
+
+	return nil, errors.New("不支持此返回值类型组合: " + printNode(funcDecl.Type))
 }
 
 func calcNumArgs(argInfos []ArgInfo) (minNumArgs int, maxNumArgs int) {

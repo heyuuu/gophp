@@ -251,9 +251,7 @@ func (this *Zval) SetString(s *String) {
 	this.SetTypeInfo(IS_STRING_EX)
 }
 func (this *Zval) SetStringVal(str string) {
-	s := NewString(str)
-	this.SetStr(s)
-	this.SetTypeInfo(IS_STRING_EX)
+	this.SetString(NewString(str))
 }
 func (this *Zval) SetInternedString(s *String) {
 	this.SetStr(s)
