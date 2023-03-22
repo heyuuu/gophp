@@ -2,6 +2,7 @@ package zif
 
 import (
 	"go/ast"
+	"go/token"
 	"log"
 	f "sik/internal/cmd/sikgen/astutil"
 )
@@ -105,11 +106,24 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 			Body: f.BlockStmt(&ast.ReturnStmt{}),
 		})
 	} else {
-		var flags ast.Expr
+		var flags []ast.Expr
+		if zifInfo.quiet {
+			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagQuiet")}
+			flags = append(flags, flag)
+		}
 		if zifInfo.strict {
-			flags = &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("ZEND_PARSE_PARAMS_THROW")}
+			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagThrow")}
+			flags = append(flags, flag)
+		}
+		if zifInfo.oldMode {
+			flag := &ast.SelectorExpr{X: f.Ident("zpp"), Sel: f.Ident("FlagOldMode")}
+			flags = append(flags, flag)
+		}
+		var flagsExpr ast.Expr
+		if len(flags) != 0 {
+			flagsExpr = f.BinaryExpr(token.OR, flags[0], flags[1:]...)
 		} else {
-			flags = f.IntLit(0)
+			flagsExpr = f.IntLit(0)
 		}
 
 		stmts = append(stmts, f.AssignStmt(
@@ -118,7 +132,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 				executeDataIdent,
 				f.IntLit(zifInfo.minNumArgs),
 				f.IntLit(zifInfo.maxNumArgs),
-				flags,
+				flagsExpr,
 			}),
 		))
 		for _, info := range zifInfo.argInfos {

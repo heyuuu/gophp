@@ -12,7 +12,9 @@ type ZifInfo struct {
 	maxNumArgs    int
 	argInfos      []ArgInfo
 	returnArgInfo *ArgInfo
+	quiet         bool
 	strict        bool
+	oldMode       bool
 }
 
 type ArgInfo struct {
@@ -28,8 +30,9 @@ type zifAnnoFlags struct {
 	strNumArgs string
 	minNumArgs int
 	maxNumArgs int
+	quiet      bool
 	strict     bool
-	typeSpec   string
+	oldMode    bool
 }
 
 type ZppType int

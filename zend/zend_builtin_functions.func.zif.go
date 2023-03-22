@@ -76,7 +76,7 @@ var DefZifFuncNumArgs = DefFunc(DefFuncOpts{name: "func_num_args", minNumArgs: 0
 
 // generate by ZifFuncGetArg
 var DefZifFuncGetArg = DefFunc(DefFuncOpts{name: "func_get_arg", minNumArgs: 1, maxNumArgs: 1, argInfos: []ArgInfo{{name: "requested_offset"}}, handler: func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	fp := zpp.FastParseStart(executeData, 1, 1, zpp.FlagOldMode)
 	requested_offset := fp.ParseLong()
 	if fp.HasError() {
 		return

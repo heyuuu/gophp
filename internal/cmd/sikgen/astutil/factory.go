@@ -79,6 +79,14 @@ func MethodCallExpr(instance ast.Expr, method string, args []ast.Expr) ast.Expr 
 	}
 }
 
+func BinaryExpr(Op token.Token, first ast.Expr, others ...ast.Expr) ast.Expr {
+	var expr ast.Expr = first
+	for _, other := range others {
+		expr = &ast.BinaryExpr{X: expr, Op: Op, Y: other}
+	}
+	return expr
+}
+
 func ExprStmt(expr ast.Expr) ast.Stmt {
 	return &ast.ExprStmt{X: expr}
 }

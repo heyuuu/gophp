@@ -62,16 +62,8 @@ func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 	return ex.NumArgs()
 }
 
-//@zif -t "l"
+//@zif -old
 func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet, requested_offset int) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	if fp.HasError() {
-		return
-	}
-
-	if ZendParseParameters(executeData.NumArgs(), "l", &requested_offset) == types.FAILURE {
-		return
-	}
 	if requested_offset < 0 {
 		faults.Error(faults.E_WARNING, "func_get_arg():  The argument number should be >= 0")
 		return_value.SetFalse()
@@ -111,7 +103,6 @@ func ZifFuncGetArg(executeData zpp.DefEx, return_value zpp.DefRet, requested_off
 func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 	var p *types.Zval
 	var q *types.Zval
-	var arg_count uint32
 	var first_extra_arg uint32
 	var i uint32
 	var ex *ZendExecuteData = executeData.GetPrevExecuteData()
@@ -124,7 +115,8 @@ func ZifFuncGetArgs(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	arg_count = ex.NumArgs()
+
+	arg_count := ex.NumArgs()
 	if arg_count != 0 {
 		ArrayInitSize(return_value, arg_count)
 		first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()

@@ -81,6 +81,7 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 		defName:  "Def" + funcName,
 		name:     zifName,
 		strict:   annoArgs.strict,
+		oldMode:  annoArgs.oldMode,
 	}
 
 	// 从参数类型获取信息
@@ -129,8 +130,9 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 	flagSet := flag.NewFlagSet(zifAnnoName, flag.ContinueOnError)
 	flagSet.StringVar(&annoFlags.name, "n", "", "name")
 	flagSet.StringVar(&annoFlags.strNumArgs, "c", "", "num of args")
-	flagSet.BoolVar(&annoFlags.strict, "s", false, "open strict mode")
-	flagSet.StringVar(&annoFlags.typeSpec, "t", "", "type spec")
+	flagSet.BoolVar(&annoFlags.strict, "s", false, "use strict mode")
+	flagSet.BoolVar(&annoFlags.quiet, "q", false, "use quite mode")
+	flagSet.BoolVar(&annoFlags.oldMode, "old", false, "use old mode")
 	err := flagSet.Parse(args[1:])
 	if err != nil {
 		return annoFlags
