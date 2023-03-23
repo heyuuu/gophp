@@ -69,9 +69,9 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				ZendCannotAddElement()
 				goto assign_dim_error
 			} else {
-				if value.IsRefcounted() {
-					value.AddRefcount()
-				}
+
+				value.TryAddRefcount()
+
 			}
 		}
 
@@ -153,9 +153,9 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				ZendCannotAddElement()
 				goto assign_dim_error
 			} else {
-				if value.IsRefcounted() {
-					value.AddRefcount()
-				}
+
+				value.TryAddRefcount()
+
 			}
 
 		}
@@ -242,9 +242,9 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				ZendCannotAddElement()
 				goto assign_dim_error
 			} else {
-				if value.IsRefcounted() {
-					value.AddRefcount()
-				}
+
+				value.TryAddRefcount()
+
 			}
 
 		}
@@ -331,9 +331,9 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				ZendCannotAddElement()
 				goto assign_dim_error
 			} else {
-				if value.IsRefcounted() {
-					value.AddRefcount()
-				}
+
+				value.TryAddRefcount()
+
 			}
 
 		}

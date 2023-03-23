@@ -110,9 +110,9 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
-					if generator.GetValue().IsRefcounted() {
-						generator.GetValue().AddRefcount()
-					}
+
+					generator.GetValue().TryAddRefcount()
+
 				}
 			}
 
@@ -132,9 +132,9 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				if generator.GetValue().IsRefcounted() {
-					generator.GetValue().AddRefcount()
-				}
+
+				generator.GetValue().TryAddRefcount()
+
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -155,9 +155,9 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
-			if generator.GetKey().IsRefcounted() {
-				generator.GetKey().AddRefcount()
-			}
+
+			generator.GetKey().TryAddRefcount()
+
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().GetLval() > generator.GetLargestUsedIntegerKey() {

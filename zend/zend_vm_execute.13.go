@@ -782,9 +782,9 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					expr = result.GetArr().IndexAddNewH(0, expr)
 
 					{
-						if expr.IsRefcounted() {
-							expr.AddRefcount()
-						}
+
+						expr.TryAddRefcount()
+
 					}
 				} else {
 					types.ZVAL_EMPTY_ARRAY(result)
@@ -821,9 +821,9 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 
 				{
-					if expr.IsRefcounted() {
-						expr.AddRefcount()
-					}
+
+					expr.TryAddRefcount()
+
 				}
 			}
 		}
@@ -994,9 +994,9 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -1021,9 +1021,9 @@ func ZEND_COALESCE_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)

@@ -470,9 +470,9 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -497,9 +497,9 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)

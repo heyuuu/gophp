@@ -847,9 +847,10 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE(arg, varptr)
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
-		} else if arg.IsRefcounted() {
-			arg.AddRefcount()
+		} else {
+			arg.TryAddRefcount()
 		}
+
 	} else {
 		types.ZVAL_COPY_VALUE(arg, varptr)
 	}
@@ -909,9 +910,9 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					expr = result.GetArr().IndexAddNewH(0, expr)
 
 					{
-						if expr.IsRefcounted() {
-							expr.AddRefcount()
-						}
+
+						expr.TryAddRefcount()
+
 					}
 				} else {
 					types.ZVAL_EMPTY_ARRAY(result)
@@ -948,9 +949,9 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 
 				{
-					if expr.IsRefcounted() {
-						expr.AddRefcount()
-					}
+
+					expr.TryAddRefcount()
+
 				}
 			}
 		}

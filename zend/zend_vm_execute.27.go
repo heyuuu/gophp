@@ -875,9 +875,9 @@ assign_object:
 					RebuildObjectProperties(zobj)
 				}
 				{
-					if value.IsRefcounted() {
-						value.AddRefcount()
-					}
+
+					value.TryAddRefcount()
+
 				}
 
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)

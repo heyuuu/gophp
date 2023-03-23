@@ -1069,9 +1069,9 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
-			if generator.GetKey().IsRefcounted() {
-				generator.GetKey().AddRefcount()
-			}
+
+			generator.GetKey().TryAddRefcount()
+
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().GetLval() > generator.GetLargestUsedIntegerKey() {

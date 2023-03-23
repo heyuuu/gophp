@@ -41,9 +41,9 @@ func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 	}
 }
 func SplPtrLlistZvalCtor(elem *SplPtrLlistElement) {
-	if elem.GetData().IsRefcounted() {
-		elem.GetData().AddRefcount()
-	}
+
+	elem.GetData().TryAddRefcount()
+
 }
 func SplPtrLlistInit(ctor SplPtrLlistCtorFunc, dtor SplPtrLlistDtorFunc) *SplPtrLlist {
 	var llist *SplPtrLlist = zend.Emalloc(b.SizeOf("spl_ptr_llist"))
@@ -333,9 +333,9 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.Array {
 	for current != nil {
 		next = current.GetNext()
 		zend.AddIndexZval(&dllist_array, i, current.GetData())
-		if current.GetData().IsRefcounted() {
-			current.GetData().AddRefcount()
-		}
+
+		current.GetData().TryAddRefcount()
+
 		i++
 		current = next
 	}

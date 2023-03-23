@@ -623,9 +623,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 				q = p
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
-					if q.IsRefcounted() {
-						q.AddRefcount()
-					}
+
+					q.TryAddRefcount()
+
 					fillScope.FillSet(q)
 				} else {
 					fillScope.FillSetNull()
@@ -645,9 +645,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 			q = p
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
-				if q.IsRefcounted() {
-					q.AddRefcount()
-				}
+
+				q.TryAddRefcount()
+
 				fillScope.FillSet(q)
 			} else {
 				fillScope.FillSetNull()

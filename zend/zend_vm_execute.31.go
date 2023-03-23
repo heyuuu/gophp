@@ -935,9 +935,9 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				ZendCannotAddElement()
 				goto assign_dim_error
 			} else {
-				if value.IsRefcounted() {
-					value.AddRefcount()
-				}
+
+				value.TryAddRefcount()
+
 			}
 		}
 
@@ -1014,9 +1014,9 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZendCannotAddElement()
 				goto assign_dim_error
 			} else {
-				if value.IsRefcounted() {
-					value.AddRefcount()
-				}
+
+				value.TryAddRefcount()
+
 			}
 
 		}

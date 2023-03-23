@@ -225,9 +225,9 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				value = RT_CONSTANT(opline, opline.GetOp1())
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
-					if generator.GetValue().IsRefcounted() {
-						generator.GetValue().AddRefcount()
-					}
+
+					generator.GetValue().TryAddRefcount()
+
 				}
 			}
 
@@ -247,9 +247,9 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 			{
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				if generator.GetValue().IsRefcounted() {
-					generator.GetValue().AddRefcount()
-				}
+
+				generator.GetValue().TryAddRefcount()
+
 			}
 
 			/* Consts, temporary variables and references need copying */
@@ -411,9 +411,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 				q = p
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
-					if q.IsRefcounted() {
-						q.AddRefcount()
-					}
+
+					q.TryAddRefcount()
+
 					fillScope.FillSet(q)
 				} else {
 					fillScope.FillSetNull()
@@ -433,9 +433,9 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 			q = p
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
-				if q.IsRefcounted() {
-					q.AddRefcount()
-				}
+
+				q.TryAddRefcount()
+
 				fillScope.FillSet(q)
 			} else {
 				fillScope.FillSetNull()

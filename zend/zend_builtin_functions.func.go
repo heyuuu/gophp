@@ -135,9 +135,9 @@ func ZifFuncGetArgs(executeData zpp.DefEx) (*types.Array, bool) {
 			arr.NextIndexInsertNew(types.NewZvalNull())
 		} else {
 			zv = types.ZVAL_DEREF(zv)
-			if zv.IsRefcounted() {
-				zv.AddRefcount()
-			}
+
+			zv.TryAddRefcount()
+
 			arr.NextIndexInsertNew(zv)
 		}
 	}
@@ -1462,9 +1462,9 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 					arg_name = call.GetFunc().GetOpArray().GetVars()[i]
 					arg = types.ZendHashFindInd(call.GetSymbolTable(), arg_name.GetStr())
 					if arg != nil {
-						if arg.IsRefcounted() {
-							arg.AddRefcount()
-						}
+
+						arg.TryAddRefcount()
+
 						fillScope.FillSet(arg)
 					} else {
 						fillScope.FillSetNull()
@@ -1475,9 +1475,9 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 			} else {
 				for i < first_extra_arg {
 					if !p.IsUndef() {
-						if p.IsRefcounted() {
-							p.AddRefcount()
-						}
+
+						p.TryAddRefcount()
+
 						fillScope.FillSet(p)
 					} else {
 						fillScope.FillSetNull()
@@ -1491,9 +1491,9 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		}
 		for i < num_args {
 			if !p.IsUndef() {
-				if p.IsRefcounted() {
-					p.AddRefcount()
-				}
+
+				p.TryAddRefcount()
+
 				fillScope.FillSet(p)
 			} else {
 				fillScope.FillSetNull()

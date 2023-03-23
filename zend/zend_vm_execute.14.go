@@ -185,9 +185,9 @@ func ZEND_ROPE_ADD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	{
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[opline.GetExtendedValue()] = var_.GetStr()
-		if var_.IsRefcounted() {
-			var_.AddRefcount()
-		}
+
+		var_.TryAddRefcount()
+
 	}
 
 	ZEND_VM_NEXT_OPCODE()
@@ -204,9 +204,9 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	{
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[opline.GetExtendedValue()] = var_.GetStr()
-		if var_.IsRefcounted() {
-			var_.AddRefcount()
-		}
+
+		var_.TryAddRefcount()
+
 	}
 
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
@@ -369,9 +369,9 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		{
 			types.ZVAL_COPY_VALUE(generator.GetKey(), key)
-			if generator.GetKey().IsRefcounted() {
-				generator.GetKey().AddRefcount()
-			}
+
+			generator.GetKey().TryAddRefcount()
+
 		}
 
 		if generator.GetKey().IsLong() && generator.GetKey().GetLval() > generator.GetLargestUsedIntegerKey() {

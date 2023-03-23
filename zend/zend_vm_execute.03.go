@@ -158,9 +158,9 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 				for {
 					ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
-					if param.IsRefcounted() {
-						param.AddRefcount()
-					}
+
+					param.TryAddRefcount()
+
 					fillScope.FillSet(param)
 					fillScope.FillNext()
 					param++
@@ -170,9 +170,9 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				}
 			} else {
 				for {
-					if param.IsRefcounted() {
-						param.AddRefcount()
-					}
+
+					param.TryAddRefcount()
+
 					fillScope.FillSet(param)
 					fillScope.FillNext()
 					param++
@@ -412,9 +412,9 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZVAL_COPY_VALUE(return_value, retval_ptr)
 			{
-				if return_value.IsRefcounted() {
-					return_value.AddRefcount()
-				}
+
+				return_value.TryAddRefcount()
+
 			}
 		}
 
@@ -472,9 +472,9 @@ func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int 
 	{
 		types.ZVAL_COPY_VALUE(generator.GetRetval(), retval)
 		{
-			if generator.GetRetval().IsRefcounted() {
-				generator.GetRetval().AddRefcount()
-			}
+
+			generator.GetRetval().TryAddRefcount()
+
 		}
 	}
 
@@ -561,9 +561,9 @@ func ZEND_SEND_VAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
 	{
-		if arg.IsRefcounted() {
-			arg.AddRefcount()
-		}
+
+		arg.TryAddRefcount()
+
 	}
 	ZEND_VM_NEXT_OPCODE()
 }
@@ -580,9 +580,9 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
 	{
-		if arg.IsRefcounted() {
-			arg.AddRefcount()
-		}
+
+		arg.TryAddRefcount()
+
 	}
 	ZEND_VM_NEXT_OPCODE()
 }
@@ -598,9 +598,9 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_QUICK_HANDLER(executeData *ZendExecuteData) int
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
 	{
-		if arg.IsRefcounted() {
-			arg.AddRefcount()
-		}
+
+		arg.TryAddRefcount()
+
 	}
 	ZEND_VM_NEXT_OPCODE()
 }
@@ -709,9 +709,9 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if expr.IsType(opline.GetExtendedValue()) {
 			types.ZVAL_COPY_VALUE(result, expr)
 			{
-				if result.IsRefcounted() {
-					result.AddRefcount()
-				}
+
+				result.TryAddRefcount()
+
 			}
 
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -722,9 +722,9 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					result.SetArray(types.NewZendArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					{
-						if expr.IsRefcounted() {
-							expr.AddRefcount()
-						}
+
+						expr.TryAddRefcount()
+
 					}
 
 				} else {
@@ -753,9 +753,9 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				{
-					if expr.IsRefcounted() {
-						expr.AddRefcount()
-					}
+
+					expr.TryAddRefcount()
+
 				}
 
 			}
@@ -887,9 +887,9 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
 		types.ZVAL_COPY_VALUE(result, value)
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -908,9 +908,9 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
 		types.ZVAL_COPY_VALUE(result, value)
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -928,9 +928,9 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	{
 		types.ZVAL_COPY_VALUE(result, value)
 		{
-			if result.IsRefcounted() {
-				result.AddRefcount()
-			}
+
+			result.TryAddRefcount()
+
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -952,9 +952,9 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		if val.IsRefcounted() {
-			val.AddRefcount()
-		}
+
+		val.TryAddRefcount()
+
 		generator.GetValues().GetFePos() = 0
 	} else {
 		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
