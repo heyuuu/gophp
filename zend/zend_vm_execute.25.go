@@ -213,9 +213,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 			}
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		/* Reset "object" to trigger reference counting */
 
 		/* Reset "object" to trigger reference counting */

@@ -56,8 +56,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	{
-	}
 	obj = object.GetObj()
 	called_scope = obj.GetCe()
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
@@ -654,9 +652,6 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendE
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 assign_object:
-	{
-	}
-
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
@@ -922,9 +917,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		/* Reset "object" to trigger reference counting */
 
 		/* Reset "object" to trigger reference counting */

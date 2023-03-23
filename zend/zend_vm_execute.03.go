@@ -467,9 +467,6 @@ func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	for {
 		{
-			{
-			}
-
 			faults.ThrowError(nil, "Can only throw objects")
 			HANDLE_EXCEPTION()
 		}
@@ -933,9 +930,6 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	} else {
 		var strict types.ZendBool
-		{
-		}
-
 		strict = executeData.IsCallUseStrictTypes()
 		for {
 			if strict == 0 {

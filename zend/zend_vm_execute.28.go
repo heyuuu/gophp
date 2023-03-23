@@ -542,8 +542,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var call_info uint32
 	object = EX_VAR(opline.GetOp1().GetVar())
 	{
-	}
-	{
 		for {
 			if object.GetType() != types.IS_OBJECT {
 				if object.IsReference() {

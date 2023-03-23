@@ -922,9 +922,6 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 assign_object:
-	{
-	}
-
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {

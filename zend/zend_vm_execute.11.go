@@ -166,8 +166,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	var call_info uint32
 	object = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	{
-	}
-	{
 		for {
 			if object.GetType() != types.IS_OBJECT {
 				if object.IsReference() {

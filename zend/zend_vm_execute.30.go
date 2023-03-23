@@ -240,9 +240,6 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		}
 	}
 assign_object:
-	{
-	}
-
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {

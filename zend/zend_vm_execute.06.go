@@ -18,9 +18,6 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	{
 		for {
-			{
-			}
-
 			if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2()
 			}
@@ -211,8 +208,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	{
 		for {
 			{
-				{
-				}
 				ZendInvalidMethodCall(object, function_name)
 				ZvalPtrDtorNogc(free_op2)
 				HANDLE_EXCEPTION()
@@ -235,9 +230,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		/* Reset "object" to trigger reference counting */
 
 		/* Reset "object" to trigger reference counting */

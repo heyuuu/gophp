@@ -377,23 +377,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	var call *ZendExecuteData
 	var call_info uint32
 	object = RT_CONSTANT(opline, opline.GetOp1())
-	{
-	}
-	{
-		for {
-			{
-				{
-				}
-
-				{
-					function_name = RT_CONSTANT(opline, opline.GetOp2())
-				}
-				ZendInvalidMethodCall(object, function_name)
-				HANDLE_EXCEPTION()
-			}
-			break
-		}
-	}
+	function_name = RT_CONSTANT(opline, opline.GetOp2())
+	ZendInvalidMethodCall(object, function_name)
+	HANDLE_EXCEPTION()
 	obj = object.GetObj()
 	called_scope = obj.GetCe()
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
@@ -430,7 +416,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 
 		obj = (*types.ZendObject)(called_scope)
 		call_info = ZEND_CALL_NESTED_FUNCTION
-	} else {
 	}
 
 	/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -622,14 +607,8 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 	var expr_ptr *types.Zval
 	var new_expr types.Zval
 
-	{
-		expr_ptr = RT_CONSTANT(opline, opline.GetOp1())
-
-		{
-			expr_ptr.TryAddRefcount()
-		}
-
-	}
+	expr_ptr = RT_CONSTANT(opline, opline.GetOp1())
+	expr_ptr.TryAddRefcount()
 	{
 		var offset *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
 		var str *types.String

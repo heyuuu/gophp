@@ -125,9 +125,6 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 		}
 	}
 assign_object:
-	{
-	}
-
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
