@@ -705,7 +705,7 @@ func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
 	return 0
 }
 func CheckHttpProxy(var_table *types.Array) {
-	if types.ArrayStrExists(var_table, "HTTP_PROXY") != 0 {
+	if var_table.KeyExists"HTTP_PROXY") {
 		var local_proxy *byte = getenv("HTTP_PROXY")
 		if local_proxy == nil {
 			types.ZendHashStrDel(var_table, "HTTP_PROXY")

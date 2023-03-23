@@ -281,7 +281,7 @@ func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *t
 
 			/* We failed.  But why? */
 
-			if types.ArrayStrExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol.GetStr()) != 0 {
+			if core.PhpStreamGetUrlStreamWrappersHash().KeyExistsprotocol.GetStr()) {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 

@@ -1738,7 +1738,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 			/** Ensure that the preferred method is actually available. */
 
 			lcname = ZendStringTolower(cur_method_ref.GetMethodName())
-			if types.ArrayStrExists(trait.GetFunctionTable(), lcname.GetStr()) == 0 {
+			if !trait.GetFunctionTable().KeyExistslcname.GetStr()) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 			}
 
@@ -1804,7 +1804,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				/** And, ensure that the referenced method is resolvable, too. */
 
 				lcname = ZendStringTolower(cur_method_ref.GetMethodName())
-				if types.ArrayStrExists(trait.GetFunctionTable(), lcname.GetStr()) == 0 {
+				if !trait.GetFunctionTable().KeyExistslcname.GetStr()) {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 				}
 				types.ZendStringReleaseEx(lcname, 0)
@@ -1871,7 +1871,7 @@ func FindFirstDefinition(ce *types.ClassEntry, traits **types.ClassEntry, curren
 	var i int
 	if coliding_ce == ce {
 		for i = 0; i < current_trait; i++ {
-			if traits[i] != nil && types.ArrayStrExists(traits[i].GetPropertiesInfo(), prop_name.GetStr()) != 0 {
+			if traits[i] != nil && traits[i].GetPropertiesInfo().KeyExistsprop_name.GetStr()) {
 				return traits[i]
 			}
 		}
@@ -2035,7 +2035,7 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 					     as in the case where alias is set. */
 
 					lc_method_name = ZendStringTolower(cur_alias.GetTraitMethod().GetMethodName())
-					if types.ArrayStrExists(ce.GetFunctionTable(), lc_method_name.GetStr()) != 0 {
+					if ce.GetFunctionTable().KeyExistslc_method_name.GetStr()) {
 						types.ZendStringReleaseEx(lc_method_name, 0)
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", cur_alias.GetTraitMethod().GetMethodName().GetVal())
 					} else {

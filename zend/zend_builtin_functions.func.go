@@ -1914,7 +1914,7 @@ func ZifExtensionLoaded(executeData *ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	lcname = ZendStringTolower(extension_name)
-	if types.ArrayStrExists(&ModuleRegistry, lcname.GetStr()) != 0 {
+	if &ModuleRegistry.KeyExistslcname.GetStr()) {
 		return_value.SetTrue()
 	} else {
 		return_value.SetFalse()

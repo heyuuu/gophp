@@ -1874,9 +1874,9 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var f zend.ZendLong
 	var argc int = executeData.NumArgs()
 	var result *types.String
-	var from_idx types.HashPosition
-	var repl_idx types.HashPosition
-	var len_idx types.HashPosition
+	var from_idx types.ArrayPosition
+	var repl_idx types.ArrayPosition
+	var len_idx types.ArrayPosition
 	var tmp_str *types.Zval = nil
 	var tmp_from *types.Zval = nil
 	var tmp_repl *types.Zval = nil

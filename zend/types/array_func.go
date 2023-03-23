@@ -13,24 +13,8 @@ func init() {
 	emptyArray.SetImmutable()
 }
 
-func MakeArrayEx(nSize int, pDestructor DtorFuncT, persistent ZendBool) Array {
-	return *NewArrayEx(nSize, pDestructor, persistent != 0)
-}
-
-func ArrayStrExists(ht *Array, key string) ZendBool {
-	var exists = ht.KeyExists(key)
-	return IntBool(exists)
-}
-func ArrayIndexExists(ht *Array, h int) ZendBool {
-	var exists = ht.IndexExists(h)
-	return IntBool(exists)
-}
-func ZendHashHasMoreElementsEx(ht *Array, pos *HashPosition) ZEND_RESULT_CODE {
-	if ZendHashGetCurrentKeyTypeEx(ht, pos) == HASH_KEY_NON_EXISTENT {
-		return FAILURE
-	} else {
-		return SUCCESS
-	}
+func ZendHashHasMoreElementsEx(ht *Array, pos *ArrayPosition) bool {
+	return ZendHashGetCurrentKeyTypeEx(ht, pos) == HASH_KEY_NON_EXISTENT
 }
 func ZendHashMoveForward(ht *Array) int {
 	return ZendHashMoveForwardEx(ht, &ht.internalPointer)
@@ -53,7 +37,7 @@ func ZendHashInternalPointerReset(ht *Array) {
 func ZendHashInternalPointerEnd(ht *Array) {
 	ZendHashInternalPointerEndEx(ht, ht.GetNInternalPointer())
 }
-func ZendHashIteratorsUpdate(ht *Array, from HashPosition, to HashPosition) {
+func ZendHashIteratorsUpdate(ht *Array, from ArrayPosition, to ArrayPosition) {
 	if ht.HasIterators() {
 		_zendHashIteratorsUpdate(ht, from, to)
 	}
@@ -214,7 +198,7 @@ func ZendHashStrFindDeref(ht *Array, key string) *Zval {
 	}
 	return zv
 }
-func ZendHashGetCurrentDataPtrEx(ht *Array, pos *HashPosition) any {
+func ZendHashGetCurrentDataPtrEx(ht *Array, pos *ArrayPosition) any {
 	var zv *Zval
 	zv = ZendHashGetCurrentDataEx(ht, pos)
 	if zv != nil {
@@ -244,14 +228,13 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 	return nSize + 1
 }
 
-func ZendHashRealInit(ht *Array)       { /* ignore simplify */ ht.RealInit() }
 func ZendHashRealInitPacked(ht *Array) { /* ignore simplify */ ht.RealInit() }
 func ZendHashRealInitMixed(ht *Array)  { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *Array) {
 	// todo 此函数不应被调用
 	b.Assert(false)
 }
-func ZendHashIteratorAdd(ht *Array, pos HashPosition) uint32 {
+func ZendHashIteratorAdd(ht *Array, pos ArrayPosition) uint32 {
 	var iter *HashTableIterator = zend.EG__().GetHtIterators()
 	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsCount()
 	var idx uint32
@@ -286,7 +269,7 @@ func ZendHashIteratorAdd(ht *Array, pos HashPosition) uint32 {
 	zend.EG__().SetHtIteratorsUsed(idx + 1)
 	return idx
 }
-func ZendHashIteratorPos(idx uint32, ht *Array) HashPosition {
+func ZendHashIteratorPos(idx uint32, ht *Array) ArrayPosition {
 	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
 	b.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
@@ -301,7 +284,7 @@ func ZendHashIteratorPos(idx uint32, ht *Array) HashPosition {
 	}
 	return iter.GetPos()
 }
-func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
+func ZendHashIteratorPosEx(idx uint32, array *Zval) ArrayPosition {
 	var ht *Array = array.GetArr()
 	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
 	b.Assert(idx != uint32-1)
@@ -349,10 +332,10 @@ func ZendHashIteratorsRemove(ht *Array) {
 		_zendHashIteratorsRemove(ht)
 	}
 }
-func ZendHashIteratorsLowerPos(ht *Array, start HashPosition) HashPosition {
+func ZendHashIteratorsLowerPos(ht *Array, start ArrayPosition) ArrayPosition {
 	var iter *HashTableIterator = zend.EG__().GetHtIterators()
 	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
-	var res HashPosition = ht.GetNNumUsed()
+	var res ArrayPosition = ht.GetNNumUsed()
 	for iter != end {
 		if iter.GetHt() == ht {
 			if iter.GetPos() >= start && iter.GetPos() < res {
@@ -363,7 +346,7 @@ func ZendHashIteratorsLowerPos(ht *Array, start HashPosition) HashPosition {
 	}
 	return res
 }
-func _zendHashIteratorsUpdate(ht *Array, from HashPosition, to HashPosition) {
+func _zendHashIteratorsUpdate(ht *Array, from ArrayPosition, to ArrayPosition) {
 	var iter *HashTableIterator = zend.EG__().GetHtIterators()
 	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
 	for iter != end {
@@ -373,7 +356,7 @@ func _zendHashIteratorsUpdate(ht *Array, from HashPosition, to HashPosition) {
 		iter++
 	}
 }
-func ZendHashIteratorsAdvance(ht *Array, step HashPosition) {
+func ZendHashIteratorsAdvance(ht *Array, step ArrayPosition) {
 	var iter *HashTableIterator = zend.EG__().GetHtIterators()
 	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsUsed()
 	for iter != end {
@@ -488,31 +471,29 @@ func ZendArrayDupElements(source *Array, target *Array) {
 }
 
 func ZendArrayDup(source *Array) *Array {
-	var target *Array = NewArray(source.Cap())
-	target.AddGcFlags(GC_COLLECTABLE)
-	target.nextFreeElement = source.nextFreeElement
-
-	if source.CountElements() == 0 {
+	// 空数组单独处理
+	if source.elementsCount == 0 {
+		target := NewArray(0)
+		target.nextFreeElement = source.nextFreeElement
 		return target
 	}
 
-	target.CopyFlags(source)
-
-	if (source.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
-		target.SetNNumUsed(source.GetNNumUsed())
-		target.SetNNumOfElements(source.CountElements())
-		HT_SET_DATA_ADDR(target, zend.Emalloc(HT_SIZE(target)))
-		target.SetNInternalPointer(source.GetNInternalPointer())
-
+	var target *Array = NewArray(source.Cap())
+	if source.IsImmutable() {
+		target.flags = source.flags
+		target.elementsCount = source.elementsCount
+		target.internalPointer = source.internalPointer
 		target.copyDataAndHash(source)
 	} else {
 		if source.internalPointer < source.DataSize() {
 			target.internalPointer = source.internalPointer
 		}
-		target.resetDataAndHash(source.DataSize())
-
 		ZendArrayDupElements(source, target)
-		target.SetNNumOfElements(target.DataSize())
+
+		//
+		target.flags = source.flags
+		target.elementsCount = source.elementsCount
+		target.nextFreeElement = source.nextFreeElement
 	}
 	return target
 }
@@ -534,10 +515,10 @@ func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT,
 		})
 	}
 }
-func ZendHashInternalPointerResetEx(ht *Array, pos *HashPosition) {
+func ZendHashInternalPointerResetEx(ht *Array, pos *ArrayPosition) {
 	*pos = ht.validPosVal(0)
 }
-func ZendHashInternalPointerEndEx(ht *Array, pos *HashPosition) {
+func ZendHashInternalPointerEndEx(ht *Array, pos *ArrayPosition) {
 	var idx uint32
 	idx = ht.GetNNumUsed()
 	for idx > 0 {
@@ -551,7 +532,7 @@ func ZendHashInternalPointerEndEx(ht *Array, pos *HashPosition) {
 }
 
 // 查找下一个有效位置
-func ZendHashMoveForwardEx(ht *Array, pos *HashPosition) int {
+func ZendHashMoveForwardEx(ht *Array, pos *ArrayPosition) int {
 	if idx, ok := ht.validPos(*pos); ok {
 		*pos, _ = ht.validPos(idx + 1)
 		return SUCCESS
@@ -559,7 +540,7 @@ func ZendHashMoveForwardEx(ht *Array, pos *HashPosition) int {
 	return FAILURE
 }
 
-func ZendHashMoveBackwardsEx(ht *Array, pos *HashPosition) int {
+func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) int {
 	var idx uint32 = *pos
 	if idx < ht.GetNNumUsed() {
 		for idx > 0 {
@@ -574,7 +555,7 @@ func ZendHashMoveBackwardsEx(ht *Array, pos *HashPosition) int {
 	}
 	return FAILURE
 }
-func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.ZendUlong, pos *HashPosition) int {
+func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.ZendUlong, pos *ArrayPosition) int {
 	var idx uint32
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
@@ -590,7 +571,7 @@ func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.Zend
 	}
 	return HASH_KEY_NON_EXISTENT
 }
-func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *HashPosition) {
+func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *ArrayPosition) {
 	var idx uint32
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
@@ -605,7 +586,7 @@ func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *HashPosition) {
 		}
 	}
 }
-func ZendHashGetCurrentKeyTypeEx(ht *Array, pos *HashPosition) int {
+func ZendHashGetCurrentKeyTypeEx(ht *Array, pos *ArrayPosition) int {
 	var idx uint32
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
@@ -619,7 +600,7 @@ func ZendHashGetCurrentKeyTypeEx(ht *Array, pos *HashPosition) int {
 	}
 	return HASH_KEY_NON_EXISTENT
 }
-func ZendHashGetCurrentDataEx(ht *Array, pos *HashPosition) *Zval {
+func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
 	var idx uint32
 	var p *Bucket
 	idx = ht.validPosVal(*pos)

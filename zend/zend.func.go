@@ -432,7 +432,6 @@ func ZendPostStartup() int {
 	return types.SUCCESS
 }
 func ZendShutdown() {
-	ZendVmDtor()
 	EG__().GetPersistentList().GracefulReverseDestroy()
 	ZendDestroyModules()
 	VirtualCwdDeactivate()

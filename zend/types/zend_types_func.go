@@ -42,20 +42,9 @@ func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
 	return ZendType(ptr)
 }
 func HT_IDX_TO_HASH(idx uint32) uint32 { return idx }
-func HT_HASH(ht *Array, idx HashPosition) uint32 {
+func HT_HASH(ht *Array, idx ArrayPosition) uint32 {
 	// todo 待移除 - 在旧 arData 上返回通过 idx 获取对应的 pos 位置
 	return 0
-}
-func HT_HASH_SIZE(nTableMask uint32) int {
-	// todo 待移除 - 旧 hash 数组内存大小
-	return 0
-}
-func HT_SIZE(ht *Array) int {
-	// todo 待移除 - 返回 HashTable 中旧 arData 内存大小 (含 hash 内存 + item 内存)
-	return 0
-}
-func HT_SET_DATA_ADDR(ht *Array, ptr __auto__) {
-	ht.SetArData((*Bucket)((*byte)(ptr) + HT_HASH_SIZE(ht.GetNTableMask())))
 }
 func ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list *ZendPropertyInfoList) int { return 0x1 | uintPtr(list) }
 func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {

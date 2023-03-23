@@ -235,9 +235,9 @@ func SplObjectStorageContains(intern *spl_SplObjectStorage, this *types.Zval, ob
 		return 0
 	}
 	if key.IsStrKey() {
-		found = types.ArrayStrExists(intern.GetStorage(), key.KeyKey())
+		found = types.IntBool(intern.GetStorage().KeyExistskey.KeyKey()))
 	} else {
-		found = types.ArrayIndexExists(intern.GetStorage(), key.IndexKey())
+		found = types.IntBool(intern.GetStorage().IndexExistskey.IndexKey()))
 	}
 	return found
 }
@@ -384,7 +384,7 @@ func zim_spl_SplObjectStorage_valid(executeData *zend.ZendExecuteData, return_va
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(intern.GetStorage(), intern.GetPos()) == types.SUCCESS)
+	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(intern.GetStorage(), intern.GetPos()))
 	return
 }
 func zim_spl_SplObjectStorage_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -443,7 +443,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	var element *spl_SplObjectStorageElement
 	var members types.Zval
 	var flags types.Zval
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	var var_hash standard.PhpSerializeDataT
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	if !executeData.CheckNumArgsNone(false) {
@@ -457,7 +457,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	flags.SetLong(intern.GetStorage().CountElements())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
-	for types.ZendHashHasMoreElementsEx(intern.GetStorage(), &pos) == types.SUCCESS {
+	for types.ZendHashHasMoreElementsEx(intern.GetStorage(), &pos) {
 		if b.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), &pos)) == nil {
 			buf.Free()
 			standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)

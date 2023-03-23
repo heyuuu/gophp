@@ -32,18 +32,6 @@ func (this ZendType) TypeName() string {
 	return b.CastStrAuto(b.CastPtr[byte](this))
 }
 
-/**
- * HashTableIterator
- */
-type HashTableIterator struct {
-	ht  *Array
-	pos HashPosition
-}
-
-func (this *HashTableIterator) GetHt() *Array             { return this.ht }
-func (this *HashTableIterator) SetHt(value *Array)        { this.ht = value }
-func (this *HashTableIterator) GetPos() HashPosition      { return this.pos }
-func (this *HashTableIterator) SetPos(value HashPosition) { this.pos = value }
 
 /**
  * ZendObject

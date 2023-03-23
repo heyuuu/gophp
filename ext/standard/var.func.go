@@ -924,51 +924,51 @@ again:
 		var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
 		var incomplete_class types.ZendBool
 		var count uint32
-		if types.ArrayStrExists(ce.GetFunctionTable(), "__serialize") != 0 {
-			var retval types.Zval
-			var obj types.Zval
-			var key *types.String
-			var data *types.Zval
-			var index zend.ZendUlong
-			struc.AddRefcount()
-			obj.SetObject(struc.GetObj())
-			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == types.FAILURE {
-				if zend.EG__().GetException() == nil {
-					buf.AppendString("N;")
-				}
-				zend.ZvalPtrDtor(&obj)
-				return
+		if ce.GetFunctionTable().KeyExists"__serialize") {
+		var retval types.Zval
+		var obj types.Zval
+		var key *types.String
+		var data *types.Zval
+		var index zend.ZendUlong
+		struc.AddRefcount()
+		obj.SetObject(struc.GetObj())
+		if PhpVarSerializeCallMagicSerialize(&retval, &obj) == types.FAILURE {
+			if zend.EG__().GetException() == nil {
+				buf.AppendString("N;")
 			}
-			PhpVarSerializeClassName(buf, &obj)
-			buf.AppendUlong(retval.GetArr().Count())
-			buf.AppendString(":{")
-			var __ht *types.Array = retval.GetArr()
-			for _, _p := range __ht.foreachData() {
-				var _z *types.Zval = _p.GetVal()
-				if _z.IsType(types.IS_INDIRECT) {
-					_z = _z.GetZv()
-					if _z.IsUndef() {
-						continue
-					}
-				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				data = _z
-				if key == nil {
-					PhpVarSerializeLong(buf, index)
-				} else {
-					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
-				}
-				if data.IsReference() && data.GetRefcount() == 1 {
-					data = types.Z_REFVAL_P(data)
-				}
-				PhpVarSerializeIntern(buf, data, var_hash)
-			}
-			buf.AppendByte('}')
 			zend.ZvalPtrDtor(&obj)
-			zend.ZvalPtrDtor(&retval)
 			return
 		}
+		PhpVarSerializeClassName(buf, &obj)
+		buf.AppendUlong(retval.GetArr().Count())
+		buf.AppendString(":{")
+		var __ht *types.Array = retval.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *types.Zval = _p.GetVal()
+			if _z.IsType(types.IS_INDIRECT) {
+				_z = _z.GetZv()
+				if _z.IsUndef() {
+					continue
+				}
+			}
+			index = _p.GetH()
+			key = _p.GetKey()
+			data = _z
+			if key == nil {
+				PhpVarSerializeLong(buf, index)
+			} else {
+				PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
+			}
+			if data.IsReference() && data.GetRefcount() == 1 {
+				data = types.Z_REFVAL_P(data)
+			}
+			PhpVarSerializeIntern(buf, data, var_hash)
+		}
+		buf.AppendByte('}')
+		zend.ZvalPtrDtor(&obj)
+		zend.ZvalPtrDtor(&retval)
+		return
+	}
 		if ce.GetSerialize() != nil {
 
 			/* has custom handler */
@@ -998,31 +998,31 @@ again:
 			}
 			return
 		}
-		if ce != PHP_IC_ENTRY && types.ArrayStrExists(ce.GetFunctionTable(), "__sleep") != 0 {
-			var retval types.Zval
-			var tmp types.Zval
-			struc.AddRefcount()
-			tmp.SetObject(struc.GetObj())
-			if PhpVarSerializeCallSleep(&retval, &tmp) == types.FAILURE {
-				if zend.EG__().GetException() == nil {
+		if ce != PHP_IC_ENTRY && ce.GetFunctionTable().KeyExists"__sleep") {
+		var retval types.Zval
+		var tmp types.Zval
+		struc.AddRefcount()
+		tmp.SetObject(struc.GetObj())
+		if PhpVarSerializeCallSleep(&retval, &tmp) == types.FAILURE {
+			if zend.EG__().GetException() == nil {
 
-					/* we should still add element even if it's not OK,
-					 * since we already wrote the length of the array before */
+				/* we should still add element even if it's not OK,
+				 * since we already wrote the length of the array before */
 
-					buf.AppendString("N;")
+				buf.AppendString("N;")
 
-					/* we should still add element even if it's not OK,
-					 * since we already wrote the length of the array before */
+				/* we should still add element even if it's not OK,
+				 * since we already wrote the length of the array before */
 
-				}
-				zend.ZvalPtrDtor(&tmp)
-				return
 			}
-			PhpVarSerializeClass(buf, &tmp, &retval, var_hash)
-			zend.ZvalPtrDtor(&retval)
 			zend.ZvalPtrDtor(&tmp)
 			return
 		}
+		PhpVarSerializeClass(buf, &tmp, &retval, var_hash)
+		zend.ZvalPtrDtor(&retval)
+		zend.ZvalPtrDtor(&tmp)
+		return
+	}
 		incomplete_class = PhpVarSerializeClassName(buf, struc)
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 

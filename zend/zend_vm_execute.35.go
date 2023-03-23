@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import (
@@ -7,40 +5,6 @@ import (
 	"sik/zend/types"
 )
 
-func ZendVmDtor() {
-	if ZendHandlersTable != nil {
-		ZendHandlersTable.Destroy()
-		Free(ZendHandlersTable)
-		ZendHandlersTable = nil
-	}
-}
-func InitOpcodeSerialiser() {
-	var i int
-	var tmp types.Zval
-	ZendHandlersTable = Malloc(b.SizeOf("HashTable"))
-	ZendHandlersTable = types.MakeArrayEx(ZendHandlersCount, nil, 1)
-	types.ZendHashRealInit(ZendHandlersTable)
-	tmp.SetTypeInfo(types.IS_LONG)
-	for i = 0; i < ZendHandlersCount; i++ {
-		tmp.SetLval(i)
-		ZendHandlersTable.IndexAddH(ZendLong(types.ZendUintptrT(ZendOpcodeHandlers[i])), &tmp)
-	}
-}
-func ZendSerializeOpcodeHandler(op *ZendOp) {
-	var zv *types.Zval
-	if ZendHandlersTable == nil {
-		InitOpcodeSerialiser()
-	}
-	zv = ZendHandlersTable.IndexFindH(ZendLong(types.ZendUintptrT(op.GetHandler())))
-	b.Assert(zv != nil)
-	op.SetHandler(any(types.ZendUintptrT(zv.GetLval())))
-}
-func ZendDeserializeOpcodeHandler(op *ZendOp) {
-	op.SetHandler(ZendOpcodeHandlers[types.ZendUintptrT(op.GetHandler())])
-}
-func ZendGetOpcodeHandlerFunc(op *ZendOp) any { return op.GetHandler() }
-func ZendGetHaltOp() *ZendOp                  { return nil }
-func ZendVmKind() int                         { return ZEND_VM_KIND }
 func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) any {
 	var zend_vm_decode []int = []int{_UNUSED_CODE, _CONST_CODE, _TMP_CODE, _UNUSED_CODE, _VAR_CODE, _UNUSED_CODE, _UNUSED_CODE, _UNUSED_CODE, _CV_CODE}
 	var offset uint32 = 0

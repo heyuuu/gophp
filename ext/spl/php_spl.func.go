@@ -205,7 +205,7 @@ func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext
 				zend.ZvalPtrDtor(&result)
 			}
 			zend.Efree(class_file)
-			return types.ArrayStrExists(zend.EG__().GetClassTable(), lc_name.GetStr())
+			return types.IntBool(zend.EG__().GetClassTable().KeyExistslc_name.GetStr()))
 		}
 	}
 	zend.Efree(class_file)
@@ -298,7 +298,7 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 		return
 	}
 	if SPL_G(autoload_functions) {
-		var pos types.HashPosition
+		var pos types.ArrayPosition
 		var num_idx zend.ZendUlong
 		var func_ *zend.ZendFunction
 		var fci types.ZendFcallInfo
@@ -342,7 +342,7 @@ func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Z
 			if zend.EG__().GetException() != nil {
 				break
 			}
-			if pos+1 == SPL_G(autoload_functions).nNumUsed || types.ArrayStrExists(zend.EG__().GetClassTable(), lc_name.GetStr()) != 0 {
+			if pos+1 == SPL_G(autoload_functions).nNumUsed || zend.EG__().GetClassTable().KeyExistslc_name.GetStr()) {
 				break
 			}
 			types.ZendHashMoveForwardEx(SPL_G(autoload_functions), &pos)
@@ -475,7 +475,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 
 		}
 		types.ZendStringReleaseEx(func_name, 0)
-		if SPL_G(autoload_functions) && types.ArrayStrExists(SPL_G(autoload_functions), lc_name.GetStr()) != 0 {
+		if SPL_G(autoload_functions) && SPL_G(autoload_functions).KeyExistslc_name.GetStr()) {
 			if !(alfi.GetClosure().IsUndef()) {
 				alfi.GetClosure().DelRefcount()
 			}

@@ -109,7 +109,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_UNUSED_HANDLER(executeData *ZendE
 	var variable_ptr *types.Zval
 	var value_type uint32
 	var fe_ht *types.Array
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
 	fe_ht = array.GetArr()
@@ -152,7 +152,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExe
 	var variable_ptr *types.Zval
 	var value_type uint32
 	var fe_ht *types.Array
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
 	fe_ht = array.GetArr()

@@ -682,7 +682,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 	var value *types.Zval
 	if generator.GetValues().IsArray() {
 		var ht *types.Array = generator.GetValues().GetArr()
-		var pos types.HashPosition = generator.GetValues().GetFePos()
+		var pos types.ArrayPosition = generator.GetValues().GetFePos()
 		var p *types.Bucket
 		for {
 			if pos >= ht.GetNNumUsed() {

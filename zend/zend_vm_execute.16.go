@@ -107,7 +107,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var value_type uint32
 	var fe_ht *types.Array
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
 	if array.IsArray() {
@@ -266,7 +266,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var value_type uint32
 	var fe_ht *types.Array
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	var p *types.Bucket
 	array = EX_VAR(opline.GetOp1().GetVar())
 	array = types.ZVAL_DEREF(array)

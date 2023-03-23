@@ -520,7 +520,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if (flags & ZEND_ACC_FINAL) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.GetName().GetVal(), name.GetVal())
 		}
-		if types.ArrayStrExists(ce.GetPropertiesInfo(), name.GetStr()) != 0 {
+		if ce.GetPropertiesInfo().KeyExistsname.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.GetName().GetVal(), name.GetVal())
 		}
 		if value_ast != nil {
@@ -736,7 +736,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			ZendTmpStringRelease(lcname)
 			name = ZendGenerateAnonClassName(decl.GetStartLineno())
 			lcname = ZendStringTolower(name)
-			if types.ArrayStrExists(CG__().GetClassTable(), lcname.GetStr()) == 0 {
+			if !CG__().GetClassTable().KeyExistslcname.GetStr()) {
 				break
 			}
 		}

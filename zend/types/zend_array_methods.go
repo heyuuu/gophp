@@ -1,10 +1,8 @@
 package types
 
 import (
-	"math"
 	b "sik/builtin"
 	"sik/zend"
-	"sik/zend/faults"
 	"sort"
 )
 
@@ -104,22 +102,6 @@ func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
 	ht.addHash(b.key, pos)
 
 	return b.GetVal()
-}
-
-func (ht *Array) addHash(key ArrayKey, pos uint32) {
-	if key.IsStrKey() {
-		ht.keyMap[key.KeyKey()] = pos
-	} else {
-		ht.indexMap[key.IndexKey()] = pos
-	}
-}
-
-func (ht *Array) deleteHash(key ArrayKey) {
-	if key.IsStrKey() {
-		delete(ht.keyMap, key.KeyKey())
-	} else {
-		delete(ht.indexMap, key.IndexKey())
-	}
 }
 
 func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
@@ -422,45 +404,6 @@ func (ht *Array) IsValidPos(pos uint32) bool {
 // ----
 
 func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
-
-func (ht *Array) resizeIfFull() {
-	dataSize := len(ht.data)
-	if dataSize == cap(ht.data) {
-		// 若空隙率过高，重新压缩；否则，跳过扩容 (后面会由 append(ht.data) 触发自动扩容)
-		if dataSize > int(ht.elementsCount+(ht.elementsCount>>5)) {
-			ht.Rehash()
-		} else if dataSize >= math.MaxInt32 {
-			faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", dataSize*2)
-		}
-	}
-}
-
-func (ht *Array) appendBucket(bucket *Bucket) *Bucket {
-	// 尝试 resize
-	ht.resizeIfFull()
-
-	// 添加到 data
-	var idx = uint32(len(ht.data))
-	ht.elementsCount++
-	ht.data = append(ht.data, *bucket)
-
-	// 更新 map
-	ht.addHash(bucket.key, idx)
-
-	if !bucket.IsStrKey() {
-		var indexKey = bucket.IndexKey()
-		// 更新 nextFreeElement
-		if indexKey > ht.nextFreeElement {
-			if indexKey < zend.ZEND_LONG_MAX {
-				ht.nextFreeElement = indexKey + 1
-			} else {
-				ht.nextFreeElement = zend.ZEND_LONG_MAX
-			}
-		}
-	}
-
-	return &ht.data[idx]
-}
 
 func (ht *Array) appendBucketStr(strKey string, zv *Zval) *Bucket {
 	var bucket = NewStrKeyBucket(strKey, zv)

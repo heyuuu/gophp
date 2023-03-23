@@ -756,7 +756,7 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.Array) int {
 			} else {
 				return types.SUCCESS
 			}
-			if types.ZendHashHasMoreElementsEx(aht, pos_ptr) != types.SUCCESS {
+			if !types.ZendHashHasMoreElementsEx(aht, pos_ptr) {
 				return types.FAILURE
 			}
 			types.ZendHashMoveForwardEx(aht, pos_ptr)
@@ -771,7 +771,7 @@ func SplArrayNextEx(intern *SplArrayObject, aht *types.Array) int {
 	if SplArrayIsObject(intern) != 0 {
 		return SplArraySkipProtected(intern, aht)
 	} else {
-		return types.ZendHashHasMoreElementsEx(aht, pos_ptr)
+		return types.ResultCode(types.ZendHashHasMoreElementsEx(aht, pos_ptr))
 	}
 }
 func SplArrayNext(intern *SplArrayObject) int {
@@ -788,7 +788,7 @@ func SplArrayItValid(iter *zend.ZendObjectIterator) int {
 	if object.IsOverloadedValid() {
 		return zend.ZendUserItValid(iter)
 	} else {
-		return types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, object))
+		return types.ResultCode(types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, object)))
 	}
 }
 func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
@@ -1023,7 +1023,7 @@ func zim_spl_Array_seek(executeData *zend.ZendExecuteData, return_value *types.Z
 		for b.PostDec(&position) > 0 && b.Assign(&result, SplArrayNext(intern)) == types.SUCCESS {
 
 		}
-		if result == types.SUCCESS && types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS {
+		if result == types.SUCCESS && types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) {
 			return
 		}
 	}
@@ -1193,7 +1193,7 @@ func zim_spl_Array_valid(executeData *zend.ZendExecuteData, return_value *types.
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == types.SUCCESS)
+	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)))
 	return
 }
 func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {

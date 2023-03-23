@@ -13,7 +13,7 @@ import (
 type spl_SplObjectStorage struct {
 	storage       types.Array
 	index         zend.ZendLong
-	pos           types.HashPosition
+	pos           types.ArrayPosition
 	flags         zend.ZendLong
 	fptr_get_hash *zend.ZendFunction
 	gcdata        *types.Zval
@@ -24,7 +24,7 @@ type spl_SplObjectStorage struct {
 //             func Makespl_SplObjectStorage(
 // storage zend.HashTable,
 // index zend.ZendLong,
-// pos zend.HashPosition,
+// pos zend.ArrayPosition,
 // flags zend.ZendLong,
 // fptr_get_hash *zend.ZendFunction,
 // gcdata *zend.Zval,
@@ -47,8 +47,8 @@ func (this *spl_SplObjectStorage) GetStorage() *types.Array { return &this.stora
 // func (this *spl_SplObjectStorage) SetStorage(value zend.HashTable) { this.storage = value }
 func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong            { return this.index }
 func (this *spl_SplObjectStorage) SetIndex(value zend.ZendLong)       { this.index = value }
-func (this *spl_SplObjectStorage) GetPos() types.HashPosition         { return this.pos }
-func (this *spl_SplObjectStorage) SetPos(value types.HashPosition)    { this.pos = value }
+func (this *spl_SplObjectStorage) GetPos() types.ArrayPosition        { return this.pos }
+func (this *spl_SplObjectStorage) SetPos(value types.ArrayPosition)   { this.pos = value }
 func (this *spl_SplObjectStorage) GetFlags() zend.ZendLong            { return this.flags }
 func (this *spl_SplObjectStorage) SetFlags(value zend.ZendLong)       { this.flags = value }
 func (this *spl_SplObjectStorage) GetFptrGetHash() *zend.ZendFunction { return this.fptr_get_hash }

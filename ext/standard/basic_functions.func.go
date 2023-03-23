@@ -2042,7 +2042,7 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zv
 		}
 		break
 	}
-	if types.ArrayStrExists(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len)) != 0 {
+	if core.SG__().rfc1867_uploaded_files.KeyExistsb.CastStr(path, path_len)) {
 		return_value.SetTrue()
 		return
 	} else {
@@ -2074,7 +2074,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		}
 		break
 	}
-	if types.ArrayStrExists(core.SG__().rfc1867_uploaded_files, b.CastStr(path, path_len)) == 0 {
+	if !core.SG__().rfc1867_uploaded_files.KeyExistsb.CastStr(path, path_len)) {
 		return_value.SetFalse()
 		return
 	}

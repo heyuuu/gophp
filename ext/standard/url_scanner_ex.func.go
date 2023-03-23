@@ -172,7 +172,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetHost() != nil {
 		var tmp *types.String = zend.ZendStringTolower(url_parts.GetHost())
-		if types.ArrayStrExists(&(BG__().url_adapt_session_hosts_ht), tmp.GetStr()) == 0 {
+		if !&(BG__().url_adapt_session_hosts_ht).KeyExiststmp.GetStr()) {
 			types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)

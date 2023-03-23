@@ -262,7 +262,7 @@ func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserialize
 	}
 	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
-	res = types.ArrayStrExists(classes, lcname.GetStr())
+	res = types.IntBool(classes.KeyExistslcname.GetStr()))
 	lcname.Free()
 	return res
 }
@@ -552,7 +552,8 @@ func ObjectCommon(
 		types.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.ArrayStrExists(types.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup") != 0
+	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.Z_OBJCE_P(rval).GetFunctionTable().KeyExists
+	"__wakeup")
 	ht = types.Z_OBJPROP_P(rval)
 	if elements >= zend_long(types.HT_MAX_SIZE-ht.CountElements()) {
 		return 0
@@ -919,7 +920,8 @@ yy18:
 		return 0
 	}
 	*p += 2
-	has_unserialize = incomplete_class == 0 && types.ArrayStrExists(ce.GetFunctionTable(), "__unserialize") != 0
+	has_unserialize = incomplete_class == 0 && ce.GetFunctionTable().KeyExists
+	"__unserialize")
 
 	/* If this class implements Serializable, it should not land here but in object_custom().
 	 * The passed string obviously doesn't descend from the regular serializer. However, if

@@ -24,7 +24,7 @@ func (this *Bucket) SetH(value zend.ZendUlong) {
 	b.Assert(false)
 }
 func (this *Bucket) SetKey(value *String) {
-	// todo 此方法应被替换
+	// todo remove
 	b.Assert(false)
 }
 
@@ -69,10 +69,6 @@ func (ht *Array) GetNTableMask() uint32 { return 0 } // todo remove
  * Constructor && Init
  */
 
-func (ht *Array) assertRc1() {
-	b.Assert(ht.GetRefcount() == 1)
-}
-
 func (ht *Array) resetDataAndHash(dataSize uint32) {
 	ht.data = make([]Bucket, dataSize)
 	ht.indexMap = make(map[int]uint32)
@@ -94,26 +90,11 @@ func (ht *Array) copyDataAndHash(source *Array) {
 	}
 }
 
-func (ht *Array) clearData() {
-	ht.assertRc1()
-
-	ht.elementsCount = 0
-	ht.data = nil
-	ht.indexMap = make(map[int]uint32)
-	ht.keyMap = make(map[string]uint32)
-	ht.nextFreeElement = 0
-	ht.internalPointer = 0
-}
 
 func (ht *Array) RealInit() {
 	ht.clearData()
 }
 
-func (ht *Array) resetHash() {
-	ht.assertRc1()
-	ht.indexMap = make(map[int]uint32)
-	ht.keyMap = make(map[string]uint32)
-}
 
 /**
  * Bucket 相关读接口
@@ -437,43 +418,6 @@ func (ht *Array) IndexDelete(index int) bool {
 	return false
 }
 
-func (ht *Array) deleteBucket(pos uint32) {
-	ht.assertRc1()
-	b.Assert(pos < ht.DataSize())
-
-	var p = &ht.data[pos]
-	b.Assert(p.IsValid())
-
-	// 移除映射
-	ht.deleteHash(p.key)
-
-	// 减少有效元素
-	ht.elementsCount--
-
-	// 更新内部指针和遍历器指针
-	if ht.internalPointer == pos || ht.HasIterators() {
-		var newIdx = ht.validPosVal(pos + 1)
-		if ht.internalPointer == pos {
-			ht.internalPointer = newIdx
-		}
-		ZendHashIteratorsUpdate(ht, pos, newIdx)
-	}
-
-	// 析构函数
-	if ht.destructor != nil {
-		var tmp Zval
-		ZVAL_COPY_VALUE(&tmp, p.GetVal())
-		ht.GetPDestructor()(&tmp)
-	}
-
-	// 设置数据不可用
-	p.SetInvalid()
-
-	// 若删除队尾元素，尝试清除 data 队尾无用数据
-	if ht.DataSize()-1 == pos {
-		ht.removeInvalidTail()
-	}
-}
 
 /**
  * Clean && Destroy

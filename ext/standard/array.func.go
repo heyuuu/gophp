@@ -1097,7 +1097,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 	var retval types.Zval
 	var zv *types.Zval
 	var target_hash *types.Array = zend.HASH_OF(array)
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	var ht_iter uint32
 	var result int = types.SUCCESS
 
@@ -4039,12 +4039,12 @@ func ZifArrayKeyFirst(executeData *zend.ZendExecuteData, return_value *types.Zva
 		break
 	}
 	var target_hash *types.Array = stack.GetArr()
-	var pos types.HashPosition = 0
+	var pos types.ArrayPosition = 0
 	types.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
 }
 func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var stack *types.Zval
-	var pos types.HashPosition
+	var pos types.ArrayPosition
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -5677,7 +5677,7 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		key = _p.GetKey()
 		value = _z
 		str = zend.ZvalGetTmpString(value, &tmp_str)
-		if types.ArrayStrExists(&exclude, str.GetStr()) == 0 {
+		if !&exclude.KeyExistsstr.GetStr()) {
 			if key != nil {
 				value = return_value.GetArr().KeyAddNew(key.GetStr(), value)
 			} else {
@@ -6385,7 +6385,6 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return
 		}
 		zend.ArrayInitSize(return_value, maxlen)
-		types.ZendHashRealInit(return_value.GetArr())
 		var __ht *types.Array = arrays[0].GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -6418,7 +6417,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		zend.ZendReleaseFcallInfoCache(&fci_cache)
 	} else {
-		var array_pos *uint32 = (*types.HashPosition)(zend.Ecalloc(n_arrays, b.SizeOf("HashPosition")))
+		var array_pos *uint32 = (*types.ArrayPosition)(zend.Ecalloc(n_arrays, b.SizeOf("ArrayPosition")))
 		for i = 0; i < n_arrays; i++ {
 			if arrays[i].GetType() != types.IS_ARRAY {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Expected parameter %d to be an array, %s given", i+2, types.ZendZvalTypeName(&arrays[i]))
@@ -6541,7 +6540,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zv
 	case types.IS_STRING:
 		types.ZVAL_BOOL(return_value, ht.SymtableExistsInd(key.GetStr().GetStr()))
 	case types.IS_LONG:
-		types.ZVAL_BOOL(return_value, types.ArrayIndexExists(ht, key.GetLval()) != 0)
+		types.ZVAL_BOOL(return_value, ht.IndexExistskey.GetLval()))
 	case types.IS_NULL:
 		types.ZVAL_BOOL(return_value, ht.KeyExistsInd(types.ZSTR_EMPTY_ALLOC().GetStr()))
 	default:
