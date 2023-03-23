@@ -52,7 +52,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 				if !prop_info.IsStatic() {
 					flags |= prop_info.GetFlags()
 					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
-						zobj.GetProperties().GetUFlags() |= types.HASH_FLAG_HAS_EMPTY_IND
+						zobj.GetProperties().SetIsHasEmptyInd()
 					}
 					types._zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 				}
@@ -68,7 +68,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 						if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 							var zv types.Zval
 							if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
-								zobj.GetProperties().GetUFlags() |= types.HASH_FLAG_HAS_EMPTY_IND
+								zobj.GetProperties().SetIsHasEmptyInd()
 							}
 							zv.SetIndirect(OBJ_PROP(zobj, prop_info.GetOffset()))
 							zobj.GetProperties().KeyAdd(prop_info.GetName().GetStr(), &zv)
@@ -526,7 +526,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 		if str == member || str.GetH() == member.GetHash() && types.ZendStringEqualContent(str, member) != 0 {
 			return &(zv.GetPropertyGuard())
 		} else if zv.GetPropertyGuard() == 0 {
-			ZvalPtrDtorStr(zv)
+
 			zv.SetStringCopy(member)
 			return &(zv.GetPropertyGuard())
 		} else {
@@ -536,7 +536,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			/* mark pointer as "special" using low bit */
 
 			types.ZendHashAddNewPtr(guards, str.GetStr(), any(zend_uintptr_t&zv.GetPropertyGuard()|1))
-			ZvalPtrDtorStr(zv)
+
 			zv.SetArray(guards)
 		}
 	} else if zv.IsArray() {
@@ -1001,7 +1001,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			slot.SetUndef()
 			ZvalPtrDtor(&tmp)
 			if zobj.GetProperties() != nil {
-				zobj.GetProperties().GetUFlags() |= types.HASH_FLAG_HAS_EMPTY_IND
+				zobj.GetProperties().SetIsHasEmptyInd()
 			}
 			goto exit
 		}

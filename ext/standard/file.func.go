@@ -507,7 +507,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.GetStr().GetLen())
 					numbytes = -1
 				}
-				zend.ZvalPtrDtorStr(&out)
+
 				break
 			}
 		}
@@ -1637,7 +1637,7 @@ func ZifFread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	str = streams.PhpStreamReadToStr(stream, len_)
 	if str == nil {
-		zend.ZvalPtrDtorStr(return_value)
+
 		return_value.SetFalse()
 		return
 	}

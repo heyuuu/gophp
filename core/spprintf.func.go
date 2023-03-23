@@ -502,7 +502,7 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 				PAD_CHAR(buf, pad_char, min_width-s_len)
 			}
 			if free_zcopy != 0 {
-				zend.ZvalPtrDtorStr(&zcopy)
+
 			}
 		}
 	skip_output:

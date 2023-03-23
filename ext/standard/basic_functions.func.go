@@ -1718,14 +1718,14 @@ func ZifIniSet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if core.PG__().open_basedir {
 		if PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
 			if core.PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
-				zend.ZvalPtrDtorStr(return_value)
+
 				return_value.SetFalse()
 				return
 			}
 		}
 	}
 	if zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
-		zend.ZvalPtrDtorStr(return_value)
+
 		return_value.SetFalse()
 		return
 	}
@@ -1772,7 +1772,7 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *types.Zv
 	key = types.NewString("include_path")
 	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
 		types.ZendStringReleaseEx(key, 0)
-		zend.ZvalPtrDtorStr(return_value)
+
 		return_value.SetFalse()
 		return
 	}

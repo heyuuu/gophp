@@ -7,80 +7,80 @@ import (
 	"sort"
 )
 
-func (this *Array) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
-	this.assertRc1()
+func (ht *Array) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
+	ht.assertRc1()
 
-	if this.nNumOfElements == 0 || (this.nNumOfElements == 1 && !renumber) {
+	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
 		return
 	}
 
-	this.removeHolesForce()
-	this.SetNInternalPointer(0)
+	ht.removeHolesForce()
+	ht.SetNInternalPointer(0)
 
-	sort.SliceStable(this.data, func(i, j int) bool {
-		return comparer(&this.data[i], &this.data[i])
+	sort.SliceStable(ht.data, func(i, j int) bool {
+		return comparer(&ht.data[i], &ht.data[i])
 	})
 
 	if renumber {
-		this.eachBucket(func(pos uint32, p *Bucket) {
+		ht.eachBucket(func(pos uint32, p *Bucket) {
 			p.SetIndexKey(int(pos))
 		})
-		this.nNextFreeElement = int(this.DataSize())
+		ht.nextFreeElement = int(ht.DataSize())
 	}
 
-	this.Rehash()
+	ht.Rehash()
 }
 
-func (this *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
-	this.Sort(func(a *Bucket, b *Bucket) bool {
+func (ht *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
+	ht.Sort(func(a *Bucket, b *Bucket) bool {
 		var compareResult = comparer(a, b)
 		return compareResult > 0
 	}, renumber != 0)
 	return SUCCESS
 }
 
-func (this *Array) SortCompatibleEx(sort_ SortFuncT) int {
+func (ht *Array) SortCompatibleEx(sort_ SortFuncT) int {
 	// todo sort 转 sortFunc 需要订制处理
 	var sortFunc = *b.Cast[func([]Bucket)](&sort_)
 
-	// 正常 sort 逻辑，除 sortFunc 部分外和 this.Sort() 逻辑一致
-	this.assertRc1()
+	// 正常 sort 逻辑，除 sortFunc 部分外和 ht.Sort() 逻辑一致
+	ht.assertRc1()
 
-	if this.nNumOfElements <= 1 {
+	if ht.elementsCount <= 1 {
 		return SUCCESS
 	}
 
-	this.removeHolesForce()
-	this.SetNInternalPointer(0)
+	ht.removeHolesForce()
+	ht.SetNInternalPointer(0)
 
-	sortFunc(this.data)
+	sortFunc(ht.data)
 
-	this.Rehash()
+	ht.Rehash()
 
 	return SUCCESS
 }
 
 // ---
 
-func (this *Array) posBucket(p *Bucket) (uint32, bool) {
+func (ht *Array) posBucket(p *Bucket) (uint32, bool) {
 	if p.IsStrKey() {
-		if pos, ok := this.keyMap[p.StrKey()]; ok {
+		if pos, ok := ht.keyMap[p.StrKey()]; ok {
 			return pos, true
 		}
 		return 0, false
 	} else {
-		if pos, ok := this.indexMap[p.IndexKey()]; ok {
+		if pos, ok := ht.indexMap[p.IndexKey()]; ok {
 			return pos, true
 		}
 		return 0, false
 	}
 }
 
-func (this *Array) SetBucketKey(b *Bucket, key string) *Zval {
-	this.assertRc1()
+func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
+	ht.assertRc1()
 
 	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
-	var p = this.KeyFindBucket(key)
+	var p = ht.KeyFindBucket(key)
 	if p != nil {
 		if p == b {
 			return p.GetVal()
@@ -90,49 +90,49 @@ func (this *Array) SetBucketKey(b *Bucket, key string) *Zval {
 	}
 
 	// 定义 bucket 位置；若 bucket 不在数据内，返回 nil
-	var pos, ok = this.posBucket(b)
+	var pos, ok = ht.posBucket(b)
 	if !ok {
 		return nil
 	}
 
 	/* del from hash */
-	this.deleteHash(b.key)
+	ht.deleteHash(b.key)
 
 	/* add to hash */
 	b.SetStrKey(key)
-	this.addHash(b.key, pos)
+	ht.addHash(b.key, pos)
 
 	return b.GetVal()
 }
 
-func (this *Array) addHash(key ArrayKey, pos uint32) {
+func (ht *Array) addHash(key ArrayKey, pos uint32) {
 	if key.IsStrKey() {
-		this.keyMap[key.KeyKey()] = pos
+		ht.keyMap[key.KeyKey()] = pos
 	} else {
-		this.indexMap[key.IndexKey()] = pos
+		ht.indexMap[key.IndexKey()] = pos
 	}
 }
 
-func (this *Array) deleteHash(key ArrayKey) {
+func (ht *Array) deleteHash(key ArrayKey) {
 	if key.IsStrKey() {
-		delete(this.keyMap, key.KeyKey())
+		delete(ht.keyMap, key.KeyKey())
 	} else {
-		delete(this.indexMap, key.IndexKey())
+		delete(ht.indexMap, key.IndexKey())
 	}
 }
 
-func (this *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
-	var size = uint32(len(this.data))
+func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
+	var size = uint32(len(ht.data))
 	for i := uint32(0); i < size; i++ {
-		var p = &this.data[i]
+		var p = &ht.data[i]
 		handler(i, p)
 	}
 }
 
-func (this *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
-	var size = uint32(len(this.data))
+func (ht *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
+	var size = uint32(len(ht.data))
 	for i := uint32(0); i < size; i++ {
-		var p = &this.data[i]
+		var p = &ht.data[i]
 		if p.IsValid() {
 			continue
 		}
@@ -140,10 +140,10 @@ func (this *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
 	}
 }
 
-func (this *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
-	var size = uint32(len(this.data))
+func (ht *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
+	var size = uint32(len(ht.data))
 	for i := uint32(0); i < size; i++ {
-		var p = &this.data[i]
+		var p = &ht.data[i]
 		var data = p.GetVal()
 
 		if data.IsIndirect() {
@@ -157,31 +157,31 @@ func (this *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, d
 	}
 }
 
-func (this *Array) applyValidBucket(apply_func func(p *Bucket) int) {
-	var size = this.DataSize()
+func (ht *Array) applyValidBucket(apply_func func(p *Bucket) int) {
+	var size = ht.DataSize()
 	for idx := uint32(0); idx < size; idx++ {
-		var p = &this.data[idx]
+		var p = &ht.data[idx]
 		if !p.IsValid() {
 			continue
 		}
 		var result = apply_func(p)
 		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
-			this.deleteBucket(idx)
+			ht.deleteBucket(idx)
 		}
 		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
 			break
 		}
 	}
 }
-func (this *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
-	for idx := this.DataSize(); idx > 0; idx-- {
-		var p = &this.data[idx-1]
+func (ht *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
+	for idx := ht.DataSize(); idx > 0; idx-- {
+		var p = &ht.data[idx-1]
 		if !p.IsValid() {
 			continue
 		}
 		var result = apply_func(p)
 		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
-			this.deleteBucket(idx - 1)
+			ht.deleteBucket(idx - 1)
 		}
 		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
 			break
@@ -189,21 +189,21 @@ func (this *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
 	}
 }
 
-func (this *Array) foreachData() []*Bucket {
+func (ht *Array) foreachData() []*Bucket {
 	// todo 逐渐替换为 eachBucket 或其他更高效代码
 	var data = make([]*Bucket, 0)
-	this.eachValidBucket(func(_ uint32, p *Bucket) {
+	ht.eachValidBucket(func(_ uint32, p *Bucket) {
 		data = append(data, p)
 	})
 	return data
 }
 
-func (this *Array) foreachDataReserve() []*Bucket {
+func (ht *Array) foreachDataReserve() []*Bucket {
 	// todo 逐渐替换为 eachBucket 或其他更高效代码
 	var data = make([]*Bucket, 0)
 
-	for i := len(this.data) - 1; i >= 0; i-- {
-		var p = &this.data[i]
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		var p = &ht.data[i]
 		if p.IsValid() {
 			continue
 		}
@@ -214,36 +214,36 @@ func (this *Array) foreachDataReserve() []*Bucket {
 }
 
 // 移动 bucket 到新位置
-func (this *Array) _moveBucket(pos uint32, newPos uint32) {
+func (ht *Array) _moveBucket(pos uint32, newPos uint32) {
 	b.Assert(newPos <= pos)
 	if newPos == pos {
 		return
 	}
-	(&this.data[newPos]).CopyFrom(&this.data[pos])
-	if this.nInternalPointer == pos {
-		this.nInternalPointer = newPos
+	(&ht.data[newPos]).CopyFrom(&ht.data[pos])
+	if ht.internalPointer == pos {
+		ht.internalPointer = newPos
 	}
 }
 
 // 移除 this.data 数据中的 holes, 返回是否移动 bucket
-func (this *Array) removeHoles() bool {
+func (ht *Array) removeHoles() bool {
 	var newPos uint32 = 0
 
-	if this.IsWithoutHoles() {
+	if ht.IsWithoutHoles() {
 		return false
 	}
 
-	if this.HasIterators() {
-		var iterPos = ZendHashIteratorsLowerPos(this, 0)
+	if ht.HasIterators() {
+		var iterPos = ZendHashIteratorsLowerPos(ht, 0)
 
-		this.eachValidBucket(func(pos uint32, p *Bucket) {
+		ht.eachValidBucket(func(pos uint32, p *Bucket) {
 			// 移动 bucket 到新位置
-			this._moveBucket(pos, newPos)
+			ht._moveBucket(pos, newPos)
 			if pos != newPos {
 				if pos >= iterPos {
 					for {
-						ZendHashIteratorsUpdate(this, iterPos, newPos)
-						iterPos = ZendHashIteratorsLowerPos(this, iterPos+1)
+						ZendHashIteratorsUpdate(ht, iterPos, newPos)
+						iterPos = ZendHashIteratorsLowerPos(ht, iterPos+1)
 						if iterPos >= pos {
 							break
 						}
@@ -253,130 +253,130 @@ func (this *Array) removeHoles() bool {
 			newPos++
 		})
 	} else {
-		this.eachValidBucket(func(pos uint32, p *Bucket) {
-			this._moveBucket(pos, newPos)
+		ht.eachValidBucket(func(pos uint32, p *Bucket) {
+			ht._moveBucket(pos, newPos)
 			newPos++
 		})
 	}
 
 	// 截取数据，记录有效元素数
-	this.data = this.data[:newPos]
-	this.nNumOfElements = newPos
+	ht.data = ht.data[:newPos]
+	ht.elementsCount = newPos
 
-	b.Assert(this.IsWithoutHoles())
+	b.Assert(ht.IsWithoutHoles())
 
 	return true
 }
 
-// 移除 data 的 holes, 不考虑 nInternalPointer 和 Iterators 内的 pos 指针
-func (this *Array) removeHolesForce() bool {
+// 移除 data 的 holes, 不考虑 internalPointer 和 Iterators 内的 pos 指针
+func (ht *Array) removeHolesForce() bool {
 	var newPos uint32 = 0
 
-	if this.IsWithoutHoles() {
+	if ht.IsWithoutHoles() {
 		return false
 	}
 
-	this.eachValidBucket(func(pos uint32, p *Bucket) {
+	ht.eachValidBucket(func(pos uint32, p *Bucket) {
 		if newPos != pos {
 			// todo 考虑下实现细节的区别
-			//(&this.data[newPos]).CopyFrom(&this.data[pos])
-			this.data[newPos] = this.data[pos]
+			//(&ht.data[newPos]).CopyFrom(&ht.data[pos])
+			ht.data[newPos] = ht.data[pos]
 		}
 		newPos++
 	})
 
 	// 截取数据，记录有效元素数
-	this.data = this.data[:newPos]
-	this.nNumOfElements = newPos
+	ht.data = ht.data[:newPos]
+	ht.elementsCount = newPos
 
-	b.Assert(this.IsWithoutHoles())
+	b.Assert(ht.IsWithoutHoles())
 
 	return true
 }
 
 // 清除 data 队尾无用数据
-func (this *Array) removeInvalidTail() {
-	var dataSize = this.DataSize()
+func (ht *Array) removeInvalidTail() {
+	var dataSize = ht.DataSize()
 
 	// 从队尾依次判断是否为无效数据，若是则缩短
 	var newDataSize = dataSize
-	for newDataSize > 0 && !this.data[newDataSize-1].IsValid() {
+	for newDataSize > 0 && !ht.data[newDataSize-1].IsValid() {
 		newDataSize--
 	}
 
 	// 若长度改变，调整 data
 	if newDataSize < dataSize {
-		this.data = this.data[:newDataSize]
-		this.nInternalPointer = b.Min(this.nInternalPointer, newDataSize)
+		ht.data = ht.data[:newDataSize]
+		ht.internalPointer = b.Min(ht.internalPointer, newDataSize)
 	}
 }
 
-func (this *Array) Rehash() {
+func (ht *Array) Rehash() {
 	// 空数组快速清空
-	if this.nNumOfElements == 0 {
-		this.resetHash()
-		this.data = nil
+	if ht.elementsCount == 0 {
+		ht.resetHash()
+		ht.data = nil
 		return
 	}
 
 	// 移除 data 中的空位
-	var oldNumUsed = this.GetNNumUsed()
-	this.removeHoles()
+	var oldNumUsed = ht.GetNNumUsed()
+	ht.removeHoles()
 
 	// 重建 hash
-	this.resetHash()
-	this.eachBucket(func(pos uint32, p *Bucket) {
-		this.addHash(p.key, pos)
+	ht.resetHash()
+	ht.eachBucket(func(pos uint32, p *Bucket) {
+		ht.addHash(p.key, pos)
 	})
 
 	/* Migrate pointer to one past the end of the array to the new one past the end, so that
 	 * newly inserted elements are picked up correctly. */
-	if this.HasIterators() {
-		zend._zendHashIteratorsUpdate(this, oldNumUsed, this.GetNNumUsed())
+	if ht.HasIterators() {
+		zend._zendHashIteratorsUpdate(ht, oldNumUsed, ht.GetNNumUsed())
 	}
 }
 
-func (this *Array) ifFullDoResize() {
-	if this.DataSize() >= this.nTableSize {
-		this.doResize()
+func (ht *Array) ifFullDoResize() {
+	if ht.DataSize() >= ht.tableSize {
+		ht.doResize()
 	}
 }
 
-func (this *Array) doResize() {
-	this.assertRc1()
+func (ht *Array) doResize() {
+	ht.assertRc1()
 
-	if this.DataSize() > this.nNumOfElements+(this.nNumOfElements>>5) {
-		this.Rehash()
-	} else if this.nTableSize < HT_MAX_SIZE {
+	if ht.DataSize() > ht.elementsCount+(ht.elementsCount>>5) {
+		ht.Rehash()
+	} else if ht.tableSize < HT_MAX_SIZE {
 		// 无内存复制，仅扩充尺寸标识
-		this.nTableSize *= 2
+		ht.tableSize *= 2
 	} else {
-		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
+		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", ht.tableSize*2)
 	}
 }
 
-func (this *Array) Extend(nSize uint32) {
+func (ht *Array) Extend(nSize uint32) {
 	// todo remove 无需手动扩展
-	this.assertRc1()
-	if nSize > this.nTableSize {
+	ht.assertRc1()
+	if nSize > ht.tableSize {
 		// 无内存复制，仅扩充尺寸标识
-		this.nTableSize = ZendHashCheckSize(nSize)
+		ht.tableSize = ZendHashCheckSize(nSize)
 	}
 }
 
-func (this *Array) Discard(nNumUsed uint32) {
-	if nNumUsed < this.DataSize() {
+func (ht *Array) Discard(nNumUsed uint32) {
+	if nNumUsed < ht.DataSize() {
 		// 裁剪数据，重新映射
-		this.data = this.data[:nNumUsed]
-		this.Rehash()
-		this.nNumOfElements = this.DataSize()
+		ht.data = ht.data[:nNumUsed]
+		ht.Rehash()
+		ht.elementsCount = ht.DataSize()
 	}
 }
 
 // 重新计算有效元素个数(与 nnNumOfElements 不同，它考虑 IS_INDIRECT 元素为 IS_UNDEF 的情况)
-func (this *Array) RecalcElements() uint32 {
+func (ht *Array) RecalcElements() uint32 {
 	var num uint32 = 0
-	for _, bucket := range this.data {
+	for _, bucket := range ht.data {
 		var val = bucket.GetVal()
 		if val.IsType(IS_UNDEF) {
 			continue
@@ -389,88 +389,88 @@ func (this *Array) RecalcElements() uint32 {
 	return num
 }
 
-func (this *Array) Count() uint32 {
+func (ht *Array) Count() uint32 {
 	var num uint32
-	if this.HasUFlags(HASH_FLAG_HAS_EMPTY_IND) {
-		num = this.RecalcElements()
-		if this.nNumOfElements == num {
-			this.SubUFlags(HASH_FLAG_HAS_EMPTY_IND)
+	if ht.IsHasEmptyInd() {
+		num = ht.RecalcElements()
+		if ht.elementsCount == num {
+			ht.UnsetIsHasEmptyInd()
 		}
-	} else if this == zend.EG__().GetSymbolTable() {
-		num = this.RecalcElements()
+	} else if ht == zend.EG__().GetSymbolTable() {
+		num = ht.RecalcElements()
 	} else {
-		num = this.GetNNumOfElements()
+		num = ht.GetNNumOfElements()
 	}
 	return num
 }
 
-func (this *Array) currentPos() (uint32, bool) {
-	return this.validPos(this.nInternalPointer)
+func (ht *Array) currentPos() (uint32, bool) {
+	return ht.validPos(ht.internalPointer)
 }
 
-func (this *Array) currentPosVal() uint32 {
-	var pos, _ = this.currentPos()
+func (ht *Array) currentPosVal() uint32 {
+	var pos, _ = ht.currentPos()
 	return pos
 }
 
-func (this *Array) validPosVal(pos uint32) uint32 {
-	pos, _ = this.validPos(pos)
+func (ht *Array) validPosVal(pos uint32) uint32 {
+	pos, _ = ht.validPos(pos)
 	return pos
 }
 
-func (this *Array) validPos(pos uint32) (uint32, bool) {
-	var dataSize = this.DataSize()
+func (ht *Array) validPos(pos uint32) (uint32, bool) {
+	var dataSize = ht.DataSize()
 	for ; pos < dataSize; pos++ {
-		if this.IsValidPos(pos) {
+		if ht.IsValidPos(pos) {
 			return pos, true
 		}
 	}
-	// 没有有效pos，此时 pos == this.DataSize()
+	// 没有有效pos，此时 pos == ht.DataSize()
 	return pos, false
 }
 
-func (this *Array) IsValidPos(pos uint32) bool {
-	b.Assert(pos < this.DataSize())
-	return !this.data[pos].GetVal().IsType(IS_UNDEF)
+func (ht *Array) IsValidPos(pos uint32) bool {
+	b.Assert(pos < ht.DataSize())
+	return !ht.data[pos].GetVal().IsType(IS_UNDEF)
 }
 
 // ----
 
-func (this *Array) IsWithoutHoles() bool { return this.GetNNumUsed() == this.nNumOfElements }
+func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
 
-func (this *Array) appendBucket(bucket *Bucket) *Bucket {
+func (ht *Array) appendBucket(bucket *Bucket) *Bucket {
 	// 尝试 resize
-	this.ifFullDoResize()
+	ht.ifFullDoResize()
 
 	// 添加到 data
-	var idx = uint32(len(this.data))
-	this.nNumOfElements++
-	this.data = append(this.data, *bucket)
+	var idx = uint32(len(ht.data))
+	ht.elementsCount++
+	ht.data = append(ht.data, *bucket)
 
 	// 更新 map
-	this.addHash(bucket.key, idx)
+	ht.addHash(bucket.key, idx)
 
 	if !bucket.IsStrKey() {
 		var indexKey = bucket.IndexKey()
-		// 更新 nNextFreeElement
-		if indexKey > this.nNextFreeElement {
+		// 更新 nextFreeElement
+		if indexKey > ht.nextFreeElement {
 			if indexKey < zend.ZEND_LONG_MAX {
-				this.nNextFreeElement = indexKey + 1
+				ht.nextFreeElement = indexKey + 1
 			} else {
-				this.nNextFreeElement = zend.ZEND_LONG_MAX
+				ht.nextFreeElement = zend.ZEND_LONG_MAX
 			}
 		}
 	}
 
-	return &this.data[idx]
+	return &ht.data[idx]
 }
 
-func (this *Array) appendBucketStr(strKey string, zv *Zval) *Bucket {
+func (ht *Array) appendBucketStr(strKey string, zv *Zval) *Bucket {
 	var bucket = NewStrKeyBucket(strKey, zv)
-	return this.appendBucket(bucket)
+	return ht.appendBucket(bucket)
 }
 
-func (this *Array) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
+func (ht *Array) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
 	var bucket = NewIndexBucket(indexKey, zv)
-	return this.appendBucket(bucket)
+	return ht.appendBucket(bucket)
 }

@@ -1,7 +1,5 @@
 package types
 
-import "sik/zend"
-
 /**
  * ArrayKey
  */
@@ -63,30 +61,62 @@ func (this *Bucket) SetVal(zval *Zval) { ZVAL_COPY_VALUE(&this.val, zval) }
  *                 +-----------------------------+
  * ht->arData ---> | Bucket[0]                   |
  *                 | ...                         |
- *                 | Bucket[ht->nTableSize-1]    |
+ *                 | Bucket[ht->tableSize-1]    |
  *                 +=============================+
  */
 type Array struct {
 	ZendRefcounted
-	u struct /* union */ {
-		v struct {
-			flags           ZendUchar
-			_unused         ZendUchar
-			nIteratorsCount ZendUchar
-			_unused2        ZendUchar
-		}
-		flags uint32
-	}
-	nNumOfElements   uint32
-	nTableSize       uint32
-	nInternalPointer uint32
-	nNextFreeElement zend.ZendLong
-	pDestructor      DtorFuncT
+	flags           ZendUchar
+	iteratorsCount  ZendUchar
+	elementsCount   uint32
+	tableSize       uint32
+	internalPointer uint32
+	nextFreeElement int
+	destructor      DtorFuncT
 
-	//
-	arData *Bucket // C 源码中存储数据的地方，实际不使用
+	data []Bucket // 实际存储数据的地方
 
-	data     []Bucket          // 实际存储数据的地方
 	indexMap map[int]uint32    // 数字索引到具体位置的映射
 	keyMap   map[string]uint32 // 字符串索引到具体位置的映射
+
+	arData *Bucket // C 源码中存储数据的地方，实际不使用
+	//u struct /* union */ {
+	//	v struct {
+	//		flags           ZendUchar
+	//		_unused         ZendUchar
+	//		nIteratorsCount ZendUchar
+	//		_unused2        ZendUchar
+	//	}
+	//	flags uint32
+	//}
 }
+
+func (ht *Array) CopyFrom(arr *Array) {
+	ht.flags = arr.flags
+	ht.iteratorsCount = arr.iteratorsCount
+	ht.tableSize = arr.tableSize
+	ht.SetNNumUsed(arr.GetNNumUsed())
+	ht.SetNNumOfElements(arr.GetNNumOfElements())
+	ht.SetNNextFreeElement(arr.GetNNextFreeElement())
+	ht.SetArData(arr.GetArData())
+	ht.SetPDestructor(arr.GetPDestructor())
+	ZendHashInternalPointerReset(ht)
+}
+
+/** Array.flags */
+func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }
+
+func (ht *Array) IsPacked() bool      { return ht.flags&HASH_FLAG_PACKED != 0 }
+func (ht *Array) SetIsPacked()        { ht.flags |= HASH_FLAG_PACKED }
+func (ht *Array) UnsetIsPacked()      { ht.flags &^= HASH_FLAG_PACKED }
+func (ht *Array) IsHasEmptyInd() bool { return ht.flags&HASH_FLAG_HAS_EMPTY_IND != 0 }
+func (ht *Array) SetIsHasEmptyInd()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
+func (ht *Array) UnsetIsHasEmptyInd() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
+
+/** Array.iteratorsCount */
+func (ht *Array) GetIteratorsCount() ZendUchar      { return ht.iteratorsCount }
+func (ht *Array) SetIteratorsCount(value ZendUchar) { ht.iteratorsCount = value }
+func (ht *Array) IncIteratorsCount()                { ht.iteratorsCount++ }
+func (ht *Array) DecIteratorsCount()                { ht.iteratorsCount-- }
+func (ht *Array) HasIterators() bool                { return ht.iteratorsCount != 0 }
+func (ht *Array) IsIteratorsOverflow() bool         { return ht.iteratorsCount == 0xff }

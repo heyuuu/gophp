@@ -1721,7 +1721,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			if op1.GetStr().GetLen() == op2.GetStr().GetLen() && op1.GetStr().GetLen() == 1 {
 				var or types.ZendUchar = zend_uchar((*types.Z_STRVAL_P)(op1) | (*types.Z_STRVAL_P)(op2))
 				if result == op1 {
-					ZvalPtrDtorStr(result)
+
 				}
 				result.SetInternedString(types.ZSTR_CHAR(or))
 				return types.SUCCESS
@@ -1738,7 +1738,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 		}
 		memcpy(str.GetVal()+i, longer.GetStr().GetVal()+i, longer.GetStr().GetLen()-i+1)
 		if result == op1 {
-			ZvalPtrDtorStr(result)
+
 		}
 		result.SetString(str)
 		return types.SUCCESS
@@ -1806,7 +1806,7 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			if op1.GetStr().GetLen() == op2.GetStr().GetLen() && op1.GetStr().GetLen() == 1 {
 				var and types.ZendUchar = zend_uchar((*types.Z_STRVAL_P)(op1) & (*types.Z_STRVAL_P)(op2))
 				if result == op1 {
-					ZvalPtrDtorStr(result)
+
 				}
 				result.SetInternedString(types.ZSTR_CHAR(and))
 				return types.SUCCESS
@@ -1823,7 +1823,7 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		}
 		str.GetVal()[i] = 0
 		if result == op1 {
-			ZvalPtrDtorStr(result)
+
 		}
 		result.SetString(str)
 		return types.SUCCESS
@@ -1891,7 +1891,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			if op1.GetStr().GetLen() == op2.GetStr().GetLen() && op1.GetStr().GetLen() == 1 {
 				var xor types.ZendUchar = zend_uchar((*types.Z_STRVAL_P)(op1) ^ (*types.Z_STRVAL_P)(op2))
 				if result == op1 {
-					ZvalPtrDtorStr(result)
+
 				}
 				result.SetInternedString(types.ZSTR_CHAR(xor))
 				return types.SUCCESS
@@ -1908,7 +1908,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		}
 		str.GetVal()[i] = 0
 		if result == op1 {
-			ZvalPtrDtorStr(result)
+
 		}
 		result.SetString(str)
 		return types.SUCCESS
@@ -2173,7 +2173,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			}
 			op1_copy.SetString(ZvalGetStringFunc(op1))
 			if EG__().GetException() != nil {
-				ZvalPtrDtorStr(&op1_copy)
+
 				if orig_op1 != result {
 					result.SetUndef()
 				}
@@ -2201,8 +2201,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			}
 			op2_copy.SetString(ZvalGetStringFunc(op2))
 			if EG__().GetException() != nil {
-				ZvalPtrDtorStr(&op1_copy)
-				ZvalPtrDtorStr(&op2_copy)
+
 				if orig_op1 != result {
 					result.SetUndef()
 				}
@@ -2233,8 +2232,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		var result_str *types.String
 		if op1_len > types.ZSTR_MAX_LEN-op2_len {
 			faults.ThrowError(nil, "String size overflow")
-			ZvalPtrDtorStr(&op1_copy)
-			ZvalPtrDtorStr(&op2_copy)
+
 			if orig_op1 != result {
 				result.SetUndef()
 			}
@@ -2264,8 +2262,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 		memcpy(result_str.GetVal()+op1_len, op2.GetStr().GetVal(), op2_len)
 		result_str.GetVal()[result_len] = '0'
 	}
-	ZvalPtrDtorStr(&op1_copy)
-	ZvalPtrDtorStr(&op2_copy)
+
 	return types.SUCCESS
 }
 func StringCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
@@ -2643,7 +2640,7 @@ func IncrementString(str *types.Zval) {
 	var last int = 0
 	var ch int
 	if str.GetStr().GetLen() == 0 {
-		ZvalPtrDtorStr(str)
+
 		str.SetInternedString(types.ZSTR_CHAR('1'))
 		return
 	}
@@ -2727,7 +2724,7 @@ try_again:
 		var dval float64
 		switch IsNumericString(op1.GetStr().GetStr(), &lval, &dval, 0) {
 		case types.IS_LONG:
-			ZvalPtrDtorStr(op1)
+
 			if lval == ZEND_LONG_MAX {
 
 				/* switch to double */
@@ -2738,7 +2735,7 @@ try_again:
 				op1.SetLong(lval + 1)
 			}
 		case types.IS_DOUBLE:
-			ZvalPtrDtorStr(op1)
+
 			op1.SetDouble(dval + 1)
 		default:
 
@@ -2785,13 +2782,13 @@ try_again:
 		op1.SetDval(op1.GetDval() - 1)
 	case types.IS_STRING:
 		if op1.GetStr().GetLen() == 0 {
-			ZvalPtrDtorStr(op1)
+
 			op1.SetLong(-1)
 			break
 		}
 		switch IsNumericString(op1.GetStr().GetStr(), &lval, &dval, 0) {
 		case types.IS_LONG:
-			ZvalPtrDtorStr(op1)
+
 			if lval == ZEND_LONG_MIN {
 				var d float64 = float64(lval)
 				op1.SetDouble(d - 1)
@@ -2799,7 +2796,7 @@ try_again:
 				op1.SetLong(lval - 1)
 			}
 		case types.IS_DOUBLE:
-			ZvalPtrDtorStr(op1)
+
 			op1.SetDouble(dval - 1)
 		}
 	case types.IS_OBJECT:

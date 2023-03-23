@@ -35,10 +35,10 @@ func ZendHashHasMoreElementsEx(ht *Array, pos *HashPosition) ZEND_RESULT_CODE {
 	}
 }
 func ZendHashMoveForward(ht *Array) int {
-	return ZendHashMoveForwardEx(ht, &ht.nInternalPointer)
+	return ZendHashMoveForwardEx(ht, &ht.internalPointer)
 }
 func ZendHashMoveBackwards(ht *Array) int {
-	return ZendHashMoveBackwardsEx(ht, &ht.nInternalPointer)
+	return ZendHashMoveBackwardsEx(ht, &ht.internalPointer)
 }
 func ZendHashGetCurrentKey(ht *Array, str_index **String, num_index *zend.ZendUlong) int {
 	return ZendHashGetCurrentKeyEx(ht, str_index, num_index, ht.GetNInternalPointer())
@@ -246,9 +246,9 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 	return nSize + 1
 }
 
-func ZendHashRealInit(ht *Array, packed ZendBool) { /* ignore simplify */ ht.RealInit() }
-func ZendHashRealInitPacked(ht *Array)            { /* ignore simplify */ ht.RealInit() }
-func ZendHashRealInitMixed(ht *Array)             { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInit(ht *Array)       { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInitPacked(ht *Array) { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInitMixed(ht *Array)  { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *Array) {
 	// todo 此函数不应被调用
 	b.Assert(false)
@@ -258,7 +258,7 @@ func ZendHashIteratorAdd(ht *Array, pos HashPosition) uint32 {
 	var end *HashTableIterator = iter + zend.EG__().GetHtIteratorsCount()
 	var idx uint32
 	if !(ht.IsIteratorsOverflow()) {
-		ht.IncNIteratorsCount()
+		ht.IncIteratorsCount()
 	}
 
 	for iter != end {
@@ -293,10 +293,10 @@ func ZendHashIteratorPos(idx uint32, ht *Array) HashPosition {
 	b.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
 		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
-			iter.GetHt().DecNIteratorsCount()
+			iter.GetHt().DecIteratorsCount()
 		}
 		if !(ht.IsIteratorsOverflow()) {
-			ht.IncNIteratorsCount()
+			ht.IncIteratorsCount()
 		}
 		iter.SetHt(ht)
 		iter.SetPos(ht.currentPosVal())
@@ -309,12 +309,12 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 	b.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
 		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(ht.IsIteratorsOverflow()) {
-			iter.GetHt().DecNIteratorsCount()
+			iter.GetHt().DecIteratorsCount()
 		}
 		SEPARATE_ARRAY(array)
 		ht = array.GetArr()
 		if !(ht.IsIteratorsOverflow()) {
-			ht.IncNIteratorsCount()
+			ht.IncIteratorsCount()
 		}
 		iter.SetHt(ht)
 		iter.SetPos(ht.currentPosVal())
@@ -325,8 +325,8 @@ func ZendHashIteratorDel(idx uint32) {
 	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
 	b.Assert(idx != uint32-1)
 	if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
-		b.Assert(iter.GetHt().GetNIteratorsCount() != 0)
-		iter.GetHt().DecNIteratorsCount()
+		b.Assert(iter.GetHt().GetIteratorsCount() != 0)
+		iter.GetHt().DecIteratorsCount()
 	}
 	iter.SetHt(nil)
 	if idx == zend.EG__().GetHtIteratorsUsed()-1 {
@@ -483,22 +483,22 @@ func ZendArrayDupElements(source *Array, target *Array) {
 		target.appendBucket(newBucket)
 
 		// 更新内部指针
-		if source.nInternalPointer == pos {
-			target.nInternalPointer = target.LastPos()
+		if source.internalPointer == pos {
+			target.internalPointer = target.LastPos()
 		}
 	})
 }
 
 func ZendArrayDup(source *Array) *Array {
-	var target *Array = NewZendArray(source.nTableSize)
+	var target *Array = NewZendArray(source.tableSize)
 	target.AddGcFlags(GC_COLLECTABLE)
-	target.nNextFreeElement = source.nNextFreeElement
+	target.nextFreeElement = source.nextFreeElement
 
 	if source.GetNNumOfElements() == 0 {
 		return target
 	}
 
-	target.SetFlags(source.GetFlags())
+	target.CopyFlags(source)
 
 	if (source.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 		target.SetNNumUsed(source.GetNNumUsed())
@@ -508,8 +508,8 @@ func ZendArrayDup(source *Array) *Array {
 
 		target.copyDataAndHash(source)
 	} else {
-		if source.nInternalPointer < source.DataSize() {
-			target.nInternalPointer = source.nInternalPointer
+		if source.internalPointer < source.DataSize() {
+			target.internalPointer = source.internalPointer
 		}
 		target.resetDataAndHash(source.DataSize())
 

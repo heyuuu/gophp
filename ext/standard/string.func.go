@@ -1664,7 +1664,7 @@ func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	if needle.IsType(types.IS_STRING) {
+	if needle.IsString() {
 		found = zend.ZendMemrchr(haystack.GetVal(), needle.GetStr().GetVal(), haystack.GetLen())
 	} else {
 		var needle_chr byte

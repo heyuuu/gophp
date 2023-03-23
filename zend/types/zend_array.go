@@ -43,78 +43,32 @@ func (this *Bucket) SetInvalid() {
 
 var _ IRefcounted = &Array{}
 
-func (this *Array) GetArData() *Bucket      { return this.arData }
-func (this *Array) SetArData(value *Bucket) { this.arData = value }
+func (ht *Array) GetArData() *Bucket      { return ht.arData }
+func (ht *Array) SetArData(value *Bucket) { ht.arData = value }
 
-func (this *Array) DataSize() uint32 { return uint32(len(this.data)) }
-func (this *Array) LastPos() uint32  { return this.DataSize() - 1 }
+func (ht *Array) DataSize() uint32 { return uint32(len(ht.data)) }
+func (ht *Array) LastPos() uint32  { return ht.DataSize() - 1 }
 
-func (this *Array) GetNNumUsed() uint32 { return this.DataSize() }
-func (this *Array) SetNNumUsed(value uint32) {
+func (ht *Array) GetNNumUsed() uint32 { return ht.DataSize() }
+func (ht *Array) SetNNumUsed(value uint32) {
 	// todo remove
 }
 
-func (this *Array) GetNNumOfElements() uint32               { return this.nNumOfElements }
-func (this *Array) SetNNumOfElements(value uint32)          { this.nNumOfElements = value }
-func (this *Array) GetNTableSize() uint32                   { return this.nTableSize }
-func (this *Array) SetNTableSize(value uint32)              { this.nTableSize = value }
-func (this *Array) GetNInternalPointer() uint32             { return this.nInternalPointer }
-func (this *Array) SetNInternalPointer(value uint32)        { this.nInternalPointer = value }
-func (this *Array) GetNNextFreeElement() zend.ZendLong      { return this.nNextFreeElement }
-func (this *Array) SetNNextFreeElement(value zend.ZendLong) { this.nNextFreeElement = value }
-func (this *Array) GetPDestructor() DtorFuncT               { return this.pDestructor }
-func (this *Array) SetPDestructor(value DtorFuncT)          { this.pDestructor = value }
+func (ht *Array) GetNNumOfElements() uint32               { return ht.elementsCount }
+func (ht *Array) SetNNumOfElements(value uint32)          { ht.elementsCount = value }
+func (ht *Array) GetNTableSize() uint32                   { return ht.tableSize }
+func (ht *Array) SetNTableSize(value uint32)              { ht.tableSize = value }
+func (ht *Array) GetNInternalPointer() uint32             { return ht.internalPointer }
+func (ht *Array) SetNInternalPointer(value uint32)        { ht.internalPointer = value }
+func (ht *Array) GetNNextFreeElement() zend.ZendLong      { return ht.nextFreeElement }
+func (ht *Array) SetNNextFreeElement(value zend.ZendLong) { ht.nextFreeElement = value }
+func (ht *Array) GetPDestructor() DtorFuncT               { return ht.destructor }
+func (ht *Array) SetPDestructor(value DtorFuncT)          { ht.destructor = value }
 
-func (this *Array) GetNTableMask() uint32 {
+func (ht *Array) GetNTableMask() uint32 {
 	// todo 待移除
-	return uint32(-(this.nTableSize + this.nTableSize))
+	return uint32(-(ht.tableSize + ht.tableSize))
 }
-func (this *Array) SetNTableMask(value uint32) {
-	b.Assert(this.GetNTableMask() == value)
-}
-
-/* Array.u.v.flags */
-func (this *Array) GetFlags() ZendUchar           { return this.u.v.flags }
-func (this *Array) SetFlags(value ZendUchar)      { this.u.v.flags = value }
-func (this *Array) AddFlags(value ZendUchar)      { this.u.v.flags |= value }
-func (this *Array) SubFlags(value ZendUchar)      { this.u.v.flags &^= value }
-func (this *Array) HasFlags(value ZendUchar) bool { return this.u.v.flags&value != 0 }
-func (this *Array) SwitchFlags(value ZendUchar, cond bool) {
-	if cond {
-		this.AddFlags(value)
-	} else {
-		this.SubFlags(value)
-	}
-}
-
-const HASH_FLAG_PACKED = 1 << 2
-const HASH_FLAG_HAS_EMPTY_IND = 1 << 5
-
-func (this *Array) IsHasEmptyInd() bool { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
-func (this *Array) SetIsHasEmptyInd()   { this.AddFlags(HASH_FLAG_HAS_EMPTY_IND) }
-
-/* Array.u.flags */
-func (this *Array) GetUFlags() uint32           { return this.u.flags }
-func (this *Array) SetUFlags(value uint32)      { this.u.flags = value }
-func (this *Array) AddUFlags(value uint32)      { this.u.flags |= value }
-func (this *Array) SubUFlags(value uint32)      { this.u.flags &^= value }
-func (this *Array) HasUFlags(value uint32) bool { return this.u.flags&value != 0 }
-func (this *Array) SwitchUFlags(value uint32, cond bool) {
-	if cond {
-		this.AddUFlags(value)
-	} else {
-		this.SubUFlags(value)
-	}
-}
-
-// nIteratorsCount
-func (this *Array) GetNIteratorsCount() ZendUchar      { return this.u.v.nIteratorsCount }
-func (this *Array) SetNIteratorsCount(value ZendUchar) { this.u.v.nIteratorsCount = value }
-func (this *Array) IncNIteratorsCount()                { this.u.v.nIteratorsCount++ }
-func (this *Array) DecNIteratorsCount()                { this.u.v.nIteratorsCount-- }
-
-func (this *Array) HasIterators() bool        { return this.GetNIteratorsCount() != 0 }
-func (this *Array) IsIteratorsOverflow() bool { return this.GetNIteratorsCount() == 0xff }
 
 /**
  * Constructor && Init
@@ -125,11 +79,11 @@ func NewZendArray(size int) *Array {
 
 func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *Array {
 	var ht = &Array{
-		nNumOfElements:   0,
-		nTableSize:       ZendHashCheckSize(size),
-		nInternalPointer: 0,
-		nNextFreeElement: 0,
-		pDestructor:      pDestructor,
+		elementsCount:   0,
+		tableSize:       ZendHashCheckSize(size),
+		internalPointer: 0,
+		nextFreeElement: 0,
+		destructor:      pDestructor,
 
 		// 数据存储
 		data:     nil,
@@ -149,114 +103,114 @@ func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *Array 
 	return ht
 }
 
-func (this *Array) assertRc1() {
-	b.Assert(this.GetRefcount() == 1)
+func (ht *Array) assertRc1() {
+	b.Assert(ht.GetRefcount() == 1)
 }
 
-func (this *Array) resetDataAndHash(dataSize uint32) {
-	this.data = make([]Bucket, dataSize)
-	this.indexMap = make(map[int]uint32)
-	this.keyMap = make(map[string]uint32)
+func (ht *Array) resetDataAndHash(dataSize uint32) {
+	ht.data = make([]Bucket, dataSize)
+	ht.indexMap = make(map[int]uint32)
+	ht.keyMap = make(map[string]uint32)
 }
 
-func (this *Array) copyDataAndHash(source *Array) {
-	this.data = make([]Bucket, len(source.data))
-	copy(this.data, source.data)
+func (ht *Array) copyDataAndHash(source *Array) {
+	ht.data = make([]Bucket, len(source.data))
+	copy(ht.data, source.data)
 
-	this.indexMap = make(map[int]uint32)
+	ht.indexMap = make(map[int]uint32)
 	for i, pos := range source.indexMap {
-		this.indexMap[i] = pos
+		ht.indexMap[i] = pos
 	}
 
-	this.keyMap = make(map[string]uint32)
+	ht.keyMap = make(map[string]uint32)
 	for i, pos := range source.keyMap {
-		this.keyMap[i] = pos
+		ht.keyMap[i] = pos
 	}
 }
 
-func (this *Array) clearData() {
-	this.assertRc1()
+func (ht *Array) clearData() {
+	ht.assertRc1()
 
-	this.nNumOfElements = 0
-	this.data = nil
-	this.indexMap = make(map[int]uint32)
-	this.keyMap = make(map[string]uint32)
-	this.nNextFreeElement = 0
-	this.nInternalPointer = 0
+	ht.elementsCount = 0
+	ht.data = nil
+	ht.indexMap = make(map[int]uint32)
+	ht.keyMap = make(map[string]uint32)
+	ht.nextFreeElement = 0
+	ht.internalPointer = 0
 }
 
-func (this *Array) RealInit() {
-	this.clearData()
+func (ht *Array) RealInit() {
+	ht.clearData()
 }
 
-func (this *Array) resetHash() {
-	this.assertRc1()
-	this.indexMap = make(map[int]uint32)
-	this.keyMap = make(map[string]uint32)
+func (ht *Array) resetHash() {
+	ht.assertRc1()
+	ht.indexMap = make(map[int]uint32)
+	ht.keyMap = make(map[string]uint32)
 }
 
 /**
  * Bucket 相关读接口
  */
-func (this *Array) Bucket(pos uint32) *Bucket { return &this.data[pos] }
+func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
-func (this *Array) IndexFindBucket(index int) *Bucket {
-	if pos, ok := this.indexMap[index]; ok {
-		return &this.data[pos]
+func (ht *Array) IndexFindBucket(index int) *Bucket {
+	if pos, ok := ht.indexMap[index]; ok {
+		return &ht.data[pos]
 	}
 	return nil
 }
 
-func (this *Array) KeyFindBucket(key string) *Bucket {
-	if pos, ok := this.keyMap[key]; ok {
-		return &this.data[pos]
+func (ht *Array) KeyFindBucket(key string) *Bucket {
+	if pos, ok := ht.keyMap[key]; ok {
+		return &ht.data[pos]
 	}
 	return nil
 }
 
-func (this *Array) IndexFindH(h zend.ZendUlong) *Zval {
-	return this.IndexFind(int(h))
+func (ht *Array) IndexFindH(h zend.ZendUlong) *Zval {
+	return ht.IndexFind(int(h))
 }
-func (this *Array) IndexFind(index int) *Zval {
-	var p = this.IndexFindBucket(index)
+func (ht *Array) IndexFind(index int) *Zval {
+	var p = ht.IndexFindBucket(index)
 	if p != nil {
 		return p.GetVal()
 	}
 	return nil
 }
 
-func (this *Array) KeyFind(key string) *Zval {
-	var p = this.KeyFindBucket(key)
+func (ht *Array) KeyFind(key string) *Zval {
+	var p = ht.KeyFindBucket(key)
 	if p != nil {
 		return p.GetVal()
 	}
 	return nil
 }
 
-func (this *Array) KeyFindPtr(key string) any {
-	var zv = this.KeyFind(key)
+func (ht *Array) KeyFindPtr(key string) any {
+	var zv = ht.KeyFind(key)
 	if zv != nil {
 		return zv.GetPtr()
 	}
 	return nil
 }
 
-func (this *Array) IndexExists(index int) bool {
-	if _, ok := this.indexMap[index]; ok {
+func (ht *Array) IndexExists(index int) bool {
+	if _, ok := ht.indexMap[index]; ok {
 		return true
 	}
 	return false
 }
 
-func (this *Array) KeyExists(key string) bool {
-	if _, ok := this.keyMap[key]; ok {
+func (ht *Array) KeyExists(key string) bool {
+	if _, ok := ht.keyMap[key]; ok {
 		return true
 	}
 	return false
 }
 
-func (this *Array) KeyExistsInd(key string) bool {
-	var zv = this.KeyFind(key)
+func (ht *Array) KeyExistsInd(key string) bool {
+	var zv = ht.KeyFind(key)
 	if zv == nil {
 		return false
 	}
@@ -273,73 +227,73 @@ func (this *Array) KeyExistsInd(key string) bool {
  */
 
 // IndexAdd
-func (this *Array) IndexAddH(h zend.ZendUlong, pData *Zval) *Zval {
-	return this.IndexAdd(int(h), pData)
+func (ht *Array) IndexAddH(h zend.ZendUlong, pData *Zval) *Zval {
+	return ht.IndexAdd(int(h), pData)
 }
-func (this *Array) IndexAdd(index int, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) IndexAdd(index int, pData *Zval) *Zval {
+	ht.assertRc1()
 
-	if this.IndexExists(index) {
+	if ht.IndexExists(index) {
 		return nil
 	}
 
-	var p = this.appendBucketIndex(index, pData)
+	var p = ht.appendBucketIndex(index, pData)
 	return p.GetVal()
 }
 
 // IndexAddNew
-func (this *Array) IndexAddNewH(h zend.ZendUlong, pData *Zval) *Zval {
-	return this.IndexAddNew(int(h), pData)
+func (ht *Array) IndexAddNewH(h zend.ZendUlong, pData *Zval) *Zval {
+	return ht.IndexAddNew(int(h), pData)
 }
-func (this *Array) IndexAddNew(index int, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) IndexAddNew(index int, pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var p = this.appendBucketIndex(index, pData)
+	var p = ht.appendBucketIndex(index, pData)
 	return p.GetVal()
 }
 
 // IndexUpdate
-func (this *Array) IndexUpdateH(h zend.ZendUlong, pData *Zval) *Zval {
-	return this.IndexUpdate(int(h), pData)
+func (ht *Array) IndexUpdateH(h zend.ZendUlong, pData *Zval) *Zval {
+	return ht.IndexUpdate(int(h), pData)
 }
-func (this *Array) IndexUpdate(index int, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) IndexUpdate(index int, pData *Zval) *Zval {
+	ht.assertRc1()
 
 	var p *Bucket
 
-	p = this.IndexFindBucket(index)
+	p = ht.IndexFindBucket(index)
 	if p != nil {
-		if this.pDestructor != nil {
-			this.pDestructor(p.GetVal())
+		if ht.destructor != nil {
+			ht.destructor(p.GetVal())
 		}
 		ZVAL_COPY_VALUE(p.GetVal(), pData)
 		return p.GetVal()
 	}
 
-	p = this.appendBucketIndex(index, pData)
+	p = ht.appendBucketIndex(index, pData)
 	return p.GetVal()
 }
 
 // NextIndexInsert
-func (this *Array) NextIndexInsert(pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) NextIndexInsert(pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var index = this.nNextFreeElement
+	var index = ht.nextFreeElement
 
-	if this.IndexExists(index) {
+	if ht.IndexExists(index) {
 		return nil
 	}
 
-	var p = this.appendBucketIndex(index, pData)
+	var p = ht.appendBucketIndex(index, pData)
 	return p.GetVal()
 }
 
 // NextIndexInsertNew
-func (this *Array) NextIndexInsertNew(pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) NextIndexInsertNew(pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var index = this.nNextFreeElement
-	var p = this.appendBucketIndex(index, pData)
+	var index = ht.nextFreeElement
+	var p = ht.appendBucketIndex(index, pData)
 	return p.GetVal()
 }
 
@@ -348,28 +302,28 @@ func (this *Array) NextIndexInsertNew(pData *Zval) *Zval {
  */
 
 // KeyAdd
-func (this *Array) KeyAdd(key string, pData *Zval) *Zval {
-	this.assertRc1()
-	if this.KeyExists(key) {
+func (ht *Array) KeyAdd(key string, pData *Zval) *Zval {
+	ht.assertRc1()
+	if ht.KeyExists(key) {
 		return nil
 	}
 
-	var p = this.appendBucketStr(key, pData)
+	var p = ht.appendBucketStr(key, pData)
 	return p.GetVal()
 }
 
 // KeyAddNew
-func (this *Array) KeyAddNew(key string, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) KeyAddNew(key string, pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var p = this.appendBucketStr(key, pData)
+	var p = ht.appendBucketStr(key, pData)
 	return p.GetVal()
 }
 
-func (this *Array) KeyAddIndirect(strKey string, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) KeyAddIndirect(strKey string, pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var p = this.KeyFindBucket(strKey)
+	var p = ht.KeyFindBucket(strKey)
 	if p != nil {
 		var data *Zval
 		b.Assert(p.GetVal() != pData)
@@ -382,42 +336,42 @@ func (this *Array) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 		} else {
 			return nil
 		}
-		if this.GetPDestructor() != nil {
-			this.GetPDestructor()(data)
+		if ht.GetPDestructor() != nil {
+			ht.GetPDestructor()(data)
 		}
 		ZVAL_COPY_VALUE(data, pData)
 		return data
 	}
 
-	p = this.appendBucketStr(strKey, pData)
+	p = ht.appendBucketStr(strKey, pData)
 	return p.GetVal()
 }
 
 // KeyUpdate
-func (this *Array) KeyUpdate(key string, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) KeyUpdate(key string, pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var p = this.KeyFindBucket(key)
+	var p = ht.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
 		b.Assert(p.GetVal() != pData)
 		data = p.GetVal()
-		if this.GetPDestructor() != nil {
-			this.GetPDestructor()(data)
+		if ht.GetPDestructor() != nil {
+			ht.GetPDestructor()(data)
 		}
 		ZVAL_COPY_VALUE(data, pData)
 		return data
 	}
 
-	p = this.appendBucketStr(key, pData)
+	p = ht.appendBucketStr(key, pData)
 	return p.GetVal()
 }
 
 // KeyUpdateIndirect
-func (this *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
-	this.assertRc1()
+func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
+	ht.assertRc1()
 
-	var p = this.KeyFindBucket(key)
+	var p = ht.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
 		b.Assert(p.GetVal() != pData)
@@ -425,176 +379,176 @@ func (this *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 		if data.IsType(IS_INDIRECT) {
 			data = data.GetZv()
 		}
-		if this.GetPDestructor() != nil {
-			this.GetPDestructor()(data)
+		if ht.GetPDestructor() != nil {
+			ht.GetPDestructor()(data)
 		}
 		ZVAL_COPY_VALUE(data, pData)
 		return data
 	}
 
-	p = this.appendBucketStr(key, pData)
+	p = ht.appendBucketStr(key, pData)
 	return p.GetVal()
 }
 
 /**
  * Add / Update by ArrayKey
  */
-func (this *Array) Add(key ArrayKey, pData *Zval) *Zval {
+func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyAdd(key.KeyKey(), pData)
+		return ht.KeyAdd(key.KeyKey(), pData)
 	} else {
-		return this.IndexAdd(key.IndexKey(), pData)
+		return ht.IndexAdd(key.IndexKey(), pData)
 	}
 }
 
-func (this *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
+func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyAddIndirect(key.KeyKey(), pData)
+		return ht.KeyAddIndirect(key.KeyKey(), pData)
 	} else {
-		return this.IndexAdd(key.IndexKey(), pData)
+		return ht.IndexAdd(key.IndexKey(), pData)
 	}
 }
 
-func (this *Array) Update(key ArrayKey, pData *Zval) *Zval {
+func (ht *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyUpdate(key.KeyKey(), pData)
+		return ht.KeyUpdate(key.KeyKey(), pData)
 	} else {
-		return this.IndexUpdate(key.IndexKey(), pData)
+		return ht.IndexUpdate(key.IndexKey(), pData)
 	}
 }
 
-func (this *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
+func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return this.KeyUpdateIndirect(key.KeyKey(), pData)
+		return ht.KeyUpdateIndirect(key.KeyKey(), pData)
 	} else {
-		return this.IndexUpdate(key.IndexKey(), pData)
+		return ht.IndexUpdate(key.IndexKey(), pData)
 	}
 }
 
 /**
  * Delete
  */
-func (this *Array) KeyDelete(key string) bool {
-	if idx, ok := this.keyMap[key]; ok {
-		this.deleteBucket(idx)
+func (ht *Array) KeyDelete(key string) bool {
+	if idx, ok := ht.keyMap[key]; ok {
+		ht.deleteBucket(idx)
 		return true
 	}
 	return false
 }
 
-func (this *Array) KeyDeleteIndirect(key string) bool {
-	this.assertRc1()
-	if idx, ok := this.keyMap[key]; ok {
-		var p = &this.data[idx]
+func (ht *Array) KeyDeleteIndirect(key string) bool {
+	ht.assertRc1()
+	if idx, ok := ht.keyMap[key]; ok {
+		var p = &ht.data[idx]
 		if p.GetVal().IsType(IS_INDIRECT) {
 			var data *Zval = p.GetVal().GetZv()
 			if data.IsType(IS_UNDEF) {
 				return false
 			} else {
-				if this.GetPDestructor() != nil {
+				if ht.GetPDestructor() != nil {
 					var tmp Zval
 					ZVAL_COPY_VALUE(&tmp, data)
 					data.SetUndef()
-					this.GetPDestructor()(&tmp)
+					ht.GetPDestructor()(&tmp)
 				} else {
 					data.SetUndef()
 				}
-				this.AddUFlags(HASH_FLAG_HAS_EMPTY_IND)
+				ht.SetIsHasEmptyInd()
 			}
 		} else {
-			this.deleteBucket(idx)
+			ht.deleteBucket(idx)
 		}
 		return true
 	}
 	return false
 }
 
-func (this *Array) IndexDelete(index int) bool {
-	if idx, ok := this.indexMap[index]; ok {
-		this.deleteBucket(idx)
+func (ht *Array) IndexDelete(index int) bool {
+	if idx, ok := ht.indexMap[index]; ok {
+		ht.deleteBucket(idx)
 		return true
 	}
 	return false
 }
 
-func (this *Array) deleteBucket(pos uint32) {
-	this.assertRc1()
-	b.Assert(pos < this.DataSize())
+func (ht *Array) deleteBucket(pos uint32) {
+	ht.assertRc1()
+	b.Assert(pos < ht.DataSize())
 
-	var p = &this.data[pos]
+	var p = &ht.data[pos]
 	b.Assert(p.IsValid())
 
 	// 移除映射
-	this.deleteHash(p.key)
+	ht.deleteHash(p.key)
 
 	// 减少有效元素
-	this.nNumOfElements--
+	ht.elementsCount--
 
 	// 更新内部指针和遍历器指针
-	if this.nInternalPointer == pos || this.HasIterators() {
-		var newIdx = this.validPosVal(pos + 1)
-		if this.nInternalPointer == pos {
-			this.nInternalPointer = newIdx
+	if ht.internalPointer == pos || ht.HasIterators() {
+		var newIdx = ht.validPosVal(pos + 1)
+		if ht.internalPointer == pos {
+			ht.internalPointer = newIdx
 		}
-		ZendHashIteratorsUpdate(this, pos, newIdx)
+		ZendHashIteratorsUpdate(ht, pos, newIdx)
 	}
 
 	// 析构函数
-	if this.pDestructor != nil {
+	if ht.destructor != nil {
 		var tmp Zval
 		ZVAL_COPY_VALUE(&tmp, p.GetVal())
-		this.GetPDestructor()(&tmp)
+		ht.GetPDestructor()(&tmp)
 	}
 
 	// 设置数据不可用
 	p.SetInvalid()
 
 	// 若删除队尾元素，尝试清除 data 队尾无用数据
-	if this.DataSize()-1 == pos {
-		this.removeInvalidTail()
+	if ht.DataSize()-1 == pos {
+		ht.removeInvalidTail()
 	}
 }
 
 /**
  * Clean && Destroy
  */
-func (this *Array) Clean() {
-	this.assertRc1()
-	if this.GetNNumUsed() != 0 {
-		if this.pDestructor != nil {
-			this.eachValidBucket(func(pos uint32, p *Bucket) {
-				this.pDestructor(p.GetVal())
+func (ht *Array) Clean() {
+	ht.assertRc1()
+	if ht.GetNNumUsed() != 0 {
+		if ht.destructor != nil {
+			ht.eachValidBucket(func(pos uint32, p *Bucket) {
+				ht.destructor(p.GetVal())
 			})
 		}
 	}
-	this.clearData()
+	ht.clearData()
 }
 
-func (this *Array) Destroy() {
-	if this.DataSize() != 0 {
-		if this.pDestructor != nil {
-			this.eachValidBucket(func(pos uint32, p *Bucket) {
-				this.pDestructor(p.GetVal())
+func (ht *Array) Destroy() {
+	if ht.DataSize() != 0 {
+		if ht.destructor != nil {
+			ht.eachValidBucket(func(pos uint32, p *Bucket) {
+				ht.destructor(p.GetVal())
 			})
 		}
 	}
-	ZendHashIteratorsRemove(this)
+	ZendHashIteratorsRemove(ht)
 }
 
-func (this *Array) DestroyEx() {
+func (ht *Array) DestroyEx() {
 	/* break possible cycles */
-	//GC_REMOVE_FROM_BUFFER(this)
-	this.SetGcTypeInfo(IS_NULL)
+	//GC_REMOVE_FROM_BUFFER(ht)
+	ht.SetGcTypeInfo(IS_NULL)
 
-	this.Destroy()
+	ht.Destroy()
 }
 
-func (this *Array) GracefulReverseDestroy() {
-	this.assertRc1()
-	for idx := this.DataSize(); idx > 0; idx-- {
-		var p = &this.data[idx-1]
+func (ht *Array) GracefulReverseDestroy() {
+	ht.assertRc1()
+	for idx := ht.DataSize(); idx > 0; idx-- {
+		var p = &ht.data[idx-1]
 		if p.IsValid() {
-			this.deleteBucket(idx)
+			ht.deleteBucket(idx)
 		}
 	}
 }

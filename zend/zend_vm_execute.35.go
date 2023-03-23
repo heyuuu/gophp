@@ -4,9 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZendVmDtor() {
@@ -21,7 +19,7 @@ func InitOpcodeSerialiser() {
 	var tmp types.Zval
 	ZendHandlersTable = Malloc(b.SizeOf("HashTable"))
 	ZendHandlersTable = types.MakeArrayEx(ZendHandlersCount, nil, 1)
-	types.ZendHashRealInit(ZendHandlersTable, 0)
+	types.ZendHashRealInit(ZendHandlersTable)
 	tmp.SetTypeInfo(types.IS_LONG)
 	for i = 0; i < ZendHandlersCount; i++ {
 		tmp.SetLval(i)

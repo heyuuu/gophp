@@ -47,7 +47,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *ZendOpArray {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				if tmp_inc_filename.IsNotUndef() {
-					ZvalPtrDtorStr(&tmp_inc_filename)
+
 				}
 				return op_array
 			} else {
@@ -74,7 +74,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *ZendOpArray {
 
 	}
 	if tmp_inc_filename.IsNotUndef() {
-		ZvalPtrDtorStr(&tmp_inc_filename)
+
 	}
 	return new_op_array
 }

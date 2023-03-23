@@ -835,7 +835,6 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
 	ZvalPtrDtor(&args[0])
-	ZvalPtrDtorStr(fcall_info.GetFunctionName())
 	types.ZendHashDel(EG__().GetInAutoload(), lc_name.GetStr())
 	ZvalPtrDtor(&local_retval)
 	if key == nil {
@@ -929,7 +928,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 	} else {
 		retval = types.FAILURE
 	}
-	ZvalPtrDtorStr(&pv)
+
 	return retval
 }
 func ZendEvalString(str *byte, retval_ptr *types.Zval, string_name *byte) int {

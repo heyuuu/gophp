@@ -406,7 +406,7 @@ func ProcessNestedData(
 							b.Assert(existing_propinfo.HasFlags(zend.ZEND_ACC_PUBLIC))
 							new_key = unmangled
 						}
-						zend.ZvalPtrDtorStr(&key)
+
 						key.SetString(new_key)
 					} else {
 						types.ZendStringReleaseEx(unmangled, 0)
@@ -465,7 +465,7 @@ func ProcessNestedData(
 		if BG__().unserialize.level > 1 {
 			VarPushDtor(var_hash, data)
 		}
-		zend.ZvalPtrDtorStr(&key)
+
 		if elements != 0 && (*((*p) - 1)) != ';' && (*((*p) - 1)) != '}' {
 			*p--
 			goto failure

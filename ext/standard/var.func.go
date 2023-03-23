@@ -676,7 +676,7 @@ func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	BG__().serialize_lock++
 	res = zend.CallUserFunction(nil, struc, &fname, retval, 0, 0)
 	BG__().serialize_lock--
-	zend.ZvalPtrDtorStr(&fname)
+
 	if res == types.FAILURE || retval.IsUndef() {
 		zend.ZvalPtrDtor(retval)
 		return types.FAILURE
@@ -695,7 +695,7 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	BG__().serialize_lock++
 	res = zend.CallUserFunction(obj, &fname, retval, 0, 0)
 	BG__().serialize_lock--
-	zend.ZvalPtrDtorStr(&fname)
+
 	if res == types.FAILURE || retval.IsUndef() {
 		zend.ZvalPtrDtor(retval)
 		return types.FAILURE

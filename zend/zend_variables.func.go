@@ -21,8 +21,7 @@ func IZvalPtrDtor(zval_ptr *types.Zval) {
 		}
 	}
 }
-func ZvalPtrDtorStr(zval_ptr *types.Zval) {} // todo remove
-func ZvalDtor(zvalue *types.Zval)         { ZvalPtrDtorNogc(zvalue) }
+func ZvalDtor(zvalue *types.Zval) { ZvalPtrDtorNogc(zvalue) }
 func RcDtorFunc(p types.IRefcounted) {
 	b.Assert(p.GetGcType() <= types.IS_CONSTANT_AST)
 	switch p.(type) {

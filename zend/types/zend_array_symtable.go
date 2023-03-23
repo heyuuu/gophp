@@ -5,11 +5,11 @@ import (
 	"sik/zend"
 )
 
-func (this *Array) SymtableClean() {
+func (ht *Array) SymtableClean() {
 	// todo 这里可能不会严格对等，需要处理一下
-	b.Assert(this.pDestructor == zend.ZVAL_PTR_DTOR)
+	b.Assert(ht.destructor == zend.ZVAL_PTR_DTOR)
 
-	this.Clean()
+	ht.Clean()
 }
 
 func (ht *Array) SymtableAddNew(key string, pData *Zval) *Zval {

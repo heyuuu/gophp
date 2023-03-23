@@ -917,7 +917,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				PAD(min_width, s_len, pad_char)
 			}
 			if free_zcopy != 0 {
-				zend.ZvalPtrDtorStr(&zcopy)
+
 			}
 		}
 	skip_output:

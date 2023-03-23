@@ -52,7 +52,7 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 	}
 	if object.GetCe().IsUseGuards() {
 		if p.IsString() {
-			ZvalPtrDtorStr(p)
+
 		} else if p.IsArray() {
 			var guards *types.Array
 			guards = p.GetArr()
@@ -209,7 +209,9 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		} else {
 			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().GetNNumOfElements())
 		}
-		new_object.GetProperties().GetUFlags() |= old_object.GetProperties().GetUFlags() & types.HASH_FLAG_HAS_EMPTY_IND
+		new_object.GetProperties().CopyFlags(old_object.GetProperties())
+		new_object.GetProperties().SetIteratorsCount(old_object.GetProperties().GetIteratorsCount())
+		new_object.GetProperties().SetIsHasEmptyInd()
 		var __ht *types.Array = old_object.GetProperties()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()

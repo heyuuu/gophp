@@ -338,10 +338,10 @@ func ZEND_IS_EQUAL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
 			{
-				ZvalPtrDtorStr(op1)
+
 			}
 			{
-				ZvalPtrDtorStr(op2)
+
 			}
 			if result != 0 {
 				goto is_equal_true
@@ -399,10 +399,10 @@ func ZEND_IS_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteData) int
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
 			{
-				ZvalPtrDtorStr(op1)
+
 			}
 			{
-				ZvalPtrDtorStr(op2)
+
 			}
 			if result != 0 {
 				goto is_equal_true
@@ -460,10 +460,10 @@ func ZEND_IS_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecuteData) in
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
 			{
-				ZvalPtrDtorStr(op1)
+
 			}
 			{
-				ZvalPtrDtorStr(op2)
+
 			}
 			if result != 0 {
 				goto is_equal_true
@@ -519,10 +519,10 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
 			{
-				ZvalPtrDtorStr(op1)
+
 			}
 			{
-				ZvalPtrDtorStr(op2)
+
 			}
 			if result == 0 {
 				goto is_not_equal_true
@@ -580,10 +580,10 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteData)
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
 			{
-				ZvalPtrDtorStr(op1)
+
 			}
 			{
-				ZvalPtrDtorStr(op2)
+
 			}
 			if result == 0 {
 				goto is_not_equal_true
@@ -641,10 +641,10 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecuteData
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
 			{
-				ZvalPtrDtorStr(op1)
+
 			}
 			{
-				ZvalPtrDtorStr(op2)
+
 			}
 			if result == 0 {
 				goto is_not_equal_true

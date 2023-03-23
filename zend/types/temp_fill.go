@@ -8,7 +8,7 @@ type PackedFillScope struct {
 }
 
 func PackedFillStart(arr *Array) *PackedFillScope {
-	b.Assert(arr.HasUFlags(HASH_FLAG_PACKED))
+	b.Assert(arr.IsPacked())
 	return &PackedFillScope{
 		ht: arr,
 		zv: NewZvalUndef(),

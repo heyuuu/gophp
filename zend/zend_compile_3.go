@@ -357,7 +357,6 @@ func ZendCompileFuncStrlen(result *Znode, args *ZendAstList) int {
 	if arg_node.GetOpType() == IS_CONST && arg_node.GetConstant().IsString() {
 		result.SetOpType(IS_CONST)
 		result.GetConstant().SetLong(arg_node.GetConstant().GetStr().GetLen())
-		ZvalPtrDtorStr(arg_node.GetConstant())
 	} else {
 		ZendEmitOpTmp(result, ZEND_STRLEN, &arg_node, nil)
 	}

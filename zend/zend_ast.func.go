@@ -373,7 +373,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 		}
 	case types.IS_STRING:
 		result.GetArr().SymtableUpdate(offset.GetStr().GetStr(), expr)
-		ZvalPtrDtorStr(offset)
+
 	case types.IS_NULL:
 		result.GetArr().SymtableUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), expr)
 	case types.IS_LONG:

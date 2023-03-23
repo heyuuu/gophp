@@ -134,7 +134,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 			case T_DOC_COMMENT:
 
 			default:
-				ZvalPtrDtorStr(&token)
+
 			}
 		}
 		token.SetUndef()
@@ -198,7 +198,7 @@ func ZendStrip() {
 			case T_DOC_COMMENT:
 
 			default:
-				ZvalPtrDtorStr(&token)
+
 			}
 		}
 		prev_space = 0

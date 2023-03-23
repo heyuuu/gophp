@@ -433,7 +433,7 @@ try_again:
 					} else {
 						zend.ZvalPtrDtor(data)
 						data.SetUndef()
-						ht.AddUFlags(types.HASH_FLAG_HAS_EMPTY_IND)
+						ht.SetIsHasEmptyInd()
 						types.ZendHashMoveForwardEx(ht, SplArrayGetPosPtr(ht, intern))
 						if SplArrayIsObject(intern) != 0 {
 							SplArraySkipProtected(intern, ht)
