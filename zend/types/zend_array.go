@@ -54,10 +54,8 @@ func (ht *Array) SetNNumUsed(value uint32) {
 	// todo remove
 }
 
-func (ht *Array) GetNNumOfElements() uint32               { return ht.elementsCount }
+func (ht *Array) CountElements() uint32                   { return ht.elementsCount }
 func (ht *Array) SetNNumOfElements(value uint32)          { ht.elementsCount = value }
-func (ht *Array) GetNTableSize() uint32                   { return ht.tableSize }
-func (ht *Array) SetNTableSize(value uint32)              { ht.tableSize = value }
 func (ht *Array) GetNInternalPointer() uint32             { return ht.internalPointer }
 func (ht *Array) SetNInternalPointer(value uint32)        { ht.internalPointer = value }
 func (ht *Array) GetNNextFreeElement() zend.ZendLong      { return ht.nextFreeElement }
@@ -65,43 +63,11 @@ func (ht *Array) SetNNextFreeElement(value zend.ZendLong) { ht.nextFreeElement =
 func (ht *Array) GetPDestructor() DtorFuncT               { return ht.destructor }
 func (ht *Array) SetPDestructor(value DtorFuncT)          { ht.destructor = value }
 
-func (ht *Array) GetNTableMask() uint32 {
-	// todo 待移除
-	return uint32(-(ht.tableSize + ht.tableSize))
-}
+func (ht *Array) GetNTableMask() uint32 { return 0 } // todo remove
 
 /**
  * Constructor && Init
  */
-func NewZendArray(size int) *Array {
-	return NewZendArrayEx(size, zend.ZVAL_PTR_DTOR, false)
-}
-
-func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *Array {
-	var ht = &Array{
-		elementsCount:   0,
-		tableSize:       ZendHashCheckSize(size),
-		internalPointer: 0,
-		nextFreeElement: 0,
-		destructor:      pDestructor,
-
-		// 数据存储
-		data:     nil,
-		indexMap: make(map[int]uint32),
-		keyMap:   make(map[string]uint32),
-	}
-
-	// GC 信息
-	ht.SetRefcount(1)
-	ht.SetGcTypeInfo(IS_ARRAY)
-	if persistent {
-		ht.AddGcFlags(GC_PERSISTENT)
-	} else {
-		ht.AddGcFlags(GC_COLLECTABLE)
-	}
-
-	return ht
-}
 
 func (ht *Array) assertRc1() {
 	b.Assert(ht.GetRefcount() == 1)

@@ -41,7 +41,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		var prop_info *ZendPropertyInfo
 		var ce *types.ClassEntry = zobj.GetCe()
 		var flags uint32 = 0
-		zobj.SetProperties(types.NewZendArray(ce.GetDefaultPropertiesCount()))
+		zobj.SetProperties(types.NewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			types.ZendHashRealInitMixed(zobj.GetProperties())
 			var __ht *types.Array = ce.GetPropertiesInfo()
@@ -133,7 +133,7 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 		}
 	} else if retval.IsNull() {
 		*is_temp = 1
-		ht = types.NewZendArray(0)
+		ht = types.NewArray(0)
 		return ht
 	}
 	faults.ErrorNoreturn(faults.E_ERROR, ZEND_DEBUGINFO_FUNC_NAME+"() must return an array")
@@ -298,7 +298,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		*info_ptr = CACHED_PTR_EX(cache_slot + 2)
 		return uintPtr(CACHED_PTR_EX(cache_slot + 1))
 	}
-	if ce.GetPropertiesInfo().GetNNumOfElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
+	if ce.GetPropertiesInfo().CountElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
@@ -397,7 +397,7 @@ func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int)
 	var property_info *ZendPropertyInfo
 	var flags uint32
 	var scope *types.ClassEntry
-	if ce.GetPropertiesInfo().GetNNumOfElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
+	if ce.GetPropertiesInfo().CountElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()

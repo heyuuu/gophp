@@ -138,7 +138,7 @@ func ZendPostDeactivateModules() {
 			ModuleDestructor(module)
 			Free(module)
 			types.ZendStringReleaseEx(key, 0)
-			__ht__1.GetNNumOfElements()--
+			__ht__1.CountElements()--
 			var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 			var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
 			var i uint32 = types.HT_HASH(__ht__1, nIndex)
@@ -164,7 +164,7 @@ func ZendPostDeactivateModules() {
 	}
 }
 func ZendNextFreeModule() int {
-	return ModuleRegistry.GetNNumOfElements() + 1
+	return ModuleRegistry.CountElements() + 1
 }
 func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
 	var class_entry *types.ClassEntry = Malloc(b.SizeOf("zend_class_entry"))

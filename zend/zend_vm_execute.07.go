@@ -99,7 +99,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -383,7 +383,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
-		ht = types.NewZendArray(result_size)
+		ht = types.NewArray(result_size)
 		EX_VAR(opline.GetResult().GetVar()).SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
 		fillScope := types.PackedFillStart(ht)
@@ -432,7 +432,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		fillScope.FillEnd()
 		ht.SetNNumOfElements(result_size)
 	} else {
-		types.ZVAL_EMPTY_ARRAY(EX_VAR(opline.GetResult().GetVar()))
+		EX_VAR(opline.GetResult().GetVar()).SetEmptyArray()
 	}
 	ZEND_VM_NEXT_OPCODE()
 }

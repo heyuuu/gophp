@@ -4,8 +4,6 @@ const HASH_KEY_IS_STRING = 1
 const HASH_KEY_IS_LONG = 2
 const HASH_KEY_NON_EXISTENT = 3
 
-var ZendEmptyArray Array
-
 type MergeCheckerFuncT func(target_ht *Array, source_data *Zval, hash_key *ArrayKey, pParam any) ZendBool
 
 const ZEND_HASH_APPLY_KEEP = 0

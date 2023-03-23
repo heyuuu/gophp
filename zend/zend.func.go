@@ -362,7 +362,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	CG__().InitTables()
 	EG__().InitTables()
-	ModuleRegistry = *types.NewZendArrayEx(32, ModuleDestructorZval, true)
+	ModuleRegistry = *types.NewArrayEx(32, ModuleDestructorZval, true)
 
 	ZendInitRsrcListDtors()
 	IniScannerGlobalsCtor(&ini_scanner_globals)

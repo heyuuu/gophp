@@ -213,7 +213,7 @@ func PhpHeadParseCookieOptionsArray(
 
 	/* Array is not empty but no valid keys were found */
 
-	if found == 0 && types.Z_ARRVAL_P(options).GetNNumOfElements() > 0 {
+	if found == 0 && types.Z_ARRVAL_P(options).CountElements() > 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "No valid options were found in the given array")
 	}
 

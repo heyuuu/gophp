@@ -592,7 +592,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		var i uint32
 		var list *ZendAstList = ZendAstGetList(ast)
 		if list.GetChildren() == 0 {
-			types.ZVAL_EMPTY_ARRAY(result)
+			result.SetEmptyArray()
 			break
 		}
 		ArrayInit(result)

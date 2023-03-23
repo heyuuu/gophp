@@ -257,7 +257,7 @@ func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserialize
 	if classes == nil {
 		return 1
 	}
-	if !(classes.GetNNumOfElements()) {
+	if !(classes.CountElements()) {
 		return 0
 	}
 	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen())
@@ -378,7 +378,7 @@ func ProcessNestedData(
 		} else {
 			if key.IsType(types.IS_STRING) {
 			string_key:
-				if obj != nil && obj.GetCe().GetPropertiesInfo().GetNNumOfElements() > 0 {
+				if obj != nil && obj.GetCe().GetPropertiesInfo().CountElements() > 0 {
 					var existing_propinfo *zend.ZendPropertyInfo
 					var new_key *types.String
 					var unmangled_class *byte = nil
@@ -554,10 +554,10 @@ func ObjectCommon(
 	}
 	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.ArrayStrExists(types.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup") != 0
 	ht = types.Z_OBJPROP_P(rval)
-	if elements >= zend_long(types.HT_MAX_SIZE-ht.GetNNumOfElements()) {
+	if elements >= zend_long(types.HT_MAX_SIZE-ht.CountElements()) {
 		return 0
 	}
-	ht.Extend(ht.GetNNumOfElements() + elements)
+	ht.Extend(ht.CountElements() + elements)
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
 			rval = types.ZVAL_DEREF(rval)
@@ -991,7 +991,7 @@ yy24:
 		   reference to some zvals might be keept in var_hash (to support references) */
 
 	} else {
-		types.ZVAL_EMPTY_ARRAY(rval)
+		rval.SetEmptyArray()
 		return FinishNestedData(rval, p, max, var_hash)
 	}
 

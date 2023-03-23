@@ -1,6 +1,9 @@
 package types
 
-import "sik/zend"
+import (
+	b "sik/builtin"
+	"sik/zend"
+)
 
 /**
  * ZendValue
@@ -144,6 +147,10 @@ func (zv *Zval) SetTypeInternedString() { zv.typ, zv.typeFlags = IS_STRING, 0 }
 func (zv *Zval) SetTypeArray() {
 	zv.typ, zv.typeFlags = IS_ARRAY, IS_TYPE_REFCOUNTED|IS_TYPE_COLLECTABLE
 }
+func (zv *Zval) SetTypeImmutableArray() {
+	zv.typ, zv.typeFlags = IS_ARRAY, 0
+}
+
 func (zv *Zval) SetTypeObject() {
 	zv.typ, zv.typeFlags = IS_OBJECT, IS_TYPE_REFCOUNTED|IS_TYPE_COLLECTABLE
 }
@@ -258,7 +265,16 @@ func (zv *Zval) SetStringCopy(s *String) {
 	s.AddRefcount()
 	zv.SetString(s)
 }
-func (zv *Zval) SetArray(arr *Array)           { zv.SetTypeArray(); zv.SetArr(arr) }
+func (zv *Zval) SetArray(arr *Array) { zv.SetTypeArray(); zv.SetArr(arr) }
+func (zv *Zval) SetImmutableArray(arr *Array) {
+	b.Assert(arr.IsImmutable())
+	zv.SetTypeArray()
+	zv.SetArr(arr)
+}
+func (zv *Zval) SetEmptyArray() {
+	zv.SetImmutableArray(emptyArray)
+}
+
 func (zv *Zval) SetObject(obj *ZendObject)     { zv.SetTypeObject(); zv.SetObj(obj) }
 func (zv *Zval) SetResource(res *ZendResource) { zv.SetTypeResource(); zv.SetRes(res) }
 func (zv *Zval) SetNewResource(handle int, ptr any, type_ int) {

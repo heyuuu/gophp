@@ -1,6 +1,7 @@
 package types
 
 import (
+	"math"
 	b "sik/builtin"
 	"sik/zend"
 	"sik/zend/faults"
@@ -332,35 +333,19 @@ func (ht *Array) Rehash() {
 	/* Migrate pointer to one past the end of the array to the new one past the end, so that
 	 * newly inserted elements are picked up correctly. */
 	if ht.HasIterators() {
-		zend._zendHashIteratorsUpdate(ht, oldNumUsed, ht.GetNNumUsed())
+		_zendHashIteratorsUpdate(ht, oldNumUsed, ht.GetNNumUsed())
 	}
 }
 
-func (ht *Array) ifFullDoResize() {
-	if ht.DataSize() >= ht.tableSize {
-		ht.doResize()
-	}
-}
-
-func (ht *Array) doResize() {
+func (ht *Array) Extend(size uint32) {
 	ht.assertRc1()
-
-	if ht.DataSize() > ht.elementsCount+(ht.elementsCount>>5) {
-		ht.Rehash()
-	} else if ht.tableSize < HT_MAX_SIZE {
-		// 无内存复制，仅扩充尺寸标识
-		ht.tableSize *= 2
-	} else {
-		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", ht.tableSize*2)
-	}
-}
-
-func (ht *Array) Extend(nSize uint32) {
-	// todo remove 无需手动扩展
-	ht.assertRc1()
-	if nSize > ht.tableSize {
-		// 无内存复制，仅扩充尺寸标识
-		ht.tableSize = ZendHashCheckSize(nSize)
+	if size > uint32(len(ht.data)) {
+		// 扩展数组 cap
+		newData := make([]Bucket, 0, size)
+		if len(ht.data) > 0 {
+			copy(newData, ht.data)
+		}
+		ht.data = newData
 	}
 }
 
@@ -399,7 +384,7 @@ func (ht *Array) Count() uint32 {
 	} else if ht == zend.EG__().GetSymbolTable() {
 		num = ht.RecalcElements()
 	} else {
-		num = ht.GetNNumOfElements()
+		num = ht.CountElements()
 	}
 	return num
 }
@@ -438,9 +423,21 @@ func (ht *Array) IsValidPos(pos uint32) bool {
 
 func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
 
+func (ht *Array) resizeIfFull() {
+	dataSize := len(ht.data)
+	if dataSize == cap(ht.data) {
+		// 若空隙率过高，重新压缩；否则，跳过扩容 (后面会由 append(ht.data) 触发自动扩容)
+		if dataSize > int(ht.elementsCount+(ht.elementsCount>>5)) {
+			ht.Rehash()
+		} else if dataSize >= math.MaxInt32 {
+			faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%d)", dataSize*2)
+		}
+	}
+}
+
 func (ht *Array) appendBucket(bucket *Bucket) *Bucket {
 	// 尝试 resize
-	ht.ifFullDoResize()
+	ht.resizeIfFull()
 
 	// 添加到 data
 	var idx = uint32(len(ht.data))

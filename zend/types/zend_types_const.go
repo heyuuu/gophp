@@ -66,8 +66,6 @@ const HT_INVALID_IDX uint32 = math.MaxUint32 // uint32(-1)
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 
-type HashPosition = uint32
-
 /* regular data types */
 const IS_UNDEF = 0
 const IS_NULL = 1

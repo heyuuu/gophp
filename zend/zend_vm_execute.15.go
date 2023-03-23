@@ -188,7 +188,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -882,7 +882,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
-					result.SetArray(types.NewZendArray(1))
+					result.SetArray(types.NewArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 
 					{
@@ -891,7 +891,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 					}
 				} else {
-					types.ZVAL_EMPTY_ARRAY(result)
+					result.SetEmptyArray()
 				}
 			} else {
 				var obj_ht *types.Array = ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_ARRAY_CAST)
@@ -902,7 +902,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					result.SetArray(types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
-					types.ZVAL_EMPTY_ARRAY(result)
+					result.SetEmptyArray()
 				}
 			}
 		} else {
@@ -920,7 +920,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				types.Z_OBJ_P(result).SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
-				ht = types.NewZendArray(1)
+				ht = types.NewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 
@@ -959,7 +959,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
 			types.ZVAL_COPY_VALUE(result, array_ptr)
-			if properties.GetNNumOfElements() == 0 {
+			if properties.CountElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				ZvalPtrDtorNogc(free_op1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))

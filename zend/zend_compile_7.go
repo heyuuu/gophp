@@ -424,7 +424,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 		return 0
 	}
 	if list.GetChildren() == 0 {
-		types.ZVAL_EMPTY_ARRAY(result)
+		result.SetEmptyArray()
 		return 1
 	}
 	ArrayInitSize(result, list.GetChildren())

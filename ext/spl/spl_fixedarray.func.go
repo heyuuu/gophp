@@ -87,7 +87,7 @@ func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 	var ht *types.Array = zend.ZendStdGetProperties(obj)
 	var i zend.ZendLong = 0
 	if intern.GetArray().GetSize() > 0 {
-		var j zend.ZendLong = ht.GetNNumOfElements()
+		var j zend.ZendLong = ht.CountElements()
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				ht.IndexUpdateH(i, intern.GetArray().GetElements()[i])
@@ -411,7 +411,7 @@ func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_va
 	}
 	if intern.GetArray().GetSize() == 0 {
 		var index int = 0
-		var size int = intern_ht.GetNNumOfElements()
+		var size int = intern_ht.CountElements()
 		SplFixedarrayInit(intern.GetArray(), size)
 		var __ht *types.Array = intern_ht
 		for _, _p := range __ht.foreachData() {
@@ -460,7 +460,7 @@ func zim_spl_SplFixedArray_toArray(executeData *zend.ZendExecuteData, return_val
 			}
 		}
 	} else {
-		types.ZVAL_EMPTY_ARRAY(return_value)
+		return_value.SetEmptyArray()
 		return
 	}
 }
@@ -473,7 +473,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParameters(executeData.NumArgs(), "a|b", &data, &save_indexes) == types.FAILURE {
 		return
 	}
-	num = types.Z_ARRVAL_P(data).GetNNumOfElements()
+	num = types.Z_ARRVAL_P(data).CountElements()
 	if num > 0 && save_indexes != 0 {
 		var element *types.Zval
 		var str_index *types.String

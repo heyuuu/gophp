@@ -80,7 +80,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 
@@ -737,7 +737,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 			if container.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(types.NewZendArray(8))
+			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)
@@ -936,7 +936,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				dim = nil
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -1013,7 +1013,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {

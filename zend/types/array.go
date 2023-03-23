@@ -1,5 +1,9 @@
 package types
 
+import (
+	"sik/zend"
+)
+
 /**
  * ArrayKey
  */
@@ -64,6 +68,7 @@ func (this *Bucket) SetVal(zval *Zval) { ZVAL_COPY_VALUE(&this.val, zval) }
  *                 | Bucket[ht->tableSize-1]    |
  *                 +=============================+
  */
+type HashPosition = uint32
 type Array struct {
 	ZendRefcounted
 	flags           ZendUchar
@@ -91,17 +96,54 @@ type Array struct {
 	//}
 }
 
+/**
+ * Constructor && Init
+ */
+func NewArray(size int) *Array {
+	return NewArrayEx(size, zend.ZVAL_PTR_DTOR, false)
+}
+func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
+	var data []Bucket
+	if size > 0 {
+		data = make([]Bucket, 0, size)
+	}
+
+	var ht = &Array{
+		destructor: pDestructor,
+
+		// 数据存储
+		data:     data,
+		indexMap: make(map[int]uint32),    // todo 改为 nil，延迟初始化
+		keyMap:   make(map[string]uint32), // todo 改为 nil，延迟初始化
+	}
+
+	// GC 信息
+	ht.SetRefcount(1)
+	ht.SetGcTypeInfo(IS_ARRAY)
+	if persistent {
+		ht.AddGcFlags(GC_PERSISTENT)
+	} else {
+		ht.AddGcFlags(GC_COLLECTABLE)
+	}
+
+	return ht
+}
+
 func (ht *Array) CopyFrom(arr *Array) {
 	ht.flags = arr.flags
 	ht.iteratorsCount = arr.iteratorsCount
-	ht.tableSize = arr.tableSize
-	ht.SetNNumUsed(arr.GetNNumUsed())
-	ht.SetNNumOfElements(arr.GetNNumOfElements())
-	ht.SetNNextFreeElement(arr.GetNNextFreeElement())
-	ht.SetArData(arr.GetArData())
-	ht.SetPDestructor(arr.GetPDestructor())
+	ht.elementsCount = arr.elementsCount
+	ht.nextFreeElement = arr.nextFreeElement
+	ht.destructor = arr.destructor
+
+	ht.data = arr.data
+	ht.indexMap = arr.indexMap
+	ht.keyMap = arr.keyMap
+
 	ZendHashInternalPointerReset(ht)
 }
+
+func (ht *Array) Cap() int { return cap(ht.data) }
 
 /** Array.flags */
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }

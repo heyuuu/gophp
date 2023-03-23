@@ -15,7 +15,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *ZendOpArray, uses_ast *
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(types.NewZendArray(8))
+		op_array.SetStaticVariables(types.NewArray(8))
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.GetChild()[i]
@@ -123,11 +123,11 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 
 	/* TODO We might want to use a special binding mode if varvars_used is set. */
 
-	if info.GetUses().GetNNumOfElements() == 0 {
+	if info.GetUses().CountElements() == 0 {
 		return
 	}
 	if op_array.GetStaticVariables() == nil {
-		op_array.SetStaticVariables(types.NewZendArray(8))
+		op_array.SetStaticVariables(types.NewArray(8))
 	}
 	var __ht *types.Array = info.GetUses()
 	for _, _p := range __ht.foreachData() {

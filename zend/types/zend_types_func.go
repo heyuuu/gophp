@@ -103,7 +103,7 @@ func ZVAL_STR(z *Zval, s *String)      { z.SetString(s) }
 func ZVAL_STR_COPY(z *Zval, s *String) { z.SetStringCopy(s) }
 func ZVAL_ARR(z *Zval, a *Array)       { z.SetArray(a) }
 func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
-	var arr = NewZendArray(0)
+	var arr = NewArray(0)
 	z.SetArray(arr)
 }
 func ZVAL_NEW_REF(z *Zval, r *Zval) { z.SetNewRef(r) }

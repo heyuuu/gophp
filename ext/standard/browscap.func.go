@@ -187,7 +187,7 @@ func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, p
 func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *types.Array {
 	var tmp types.Zval
 	var i uint32
-	var ht *types.Array = types.NewZendArray(8)
+	var ht *types.Array = types.NewArray(8)
 	tmp.SetString(BrowscapConvertPattern(entry.GetPattern(), 0))
 	ht.KeyAdd("browser_name_regex", &tmp)
 	tmp.SetStringCopy(entry.GetPattern())

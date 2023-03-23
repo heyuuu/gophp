@@ -113,7 +113,7 @@ func ZifFuncGetArgs(executeData zpp.DefEx) (*types.Array, bool) {
 
 	argCount := ex.NumArgs()
 	if argCount == 0 {
-		return types.NewEmptyArray(), true
+		return types.NewArray(0), true
 	}
 
 	first_extra_arg := int(ex.GetFunc().GetOpArray().GetNumArgs())
@@ -129,7 +129,7 @@ func ZifFuncGetArgs(executeData zpp.DefEx) (*types.Array, bool) {
 		}
 	}
 
-	arr := types.NewZendArray(argCount)
+	arr := types.NewArray(argCount)
 	for _, zv := range values {
 		if zv.IsUndef() {
 			arr.NextIndexInsertNew(types.NewZvalNull())
@@ -302,7 +302,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 	var idx ZendUlong
 	var new_val *types.Zval
 	var val *types.Zval
-	ArrayInitSize(dst, types.Z_ARRVAL_P(src).GetNNumOfElements())
+	ArrayInitSize(dst, types.Z_ARRVAL_P(src).CountElements())
 	var __ht = src.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z = _p.GetVal()
@@ -645,7 +645,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetArray(types.ZendProptableToSymtable(properties, 1))
 		return
 	} else {
-		ArrayInitSize(return_value, properties.GetNNumOfElements())
+		ArrayInitSize(return_value, properties.CountElements())
 		var __ht = properties
 		for _, _p := range __ht.foreachData() {
 			var _z = _p.GetVal()
@@ -718,7 +718,7 @@ func ZifGetMangledObjectVars(executeData *ZendExecuteData, return_value *types.Z
 	}
 	properties = types.Z_OBJ_HT_P(obj).GetGetProperties()(obj)
 	if properties == nil {
-		types.ZVAL_EMPTY_ARRAY(return_value)
+		return_value.SetEmptyArray()
 		return
 	}
 	properties = types.ZendProptableToSymtable(properties, types.Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(obj).GetHandlers() != &StdObjectHandlers || properties.IsRecursive())
@@ -1368,8 +1368,8 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 		var module_names **byte
 		var module *ZendModuleEntry
 		var i = 1
-		modules = Ecalloc(ModuleRegistry.GetNNumOfElements()+2, b.SizeOf("zval"))
-		module_names = Emalloc((ModuleRegistry.GetNNumOfElements() + 2) * b.SizeOf("char *"))
+		modules = Ecalloc(ModuleRegistry.CountElements()+2, b.SizeOf("zval"))
+		module_names = Emalloc((ModuleRegistry.CountElements() + 2) * b.SizeOf("char *"))
 		module_names[0] = "internal"
 		var __ht = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {
@@ -1505,7 +1505,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		fillScope.FillEnd()
 		types.Z_ARRVAL_P(arg_array).SetNNumOfElements(num_args)
 	} else {
-		types.ZVAL_EMPTY_ARRAY(arg_array)
+		arg_array.SetEmptyArray()
 	}
 }
 func DebugPrintBacktraceArgs(arg_array *types.Zval) {

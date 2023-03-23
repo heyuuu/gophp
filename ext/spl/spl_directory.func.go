@@ -1634,7 +1634,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 		case types.IS_STRING:
 			return intern.GetCurrentZval().GetStr().GetLen() == 0
 		case types.IS_ARRAY:
-			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && types.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 1 {
+			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && types.Z_ARRVAL(intern.GetCurrentZval()).CountElements() == 1 {
 				var idx uint32 = 0
 				var first *types.Zval
 				for types.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal().IsUndef() {
@@ -1643,7 +1643,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 				first = types.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
 				return first.IsType(types.IS_STRING) && first.GetStr().GetLen() == 0
 			}
-			return types.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 0
+			return types.Z_ARRVAL(intern.GetCurrentZval()).CountElements() == 0
 		case types.IS_NULL:
 			return 1
 		default:

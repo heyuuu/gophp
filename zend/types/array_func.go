@@ -6,17 +6,15 @@ import (
 	"sik/zend/faults"
 )
 
-func NewEmptyArray() *Array {
-	return NewZendArray(0)
+var emptyArray *Array
+
+func init() {
+	emptyArray = NewArray(0)
+	emptyArray.SetImmutable()
 }
 
-func ZVAL_EMPTY_ARRAY(z *Zval) {
-	z.SetArr((*Array)(&ZendEmptyArray))
-	z.SetTypeInfo(IS_ARRAY)
-}
-
-func MakeArrayEx(nSize uint32, pDestructor DtorFuncT, persistent ZendBool) Array {
-	return *NewZendArrayEx(nSize, pDestructor, persistent != 0)
+func MakeArrayEx(nSize int, pDestructor DtorFuncT, persistent ZendBool) Array {
+	return *NewArrayEx(nSize, pDestructor, persistent != 0)
 }
 
 func ArrayStrExists(ht *Array, key string) ZendBool {
@@ -490,11 +488,11 @@ func ZendArrayDupElements(source *Array, target *Array) {
 }
 
 func ZendArrayDup(source *Array) *Array {
-	var target *Array = NewZendArray(source.tableSize)
+	var target *Array = NewArray(source.Cap())
 	target.AddGcFlags(GC_COLLECTABLE)
 	target.nextFreeElement = source.nextFreeElement
 
-	if source.GetNNumOfElements() == 0 {
+	if source.CountElements() == 0 {
 		return target
 	}
 
@@ -502,7 +500,7 @@ func ZendArrayDup(source *Array) *Array {
 
 	if (source.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 		target.SetNNumUsed(source.GetNNumUsed())
-		target.SetNNumOfElements(source.GetNNumOfElements())
+		target.SetNNumOfElements(source.CountElements())
 		HT_SET_DATA_ADDR(target, zend.Emalloc(HT_SIZE(target)))
 		target.SetNInternalPointer(source.GetNInternalPointer())
 
@@ -649,8 +647,8 @@ func ZendHashBucketSwap(p *Bucket, q *Bucket) {
 func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBool) int {
 	var idx1 uint32
 	var idx2 uint32
-	if ht1.GetNNumOfElements() != ht2.GetNNumOfElements() {
-		if ht1.GetNNumOfElements() > ht2.GetNNumOfElements() {
+	if ht1.CountElements() != ht2.CountElements() {
+		if ht1.CountElements() > ht2.CountElements() {
 			return 1
 		} else {
 			return -1
@@ -771,7 +769,7 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBo
 }
 func ZendHashMinmax(ht *Array, compar CompareFuncT, flag uint32) *Zval {
 	var res *Bucket
-	if ht.GetNNumOfElements() == 0 {
+	if ht.CountElements() == 0 {
 		return nil
 	}
 
@@ -853,7 +851,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = NewZendArray(ht.GetNNumOfElements())
+	var new_ht *Array = NewArray(ht.CountElements())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -916,7 +914,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = NewZendArray(ht.GetNNumOfElements())
+	var new_ht *Array = NewArray(ht.CountElements())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()

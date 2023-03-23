@@ -53,9 +53,9 @@ type ZendCompilerGlobals struct {
 }
 
 func (this *ZendCompilerGlobals) InitTables() {
-	this.function_table = types.NewZendArrayEx(1024, ZEND_FUNCTION_DTOR, true)
-	this.class_table = types.NewZendArrayEx(64, ZEND_CLASS_DTOR, true)
-	this.auto_globals = types.NewZendArrayEx(8, AutoGlobalDtor, true)
+	this.function_table = types.NewArrayEx(1024, ZEND_FUNCTION_DTOR, true)
+	this.class_table = types.NewArrayEx(64, ZEND_CLASS_DTOR, true)
+	this.auto_globals = types.NewArrayEx(8, AutoGlobalDtor, true)
 }
 
 func (this *ZendCompilerGlobals) DestroyTables() {
@@ -255,7 +255,7 @@ type ZendExecutorGlobals struct {
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
-	this.zend_constants = types.NewZendArrayEx(128, ZEND_CONSTANT_DTOR, true)
+	this.zend_constants = types.NewArrayEx(128, ZEND_CONSTANT_DTOR, true)
 }
 func (this *ZendExecutorGlobals) DestroyTables() {
 	this.zend_constants.Destroy()

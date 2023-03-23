@@ -15,7 +15,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 

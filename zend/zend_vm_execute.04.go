@@ -37,7 +37,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			ZEND_VM_SMART_BRANCH_TRUE()
 			EX_VAR(opline.GetResult().GetVar()).SetTrue()
 			ZEND_VM_NEXT_OPCODE()
-		} else if EG__().GetZendConstants().GetNNumOfElements() == DECODE_SPECIAL_CACHE_NUM(c) {
+		} else if EG__().GetZendConstants().CountElements() == DECODE_SPECIAL_CACHE_NUM(c) {
 		defined_false:
 			ZEND_VM_SMART_BRANCH_FALSE()
 			EX_VAR(opline.GetResult().GetVar()).SetFalse()
@@ -45,7 +45,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	if ZendQuickCheckConstant(RT_CONSTANT(opline, opline.GetOp1()), opline, executeData) != types.SUCCESS {
-		CACHE_PTR(opline.GetExtendedValue(), ENCODE_SPECIAL_CACHE_NUM(EG__().GetZendConstants().GetNNumOfElements()))
+		CACHE_PTR(opline.GetExtendedValue(), ENCODE_SPECIAL_CACHE_NUM(EG__().GetZendConstants().CountElements()))
 		goto defined_false
 	} else {
 		goto defined_true
@@ -653,7 +653,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 

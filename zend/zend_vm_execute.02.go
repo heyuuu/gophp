@@ -31,14 +31,14 @@ send_again:
 		var arg *types.Zval
 		var top *types.Zval
 		var name *types.String
-		ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, ht.GetNNumOfElements())
+		ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, ht.CountElements())
 		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && args.GetRefcount() > 1 {
 			var i uint32
 			var separate int = 0
 
 			/* check if any of arguments are going to be passed by reference */
 
-			for i = 0; i < ht.GetNNumOfElements(); i++ {
+			for i = 0; i < ht.CountElements(); i++ {
 				if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num+i) != 0 {
 					separate = 1
 					break
@@ -182,7 +182,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			var free_op2 ZendFreeOp
 			var op2 *types.Zval = GetZvalPtr(opline.GetOp2Type(), opline.GetOp2(), &free_op2, BP_VAR_R)
 			var skip uint32 = opline.GetExtendedValue()
-			var count uint32 = ht.GetNNumOfElements()
+			var count uint32 = ht.CountElements()
 			var len_ ZendLong = ZvalGetLong(op2)
 			if len_ < 0 {
 				len_ += zend_long(count - skip)
@@ -241,7 +241,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			}
 			FREE_OP(free_op2)
 		} else {
-			ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, ht.GetNNumOfElements())
+			ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, ht.CountElements())
 			arg_num = 1
 			param = executeData.GetCall().Arg(1)
 			var __ht *types.Array = ht
@@ -827,7 +827,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if num_args != 0 {
 		var p *types.Zval = executeData.Arg(1)
 		var end *types.Zval = p + num_args
-		args = types.NewZendArray(num_args)
+		args = types.NewArray(num_args)
 		types.ZendHashRealInitPacked(args)
 		for {
 			fillScope := types.PackedFillStart(args)
@@ -857,7 +857,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if args != nil {
 		call.Arg(2).SetArray(args)
 	} else {
-		types.ZVAL_EMPTY_ARRAY(call.Arg(2))
+		call.Arg(2).SetEmptyArray()
 	}
 	ZendFreeTrampoline(fbc)
 	fbc = call.GetFunc()

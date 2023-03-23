@@ -145,7 +145,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 				dim = RT_CONSTANT(opline, opline.GetOp2())
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -222,7 +222,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -300,7 +300,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -375,7 +375,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 				dim = RT_CONSTANT(opline, opline.GetOp2())
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -685,7 +685,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 

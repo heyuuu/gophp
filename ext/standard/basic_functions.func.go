@@ -658,7 +658,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		argc = types.Z_ARRVAL_P(args).GetNNumOfElements()
+		argc = types.Z_ARRVAL_P(args).CountElements()
 
 		/* Attempt to allocate enough memory to hold all of the arguments
 		 * and a trailing NULL */
@@ -697,7 +697,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if p_longopts != nil {
 		var count int
 		var entry *types.Zval
-		count = types.Z_ARRVAL_P(p_longopts).GetNNumOfElements()
+		count = types.Z_ARRVAL_P(p_longopts).CountElements()
 
 		/* the first <len> slots are filled by the one short ops
 		 * we now extend our array and jump to the new added structs */

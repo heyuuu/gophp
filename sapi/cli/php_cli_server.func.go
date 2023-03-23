@@ -97,7 +97,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	client = core.SG__().server_context
 	headers = client.GetRequest().GetHeadersOriginalCase()
-	zend.ArrayInitSize(return_value, headers.GetNNumOfElements())
+	zend.ArrayInitSize(return_value, headers.CountElements())
 	var __ht *types.Array = headers
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -1168,7 +1168,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 	PhpCliServerPollerAdd(server.GetPoller(), POLLIN, server_sock)
 	server.SetHostStr(host)
 	server.SetPort(port)
-	server.clients = *types.NewZendArrayEx(0, PhpCliServerClientDtorWrapper, true)
+	server.clients = *types.NewArrayEx(0, PhpCliServerClientDtorWrapper, true)
 	server.SetDocumentRootStr(document_root)
 	server.SetRouterStr(router)
 	server.SetIsRunning(1)

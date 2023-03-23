@@ -335,7 +335,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 			if container.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 			}
-			container.SetArray(types.NewZendArray(8))
+			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
 		} else {
 			ZendBinaryAssignOpDimSlow(container, dim, opline, executeData)

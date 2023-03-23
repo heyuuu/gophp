@@ -1564,7 +1564,7 @@ func PhpUnregisterUrlStreamWrapper(protocol string) int {
 }
 func CloneWrapperHash() {
 	zend.ALLOC_HASHTABLE(standard.FG(stream_wrappers))
-	standard.FG(stream_wrappers) = types.MakeArrayEx(UrlStreamWrappersHash.GetNNumOfElements(), nil, 0)
+	standard.FG(stream_wrappers) = types.MakeArrayEx(UrlStreamWrappersHash.CountElements(), nil, 0)
 	types.ZendHashCopy(standard.FG(stream_wrappers), &UrlStreamWrappersHash, nil)
 }
 func PhpRegisterUrlStreamWrapperVolatile(protocol *types.String, wrapper *core.PhpStreamWrapper) int {

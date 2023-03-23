@@ -608,7 +608,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = types.NewZendArray(types.Z_ARRVAL_P(stream_array).GetNNumOfElements())
+	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).CountElements())
 	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -667,7 +667,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = types.NewZendArray(types.Z_ARRVAL_P(stream_array).GetNNumOfElements())
+	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).CountElements())
 	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -803,11 +803,11 @@ func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *types.Zval
 		if retval > 0 {
 			if w_array != nil {
 				zend.ZvalPtrDtor(w_array)
-				types.ZVAL_EMPTY_ARRAY(w_array)
+				w_array.SetEmptyArray()
 			}
 			if e_array != nil {
 				zend.ZvalPtrDtor(e_array)
-				types.ZVAL_EMPTY_ARRAY(e_array)
+				e_array.SetEmptyArray()
 			}
 			return_value.SetLong(retval)
 			return

@@ -60,7 +60,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 				dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 				UNDEF_RESULT()
 			} else {
-				object_ptr.SetArray(types.NewZendArray(8))
+				object_ptr.SetArray(types.NewArray(8))
 				goto try_assign_dim_array
 			}
 		} else {
@@ -436,7 +436,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	array = EX_VAR(opline.GetResult().GetVar())
 	{
 		size = opline.GetExtendedValue() >> ZEND_ARRAY_SIZE_SHIFT
-		array.SetArray(types.NewZendArray(size))
+		array.SetArray(types.NewArray(size))
 
 		/* Explicitly initialize array as not-packed if flag is set */
 

@@ -647,7 +647,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 		str  *types.String
 		lval zend.ZendLong
 	}
-	numelems = types.Z_ARRVAL_P(pieces).GetNNumOfElements()
+	numelems = types.Z_ARRVAL_P(pieces).CountElements()
 	if numelems == 0 {
 		zend.ZVAL_EMPTY_STRING(return_value)
 		return
@@ -1929,7 +1929,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			return
 		}
 		if argc == 4 && from.IsType(types.IS_ARRAY) {
-			if types.Z_ARRVAL_P(from).GetNNumOfElements() != types.Z_ARRVAL_P(len_).GetNNumOfElements() {
+			if types.Z_ARRVAL_P(from).CountElements() != types.Z_ARRVAL_P(len_).CountElements() {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should have the same number of elements")
 				return_value.SetStringCopy(str.GetStr())
 				return
@@ -2462,7 +2462,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 
 		/* we have to rebuild HashTable with numeric keys */
 
-		&str_hash = types.MakeArrayEx(pats.GetNNumOfElements(), nil, 0)
+		&str_hash = types.MakeArrayEx(pats.CountElements(), nil, 0)
 		var __ht *types.Array = pats
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -2916,10 +2916,10 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	if ac == 2 {
 		var pats *types.Array = from.GetArr()
-		if pats.GetNNumOfElements() < 1 {
+		if pats.CountElements() < 1 {
 			return_value.SetStringCopy(str)
 			return
-		} else if pats.GetNNumOfElements() == 1 {
+		} else if pats.CountElements() == 1 {
 			var num_key zend.ZendLong
 			var str_key *types.String
 			var tmp_str *types.String

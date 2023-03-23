@@ -597,12 +597,12 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 	if args.GetChild()[1].GetKind() != ZEND_AST_ARRAY || ZendTryCtEvalArray(array.GetConstant(), args.GetChild()[1]) == 0 {
 		return types.FAILURE
 	}
-	if types.Z_ARRVAL(array.GetConstant()).GetNNumOfElements() > 0 {
+	if types.Z_ARRVAL(array.GetConstant()).CountElements() > 0 {
 		var ok types.ZendBool = 1
 		var val *types.Zval
 		var tmp types.Zval
 		var src *types.Array = array.GetConstant().GetArr()
-		var dst *types.Array = types.NewZendArray(src.GetNNumOfElements())
+		var dst *types.Array = types.NewArray(src.CountElements())
 		tmp.SetTrue()
 		if strict != 0 {
 			var __ht *types.Array = src

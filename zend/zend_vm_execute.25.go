@@ -334,7 +334,7 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Explicitly initialize array as not-packed if flag is set */
 
 	{
-		array.SetArray(types.NewZendArray(0))
+		array.SetArray(types.NewArray(0))
 		ZEND_VM_NEXT_OPCODE()
 	}
 }

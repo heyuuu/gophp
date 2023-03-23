@@ -185,7 +185,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 	} else {
-		types.ZVAL_EMPTY_ARRAY(params)
+		params.SetEmptyArray()
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
@@ -672,7 +672,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if opline.GetExtendedValue() == types.IS_ARRAY {
 			{
 				if expr.GetType() != types.IS_NULL {
-					result.SetArray(types.NewZendArray(1))
+					result.SetArray(types.NewArray(1))
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					{
 
@@ -681,7 +681,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					}
 
 				} else {
-					types.ZVAL_EMPTY_ARRAY(result)
+					result.SetEmptyArray()
 				}
 			}
 
@@ -702,7 +702,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				}
 				types.Z_OBJ_P(result).SetProperties(ht)
 			} else if expr.GetType() != types.IS_NULL {
-				ht = types.NewZendArray(1)
+				ht = types.NewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
 				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
 				{

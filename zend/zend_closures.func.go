@@ -211,7 +211,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval
 		ArrayInitSize(fci.GetParams()[1], executeData.NumArgs())
 		ZendCopyParametersArray(executeData.NumArgs(), fci.GetParams()[1])
 	} else {
-		types.ZVAL_EMPTY_ARRAY(fci.GetParams()[1])
+		fci.GetParams()[1].SetEmptyArray()
 	}
 	fci.SetObject(ZEND_THIS(executeData).GetObj())
 	fcc.SetObject(fci.GetObject())
@@ -399,7 +399,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	var debug_info *types.Array
 	var zstr_args types.ZendBool = closure.GetFunc().GetType() == ZEND_USER_FUNCTION || closure.GetFunc().IsUserArgInfo()
 	*is_temp = 1
-	debug_info = types.NewZendArray(8)
+	debug_info = types.NewArray(8)
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 		var var_ *types.Zval
 		var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)

@@ -42,7 +42,7 @@ func Pestrdup(s *byte, persistent int) *byte {
 func Pestrndup(s *byte, length int, persistent int) *byte {
 	return b.Strndup(s, length)
 }
-func ALLOC_HASHTABLE(ht *types.Array) *types.Array { return types.NewZendArray(0) }
+func ALLOC_HASHTABLE(ht *types.Array) *types.Array { return types.NewArray(0) }
 func FREE_HASHTABLE(ht *types.Array)               { b.Free(ht) }
 func ZendMmGc(__ZendMmHeap any) int                { return 0 }
 func IsZendMm() int                                { return 0 }
