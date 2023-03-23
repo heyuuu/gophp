@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -490,8 +489,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			ref.GetGcTypeInfo() = types.IS_REFERENCE
 			types.ZVAL_COPY_VALUE(ref.GetVal(), value)
 			ref.GetSources().SetPtr(nil)
-			value.SetRef(ref)
-			value.SetTypeInfo(types.IS_REFERENCE_EX)
+			value.SetTypeReference()
 			variable_ptr.SetReference(ref)
 		} else {
 			value.AddRefcount()
@@ -505,7 +503,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_CHECK_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = EX_VAR(opline.GetOp1().GetVar())
-	if op1.GetTypeInfo() == types.IS_UNDEF {
+	if op1.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}

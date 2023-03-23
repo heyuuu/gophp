@@ -7,33 +7,33 @@ import (
 /**
  * GC - Refcount
  */
-func (this *Zval) IsRefcounted() bool  { return this.GetTypeFlags() != 0 }
-func (this *Zval) IsCollectable() bool { return b.FlagMatch(this.GetTypeFlags(), IS_TYPE_COLLECTABLE) }
+func (zv *Zval) IsRefcounted() bool  { return zv.GetTypeFlags() != 0 }
+func (zv *Zval) IsCollectable() bool { return b.FlagMatch(zv.GetTypeFlags(), IS_TYPE_COLLECTABLE) }
 
-func (this *Zval) GetRefcount() uint32 {
-	b.Assert(this.IsRefcounted())
-	return this.GetCounted().GetRefcount()
+func (zv *Zval) GetRefcount() uint32 {
+	b.Assert(zv.IsRefcounted())
+	return zv.GetCounted().GetRefcount()
 }
-func (this *Zval) SetRefcount(rc uint32) uint32 {
-	b.Assert(this.IsRefcounted())
-	return this.GetCounted().SetRefcount(rc)
+func (zv *Zval) SetRefcount(rc uint32) uint32 {
+	b.Assert(zv.IsRefcounted())
+	return zv.GetCounted().SetRefcount(rc)
 }
-func (this *Zval) AddRefcount() uint32 {
-	b.Assert(this.IsRefcounted())
-	return this.GetCounted().AddRefcount()
+func (zv *Zval) AddRefcount() uint32 {
+	b.Assert(zv.IsRefcounted())
+	return zv.GetCounted().AddRefcount()
 }
-func (this *Zval) DelRefcount() uint32 {
-	b.Assert(this.IsRefcounted())
-	return this.GetCounted().DelRefcount()
+func (zv *Zval) DelRefcount() uint32 {
+	b.Assert(zv.IsRefcounted())
+	return zv.GetCounted().DelRefcount()
 }
-func (this *Zval) TryAddRefcount() {
-	if this.IsRefcounted() {
-		this.GetCounted().AddRefcount()
+func (zv *Zval) TryAddRefcount() {
+	if zv.IsRefcounted() {
+		zv.GetCounted().AddRefcount()
 	}
 }
-func (this *Zval) TryDelRefcount() {
-	if this.IsRefcounted() {
-		this.GetCounted().DelRefcount()
+func (zv *Zval) TryDelRefcount() {
+	if zv.IsRefcounted() {
+		zv.GetCounted().DelRefcount()
 	}
 }
 

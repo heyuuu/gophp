@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -87,7 +86,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
 
-	if offset.GetTypeInfo() == types.IS_UNDEF {
+	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2()
 	}
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, EX_VAR(opline.GetResult().GetVar()))
@@ -563,7 +562,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	retval_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	return_value = executeData.GetReturnValue()
-	if retval_ptr.GetTypeInfo() == types.IS_UNDEF {
+	if retval_ptr.IsUndef() {
 		retval_ptr = ZVAL_UNDEFINED_OP1()
 		if return_value != nil {
 			return_value.SetNull()

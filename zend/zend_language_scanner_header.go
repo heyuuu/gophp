@@ -124,7 +124,7 @@ func ZendCompile(type_ int) *ZendOpArray {
 		var last_lineno int = CG__().zend_lineno
 		var original_file_context zend_file_context
 		var original_oparray_context zend_oparray_context
-		var original_active_op_array *zend_op_array = CG__().active_op_array
+		var original_active_op_array int = CG__().active_op_array
 		op_array = emalloc(b.SizeOf("zend_op_array"))
 		init_op_array(op_array, type_, INITIAL_OP_ARRAY_SIZE)
 		CG__().active_op_array = op_array
@@ -152,12 +152,12 @@ func ZendCompile(type_ int) *ZendOpArray {
 	CG__().in_compilation = original_in_compilation
 	return op_array
 }
-func CompileFilename(type_ int, filename *zval) *zend_op_array {
+func CompileFilename(type_ int, filename *types.Zval) int {
 	var file_handle zend_file_handle
-	var tmp zval
-	var retval *zend_op_array
+	var tmp types.Zval
+	var retval int
 	var opened_path *zend_string = nil
-	if Z_TYPE_P(filename) != types.IS_STRING {
+	if filename.IsString() {
 		types.ZVAL_STR(&tmp, zval_get_string(filename))
 		filename = &tmp
 	}
@@ -179,17 +179,17 @@ func CompileFilename(type_ int, filename *zval) *zend_op_array {
 	}
 	return retval
 }
-func ZendPrepareStringForScanning(str *zval, filename *byte) int {
+func ZendPrepareStringForScanning(str *types.Zval, filename *byte) int {
 	var buf *byte
 	var size int
 	var old_len int
-	var new_compiled_filename *zend_string
+	var new_compiled_filename *types.String
 
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = str.GetStr().GetLen()
-	types.Z_STR_P(str) = zend_string_extend(types.Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
-	Z_TYPE_INFO_P(str) = types.IS_STRING_EX
+	types.Z_STR_P(str) = types.ZendStringExtend(types.Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
+	str.SetTypeString()
 	memset(str.GetStr().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
 	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
@@ -204,10 +204,10 @@ func ZendPrepareStringForScanning(str *zval, filename *byte) int {
 	RESET_DOC_COMMENT()
 	return types.SUCCESS
 }
-func CompileString(source_string *zval, filename *byte) *zend_op_array {
+func CompileString(source_string *types.Zval, filename *byte) *ZendOpArray {
 	var original_lex_state ZendLexState
-	var op_array *zend_op_array = nil
-	var tmp zval
+	var op_array int = nil
+	var tmp types.Zval
 	if Z_TYPE_P(source_string) != types.IS_STRING {
 		types.ZVAL_STR(&tmp, zval_get_string_func(source_string))
 	} else {
@@ -245,9 +245,9 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 	ZendRestoreLexicalState(&original_lex_state)
 	return types.SUCCESS
 }
-func HighlightString(str *zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
+func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
 	var original_lex_state ZendLexState
-	var tmp zval
+	var tmp types.Zval
 	if Z_TYPE_P(str) != types.IS_STRING {
 		types.ZVAL_STR(&tmp, zval_get_string_func(str))
 		str = &tmp
@@ -428,7 +428,7 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 	return nil
 }
 
-func StripMultilineStringIndentation(zendlval *zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
+func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
 	var str *byte = zendlval.GetStr().GetVal()
 	var end *byte = str + zendlval.GetStr().GetLen()
 	var copy *byte = zendlval.GetStr().GetVal()

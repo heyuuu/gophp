@@ -701,7 +701,7 @@ try_again:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_BOOL, ConvertToBoolean)
 		ZvalPtrDtor(op)
-		if dst.GetTypeInfo() == types.IS_FALSE || dst.GetTypeInfo() == types.IS_TRUE {
+		if dst.IsFalse() || dst.IsTrue() {
 			op.SetTypeInfo(dst.GetTypeInfo())
 		} else {
 			op.SetTrue()
@@ -2649,7 +2649,7 @@ func IncrementString(str *types.Zval) {
 	}
 	if !(str.IsRefcounted()) {
 		str.SetStr(types.NewString(str.GetStr().GetStr()))
-		str.SetTypeInfo(types.IS_STRING_EX)
+		str.SetTypeString()
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
 		str.SetStr(types.NewString(str.GetStr().GetStr()))

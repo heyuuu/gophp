@@ -409,7 +409,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		if arg_count > first_extra_arg {
 			for i < first_extra_arg {
 				q = p
-				if q.GetTypeInfo() != types.IS_UNDEF {
+				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
 					if q.IsRefcounted() {
 						q.AddRefcount()
@@ -431,7 +431,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		}
 		for i < arg_count {
 			q = p
-			if q.GetTypeInfo() != types.IS_UNDEF {
+			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
 				if q.IsRefcounted() {
 					q.AddRefcount()
@@ -586,7 +586,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
 
-	if offset.GetTypeInfo() == types.IS_UNDEF {
+	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2()
 	}
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, EX_VAR(opline.GetResult().GetVar()))

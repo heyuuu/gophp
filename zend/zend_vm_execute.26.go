@@ -19,7 +19,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_SEND_REF_SPEC_CV_HANDLER(executeData)
 	}
 	varptr = EX_VAR(opline.GetOp1().GetVar())
-	if varptr.GetTypeInfo() == types.IS_UNDEF {
+	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
@@ -41,7 +41,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_QUICK_HANDLER(executeData *ZendExecuteData) int {
 		goto send_var_by_ref
 	}
 	varptr = EX_VAR(opline.GetOp1().GetVar())
-	if varptr.GetTypeInfo() == types.IS_UNDEF {
+	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
@@ -70,7 +70,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 

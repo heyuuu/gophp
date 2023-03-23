@@ -1040,7 +1040,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
-			if container.GetTypeInfo() == types.IS_UNDEF {
+			if container.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 			}
 			container.SetArray(types.NewZendArray(8))

@@ -1474,7 +1474,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				}
 			} else {
 				for i < first_extra_arg {
-					if p.GetTypeInfo() != types.IS_UNDEF {
+					if !p.IsUndef() {
 						if p.IsRefcounted() {
 							p.AddRefcount()
 						}
@@ -1490,7 +1490,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 			p = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
 		}
 		for i < num_args {
-			if p.GetTypeInfo() != types.IS_UNDEF {
+			if !p.IsUndef() {
 				if p.IsRefcounted() {
 					p.AddRefcount()
 				}

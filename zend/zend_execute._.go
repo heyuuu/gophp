@@ -12,9 +12,8 @@ var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *types.Z
 
 /* dedicated Zend executor functions - do not use! */
 
-var ZEND_VM_STACK_HEADER_SLOTS *types.Zval = (
-	ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct _zend_vm_stack")) +
-		ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval"))
+var ZEND_VM_STACK_HEADER_SLOTS *types.Zval = (ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct _zend_vm_stack")) +
+	ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval"))
 
 /* services */
 

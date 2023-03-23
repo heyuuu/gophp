@@ -494,7 +494,7 @@ func ZEND_BW_NOT_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	op1 = EX_VAR(opline.GetOp1().GetVar())
-	if op1.GetTypeInfo() == types.IS_LONG {
+	if op1.IsLong() {
 		EX_VAR(opline.GetResult().GetVar()).SetLong(^(op1.GetLval()))
 		ZEND_VM_NEXT_OPCODE()
 	}
@@ -508,7 +508,7 @@ func ZEND_BOOL_NOT_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 
@@ -732,10 +732,10 @@ func ZEND_JMPZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_NEXT_OPCODE()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -754,10 +754,10 @@ func ZEND_JMPNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -776,11 +776,11 @@ func ZEND_JMPZNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, opline.GetExtendedValue())
 		return 0
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -800,12 +800,12 @@ func ZEND_JMPZ_EX_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var ret int
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		ZEND_VM_NEXT_OPCODE()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -828,12 +828,12 @@ func ZEND_JMPNZ_EX_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var ret int
 	val = EX_VAR(opline.GetOp1().GetVar())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -857,7 +857,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	retval_ptr = EX_VAR(opline.GetOp1().GetVar())
 	return_value = executeData.GetReturnValue()
-	if retval_ptr.GetTypeInfo() == types.IS_UNDEF {
+	if retval_ptr.IsUndef() {
 		retval_ptr = ZVAL_UNDEFINED_OP1()
 		if return_value != nil {
 			return_value.SetNull()
@@ -989,7 +989,7 @@ func ZEND_SEND_VAR_SPEC_CV_INLINE_HANDLER(executeData *ZendExecuteData) int {
 	var varptr *types.Zval
 	var arg *types.Zval
 	varptr = EX_VAR(opline.GetOp1().GetVar())
-	if varptr.GetTypeInfo() == types.IS_UNDEF {
+	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()

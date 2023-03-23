@@ -41,7 +41,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
 
-	if offset.GetTypeInfo() == types.IS_UNDEF {
+	if offset.IsUndef() {
 		ZVAL_UNDEFINED_OP2()
 	}
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, EX_VAR(opline.GetResult().GetVar()))

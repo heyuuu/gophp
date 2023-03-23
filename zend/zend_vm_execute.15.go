@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_GET_TYPE_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -547,7 +546,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	retval_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	return_value = executeData.GetReturnValue()
-	if retval_ptr.GetTypeInfo() == types.IS_UNDEF {
+	if retval_ptr.IsUndef() {
 		retval_ptr = ZVAL_UNDEFINED_OP1()
 		if return_value != nil {
 			return_value.SetNull()
@@ -693,7 +692,7 @@ func ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(executeData *ZendExecuteData) int {
 	var arg *types.Zval
 	var free_op1 ZendFreeOp
 	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if varptr.GetTypeInfo() == types.IS_UNDEF {
+	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
@@ -796,7 +795,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData)
 	}
 	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if varptr.GetTypeInfo() == types.IS_UNDEF {
+	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
@@ -819,7 +818,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData) int {
 		goto send_var_by_ref
 	}
 	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if varptr.GetTypeInfo() == types.IS_UNDEF {
+	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()

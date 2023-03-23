@@ -77,7 +77,7 @@ func ZEND_BW_NOT_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
 	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if op1.GetTypeInfo() == types.IS_LONG {
+	if op1.IsLong() {
 		EX_VAR(opline.GetResult().GetVar()).SetLong(^(op1.GetLval()))
 		ZEND_VM_NEXT_OPCODE()
 	}
@@ -93,7 +93,7 @@ func ZEND_BOOL_NOT_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 
@@ -139,10 +139,10 @@ func ZEND_JMPZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var val *types.Zval
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_NEXT_OPCODE()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -163,10 +163,10 @@ func ZEND_JMPNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var val *types.Zval
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -187,11 +187,11 @@ func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var val *types.Zval
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, opline.GetExtendedValue())
 		return 0
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -213,12 +213,12 @@ func ZEND_JMPZ_EX_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var ret int
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		ZEND_VM_NEXT_OPCODE()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
@@ -243,12 +243,12 @@ func ZEND_JMPNZ_EX_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var ret int
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
-		if val.GetTypeInfo() == types.IS_UNDEF {
+		if val.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
@@ -299,7 +299,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 
@@ -1038,7 +1038,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 			var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
 			if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 				retval = OBJ_PROP(zobj, prop_offset)
-				if retval.GetTypeInfo() != types.IS_UNDEF {
+				if !retval.IsUndef() {
 					{
 						goto fetch_obj_r_copy
 					}

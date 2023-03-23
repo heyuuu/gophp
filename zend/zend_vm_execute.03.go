@@ -237,7 +237,7 @@ func ZEND_BW_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	if op1.GetTypeInfo() == types.IS_LONG {
+	if op1.IsLong() {
 		EX_VAR(opline.GetResult().GetVar()).SetLong(^(op1.GetLval()))
 		ZEND_VM_NEXT_OPCODE()
 	}
@@ -251,7 +251,7 @@ func ZEND_BOOL_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 
@@ -292,7 +292,7 @@ func ZEND_JMPZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_NEXT_OPCODE()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		{
@@ -311,7 +311,7 @@ func ZEND_JMPNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		{
@@ -330,7 +330,7 @@ func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, opline.GetExtendedValue())
 		return 0
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
@@ -351,7 +351,7 @@ func ZEND_JMPZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var ret int
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		ZEND_VM_NEXT_OPCODE()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
@@ -376,7 +376,7 @@ func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	var ret int
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
@@ -620,7 +620,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if val.GetTypeInfo() == types.IS_TRUE {
+	if val.IsTrue() {
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 

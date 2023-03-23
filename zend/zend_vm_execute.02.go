@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
@@ -291,10 +290,10 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)

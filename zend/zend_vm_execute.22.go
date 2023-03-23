@@ -471,7 +471,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 			var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
 			if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 				retval = OBJ_PROP(zobj, prop_offset)
-				if retval.GetTypeInfo() != types.IS_UNDEF {
+				if !retval.IsUndef() {
 
 					{
 					fetch_obj_r_fast_copy:

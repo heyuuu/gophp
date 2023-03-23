@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func LOAD_NEXT_OPLINE() int            { return ZEND_VM_INC_OPCODE() }
@@ -23,10 +22,10 @@ func ZEND_VM_DISPATCH(opcode types.ZendUchar, opline *ZendOp) int {
 }
 func zend_add_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	AddFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -40,10 +39,10 @@ func zend_add_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 }
 func zend_sub_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	SubFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -57,10 +56,10 @@ func zend_sub_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 }
 func zend_mul_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	MulFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -80,10 +79,10 @@ func zend_mod_by_zero_helper_SPEC(executeData *ZendExecuteData) int {
 }
 func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	ModFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -97,10 +96,10 @@ func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 }
 func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	ShiftLeftFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -114,10 +113,10 @@ func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 }
 func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	ShiftRightFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -131,10 +130,10 @@ func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDat
 }
 func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -159,10 +158,10 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 }
 func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -187,10 +186,10 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 }
 func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -215,10 +214,10 @@ func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 }
 func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -243,10 +242,10 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 }
 func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	BitwiseOrFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -260,10 +259,10 @@ func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zen
 }
 func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	BitwiseAndFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
@@ -277,10 +276,10 @@ func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 }
 func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if op_1.GetTypeInfo() == types.IS_UNDEF {
+	if op_1.IsUndef() {
 		op_1 = ZVAL_UNDEFINED_OP1()
 	}
-	if op_2.GetTypeInfo() == types.IS_UNDEF {
+	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
 	BitwiseXorFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
