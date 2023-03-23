@@ -611,7 +611,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	zend.ALLOC_HASHTABLE(uploaded_files)
 	uploaded_files = types.MakeArrayEx(8, FreeFilename, 0)
 	SG__().rfc1867_uploaded_files = uploaded_files
-	if PG__().http_globals[TRACK_VARS_FILES].u1.v.type_ != types.IS_ARRAY {
+	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IS_ARRAY {
 
 		/* php_auto_globals_create_files() might have already done that */
 

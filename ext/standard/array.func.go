@@ -5061,7 +5061,7 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 				} else {
 					types.ZendHashDel(return_value.GetArr(), p.GetKey().GetStr())
 				}
-				if b.PreInc(&ptrs[0]).val.u1.v.type_ == types.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.IsUndef() {
 					goto out
 				}
 				if behavior == INTERSECT_NORMAL {
@@ -5086,7 +5086,7 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 			/* ptrs[0] is present in all the arguments */
 
 			for {
-				if b.PreInc(&ptrs[0]).val.u1.v.type_ == types.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.IsUndef() {
 					goto out
 				}
 				if behavior == INTERSECT_NORMAL {
@@ -5464,7 +5464,7 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 				} else {
 					types.ZendHashDel(return_value.GetArr(), p.GetKey().GetStr())
 				}
-				if b.PreInc(&ptrs[0]).val.u1.v.type_ == types.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.IsUndef() {
 					goto out
 				}
 				if behavior == DIFF_NORMAL {
@@ -5489,7 +5489,7 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 			/* ptrs[0] in none of the other arguments */
 
 			for {
-				if b.PreInc(&ptrs[0]).val.u1.v.type_ == types.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.IsUndef() {
 					goto out
 				}
 				if behavior == DIFF_NORMAL {

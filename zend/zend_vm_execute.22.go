@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -277,7 +276,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		}
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetParent().name)
 	case ZEND_FETCH_CLASS_STATIC:
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+		if executeData.GetThis().IsObject() {
 			called_scope = types.Z_OBJCE(executeData.GetThis())
 		} else {
 			called_scope = executeData.GetThis().GetCe()

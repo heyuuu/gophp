@@ -551,7 +551,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 	if agent_name == nil {
 		var http_user_agent *types.Zval = nil
-		if core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
+		if core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
 			http_user_agent = core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr().KeyFind("HTTP_USER_AGENT")
 		}
 		if http_user_agent == nil {

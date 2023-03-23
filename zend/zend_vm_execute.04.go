@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_TYPE_CHECK_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -732,7 +731,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {

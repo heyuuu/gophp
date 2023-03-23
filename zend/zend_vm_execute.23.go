@@ -168,7 +168,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
@@ -184,7 +184,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+			if executeData.GetThis().IsObject() {
 				ce = types.Z_OBJCE(executeData.GetThis())
 			} else {
 				ce = executeData.GetThis().GetCe()

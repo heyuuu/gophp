@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_VERIFY_RETURN_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -183,7 +182,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		b.Assert(func_.GetType() == ZEND_USER_FUNCTION)
 		CACHE_PTR(opline.GetExtendedValue(), func_)
 	}
-	if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+	if executeData.GetThis().IsObject() {
 		called_scope = types.Z_OBJCE(executeData.GetThis())
 		if func_.IsStatic() || (executeData.GetFunc().common.fn_flags&ZEND_ACC_STATIC) != 0 {
 			object = nil
@@ -908,7 +907,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {

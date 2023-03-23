@@ -240,7 +240,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 			 * more specific cookies with the less specific ones.
 			 */
 
-			if PG__().http_globals[TRACK_VARS_COOKIE].u1.v.type_ != types.IS_UNDEF && symtable1 == PG__().http_globals[TRACK_VARS_COOKIE].GetArr() && symtable1.SymtableExists(b.CastStr(index, index_len)) {
+			if PG__().http_globals[TRACK_VARS_COOKIE].GetType() != types.IS_UNDEF && symtable1 == PG__().http_globals[TRACK_VARS_COOKIE].GetArr() && symtable1.SymtableExists(b.CastStr(index, index_len)) {
 				zend.ZvalPtrDtorNogc(val)
 			} else if types.HandleNumericStr(b.CastStr(index, index_len), &idx) {
 				symtable1.IndexUpdateH(idx, val)
@@ -697,7 +697,7 @@ func PhpAutoGlobalsCreateCookie(name *types.String) types.ZendBool {
 	return 0
 }
 func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
-	if PG__().http_globals[TRACK_VARS_FILES].u1.v.type_ == types.IS_UNDEF {
+	if PG__().http_globals[TRACK_VARS_FILES].IsUndef() {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_FILES])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_FILES])

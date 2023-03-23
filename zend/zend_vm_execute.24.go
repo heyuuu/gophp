@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -76,7 +75,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
@@ -92,7 +91,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+			if executeData.GetThis().IsObject() {
 				ce = types.Z_OBJCE(executeData.GetThis())
 			} else {
 				ce = executeData.GetThis().GetCe()
@@ -358,7 +357,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 			faults.ThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
+		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
@@ -368,7 +367,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 		}
 	}
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
@@ -384,7 +383,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendEx
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		if (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_PARENT || (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF {
-			if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+			if executeData.GetThis().IsObject() {
 				ce = types.Z_OBJCE(executeData.GetThis())
 			} else {
 				ce = executeData.GetThis().GetCe()
@@ -549,7 +548,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FETCH_THIS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+	if executeData.GetThis().IsObject() {
 		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
 		result.SetObject(executeData.GetThis().GetObj())
 		result.AddRefcount()
@@ -560,7 +559,7 @@ func ZEND_FETCH_THIS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) in
 }
 func ZEND_ISSET_ISEMPTY_THIS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), (opline.GetExtendedValue()&ZEND_ISEMPTY^executeData.GetThis().u1.v.type_ == types.IS_OBJECT) != 0)
+	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), (opline.GetExtendedValue()&ZEND_ISEMPTY^executeData.GetThis().IsObject()) != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_GET_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -579,7 +578,7 @@ func ZEND_GET_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int
 }
 func ZEND_GET_CALLED_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	if executeData.GetThis().u1.v.type_ == types.IS_OBJECT {
+	if executeData.GetThis().IsObject() {
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(types.Z_OBJCE(executeData.GetThis()).GetName())
 	} else if executeData.GetThis().GetCe() != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(types.Z_CE(executeData.GetThis()).GetName())

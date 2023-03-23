@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -380,7 +379,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 	}
 
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {
@@ -1019,7 +1018,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 			faults.ThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
+		if executeData.GetThis().IsObject() && types.Z_OBJ(executeData.GetThis()).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			faults.ThrowError(nil, "Cannot call private %s::__construct()", ce.GetName().GetVal())
 			HANDLE_EXCEPTION()
 		}
@@ -1029,7 +1028,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		}
 	}
 	if !fbc.IsStatic() {
-		if executeData.GetThis().u1.v.type_ == types.IS_OBJECT && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
+		if executeData.GetThis().IsObject() && InstanceofFunction(types.Z_OBJCE(executeData.GetThis()), ce) != 0 {
 			ce = (*types.ClassEntry)(executeData.GetThis().GetObj())
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 		} else {

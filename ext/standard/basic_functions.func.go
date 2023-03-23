@@ -651,7 +651,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].u1.v.type_ == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV.GetStr())) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr())) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV.GetStr())) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr())) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -2160,7 +2160,7 @@ func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.
 		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), &(BG__().active_ini_file_section))
 	} else if arg2 != nil {
 		var active_arr *types.Zval
-		if BG__().active_ini_file_section.u1.v.type_ != types.IS_UNDEF {
+		if BG__().active_ini_file_section.GetType() != types.IS_UNDEF {
 			active_arr = &(BG__().active_ini_file_section)
 		} else {
 			active_arr = arr
