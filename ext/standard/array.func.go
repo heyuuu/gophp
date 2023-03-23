@@ -2565,7 +2565,7 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if val.IsRefcounted() {
 				val.GetCounted().AddRefcountEx(uint32(num))
 			}
-			return_value.GetArr().IndexAddNewH(start_key, val)
+			return_value.GetArr().IndexAddNew(start_key, val)
 			for b.PreDec(&num) {
 				return_value.GetArr().NextIndexInsertNew(val)
 				start_key++
@@ -2608,7 +2608,7 @@ func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *types.Zva
 		entry = types.ZVAL_DEREF(entry)
 		val.TryAddRefcount()
 		if entry.IsType(types.IS_LONG) {
-			return_value.GetArr().IndexUpdateH(entry.GetLval(), val)
+			return_value.GetArr().IndexUpdate(entry.GetLval(), val)
 		} else {
 			var tmp_key *types.String
 			var key *types.String = zend.ZvalGetTmpString(entry, &tmp_key)
@@ -3548,7 +3548,7 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			entry = return_value.GetArr().KeyAddNew(string_key.GetStr(), entry)
 		} else {
 			if preserve_keys != 0 {
-				entry = return_value.GetArr().IndexAddNewH(num_key, entry)
+				entry = return_value.GetArr().IndexAddNew(num_key, entry)
 			} else {
 				entry = return_value.GetArr().NextIndexInsertNew(entry)
 			}
@@ -3690,7 +3690,7 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) int {
 			}
 		} else {
 			if src_zval.GetType() != types.IS_ARRAY || b.Assign(&dest_entry, dest.IndexFind(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY && (!(dest_entry.IsReference()) || types.Z_REFVAL_P(dest_entry).GetType() != types.IS_ARRAY) {
-				var zv *types.Zval = dest.IndexUpdateH(num_key, src_entry)
+				var zv *types.Zval = dest.IndexUpdate(num_key, src_entry)
 				zend.ZvalAddRef(zv)
 				continue
 			}
@@ -4146,7 +4146,7 @@ func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *types.
 			if b.Assign(&tmp, return_value.GetArr().IndexFind(entry.GetLval())) == nil {
 				var data types.Zval
 				data.SetLong(1)
-				return_value.GetArr().IndexUpdateH(entry.GetLval(), &data)
+				return_value.GetArr().IndexUpdate(entry.GetLval(), &data)
 			} else {
 				tmp.GetLval()++
 			}
@@ -4290,7 +4290,7 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 					case types.IS_STRING:
 						return_value.GetArr().SymtableUpdate(keyval.GetStr().GetStr(), colval)
 					case types.IS_LONG:
-						return_value.GetArr().IndexUpdateH(keyval.GetLval(), colval)
+						return_value.GetArr().IndexUpdate(keyval.GetLval(), colval)
 					case types.IS_OBJECT:
 						var tmp_key *types.String
 						var key *types.String = zend.ZvalGetTmpString(keyval, &tmp_key)
@@ -4299,13 +4299,13 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *types.Zval)
 					case types.IS_NULL:
 						return_value.GetArr().KeyUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), colval)
 					case types.IS_DOUBLE:
-						return_value.GetArr().IndexUpdateH(zend.ZendDvalToLval(keyval.GetDval()), colval)
+						return_value.GetArr().IndexUpdate(zend.ZendDvalToLval(keyval.GetDval()), colval)
 					case types.IS_TRUE:
-						return_value.GetArr().IndexUpdateH(1, colval)
+						return_value.GetArr().IndexUpdate(1, colval)
 					case types.IS_FALSE:
-						return_value.GetArr().IndexUpdateH(0, colval)
+						return_value.GetArr().IndexUpdate(0, colval)
 					case types.IS_RESOURCE:
-						return_value.GetArr().IndexUpdateH(types.Z_RES_HANDLE_P(keyval), colval)
+						return_value.GetArr().IndexUpdate(types.Z_RES_HANDLE_P(keyval), colval)
 					default:
 						return_value.GetArr().NextIndexInsert(colval)
 					}
@@ -4375,7 +4375,7 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *types.Zval
 				entry = return_value.GetArr().KeyAddNew(string_key.GetStr(), entry)
 			} else {
 				if preserve_keys != 0 {
-					entry = return_value.GetArr().IndexAddNewH(num_key, entry)
+					entry = return_value.GetArr().IndexAddNew(num_key, entry)
 				} else {
 					entry = return_value.GetArr().NextIndexInsertNew(entry)
 				}
@@ -4521,7 +4521,7 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			} else {
 				data.SetLong(num_idx)
 			}
-			return_value.GetArr().IndexUpdateH(entry.GetLval(), &data)
+			return_value.GetArr().IndexUpdate(entry.GetLval(), &data)
 		} else if entry.IsType(types.IS_STRING) {
 			if str_idx != nil {
 				data.SetStringCopy(str_idx)
@@ -4563,7 +4563,7 @@ func ZifArrayChangeKeyCase(executeData *zend.ZendExecuteData, return_value *type
 		string_key = _p.GetKey()
 		entry = _z
 		if string_key == nil {
-			entry = return_value.GetArr().IndexUpdateH(num_key, entry)
+			entry = return_value.GetArr().IndexUpdate(num_key, entry)
 		} else {
 			if change_to_upper != 0 {
 				new_key = PhpStringToupper(string_key)
@@ -4650,7 +4650,7 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *types.Zval)
 				if str_key != nil {
 					return_value.GetArr().KeyAddNew(str_key.GetStr(), val)
 				} else {
-					return_value.GetArr().IndexAddNewH(num_key, val)
+					return_value.GetArr().IndexAddNew(num_key, val)
 				}
 			}
 		}
@@ -4800,7 +4800,7 @@ func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *types
 			}
 			if ok != 0 {
 				val.TryAddRefcount()
-				return_value.GetArr().IndexUpdateH(p.GetH(), val)
+				return_value.GetArr().IndexUpdate(p.GetH(), val)
 			}
 		} else {
 			ok = 1
@@ -5195,7 +5195,7 @@ func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 			}
 			if ok != 0 {
 				val.TryAddRefcount()
-				return_value.GetArr().IndexUpdateH(p.GetH(), val)
+				return_value.GetArr().IndexUpdate(p.GetH(), val)
 			}
 		} else {
 			ok = 1
@@ -5677,11 +5677,11 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		key = _p.GetKey()
 		value = _z
 		str = zend.ZvalGetTmpString(value, &tmp_str)
-		if !&exclude.KeyExistsstr.GetStr()) {
+		if !&exclude.KeyExists(str.GetStr()) {
 			if key != nil {
 				value = return_value.GetArr().KeyAddNew(key.GetStr(), value)
 			} else {
-				value = return_value.GetArr().IndexAddNewH(idx, value)
+				value = return_value.GetArr().IndexAddNew(idx, value)
 			}
 			zend.ZvalAddRef(value)
 		}
@@ -6333,7 +6333,7 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		if string_key != nil {
 			operand = return_value.GetArr().KeyUpdate(string_key.GetStr(), operand)
 		} else {
-			operand = return_value.GetArr().IndexUpdateH(num_key, operand)
+			operand = return_value.GetArr().IndexUpdate(num_key, operand)
 		}
 		zend.ZvalAddRef(operand)
 	}
@@ -6412,7 +6412,7 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if str_key != nil {
 				zend._zendHashAppend(return_value.GetArr(), str_key, &result)
 			} else {
-				return_value.GetArr().IndexAddNewH(num_key, &result)
+				return_value.GetArr().IndexAddNew(num_key, &result)
 			}
 		}
 		zend.ZendReleaseFcallInfoCache(&fci_cache)
@@ -6540,7 +6540,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zv
 	case types.IS_STRING:
 		types.ZVAL_BOOL(return_value, ht.SymtableExistsInd(key.GetStr().GetStr()))
 	case types.IS_LONG:
-		types.ZVAL_BOOL(return_value, ht.IndexExistskey.GetLval()))
+		types.ZVAL_BOOL(return_value, ht.IndexExists(key.GetLval()))
 	case types.IS_NULL:
 		types.ZVAL_BOOL(return_value, ht.KeyExistsInd(types.ZSTR_EMPTY_ALLOC().GetStr()))
 	default:
@@ -6612,7 +6612,7 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 			if str_key != nil {
 				entry = chunk.GetArr().KeyUpdate(str_key.GetStr(), entry)
 			} else {
-				entry = chunk.GetArr().IndexUpdateH(num_key, entry)
+				entry = chunk.GetArr().IndexUpdate(num_key, entry)
 			}
 		} else {
 			entry = chunk.GetArr().NextIndexInsert(entry)
@@ -6683,7 +6683,7 @@ func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *types.Zval
 			} else if values.GetArData()[pos_values].GetVal().IsNotUndef() {
 				entry_values = values.GetArData()[pos_values].GetVal()
 				if entry_keys.IsType(types.IS_LONG) {
-					entry_values = return_value.GetArr().IndexUpdateH(entry_keys.GetLval(), entry_values)
+					entry_values = return_value.GetArr().IndexUpdate(entry_keys.GetLval(), entry_values)
 				} else {
 					var tmp_key *types.String
 					var key *types.String = zend.ZvalGetTmpString(entry_keys, &tmp_key)

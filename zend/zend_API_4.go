@@ -97,7 +97,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 			if object.GetProperties() == nil {
 				RebuildObjectProperties(object)
 			}
-			prop = object.GetProperties().IndexUpdateH(h, prop)
+			prop = object.GetProperties().IndexUpdate(h, prop)
 			ZvalAddRef(prop)
 		}
 	}
@@ -184,40 +184,40 @@ func AddAssocZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 func AddIndexLong(arg *types.Zval, index ZendUlong, n ZendLong) int {
 	var tmp types.Zval
 	tmp.SetLong(n)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	arg.GetArr().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexBool(arg *types.Zval, index ZendUlong, b int) int {
 	var tmp types.Zval
 	tmp.SetBool(b != 0)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	arg.GetArr().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexResource(arg *types.Zval, index ZendUlong, r *types.ZendResource) int {
 	var tmp types.Zval
 	tmp.SetResource(r)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	arg.GetArr().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexDouble(arg *types.Zval, index ZendUlong, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	arg.GetArr().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexStr(arg *types.Zval, index ZendUlong, str *types.String) int {
 	zv := types.NewZvalString(str.GetStr())
-	arg.GetArr().IndexUpdateH(index, zv)
+	arg.GetArr().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddIndexString(arg *types.Zval, index ZendUlong, str *byte) int {
 	zv := types.NewZvalString(b.CastStrAuto(str))
-	arg.GetArr().IndexUpdateH(index, zv)
+	arg.GetArr().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddIndexStringl(arg *types.Zval, index ZendUlong, str *byte, length int) int {
 	zv := types.NewZvalString(b.CastStr(str, length))
-	arg.GetArr().IndexUpdateH(index, zv)
+	arg.GetArr().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddNextIndexLong(arg *types.Zval, n ZendLong) int {
@@ -302,10 +302,10 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.IndexUpdate(types.Z_RES_HANDLE_P(key), value)
 		break
 	case types.IS_FALSE:
-		result = ht.IndexUpdateH(0, value)
+		result = ht.IndexUpdate(0, value)
 		break
 	case types.IS_TRUE:
-		result = ht.IndexUpdateH(1, value)
+		result = ht.IndexUpdate(1, value)
 		break
 	case types.IS_LONG:
 		result = ht.IndexUpdate(key.GetLval(), value)

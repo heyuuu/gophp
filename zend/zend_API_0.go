@@ -51,7 +51,7 @@ func AddAssocZval(arg *types.Zval, key string, __value *types.Zval) int {
 	return AddAssocZvalEx(arg, key, __value)
 }
 func AddIndexZval(arg *types.Zval, index ZendUlong, value *types.Zval) int {
-	if arg.GetArr().IndexUpdateH(index, value) != nil {
+	if arg.GetArr().IndexUpdate(index, value) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE

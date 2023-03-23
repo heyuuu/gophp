@@ -235,9 +235,9 @@ func SplObjectStorageContains(intern *spl_SplObjectStorage, this *types.Zval, ob
 		return 0
 	}
 	if key.IsStrKey() {
-		found = types.IntBool(intern.GetStorage().KeyExistskey.KeyKey()))
+		found = types.IntBool(intern.GetStorage().KeyExists(key.KeyKey()))
 	} else {
-		found = types.IntBool(intern.GetStorage().IndexExistskey.IndexKey()))
+		found = types.IntBool(intern.GetStorage().IndexExists(key.IndexKey()))
 	}
 	return found
 }

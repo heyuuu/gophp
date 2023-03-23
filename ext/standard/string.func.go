@@ -620,7 +620,7 @@ func ZifExplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if str.GetLen() == 0 {
 		if limit >= 0 {
 			zend.ZVAL_EMPTY_STRING(&tmp)
-			return_value.GetArr().IndexAddNewH(0, &tmp)
+			return_value.GetArr().IndexAddNew(0, &tmp)
 		}
 		return
 	}
@@ -630,7 +630,7 @@ func ZifExplode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		PhpExplodeNegativeLimit(delim, str, return_value, limit)
 	} else {
 		tmp.SetStringCopy(str)
-		return_value.GetArr().IndexAddNewH(0, &tmp)
+		return_value.GetArr().IndexAddNew(0, &tmp)
 	}
 }
 func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval) {
@@ -3624,7 +3624,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 			if string_key != nil {
 				return_value.GetArr().KeyAddNew(string_key.GetStr(), &result)
 			} else {
-				return_value.GetArr().IndexAddNewH(num_key, &result)
+				return_value.GetArr().IndexAddNew(num_key, &result)
 			}
 
 			/* Add to return array */

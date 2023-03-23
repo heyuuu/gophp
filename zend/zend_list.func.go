@@ -19,7 +19,7 @@ func ZendListInsert(ptr any, type_ int) *types.Zval {
 		faults.ErrorNoreturn(faults.E_ERROR, "Resource ID space overflow")
 	}
 	zv.SetNewResource(index, ptr, type_)
-	return EG__().GetRegularList().IndexAddNewH(index, &zv)
+	return EG__().GetRegularList().IndexAddNew(index, &zv)
 }
 func ZendListDelete(res *types.ZendResource) int {
 	if res.DelRefcount() <= 0 {

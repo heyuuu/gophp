@@ -279,7 +279,7 @@ try_again:
 			case zend.BP_VAR_W:
 				var value types.Zval
 				value.SetUndef()
-				retval = ht.IndexUpdateH(index, &value)
+				retval = ht.IndexUpdate(index, &value)
 			}
 		}
 		return retval
@@ -383,7 +383,7 @@ try_again:
 		index = offset.GetLval()
 	num_index:
 		ht = SplArrayGetHashTable(intern)
-		ht.IndexUpdateH(index, value)
+		ht.IndexUpdate(index, value)
 		return
 	case types.IS_NULL:
 		ht = SplArrayGetHashTable(intern)

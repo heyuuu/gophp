@@ -788,7 +788,7 @@ func _tryConvertToString(op *types.Zval) types.ZendBool {
 }
 func ConvertScalarToArray(op *types.Zval) {
 	var ht *types.Array = types.NewArray(1)
-	ht.IndexAddNewH(0, op)
+	ht.IndexAddNew(0, op)
 	op.SetArray(ht)
 }
 func ConvertToArray(op *types.Zval) {

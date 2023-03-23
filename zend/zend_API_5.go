@@ -148,40 +148,40 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 				name_len = strlen(dep.GetName())
 				lcname = types.ZendStringAlloc(name_len, 0)
 				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if &ModuleRegistry.KeyExistslcname.GetStr()) || ZendGetExtension(dep.GetName()) != nil {
-types.ZendStringEfree(lcname)
+				if &ModuleRegistry.KeyExists(lcname.GetStr()) || ZendGetExtension(dep.GetName()) != nil {
+					types.ZendStringEfree(lcname)
 
-/* TODO: Check version relationship */
+					/* TODO: Check version relationship */
 
-faults.Error(faults.E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
-return nil
-}
-types.ZendStringEfree(lcname)
-}
-dep++
-}
-}
-name_len = strlen(module.GetName())
-lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
-ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
-lcname = types.ZendNewInternedString(lcname)
-if b.Assign(&module_ptr, types.ZendHashAddMem(&ModuleRegistry, lcname.GetStr(), module, b.SizeOf("zend_module_entry"))) == nil {
-faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
-types.ZendStringRelease(lcname)
-return nil
-}
-module = module_ptr
-EG__().SetCurrentModule(module)
-if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
-types.ZendHashDel(&ModuleRegistry, lcname.GetStr())
-types.ZendStringRelease(lcname)
-EG__().SetCurrentModule(nil)
-faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
-return nil
-}
-EG__().SetCurrentModule(nil)
-types.ZendStringRelease(lcname)
-return module
+					faults.Error(faults.E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
+					return nil
+				}
+				types.ZendStringEfree(lcname)
+			}
+			dep++
+		}
+	}
+	name_len = strlen(module.GetName())
+	lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
+	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
+	lcname = types.ZendNewInternedString(lcname)
+	if b.Assign(&module_ptr, types.ZendHashAddMem(&ModuleRegistry, lcname.GetStr(), module, b.SizeOf("zend_module_entry"))) == nil {
+		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
+		types.ZendStringRelease(lcname)
+		return nil
+	}
+	module = module_ptr
+	EG__().SetCurrentModule(module)
+	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
+		types.ZendHashDel(&ModuleRegistry, lcname.GetStr())
+		types.ZendStringRelease(lcname)
+		EG__().SetCurrentModule(nil)
+		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
+		return nil
+	}
+	EG__().SetCurrentModule(nil)
+	types.ZendStringRelease(lcname)
+	return module
 }
 func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
 	module.SetModuleNumber(ZendNextFreeModule())
@@ -500,7 +500,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 			fname_len = strlen(ptr.GetFname())
 			lowercase_name = types.ZendStringAlloc(fname_len, 0)
 			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
-			if target_function_table.KeyExistslowercase_name.GetStr()) {
+			if target_function_table.KeyExists(lowercase_name.GetStr()) {
 				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			types.ZendStringEfree(lowercase_name)

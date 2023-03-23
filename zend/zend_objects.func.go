@@ -228,7 +228,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 			if key != nil {
 				types._zendHashAppend(new_object.GetProperties(), key, &new_prop)
 			} else {
-				new_object.GetProperties().IndexAddNewH(num_key, &new_prop)
+				new_object.GetProperties().IndexAddNew(num_key, &new_prop)
 			}
 		}
 	}

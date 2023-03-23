@@ -261,7 +261,7 @@ try_again:
 			}
 			fallthrough
 		case BP_VAR_W:
-			retval = ht.IndexAddNewH(hval, EG__().GetUninitializedZval())
+			retval = ht.IndexAddNew(hval, EG__().GetUninitializedZval())
 		}
 	} else if dim.IsString() {
 		offset_key = dim.GetStr()

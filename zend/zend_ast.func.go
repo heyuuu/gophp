@@ -377,16 +377,16 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IS_NULL:
 		result.GetArr().SymtableUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), expr)
 	case types.IS_LONG:
-		result.GetArr().IndexUpdateH(offset.GetLval(), expr)
+		result.GetArr().IndexUpdate(offset.GetLval(), expr)
 	case types.IS_FALSE:
-		result.GetArr().IndexUpdateH(0, expr)
+		result.GetArr().IndexUpdate(0, expr)
 	case types.IS_TRUE:
-		result.GetArr().IndexUpdateH(1, expr)
+		result.GetArr().IndexUpdate(1, expr)
 	case types.IS_DOUBLE:
-		result.GetArr().IndexUpdateH(ZendDvalToLval(offset.GetDval()), expr)
+		result.GetArr().IndexUpdate(ZendDvalToLval(offset.GetDval()), expr)
 	case types.IS_RESOURCE:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(offset), types.Z_RES_HANDLE_P(offset))
-		result.GetArr().IndexUpdateH(types.Z_RES_HANDLE_P(offset), expr)
+		result.GetArr().IndexUpdate(types.Z_RES_HANDLE_P(offset), expr)
 	default:
 		faults.ThrowError(nil, "Illegal offset type")
 		return types.FAILURE

@@ -169,7 +169,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
 					result.SetArray(types.NewArray(1))
-					expr = result.GetArr().IndexAddNewH(0, expr)
+					expr = result.GetArr().IndexAddNew(0, expr)
 
 					{
 

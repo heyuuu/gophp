@@ -120,7 +120,7 @@ func ZendHashIndexAddNewPtr(ht *Array, index int, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ht.IndexAddNewH(index, &tmp)
+	zv = ht.IndexAddNew(index, &tmp)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -131,7 +131,7 @@ func ZendHashIndexUpdatePtr(ht *Array, index int, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ht.IndexUpdateH(index, &tmp)
+	zv = ht.IndexUpdate(index, &tmp)
 	return zv.GetPtr()
 }
 func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
@@ -924,7 +924,7 @@ convert:
 		/* Again, thank ArrayObject for `!str_key ||`. */
 
 		if str_key == nil || HandleNumericStr(str_key, &num_key) {
-			new_ht.IndexUpdateH(num_key, zv)
+			new_ht.IndexUpdate(num_key, zv)
 		} else {
 			new_ht.KeyUpdate(str_key.GetStr(), zv)
 		}

@@ -202,7 +202,7 @@ func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {
 	if entry.IsRefcounted() {
 		entry.GetCounted().AddRefcountEx(2)
 	}
-	return_value.GetArr().IndexAddNewH(1, entry)
+	return_value.GetArr().IndexAddNew(1, entry)
 	return_value.GetArr().KeyAddNew(types.ZSTR_VALUE.GetStr(), entry)
 
 	/* add the key elements */
@@ -213,7 +213,7 @@ func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else {
 		tmp.SetLong(num_key)
 	}
-	return_value.GetArr().IndexAddNewH(0, &tmp)
+	return_value.GetArr().IndexAddNew(0, &tmp)
 	return_value.GetArr().KeyAddNew(types.ZSTR_KEY.GetStr(), &tmp)
 	types.ZendHashMoveForward(target_hash)
 }
@@ -322,7 +322,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 		if key != nil {
 			new_val = dst.GetArr().KeyAddNew(key.GetStr(), val)
 		} else {
-			new_val = dst.GetArr().IndexAddNewH(idx, val)
+			new_val = dst.GetArr().IndexAddNew(idx, val)
 		}
 		if val.IsArray() {
 			if val.IsRefcounted() {
@@ -1291,7 +1291,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 			val = _z
 			if key == nil {
 				val.AddRefcount()
-				return_value.GetArr().IndexAddNewH(index, val)
+				return_value.GetArr().IndexAddNew(index, val)
 			}
 		}
 	} else if types.ZendStringEqualsLiteral(type_, "Unknown") {
@@ -1305,7 +1305,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 			val = _z
 			if key == nil && types.Z_RES_TYPE_P(val) <= 0 {
 				val.AddRefcount()
-				return_value.GetArr().IndexAddNewH(index, val)
+				return_value.GetArr().IndexAddNew(index, val)
 			}
 		}
 	} else {
@@ -1325,7 +1325,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 			val = _z
 			if key == nil && types.Z_RES_TYPE_P(val) == id {
 				val.AddRefcount()
-				return_value.GetArr().IndexAddNewH(index, val)
+				return_value.GetArr().IndexAddNew(index, val)
 			}
 		}
 	}
@@ -1914,7 +1914,7 @@ func ZifExtensionLoaded(executeData *ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 	lcname = ZendStringTolower(extension_name)
-	if &ModuleRegistry.KeyExistslcname.GetStr()) {
+	if &ModuleRegistry.KeyExists(lcname.GetStr()) {
 		return_value.SetTrue()
 	} else {
 		return_value.SetFalse()

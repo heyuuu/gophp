@@ -243,7 +243,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 			if PG__().http_globals[TRACK_VARS_COOKIE].IsNotUndef() && symtable1 == PG__().http_globals[TRACK_VARS_COOKIE].GetArr() && symtable1.SymtableExists(b.CastStr(index, index_len)) {
 				zend.ZvalPtrDtorNogc(val)
 			} else if types.HandleNumericStr(b.CastStr(index, index_len), &idx) {
-				symtable1.IndexUpdateH(idx, val)
+				symtable1.IndexUpdate(idx, val)
 			} else {
 				PhpRegisterVariableQuick(index, index_len, val, symtable1)
 			}
@@ -507,7 +507,7 @@ func ImportEnvironmentVariable(ht *types.Array, env *byte) {
 		val.SetString(types.NewString(b.CastStr(p, len_)))
 	}
 	if types.HandleNumericStr(b.CastStr(env, name_len), &idx) {
-		ht.IndexUpdateH(idx, &val)
+		ht.IndexUpdate(idx, &val)
 	} else {
 		PhpRegisterVariableQuick(env, name_len, &val, ht)
 	}
@@ -647,7 +647,7 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 					src_entry.TryDelRefcount()
 				}
 			} else {
-				dest.IndexUpdateH(num_key, src_entry)
+				dest.IndexUpdate(num_key, src_entry)
 			}
 		} else {
 			types.SEPARATE_ARRAY(dest_entry)
@@ -705,7 +705,7 @@ func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
 	return 0
 }
 func CheckHttpProxy(var_table *types.Array) {
-	if var_table.KeyExists"HTTP_PROXY") {
+	if var_table.KeyExists("HTTP_PROXY") {
 		var local_proxy *byte = getenv("HTTP_PROXY")
 		if local_proxy == nil {
 			types.ZendHashStrDel(var_table, "HTTP_PROXY")

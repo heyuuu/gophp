@@ -796,7 +796,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				}
 				args.GetArr().NextIndexInsert(&val)
 			} else {
-				return_value.GetArr().IndexUpdateH(optname_int, &val)
+				return_value.GetArr().IndexUpdate(optname_int, &val)
 			}
 		} else {
 
@@ -2042,7 +2042,7 @@ func ZifIsUploadedFile(executeData *zend.ZendExecuteData, return_value *types.Zv
 		}
 		break
 	}
-	if core.SG__().rfc1867_uploaded_files.KeyExistsb.CastStr(path, path_len)) {
+	if core.SG__().rfc1867_uploaded_files.KeyExists(b.CastStr(path, path_len)) {
 		return_value.SetTrue()
 		return
 	} else {
@@ -2074,7 +2074,7 @@ func ZifMoveUploadedFile(executeData *zend.ZendExecuteData, return_value *types.
 		}
 		break
 	}
-	if !core.SG__().rfc1867_uploaded_files.KeyExistsb.CastStr(path, path_len)) {
+	if !core.SG__().rfc1867_uploaded_files.KeyExists(b.CastStr(path, path_len)) {
 		return_value.SetFalse()
 		return
 	}
@@ -2132,7 +2132,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()))
 			if b.Assign(&find_hash, arr.GetArr().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = arr.GetArr().IndexAddNewH(key, &hash)
+				find_hash = arr.GetArr().IndexAddNew(key, &hash)
 			}
 		} else {
 			if b.Assign(&find_hash, arr.GetArr().KeyFind(arg1.GetStr().GetStr())) == nil {

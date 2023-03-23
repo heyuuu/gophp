@@ -90,10 +90,10 @@ func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 		var j zend.ZendLong = ht.Len()
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
-				ht.IndexUpdateH(i, intern.GetArray().GetElements()[i])
+				ht.IndexUpdate(i, intern.GetArray().GetElements()[i])
 				intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
-				ht.IndexUpdateH(i, zend.EG__().GetUninitializedZval())
+				ht.IndexUpdate(i, zend.EG__().GetUninitializedZval())
 			}
 		}
 		if j > intern.GetArray().GetSize() {
@@ -453,10 +453,10 @@ func zim_spl_SplFixedArray_toArray(executeData *zend.ZendExecuteData, return_val
 		zend.ArrayInit(return_value)
 		for ; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
-				return_value.GetArr().IndexUpdateH(i, intern.GetArray().GetElements()[i])
+				return_value.GetArr().IndexUpdate(i, intern.GetArray().GetElements()[i])
 				intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
-				return_value.GetArr().IndexUpdateH(i, zend.EG__().GetUninitializedZval())
+				return_value.GetArr().IndexUpdate(i, zend.EG__().GetUninitializedZval())
 			}
 		}
 	} else {

@@ -32,7 +32,6 @@ func (this ZendType) TypeName() string {
 	return b.CastStrAuto(b.CastPtr[byte](this))
 }
 
-
 /**
  * ZendObject
  */
