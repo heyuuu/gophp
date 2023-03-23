@@ -124,7 +124,7 @@ func UserWrapperOpener(
 	us = zend.Emalloc(b.SizeOf("* us"))
 	us.SetWrapper(uwrap)
 	UserStreamCreateObject(uwrap, context, us.GetObject())
-	if us.GetObject().IsType(types.IS_UNDEF) {
+	if us.GetObject().IsUndef() {
 		standard.FG(user_stream_current_filename) = nil
 		core.PG__().in_user_include = old_in_user_include
 		zend.Efree(us)
@@ -149,7 +149,7 @@ func UserWrapperOpener(
 		faults.Bailout()
 	}
 	zend.EG__().SetBailout(__orig_bailout)
-	if call_result == types.SUCCESS && zretval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&zretval) != 0 {
+	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) != 0 {
 
 		/* the stream is now open! */
 
@@ -214,7 +214,7 @@ func UserWrapperOpendir(
 	us = zend.Emalloc(b.SizeOf("* us"))
 	us.SetWrapper(uwrap)
 	UserStreamCreateObject(uwrap, context, us.GetObject())
-	if us.GetObject().IsType(types.IS_UNDEF) {
+	if us.GetObject().IsUndef() {
 		standard.FG(user_stream_current_filename) = nil
 		zend.Efree(us)
 		return nil
@@ -226,7 +226,7 @@ func UserWrapperOpendir(
 	args[1].SetLong(options)
 	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_DIR_OPEN))
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &zfuncname, &zretval, 2, args, 0)
-	if call_result == types.SUCCESS && zretval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&zretval) != 0 {
+	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) != 0 {
 
 		/* the stream is now open! */
 
@@ -369,7 +369,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	if zend.EG__().GetException() != nil {
 		return -1
 	}
-	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	if call_result == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsType(types.IS_FALSE) {
 			didwrite = -1
 		} else {
@@ -436,7 +436,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		stream.SetEof(1)
 		return -1
 	}
-	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&retval) != 0 {
+	if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) != 0 {
 		stream.SetEof(1)
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_EOF+" is not implemented! Assuming EOF", us.GetWrapper().GetClassname())
@@ -467,7 +467,7 @@ func PhpUserstreamopFlush(stream *core.PhpStream) int {
 	b.Assert(us != nil)
 	func_name.SetRawString(USERSTREAM_FLUSH)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
-	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&retval) != 0 {
+	if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) != 0 {
 		call_result = 0
 	} else {
 		call_result = -1
@@ -501,7 +501,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 
 		zend.ZvalPtrDtor(&retval)
 		return -1
-	} else if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF && zend.ZvalIsTrue(&retval) != 0 {
+	} else if call_result == types.SUCCESS && retval.IsNotUndef() && zend.ZvalIsTrue(&retval) != 0 {
 		ret = 0
 	} else {
 		ret = -1
@@ -673,7 +673,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 			if new_size >= 0 && new_size <= ptrdiff_t(zend.LONG_MAX) {
 				args[0].SetLong(zend.ZendLong(new_size))
 				call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
-				if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+				if call_result == types.SUCCESS && retval.IsNotUndef() {
 					if retval.IsType(types.IS_FALSE) || retval.IsType(types.IS_TRUE) {
 						if retval.IsType(types.IS_TRUE) {
 							ret = core.PHP_STREAM_OPTION_RETURN_OK
@@ -752,7 +752,7 @@ func UserWrapperUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 	/* create an instance of our class */
 
 	UserStreamCreateObject(uwrap, context, &object)
-	if object.IsType(types.IS_UNDEF) {
+	if object.IsUndef() {
 		return ret
 	}
 
@@ -787,7 +787,7 @@ func UserWrapperRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *b
 	/* create an instance of our class */
 
 	UserStreamCreateObject(uwrap, context, &object)
-	if object.IsType(types.IS_UNDEF) {
+	if object.IsUndef() {
 		return ret
 	}
 
@@ -824,7 +824,7 @@ func UserWrapperMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, optio
 	/* create an instance of our class */
 
 	UserStreamCreateObject(uwrap, context, &object)
-	if object.IsType(types.IS_UNDEF) {
+	if object.IsUndef() {
 		return ret
 	}
 
@@ -863,7 +863,7 @@ func UserWrapperRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, co
 	/* create an instance of our class */
 
 	UserStreamCreateObject(uwrap, context, &object)
-	if object.IsType(types.IS_UNDEF) {
+	if object.IsUndef() {
 		return ret
 	}
 
@@ -923,7 +923,7 @@ func UserWrapperMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int, 
 	/* create an instance of our class */
 
 	UserStreamCreateObject(uwrap, context, &object)
-	if object.IsType(types.IS_UNDEF) {
+	if object.IsUndef() {
 		zend.ZvalPtrDtor(&args[2])
 		return ret
 	}
@@ -962,7 +962,7 @@ func UserWrapperStatUrl(wrapper *core.PhpStreamWrapper, url *byte, flags int, ss
 	/* create an instance of our class */
 
 	UserStreamCreateObject(uwrap, context, &object)
-	if object.IsType(types.IS_UNDEF) {
+	if object.IsUndef() {
 		return ret
 	}
 

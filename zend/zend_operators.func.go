@@ -581,7 +581,7 @@ try_again:
 	case types.IS_DOUBLE:
 		op.SetLong(ZendDvalToLval(op.GetDval()))
 	case types.IS_STRING:
-		var str *types.String = types.Z_STR_P(op)
+		var str *types.String = op.GetStr()
 		if base == 10 {
 			op.SetLong(ZvalGetLong(op))
 		} else {
@@ -632,7 +632,7 @@ try_again:
 	case types.IS_DOUBLE:
 
 	case types.IS_STRING:
-		var str *types.String = types.Z_STR_P(op)
+		var str *types.String = op.GetStr()
 		op.SetDouble(ZendStrtod(str.GetVal(), nil))
 		types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
@@ -682,7 +682,7 @@ try_again:
 	case types.IS_DOUBLE:
 		types.ZVAL_BOOL(op, b.Cond(op.GetDval(), 1, 0))
 	case types.IS_STRING:
-		var str *types.String = types.Z_STR_P(op)
+		var str *types.String = op.GetStr()
 		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetVal()[0] == '0' {
 			op.SetFalse()
 		} else {

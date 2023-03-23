@@ -872,7 +872,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 			for b.PostDec(&an) && cp != nil && cp < end {
 				var retval types.Zval
 				cp = PhpParserr(cp, end, &answer, type_to_fetch, store_results, raw, &retval)
-				if retval.GetType() != types.IS_UNDEF && store_results != 0 {
+				if retval.IsNotUndef() && store_results != 0 {
 					zend.AddNextIndexZval(return_value, &retval)
 				}
 			}
@@ -885,7 +885,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 				for b.PostDec(&ns) > 0 && cp != nil && cp < end {
 					var retval types.Zval
 					cp = PhpParserr(cp, end, &answer, DNS_T_ANY, authns != nil, raw, &retval)
-					if retval.GetType() != types.IS_UNDEF {
+					if retval.IsNotUndef() {
 						zend.AddNextIndexZval(authns, &retval)
 					}
 				}
@@ -902,7 +902,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 				for b.PostDec(&ar) > 0 && cp != nil && cp < end {
 					var retval types.Zval
 					cp = PhpParserr(cp, end, &answer, DNS_T_ANY, 1, raw, &retval)
-					if retval.GetType() != types.IS_UNDEF {
+					if retval.IsNotUndef() {
 						zend.AddNextIndexZval(addtl, &retval)
 					}
 				}

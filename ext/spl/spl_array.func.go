@@ -212,7 +212,7 @@ try_again:
 		if retval != nil {
 			if retval.IsType(types.IS_INDIRECT) {
 				retval = retval.GetZv()
-				if retval.IsType(types.IS_UNDEF) {
+				if retval.IsUndef() {
 					switch type_ {
 					case zend.BP_VAR_R:
 						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
@@ -428,7 +428,7 @@ try_again:
 			if data != nil {
 				if data.IsType(types.IS_INDIRECT) {
 					data = data.GetZv()
-					if data.IsType(types.IS_UNDEF) {
+					if data.IsUndef() {
 						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
 					} else {
 						zend.ZvalPtrDtor(data)
@@ -1045,7 +1045,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 			key = _p.GetKey()
 			val = _z
 			if val.IsType(types.IS_INDIRECT) {
-				if types.Z_INDIRECT_P(val).IsType(types.IS_UNDEF) {
+				if types.Z_INDIRECT_P(val).IsUndef() {
 					continue
 				}
 				if key != nil && key.GetVal()[0] == '0' {
@@ -1064,7 +1064,7 @@ func SplArrayObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 	if intern.GetFptrCount() != nil {
 		var rv types.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
-		if rv.GetType() != types.IS_UNDEF {
+		if rv.IsNotUndef() {
 			*count = zend.ZvalGetLong(&rv)
 			zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
@@ -1160,7 +1160,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	}
 	if entry.IsType(types.IS_INDIRECT) {
 		entry = entry.GetZv()
-		if entry.IsType(types.IS_UNDEF) {
+		if entry.IsUndef() {
 			return
 		}
 	}
@@ -1458,10 +1458,10 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	if iterator_class_zv != nil && iterator_class_zv.IsType(types.IS_STRING) {
 		var ce *types.ClassEntry = zend.ZendLookupClass(iterator_class_zv.GetStr())
 		if ce == nil {
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", types.Z_STR_P(iterator_class_zv).GetVal())
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", iterator_class_zv.GetStr().GetVal())
 			return
 		} else if zend.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
-			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", types.Z_STR_P(iterator_class_zv).GetVal())
+			faults.ThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", iterator_class_zv.GetStr().GetVal())
 			return
 		} else {
 			intern.SetCeGetIterator(ce)

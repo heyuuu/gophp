@@ -607,7 +607,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			zend.ZvalPtrDtor(&ob_data)
 			var PHP_OUTPUT_USER_SUCCESS func(retval types.Zval) bool = func(retval types.Zval) bool {
-				return retval.GetType() != types.IS_UNDEF && retval.GetType() != types.IS_FALSE
+				return retval.IsNotUndef() && retval.GetType() != types.IS_FALSE
 			}
 			if types.SUCCESS == zend.ZendFcallInfoCall(handler.GetUser().GetFci(), handler.GetUser().GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
 

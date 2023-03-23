@@ -132,7 +132,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
@@ -222,7 +222,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
@@ -310,7 +310,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
@@ -397,7 +397,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)

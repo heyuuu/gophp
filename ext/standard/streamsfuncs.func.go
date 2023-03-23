@@ -864,7 +864,7 @@ func UserSpaceStreamNotifier(
 	zend.ZvalPtrDtor(&retval)
 }
 func UserSpaceStreamNotifierDtor(notifier *streams.PhpStreamNotifier) {
-	if notifier != nil && notifier.GetPtr().GetType() != types.IS_UNDEF {
+	if notifier != nil && notifier.GetPtr().IsNotUndef() {
 		zend.ZvalPtrDtor(notifier.GetPtr())
 		notifier.GetPtr().SetUndef()
 	}
@@ -1079,7 +1079,7 @@ func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *
 		return
 	}
 	zend.ArrayInit(return_value)
-	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().GetType() != types.IS_UNDEF && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
+	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().IsNotUndef() && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
 		context.GetNotifier().GetPtr().TryAddRefcount()
 		zend.AddAssocZvalEx(return_value, "notification", context.GetNotifier().GetPtr())
 	}

@@ -585,7 +585,7 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 			ZendExecute(op_array, retval)
 			faults.ExceptionRestore()
 			if EG__().GetException() != nil {
-				if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
+				if EG__().GetUserExceptionHandler().IsNotUndef() {
 					ZendUserExceptionHandler()
 				}
 				if EG__().GetException() != nil {

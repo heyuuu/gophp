@@ -148,7 +148,7 @@ func UserfilterFilter(
 	types.ZVAL_BOOL(&args[3], (flags&streams.PSFS_FLAG_FLUSH_CLOSE) != 0)
 	call_result = zend.CallUserFunctionEx(obj, &func_name, &retval, 4, args, 0)
 	zend.ZvalPtrDtor(&func_name)
-	if call_result == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	if call_result == types.SUCCESS && retval.IsNotUndef() {
 		zend.ConvertToLong(&retval)
 		ret = int(retval.GetLval())
 	} else if call_result == types.FAILURE {
@@ -282,7 +282,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	func_name.SetRawString("oncreate")
 	zend.CallUserFunction(&obj, &func_name, &retval, 0, nil)
-	if retval.GetType() != types.IS_UNDEF {
+	if retval.IsNotUndef() {
 		if retval.IsType(types.IS_FALSE) {
 
 			/* User reported filter creation error "return false;" */

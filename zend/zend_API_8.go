@@ -274,7 +274,7 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 		ZendFcallInfoArgs(fci, args)
 	}
 	result = ZendCallFunction(fci, fcc)
-	if retval_ptr == nil && retval.GetType() != types.IS_UNDEF {
+	if retval_ptr == nil && retval.IsNotUndef() {
 		ZvalPtrDtor(&retval)
 	}
 	if args != nil {

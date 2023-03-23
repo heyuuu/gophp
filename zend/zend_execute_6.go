@@ -123,7 +123,7 @@ func ZendFetchPropertyAddress(
 		var zobj *types.ZendObject = container.GetObj()
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			ptr = OBJ_PROP(zobj, prop_offset)
-			if ptr.GetType() != types.IS_UNDEF {
+			if ptr.IsNotUndef() {
 				result.SetIndirect(ptr)
 				if flags != 0 {
 					var prop_info *ZendPropertyInfo = CACHED_PTR_EX(cache_slot + 2)

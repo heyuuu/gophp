@@ -22,7 +22,7 @@ func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
 func PhpLeStreamContext() int { return LeStreamContext }
 func FileContextDtor(res *types.ZendResource) {
 	var context *core.PhpStreamContext = (*core.PhpStreamContext)(res.GetPtr())
-	if context.GetOptions().GetType() != types.IS_UNDEF {
+	if context.GetOptions().IsNotUndef() {
 		zend.ZvalPtrDtor(context.GetOptions())
 		context.GetOptions().SetUndef()
 	}

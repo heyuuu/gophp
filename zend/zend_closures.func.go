@@ -131,7 +131,7 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *types.Zval) {
 	fci.GetFunctionName().SetObject(closure.GetStd())
 	fci.SetRetval(&closure_result)
 	fci.SetNoSeparation(1)
-	if ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && closure_result.GetType() != types.IS_UNDEF {
+	if ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && closure_result.IsNotUndef() {
 		if closure_result.IsReference() {
 			ZendUnwrapReference(&closure_result)
 		}
@@ -363,7 +363,7 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 	} else if closure.GetOrigInternalHandler() == ZendClosureCallMagic {
 		types.ZendStringRelease(closure.GetFunc().GetFunctionName())
 	}
-	if closure.GetThisPtr().GetType() != types.IS_UNDEF {
+	if closure.GetThisPtr().IsNotUndef() {
 		ZvalPtrDtor(closure.GetThisPtr())
 	}
 }
@@ -385,7 +385,7 @@ func ZendClosureGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr 
 	var closure *ZendClosure = (*ZendClosure)(obj.GetObj())
 	*fptr_ptr = closure.GetFunc()
 	*ce_ptr = closure.GetCalledScope()
-	if closure.GetThisPtr().GetType() != types.IS_UNDEF {
+	if closure.GetThisPtr().IsNotUndef() {
 		*obj_ptr = closure.GetThisPtr().GetObj()
 	} else {
 		*obj_ptr = nil
@@ -416,7 +416,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 			}
 		}
 	}
-	if closure.GetThisPtr().GetType() != types.IS_UNDEF {
+	if closure.GetThisPtr().IsNotUndef() {
 		closure.GetThisPtr().AddRefcount()
 		debug_info.KeyUpdate(types.ZSTR_THIS.GetStr(), closure.GetThisPtr())
 	}
@@ -506,7 +506,7 @@ func ZendCreateClosure(res *types.Zval, func_ *ZendFunction, scope *types.ClassE
 	var closure *ZendClosure
 	ObjectInitEx(res, ZendCeClosure)
 	closure = (*ZendClosure)(res.GetObj())
-	if scope == nil && this_ptr != nil && this_ptr.GetType() != types.IS_UNDEF {
+	if scope == nil && this_ptr != nil && this_ptr.IsNotUndef() {
 
 		/* use dummy scope if we're binding an object without specifying a scope */
 

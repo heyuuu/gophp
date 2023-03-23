@@ -199,7 +199,7 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *types.Zval) {
 	var object *types.Zval = iter.GetIt().GetData()
 	var retval types.Zval
 	ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
-	if retval.GetType() != types.IS_UNDEF {
+	if retval.IsNotUndef() {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
 		if EG__().GetException() == nil {

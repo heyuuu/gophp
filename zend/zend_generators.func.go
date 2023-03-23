@@ -176,7 +176,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 
 	/* leave yield from mode to properly allow finally execution */
 
-	if generator.GetValues().GetType() != types.IS_UNDEF {
+	if generator.GetValues().IsNotUndef() {
 		ZvalPtrDtor(generator.GetValues())
 		generator.GetValues().SetUndef()
 	}
@@ -486,7 +486,7 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *types.Zval
 
 	/* if we don't stop an array/iterator yield from, the exception will only reach the generator after the values were all iterated over */
 
-	if generator.GetValues().GetType() != types.IS_UNDEF {
+	if generator.GetValues().IsNotUndef() {
 		ZvalPtrDtor(generator.GetValues())
 		generator.GetValues().SetUndef()
 	}
@@ -915,7 +915,7 @@ func zim_Generator_current(executeData *ZendExecuteData, return_value *types.Zva
 	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
-	if generator.GetExecuteData() != nil && root.GetValue().GetType() != types.IS_UNDEF {
+	if generator.GetExecuteData() != nil && root.GetValue().IsNotUndef() {
 		var value *types.Zval = root.GetValue()
 		types.ZVAL_COPY_DEREF(return_value, value)
 	}
@@ -929,7 +929,7 @@ func zim_Generator_key(executeData *ZendExecuteData, return_value *types.Zval) {
 	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
-	if generator.GetExecuteData() != nil && root.GetKey().GetType() != types.IS_UNDEF {
+	if generator.GetExecuteData() != nil && root.GetKey().IsNotUndef() {
 		var key *types.Zval = root.GetKey()
 		types.ZVAL_COPY_DEREF(return_value, key)
 	}
@@ -1064,7 +1064,7 @@ func ZendGeneratorIteratorGetKey(iterator *ZendObjectIterator, key *types.Zval) 
 	var root *ZendGenerator
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
-	if root.GetKey().GetType() != types.IS_UNDEF {
+	if root.GetKey().IsNotUndef() {
 		var zv *types.Zval = root.GetKey()
 		types.ZVAL_COPY_DEREF(key, zv)
 	} else {

@@ -397,7 +397,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 			stream.GetWrapper().GetWops().GetStreamCloser()(stream.GetWrapper(), stream)
 			stream.SetWrapper(nil)
 		}
-		if stream.GetWrapperdata().GetType() != types.IS_UNDEF {
+		if stream.GetWrapperdata().IsNotUndef() {
 			zend.ZvalPtrDtor(stream.GetWrapperdata())
 			stream.GetWrapperdata().SetUndef()
 		}
@@ -1938,7 +1938,7 @@ func PhpStreamNotificationNotify(
 	}
 }
 func PhpStreamContextFree(context *core.PhpStreamContext) {
-	if context.GetOptions().GetType() != types.IS_UNDEF {
+	if context.GetOptions().IsNotUndef() {
 		zend.ZvalPtrDtor(context.GetOptions())
 		context.GetOptions().SetUndef()
 	}

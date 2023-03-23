@@ -42,7 +42,7 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, ind
 		}
 		zend.ZEND_PUTS("]=>\n")
 	}
-	if zv.IsType(types.IS_UNDEF) {
+	if zv.IsUndef() {
 		b.Assert(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
 			return b.CondF(prop_info.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.String { return prop_info.GetType().Name() }).GetVal()
@@ -97,7 +97,7 @@ again:
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -223,7 +223,7 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, in
 		}
 		zend.ZEND_PUTS("]=>\n")
 	}
-	if prop_info != nil && zv.IsType(types.IS_UNDEF) {
+	if prop_info != nil && zv.IsUndef() {
 		b.Assert(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
 			return b.CondF(prop_info.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.String { return prop_info.GetType().Name() }).GetVal()
@@ -278,7 +278,7 @@ again:
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -493,7 +493,7 @@ again:
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -541,7 +541,7 @@ again:
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
 					_z = _z.GetZv()
-					if _z.IsType(types.IS_UNDEF) {
+					if _z.IsUndef() {
 						continue
 					}
 				}
@@ -714,7 +714,7 @@ func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *t
 	}
 	if val.IsType(types.IS_INDIRECT) {
 		val = val.GetZv()
-		if val.IsType(types.IS_UNDEF) {
+		if val.IsUndef() {
 			var info *zend.ZendPropertyInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
 			if info != nil {
 				return types.SUCCESS
@@ -744,7 +744,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsType(types.IS_INDIRECT) {
 			_z = _z.GetZv()
-			if _z.IsType(types.IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}
@@ -817,7 +817,7 @@ func PhpVarSerializeNestedData(
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -947,7 +947,7 @@ again:
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
 					_z = _z.GetZv()
-					if _z.IsType(types.IS_UNDEF) {
+					if _z.IsUndef() {
 						continue
 					}
 				}

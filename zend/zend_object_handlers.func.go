@@ -578,7 +578,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, type_ == BP_VAR_IS || zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
-		if retval.GetType() != types.IS_UNDEF {
+		if retval.IsNotUndef() {
 			goto exit
 		}
 		if retval.GetU2Extra() == types.IS_PROP_UNINIT {
@@ -596,7 +596,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-					if p.GetVal().GetType() != types.IS_UNDEF && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
+					if p.GetVal().IsNotUndef() && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
 						retval = p.GetVal()
 						goto exit
 					}
@@ -660,7 +660,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			*guard |= IN_GET
 			ZendStdCallGetter(zobj, name, rv)
 			*guard &= ^IN_GET
-			if rv.GetType() != types.IS_UNDEF {
+			if rv.IsNotUndef() {
 				retval = rv
 				if !(rv.IsReference()) && (type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET) {
 					if rv.GetType() != types.IS_OBJECT {
@@ -719,7 +719,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetSet() != nil, cache_slot, &prop_info)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		variable_ptr = OBJ_PROP(zobj, property_offset)
-		if variable_ptr.GetType() != types.IS_UNDEF {
+		if variable_ptr.IsNotUndef() {
 			value.TryAddRefcount()
 			if prop_info != nil {
 				types.ZVAL_COPY_VALUE(&tmp, value)
@@ -990,7 +990,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetUnset() != nil, cache_slot, &prop_info)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		var slot *types.Zval = OBJ_PROP(zobj, property_offset)
-		if slot.GetType() != types.IS_UNDEF {
+		if slot.IsNotUndef() {
 			if slot.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(slot.GetRef()) {
 				if prop_info != nil {
 					ZEND_REF_DEL_TYPE_SOURCE(slot.GetRef(), prop_info)
@@ -1428,8 +1428,8 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 			if info.IsStatic() {
 				continue
 			}
-			if p1.GetType() != types.IS_UNDEF {
-				if p2.GetType() != types.IS_UNDEF {
+			if p1.IsNotUndef() {
+				if p2.IsNotUndef() {
 					var result types.Zval
 					if CompareFunction(&result, p1, p2) == types.FAILURE {
 						o1.UnprotectRecursive()
@@ -1444,7 +1444,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 					return 1
 				}
 			} else {
-				if p2.GetType() != types.IS_UNDEF {
+				if p2.IsNotUndef() {
 					o1.UnprotectRecursive()
 					return 1
 				}
@@ -1478,7 +1478,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, 1, cache_slot, &prop_info)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		value = OBJ_PROP(zobj, property_offset)
-		if value.GetType() != types.IS_UNDEF {
+		if value.IsNotUndef() {
 			goto found
 		}
 		if value.GetU2Extra() == types.IS_PROP_UNINIT {
@@ -1494,7 +1494,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-					if p.GetVal().GetType() != types.IS_UNDEF && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
+					if p.GetVal().IsNotUndef() && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
 						value = p.GetVal()
 						goto found
 					}

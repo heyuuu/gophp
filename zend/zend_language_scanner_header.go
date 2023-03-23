@@ -153,10 +153,10 @@ func ZendCompile(type_ int) *ZendOpArray {
 	return op_array
 }
 func CompileFilename(type_ int, filename *types.Zval) int {
-	var file_handle zend_file_handle
+	var file_handle ZendFileHandle
 	var tmp types.Zval
 	var retval int
-	var opened_path *zend_string = nil
+	var opened_path *types.String = nil
 	if filename.IsString() {
 		types.ZVAL_STR(&tmp, zval_get_string(filename))
 		filename = &tmp
@@ -165,7 +165,7 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	retval = zend_compile_file(&file_handle, type_)
 	if retval != nil && file_handle.handle.stream.handle {
 		if !(file_handle.opened_path) {
-			opened_path = zend_string_copy(types.Z_STR_P(filename))
+			opened_path = filename.GetStr().Copy()
 			file_handle.opened_path = opened_path
 		}
 		zend_hash_add_empty_element(EG__().included_files, file_handle.opened_path)
@@ -188,8 +188,7 @@ func ZendPrepareStringForScanning(str *types.Zval, filename *byte) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = str.GetStr().GetLen()
-	types.Z_STR_P(str) = types.ZendStringExtend(types.Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
-	str.SetTypeString()
+	str.SetString(types.ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD, 0))
 	memset(str.GetStr().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
 	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
@@ -228,7 +227,7 @@ func CompileString(source_string *types.Zval, filename *byte) *ZendOpArray {
 }
 func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlighter_ini) int {
 	var original_lex_state ZendLexState
-	var file_handle zend_file_handle
+	var file_handle ZendFileHandle
 	zend_stream_init_filename(&file_handle, filename)
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(&file_handle) == types.FAILURE {

@@ -244,7 +244,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *types.String = types.Z_STR_P(arg1)
+		var pattern *types.String = arg1.GetStr()
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {

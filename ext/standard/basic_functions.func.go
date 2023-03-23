@@ -1167,7 +1167,7 @@ func ZifCallUserFunc(executeData *zend.ZendExecuteData, return_value *types.Zval
 		break
 	}
 	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
@@ -1193,7 +1193,7 @@ func ZifCallUserFuncArray(executeData *zend.ZendExecuteData, return_value *types
 	}
 	zend.ZendFcallInfoArgs(&fci, params)
 	fci.SetRetval(&retval)
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
@@ -1240,7 +1240,7 @@ func ZifForwardStaticCall(executeData *zend.ZendExecuteData, return_value *types
 	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
@@ -1271,7 +1271,7 @@ func ZifForwardStaticCallArray(executeData *zend.ZendExecuteData, return_value *
 	if called_scope != nil && fci_cache.GetCallingScope() != nil && zend.InstanceofFunction(called_scope, fci_cache.GetCallingScope()) != 0 {
 		fci_cache.SetCalledScope(called_scope)
 	}
-	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.GetType() != types.IS_UNDEF {
+	if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
 		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
@@ -2160,7 +2160,7 @@ func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.
 		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), &(BG__().active_ini_file_section))
 	} else if arg2 != nil {
 		var active_arr *types.Zval
-		if BG__().active_ini_file_section.GetType() != types.IS_UNDEF {
+		if BG__().active_ini_file_section.IsNotUndef() {
 			active_arr = &(BG__().active_ini_file_section)
 		} else {
 			active_arr = arr

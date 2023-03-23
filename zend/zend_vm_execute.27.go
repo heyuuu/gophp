@@ -605,7 +605,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-						if p.GetVal().GetType() != types.IS_UNDEF && (p.GetKey() == offset.GetStr() || p.GetH() == types.Z_STR_P(offset).GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), offset.GetStr()) != 0) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
 							retval = p.GetVal()
 							{
 								goto fetch_obj_r_copy
@@ -702,7 +702,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
 			if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 				retval = OBJ_PROP(zobj, prop_offset)
-				if retval.GetType() != types.IS_UNDEF {
+				if retval.IsNotUndef() {
 					{
 						goto fetch_obj_is_copy
 					}
@@ -713,7 +713,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-						if p.GetVal().GetType() != types.IS_UNDEF && (p.GetKey() == offset.GetStr() || p.GetH() == types.Z_STR_P(offset).GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), offset.GetStr()) != 0) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
 							retval = p.GetVal()
 							{
 								goto fetch_obj_is_copy
@@ -801,7 +801,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
@@ -887,7 +887,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)
@@ -971,7 +971,7 @@ assign_object:
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
-			if property_val.GetType() != types.IS_UNDEF {
+			if property_val.IsNotUndef() {
 				var prop_info *ZendPropertyInfo = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
 				if prop_info != nil {
 					value = ZendAssignToTypedProp(prop_info, property_val, value, executeData)

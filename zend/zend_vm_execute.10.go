@@ -1013,12 +1013,9 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-						if p.GetVal().GetType() != types.IS_UNDEF && (p.GetKey() == offset.GetStr() || p.GetH() == types.Z_STR_P(offset).GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), offset.GetStr()) != 0) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
 							retval = p.GetVal()
-							{
-								goto fetch_obj_r_copy
-							}
-
+							goto fetch_obj_r_copy
 						}
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))

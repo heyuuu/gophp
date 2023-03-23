@@ -223,11 +223,11 @@ func ShutdownExecutor() {
 
 		/* Also release error and exception handlers, which may hold objects. */
 
-		if EG__().GetUserErrorHandler().GetType() != types.IS_UNDEF {
+		if EG__().GetUserErrorHandler().IsNotUndef() {
 			ZvalPtrDtor(EG__().GetUserErrorHandler())
 			EG__().GetUserErrorHandler().SetUndef()
 		}
-		if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
+		if EG__().GetUserExceptionHandler().IsNotUndef() {
 			ZvalPtrDtor(EG__().GetUserExceptionHandler())
 			EG__().GetUserExceptionHandler().SetUndef()
 		}
@@ -911,7 +911,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			faults.Bailout()
 		}
 		EG__().SetBailout(__orig_bailout)
-		if local_retval.GetType() != types.IS_UNDEF {
+		if local_retval.IsNotUndef() {
 			if retval_ptr != nil {
 				types.ZVAL_COPY_VALUE(retval_ptr, &local_retval)
 			} else {

@@ -157,6 +157,7 @@ func (zv *Zval) SetTypeError()     { zv.typ, zv.typeFlags = IS_ERROR, 0 }
 
 func (zv *Zval) IsType(value ZendUchar) bool { return zv.typ == value }
 func (zv *Zval) IsUndef() bool               { return zv.typ == IS_UNDEF }
+func (zv *Zval) IsNotUndef() bool            { return zv.typ != IS_UNDEF }
 func (zv *Zval) IsNull() bool                { return zv.typ == IS_NULL }
 func (zv *Zval) IsFalse() bool               { return zv.typ == IS_FALSE }
 func (zv *Zval) IsTrue() bool                { return zv.typ == IS_TRUE }

@@ -987,7 +987,7 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 		var retval types.Zval
 		retval.SetUndef()
 		if types.SUCCESS == zend.ZendExecuteScripts(zend.ZEND_REQUIRE, &retval, 1, &zfd) {
-			if retval.GetType() != types.IS_UNDEF {
+			if retval.IsNotUndef() {
 				decline = retval.IsType(types.IS_FALSE)
 				zend.ZvalPtrDtor(&retval)
 			}

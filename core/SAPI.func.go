@@ -631,7 +631,7 @@ func SapiSendHeaders() int {
 		}
 		SG__().sapi_headers.send_default_content_type = 0
 	}
-	if SG__().callback_func.GetType() != types.IS_UNDEF {
+	if SG__().callback_func.IsNotUndef() {
 		var cb types.Zval
 		types.ZVAL_COPY_VALUE(&cb, &(SG__().callback_func))
 		SG__().callback_func.SetUndef()

@@ -384,7 +384,7 @@ func PhpStreamTempSetOption(stream *core.PhpStream, option int, value int, ptrpa
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
 	switch option {
 	case core.PHP_STREAM_OPTION_META_DATA_API:
-		if ts.GetMeta().GetType() != types.IS_UNDEF {
+		if ts.GetMeta().IsNotUndef() {
 			types.ZendHashCopy((*types.Zval)(ptrparam).GetArr(), ts.GetMeta().GetArr(), zend.ZvalAddRef)
 		}
 		return core.PHP_STREAM_OPTION_RETURN_OK

@@ -728,7 +728,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	if docref_buf != nil {
 		zend.Efree(docref_buf)
 	}
-	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsType(types.IS_UNDEF) || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
+	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp types.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {

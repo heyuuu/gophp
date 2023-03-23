@@ -660,7 +660,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -679,7 +679,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsType(types.IS_INDIRECT) {
 			_z = _z.GetZv()
-			if _z.IsType(types.IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}
@@ -1665,7 +1665,7 @@ func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		break
 	}
 	if needle.IsType(types.IS_STRING) {
-		found = zend.ZendMemrchr(haystack.GetVal(), (*types.Z_STRVAL_P)(needle), haystack.GetLen())
+		found = zend.ZendMemrchr(haystack.GetVal(), needle.GetStr().GetVal(), haystack.GetLen())
 	} else {
 		var needle_chr byte
 		if PhpNeedleChar(needle, &needle_chr) != types.SUCCESS {
@@ -1971,7 +1971,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 				repl_idx = 0
 				for repl_idx < types.Z_ARRVAL_P(repl).GetNNumUsed() {
 					tmp_repl = types.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
-					if tmp_repl.GetType() != types.IS_UNDEF {
+					if tmp_repl.IsNotUndef() {
 						break
 					}
 					repl_idx++
@@ -2012,7 +2012,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -2024,7 +2024,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			if from.IsType(types.IS_ARRAY) {
 				for from_idx < types.Z_ARRVAL_P(from).GetNNumUsed() {
 					tmp_from = types.Z_ARRVAL_P(from).GetArData()[from_idx].GetVal()
-					if tmp_from.GetType() != types.IS_UNDEF {
+					if tmp_from.IsNotUndef() {
 						break
 					}
 					from_idx++
@@ -2057,7 +2057,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			if argc > 3 && len_.IsType(types.IS_ARRAY) {
 				for len_idx < types.Z_ARRVAL_P(len_).GetNNumUsed() {
 					tmp_len = types.Z_ARRVAL_P(len_).GetArData()[len_idx].GetVal()
-					if tmp_len.GetType() != types.IS_UNDEF {
+					if tmp_len.IsNotUndef() {
 						break
 					}
 					len_idx++
@@ -2088,7 +2088,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 			if repl.IsType(types.IS_ARRAY) {
 				for repl_idx < types.Z_ARRVAL_P(repl).GetNNumUsed() {
 					tmp_repl = types.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
-					if tmp_repl.GetType() != types.IS_UNDEF {
+					if tmp_repl.IsNotUndef() {
 						break
 					}
 					repl_idx++
@@ -2468,7 +2468,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -2931,7 +2931,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
 					_z = _z.GetZv()
-					if _z.IsType(types.IS_UNDEF) {
+					if _z.IsUndef() {
 						continue
 					}
 				}
@@ -3438,7 +3438,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -3460,7 +3460,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 				var replace_entry *types.Zval = nil
 				for replace_idx < types.Z_ARRVAL_P(replace).GetNNumUsed() {
 					replace_entry = types.Z_ARRVAL_P(replace).GetArData()[replace_idx].GetVal()
-					if replace_entry.GetType() != types.IS_UNDEF {
+					if replace_entry.IsNotUndef() {
 						break
 					}
 					replace_idx++
@@ -3605,7 +3605,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
-				if _z.IsType(types.IS_UNDEF) {
+				if _z.IsUndef() {
 					continue
 				}
 			}
@@ -3983,7 +3983,7 @@ func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		if args[0].IsType(types.IS_ARRAY) {
 			for idx < types.Z_ARRVAL(args[0]).GetNNumUsed() {
 				plocale = types.Z_ARRVAL(args[0]).GetArData()[idx].GetVal()
-				if plocale.GetType() != types.IS_UNDEF {
+				if plocale.IsNotUndef() {
 					break
 				}
 				idx++

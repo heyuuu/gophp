@@ -28,11 +28,11 @@ func OnChangeCallback(
 	stage int,
 ) int {
 	if zend.CurrEX() != nil {
-		if ASSERTG(callback).GetType() != types.IS_UNDEF {
+		if ASSERTG(callback).IsNotUndef() {
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))
 			ASSERTG(callback).SetUndef()
 		}
-		if new_value != nil && (ASSERTG(callback).GetType() != types.IS_UNDEF || new_value.GetLen() != 0) {
+		if new_value != nil && (ASSERTG(callback).IsNotUndef() || new_value.GetLen() != 0) {
 			ASSERTG(callback).SetStringCopy(new_value)
 		}
 	} else {
@@ -77,7 +77,7 @@ func ZmShutdownAssert(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmDeactivateAssert(type_ int, module_number int) int {
-	if ASSERTG(callback).GetType() != types.IS_UNDEF {
+	if ASSERTG(callback).IsNotUndef() {
 		zend.ZvalPtrDtor(&(ASSERTG(callback)))
 		ASSERTG(callback).SetUndef()
 	}
@@ -152,7 +152,7 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if ASSERTG(callback).IsUndef() && ASSERTG(cb) {
 		(ASSERTG(callback)).SetRawString(b.CastStrAuto(ASSERTG(cb)))
 	}
-	if ASSERTG(callback).GetType() != types.IS_UNDEF {
+	if ASSERTG(callback).IsNotUndef() {
 		var args []types.Zval
 		var retval types.Zval
 		var lineno uint32 = zend.ZendGetExecutedLineno()
@@ -288,7 +288,7 @@ func ZifAssertOptions(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return_value.SetLong(oldint)
 		return
 	case ASSERT_CALLBACK:
-		if ASSERTG(callback).GetType() != types.IS_UNDEF {
+		if ASSERTG(callback).IsNotUndef() {
 			types.ZVAL_COPY(return_value, &(ASSERTG(callback)))
 		} else if ASSERTG(cb) {
 			return_value.SetRawString(b.CastStrAuto(ASSERTG(cb)))

@@ -68,16 +68,15 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 func Z_FE_ITER_P(zval_p *Zval) uint32      { return zval_p.GetFeIterIdx() }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
 
-func Z_STR_P(zval_p *Zval) *String                     { return zval_p.GetStr() }
-func Z_STRVAL_P(zval_p *Zval) []byte                   { return zval_p.GetStr().GetVal() }
-func Z_ARRVAL(zval Zval) *Array                        { return zval.GetArr() }
-func Z_ARRVAL_P(zval_p *Zval) *Array                   { return zval_p.GetArr() }
-func Z_OBJ(zval Zval) *ZendObject                      { return zval.GetObj() }
-func Z_OBJ_P(zval_p *Zval) *ZendObject                 { return zval_p.GetObj() }
-func Z_OBJ_HT(zval Zval) *zend.ZendObjectHandlers      { return Z_OBJ(zval).GetHandlers() }
-func Z_OBJ_HT_P(zval_p *Zval) *zend.ZendObjectHandlers { return Z_OBJ_HT(*zval_p) }
-func Z_OBJCE(zval Zval) *ClassEntry                    { return zval.GetObj().GetCe() }
-func Z_OBJCE_P(zval_p *Zval) *ClassEntry               { return zval_p.GetObj().GetCe() }
+func Z_STRVAL_P(zval *Zval) []byte                   { return zval.GetStr().GetVal() }
+func Z_ARRVAL(zval Zval) *Array                      { return zval.GetArr() }
+func Z_ARRVAL_P(zval *Zval) *Array                   { return zval.GetArr() }
+func Z_OBJ(zval Zval) *ZendObject                    { return zval.GetObj() }
+func Z_OBJ_P(zval *Zval) *ZendObject                 { return zval.GetObj() }
+func Z_OBJ_HT(zval Zval) *zend.ZendObjectHandlers    { return zval.GetObj().GetHandlers() }
+func Z_OBJ_HT_P(zval *Zval) *zend.ZendObjectHandlers { return zval.GetObj().GetHandlers() }
+func Z_OBJCE(zval Zval) *ClassEntry                  { return zval.GetObj().GetCe() }
+func Z_OBJCE_P(zval *Zval) *ClassEntry               { return zval.GetObj().GetCe() }
 func Z_OBJPROP(zval Zval) *Array {
 	return Z_OBJ_HT(zval).GetGetProperties()(&zval)
 }
@@ -99,7 +98,7 @@ func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.GetZv() }
 func Z_CE(zval Zval) *ClassEntry            { return zval.GetCe() }
 func Z_PTR(zval Zval) any                   { return zval.GetPtr() }
 
-func ZVAL_BOOL(z *Zval, b int)         { z.SetBool(b != 0) }
+func ZVAL_BOOL(z *Zval, b bool)        { z.SetBool(b) }
 func ZVAL_STR(z *Zval, s *String)      { z.SetString(s) }
 func ZVAL_STR_COPY(z *Zval, s *String) { z.SetStringCopy(s) }
 func ZVAL_ARR(z *Zval, a *Array)       { z.SetArray(a) }

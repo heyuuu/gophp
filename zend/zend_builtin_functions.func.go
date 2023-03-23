@@ -1048,7 +1048,7 @@ func ZifSetErrorHandler(executeData *ZendExecuteData, return_value *types.Zval) 
 			return
 		}
 	}
-	if EG__().GetUserErrorHandler().GetType() != types.IS_UNDEF {
+	if EG__().GetUserErrorHandler().IsNotUndef() {
 		types.ZVAL_COPY(return_value, EG__().GetUserErrorHandler())
 	}
 	EG__().GetUserErrorHandlersErrorReporting().Push(EG__().GetUserErrorHandlerErrorReporting())
@@ -1064,7 +1064,7 @@ func ZifRestoreErrorHandler(executeData *ZendExecuteData, return_value *types.Zv
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if EG__().GetUserErrorHandler().GetType() != types.IS_UNDEF {
+	if EG__().GetUserErrorHandler().IsNotUndef() {
 		var zeh types.Zval
 		types.ZVAL_COPY_VALUE(&zeh, EG__().GetUserErrorHandler())
 		EG__().GetUserErrorHandler().SetUndef()
@@ -1096,7 +1096,7 @@ func ZifSetExceptionHandler(executeData *ZendExecuteData, return_value *types.Zv
 			return
 		}
 	}
-	if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
+	if EG__().GetUserExceptionHandler().IsNotUndef() {
 		types.ZVAL_COPY(return_value, EG__().GetUserExceptionHandler())
 	}
 	EG__().GetUserExceptionHandlers().Push(EG__().GetUserExceptionHandler())
@@ -1110,7 +1110,7 @@ func ZifRestoreExceptionHandler(executeData *ZendExecuteData, return_value *type
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if EG__().GetUserExceptionHandler().GetType() != types.IS_UNDEF {
+	if EG__().GetUserExceptionHandler().IsNotUndef() {
 		ZvalPtrDtor(EG__().GetUserExceptionHandler())
 	}
 	if ZendStackIsEmpty(EG__().GetUserExceptionHandlers()) != 0 {
@@ -1675,7 +1675,7 @@ func ZifDebugPrintBacktrace(executeData *ZendExecuteData, return_value *types.Zv
 			}
 		}
 		ZendPrintf("%s(", function_name)
-		if arg_array.GetType() != types.IS_UNDEF {
+		if arg_array.IsNotUndef() {
 			DebugPrintBacktraceArgs(&arg_array)
 			ZvalPtrDtor(&arg_array)
 		}

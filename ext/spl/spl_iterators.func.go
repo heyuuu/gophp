@@ -125,7 +125,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 					faults.ClearException()
 				}
 			}
-			if retval.GetType() != types.IS_UNDEF {
+			if retval.IsNotUndef() {
 				has_children = zend.ZendIsTrue(&retval)
 				zend.ZvalPtrDtor(&retval)
 				if has_children != 0 {
@@ -197,7 +197,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 					goto next_step
 				}
 			}
-			if child.IsType(types.IS_UNDEF) || child.GetType() != types.IS_OBJECT || !(b.Assign(&ce, types.Z_OBJCE(child)) && zend.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
+			if child.IsUndef() || child.GetType() != types.IS_OBJECT || !(b.Assign(&ce, types.Z_OBJCE(child)) && zend.InstanceofFunction(ce, spl_ce_RecursiveIterator) != 0) {
 				zend.ZvalPtrDtor(&child)
 				faults.ThrowException(spl_ce_UnexpectedValueException, "Objects returned by RecursiveIterator::getChildren() must implement RecursiveIterator", 0)
 				return
@@ -536,12 +536,12 @@ func zim_spl_RecursiveIteratorIterator_callHasChildren(executeData *zend.ZendExe
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
 	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
-	if zobject.IsType(types.IS_UNDEF) {
+	if zobject.IsUndef() {
 		return_value.SetFalse()
 		return
 	} else {
 		zend.ZendCallMethodWith0Params(zobject, ce, nil, "haschildren", return_value)
-		if return_value.IsType(types.IS_UNDEF) {
+		if return_value.IsUndef() {
 			return_value.SetFalse()
 			return
 		}
@@ -560,11 +560,11 @@ func zim_spl_RecursiveIteratorIterator_callGetChildren(executeData *zend.ZendExe
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
 	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
-	if zobject.IsType(types.IS_UNDEF) {
+	if zobject.IsUndef() {
 		return
 	} else {
 		zend.ZendCallMethodWith0Params(zobject, ce, nil, "getchildren", return_value)
-		if return_value.IsType(types.IS_UNDEF) {
+		if return_value.IsUndef() {
 			return_value.SetNull()
 			return
 		}
@@ -695,8 +695,8 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 	str.AppendString(object.GetPrefix()[0].GetS().GetStr())
 	for level = 0; level < object.GetLevel(); level++ {
 		zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
-		if has_next.GetType() != types.IS_UNDEF {
-			if has_next.IsType(types.IS_TRUE) {
+		if has_next.IsNotUndef() {
+			if has_next.IsTrue() {
 				str.AppendString(object.GetPrefix()[1].GetS().GetStr())
 			} else {
 				str.AppendString(object.GetPrefix()[2].GetS().GetStr())
@@ -705,8 +705,8 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 		}
 	}
 	zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
-	if has_next.GetType() != types.IS_UNDEF {
-		if has_next.IsType(types.IS_TRUE) {
+	if has_next.IsNotUndef() {
+		if has_next.IsTrue() {
 			str.AppendString(object.GetPrefix()[3].GetS().GetStr())
 		} else {
 			str.AppendString(object.GetPrefix()[4].GetS().GetStr())
@@ -1121,20 +1121,20 @@ func SplDualItFree(intern *SplDualItObject) {
 	if intern.GetInnerIterator() != nil && intern.GetInnerIterator().GetFuncs().GetInvalidateCurrent() != nil {
 		intern.GetInnerIterator().GetFuncs().GetInvalidateCurrent()(intern.GetInnerIterator())
 	}
-	if intern.GetData().GetType() != types.IS_UNDEF {
+	if intern.GetData().IsNotUndef() {
 		zend.ZvalPtrDtor(intern.GetData())
 		intern.GetData().SetUndef()
 	}
-	if intern.GetKey().GetType() != types.IS_UNDEF {
+	if intern.GetKey().IsNotUndef() {
 		zend.ZvalPtrDtor(intern.GetKey())
 		intern.GetKey().SetUndef()
 	}
 	if intern.GetDitType() == DIT_CachingIterator || intern.GetDitType() == DIT_RecursiveCachingIterator {
-		if intern.GetZstr().GetType() != types.IS_UNDEF {
+		if intern.GetZstr().IsNotUndef() {
 			zend.ZvalPtrDtor(intern.GetZstr())
 			intern.GetZstr().SetUndef()
 		}
-		if intern.GetZchildren().GetType() != types.IS_UNDEF {
+		if intern.GetZchildren().IsNotUndef() {
 			zend.ZvalPtrDtor(intern.GetZchildren())
 			intern.GetZchildren().SetUndef()
 		}
@@ -1218,7 +1218,7 @@ func ZimSplDualItValid(executeData *zend.ZendExecuteData, return_value *types.Zv
 		return
 	}
 	intern = it
-	types.ZVAL_BOOL(return_value, intern.GetData().GetType() != types.IS_UNDEF)
+	types.ZVAL_BOOL(return_value, intern.GetData().IsNotUndef())
 	return
 }
 func ZimSplDualItKey(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1232,7 +1232,7 @@ func ZimSplDualItKey(executeData *zend.ZendExecuteData, return_value *types.Zval
 		return
 	}
 	intern = it
-	if intern.GetKey().GetType() != types.IS_UNDEF {
+	if intern.GetKey().IsNotUndef() {
 		var value *types.Zval = intern.GetKey()
 		types.ZVAL_COPY_DEREF(return_value, value)
 	} else {
@@ -1251,7 +1251,7 @@ func ZimSplDualItCurrent(executeData *zend.ZendExecuteData, return_value *types.
 		return
 	}
 	intern = it
-	if intern.GetData().GetType() != types.IS_UNDEF {
+	if intern.GetData().IsNotUndef() {
 		var value *types.Zval = intern.GetData()
 		types.ZVAL_COPY_DEREF(return_value, value)
 	} else {
@@ -1277,7 +1277,7 @@ func SplFilterItFetch(zthis *types.Zval, intern *SplDualItObject) {
 	var retval types.Zval
 	for SplDualItFetch(intern, 1) == types.SUCCESS {
 		zend.ZendCallMethodWith0Params(zthis, intern.GetStd().GetCe(), nil, "accept", &retval)
-		if retval.GetType() != types.IS_UNDEF {
+		if retval.IsNotUndef() {
 			if zend.ZendIsTrue(&retval) != 0 {
 				zend.ZvalPtrDtor(&retval)
 				return
@@ -1344,7 +1344,7 @@ func zim_spl_RecursiveFilterIterator_hasChildren(executeData *zend.ZendExecuteDa
 	}
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "haschildren", &retval)
-	if retval.GetType() != types.IS_UNDEF {
+	if retval.IsNotUndef() {
 		zend.ZVAL_ZVAL(return_value, &retval, 0, 1)
 		return
 	} else {
@@ -1365,7 +1365,7 @@ func zim_spl_RecursiveFilterIterator_getChildren(executeData *zend.ZendExecuteDa
 	}
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
-	if zend.EG__().GetException() == nil && retval.GetType() != types.IS_UNDEF {
+	if zend.EG__().GetException() == nil && retval.IsNotUndef() {
 		SplInstantiateArgEx1(types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), return_value, &retval)
 	}
 	zend.ZvalPtrDtor(&retval)
@@ -1383,7 +1383,7 @@ func zim_spl_RecursiveCallbackFilterIterator_getChildren(executeData *zend.ZendE
 	}
 	intern = it
 	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
-	if zend.EG__().GetException() == nil && retval.GetType() != types.IS_UNDEF {
+	if zend.EG__().GetException() == nil && retval.IsNotUndef() {
 		SplInstantiateArgEx2(types.Z_OBJCE_P(zend.ZEND_THIS(executeData)), return_value, &retval, intern.GetCbfilter().GetFci().GetFunctionName())
 	}
 	zend.ZvalPtrDtor(&retval)
@@ -1402,7 +1402,7 @@ func zim_spl_CallbackFilterIterator_accept(executeData *zend.ZendExecuteData, re
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if intern.GetData().IsType(types.IS_UNDEF) || intern.GetKey().IsType(types.IS_UNDEF) {
+	if intern.GetData().IsUndef() || intern.GetKey().IsUndef() {
 		return_value.SetFalse()
 		return
 	}
@@ -1446,7 +1446,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		return
 	}
 	intern = it
-	if intern.GetData().IsType(types.IS_UNDEF) {
+	if intern.GetData().IsUndef() {
 		return_value.SetFalse()
 		return
 	}
@@ -1661,7 +1661,7 @@ func zim_spl_RecursiveRegexIterator_accept(executeData *zend.ZendExecuteData, re
 		return
 	}
 	intern = it
-	if intern.GetData().IsType(types.IS_UNDEF) {
+	if intern.GetData().IsUndef() {
 		return_value.SetFalse()
 		return
 	} else if intern.GetData().IsType(types.IS_ARRAY) {
@@ -1688,7 +1688,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 	}
 	if object.GetDitType() == DIT_AppendIterator {
 		zend.ZendIteratorDtor(object.GetUAppendIterator())
-		if object.GetZarrayit().GetType() != types.IS_UNDEF {
+		if object.GetZarrayit().IsNotUndef() {
 			zend.ZvalPtrDtor(object.GetZarrayit())
 		}
 	}
@@ -1797,7 +1797,7 @@ func zim_spl_LimitIterator_valid(executeData *zend.ZendExecuteData, return_value
 
 	/*    RETURN_BOOL(spl_limit_it_valid(intern) == SUCCESS);*/
 
-	types.ZVAL_BOOL(return_value, (intern.GetCount() == -1 || intern.GetPos() < intern.GetOffset()+intern.GetCount()) && intern.GetData().GetType() != types.IS_UNDEF)
+	types.ZVAL_BOOL(return_value, (intern.GetCount() == -1 || intern.GetPos() < intern.GetOffset()+intern.GetCount()) && intern.GetData().IsNotUndef())
 	return
 }
 func zim_spl_LimitIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2193,7 +2193,7 @@ func zim_spl_RecursiveCachingIterator_hasChildren(executeData *zend.ZendExecuteD
 		return
 	}
 	intern = it
-	types.ZVAL_BOOL(return_value, intern.GetZchildren().GetType() != types.IS_UNDEF)
+	types.ZVAL_BOOL(return_value, intern.GetZchildren().IsNotUndef())
 	return
 }
 func zim_spl_RecursiveCachingIterator_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2207,7 +2207,7 @@ func zim_spl_RecursiveCachingIterator_getChildren(executeData *zend.ZendExecuteD
 		return
 	}
 	intern = it
-	if intern.GetZchildren().GetType() != types.IS_UNDEF {
+	if intern.GetZchildren().IsNotUndef() {
 		var value *types.Zval = intern.GetZchildren()
 		types.ZVAL_COPY_DEREF(return_value, value)
 	} else {
@@ -2425,7 +2425,7 @@ func zim_spl_AppendIterator_current(executeData *zend.ZendExecuteData, return_va
 	}
 	intern = it
 	SplDualItFetch(intern, 1)
-	if intern.GetData().GetType() != types.IS_UNDEF {
+	if intern.GetData().IsNotUndef() {
 		var value *types.Zval = intern.GetData()
 		types.ZVAL_COPY_DEREF(return_value, value)
 	} else {
@@ -2460,7 +2460,7 @@ func zim_spl_AppendIterator_valid(executeData *zend.ZendExecuteData, return_valu
 		return
 	}
 	intern = it
-	types.ZVAL_BOOL(return_value, intern.GetData().GetType() != types.IS_UNDEF)
+	types.ZVAL_BOOL(return_value, intern.GetData().IsNotUndef())
 	return
 }
 func zim_spl_AppendIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
