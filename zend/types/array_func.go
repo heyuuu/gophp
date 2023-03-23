@@ -105,33 +105,33 @@ func ZendHashStrUpdateMem(ht *Array, str string, pData any, size int) any {
 	memcpy(p, pData, size)
 	return ZendHashUpdatePtr(ht, str, p)
 }
-func ZendHashIndexAddPtr(ht *Array, h zend.ZendUlong, pData any) any {
+func ZendHashIndexAddPtr(ht *Array, index int, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ht.IndexAddH(h, &tmp)
+	zv = ht.IndexAdd(index, &tmp)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
 		return nil
 	}
 }
-func ZendHashIndexAddNewPtr(ht *Array, h zend.ZendUlong, pData any) any {
+func ZendHashIndexAddNewPtr(ht *Array, index int, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ht.IndexAddNewH(h, &tmp)
+	zv = ht.IndexAddNewH(index, &tmp)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
 		return nil
 	}
 }
-func ZendHashIndexUpdatePtr(ht *Array, h zend.ZendUlong, pData any) any {
+func ZendHashIndexUpdatePtr(ht *Array, index int, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ht.IndexUpdateH(h, &tmp)
+	zv = ht.IndexUpdateH(index, &tmp)
 	return zv.GetPtr()
 }
 func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
@@ -145,11 +145,11 @@ func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
 		return nil
 	}
 }
-func ZendHashIndexUpdateMem(ht *Array, h zend.ZendUlong, pData any, size int) any {
+func ZendHashIndexUpdateMem(ht *Array, index int, pData any, size int) any {
 	var p any
 	p = zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	memcpy(p, pData, size)
-	return ZendHashIndexUpdatePtr(ht, h, p)
+	return ZendHashIndexUpdatePtr(ht, index, p)
 }
 func ZendHashNextIndexInsertMem(ht *Array, pData any, size int) any {
 	var tmp Zval
@@ -628,8 +628,8 @@ func ZendHashBucketSwap(p *Bucket, q *Bucket) {
 func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBool) int {
 	var idx1 uint32
 	var idx2 uint32
-	if ht1.CountElements() != ht2.CountElements() {
-		if ht1.CountElements() > ht2.CountElements() {
+	if ht1.Len() != ht2.Len() {
+		if ht1.Len() > ht2.Len() {
 			return 1
 		} else {
 			return -1
@@ -692,7 +692,7 @@ func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered Ze
 			idx2++
 		} else {
 			if p1.GetKey() == nil {
-				pData2 = ht2.IndexFindH(p1.GetH())
+				pData2 = ht2.IndexFind(p1.GetH())
 				if pData2 == nil {
 					return 1
 				}
@@ -750,7 +750,7 @@ func ZendHashCompare(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered ZendBo
 }
 func ZendHashMinmax(ht *Array, compar CompareFuncT, flag uint32) *Zval {
 	var res *Bucket
-	if ht.CountElements() == 0 {
+	if ht.Len() == 0 {
 		return nil
 	}
 
@@ -832,7 +832,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = NewArray(ht.CountElements())
+	var new_ht *Array = NewArray(ht.Len())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -895,7 +895,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = NewArray(ht.CountElements())
+	var new_ht *Array = NewArray(ht.Len())
 	var __ht__1 *Array = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()

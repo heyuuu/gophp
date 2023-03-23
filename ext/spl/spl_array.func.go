@@ -264,7 +264,7 @@ try_again:
 	case types.IS_LONG:
 		index = offset.GetLval()
 	num_index:
-		if b.Assign(&retval, ht.IndexFindH(index)) == nil {
+		if b.Assign(&retval, ht.IndexFind(index)) == nil {
 			switch type_ {
 			case zend.BP_VAR_R:
 				faults.Error(faults.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
@@ -525,7 +525,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 		case types.IS_LONG:
 			index = offset.GetLval()
 		num_index:
-			if b.Assign(&tmp, ht.IndexFindH(index)) != nil {
+			if b.Assign(&tmp, ht.IndexFind(index)) != nil {
 				if check_empty == 2 {
 					return 1
 				}
@@ -655,7 +655,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 		return types.ZendArrayDup(intern.GetStd().GetProperties())
 	} else {
 		var debug_info *types.Array
-		debug_info = types.NewArray(intern.GetStd().GetProperties().CountElements() + 1)
+		debug_info = types.NewArray(intern.GetStd().GetProperties().Len() + 1)
 		types.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), types.CopyCtorFuncT(zend.ZvalAddRef))
 		storage = intern.GetArray()
 		storage.TryAddRefcount()
@@ -1056,7 +1056,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 		}
 		return count
 	} else {
-		return aht.CountElements()
+		return aht.Len()
 	}
 }
 func SplArrayObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
@@ -1437,10 +1437,10 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	if zend.ZendParseParametersThrow(executeData.NumArgs(), "h", &data) == types.FAILURE {
 		return
 	}
-	flags_zv = data.IndexFindH(0)
-	storage_zv = data.IndexFindH(1)
-	members_zv = data.IndexFindH(2)
-	iterator_class_zv = data.IndexFindH(3)
+	flags_zv = data.IndexFind(0)
+	storage_zv = data.IndexFind(1)
+	members_zv = data.IndexFind(2)
+	iterator_class_zv = data.IndexFind(3)
 	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != types.IS_LONG || members_zv.GetType() != types.IS_ARRAY || iterator_class_zv != nil && (iterator_class_zv.GetType() != types.IS_NULL && iterator_class_zv.GetType() != types.IS_STRING) {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return

@@ -97,7 +97,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ty
 	}
 	client = core.SG__().server_context
 	headers = client.GetRequest().GetHeadersOriginalCase()
-	zend.ArrayInitSize(return_value, headers.CountElements())
+	zend.ArrayInitSize(return_value, headers.Len())
 	var __ht *types.Array = headers
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()

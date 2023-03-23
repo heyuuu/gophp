@@ -289,7 +289,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFindH(op1.GetLval())
+			result = ht.IndexFind(op1.GetLval())
 		} else {
 			result = nil
 		}

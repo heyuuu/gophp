@@ -123,9 +123,9 @@ func ShutdownDestructors() {
 	if SETJMP(__bailout) == 0 {
 		var symbols uint32
 		for {
-			symbols = EG__().GetSymbolTable().CountElements()
+			symbols = EG__().GetSymbolTable().Len()
 			types.ZendHashReverseApply(EG__().GetSymbolTable(), types.ApplyFuncT(ZvalCallDestructor))
-			if symbols == EG__().GetSymbolTable().CountElements() {
+			if symbols == EG__().GetSymbolTable().Len() {
 				break
 			}
 		}
@@ -279,7 +279,7 @@ func ShutdownExecutor() {
 				}
 				Efree(c)
 				types.ZendStringReleaseEx(key, 0)
-				__ht.CountElements()--
+				__ht.Len()--
 				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
 				var i uint32 = types.HT_HASH(__ht, nIndex)
@@ -307,7 +307,7 @@ func ShutdownExecutor() {
 				}
 				DestroyOpArray(func_.GetOpArray())
 				types.ZendStringReleaseEx(key, 0)
-				__ht__1.CountElements()--
+				__ht__1.Len()--
 				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 				var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
 				var i uint32 = types.HT_HASH(__ht__1, nIndex)
@@ -334,7 +334,7 @@ func ShutdownExecutor() {
 				}
 				DestroyZendClass(zv)
 				types.ZendStringReleaseEx(key, 0)
-				__ht__2.CountElements()--
+				__ht__2.Len()--
 				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 				var nIndex uint32 = _p.GetH() | __ht__2.GetNTableMask()
 				var i uint32 = types.HT_HASH(__ht__2, nIndex)

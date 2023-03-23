@@ -97,6 +97,8 @@ type Array struct {
 	//}
 }
 
+var _ IRefcounted = &Array{}
+
 /**
  * Constructor && Init
  */
@@ -133,7 +135,8 @@ func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
 	return ht
 }
 
-func (ht *Array) CopyFrom(arr *Array) {
+/* init */
+func (ht *Array) SetBy(arr *Array) {
 	ht.flags = arr.flags
 	ht.iteratorsCount = arr.iteratorsCount
 	ht.elementsCount = arr.elementsCount
@@ -147,7 +150,10 @@ func (ht *Array) CopyFrom(arr *Array) {
 	ZendHashInternalPointerReset(ht)
 }
 
-func (ht *Array) Cap() int { return cap(ht.data) }
+// 实际元素个数，从使用者角度的数组大小
+func (ht *Array) Len() uint32               { return ht.elementsCount }
+func (ht *Array) Cap() int                  { return cap(ht.data) }
+func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
 /* data -> Array.data */
 func (ht *Array) clearData() {

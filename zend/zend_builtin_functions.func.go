@@ -302,7 +302,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 	var idx ZendUlong
 	var new_val *types.Zval
 	var val *types.Zval
-	ArrayInitSize(dst, types.Z_ARRVAL_P(src).CountElements())
+	ArrayInitSize(dst, types.Z_ARRVAL_P(src).Len())
 	var __ht = src.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z = _p.GetVal()
@@ -645,7 +645,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 		return_value.SetArray(types.ZendProptableToSymtable(properties, 1))
 		return
 	} else {
-		ArrayInitSize(return_value, properties.CountElements())
+		ArrayInitSize(return_value, properties.Len())
 		var __ht = properties
 		for _, _p := range __ht.foreachData() {
 			var _z = _p.GetVal()
@@ -672,7 +672,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
 
-				return_value.GetArr().IndexAddH(num_key, value)
+				return_value.GetArr().IndexAdd(num_key, value)
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
 
@@ -1368,8 +1368,8 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 		var module_names **byte
 		var module *ZendModuleEntry
 		var i = 1
-		modules = Ecalloc(ModuleRegistry.CountElements()+2, b.SizeOf("zval"))
-		module_names = Emalloc((ModuleRegistry.CountElements() + 2) * b.SizeOf("char *"))
+		modules = Ecalloc(ModuleRegistry.Len()+2, b.SizeOf("zval"))
+		module_names = Emalloc((ModuleRegistry.Len() + 2) * b.SizeOf("char *"))
 		module_names[0] = "internal"
 		var __ht = &ModuleRegistry
 		for _, _p := range __ht.foreachData() {

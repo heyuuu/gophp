@@ -198,16 +198,16 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		/* fast copy */
 
 	}
-	if old_object.GetProperties() != nil && old_object.GetProperties().CountElements() {
+	if old_object.GetProperties() != nil && old_object.GetProperties().Len() {
 		var prop *types.Zval
 		var new_prop types.Zval
 		var num_key ZendUlong
 		var key *types.String
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(types.NewArray(old_object.GetProperties().CountElements()))
+			new_object.SetProperties(types.NewArray(old_object.GetProperties().Len()))
 			types.ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
-			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().CountElements())
+			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().Len())
 		}
 		new_object.GetProperties().CopyFlags(old_object.GetProperties())
 		new_object.GetProperties().SetIteratorsCount(old_object.GetProperties().GetIteratorsCount())

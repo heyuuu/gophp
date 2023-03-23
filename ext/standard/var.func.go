@@ -734,7 +734,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 	var props *types.Array = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
 	var retval int = types.SUCCESS
-	ht = types.MakeArrayEx(sleep_retval.CountElements(), zend.ZVAL_PTR_DTOR, 0)
+	ht = types.MakeArrayEx(sleep_retval.Len(), zend.ZVAL_PTR_DTOR, 0)
 
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
@@ -867,7 +867,7 @@ func PhpVarSerializeClass(buf *zend.SmartStr, struc *types.Zval, retval_ptr *typ
 	var props types.Array
 	if PhpVarSerializeGetSleepProps(&props, struc, zend.HASH_OF(retval_ptr)) == types.SUCCESS {
 		PhpVarSerializeClassName(buf, struc)
-		PhpVarSerializeNestedData(buf, struc, &props, props.CountElements(), 0, var_hash)
+		PhpVarSerializeNestedData(buf, struc, &props, props.Len(), 0, var_hash)
 	}
 	props.Destroy()
 }
@@ -1159,7 +1159,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		}
 		if classes != nil && (classes.IsType(types.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
 			zend.ALLOC_HASHTABLE(class_hash)
-			class_hash = types.MakeArrayEx(b.CondF1(classes.IsType(types.IS_ARRAY), func() __auto__ { return types.Z_ARRVAL_P(classes).CountElements() }, 0), nil, 0)
+			class_hash = types.MakeArrayEx(b.CondF1(classes.IsType(types.IS_ARRAY), func() __auto__ { return types.Z_ARRVAL_P(classes).Len() }, 0), nil, 0)
 		}
 		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
 			var entry *types.Zval

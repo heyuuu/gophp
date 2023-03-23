@@ -47,7 +47,7 @@ func PhpInfoPrint(str *byte) int {
 func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 	var key *types.String
 	if ht != nil {
-		if ht.CountElements() {
+		if ht.Len() {
 			var first int = 1
 			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrintf("<tr><td class=\"e\">Registered %s</td><td class=\"v\">", name)
@@ -328,7 +328,7 @@ func PhpPrintInfo(flag int) {
 	if (flag & PHP_INFO_MODULES) != 0 {
 		var sorted_registry types.Array
 		var module *zend.ZendModuleEntry
-		&sorted_registry = types.MakeArrayEx(zend.ModuleRegistry.CountElements(), nil, 1)
+		&sorted_registry = types.MakeArrayEx(zend.ModuleRegistry.Len(), nil, 1)
 		types.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		sorted_registry.SortCompatible(ModuleNameCmp, 0)
 		var __ht *types.Array = &sorted_registry

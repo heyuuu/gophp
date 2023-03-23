@@ -196,7 +196,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 				jmp_target.SetLong(GetNextOpNumber())
 				b.Assert(cond_zv.IsType(jumptable_type))
 				if cond_zv.IsLong() {
-					jumptable.IndexAddH(cond_zv.GetLval(), &jmp_target)
+					jumptable.IndexAdd(cond_zv.GetLval(), &jmp_target)
 				} else {
 					b.Assert(cond_zv.IsString())
 					jumptable.KeyAdd(cond_zv.GetStr().GetStr(), &jmp_target)

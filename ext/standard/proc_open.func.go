@@ -28,7 +28,7 @@ func _phpArrayToEnvp(environment *types.Zval, is_persistent int) PhpProcessEnvT 
 	if environment == nil {
 		return env
 	}
-	cnt = types.Z_ARRVAL_P(environment).CountElements()
+	cnt = types.Z_ARRVAL_P(environment).Len()
 	if cnt < 1 {
 		env.SetEnvarray((**byte)(zend.Pecalloc(1, b.SizeOf("char *"), is_persistent)))
 		env.SetEnvp((*byte)(zend.Pecalloc(4, 1, is_persistent)))
@@ -301,7 +301,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	memset(&env, 0, b.SizeOf("env"))
 	if command_zv.IsType(types.IS_ARRAY) {
 		var arg_zv *types.Zval
-		var num_elems uint32 = types.Z_ARRVAL_P(command_zv).CountElements()
+		var num_elems uint32 = types.Z_ARRVAL_P(command_zv).Len()
 		if num_elems == 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Command array must have at least one element")
 			return_value.SetFalse()
@@ -340,7 +340,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if environment != nil {
 		env = _phpArrayToEnvp(environment, is_persistent)
 	}
-	ndescriptors_array = types.Z_ARRVAL_P(descriptorspec).CountElements()
+	ndescriptors_array = types.Z_ARRVAL_P(descriptorspec).Len()
 	descriptors = zend.SafeEmalloc(b.SizeOf("struct php_proc_open_descriptor_item"), ndescriptors_array, 0)
 	memset(descriptors, 0, b.SizeOf("struct php_proc_open_descriptor_item")*ndescriptors_array)
 
@@ -379,7 +379,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Descriptor item must be either an array or a File-Handle")
 			goto exit_fail
 		} else {
-			if b.Assign(&ztype, descitem.GetArr().IndexFindH(0)) != nil {
+			if b.Assign(&ztype, descitem.GetArr().IndexFind(0)) != nil {
 				if zend.TryConvertToString(ztype) == 0 {
 					goto exit_fail
 				}
@@ -390,7 +390,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			if strcmp(ztype.GetStr().GetVal(), "pipe") == 0 {
 				var newpipe []PhpFileDescriptorT
 				var zmode *types.Zval
-				if b.Assign(&zmode, descitem.GetArr().IndexFindH(1)) != nil {
+				if b.Assign(&zmode, descitem.GetArr().IndexFind(1)) != nil {
 					if zend.TryConvertToString(zmode) == 0 {
 						goto exit_fail
 					}
@@ -422,7 +422,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 				var fd core.PhpSocketT
 				var stream *core.PhpStream
 				descriptors[ndesc].SetMode(DESC_FILE)
-				if b.Assign(&zfile, descitem.GetArr().IndexFindH(1)) != nil {
+				if b.Assign(&zfile, descitem.GetArr().IndexFind(1)) != nil {
 					if zend.TryConvertToString(zfile) == 0 {
 						goto exit_fail
 					}
@@ -430,7 +430,7 @@ func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 					core.PhpErrorDocref(nil, faults.E_WARNING, "Missing file name parameter for 'file'")
 					goto exit_fail
 				}
-				if b.Assign(&zmode, descitem.GetArr().IndexFindH(2)) != nil {
+				if b.Assign(&zmode, descitem.GetArr().IndexFind(2)) != nil {
 					if zend.TryConvertToString(zmode) == 0 {
 						goto exit_fail
 					}

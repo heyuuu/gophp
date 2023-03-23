@@ -241,7 +241,7 @@ try_again:
 	if dim.IsLong() {
 		hval = dim.GetLval()
 	num_index:
-		retval = ht.IndexFindH(hval)
+		retval = ht.IndexFind(hval)
 		if retval == nil {
 			goto num_undef
 		}

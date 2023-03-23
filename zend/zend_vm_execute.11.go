@@ -330,7 +330,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ht.IndexFindH(hval)
+			value = ht.IndexFind(hval)
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
 			if EG__().GetException() != nil {
@@ -475,7 +475,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDa
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		value = ht.IndexFindH(offset)
+		value = ht.IndexFind(offset)
 		if value == nil {
 			goto fetch_dim_r_index_undef
 		}
@@ -525,7 +525,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_TMPVARCV_HANDLER(executeData *ZendExecut
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		value = ht.IndexFindH(offset)
+		value = ht.IndexFind(offset)
 		if value == nil {
 			goto fetch_dim_r_index_undef
 		}

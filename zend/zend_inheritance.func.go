@@ -1249,8 +1249,8 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			}
 		}
 	}
-	if parent_ce.GetPropertiesInfo().CountElements() {
-		ce.GetPropertiesInfo().Extend(ce.GetPropertiesInfo().CountElements() + parent_ce.GetPropertiesInfo().CountElements())
+	if parent_ce.GetPropertiesInfo().Len() {
+		ce.GetPropertiesInfo().Extend(ce.GetPropertiesInfo().Len() + parent_ce.GetPropertiesInfo().Len())
 		var __ht *types.Array = parent_ce.GetPropertiesInfo()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -1260,9 +1260,9 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			DoInheritProperty(property_info, key, ce)
 		}
 	}
-	if parent_ce.GetConstantsTable().CountElements() {
+	if parent_ce.GetConstantsTable().Len() {
 		var c *ZendClassConstant
-		ce.GetConstantsTable().Extend(ce.GetConstantsTable().CountElements() + parent_ce.GetConstantsTable().CountElements())
+		ce.GetConstantsTable().Extend(ce.GetConstantsTable().Len() + parent_ce.GetConstantsTable().Len())
 		var __ht *types.Array = parent_ce.GetConstantsTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -1272,8 +1272,8 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			DoInheritClassConstant(key, c, ce)
 		}
 	}
-	if parent_ce.GetFunctionTable().CountElements() {
-		ce.GetFunctionTable().Extend(ce.GetFunctionTable().CountElements() + parent_ce.GetFunctionTable().CountElements())
+	if parent_ce.GetFunctionTable().Len() {
+		ce.GetFunctionTable().Extend(ce.GetFunctionTable().Len() + parent_ce.GetFunctionTable().Len())
 		if checked != 0 {
 			var __ht *types.Array = parent_ce.GetFunctionTable()
 			for _, _p := range __ht.foreachData() {
@@ -2292,7 +2292,7 @@ func ResolveDelayedVarianceObligations(ce *types.ClassEntry) {
 	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
 	types.ZendHashApply(obligations, CheckVarianceObligation)
-	if obligations.CountElements() == 0 {
+	if obligations.Len() == 0 {
 		ce.SetIsUnresolvedVariance(false)
 		ce.SetIsLinked(true)
 		types.ZendHashIndexDel(all_obligations, num_key)

@@ -154,7 +154,7 @@ func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *Zend
 	if offset.IsDouble() {
 		hval = ZendDvalToLval(offset.GetDval())
 	num_idx:
-		return ht.IndexFindH(hval)
+		return ht.IndexFind(hval)
 	} else if offset.IsNull() {
 	str_idx:
 		return types.ZendHashFindInd(ht, types.ZSTR_EMPTY_ALLOC().GetStr())
@@ -267,7 +267,7 @@ try_again:
 	} else if key.IsLong() {
 		hval = key.GetLval()
 	num_key:
-		if ht.IndexFindH(hval) != nil {
+		if ht.IndexFind(hval) != nil {
 			return types.IS_TRUE
 		} else {
 			return types.IS_FALSE

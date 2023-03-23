@@ -587,7 +587,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if container.IsArray() {
 			var el *types.Zval
 			if dim.IsLong() {
-				el = container.GetArr().IndexFindH(dim.GetLval())
+				el = container.GetArr().IndexFind(dim.GetLval())
 				if el != nil {
 					types.ZVAL_COPY(&result, el)
 				} else {

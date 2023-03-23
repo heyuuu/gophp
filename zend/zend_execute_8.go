@@ -359,11 +359,11 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 	var fbc *ZendFunction
 	var object_or_called_scope any
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	if function.CountElements() == 2 {
+	if function.Len() == 2 {
 		var obj *types.Zval
 		var method *types.Zval
-		obj = function.IndexFindH(0)
-		method = function.IndexFindH(1)
+		obj = function.IndexFind(0)
+		method = function.IndexFind(1)
 		if obj == nil || method == nil {
 			faults.ThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil

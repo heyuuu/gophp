@@ -123,7 +123,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 
 	/* TODO We might want to use a special binding mode if varvars_used is set. */
 
-	if info.GetUses().CountElements() == 0 {
+	if info.GetUses().Len() == 0 {
 		return
 	}
 	if op_array.GetStaticVariables() == nil {

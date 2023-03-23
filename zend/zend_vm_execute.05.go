@@ -204,7 +204,7 @@ func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int
 
 		}
 	}
-	jump_zv = jumptable.IndexFindH(op.GetLval())
+	jump_zv = jumptable.IndexFind(op.GetLval())
 	if jump_zv != nil {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, jump_zv.GetLval())
 		return 0
@@ -261,7 +261,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFindH(op1.GetLval())
+			result = ht.IndexFind(op1.GetLval())
 		} else {
 			result = nil
 		}
@@ -877,7 +877,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecute
 			offset = ZvalGetLong(dim)
 		}
 		ht = container.GetArr()
-		value = ht.IndexFindH(offset)
+		value = ht.IndexFind(offset)
 		if value == nil {
 			goto fetch_dim_r_index_undef
 		}

@@ -313,7 +313,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		PhpUrlFree(url_parts)
 		return types.SUCCESS
 	}
-	if !(allowed_hosts.CountElements()) && CheckHttpHost(url_parts.GetHost().GetVal()) == types.SUCCESS {
+	if !(allowed_hosts.Len()) && CheckHttpHost(url_parts.GetHost().GetVal()) == types.SUCCESS {
 		PhpUrlFree(url_parts)
 		return types.SUCCESS
 	}

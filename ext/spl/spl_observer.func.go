@@ -163,7 +163,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	var zname *types.String
 	var debug_info *types.Array
 	props = types.Z_OBJPROP_P(obj)
-	debug_info = types.NewArray(props.CountElements() + 1)
+	debug_info = types.NewArray(props.Len() + 1)
 	types.ZendHashCopy(debug_info, props, types.CopyCtorFuncT(zend.ZvalAddRef))
 	zend.ArrayInit(&storage)
 	var __ht *types.Array = intern.GetStorage()
@@ -192,8 +192,8 @@ func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.A
 	var i int = 0
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(obj)
 	var element *spl_SplObjectStorageElement
-	if intern.GetStorage().CountElements()*2 > intern.GetGcdataNum() {
-		intern.SetGcdataNum(intern.GetStorage().CountElements() * 2)
+	if intern.GetStorage().Len()*2 > intern.GetGcdataNum() {
+		intern.SetGcdataNum(intern.GetStorage().Len() * 2)
 		intern.SetGcdata((*types.Zval)(zend.Erealloc(intern.GetGcdata(), b.SizeOf("zval")*intern.GetGcdataNum())))
 	}
 	var __ht *types.Array = intern.GetStorage()
@@ -296,7 +296,7 @@ func zim_spl_SplObjectStorage_addAll(executeData *zend.ZendExecuteData, return_v
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
 	SplObjectStorageAddall(intern, zend.ZEND_THIS(executeData), other)
-	return_value.SetLong(intern.GetStorage().CountElements())
+	return_value.SetLong(intern.GetStorage().Len())
 	return
 }
 func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -316,7 +316,7 @@ func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, retur
 	}
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
 	intern.SetIndex(0)
-	return_value.SetLong(intern.GetStorage().CountElements())
+	return_value.SetLong(intern.GetStorage().Len())
 	return
 }
 func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -339,7 +339,7 @@ func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData,
 	}
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
 	intern.SetIndex(0)
-	return_value.SetLong(intern.GetStorage().CountElements())
+	return_value.SetLong(intern.GetStorage().Len())
 	return
 }
 func zim_spl_SplObjectStorage_contains(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -360,7 +360,7 @@ func zim_spl_SplObjectStorage_count(executeData *zend.ZendExecuteData, return_va
 	if mode == standard.COUNT_RECURSIVE {
 		var ret zend.ZendLong
 		if mode != standard.COUNT_RECURSIVE {
-			ret = intern.GetStorage().CountElements()
+			ret = intern.GetStorage().Len()
 		} else {
 			ret = standard.PhpCountRecursive(intern.GetStorage())
 		}
@@ -368,7 +368,7 @@ func zim_spl_SplObjectStorage_count(executeData *zend.ZendExecuteData, return_va
 		return
 		return
 	}
-	return_value.SetLong(intern.GetStorage().CountElements())
+	return_value.SetLong(intern.GetStorage().Len())
 	return
 }
 func zim_spl_SplObjectStorage_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -454,7 +454,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	/* storage */
 
 	buf.AppendString("x:")
-	flags.SetLong(intern.GetStorage().CountElements())
+	flags.SetLong(intern.GetStorage().Len())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	types.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
 	for types.ZendHashHasMoreElementsEx(intern.GetStorage(), &pos) {
@@ -618,7 +618,7 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 
 	/* storage */
 
-	zend.ArrayInitSize(&tmp, 2*intern.GetStorage().CountElements())
+	zend.ArrayInitSize(&tmp, 2*intern.GetStorage().Len())
 	var __ht *types.Array = intern.GetStorage()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -647,13 +647,13 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 	if zend.ZendParseParametersThrow(executeData.NumArgs(), "h", &data) == types.FAILURE {
 		return
 	}
-	storage_zv = data.IndexFindH(0)
-	members_zv = data.IndexFindH(1)
+	storage_zv = data.IndexFind(0)
+	members_zv = data.IndexFind(1)
 	if storage_zv == nil || members_zv == nil || storage_zv.GetType() != types.IS_ARRAY || members_zv.GetType() != types.IS_ARRAY {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	if types.Z_ARRVAL_P(storage_zv).CountElements()%2 != 0 {
+	if types.Z_ARRVAL_P(storage_zv).Len()%2 != 0 {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Odd number of elements", 0)
 		return
 	}
@@ -773,7 +773,7 @@ func zim_spl_MultipleIterator_valid(executeData *zend.ZendExecuteData, return_va
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	if !(intern.GetStorage().CountElements()) {
+	if !(intern.GetStorage().Len()) {
 		return_value.SetFalse()
 		return
 	}
@@ -807,7 +807,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 	var retval types.Zval
 	var valid int = 1
 	var num_elements int
-	num_elements = intern.GetStorage().CountElements()
+	num_elements = intern.GetStorage().Len()
 	if num_elements < 1 {
 		return_value.SetFalse()
 		return

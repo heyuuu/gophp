@@ -1489,7 +1489,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		zend.ZvalPtrDtor(intern.GetData())
 		intern.GetData().SetUndef()
 		php_pcre_split_impl(intern.GetPce(), subject, intern.GetData(), -1, intern.GetPregFlags())
-		count = types.Z_ARRVAL(intern.GetData()).CountElements()
+		count = types.Z_ARRVAL(intern.GetData()).Len()
 		types.ZVAL_BOOL(return_value, count > 1)
 	case REGIT_MODE_REPLACE:
 		var replacement *types.Zval = zend.ZendReadProperty(intern.GetStd().GetCe(), zend.ZEND_THIS(executeData), "replacement", b.SizeOf("\"replacement\"")-1, 1, &rv)
@@ -1665,7 +1665,7 @@ func zim_spl_RecursiveRegexIterator_accept(executeData *zend.ZendExecuteData, re
 		return_value.SetFalse()
 		return
 	} else if intern.GetData().IsType(types.IS_ARRAY) {
-		types.ZVAL_BOOL(return_value, types.Z_ARRVAL(intern.GetData()).CountElements() > 0)
+		types.ZVAL_BOOL(return_value, types.Z_ARRVAL(intern.GetData()).Len() > 0)
 		return
 	}
 	zend.ZendCallMethodWith0Params(zend.ZEND_THIS(executeData), spl_ce_RegexIterator, nil, "accept", return_value)
@@ -2176,7 +2176,7 @@ func zim_spl_CachingIterator_count(executeData *zend.ZendExecuteData, return_val
 		faults.ThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", types.Z_OBJCE_P(zend.ZEND_THIS(executeData)).GetName().GetVal())
 		return
 	}
-	return_value.SetLong(types.Z_ARRVAL(intern.GetZcache()).CountElements())
+	return_value.SetLong(types.Z_ARRVAL(intern.GetZcache()).Len())
 	return
 }
 func zim_spl_RecursiveCachingIterator___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {

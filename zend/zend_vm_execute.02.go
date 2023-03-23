@@ -31,14 +31,14 @@ send_again:
 		var arg *types.Zval
 		var top *types.Zval
 		var name *types.String
-		ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, ht.CountElements())
+		ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, ht.Len())
 		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && args.GetRefcount() > 1 {
 			var i uint32
 			var separate int = 0
 
 			/* check if any of arguments are going to be passed by reference */
 
-			for i = 0; i < ht.CountElements(); i++ {
+			for i = 0; i < ht.Len(); i++ {
 				if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num+i) != 0 {
 					separate = 1
 					break
@@ -182,7 +182,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			var free_op2 ZendFreeOp
 			var op2 *types.Zval = GetZvalPtr(opline.GetOp2Type(), opline.GetOp2(), &free_op2, BP_VAR_R)
 			var skip uint32 = opline.GetExtendedValue()
-			var count uint32 = ht.CountElements()
+			var count uint32 = ht.Len()
 			var len_ ZendLong = ZvalGetLong(op2)
 			if len_ < 0 {
 				len_ += zend_long(count - skip)
@@ -241,7 +241,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			}
 			FREE_OP(free_op2)
 		} else {
-			ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, ht.CountElements())
+			ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, ht.Len())
 			arg_num = 1
 			param = executeData.GetCall().Arg(1)
 			var __ht *types.Array = ht

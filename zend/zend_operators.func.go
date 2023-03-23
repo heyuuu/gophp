@@ -202,7 +202,7 @@ again:
 			result = 1
 		}
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).CountElements() {
+		if types.Z_ARRVAL_P(op).Len() {
 			result = 1
 		}
 	case types.IS_OBJECT:
@@ -589,7 +589,7 @@ try_again:
 		}
 		types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).CountElements() {
+		if types.Z_ARRVAL_P(op).Len() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -636,7 +636,7 @@ try_again:
 		op.SetDouble(ZendStrtod(str.GetVal(), nil))
 		types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).CountElements() {
+		if types.Z_ARRVAL_P(op).Len() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -690,7 +690,7 @@ try_again:
 		}
 		types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).CountElements() {
+		if types.Z_ARRVAL_P(op).Len() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -906,7 +906,7 @@ try_again:
 		}
 		fallthrough
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).CountElements() {
+		if types.Z_ARRVAL_P(op).Len() {
 			return 1
 		} else {
 			return 0
@@ -949,7 +949,7 @@ try_again:
 	case types.IS_STRING:
 		return ZendStrtod(op.GetStr().GetVal(), nil)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).CountElements() {
+		if types.Z_ARRVAL_P(op).Len() {
 			return 1.0
 		} else {
 			return 0.0

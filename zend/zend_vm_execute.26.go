@@ -293,7 +293,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
 			types.ZVAL_COPY_VALUE(result, array_ptr)
-			if properties.CountElements() == 0 {
+			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
@@ -362,7 +362,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
-			if properties.CountElements() == 0 {
+			if properties.Len() == 0 {
 				EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 			}

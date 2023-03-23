@@ -41,20 +41,14 @@ func (this *Bucket) SetInvalid() {
 	this.val.SetUndef()
 }
 
-var _ IRefcounted = &Array{}
-
-func (ht *Array) GetArData() *Bucket      { return ht.arData }
-func (ht *Array) SetArData(value *Bucket) { ht.arData = value }
+func (ht *Array) GetArData() *Bucket { return ht.arData }
 
 func (ht *Array) DataSize() uint32 { return uint32(len(ht.data)) }
 func (ht *Array) LastPos() uint32  { return ht.DataSize() - 1 }
 
-func (ht *Array) GetNNumUsed() uint32 { return ht.DataSize() }
-func (ht *Array) SetNNumUsed(value uint32) {
-	// todo remove
-}
+func (ht *Array) GetNNumUsed() uint32      { return ht.DataSize() }
+func (ht *Array) SetNNumUsed(value uint32) {} // todo remove
 
-func (ht *Array) CountElements() uint32                   { return ht.elementsCount }
 func (ht *Array) SetNNumOfElements(value uint32)          { ht.elementsCount = value }
 func (ht *Array) GetNInternalPointer() uint32             { return ht.internalPointer }
 func (ht *Array) SetNInternalPointer(value uint32)        { ht.internalPointer = value }
@@ -66,68 +60,18 @@ func (ht *Array) SetPDestructor(value DtorFuncT)          { ht.destructor = valu
 func (ht *Array) GetNTableMask() uint32 { return 0 } // todo remove
 
 /**
- * Constructor && Init
- */
-
-func (ht *Array) resetDataAndHash(dataSize uint32) {
-	ht.data = make([]Bucket, dataSize)
-	ht.indexMap = make(map[int]uint32)
-	ht.keyMap = make(map[string]uint32)
-}
-
-func (ht *Array) copyDataAndHash(source *Array) {
-	ht.data = make([]Bucket, len(source.data))
-	copy(ht.data, source.data)
-
-	ht.indexMap = make(map[int]uint32)
-	for i, pos := range source.indexMap {
-		ht.indexMap[i] = pos
-	}
-
-	ht.keyMap = make(map[string]uint32)
-	for i, pos := range source.keyMap {
-		ht.keyMap[i] = pos
-	}
-}
-
-
-func (ht *Array) RealInit() {
-	ht.clearData()
-}
-
-
-/**
  * Bucket 相关读接口
  */
-func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
-func (ht *Array) IndexFindBucket(index int) *Bucket {
-	if pos, ok := ht.indexMap[index]; ok {
-		return &ht.data[pos]
-	}
-	return nil
-}
-
-func (ht *Array) KeyFindBucket(key string) *Bucket {
+func (ht *Array) keyFindBucket(key string) *Bucket {
 	if pos, ok := ht.keyMap[key]; ok {
 		return &ht.data[pos]
 	}
 	return nil
 }
 
-func (ht *Array) IndexFindH(h zend.ZendUlong) *Zval {
-	return ht.IndexFind(int(h))
-}
-func (ht *Array) IndexFind(index int) *Zval {
-	var p = ht.IndexFindBucket(index)
-	if p != nil {
-		return p.GetVal()
-	}
-	return nil
-}
-
 func (ht *Array) KeyFind(key string) *Zval {
-	var p = ht.KeyFindBucket(key)
+	var p = ht.keyFindBucket(key)
 	if p != nil {
 		return p.GetVal()
 	}
@@ -140,13 +84,6 @@ func (ht *Array) KeyFindPtr(key string) any {
 		return zv.GetPtr()
 	}
 	return nil
-}
-
-func (ht *Array) IndexExists(index int) bool {
-	if _, ok := ht.indexMap[index]; ok {
-		return true
-	}
-	return false
 }
 
 func (ht *Array) KeyExists(key string) bool {
@@ -174,12 +111,8 @@ func (ht *Array) KeyExistsInd(key string) bool {
  */
 
 // IndexAdd
-func (ht *Array) IndexAddH(h zend.ZendUlong, pData *Zval) *Zval {
-	return ht.IndexAdd(int(h), pData)
-}
 func (ht *Array) IndexAdd(index int, pData *Zval) *Zval {
 	ht.assertRc1()
-
 	if ht.IndexExists(index) {
 		return nil
 	}
@@ -206,19 +139,17 @@ func (ht *Array) IndexUpdateH(h zend.ZendUlong, pData *Zval) *Zval {
 func (ht *Array) IndexUpdate(index int, pData *Zval) *Zval {
 	ht.assertRc1()
 
-	var p *Bucket
-
-	p = ht.IndexFindBucket(index)
-	if p != nil {
+	// 若找到则更新
+	if zv := ht.IndexFind(index); zv != nil {
 		if ht.destructor != nil {
-			ht.destructor(p.GetVal())
+			ht.destructor(zv)
 		}
-		ZVAL_COPY_VALUE(p.GetVal(), pData)
-		return p.GetVal()
+		ZVAL_COPY_VALUE(zv, pData)
+		return zv
 	}
 
-	p = ht.appendBucketIndex(index, pData)
-	return p.GetVal()
+	// 插入后返回
+	return ht.appendBucketIndex(index, pData).GetVal()
 }
 
 // NextIndexInsert
@@ -270,7 +201,7 @@ func (ht *Array) KeyAddNew(key string, pData *Zval) *Zval {
 func (ht *Array) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 	ht.assertRc1()
 
-	var p = ht.KeyFindBucket(strKey)
+	var p = ht.keyFindBucket(strKey)
 	if p != nil {
 		var data *Zval
 		b.Assert(p.GetVal() != pData)
@@ -298,7 +229,7 @@ func (ht *Array) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 func (ht *Array) KeyUpdate(key string, pData *Zval) *Zval {
 	ht.assertRc1()
 
-	var p = ht.KeyFindBucket(key)
+	var p = ht.keyFindBucket(key)
 	if p != nil {
 		var data *Zval
 		b.Assert(p.GetVal() != pData)
@@ -318,7 +249,7 @@ func (ht *Array) KeyUpdate(key string, pData *Zval) *Zval {
 func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	ht.assertRc1()
 
-	var p = ht.KeyFindBucket(key)
+	var p = ht.keyFindBucket(key)
 	if p != nil {
 		var data *Zval
 		b.Assert(p.GetVal() != pData)
@@ -417,7 +348,6 @@ func (ht *Array) IndexDelete(index int) bool {
 	}
 	return false
 }
-
 
 /**
  * Clean && Destroy

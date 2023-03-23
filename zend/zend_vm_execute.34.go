@@ -577,7 +577,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ht.IndexFindH(hval)
+			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
 			offset = types.Z_REFVAL_P(offset)
 			goto isset_again

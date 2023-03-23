@@ -608,7 +608,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).CountElements())
+	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
 	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -667,7 +667,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).CountElements())
+	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
 	var __ht *types.Array = stream_array.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *types.Zval = _p.GetVal()

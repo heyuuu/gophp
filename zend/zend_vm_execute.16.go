@@ -60,7 +60,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
-			if properties.CountElements() == 0 {
+			if properties.Len() == 0 {
 				EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 				if free_op1 != nil {
 					ZvalPtrDtorNogc(free_op1)

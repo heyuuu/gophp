@@ -52,7 +52,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ht.IndexFindH(hval)
+			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
 			offset = types.Z_REFVAL_P(offset)
 			goto isset_again
@@ -765,7 +765,7 @@ func ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) 
 
 		}
 	}
-	jump_zv = jumptable.IndexFindH(op.GetLval())
+	jump_zv = jumptable.IndexFind(op.GetLval())
 	if jump_zv != nil {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, jump_zv.GetLval())
 		return 0

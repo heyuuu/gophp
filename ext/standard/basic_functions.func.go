@@ -658,7 +658,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		argc = types.Z_ARRVAL_P(args).CountElements()
+		argc = types.Z_ARRVAL_P(args).Len()
 
 		/* Attempt to allocate enough memory to hold all of the arguments
 		 * and a trailing NULL */
@@ -697,7 +697,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if p_longopts != nil {
 		var count int
 		var entry *types.Zval
-		count = types.Z_ARRVAL_P(p_longopts).CountElements()
+		count = types.Z_ARRVAL_P(p_longopts).Len()
 
 		/* the first <len> slots are filled by the one short ops
 		 * we now extend our array and jump to the new added structs */
@@ -790,7 +790,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
-			if b.Assign(&args, return_value.GetArr().IndexFindH(optname_int)) != nil {
+			if b.Assign(&args, return_value.GetArr().IndexFind(optname_int)) != nil {
 				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
@@ -1324,7 +1324,7 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 			var method *types.Zval
 			if function.IsType(types.IS_STRING) {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s() - function does not exist", function.GetStr().GetVal())
-			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFindH(0)) != nil && b.Assign(&method, function.GetArr().IndexFindH(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
+			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFind(0)) != nil && b.Assign(&method, function.GetArr().IndexFind(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call tick function")
@@ -2130,7 +2130,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 		}
 		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetStr(), nil, nil, 0) == types.IS_LONG {
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()))
-			if b.Assign(&find_hash, arr.GetArr().IndexFindH(key)) == nil {
+			if b.Assign(&find_hash, arr.GetArr().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.GetArr().IndexAddNewH(key, &hash)
 			}

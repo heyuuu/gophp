@@ -416,7 +416,7 @@ try_again:
 	case types.IS_ARRAY:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
-		if types.Z_ARRVAL_P(callable).CountElements() == 2 {
+		if types.Z_ARRVAL_P(callable).Len() == 2 {
 			obj = types.ZendHashIndexFindDeref(callable.GetArr(), 0)
 			method = types.ZendHashIndexFindDeref(callable.GetArr(), 1)
 		}

@@ -298,7 +298,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		*info_ptr = CACHED_PTR_EX(cache_slot + 2)
 		return uintPtr(CACHED_PTR_EX(cache_slot + 1))
 	}
-	if ce.GetPropertiesInfo().CountElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
+	if ce.GetPropertiesInfo().Len() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
@@ -397,7 +397,7 @@ func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int)
 	var property_info *ZendPropertyInfo
 	var flags uint32
 	var scope *types.ClassEntry
-	if ce.GetPropertiesInfo().CountElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
+	if ce.GetPropertiesInfo().Len() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()

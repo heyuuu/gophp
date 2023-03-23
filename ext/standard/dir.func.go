@@ -431,7 +431,7 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		zend.AddNextIndexString(return_value, globbuf.gl_pathv[n]+cwd_skip)
 	}
 	globfree(&globbuf)
-	if basedir_limit != 0 && !(types.Z_ARRVAL_P(return_value).CountElements()) {
+	if basedir_limit != 0 && !(types.Z_ARRVAL_P(return_value).Len()) {
 		return_value.GetArr().DestroyEx()
 		return_value.SetFalse()
 		return

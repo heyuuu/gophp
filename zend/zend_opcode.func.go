@@ -313,7 +313,7 @@ func DestroyZendClass(zv *types.Zval) {
 		ce.GetPropertiesInfo().Destroy()
 		types.ZendStringReleaseEx(ce.GetName(), 0)
 		ce.GetFunctionTable().Destroy()
-		if ce.GetConstantsTable().CountElements() {
+		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
 			var __ht *types.Array = ce.GetConstantsTable()
 			for _, _p := range __ht.foreachData() {
@@ -382,7 +382,7 @@ func DestroyZendClass(zv *types.Zval) {
 			}
 		}
 		ce.GetFunctionTable().Destroy()
-		if ce.GetConstantsTable().CountElements() {
+		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
 			var __ht *types.Array = ce.GetConstantsTable()
 			for _, _p := range __ht.foreachData() {

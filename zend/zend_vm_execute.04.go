@@ -37,7 +37,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			ZEND_VM_SMART_BRANCH_TRUE()
 			EX_VAR(opline.GetResult().GetVar()).SetTrue()
 			ZEND_VM_NEXT_OPCODE()
-		} else if EG__().GetZendConstants().CountElements() == DECODE_SPECIAL_CACHE_NUM(c) {
+		} else if EG__().GetZendConstants().Len() == DECODE_SPECIAL_CACHE_NUM(c) {
 		defined_false:
 			ZEND_VM_SMART_BRANCH_FALSE()
 			EX_VAR(opline.GetResult().GetVar()).SetFalse()
@@ -45,7 +45,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	if ZendQuickCheckConstant(RT_CONSTANT(opline, opline.GetOp1()), opline, executeData) != types.SUCCESS {
-		CACHE_PTR(opline.GetExtendedValue(), ENCODE_SPECIAL_CACHE_NUM(EG__().GetZendConstants().CountElements()))
+		CACHE_PTR(opline.GetExtendedValue(), ENCODE_SPECIAL_CACHE_NUM(EG__().GetZendConstants().Len()))
 		goto defined_false
 	} else {
 		goto defined_true
@@ -685,7 +685,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ht.IndexFindH(hval)
+			value = ht.IndexFind(hval)
 		} else {
 			value = ZendFindArrayDimSlow(ht, offset, executeData)
 			if EG__().GetException() != nil {

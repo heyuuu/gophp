@@ -79,7 +79,7 @@ func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
 	ht.assertRc1()
 
 	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
-	var p = ht.KeyFindBucket(key)
+	var p = ht.keyFindBucket(key)
 	if p != nil {
 		if p == b {
 			return p.GetVal()
@@ -262,7 +262,7 @@ func (ht *Array) removeHolesForce() bool {
 	ht.eachValidBucket(func(pos uint32, p *Bucket) {
 		if newPos != pos {
 			// todo 考虑下实现细节的区别
-			//(&ht.data[newPos]).CopyFrom(&ht.data[pos])
+			//(&ht.data[newPos]).SetBy(&ht.data[pos])
 			ht.data[newPos] = ht.data[pos]
 		}
 		newPos++
@@ -366,7 +366,7 @@ func (ht *Array) Count() uint32 {
 	} else if ht == zend.EG__().GetSymbolTable() {
 		num = ht.RecalcElements()
 	} else {
-		num = ht.CountElements()
+		num = ht.Len()
 	}
 	return num
 }

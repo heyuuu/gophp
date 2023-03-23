@@ -638,7 +638,7 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 		num_key = _p.GetH()
 		string_key = _p.GetKey()
 		src_entry = _z
-		if src_entry.GetType() != types.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || string_key == nil && b.Assign(&dest_entry, dest.IndexFindH(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY {
+		if src_entry.GetType() != types.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || string_key == nil && b.Assign(&dest_entry, dest.IndexFind(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY {
 			src_entry.TryAddRefcount()
 			if string_key != nil {
 				if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
