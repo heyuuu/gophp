@@ -123,6 +123,9 @@ func (this *ZendExecuteData) Args(start int, len_ int) []*types.Zval {
 	}
 	return result
 }
+func (this *ZendExecuteData) AllArgs() []*types.Zval {
+	return this.Args(1, this.NumArgs())
+}
 
 func (this *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
 	if forceStrict {

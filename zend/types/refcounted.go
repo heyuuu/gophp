@@ -1,5 +1,3 @@
-// <<generate>>
-
 package types
 
 import (

@@ -10,9 +10,10 @@ import (
 )
 
 func ZEND_MM_ALIGNED_SIZE(size int) int {
-	return size + core.ZEND_MM_ALIGNMENT - 1&ZEND_MM_ALIGNMENT_MASK
+	return ZEND_MM_ALIGNED_SIZE_EX(size, core.ZEND_MM_ALIGNMENT)
 }
 func ZEND_MM_ALIGNED_SIZE_EX(size int, alignment int) int {
+	// size 对 alignment 向上取整 = math.Ceil(size/alignment) * alignment
 	return size + (alignment-1) & ^(alignment-1)
 }
 func EfreeSize(ptr any, size int)                     { b.Free(ptr) }

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import (
@@ -8,11 +6,8 @@ import (
 	"sik/zend/types"
 )
 
-func ZEND_REF_TYPE_SOURCES(ref *types.ZendReference) *types.ZendPropertyInfoSourceList {
-	return ref.GetSources()
-}
 func ZEND_REF_HAS_TYPE_SOURCES(ref *types.ZendReference) bool {
-	return ZEND_REF_TYPE_SOURCES(ref).GetPtr() != nil
+	return ref.GetSources().GetPtr() != nil
 }
 func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *ZendPropertyInfo {
 	if types.ZEND_PROPERTY_INFO_SOURCE_IS_LIST(ref.GetSources().GetList()) != 0 {
@@ -137,20 +132,12 @@ func ZendVmStackFreeExtraArgs(call *ZendExecuteData) {
 	ZendVmStackFreeExtraArgsEx(ZEND_CALL_INFO(call), call)
 }
 func ZendVmStackFreeArgs(call *ZendExecuteData) {
-	var num_args uint32 = call.NumArgs()
-	if num_args > 0 {
-		var p *types.Zval = call.Arg(1)
-		for {
-			if p.IsRefcounted() {
-				var r *types.ZendRefcounted = p.GetCounted()
-				if r.DelRefcount() == 0 {
-					p.SetNull()
-					RcDtorFunc(r)
-				}
-			}
-			p++
-			if !(b.PreDec(&num_args)) {
-				break
+	for _, p := range call.AllArgs() {
+		if p.IsRefcounted() {
+			r := p.GetCounted()
+			if r.DelRefcount() == 0 {
+				p.SetNull()
+				RcDtorFunc(r)
 			}
 		}
 	}
@@ -159,7 +146,7 @@ func ZendVmStackFreeCallFrameEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_ALLOCATED) != 0 {
 		var p ZendVmStack = EG__().GetVmStack()
 		var prev ZendVmStack = p.GetPrev()
-		b.Assert(call == (*ZendExecuteData)(ZEND_VM_STACK_ELEMENTS(EG__().GetVmStack())))
+		b.Assert(call == p.ElementsAsEx())
 		EG__().SetVmStackTop(prev.GetTop())
 		EG__().SetVmStackEnd(prev.GetEnd())
 		EG__().SetVmStack(prev)
