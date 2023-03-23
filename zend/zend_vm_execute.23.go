@@ -58,11 +58,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 	}
 	{
 	}
-	{
-	}
-	{
-	}
-
 	obj = object.GetObj()
 	called_scope = obj.GetCe()
 	if CACHED_PTR(opline.GetResult().GetNum()) == called_scope {
@@ -85,9 +80,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE|ZEND_ACC_NEVER_CACHE) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
-		{
-		}
-
 		/* Reset "object" to trigger reference counting */
 
 		/* Reset "object" to trigger reference counting */
@@ -96,14 +88,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteDat
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	}
-	{
-	}
-
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		{
-		}
-
 		/* call static method */
 
 		obj = (*types.ZendObject)(called_scope)
@@ -142,9 +128,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 		fbc = CACHED_PTR(opline.GetResult().GetNum() + b.SizeOf("void *"))
 	} else {
 		function_name = RT_CONSTANT(opline, opline.GetOp2())
-		{
-		}
-
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
@@ -162,9 +145,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExe
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
-		{
-		}
-
 	}
 
 	if !fbc.IsStatic() {
@@ -283,9 +263,6 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 	}
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	for {
-		{
-		}
-
 		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
 	}
@@ -301,9 +278,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExec
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ types.Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -412,9 +386,6 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
-		{
-		}
-
 	assign_op_object:
 
 		/* here we are sure we are dealing with an object */
@@ -487,9 +458,6 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	}
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	for {
-		{
-		}
-
 	pre_incdec_object:
 
 		/* here we are sure we are dealing with an object */
@@ -531,9 +499,6 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	}
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	for {
-		{
-		}
-
 	post_incdec_object:
 
 		/* here we are sure we are dealing with an object */
@@ -570,9 +535,6 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
-	{
-	}
-
 	/* here we are sure we are dealing with an object */
 
 	var zobj *types.ZendObject = container.GetObj()
@@ -607,9 +569,6 @@ func ZEND_FETCH_OBJ_W_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_TMP_VAR|IS_VAR, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS) }, nil), BP_VAR_W, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, 1, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -627,9 +586,6 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_TMP_VAR|IS_VAR, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -643,16 +599,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
-	{
-	}
-
 	/* here we are sure we are dealing with an object */
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	{
-	}
-
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, EX_VAR(opline.GetResult().GetVar()))
 	if retval != EX_VAR(opline.GetResult().GetVar()) {
 	fetch_obj_is_copy:
@@ -666,9 +616,6 @@ fetch_obj_is_finish:
 }
 func ZEND_FETCH_OBJ_FUNC_ARG_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_SEND_ARG_BY_REF) != 0 {
-		{
-		}
-
 		/* Behave like FETCH_OBJ_W */
 
 		return ZEND_FETCH_OBJ_W_SPEC_UNUSED_TMPVAR_HANDLER(executeData)
@@ -691,9 +638,6 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_TMP_VAR|IS_VAR, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_UNSET, 0, 1, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -709,12 +653,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendE
 	}
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-	{
-	}
-
 assign_object:
-	{
-	}
 	{
 	}
 
@@ -745,13 +684,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExe
 	}
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-	{
-	}
-
 assign_object:
-	{
-	}
-
 	{
 		value = types.ZVAL_DEREF(value)
 	}
@@ -783,13 +716,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExe
 	}
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-	{
-	}
-
 assign_object:
-	{
-	}
-
 	{
 		value = types.ZVAL_DEREF(value)
 	}
@@ -820,13 +747,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExec
 	}
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value = _get_zval_ptr_cv_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
-	{
-	}
-
 assign_object:
-	{
-	}
-
 	{
 		value = types.ZVAL_DEREF(value)
 	}
@@ -986,17 +907,11 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			break
 		}
 	}
-	{
-	}
-
 	obj = object.GetObj()
 	called_scope = obj.GetCe()
 
 	{
 		var orig_obj *types.ZendObject = obj
-		{
-		}
-
 		/* First, locate the function. */
 
 		fbc = obj.GetHandlers().GetGetMethod()(&obj, function_name.GetStr(), b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return RT_CONSTANT(opline, opline.GetOp2()) + 1 }, nil))
@@ -1006,8 +921,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			}
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
-		}
-		{
 		}
 		{
 		}
@@ -1025,9 +938,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		{
-		}
-
 		/* call static method */
 
 		obj = (*types.ZendObject)(called_scope)

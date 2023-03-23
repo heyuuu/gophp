@@ -49,9 +49,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 		if object_ptr.IsObject() {
 			dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 			value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 			ZvalPtrDtorNogc(free_op_data)
 		} else if object_ptr.IsString() {
@@ -136,9 +133,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 		if object_ptr.IsObject() {
 			dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 			value = _getZvalPtrVarDeref((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 			ZvalPtrDtorNogc(free_op_data)
 		} else if object_ptr.IsString() {
@@ -223,9 +217,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 		if object_ptr.IsObject() {
 			dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 			value = _get_zval_ptr_cv_deref_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 		} else if object_ptr.IsString() {
 
@@ -274,9 +265,6 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendEx
 	var container *types.Zval
 	var value_ptr *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 
@@ -304,9 +292,6 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExe
 	var container *types.Zval
 	var value_ptr *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	value_ptr = _get_zval_ptr_cv_BP_VAR_W((opline + 1).GetOp1().GetVar(), executeData)
 
@@ -373,9 +358,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 			ZvalPtrDtorNogc(free_op2)
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
@@ -397,9 +379,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 		}
 	} else {
 	check_parent_and_self:
-		{
-		}
-
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		call_info = ZEND_CALL_NESTED_FUNCTION
@@ -426,9 +405,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 		}
 	} else {
 		expr_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-		{
-		}
-
 	}
 	{
 		var free_op2 ZendFreeOp
@@ -572,9 +548,6 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			offset = ZVAL_UNDEFINED_OP2()
 		}
 		if container.IsObject() {
-			{
-			}
-
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
@@ -594,9 +567,6 @@ func ZEND_UNSET_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	for {
 		if container.GetType() != types.IS_OBJECT {
@@ -722,9 +692,6 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				{
-				}
-
 			}
 
 			/* If a function call result is yielded and the function did
@@ -923,9 +890,6 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				{
-				}
-
 			}
 
 			/* If a function call result is yielded and the function did
@@ -1016,9 +980,6 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
 		for {
-			{
-			}
-
 			ZendBinaryOp(var_ptr, var_ptr, value, opline)
 			break
 		}
@@ -1035,9 +996,6 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 		}
 		dim = nil
 		if container.IsObject() {
-			{
-			}
-
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {

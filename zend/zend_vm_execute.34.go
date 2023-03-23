@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -48,9 +47,6 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 		if object_ptr.IsObject() {
 			dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 			value = _get_zval_ptr_cv_deref_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 		} else if object_ptr.IsString() {
 
@@ -78,9 +74,6 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 			}
 		}
 	}
-	{
-	}
-
 	/* assign_dim has two opcodes! */
 
 	OPLINE = executeData.GetOpline() + 2
@@ -143,9 +136,6 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	var container *types.Zval
 	var value_ptr *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 
@@ -167,9 +157,6 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	var container *types.Zval
 	var value_ptr *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	value_ptr = _get_zval_ptr_cv_BP_VAR_W((opline + 1).GetOp1().GetVar(), executeData)
 
@@ -246,9 +233,6 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	for {
 		{
 			if op1_str.GetLen() == 0 {
-				{
-				}
-
 				EX_VAR(opline.GetResult().GetVar()).SetString(op2_str)
 				types.ZendStringReleaseEx(op1_str, 0)
 				break
@@ -256,9 +240,6 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		{
 			if op2_str.GetLen() == 0 {
-				{
-				}
-
 				EX_VAR(opline.GetResult().GetVar()).SetString(op1_str)
 				types.ZendStringReleaseEx(op2_str, 0)
 				break
@@ -289,9 +270,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	var call *ZendExecuteData
 	var call_info uint32
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	{
 		function_name = EX_VAR(opline.GetOp2().GetVar())
 	}
@@ -325,14 +303,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1()
 					if EG__().GetException() != nil {
-						{
-						}
 						HANDLE_EXCEPTION()
 					}
 				}
-				{
-				}
-
 				ZendInvalidMethodCall(object, function_name)
 				HANDLE_EXCEPTION()
 			}
@@ -344,9 +317,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 
 	{
 		var orig_obj *types.ZendObject = obj
-		{
-		}
-
 		/* First, locate the function. */
 
 		fbc = obj.GetHandlers().GetGetMethod()(&obj, function_name.GetStr(), b.CondF1(IS_CV == IS_CONST, func() *types.Zval { return RT_CONSTANT(opline, opline.GetOp2()) + 1 }, nil))
@@ -356,9 +326,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 			}
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		if obj != orig_obj {
 
 			/* Reset "object" to trigger reference counting */
@@ -371,8 +338,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
-	}
-	{
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
@@ -414,9 +379,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 		}
 	} else {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
-		{
-		}
-
 	}
 	{
 		var offset *types.Zval = EX_VAR(opline.GetOp2().GetVar())
@@ -556,9 +518,6 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			offset = ZVAL_UNDEFINED_OP2()
 		}
 		if container.IsObject() {
-			{
-			}
-
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
 		} else if container.IsString() {
 			faults.ThrowError(nil, "Cannot unset string offsets")
@@ -572,9 +531,6 @@ func ZEND_UNSET_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		if container.GetType() != types.IS_OBJECT {
@@ -655,9 +611,6 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 			goto isset_dim_obj_array
 		}
 	}
-	{
-	}
-
 	if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 		result = ZendIssetDimSlow(container, offset, executeData)
 	} else {
@@ -674,9 +627,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData
 	var result int
 	var offset *types.Zval
 	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
-	{
-	}
-
 	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -749,9 +699,6 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				{
-				}
-
 			}
 
 			/* If a function call result is yielded and the function did

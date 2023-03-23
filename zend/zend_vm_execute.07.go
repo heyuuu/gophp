@@ -10,9 +10,6 @@ import (
 
 func ZEND_VERIFY_RETURN_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -126,9 +123,6 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	types.ZendHashDelInd(target_symbol_table, name.GetStr())
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -146,9 +140,6 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
-	{
-	}
-
 	if value == nil {
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
 	} else {
@@ -333,9 +324,6 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			/* If There's no handler and it doesn't implement Countable then add a warning */
 
 		} else if op1.GetType() <= types.IS_NULL {
-			{
-			}
-
 			count = 0
 		} else {
 			count = 1
@@ -356,9 +344,6 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 			if op1.IsObject() {
 				EX_VAR(opline.GetResult().GetVar()).SetStringCopy(types.Z_OBJCE_P(op1).GetName())
 			} else {
-				{
-				}
-
 				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				EX_VAR(opline.GetResult().GetVar()).SetFalse()
 			}
@@ -494,17 +479,11 @@ func ZEND_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			EX_VAR(opline.GetResult().GetVar()).SetString(str)
 			{
-			}
-
-			{
 				types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		ZEND_VM_NEXT_OPCODE()
 	} else {
-		{
-		}
-
 		if op2.IsUndef() {
 			op2 = ZVAL_UNDEFINED_OP2()
 		}
@@ -548,9 +527,6 @@ func ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData)
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		{
-		}
-
 		return ZEND_FETCH_DIM_R_SPEC_CONST_CV_HANDLER(executeData)
 	}
 }
@@ -560,14 +536,9 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	{
-	}
-
 	offset = EX_VAR(opline.GetOp2().GetVar())
 	{
 		for {
-			{
-			}
 			{
 			}
 
@@ -605,15 +576,9 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	{
-	}
-
 	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	{
 		for {
-			{
-			}
-
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			goto fetch_obj_is_finish
 			break
@@ -624,9 +589,6 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	{
-	}
-
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, EX_VAR(opline.GetResult().GetVar()))
 	if retval != EX_VAR(opline.GetResult().GetVar()) {
 	fetch_obj_is_copy:
@@ -685,9 +647,6 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			EX_VAR(opline.GetResult().GetVar()).SetString(str)
 			{
-			}
-
-			{
 				types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
@@ -707,9 +666,6 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	for {
 		{
-		}
-
-		{
 			if op2_str.GetLen() == 0 {
 				{
 					if op1.IsRefcounted() {
@@ -725,9 +681,6 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 		memcpy(str.GetVal(), op1_str.GetVal(), op1_str.GetLen())
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		EX_VAR(opline.GetResult().GetVar()).SetString(str)
-		{
-		}
-
 		{
 			types.ZendStringReleaseEx(op2_str, 0)
 		}
@@ -746,9 +699,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	var call *ZendExecuteData
 	var call_info uint32
 	object = RT_CONSTANT(opline, opline.GetOp1())
-	{
-	}
-
 	{
 		function_name = EX_VAR(opline.GetOp2().GetVar())
 	}
@@ -775,11 +725,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 			{
 				{
 				}
-				{
-				}
-				{
-				}
-
 				ZendInvalidMethodCall(object, function_name)
 				HANDLE_EXCEPTION()
 			}
@@ -791,9 +736,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 
 	{
 		var orig_obj *types.ZendObject = obj
-		{
-		}
-
 		/* First, locate the function. */
 
 		fbc = obj.GetHandlers().GetGetMethod()(&obj, function_name.GetStr(), b.CondF1(IS_CV == IS_CONST, func() *types.Zval { return RT_CONSTANT(opline, opline.GetOp2()) + 1 }, nil))
@@ -802,8 +744,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
 			HANDLE_EXCEPTION()
-		}
-		{
 		}
 		{
 		}
@@ -816,13 +756,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	}
-	{
-	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		{
-		}
-
 		/* call static method */
 
 		obj = (*types.ZendObject)(called_scope)
@@ -896,13 +831,8 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 			}
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
-		}
-		{
 		}
 	}
 
@@ -919,9 +849,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 		}
 	} else {
 	check_parent_and_self:
-		{
-		}
-
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		call_info = ZEND_CALL_NESTED_FUNCTION

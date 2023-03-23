@@ -61,9 +61,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 		types.SEPARATE_ARRAY(object_ptr)
 		{
-			{
-			}
-
 			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
@@ -88,9 +85,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 		if object_ptr.IsObject() {
 			dim = nil
 			value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 		} else if object_ptr.IsString() {
 			{
@@ -117,9 +111,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 			}
 		}
 	}
-	{
-	}
-
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
@@ -173,9 +164,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 		if object_ptr.IsObject() {
 			dim = nil
 			value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 			ZvalPtrDtorNogc(free_op_data)
 		} else if object_ptr.IsString() {
@@ -206,9 +194,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 			}
 		}
 	}
-	{
-	}
-
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
@@ -262,9 +247,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 		if object_ptr.IsObject() {
 			dim = nil
 			value = _getZvalPtrVarDeref((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 			ZvalPtrDtorNogc(free_op_data)
 		} else if object_ptr.IsString() {
@@ -295,9 +277,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 			}
 		}
 	}
-	{
-	}
-
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
@@ -351,9 +330,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 		if object_ptr.IsObject() {
 			dim = nil
 			value = _get_zval_ptr_cv_deref_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
-			{
-			}
-
 			ZendAssignToObjectDim(object_ptr, dim, value, opline, executeData)
 		} else if object_ptr.IsString() {
 			{
@@ -380,9 +356,6 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 			}
 		}
 	}
-	{
-	}
-
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
@@ -433,9 +406,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 		}
 	} else {
 	check_parent_and_self:
-		{
-		}
-
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		call_info = ZEND_CALL_NESTED_FUNCTION
@@ -447,9 +417,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 }
 func ZEND_VERIFY_RETURN_TYPE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -518,9 +485,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 		}
 	} else {
 		expr_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-		{
-		}
-
 	}
 
 	{
@@ -589,9 +553,6 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				{
-				}
-
 			}
 
 			/* If a function call result is yielded and the function did
@@ -697,9 +658,6 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
@@ -826,9 +784,6 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		dim = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 		if container.IsObject() {
-			{
-			}
-
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
@@ -893,9 +848,6 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -949,9 +901,6 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		if object.GetType() != types.IS_OBJECT {

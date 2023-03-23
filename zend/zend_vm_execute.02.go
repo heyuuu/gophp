@@ -972,18 +972,12 @@ try_function_name:
 	if function_name.IsArray() {
 		call = ZendInitDynamicCallArray(function_name.GetArr(), opline.GetExtendedValue())
 	} else {
-		{
-		}
-
 		faults.ThrowError(nil, "Function name must be a string")
 		call = nil
 	}
 	if call == nil {
 		HANDLE_EXCEPTION()
 	}
-	{
-	}
-
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()

@@ -4,9 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -16,9 +14,6 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -118,9 +113,6 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 			{
 				types.ZendStringReleaseEx(op1_str, 0)
 			}
-			{
-			}
-
 		}
 		ZEND_VM_NEXT_OPCODE()
 	}
@@ -150,9 +142,6 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 				break
 			}
 		}
-		{
-		}
-
 		str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
 		memcpy(str.GetVal(), op1_str.GetVal(), op1_str.GetLen())
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
@@ -160,9 +149,6 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		{
 			types.ZendStringReleaseEx(op1_str, 0)
 		}
-		{
-		}
-
 		break
 	}
 	ZvalPtrDtorNogc(free_op1)
@@ -182,11 +168,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	{
 	}
 	{
-	}
-	{
-	}
-
-	{
 		for {
 			if object.GetType() != types.IS_OBJECT {
 				if object.IsReference() {
@@ -198,9 +179,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1()
 					if EG__().GetException() != nil {
-						{
-						}
-
 						HANDLE_EXCEPTION()
 					}
 				}
@@ -250,9 +228,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	}
-	{
-	}
-
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
 		ZvalPtrDtorNogc(free_op1)
@@ -353,9 +328,6 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			{
-			}
-
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
@@ -412,9 +384,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExec
 	var result int
 	var offset *types.Zval
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -449,9 +418,6 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 		ht = subject.GetArr()
 		result = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 	} else {
-		{
-		}
-
 		result = ZendArrayKeyExistsSlow(subject, key, opline, executeData)
 	}
 	ZvalPtrDtorNogc(free_op1)
@@ -580,9 +546,6 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_TMPVARCV_HANDLER(executeData *ZendExecut
 		}
 	} else {
 	fetch_dim_r_index_slow:
-		{
-		}
-
 		zend_fetch_dimension_address_read_R_slow(container, dim, opline, executeData)
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()

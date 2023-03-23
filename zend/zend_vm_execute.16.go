@@ -538,18 +538,12 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		{
-		}
-
 		generator.GetValues().GetFePos() = 0
 		ZvalPtrDtorNogc(free_op1)
 	} else if val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
 		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
-			{
-			}
-
 			ZvalPtrDtorNogc(free_op1)
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
@@ -689,9 +683,6 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
@@ -886,9 +877,6 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -943,9 +931,6 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if object.GetType() != types.IS_OBJECT {

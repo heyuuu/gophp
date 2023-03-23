@@ -82,9 +82,6 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 		goto isset_dim_obj_exit
 	} else {
 	}
-	{
-	}
-
 	if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 		result = ZendIssetDimSlow(container, offset, executeData)
 	} else {
@@ -101,9 +98,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteD
 	var result int
 	var offset *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	{
-	}
-
 	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	{
 

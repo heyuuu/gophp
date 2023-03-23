@@ -30,9 +30,6 @@ func ZEND_FETCH_DIM_FUNC_ARG_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) i
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		{
-		}
-
 		return ZEND_FETCH_DIM_R_SPEC_TMPVAR_CV_HANDLER(executeData)
 	}
 }
@@ -134,9 +131,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 		}
 	} else {
 		expr_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-		{
-		}
-
 	}
 	{
 		var offset *types.Zval = EX_VAR(opline.GetOp2().GetVar())
@@ -234,9 +228,6 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				{
-				}
-
 			}
 
 			/* If a function call result is yielded and the function did
@@ -560,9 +551,6 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		{
 			types.ZVAL_COPY_VALUE(return_value, retval_ptr)
-			{
-			}
-
 		}
 
 	}
@@ -588,9 +576,6 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 				executeData.GetReturnValue().
 					SetNewRef(retval_ptr)
-				{
-				}
-
 			}
 			break
 		}
@@ -637,9 +622,6 @@ func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		types.ZVAL_COPY_VALUE(generator.GetRetval(), retval)
-		{
-		}
-
 	}
 
 	/* Close the generator to free up resources */
@@ -678,9 +660,6 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		break
 	}
 	faults.ExceptionSave()
-	{
-	}
-
 	faults.ThrowExceptionObject(value)
 	faults.ExceptionRestore()
 	ZvalPtrDtorNogc(free_op1)
@@ -897,9 +876,6 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 		if expr.IsType(opline.GetExtendedValue()) {
 			types.ZVAL_COPY_VALUE(result, expr)
-			{
-			}
-
 			ZvalPtrDtorNogc(free_op1)
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
@@ -968,9 +944,6 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if array_ptr.IsArray() {
 		result = EX_VAR(opline.GetResult().GetVar())
 		types.ZVAL_COPY_VALUE(result, array_ptr)
-		{
-		}
-
 		result.SetFePos(0)
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_NEXT_OPCODE()
@@ -986,9 +959,6 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
 			types.ZVAL_COPY_VALUE(result, array_ptr)
-			{
-			}
-
 			if properties.GetNNumOfElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				ZvalPtrDtorNogc(free_op1)

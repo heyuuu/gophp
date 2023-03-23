@@ -57,9 +57,6 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 			}
 		} else {
 		fetch_dim_r_slow:
-			{
-			}
-
 			zend_fetch_dimension_address_read_R_slow(container, dim, opline, executeData)
 		}
 	}
@@ -87,9 +84,6 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -140,9 +134,6 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -162,9 +153,6 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	{
-	}
-
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, EX_VAR(opline.GetResult().GetVar()))
 	if retval != EX_VAR(opline.GetResult().GetVar()) {
 	fetch_obj_is_copy:
@@ -243,9 +231,6 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	for {
 		{
 			if op1_str.GetLen() == 0 {
-				{
-				}
-
 				EX_VAR(opline.GetResult().GetVar()).SetString(op2_str)
 				types.ZendStringReleaseEx(op1_str, 0)
 				break
@@ -253,9 +238,6 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		}
 		{
 			if op2_str.GetLen() == 0 {
-				{
-				}
-
 				EX_VAR(opline.GetResult().GetVar()).SetString(op1_str)
 				types.ZendStringReleaseEx(op2_str, 0)
 				break
@@ -289,9 +271,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var call *ZendExecuteData
 	var call_info uint32
 	object = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	{
 		function_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	}
@@ -334,9 +313,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 						HANDLE_EXCEPTION()
 					}
 				}
-				{
-				}
-
 				ZendInvalidMethodCall(object, function_name)
 				ZvalPtrDtorNogc(free_op2)
 				ZvalPtrDtorNogc(free_op1)
@@ -350,9 +326,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 
 	{
 		var orig_obj *types.ZendObject = obj
-		{
-		}
-
 		/* First, locate the function. */
 
 		fbc = obj.GetHandlers().GetGetMethod()(&obj, function_name.GetStr(), b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *types.Zval { return RT_CONSTANT(opline, opline.GetOp2()) + 1 }, nil))
@@ -364,9 +337,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 		}
-		{
-		}
-
 		if obj != orig_obj {
 
 			/* Reset "object" to trigger reference counting */
@@ -530,9 +500,6 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 			goto isset_dim_obj_array
 		}
 	}
-	{
-	}
-
 	if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 		result = ZendIssetDimSlow(container, offset, executeData)
 	} else {
@@ -553,9 +520,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExe
 	var result int
 	var offset *types.Zval
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {

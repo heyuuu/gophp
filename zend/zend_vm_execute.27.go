@@ -53,9 +53,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result == 0 {
 				goto is_not_equal_true
 			} else {
@@ -113,9 +110,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) 
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result == 0 {
 				goto is_not_equal_true
 			} else {
@@ -173,9 +167,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData)
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result == 0 {
 				goto is_not_equal_true
 			} else {
@@ -213,9 +204,6 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
@@ -398,9 +386,6 @@ func ZEND_PRE_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -451,9 +436,6 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -562,9 +544,6 @@ func ZEND_FETCH_DIM_FUNC_ARG_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData)
 		}
 		return ZEND_FETCH_DIM_W_SPEC_CV_CONST_HANDLER(executeData)
 	} else {
-		{
-		}
-
 		return ZEND_FETCH_DIM_R_SPEC_CV_CONST_HANDLER(executeData)
 	}
 }
@@ -586,9 +565,6 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -601,9 +577,6 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 			if container.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 			}
-			{
-			}
-
 			ZendWrongPropertyRead(offset)
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			goto fetch_obj_r_finish
@@ -675,9 +648,6 @@ func ZEND_FETCH_OBJ_W_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var result *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_CV, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS) }, nil), BP_VAR_W, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, 1, opline, executeData)
@@ -693,9 +663,6 @@ func ZEND_FETCH_OBJ_RW_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var result *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_CV, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
@@ -710,9 +677,6 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -801,9 +765,6 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) in
 	var property *types.Zval
 	var result *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_CV, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_UNSET, 0, 1, opline, executeData)
@@ -819,9 +780,6 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 	var value *types.Zval
 	var tmp types.Zval
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 	if object.GetType() != types.IS_OBJECT {
@@ -888,9 +846,6 @@ assign_object:
 			}
 		}
 	}
-	{
-	}
-
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
@@ -911,9 +866,6 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 	var value *types.Zval
 	var tmp types.Zval
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 	if object.GetType() != types.IS_OBJECT {
@@ -966,9 +918,6 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				{
-				}
-
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
@@ -1001,9 +950,6 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 	var value *types.Zval
 	var tmp types.Zval
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 	if object.GetType() != types.IS_OBJECT {
@@ -1056,9 +1002,6 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				{
-				}
-
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)

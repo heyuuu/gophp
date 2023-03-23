@@ -96,9 +96,6 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	for {
 		if obj.GetType() != types.IS_OBJECT {
 			if obj.IsReference() {
@@ -166,9 +163,6 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 
 		if expr.IsType(opline.GetExtendedValue()) {
 			types.ZVAL_COPY_VALUE(result, expr)
-			{
-			}
-
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
@@ -285,9 +279,6 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	if array_ptr.IsArray() {
 		result = EX_VAR(opline.GetResult().GetVar())
 		types.ZVAL_COPY_VALUE(result, array_ptr)
-		{
-		}
-
 		result.SetFePos(0)
 		ZEND_VM_NEXT_OPCODE()
 	} else if array_ptr.IsObject() {
@@ -302,9 +293,6 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = EX_VAR(opline.GetResult().GetVar())
 			types.ZVAL_COPY_VALUE(result, array_ptr)
-			{
-			}
-
 			if properties.GetNNumOfElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
@@ -354,8 +342,6 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			types.SEPARATE_ARRAY(array_ptr)
 		}
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
-		{
-		}
 		ZEND_VM_NEXT_OPCODE()
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
@@ -384,8 +370,6 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
-			{
-			}
 			if EG__().GetException() != nil {
 				HANDLE_EXCEPTION()
 			} else if is_empty != 0 {
@@ -398,8 +382,6 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
 		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
-		{
-		}
 		ZEND_VM_JMP(OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }
@@ -487,17 +469,11 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
-		{
-		}
-
 		generator.GetValues().GetFePos() = 0
 	} else if val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
 		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
-			{
-			}
-
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
 					faults.ThrowError(nil, "Impossible to yield from the Generator being currently run")
@@ -804,18 +780,12 @@ func ZEND_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZendStringReleaseEx(op1_str, 0)
 			}
-			{
-			}
-
 		}
 		ZEND_VM_NEXT_OPCODE()
 	} else {
 		if op1.IsUndef() {
 			op1 = ZVAL_UNDEFINED_OP1()
 		}
-		{
-		}
-
 		ConcatFunction(EX_VAR(opline.GetResult().GetVar()), op1, op2)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
@@ -890,9 +860,6 @@ func ZEND_IS_EQUAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result != 0 {
 				goto is_equal_true
 			} else {
@@ -950,9 +917,6 @@ func ZEND_IS_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) int 
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result != 0 {
 				goto is_equal_true
 			} else {
@@ -1010,9 +974,6 @@ func ZEND_IS_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData) int
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result != 0 {
 				goto is_equal_true
 			} else {

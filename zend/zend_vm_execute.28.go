@@ -6,7 +6,6 @@ import (
 	b "sik/builtin"
 	"sik/zend/faults"
 	"sik/zend/types"
-	"sik/zend/zpp"
 )
 
 func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -16,9 +15,6 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 	var value *types.Zval
 	var tmp types.Zval
 	object = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value = _get_zval_ptr_cv_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
 	if object.GetType() != types.IS_OBJECT {
@@ -71,9 +67,6 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				{
-				}
-
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
@@ -166,9 +159,6 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 			}
 		}
 	}
-	{
-	}
-
 	/* assign_dim has two opcodes! */
 
 	OPLINE = executeData.GetOpline() + 2
@@ -247,9 +237,6 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 			}
 		}
 	}
-	{
-	}
-
 	/* assign_dim has two opcodes! */
 
 	OPLINE = executeData.GetOpline() + 2
@@ -328,9 +315,6 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 			}
 		}
 	}
-	{
-	}
-
 	/* assign_dim has two opcodes! */
 
 	OPLINE = executeData.GetOpline() + 2
@@ -405,9 +389,6 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 			}
 		}
 	}
-	{
-	}
-
 	/* assign_dim has two opcodes! */
 
 	OPLINE = executeData.GetOpline() + 2
@@ -447,9 +428,6 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExec
 	var container *types.Zval
 	var value_ptr *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 
@@ -471,9 +449,6 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecu
 	var container *types.Zval
 	var value_ptr *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value_ptr = _get_zval_ptr_cv_BP_VAR_W((opline + 1).GetOp1().GetVar(), executeData)
 
@@ -515,9 +490,6 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZendStringReleaseEx(op1_str, 0)
 			}
-			{
-			}
-
 		}
 		ZEND_VM_NEXT_OPCODE()
 	}
@@ -547,9 +519,6 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				break
 			}
 		}
-		{
-		}
-
 		str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
 		memcpy(str.GetVal(), op1_str.GetVal(), op1_str.GetLen())
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
@@ -557,9 +526,6 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		{
 			types.ZendStringReleaseEx(op1_str, 0)
 		}
-		{
-		}
-
 		break
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -578,11 +544,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	{
 	}
 	{
-	}
-	{
-	}
-
-	{
 		for {
 			if object.GetType() != types.IS_OBJECT {
 				if object.IsReference() {
@@ -594,9 +555,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 				if object.IsUndef() {
 					object = ZVAL_UNDEFINED_OP1()
 					if EG__().GetException() != nil {
-						{
-						}
-
 						HANDLE_EXCEPTION()
 					}
 				}
@@ -644,9 +602,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	}
-	{
-	}
-
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
 		if EG__().GetException() != nil {
@@ -687,9 +642,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 		}
 	} else {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
-		{
-		}
-
 	}
 	{
 		var offset *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
@@ -698,9 +650,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			{
-			}
-
 		str_index:
 			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
@@ -766,9 +715,6 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		offset_again:
 			if offset.IsString() {
 				key = offset.GetStr()
-				{
-				}
-
 			str_index_dim:
 				if ht == EG__().GetSymbolTable() {
 					ZendDeleteGlobalVariable(key)
@@ -807,9 +753,6 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsUndef() {
 			container = ZVAL_UNDEFINED_OP1()
 		}
-		{
-		}
-
 		if container.IsObject() {
 			if offset.GetU2Extra() == ZEND_EXTRA_VALUE {
 				offset++
@@ -827,9 +770,6 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	container = EX_VAR(opline.GetOp1().GetVar())
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if container.GetType() != types.IS_OBJECT {
@@ -867,9 +807,6 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			{
-			}
-
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
@@ -924,9 +861,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteD
 	var result int
 	var offset *types.Zval
 	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -959,9 +893,6 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 		ht = subject.GetArr()
 		result = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 	} else {
-		{
-		}
-
 		result = ZendArrayKeyExistsSlow(subject, key, opline, executeData)
 	}
 	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
@@ -1028,9 +959,6 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
 				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
-				{
-				}
-
 			}
 
 			/* If a function call result is yielded and the function did

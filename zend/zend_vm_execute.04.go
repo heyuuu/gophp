@@ -103,9 +103,6 @@ func ZEND_ADD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_add_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_SUB_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -117,9 +114,6 @@ func ZEND_SUB_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_sub_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_MUL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -131,9 +125,6 @@ func ZEND_MUL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_mul_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_DIV_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -152,9 +143,6 @@ func ZEND_MOD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	/* Prevent overflow error/crash if op1==ZEND_LONG_MIN */
 
 	/* Prevent overflow error/crash if op1==ZEND_LONG_MIN */
@@ -167,9 +155,6 @@ func ZEND_SL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
 
 	return zend_shift_left_helper_SPEC(op1, op2, executeData)
@@ -180,9 +165,6 @@ func ZEND_SR_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_shift_right_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_POW_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -226,9 +208,6 @@ func ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_is_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -239,9 +218,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) in
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_is_not_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -252,9 +228,6 @@ func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_is_smaller_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -265,9 +238,6 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteD
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_SPACESHIP_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -285,9 +255,6 @@ func ZEND_BW_OR_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_bw_or_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_BW_AND_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -296,9 +263,6 @@ func ZEND_BW_AND_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_bw_and_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_BW_XOR_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -307,9 +271,6 @@ func ZEND_BW_XOR_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	{
-	}
-
 	return zend_bw_xor_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_BOOL_XOR_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -348,9 +309,6 @@ func ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDa
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		{
-		}
-
 		return ZEND_FETCH_DIM_R_SPEC_CONST_CONST_HANDLER(executeData)
 	}
 }
@@ -422,15 +380,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	{
 	}
 	{
-	}
-	{
-	}
-
-	{
 		for {
 			{
-				{
-				}
 				{
 				}
 
@@ -465,9 +416,6 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE|ZEND_ACC_NEVER_CACHE) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
-		{
-		}
-
 		/* Reset "object" to trigger reference counting */
 
 		/* Reset "object" to trigger reference counting */
@@ -476,14 +424,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 	}
-	{
-	}
-
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		{
-		}
-
 		/* call static method */
 
 		obj = (*types.ZendObject)(called_scope)
@@ -518,18 +460,12 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 				b.Assert(EG__().GetException() != nil)
 				HANDLE_EXCEPTION()
 			}
-			{
-			}
-
 		}
 	}
 
 	if b.Assign(&fbc, CACHED_PTR(opline.GetResult().GetNum()+b.SizeOf("void *"))) != nil {
 	} else {
 		function_name = RT_CONSTANT(opline, opline.GetOp2())
-		{
-		}
-
 		if ce.GetGetStaticMethod() != nil {
 			fbc = ce.GetGetStaticMethod()(ce, function_name.GetStr())
 		} else {
@@ -547,9 +483,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
-		{
-		}
-
 	}
 
 	if !fbc.IsStatic() {
@@ -565,9 +498,6 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 		}
 	} else {
 	check_parent_and_self:
-		{
-		}
-
 		/* previous opcode is ZEND_FETCH_CLASS */
 
 		call_info = ZEND_CALL_NESTED_FUNCTION
@@ -618,9 +548,6 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
-		{
-		}
-
 		if func_.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(func_.GetOpArray())) {
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
@@ -710,9 +637,6 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 	add_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			{
-			}
-
 		str_index:
 			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
@@ -778,9 +702,6 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 	isset_again:
 		if offset.IsString() {
 			str = offset.GetStr()
-			{
-			}
-
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
 			hval = offset.GetLval()
@@ -832,9 +753,6 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecu
 	var result int
 	var offset *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	{
 

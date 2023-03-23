@@ -289,9 +289,6 @@ func ZEND_SEND_VAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
-	{
-	}
-
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -327,9 +324,6 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	for {
 		if obj.GetType() != types.IS_OBJECT {
 			if obj.IsReference() {
@@ -554,18 +548,12 @@ func ZEND_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				types.ZendStringReleaseEx(op1_str, 0)
 			}
-			{
-			}
-
 		}
 		ZEND_VM_NEXT_OPCODE()
 	} else {
 		if op1.IsUndef() {
 			op1 = ZVAL_UNDEFINED_OP1()
 		}
-		{
-		}
-
 		ConcatFunction(EX_VAR(opline.GetResult().GetVar()), op1, op2)
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -618,9 +606,6 @@ func ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result != 0 {
 				goto is_equal_true
 			} else {
@@ -679,9 +664,6 @@ func ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) 
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result != 0 {
 				goto is_equal_true
 			} else {
@@ -740,9 +722,6 @@ func ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData)
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result != 0 {
 				goto is_equal_true
 			} else {
@@ -799,9 +778,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result == 0 {
 				goto is_not_equal_true
 			} else {
@@ -860,9 +836,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result == 0 {
 				goto is_not_equal_true
 			} else {
@@ -921,9 +894,6 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 			{
 				ZvalPtrDtorStr(op1)
 			}
-			{
-			}
-
 			if result == 0 {
 				goto is_not_equal_true
 			} else {
@@ -1003,9 +973,6 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	{
-	}
-
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -1018,9 +985,6 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 			if container.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 			}
-			{
-			}
-
 			ZendWrongPropertyRead(offset)
 			EX_VAR(opline.GetResult().GetVar()).SetNull()
 			goto fetch_obj_r_finish

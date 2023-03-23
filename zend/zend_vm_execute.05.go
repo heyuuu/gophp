@@ -20,9 +20,6 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 		ht = subject.GetArr()
 		result = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 	} else {
-		{
-		}
-
 		result = ZendArrayKeyExistsSlow(subject, key, opline, executeData)
 	}
 	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
@@ -892,9 +889,6 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecute
 		}
 	} else {
 	fetch_dim_r_index_slow:
-		{
-		}
-
 		zend_fetch_dimension_address_read_R_slow(container, dim, opline, executeData)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
@@ -951,17 +945,11 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			EX_VAR(opline.GetResult().GetVar()).SetString(str)
 			{
-			}
-
-			{
 				types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		ZEND_VM_NEXT_OPCODE()
 	} else {
-		{
-		}
-
 		if op2.IsUndef() {
 			op2 = ZVAL_UNDEFINED_OP2()
 		}
@@ -1012,9 +1000,6 @@ func ZEND_FETCH_DIM_FUNC_ARG_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteD
 		}
 		return ZEND_NULL_HANDLER(executeData)
 	} else {
-		{
-		}
-
 		return ZEND_FETCH_DIM_R_SPEC_CONST_TMPVAR_HANDLER(executeData)
 	}
 }
