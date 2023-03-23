@@ -866,10 +866,10 @@ convert:
 			str_key.DelRefcount()
 		}
 		for {
-			if Z_OPT_REFCOUNTED_P(zv) {
-				if Z_ISREF_P(zv) && Z_REFCOUNT_P(zv) == 1 {
+			if zv.IsRefcounted() {
+				if zv.IsReference() && Z_REFCOUNT_P(zv) == 1 {
 					zv = Z_REFVAL_P(zv)
-					if !(Z_OPT_REFCOUNTED_P(zv)) {
+					if !(zv.IsRefcounted()) {
 						break
 					}
 				}
@@ -930,10 +930,10 @@ convert:
 		str_key = _p.GetKey()
 		zv = _z
 		for {
-			if Z_OPT_REFCOUNTED_P(zv) {
-				if Z_ISREF_P(zv) && Z_REFCOUNT_P(zv) == 1 {
+			if zv.IsRefcounted() {
+				if zv.IsReference() && Z_REFCOUNT_P(zv) == 1 {
 					zv = Z_REFVAL_P(zv)
-					if !(Z_OPT_REFCOUNTED_P(zv)) {
+					if !(zv.IsRefcounted()) {
 						break
 					}
 				}

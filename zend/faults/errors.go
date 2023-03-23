@@ -313,7 +313,7 @@ func ErrorNoreturn(type_ int, format string, _ ...any) {
 
 	/* Should never reach this. */
 }
-func ThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
+func ThrowErrorEx(exception_ce *types.ClassEntry, message string) {
 	if exception_ce != nil {
 		if zend.InstanceofFunction(exception_ce, ZendCeError) == 0 {
 			Error(E_NOTICE, "Error exceptions must be derived from Error")
@@ -329,8 +329,6 @@ func ThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
 		return
 	}
 
-	message := zend.ZendSprintf(format, args...)
-
 	//TODO: we can't convert compile-time errors to exceptions yet???
 
 	if zend.CurrEX() != nil && zend.CG__().GetInCompilation() == 0 {
@@ -338,6 +336,10 @@ func ThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
 	} else {
 		Error(E_ERROR, "%s", message)
 	}
+}
+func ThrowError(exception_ce *types.ClassEntry, format string, args ...any) {
+	message := zend.ZendSprintf(format, args...)
+	ThrowErrorEx(exception_ce, message)
 }
 func TypeError(format string, args ...any) {
 	message := zend.ZendSprintf(format, args...)

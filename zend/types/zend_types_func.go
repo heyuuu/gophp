@@ -54,15 +54,8 @@ func HT_SIZE(ht *Array) int {
 	// todo 待移除 - 返回 HashTable 中旧 arData 内存大小 (含 hash 内存 + item 内存)
 	return 0
 }
-func HT_USED_SIZE(ht *Array) int {
-	return HT_HASH_SIZE(ht.GetNTableMask()) + size_t(ht).nNumUsed*b.SizeOf("Bucket")
-}
-func HT_HASH_TO_BUCKET(ht *Array, idx uint32) *Bucket { return ht.Bucket(idx) }
 func HT_SET_DATA_ADDR(ht *Array, ptr __auto__) {
 	ht.SetArData((*Bucket)((*byte)(ptr) + HT_HASH_SIZE(ht.GetNTableMask())))
-}
-func HT_GET_DATA_ADDR(ht *Array) *byte {
-	return (*byte)(ht.GetArData() - HT_HASH_SIZE(ht.GetNTableMask()))
 }
 func ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list *ZendPropertyInfoList) int { return 0x1 | uintPtr(list) }
 func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
@@ -75,8 +68,6 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 func Z_FE_ITER_P(zval_p *Zval) uint32      { return zval_p.GetFeIterIdx() }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
 
-func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool             { return zval_p.IsRefcounted() }
-func Z_ISREF_P(zval_p *Zval) bool                      { return zval_p.IsReference() }
 func Z_STR_P(zval_p *Zval) *String                     { return zval_p.GetStr() }
 func Z_STRVAL_P(zval_p *Zval) []byte                   { return zval_p.GetStr().GetVal() }
 func Z_ARRVAL(zval Zval) *Array                        { return zval.GetArr() }
@@ -97,7 +88,6 @@ func Z_RES_HANDLE(zval Zval) int            { return Z_RES(zval).GetHandle() }
 func Z_RES_HANDLE_P(zval_p *Zval) int       { return Z_RES_HANDLE(*zval_p) }
 func Z_RES_TYPE(zval Zval) int              { return Z_RES(zval).GetType() }
 func Z_RES_TYPE_P(zval_p *Zval) int         { return Z_RES_TYPE(*zval_p) }
-func Z_REF(zval Zval) *ZendReference        { return zval.GetRef() }
 func Z_REF_P(zval_p *Zval) *ZendReference   { return zval_p.GetRef() }
 func Z_REFVAL(zval Zval) *Zval              { return zval.GetRef().GetVal() }
 func Z_REFVAL_P(zval_p *Zval) *Zval         { return zval_p.GetRef().GetVal() }
@@ -109,32 +99,21 @@ func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.GetZv() }
 func Z_CE(zval Zval) *ClassEntry            { return zval.GetCe() }
 func Z_PTR(zval Zval) any                   { return zval.GetPtr() }
 
-func ZVAL_BOOL(z *Zval, b int)             { z.SetBool(b != 0) }
-func ZVAL_LONG(z *Zval, l zend.ZendLong)   { z.SetLong(l) }
-func ZVAL_STR(z *Zval, s *String)          { z.SetString(s) }
-func ZVAL_INTERNED_STR(z *Zval, s *String) { z.SetInternedString(s) }
-func ZVAL_NEW_STR(z *Zval, s *String)      { z.SetString(s) }
-func ZVAL_STR_COPY(z *Zval, s *String)     { z.SetStringCopy(s) }
-func ZVAL_ARR(z *Zval, a *Array)           { z.SetArray(a) }
+func ZVAL_BOOL(z *Zval, b int)         { z.SetBool(b != 0) }
+func ZVAL_STR(z *Zval, s *String)      { z.SetString(s) }
+func ZVAL_STR_COPY(z *Zval, s *String) { z.SetStringCopy(s) }
+func ZVAL_ARR(z *Zval, a *Array)       { z.SetArray(a) }
 func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
 	var arr = NewZendArray(0)
 	z.SetArray(arr)
 }
-func ZVAL_OBJ(z *Zval, o *ZendObject)                      { z.SetObject(o) }
-func ZVAL_RES(z *Zval, r *ZendResource)                    { z.SetResource(r) }
-func ZVAL_NEW_RES(z *Zval, h int, p any, t int)            { z.SetNewResource(h, p, t) }
-func ZVAL_NEW_PERSISTENT_RES(z *Zval, h int, p any, t int) { z.SetNewResourcePersistent(h, p, t) }
-func ZVAL_REF(z *Zval, r *ZendReference)                   { z.SetReference(r) }
-func ZVAL_NEW_EMPTY_REF(z *Zval)                           { z.SetNewEmptyRef() }
-func ZVAL_NEW_REF(z *Zval, r *Zval)                        { z.SetNewRef(r) }
+func ZVAL_NEW_REF(z *Zval, r *Zval) { z.SetNewRef(r) }
 func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	var ref *ZendReference = NewZendReference(z)
 	ref.SetRefcount(refcount)
 	z.SetReference(ref)
 }
-func ZVAL_AST(z *Zval, ast *ZendAstRef) { z.SetConstantAst(ast) }
-func ZVAL_INDIRECT(z *Zval, v *Zval)    { z.SetIndirect(v) }
-func ZVAL_PTR(z *Zval, p any)           { z.SetAsPtr(p) }
+func ZVAL_PTR(z *Zval, p any) { z.SetAsPtr(p) }
 func ZVAL_ALIAS_PTR(z *Zval, p *ClassEntry) {
 	z.SetPtr(p)
 	z.SetTypeInfo(IS_ALIAS_PTR)

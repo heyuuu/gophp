@@ -9,7 +9,7 @@ import (
 )
 
 func ZendWrongStringOffset(executeData *ZendExecuteData) {
-	var msg *byte = nil
+	var msg string
 	var opline *ZendOp = executeData.GetOpline()
 	var end *ZendOp
 	var var_ uint32
@@ -132,8 +132,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 	default:
 
 	}
-	b.Assert(msg != nil)
-	faults.ThrowError(nil, "%s", msg)
+	faults.ThrowErrorEx(nil, msg)
 }
 func ZendWrongPropertyRead(property *types.Zval) {
 	var tmp_property_name *types.String
