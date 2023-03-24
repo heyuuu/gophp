@@ -26,11 +26,11 @@ func (ht *Array) GetNTableMask() uint32                   { return 0 } // todo r
 
 func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
 
-func (ht *Array) Count() uint32 {
-	var num uint32
+func (ht *Array) Count() int {
+	var num int
 	if ht.HasEmptyIndex() {
 		num = ht.recalcElements()
-		if ht.elementsCount == num {
+		if int(ht.elementsCount) == num {
 			ht.UnmarkHasEmptyIndex()
 		}
 	} else if ht == zend.EG__().GetSymbolTable() { // todo
@@ -41,9 +41,9 @@ func (ht *Array) Count() uint32 {
 	return num
 }
 
-// 重新计算有效元素个数(与 elementsCount 不同，它考虑 IS_INDIRECT 元素为 IS_UNDEF 的情况)
-func (ht *Array) recalcElements() uint32 {
-	var num uint32 = 0
+// 重新计算有效元素个数(与 elementsCount 不同，它需要过滤 IS_INDIRECT 元素为 IS_UNDEF 的情况)
+func (ht *Array) recalcElements() int {
+	var num = 0
 	ht.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
 		num++
 	})
@@ -53,8 +53,8 @@ func (ht *Array) recalcElements() uint32 {
 /**
  * Sort
  */
-type ArrayCompareFunc func(a *Bucket, b *Bucket) bool
-type ArrayCompareExFunc func(a *Bucket, b *Bucket) int
+type ArrayCompareFunc func(p1 *Bucket, p2 *Bucket) bool
+type ArrayCompareExFunc func(p1 *Bucket, p2 *Bucket) int
 
 func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 	ht.assertRc1()
@@ -80,7 +80,7 @@ func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 	ht.Rehash()
 }
 
-func (ht *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) bool {
+func (ht *Array) SortCompatible(comparer ArrayCompareExFunc, renumber ZendBool) bool {
 	ht.Sort(func(a *Bucket, b *Bucket) bool {
 		var compareResult = comparer(a, b)
 		return compareResult > 0

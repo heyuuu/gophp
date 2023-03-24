@@ -745,7 +745,8 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	PhpError(type_, "%s", message)
 	zend.Efree(message)
 }
-func PhpErrorDocref(docref string, type_ int, format string, _ ...any) {
+
+func PhpErrorDocref(docref *string, type_ int, format string, _ ...any) {
 	var args va_list
 	va_start(args, format)
 	PhpVerror(docref, "", type_, format, args)

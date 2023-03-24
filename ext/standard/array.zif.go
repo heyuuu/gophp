@@ -6,6 +6,19 @@ import (
 	"sik/zend/zpp"
 )
 
+// generate by ZifKrsort
+var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	arg := fp.ParseArrayEx(false, true)
+	fp.StartOptional()
+	sort_flags := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifKrsort(arg, nil, sort_flags)
+	returnValue.SetBool(ret)
+})
+
 // generate by ZifKsort
 var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -17,6 +30,18 @@ var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{name: "arg"}, {name:
 	}
 	ret := ZifKsort(arg, nil, sort_flags)
 	returnValue.SetBool(ret)
+})
+
+// generate by ZifCount
+var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{name: "var_"}, {name: "mode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	var_ := fp.ParseZval()
+	fp.StartOptional()
+	mode := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ZifCount(returnValue, var_, nil, mode)
 })
 
 // generate by ZifNatsort
@@ -40,51 +65,55 @@ var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{name: "a
 })
 
 // generate by ZifAsort
-var DefZifAsort = def.DefFunc("asort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+var DefZifAsort = def.DefFunc("asort", 3, 3, []def.ArgInfo{{name: "arg"}, {name: "_"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arg := fp.ParseZvalEx(false, true)
-	fp.StartOptional()
-	sort_flags := fp.ParseZval()
+	_ := fp.ParseArrayEx(false, true)
+	sort_flags := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifAsort(executeData, returnValue, arg, nil, sort_flags)
+	ret := ZifAsort(arg, _, sort_flags)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifArsort
-var DefZifArsort = def.DefFunc("arsort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
-	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+var DefZifArsort = def.DefFunc("arsort", 3, 3, []def.ArgInfo{{name: "arg"}, {name: "_"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arg := fp.ParseZvalEx(false, true)
-	fp.StartOptional()
-	sort_flags := fp.ParseZval()
+	_ := fp.ParseArrayEx(false, true)
+	sort_flags := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifArsort(executeData, returnValue, arg, nil, sort_flags)
+	ret := ZifArsort(arg, _, sort_flags)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifSort
 var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	arg := fp.ParseZvalEx(false, true)
+	arg := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
-	sort_flags := fp.ParseZval()
+	sort_flags := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifSort(executeData, returnValue, arg, nil, sort_flags)
+	ret := ZifSort(arg, nil, sort_flags)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifRsort
 var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	arg := fp.ParseZvalEx(false, true)
+	arg := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
-	sort_flags := fp.ParseZval()
+	sort_flags := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifRsort(executeData, returnValue, arg, nil, sort_flags)
+	ret := ZifRsort(arg, nil, sort_flags)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifUsort

@@ -152,7 +152,9 @@ func PhpArrayKeyCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 		return b.Compare(d1, d2)
 	}
 }
-func PhpArrayReverseKeyCompareNumeric(a *types.Bucket, b *types.Bucket) int { return PhpArrayKeyCompareNumeric(b, a) }
+func PhpArrayReverseKeyCompareNumeric(a *types.Bucket, b *types.Bucket) int {
+	return PhpArrayKeyCompareNumeric(b, a)
+}
 func PhpArrayKeyCompareStringCase(p1 *types.Bucket, p2 *types.Bucket) int {
 	str1 := _bucketKeyToString(p1)
 	str2 := _bucketKeyToString(p2)
@@ -166,7 +168,9 @@ func PhpArrayKeyCompareString(p1 *types.Bucket, p2 *types.Bucket) int {
 	str2 := _bucketKeyToString(p2)
 	return zend.ZendBinaryStrcmp(str1, str2)
 }
-func PhpArrayReverseKeyCompareString(a *types.Bucket, b *types.Bucket) int { return PhpArrayKeyCompareString(b, a) }
+func PhpArrayReverseKeyCompareString(a *types.Bucket, b *types.Bucket) int {
+	return PhpArrayKeyCompareString(b, a)
+}
 func PhpArrayKeyCompareStringNaturalGeneral(p1 *types.Bucket, p2 *types.Bucket, fold_case int) int {
 	str1 := _bucketKeyToString(p1)
 	str2 := _bucketKeyToString(p2)
@@ -210,7 +214,9 @@ func PhpArrayDataCompare(p1 *types.Bucket, p2 *types.Bucket) int {
 	b.Assert(result.IsType(types.IS_LONG))
 	return zend.ZEND_NORMALIZE_BOOL(result.GetLval())
 }
-func PhpArrayReverseDataCompare(a *types.Bucket, b *types.Bucket) int { return PhpArrayDataCompare(a, b) * -1 }
+func PhpArrayReverseDataCompare(a *types.Bucket, b *types.Bucket) int {
+	return PhpArrayDataCompare(a, b) * -1
+}
 func PhpArrayDataCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 	var first *types.Zval
 	var second *types.Zval
@@ -224,7 +230,9 @@ func PhpArrayDataCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 	}
 	return zend.NumericCompareFunction(first, second)
 }
-func PhpArrayReverseDataCompareNumeric(a *types.Bucket, b *types.Bucket) int { return PhpArrayDataCompareNumeric(b, a) }
+func PhpArrayReverseDataCompareNumeric(a *types.Bucket, b *types.Bucket) int {
+	return PhpArrayDataCompareNumeric(b, a)
+}
 func PhpArrayDataCompareStringCase(p1 *types.Bucket, p2 *types.Bucket) int {
 	var first *types.Zval
 	var second *types.Zval
@@ -258,15 +266,15 @@ func PhpArrayDataCompareString(a *types.Bucket, b *types.Bucket) int {
 	}
 	return zend.StringCompareFunction(first, second)
 }
-func PhpArrayReverseDataCompareString(a *types.Bucket, b *types.Bucket) int { return PhpArrayDataCompareString(b, a) }
-func PhpArrayNaturalGeneralCompare(a any, b any, fold_case int) int {
-	var f = (*types.Bucket)(a)
-	var s = (*types.Bucket)(b)
+func PhpArrayReverseDataCompareString(a *types.Bucket, b *types.Bucket) int {
+	return PhpArrayDataCompareString(b, a)
+}
+func PhpArrayNaturalGeneralCompare(p1 *types.Bucket, p2 *types.Bucket, fold_case int) int {
 	var tmp_str1 *types.String
 	var tmp_str2 *types.String
-	var str1 = zend.ZvalGetTmpString(f.GetVal(), &tmp_str1)
-	var str2 = zend.ZvalGetTmpString(s.GetVal(), &tmp_str2)
-	var result = StrnatcmpEx(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen(), fold_case)
+	var str1 = zend.ZvalGetTmpString(p1.GetVal(), &tmp_str1)
+	var str2 = zend.ZvalGetTmpString(p2.GetVal(), &tmp_str2)
+	var result = StrnatcmpExEx(str1.GetStr(), str2.GetStr(), fold_case)
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
 	return result
@@ -303,7 +311,7 @@ func PhpArrayDataCompareStringLocale(a *types.Bucket, b *types.Bucket) int {
 func PhpArrayReverseDataCompareStringLocale(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayDataCompareStringLocale(b, a)
 }
-func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) types.CompareFuncT {
+func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) types.ArrayCompareExFunc {
 	switch sort_type & ^PHP_SORT_FLAG_CASE {
 	case PHP_SORT_NUMERIC:
 		if reverse != 0 {
@@ -354,9 +362,8 @@ func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) types.CompareFun
 			return PhpArrayKeyCompare
 		}
 	}
-	return nil
 }
-func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) types.CompareFuncT {
+func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) types.ArrayCompareExFunc {
 	switch sort_type & ^PHP_SORT_FLAG_CASE {
 	case PHP_SORT_NUMERIC:
 		if reverse != 0 {
@@ -407,10 +414,9 @@ func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) types.CompareFu
 			return PhpArrayDataCompare
 		}
 	}
-	return nil
 }
 
-func ZifKrsort(executeData *zend.ZendExecuteData, return_value *types.Zval, arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
+func ZifKrsort(arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
 	cmp := PhpGetKeyCompareFunc(sortFlags, 1)
 	return arg.GetArr().SortCompatible(cmp, 0)
 }
@@ -420,36 +426,32 @@ func ZifKsort(arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
 	return arg.GetArr().SortCompatible(cmp, 0)
 }
 
-func PhpCountRecursive(ht *types.Array) zend.ZendLong {
-	var cnt = 0
-	var element *types.Zval
-	if (ht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+func PhpCountRecursive(ht *types.Array) int {
+	if !ht.IsImmutable() {
 		if ht.IsRecursive() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "recursion detected")
 			return 0
 		}
 		ht.ProtectRecursive()
 	}
-	cnt = ht.Count()
-	var __ht = ht
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
 
-		element = _z
-		element = types.ZVAL_DEREF(element)
-		if element.IsType(types.IS_ARRAY) {
-			cnt += PhpCountRecursive(element.GetArr())
+	cnt := ht.Count()
+	ht.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		value = types.ZVAL_DEREF(value)
+		if value.IsArray() {
+			cnt += PhpCountRecursive(value.GetArr())
 		}
-	}
-	if (ht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+	})
+
+	if !ht.IsImmutable() {
 		ht.UnprotectRecursive()
 	}
 	return cnt
 }
 
 //@zif -alias sizeof
-func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval, var_ *types.Zval, _ zpp.DefOpt, mode int) {
-	var array *types.Zval = var_
+func ZifCount(return_value zpp.DefReturn, var_ *types.Zval, _ zpp.DefOpt, mode int) {
+	var array = var_
 	var cnt zend.ZendLong
 	switch array.GetType() {
 	case types.IS_NULL:
@@ -468,7 +470,6 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval, var_ 
 		var retval types.Zval
 
 		/* first, we check if the handler is defined */
-
 		if types.Z_OBJ_HT_P(array).GetCountElements() != nil {
 			return_value.SetLong(1)
 			if types.SUCCESS == types.Z_OBJ_HT(*array).GetCountElements()(array, &(return_value.GetLval())) {
@@ -480,7 +481,6 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval, var_ 
 		}
 
 		/* if not and the object implements Countable we call its count() method */
-
 		if zend.InstanceofFunction(types.Z_OBJCE_P(array), zend.ZendCeCountable) != 0 {
 			zend.ZendCallMethodWith0Params(array, nil, nil, "count", &retval)
 			if retval.IsNotUndef() {
@@ -491,7 +491,6 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval, var_ 
 		}
 
 		/* If There's no handler and it doesn't implement Countable then add a warning */
-
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(1)
 		return
@@ -532,109 +531,21 @@ func ZifNatsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRe
 func ZifNatcasesort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	PhpNatsort(executeData, return_value, 1)
 }
-func ZifAsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, _ zpp.DefOpt, sortFlags *types.Zval) {
-	var array *types.Zval
-	var sort_type = PHP_SORT_REGULAR
-	var cmp types.CompareFuncT
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			array = fp.ParseArrayEx(false, true)
-			fp.StartOptional()
-			sort_type = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	cmp = PhpGetDataCompareFunc(sort_type, 0)
-	if !array.GetArr().SortCompatible(cmp, 0) {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
+func ZifAsort(arg zpp.DefRef, _ zpp.DefRefArray, sortFlags int) bool {
+	cmp := PhpGetDataCompareFunc(sortFlags, 0)
+	return arg.GetArr().SortCompatible(cmp, 0)
 }
-func ZifArsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, _ zpp.DefOpt, sortFlags *types.Zval) {
-	var array *types.Zval
-	var sort_type = PHP_SORT_REGULAR
-	var cmp types.CompareFuncT
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			array = fp.ParseArrayEx(false, true)
-			fp.StartOptional()
-			sort_type = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	cmp = PhpGetDataCompareFunc(sort_type, 1)
-	if !array.GetArr().SortCompatible(cmp, 0) {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
+func ZifArsort(arg zpp.DefRef, _ zpp.DefRefArray, sortFlags int) bool {
+	cmp := PhpGetDataCompareFunc(sortFlags, 1)
+	return arg.GetArr().SortCompatible(cmp, 0)
 }
-func ZifSort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, _ zpp.DefOpt, sortFlags *types.Zval) {
-	var array *types.Zval
-	var sort_type = PHP_SORT_REGULAR
-	var cmp types.CompareFuncT
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			array = fp.ParseArrayEx(false, true)
-			fp.StartOptional()
-			sort_type = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	cmp = PhpGetDataCompareFunc(sort_type, 0)
-	if !array.GetArr().SortCompatible(cmp, 1) {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
+func ZifSort(arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
+	cmp := PhpGetDataCompareFunc(sortFlags, 0)
+	return arg.GetArr().SortCompatible(cmp, 1)
 }
-func ZifRsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, _ zpp.DefOpt, sortFlags *types.Zval) {
-	var array *types.Zval
-	var sort_type = PHP_SORT_REGULAR
-	var cmp types.CompareFuncT
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			array = fp.ParseArrayEx(false, true)
-			fp.StartOptional()
-			sort_type = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	cmp = PhpGetDataCompareFunc(sort_type, 1)
-	if !array.GetArr().SortCompatible(cmp, 1) {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
+func ZifRsort(arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
+	cmp := PhpGetDataCompareFunc(sortFlags, 1)
+	return arg.GetArr().SortCompatible(cmp, 1)
 }
 func PhpArrayUserCompare(a *types.Bucket, b *types.Bucket) int {
 	var f *types.Bucket
@@ -659,15 +570,6 @@ func PhpArrayUserCompare(a *types.Bucket, b *types.Bucket) int {
 		zend.ZvalPtrDtor(&args[1])
 		zend.ZvalPtrDtor(&args[0])
 		return 0
-	}
-}
-func PHP_ARRAY_CMP_FUNC_CHECK(func_name **types.Zval) {
-	if zend.ZendIsCallable(*func_name, 0, nil) == 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid comparison function")
-		BG__().user_compare_fci = old_user_compare_fci
-		BG__().user_compare_fci_cache = old_user_compare_fci_cache
-		return_value.SetFalse()
-		return
 	}
 }
 func PHP_ARRAY_CMP_FUNC_BACKUP() {
@@ -6301,7 +6203,7 @@ func ZifArrayMap(executeData zpp.DefEx, return_value zpp.DefReturn, callback *ty
 			return
 		}
 		zend.ArrayInitSize(return_value, maxlen)
-		var __ht *types.Array = arrays[0].GetArr()
+		var __ht = arrays[0].GetArr()
 		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 			if _z.IsIndirect() {
