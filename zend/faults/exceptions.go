@@ -34,15 +34,13 @@ var ZendFuncsThrowable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
 	types.MakeZendFunctionEntryEx("__toString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
 }
-var ArginfoExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(0),
-	zend.MakeArgName("message"),
-	zend.MakeArgName("code"),
-	zend.MakeArgName("previous"),
-}
 var DefaultExceptionFunctions = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("__clone", zend.ZEND_ACC_PRIVATE|zend.ZEND_ACC_FINAL, ZimExceptionClone, nil),
-	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimExceptionConstruct, ArginfoExceptionConstruct),
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+		zend.MakeArgName("message"),
+		zend.MakeArgName("code"),
+		zend.MakeArgName("previous"),
+	}),
 	types.MakeZendFunctionEntryEx("__wakeup", zend.ZEND_ACC_PUBLIC, ZimExceptionWakeup, nil),
 	types.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getMessage, nil),
 	types.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getCode, nil),
@@ -53,17 +51,15 @@ var DefaultExceptionFunctions = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTraceAsString, nil),
 	types.MakeZendFunctionEntryEx("__toString", 0, zim_exception___toString, nil),
 }
-var ArginfoErrorExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(0),
-	zend.MakeArgName("message"),
-	zend.MakeArgName("code"),
-	zend.MakeArgName("severity"),
-	zend.MakeArgName("filename"),
-	zend.MakeArgName("lineno"),
-	zend.MakeArgName("previous"),
-}
 var ErrorExceptionFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct),
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+		zend.MakeArgName("message"),
+		zend.MakeArgName("code"),
+		zend.MakeArgName("severity"),
+		zend.MakeArgName("filename"),
+		zend.MakeArgName("lineno"),
+		zend.MakeArgName("previous"),
+	}),
 	types.MakeZendFunctionEntryEx("getSeverity", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_error_exception_getSeverity, nil),
 }
 

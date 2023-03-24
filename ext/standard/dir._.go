@@ -3,6 +3,7 @@
 package standard
 
 import (
+	"sik/zend"
 	"sik/zend/types"
 )
 
@@ -32,19 +33,16 @@ var DirClassEntryPtr *types.ClassEntry
 /* {{{ arginfo */
 
 var PhpDirClassFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("close", 0, ZifClosedir, ArginfoDir),
-	types.MakeZendFunctionEntryEx("rewind", 0, ZifRewinddir, ArginfoDir),
-	types.MakeZendFunctionEntryEx("read", 0, PhpIfReaddir, ArginfoDir),
+	types.MakeZendFunctionEntryEx("close", 0, ZifClosedir, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("directory"),
+		zend.MakeArgName("context"),
+	}),
+	types.MakeZendFunctionEntryEx("rewind", 0, ZifRewinddir, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("directory"),
+		zend.MakeArgName("context"),
+	}),
+	types.MakeZendFunctionEntryEx("read", 0, PhpIfReaddir, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("directory"),
+		zend.MakeArgName("context"),
+	}),
 }
-
-/* {{{ proto bool chroot(string directory)
-   Change root directory */
-
-/* {{{ proto bool chdir(string directory)
-   Change the current directory */
-
-/* {{{ proto array glob(string pattern [, int flags])
-   Find pathnames matching a pattern */
-
-/* {{{ proto array scandir(string dir [, int sorting_order [, resource context]])
-   List files & directories inside the specified path */
