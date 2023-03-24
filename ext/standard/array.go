@@ -140,7 +140,7 @@ func PhpArrayKeyCompare(p1 *types.Bucket, p2 *types.Bucket) int {
 		return b.Compare(d1, d2)
 	}
 }
-func PhpArrayReverseKeyCompare(a any, b any) int { return PhpArrayKeyCompare(b, a) }
+func PhpArrayReverseKeyCompare(a *types.Bucket, b *types.Bucket) int { return PhpArrayKeyCompare(b, a) }
 func PhpArrayKeyCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 	l1, _, isStr1 := p1.Keys()
 	l2, _, isStr2 := p2.Keys()
@@ -152,13 +152,13 @@ func PhpArrayKeyCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 		return b.Compare(d1, d2)
 	}
 }
-func PhpArrayReverseKeyCompareNumeric(a any, b any) int { return PhpArrayKeyCompareNumeric(b, a) }
+func PhpArrayReverseKeyCompareNumeric(a *types.Bucket, b *types.Bucket) int { return PhpArrayKeyCompareNumeric(b, a) }
 func PhpArrayKeyCompareStringCase(p1 *types.Bucket, p2 *types.Bucket) int {
 	str1 := _bucketKeyToString(p1)
 	str2 := _bucketKeyToString(p2)
 	return zend.ZendBinaryStrcasecmpL(str1, str2)
 }
-func PhpArrayReverseKeyCompareStringCase(a any, b any) int {
+func PhpArrayReverseKeyCompareStringCase(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringCase(b, a)
 }
 func PhpArrayKeyCompareString(p1 *types.Bucket, p2 *types.Bucket) int {
@@ -166,22 +166,22 @@ func PhpArrayKeyCompareString(p1 *types.Bucket, p2 *types.Bucket) int {
 	str2 := _bucketKeyToString(p2)
 	return zend.ZendBinaryStrcmp(str1, str2)
 }
-func PhpArrayReverseKeyCompareString(a any, b any) int { return PhpArrayKeyCompareString(b, a) }
+func PhpArrayReverseKeyCompareString(a *types.Bucket, b *types.Bucket) int { return PhpArrayKeyCompareString(b, a) }
 func PhpArrayKeyCompareStringNaturalGeneral(p1 *types.Bucket, p2 *types.Bucket, fold_case int) int {
 	str1 := _bucketKeyToString(p1)
 	str2 := _bucketKeyToString(p2)
 	return StrnatcmpExEx(str1, str2, fold_case)
 }
-func PhpArrayKeyCompareStringNaturalCase(a any, b any) int {
+func PhpArrayKeyCompareStringNaturalCase(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringNaturalGeneral(a, b, 1)
 }
-func PhpArrayReverseKeyCompareStringNaturalCase(a any, b any) int {
+func PhpArrayReverseKeyCompareStringNaturalCase(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringNaturalGeneral(b, a, 1)
 }
-func PhpArrayKeyCompareStringNatural(a any, b any) int {
+func PhpArrayKeyCompareStringNatural(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringNaturalGeneral(a, b, 0)
 }
-func PhpArrayReverseKeyCompareStringNatural(a any, b any) int {
+func PhpArrayReverseKeyCompareStringNatural(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringNaturalGeneral(b, a, 0)
 }
 func PhpArrayKeyCompareStringLocale(p1 *types.Bucket, p2 *types.Bucket) int {
@@ -189,7 +189,7 @@ func PhpArrayKeyCompareStringLocale(p1 *types.Bucket, p2 *types.Bucket) int {
 	str2 := _bucketKeyToString(p2)
 	return strcoll(str1, str2)
 }
-func PhpArrayReverseKeyCompareStringLocale(a any, b any) int {
+func PhpArrayReverseKeyCompareStringLocale(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringLocale(b, a)
 }
 func PhpArrayDataCompare(p1 *types.Bucket, p2 *types.Bucket) int {
@@ -210,7 +210,7 @@ func PhpArrayDataCompare(p1 *types.Bucket, p2 *types.Bucket) int {
 	b.Assert(result.IsType(types.IS_LONG))
 	return zend.ZEND_NORMALIZE_BOOL(result.GetLval())
 }
-func PhpArrayReverseDataCompare(a any, b any) int { return PhpArrayDataCompare(a, b) * -1 }
+func PhpArrayReverseDataCompare(a *types.Bucket, b *types.Bucket) int { return PhpArrayDataCompare(a, b) * -1 }
 func PhpArrayDataCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 	var first *types.Zval
 	var second *types.Zval
@@ -224,7 +224,7 @@ func PhpArrayDataCompareNumeric(p1 *types.Bucket, p2 *types.Bucket) int {
 	}
 	return zend.NumericCompareFunction(first, second)
 }
-func PhpArrayReverseDataCompareNumeric(a any, b any) int { return PhpArrayDataCompareNumeric(b, a) }
+func PhpArrayReverseDataCompareNumeric(a *types.Bucket, b *types.Bucket) int { return PhpArrayDataCompareNumeric(b, a) }
 func PhpArrayDataCompareStringCase(p1 *types.Bucket, p2 *types.Bucket) int {
 	var first *types.Zval
 	var second *types.Zval
@@ -238,10 +238,10 @@ func PhpArrayDataCompareStringCase(p1 *types.Bucket, p2 *types.Bucket) int {
 	}
 	return zend.StringCaseCompareFunction(first, second)
 }
-func PhpArrayReverseDataCompareStringCase(a any, b any) int {
+func PhpArrayReverseDataCompareStringCase(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayDataCompareStringCase(b, a)
 }
-func PhpArrayDataCompareString(a any, b any) int {
+func PhpArrayDataCompareString(a *types.Bucket, b *types.Bucket) int {
 	var f *types.Bucket
 	var s *types.Bucket
 	var first *types.Zval
@@ -258,7 +258,7 @@ func PhpArrayDataCompareString(a any, b any) int {
 	}
 	return zend.StringCompareFunction(first, second)
 }
-func PhpArrayReverseDataCompareString(a any, b any) int { return PhpArrayDataCompareString(b, a) }
+func PhpArrayReverseDataCompareString(a *types.Bucket, b *types.Bucket) int { return PhpArrayDataCompareString(b, a) }
 func PhpArrayNaturalGeneralCompare(a any, b any, fold_case int) int {
 	var f = (*types.Bucket)(a)
 	var s = (*types.Bucket)(b)
@@ -271,19 +271,19 @@ func PhpArrayNaturalGeneralCompare(a any, b any, fold_case int) int {
 	zend.ZendTmpStringRelease(tmp_str2)
 	return result
 }
-func PhpArrayNaturalCompare(a any, b any) int {
+func PhpArrayNaturalCompare(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayNaturalGeneralCompare(a, b, 0)
 }
-func PhpArrayReverseNaturalCompare(a any, b any) int {
+func PhpArrayReverseNaturalCompare(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayNaturalGeneralCompare(b, a, 0)
 }
-func PhpArrayNaturalCaseCompare(a any, b any) int {
+func PhpArrayNaturalCaseCompare(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayNaturalGeneralCompare(a, b, 1)
 }
-func PhpArrayReverseNaturalCaseCompare(a any, b any) int {
+func PhpArrayReverseNaturalCaseCompare(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayNaturalGeneralCompare(b, a, 1)
 }
-func PhpArrayDataCompareStringLocale(a any, b any) int {
+func PhpArrayDataCompareStringLocale(a *types.Bucket, b *types.Bucket) int {
 	var f *types.Bucket
 	var s *types.Bucket
 	var first *types.Zval
@@ -300,7 +300,7 @@ func PhpArrayDataCompareStringLocale(a any, b any) int {
 	}
 	return zend.StringLocaleCompareFunction(first, second)
 }
-func PhpArrayReverseDataCompareStringLocale(a any, b any) int {
+func PhpArrayReverseDataCompareStringLocale(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayDataCompareStringLocale(b, a)
 }
 func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) types.CompareFuncT {
@@ -636,7 +636,7 @@ func ZifRsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef,
 	return_value.SetTrue()
 	return
 }
-func PhpArrayUserCompare(a any, b any) int {
+func PhpArrayUserCompare(a *types.Bucket, b *types.Bucket) int {
 	var f *types.Bucket
 	var s *types.Bucket
 	var args []types.Zval
@@ -725,7 +725,7 @@ func ZifUsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef,
 func ZifUasort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, cmpFunction *types.Zval) {
 	PhpUsort(executeData, return_value, PhpArrayUserCompare, 0)
 }
-func PhpArrayUserKeyCompare(a any, b any) int {
+func PhpArrayUserKeyCompare(a *types.Bucket, b *types.Bucket) int {
 	var f *types.Bucket
 	var s *types.Bucket
 	var args []types.Zval
@@ -5620,7 +5620,7 @@ func ZifArrayUdiffAssoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 
 func ZifArrayUdiffUassoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval, callbackKeyCompFunc *types.Zval) {
 	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_USER)
 }
-func PhpMultisortCompare(a any, b any) int {
+func PhpMultisortCompare(a *types.Bucket, b *types.Bucket) int {
 	var ab = *((**types.Bucket)(a))
 	var bb = *((**types.Bucket)(b))
 	var r int
