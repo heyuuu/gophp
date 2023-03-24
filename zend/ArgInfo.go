@@ -37,6 +37,14 @@ func MakeArgName(name string) ArgInfo {
 	return ArgInfo{name: name}
 }
 
+func MakeArgVariadic(name string) ArgInfo {
+	return ArgInfo{name: name}
+}
+
+func MakeArgByRef(name string) ArgInfo {
+	return ArgInfo{name: name}
+}
+
 func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	argInfo := ArgInfo{name: name}
 	for _, opt := range opts {

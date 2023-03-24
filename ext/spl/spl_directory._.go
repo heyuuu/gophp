@@ -194,7 +194,7 @@ var spl_SplFileObject_functions []types.ZendFunctionEntry = []types.ZendFunction
 	types.MakeZendFunctionEntryEx("getCsvControl", zend.ZEND_ACC_PUBLIC, zim_spl_SplFileObject_getCsvControl, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("flock", zend.ZEND_ACC_PUBLIC, zim_spl_SplFileObject_flock, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("operation"),
-		zend.MakeArgInfo("wouldblock", zend.ArgInfoByRef(1)),
+		zend.MakeArgByRef("wouldblock"),
 	}),
 	types.MakeZendFunctionEntryEx("fflush", zend.ZEND_ACC_PUBLIC, zim_spl_SplFileObject_fflush, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("ftell", zend.ZEND_ACC_PUBLIC, zim_spl_SplFileObject_ftell, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),

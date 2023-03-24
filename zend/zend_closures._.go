@@ -22,7 +22,7 @@ var ClosureFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	}),
 	types.MakeZendFunctionEntryEx("call", ZEND_ACC_PUBLIC, zim_Closure_call, []ArgInfo{MakeReturnArgInfo(1),
 		MakeArgName("newthis"),
-		MakeArgInfo("parameters", ArgInfoVariadic()),
+		MakeArgVariadic("parameters"),
 	}),
 	types.MakeZendFunctionEntryEx("fromCallable", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_fromCallable, []ArgInfo{MakeReturnArgInfo(1),
 		MakeArgName("callable"),
