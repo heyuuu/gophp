@@ -38,11 +38,11 @@ func MakeArgName(name string) ArgInfo {
 }
 
 func MakeArgVariadic(name string) ArgInfo {
-	return ArgInfo{name: name}
+	return ArgInfo{name: name, isVariadic: true}
 }
 
 func MakeArgByRef(name string) ArgInfo {
-	return ArgInfo{name: name}
+	return ArgInfo{name: name, byReference: 1}
 }
 
 func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {

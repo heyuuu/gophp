@@ -160,7 +160,7 @@ func ZifStrncasecmp(str1 string, str2 string, len_ int) (int, bool) {
 	}
 	return ZendBinaryStrncasecmp(str1, str2, len_), true
 }
-func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifEach(executeData zpp.DefEx, return_value zpp.DefReturn, arr zpp.DefRef) {
 	var array *types.Zval
 	var entry *types.Zval
 	var tmp types.Zval
@@ -993,7 +993,7 @@ func ZifClassAlias(executeData zpp.DefEx, return_value zpp.DefReturn, userClassN
 		return
 	}
 }
-func ZifGetIncludedFiles(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifGetIncludedFiles(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var entry *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -1060,7 +1060,7 @@ func ZifSetErrorHandler(executeData zpp.DefEx, return_value zpp.DefReturn, error
 	types.ZVAL_COPY(EG__().GetUserErrorHandler(), error_handler)
 	EG__().SetUserErrorHandlerErrorReporting(int(error_type))
 }
-func ZifRestoreErrorHandler(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifRestoreErrorHandler(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1106,7 +1106,7 @@ func ZifSetExceptionHandler(executeData zpp.DefEx, return_value zpp.DefReturn, e
 	}
 	types.ZVAL_COPY(EG__().GetUserExceptionHandler(), exception_handler)
 }
-func ZifRestoreExceptionHandler(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifRestoreExceptionHandler(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1147,13 +1147,13 @@ func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval
 		}
 	}
 }
-func ZifGetDeclaredTraits(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifGetDeclaredTraits(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	GetDeclaredClassImpl(executeData, return_value, ZEND_ACC_TRAIT, 0)
 }
-func ZifGetDeclaredClasses(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifGetDeclaredClasses(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	GetDeclaredClassImpl(executeData, return_value, ZEND_ACC_LINKED, ZEND_ACC_INTERFACE|ZEND_ACC_TRAIT)
 }
-func ZifGetDeclaredInterfaces(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifGetDeclaredInterfaces(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	GetDeclaredClassImpl(executeData, return_value, ZEND_ACC_INTERFACE, 0)
 }
 func ZifGetDefinedFunctions(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, excludeDisabled *types.Zval) {
@@ -1185,7 +1185,7 @@ func ZifGetDefinedFunctions(executeData zpp.DefEx, return_value zpp.DefReturn, _
 	return_value.GetArr().KeyAddNew("internal", &internal)
 	return_value.GetArr().KeyAddNew("user", &user)
 }
-func ZifGetDefinedVars(executeData *ZendExecuteData, return_value *types.Zval) {
+func ZifGetDefinedVars(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var symbol_table *types.Array
 	if ZendForbidDynamicCall("get_defined_vars()") == types.FAILURE {
 		return

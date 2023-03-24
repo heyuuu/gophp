@@ -167,6 +167,16 @@ var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{name: "s
 	}
 })
 
+// generate by ZifEach
+var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{name: "arr"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	arr := fp.ParseZvalEx(false, true)
+	if fp.HasError() {
+		return
+	}
+	ZifEach(executeData, returnValue, arr)
+})
+
 // generate by ZifErrorReporting
 var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{name: "new_error_level"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
@@ -385,6 +395,14 @@ var DefZifClassAlias = def.DefFunc("class_alias", 2, 3, []def.ArgInfo{{name: "us
 	ZifClassAlias(executeData, returnValue, user_class_name, alias_name, nil, autoload)
 })
 
+// generate by ZifGetIncludedFiles
+var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetIncludedFiles(executeData, returnValue)
+})
+
 // generate by ZifTriggerError
 var DefZifTriggerError = def.DefFunc("trigger_error", 1, 2, []def.ArgInfo{{name: "message"}, {name: "error_type"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -409,6 +427,14 @@ var DefZifSetErrorHandler = def.DefFunc("set_error_handler", 1, 2, []def.ArgInfo
 	ZifSetErrorHandler(executeData, returnValue, error_handler, nil, error_types)
 })
 
+// generate by ZifRestoreErrorHandler
+var DefZifRestoreErrorHandler = def.DefFunc("restore_error_handler", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifRestoreErrorHandler(executeData, returnValue)
+})
+
 // generate by ZifSetExceptionHandler
 var DefZifSetExceptionHandler = def.DefFunc("set_exception_handler", 1, 1, []def.ArgInfo{{name: "exception_handler"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -417,6 +443,38 @@ var DefZifSetExceptionHandler = def.DefFunc("set_exception_handler", 1, 1, []def
 		return
 	}
 	ZifSetExceptionHandler(executeData, returnValue, exception_handler)
+})
+
+// generate by ZifRestoreExceptionHandler
+var DefZifRestoreExceptionHandler = def.DefFunc("restore_exception_handler", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifRestoreExceptionHandler(executeData, returnValue)
+})
+
+// generate by ZifGetDeclaredTraits
+var DefZifGetDeclaredTraits = def.DefFunc("get_declared_traits", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetDeclaredTraits(executeData, returnValue)
+})
+
+// generate by ZifGetDeclaredClasses
+var DefZifGetDeclaredClasses = def.DefFunc("get_declared_classes", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetDeclaredClasses(executeData, returnValue)
+})
+
+// generate by ZifGetDeclaredInterfaces
+var DefZifGetDeclaredInterfaces = def.DefFunc("get_declared_interfaces", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetDeclaredInterfaces(executeData, returnValue)
 })
 
 // generate by ZifGetDefinedFunctions
@@ -428,6 +486,14 @@ var DefZifGetDefinedFunctions = def.DefFunc("get_defined_functions", 0, 1, []def
 		return
 	}
 	ZifGetDefinedFunctions(executeData, returnValue, nil, exclude_disabled)
+})
+
+// generate by ZifGetDefinedVars
+var DefZifGetDefinedVars = def.DefFunc("get_defined_vars", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetDefinedVars(executeData, returnValue)
 })
 
 // generate by ZifCreateFunction
