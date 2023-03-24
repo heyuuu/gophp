@@ -13,30 +13,137 @@ func init() {
 	emptyArray.SetImmutable()
 }
 
+func bucketType(p *Bucket) int {
+	if p == nil {
+		return HASH_KEY_NON_EXISTENT
+	} else if p.IsStrKey() {
+		return HASH_KEY_IS_STRING
+	} else {
+		return HASH_KEY_IS_LONG
+	}
+}
+
+func (ht *Array) CurrentKeyType(pos uint32) int {
+	var p *Bucket
+	if validPos, ok := ht.validPos(pos); ok {
+		p = ht.Bucket(validPos)
+	}
+	return bucketType(p)
+}
+
 func ZendHashHasMoreElementsEx(ht *Array, pos *ArrayPosition) bool {
-	return ZendHashGetCurrentKeyTypeEx(ht, pos) == HASH_KEY_NON_EXISTENT
+	_, ok := ht.validPos(*pos)
+	return ok
 }
 func ZendHashMoveForward(ht *Array) int {
 	return ZendHashMoveForwardEx(ht, &ht.internalPointer)
 }
+
+// 查找下一个有效位置
+func ZendHashMoveForwardEx(ht *Array, pos *ArrayPosition) int {
+	if idx, ok := ht.validPos(*pos); ok {
+		*pos, _ = ht.validPos(idx + 1)
+		return SUCCESS
+	}
+	return FAILURE
+}
+
 func ZendHashMoveBackwards(ht *Array) int {
 	return ZendHashMoveBackwardsEx(ht, &ht.internalPointer)
 }
+func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) int {
+	var idx uint32 = *pos
+	if idx < ht.GetNNumUsed() {
+		for idx > 0 {
+			idx--
+			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
+				*pos = idx
+				return SUCCESS
+			}
+		}
+		*pos = ht.GetNNumUsed()
+		return SUCCESS
+	}
+	return FAILURE
+}
+
 func ZendHashGetCurrentKey(ht *Array, str_index **String, num_index *zend.ZendUlong) int {
 	return ZendHashGetCurrentKeyEx(ht, str_index, num_index, ht.GetNInternalPointer())
 }
+func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.ZendUlong, pos *ArrayPosition) int {
+	var idx uint32
+	var p *Bucket
+	idx = ht.validPosVal(*pos)
+	if idx < ht.GetNNumUsed() {
+		p = ht.Bucket(idx)
+		if p.IsStrKey() {
+			*str_index = p.GetKey()
+			return HASH_KEY_IS_STRING
+		} else {
+			*num_index = p.GetH()
+			return HASH_KEY_IS_LONG
+		}
+	}
+	return HASH_KEY_NON_EXISTENT
+}
+
 func ZendHashGetCurrentKeyZval(ht *Array, key *Zval) {
 	ZendHashGetCurrentKeyZvalEx(ht, key, ht.GetNInternalPointer())
 }
+func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *ArrayPosition) {
+	var idx uint32
+	var p *Bucket
+	idx = ht.validPosVal(*pos)
+	if idx >= ht.GetNNumUsed() {
+		key.SetNull()
+	} else {
+		p = ht.Bucket(idx)
+		if p.GetKey() != nil {
+			ZVAL_STR_COPY(key, p.GetKey())
+		} else {
+			key.SetLong(p.IndexKey())
+		}
+	}
+}
+
 func ZendHashGetCurrentData(ht *Array) *Zval {
 	return ZendHashGetCurrentDataEx(ht, ht.GetNInternalPointer())
 }
+func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
+	var idx uint32
+	var p *Bucket
+	idx = ht.validPosVal(*pos)
+	if idx < ht.GetNNumUsed() {
+		p = ht.Bucket(idx)
+		return p.GetVal()
+	} else {
+		return nil
+	}
+}
+
 func ZendHashInternalPointerReset(ht *Array) {
 	ZendHashInternalPointerResetEx(ht, ht.GetNInternalPointer())
 }
+func ZendHashInternalPointerResetEx(ht *Array, pos *ArrayPosition) {
+	*pos = ht.validPosVal(0)
+}
+
 func ZendHashInternalPointerEnd(ht *Array) {
 	ZendHashInternalPointerEndEx(ht, ht.GetNInternalPointer())
 }
+func ZendHashInternalPointerEndEx(ht *Array, pos *ArrayPosition) {
+	var idx uint32
+	idx = ht.GetNNumUsed()
+	for idx > 0 {
+		idx--
+		if ht.data[idx].GetVal().GetType() != IS_UNDEF {
+			*pos = idx
+			return
+		}
+	}
+	*pos = ht.GetNNumUsed()
+}
+
 func ZendHashIteratorsUpdate(ht *Array, from ArrayPosition, to ArrayPosition) {
 	if ht.HasIterators() {
 		_zendHashIteratorsUpdate(ht, from, to)
@@ -515,102 +622,7 @@ func ZendHashMerge(target *Array, source *Array, pCopyConstructor CopyCtorFuncT,
 		})
 	}
 }
-func ZendHashInternalPointerResetEx(ht *Array, pos *ArrayPosition) {
-	*pos = ht.validPosVal(0)
-}
-func ZendHashInternalPointerEndEx(ht *Array, pos *ArrayPosition) {
-	var idx uint32
-	idx = ht.GetNNumUsed()
-	for idx > 0 {
-		idx--
-		if ht.data[idx].GetVal().GetType() != IS_UNDEF {
-			*pos = idx
-			return
-		}
-	}
-	*pos = ht.GetNNumUsed()
-}
 
-// 查找下一个有效位置
-func ZendHashMoveForwardEx(ht *Array, pos *ArrayPosition) int {
-	if idx, ok := ht.validPos(*pos); ok {
-		*pos, _ = ht.validPos(idx + 1)
-		return SUCCESS
-	}
-	return FAILURE
-}
-
-func ZendHashMoveBackwardsEx(ht *Array, pos *ArrayPosition) int {
-	var idx uint32 = *pos
-	if idx < ht.GetNNumUsed() {
-		for idx > 0 {
-			idx--
-			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
-				*pos = idx
-				return SUCCESS
-			}
-		}
-		*pos = ht.GetNNumUsed()
-		return SUCCESS
-	}
-	return FAILURE
-}
-func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.ZendUlong, pos *ArrayPosition) int {
-	var idx uint32
-	var p *Bucket
-	idx = ht.validPosVal(*pos)
-	if idx < ht.GetNNumUsed() {
-		p = ht.Bucket(idx)
-		if p.GetKey() != nil {
-			*str_index = p.GetKey()
-			return HASH_KEY_IS_STRING
-		} else {
-			*num_index = p.GetH()
-			return HASH_KEY_IS_LONG
-		}
-	}
-	return HASH_KEY_NON_EXISTENT
-}
-func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *ArrayPosition) {
-	var idx uint32
-	var p *Bucket
-	idx = ht.validPosVal(*pos)
-	if idx >= ht.GetNNumUsed() {
-		key.SetNull()
-	} else {
-		p = ht.Bucket(idx)
-		if p.GetKey() != nil {
-			ZVAL_STR_COPY(key, p.GetKey())
-		} else {
-			key.SetLong(p.IndexKey())
-		}
-	}
-}
-func ZendHashGetCurrentKeyTypeEx(ht *Array, pos *ArrayPosition) int {
-	var idx uint32
-	var p *Bucket
-	idx = ht.validPosVal(*pos)
-	if idx < ht.GetNNumUsed() {
-		p = ht.Bucket(idx)
-		if p.GetKey() != nil {
-			return HASH_KEY_IS_STRING
-		} else {
-			return HASH_KEY_IS_LONG
-		}
-	}
-	return HASH_KEY_NON_EXISTENT
-}
-func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
-	var idx uint32
-	var p *Bucket
-	idx = ht.validPosVal(*pos)
-	if idx < ht.GetNNumUsed() {
-		p = ht.Bucket(idx)
-		return p.GetVal()
-	} else {
-		return nil
-	}
-}
 func ZendHashBucketSwap(p *Bucket, q *Bucket) {
 	var val Zval
 	var h zend.ZendUlong
@@ -879,13 +891,6 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 		if str_key != nil && HandleNumericStr(str_key, &num_key) {
 			goto convert
 		}
-
-		/* The `str_key &&` here might seem redundant: property tables should
-		 * only have string keys. Unfortunately, this isn't true, at the very
-		 * least because of ArrayObject, which stores a symtable where the
-		 * property table should be.
-		 */
-
 	}
 	if always_duplicate != 0 {
 		return ZendArrayDup(ht)

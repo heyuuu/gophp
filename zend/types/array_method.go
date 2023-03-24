@@ -532,19 +532,14 @@ func (ht *Array) validPosVal(pos uint32) uint32 {
 }
 
 func (ht *Array) validPos(pos uint32) (uint32, bool) {
-	var dataSize = ht.DataSize()
-	for ; pos < dataSize; pos++ {
-		if ht.IsValidPos(pos) {
-			return pos, true
+	dataSize := uint32(len(ht.data))
+	for i := pos; i < dataSize; i++ {
+		if ht.data[i].IsValid() {
+			return i, true
 		}
 	}
 	// 没有有效pos，此时 pos == ht.DataSize()
 	return pos, false
-}
-
-func (ht *Array) IsValidPos(pos uint32) bool {
-	b.Assert(pos < ht.DataSize())
-	return !ht.data[pos].GetVal().IsType(IS_UNDEF)
 }
 
 /**
