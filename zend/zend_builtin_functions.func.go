@@ -39,7 +39,7 @@ func ZifGcDisable() {
 	ZendAlterIniEntryChars("zend.enable_gc", "0", ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME)
 }
 
-func ZifGcStatus(ret zpp.DefRet) {
+func ZifGcStatus(ret zpp.DefReturn) {
 	ArrayInitSize(ret, 3)
 	AddAssocLongEx(ret, "runs", 0)
 	AddAssocLongEx(ret, "collected", 0)
@@ -64,7 +64,7 @@ func IZifFuncNumArgs(executeData *ZendExecuteData) int {
 }
 
 //@zif -old
-func ZifFuncGetArg(executeData zpp.DefEx, returnValue zpp.DefRet, argNum int) {
+func ZifFuncGetArg(executeData zpp.DefEx, returnValue zpp.DefReturn, argNum int) {
 	if argNum < 0 {
 		faults.Error(faults.E_WARNING, "func_get_arg():  The argument number should be >= 0")
 		returnValue.SetFalse()
@@ -217,7 +217,7 @@ func ZifEach(executeData *ZendExecuteData, return_value *types.Zval) {
 	return_value.GetArr().KeyAddNew(types.ZSTR_KEY.GetStr(), &tmp)
 	types.ZendHashMoveForward(target_hash)
 }
-func ZifErrorReporting(ret zpp.DefRet, _ zpp.DefOpt, newErrorLevel *types.Zval) {
+func ZifErrorReporting(ret zpp.DefReturn, _ zpp.DefOpt, newErrorLevel *types.Zval) {
 	var old_error_reporting int
 	old_error_reporting = EG__().GetErrorReporting()
 	if newErrorLevel != nil {

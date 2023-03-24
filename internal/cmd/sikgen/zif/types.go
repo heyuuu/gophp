@@ -77,7 +77,7 @@ func toZppType(typ string) (ZppType, bool) {
 	// special
 	case "zpp.DefEx":
 		return ZppTypeEx, true
-	case "zpp.DefRet":
+	case "zpp.DefReturn":
 		return ZppTypeRet, true
 	case "zpp.DefOpt":
 		return ZppTypeOpt, true

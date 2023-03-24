@@ -34,4 +34,4 @@
 - `bool`: 相当于通过 Z_PARAM_BOOL 获取后会转为 bool 类型
 - `string`: 相当于通过 Z_PARAM_STRING 获取后将参数转为 string 类型
 - `zpp.DefOpt`: 当前EX对象，用于直接依赖 executeData 的函数，不直接使用 *zend.ZendExecuteData 是为了和原始写法区分
-- `zpp.DefRet`: 返回值，用于需要直接操作返回值的情况
+- `zpp.DefReturn`: 返回值，用于需要直接操作返回值的情况
