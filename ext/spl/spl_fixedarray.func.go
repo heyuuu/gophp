@@ -414,7 +414,7 @@ func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_va
 		var size int = intern_ht.Len()
 		SplFixedarrayInit(intern.GetArray(), size)
 		var __ht *types.Array = intern_ht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			data = _z
@@ -481,7 +481,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var max_index zend.ZendUlong = 0
 		var tmp zend.ZendLong
 		var __ht *types.Array = data.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			num_index = _p.GetH()
@@ -501,7 +501,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		}
 		SplFixedarrayInit(&array, tmp)
 		var __ht__1 *types.Array = data.GetArr()
-		for _, _p := range __ht__1.foreachData() {
+		for _, _p := range __ht__1.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			num_index = _p.GetH()
@@ -514,7 +514,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var i zend.ZendLong = 0
 		SplFixedarrayInit(&array, num)
 		var __ht *types.Array = data.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			element = _z

@@ -50,7 +50,7 @@ send_again:
 			}
 		}
 		var __ht *types.Array = ht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			name = _p.GetKey()
@@ -195,7 +195,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 				arg_num = 1
 				param = executeData.GetCall().Arg(1)
 				var __ht *types.Array = ht
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					arg = _z
@@ -245,7 +245,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			arg_num = 1
 			param = executeData.GetCall().Arg(1)
 			var __ht *types.Array = ht
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				arg = _z
@@ -324,7 +324,7 @@ add_unpack_again:
 		var val *types.Zval
 		var key *types.String
 		var __ht *types.Array = ht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()

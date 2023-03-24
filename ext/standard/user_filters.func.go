@@ -475,7 +475,7 @@ func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *types.
 	filters_hash = core.PhpGetStreamFiltersHash()
 	if filters_hash != nil {
 		var __ht *types.Array = filters_hash
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			filter_name = _p.GetKey()

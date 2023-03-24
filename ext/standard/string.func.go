@@ -656,7 +656,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 		/* loop to search the first not undefined element... */
 
 		var __ht *types.Array = pieces.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -675,7 +675,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 	strings = zend.DoAlloca(b.SizeOf("* strings")*numelems, use_heap)
 	ptr = strings
 	var __ht *types.Array = pieces.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsType(types.IS_INDIRECT) {
 			_z = _z.GetZv()
@@ -2008,7 +2008,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 		len_idx = repl_idx
 		from_idx = len_idx
 		var __ht *types.Array = str.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -2423,7 +2423,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 	/* check if original array has numeric keys */
 
 	var __ht *types.Array = pats
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		str_key = _p.GetKey()
@@ -2464,7 +2464,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 
 		&str_hash = types.MakeArrayEx(pats.Len(), nil, 0)
 		var __ht *types.Array = pats
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -2927,7 +2927,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var tmp_replace *types.String
 			var entry *types.Zval
 			var __ht *types.Array = pats
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
 					_z = _z.GetZv()
@@ -3434,7 +3434,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 		}
 
 		var __ht *types.Array = search.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -3601,7 +3601,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 		   and add the result to the return_value array. */
 
 		var __ht *types.Array = subject.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -3923,7 +3923,7 @@ func ZifStripTags(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var tmp *types.Zval
 			var tag *types.String
 			var __ht *types.Array = allow.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				tmp = _z

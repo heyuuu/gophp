@@ -22,25 +22,25 @@ func ZendExtensionDeactivator(extension *ZendExtension) {
 func CleanNonPersistentConstantFull(zv *types.Zval) int {
 	var c *ZendConstant = zv.GetPtr()
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) != 0 {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	} else {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	}
 }
 func CleanNonPersistentFunctionFull(zv *types.Zval) int {
 	var function *ZendFunction = zv.GetPtr()
 	if function.GetType() == ZEND_INTERNAL_FUNCTION {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	} else {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	}
 }
 func CleanNonPersistentClassFull(zv *types.Zval) int {
 	var ce *types.ClassEntry = zv.GetPtr()
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	} else {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	}
 }
 func InitExecutor() {
@@ -94,9 +94,9 @@ func ZvalCallDestructor(zv *types.Zval) int {
 		zv = zv.GetZv()
 	}
 	if zv.IsObject() && zv.GetRefcount() == 1 {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	} else {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	}
 }
 func ZendUncleanZvalPtrDtor(zv *types.Zval) {
@@ -172,7 +172,7 @@ func ShutdownExecutor() {
 		 * as they may hold GC roots. */
 
 		var __ht *types.Array = EG__().GetFunctionTable()
-		for _, _p := range __ht.foreachDataReserve() {
+		for _, _p := range __ht.ForeachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
 			zv = _z
@@ -191,7 +191,7 @@ func ShutdownExecutor() {
 			}
 		}
 		var __ht__1 *types.Array = EG__().GetClassTable()
-		for _, _p := range __ht__1.foreachDataReserve() {
+		for _, _p := range __ht__1.ForeachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
 			zv = _z
@@ -202,7 +202,7 @@ func ShutdownExecutor() {
 			if ce.IsHasStaticInMethods() {
 				var op_array *ZendOpArray
 				var __ht *types.Array = ce.GetFunctionTable()
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					op_array = _z.GetPtr()
@@ -264,7 +264,7 @@ func ShutdownExecutor() {
 			types.ZendHashReverseApply(EG__().GetClassTable(), CleanNonPersistentClassFull)
 		} else {
 			var __ht *types.Array = EG__().GetZendConstants()
-			for _, _p := range __ht.foreachDataReserve() {
+			for _, _p := range __ht.ForeachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
 				key = _p.GetKey()
@@ -296,7 +296,7 @@ func ShutdownExecutor() {
 			}
 			__ht.SetNNumUsed(_idx)
 			var __ht__1 *types.Array = EG__().GetFunctionTable()
-			for _, _p := range __ht__1.foreachDataReserve() {
+			for _, _p := range __ht__1.ForeachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
 				key = _p.GetKey()
@@ -324,7 +324,7 @@ func ShutdownExecutor() {
 			}
 			__ht__1.SetNNumUsed(_idx)
 			var __ht__2 *types.Array = EG__().GetClassTable()
-			for _, _p := range __ht__2.foreachDataReserve() {
+			for _, _p := range __ht__2.ForeachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
 				key = _p.GetKey()

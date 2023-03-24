@@ -110,7 +110,7 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.String, val *types.Zv
 	var tmp_key *types.String
 	var tmp_val *types.Zval
 	var __ht *types.Array = val.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		tmp_key = _p.GetKey()
@@ -133,7 +133,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.String {
 	var s zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(headers.IsType(types.IS_ARRAY))
 	var __ht *types.Array = headers.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		idx = _p.GetH()

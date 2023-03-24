@@ -55,7 +55,7 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 				PhpInfoPrintf("\nRegistered %s => ", name)
 			}
 			var __ht *types.Array = ht
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				key = _p.GetKey()
@@ -122,7 +122,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	zend.ZendIsAutoGlobal(key)
 	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), key.GetStr())) != nil && data.IsType(types.IS_ARRAY) {
 		var __ht *types.Array = data.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			num_key = _p.GetH()
@@ -332,7 +332,7 @@ func PhpPrintInfo(flag int) {
 		types.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		sorted_registry.SortCompatible(ModuleNameCmp, 0)
 		var __ht *types.Array = &sorted_registry
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()
@@ -344,7 +344,7 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(1, "Module Name")
 		var __ht__1 *types.Array = &sorted_registry
-		for _, _p := range __ht__1.foreachData() {
+		for _, _p := range __ht__1.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()

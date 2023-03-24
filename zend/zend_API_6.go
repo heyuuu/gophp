@@ -29,9 +29,9 @@ func CleanModuleClass(el *types.Zval, arg any) int {
 	var ce *types.ClassEntry = (*types.ClassEntry)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == module_number {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	} else {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	}
 }
 func CleanModuleClasses(module_number int) {
@@ -85,7 +85,7 @@ func ZendDeactivateModules() {
 		if EG__().GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
 			var __ht *types.Array = &ModuleRegistry
-			for _, _p := range __ht.foreachDataReserve() {
+			for _, _p := range __ht.ForeachDataReserve() {
 				var _z types.Zval = _p.GetVal()
 
 				module = _z.GetPtr()
@@ -117,7 +117,7 @@ func ZendPostDeactivateModules() {
 		var zv *types.Zval
 		var key *types.String
 		var __ht *types.Array = &ModuleRegistry
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()
@@ -126,7 +126,7 @@ func ZendPostDeactivateModules() {
 			}
 		}
 		var __ht__1 *types.Array = &ModuleRegistry
-		for _, _p := range __ht__1.foreachDataReserve() {
+		for _, _p := range __ht__1.ForeachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
 			key = _p.GetKey()

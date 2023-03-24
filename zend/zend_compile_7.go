@@ -439,7 +439,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 				var val *types.Zval
 				var key *types.String
 				var __ht *types.Array = ht
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					key = _p.GetKey()

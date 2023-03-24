@@ -479,7 +479,7 @@ func ZifFilePutContents(executeData *zend.ZendExecuteData, return_value *types.Z
 			var bytes_written ssize_t
 			var tmp *types.Zval
 			var __ht *types.Array = data.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				tmp = _z
@@ -1784,7 +1784,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = types.Z_ARRVAL_P(fields).Len()
 	var __ht *types.Array = fields.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		field_tmp = _z

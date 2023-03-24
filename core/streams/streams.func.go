@@ -41,7 +41,7 @@ func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 func ZmDeactivateStreams(type_ int, module_number int) int {
 	var el *types.Zval
 	var __ht *types.Array = zend.EG__().GetPersistentList()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		el = _z
@@ -68,7 +68,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 
 				*stream = (*core.PhpStream)(le.GetPtr())
 				var __ht *types.Array = zend.EG__().GetRegularList()
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					regentry = _z.GetPtr()

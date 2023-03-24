@@ -124,7 +124,7 @@ func PrintFlatHash(ht *types.Array) {
 	var num_key ZendUlong
 	var i int = 0
 	var __ht *types.Array = ht
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsIndirect() {
 			_z = _z.GetZv()
@@ -392,7 +392,7 @@ func ZendResolvePropertyTypes() {
 	var ce *types.ClassEntry
 	var prop_info *ZendPropertyInfo
 	var __ht *types.Array = CG__().GetClassTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		ce = _z.GetPtr()
@@ -401,7 +401,7 @@ func ZendResolvePropertyTypes() {
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
 			var __ht *types.Array = ce.GetPropertiesInfo()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				prop_info = _z.GetPtr()

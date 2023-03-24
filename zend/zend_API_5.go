@@ -11,9 +11,9 @@ import (
 func ZendStartupModuleZval(zv *types.Zval) int {
 	var module *ZendModuleEntry = zv.GetPtr()
 	if ZendStartupModuleEx(module) == types.SUCCESS {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	} else {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	}
 }
 func ZendSortModules(base any, count int, siz int, compare types.CompareFuncT, swp types.SwapFuncT) {
@@ -59,7 +59,7 @@ func ZendCollectModuleHandlers() {
 	/* Collect extensions with request startup/shutdown handlers */
 
 	var __ht *types.Array = &ModuleRegistry
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		module = _z.GetPtr()
@@ -81,7 +81,7 @@ func ZendCollectModuleHandlers() {
 	ModulePostDeactivateHandlers[post_deactivate_count] = nil
 	startup_count = 0
 	var __ht__1 *types.Array = &ModuleRegistry
-	for _, _p := range __ht__1.foreachData() {
+	for _, _p := range __ht__1.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		module = _z.GetPtr()
@@ -99,7 +99,7 @@ func ZendCollectModuleHandlers() {
 	/* Collect internal classes with static members */
 
 	var __ht__2 *types.Array = CG__().GetClassTable()
-	for _, _p := range __ht__2.foreachData() {
+	for _, _p := range __ht__2.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		ce = _z.GetPtr()
@@ -111,7 +111,7 @@ func ZendCollectModuleHandlers() {
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
 		var __ht *types.Array = CG__().GetClassTable()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			ce = _z.GetPtr()

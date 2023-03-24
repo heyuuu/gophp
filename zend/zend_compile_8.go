@@ -295,7 +295,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 		opline.SetResult(result.GetOp())
 	}
 	var __ht *types.Array = CG__().GetMemoizedExprs()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		node = _z.GetPtr()
@@ -311,7 +311,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 		var jump_opnum uint32 = ZendEmitJump(0)
 		ZendUpdateJumpTargetToNext(coalesce_opnum)
 		var __ht *types.Array = CG__().GetMemoizedExprs()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			node = _z.GetPtr()

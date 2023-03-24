@@ -662,7 +662,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 		var key *types.String
 		zend.ArrayInit(return_value)
 		var __ht *types.Array = SPL_G(autoload_functions)
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
@@ -800,7 +800,7 @@ func ZmInfoSpl(zend_module *zend.ZendModuleEntry) {
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
 	var __ht *types.Array = list.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		zv = _z
@@ -867,7 +867,7 @@ func ZmInfoSpl(zend_module *zend.ZendModuleEntry) {
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
 	var __ht__1 *types.Array = list.GetArr()
-	for _, _p := range __ht__1.foreachData() {
+	for _, _p := range __ht__1.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		zv = _z

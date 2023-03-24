@@ -589,7 +589,7 @@ func ZendRegisterAutoGlobal(name *types.String, jit types.ZendBool, auto_global_
 func ZendActivateAutoGlobals() {
 	var auto_global *ZendAutoGlobal
 	var __ht *types.Array = CG__().GetAutoGlobals()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		auto_global = _z.GetPtr()

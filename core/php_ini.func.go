@@ -62,7 +62,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 		module_number = 0
 	}
 	var __ht *types.Array = zend.EG__().GetIniDirectives()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		ini_entry = _z.GetPtr()
@@ -622,7 +622,7 @@ func PhpIniActivateConfig(source_hash *types.Array, modify_type int, stage int) 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 
 	var __ht *types.Array = source_hash
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		str = _p.GetKey()

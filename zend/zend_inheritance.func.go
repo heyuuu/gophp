@@ -1012,7 +1012,7 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 
 	}
 	var __ht *types.Array = ce.GetPropertiesInfo()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		prop = _z.GetPtr()
@@ -1237,7 +1237,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		}
 	}
 	var __ht *types.Array = ce.GetPropertiesInfo()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		property_info = _z.GetPtr()
@@ -1252,7 +1252,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	if parent_ce.GetPropertiesInfo().Len() {
 		ce.GetPropertiesInfo().Extend(ce.GetPropertiesInfo().Len() + parent_ce.GetPropertiesInfo().Len())
 		var __ht *types.Array = parent_ce.GetPropertiesInfo()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
@@ -1264,7 +1264,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		var c *ZendClassConstant
 		ce.GetConstantsTable().Extend(ce.GetConstantsTable().Len() + parent_ce.GetConstantsTable().Len())
 		var __ht *types.Array = parent_ce.GetConstantsTable()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
@@ -1276,7 +1276,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		ce.GetFunctionTable().Extend(ce.GetFunctionTable().Len() + parent_ce.GetFunctionTable().Len())
 		if checked != 0 {
 			var __ht *types.Array = parent_ce.GetFunctionTable()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				key = _p.GetKey()
@@ -1285,7 +1285,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			}
 		} else {
 			var __ht *types.Array = parent_ce.GetFunctionTable()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				key = _p.GetKey()
@@ -1333,7 +1333,7 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 	var key *types.String
 	var c *ZendClassConstant
 	var __ht *types.Array = iface.GetConstantsTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
@@ -1341,7 +1341,7 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 		DoInheritIfaceConstant(key, c, ce, iface)
 	}
 	var __ht__1 *types.Array = iface.GetFunctionTable()
-	for _, _p := range __ht__1.foreachData() {
+	for _, _p := range __ht__1.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
@@ -1378,7 +1378,7 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 		/* Check for attempt to redeclare interface constants */
 
 		var __ht *types.Array = ce.GetConstantsTable()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
@@ -1429,7 +1429,7 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 				/* skip duplications */
 
 				var __ht *types.Array = ce.GetConstantsTable()
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					key = _p.GetKey()
@@ -1827,7 +1827,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 				/* copies functions, applies defined aliasing, and excludes unused trait methods */
 
 				var __ht *types.Array = traits[i].GetFunctionTable()
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					key = _p.GetKey()
@@ -1845,7 +1845,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
 				var __ht *types.Array = traits[i].GetFunctionTable()
-				for _, _p := range __ht.foreachData() {
+				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
 					key = _p.GetKey()
@@ -1856,7 +1856,7 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 		}
 	}
 	var __ht *types.Array = ce.GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		fn = _z.GetPtr()
@@ -1900,7 +1900,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 			continue
 		}
 		var __ht *types.Array = traits[i].GetPropertiesInfo()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			property_info = _z.GetPtr()
@@ -2155,7 +2155,7 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 	b.Assert((ce.GetCeFlags() & (ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)) == ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
 	memset(&ai, 0, b.SizeOf("ai"))
 	var __ht *types.Array = ce.GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		func_ = _z.GetPtr()
@@ -2239,14 +2239,14 @@ func CheckVarianceObligation(zv *types.Zval) int {
 			ResolveDelayedVarianceObligations(dependency_ce)
 		}
 		if !dependency_ce.IsLinked() {
-			return types.ZEND_HASH_APPLY_KEEP
+			return types.ArrayApplyKeep
 		}
 	} else if obligation.GetType() == OBLIGATION_COMPATIBILITY {
 		var unresolved_class *types.String
 		var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, obligation.GetChildFn(), obligation.GetParentFn())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return types.ZEND_HASH_APPLY_KEEP
+				return types.ArrayApplyKeep
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatibleMethodErrorOrWarning(obligation.GetChildFn(), obligation.GetParentFn(), status, unresolved_class, obligation.GetAlwaysError())
@@ -2256,13 +2256,13 @@ func CheckVarianceObligation(zv *types.Zval) int {
 		var status InheritanceStatus = PropertyTypesCompatible(obligation.GetParentProp(), obligation.GetChildProp())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
-				return types.ZEND_HASH_APPLY_KEEP
+				return types.ArrayApplyKeep
 			}
 			b.Assert(status == INHERITANCE_ERROR)
 			EmitIncompatiblePropertyError(obligation.GetChildProp(), obligation.GetParentProp())
 		}
 	}
-	return types.ZEND_HASH_APPLY_REMOVE
+	return types.ArrayApplyRemove
 }
 func LoadDelayedClasses() {
 	var delayed_autoloads *types.Array = CG__().GetDelayedAutoloads()
@@ -2275,7 +2275,7 @@ func LoadDelayedClasses() {
 
 	CG__().SetDelayedAutoloads(nil)
 	var __ht *types.Array = delayed_autoloads
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		name = _p.GetKey()
@@ -2307,7 +2307,7 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 	obligations = types.ZendHashIndexFindPtr(all_obligations, num_key)
 	b.Assert(obligations != nil)
 	var __ht *types.Array = obligations
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		obligation = _z.GetPtr()
@@ -2426,7 +2426,7 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 	var parent_func *ZendFunction
 	var parent_info *ZendPropertyInfo
 	var __ht *types.Array = parent_ce.GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
@@ -2445,7 +2445,7 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 		}
 	}
 	var __ht__1 *types.Array = parent_ce.GetPropertiesInfo()
-	for _, _p := range __ht__1.foreachData() {
+	for _, _p := range __ht__1.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()

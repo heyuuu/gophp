@@ -566,7 +566,7 @@ func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	if found_entry == nil {
 		var entry *BrowscapEntry
 		var __ht *types.Array = bdata.GetHtab()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			entry = _z.GetPtr()

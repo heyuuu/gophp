@@ -99,7 +99,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ty
 	headers = client.GetRequest().GetHeadersOriginalCase()
 	zend.ArrayInitSize(return_value, headers.Len())
 	var __ht *types.Array = headers
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
@@ -232,7 +232,7 @@ func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key
 		zend.Efree(key)
 		zend.Efree(real_key)
 	}
-	return types.ZEND_HASH_APPLY_KEEP
+	return types.ArrayApplyKeep
 }
 func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	var client *PhpCliServerClient = core.SG__().server_context

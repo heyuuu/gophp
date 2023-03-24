@@ -72,7 +72,7 @@ func PrintModules() {
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
-	return types.ZEND_HASH_APPLY_KEEP
+	return types.ArrayApplyKeep
 }
 func PrintExtensions() {
 	elements := zend.ZendExtensions.ElementsData()

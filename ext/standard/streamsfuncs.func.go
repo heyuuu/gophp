@@ -513,7 +513,7 @@ func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *typ
 	if b.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
 		zend.ArrayInit(return_value)
 		var __ht *types.Array = stream_xport_hash
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			stream_xport = _p.GetKey()
@@ -533,7 +533,7 @@ func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *types
 	if b.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
 		zend.ArrayInit(return_value)
 		var __ht *types.Array = url_stream_wrappers_hash
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			stream_protocol = _p.GetKey()
@@ -554,7 +554,7 @@ func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpS
 		return 0
 	}
 	var __ht *types.Array = stream_array.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		elem = _z
@@ -610,7 +610,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	}
 	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
 	var __ht *types.Array = stream_array.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		num_ind = _p.GetH()
@@ -669,7 +669,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	}
 	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
 	var __ht *types.Array = stream_array.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		num_ind = _p.GetH()
@@ -876,7 +876,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 	var okey *types.String
 	var ret int = types.SUCCESS
 	var __ht *types.Array = options.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		wkey = _p.GetKey()
@@ -884,7 +884,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 		wval = types.ZVAL_DEREF(wval)
 		if wkey != nil && wval.IsType(types.IS_ARRAY) {
 			var __ht *types.Array = wval.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				okey = _p.GetKey()

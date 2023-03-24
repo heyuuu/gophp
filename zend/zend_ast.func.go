@@ -399,7 +399,7 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 		var val *types.Zval
 		var key *types.String
 		var __ht *types.Array = ht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
@@ -1080,7 +1080,7 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 		str.AppendByte('[')
 		first = 1
 		var __ht *types.Array = types.Z_ARRVAL_P(zv)
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			idx = _p.GetH()

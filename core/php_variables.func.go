@@ -632,7 +632,7 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 	var num_key zend.ZendUlong
 	var globals_check int = dest == zend.EG__().GetSymbolTable()
 	var __ht *types.Array = src
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		num_key = _p.GetH()

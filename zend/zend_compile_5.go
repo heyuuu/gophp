@@ -248,7 +248,7 @@ func ZendCompileTry(ast *ZendAst) {
 	if CG__().GetContext().GetLabels() != nil {
 		var label *ZendLabel
 		var __ht *types.Array = CG__().GetContext().GetLabels()
-		for _, _p := range __ht.foreachDataReserve() {
+		for _, _p := range __ht.ForeachDataReserve() {
 			var _z types.Zval = _p.GetVal()
 
 			label = _z.GetPtr()

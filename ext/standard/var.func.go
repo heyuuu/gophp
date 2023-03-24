@@ -93,7 +93,7 @@ again:
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) {\n", COMMON, count)
 		var __ht *types.Array = myht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -131,7 +131,7 @@ again:
 			var key *types.String
 			var val *types.Zval
 			var __ht *types.Array = myht
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				num = _p.GetH()
@@ -274,7 +274,7 @@ again:
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return struc.GetRefcount() - 1 }, 1))
 		var __ht *types.Array = myht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -312,7 +312,7 @@ again:
 		types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			var __ht *types.Array = myht
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				index = _p.GetH()
@@ -489,7 +489,7 @@ again:
 		}
 		buf.AppendString("array (\n")
 		var __ht *types.Array = myht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -537,7 +537,7 @@ again:
 		}
 		if myht != nil {
 			var __ht *types.Array = myht
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
 					_z = _z.GetZv()
@@ -740,7 +740,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 	 * name manglings? */
 
 	var __ht *types.Array = sleep_retval
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsType(types.IS_INDIRECT) {
 			_z = _z.GetZv()
@@ -813,7 +813,7 @@ func PhpVarSerializeNestedData(
 		var data *types.Zval
 		var index zend.ZendUlong
 		var __ht *types.Array = ht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 			if _z.IsType(types.IS_INDIRECT) {
 				_z = _z.GetZv()
@@ -943,7 +943,7 @@ again:
 			buf.AppendUlong(retval.GetArr().Count())
 			buf.AppendString(":{")
 			var __ht *types.Array = retval.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 				if _z.IsType(types.IS_INDIRECT) {
 					_z = _z.GetZv()
@@ -1165,7 +1165,7 @@ func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval)
 			var entry *types.Zval
 			var lcname *types.String
 			var __ht *types.Array = classes.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				entry = _z

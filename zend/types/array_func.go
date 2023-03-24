@@ -560,7 +560,7 @@ func ZendHashGetCurrentKeyEx(ht *Array, str_index **String, num_index *zend.Zend
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
 	if idx < ht.GetNNumUsed() {
-		p = ht.GetArData() + idx
+		p = ht.Bucket(idx)
 		if p.GetKey() != nil {
 			*str_index = p.GetKey()
 			return HASH_KEY_IS_STRING
@@ -578,7 +578,7 @@ func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *ArrayPosition) {
 	if idx >= ht.GetNNumUsed() {
 		key.SetNull()
 	} else {
-		p = ht.GetArData() + idx
+		p = ht.Bucket(idx)
 		if p.GetKey() != nil {
 			ZVAL_STR_COPY(key, p.GetKey())
 		} else {
@@ -591,7 +591,7 @@ func ZendHashGetCurrentKeyTypeEx(ht *Array, pos *ArrayPosition) int {
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
 	if idx < ht.GetNNumUsed() {
-		p = ht.GetArData() + idx
+		p = ht.Bucket(idx)
 		if p.GetKey() != nil {
 			return HASH_KEY_IS_STRING
 		} else {
@@ -605,7 +605,7 @@ func ZendHashGetCurrentDataEx(ht *Array, pos *ArrayPosition) *Zval {
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
 	if idx < ht.GetNNumUsed() {
-		p = ht.GetArData() + idx
+		p = ht.Bucket(idx)
 		return p.GetVal()
 	} else {
 		return nil
@@ -638,7 +638,7 @@ func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered Ze
 	idx1 = 0
 	idx2 = 0
 	for ; idx1 < ht1.GetNNumUsed(); idx1++ {
-		var p1 *Bucket = ht1.GetArData() + idx1
+		var p1 *Bucket = ht1.Bucket(idx1)
 		var p2 *Bucket
 		var pData1 *Zval
 		var pData2 *Zval
@@ -649,7 +649,7 @@ func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered Ze
 		if ordered != 0 {
 			for true {
 				b.Assert(idx2 != ht2.GetNNumUsed())
-				p2 = ht2.GetArData() + idx2
+				p2 = ht2.Bucket(idx2)
 				if p2.GetVal().GetType() != IS_UNDEF {
 					break
 				}
@@ -819,7 +819,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 	var zv *Zval
 
 	var __ht *Array = ht
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *Zval = _p.GetVal()
 
 		str_key = _p.GetKey()
@@ -834,7 +834,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 convert:
 	var new_ht *Array = NewArray(ht.Len())
 	var __ht__1 *Array = ht
-	for _, _p := range __ht__1.foreachData() {
+	for _, _p := range __ht__1.ForeachData() {
 		var _z *Zval = _p.GetVal()
 
 		num_key = _p.GetH()
@@ -865,7 +865,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	var str_key *String
 	var zv *Zval
 	var __ht *Array = ht
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *Zval = _p.GetVal()
 
 		str_key = _p.GetKey()
@@ -897,7 +897,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 convert:
 	var new_ht *Array = NewArray(ht.Len())
 	var __ht__1 *Array = ht
-	for _, _p := range __ht__1.foreachData() {
+	for _, _p := range __ht__1.ForeachData() {
 		var _z *Zval = _p.GetVal()
 		if _z.IsIndirect() {
 			_z = _z.GetZv()

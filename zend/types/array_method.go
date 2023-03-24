@@ -3,6 +3,7 @@ package types
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"sort"
 )
 
 /**
@@ -22,6 +23,114 @@ func (ht *Array) SetNNextFreeElement(value zend.ZendLong) { ht.nextFreeElement =
 func (ht *Array) GetPDestructor() DtorFuncT               { return ht.destructor }
 func (ht *Array) SetPDestructor(value DtorFuncT)          { ht.destructor = value }
 func (ht *Array) GetNTableMask() uint32                   { return 0 } // todo remove
+
+func (ht *Array) IsWithoutHoles() bool { return ht.GetNNumUsed() == ht.elementsCount }
+
+func (ht *Array) Count() uint32 {
+	var num uint32
+	if ht.HasEmptyIndex() {
+		num = ht.recalcElements()
+		if ht.elementsCount == num {
+			ht.UnmarkHasEmptyIndex()
+		}
+	} else if ht == zend.EG__().GetSymbolTable() { // todo
+		num = ht.recalcElements()
+	} else {
+		num = ht.Len()
+	}
+	return num
+}
+
+// 重新计算有效元素个数(与 elementsCount 不同，它考虑 IS_INDIRECT 元素为 IS_UNDEF 的情况)
+func (ht *Array) recalcElements() uint32 {
+	var num uint32 = 0
+	ht.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+		num++
+	})
+	return num
+}
+
+func (ht *Array) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
+	ht.assertRc1()
+
+	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
+		return
+	}
+
+	ht.removeHolesForce()
+	ht.internalPointer = 0
+
+	sort.SliceStable(ht.data, func(i, j int) bool {
+		return comparer(&ht.data[i], &ht.data[i])
+	})
+
+	if renumber {
+		ht.eachBucket(func(pos uint32, p *Bucket) {
+			p.SetIndexKey(int(pos))
+		})
+		ht.nextFreeElement = int(ht.DataSize())
+	}
+
+	ht.Rehash()
+}
+
+func (ht *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
+	ht.Sort(func(a *Bucket, b *Bucket) bool {
+		var compareResult = comparer(a, b)
+		return compareResult > 0
+	}, renumber != 0)
+	return SUCCESS
+}
+
+func (ht *Array) SortCompatibleEx(sort_ SortFuncT) int {
+	// todo sort 转 sortFunc 需要订制处理
+	var sortFunc = *b.Cast[func([]Bucket)](&sort_)
+
+	// 正常 sort 逻辑，除 sortFunc 部分外和 ht.Sort() 逻辑一致
+	ht.assertRc1()
+
+	if ht.elementsCount <= 1 {
+		return SUCCESS
+	}
+
+	ht.removeHolesForce()
+	ht.SetNInternalPointer(0)
+
+	sortFunc(ht.data)
+
+	ht.Rehash()
+
+	return SUCCESS
+}
+
+func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
+	ht.assertRc1()
+
+	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
+	if pos, ok := ht.keyMap[key]; ok {
+		p := &ht.data[pos]
+		if p == b {
+			return p.GetVal()
+		} else {
+			return nil
+		}
+	}
+
+	// 定义 bucket 位置；若 bucket 不在数据内，返回 nil
+	var pos, ok = ht.posBucket(b)
+	if !ok {
+		return nil
+	}
+
+	/* del from hash */
+	ht.deleteHash(b.key)
+
+	/* add to hash */
+	b.SetStrKey(key)
+	ht.addHash(b.key, pos)
+
+	return b.GetVal()
+}
 
 /**
  * Clean && Destroy
@@ -305,42 +414,137 @@ func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
  */
 func (ht *Array) Foreach(handler func(key ArrayKey, value *Zval)) {
 	for i, _ := range ht.data {
-		handler(ht.data[i].GetArrayKey(), &ht.data[i].val)
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		handler(p.GetArrayKey(), p.GetVal())
+	}
+}
+func (ht *Array) ForeachReserve(handler func(key ArrayKey, value *Zval)) {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		handler(p.GetArrayKey(), p.GetVal())
 	}
 }
 
-func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
-	var size = uint32(len(ht.data))
-	for i := uint32(0); i < size; i++ {
-		var p = &ht.data[i]
-		handler(i, p)
-	}
+// todo 逐渐替换为 Foreach 或其他更高效代码
+func (ht *Array) ForeachData() []*Bucket {
+	var data = make([]*Bucket, 0)
+	ht.eachValidBucket(func(_ uint32, p *Bucket) {
+		data = append(data, p)
+	})
+	return data
 }
-func (ht *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
-	var size = uint32(len(ht.data))
-	for i := uint32(0); i < size; i++ {
+
+// todo 逐渐替换为 ForeachReserve 或其他更高效代码
+func (ht *Array) ForeachDataReserve() []*Bucket {
+	var data = make([]*Bucket, 0)
+
+	for i := len(ht.data) - 1; i >= 0; i-- {
 		var p = &ht.data[i]
 		if p.IsValid() {
 			continue
 		}
-		handler(i, p)
+		data = append(data, p)
+	}
+
+	return data
+}
+
+func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		handler(uint32(i), p)
+	}
+}
+func (ht *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		handler(uint32(i), p)
 	}
 }
 func (ht *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
-	var size = uint32(len(ht.data))
-	for i := uint32(0); i < size; i++ {
-		var p = &ht.data[i]
-		var data = p.GetVal()
-
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		data := p.GetVal()
 		if data.IsIndirect() {
 			data = data.GetZv()
 		}
 		if data.IsUndef() {
 			return
 		}
-
-		handler(i, p, data)
+		handler(uint32(i), p, data)
 	}
+}
+
+func (ht *Array) applyValidBucket(apply_func func(p *Bucket) int) {
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		result := apply_func(p)
+		if b.FlagMatch(result, ArrayApplyRemove) {
+			ht.deleteBucket(uint32(i))
+		}
+		if b.FlagMatch(result, ArrayApplyStop) {
+			break
+		}
+	}
+}
+func (ht *Array) applyValidBucketReserve(apply_func func(p *Bucket) int) {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := &ht.data[i]
+		if p.IsValid() {
+			continue
+		}
+		result := apply_func(p)
+		if b.FlagMatch(result, ArrayApplyRemove) {
+			ht.deleteBucket(uint32(i))
+		}
+		if b.FlagMatch(result, ArrayApplyStop) {
+			break
+		}
+	}
+}
+
+/**
+ * Iterator & Pos
+ */
+func (ht *Array) currentPos() (uint32, bool) {
+	return ht.validPos(ht.internalPointer)
+}
+
+func (ht *Array) currentPosVal() uint32 {
+	var pos, _ = ht.currentPos()
+	return pos
+}
+func (ht *Array) validPosVal(pos uint32) uint32 {
+	pos, _ = ht.validPos(pos)
+	return pos
+}
+
+func (ht *Array) validPos(pos uint32) (uint32, bool) {
+	var dataSize = ht.DataSize()
+	for ; pos < dataSize; pos++ {
+		if ht.IsValidPos(pos) {
+			return pos, true
+		}
+	}
+	// 没有有效pos，此时 pos == ht.DataSize()
+	return pos, false
+}
+
+func (ht *Array) IsValidPos(pos uint32) bool {
+	b.Assert(pos < ht.DataSize())
+	return !ht.data[pos].GetVal().IsType(IS_UNDEF)
 }
 
 /**
@@ -358,5 +562,91 @@ func (ht *Array) copyDataAndHash(source *Array) {
 	ht.keyMap = make(map[string]uint32)
 	for i, pos := range source.keyMap {
 		ht.keyMap[i] = pos
+	}
+}
+
+// 移除 this.data 数据中的 holes, 返回是否移动 bucket
+func (ht *Array) removeHoles() bool {
+	var newPos uint32 = 0
+
+	if ht.IsWithoutHoles() {
+		return false
+	}
+
+	if ht.HasIterators() {
+		var iterPos = ZendHashIteratorsLowerPos(ht, 0)
+
+		ht.eachValidBucket(func(pos uint32, p *Bucket) {
+			// 移动 bucket 到新位置
+			ht.moveBucket(pos, newPos)
+			if pos != newPos {
+				if pos >= iterPos {
+					for {
+						ZendHashIteratorsUpdate(ht, iterPos, newPos)
+						iterPos = ZendHashIteratorsLowerPos(ht, iterPos+1)
+						if iterPos >= pos {
+							break
+						}
+					}
+				}
+			}
+			newPos++
+		})
+	} else {
+		ht.eachValidBucket(func(pos uint32, p *Bucket) {
+			ht.moveBucket(pos, newPos)
+			newPos++
+		})
+	}
+
+	// 截取数据，记录有效元素数
+	ht.data = ht.data[:newPos]
+	ht.elementsCount = newPos
+
+	b.Assert(ht.IsWithoutHoles())
+
+	return true
+}
+
+// 移除 data 的 holes, 不考虑 internalPointer 和 Iterators 内的 pos 指针
+func (ht *Array) removeHolesForce() bool {
+	var newPos uint32 = 0
+
+	if ht.IsWithoutHoles() {
+		return false
+	}
+
+	ht.eachValidBucket(func(pos uint32, p *Bucket) {
+		if newPos != pos {
+			// todo 考虑下实现细节的区别
+			//(&ht.data[newPos]).SetBy(&ht.data[pos])
+			ht.data[newPos] = ht.data[pos]
+		}
+		newPos++
+	})
+
+	// 截取数据，记录有效元素数
+	ht.data = ht.data[:newPos]
+	ht.elementsCount = newPos
+
+	b.Assert(ht.IsWithoutHoles())
+
+	return true
+}
+
+// 清除 data 队尾无用数据
+func (ht *Array) removeInvalidTail() {
+	var dataSize = ht.DataSize()
+
+	// 从队尾依次判断是否为无效数据，若是则缩短
+	var newDataSize = dataSize
+	for newDataSize > 0 && !ht.data[newDataSize-1].IsValid() {
+		newDataSize--
+	}
+
+	// 若长度改变，调整 data
+	if newDataSize < dataSize {
+		ht.data = ht.data[:newDataSize]
+		ht.internalPointer = b.Min(ht.internalPointer, newDataSize)
 	}
 }

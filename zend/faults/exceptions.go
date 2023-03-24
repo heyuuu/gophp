@@ -513,7 +513,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			var last_len int = str.GetS().GetLen()
 			var arg *types.Zval
 			var __ht *types.Array = tmp.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				arg = _z
@@ -548,7 +548,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 		return
 	}
 	var __ht *types.Array = trace.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		index = _p.GetH()

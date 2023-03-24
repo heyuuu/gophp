@@ -149,7 +149,7 @@ func ZendInitRsrcPlist() int {
 func ZendCloseRsrcList(ht *types.Array) {
 	var res *types.ZendResource
 	var __ht *types.Array = ht
-	for _, _p := range __ht.foreachDataReserve() {
+	for _, _p := range __ht.ForeachDataReserve() {
 		var _z types.Zval = _p.GetVal()
 
 		res = _z.GetPtr()
@@ -194,7 +194,7 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 func ZendFetchListDtorId(type_name *byte) int {
 	var lde *ZendRsrcListDtorsEntry
 	var __ht *types.Array = &ListDestructors
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		lde = _z.GetPtr()

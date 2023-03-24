@@ -401,7 +401,7 @@ func ZendResolveMethodName(ce *types.ClassEntry, f *ZendFunction) *types.String 
 	}
 	function_table = ce.GetFunctionTable()
 	var __ht *types.Array = function_table
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		name = _p.GetKey()

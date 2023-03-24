@@ -115,7 +115,7 @@ func FreeFilename(el *types.Zval) {
 func DestroyUploadedFilesHash() {
 	var el *types.Zval
 	var __ht *types.Array = SG__().rfc1867_uploaded_files
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		el = _z

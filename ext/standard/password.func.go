@@ -488,7 +488,7 @@ func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *types.Zva
 	}
 	zend.ArrayInit(return_value)
 	var __ht *types.Array = &PhpPasswordAlgos
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		algo = _p.GetKey()

@@ -68,9 +68,9 @@ func CleanModuleConstant(el *types.Zval, arg any) int {
 	var c *ZendConstant = (*ZendConstant)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ZEND_CONSTANT_MODULE_NUMBER(c) == module_number {
-		return types.ZEND_HASH_APPLY_REMOVE
+		return types.ArrayApplyRemove
 	} else {
-		return types.ZEND_HASH_APPLY_KEEP
+		return types.ArrayApplyKeep
 	}
 }
 func CleanModuleConstants(module_number int) {

@@ -2523,7 +2523,7 @@ func SplIteratorApply(obj *types.Zval, apply_func SplIteratorApplyFuncT, puser a
 		if zend.EG__().GetException() != nil {
 			goto done
 		}
-		if apply_func(iter, puser) == types.ZEND_HASH_APPLY_STOP || zend.EG__().GetException() != nil {
+		if apply_func(iter, puser) == types.ArrayApplyStop || zend.EG__().GetException() != nil {
 			goto done
 		}
 		iter.GetIndex()++
@@ -2547,16 +2547,16 @@ func SplIteratorToArrayApply(iter *zend.ZendObjectIterator, puser any) int {
 	var return_value *types.Zval = (*types.Zval)(puser)
 	data = iter.GetFuncs().GetGetCurrentData()(iter)
 	if zend.EG__().GetException() != nil {
-		return types.ZEND_HASH_APPLY_STOP
+		return types.ArrayApplyStop
 	}
 	if data == nil {
-		return types.ZEND_HASH_APPLY_STOP
+		return types.ArrayApplyStop
 	}
 	if iter.GetFuncs().GetGetCurrentKey() != nil {
 		var key types.Zval
 		iter.GetFuncs().GetGetCurrentKey()(iter, &key)
 		if zend.EG__().GetException() != nil {
-			return types.ZEND_HASH_APPLY_STOP
+			return types.ArrayApplyStop
 		}
 		zend.ArraySetZvalKey(return_value.GetArr(), &key, data)
 		zend.ZvalPtrDtor(&key)
@@ -2564,21 +2564,21 @@ func SplIteratorToArrayApply(iter *zend.ZendObjectIterator, puser any) int {
 		data.TryAddRefcount()
 		zend.AddNextIndexZval(return_value, data)
 	}
-	return types.ZEND_HASH_APPLY_KEEP
+	return types.ArrayApplyKeep
 }
 func SplIteratorToValuesApply(iter *zend.ZendObjectIterator, puser any) int {
 	var data *types.Zval
 	var return_value *types.Zval = (*types.Zval)(puser)
 	data = iter.GetFuncs().GetGetCurrentData()(iter)
 	if zend.EG__().GetException() != nil {
-		return types.ZEND_HASH_APPLY_STOP
+		return types.ArrayApplyStop
 	}
 	if data == nil {
-		return types.ZEND_HASH_APPLY_STOP
+		return types.ArrayApplyStop
 	}
 	data.TryAddRefcount()
 	zend.AddNextIndexZval(return_value, data)
-	return types.ZEND_HASH_APPLY_KEEP
+	return types.ArrayApplyKeep
 }
 func ZifIteratorToArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
@@ -2592,7 +2592,7 @@ func ZifIteratorToArray(executeData *zend.ZendExecuteData, return_value *types.Z
 }
 func SplIteratorCountApply(iter *zend.ZendObjectIterator, puser any) int {
 	*((*zend.ZendLong)(puser))++
-	return types.ZEND_HASH_APPLY_KEEP
+	return types.ArrayApplyKeep
 }
 func ZifIteratorCount(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var obj *types.Zval
@@ -2614,9 +2614,9 @@ func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 	apply_info.GetCount()++
 	zend.ZendFcallInfoCall(apply_info.GetFci(), apply_info.GetFcc(), &retval, nil)
 	if zend.ZendIsTrue(&retval) != 0 {
-		result = types.ZEND_HASH_APPLY_KEEP
+		result = types.ArrayApplyKeep
 	} else {
-		result = types.ZEND_HASH_APPLY_STOP
+		result = types.ArrayApplyStop
 	}
 	zend.ZvalPtrDtor(&retval)
 	return result

@@ -542,7 +542,7 @@ func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNod
 	var leaf ZendUlong
 	b.Assert(src.GetChildren() > 1)
 	var __ht *types.Array = src.GetHt()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		leaf = _p.GetH()

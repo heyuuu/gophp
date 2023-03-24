@@ -140,7 +140,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 			var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
 			var tmp *types.Zval
 			var __ht *types.Array = filterparams.GetArr()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				tmp = _z

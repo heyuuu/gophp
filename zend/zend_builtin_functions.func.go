@@ -265,7 +265,7 @@ func ValidateConstantArray(ht *types.Array) int {
 	var val *types.Zval
 	ht.ProtectRecursive()
 	var __ht = ht
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 		if _z.IsIndirect() {
 			_z = _z.GetZv()
@@ -304,7 +304,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 	var val *types.Zval
 	ArrayInitSize(dst, types.Z_ARRVAL_P(src).Len())
 	var __ht = src.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 		if _z.IsIndirect() {
 			_z = _z.GetZv()
@@ -539,7 +539,7 @@ func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, re
 	var prop_copy types.Zval
 	var key *types.String
 	var __ht *types.Array = ce.GetPropertiesInfo()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		key = _p.GetKey()
@@ -647,7 +647,7 @@ func ZifGetObjectVars(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else {
 		ArrayInitSize(return_value, properties.Len())
 		var __ht = properties
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			num_key = _p.GetH()
@@ -761,7 +761,7 @@ func ZifGetClassMethods(executeData *ZendExecuteData, return_value *types.Zval) 
 	ArrayInit(return_value)
 	scope = ZendGetExecutedScope()
 	var __ht *types.Array = ce.GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		key = _p.GetKey()
@@ -1000,7 +1000,7 @@ func ZifGetIncludedFiles(executeData *ZendExecuteData, return_value *types.Zval)
 	}
 	ArrayInit(return_value)
 	var __ht = EG__().GetIncludedFiles()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		entry = _p.GetKey()
@@ -1137,7 +1137,7 @@ func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval
 	}
 	ArrayInit(return_value)
 	var __ht = EG__().GetClassTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		key = _p.GetKey()
@@ -1169,7 +1169,7 @@ func ZifGetDefinedFunctions(executeData *ZendExecuteData, return_value *types.Zv
 	ArrayInit(&user)
 	ArrayInit(return_value)
 	var __ht = EG__().GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		key = _p.GetKey()
@@ -1283,7 +1283,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 	if type_ == nil {
 		ArrayInit(return_value)
 		var __ht *types.Array = EG__().GetRegularList()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			index = _p.GetH()
@@ -1297,7 +1297,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 	} else if types.ZendStringEqualsLiteral(type_, "Unknown") {
 		ArrayInit(return_value)
 		var __ht *types.Array = EG__().GetRegularList()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			index = _p.GetH()
@@ -1317,7 +1317,7 @@ func ZifGetResources(executeData *ZendExecuteData, return_value *types.Zval) {
 		}
 		ArrayInit(return_value)
 		var __ht *types.Array = EG__().GetRegularList()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			index = _p.GetH()
@@ -1346,7 +1346,7 @@ func ZifGetLoadedExtensions(executeData *ZendExecuteData, return_value *types.Zv
 	} else {
 		var module *ZendModuleEntry
 		var __ht = &ModuleRegistry
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			module = _z.GetPtr()
@@ -1372,7 +1372,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 		module_names = Emalloc((ModuleRegistry.Len() + 2) * b.SizeOf("char *"))
 		module_names[0] = "internal"
 		var __ht = &ModuleRegistry
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			module = _z.GetPtr()
@@ -1381,7 +1381,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 		}
 		module_names[i] = "user"
 		var __ht__1 = EG__().GetZendConstants()
-		for _, _p := range __ht__1.foreachData() {
+		for _, _p := range __ht__1.ForeachData() {
 			var _z = _p.GetVal()
 
 			val = _z.GetPtr()
@@ -1420,7 +1420,7 @@ func ZifGetDefinedConstants(executeData *ZendExecuteData, return_value *types.Zv
 		var constant *ZendConstant
 		var const_val types.Zval
 		var __ht = EG__().GetZendConstants()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z = _p.GetVal()
 
 			constant = _z.GetPtr()
@@ -1512,7 +1512,7 @@ func DebugPrintBacktraceArgs(arg_array *types.Zval) {
 	var tmp *types.Zval
 	var i = 0
 	var __ht = arg_array.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		tmp = _z
@@ -1951,7 +1951,7 @@ func ZifGetExtensionFuncs(executeData *ZendExecuteData, return_value *types.Zval
 		array = 0
 	}
 	var __ht = CG__().GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
 		zif = _z.GetPtr()

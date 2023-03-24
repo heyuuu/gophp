@@ -606,7 +606,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		tmp.SetTrue()
 		if strict != 0 {
 			var __ht *types.Array = src
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				val = _z
@@ -622,7 +622,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 			}
 		} else {
 			var __ht *types.Array = src
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				val = _z

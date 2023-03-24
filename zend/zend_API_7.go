@@ -42,7 +42,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	disabled_class.InitMethods(DisabledClassNew)
 	disabled_class.SetCreateObject(DisplayDisabledClass)
 	var __ht *types.Array = disabled_class.GetFunctionTable()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		fn = _z.GetPtr()

@@ -619,7 +619,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	}
 	zend.ArrayInit(return_value)
 	var __ht *types.Array = stream.GetWrapperdata().GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		hdr = _z

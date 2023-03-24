@@ -109,7 +109,7 @@ func SplObjectStorageDetach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *types.Zval, other *spl_SplObjectStorage) {
 	var element *spl_SplObjectStorageElement
 	var __ht *types.Array = other.GetStorage()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		element = _z.GetPtr()
@@ -167,7 +167,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	types.ZendHashCopy(debug_info, props, types.CopyCtorFuncT(zend.ZvalAddRef))
 	zend.ArrayInit(&storage)
 	var __ht *types.Array = intern.GetStorage()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		element = _z.GetPtr()
@@ -197,7 +197,7 @@ func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.A
 		intern.SetGcdata((*types.Zval)(zend.Erealloc(intern.GetGcdata(), b.SizeOf("zval")*intern.GetGcdataNum())))
 	}
 	var __ht *types.Array = intern.GetStorage()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		element = _z.GetPtr()
@@ -329,7 +329,7 @@ func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData,
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
 	var __ht *types.Array = intern.GetStorage()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		element = _z.GetPtr()
@@ -620,7 +620,7 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 
 	zend.ArrayInitSize(&tmp, 2*intern.GetStorage().Len())
 	var __ht *types.Array = intern.GetStorage()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		elem = _z.GetPtr()
@@ -659,7 +659,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 	}
 	key = nil
 	var __ht *types.Array = storage_zv.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		val = _z

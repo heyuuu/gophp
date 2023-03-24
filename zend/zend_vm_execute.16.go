@@ -113,7 +113,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if array.IsArray() {
 		fe_ht = array.GetArr()
 		pos = array.GetFePos()
-		p = fe_ht.GetArData() + pos
+		p = fe_ht.Bucket(pos)
 		for true {
 			if pos >= fe_ht.GetNNumUsed() {
 
@@ -156,7 +156,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			fe_ht = types.Z_OBJPROP_P(array)
 			pos = types.ZendHashIteratorPos(array.GetFeIterIdx(), fe_ht)
-			p = fe_ht.GetArData() + pos
+			p = fe_ht.Bucket(pos)
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
 
@@ -273,7 +273,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if array.IsArray() {
 		pos = types.ZendHashIteratorPosEx(EX_VAR(opline.GetOp1().GetVar()).GetFeIterIdx(), array)
 		fe_ht = array.GetArr()
-		p = fe_ht.GetArData() + pos
+		p = fe_ht.Bucket(pos)
 		for true {
 			if pos >= fe_ht.GetNNumUsed() {
 
@@ -316,7 +316,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 			fe_ht = types.Z_OBJPROP_P(array)
 			pos = types.ZendHashIteratorPos(EX_VAR(opline.GetOp1().GetVar()).GetFeIterIdx(), fe_ht)
-			p = fe_ht.GetArData() + pos
+			p = fe_ht.Bucket(pos)
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
 

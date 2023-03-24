@@ -52,7 +52,7 @@ func PhpUrlEncodeHashEx(
 	}
 	arg_sep_len = strlen(arg_sep)
 	var __ht *types.Array = ht
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		idx = _p.GetH()

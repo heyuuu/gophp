@@ -891,7 +891,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 	}
 	intern.SetFlags(int(flags_zv.GetLval()))
 	var __ht *types.Array = storage_zv.GetArr()
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		elem = _z

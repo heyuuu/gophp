@@ -101,7 +101,7 @@ func ZendIniDeactivate() int {
 	if EG__().GetModifiedIniDirectives() != nil {
 		var ini_entry *ZendIniEntry
 		var __ht *types.Array = EG__().GetModifiedIniDirectives()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			ini_entry = _z.GetPtr()

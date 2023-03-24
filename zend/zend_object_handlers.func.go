@@ -45,7 +45,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		if ce.GetDefaultPropertiesCount() != 0 {
 			types.ZendHashRealInitMixed(zobj.GetProperties())
 			var __ht *types.Array = ce.GetPropertiesInfo()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				prop_info = _z.GetPtr()
@@ -61,7 +61,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 				for ce.GetParent() && ce.GetParent().default_properties_count {
 					ce = ce.GetParent()
 					var __ht *types.Array = ce.GetPropertiesInfo()
-					for _, _p := range __ht.foreachData() {
+					for _, _p := range __ht.ForeachData() {
 						var _z *types.Zval = _p.GetVal()
 
 						prop_info = _z.GetPtr()
@@ -595,7 +595,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
 				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
-					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
+					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
 					if p.GetVal().IsNotUndef() && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
 						retval = p.GetVal()
 						goto exit
@@ -1419,7 +1419,7 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 		}
 		o1.ProtectRecursive()
 		var __ht *types.Array = zobj1.GetCe().GetPropertiesInfo()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			info = _z.GetPtr()
@@ -1493,7 +1493,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 			if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
 				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
-					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
+					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
 					if p.GetVal().IsNotUndef() && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
 						value = p.GetVal()
 						goto found

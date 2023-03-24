@@ -312,7 +312,7 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 	}
 	if nil != b.Assign(&rconflicts, types.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName().GetStr())) {
 		var __ht *types.Array = rconflicts
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			conflict = _z.GetPtr()

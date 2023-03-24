@@ -56,8 +56,13 @@ func (this *Bucket) GetArrayKey() ArrayKey { return this.key }
 func (this *Bucket) GetVal() *Zval     { return &this.val }
 func (this *Bucket) SetVal(zval *Zval) { ZVAL_COPY_VALUE(&this.val, zval) }
 
+func (this *Bucket) IsValid() bool { return !this.val.IsUndef() }
+func (this *Bucket) MarkInvalid()  { this.val.SetUndef() }
 
-
+func (this *Bucket) CopyFrom(from *Bucket) {
+	this.SetVal(from.GetVal())
+	this.key = from.key
+}
 
 /**
  * Array
@@ -154,7 +159,7 @@ func (ht *Array) SetBy(arr *Array) {
 }
 
 // 实际元素个数，从使用者角度的数组大小
-func (ht *Array) Len() uint32               { return ht.elementsCount }
+func (ht *Array) Len() int                  { return int(ht.elementsCount) }
 func (ht *Array) Cap() int                  { return cap(ht.data) }
 func (ht *Array) Bucket(pos uint32) *Bucket { return &ht.data[pos] }
 
@@ -168,6 +173,15 @@ func (ht *Array) clearData() {
 	ht.data = nil
 	ht.indexMap = make(map[int]uint32)
 	ht.keyMap = make(map[string]uint32)
+}
+func (ht *Array) appendBucketStr(strKey string, zv *Zval) *Bucket {
+	var bucket = NewStrKeyBucket(strKey, zv)
+	return ht.appendBucket(bucket)
+}
+
+func (ht *Array) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
+	var bucket = NewIndexBucket(indexKey, zv)
+	return ht.appendBucket(bucket)
 }
 func (ht *Array) appendBucket(bucket *Bucket) *Bucket {
 	// 尝试 resize
@@ -208,7 +222,7 @@ func (ht *Array) resizeIfFull() {
 }
 func (ht *Array) deleteBucket(pos uint32) {
 	ht.assertRc1()
-	b.Assert(pos < ht.DataSize())
+	b.Assert(int(pos) < len(ht.data))
 
 	var p = &ht.data[pos]
 	b.Assert(p.IsValid())
@@ -232,15 +246,65 @@ func (ht *Array) deleteBucket(pos uint32) {
 	if ht.destructor != nil {
 		var tmp Zval
 		ZVAL_COPY_VALUE(&tmp, p.GetVal())
-		ht.GetPDestructor()(&tmp)
+		ht.destructor(&tmp)
 	}
 
 	// 设置数据不可用
-	p.SetInvalid()
+	p.MarkInvalid()
 
 	// 若删除队尾元素，尝试清除 data 队尾无用数据
 	if ht.DataSize()-1 == pos {
 		ht.removeInvalidTail()
+	}
+}
+
+func (ht *Array) posBucket(p *Bucket) (uint32, bool) {
+	if p.IsStrKey() {
+		if pos, ok := ht.keyMap[p.StrKey()]; ok {
+			return pos, true
+		}
+		return 0, false
+	} else {
+		if pos, ok := ht.indexMap[p.IndexKey()]; ok {
+			return pos, true
+		}
+		return 0, false
+	}
+}
+
+// 移动 bucket 到新位置
+func (ht *Array) moveBucket(pos uint32, newPos uint32) {
+	b.Assert(newPos <= pos)
+	if newPos == pos {
+		return
+	}
+	(&ht.data[newPos]).CopyFrom(&ht.data[pos])
+	if ht.internalPointer == pos {
+		ht.internalPointer = newPos
+	}
+}
+
+// todo 一般情况无需主动扩展
+func (ht *Array) Extend(size uint32) {
+	ht.assertRc1()
+	if size > uint32(len(ht.data)) {
+		// 扩展数组 cap
+		newData := make([]Bucket, 0, size)
+		if len(ht.data) > 0 {
+			copy(newData, ht.data)
+		}
+		ht.data = newData
+	}
+}
+
+// todo 一般情况无需主动扩展,确认使用目前是缩减内存占用还是裁剪元素
+func (ht *Array) Discard(nNumUsed uint32) {
+	if nNumUsed < ht.DataSize() {
+		// 裁剪数据，重新映射
+		ht.data = ht.data[:nNumUsed]
+		ht.Rehash()
+		// rehash 清理了所有 holes, 此时元素数就是 ht.data 长度
+		ht.elementsCount = ht.DataSize()
 	}
 }
 
@@ -262,6 +326,30 @@ func (ht *Array) deleteHash(key ArrayKey) {
 		delete(ht.keyMap, key.KeyKey())
 	} else {
 		delete(ht.indexMap, key.IndexKey())
+	}
+}
+func (ht *Array) Rehash() {
+	// 空数组快速清空
+	if ht.elementsCount == 0 {
+		ht.resetHash()
+		ht.data = nil
+		return
+	}
+
+	// 移除 data 中的空位
+	var oldNumUsed = ht.GetNNumUsed()
+	ht.removeHoles()
+
+	// 重建 hash
+	ht.resetHash()
+	ht.eachBucket(func(pos uint32, p *Bucket) {
+		ht.addHash(p.key, pos)
+	})
+
+	/* Migrate pointer to one past the end of the array to the new one past the end, so that
+	 * newly inserted elements are picked up correctly. */
+	if ht.HasIterators() {
+		_zendHashIteratorsUpdate(ht, oldNumUsed, ht.GetNNumUsed())
 	}
 }
 

@@ -21,7 +21,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		idx = uintPtr(CACHED_PTR(opline.GetExtendedValue()) - 1)
 		if idx < EG__().GetSymbolTable().GetNNumUsed()*b.SizeOf("Bucket") {
-			var p *types.Bucket = (*types.Bucket)((*byte)(EG__().GetSymbolTable().GetArData() + idx))
+			var p *types.Bucket = (*types.Bucket)((*byte)(EG__().GetSymbolTable().Bucket(idx)))
 			if p.GetVal().IsNotUndef() && (p.GetKey() == varname || p.GetH() == varname.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), varname) != 0) {
 				value = (*types.Zval)(p)
 				goto check_indirect
@@ -113,7 +113,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var val *types.Zval
 		result = nil
 		var __ht *types.Array = ht
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()

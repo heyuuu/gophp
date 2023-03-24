@@ -406,7 +406,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 		val.SetArray(types.ZendArrayDup(static_variables))
 		debug_info.KeyUpdate(types.ZSTR_STATIC.GetStr(), &val)
 		var __ht *types.Array = val.GetArr()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			var_ = _z
@@ -609,7 +609,7 @@ func ZendClosureBindVar(closure_zv *types.Zval, var_name *types.String, var_ *ty
 func ZendClosureBindVarEx(closure_zv *types.Zval, offset uint32, val *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())
 	var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
-	var var_ *types.Zval = (*types.Zval)((*byte)(static_variables.GetArData() + offset))
+	var var_ *types.Zval = (*types.Zval)((*byte)(static_variables.Bucket(offset)))
 	ZvalPtrDtor(var_)
 	types.ZVAL_COPY_VALUE(var_, val)
 }

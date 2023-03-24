@@ -232,7 +232,7 @@ func DestroyZendClass(zv *types.Zval) {
 		}
 		if ce.IsHasStaticInMethods() {
 			var __ht *types.Array = ce.GetFunctionTable()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				op_array = _z.GetPtr()
@@ -296,7 +296,7 @@ func DestroyZendClass(zv *types.Zval) {
 			Efree(ce.GetDefaultStaticMembersTable())
 		}
 		var __ht *types.Array = ce.GetPropertiesInfo()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			prop_info = _z.GetPtr()
@@ -316,7 +316,7 @@ func DestroyZendClass(zv *types.Zval) {
 		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
 			var __ht *types.Array = ce.GetConstantsTable()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				c = _z.GetPtr()
@@ -373,7 +373,7 @@ func DestroyZendClass(zv *types.Zval) {
 		/* TODO: eliminate this loop for classes without functions with arg_info */
 
 		var __ht *types.Array = ce.GetFunctionTable()
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			fn = _z.GetPtr()
@@ -385,7 +385,7 @@ func DestroyZendClass(zv *types.Zval) {
 		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
 			var __ht *types.Array = ce.GetConstantsTable()
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				c = _z.GetPtr()
@@ -962,7 +962,7 @@ func PassTwo(op_array *ZendOpArray) int {
 			var jumptable *types.Array = types.Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
 			var zv *types.Zval
 			var __ht *types.Array = jumptable
-			for _, _p := range __ht.foreachData() {
+			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
 				zv = _z

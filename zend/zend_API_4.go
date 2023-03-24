@@ -19,7 +19,7 @@ func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.Array) {
 		var key *types.String
 		var property_info *ZendPropertyInfo
 		var __ht *types.Array = properties
-		for _, _p := range __ht.foreachData() {
+		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
@@ -49,7 +49,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 	var h ZendLong
 	var property_info *ZendPropertyInfo
 	var __ht *types.Array = properties
-	for _, _p := range __ht.foreachData() {
+	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		h = _p.GetH()
