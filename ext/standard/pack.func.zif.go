@@ -1,0 +1,32 @@
+package standard
+
+import (
+	"sik/zend/def"
+	"sik/zend/types"
+	"sik/zend/zpp"
+)
+
+// generate by ZifPack
+var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{name: "format"}, {name: "args"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
+	format := fp.ParseZval()
+	fp.StartOptional()
+	args := fp.ParseVariadic()
+	if fp.HasError() {
+		return
+	}
+	ZifPack(executeData, returnValue, format, nil, args)
+})
+
+// generate by ZifUnpack
+var DefZifUnpack = def.DefFunc("unpack", 2, 3, []def.ArgInfo{{name: "format"}, {name: "input"}, {name: "offset"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 3, 0)
+	format := fp.ParseZval()
+	input := fp.ParseZval()
+	fp.StartOptional()
+	offset := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifUnpack(executeData, returnValue, format, input, nil, offset)
+})
