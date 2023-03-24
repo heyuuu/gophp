@@ -30,11 +30,16 @@ func DefFunc(name string, minNumArgs uint32, maxNumArgs int32, argInfos []ArgInf
 		log.Fatalf("DefFunc() 参数 handler 不可为空: name=" + name)
 	}
 
+	var realArgs []zend.ArgInfo
+	for _, info := range argInfos {
+		realArgs = append(realArgs, zend.DefArgInfo(info.Name))
+	}
+
 	return types.DefFunctionEntry(
 		name,
 		handler,
 		minNumArgs,
-		argInfos,
+		realArgs,
 		nil,
 		0,
 	)

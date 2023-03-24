@@ -33,6 +33,11 @@ func (this *ArgInfo) ByReference() uint8   { return this.byReference }
 func (this *ArgInfo) IsVariadic() bool     { return this.isVariadic }
 func (this *ArgInfo) RequiredNumArgs() int { return this.requiredNumArgs }
 
+// 只可用于 def.DefFunc 使用，后续会做不兼容修改
+func DefArgInfo(name string) ArgInfo {
+	return ArgInfo{name: name}
+}
+
 func MakeArgName(name string) ArgInfo {
 	return ArgInfo{name: name}
 }
