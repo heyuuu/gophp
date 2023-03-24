@@ -38,6 +38,16 @@ var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{name: "var_
 	ZifVarExport(executeData, returnValue, var_, nil, return_)
 })
 
+// generate by ZifSerialize
+var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	var_ := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifSerialize(executeData, returnValue, var_)
+})
+
 // generate by ZifUnserialize
 var DefZifUnserialize = def.DefFunc("unserialize", 1, 2, []def.ArgInfo{{name: "variable_representation"}, {name: "allowed_classes"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)

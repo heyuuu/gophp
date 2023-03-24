@@ -12,7 +12,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifReadlink(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval) {
 	var link *byte
 	var link_len int
 	var buff []byte
@@ -45,7 +45,7 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetRawString(b.CastStr(buff, ret))
 	return
 }
-func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifLinkinfo(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval) {
 	var link *byte
 	var dirname *byte
 	var link_len int
@@ -80,7 +80,7 @@ func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetLong(zend.ZendLong(sb.st_dev))
 	return
 }
-func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSymlink(executeData zpp.DefEx, return_value zpp.DefReturn, target *types.Zval, link *types.Zval) {
 	var topath *byte
 	var frompath *byte
 	var topath_len int
@@ -141,7 +141,7 @@ func ZifSymlink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifLink(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifLink(executeData zpp.DefEx, return_value zpp.DefReturn, target *types.Zval, link *types.Zval) {
 	var topath *byte
 	var frompath *byte
 	var topath_len int

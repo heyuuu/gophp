@@ -156,7 +156,7 @@ err:
 	types.ZendStringEfree(dest)
 	return nil
 }
-func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifConvertUuencode(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Zval) {
 	var src *types.String
 	for {
 		for {
@@ -177,7 +177,7 @@ func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *types.Z
 	return_value.SetString(PhpUuencode(src.GetVal(), src.GetLen()))
 	return
 }
-func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifConvertUudecode(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Zval) {
 	var src *types.String
 	var dest *types.String
 	for {

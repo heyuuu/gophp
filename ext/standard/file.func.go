@@ -633,7 +633,7 @@ func ZifFile(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.
 	}
 	core.PhpStreamClose(stream)
 }
-func ZifTempnam(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifTempnam(executeData zpp.DefEx, return_value zpp.DefReturn, dir *types.Zval, prefix *types.Zval) {
 	var dir *byte
 	var prefix *byte
 	var dir_len int
@@ -710,7 +710,7 @@ func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifFclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFclose(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var stream *core.PhpStream
 	for {
@@ -735,7 +735,7 @@ func ZifFclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifPopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPopen(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, mode *types.Zval) {
 	var command *byte
 	var mode *byte
 	var command_len int
@@ -776,7 +776,7 @@ func ZifPopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	zend.Efree(posix_mode)
 }
-func ZifPclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPclose(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var stream *core.PhpStream
 	for {
@@ -798,7 +798,7 @@ func ZifPclose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetLong(FG(pclose_ret))
 	return
 }
-func ZifFeof(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFeof(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var stream *core.PhpStream
 	for {
@@ -884,7 +884,7 @@ func ZifFgets(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval,
 		return
 	}
 }
-func ZifFgetc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFgetc(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var buf []byte
 	var result int
@@ -1061,7 +1061,7 @@ func ZifFwrite(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval
 	return_value.SetLong(ret)
 	return
 }
-func ZifFflush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFflush(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var ret int
 	var stream *core.PhpStream
@@ -1086,7 +1086,7 @@ func ZifFflush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifRewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRewind(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var stream *core.PhpStream
 	for {
@@ -1109,7 +1109,7 @@ func ZifRewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifFtell(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFtell(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var ret zend.ZendLong
 	var stream *core.PhpStream
@@ -1283,7 +1283,7 @@ func ZifUmask(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, m
 	return_value.SetLong(oldumask)
 	return
 }
-func ZifFpassthru(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFpassthru(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var res *types.Zval
 	var size int
 	var stream *core.PhpStream
@@ -1611,7 +1611,7 @@ safe_to_copy:
 	}
 	return ret
 }
-func ZifFread(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFread(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, length *types.Zval) {
 	var res *types.Zval
 	var len_ zend.ZendLong
 	var stream *core.PhpStream
@@ -2230,7 +2230,7 @@ out:
 		zend.Efree(buf)
 	}
 }
-func ZifRealpath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRealpath(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var resolved_path_buff []byte
@@ -2373,7 +2373,7 @@ func ZifFnmatch(executeData zpp.DefEx, return_value zpp.DefReturn, pattern *type
 	types.ZVAL_BOOL(return_value, !(fnmatch(pattern, filename, int(flags))))
 	return
 }
-func ZifSysGetTempDir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSysGetTempDir(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

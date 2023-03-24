@@ -42,6 +42,14 @@ var DefZifClassUses = def.DefFunc("class_uses", 1, 2, []def.ArgInfo{{name: "what
 	ZifClassUses(executeData, returnValue, what, nil, autoload)
 })
 
+// generate by ZifSplClasses
+var DefZifSplClasses = def.DefFunc("spl_classes", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifSplClasses(executeData, returnValue)
+})
+
 // generate by ZifSplAutoload
 var DefZifSplAutoload = def.DefFunc("spl_autoload", 1, 2, []def.ArgInfo{{name: "class_name"}, {name: "file_extensions"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -96,6 +104,14 @@ var DefZifSplAutoloadUnregister = def.DefFunc("spl_autoload_unregister", 1, 1, [
 		return
 	}
 	ZifSplAutoloadUnregister(executeData, returnValue, autoload_function)
+})
+
+// generate by ZifSplAutoloadFunctions
+var DefZifSplAutoloadFunctions = def.DefFunc("spl_autoload_functions", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifSplAutoloadFunctions(executeData, returnValue)
 })
 
 // generate by ZifSplObjectHash

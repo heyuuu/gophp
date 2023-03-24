@@ -77,7 +77,7 @@ func IfaceAppendUnicast(
 	}
 	zend.AddNextIndexZval(unicast, &u)
 }
-func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifNetGetInterfaces(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
 	if !executeData.CheckNumArgsNone(false) {

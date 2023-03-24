@@ -222,7 +222,7 @@ func ZifIptcembed(executeData zpp.DefEx, return_value zpp.DefReturn, iptcdata *t
 		return
 	}
 }
-func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIptcparse(executeData zpp.DefEx, return_value zpp.DefReturn, iptcdata *types.Zval) {
 	var inx int = 0
 	var len_ int
 	var tagsfound uint = 0

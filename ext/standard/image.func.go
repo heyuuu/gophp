@@ -872,7 +872,7 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 		return "application/octet-stream"
 	}
 }
-func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifImageTypeToMimeType(executeData zpp.DefEx, return_value zpp.DefReturn, imagetype *types.Zval) {
 	var p_image_type zend.ZendLong
 	for {
 		for {

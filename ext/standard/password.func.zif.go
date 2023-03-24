@@ -52,3 +52,11 @@ var DefZifPasswordHash = def.DefFunc("password_hash", 2, 3, []def.ArgInfo{{name:
 	}
 	ZifPasswordHash(executeData, returnValue, password, algo, nil, options)
 })
+
+// generate by ZifPasswordAlgos
+var DefZifPasswordAlgos = def.DefFunc("password_algos", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifPasswordAlgos(executeData, returnValue)
+})

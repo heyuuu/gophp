@@ -10,7 +10,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifFtok(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFtok(executeData zpp.DefEx, return_value zpp.DefReturn, pathname *types.Zval, proj *types.Zval) {
 	var pathname *byte
 	var proj *byte
 	var pathname_len int

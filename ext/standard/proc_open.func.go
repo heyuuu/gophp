@@ -165,7 +165,7 @@ func ZifProcTerminate(executeData zpp.DefEx, return_value zpp.DefReturn, process
 		return
 	}
 }
-func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifProcClose(executeData zpp.DefEx, return_value zpp.DefReturn, process *types.Zval) {
 	var zproc *types.Zval
 	var proc *PhpProcessHandle
 	for {
@@ -190,7 +190,7 @@ func ZifProcClose(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetLong(FG(pclose_ret))
 	return
 }
-func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifProcGetStatus(executeData zpp.DefEx, return_value zpp.DefReturn, process *types.Zval) {
 	var zproc *types.Zval
 	var proc *PhpProcessHandle
 	var wstatus int

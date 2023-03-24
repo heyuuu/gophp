@@ -18,3 +18,13 @@ var DefZifIptcembed = def.DefFunc("iptcembed", 2, 3, []def.ArgInfo{{name: "iptcd
 	}
 	ZifIptcembed(executeData, returnValue, iptcdata, jpeg_file_name, nil, spool)
 })
+
+// generate by ZifIptcparse
+var DefZifIptcparse = def.DefFunc("iptcparse", 1, 1, []def.ArgInfo{{name: "iptcdata"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	iptcdata := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifIptcparse(executeData, returnValue, iptcdata)
+})

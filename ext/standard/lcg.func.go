@@ -49,7 +49,7 @@ func ZmStartupLcg(type_ int, module_number int) int {
 	LcgInitGlobals(&LcgGlobals)
 	return types.SUCCESS
 }
-func ZifLcgValue(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifLcgValue(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

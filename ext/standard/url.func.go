@@ -454,7 +454,7 @@ func PhpUrlEncode(s *byte, len_ int) *types.String {
 	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
 	return start
 }
-func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUrlencode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var in_str *types.String
 	for {
 		for {
@@ -470,7 +470,7 @@ func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetString(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUrldecode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var in_str *types.String
 	var out_str *types.String
 	for {
@@ -532,7 +532,7 @@ func PhpRawUrlEncode(s *byte, len_ int) *types.String {
 	str = types.ZendStringTruncate(str, y, 0)
 	return str
 }
-func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRawurlencode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var in_str *types.String
 	for {
 		for {
@@ -548,7 +548,7 @@ func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *types.Zval
 	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRawurldecode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var in_str *types.String
 	var out_str *types.String
 	for {

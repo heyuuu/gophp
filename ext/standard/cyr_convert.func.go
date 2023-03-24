@@ -66,7 +66,7 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	}
 	return (*byte)(str)
 }
-func ZifConvertCyrString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifConvertCyrString(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, from *types.Zval, to *types.Zval) {
 	var input *byte
 	var fr_cs *byte
 	var to_cs *byte

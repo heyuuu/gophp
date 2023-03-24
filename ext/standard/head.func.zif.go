@@ -76,6 +76,14 @@ var DefZifHeadersSent = def.DefFunc("headers_sent", 0, 2, []def.ArgInfo{{name: "
 	ZifHeadersSent(executeData, returnValue, nil, file, line)
 })
 
+// generate by ZifHeadersList
+var DefZifHeadersList = def.DefFunc("headers_list", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifHeadersList(executeData, returnValue)
+})
+
 // generate by ZifHttpResponseCode
 var DefZifHttpResponseCode = def.DefFunc("http_response_code", 0, 1, []def.ArgInfo{{name: "response_code"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)

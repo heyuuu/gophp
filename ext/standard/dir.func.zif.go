@@ -41,6 +41,34 @@ var DefZifClosedir = def.DefFunc("closedir", 0, 1, []def.ArgInfo{{name: "dir_han
 	ZifClosedir(executeData, returnValue, nil, dir_handle)
 })
 
+// generate by ZifChroot
+var DefZifChroot = def.DefFunc("chroot", 1, 1, []def.ArgInfo{{name: "directory"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	directory := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifChroot(executeData, returnValue, directory)
+})
+
+// generate by ZifChdir
+var DefZifChdir = def.DefFunc("chdir", 1, 1, []def.ArgInfo{{name: "directory"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	directory := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifChdir(executeData, returnValue, directory)
+})
+
+// generate by ZifGetcwd
+var DefZifGetcwd = def.DefFunc("getcwd", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetcwd(executeData, returnValue)
+})
+
 // generate by ZifRewinddir
 var DefZifRewinddir = def.DefFunc("rewinddir", 0, 1, []def.ArgInfo{{name: "dir_handle"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)

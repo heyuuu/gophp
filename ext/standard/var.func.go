@@ -1083,7 +1083,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 		BG__().serialize.data = nil
 	}
 }
-func ZifSerialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSerialize(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var struc *types.Zval
 	var var_hash PhpSerializeDataT
 	var buf zend.SmartStr = zend.MakeSmartStr(0)

@@ -201,7 +201,7 @@ func ZifMtRand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, 
 	return_value.SetLong(PhpMtRandCommon(min, max))
 	return
 }
-func ZifMtGetrandmax(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifMtGetrandmax(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

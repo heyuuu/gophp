@@ -6,6 +6,44 @@ import (
 	"sik/zend/zpp"
 )
 
+// generate by ZifGethostname
+var DefZifGethostname = def.DefFunc("gethostname", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGethostname(executeData, returnValue)
+})
+
+// generate by ZifGethostbyaddr
+var DefZifGethostbyaddr = def.DefFunc("gethostbyaddr", 1, 1, []def.ArgInfo{{name: "ip_address"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	ip_address := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifGethostbyaddr(executeData, returnValue, ip_address)
+})
+
+// generate by ZifGethostbyname
+var DefZifGethostbyname = def.DefFunc("gethostbyname", 1, 1, []def.ArgInfo{{name: "hostname"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	hostname := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifGethostbyname(executeData, returnValue, hostname)
+})
+
+// generate by ZifGethostbynamel
+var DefZifGethostbynamel = def.DefFunc("gethostbynamel", 1, 1, []def.ArgInfo{{name: "hostname"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	hostname := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifGethostbynamel(executeData, returnValue, hostname)
+})
+
 // generate by ZifDnsCheckRecord
 var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{name: "host"}, {name: "type_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)

@@ -87,8 +87,8 @@ const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
 
 var CgiFunctions = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifApacheRequestHeaders,
+	DefZifApacheResponseHeaders,
 	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var CgiModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)

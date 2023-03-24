@@ -6,6 +6,16 @@ import (
 	"sik/zend/zpp"
 )
 
+// generate by ZifImageTypeToMimeType
+var DefZifImageTypeToMimeType = def.DefFunc("image_type_to_mime_type", 1, 1, []def.ArgInfo{{name: "imagetype"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	imagetype := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifImageTypeToMimeType(executeData, returnValue, imagetype)
+})
+
 // generate by ZifImageTypeToExtension
 var DefZifImageTypeToExtension = def.DefFunc("image_type_to_extension", 1, 2, []def.ArgInfo{{name: "imagetype"}, {name: "include_dot"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)

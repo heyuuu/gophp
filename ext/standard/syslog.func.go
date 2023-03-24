@@ -63,7 +63,7 @@ func PhpOpenlog(ident *byte, option int, facility int) {
 	openlog(ident, option, facility)
 	core.PG__().have_called_openlog = 1
 }
-func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifOpenlog(executeData zpp.DefEx, return_value zpp.DefReturn, ident *types.Zval, option *types.Zval, facility *types.Zval) {
 	var ident *byte
 	var option zend.ZendLong
 	var facility zend.ZendLong
@@ -93,7 +93,7 @@ func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifCloselog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifCloselog(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -105,7 +105,7 @@ func ZifCloselog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifSyslog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSyslog(executeData zpp.DefEx, return_value zpp.DefReturn, priority *types.Zval, message *types.Zval) {
 	var priority zend.ZendLong
 	var message *byte
 	var message_len int

@@ -27,7 +27,7 @@ func PHP_RETURN_HRTIME(t __auto__) {
 	return_value.SetLong(zend.ZendLong(t))
 	return
 }
-func ZifHrtime(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifHrtime(executeData zpp.DefEx, return_value zpp.DefReturn, getAsNumber *types.Zval) {
 	return_value.SetFalse()
 	return
 }

@@ -384,7 +384,7 @@ func PhpHeadApplyHeaderListToHash(data any, arg any) {
 		zend.AddNextIndexString((*types.Zval)(arg), (*byte)(sapi_header.GetHeader()))
 	}
 }
-func ZifHeadersList(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifHeadersList(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

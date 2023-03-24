@@ -11,7 +11,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGettype(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var arg *types.Zval
 	var type_ *types.String
 	for {
@@ -34,7 +34,7 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSettype(executeData zpp.DefEx, return_value zpp.DefReturn, var_ zpp.DefRef, type_ *types.Zval) {
 	var var_ *types.Zval
 	var type_ *types.String
 	var tmp types.Zval
@@ -156,7 +156,7 @@ func ZifIntval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zv
 	}
 	return_value.SetLong(zend.ZEND_STRTOL(num.GetStr().GetVal(), nil, base))
 }
-func ZifFloatval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFloatval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var num *types.Zval
 	for {
 		for {
@@ -172,7 +172,7 @@ func ZifFloatval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetDouble(zend.ZvalGetDouble(num))
 	return
 }
-func ZifBoolval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifBoolval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var val *types.Zval
 	for {
 		for {
@@ -188,7 +188,7 @@ func ZifBoolval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	types.ZVAL_BOOL(return_value, zend.ZendIsTrue(val) != 0)
 	return
 }
-func ZifStrval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifStrval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var num *types.Zval
 	for {
 		for {
@@ -232,13 +232,13 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type
 		return
 	}
 }
-func ZifIsNull(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsNull(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_NULL)
 }
-func ZifIsResource(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsResource(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_RESOURCE)
 }
-func ZifIsBool(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsBool(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var arg *types.Zval
 	for {
 		for {
@@ -255,22 +255,22 @@ func ZifIsBool(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	types.ZVAL_BOOL(return_value, arg.IsType(types.IS_FALSE) || arg.IsType(types.IS_TRUE))
 	return
 }
-func ZifIsInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsInt(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_LONG)
 }
-func ZifIsFloat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsFloat(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_DOUBLE)
 }
-func ZifIsString(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsString(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_STRING)
 }
-func ZifIsArray(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsArray(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_ARRAY)
 }
-func ZifIsObject(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsObject(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_OBJECT)
 }
-func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsNumeric(executeData zpp.DefEx, return_value zpp.DefReturn, value *types.Zval) {
 	var arg *types.Zval
 	for {
 		for {
@@ -302,7 +302,7 @@ func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsScalar(executeData zpp.DefEx, return_value zpp.DefReturn, value *types.Zval) {
 	var arg *types.Zval
 	for {
 		for {
@@ -391,7 +391,7 @@ func ZifIsIterable(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *type
 	types.ZVAL_BOOL(return_value, zend.ZendIsIterable(var_) != 0)
 	return
 }
-func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsCountable(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var var_ *types.Zval
 	for {
 		for {

@@ -146,7 +146,7 @@ func PhpQuotPrintEncode(str *uint8, length int) *types.String {
 	ret = types.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()), 0)
 	return ret
 }
-func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifQuotedPrintableDecode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var arg1 *types.String
 	var str_in *byte
 	var str_out *types.String
@@ -226,7 +226,7 @@ func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *t
 	str_out.SetLen(j)
 	return_value.SetString(str_out)
 }
-func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifQuotedPrintableEncode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var str *types.String
 	var new_str *types.String
 	for {

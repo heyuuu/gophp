@@ -303,7 +303,7 @@ func ZifStreamWrapperRegister(executeData zpp.DefEx, return_value zpp.DefReturn,
 	return_value.SetFalse()
 	return
 }
-func ZifStreamWrapperUnregister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifStreamWrapperUnregister(executeData zpp.DefEx, return_value zpp.DefReturn, protocol *types.Zval) {
 	var protocol *types.String
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == types.FAILURE {
 		return_value.SetFalse()
@@ -320,7 +320,7 @@ func ZifStreamWrapperUnregister(executeData *zend.ZendExecuteData, return_value 
 	return_value.SetTrue()
 	return
 }
-func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifStreamWrapperRestore(executeData zpp.DefEx, return_value zpp.DefReturn, protocol *types.Zval) {
 	var protocol *types.String
 	var wrapper *core.PhpStreamWrapper
 	var global_wrapper_hash *types.Array

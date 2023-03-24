@@ -139,7 +139,7 @@ func PhpBase64DecodeEx(str *uint8, length int, strict types.ZendBool) *types.Str
 	result.SetLen(outl)
 	return result
 }
-func ZifBase64Encode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifBase64Encode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
 	var str *byte
 	var str_len int
 	var result *types.String

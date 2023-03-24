@@ -28,7 +28,7 @@ func MAIL_ASCIIZ_CHECK(str __auto__, len_ int) {
 		*p = ' '
 	}
 }
-func ZifEzmlmHash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifEzmlmHash(executeData zpp.DefEx, return_value zpp.DefReturn, addr *types.Zval) {
 	var str *byte = nil
 	var h uint = 5381
 	var j int

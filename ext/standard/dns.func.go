@@ -11,7 +11,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGethostname(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var buf []byte
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -24,7 +24,7 @@ func ZifGethostname(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	return_value.SetRawString(b.CastStrAuto(buf))
 	return
 }
-func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGethostbyaddr(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress *types.Zval) {
 	var addr *byte
 	var addr_len int
 	var hostname *types.String
@@ -63,7 +63,7 @@ func PhpGethostbyaddr(ip *byte) *types.String {
 	}
 	return types.NewString(hp.h_name)
 }
-func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGethostbyname(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	for {
@@ -88,7 +88,7 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *types.Zva
 	return_value.SetString(PhpGethostbyname(hostname))
 	return
 }
-func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGethostbynamel(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var hp *__struct__hostent

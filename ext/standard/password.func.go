@@ -481,7 +481,7 @@ func ZifPasswordHash(executeData zpp.DefEx, return_value zpp.DefReturn, password
 	return_value.SetString(digest)
 	return
 }
-func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPasswordAlgos(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var algo *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return

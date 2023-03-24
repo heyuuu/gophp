@@ -361,7 +361,7 @@ func PhpEscapeShellArg(str *byte) *types.String {
 	cmd.SetLen(y)
 	return cmd
 }
-func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifEscapeshellcmd(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval) {
 	var command *byte
 	var command_len int
 	for {
@@ -385,7 +385,7 @@ func ZifEscapeshellcmd(executeData *zend.ZendExecuteData, return_value *types.Zv
 		zend.ZVAL_EMPTY_STRING(return_value)
 	}
 }
-func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifEscapeshellarg(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var argument *byte
 	var argument_len int
 	for {
@@ -407,7 +407,7 @@ func ZifEscapeshellarg(executeData *zend.ZendExecuteData, return_value *types.Zv
 		return_value.SetString(PhpEscapeShellArg(argument))
 	}
 }
-func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifShellExec(executeData zpp.DefEx, return_value zpp.DefReturn, cmd *types.Zval) {
 	var in *r.FILE
 	var command *byte
 	var command_len int
@@ -446,7 +446,7 @@ func ZifShellExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return_value.SetString(ret)
 	}
 }
-func ZifProcNice(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifProcNice(executeData zpp.DefEx, return_value zpp.DefReturn, priority *types.Zval) {
 	var pri zend.ZendLong
 	for {
 		for {

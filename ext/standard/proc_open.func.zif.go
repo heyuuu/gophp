@@ -18,6 +18,26 @@ var DefZifProcTerminate = def.DefFunc("proc_terminate", 1, 2, []def.ArgInfo{{nam
 	ZifProcTerminate(executeData, returnValue, process, nil, signal)
 })
 
+// generate by ZifProcClose
+var DefZifProcClose = def.DefFunc("proc_close", 1, 1, []def.ArgInfo{{name: "process"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	process := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifProcClose(executeData, returnValue, process)
+})
+
+// generate by ZifProcGetStatus
+var DefZifProcGetStatus = def.DefFunc("proc_get_status", 1, 1, []def.ArgInfo{{name: "process"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	process := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifProcGetStatus(executeData, returnValue, process)
+})
+
 // generate by ZifProcOpen
 var DefZifProcOpen = def.DefFunc("proc_open", 3, 6, []def.ArgInfo{{name: "command"}, {name: "descriptorspec"}, {name: "pipes"}, {name: "cwd"}, {name: "env"}, {name: "other_options"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 3, 6, 0)

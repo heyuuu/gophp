@@ -920,7 +920,7 @@ func ZifObStart(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt,
 	return_value.SetTrue()
 	return
 }
-func ZifObFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -937,7 +937,7 @@ func ZifObFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -954,7 +954,7 @@ func ZifObClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObEndFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -966,7 +966,7 @@ func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputEnd())
 	return
 }
-func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObEndClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -978,7 +978,7 @@ func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputDiscard())
 	return
 }
-func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObGetFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -991,7 +991,7 @@ func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObGetClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1008,7 +1008,7 @@ func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObGetContents(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1017,14 +1017,14 @@ func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return
 	}
 }
-func ZifObGetLevel(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObGetLevel(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(PhpOutputGetLevel())
 	return
 }
-func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObGetLength(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1033,7 +1033,7 @@ func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		return
 	}
 }
-func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObListHandlers(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1066,7 +1066,7 @@ func ZifObImplicitFlush(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp
 	}
 	PhpOutputSetImplicitFlush(flag)
 }
-func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifOutputResetRewriteVars(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1078,7 +1078,7 @@ func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *
 		return
 	}
 }
-func ZifOutputAddRewriteVar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifOutputAddRewriteVar(executeData zpp.DefEx, return_value zpp.DefReturn, name *types.Zval, value *types.Zval) {
 	var name *byte
 	var value *byte
 	var name_len int

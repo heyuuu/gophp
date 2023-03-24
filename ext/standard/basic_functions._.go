@@ -4,7 +4,6 @@ package standard
 
 import (
 	b "sik/builtin"
-	"sik/core"
 	"sik/zend"
 	"sik/zend/types"
 )
@@ -29,33 +28,23 @@ var BasicGlobals PhpBasicGlobals
 var IncompleteClassEntry *types.ClassEntry = nil
 
 var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("constant", 0, ZifConstant, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("const_name"),
-	}),
-	types.MakeZendFunctionEntryEx("bin2hex", 0, ZifBin2hex, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("data"),
-	}),
-	types.MakeZendFunctionEntryEx("hex2bin", 0, ZifHex2bin, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("data"),
-	}),
-	types.MakeZendFunctionEntryEx("sleep", 0, ZifSleep, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("seconds"),
-	}),
-	types.MakeZendFunctionEntryEx("usleep", 0, ZifUsleep, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("micro_seconds"),
-	}),
-	types.MakeZendFunctionEntryEx("time_nanosleep", 0, ZifTimeNanosleep, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("seconds"),
-		zend.MakeArgName("nanoseconds"),
-	}),
-	types.MakeZendFunctionEntryEx("time_sleep_until", 0, ZifTimeSleepUntil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("timestamp"),
-	}),
-	types.MakeZendFunctionEntryEx("strptime", 0, ZifStrptime, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("timestamp"),
-		zend.MakeArgName("format"),
-	}),
-	types.MakeZendFunctionEntryEx("flush", 0, ZifFlush, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifConstant,
+
+	DefZifBin2hex,
+
+	DefZifHex2bin,
+
+	DefZifSleep,
+
+	DefZifUsleep,
+
+	DefZifTimeNanosleep,
+
+	DefZifTimeSleepUntil,
+
+	DefZifStrptime,
+
+	DefZifFlush,
 	DefZifWordwrap,
 
 	DefZifHtmlspecialchars,
@@ -83,37 +72,31 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("crc32", 0, PhpIfCrc32, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("str"),
 	}),
-	types.MakeZendFunctionEntryEx("iptcparse", 0, ZifIptcparse, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("iptcdata"),
-	}),
+	DefZifIptcparse,
+
 	DefZifIptcembed,
 
 	DefZifGetimagesize,
 
 	DefZifGetimagesizefromstring,
 
-	types.MakeZendFunctionEntryEx("image_type_to_mime_type", 0, ZifImageTypeToMimeType, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("imagetype"),
-	}),
+	DefZifImageTypeToMimeType,
+
 	DefZifImageTypeToExtension,
 
 	DefZifPhpversion,
 
 	DefZifPhpcredits,
 
-	types.MakeZendFunctionEntryEx("php_sapi_name", 0, ZifPhpSapiName, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifPhpSapiName,
 	DefZifPhpUname,
 
-	types.MakeZendFunctionEntryEx("php_ini_scanned_files", 0, ZifPhpIniScannedFiles, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("php_ini_loaded_file", 0, ZifPhpIniLoadedFile, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("strnatcmp", 0, ZifStrnatcmp, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("s1"),
-		zend.MakeArgName("s2"),
-	}),
-	types.MakeZendFunctionEntryEx("strnatcasecmp", 0, ZifStrnatcasecmp, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("s1"),
-		zend.MakeArgName("s2"),
-	}),
+	DefZifPhpIniScannedFiles,
+	DefZifPhpIniLoadedFile,
+	DefZifStrnatcmp,
+
+	DefZifStrnatcasecmp,
+
 	DefZifSubstrCount,
 
 	DefZifStrspn,
@@ -122,12 +105,10 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifStrtok,
 
-	types.MakeZendFunctionEntryEx("strtoupper", 0, ZifStrtoupper, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("strtolower", 0, ZifStrtolower, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifStrtoupper,
+
+	DefZifStrtolower,
+
 	DefZifStrpos,
 
 	DefZifStripos,
@@ -136,9 +117,8 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifStrripos,
 
-	types.MakeZendFunctionEntryEx("strrev", 0, ZifStrrev, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifStrrev,
+
 	DefZifHebrev,
 
 	DefZifHebrevc,
@@ -151,23 +131,18 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifPathinfo,
 
-	types.MakeZendFunctionEntryEx("stripslashes", 0, ZifStripslashes, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("stripcslashes", 0, ZifStripcslashes, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifStripslashes,
+
+	DefZifStripcslashes,
+
 	DefZifStrstr,
 
 	DefZifStristr,
 
-	types.MakeZendFunctionEntryEx("strrchr", 0, ZifStrrchr, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("haystack"),
-		zend.MakeArgName("needle"),
-	}),
-	types.MakeZendFunctionEntryEx("str_shuffle", 0, ZifStrShuffle, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifStrrchr,
+
+	DefZifStrShuffle,
+
 	DefZifStrWordCount,
 
 	DefZifStrSplit,
@@ -180,48 +155,36 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifUtf8Decode,
 
-	types.MakeZendFunctionEntryEx("strcoll", 0, ZifStrcoll, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str1"),
-		zend.MakeArgName("str2"),
-	}),
-	types.MakeZendFunctionEntryEx("money_format", zend.ZEND_ACC_DEPRECATED, ZifMoneyFormat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("format"),
-		zend.MakeArgName("value"),
-	}),
+	DefZifStrcoll,
+
+	DefZifMoneyFormat,
+
 	DefZifSubstr,
 
 	DefZifSubstrReplace,
 
-	types.MakeZendFunctionEntryEx("quotemeta", 0, ZifQuotemeta, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("ucfirst", 0, ZifUcfirst, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("lcfirst", 0, ZifLcfirst, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifQuotemeta,
+
+	DefZifUcfirst,
+
+	DefZifLcfirst,
+
 	DefZifUcwords,
 
 	DefZifStrtr,
 
-	types.MakeZendFunctionEntryEx("addslashes", 0, ZifAddslashes, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("addcslashes", 0, ZifAddcslashes, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-		zend.MakeArgName("charlist"),
-	}),
+	DefZifAddslashes,
+
+	DefZifAddcslashes,
+
 	DefZifRtrim,
 
 	DefZifStrReplace,
 
 	DefZifStrIreplace,
 
-	types.MakeZendFunctionEntryEx("str_repeat", 0, ZifStrRepeat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("input"),
-		zend.MakeArgName("mult"),
-	}),
+	DefZifStrRepeat,
+
 	DefZifCountChars,
 
 	DefZifChunkSplit,
@@ -236,28 +199,23 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifExplode,
 
-	types.MakeZendFunctionEntryEx("implode", 0, ZifImplode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("glue"),
-		zend.MakeArgName("pieces"),
-	}),
+	DefZifImplode,
+
 	types.MakeZendFunctionEntryEx("join", 0, ZifImplode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("glue"),
 		zend.MakeArgName("pieces"),
 	}),
 	DefZifSetlocale,
 
-	types.MakeZendFunctionEntryEx("localeconv", 0, ZifLocaleconv, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("soundex", 0, ZifSoundex, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifLocaleconv,
+	DefZifSoundex,
+
 	DefZifLevenshtein,
 
-	types.MakeZendFunctionEntryEx("chr", 0, ZifChr, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("codepoint"),
-	}),
-	types.MakeZendFunctionEntryEx("ord", 0, ZifOrd, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("character"),
-	}),
+	DefZifChr,
+
+	DefZifOrd,
+
 	DefZifParseStr,
 
 	DefZifStrGetcsv,
@@ -281,91 +239,68 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 		zend.MakeArgName("format"),
 		zend.MakeArgVariadic("args"),
 	}),
-	types.MakeZendFunctionEntryEx("vprintf", 0, ZifVprintf, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("format"),
-		zend.MakeArgName("args"),
-	}),
-	types.MakeZendFunctionEntryEx("vsprintf", 0, ZifVsprintf, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("format"),
-		zend.MakeArgName("args"),
-	}),
+	DefZifVprintf,
+
+	DefZifVsprintf,
+
 	DefZifFprintf,
 
-	types.MakeZendFunctionEntryEx("vfprintf", 0, ZifVfprintf, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream"),
-		zend.MakeArgName("format"),
-		zend.MakeArgName("args"),
-	}),
+	DefZifVfprintf,
+
 	types.MakeZendFunctionEntryEx("sscanf", 0, ZifSscanf, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
 		zend.MakeArgName("str"),
 		zend.MakeArgName("format"),
-		zend.MakeArgInfo("vars", zend.ArgInfoByRef(1), ArgInfoVariadic()),
+		zend.MakeArgInfo("vars", zend.ArgInfoByRef(1), zend.ArgInfoVariadic()),
 	}),
 	types.MakeZendFunctionEntryEx("fscanf", 0, ZifFscanf, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
 		zend.MakeArgName("stream"),
 		zend.MakeArgName("format"),
-		zend.MakeArgInfo("vars", zend.ArgInfoByRef(1), ArgInfoVariadic()),
+		zend.MakeArgInfo("vars", zend.ArgInfoByRef(1), zend.ArgInfoVariadic()),
 	}),
 	DefZifParseUrl,
 
-	types.MakeZendFunctionEntryEx("urlencode", 0, ZifUrlencode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("urldecode", 0, ZifUrldecode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("rawurlencode", 0, ZifRawurlencode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("rawurldecode", 0, ZifRawurldecode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifUrlencode,
+
+	DefZifUrldecode,
+
+	DefZifRawurlencode,
+
+	DefZifRawurldecode,
+
 	DefZifHttpBuildQuery,
 
-	types.MakeZendFunctionEntryEx("readlink", 0, ZifReadlink, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("linkinfo", 0, ZifLinkinfo, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("symlink", 0, ZifSymlink, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("target"),
-		zend.MakeArgName("link"),
-	}),
-	types.MakeZendFunctionEntryEx("link", 0, ZifLink, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("target"),
-		zend.MakeArgName("link"),
-	}),
+	DefZifReadlink,
+
+	DefZifLinkinfo,
+
+	DefZifSymlink,
+
+	DefZifLink,
+
 	DefZifUnlink,
 
 	DefZifExec,
 
 	DefZifSystem,
 
-	types.MakeZendFunctionEntryEx("escapeshellcmd", 0, ZifEscapeshellcmd, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("command"),
-	}),
-	types.MakeZendFunctionEntryEx("escapeshellarg", 0, ZifEscapeshellarg, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
+	DefZifEscapeshellcmd,
+
+	DefZifEscapeshellarg,
+
 	DefZifPassthru,
 
-	types.MakeZendFunctionEntryEx("shell_exec", 0, ZifShellExec, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("cmd"),
-	}),
+	DefZifShellExec,
+
 	DefZifProcOpen,
 
-	types.MakeZendFunctionEntryEx("proc_close", 0, ZifProcClose, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("process"),
-	}),
+	DefZifProcClose,
+
 	DefZifProcTerminate,
 
-	types.MakeZendFunctionEntryEx("proc_get_status", 0, ZifProcGetStatus, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("process"),
-	}),
-	types.MakeZendFunctionEntryEx("proc_nice", 0, ZifProcNice, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("priority"),
-	}),
+	DefZifProcGetStatus,
+
+	DefZifProcNice,
+
 	DefZifRand,
 
 	types.MakeZendFunctionEntryEx("srand", 0, ZifMtSrand, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
@@ -377,35 +312,28 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifMtSrand,
 
-	types.MakeZendFunctionEntryEx("mt_getrandmax", 0, ZifMtGetrandmax, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifMtGetrandmax,
 	DefZifRandomBytes,
 
 	DefZifRandomInt,
 
-	types.MakeZendFunctionEntryEx("getservbyname", 0, ZifGetservbyname, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("service"),
-		zend.MakeArgName("protocol"),
-	}),
-	types.MakeZendFunctionEntryEx("getservbyport", 0, ZifGetservbyport, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("port"),
-		zend.MakeArgName("protocol"),
-	}),
-	types.MakeZendFunctionEntryEx("getprotobyname", 0, ZifGetprotobyname, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("name"),
-	}),
-	types.MakeZendFunctionEntryEx("getprotobynumber", 0, ZifGetprotobynumber, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("proto"),
-	}),
-	types.MakeZendFunctionEntryEx("getmyuid", 0, ZifGetmyuid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("getmygid", 0, ZifGetmygid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("getmypid", 0, ZifGetmypid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("getmyinode", 0, ZifGetmyinode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("getlastmod", 0, ZifGetlastmod, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifGetservbyname,
+
+	DefZifGetservbyport,
+
+	DefZifGetprotobyname,
+
+	DefZifGetprotobynumber,
+
+	DefZifGetmyuid,
+	DefZifGetmygid,
+	DefZifGetmypid,
+	DefZifGetmyinode,
+	DefZifGetlastmod,
 	DefZifBase64Decode,
 
-	types.MakeZendFunctionEntryEx("base64_encode", 0, ZifBase64Encode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
+	DefZifBase64Encode,
+
 	DefZifPasswordHash,
 
 	DefZifPasswordGetInfo,
@@ -414,192 +342,135 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifPasswordVerify,
 
-	types.MakeZendFunctionEntryEx("password_algos", 0, ZifPasswordAlgos, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("convert_uuencode", 0, ZifConvertUuencode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("data"),
-	}),
-	types.MakeZendFunctionEntryEx("convert_uudecode", 0, ZifConvertUudecode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("data"),
-	}),
-	types.MakeZendFunctionEntryEx("abs", 0, ZifAbs, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("ceil", 0, ZifCeil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("floor", 0, ZifFloor, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
+	DefZifPasswordAlgos,
+	DefZifConvertUuencode,
+
+	DefZifConvertUudecode,
+
+	DefZifAbs,
+
+	DefZifCeil,
+
+	DefZifFloor,
+
 	DefZifRound,
 
-	types.MakeZendFunctionEntryEx("sin", 0, ZifSin, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("cos", 0, ZifCos, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("tan", 0, ZifTan, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("asin", 0, ZifAsin, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("acos", 0, ZifAcos, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("atan", 0, ZifAtan, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("atanh", 0, ZifAtanh, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("atan2", 0, ZifAtan2, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("y"),
-		zend.MakeArgName("x"),
-	}),
-	types.MakeZendFunctionEntryEx("sinh", 0, ZifSinh, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("cosh", 0, ZifCosh, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("tanh", 0, ZifTanh, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("asinh", 0, ZifAsinh, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("acosh", 0, ZifAcosh, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("expm1", 0, ZifExpm1, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("log1p", 0, ZifLog1p, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("pi", 0, ZifPi, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("is_finite", 0, ZifIsFinite, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("val"),
-	}),
-	types.MakeZendFunctionEntryEx("is_nan", 0, ZifIsNan, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("val"),
-	}),
-	types.MakeZendFunctionEntryEx("is_infinite", 0, ZifIsInfinite, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("val"),
-	}),
-	types.MakeZendFunctionEntryEx("pow", 0, ZifPow, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("base"),
-		zend.MakeArgName("exponent"),
-	}),
-	types.MakeZendFunctionEntryEx("exp", 0, ZifExp, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
+	DefZifSin,
+
+	DefZifCos,
+
+	DefZifTan,
+
+	DefZifAsin,
+
+	DefZifAcos,
+
+	DefZifAtan,
+
+	DefZifAtanh,
+
+	DefZifAtan2,
+
+	DefZifSinh,
+
+	DefZifCosh,
+
+	DefZifTanh,
+
+	DefZifAsinh,
+
+	DefZifAcosh,
+
+	DefZifExpm1,
+
+	DefZifLog1p,
+
+	DefZifPi,
+	DefZifIsFinite,
+
+	DefZifIsNan,
+
+	DefZifIsInfinite,
+
+	DefZifPow,
+
+	DefZifExp,
+
 	DefZifLog,
 
-	types.MakeZendFunctionEntryEx("log10", 0, ZifLog10, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("sqrt", 0, ZifSqrt, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("hypot", 0, ZifHypot, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("num1"),
-		zend.MakeArgName("num2"),
-	}),
-	types.MakeZendFunctionEntryEx("deg2rad", 0, ZifDeg2rad, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("rad2deg", 0, ZifRad2deg, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-	}),
-	types.MakeZendFunctionEntryEx("bindec", 0, ZifBindec, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("binary_number"),
-	}),
-	types.MakeZendFunctionEntryEx("hexdec", 0, ZifHexdec, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("hexadecimal_number"),
-	}),
-	types.MakeZendFunctionEntryEx("octdec", 0, ZifOctdec, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("octal_number"),
-	}),
-	types.MakeZendFunctionEntryEx("decbin", 0, ZifDecbin, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("decimal_number"),
-	}),
-	types.MakeZendFunctionEntryEx("decoct", 0, ZifDecoct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("decimal_number"),
-	}),
-	types.MakeZendFunctionEntryEx("dechex", 0, ZifDechex, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("decimal_number"),
-	}),
-	types.MakeZendFunctionEntryEx("base_convert", 0, ZifBaseConvert, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("number"),
-		zend.MakeArgName("frombase"),
-		zend.MakeArgName("tobase"),
-	}),
+	DefZifLog10,
+
+	DefZifSqrt,
+
+	DefZifHypot,
+
+	DefZifDeg2rad,
+
+	DefZifRad2deg,
+
+	DefZifBindec,
+
+	DefZifHexdec,
+
+	DefZifOctdec,
+
+	DefZifDecbin,
+
+	DefZifDecoct,
+
+	DefZifDechex,
+
+	DefZifBaseConvert,
+
 	DefZifNumberFormat,
 
-	types.MakeZendFunctionEntryEx("fmod", 0, ZifFmod, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("x"),
-		zend.MakeArgName("y"),
-	}),
-	types.MakeZendFunctionEntryEx("intdiv", 0, ZifIntdiv, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("dividend"),
-		zend.MakeArgName("divisor"),
-	}),
-	types.MakeZendFunctionEntryEx("inet_ntop", 0, ZifInetNtop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("in_addr"),
-	}),
+	DefZifFmod,
+
+	DefZifIntdiv,
+
+	DefZifInetNtop,
+
 	types.MakeZendFunctionEntryEx("inet_pton", 0, PhpInetPton, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("ip_address"),
 	}),
-	types.MakeZendFunctionEntryEx("ip2long", 0, ZifIp2long, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("ip_address"),
-	}),
-	types.MakeZendFunctionEntryEx("long2ip", 0, ZifLong2ip, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("proper_address"),
-	}),
+	DefZifIp2long,
+
+	DefZifLong2ip,
+
 	DefZifGetenv,
 
-	types.MakeZendFunctionEntryEx("putenv", 0, ZifPutenv, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("setting"),
-	}),
+	DefZifPutenv,
+
 	DefZifGetopt,
 
-	types.MakeZendFunctionEntryEx("sys_getloadavg", 0, ZifSysGetloadavg, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifSysGetloadavg,
 	DefZifMicrotime,
 
 	DefZifGettimeofday,
 
 	DefZifGetrusage,
 
-	types.MakeZendFunctionEntryEx("hrtime", 0, ZifHrtime, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("get_as_number"),
-	}),
+	DefZifHrtime,
+
 	DefZifUniqid,
 
-	types.MakeZendFunctionEntryEx("quoted_printable_decode", 0, ZifQuotedPrintableDecode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("quoted_printable_encode", 0, ZifQuotedPrintableEncode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("convert_cyr_string", zend.ZEND_ACC_DEPRECATED, ZifConvertCyrString, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-		zend.MakeArgName("from"),
-		zend.MakeArgName("to"),
-	}),
-	types.MakeZendFunctionEntryEx("get_current_user", 0, ZifGetCurrentUser, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifQuotedPrintableDecode,
+
+	DefZifQuotedPrintableEncode,
+
+	DefZifConvertCyrString,
+
+	DefZifGetCurrentUser,
 	types.MakeZendFunctionEntryEx("set_time_limit", 0, ZifSetTimeLimit, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("seconds"),
 	}),
 	types.MakeZendFunctionEntryEx("header_register_callback", 0, ZifHeaderRegisterCallback, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("callback"),
 	}),
-	types.MakeZendFunctionEntryEx("get_cfg_var", 0, ZifGetCfgVar, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("option_name"),
-	}),
-	types.MakeZendFunctionEntryEx("get_magic_quotes_gpc", zend.ZEND_ACC_DEPRECATED, ZifGetMagicQuotesGpc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("get_magic_quotes_runtime", zend.ZEND_ACC_DEPRECATED, ZifGetMagicQuotesRuntime, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifGetCfgVar,
+
+	DefZifGetMagicQuotesGpc,
+	DefZifGetMagicQuotesRuntime,
 	DefZifErrorLog,
 
 	DefZifErrorGetLast,
@@ -612,9 +483,8 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifForwardStaticCallArray,
 
-	types.MakeZendFunctionEntryEx("serialize", 0, ZifSerialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
+	DefZifSerialize,
+
 	DefZifUnserialize,
 
 	DefZifVarDump,
@@ -633,9 +503,8 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifRegisterTickFunction,
 
-	types.MakeZendFunctionEntryEx("unregister_tick_function", 0, ZifUnregisterTickFunction, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("function_name"),
-	}),
+	DefZifUnregisterTickFunction,
+
 	DefZifHighlightFile,
 
 	types.MakeZendFunctionEntryEx("show_source", 0, ZifHighlightFile, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
@@ -644,30 +513,24 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	}),
 	DefZifHighlightString,
 
-	types.MakeZendFunctionEntryEx("php_strip_whitespace", 0, ZifPhpStripWhitespace, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("file_name"),
-	}),
-	types.MakeZendFunctionEntryEx("ini_get", 0, ZifIniGet, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("varname"),
-	}),
+	DefZifPhpStripWhitespace,
+
+	DefZifIniGet,
+
 	DefZifIniGetAll,
 
-	types.MakeZendFunctionEntryEx("ini_set", 0, ZifIniSet, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("varname"),
-		zend.MakeArgName("newvalue"),
-	}),
+	DefZifIniSet,
+
 	types.MakeZendFunctionEntryEx("ini_alter", 0, ZifIniSet, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("varname"),
 		zend.MakeArgName("newvalue"),
 	}),
-	types.MakeZendFunctionEntryEx("ini_restore", 0, ZifIniRestore, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("varname"),
-	}),
-	types.MakeZendFunctionEntryEx("get_include_path", 0, ZifGetIncludePath, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("set_include_path", 0, ZifSetIncludePath, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("new_include_path"),
-	}),
-	types.MakeZendFunctionEntryEx("restore_include_path", zend.ZEND_ACC_DEPRECATED, ZifRestoreIncludePath, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifIniRestore,
+
+	DefZifGetIncludePath,
+	DefZifSetIncludePath,
+
+	DefZifRestoreIncludePath,
 	DefZifSetcookie,
 
 	DefZifSetrawcookie,
@@ -678,35 +541,29 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifHeadersSent,
 
-	types.MakeZendFunctionEntryEx("headers_list", 0, ZifHeadersList, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifHeadersList,
 	DefZifHttpResponseCode,
 
-	types.MakeZendFunctionEntryEx("connection_aborted", 0, ZifConnectionAborted, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("connection_status", 0, ZifConnectionStatus, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifConnectionAborted,
+	DefZifConnectionStatus,
 	DefZifIgnoreUserAbort,
 
 	DefZifParseIniFile,
 
 	DefZifParseIniString,
 
-	types.MakeZendFunctionEntryEx("is_uploaded_file", 0, ZifIsUploadedFile, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("path"),
-	}),
-	types.MakeZendFunctionEntryEx("move_uploaded_file", 0, ZifMoveUploadedFile, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("path"),
-		zend.MakeArgName("new_path"),
-	}),
-	types.MakeZendFunctionEntryEx("gethostbyaddr", 0, ZifGethostbyaddr, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("ip_address"),
-	}),
-	types.MakeZendFunctionEntryEx("gethostbyname", 0, ZifGethostbyname, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("hostname"),
-	}),
-	types.MakeZendFunctionEntryEx("gethostbynamel", 0, ZifGethostbynamel, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("hostname"),
-	}),
-	types.MakeZendFunctionEntryEx("gethostname", 0, ZifGethostname, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("net_get_interfaces", 0, ZifNetGetInterfaces, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifIsUploadedFile,
+
+	DefZifMoveUploadedFile,
+
+	DefZifGethostbyaddr,
+
+	DefZifGethostbyname,
+
+	DefZifGethostbynamel,
+
+	DefZifGethostname,
+	DefZifNetGetInterfaces,
 	DefZifDnsCheckRecord,
 
 	types.MakeZendFunctionEntryEx("checkdnsrr", 0, ZifDnsCheckRecord, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
@@ -729,40 +586,29 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	}),
 	DefZifIntval,
 
-	types.MakeZendFunctionEntryEx("floatval", 0, ZifFloatval, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
+	DefZifFloatval,
+
 	types.MakeZendFunctionEntryEx("doubleval", 0, ZifFloatval, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("var"),
 	}),
-	types.MakeZendFunctionEntryEx("strval", 0, ZifStrval, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("boolval", 0, ZifBoolval, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("gettype", 0, ZifGettype, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("settype", 0, ZifSettype, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("var"),
-		zend.MakeArgName("type"),
-	}),
-	types.MakeZendFunctionEntryEx("is_null", 0, ZifIsNull, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_resource", 0, ZifIsResource, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_bool", 0, ZifIsBool, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_int", 0, ZifIsInt, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_float", 0, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
+	DefZifStrval,
+
+	DefZifBoolval,
+
+	DefZifGettype,
+
+	DefZifSettype,
+
+	DefZifIsNull,
+
+	DefZifIsResource,
+
+	DefZifIsBool,
+
+	DefZifIsInt,
+
+	DefZifIsFloat,
+
 	types.MakeZendFunctionEntryEx("is_integer", 0, ZifIsInt, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("var"),
 	}),
@@ -775,70 +621,54 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("is_real", zend.ZEND_ACC_DEPRECATED, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("var"),
 	}),
-	types.MakeZendFunctionEntryEx("is_numeric", 0, ZifIsNumeric, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("value"),
-	}),
-	types.MakeZendFunctionEntryEx("is_string", 0, ZifIsString, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_array", 0, ZifIsArray, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_object", 0, ZifIsObject, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("is_scalar", 0, ZifIsScalar, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("value"),
-	}),
+	DefZifIsNumeric,
+
+	DefZifIsString,
+
+	DefZifIsArray,
+
+	DefZifIsObject,
+
+	DefZifIsScalar,
+
 	DefZifIsCallable,
 
 	DefZifIsIterable,
 
-	types.MakeZendFunctionEntryEx("is_countable", 0, ZifIsCountable, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("var"),
-	}),
-	types.MakeZendFunctionEntryEx("pclose", 0, ZifPclose, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
-	types.MakeZendFunctionEntryEx("popen", 0, ZifPopen, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("command"),
-		zend.MakeArgName("mode"),
-	}),
+	DefZifIsCountable,
+
+	DefZifPclose,
+
+	DefZifPopen,
+
 	DefZifReadfile,
 
-	types.MakeZendFunctionEntryEx("rewind", 0, ZifRewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
+	DefZifRewind,
+
 	DefZifRmdir,
 
 	DefZifUmask,
 
-	types.MakeZendFunctionEntryEx("fclose", 0, ZifFclose, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
-	types.MakeZendFunctionEntryEx("feof", 0, ZifFeof, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
-	types.MakeZendFunctionEntryEx("fgetc", 0, ZifFgetc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
+	DefZifFclose,
+
+	DefZifFeof,
+
+	DefZifFgetc,
+
 	DefZifFgets,
 
 	DefZifFgetss,
 
-	types.MakeZendFunctionEntryEx("fread", 0, ZifFread, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-		zend.MakeArgName("length"),
-	}),
+	DefZifFread,
+
 	types.MakeZendFunctionEntryEx("fopen", 0, PhpIfFopen, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
 		zend.MakeArgName("filename"),
 		zend.MakeArgName("mode"),
 		zend.MakeArgName("use_include_path"),
 		zend.MakeArgName("context"),
 	}),
-	types.MakeZendFunctionEntryEx("fpassthru", 0, ZifFpassthru, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
+	DefZifFpassthru,
+
 	types.MakeZendFunctionEntryEx("ftruncate", 0, PhpIfFtruncate, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("fp"),
 		zend.MakeArgName("size"),
@@ -848,12 +678,10 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	}),
 	DefZifFseek,
 
-	types.MakeZendFunctionEntryEx("ftell", 0, ZifFtell, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
-	types.MakeZendFunctionEntryEx("fflush", 0, ZifFflush, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
+	DefZifFtell,
+
+	DefZifFflush,
+
 	DefZifFwrite,
 
 	types.MakeZendFunctionEntryEx("fputs", 0, ZifFwrite, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
@@ -867,10 +695,8 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifCopy,
 
-	types.MakeZendFunctionEntryEx("tempnam", 0, ZifTempnam, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("dir"),
-		zend.MakeArgName("prefix"),
-	}),
+	DefZifTempnam,
+
 	types.MakeZendFunctionEntryEx("tmpfile", 0, PhpIfTmpfile, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	DefZifFile,
 
@@ -882,54 +708,42 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifStreamContextCreate,
 
-	types.MakeZendFunctionEntryEx("stream_context_set_params", 0, ZifStreamContextSetParams, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream_or_context"),
-		zend.MakeArgName("options"),
-	}),
+	DefZifStreamContextSetParams,
+
 	DefZifStreamContextGetParams,
 
 	DefZifStreamContextSetOption,
 
-	types.MakeZendFunctionEntryEx("stream_context_get_options", 0, ZifStreamContextGetOptions, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream_or_context"),
-	}),
+	DefZifStreamContextGetOptions,
+
 	DefZifStreamContextGetDefault,
 
-	types.MakeZendFunctionEntryEx("stream_context_set_default", 0, ZifStreamContextSetDefault, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("options"),
-	}),
+	DefZifStreamContextSetDefault,
+
 	DefZifStreamFilterPrepend,
 
 	DefZifStreamFilterAppend,
 
-	types.MakeZendFunctionEntryEx("stream_filter_remove", 0, ZifStreamFilterRemove, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream_filter"),
-	}),
+	DefZifStreamFilterRemove,
+
 	DefZifStreamSocketClient,
 
 	DefZifStreamSocketServer,
 
 	DefZifStreamSocketAccept,
 
-	types.MakeZendFunctionEntryEx("stream_socket_get_name", 0, ZifStreamSocketGetName, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream"),
-		zend.MakeArgName("want_peer"),
-	}),
+	DefZifStreamSocketGetName,
+
 	DefZifStreamSocketRecvfrom,
 
 	DefZifStreamSocketSendto,
 
 	DefZifStreamSocketEnableCrypto,
 
-	types.MakeZendFunctionEntryEx("stream_socket_shutdown", 0, ZifStreamSocketShutdown, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream"),
-		zend.MakeArgName("how"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_socket_pair", 0, ZifStreamSocketPair, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("domain"),
-		zend.MakeArgName("type"),
-		zend.MakeArgName("protocol"),
-	}),
+	DefZifStreamSocketShutdown,
+
+	DefZifStreamSocketPair,
+
 	DefZifStreamCopyToStream,
 
 	DefZifStreamGetContents,
@@ -946,33 +760,24 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifGetMetaTags,
 
-	types.MakeZendFunctionEntryEx("stream_set_read_buffer", 0, ZifStreamSetReadBuffer, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-		zend.MakeArgName("buffer"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_set_write_buffer", 0, ZifStreamSetWriteBuffer, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-		zend.MakeArgName("buffer"),
-	}),
+	DefZifStreamSetReadBuffer,
+
+	DefZifStreamSetWriteBuffer,
+
 	types.MakeZendFunctionEntryEx("set_file_buffer", 0, ZifStreamSetWriteBuffer, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("fp"),
 		zend.MakeArgName("buffer"),
 	}),
-	types.MakeZendFunctionEntryEx("stream_set_chunk_size", 0, ZifStreamSetChunkSize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-		zend.MakeArgName("chunk_size"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_set_blocking", 0, ZifStreamSetBlocking, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("socket"),
-		zend.MakeArgName("mode"),
-	}),
+	DefZifStreamSetChunkSize,
+
+	DefZifStreamSetBlocking,
+
 	types.MakeZendFunctionEntryEx("socket_set_blocking", 0, ZifStreamSetBlocking, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("socket"),
 		zend.MakeArgName("mode"),
 	}),
-	types.MakeZendFunctionEntryEx("stream_get_meta_data", 0, ZifStreamGetMetaData, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("fp"),
-	}),
+	DefZifStreamGetMetaData,
+
 	DefZifStreamGetLine,
 
 	DefZifStreamWrapperRegister,
@@ -982,20 +787,16 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 		zend.MakeArgName("classname"),
 		zend.MakeArgName("flags"),
 	}),
-	types.MakeZendFunctionEntryEx("stream_wrapper_unregister", 0, ZifStreamWrapperUnregister, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("protocol"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_wrapper_restore", 0, ZifStreamWrapperRestore, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("protocol"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_get_wrappers", 0, ZifStreamGetWrappers, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("stream_get_transports", 0, ZifStreamGetTransports, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("stream_resolve_include_path", 0, ZifStreamResolveIncludePath, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_is_local", 0, ZifStreamIsLocal, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream"),
-	}),
+	DefZifStreamWrapperUnregister,
+
+	DefZifStreamWrapperRestore,
+
+	DefZifStreamGetWrappers,
+	DefZifStreamGetTransports,
+	DefZifStreamResolveIncludePath,
+
+	DefZifStreamIsLocal,
+
 	DefZifGetHeaders,
 
 	DefZifStreamSetTimeout,
@@ -1008,9 +809,8 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("socket_get_status", 0, ZifStreamGetMetaData, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("fp"),
 	}),
-	types.MakeZendFunctionEntryEx("realpath", 0, ZifRealpath, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("path"),
-	}),
+	DefZifRealpath,
+
 	DefZifFnmatch,
 
 	DefZifFsockopen,
@@ -1029,13 +829,11 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifClosedir,
 
-	types.MakeZendFunctionEntryEx("chdir", 0, ZifChdir, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("directory"),
-	}),
-	types.MakeZendFunctionEntryEx("chroot", 0, ZifChroot, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("directory"),
-	}),
-	types.MakeZendFunctionEntryEx("getcwd", 0, ZifGetcwd, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifChdir,
+
+	DefZifChroot,
+
+	DefZifGetcwd,
 	DefZifRewinddir,
 
 	types.MakeZendFunctionEntryEx("readdir", 0, PhpIfReaddir, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
@@ -1049,132 +847,98 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifGlob,
 
-	types.MakeZendFunctionEntryEx("fileatime", 0, ZifFileatime, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("filectime", 0, ZifFilectime, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("filegroup", 0, ZifFilegroup, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("fileinode", 0, ZifFileinode, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("filemtime", 0, ZifFilemtime, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("fileowner", 0, ZifFileowner, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("fileperms", 0, ZifFileperms, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("filesize", 0, ZifFilesize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("filetype", 0, ZifFiletype, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("file_exists", 0, ZifFileExists, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("is_writable", 0, ZifIsWritable, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
+	DefZifFileatime,
+
+	DefZifFilectime,
+
+	DefZifFilegroup,
+
+	DefZifFileinode,
+
+	DefZifFilemtime,
+
+	DefZifFileowner,
+
+	DefZifFileperms,
+
+	DefZifFilesize,
+
+	DefZifFiletype,
+
+	DefZifFileExists,
+
+	DefZifIsWritable,
+
 	types.MakeZendFunctionEntryEx("is_writeable", 0, ZifIsWritable, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("filename"),
 	}),
-	types.MakeZendFunctionEntryEx("is_readable", 0, ZifIsReadable, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("is_executable", 0, ZifIsExecutable, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("is_file", 0, ZifIsFile, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("is_dir", 0, ZifIsDir, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
-	types.MakeZendFunctionEntryEx("is_link", 0, ZifIsLink, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-	}),
+	DefZifIsReadable,
+
+	DefZifIsExecutable,
+
+	DefZifIsFile,
+
+	DefZifIsDir,
+
+	DefZifIsLink,
+
 	types.MakeZendFunctionEntryEx("stat", 0, PhpIfStat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("filename"),
 	}),
 	types.MakeZendFunctionEntryEx("lstat", 0, PhpIfLstat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("filename"),
 	}),
-	types.MakeZendFunctionEntryEx("chown", 0, ZifChown, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-		zend.MakeArgName("user"),
-	}),
-	types.MakeZendFunctionEntryEx("chgrp", 0, ZifChgrp, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-		zend.MakeArgName("group"),
-	}),
-	types.MakeZendFunctionEntryEx("lchown", 0, ZifLchown, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-		zend.MakeArgName("user"),
-	}),
-	types.MakeZendFunctionEntryEx("lchgrp", 0, ZifLchgrp, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-		zend.MakeArgName("group"),
-	}),
-	types.MakeZendFunctionEntryEx("chmod", 0, ZifChmod, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filename"),
-		zend.MakeArgName("mode"),
-	}),
+	DefZifChown,
+
+	DefZifChgrp,
+
+	DefZifLchown,
+
+	DefZifLchgrp,
+
+	DefZifChmod,
+
 	DefZifTouch,
 
 	DefZifClearstatcache,
 
-	types.MakeZendFunctionEntryEx("disk_total_space", 0, ZifDiskTotalSpace, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("path"),
-	}),
-	types.MakeZendFunctionEntryEx("disk_free_space", 0, ZifDiskFreeSpace, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("path"),
-	}),
+	DefZifDiskTotalSpace,
+
+	DefZifDiskFreeSpace,
+
 	types.MakeZendFunctionEntryEx("diskfreespace", 0, ZifDiskFreeSpace, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("path"),
 	}),
-	types.MakeZendFunctionEntryEx("realpath_cache_size", 0, ZifRealpathCacheSize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("realpath_cache_get", 0, ZifRealpathCacheGet, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifRealpathCacheSize,
+	DefZifRealpathCacheGet,
 	DefZifMail,
 
-	types.MakeZendFunctionEntryEx("ezmlm_hash", zend.ZEND_ACC_DEPRECATED, ZifEzmlmHash, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("addr"),
-	}),
-	types.MakeZendFunctionEntryEx("openlog", 0, ZifOpenlog, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("ident"),
-		zend.MakeArgName("option"),
-		zend.MakeArgName("facility"),
-	}),
-	types.MakeZendFunctionEntryEx("syslog", 0, ZifSyslog, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("priority"),
-		zend.MakeArgName("message"),
-	}),
-	types.MakeZendFunctionEntryEx("closelog", 0, ZifCloselog, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("lcg_value", 0, ZifLcgValue, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifEzmlmHash,
+
+	DefZifOpenlog,
+
+	DefZifSyslog,
+
+	DefZifCloselog,
+	DefZifLcgValue,
 	DefZifMetaphone,
 
 	DefZifObStart,
 
-	types.MakeZendFunctionEntryEx("ob_flush", 0, core.ZifObFlush, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_clean", 0, core.ZifObClean, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_end_flush", 0, core.ZifObEndFlush, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_end_clean", 0, core.ZifObEndClean, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_get_flush", 0, core.ZifObGetFlush, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_get_clean", 0, core.ZifObGetClean, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_get_length", 0, core.ZifObGetLength, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("ob_get_level", 0, core.ZifObGetLevel, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifObFlush,
+	DefZifObClean,
+	DefZifObEndFlush,
+	DefZifObEndClean,
+	DefZifObGetFlush,
+	DefZifObGetClean,
+	DefZifObGetLength,
+	DefZifObGetLevel,
 	DefZifObGetStatus,
 
-	types.MakeZendFunctionEntryEx("ob_get_contents", 0, core.ZifObGetContents, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifObGetContents,
 	DefZifObImplicitFlush,
 
-	types.MakeZendFunctionEntryEx("ob_list_handlers", 0, core.ZifObListHandlers, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifObListHandlers,
 	types.MakeZendFunctionEntryEx("ksort", 0, ZifKsort, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgByRef("arg"),
 		zend.MakeArgName("sort_flags"),
@@ -1183,12 +947,10 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 		zend.MakeArgByRef("arg"),
 		zend.MakeArgName("sort_flags"),
 	}),
-	types.MakeZendFunctionEntryEx("natsort", 0, ZifNatsort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("natcasesort", 0, ZifNatcasesort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
+	DefZifNatsort,
+
+	DefZifNatcasesort,
+
 	DefZifAsort,
 
 	DefZifArsort,
@@ -1197,21 +959,14 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifRsort,
 
-	types.MakeZendFunctionEntryEx("usort", 0, ZifUsort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-		zend.MakeArgName("cmp_function"),
-	}),
-	types.MakeZendFunctionEntryEx("uasort", 0, ZifUasort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-		zend.MakeArgName("cmp_function"),
-	}),
-	types.MakeZendFunctionEntryEx("uksort", 0, ZifUksort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-		zend.MakeArgName("cmp_function"),
-	}),
-	types.MakeZendFunctionEntryEx("shuffle", 0, ZifShuffle, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
+	DefZifUsort,
+
+	DefZifUasort,
+
+	DefZifUksort,
+
+	DefZifShuffle,
+
 	DefZifArrayWalk,
 
 	DefZifArrayWalkRecursive,
@@ -1220,24 +975,18 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 		zend.MakeArgName("var"),
 		zend.MakeArgName("mode"),
 	}),
-	types.MakeZendFunctionEntryEx("end", 0, ZifEnd, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("prev", 0, ZifPrev, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("next", 0, ZifNext, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("reset", 0, ZifReset, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("current", 0, ZifCurrent, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("key", 0, ZifKey, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
+	DefZifEnd,
+
+	DefZifPrev,
+
+	DefZifNext,
+
+	DefZifReset,
+
+	DefZifCurrent,
+
+	DefZifKey,
+
 	DefZifMin,
 
 	DefZifMax,
@@ -1253,31 +1002,24 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	}),
 	DefZifCompact,
 
-	types.MakeZendFunctionEntryEx("array_fill", 0, ZifArrayFill, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("start_key"),
-		zend.MakeArgName("num"),
-		zend.MakeArgName("val"),
-	}),
-	types.MakeZendFunctionEntryEx("array_fill_keys", 0, ZifArrayFillKeys, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("keys"),
-		zend.MakeArgName("val"),
-	}),
+	DefZifArrayFill,
+
+	DefZifArrayFillKeys,
+
 	DefZifRange,
 
 	types.MakeZendFunctionEntryEx("array_multisort", 0, ZifArrayMultisort, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgInfo("arr1", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
 		zend.MakeArgInfo("sort_order", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
 		zend.MakeArgInfo("sort_flags", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
-		zend.MakeArgInfo("arr2", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF), ArgInfoVariadic()),
+		zend.MakeArgInfo("arr2", zend.ArgInfoByRef(zend.ZEND_SEND_PREFER_REF), zend.ArgInfoVariadic()),
 	}),
 	DefZifArrayPush,
 
-	types.MakeZendFunctionEntryEx("array_pop", 0, ZifArrayPop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("stack"),
-	}),
-	types.MakeZendFunctionEntryEx("array_shift", 0, ZifArrayShift, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgByRef("stack"),
-	}),
+	DefZifArrayPop,
+
+	DefZifArrayShift,
+
 	DefZifArrayUnshift,
 
 	DefZifArraySplice,
@@ -1294,32 +1036,24 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifArrayKeys,
 
-	types.MakeZendFunctionEntryEx("array_key_first", 0, ZifArrayKeyFirst, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("array_key_last", 0, ZifArrayKeyLast, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("array_values", 0, ZifArrayValues, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("array_count_values", 0, ZifArrayCountValues, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
+	DefZifArrayKeyFirst,
+
+	DefZifArrayKeyLast,
+
+	DefZifArrayValues,
+
+	DefZifArrayCountValues,
+
 	DefZifArrayColumn,
 
 	DefZifArrayReverse,
 
 	DefZifArrayReduce,
 
-	types.MakeZendFunctionEntryEx("array_pad", 0, ZifArrayPad, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-		zend.MakeArgName("pad_size"),
-		zend.MakeArgName("pad_value"),
-	}),
-	types.MakeZendFunctionEntryEx("array_flip", 0, ZifArrayFlip, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
+	DefZifArrayPad,
+
+	DefZifArrayFlip,
+
 	DefZifArrayChangeKeyCase,
 
 	DefZifArrayRand,
@@ -1330,86 +1064,48 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifArrayIntersectKey,
 
-	types.MakeZendFunctionEntryEx("array_intersect_ukey", 0, ZifArrayIntersectUkey, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_key_compare_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_uintersect", 0, ZifArrayUintersect, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_data_compare_func"),
-	}),
+	DefZifArrayIntersectUkey,
+
+	DefZifArrayUintersect,
+
 	DefZifArrayIntersectAssoc,
 
-	types.MakeZendFunctionEntryEx("array_uintersect_assoc", 0, ZifArrayUintersectAssoc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_data_compare_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_intersect_uassoc", 0, ZifArrayIntersectUassoc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_key_compare_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_uintersect_uassoc", 0, ZifArrayUintersectUassoc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_data_compare_func"),
-		zend.MakeArgName("callback_key_compare_func"),
-	}),
+	DefZifArrayUintersectAssoc,
+
+	DefZifArrayIntersectUassoc,
+
+	DefZifArrayUintersectUassoc,
+
 	DefZifArrayDiff,
 
 	DefZifArrayDiffKey,
 
-	types.MakeZendFunctionEntryEx("array_diff_ukey", 0, ZifArrayDiffUkey, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_key_comp_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_udiff", 0, ZifArrayUdiff, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_data_comp_func"),
-	}),
+	DefZifArrayDiffUkey,
+
+	DefZifArrayUdiff,
+
 	DefZifArrayDiffAssoc,
 
-	types.MakeZendFunctionEntryEx("array_udiff_assoc", 0, ZifArrayUdiffAssoc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_key_comp_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_diff_uassoc", 0, ZifArrayDiffUassoc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_data_comp_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_udiff_uassoc", 0, ZifArrayUdiffUassoc, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arr1"),
-		zend.MakeArgName("arr2"),
-		zend.MakeArgName("callback_data_comp_func"),
-		zend.MakeArgName("callback_key_comp_func"),
-	}),
-	types.MakeZendFunctionEntryEx("array_sum", 0, ZifArraySum, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
-	types.MakeZendFunctionEntryEx("array_product", 0, ZifArrayProduct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("arg"),
-	}),
+	DefZifArrayUdiffAssoc,
+
+	DefZifArrayDiffUassoc,
+
+	DefZifArrayUdiffUassoc,
+
+	DefZifArraySum,
+
+	DefZifArrayProduct,
+
 	DefZifArrayFilter,
 
 	DefZifArrayMap,
 
 	DefZifArrayChunk,
 
-	types.MakeZendFunctionEntryEx("array_combine", 0, ZifArrayCombine, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("keys"),
-		zend.MakeArgName("values"),
-	}),
-	types.MakeZendFunctionEntryEx("array_key_exists", 0, ZifArrayKeyExists, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("key"),
-		zend.MakeArgName("search"),
-	}),
+	DefZifArrayCombine,
+
+	DefZifArrayKeyExists,
+
 	types.MakeZendFunctionEntryEx("pos", 0, ZifCurrent, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("arg"),
 	}),
@@ -1427,39 +1123,25 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 
 	DefZifVersionCompare,
 
-	types.MakeZendFunctionEntryEx("ftok", 0, ZifFtok, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("pathname"),
-		zend.MakeArgName("proj"),
-	}),
-	types.MakeZendFunctionEntryEx("str_rot13", 0, ZifStrRot13, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("str"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_get_filters", 0, ZifStreamGetFilters, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("stream_filter_register", 0, ZifStreamFilterRegister, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("filtername"),
-		zend.MakeArgName("classname"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_bucket_make_writeable", 0, ZifStreamBucketMakeWriteable, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("brigade"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_bucket_prepend", 0, ZifStreamBucketPrepend, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("brigade"),
-		zend.MakeArgName("bucket"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_bucket_append", 0, ZifStreamBucketAppend, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("brigade"),
-		zend.MakeArgName("bucket"),
-	}),
-	types.MakeZendFunctionEntryEx("stream_bucket_new", 0, ZifStreamBucketNew, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("stream"),
-		zend.MakeArgName("buffer"),
-	}),
-	types.MakeZendFunctionEntryEx("output_add_rewrite_var", 0, core.ZifOutputAddRewriteVar, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
-		zend.MakeArgName("name"),
-		zend.MakeArgName("value"),
-	}),
-	types.MakeZendFunctionEntryEx("output_reset_rewrite_vars", 0, core.ZifOutputResetRewriteVars, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
-	types.MakeZendFunctionEntryEx("sys_get_temp_dir", 0, ZifSysGetTempDir, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifFtok,
+
+	DefZifStrRot13,
+
+	DefZifStreamGetFilters,
+	DefZifStreamFilterRegister,
+
+	DefZifStreamBucketMakeWriteable,
+
+	DefZifStreamBucketPrepend,
+
+	DefZifStreamBucketAppend,
+
+	DefZifStreamBucketNew,
+
+	DefZifOutputAddRewriteVar,
+
+	DefZifOutputResetRewriteVars,
+	DefZifSysGetTempDir,
 }
 var StandardDeps []zend.ZendModuleDep = []zend.ZendModuleDep{
 	zend.MakeZendModuleDep("session", nil, nil, zend.MODULE_DEP_OPTIONAL),

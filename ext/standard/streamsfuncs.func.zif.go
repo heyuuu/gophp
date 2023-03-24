@@ -6,6 +6,18 @@ import (
 	"sik/zend/zpp"
 )
 
+// generate by ZifStreamSocketPair
+var DefZifStreamSocketPair = def.DefFunc("stream_socket_pair", 3, 3, []def.ArgInfo{{name: "domain"}, {name: "type_"}, {name: "protocol"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 3, 3, 0)
+	domain := fp.ParseZval()
+	type_ := fp.ParseZval()
+	protocol := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSocketPair(executeData, returnValue, domain, type_, protocol)
+})
+
 // generate by ZifStreamSocketClient
 var DefZifStreamSocketClient = def.DefFunc("stream_socket_client", 1, 6, []def.ArgInfo{{name: "remoteaddress"}, {name: "errcode"}, {name: "errstring"}, {name: "timeout"}, {name: "flags"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 1, 6, 0)
@@ -48,6 +60,17 @@ var DefZifStreamSocketAccept = def.DefFunc("stream_socket_accept", 1, 3, []def.A
 		return
 	}
 	ZifStreamSocketAccept(executeData, returnValue, serverstream, nil, timeout, peername)
+})
+
+// generate by ZifStreamSocketGetName
+var DefZifStreamSocketGetName = def.DefFunc("stream_socket_get_name", 2, 2, []def.ArgInfo{{name: "stream"}, {name: "want_peer"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	stream := fp.ParseZval()
+	want_peer := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSocketGetName(executeData, returnValue, stream, want_peer)
 })
 
 // generate by ZifStreamSocketSendto
@@ -105,6 +128,32 @@ var DefZifStreamCopyToStream = def.DefFunc("stream_copy_to_stream", 2, 4, []def.
 	ZifStreamCopyToStream(executeData, returnValue, source, dest, nil, maxlen, pos)
 })
 
+// generate by ZifStreamGetMetaData
+var DefZifStreamGetMetaData = def.DefFunc("stream_get_meta_data", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	fp := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamGetMetaData(executeData, returnValue, fp)
+})
+
+// generate by ZifStreamGetTransports
+var DefZifStreamGetTransports = def.DefFunc("stream_get_transports", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifStreamGetTransports(executeData, returnValue)
+})
+
+// generate by ZifStreamGetWrappers
+var DefZifStreamGetWrappers = def.DefFunc("stream_get_wrappers", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifStreamGetWrappers(executeData, returnValue)
+})
+
 // generate by ZifStreamSelect
 var DefZifStreamSelect = def.DefFunc("stream_select", 4, 5, []def.ArgInfo{{name: "read_streams"}, {name: "write_streams"}, {name: "except_streams"}, {name: "tv_sec"}, {name: "tv_usec"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 4, 5, 0)
@@ -120,6 +169,16 @@ var DefZifStreamSelect = def.DefFunc("stream_select", 4, 5, []def.ArgInfo{{name:
 	ZifStreamSelect(executeData, returnValue, read_streams, write_streams, except_streams, tv_sec, nil, tv_usec)
 })
 
+// generate by ZifStreamContextGetOptions
+var DefZifStreamContextGetOptions = def.DefFunc("stream_context_get_options", 1, 1, []def.ArgInfo{{name: "stream_or_context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	stream_or_context := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamContextGetOptions(executeData, returnValue, stream_or_context)
+})
+
 // generate by ZifStreamContextSetOption
 var DefZifStreamContextSetOption = def.DefFunc("stream_context_set_option", 2, 4, []def.ArgInfo{{name: "stream_or_context"}, {name: "wrappername"}, {name: "optionname"}, {name: "value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
@@ -132,6 +191,17 @@ var DefZifStreamContextSetOption = def.DefFunc("stream_context_set_option", 2, 4
 		return
 	}
 	ZifStreamContextSetOption(executeData, returnValue, stream_or_context, wrappername, nil, optionname, value)
+})
+
+// generate by ZifStreamContextSetParams
+var DefZifStreamContextSetParams = def.DefFunc("stream_context_set_params", 2, 2, []def.ArgInfo{{name: "stream_or_context"}, {name: "options"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	stream_or_context := fp.ParseZval()
+	options := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamContextSetParams(executeData, returnValue, stream_or_context, options)
 })
 
 // generate by ZifStreamContextGetParams
@@ -153,6 +223,16 @@ var DefZifStreamContextGetDefault = def.DefFunc("stream_context_get_default", 0,
 		return
 	}
 	ZifStreamContextGetDefault(executeData, returnValue, nil, options)
+})
+
+// generate by ZifStreamContextSetDefault
+var DefZifStreamContextSetDefault = def.DefFunc("stream_context_set_default", 1, 1, []def.ArgInfo{{name: "options"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	options := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamContextSetDefault(executeData, returnValue, options)
 })
 
 // generate by ZifStreamContextCreate
@@ -195,6 +275,16 @@ var DefZifStreamFilterAppend = def.DefFunc("stream_filter_append", 2, 4, []def.A
 	ZifStreamFilterAppend(executeData, returnValue, stream, filtername, nil, read_write, filterparams)
 })
 
+// generate by ZifStreamFilterRemove
+var DefZifStreamFilterRemove = def.DefFunc("stream_filter_remove", 1, 1, []def.ArgInfo{{name: "stream_filter"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	stream_filter := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamFilterRemove(executeData, returnValue, stream_filter)
+})
+
 // generate by ZifStreamGetLine
 var DefZifStreamGetLine = def.DefFunc("stream_get_line", 2, 3, []def.ArgInfo{{name: "stream"}, {name: "maxlen"}, {name: "ending"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
@@ -206,6 +296,17 @@ var DefZifStreamGetLine = def.DefFunc("stream_get_line", 2, 3, []def.ArgInfo{{na
 		return
 	}
 	ZifStreamGetLine(executeData, returnValue, stream, maxlen, nil, ending)
+})
+
+// generate by ZifStreamSetBlocking
+var DefZifStreamSetBlocking = def.DefFunc("stream_set_blocking", 2, 2, []def.ArgInfo{{name: "socket"}, {name: "mode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	socket := fp.ParseZval()
+	mode := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetBlocking(executeData, returnValue, socket, mode)
 })
 
 // generate by ZifStreamSetTimeout
@@ -221,6 +322,39 @@ var DefZifStreamSetTimeout = def.DefFunc("stream_set_timeout", 2, 3, []def.ArgIn
 	ZifStreamSetTimeout(executeData, returnValue, stream, seconds, nil, microseconds)
 })
 
+// generate by ZifStreamSetWriteBuffer
+var DefZifStreamSetWriteBuffer = def.DefFunc("stream_set_write_buffer", 2, 2, []def.ArgInfo{{name: "fp"}, {name: "buffer"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	fp := fp.ParseZval()
+	buffer := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetWriteBuffer(executeData, returnValue, fp, buffer)
+})
+
+// generate by ZifStreamSetChunkSize
+var DefZifStreamSetChunkSize = def.DefFunc("stream_set_chunk_size", 2, 2, []def.ArgInfo{{name: "fp"}, {name: "chunk_size"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	fp := fp.ParseZval()
+	chunk_size := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetChunkSize(executeData, returnValue, fp, chunk_size)
+})
+
+// generate by ZifStreamSetReadBuffer
+var DefZifStreamSetReadBuffer = def.DefFunc("stream_set_read_buffer", 2, 2, []def.ArgInfo{{name: "fp"}, {name: "buffer"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	fp := fp.ParseZval()
+	buffer := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetReadBuffer(executeData, returnValue, fp, buffer)
+})
+
 // generate by ZifStreamSocketEnableCrypto
 var DefZifStreamSocketEnableCrypto = def.DefFunc("stream_socket_enable_crypto", 2, 4, []def.ArgInfo{{name: "stream"}, {name: "enable"}, {name: "cryptokind"}, {name: "sessionstream"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
@@ -233,6 +367,26 @@ var DefZifStreamSocketEnableCrypto = def.DefFunc("stream_socket_enable_crypto", 
 		return
 	}
 	ZifStreamSocketEnableCrypto(executeData, returnValue, stream, enable, nil, cryptokind, sessionstream)
+})
+
+// generate by ZifStreamResolveIncludePath
+var DefZifStreamResolveIncludePath = def.DefFunc("stream_resolve_include_path", 1, 1, []def.ArgInfo{{name: "filename"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	filename := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamResolveIncludePath(executeData, returnValue, filename)
+})
+
+// generate by ZifStreamIsLocal
+var DefZifStreamIsLocal = def.DefFunc("stream_is_local", 1, 1, []def.ArgInfo{{name: "stream"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	stream := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamIsLocal(executeData, returnValue, stream)
 })
 
 // generate by ZifStreamSupportsLock
@@ -253,4 +407,15 @@ var DefZifStreamIsatty = def.DefFunc("stream_isatty", 1, 1, []def.ArgInfo{{name:
 		return
 	}
 	ZifStreamIsatty(executeData, returnValue, stream)
+})
+
+// generate by ZifStreamSocketShutdown
+var DefZifStreamSocketShutdown = def.DefFunc("stream_socket_shutdown", 2, 2, []def.ArgInfo{{name: "stream"}, {name: "how"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	stream := fp.ParseZval()
+	how := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSocketShutdown(executeData, returnValue, stream, how)
 })

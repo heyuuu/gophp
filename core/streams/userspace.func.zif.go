@@ -18,3 +18,23 @@ var DefZifStreamWrapperRegister = def.DefFunc("stream_wrapper_register", 2, 3, [
 	}
 	ZifStreamWrapperRegister(executeData, returnValue, protocol, classname, nil, flags)
 })
+
+// generate by ZifStreamWrapperUnregister
+var DefZifStreamWrapperUnregister = def.DefFunc("stream_wrapper_unregister", 1, 1, []def.ArgInfo{{name: "protocol"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	protocol := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamWrapperUnregister(executeData, returnValue, protocol)
+})
+
+// generate by ZifStreamWrapperRestore
+var DefZifStreamWrapperRestore = def.DefFunc("stream_wrapper_restore", 1, 1, []def.ArgInfo{{name: "protocol"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	protocol := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamWrapperRestore(executeData, returnValue, protocol)
+})

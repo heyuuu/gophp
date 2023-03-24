@@ -628,7 +628,7 @@ func ZifPhpcredits(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefO
 	return_value.SetTrue()
 	return
 }
-func ZifPhpSapiName(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPhpSapiName(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -653,7 +653,7 @@ func ZifPhpUname(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt
 	return_value.SetString(PhpGetUname(*mode))
 	return
 }
-func ZifPhpIniScannedFiles(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPhpIniScannedFiles(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -665,7 +665,7 @@ func ZifPhpIniScannedFiles(executeData *zend.ZendExecuteData, return_value *type
 		return
 	}
 }
-func ZifPhpIniLoadedFile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPhpIniLoadedFile(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

@@ -526,10 +526,10 @@ func PhpNatsort(executeData *zend.ZendExecuteData, return_value *types.Zval, fol
 	return_value.SetTrue()
 	return
 }
-func ZifNatsort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifNatsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	PhpNatsort(executeData, return_value, 0)
 }
-func ZifNatcasesort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifNatcasesort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	PhpNatsort(executeData, return_value, 1)
 }
 func ZifAsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, _ zpp.DefOpt, sortFlags *types.Zval) {
@@ -719,10 +719,10 @@ func PhpUsort(executeData *zend.ZendExecuteData, return_value *types.Zval, compa
 	types.ZVAL_BOOL(return_value, retval != 0)
 	return
 }
-func ZifUsort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUsort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, cmpFunction *types.Zval) {
 	PhpUsort(executeData, return_value, PhpArrayUserCompare, 1)
 }
-func ZifUasort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUasort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, cmpFunction *types.Zval) {
 	PhpUsort(executeData, return_value, PhpArrayUserCompare, 0)
 }
 func PhpArrayUserKeyCompare(a any, b any) int {
@@ -757,10 +757,10 @@ func PhpArrayUserKeyCompare(a any, b any) int {
 	zend.ZvalPtrDtor(&args[1])
 	return zend.ZEND_NORMALIZE_BOOL(result)
 }
-func ZifUksort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUksort(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef, cmpFunction *types.Zval) {
 	PhpUsort(executeData, return_value, PhpArrayUserKeyCompare, 0)
 }
-func ZifEnd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifEnd(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -786,7 +786,7 @@ func ZifEnd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		types.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifPrev(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPrev(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -812,7 +812,7 @@ func ZifPrev(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		types.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifNext(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifNext(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -838,7 +838,7 @@ func ZifNext(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		types.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifReset(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifReset(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -864,7 +864,7 @@ func ZifReset(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		types.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifCurrent(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifCurrent(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var array *types.Array
 	var entry *types.Zval
 	for {
@@ -887,7 +887,7 @@ func ZifCurrent(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	types.ZVAL_COPY_DEREF(return_value, entry)
 }
-func ZifKey(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifKey(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var array *types.Array
 	for {
 		for {
@@ -2419,7 +2419,7 @@ func ZifCompact(executeData zpp.DefEx, return_value zpp.DefReturn, varNames []*t
 		PhpCompactVar(symbol_table, return_value, &args[i])
 	}
 }
-func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayFill(executeData zpp.DefEx, return_value zpp.DefReturn, startKey *types.Zval, num *types.Zval, val *types.Zval) {
 	var val *types.Zval
 	var start_key zend.ZendLong
 	var num zend.ZendLong
@@ -2496,7 +2496,7 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayFillKeys(executeData zpp.DefEx, return_value zpp.DefReturn, keys *types.Zval, val *types.Zval) {
 	var keys *types.Zval
 	var val *types.Zval
 	var entry *types.Zval
@@ -2872,7 +2872,7 @@ func PhpArrayDataShuffle(array *types.Zval) {
 		types.ZendHashToPacked(hash)
 	}
 }
-func ZifShuffle(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifShuffle(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef) {
 	var array *types.Zval
 	for {
 		for {
@@ -3084,7 +3084,7 @@ func ZifArrayPush(executeData zpp.DefEx, return_value zpp.DefReturn, stack zpp.D
 
 	/* Clean up and return the number of values in the stack */
 }
-func ZifArrayPop(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayPop(executeData zpp.DefEx, return_value zpp.DefReturn, stack zpp.DefRef) {
 	var stack *types.Zval
 	var val *types.Zval
 	var idx uint32
@@ -3135,7 +3135,7 @@ func ZifArrayPop(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	types.ZendHashInternalPointerReset(stack.GetArr())
 }
-func ZifArrayShift(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayShift(executeData zpp.DefEx, return_value zpp.DefReturn, stack zpp.DefRef) {
 	var stack *types.Zval
 	var val *types.Zval
 	var idx uint32
@@ -3941,7 +3941,7 @@ func ZifArrayKeys(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.
 
 	/* Initialize return array */
 }
-func ZifArrayKeyFirst(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayKeyFirst(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var stack *types.Zval
 	for {
 		for {
@@ -3958,7 +3958,7 @@ func ZifArrayKeyFirst(executeData *zend.ZendExecuteData, return_value *types.Zva
 	var pos types.ArrayPosition = 0
 	types.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
 }
-func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayKeyLast(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var stack *types.Zval
 	var pos types.ArrayPosition
 	for {
@@ -3976,7 +3976,7 @@ func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *types.Zval
 	types.ZendHashInternalPointerEndEx(target_hash, &pos)
 	types.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
 }
-func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayValues(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var input *types.Zval
 	var entry *types.Zval
 	var arrval *types.Array
@@ -4028,7 +4028,7 @@ func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *types.Zval)
 
 	/* Go through input array and add values to the return array */
 }
-func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayCountValues(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var input *types.Zval
 	var entry *types.Zval
 	var tmp *types.Zval
@@ -4300,7 +4300,7 @@ func ZifArrayReverse(executeData zpp.DefEx, return_value zpp.DefReturn, input *t
 		}
 	}
 }
-func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayPad(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval, padSize *types.Zval, padValue *types.Zval) {
 	var input *types.Zval
 	var pad_value *types.Zval
 	var pad_size zend.ZendLong
@@ -4405,7 +4405,7 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 	}
 }
-func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayFlip(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var array *types.Zval
 	var entry *types.Zval
 	var data types.Zval
@@ -5022,25 +5022,25 @@ out:
 func ZifArrayIntersectKey(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_NONE)
 }
-func ZifArrayIntersectUkey(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayIntersectUkey(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompareFunc *types.Zval) {
 	PhpArrayIntersect(executeData, return_value, INTERSECT_KEY, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
 }
 func ZifArrayIntersect(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayIntersect(executeData, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_INTERNAL)
 }
-func ZifArrayUintersect(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayUintersect(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval) {
 	PhpArrayIntersect(executeData, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_INTERNAL)
 }
 func ZifArrayIntersectAssoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_INTERNAL)
 }
-func ZifArrayIntersectUassoc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayIntersectUassoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompareFunc *types.Zval) {
 	PhpArrayIntersect(executeData, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
 }
-func ZifArrayUintersectAssoc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayUintersectAssoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval) {
 	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_USER)
 }
-func ZifArrayUintersectUassoc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayUintersectUassoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompareFunc *types.Zval, callbackKeyCompareFunc *types.Zval) {
 	PhpArrayIntersect(executeData, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_USER)
 }
 func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *types.Zval, data_compare_type int) {
@@ -5425,7 +5425,7 @@ out:
 func ZifArrayDiffKey(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_NONE)
 }
-func ZifArrayDiffUkey(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayDiffUkey(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompFunc *types.Zval) {
 	PhpArrayDiff(executeData, return_value, DIFF_KEY, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
 }
 func ZifArrayDiff(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arrays []*types.Zval) {
@@ -5605,19 +5605,19 @@ func ZifArrayDiff(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types
 	}
 	exclude.Destroy()
 }
-func ZifArrayUdiff(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayUdiff(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval) {
 	PhpArrayDiff(executeData, return_value, DIFF_NORMAL, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_INTERNAL)
 }
 func ZifArrayDiffAssoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arrays []*types.Zval) {
 	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_INTERNAL)
 }
-func ZifArrayDiffUassoc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayDiffUassoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval) {
 	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
 }
-func ZifArrayUdiffAssoc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayUdiffAssoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackKeyCompFunc *types.Zval) {
 	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_USER)
 }
-func ZifArrayUdiffUassoc(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayUdiffUassoc(executeData zpp.DefEx, return_value zpp.DefReturn, arr1 *types.Zval, arr2 *types.Zval, callbackDataCompFunc *types.Zval, callbackKeyCompFunc *types.Zval) {
 	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_USER)
 }
 func PhpMultisortCompare(a any, b any) int {
@@ -6017,7 +6017,7 @@ func ZifArrayRand(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.
 	fillScope.FillEnd()
 	zend.FreeAlloca(bitset, use_heap)
 }
-func ZifArraySum(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArraySum(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var input *types.Zval
 	var entry *types.Zval
 	var entry_n types.Zval
@@ -6046,7 +6046,7 @@ func ZifArraySum(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		zend.FastAddFunction(return_value, return_value, &entry_n)
 	}
 }
-func ZifArrayProduct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayProduct(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var input *types.Zval
 	var entry *types.Zval
 	var entry_n types.Zval
@@ -6430,7 +6430,7 @@ func ZifArrayMap(executeData zpp.DefEx, return_value zpp.DefReturn, callback *ty
 		zend.Efree(array_pos)
 	}
 }
-func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayKeyExists(executeData zpp.DefEx, return_value zpp.DefReturn, key *types.Zval, search *types.Zval) {
 	var key *types.Zval
 	var array *types.Zval
 	var ht *types.Array
@@ -6556,7 +6556,7 @@ func ZifArrayChunk(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types
 
 	/* Add the final chunk if there is one. */
 }
-func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifArrayCombine(executeData zpp.DefEx, return_value zpp.DefReturn, keys *types.Zval, values *types.Zval) {
 	var values *types.Array
 	var keys *types.Array
 	var pos_values uint32 = 0

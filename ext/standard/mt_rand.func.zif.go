@@ -29,3 +29,11 @@ var DefZifMtRand = def.DefFunc("mt_rand", 0, 2, []def.ArgInfo{{name: "min"}, {na
 	}
 	ZifMtRand(executeData, returnValue, nil, min, max)
 })
+
+// generate by ZifMtGetrandmax
+var DefZifMtGetrandmax = def.DefFunc("mt_getrandmax", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifMtGetrandmax(executeData, returnValue)
+})

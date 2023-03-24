@@ -157,7 +157,7 @@ func ZifClosedir(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt
 		PhpSetDefaultDir(nil)
 	}
 }
-func ZifChroot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifChroot(executeData zpp.DefEx, return_value zpp.DefReturn, directory *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -189,7 +189,7 @@ func ZifChroot(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifChdir(executeData zpp.DefEx, return_value zpp.DefReturn, directory *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -226,7 +226,7 @@ func ZifChdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGetcwd(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var path []byte
 	var ret *byte = nil
 	if !executeData.CheckNumArgsNone(false) {

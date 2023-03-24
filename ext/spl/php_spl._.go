@@ -18,12 +18,12 @@ var SplAutoloadFn *zend.ZendFunction = nil
 var SplAutoloadCallFn *zend.ZendFunction = nil
 
 var SplFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("spl_classes", 0, ZifSplClasses, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifSplClasses,
 	DefZifSplAutoload,
 	DefZifSplAutoloadExtensions,
 	DefZifSplAutoloadRegister,
 	DefZifSplAutoloadUnregister,
-	types.MakeZendFunctionEntryEx("spl_autoload_functions", 0, ZifSplAutoloadFunctions, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	DefZifSplAutoloadFunctions,
 	DefZifSplAutoloadCall,
 	DefZifClassParents,
 	DefZifClassImplements,
