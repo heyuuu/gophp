@@ -1,5 +1,3 @@
-// <<generate>>
-
 package streams
 
 // #define php_stream_fopen(filename,mode,opened) _php_stream_fopen ( ( filename ) , ( mode ) , ( opened ) , 0 STREAMS_CC )

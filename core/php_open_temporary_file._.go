@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 // Source: <main/php_open_temporary_file.h>

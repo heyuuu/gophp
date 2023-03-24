@@ -1,5 +1,3 @@
-// <<generate>>
-
 package streams
 
 // Source: <main/streams/mmap.c>

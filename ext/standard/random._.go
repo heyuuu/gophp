@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // Source: <ext/standard/random.c>

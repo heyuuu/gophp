@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 func PHP_VAR_SERIALIZE_INIT(d PhpSerializeDataT) PhpSerializeDataT {

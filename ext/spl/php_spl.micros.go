@@ -1,5 +1,3 @@
-// <<generate>>
-
 package spl
 
 // #define PHP_SPL_H

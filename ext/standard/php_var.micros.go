@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define PHP_VAR_H

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 // #define PHP_STDINT_H

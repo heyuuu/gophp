@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // Source: <ext/standard/php_random.h>

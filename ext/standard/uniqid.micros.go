@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define UNIQID_H

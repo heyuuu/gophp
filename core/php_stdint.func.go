@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 func INT8_C(c __auto__) __auto__   { return c }

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 func ZEND_MAP_PTR_IS_OFFSET(ptr __auto__) int { return uintPtr(ptr__ptr) & 1 }

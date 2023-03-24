@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 type LlistDtorFuncT func(any)

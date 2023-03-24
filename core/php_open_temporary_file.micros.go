@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 // #define PHP_OPEN_TEMPORARY_FILE_H

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package spl
 
 // #define SPL_DIRECTORY_H

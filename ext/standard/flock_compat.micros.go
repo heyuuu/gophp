@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define FLOCK_COMPAT_H

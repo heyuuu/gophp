@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define PAGEINFO_H

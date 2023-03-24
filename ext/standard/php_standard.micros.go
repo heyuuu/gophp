@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // # include "basic_functions.h"

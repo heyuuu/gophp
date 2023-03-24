@@ -1,5 +1,3 @@
-// <<generate>>
-
 package spl
 
 // Source: <ext/spl/spl_engine.h>

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import b "sik/builtin"

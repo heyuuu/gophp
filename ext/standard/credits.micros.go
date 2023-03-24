@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define CREDITS_H

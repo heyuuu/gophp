@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 func CG__() *ZendCompilerGlobals          { return &CompilerGlobals }

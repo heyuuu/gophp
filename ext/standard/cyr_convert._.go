@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // Source: <ext/standard/cyr_convert.h>

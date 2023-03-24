@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define PHP_INCOMPLETE_CLASS_H

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 func Strnatcmp(a *byte, b *byte) int {

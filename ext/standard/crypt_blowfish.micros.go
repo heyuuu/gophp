@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define _CRYPT_BLOWFISH_H

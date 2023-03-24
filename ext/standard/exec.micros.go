@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define EXEC_H

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define PHP_LCG_H

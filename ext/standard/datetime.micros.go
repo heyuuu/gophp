@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define DATETIME_H

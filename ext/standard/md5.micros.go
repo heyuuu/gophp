@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define MD5_H

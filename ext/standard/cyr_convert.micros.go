@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define CYR_CONVERT_H

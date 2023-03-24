@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 func PHP_OUTPUT_HANDLER_INITBUF_SIZE(s int) __auto__ {

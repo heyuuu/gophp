@@ -1,5 +1,3 @@
-// <<generate>>
-
 package streams
 
 // Source: <main/streams/php_stream_plain_wrapper.h>

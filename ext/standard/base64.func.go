@@ -1,10 +1,7 @@
-// <<generate>>
-
 package standard
 
 import (
 	b "sik/builtin"
-	"sik/zend"
 	"sik/zend/types"
 	"sik/zend/zpp"
 )

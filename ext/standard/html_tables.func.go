@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 func CHARSET_UNICODE_COMPAT(cs EntityCharset) bool                      { return cs <= Cs88591 }

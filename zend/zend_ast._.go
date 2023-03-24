@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 // Source: <Zend/zend_ast.h>

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 // Source: <Zend/zend_ini_scanner_defs.h>

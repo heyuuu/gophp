@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 func ZendLlistGetFirst(l *ZendLlist) any { return ZendLlistGetFirstEx(l, nil) }

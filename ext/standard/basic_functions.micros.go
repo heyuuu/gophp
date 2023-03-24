@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define BASIC_FUNCTIONS_H

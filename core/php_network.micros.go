@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 // #define _PHP_NETWORK_H

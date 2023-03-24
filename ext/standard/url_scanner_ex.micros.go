@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define URL_SCANNER_EX_H

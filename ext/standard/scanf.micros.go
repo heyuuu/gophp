@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define SCANF_H

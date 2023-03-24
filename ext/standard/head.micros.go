@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define HEAD_H

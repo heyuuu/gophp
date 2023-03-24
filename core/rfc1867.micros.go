@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 // #define RFC1867_H

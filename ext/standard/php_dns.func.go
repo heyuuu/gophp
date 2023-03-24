@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 func PhpDnsSearch(

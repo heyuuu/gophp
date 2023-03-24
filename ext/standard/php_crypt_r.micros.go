@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define _CRYPT_WIHN32_H_

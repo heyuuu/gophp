@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 func ZendInitFpu()     { EG__().SetSavedFpuCwPtr(nil) }

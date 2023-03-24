@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 func PhpExplicitBzero(dst any, siz int) {

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define PHP_NET_H

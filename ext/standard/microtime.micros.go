@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define MICROTIME_H

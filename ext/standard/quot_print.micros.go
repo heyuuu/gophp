@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define QUOT_PRINT_H

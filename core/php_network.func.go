@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 func PhpSocketErrno() __auto__                                 { return errno }

@@ -1,5 +1,3 @@
-// <<generate>>
-
 package streams
 
 // #define _GNU_SOURCE

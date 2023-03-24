@@ -1,11 +1,8 @@
-// <<generate>>
-
 package standard
 
 import (
 	"sik/core"
 	"sik/zend"
-	"sik/zend/types"
 )
 
 func PhpStatpage() {

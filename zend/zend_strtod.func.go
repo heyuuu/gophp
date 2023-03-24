@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 func ZendStrtod(s00 *byte, se **byte) float64 {

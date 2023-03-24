@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define CSS_H

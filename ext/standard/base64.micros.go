@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // #define BASE64_H

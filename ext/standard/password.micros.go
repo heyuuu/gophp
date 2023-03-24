@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 // # include < stdlib . h >
