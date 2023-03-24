@@ -504,7 +504,7 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	*argc = n
 	return args
 }
-func ZifUserSprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUserSprintf(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, _ zpp.DefOpt, args []*types.Zval) {
 	var result *types.String
 	var format *types.Zval
 	var args *types.Zval
@@ -561,7 +561,7 @@ func ZifVsprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	return_value.SetString(result)
 }
-func ZifUserPrintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUserPrintf(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, _ zpp.DefOpt, args []*types.Zval) {
 	var result *types.String
 	var rlen int
 	var format *types.Zval
@@ -626,7 +626,7 @@ func ZifVprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetLong(rlen)
 	return
 }
-func ZifFprintf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFprintf(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, format *types.Zval, _ zpp.DefOpt, args []*types.Zval) {
 	var stream *core.PhpStream
 	var arg1 *types.Zval
 	var format *types.Zval

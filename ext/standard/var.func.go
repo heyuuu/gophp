@@ -171,7 +171,7 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifVarDump(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifVarDump(executeData zpp.DefEx, return_value zpp.DefReturn, vars []*types.Zval) {
 	var args *types.Zval
 	var argc int
 	var i int
@@ -352,7 +352,7 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifDebugZvalDump(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifDebugZvalDump(executeData zpp.DefEx, return_value zpp.DefReturn, vars []*types.Zval) {
 	var args *types.Zval
 	var argc int
 	var i int
@@ -575,7 +575,7 @@ func PhpVarExport(struc *types.Zval, level int) {
 	core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
 	buf.Free()
 }
-func ZifVarExport(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifVarExport(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval, _ zpp.DefOpt, return_ *types.Zval) {
 	var var_ *types.Zval
 	var return_output types.ZendBool = 0
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -1114,7 +1114,7 @@ func ZifSerialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifUnserialize(executeData zpp.DefEx, return_value zpp.DefReturn, variableRepresentation *types.Zval, _ zpp.DefOpt, allowedClasses *types.Zval) {
 	var buf *byte = nil
 	var buf_len int
 	var p *uint8
@@ -1253,7 +1253,7 @@ cleanup:
 	 * the very end, because __wakeup() calls performed during UNSERIALIZE_DESTROY might affect
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 }
-func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifMemoryGetUsage(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, realUsage *types.Zval) {
 	var real_usage types.ZendBool = 0
 	for {
 		for {
@@ -1271,7 +1271,7 @@ func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *types.Zv
 	return_value.SetLong(zend.ZendMemoryUsage(real_usage))
 	return
 }
-func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifMemoryGetPeakUsage(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, realUsage *types.Zval) {
 	var real_usage types.ZendBool = 0
 	for {
 		for {

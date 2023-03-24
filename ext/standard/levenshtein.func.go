@@ -73,7 +73,7 @@ func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
 
 	/* not there yet */
 }
-func ZifLevenshtein(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifLevenshtein(executeData zpp.DefEx, return_value zpp.DefReturn, str1 *types.Zval, str2 *types.Zval, _ zpp.DefOpt, costIns *types.Zval, costRep *types.Zval, costDel *types.Zval) {
 	var argc int = executeData.NumArgs()
 	var str1 *byte
 	var str2 *byte

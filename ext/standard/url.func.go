@@ -297,7 +297,7 @@ just_path:
 	}
 	return ret
 }
-func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifParseUrl(executeData zpp.DefEx, return_value zpp.DefReturn, url *types.Zval, _ zpp.DefOpt, component *types.Zval) {
 	var str *byte
 	var str_len int
 	var resource *PhpUrl
@@ -584,7 +584,7 @@ func PhpRawUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGetHeaders(executeData zpp.DefEx, return_value zpp.DefReturn, url *types.Zval, _ zpp.DefOpt, format *types.Zval, context *types.Zval) {
 	var url *byte
 	var url_len int
 	var stream *core.PhpStream

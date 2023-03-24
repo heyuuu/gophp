@@ -261,7 +261,7 @@ func ZifFloor(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifRound(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRound(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, _ zpp.DefOpt, precision *types.Zval, mode *types.Zval) {
 	var value *types.Zval
 	var places int = 0
 	var precision zend.ZendLong = 0
@@ -648,7 +648,7 @@ func ZifLog1p(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetDouble(PhpLog1p(num))
 	return
 }
-func ZifLog(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifLog(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, _ zpp.DefOpt, base *types.Zval) {
 	var num float64
 	var base float64 = 0
 	for {
@@ -1234,7 +1234,7 @@ func _phpMathNumberFormatEx(
 	types.ZendStringReleaseEx(tmpbuf, 0)
 	return res
 }
-func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifNumberFormat(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, _ zpp.DefOpt, numDecimalPlaces *types.Zval, decSeparator *types.Zval, thousandsSeparator *types.Zval) {
 	var num float64
 	var dec zend.ZendLong = 0
 	var thousand_sep *byte = nil

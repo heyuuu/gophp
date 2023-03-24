@@ -184,13 +184,13 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 		zend.ZEND_TRY_ASSIGN_REF_LONG(ret_code, ret)
 	}
 }
-func ZifExec(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifExec(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, _ zpp.DefOpt, output zpp.DefRef, returnValue zpp.DefRef) {
 	PhpExecEx(executeData, return_value, 0)
 }
-func ZifSystem(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSystem(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, _ zpp.DefOpt, returnValue zpp.DefRef) {
 	PhpExecEx(executeData, return_value, 1)
 }
-func ZifPassthru(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPassthru(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, _ zpp.DefOpt, returnValue zpp.DefRef) {
 	PhpExecEx(executeData, return_value, 3)
 }
 func PhpEscapeShellCmd(str *byte) *types.String {

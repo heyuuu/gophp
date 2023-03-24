@@ -33,7 +33,7 @@ func SplFindCeByName(name *types.String, autoload types.ZendBool) *types.ClassEn
 	}
 	return ce
 }
-func ZifClassParents(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifClassParents(executeData zpp.DefEx, return_value zpp.DefReturn, instance *types.Zval, _ zpp.DefOpt, autoload *types.Zval) {
 	var obj *types.Zval
 	var parent_class *types.ClassEntry
 	var ce *types.ClassEntry
@@ -62,7 +62,7 @@ func ZifClassParents(executeData *zend.ZendExecuteData, return_value *types.Zval
 		parent_class = parent_class.GetParent()
 	}
 }
-func ZifClassImplements(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifClassImplements(executeData zpp.DefEx, return_value zpp.DefReturn, what *types.Zval, _ zpp.DefOpt, autoload *types.Zval) {
 	var obj *types.Zval
 	var autoload types.ZendBool = 1
 	var ce *types.ClassEntry
@@ -86,7 +86,7 @@ func ZifClassImplements(executeData *zend.ZendExecuteData, return_value *types.Z
 	zend.ArrayInit(return_value)
 	SplAddInterfaces(return_value, ce, 1, zend.ZEND_ACC_INTERFACE)
 }
-func ZifClassUses(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifClassUses(executeData zpp.DefEx, return_value zpp.DefReturn, what *types.Zval, _ zpp.DefOpt, autoload *types.Zval) {
 	var obj *types.Zval
 	var autoload types.ZendBool = 1
 	var ce *types.ClassEntry
@@ -211,7 +211,7 @@ func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext
 	zend.Efree(class_file)
 	return 0
 }
-func ZifSplAutoload(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplAutoload(executeData zpp.DefEx, return_value zpp.DefReturn, className *types.Zval, _ zpp.DefOpt, fileExtensions *types.Zval) {
 	var pos_len int
 	var pos1_len int
 	var pos *byte
@@ -254,7 +254,7 @@ func ZifSplAutoload(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	}
 	types.ZendStringRelease(lc_name)
 }
-func ZifSplAutoloadExtensions(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplAutoloadExtensions(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, fileExtensions *types.Zval) {
 	var file_exts *types.String = nil
 	if zend.ZendParseParameters(executeData.NumArgs(), "|S", &file_exts) == types.FAILURE {
 		return
@@ -288,7 +288,7 @@ func AutoloadFuncInfoDtor(element *types.Zval) {
 	}
 	zend.Efree(alfi)
 }
-func ZifSplAutoloadCall(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplAutoloadCall(executeData zpp.DefEx, return_value zpp.DefReturn, className *types.Zval) {
 	var class_name *types.Zval
 	var retval types.Zval
 	var lc_name *types.String
@@ -376,7 +376,7 @@ func HT_MOVE_TAIL_TO_HEAD(ht *types.Array) {
 	ht.GetArData()[0] = tmp
 	ht.Rehash()
 }
-func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplAutoloadRegister(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, autoloadFunction *types.Zval, throw *types.Zval, prepend *types.Zval) {
 	var func_name *types.String
 	var error *byte = nil
 	var lc_name *types.String
@@ -553,7 +553,7 @@ func ZifSplAutoloadRegister(executeData *zend.ZendExecuteData, return_value *typ
 	return_value.SetTrue()
 	return
 }
-func ZifSplAutoloadUnregister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplAutoloadUnregister(executeData zpp.DefEx, return_value zpp.DefReturn, autoloadFunction *types.Zval) {
 	var func_name *types.String = nil
 	var error *byte = nil
 	var lc_name *types.String
@@ -694,7 +694,7 @@ func ZifSplAutoloadFunctions(executeData *zend.ZendExecuteData, return_value *ty
 	zend.ArrayInit(return_value)
 	zend.AddNextIndexStr(return_value, zend.EG__().GetAutoloadFunc().GetFunctionName().Copy())
 }
-func ZifSplObjectHash(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplObjectHash(executeData zpp.DefEx, return_value zpp.DefReturn, obj *types.Zval) {
 	var obj *types.Zval
 	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
 		return
@@ -702,7 +702,7 @@ func ZifSplObjectHash(executeData *zend.ZendExecuteData, return_value *types.Zva
 	return_value.SetString(PhpSplObjectHash(obj))
 	return
 }
-func ZifSplObjectId(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSplObjectId(executeData zpp.DefEx, return_value zpp.DefReturn, obj *types.Zval) {
 	var obj *types.Zval
 	for {
 		for {

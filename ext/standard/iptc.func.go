@@ -92,7 +92,7 @@ func PhpIptcNextMarker(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	}
 	return uint(c)
 }
-func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIptcembed(executeData zpp.DefEx, return_value zpp.DefReturn, iptcdata *types.Zval, jpegFileName *types.Zval, _ zpp.DefOpt, spool *types.Zval) {
 	var iptcdata *byte
 	var jpeg_file *byte
 	var iptcdata_len int

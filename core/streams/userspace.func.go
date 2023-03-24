@@ -256,7 +256,7 @@ func UserWrapperOpendir(
 	standard.FG(user_stream_current_filename) = nil
 	return stream
 }
-func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifStreamWrapperRegister(executeData zpp.DefEx, return_value zpp.DefReturn, protocol *types.Zval, classname *types.Zval, _ zpp.DefOpt, flags *types.Zval) {
 	var protocol *types.String
 	var classname *types.String
 	var uwrap *PhpUserStreamWrapper

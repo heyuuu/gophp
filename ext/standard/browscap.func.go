@@ -513,7 +513,7 @@ func BrowscapZvalCopyCtor(p *types.Zval) {
 		p.SetString(str)
 	}
 }
-func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGetBrowser(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, browserName *types.Zval, returnArray *types.Zval) {
 	var agent_name *types.String = nil
 	var lookup_browser_name *types.String
 	var return_array types.ZendBool = 0

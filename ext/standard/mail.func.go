@@ -223,7 +223,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.String {
 	s.ZeroTail()
 	return s.GetS()
 }
-func ZifMail(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifMail(executeData zpp.DefEx, return_value zpp.DefReturn, to *types.Zval, subject *types.Zval, message *types.Zval, _ zpp.DefOpt, additionalHeaders *types.Zval, additionalParameters *types.Zval) {
 	var to *byte = nil
 	var message *byte = nil
 	var subject *byte = nil

@@ -371,7 +371,7 @@ func ZifChmod(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifTouch(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifTouch(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval, _ zpp.DefOpt, time *types.Zval, atime *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var filetime zend.ZendLong = 0
@@ -493,7 +493,7 @@ func PhpClearStatCache(clear_realpath_cache types.ZendBool, filename *byte, file
 		}
 	}
 }
-func ZifClearstatcache(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifClearstatcache(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, clearRealpathCache *types.Zval, filename *types.Zval) {
 	var clear_realpath_cache types.ZendBool = 0
 	var filename *byte = nil
 	var filename_len int = 0

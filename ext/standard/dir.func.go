@@ -98,13 +98,13 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, 
 		core.PhpStreamToZval(dirp, return_value)
 	}
 }
-func ZifOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifOpendir(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval, _ zpp.DefOpt, context *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 0)
 }
-func ZifGetdir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGetdir(executeData zpp.DefEx, return_value zpp.DefReturn, directory *types.Zval, _ zpp.DefOpt, context *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 1)
 }
-func ZifClosedir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifClosedir(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, dirHandle *types.Zval) {
 	var id *types.Zval = nil
 	var tmp *types.Zval
 	var myself *types.Zval
@@ -241,7 +241,7 @@ func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRewinddir(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, dirHandle *types.Zval) {
 	var id *types.Zval = nil
 	var tmp *types.Zval
 	var myself *types.Zval
@@ -343,7 +343,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGlob(executeData zpp.DefEx, return_value zpp.DefReturn, pattern *types.Zval, _ zpp.DefOpt, flags *types.Zval) {
 	var cwd_skip int = 0
 	var pattern *byte = nil
 	var pattern_len int
@@ -437,7 +437,7 @@ func ZifGlob(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifScandir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifScandir(executeData zpp.DefEx, return_value zpp.DefReturn, dir *types.Zval, _ zpp.DefOpt, sortingOrder *types.Zval, context *types.Zval) {
 	var dirn *byte
 	var dirn_len int
 	var flags zend.ZendLong = 0

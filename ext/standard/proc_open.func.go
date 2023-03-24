@@ -135,7 +135,7 @@ func ZmStartupProcOpen(type_ int, module_number int) int {
 	LeProcOpen = zend.ZendRegisterListDestructorsEx(ProcOpenRsrcDtor, nil, "process", module_number)
 	return types.SUCCESS
 }
-func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifProcTerminate(executeData zpp.DefEx, return_value zpp.DefReturn, process *types.Zval, _ zpp.DefOpt, signal *types.Zval) {
 	var zproc *types.Zval
 	var proc *PhpProcessHandle
 	var sig_no zend.ZendLong = SIGTERM
@@ -259,7 +259,7 @@ func GetValidArgString(zv *types.Zval, elem_num int) *types.String {
 	}
 	return str
 }
-func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifProcOpen(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, descriptorspec *types.Zval, pipes zpp.DefRef, _ zpp.DefOpt, cwd *types.Zval, env *types.Zval, otherOptions *types.Zval) {
 	var command_zv *types.Zval
 	var command *byte = nil
 	var cwd *byte = nil

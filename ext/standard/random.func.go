@@ -66,7 +66,7 @@ func PhpRandomBytes(bytes any, size int, should_throw types.ZendBool) int {
 	}
 	return types.SUCCESS
 }
-func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRandomBytes(executeData zpp.DefEx, return_value zpp.DefReturn, length *types.Zval) {
 	var size zend.ZendLong
 	var bytes *types.String
 	for {
@@ -142,7 +142,7 @@ func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, s
 	*result = zend_long(trial%umax + min)
 	return types.SUCCESS
 }
-func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifRandomInt(executeData zpp.DefEx, return_value zpp.DefReturn, min *types.Zval, max *types.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var result zend.ZendLong

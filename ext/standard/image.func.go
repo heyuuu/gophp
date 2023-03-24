@@ -887,7 +887,7 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *typ
 	}
 	return_value.SetRawString(b.CastStrAuto((*byte)(PhpImageTypeToMimeType(p_image_type))))
 }
-func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifImageTypeToExtension(executeData zpp.DefEx, return_value zpp.DefReturn, imagetype *types.Zval, _ zpp.DefOpt, includeDot *types.Zval) {
 	var image_type zend.ZendLong
 	var inc_dot types.ZendBool = 1
 	var imgext *byte = nil
@@ -1152,9 +1152,9 @@ func PhpGetimagesizeFromAny(executeData *zend.ZendExecuteData, return_value *typ
 	PhpGetimagesizeFromStream(stream, info, executeData, return_value)
 	core.PhpStreamClose(stream)
 }
-func ZifGetimagesize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGetimagesize(executeData zpp.DefEx, return_value zpp.DefReturn, imagefile *types.Zval, _ zpp.DefOpt, info zpp.DefRef) {
 	PhpGetimagesizeFromAny(executeData, return_value, FROM_PATH)
 }
-func ZifGetimagesizefromstring(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifGetimagesizefromstring(executeData zpp.DefEx, return_value zpp.DefReturn, imagefile *types.Zval, _ zpp.DefOpt, info zpp.DefRef) {
 	PhpGetimagesizeFromAny(executeData, return_value, FROM_DATA)
 }

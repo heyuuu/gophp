@@ -95,9 +95,9 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifFsockopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFsockopen(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval, _ zpp.DefOpt, port *types.Zval, errno zpp.DefRef, errstr zpp.DefRef, timeout *types.Zval) {
 	PhpFsockopenStream(executeData, return_value, 0)
 }
-func ZifPfsockopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPfsockopen(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval, _ zpp.DefOpt, port *types.Zval, errno zpp.DefRef, errstr zpp.DefRef, timeout *types.Zval) {
 	PhpFsockopenStream(executeData, return_value, 1)
 }

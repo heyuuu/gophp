@@ -581,7 +581,7 @@ func RegisterPhpinfoConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("CREDITS_QA", PHP_CREDITS_QA, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 	zend.RegisterLongConstant("CREDITS_ALL", PHP_CREDITS_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 }
-func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPhpversion(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, extension *types.Zval) {
 	var ext_name *byte = nil
 	var ext_name_len int = 0
 	for {
@@ -610,7 +610,7 @@ func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 		return
 	}
 }
-func ZifPhpcredits(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPhpcredits(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, flag *types.Zval) {
 	var flag zend.ZendLong = PHP_CREDITS_ALL
 	for {
 		for {
@@ -635,7 +635,7 @@ func ZifPhpSapiName(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	return_value.SetRawString(core.SM__().Name())
 	return
 }
-func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifPhpUname(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, mode *types.Zval) {
 	var mode *byte = "a"
 	var modelen int = b.SizeOf("\"a\"") - 1
 	for {

@@ -94,7 +94,7 @@ func PhpMtRand() uint32 {
 	s1 ^= s1 << 15 & 0xefc60000
 	return s1 ^ s1>>18
 }
-func ZifMtSrand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifMtSrand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, seed *types.Zval, mode *types.Zval) {
 	var seed zend.ZendLong = 0
 	var mode zend.ZendLong = MT_RAND_MT19937
 	for {
@@ -170,7 +170,7 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	RAND_RANGE_BADSCALING(n, min, max, PHP_MT_RAND_MAX)
 	return n
 }
-func ZifMtRand(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifMtRand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, min *types.Zval, max *types.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var argc int = executeData.NumArgs()

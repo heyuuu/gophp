@@ -158,7 +158,7 @@ func ZifBase64Encode(executeData *zend.ZendExecuteData, return_value *types.Zval
 	return_value.SetString(result)
 	return
 }
-func ZifBase64Decode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifBase64Decode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, strict *types.Zval) {
 	var str *byte
 	var strict types.ZendBool = 0
 	var str_len int

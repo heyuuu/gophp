@@ -152,7 +152,7 @@ func PhpGethostbyname(name *byte) *types.String {
 	address = inet_ntoa(in)
 	return types.NewString(address)
 }
-func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifDnsCheckRecord(executeData zpp.DefEx, return_value zpp.DefReturn, host *types.Zval, _ zpp.DefOpt, type_ *types.Zval) {
 	var hp *HEADER
 	var answer Querybuf
 	var hostname *byte
@@ -914,7 +914,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 		}
 	}
 }
-func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifDnsGetMx(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval, mxhosts zpp.DefRef, _ zpp.DefOpt, weight zpp.DefRef) {
 	var hostname *byte
 	var hostname_len int
 	var mx_list *types.Zval

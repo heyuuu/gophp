@@ -95,7 +95,7 @@ func ZifSettype(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	return_value.SetTrue()
 }
-func ZifIntval(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIntval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval, _ zpp.DefOpt, base *types.Zval) {
 	var num *types.Zval
 	var base zend.ZendLong = 10
 	for {
@@ -332,7 +332,7 @@ func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsCallable(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval, _ zpp.DefOpt, syntaxOnly *types.Zval, callableName zpp.DefRef) {
 	var var_ *types.Zval
 	var callable_name *types.Zval = nil
 	var name *types.String
@@ -375,7 +375,7 @@ func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *types.Zval) 
 	types.ZVAL_BOOL(return_value, retval != 0)
 	return
 }
-func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifIsIterable(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var var_ *types.Zval
 	for {
 		for {

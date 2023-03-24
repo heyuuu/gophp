@@ -902,7 +902,7 @@ func PhpOutputHandlerDefaultFunc(handler_context *any, output_context *PhpOutput
 func PhpOutputHandlerDevnullFunc(handler_context *any, output_context *PhpOutputContext) int {
 	return types.SUCCESS
 }
-func ZifObStart(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObStart(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, userFunction *types.Zval, chunkSize *types.Zval, flags *types.Zval) {
 	var output_handler *types.Zval = nil
 	var chunk_size zend.ZendLong = 0
 	var flags zend.ZendLong = PHP_OUTPUT_HANDLER_STDFLAGS
@@ -1043,7 +1043,7 @@ func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *types.Zv
 	}
 	zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
 }
-func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObGetStatus(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, fullStatus *types.Zval) {
 	var full_status types.ZendBool = 0
 	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &full_status) == types.FAILURE {
 		return
@@ -1059,7 +1059,7 @@ func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *types.Zval)
 		PhpOutputHandlerStatus(OG(active), return_value)
 	}
 }
-func ZifObImplicitFlush(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifObImplicitFlush(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, flag *types.Zval) {
 	var flag zend.ZendLong = 1
 	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &flag) == types.FAILURE {
 		return
