@@ -50,7 +50,13 @@ func (ht *Array) recalcElements() uint32 {
 	return num
 }
 
-func (ht *Array) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
+/**
+ * Sort
+ */
+type ArraySortFunc func(a *Bucket, b *Bucket) bool
+type ArraySortExFunc func(a *Bucket, b *Bucket) int
+
+func (ht *Array) Sort(comparer ArraySortFunc, renumber bool) {
 	ht.assertRc1()
 
 	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
@@ -74,12 +80,12 @@ func (ht *Array) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
 	ht.Rehash()
 }
 
-func (ht *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
+func (ht *Array) SortCompatible(comparer CompareFuncT, renumber ZendBool) bool {
 	ht.Sort(func(a *Bucket, b *Bucket) bool {
 		var compareResult = comparer(a, b)
 		return compareResult > 0
 	}, renumber != 0)
-	return SUCCESS
+	return true
 }
 
 func (ht *Array) SortCompatibleEx(sort_ SortFuncT) int {

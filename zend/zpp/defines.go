@@ -14,4 +14,6 @@ type (
 	DefRet = *types.Zval
 	// Type: 'L', FAST_ZPP: Z_PARAM_STRICT_LONG
 	DefStrictLong = int
+
+	DefRefArray = *types.Zval // fp.ParseArrayEx(false, true)
 )
