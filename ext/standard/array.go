@@ -1,5 +1,3 @@
-// <<generate>>
-
 package standard
 
 import (
@@ -11,11 +9,82 @@ import (
 	"sik/zend/zpp"
 )
 
-func PhpArrayInitGlobals(array_globals *ZendArrayGlobals) {
-	memset(array_globals, 0, b.SizeOf("zend_array_globals"))
+/**
+ * Constants & Global Variables
+ */
+const EXTR_OVERWRITE = 0
+const EXTR_SKIP = 1
+const EXTR_PREFIX_SAME = 2
+const EXTR_PREFIX_ALL = 3
+const EXTR_PREFIX_INVALID = 4
+const EXTR_PREFIX_IF_EXISTS = 5
+const EXTR_IF_EXISTS = 6
+const EXTR_REFS = 0x100
+const CASE_LOWER = 0
+const CASE_UPPER = 1
+const DIFF_NORMAL = 1
+const DIFF_KEY = 2
+const DIFF_ASSOC = 6
+const DIFF_COMP_DATA_NONE = -1
+const DIFF_COMP_DATA_INTERNAL = 0
+const DIFF_COMP_DATA_USER = 1
+const DIFF_COMP_KEY_INTERNAL = 0
+const DIFF_COMP_KEY_USER = 1
+const INTERSECT_NORMAL = 1
+const INTERSECT_KEY = 2
+const INTERSECT_ASSOC = 6
+const INTERSECT_COMP_DATA_NONE = -1
+const INTERSECT_COMP_DATA_INTERNAL = 0
+const INTERSECT_COMP_DATA_USER = 1
+const INTERSECT_COMP_KEY_INTERNAL = 0
+const INTERSECT_COMP_KEY_USER = 1
+
+const MULTISORT_ORDER = 0
+const MULTISORT_TYPE = 1
+const MULTISORT_LAST = 2
+
+const PHP_SORT_REGULAR = 0
+const PHP_SORT_NUMERIC = 1
+const PHP_SORT_STRING = 2
+const PHP_SORT_DESC = 3
+const PHP_SORT_ASC = 4
+const PHP_SORT_LOCALE_STRING = 5
+const PHP_SORT_NATURAL = 6
+const PHP_SORT_FLAG_CASE = 8
+const COUNT_NORMAL = 0
+const COUNT_RECURSIVE = 1
+const ARRAY_FILTER_USE_BOTH = 1
+const ARRAY_FILTER_USE_KEY = 2
+
+var ArrayGlobals ZendArrayGlobals
+
+/**
+ * ZendArrayGlobals
+ */
+type ZendArrayGlobals struct {
+	multisort_func *types.CompareFuncT
 }
+
+/**
+ * Bucketindex
+ */
+type Bucketindex struct {
+	b types.Bucket
+	i uint
+}
+
+func (this *Bucketindex) GetB() types.Bucket      { return this.b }
+func (this *Bucketindex) SetB(value types.Bucket) { this.b = value }
+func (this *Bucketindex) GetI() uint              { return this.i }
+func (this *Bucketindex) SetI(value uint)         { this.i = value }
+
+/**
+ * functions
+ */
+func ARRAYG(v __auto__) __auto__ { return ArrayGlobals.v }
+
 func ZmStartupArray(type_ int, module_number int) int {
-	PhpArrayInitGlobals(&ArrayGlobals)
+	ArrayGlobals = ZendArrayGlobals{}
 	zend.RegisterLongConstant("EXTR_OVERWRITE", EXTR_OVERWRITE, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("EXTR_SKIP", EXTR_SKIP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("EXTR_PREFIX_SAME", EXTR_PREFIX_SAME, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
