@@ -189,8 +189,8 @@ func parseArgInfos(funcDecl *ast.FuncDecl) ([]ArgInfo, error) {
 			if hasOpt {
 				return nil, errors.New("参数类型不合法, 不可有多个Opt")
 			}
+			hasRealParam = true
 			hasOpt = true
-			hasVarargs = true
 		default:
 			hasRealParam = true
 		}

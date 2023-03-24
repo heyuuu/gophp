@@ -155,13 +155,13 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 				continue
 			} else if argTyp == ZppTypeOpt {
 				stmts = append(stmts, f.ExprStmt(f.MethodCallExpr(fpIdent, "StartOptional", nil)))
-			} else if parseMethod, ok := toZppParseMethod(argTyp); ok {
+			} else if parseMethod, args, ok := toZppParseMethodEx(argTyp); ok {
 				stmts = append(stmts, f.AssignStmt(
 					f.Ident(info.name),
-					f.MethodCallExpr(fpIdent, parseMethod, nil),
+					f.MethodCallExpr(fpIdent, parseMethod, args),
 				))
 			} else {
-				log.Fatalf("Zpp类型未定义 Parse 方法: type=%d\n", argTyp)
+				log.Fatalf("Zpp类型未定义 Parse 方法: type=%s\n", argTyp)
 			}
 		}
 		stmts = append(stmts, &ast.IfStmt{

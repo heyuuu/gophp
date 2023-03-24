@@ -1,5 +1,10 @@
 package zif
 
+import (
+	"go/ast"
+	f "sik/internal/cmd/sikgen/astutil"
+)
+
 type ZifInfo struct {
 	funcName   string
 	defName    string
@@ -49,6 +54,9 @@ const (
 	ZppTypeZendString
 	ZppTypeZendArray
 	ZppTypeZval
+	// ref
+	ZppTypeZendArrayRef
+	ZppTypeZvalRef
 	// special
 	ZppTypeEx
 	ZppTypeRet
@@ -74,6 +82,11 @@ func toZppType(typ string) (ZppType, bool) {
 		return ZppTypeZendString, true
 	case "*types.Zval":
 		return ZppTypeZval, true
+	// ref
+	case "zpp.DefRefArray":
+		return ZppTypeZendArrayRef, true
+	case "zpp.DefRef":
+		return ZppTypeZvalRef, true
 	// special
 	case "zpp.DefEx":
 		return ZppTypeEx, true
@@ -81,8 +94,9 @@ func toZppType(typ string) (ZppType, bool) {
 		return ZppTypeRet, true
 	case "zpp.DefOpt":
 		return ZppTypeOpt, true
-	case "[]*type.Zval":
+	case "[]*types.Zval":
 		return ZppTypeVariadic, true
+
 	default:
 		return 0, false
 	}
@@ -110,6 +124,18 @@ func toZppParseMethod(typ ZppType) (string, bool) {
 		return "ParseVariadic", true
 	default:
 		return "", false
+	}
+}
+
+func toZppParseMethodEx(typ ZppType) (string, []ast.Expr, bool) {
+	switch typ {
+	case ZppTypeZvalRef:
+		return "ParseZvalEx", []ast.Expr{f.BoolLit(false), f.BoolLit(true)}, true
+	case ZppTypeZendArrayRef:
+		return "ParseArrayEx", []ast.Expr{f.BoolLit(false), f.BoolLit(true)}, true
+	default:
+		method, ok := toZppParseMethod(typ)
+		return method, nil, ok
 	}
 }
 
