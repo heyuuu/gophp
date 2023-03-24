@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifVersionCompare
-var DefZifVersionCompare = def.DefFunc("version_compare", 2, 3, []def.ArgInfo{{name: "ver1"}, {name: "ver2"}, {name: "oper"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifVersionCompare = def.DefFunc("version_compare", 2, 3, []def.ArgInfo{{Name: "ver1"}, {Name: "ver2"}, {Name: "oper"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	ver1 := fp.ParseZval()
 	ver2 := fp.ParseZval()

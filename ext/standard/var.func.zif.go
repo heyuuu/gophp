@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifVarDump
-var DefZifVarDump = def.DefFunc("var_dump", -1, -1, []def.ArgInfo{{name: "vars"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifVarDump = def.DefFunc("var_dump", -1, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	vars := fp.ParseVariadic()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifVarDump = def.DefFunc("var_dump", -1, -1, []def.ArgInfo{{name: "vars"}
 })
 
 // generate by ZifDebugZvalDump
-var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", -1, -1, []def.ArgInfo{{name: "vars"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", -1, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	vars := fp.ParseVariadic()
 	if fp.HasError() {
@@ -27,7 +27,7 @@ var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", -1, -1, []def.ArgInfo{{
 })
 
 // generate by ZifVarExport
-var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{name: "var_"}, {name: "return_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name: "return_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
@@ -39,7 +39,7 @@ var DefZifVarExport = def.DefFunc("var_export", 1, 2, []def.ArgInfo{{name: "var_
 })
 
 // generate by ZifSerialize
-var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -49,7 +49,7 @@ var DefZifSerialize = def.DefFunc("serialize", 1, 1, []def.ArgInfo{{name: "var_"
 })
 
 // generate by ZifUnserialize
-var DefZifUnserialize = def.DefFunc("unserialize", 1, 2, []def.ArgInfo{{name: "variable_representation"}, {name: "allowed_classes"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUnserialize = def.DefFunc("unserialize", 1, 2, []def.ArgInfo{{Name: "variable_representation"}, {Name: "allowed_classes"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	variable_representation := fp.ParseZval()
 	fp.StartOptional()
@@ -61,7 +61,7 @@ var DefZifUnserialize = def.DefFunc("unserialize", 1, 2, []def.ArgInfo{{name: "v
 })
 
 // generate by ZifMemoryGetUsage
-var DefZifMemoryGetUsage = def.DefFunc("memory_get_usage", 0, 1, []def.ArgInfo{{name: "real_usage"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMemoryGetUsage = def.DefFunc("memory_get_usage", 0, 1, []def.ArgInfo{{Name: "real_usage"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	real_usage := fp.ParseZval()
@@ -72,7 +72,7 @@ var DefZifMemoryGetUsage = def.DefFunc("memory_get_usage", 0, 1, []def.ArgInfo{{
 })
 
 // generate by ZifMemoryGetPeakUsage
-var DefZifMemoryGetPeakUsage = def.DefFunc("memory_get_peak_usage", 0, 1, []def.ArgInfo{{name: "real_usage"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMemoryGetPeakUsage = def.DefFunc("memory_get_peak_usage", 0, 1, []def.ArgInfo{{Name: "real_usage"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	real_usage := fp.ParseZval()

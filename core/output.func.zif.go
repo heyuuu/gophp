@@ -2,12 +2,11 @@ package core
 
 import (
 	"sik/zend/def"
-	"sik/zend/types"
 	"sik/zend/zpp"
 )
 
 // generate by ZifObStart
-var DefZifObStart = def.DefFunc("ob_start", 0, 3, []def.ArgInfo{{name: "user_function"}, {name: "chunk_size"}, {name: "flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObStart = def.DefFunc("ob_start", 0, 3, []def.ArgInfo{{Name: "user_function"}, {Name: "chunk_size"}, {Name: "flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 3, 0)
 	fp.StartOptional()
 	user_function := fp.ParseZval()
@@ -20,7 +19,7 @@ var DefZifObStart = def.DefFunc("ob_start", 0, 3, []def.ArgInfo{{name: "user_fun
 })
 
 // generate by ZifObFlush
-var DefZifObFlush = def.DefFunc("ob_flush", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObFlush = def.DefFunc("ob_flush", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -28,7 +27,7 @@ var DefZifObFlush = def.DefFunc("ob_flush", 0, 0, []def.ArgInfo{}, func(executeD
 })
 
 // generate by ZifObClean
-var DefZifObClean = def.DefFunc("ob_clean", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObClean = def.DefFunc("ob_clean", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -36,7 +35,7 @@ var DefZifObClean = def.DefFunc("ob_clean", 0, 0, []def.ArgInfo{}, func(executeD
 })
 
 // generate by ZifObEndFlush
-var DefZifObEndFlush = def.DefFunc("ob_end_flush", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObEndFlush = def.DefFunc("ob_end_flush", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -44,7 +43,7 @@ var DefZifObEndFlush = def.DefFunc("ob_end_flush", 0, 0, []def.ArgInfo{}, func(e
 })
 
 // generate by ZifObEndClean
-var DefZifObEndClean = def.DefFunc("ob_end_clean", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObEndClean = def.DefFunc("ob_end_clean", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -52,7 +51,7 @@ var DefZifObEndClean = def.DefFunc("ob_end_clean", 0, 0, []def.ArgInfo{}, func(e
 })
 
 // generate by ZifObGetFlush
-var DefZifObGetFlush = def.DefFunc("ob_get_flush", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObGetFlush = def.DefFunc("ob_get_flush", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -60,7 +59,7 @@ var DefZifObGetFlush = def.DefFunc("ob_get_flush", 0, 0, []def.ArgInfo{}, func(e
 })
 
 // generate by ZifObGetClean
-var DefZifObGetClean = def.DefFunc("ob_get_clean", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObGetClean = def.DefFunc("ob_get_clean", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -68,7 +67,7 @@ var DefZifObGetClean = def.DefFunc("ob_get_clean", 0, 0, []def.ArgInfo{}, func(e
 })
 
 // generate by ZifObGetContents
-var DefZifObGetContents = def.DefFunc("ob_get_contents", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObGetContents = def.DefFunc("ob_get_contents", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -76,7 +75,7 @@ var DefZifObGetContents = def.DefFunc("ob_get_contents", 0, 0, []def.ArgInfo{}, 
 })
 
 // generate by ZifObGetLevel
-var DefZifObGetLevel = def.DefFunc("ob_get_level", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObGetLevel = def.DefFunc("ob_get_level", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -84,7 +83,7 @@ var DefZifObGetLevel = def.DefFunc("ob_get_level", 0, 0, []def.ArgInfo{}, func(e
 })
 
 // generate by ZifObGetLength
-var DefZifObGetLength = def.DefFunc("ob_get_length", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObGetLength = def.DefFunc("ob_get_length", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -92,7 +91,7 @@ var DefZifObGetLength = def.DefFunc("ob_get_length", 0, 0, []def.ArgInfo{}, func
 })
 
 // generate by ZifObListHandlers
-var DefZifObListHandlers = def.DefFunc("ob_list_handlers", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObListHandlers = def.DefFunc("ob_list_handlers", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -100,7 +99,7 @@ var DefZifObListHandlers = def.DefFunc("ob_list_handlers", 0, 0, []def.ArgInfo{}
 })
 
 // generate by ZifObGetStatus
-var DefZifObGetStatus = def.DefFunc("ob_get_status", 0, 1, []def.ArgInfo{{name: "full_status"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObGetStatus = def.DefFunc("ob_get_status", 0, 1, []def.ArgInfo{{Name: "full_status"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	full_status := fp.ParseZval()
@@ -111,7 +110,7 @@ var DefZifObGetStatus = def.DefFunc("ob_get_status", 0, 1, []def.ArgInfo{{name: 
 })
 
 // generate by ZifObImplicitFlush
-var DefZifObImplicitFlush = def.DefFunc("ob_implicit_flush", 0, 1, []def.ArgInfo{{name: "flag"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifObImplicitFlush = def.DefFunc("ob_implicit_flush", 0, 1, []def.ArgInfo{{Name: "flag"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	flag := fp.ParseZval()
@@ -122,7 +121,7 @@ var DefZifObImplicitFlush = def.DefFunc("ob_implicit_flush", 0, 1, []def.ArgInfo
 })
 
 // generate by ZifOutputResetRewriteVars
-var DefZifOutputResetRewriteVars = def.DefFunc("output_reset_rewrite_vars", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifOutputResetRewriteVars = def.DefFunc("output_reset_rewrite_vars", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -130,7 +129,7 @@ var DefZifOutputResetRewriteVars = def.DefFunc("output_reset_rewrite_vars", 0, 0
 })
 
 // generate by ZifOutputAddRewriteVar
-var DefZifOutputAddRewriteVar = def.DefFunc("output_add_rewrite_var", 2, 2, []def.ArgInfo{{name: "name"}, {name: "value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifOutputAddRewriteVar = def.DefFunc("output_add_rewrite_var", 2, 2, []def.ArgInfo{{Name: "name"}, {Name: "value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	name := fp.ParseZval()
 	value := fp.ParseZval()

@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifConvertCyrString
-var DefZifConvertCyrString = def.DefFunc("convert_cyr_string", 3, 3, []def.ArgInfo{{name: "str"}, {name: "from"}, {name: "to"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifConvertCyrString = def.DefFunc("convert_cyr_string", 3, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	str := fp.ParseZval()
 	from := fp.ParseZval()

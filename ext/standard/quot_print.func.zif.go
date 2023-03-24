@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifQuotedPrintableDecode
-var DefZifQuotedPrintableDecode = def.DefFunc("quoted_printable_decode", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifQuotedPrintableDecode = def.DefFunc("quoted_printable_decode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifQuotedPrintableDecode = def.DefFunc("quoted_printable_decode", 1, 1, [
 })
 
 // generate by ZifQuotedPrintableEncode
-var DefZifQuotedPrintableEncode = def.DefFunc("quoted_printable_encode", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifQuotedPrintableEncode = def.DefFunc("quoted_printable_encode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {

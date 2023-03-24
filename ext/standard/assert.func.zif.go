@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifAssert
-var DefZifAssert = def.DefFunc("assert", 1, 2, []def.ArgInfo{{name: "assertion"}, {name: "description"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifAssert = def.DefFunc("assert", 1, 2, []def.ArgInfo{{Name: "assertion"}, {Name: "description"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	assertion := fp.ParseZval()
 	fp.StartOptional()
@@ -19,7 +19,7 @@ var DefZifAssert = def.DefFunc("assert", 1, 2, []def.ArgInfo{{name: "assertion"}
 })
 
 // generate by ZifAssertOptions
-var DefZifAssertOptions = def.DefFunc("assert_options", 1, 2, []def.ArgInfo{{name: "what"}, {name: "value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifAssertOptions = def.DefFunc("assert_options", 1, 2, []def.ArgInfo{{Name: "what"}, {Name: "value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	what := fp.ParseZval()
 	fp.StartOptional()

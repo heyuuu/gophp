@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifStrptime
-var DefZifStrptime = def.DefFunc("strptime", 2, 2, []def.ArgInfo{{name: "timestamp"}, {name: "format"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrptime = def.DefFunc("strptime", 2, 2, []def.ArgInfo{{Name: "timestamp"}, {Name: "format"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	timestamp := fp.ParseZval()
 	format := fp.ParseZval()

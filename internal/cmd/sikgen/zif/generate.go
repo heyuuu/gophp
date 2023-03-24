@@ -12,8 +12,10 @@ var (
 	zppPkgIdent = func(name string) *ast.SelectorExpr { return f.PkgIdent("zpp", name) }
 	defPkgIdent = func(name string) *ast.SelectorExpr { return f.PkgIdent("def", name) }
 	// types
-	typeEx         = f.RefType(f.Type("ZendExecuteData"))
-	typeZval       = f.RefType(f.PkgIdent("types", "Zval"))
+	//typeEx         = f.RefType(f.Type("ZendExecuteData"))
+	//typeZval       = f.RefType(f.PkgIdent("types", "Zval"))
+	typeEx         = zppPkgIdent("DefEx")
+	typeZval       = zppPkgIdent("DefReturn")
 	typeArgInfo    = defPkgIdent("ArgInfo")
 	typeReturnInfo = defPkgIdent("ReturnInfo")
 
@@ -63,7 +65,7 @@ func genDefFuncArgs(zifInfo *ZifInfo) []ast.Expr {
 		default:
 			realArgInfos = append(realArgInfos, &ast.CompositeLit{
 				Elts: []ast.Expr{
-					f.KeyValue("name", f.StrLit(argInfo.name)),
+					f.KeyValue("Name", f.StrLit(argInfo.name)),
 				},
 			})
 		}

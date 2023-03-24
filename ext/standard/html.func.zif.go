@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifHtmlspecialchars
-var DefZifHtmlspecialchars = def.DefFunc("htmlspecialchars", 1, 4, []def.ArgInfo{{name: "string"}, {name: "quote_style"}, {name: "encoding"}, {name: "double_encode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHtmlspecialchars = def.DefFunc("htmlspecialchars", 1, 4, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}, {Name: "encoding"}, {Name: "double_encode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	string := fp.ParseZval()
 	fp.StartOptional()
@@ -21,7 +21,7 @@ var DefZifHtmlspecialchars = def.DefFunc("htmlspecialchars", 1, 4, []def.ArgInfo
 })
 
 // generate by ZifHtmlspecialcharsDecode
-var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, []def.ArgInfo{{name: "string"}, {name: "quote_style"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	string := fp.ParseZval()
 	fp.StartOptional()
@@ -33,7 +33,7 @@ var DefZifHtmlspecialcharsDecode = def.DefFunc("htmlspecialchars_decode", 1, 2, 
 })
 
 // generate by ZifHtmlEntityDecode
-var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgInfo{{name: "string"}, {name: "quote_style"}, {name: "encoding"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}, {Name: "encoding"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	string := fp.ParseZval()
 	fp.StartOptional()
@@ -46,7 +46,7 @@ var DefZifHtmlEntityDecode = def.DefFunc("html_entity_decode", 1, 3, []def.ArgIn
 })
 
 // generate by ZifHtmlentities
-var DefZifHtmlentities = def.DefFunc("htmlentities", 1, 4, []def.ArgInfo{{name: "string"}, {name: "quote_style"}, {name: "encoding"}, {name: "double_encode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHtmlentities = def.DefFunc("htmlentities", 1, 4, []def.ArgInfo{{Name: "string"}, {Name: "quote_style"}, {Name: "encoding"}, {Name: "double_encode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	string := fp.ParseZval()
 	fp.StartOptional()
@@ -60,7 +60,7 @@ var DefZifHtmlentities = def.DefFunc("htmlentities", 1, 4, []def.ArgInfo{{name: 
 })
 
 // generate by ZifGetHtmlTranslationTable
-var DefZifGetHtmlTranslationTable = def.DefFunc("get_html_translation_table", 0, 3, []def.ArgInfo{{name: "table"}, {name: "quote_style"}, {name: "encoding"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetHtmlTranslationTable = def.DefFunc("get_html_translation_table", 0, 3, []def.ArgInfo{{Name: "table"}, {Name: "quote_style"}, {Name: "encoding"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 3, 0)
 	fp.StartOptional()
 	table := fp.ParseZval()

@@ -8,7 +8,9 @@ import (
 
 type FuncType = types.ZendFunctionEntry
 type FuncHandler = zend.ZifHandler
-type ArgInfo = zend.ArgInfo
+type ArgInfo struct {
+	Name string
+}
 type ReturnInfo = zend.ArgInfo
 
 /**

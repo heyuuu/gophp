@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifIptcembed
-var DefZifIptcembed = def.DefFunc("iptcembed", 2, 3, []def.ArgInfo{{name: "iptcdata"}, {name: "jpeg_file_name"}, {name: "spool"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIptcembed = def.DefFunc("iptcembed", 2, 3, []def.ArgInfo{{Name: "iptcdata"}, {Name: "jpeg_file_name"}, {Name: "spool"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	iptcdata := fp.ParseZval()
 	jpeg_file_name := fp.ParseZval()
@@ -20,7 +20,7 @@ var DefZifIptcembed = def.DefFunc("iptcembed", 2, 3, []def.ArgInfo{{name: "iptcd
 })
 
 // generate by ZifIptcparse
-var DefZifIptcparse = def.DefFunc("iptcparse", 1, 1, []def.ArgInfo{{name: "iptcdata"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIptcparse = def.DefFunc("iptcparse", 1, 1, []def.ArgInfo{{Name: "iptcdata"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	iptcdata := fp.ParseZval()
 	if fp.HasError() {

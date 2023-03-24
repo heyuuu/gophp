@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifImageTypeToMimeType
-var DefZifImageTypeToMimeType = def.DefFunc("image_type_to_mime_type", 1, 1, []def.ArgInfo{{name: "imagetype"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifImageTypeToMimeType = def.DefFunc("image_type_to_mime_type", 1, 1, []def.ArgInfo{{Name: "imagetype"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	imagetype := fp.ParseZval()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifImageTypeToMimeType = def.DefFunc("image_type_to_mime_type", 1, 1, []d
 })
 
 // generate by ZifImageTypeToExtension
-var DefZifImageTypeToExtension = def.DefFunc("image_type_to_extension", 1, 2, []def.ArgInfo{{name: "imagetype"}, {name: "include_dot"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifImageTypeToExtension = def.DefFunc("image_type_to_extension", 1, 2, []def.ArgInfo{{Name: "imagetype"}, {Name: "include_dot"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	imagetype := fp.ParseZval()
 	fp.StartOptional()
@@ -29,7 +29,7 @@ var DefZifImageTypeToExtension = def.DefFunc("image_type_to_extension", 1, 2, []
 })
 
 // generate by ZifGetimagesize
-var DefZifGetimagesize = def.DefFunc("getimagesize", 1, 2, []def.ArgInfo{{name: "imagefile"}, {name: "info"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetimagesize = def.DefFunc("getimagesize", 1, 2, []def.ArgInfo{{Name: "imagefile"}, {Name: "info"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	imagefile := fp.ParseZval()
 	fp.StartOptional()
@@ -41,7 +41,7 @@ var DefZifGetimagesize = def.DefFunc("getimagesize", 1, 2, []def.ArgInfo{{name: 
 })
 
 // generate by ZifGetimagesizefromstring
-var DefZifGetimagesizefromstring = def.DefFunc("getimagesizefromstring", 1, 2, []def.ArgInfo{{name: "imagefile"}, {name: "info"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetimagesizefromstring = def.DefFunc("getimagesizefromstring", 1, 2, []def.ArgInfo{{Name: "imagefile"}, {Name: "info"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	imagefile := fp.ParseZval()
 	fp.StartOptional()

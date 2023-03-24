@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifOpenlog
-var DefZifOpenlog = def.DefFunc("openlog", 3, 3, []def.ArgInfo{{name: "ident"}, {name: "option"}, {name: "facility"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifOpenlog = def.DefFunc("openlog", 3, 3, []def.ArgInfo{{Name: "ident"}, {Name: "option"}, {Name: "facility"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	ident := fp.ParseZval()
 	option := fp.ParseZval()
@@ -19,7 +19,7 @@ var DefZifOpenlog = def.DefFunc("openlog", 3, 3, []def.ArgInfo{{name: "ident"}, 
 })
 
 // generate by ZifCloselog
-var DefZifCloselog = def.DefFunc("closelog", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCloselog = def.DefFunc("closelog", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -27,7 +27,7 @@ var DefZifCloselog = def.DefFunc("closelog", 0, 0, []def.ArgInfo{}, func(execute
 })
 
 // generate by ZifSyslog
-var DefZifSyslog = def.DefFunc("syslog", 2, 2, []def.ArgInfo{{name: "priority"}, {name: "message"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSyslog = def.DefFunc("syslog", 2, 2, []def.ArgInfo{{Name: "priority"}, {Name: "message"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	priority := fp.ParseZval()
 	message := fp.ParseZval()

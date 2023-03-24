@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifRand
-var DefZifRand = def.DefFunc("rand", 0, 2, []def.ArgInfo{{name: "min"}, {name: "max"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRand = def.DefFunc("rand", 0, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	min := fp.ParseZval()

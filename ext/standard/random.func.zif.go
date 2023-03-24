@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifRandomBytes
-var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	length := fp.ParseZval()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifRandomBytes = def.DefFunc("random_bytes", 1, 1, []def.ArgInfo{{name: "
 })
 
 // generate by ZifRandomInt
-var DefZifRandomInt = def.DefFunc("random_int", 2, 2, []def.ArgInfo{{name: "min"}, {name: "max"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRandomInt = def.DefFunc("random_int", 2, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	min := fp.ParseZval()
 	max := fp.ParseZval()

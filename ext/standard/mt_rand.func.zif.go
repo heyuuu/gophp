@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifMtSrand
-var DefZifMtSrand = def.DefFunc("mt_srand", 0, 2, []def.ArgInfo{{name: "seed"}, {name: "mode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMtSrand = def.DefFunc("mt_srand", 0, 2, []def.ArgInfo{{Name: "seed"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	seed := fp.ParseZval()
@@ -19,7 +19,7 @@ var DefZifMtSrand = def.DefFunc("mt_srand", 0, 2, []def.ArgInfo{{name: "seed"}, 
 })
 
 // generate by ZifMtRand
-var DefZifMtRand = def.DefFunc("mt_rand", 0, 2, []def.ArgInfo{{name: "min"}, {name: "max"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMtRand = def.DefFunc("mt_rand", 0, 2, []def.ArgInfo{{Name: "min"}, {Name: "max"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	min := fp.ParseZval()
@@ -31,7 +31,7 @@ var DefZifMtRand = def.DefFunc("mt_rand", 0, 2, []def.ArgInfo{{name: "min"}, {na
 })
 
 // generate by ZifMtGetrandmax
-var DefZifMtGetrandmax = def.DefFunc("mt_getrandmax", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMtGetrandmax = def.DefFunc("mt_getrandmax", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}

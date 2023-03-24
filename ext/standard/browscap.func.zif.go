@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifGetBrowser
-var DefZifGetBrowser = def.DefFunc("get_browser", 0, 2, []def.ArgInfo{{name: "browser_name"}, {name: "return_array"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetBrowser = def.DefFunc("get_browser", 0, 2, []def.ArgInfo{{Name: "browser_name"}, {Name: "return_array"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	browser_name := fp.ParseZval()

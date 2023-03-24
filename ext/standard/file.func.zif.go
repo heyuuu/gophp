@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifFlock
-var DefZifFlock = def.DefFunc("flock", 2, 3, []def.ArgInfo{{name: "fp"}, {name: "operation"}, {name: "wouldblock"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFlock = def.DefFunc("flock", 2, 3, []def.ArgInfo{{Name: "fp"}, {Name: "operation"}, {Name: "wouldblock"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	fp := fp.ParseZval()
 	operation := fp.ParseZval()
@@ -20,7 +20,7 @@ var DefZifFlock = def.DefFunc("flock", 2, 3, []def.ArgInfo{{name: "fp"}, {name: 
 })
 
 // generate by ZifGetMetaTags
-var DefZifGetMetaTags = def.DefFunc("get_meta_tags", 1, 2, []def.ArgInfo{{name: "filename"}, {name: "use_include_path"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetMetaTags = def.DefFunc("get_meta_tags", 1, 2, []def.ArgInfo{{Name: "filename"}, {Name: "use_include_path"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	filename := fp.ParseZval()
 	fp.StartOptional()
@@ -32,7 +32,7 @@ var DefZifGetMetaTags = def.DefFunc("get_meta_tags", 1, 2, []def.ArgInfo{{name: 
 })
 
 // generate by ZifFileGetContents
-var DefZifFileGetContents = def.DefFunc("file_get_contents", 1, 5, []def.ArgInfo{{name: "filename"}, {name: "flags"}, {name: "context"}, {name: "offset"}, {name: "maxlen"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFileGetContents = def.DefFunc("file_get_contents", 1, 5, []def.ArgInfo{{Name: "filename"}, {Name: "flags"}, {Name: "context"}, {Name: "offset"}, {Name: "maxlen"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 5, 0)
 	filename := fp.ParseZval()
 	fp.StartOptional()
@@ -47,7 +47,7 @@ var DefZifFileGetContents = def.DefFunc("file_get_contents", 1, 5, []def.ArgInfo
 })
 
 // generate by ZifFilePutContents
-var DefZifFilePutContents = def.DefFunc("file_put_contents", 2, 4, []def.ArgInfo{{name: "filename"}, {name: "data"}, {name: "flags"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFilePutContents = def.DefFunc("file_put_contents", 2, 4, []def.ArgInfo{{Name: "filename"}, {Name: "data"}, {Name: "flags"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	filename := fp.ParseZval()
 	data := fp.ParseZval()
@@ -61,7 +61,7 @@ var DefZifFilePutContents = def.DefFunc("file_put_contents", 2, 4, []def.ArgInfo
 })
 
 // generate by ZifFile
-var DefZifFile = def.DefFunc("file", 1, 3, []def.ArgInfo{{name: "filename"}, {name: "flags"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFile = def.DefFunc("file", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "flags"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	filename := fp.ParseZval()
 	fp.StartOptional()
@@ -74,7 +74,7 @@ var DefZifFile = def.DefFunc("file", 1, 3, []def.ArgInfo{{name: "filename"}, {na
 })
 
 // generate by ZifTempnam
-var DefZifTempnam = def.DefFunc("tempnam", 2, 2, []def.ArgInfo{{name: "dir"}, {name: "prefix"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifTempnam = def.DefFunc("tempnam", 2, 2, []def.ArgInfo{{Name: "dir"}, {Name: "prefix"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	dir := fp.ParseZval()
 	prefix := fp.ParseZval()
@@ -85,7 +85,7 @@ var DefZifTempnam = def.DefFunc("tempnam", 2, 2, []def.ArgInfo{{name: "dir"}, {n
 })
 
 // generate by ZifFclose
-var DefZifFclose = def.DefFunc("fclose", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFclose = def.DefFunc("fclose", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -95,7 +95,7 @@ var DefZifFclose = def.DefFunc("fclose", 1, 1, []def.ArgInfo{{name: "fp"}}, func
 })
 
 // generate by ZifPopen
-var DefZifPopen = def.DefFunc("popen", 2, 2, []def.ArgInfo{{name: "command"}, {name: "mode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifPopen = def.DefFunc("popen", 2, 2, []def.ArgInfo{{Name: "command"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	command := fp.ParseZval()
 	mode := fp.ParseZval()
@@ -106,7 +106,7 @@ var DefZifPopen = def.DefFunc("popen", 2, 2, []def.ArgInfo{{name: "command"}, {n
 })
 
 // generate by ZifPclose
-var DefZifPclose = def.DefFunc("pclose", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifPclose = def.DefFunc("pclose", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -116,7 +116,7 @@ var DefZifPclose = def.DefFunc("pclose", 1, 1, []def.ArgInfo{{name: "fp"}}, func
 })
 
 // generate by ZifFeof
-var DefZifFeof = def.DefFunc("feof", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFeof = def.DefFunc("feof", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -126,7 +126,7 @@ var DefZifFeof = def.DefFunc("feof", 1, 1, []def.ArgInfo{{name: "fp"}}, func(exe
 })
 
 // generate by ZifFgets
-var DefZifFgets = def.DefFunc("fgets", 1, 2, []def.ArgInfo{{name: "fp"}, {name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFgets = def.DefFunc("fgets", 1, 2, []def.ArgInfo{{Name: "fp"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	fp := fp.ParseZval()
 	fp.StartOptional()
@@ -138,7 +138,7 @@ var DefZifFgets = def.DefFunc("fgets", 1, 2, []def.ArgInfo{{name: "fp"}, {name: 
 })
 
 // generate by ZifFgetc
-var DefZifFgetc = def.DefFunc("fgetc", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFgetc = def.DefFunc("fgetc", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -148,7 +148,7 @@ var DefZifFgetc = def.DefFunc("fgetc", 1, 1, []def.ArgInfo{{name: "fp"}}, func(e
 })
 
 // generate by ZifFgetss
-var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{name: "fp"}, {name: "length"}, {name: "allowable_tags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{Name: "fp"}, {Name: "length"}, {Name: "allowable_tags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	fp := fp.ParseZval()
 	fp.StartOptional()
@@ -161,7 +161,7 @@ var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{name: "fp"}, {name
 })
 
 // generate by ZifFwrite
-var DefZifFwrite = def.DefFunc("fwrite", 2, 3, []def.ArgInfo{{name: "fp"}, {name: "str"}, {name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFwrite = def.DefFunc("fwrite", 2, 3, []def.ArgInfo{{Name: "fp"}, {Name: "str"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	fp := fp.ParseZval()
 	str := fp.ParseZval()
@@ -174,7 +174,7 @@ var DefZifFwrite = def.DefFunc("fwrite", 2, 3, []def.ArgInfo{{name: "fp"}, {name
 })
 
 // generate by ZifFflush
-var DefZifFflush = def.DefFunc("fflush", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFflush = def.DefFunc("fflush", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -184,7 +184,7 @@ var DefZifFflush = def.DefFunc("fflush", 1, 1, []def.ArgInfo{{name: "fp"}}, func
 })
 
 // generate by ZifRewind
-var DefZifRewind = def.DefFunc("rewind", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRewind = def.DefFunc("rewind", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -194,7 +194,7 @@ var DefZifRewind = def.DefFunc("rewind", 1, 1, []def.ArgInfo{{name: "fp"}}, func
 })
 
 // generate by ZifFtell
-var DefZifFtell = def.DefFunc("ftell", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFtell = def.DefFunc("ftell", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -204,7 +204,7 @@ var DefZifFtell = def.DefFunc("ftell", 1, 1, []def.ArgInfo{{name: "fp"}}, func(e
 })
 
 // generate by ZifFseek
-var DefZifFseek = def.DefFunc("fseek", 2, 3, []def.ArgInfo{{name: "fp"}, {name: "offset"}, {name: "whence"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFseek = def.DefFunc("fseek", 2, 3, []def.ArgInfo{{Name: "fp"}, {Name: "offset"}, {Name: "whence"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	fp := fp.ParseZval()
 	offset := fp.ParseZval()
@@ -217,7 +217,7 @@ var DefZifFseek = def.DefFunc("fseek", 2, 3, []def.ArgInfo{{name: "fp"}, {name: 
 })
 
 // generate by ZifMkdir
-var DefZifMkdir = def.DefFunc("mkdir", 1, 4, []def.ArgInfo{{name: "pathname"}, {name: "mode"}, {name: "recursive"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMkdir = def.DefFunc("mkdir", 1, 4, []def.ArgInfo{{Name: "pathname"}, {Name: "mode"}, {Name: "recursive"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	pathname := fp.ParseZval()
 	fp.StartOptional()
@@ -231,7 +231,7 @@ var DefZifMkdir = def.DefFunc("mkdir", 1, 4, []def.ArgInfo{{name: "pathname"}, {
 })
 
 // generate by ZifRmdir
-var DefZifRmdir = def.DefFunc("rmdir", 1, 2, []def.ArgInfo{{name: "dirname"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRmdir = def.DefFunc("rmdir", 1, 2, []def.ArgInfo{{Name: "dirname"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	dirname := fp.ParseZval()
 	fp.StartOptional()
@@ -243,7 +243,7 @@ var DefZifRmdir = def.DefFunc("rmdir", 1, 2, []def.ArgInfo{{name: "dirname"}, {n
 })
 
 // generate by ZifReadfile
-var DefZifReadfile = def.DefFunc("readfile", 1, 3, []def.ArgInfo{{name: "filename"}, {name: "flags"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifReadfile = def.DefFunc("readfile", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "flags"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	filename := fp.ParseZval()
 	fp.StartOptional()
@@ -256,7 +256,7 @@ var DefZifReadfile = def.DefFunc("readfile", 1, 3, []def.ArgInfo{{name: "filenam
 })
 
 // generate by ZifUmask
-var DefZifUmask = def.DefFunc("umask", 0, 1, []def.ArgInfo{{name: "mask"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUmask = def.DefFunc("umask", 0, 1, []def.ArgInfo{{Name: "mask"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	mask := fp.ParseZval()
@@ -267,7 +267,7 @@ var DefZifUmask = def.DefFunc("umask", 0, 1, []def.ArgInfo{{name: "mask"}}, func
 })
 
 // generate by ZifFpassthru
-var DefZifFpassthru = def.DefFunc("fpassthru", 1, 1, []def.ArgInfo{{name: "fp"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFpassthru = def.DefFunc("fpassthru", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	fp := fp.ParseZval()
 	if fp.HasError() {
@@ -277,7 +277,7 @@ var DefZifFpassthru = def.DefFunc("fpassthru", 1, 1, []def.ArgInfo{{name: "fp"}}
 })
 
 // generate by ZifRename
-var DefZifRename = def.DefFunc("rename", 2, 3, []def.ArgInfo{{name: "old_name"}, {name: "new_name"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRename = def.DefFunc("rename", 2, 3, []def.ArgInfo{{Name: "old_name"}, {Name: "new_name"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	old_name := fp.ParseZval()
 	new_name := fp.ParseZval()
@@ -290,7 +290,7 @@ var DefZifRename = def.DefFunc("rename", 2, 3, []def.ArgInfo{{name: "old_name"},
 })
 
 // generate by ZifUnlink
-var DefZifUnlink = def.DefFunc("unlink", 1, 2, []def.ArgInfo{{name: "filename"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUnlink = def.DefFunc("unlink", 1, 2, []def.ArgInfo{{Name: "filename"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	filename := fp.ParseZval()
 	fp.StartOptional()
@@ -302,7 +302,7 @@ var DefZifUnlink = def.DefFunc("unlink", 1, 2, []def.ArgInfo{{name: "filename"},
 })
 
 // generate by ZifCopy
-var DefZifCopy = def.DefFunc("copy", 2, 3, []def.ArgInfo{{name: "source_file"}, {name: "destination_file"}, {name: "context"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCopy = def.DefFunc("copy", 2, 3, []def.ArgInfo{{Name: "source_file"}, {Name: "destination_file"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	source_file := fp.ParseZval()
 	destination_file := fp.ParseZval()
@@ -315,7 +315,7 @@ var DefZifCopy = def.DefFunc("copy", 2, 3, []def.ArgInfo{{name: "source_file"}, 
 })
 
 // generate by ZifFread
-var DefZifFread = def.DefFunc("fread", 2, 2, []def.ArgInfo{{name: "fp"}, {name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFread = def.DefFunc("fread", 2, 2, []def.ArgInfo{{Name: "fp"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	fp := fp.ParseZval()
 	length := fp.ParseZval()
@@ -326,7 +326,7 @@ var DefZifFread = def.DefFunc("fread", 2, 2, []def.ArgInfo{{name: "fp"}, {name: 
 })
 
 // generate by ZifFputcsv
-var DefZifFputcsv = def.DefFunc("fputcsv", 2, 5, []def.ArgInfo{{name: "fp"}, {name: "fields"}, {name: "delimiter"}, {name: "enclosure"}, {name: "escape_char"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFputcsv = def.DefFunc("fputcsv", 2, 5, []def.ArgInfo{{Name: "fp"}, {Name: "fields"}, {Name: "delimiter"}, {Name: "enclosure"}, {Name: "escape_char"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 5, 0)
 	fp := fp.ParseZval()
 	fields := fp.ParseZval()
@@ -341,7 +341,7 @@ var DefZifFputcsv = def.DefFunc("fputcsv", 2, 5, []def.ArgInfo{{name: "fp"}, {na
 })
 
 // generate by ZifFgetcsv
-var DefZifFgetcsv = def.DefFunc("fgetcsv", 1, 5, []def.ArgInfo{{name: "fp"}, {name: "length"}, {name: "delimiter"}, {name: "enclosure"}, {name: "escape"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFgetcsv = def.DefFunc("fgetcsv", 1, 5, []def.ArgInfo{{Name: "fp"}, {Name: "length"}, {Name: "delimiter"}, {Name: "enclosure"}, {Name: "escape"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 5, 0)
 	fp := fp.ParseZval()
 	fp.StartOptional()
@@ -356,7 +356,7 @@ var DefZifFgetcsv = def.DefFunc("fgetcsv", 1, 5, []def.ArgInfo{{name: "fp"}, {na
 })
 
 // generate by ZifRealpath
-var DefZifRealpath = def.DefFunc("realpath", 1, 1, []def.ArgInfo{{name: "path"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRealpath = def.DefFunc("realpath", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	path := fp.ParseZval()
 	if fp.HasError() {
@@ -366,7 +366,7 @@ var DefZifRealpath = def.DefFunc("realpath", 1, 1, []def.ArgInfo{{name: "path"}}
 })
 
 // generate by ZifFnmatch
-var DefZifFnmatch = def.DefFunc("fnmatch", 2, 3, []def.ArgInfo{{name: "pattern"}, {name: "filename"}, {name: "flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFnmatch = def.DefFunc("fnmatch", 2, 3, []def.ArgInfo{{Name: "pattern"}, {Name: "filename"}, {Name: "flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	pattern := fp.ParseZval()
 	filename := fp.ParseZval()
@@ -379,7 +379,7 @@ var DefZifFnmatch = def.DefFunc("fnmatch", 2, 3, []def.ArgInfo{{name: "pattern"}
 })
 
 // generate by ZifSysGetTempDir
-var DefZifSysGetTempDir = def.DefFunc("sys_get_temp_dir", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSysGetTempDir = def.DefFunc("sys_get_temp_dir", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}

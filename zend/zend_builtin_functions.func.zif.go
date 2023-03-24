@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifZendVersion
-var DefZifZendVersion = def.DefFunc("zend_version", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifZendVersion = def.DefFunc("zend_version", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -16,7 +16,7 @@ var DefZifZendVersion = def.DefFunc("zend_version", 0, 0, []def.ArgInfo{}, func(
 })
 
 // generate by ZifGcMemCaches
-var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -25,7 +25,7 @@ var DefZifGcMemCaches = def.DefFunc("gc_mem_caches", 0, 0, []def.ArgInfo{}, func
 })
 
 // generate by ZifGcCollectCycles
-var DefZifGcCollectCycles = def.DefFunc("gc_collect_cycles", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcCollectCycles = def.DefFunc("gc_collect_cycles", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -34,7 +34,7 @@ var DefZifGcCollectCycles = def.DefFunc("gc_collect_cycles", 0, 0, []def.ArgInfo
 })
 
 // generate by ZifGcEnabled
-var DefZifGcEnabled = def.DefFunc("gc_enabled", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcEnabled = def.DefFunc("gc_enabled", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -43,7 +43,7 @@ var DefZifGcEnabled = def.DefFunc("gc_enabled", 0, 0, []def.ArgInfo{}, func(exec
 })
 
 // generate by ZifGcEnable
-var DefZifGcEnable = def.DefFunc("gc_enable", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcEnable = def.DefFunc("gc_enable", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -51,7 +51,7 @@ var DefZifGcEnable = def.DefFunc("gc_enable", 0, 0, []def.ArgInfo{}, func(execut
 })
 
 // generate by ZifGcDisable
-var DefZifGcDisable = def.DefFunc("gc_disable", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcDisable = def.DefFunc("gc_disable", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -59,7 +59,7 @@ var DefZifGcDisable = def.DefFunc("gc_disable", 0, 0, []def.ArgInfo{}, func(exec
 })
 
 // generate by ZifGcStatus
-var DefZifGcStatus = def.DefFunc("gc_status", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGcStatus = def.DefFunc("gc_status", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -67,7 +67,7 @@ var DefZifGcStatus = def.DefFunc("gc_status", 0, 0, []def.ArgInfo{}, func(execut
 })
 
 // generate by ZifFuncNumArgs
-var DefZifFuncNumArgs = def.DefFunc("func_num_args", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFuncNumArgs = def.DefFunc("func_num_args", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -76,7 +76,7 @@ var DefZifFuncNumArgs = def.DefFunc("func_num_args", 0, 0, []def.ArgInfo{}, func
 })
 
 // generate by ZifFuncGetArg
-var DefZifFuncGetArg = def.DefFunc("func_get_arg", 1, 1, []def.ArgInfo{{name: "arg_num"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFuncGetArg = def.DefFunc("func_get_arg", 1, 1, []def.ArgInfo{{Name: "arg_num"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, zpp.FlagOldMode)
 	arg_num := fp.ParseLong()
 	if fp.HasError() {
@@ -86,7 +86,7 @@ var DefZifFuncGetArg = def.DefFunc("func_get_arg", 1, 1, []def.ArgInfo{{name: "a
 })
 
 // generate by ZifFuncGetArgs
-var DefZifFuncGetArgs = def.DefFunc("func_get_args", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFuncGetArgs = def.DefFunc("func_get_args", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -99,7 +99,7 @@ var DefZifFuncGetArgs = def.DefFunc("func_get_args", 0, 0, []def.ArgInfo{}, func
 })
 
 // generate by ZifStrlen
-var DefZifStrlen = def.DefFunc("strlen", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrlen = def.DefFunc("strlen", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseStr()
 	if fp.HasError() {
@@ -110,7 +110,7 @@ var DefZifStrlen = def.DefFunc("strlen", 1, 1, []def.ArgInfo{{name: "str"}}, fun
 })
 
 // generate by ZifStrcmp
-var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{name: "str1"}, {name: "str2"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	str1 := fp.ParseStringVal()
 	str2 := fp.ParseStringVal()
@@ -122,7 +122,7 @@ var DefZifStrcmp = def.DefFunc("strcmp", 2, 2, []def.ArgInfo{{name: "str1"}, {na
 })
 
 // generate by ZifStrncmp
-var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{name: "str1"}, {name: "str2"}, {name: "len_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	str1 := fp.ParseStringVal()
 	str2 := fp.ParseStringVal()
@@ -139,7 +139,7 @@ var DefZifStrncmp = def.DefFunc("strncmp", 3, 3, []def.ArgInfo{{name: "str1"}, {
 })
 
 // generate by ZifStrcasecmp
-var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{name: "str1"}, {name: "str2"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	str1 := fp.ParseStringVal()
 	str2 := fp.ParseStringVal()
@@ -151,7 +151,7 @@ var DefZifStrcasecmp = def.DefFunc("strcasecmp", 2, 2, []def.ArgInfo{{name: "str
 })
 
 // generate by ZifStrncasecmp
-var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{name: "str1"}, {name: "str2"}, {name: "len_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "len_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	str1 := fp.ParseStringVal()
 	str2 := fp.ParseStringVal()
@@ -168,7 +168,7 @@ var DefZifStrncasecmp = def.DefFunc("strncasecmp", 3, 3, []def.ArgInfo{{name: "s
 })
 
 // generate by ZifEach
-var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{name: "arr"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{Name: "arr"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arr := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -178,7 +178,7 @@ var DefZifEach = def.DefFunc("each", 1, 1, []def.ArgInfo{{name: "arr"}}, func(ex
 })
 
 // generate by ZifErrorReporting
-var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{name: "new_error_level"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{Name: "new_error_level"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	new_error_level := fp.ParseZval()
@@ -189,7 +189,7 @@ var DefZifErrorReporting = def.DefFunc("error_reporting", 0, 1, []def.ArgInfo{{n
 })
 
 // generate by ZifDefine
-var DefZifDefine = def.DefFunc("define", 2, 3, []def.ArgInfo{{name: "constant_name"}, {name: "value"}, {name: "case_insensitive"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifDefine = def.DefFunc("define", 2, 3, []def.ArgInfo{{Name: "constant_name"}, {Name: "value"}, {Name: "case_insensitive"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	constant_name := fp.ParseStringVal()
 	value := fp.ParseZval()
@@ -203,7 +203,7 @@ var DefZifDefine = def.DefFunc("define", 2, 3, []def.ArgInfo{{name: "constant_na
 })
 
 // generate by ZifDefined
-var DefZifDefined = def.DefFunc("defined", 1, 1, []def.ArgInfo{{name: "constant_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifDefined = def.DefFunc("defined", 1, 1, []def.ArgInfo{{Name: "constant_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	constant_name := fp.ParseStringVal()
 	if fp.HasError() {
@@ -214,7 +214,7 @@ var DefZifDefined = def.DefFunc("defined", 1, 1, []def.ArgInfo{{name: "constant_
 })
 
 // generate by ZifGetClass
-var DefZifGetClass = def.DefFunc("get_class", 0, 1, []def.ArgInfo{{name: "object"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetClass = def.DefFunc("get_class", 0, 1, []def.ArgInfo{{Name: "object"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	object := fp.ParseZval()
@@ -225,7 +225,7 @@ var DefZifGetClass = def.DefFunc("get_class", 0, 1, []def.ArgInfo{{name: "object
 })
 
 // generate by ZifGetCalledClass
-var DefZifGetCalledClass = def.DefFunc("get_called_class", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetCalledClass = def.DefFunc("get_called_class", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -238,7 +238,7 @@ var DefZifGetCalledClass = def.DefFunc("get_called_class", 0, 0, []def.ArgInfo{}
 })
 
 // generate by ZifGetParentClass
-var DefZifGetParentClass = def.DefFunc("get_parent_class", 0, 1, []def.ArgInfo{{name: "object"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetParentClass = def.DefFunc("get_parent_class", 0, 1, []def.ArgInfo{{Name: "object"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	object := fp.ParseZval()
@@ -249,7 +249,7 @@ var DefZifGetParentClass = def.DefFunc("get_parent_class", 0, 1, []def.ArgInfo{{
 })
 
 // generate by ZifIsSubclassOf
-var DefZifIsSubclassOf = def.DefFunc("is_subclass_of", 2, 3, []def.ArgInfo{{name: "object"}, {name: "class_name"}, {name: "allow_string"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsSubclassOf = def.DefFunc("is_subclass_of", 2, 3, []def.ArgInfo{{Name: "object"}, {Name: "class_name"}, {Name: "allow_string"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	object := fp.ParseZval()
 	class_name := fp.ParseZval()
@@ -262,7 +262,7 @@ var DefZifIsSubclassOf = def.DefFunc("is_subclass_of", 2, 3, []def.ArgInfo{{name
 })
 
 // generate by ZifIsA
-var DefZifIsA = def.DefFunc("is_a", 2, 3, []def.ArgInfo{{name: "object"}, {name: "class_name"}, {name: "allow_string"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsA = def.DefFunc("is_a", 2, 3, []def.ArgInfo{{Name: "object"}, {Name: "class_name"}, {Name: "allow_string"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	object := fp.ParseZval()
 	class_name := fp.ParseZval()
@@ -275,7 +275,7 @@ var DefZifIsA = def.DefFunc("is_a", 2, 3, []def.ArgInfo{{name: "object"}, {name:
 })
 
 // generate by ZifGetClassVars
-var DefZifGetClassVars = def.DefFunc("get_class_vars", 1, 1, []def.ArgInfo{{name: "class_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetClassVars = def.DefFunc("get_class_vars", 1, 1, []def.ArgInfo{{Name: "class_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	class_name := fp.ParseZval()
 	if fp.HasError() {
@@ -285,7 +285,7 @@ var DefZifGetClassVars = def.DefFunc("get_class_vars", 1, 1, []def.ArgInfo{{name
 })
 
 // generate by ZifGetObjectVars
-var DefZifGetObjectVars = def.DefFunc("get_object_vars", 1, 1, []def.ArgInfo{{name: "obj"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetObjectVars = def.DefFunc("get_object_vars", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	obj := fp.ParseZval()
 	if fp.HasError() {
@@ -295,7 +295,7 @@ var DefZifGetObjectVars = def.DefFunc("get_object_vars", 1, 1, []def.ArgInfo{{na
 })
 
 // generate by ZifGetMangledObjectVars
-var DefZifGetMangledObjectVars = def.DefFunc("get_mangled_object_vars", 1, 1, []def.ArgInfo{{name: "obj"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetMangledObjectVars = def.DefFunc("get_mangled_object_vars", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	obj := fp.ParseZval()
 	if fp.HasError() {
@@ -305,7 +305,7 @@ var DefZifGetMangledObjectVars = def.DefFunc("get_mangled_object_vars", 1, 1, []
 })
 
 // generate by ZifGetClassMethods
-var DefZifGetClassMethods = def.DefFunc("get_class_methods", 1, 1, []def.ArgInfo{{name: "class"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetClassMethods = def.DefFunc("get_class_methods", 1, 1, []def.ArgInfo{{Name: "class"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	class := fp.ParseZval()
 	if fp.HasError() {
@@ -315,7 +315,7 @@ var DefZifGetClassMethods = def.DefFunc("get_class_methods", 1, 1, []def.ArgInfo
 })
 
 // generate by ZifMethodExists
-var DefZifMethodExists = def.DefFunc("method_exists", 2, 2, []def.ArgInfo{{name: "object"}, {name: "method"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMethodExists = def.DefFunc("method_exists", 2, 2, []def.ArgInfo{{Name: "object"}, {Name: "method"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	object := fp.ParseZval()
 	method := fp.ParseZval()
@@ -326,7 +326,7 @@ var DefZifMethodExists = def.DefFunc("method_exists", 2, 2, []def.ArgInfo{{name:
 })
 
 // generate by ZifPropertyExists
-var DefZifPropertyExists = def.DefFunc("property_exists", 2, 2, []def.ArgInfo{{name: "object_or_class"}, {name: "property_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifPropertyExists = def.DefFunc("property_exists", 2, 2, []def.ArgInfo{{Name: "object_or_class"}, {Name: "property_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	object_or_class := fp.ParseZval()
 	property_name := fp.ParseZval()
@@ -337,7 +337,7 @@ var DefZifPropertyExists = def.DefFunc("property_exists", 2, 2, []def.ArgInfo{{n
 })
 
 // generate by ZifClassExists
-var DefZifClassExists = def.DefFunc("class_exists", 1, 2, []def.ArgInfo{{name: "classname"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifClassExists = def.DefFunc("class_exists", 1, 2, []def.ArgInfo{{Name: "classname"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	classname := fp.ParseZval()
 	fp.StartOptional()
@@ -349,7 +349,7 @@ var DefZifClassExists = def.DefFunc("class_exists", 1, 2, []def.ArgInfo{{name: "
 })
 
 // generate by ZifInterfaceExists
-var DefZifInterfaceExists = def.DefFunc("interface_exists", 1, 2, []def.ArgInfo{{name: "classname"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifInterfaceExists = def.DefFunc("interface_exists", 1, 2, []def.ArgInfo{{Name: "classname"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	classname := fp.ParseZval()
 	fp.StartOptional()
@@ -361,7 +361,7 @@ var DefZifInterfaceExists = def.DefFunc("interface_exists", 1, 2, []def.ArgInfo{
 })
 
 // generate by ZifTraitExists
-var DefZifTraitExists = def.DefFunc("trait_exists", 1, 2, []def.ArgInfo{{name: "traitname"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifTraitExists = def.DefFunc("trait_exists", 1, 2, []def.ArgInfo{{Name: "traitname"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	traitname := fp.ParseZval()
 	fp.StartOptional()
@@ -373,7 +373,7 @@ var DefZifTraitExists = def.DefFunc("trait_exists", 1, 2, []def.ArgInfo{{name: "
 })
 
 // generate by ZifFunctionExists
-var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{name: "function_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{Name: "function_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	function_name := fp.ParseZval()
 	if fp.HasError() {
@@ -383,7 +383,7 @@ var DefZifFunctionExists = def.DefFunc("function_exists", 1, 1, []def.ArgInfo{{n
 })
 
 // generate by ZifClassAlias
-var DefZifClassAlias = def.DefFunc("class_alias", 2, 3, []def.ArgInfo{{name: "user_class_name"}, {name: "alias_name"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifClassAlias = def.DefFunc("class_alias", 2, 3, []def.ArgInfo{{Name: "user_class_name"}, {Name: "alias_name"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	user_class_name := fp.ParseZval()
 	alias_name := fp.ParseZval()
@@ -396,7 +396,7 @@ var DefZifClassAlias = def.DefFunc("class_alias", 2, 3, []def.ArgInfo{{name: "us
 })
 
 // generate by ZifGetIncludedFiles
-var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -404,7 +404,7 @@ var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgIn
 })
 
 // generate by ZifTriggerError
-var DefZifTriggerError = def.DefFunc("trigger_error", 1, 2, []def.ArgInfo{{name: "message"}, {name: "error_type"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifTriggerError = def.DefFunc("trigger_error", 1, 2, []def.ArgInfo{{Name: "message"}, {Name: "error_type"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	message := fp.ParseZval()
 	fp.StartOptional()
@@ -416,7 +416,7 @@ var DefZifTriggerError = def.DefFunc("trigger_error", 1, 2, []def.ArgInfo{{name:
 })
 
 // generate by ZifSetErrorHandler
-var DefZifSetErrorHandler = def.DefFunc("set_error_handler", 1, 2, []def.ArgInfo{{name: "error_handler"}, {name: "error_types"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSetErrorHandler = def.DefFunc("set_error_handler", 1, 2, []def.ArgInfo{{Name: "error_handler"}, {Name: "error_types"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	error_handler := fp.ParseZval()
 	fp.StartOptional()
@@ -428,7 +428,7 @@ var DefZifSetErrorHandler = def.DefFunc("set_error_handler", 1, 2, []def.ArgInfo
 })
 
 // generate by ZifRestoreErrorHandler
-var DefZifRestoreErrorHandler = def.DefFunc("restore_error_handler", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRestoreErrorHandler = def.DefFunc("restore_error_handler", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -436,7 +436,7 @@ var DefZifRestoreErrorHandler = def.DefFunc("restore_error_handler", 0, 0, []def
 })
 
 // generate by ZifSetExceptionHandler
-var DefZifSetExceptionHandler = def.DefFunc("set_exception_handler", 1, 1, []def.ArgInfo{{name: "exception_handler"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSetExceptionHandler = def.DefFunc("set_exception_handler", 1, 1, []def.ArgInfo{{Name: "exception_handler"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	exception_handler := fp.ParseZval()
 	if fp.HasError() {
@@ -446,7 +446,7 @@ var DefZifSetExceptionHandler = def.DefFunc("set_exception_handler", 1, 1, []def
 })
 
 // generate by ZifRestoreExceptionHandler
-var DefZifRestoreExceptionHandler = def.DefFunc("restore_exception_handler", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRestoreExceptionHandler = def.DefFunc("restore_exception_handler", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -454,7 +454,7 @@ var DefZifRestoreExceptionHandler = def.DefFunc("restore_exception_handler", 0, 
 })
 
 // generate by ZifGetDeclaredTraits
-var DefZifGetDeclaredTraits = def.DefFunc("get_declared_traits", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetDeclaredTraits = def.DefFunc("get_declared_traits", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -462,7 +462,7 @@ var DefZifGetDeclaredTraits = def.DefFunc("get_declared_traits", 0, 0, []def.Arg
 })
 
 // generate by ZifGetDeclaredClasses
-var DefZifGetDeclaredClasses = def.DefFunc("get_declared_classes", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetDeclaredClasses = def.DefFunc("get_declared_classes", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -470,7 +470,7 @@ var DefZifGetDeclaredClasses = def.DefFunc("get_declared_classes", 0, 0, []def.A
 })
 
 // generate by ZifGetDeclaredInterfaces
-var DefZifGetDeclaredInterfaces = def.DefFunc("get_declared_interfaces", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetDeclaredInterfaces = def.DefFunc("get_declared_interfaces", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -478,7 +478,7 @@ var DefZifGetDeclaredInterfaces = def.DefFunc("get_declared_interfaces", 0, 0, [
 })
 
 // generate by ZifGetDefinedFunctions
-var DefZifGetDefinedFunctions = def.DefFunc("get_defined_functions", 0, 1, []def.ArgInfo{{name: "exclude_disabled"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetDefinedFunctions = def.DefFunc("get_defined_functions", 0, 1, []def.ArgInfo{{Name: "exclude_disabled"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	exclude_disabled := fp.ParseZval()
@@ -489,7 +489,7 @@ var DefZifGetDefinedFunctions = def.DefFunc("get_defined_functions", 0, 1, []def
 })
 
 // generate by ZifGetDefinedVars
-var DefZifGetDefinedVars = def.DefFunc("get_defined_vars", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetDefinedVars = def.DefFunc("get_defined_vars", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -497,7 +497,7 @@ var DefZifGetDefinedVars = def.DefFunc("get_defined_vars", 0, 0, []def.ArgInfo{}
 })
 
 // generate by ZifCreateFunction
-var DefZifCreateFunction = def.DefFunc("create_function", 2, 2, []def.ArgInfo{{name: "args"}, {name: "code"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCreateFunction = def.DefFunc("create_function", 2, 2, []def.ArgInfo{{Name: "args"}, {Name: "code"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	args := fp.ParseZval()
 	code := fp.ParseZval()
@@ -508,7 +508,7 @@ var DefZifCreateFunction = def.DefFunc("create_function", 2, 2, []def.ArgInfo{{n
 })
 
 // generate by ZifGetResourceType
-var DefZifGetResourceType = def.DefFunc("get_resource_type", 1, 1, []def.ArgInfo{{name: "res"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetResourceType = def.DefFunc("get_resource_type", 1, 1, []def.ArgInfo{{Name: "res"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	res := fp.ParseZval()
 	if fp.HasError() {
@@ -518,7 +518,7 @@ var DefZifGetResourceType = def.DefFunc("get_resource_type", 1, 1, []def.ArgInfo
 })
 
 // generate by ZifGetResources
-var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{name: "type_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{Name: "type_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	type_ := fp.ParseZval()
@@ -529,7 +529,7 @@ var DefZifGetResources = def.DefFunc("get_resources", 0, 1, []def.ArgInfo{{name:
 })
 
 // generate by ZifGetLoadedExtensions
-var DefZifGetLoadedExtensions = def.DefFunc("get_loaded_extensions", 0, 1, []def.ArgInfo{{name: "zend_extensions"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetLoadedExtensions = def.DefFunc("get_loaded_extensions", 0, 1, []def.ArgInfo{{Name: "zend_extensions"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	zend_extensions := fp.ParseZval()
@@ -540,7 +540,7 @@ var DefZifGetLoadedExtensions = def.DefFunc("get_loaded_extensions", 0, 1, []def
 })
 
 // generate by ZifGetDefinedConstants
-var DefZifGetDefinedConstants = def.DefFunc("get_defined_constants", 0, 1, []def.ArgInfo{{name: "categorize"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetDefinedConstants = def.DefFunc("get_defined_constants", 0, 1, []def.ArgInfo{{Name: "categorize"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	categorize := fp.ParseZval()
@@ -551,7 +551,7 @@ var DefZifGetDefinedConstants = def.DefFunc("get_defined_constants", 0, 1, []def
 })
 
 // generate by ZifDebugPrintBacktrace
-var DefZifDebugPrintBacktrace = def.DefFunc("debug_print_backtrace", 0, 2, []def.ArgInfo{{name: "options"}, {name: "limit"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifDebugPrintBacktrace = def.DefFunc("debug_print_backtrace", 0, 2, []def.ArgInfo{{Name: "options"}, {Name: "limit"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	options := fp.ParseZval()
@@ -563,7 +563,7 @@ var DefZifDebugPrintBacktrace = def.DefFunc("debug_print_backtrace", 0, 2, []def
 })
 
 // generate by ZifDebugBacktrace
-var DefZifDebugBacktrace = def.DefFunc("debug_backtrace", 0, 2, []def.ArgInfo{{name: "options"}, {name: "limit"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifDebugBacktrace = def.DefFunc("debug_backtrace", 0, 2, []def.ArgInfo{{Name: "options"}, {Name: "limit"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	options := fp.ParseZval()
@@ -575,7 +575,7 @@ var DefZifDebugBacktrace = def.DefFunc("debug_backtrace", 0, 2, []def.ArgInfo{{n
 })
 
 // generate by ZifExtensionLoaded
-var DefZifExtensionLoaded = def.DefFunc("extension_loaded", 1, 1, []def.ArgInfo{{name: "extension_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifExtensionLoaded = def.DefFunc("extension_loaded", 1, 1, []def.ArgInfo{{Name: "extension_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	extension_name := fp.ParseZval()
 	if fp.HasError() {
@@ -585,7 +585,7 @@ var DefZifExtensionLoaded = def.DefFunc("extension_loaded", 1, 1, []def.ArgInfo{
 })
 
 // generate by ZifGetExtensionFuncs
-var DefZifGetExtensionFuncs = def.DefFunc("get_extension_funcs", 1, 1, []def.ArgInfo{{name: "extension_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetExtensionFuncs = def.DefFunc("get_extension_funcs", 1, 1, []def.ArgInfo{{Name: "extension_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	extension_name := fp.ParseZval()
 	if fp.HasError() {

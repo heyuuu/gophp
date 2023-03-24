@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifConvertUuencode
-var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{{name: "data"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	data := fp.ParseZval()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifConvertUuencode = def.DefFunc("convert_uuencode", 1, 1, []def.ArgInfo{
 })
 
 // generate by ZifConvertUudecode
-var DefZifConvertUudecode = def.DefFunc("convert_uudecode", 1, 1, []def.ArgInfo{{name: "data"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifConvertUudecode = def.DefFunc("convert_uudecode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	data := fp.ParseZval()
 	if fp.HasError() {

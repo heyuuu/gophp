@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifGetmyuid
-var DefZifGetmyuid = def.DefFunc("getmyuid", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetmyuid = def.DefFunc("getmyuid", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -15,7 +15,7 @@ var DefZifGetmyuid = def.DefFunc("getmyuid", 0, 0, []def.ArgInfo{}, func(execute
 })
 
 // generate by ZifGetmygid
-var DefZifGetmygid = def.DefFunc("getmygid", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetmygid = def.DefFunc("getmygid", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -23,7 +23,7 @@ var DefZifGetmygid = def.DefFunc("getmygid", 0, 0, []def.ArgInfo{}, func(execute
 })
 
 // generate by ZifGetmypid
-var DefZifGetmypid = def.DefFunc("getmypid", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetmypid = def.DefFunc("getmypid", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -31,7 +31,7 @@ var DefZifGetmypid = def.DefFunc("getmypid", 0, 0, []def.ArgInfo{}, func(execute
 })
 
 // generate by ZifGetmyinode
-var DefZifGetmyinode = def.DefFunc("getmyinode", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetmyinode = def.DefFunc("getmyinode", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -39,7 +39,7 @@ var DefZifGetmyinode = def.DefFunc("getmyinode", 0, 0, []def.ArgInfo{}, func(exe
 })
 
 // generate by ZifGetlastmod
-var DefZifGetlastmod = def.DefFunc("getlastmod", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGetlastmod = def.DefFunc("getlastmod", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}

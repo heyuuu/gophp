@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifProcTerminate
-var DefZifProcTerminate = def.DefFunc("proc_terminate", 1, 2, []def.ArgInfo{{name: "process"}, {name: "signal"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifProcTerminate = def.DefFunc("proc_terminate", 1, 2, []def.ArgInfo{{Name: "process"}, {Name: "signal"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	process := fp.ParseZval()
 	fp.StartOptional()
@@ -19,7 +19,7 @@ var DefZifProcTerminate = def.DefFunc("proc_terminate", 1, 2, []def.ArgInfo{{nam
 })
 
 // generate by ZifProcClose
-var DefZifProcClose = def.DefFunc("proc_close", 1, 1, []def.ArgInfo{{name: "process"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifProcClose = def.DefFunc("proc_close", 1, 1, []def.ArgInfo{{Name: "process"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	process := fp.ParseZval()
 	if fp.HasError() {
@@ -29,7 +29,7 @@ var DefZifProcClose = def.DefFunc("proc_close", 1, 1, []def.ArgInfo{{name: "proc
 })
 
 // generate by ZifProcGetStatus
-var DefZifProcGetStatus = def.DefFunc("proc_get_status", 1, 1, []def.ArgInfo{{name: "process"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifProcGetStatus = def.DefFunc("proc_get_status", 1, 1, []def.ArgInfo{{Name: "process"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	process := fp.ParseZval()
 	if fp.HasError() {
@@ -39,7 +39,7 @@ var DefZifProcGetStatus = def.DefFunc("proc_get_status", 1, 1, []def.ArgInfo{{na
 })
 
 // generate by ZifProcOpen
-var DefZifProcOpen = def.DefFunc("proc_open", 3, 6, []def.ArgInfo{{name: "command"}, {name: "descriptorspec"}, {name: "pipes"}, {name: "cwd"}, {name: "env"}, {name: "other_options"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifProcOpen = def.DefFunc("proc_open", 3, 6, []def.ArgInfo{{Name: "command"}, {Name: "descriptorspec"}, {Name: "pipes"}, {Name: "cwd"}, {Name: "env"}, {Name: "other_options"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 6, 0)
 	command := fp.ParseZval()
 	descriptorspec := fp.ParseZval()

@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifHttpBuildQuery
-var DefZifHttpBuildQuery = def.DefFunc("http_build_query", 1, 4, []def.ArgInfo{{name: "formdata"}, {name: "prefix"}, {name: "arg_separator"}, {name: "enc_type"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHttpBuildQuery = def.DefFunc("http_build_query", 1, 4, []def.ArgInfo{{Name: "formdata"}, {Name: "prefix"}, {Name: "arg_separator"}, {Name: "enc_type"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	formdata := fp.ParseZval()
 	fp.StartOptional()

@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifBin2hex
-var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{name: "data"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	data := fp.ParseZval()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{name: "data"}}, 
 })
 
 // generate by ZifHex2bin
-var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{name: "data"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	data := fp.ParseZval()
 	if fp.HasError() {
@@ -27,7 +27,7 @@ var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{name: "data"}}, 
 })
 
 // generate by ZifStrspn
-var DefZifStrspn = def.DefFunc("strspn", 2, 4, []def.ArgInfo{{name: "str"}, {name: "mask"}, {name: "start"}, {name: "len_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrspn = def.DefFunc("strspn", 2, 4, []def.ArgInfo{{Name: "str"}, {Name: "mask"}, {Name: "start"}, {Name: "len_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	str := fp.ParseZval()
 	mask := fp.ParseZval()
@@ -41,7 +41,7 @@ var DefZifStrspn = def.DefFunc("strspn", 2, 4, []def.ArgInfo{{name: "str"}, {nam
 })
 
 // generate by ZifStrcspn
-var DefZifStrcspn = def.DefFunc("strcspn", 2, 4, []def.ArgInfo{{name: "str"}, {name: "mask"}, {name: "start"}, {name: "len_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrcspn = def.DefFunc("strcspn", 2, 4, []def.ArgInfo{{Name: "str"}, {Name: "mask"}, {Name: "start"}, {Name: "len_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	str := fp.ParseZval()
 	mask := fp.ParseZval()
@@ -55,7 +55,7 @@ var DefZifStrcspn = def.DefFunc("strcspn", 2, 4, []def.ArgInfo{{name: "str"}, {n
 })
 
 // generate by ZifStrcoll
-var DefZifStrcoll = def.DefFunc("strcoll", 2, 2, []def.ArgInfo{{name: "str1"}, {name: "str2"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrcoll = def.DefFunc("strcoll", 2, 2, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	str1 := fp.ParseZval()
 	str2 := fp.ParseZval()
@@ -66,7 +66,7 @@ var DefZifStrcoll = def.DefFunc("strcoll", 2, 2, []def.ArgInfo{{name: "str1"}, {
 })
 
 // generate by ZifTrim
-var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{name: "str"}, {name: "character_mask"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -78,7 +78,7 @@ var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{name: "str"}, {name: "
 })
 
 // generate by ZifRtrim
-var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{name: "str"}, {name: "character_mask"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -90,7 +90,7 @@ var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{name: "str"}, {name:
 })
 
 // generate by ZifLtrim
-var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{name: "str"}, {name: "character_mask"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -102,7 +102,7 @@ var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{name: "str"}, {name:
 })
 
 // generate by ZifWordwrap
-var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{name: "str"}, {name: "width"}, {name: "break_"}, {name: "cut"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{Name: "str"}, {Name: "width"}, {Name: "break_"}, {Name: "cut"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -116,7 +116,7 @@ var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{name: "str"}, 
 })
 
 // generate by ZifExplode
-var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{name: "separator"}, {name: "str"}, {name: "limit"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator"}, {Name: "str"}, {Name: "limit"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	separator := fp.ParseZval()
 	str := fp.ParseZval()
@@ -129,7 +129,7 @@ var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{name: "separator
 })
 
 // generate by ZifImplode
-var DefZifImplode = def.DefFunc("implode", 2, 2, []def.ArgInfo{{name: "glue"}, {name: "pieces"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifImplode = def.DefFunc("implode", 2, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	glue := fp.ParseZval()
 	pieces := fp.ParseZval()
@@ -140,7 +140,7 @@ var DefZifImplode = def.DefFunc("implode", 2, 2, []def.ArgInfo{{name: "glue"}, {
 })
 
 // generate by ZifStrtok
-var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{name: "str"}, {name: "token"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "token"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -152,7 +152,7 @@ var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{name: "str"}, {nam
 })
 
 // generate by ZifStrtoupper
-var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -162,7 +162,7 @@ var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{name: "str
 })
 
 // generate by ZifStrtolower
-var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -172,7 +172,7 @@ var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{name: "str
 })
 
 // generate by ZifBasename
-var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{name: "path"}, {name: "suffix"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "suffix"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	path := fp.ParseZval()
 	fp.StartOptional()
@@ -184,7 +184,7 @@ var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{name: "path"},
 })
 
 // generate by ZifDirname
-var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{name: "path"}, {name: "levels"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "levels"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	path := fp.ParseZval()
 	fp.StartOptional()
@@ -196,7 +196,7 @@ var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{name: "path"}, {
 })
 
 // generate by ZifPathinfo
-var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{name: "path"}, {name: "options"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "options"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	path := fp.ParseZval()
 	fp.StartOptional()
@@ -208,7 +208,7 @@ var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{name: "path"},
 })
 
 // generate by ZifStristr
-var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "part"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -221,7 +221,7 @@ var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{name: "haystack"
 })
 
 // generate by ZifStrstr
-var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "part"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -234,7 +234,7 @@ var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{name: "haystack"},
 })
 
 // generate by ZifStrpos
-var DefZifStrpos = def.DefFunc("strpos", 2, 3, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "offset"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrpos = def.DefFunc("strpos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -247,7 +247,7 @@ var DefZifStrpos = def.DefFunc("strpos", 2, 3, []def.ArgInfo{{name: "haystack"},
 })
 
 // generate by ZifStripos
-var DefZifStripos = def.DefFunc("stripos", 2, 3, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "offset"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStripos = def.DefFunc("stripos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -260,7 +260,7 @@ var DefZifStripos = def.DefFunc("stripos", 2, 3, []def.ArgInfo{{name: "haystack"
 })
 
 // generate by ZifStrrpos
-var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "offset"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -273,7 +273,7 @@ var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{name: "haystack"
 })
 
 // generate by ZifStrripos
-var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "offset"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -286,7 +286,7 @@ var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{name: "haystac
 })
 
 // generate by ZifStrrchr
-var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{name: "haystack"}, {name: "needle"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -297,7 +297,7 @@ var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{name: "haystack"
 })
 
 // generate by ZifChunkSplit
-var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{name: "str"}, {name: "chunklen"}, {name: "ending"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "chunklen"}, {Name: "ending"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -310,7 +310,7 @@ var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{name: "st
 })
 
 // generate by ZifSubstr
-var DefZifSubstr = def.DefFunc("substr", 2, 3, []def.ArgInfo{{name: "str"}, {name: "start"}, {name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSubstr = def.DefFunc("substr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name: "start"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	str := fp.ParseZval()
 	start := fp.ParseZval()
@@ -323,7 +323,7 @@ var DefZifSubstr = def.DefFunc("substr", 2, 3, []def.ArgInfo{{name: "str"}, {nam
 })
 
 // generate by ZifSubstrReplace
-var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{name: "str"}, {name: "replace"}, {name: "start"}, {name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{Name: "str"}, {Name: "replace"}, {Name: "start"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 4, 0)
 	str := fp.ParseZval()
 	replace := fp.ParseZval()
@@ -337,7 +337,7 @@ var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{nam
 })
 
 // generate by ZifQuotemeta
-var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -347,7 +347,7 @@ var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{name: "str"}
 })
 
 // generate by ZifOrd
-var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{name: "character"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{Name: "character"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	character := fp.ParseZval()
 	if fp.HasError() {
@@ -357,7 +357,7 @@ var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{name: "character"}}, fun
 })
 
 // generate by ZifChr
-var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{name: "codepoint"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	codepoint := fp.ParseZval()
 	if fp.HasError() {
@@ -367,7 +367,7 @@ var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{name: "codepoint"}}, fun
 })
 
 // generate by ZifUcfirst
-var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -377,7 +377,7 @@ var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{name: "str"}}, f
 })
 
 // generate by ZifLcfirst
-var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -387,7 +387,7 @@ var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{name: "str"}}, f
 })
 
 // generate by ZifUcwords
-var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{name: "str"}, {name: "delimiters"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "delimiters"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -399,7 +399,7 @@ var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{name: "str"}, {n
 })
 
 // generate by ZifStrtr
-var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{name: "str"}, {name: "from"}, {name: "to"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	str := fp.ParseZval()
 	from := fp.ParseZval()
@@ -412,7 +412,7 @@ var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{name: "str"}, {name:
 })
 
 // generate by ZifStrrev
-var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -422,7 +422,7 @@ var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{name: "str"}}, fun
 })
 
 // generate by ZifSimilarText
-var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{name: "str1"}, {name: "str2"}, {name: "percent"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "percent"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	str1 := fp.ParseZval()
 	str2 := fp.ParseZval()
@@ -435,7 +435,7 @@ var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{name: "
 })
 
 // generate by ZifAddcslashes
-var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{name: "str"}, {name: "charlist"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{Name: "str"}, {Name: "charlist"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	str := fp.ParseZval()
 	charlist := fp.ParseZval()
@@ -446,7 +446,7 @@ var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{name: "s
 })
 
 // generate by ZifAddslashes
-var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -456,7 +456,7 @@ var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{name: "str
 })
 
 // generate by ZifStripcslashes
-var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -466,7 +466,7 @@ var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{name
 })
 
 // generate by ZifStripslashes
-var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -476,7 +476,7 @@ var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{name: 
 })
 
 // generate by ZifStrReplace
-var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{name: "search"}, {name: "replace"}, {name: "subject"}, {name: "replace_count"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 4, 0)
 	search := fp.ParseZval()
 	replace := fp.ParseZval()
@@ -490,7 +490,7 @@ var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{name: "se
 })
 
 // generate by ZifStrIreplace
-var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{name: "search"}, {name: "replace"}, {name: "subject"}, {name: "replace_count"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "search"}, {Name: "replace"}, {Name: "subject"}, {Name: "replace_count"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 4, 0)
 	search := fp.ParseZval()
 	replace := fp.ParseZval()
@@ -504,7 +504,7 @@ var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{name: "
 })
 
 // generate by ZifHebrev
-var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{name: "str"}, {name: "max_chars_per_line"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "max_chars_per_line"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -516,7 +516,7 @@ var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{name: "str"}, {nam
 })
 
 // generate by ZifHebrevc
-var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{name: "str"}, {name: "max_chars_per_line"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "max_chars_per_line"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -528,7 +528,7 @@ var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{name: "str"}, {n
 })
 
 // generate by ZifNl2br
-var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{name: "str"}, {name: "is_xhtml"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "is_xhtml"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -540,7 +540,7 @@ var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{name: "str"}, {name:
 })
 
 // generate by ZifStripTags
-var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{name: "str"}, {name: "allowable_tags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "allowable_tags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -552,7 +552,7 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{name: "str"
 })
 
 // generate by ZifSetlocale
-var DefZifSetlocale = def.DefFunc("setlocale", -1, -1, []def.ArgInfo{{name: "category"}, {name: "locales"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSetlocale = def.DefFunc("setlocale", -1, -1, []def.ArgInfo{{Name: "category"}, {Name: "locales"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	category := fp.ParseZval()
 	locales := fp.ParseVariadic()
@@ -563,7 +563,7 @@ var DefZifSetlocale = def.DefFunc("setlocale", -1, -1, []def.ArgInfo{{name: "cat
 })
 
 // generate by ZifParseStr
-var DefZifParseStr = def.DefFunc("parse_str", 1, 2, []def.ArgInfo{{name: "encoded_string"}, {name: "result"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifParseStr = def.DefFunc("parse_str", 1, 2, []def.ArgInfo{{Name: "encoded_string"}, {Name: "result"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	encoded_string := fp.ParseZval()
 	fp.StartOptional()
@@ -575,7 +575,7 @@ var DefZifParseStr = def.DefFunc("parse_str", 1, 2, []def.ArgInfo{{name: "encode
 })
 
 // generate by ZifStrGetcsv
-var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{name: "string"}, {name: "delimiter"}, {name: "enclosure"}, {name: "escape"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{Name: "string"}, {Name: "delimiter"}, {Name: "enclosure"}, {Name: "escape"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
 	string := fp.ParseZval()
 	fp.StartOptional()
@@ -589,7 +589,7 @@ var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{name: "stri
 })
 
 // generate by ZifStrRepeat
-var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{name: "input"}, {name: "mult"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "input"}, {Name: "mult"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	input := fp.ParseZval()
 	mult := fp.ParseZval()
@@ -600,7 +600,7 @@ var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{name: "inpu
 })
 
 // generate by ZifCountChars
-var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{name: "input"}, {name: "mode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	input := fp.ParseZval()
 	fp.StartOptional()
@@ -612,7 +612,7 @@ var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{name: "in
 })
 
 // generate by ZifStrnatcmp
-var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{name: "s1"}, {name: "s2"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{Name: "s1"}, {Name: "s2"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	s1 := fp.ParseZval()
 	s2 := fp.ParseZval()
@@ -623,7 +623,7 @@ var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{name: "s1"},
 })
 
 // generate by ZifLocaleconv
-var DefZifLocaleconv = def.DefFunc("localeconv", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifLocaleconv = def.DefFunc("localeconv", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -631,7 +631,7 @@ var DefZifLocaleconv = def.DefFunc("localeconv", 0, 0, []def.ArgInfo{}, func(exe
 })
 
 // generate by ZifStrnatcasecmp
-var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{name: "s1"}, {name: "s2"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{Name: "s1"}, {Name: "s2"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	s1 := fp.ParseZval()
 	s2 := fp.ParseZval()
@@ -642,7 +642,7 @@ var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{name
 })
 
 // generate by ZifSubstrCount
-var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{name: "haystack"}, {name: "needle"}, {name: "offset"}, {name: "length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()
@@ -656,7 +656,7 @@ var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{name: "
 })
 
 // generate by ZifStrPad
-var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{name: "input"}, {name: "pad_length"}, {name: "pad_string"}, {name: "pad_type"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {Name: "pad_length"}, {Name: "pad_string"}, {Name: "pad_type"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	input := fp.ParseZval()
 	pad_length := fp.ParseZval()
@@ -670,7 +670,7 @@ var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{name: "input"}, {
 })
 
 // generate by ZifStrRot13
-var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -680,7 +680,7 @@ var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{name: "str"}}
 })
 
 // generate by ZifStrShuffle
-var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{name: "str"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -690,7 +690,7 @@ var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{name: "st
 })
 
 // generate by ZifStrWordCount
-var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{name: "str"}, {name: "format"}, {name: "charlist"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "format"}, {Name: "charlist"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -703,7 +703,7 @@ var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{name
 })
 
 // generate by ZifMoneyFormat
-var DefZifMoneyFormat = def.DefFunc("money_format", 2, 2, []def.ArgInfo{{name: "format"}, {name: "value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMoneyFormat = def.DefFunc("money_format", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	format := fp.ParseZval()
 	value := fp.ParseZval()
@@ -714,7 +714,7 @@ var DefZifMoneyFormat = def.DefFunc("money_format", 2, 2, []def.ArgInfo{{name: "
 })
 
 // generate by ZifStrSplit
-var DefZifStrSplit = def.DefFunc("str_split", 1, 2, []def.ArgInfo{{name: "str"}, {name: "split_length"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrSplit = def.DefFunc("str_split", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "split_length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()
@@ -726,7 +726,7 @@ var DefZifStrSplit = def.DefFunc("str_split", 1, 2, []def.ArgInfo{{name: "str"},
 })
 
 // generate by ZifStrpbrk
-var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{name: "haystack"}, {name: "char_list"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{Name: "haystack"}, {Name: "char_list"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	haystack := fp.ParseZval()
 	char_list := fp.ParseZval()
@@ -737,7 +737,7 @@ var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{name: "haystack"
 })
 
 // generate by ZifSubstrCompare
-var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{name: "main_str"}, {name: "str"}, {name: "offset"}, {name: "length"}, {name: "case_sensitivity"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Name: "main_str"}, {Name: "str"}, {Name: "offset"}, {Name: "length"}, {Name: "case_sensitivity"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 5, 0)
 	main_str := fp.ParseZval()
 	str := fp.ParseZval()
@@ -752,7 +752,7 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{nam
 })
 
 // generate by ZifUtf8Encode
-var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{name: "data"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	data := fp.ParseZval()
 	if fp.HasError() {
@@ -762,7 +762,7 @@ var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{name: "da
 })
 
 // generate by ZifUtf8Decode
-var DefZifUtf8Decode = def.DefFunc("utf8_decode", 1, 1, []def.ArgInfo{{name: "data"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUtf8Decode = def.DefFunc("utf8_decode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	data := fp.ParseZval()
 	if fp.HasError() {

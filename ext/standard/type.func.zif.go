@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifGettype
-var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -17,7 +17,7 @@ var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{name: "var_"}}, 
 })
 
 // generate by ZifSettype
-var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{name: "var_"}, {name: "type_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{Name: "var_"}, {Name: "type_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	var_ := fp.ParseZvalEx(false, true)
 	type_ := fp.ParseZval()
@@ -28,7 +28,7 @@ var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{name: "var_"}, {
 })
 
 // generate by ZifIntval
-var DefZifIntval = def.DefFunc("intval", 1, 2, []def.ArgInfo{{name: "var_"}, {name: "base"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIntval = def.DefFunc("intval", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name: "base"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
@@ -40,7 +40,7 @@ var DefZifIntval = def.DefFunc("intval", 1, 2, []def.ArgInfo{{name: "var_"}, {na
 })
 
 // generate by ZifFloatval
-var DefZifFloatval = def.DefFunc("floatval", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifFloatval = def.DefFunc("floatval", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -50,7 +50,7 @@ var DefZifFloatval = def.DefFunc("floatval", 1, 1, []def.ArgInfo{{name: "var_"}}
 })
 
 // generate by ZifBoolval
-var DefZifBoolval = def.DefFunc("boolval", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifBoolval = def.DefFunc("boolval", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -60,7 +60,7 @@ var DefZifBoolval = def.DefFunc("boolval", 1, 1, []def.ArgInfo{{name: "var_"}}, 
 })
 
 // generate by ZifStrval
-var DefZifStrval = def.DefFunc("strval", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifStrval = def.DefFunc("strval", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -70,7 +70,7 @@ var DefZifStrval = def.DefFunc("strval", 1, 1, []def.ArgInfo{{name: "var_"}}, fu
 })
 
 // generate by ZifIsNull
-var DefZifIsNull = def.DefFunc("is_null", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsNull = def.DefFunc("is_null", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -80,7 +80,7 @@ var DefZifIsNull = def.DefFunc("is_null", 1, 1, []def.ArgInfo{{name: "var_"}}, f
 })
 
 // generate by ZifIsResource
-var DefZifIsResource = def.DefFunc("is_resource", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsResource = def.DefFunc("is_resource", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -90,7 +90,7 @@ var DefZifIsResource = def.DefFunc("is_resource", 1, 1, []def.ArgInfo{{name: "va
 })
 
 // generate by ZifIsBool
-var DefZifIsBool = def.DefFunc("is_bool", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsBool = def.DefFunc("is_bool", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -100,7 +100,7 @@ var DefZifIsBool = def.DefFunc("is_bool", 1, 1, []def.ArgInfo{{name: "var_"}}, f
 })
 
 // generate by ZifIsInt
-var DefZifIsInt = def.DefFunc("is_int", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsInt = def.DefFunc("is_int", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -110,7 +110,7 @@ var DefZifIsInt = def.DefFunc("is_int", 1, 1, []def.ArgInfo{{name: "var_"}}, fun
 })
 
 // generate by ZifIsFloat
-var DefZifIsFloat = def.DefFunc("is_float", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsFloat = def.DefFunc("is_float", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -120,7 +120,7 @@ var DefZifIsFloat = def.DefFunc("is_float", 1, 1, []def.ArgInfo{{name: "var_"}},
 })
 
 // generate by ZifIsString
-var DefZifIsString = def.DefFunc("is_string", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsString = def.DefFunc("is_string", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -130,7 +130,7 @@ var DefZifIsString = def.DefFunc("is_string", 1, 1, []def.ArgInfo{{name: "var_"}
 })
 
 // generate by ZifIsArray
-var DefZifIsArray = def.DefFunc("is_array", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsArray = def.DefFunc("is_array", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -140,7 +140,7 @@ var DefZifIsArray = def.DefFunc("is_array", 1, 1, []def.ArgInfo{{name: "var_"}},
 })
 
 // generate by ZifIsObject
-var DefZifIsObject = def.DefFunc("is_object", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsObject = def.DefFunc("is_object", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -150,7 +150,7 @@ var DefZifIsObject = def.DefFunc("is_object", 1, 1, []def.ArgInfo{{name: "var_"}
 })
 
 // generate by ZifIsNumeric
-var DefZifIsNumeric = def.DefFunc("is_numeric", 1, 1, []def.ArgInfo{{name: "value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsNumeric = def.DefFunc("is_numeric", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	value := fp.ParseZval()
 	if fp.HasError() {
@@ -160,7 +160,7 @@ var DefZifIsNumeric = def.DefFunc("is_numeric", 1, 1, []def.ArgInfo{{name: "valu
 })
 
 // generate by ZifIsScalar
-var DefZifIsScalar = def.DefFunc("is_scalar", 1, 1, []def.ArgInfo{{name: "value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsScalar = def.DefFunc("is_scalar", 1, 1, []def.ArgInfo{{Name: "value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	value := fp.ParseZval()
 	if fp.HasError() {
@@ -170,7 +170,7 @@ var DefZifIsScalar = def.DefFunc("is_scalar", 1, 1, []def.ArgInfo{{name: "value"
 })
 
 // generate by ZifIsCallable
-var DefZifIsCallable = def.DefFunc("is_callable", 1, 3, []def.ArgInfo{{name: "var_"}, {name: "syntax_only"}, {name: "callable_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsCallable = def.DefFunc("is_callable", 1, 3, []def.ArgInfo{{Name: "var_"}, {Name: "syntax_only"}, {Name: "callable_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
@@ -183,7 +183,7 @@ var DefZifIsCallable = def.DefFunc("is_callable", 1, 3, []def.ArgInfo{{name: "va
 })
 
 // generate by ZifIsIterable
-var DefZifIsIterable = def.DefFunc("is_iterable", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsIterable = def.DefFunc("is_iterable", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {
@@ -193,7 +193,7 @@ var DefZifIsIterable = def.DefFunc("is_iterable", 1, 1, []def.ArgInfo{{name: "va
 })
 
 // generate by ZifIsCountable
-var DefZifIsCountable = def.DefFunc("is_countable", 1, 1, []def.ArgInfo{{name: "var_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifIsCountable = def.DefFunc("is_countable", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {

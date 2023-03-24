@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifClassParents
-var DefZifClassParents = def.DefFunc("class_parents", 1, 2, []def.ArgInfo{{name: "instance"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifClassParents = def.DefFunc("class_parents", 1, 2, []def.ArgInfo{{Name: "instance"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	instance := fp.ParseZval()
 	fp.StartOptional()
@@ -19,7 +19,7 @@ var DefZifClassParents = def.DefFunc("class_parents", 1, 2, []def.ArgInfo{{name:
 })
 
 // generate by ZifClassImplements
-var DefZifClassImplements = def.DefFunc("class_implements", 1, 2, []def.ArgInfo{{name: "what"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifClassImplements = def.DefFunc("class_implements", 1, 2, []def.ArgInfo{{Name: "what"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	what := fp.ParseZval()
 	fp.StartOptional()
@@ -31,7 +31,7 @@ var DefZifClassImplements = def.DefFunc("class_implements", 1, 2, []def.ArgInfo{
 })
 
 // generate by ZifClassUses
-var DefZifClassUses = def.DefFunc("class_uses", 1, 2, []def.ArgInfo{{name: "what"}, {name: "autoload"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifClassUses = def.DefFunc("class_uses", 1, 2, []def.ArgInfo{{Name: "what"}, {Name: "autoload"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	what := fp.ParseZval()
 	fp.StartOptional()
@@ -43,7 +43,7 @@ var DefZifClassUses = def.DefFunc("class_uses", 1, 2, []def.ArgInfo{{name: "what
 })
 
 // generate by ZifSplClasses
-var DefZifSplClasses = def.DefFunc("spl_classes", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplClasses = def.DefFunc("spl_classes", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -51,7 +51,7 @@ var DefZifSplClasses = def.DefFunc("spl_classes", 0, 0, []def.ArgInfo{}, func(ex
 })
 
 // generate by ZifSplAutoload
-var DefZifSplAutoload = def.DefFunc("spl_autoload", 1, 2, []def.ArgInfo{{name: "class_name"}, {name: "file_extensions"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplAutoload = def.DefFunc("spl_autoload", 1, 2, []def.ArgInfo{{Name: "class_name"}, {Name: "file_extensions"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	class_name := fp.ParseZval()
 	fp.StartOptional()
@@ -63,7 +63,7 @@ var DefZifSplAutoload = def.DefFunc("spl_autoload", 1, 2, []def.ArgInfo{{name: "
 })
 
 // generate by ZifSplAutoloadExtensions
-var DefZifSplAutoloadExtensions = def.DefFunc("spl_autoload_extensions", 0, 1, []def.ArgInfo{{name: "file_extensions"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplAutoloadExtensions = def.DefFunc("spl_autoload_extensions", 0, 1, []def.ArgInfo{{Name: "file_extensions"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	file_extensions := fp.ParseZval()
@@ -74,7 +74,7 @@ var DefZifSplAutoloadExtensions = def.DefFunc("spl_autoload_extensions", 0, 1, [
 })
 
 // generate by ZifSplAutoloadCall
-var DefZifSplAutoloadCall = def.DefFunc("spl_autoload_call", 1, 1, []def.ArgInfo{{name: "class_name"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplAutoloadCall = def.DefFunc("spl_autoload_call", 1, 1, []def.ArgInfo{{Name: "class_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	class_name := fp.ParseZval()
 	if fp.HasError() {
@@ -84,7 +84,7 @@ var DefZifSplAutoloadCall = def.DefFunc("spl_autoload_call", 1, 1, []def.ArgInfo
 })
 
 // generate by ZifSplAutoloadRegister
-var DefZifSplAutoloadRegister = def.DefFunc("spl_autoload_register", 0, 3, []def.ArgInfo{{name: "autoload_function"}, {name: "throw"}, {name: "prepend"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplAutoloadRegister = def.DefFunc("spl_autoload_register", 0, 3, []def.ArgInfo{{Name: "autoload_function"}, {Name: "throw"}, {Name: "prepend"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 0, 3, 0)
 	fp.StartOptional()
 	autoload_function := fp.ParseZval()
@@ -97,7 +97,7 @@ var DefZifSplAutoloadRegister = def.DefFunc("spl_autoload_register", 0, 3, []def
 })
 
 // generate by ZifSplAutoloadUnregister
-var DefZifSplAutoloadUnregister = def.DefFunc("spl_autoload_unregister", 1, 1, []def.ArgInfo{{name: "autoload_function"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplAutoloadUnregister = def.DefFunc("spl_autoload_unregister", 1, 1, []def.ArgInfo{{Name: "autoload_function"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	autoload_function := fp.ParseZval()
 	if fp.HasError() {
@@ -107,7 +107,7 @@ var DefZifSplAutoloadUnregister = def.DefFunc("spl_autoload_unregister", 1, 1, [
 })
 
 // generate by ZifSplAutoloadFunctions
-var DefZifSplAutoloadFunctions = def.DefFunc("spl_autoload_functions", 0, 0, []def.ArgInfo{}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplAutoloadFunctions = def.DefFunc("spl_autoload_functions", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -115,7 +115,7 @@ var DefZifSplAutoloadFunctions = def.DefFunc("spl_autoload_functions", 0, 0, []d
 })
 
 // generate by ZifSplObjectHash
-var DefZifSplObjectHash = def.DefFunc("spl_object_hash", 1, 1, []def.ArgInfo{{name: "obj"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplObjectHash = def.DefFunc("spl_object_hash", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	obj := fp.ParseZval()
 	if fp.HasError() {
@@ -125,7 +125,7 @@ var DefZifSplObjectHash = def.DefFunc("spl_object_hash", 1, 1, []def.ArgInfo{{na
 })
 
 // generate by ZifSplObjectId
-var DefZifSplObjectId = def.DefFunc("spl_object_id", 1, 1, []def.ArgInfo{{name: "obj"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSplObjectId = def.DefFunc("spl_object_id", 1, 1, []def.ArgInfo{{Name: "obj"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	obj := fp.ParseZval()
 	if fp.HasError() {

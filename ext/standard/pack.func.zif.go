@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifPack
-var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{name: "format"}, {name: "args"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	format := fp.ParseZval()
 	fp.StartOptional()
@@ -19,7 +19,7 @@ var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{name: "format"}, {nam
 })
 
 // generate by ZifUnpack
-var DefZifUnpack = def.DefFunc("unpack", 2, 3, []def.ArgInfo{{name: "format"}, {name: "input"}, {name: "offset"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUnpack = def.DefFunc("unpack", 2, 3, []def.ArgInfo{{Name: "format"}, {Name: "input"}, {Name: "offset"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	format := fp.ParseZval()
 	input := fp.ParseZval()

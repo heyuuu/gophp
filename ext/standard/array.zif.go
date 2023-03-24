@@ -7,7 +7,7 @@ import (
 )
 
 // generate by ZifKrsort
-var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	arg := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
@@ -20,7 +20,7 @@ var DefZifKrsort = def.DefFunc("krsort", 1, 2, []def.ArgInfo{{name: "arg"}, {nam
 })
 
 // generate by ZifKsort
-var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	arg := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
@@ -33,7 +33,7 @@ var DefZifKsort = def.DefFunc("ksort", 1, 2, []def.ArgInfo{{name: "arg"}, {name:
 })
 
 // generate by ZifCount
-var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{name: "var_"}, {name: "mode"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	var_ := fp.ParseZval()
 	fp.StartOptional()
@@ -45,7 +45,7 @@ var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{name: "var_"}, {name
 })
 
 // generate by ZifNatsort
-var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -55,7 +55,7 @@ var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{name: "arg"}}, f
 })
 
 // generate by ZifNatcasesort
-var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -65,7 +65,7 @@ var DefZifNatcasesort = def.DefFunc("natcasesort", 1, 1, []def.ArgInfo{{name: "a
 })
 
 // generate by ZifAsort
-var DefZifAsort = def.DefFunc("asort", 3, 3, []def.ArgInfo{{name: "arg"}, {name: "_"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifAsort = def.DefFunc("asort", 3, 3, []def.ArgInfo{{Name: "arg"}, {Name: "_"}, {Name: "sort_flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arg := fp.ParseZvalEx(false, true)
 	_ := fp.ParseArrayEx(false, true)
@@ -78,7 +78,7 @@ var DefZifAsort = def.DefFunc("asort", 3, 3, []def.ArgInfo{{name: "arg"}, {name:
 })
 
 // generate by ZifArsort
-var DefZifArsort = def.DefFunc("arsort", 3, 3, []def.ArgInfo{{name: "arg"}, {name: "_"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArsort = def.DefFunc("arsort", 3, 3, []def.ArgInfo{{Name: "arg"}, {Name: "_"}, {Name: "sort_flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arg := fp.ParseZvalEx(false, true)
 	_ := fp.ParseArrayEx(false, true)
@@ -91,7 +91,7 @@ var DefZifArsort = def.DefFunc("arsort", 3, 3, []def.ArgInfo{{name: "arg"}, {nam
 })
 
 // generate by ZifSort
-var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	arg := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
@@ -104,7 +104,7 @@ var DefZifSort = def.DefFunc("sort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "
 })
 
 // generate by ZifRsort
-var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "sort_flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "sort_flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	arg := fp.ParseArrayEx(false, true)
 	fp.StartOptional()
@@ -117,7 +117,7 @@ var DefZifRsort = def.DefFunc("rsort", 1, 2, []def.ArgInfo{{name: "arg"}, {name:
 })
 
 // generate by ZifUsort
-var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{name: "arg"}, {name: "cmp_function"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name: "cmp_function"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	arg := fp.ParseZvalEx(false, true)
 	cmp_function := fp.ParseZval()
@@ -128,7 +128,7 @@ var DefZifUsort = def.DefFunc("usort", 2, 2, []def.ArgInfo{{name: "arg"}, {name:
 })
 
 // generate by ZifUasort
-var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{name: "arg"}, {name: "cmp_function"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name: "cmp_function"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	arg := fp.ParseZvalEx(false, true)
 	cmp_function := fp.ParseZval()
@@ -139,7 +139,7 @@ var DefZifUasort = def.DefFunc("uasort", 2, 2, []def.ArgInfo{{name: "arg"}, {nam
 })
 
 // generate by ZifUksort
-var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{name: "arg"}, {name: "cmp_function"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{Name: "arg"}, {Name: "cmp_function"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	arg := fp.ParseZvalEx(false, true)
 	cmp_function := fp.ParseZval()
@@ -150,7 +150,7 @@ var DefZifUksort = def.DefFunc("uksort", 2, 2, []def.ArgInfo{{name: "arg"}, {nam
 })
 
 // generate by ZifEnd
-var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -160,7 +160,7 @@ var DefZifEnd = def.DefFunc("end", 1, 1, []def.ArgInfo{{name: "arg"}}, func(exec
 })
 
 // generate by ZifPrev
-var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -170,7 +170,7 @@ var DefZifPrev = def.DefFunc("prev", 1, 1, []def.ArgInfo{{name: "arg"}}, func(ex
 })
 
 // generate by ZifNext
-var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -180,7 +180,7 @@ var DefZifNext = def.DefFunc("next", 1, 1, []def.ArgInfo{{name: "arg"}}, func(ex
 })
 
 // generate by ZifReset
-var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -190,7 +190,7 @@ var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{name: "arg"}}, func(
 })
 
 // generate by ZifCurrent
-var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -200,7 +200,7 @@ var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{name: "arg"}}, f
 })
 
 // generate by ZifKey
-var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -210,7 +210,7 @@ var DefZifKey = def.DefFunc("key", 1, 1, []def.ArgInfo{{name: "arg"}}, func(exec
 })
 
 // generate by ZifMin
-var DefZifMin = def.DefFunc("min", -1, -1, []def.ArgInfo{{name: "args"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMin = def.DefFunc("min", -1, -1, []def.ArgInfo{{Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	args := fp.ParseVariadic()
 	if fp.HasError() {
@@ -220,7 +220,7 @@ var DefZifMin = def.DefFunc("min", -1, -1, []def.ArgInfo{{name: "args"}}, func(e
 })
 
 // generate by ZifMax
-var DefZifMax = def.DefFunc("max", -1, -1, []def.ArgInfo{{name: "args"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifMax = def.DefFunc("max", -1, -1, []def.ArgInfo{{Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	args := fp.ParseVariadic()
 	if fp.HasError() {
@@ -230,7 +230,7 @@ var DefZifMax = def.DefFunc("max", -1, -1, []def.ArgInfo{{name: "args"}}, func(e
 })
 
 // generate by ZifArrayWalk
-var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{name: "input"}, {name: "funcname"}, {name: "userdata"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{Name: "input"}, {Name: "funcname"}, {Name: "userdata"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	input := fp.ParseZvalEx(false, true)
 	funcname := fp.ParseZval()
@@ -243,7 +243,7 @@ var DefZifArrayWalk = def.DefFunc("array_walk", 2, 3, []def.ArgInfo{{name: "inpu
 })
 
 // generate by ZifArrayWalkRecursive
-var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.ArgInfo{{name: "input"}, {name: "funcname"}, {name: "userdata"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.ArgInfo{{Name: "input"}, {Name: "funcname"}, {Name: "userdata"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	input := fp.ParseZvalEx(false, true)
 	funcname := fp.ParseZval()
@@ -256,7 +256,7 @@ var DefZifArrayWalkRecursive = def.DefFunc("array_walk_recursive", 2, 3, []def.A
 })
 
 // generate by ZifInArray
-var DefZifInArray = def.DefFunc("in_array", 2, 3, []def.ArgInfo{{name: "needle"}, {name: "haystack"}, {name: "strict"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifInArray = def.DefFunc("in_array", 2, 3, []def.ArgInfo{{Name: "needle"}, {Name: "haystack"}, {Name: "strict"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	needle := fp.ParseZval()
 	haystack := fp.ParseZval()
@@ -269,7 +269,7 @@ var DefZifInArray = def.DefFunc("in_array", 2, 3, []def.ArgInfo{{name: "needle"}
 })
 
 // generate by ZifArraySearch
-var DefZifArraySearch = def.DefFunc("array_search", 2, 3, []def.ArgInfo{{name: "needle"}, {name: "haystack"}, {name: "strict"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArraySearch = def.DefFunc("array_search", 2, 3, []def.ArgInfo{{Name: "needle"}, {Name: "haystack"}, {Name: "strict"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	needle := fp.ParseZval()
 	haystack := fp.ParseZval()
@@ -282,7 +282,7 @@ var DefZifArraySearch = def.DefFunc("array_search", 2, 3, []def.ArgInfo{{name: "
 })
 
 // generate by ZifCompact
-var DefZifCompact = def.DefFunc("compact", -1, -1, []def.ArgInfo{{name: "var_names"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifCompact = def.DefFunc("compact", -1, -1, []def.ArgInfo{{Name: "var_names"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	var_names := fp.ParseVariadic()
 	if fp.HasError() {
@@ -292,7 +292,7 @@ var DefZifCompact = def.DefFunc("compact", -1, -1, []def.ArgInfo{{name: "var_nam
 })
 
 // generate by ZifArrayFill
-var DefZifArrayFill = def.DefFunc("array_fill", 3, 3, []def.ArgInfo{{name: "start_key"}, {name: "num"}, {name: "val"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayFill = def.DefFunc("array_fill", 3, 3, []def.ArgInfo{{Name: "start_key"}, {Name: "num"}, {Name: "val"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	start_key := fp.ParseZval()
 	num := fp.ParseZval()
@@ -304,7 +304,7 @@ var DefZifArrayFill = def.DefFunc("array_fill", 3, 3, []def.ArgInfo{{name: "star
 })
 
 // generate by ZifArrayFillKeys
-var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{name: "keys"}, {name: "val"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{Name: "keys"}, {Name: "val"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	keys := fp.ParseZval()
 	val := fp.ParseZval()
@@ -315,7 +315,7 @@ var DefZifArrayFillKeys = def.DefFunc("array_fill_keys", 2, 2, []def.ArgInfo{{na
 })
 
 // generate by ZifRange
-var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{name: "low"}, {name: "high"}, {name: "step"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{Name: "low"}, {Name: "high"}, {Name: "step"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	low := fp.ParseZval()
 	high := fp.ParseZval()
@@ -328,7 +328,7 @@ var DefZifRange = def.DefFunc("range", 2, 3, []def.ArgInfo{{name: "low"}, {name:
 })
 
 // generate by ZifShuffle
-var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -338,7 +338,7 @@ var DefZifShuffle = def.DefFunc("shuffle", 1, 1, []def.ArgInfo{{name: "arg"}}, f
 })
 
 // generate by ZifArrayPush
-var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{name: "stack"}, {name: "vars"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	stack := fp.ParseZvalEx(false, true)
 	fp.StartOptional()
@@ -350,7 +350,7 @@ var DefZifArrayPush = def.DefFunc("array_push", 1, -1, []def.ArgInfo{{name: "sta
 })
 
 // generate by ZifArrayPop
-var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{name: "stack"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{Name: "stack"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	stack := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -360,7 +360,7 @@ var DefZifArrayPop = def.DefFunc("array_pop", 1, 1, []def.ArgInfo{{name: "stack"
 })
 
 // generate by ZifArrayShift
-var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{name: "stack"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{Name: "stack"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	stack := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
@@ -370,7 +370,7 @@ var DefZifArrayShift = def.DefFunc("array_shift", 1, 1, []def.ArgInfo{{name: "st
 })
 
 // generate by ZifArrayUnshift
-var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{name: "stack"}, {name: "vars"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{Name: "stack"}, {Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	stack := fp.ParseZvalEx(false, true)
 	fp.StartOptional()
@@ -382,7 +382,7 @@ var DefZifArrayUnshift = def.DefFunc("array_unshift", 1, -1, []def.ArgInfo{{name
 })
 
 // generate by ZifArraySplice
-var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{name: "arg"}, {name: "offset"}, {name: "length"}, {name: "replacement"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{Name: "arg"}, {Name: "offset"}, {Name: "length"}, {Name: "replacement"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	arg := fp.ParseZvalEx(false, true)
 	offset := fp.ParseZval()
@@ -396,7 +396,7 @@ var DefZifArraySplice = def.DefFunc("array_splice", 2, 4, []def.ArgInfo{{name: "
 })
 
 // generate by ZifArraySlice
-var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{name: "arg"}, {name: "offset"}, {name: "length"}, {name: "preserve_keys"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{Name: "arg"}, {Name: "offset"}, {Name: "length"}, {Name: "preserve_keys"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
 	arg := fp.ParseZval()
 	offset := fp.ParseZval()
@@ -410,7 +410,7 @@ var DefZifArraySlice = def.DefFunc("array_slice", 2, 4, []def.ArgInfo{{name: "ar
 })
 
 // generate by ZifArrayMerge
-var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -418,7 +418,7 @@ var DefZifArrayMerge = def.DefFunc("array_merge", 0, -1, []def.ArgInfo{{name: "a
 })
 
 // generate by ZifArrayMergeRecursive
-var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []def.ArgInfo{{name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []def.ArgInfo{{Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -426,7 +426,7 @@ var DefZifArrayMergeRecursive = def.DefFunc("array_merge_recursive", 0, -1, []de
 })
 
 // generate by ZifArrayReplace
-var DefZifArrayReplace = def.DefFunc("array_replace", 1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayReplace = def.DefFunc("array_replace", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	arr1 := fp.ParseZval()
 	fp.StartOptional()
@@ -438,7 +438,7 @@ var DefZifArrayReplace = def.DefFunc("array_replace", 1, -1, []def.ArgInfo{{name
 })
 
 // generate by ZifArrayReplaceRecursive
-var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	arr1 := fp.ParseZval()
 	fp.StartOptional()
@@ -450,7 +450,7 @@ var DefZifArrayReplaceRecursive = def.DefFunc("array_replace_recursive", 1, -1, 
 })
 
 // generate by ZifArrayKeys
-var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{name: "arg"}, {name: "search_value"}, {name: "strict"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{Name: "arg"}, {Name: "search_value"}, {Name: "strict"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	arg := fp.ParseZval()
 	fp.StartOptional()
@@ -463,7 +463,7 @@ var DefZifArrayKeys = def.DefFunc("array_keys", 1, 3, []def.ArgInfo{{name: "arg"
 })
 
 // generate by ZifArrayKeyFirst
-var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -473,7 +473,7 @@ var DefZifArrayKeyFirst = def.DefFunc("array_key_first", 1, 1, []def.ArgInfo{{na
 })
 
 // generate by ZifArrayKeyLast
-var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -483,7 +483,7 @@ var DefZifArrayKeyLast = def.DefFunc("array_key_last", 1, 1, []def.ArgInfo{{name
 })
 
 // generate by ZifArrayValues
-var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -493,7 +493,7 @@ var DefZifArrayValues = def.DefFunc("array_values", 1, 1, []def.ArgInfo{{name: "
 })
 
 // generate by ZifArrayCountValues
-var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -503,7 +503,7 @@ var DefZifArrayCountValues = def.DefFunc("array_count_values", 1, 1, []def.ArgIn
 })
 
 // generate by ZifArrayColumn
-var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{name: "arg"}, {name: "column_key"}, {name: "index_key"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{Name: "arg"}, {Name: "column_key"}, {Name: "index_key"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	arg := fp.ParseZval()
 	column_key := fp.ParseZval()
@@ -516,7 +516,7 @@ var DefZifArrayColumn = def.DefFunc("array_column", 2, 3, []def.ArgInfo{{name: "
 })
 
 // generate by ZifArrayReverse
-var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{name: "input"}, {name: "preserve_keys"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "preserve_keys"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	input := fp.ParseZval()
 	fp.StartOptional()
@@ -528,7 +528,7 @@ var DefZifArrayReverse = def.DefFunc("array_reverse", 1, 2, []def.ArgInfo{{name:
 })
 
 // generate by ZifArrayPad
-var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{name: "arg"}, {name: "pad_size"}, {name: "pad_value"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{Name: "arg"}, {Name: "pad_size"}, {Name: "pad_value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arg := fp.ParseZval()
 	pad_size := fp.ParseZval()
@@ -540,7 +540,7 @@ var DefZifArrayPad = def.DefFunc("array_pad", 3, 3, []def.ArgInfo{{name: "arg"},
 })
 
 // generate by ZifArrayFlip
-var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -550,7 +550,7 @@ var DefZifArrayFlip = def.DefFunc("array_flip", 1, 1, []def.ArgInfo{{name: "arg"
 })
 
 // generate by ZifArrayChangeKeyCase
-var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.ArgInfo{{name: "input"}, {name: "case_"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "case_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	input := fp.ParseZval()
 	fp.StartOptional()
@@ -562,7 +562,7 @@ var DefZifArrayChangeKeyCase = def.DefFunc("array_change_key_case", 1, 2, []def.
 })
 
 // generate by ZifArrayUnique
-var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "flags"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	arg := fp.ParseZval()
 	fp.StartOptional()
@@ -574,7 +574,7 @@ var DefZifArrayUnique = def.DefFunc("array_unique", 1, 2, []def.ArgInfo{{name: "
 })
 
 // generate by ZifArrayIntersectKey
-var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", -1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", -1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	arr1 := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -585,7 +585,7 @@ var DefZifArrayIntersectKey = def.DefFunc("array_intersect_key", -1, -1, []def.A
 })
 
 // generate by ZifArrayIntersectUkey
-var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_key_compare_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -597,7 +597,7 @@ var DefZifArrayIntersectUkey = def.DefFunc("array_intersect_ukey", 3, 3, []def.A
 })
 
 // generate by ZifArrayIntersect
-var DefZifArrayIntersect = def.DefFunc("array_intersect", -1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayIntersect = def.DefFunc("array_intersect", -1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	arr1 := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -608,7 +608,7 @@ var DefZifArrayIntersect = def.DefFunc("array_intersect", -1, -1, []def.ArgInfo{
 })
 
 // generate by ZifArrayUintersect
-var DefZifArrayUintersect = def.DefFunc("array_uintersect", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_data_compare_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUintersect = def.DefFunc("array_uintersect", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_compare_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -620,7 +620,7 @@ var DefZifArrayUintersect = def.DefFunc("array_uintersect", 3, 3, []def.ArgInfo{
 })
 
 // generate by ZifArrayIntersectAssoc
-var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", -1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", -1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	arr1 := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -631,7 +631,7 @@ var DefZifArrayIntersectAssoc = def.DefFunc("array_intersect_assoc", -1, -1, []d
 })
 
 // generate by ZifArrayIntersectUassoc
-var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_key_compare_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -643,7 +643,7 @@ var DefZifArrayIntersectUassoc = def.DefFunc("array_intersect_uassoc", 3, 3, []d
 })
 
 // generate by ZifArrayUintersectAssoc
-var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_data_compare_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_compare_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -655,7 +655,7 @@ var DefZifArrayUintersectAssoc = def.DefFunc("array_uintersect_assoc", 3, 3, []d
 })
 
 // generate by ZifArrayUintersectUassoc
-var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 4, 4, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_data_compare_func"}, {name: "callback_key_compare_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 4, 4, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_compare_func"}, {Name: "callback_key_compare_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 4, 4, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -668,7 +668,7 @@ var DefZifArrayUintersectUassoc = def.DefFunc("array_uintersect_uassoc", 4, 4, [
 })
 
 // generate by ZifArrayDiffKey
-var DefZifArrayDiffKey = def.DefFunc("array_diff_key", -1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayDiffKey = def.DefFunc("array_diff_key", -1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	arr1 := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -679,7 +679,7 @@ var DefZifArrayDiffKey = def.DefFunc("array_diff_key", -1, -1, []def.ArgInfo{{na
 })
 
 // generate by ZifArrayDiffUkey
-var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_key_comp_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -691,7 +691,7 @@ var DefZifArrayDiffUkey = def.DefFunc("array_diff_ukey", 3, 3, []def.ArgInfo{{na
 })
 
 // generate by ZifArrayDiff
-var DefZifArrayDiff = def.DefFunc("array_diff", -1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayDiff = def.DefFunc("array_diff", -1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	arr1 := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -702,7 +702,7 @@ var DefZifArrayDiff = def.DefFunc("array_diff", -1, -1, []def.ArgInfo{{name: "ar
 })
 
 // generate by ZifArrayUdiff
-var DefZifArrayUdiff = def.DefFunc("array_udiff", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_data_comp_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUdiff = def.DefFunc("array_udiff", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_comp_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -714,7 +714,7 @@ var DefZifArrayUdiff = def.DefFunc("array_udiff", 3, 3, []def.ArgInfo{{name: "ar
 })
 
 // generate by ZifArrayDiffAssoc
-var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", -1, -1, []def.ArgInfo{{name: "arr1"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", -1, -1, []def.ArgInfo{{Name: "arr1"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	arr1 := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -725,7 +725,7 @@ var DefZifArrayDiffAssoc = def.DefFunc("array_diff_assoc", -1, -1, []def.ArgInfo
 })
 
 // generate by ZifArrayDiffUassoc
-var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_data_comp_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_comp_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -737,7 +737,7 @@ var DefZifArrayDiffUassoc = def.DefFunc("array_diff_uassoc", 3, 3, []def.ArgInfo
 })
 
 // generate by ZifArrayUdiffAssoc
-var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 3, 3, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_key_comp_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 3, 3, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -749,7 +749,7 @@ var DefZifArrayUdiffAssoc = def.DefFunc("array_udiff_assoc", 3, 3, []def.ArgInfo
 })
 
 // generate by ZifArrayUdiffUassoc
-var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 4, 4, []def.ArgInfo{{name: "arr1"}, {name: "arr2"}, {name: "callback_data_comp_func"}, {name: "callback_key_comp_func"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 4, 4, []def.ArgInfo{{Name: "arr1"}, {Name: "arr2"}, {Name: "callback_data_comp_func"}, {Name: "callback_key_comp_func"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 4, 4, 0)
 	arr1 := fp.ParseZval()
 	arr2 := fp.ParseZval()
@@ -762,7 +762,7 @@ var DefZifArrayUdiffUassoc = def.DefFunc("array_udiff_uassoc", 4, 4, []def.ArgIn
 })
 
 // generate by ZifArrayRand
-var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{name: "arg"}, {name: "num_req"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{Name: "arg"}, {Name: "num_req"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	arg := fp.ParseZval()
 	fp.StartOptional()
@@ -774,7 +774,7 @@ var DefZifArrayRand = def.DefFunc("array_rand", 1, 2, []def.ArgInfo{{name: "arg"
 })
 
 // generate by ZifArraySum
-var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -784,7 +784,7 @@ var DefZifArraySum = def.DefFunc("array_sum", 1, 1, []def.ArgInfo{{name: "arg"}}
 })
 
 // generate by ZifArrayProduct
-var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{name: "arg"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -794,7 +794,7 @@ var DefZifArrayProduct = def.DefFunc("array_product", 1, 1, []def.ArgInfo{{name:
 })
 
 // generate by ZifArrayReduce
-var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{name: "arg"}, {name: "callback"}, {name: "initial"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{Name: "arg"}, {Name: "callback"}, {Name: "initial"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	arg := fp.ParseZval()
 	callback := fp.ParseZval()
@@ -807,7 +807,7 @@ var DefZifArrayReduce = def.DefFunc("array_reduce", 2, 3, []def.ArgInfo{{name: "
 })
 
 // generate by ZifArrayFilter
-var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{name: "arg"}, {name: "callback"}, {name: "use_keys"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{Name: "arg"}, {Name: "callback"}, {Name: "use_keys"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	arg := fp.ParseZval()
 	fp.StartOptional()
@@ -820,7 +820,7 @@ var DefZifArrayFilter = def.DefFunc("array_filter", 1, 3, []def.ArgInfo{{name: "
 })
 
 // generate by ZifArrayMap
-var DefZifArrayMap = def.DefFunc("array_map", -1, -1, []def.ArgInfo{{name: "callback"}, {name: "arrays"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayMap = def.DefFunc("array_map", -1, -1, []def.ArgInfo{{Name: "callback"}, {Name: "arrays"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, -1, -1, 0)
 	callback := fp.ParseZval()
 	arrays := fp.ParseVariadic()
@@ -831,7 +831,7 @@ var DefZifArrayMap = def.DefFunc("array_map", -1, -1, []def.ArgInfo{{name: "call
 })
 
 // generate by ZifArrayKeyExists
-var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{name: "key"}, {name: "search"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "search"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	key := fp.ParseZval()
 	search := fp.ParseZval()
@@ -842,7 +842,7 @@ var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{
 })
 
 // generate by ZifArrayChunk
-var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{name: "arg"}, {name: "size"}, {name: "preserve_keys"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{Name: "arg"}, {Name: "size"}, {Name: "preserve_keys"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	arg := fp.ParseZval()
 	size := fp.ParseZval()
@@ -855,7 +855,7 @@ var DefZifArrayChunk = def.DefFunc("array_chunk", 2, 3, []def.ArgInfo{{name: "ar
 })
 
 // generate by ZifArrayCombine
-var DefZifArrayCombine = def.DefFunc("array_combine", 2, 2, []def.ArgInfo{{name: "keys"}, {name: "values"}}, func(executeData *ZendExecuteData, returnValue *types.Zval) {
+var DefZifArrayCombine = def.DefFunc("array_combine", 2, 2, []def.ArgInfo{{Name: "keys"}, {Name: "values"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	keys := fp.ParseZval()
 	values := fp.ParseZval()
