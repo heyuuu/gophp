@@ -1,9 +1,9 @@
 package streams
 
 import (
+	"sik/zend/def"
 	"sik/zend/types"
 	"sik/zend/zpp"
-	"sik/zend/def"
 )
 
 // generate by ZifStreamWrapperRegister
