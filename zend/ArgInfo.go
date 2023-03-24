@@ -33,6 +33,10 @@ func (this *ArgInfo) ByReference() uint8   { return this.byReference }
 func (this *ArgInfo) IsVariadic() bool     { return this.isVariadic }
 func (this *ArgInfo) RequiredNumArgs() int { return this.requiredNumArgs }
 
+func MakeArgName(name string) ArgInfo {
+	return ArgInfo{name: name}
+}
+
 func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	argInfo := ArgInfo{name: name}
 	for _, opt := range opts {

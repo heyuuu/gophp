@@ -36,9 +36,9 @@ var ZendFuncsThrowable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 }
 var ArginfoExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(0),
-	zend.MakeArgInfo("message"),
-	zend.MakeArgInfo("code"),
-	zend.MakeArgInfo("previous"),
+	zend.MakeArgName("message"),
+	zend.MakeArgName("code"),
+	zend.MakeArgName("previous"),
 }
 var DefaultExceptionFunctions = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("__clone", zend.ZEND_ACC_PRIVATE|zend.ZEND_ACC_FINAL, ZimExceptionClone, nil),
@@ -55,12 +55,12 @@ var DefaultExceptionFunctions = []types.ZendFunctionEntry{
 }
 var ArginfoErrorExceptionConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(0),
-	zend.MakeArgInfo("message"),
-	zend.MakeArgInfo("code"),
-	zend.MakeArgInfo("severity"),
-	zend.MakeArgInfo("filename"),
-	zend.MakeArgInfo("lineno"),
-	zend.MakeArgInfo("previous"),
+	zend.MakeArgName("message"),
+	zend.MakeArgName("code"),
+	zend.MakeArgName("severity"),
+	zend.MakeArgName("filename"),
+	zend.MakeArgName("lineno"),
+	zend.MakeArgName("previous"),
 }
 var ErrorExceptionFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct),

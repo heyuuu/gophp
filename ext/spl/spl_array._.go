@@ -1,5 +1,3 @@
-// <<generate>>
-
 package spl
 
 import (
@@ -7,49 +5,9 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <ext/spl/spl_array.h>
-
-/*
-   +----------------------------------------------------------------------+
-   | PHP Version 7                                                        |
-   +----------------------------------------------------------------------+
-   | Copyright (c) The PHP Group                                          |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 3.01 of the PHP license,      |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
-   | If you did not receive a copy of the PHP license and are unable to   |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@php.net so we can mail you a copy immediately.               |
-   +----------------------------------------------------------------------+
-   | Authors: Marcus Boerger <helly@php.net>                              |
-   +----------------------------------------------------------------------+
-*/
-
 var spl_ce_ArrayObject *types.ClassEntry
 var spl_ce_ArrayIterator *types.ClassEntry
 var spl_ce_RecursiveArrayIterator *types.ClassEntry
-
-// Source: <ext/spl/spl_array.c>
-
-/*
-   +----------------------------------------------------------------------+
-   | PHP Version 7                                                        |
-   +----------------------------------------------------------------------+
-   | Copyright (c) The PHP Group                                          |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 3.01 of the PHP license,      |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
-   | If you did not receive a copy of the PHP license and are unable to   |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@php.net so we can mail you a copy immediately.               |
-   +----------------------------------------------------------------------+
-   | Authors: Marcus Boerger <helly@php.net>                              |
-   +----------------------------------------------------------------------+
-*/
 
 var spl_handler_ArrayObject zend.ZendObjectHandlers
 var spl_handler_ArrayIterator zend.ZendObjectHandlers
@@ -70,184 +28,121 @@ const SPL_ARRAY_METHOD_NO_ARG = 0
 const SPL_ARRAY_METHOD_USE_ARG = 1
 const SPL_ARRAY_METHOD_MAY_USER_ARG = 2
 
-/* {{{ spl_array_object_new_ex */
-
-/* {{{ proto bool ArrayObject::offsetExists(mixed $index)
-    proto bool ArrayIterator::offsetExists(mixed $index)
-Returns whether the requested $index exists. */
-
-/* {{{ proto mixed ArrayObject::offsetGet(mixed $index)
-    proto mixed ArrayIterator::offsetGet(mixed $index)
-Returns the value at the specified $index. */
-
-/* {{{ proto void ArrayObject::offsetSet(mixed $index, mixed $newval)
-    proto void ArrayIterator::offsetSet(mixed $index, mixed $newval)
-Sets the value at the specified $index to $newval. */
-
-/* {{{ proto void ArrayObject::append(mixed $newval)
-    proto void ArrayIterator::append(mixed $newval)
-Appends the value (cannot be called for objects). */
-
-/* {{{ proto void ArrayObject::offsetUnset(mixed $index)
-    proto void ArrayIterator::offsetUnset(mixed $index)
-Unsets the value at the specified $index. */
-
-/* {{{ proto array ArrayObject::getArrayCopy()
-   proto array ArrayIterator::getArrayCopy()
-Return a copy of the contained array */
-
 var SplArrayItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplArrayItDtor, SplArrayItValid, SplArrayItGetCurrentData, SplArrayItGetCurrentKey, SplArrayItMoveForward, SplArrayItRewind, nil)
 
-/* {{{ proto int ArrayObject::count()
-    proto int ArrayIterator::count()
-Return the number of elements in the Iterator. */
-
-/* {{{ proto int ArrayObject::asort([int $sort_flags = SORT_REGULAR ])
-    proto int ArrayIterator::asort([int $sort_flags = SORT_REGULAR ])
-Sort the entries by values. */
-
-/* {{{ proto int ArrayObject::ksort([int $sort_flags = SORT_REGULAR ])
-    proto int ArrayIterator::ksort([int $sort_flags = SORT_REGULAR ])
-Sort the entries by key. */
-
-/* {{{ proto int ArrayObject::uasort(callback cmp_function)
-    proto int ArrayIterator::uasort(callback cmp_function)
-Sort the entries by values user defined function. */
-
-/* {{{ proto int ArrayObject::uksort(callback cmp_function)
-    proto int ArrayIterator::uksort(callback cmp_function)
-Sort the entries by key using user defined function. */
-
-/* {{{ proto int ArrayObject::natsort()
-    proto int ArrayIterator::natsort()
-Sort the entries by values using "natural order" algorithm. */
-
-/* {{{ proto int ArrayObject::natcasesort()
-    proto int ArrayIterator::natcasesort()
-Sort the entries by key using case insensitive "natural order" algorithm. */
-
-/* {{{ proto mixed|NULL ArrayIterator::current()
-   Return current array entry */
-
-/* {{{ proto void ArrayObject::unserialize(string serialized)
- * unserialize the object
- */
-
-/* {{{ proto array ArrayObject::__serialize() */
-
-/* {{{ arginfo and function table */
-
-var ArginfoArrayConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(0),
-	zend.MakeArgInfo("input"),
-	zend.MakeArgInfo("flags"),
-	zend.MakeArgInfo("iterator_class"),
-}
-
 /* ArrayIterator::__construct and ArrayObject::__construct have different signatures */
-
-var ArginfoArrayIteratorConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(0),
-	zend.MakeArgInfo("array"),
-	zend.MakeArgInfo("flags"),
-}
-var arginfo_array_offsetGet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("index"),
-}
-var arginfo_array_offsetSet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(2),
-	zend.MakeArgInfo("index"),
-	zend.MakeArgInfo("newval"),
-}
-var ArginfoArrayAppend []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("value"),
-}
-var ArginfoArraySeek []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("position"),
-}
-var arginfo_array_exchangeArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("input"),
-}
-var arginfo_array_setFlags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("flags"),
-}
-var arginfo_array_setIteratorClass []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("iteratorClass"),
-}
-var arginfo_array_uXsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("cmp_function"),
-}
-var ArginfoArrayUnserialize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("serialized"),
-}
-var ArginfoArrayVoid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-}
 var spl_funcs_ArrayObject []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_Array___construct, ArginfoArrayConstruct),
-	types.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetExists, arginfo_array_offsetGet),
-	types.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetGet, arginfo_array_offsetGet),
-	types.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetSet, arginfo_array_offsetSet),
-	types.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetUnset, arginfo_array_offsetGet),
-	types.MakeZendFunctionEntryEx("append", zend.ZEND_ACC_PUBLIC, zim_spl_Array_append, ArginfoArrayAppend),
-	types.MakeZendFunctionEntryEx("getArrayCopy", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getArrayCopy, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_Array_count, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getFlags, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_setFlags, arginfo_array_setFlags),
-	types.MakeZendFunctionEntryEx("asort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_asort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("ksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_ksort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("uasort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uasort, arginfo_array_uXsort),
-	types.MakeZendFunctionEntryEx("uksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uksort, arginfo_array_uXsort),
-	types.MakeZendFunctionEntryEx("natsort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natsort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("natcasesort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natcasesort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_unserialize, ArginfoArrayUnserialize),
-	types.MakeZendFunctionEntryEx("serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_serialize, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("__unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___unserialize, ArginfoArrayUnserialize),
-	types.MakeZendFunctionEntryEx("__serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___serialize, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_Array___debugInfo, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("getIterator", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getIterator, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("exchangeArray", zend.ZEND_ACC_PUBLIC, zim_spl_Array_exchangeArray, arginfo_array_exchangeArray),
-	types.MakeZendFunctionEntryEx("setIteratorClass", zend.ZEND_ACC_PUBLIC, zim_spl_Array_setIteratorClass, arginfo_array_setIteratorClass),
-	types.MakeZendFunctionEntryEx("getIteratorClass", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getIteratorClass, ArginfoArrayVoid),
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_Array___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+		zend.MakeArgName("input"),
+		zend.MakeArgName("flags"),
+		zend.MakeArgName("iterator_class"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetExists, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("index"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetGet, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("index"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetSet, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
+		zend.MakeArgName("index"),
+		zend.MakeArgName("newval"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetUnset, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("index"),
+	}),
+	types.MakeZendFunctionEntryEx("append", zend.ZEND_ACC_PUBLIC, zim_spl_Array_append, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("value"),
+	}),
+	types.MakeZendFunctionEntryEx("getArrayCopy", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getArrayCopy, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_Array_count, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getFlags, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_setFlags, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("flags"),
+	}),
+	types.MakeZendFunctionEntryEx("asort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_asort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("ksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_ksort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("uasort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uasort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("cmp_function"),
+	}),
+	types.MakeZendFunctionEntryEx("uksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uksort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("cmp_function"),
+	}),
+	types.MakeZendFunctionEntryEx("natsort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natsort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("natcasesort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natcasesort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_unserialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("serialized"),
+	}),
+	types.MakeZendFunctionEntryEx("serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_serialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("__unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___unserialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("serialized"),
+	}),
+	types.MakeZendFunctionEntryEx("__serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___serialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_Array___debugInfo, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("getIterator", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getIterator, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("exchangeArray", zend.ZEND_ACC_PUBLIC, zim_spl_Array_exchangeArray, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("input"),
+	}),
+	types.MakeZendFunctionEntryEx("setIteratorClass", zend.ZEND_ACC_PUBLIC, zim_spl_Array_setIteratorClass, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("iteratorClass"),
+	}),
+	types.MakeZendFunctionEntryEx("getIteratorClass", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getIteratorClass, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var spl_funcs_ArrayIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_ArrayIterator___construct, ArginfoArrayIteratorConstruct),
-	types.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetExists, arginfo_array_offsetGet),
-	types.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetGet, arginfo_array_offsetGet),
-	types.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetSet, arginfo_array_offsetSet),
-	types.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetUnset, arginfo_array_offsetGet),
-	types.MakeZendFunctionEntryEx("append", zend.ZEND_ACC_PUBLIC, zim_spl_Array_append, ArginfoArrayAppend),
-	types.MakeZendFunctionEntryEx("getArrayCopy", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getArrayCopy, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_Array_count, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getFlags, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_setFlags, arginfo_array_setFlags),
-	types.MakeZendFunctionEntryEx("asort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_asort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("ksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_ksort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("uasort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uasort, arginfo_array_uXsort),
-	types.MakeZendFunctionEntryEx("uksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uksort, arginfo_array_uXsort),
-	types.MakeZendFunctionEntryEx("natsort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natsort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("natcasesort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natcasesort, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_unserialize, ArginfoArrayUnserialize),
-	types.MakeZendFunctionEntryEx("serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_serialize, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("__unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___unserialize, ArginfoArrayUnserialize),
-	types.MakeZendFunctionEntryEx("__serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___serialize, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_Array___debugInfo, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_Array_rewind, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_Array_current, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_Array_key, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_Array_next, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_Array_valid, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("seek", zend.ZEND_ACC_PUBLIC, zim_spl_Array_seek, ArginfoArraySeek),
+	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_ArrayIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+		zend.MakeArgName("array"),
+		zend.MakeArgName("flags"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetExists, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("index"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetGet, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("index"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetSet, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
+		zend.MakeArgName("index"),
+		zend.MakeArgName("newval"),
+	}),
+	types.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_Array_offsetUnset, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
+		zend.MakeArgName("index"),
+	}),
+	types.MakeZendFunctionEntryEx("append", zend.ZEND_ACC_PUBLIC, zim_spl_Array_append, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("value"),
+	}),
+	types.MakeZendFunctionEntryEx("getArrayCopy", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getArrayCopy, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_Array_count, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("getFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getFlags, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("setFlags", zend.ZEND_ACC_PUBLIC, zim_spl_Array_setFlags, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("flags"),
+	}),
+	types.MakeZendFunctionEntryEx("asort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_asort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("ksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_ksort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("uasort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uasort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("cmp_function"),
+	}),
+	types.MakeZendFunctionEntryEx("uksort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_uksort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("cmp_function"),
+	}),
+	types.MakeZendFunctionEntryEx("natsort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natsort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("natcasesort", zend.ZEND_ACC_PUBLIC, zim_spl_Array_natcasesort, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_unserialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("serialized"),
+	}),
+	types.MakeZendFunctionEntryEx("serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array_serialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("__unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___unserialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("serialized"),
+	}),
+	types.MakeZendFunctionEntryEx("__serialize", zend.ZEND_ACC_PUBLIC, zim_spl_Array___serialize, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_Array___debugInfo, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_Array_rewind, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_Array_current, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_Array_key, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_Array_next, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_Array_valid, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("seek", zend.ZEND_ACC_PUBLIC, zim_spl_Array_seek, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+		zend.MakeArgName("position"),
+	}),
 }
 var spl_funcs_RecursiveArrayIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_Array_hasChildren, ArginfoArrayVoid),
-	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getChildren, ArginfoArrayVoid),
+	types.MakeZendFunctionEntryEx("hasChildren", zend.ZEND_ACC_PUBLIC, zim_spl_Array_hasChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("getChildren", zend.ZEND_ACC_PUBLIC, zim_spl_Array_getChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }

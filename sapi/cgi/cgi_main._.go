@@ -70,8 +70,6 @@ var OPTIONS []core.Opt = []core.Opt{
 	core.MakeOpt('-', 0, nil),
 }
 
-type _phpCgiGlobals = php_cgi_globals_struct
-
 /* {{{ user_config_cache
  *
  * Key for each cache entry is dirname(PATH_TRANSLATED).
@@ -88,12 +86,9 @@ const STDOUT_FILENO = 1
 const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
 
-var ArginfoNoArgs = []zend.ArgInfo{
-	zend.MakeReturnArgInfo(-1),
-}
 var CgiFunctions = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, ArginfoNoArgs),
-	types.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, ArginfoNoArgs),
-	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, ArginfoNoArgs),
+	types.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var CgiModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
