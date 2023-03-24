@@ -52,7 +52,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 				if !prop_info.IsStatic() {
 					flags |= prop_info.GetFlags()
 					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
-						zobj.GetProperties().SetIsHasEmptyInd()
+						zobj.GetProperties().MarkHasEmptyIndex()
 					}
 					types._zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 				}
@@ -68,7 +68,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 						if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 							var zv types.Zval
 							if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
-								zobj.GetProperties().SetIsHasEmptyInd()
+								zobj.GetProperties().MarkHasEmptyIndex()
 							}
 							zv.SetIndirect(OBJ_PROP(zobj, prop_info.GetOffset()))
 							zobj.GetProperties().KeyAdd(prop_info.GetName().GetStr(), &zv)
@@ -1001,7 +1001,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			slot.SetUndef()
 			ZvalPtrDtor(&tmp)
 			if zobj.GetProperties() != nil {
-				zobj.GetProperties().SetIsHasEmptyInd()
+				zobj.GetProperties().MarkHasEmptyIndex()
 			}
 			goto exit
 		}

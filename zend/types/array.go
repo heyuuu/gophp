@@ -56,6 +56,9 @@ func (this *Bucket) GetArrayKey() ArrayKey { return this.key }
 func (this *Bucket) GetVal() *Zval     { return &this.val }
 func (this *Bucket) SetVal(zval *Zval) { ZVAL_COPY_VALUE(&this.val, zval) }
 
+
+
+
 /**
  * Array
  * HashTable Data Layout
@@ -268,12 +271,12 @@ func (ht *Array) assertRc1() { b.Assert(ht.GetRefcount() == 1) }
 /** Array.flags */
 func (ht *Array) CopyFlags(arr *Array) { ht.flags = arr.flags }
 
-func (ht *Array) IsPacked() bool      { return ht.flags&HASH_FLAG_PACKED != 0 }
-func (ht *Array) SetIsPacked()        { ht.flags |= HASH_FLAG_PACKED }
-func (ht *Array) UnsetIsPacked()      { ht.flags &^= HASH_FLAG_PACKED }
-func (ht *Array) IsHasEmptyInd() bool { return ht.flags&HASH_FLAG_HAS_EMPTY_IND != 0 }
-func (ht *Array) SetIsHasEmptyInd()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
-func (ht *Array) UnsetIsHasEmptyInd() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
+func (ht *Array) IsPacked() bool       { return ht.flags&HASH_FLAG_PACKED != 0 }
+func (ht *Array) MarkPacked()          { ht.flags |= HASH_FLAG_PACKED }
+func (ht *Array) UnmarkIsPacked()      { ht.flags &^= HASH_FLAG_PACKED }
+func (ht *Array) HasEmptyIndex() bool  { return ht.flags&HASH_FLAG_HAS_EMPTY_IND != 0 }
+func (ht *Array) MarkHasEmptyIndex()   { ht.flags |= HASH_FLAG_HAS_EMPTY_IND }
+func (ht *Array) UnmarkHasEmptyIndex() { ht.flags &^= HASH_FLAG_HAS_EMPTY_IND }
 
 /** Array.iteratorsCount */
 func (ht *Array) GetIteratorsCount() ZendUchar      { return ht.iteratorsCount }

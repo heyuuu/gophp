@@ -61,6 +61,6 @@ func (ht *Array) SymtableExistsInd(key string) bool {
 	if idx, ok := parseNumericStr(key); ok {
 		return ht.IndexExists(idx)
 	} else {
-		return ht.KeyExistsInd(key)
+		return ht.KeyExistsIndirect(key)
 	}
 }

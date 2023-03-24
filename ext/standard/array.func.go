@@ -6542,7 +6542,7 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *types.Zv
 	case types.IS_LONG:
 		types.ZVAL_BOOL(return_value, ht.IndexExists(key.GetLval()))
 	case types.IS_NULL:
-		types.ZVAL_BOOL(return_value, ht.KeyExistsInd(types.ZSTR_EMPTY_ALLOC().GetStr()))
+		types.ZVAL_BOOL(return_value, ht.KeyExistsIndirect(types.ZSTR_EMPTY_ALLOC().GetStr()))
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument should be either a string or an integer")
 		return_value.SetFalse()

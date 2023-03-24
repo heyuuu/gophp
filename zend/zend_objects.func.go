@@ -211,7 +211,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		}
 		new_object.GetProperties().CopyFlags(old_object.GetProperties())
 		new_object.GetProperties().SetIteratorsCount(old_object.GetProperties().GetIteratorsCount())
-		new_object.GetProperties().SetIsHasEmptyInd()
+		new_object.GetProperties().MarkHasEmptyIndex()
 		var __ht *types.Array = old_object.GetProperties()
 		for _, _p := range __ht.foreachData() {
 			var _z *types.Zval = _p.GetVal()

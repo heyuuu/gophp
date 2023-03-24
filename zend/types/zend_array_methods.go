@@ -79,8 +79,8 @@ func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
 	ht.assertRc1()
 
 	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
-	var p = ht.keyFindBucket(key)
-	if p != nil {
+	if pos, ok := ht.keyMap[key]; ok {
+		p := &ht.data[pos]
 		if p == b {
 			return p.GetVal()
 		} else {
@@ -102,42 +102,6 @@ func (ht *Array) SetBucketKey(b *Bucket, key string) *Zval {
 	ht.addHash(b.key, pos)
 
 	return b.GetVal()
-}
-
-func (ht *Array) eachBucket(handler func(pos uint32, p *Bucket)) {
-	var size = uint32(len(ht.data))
-	for i := uint32(0); i < size; i++ {
-		var p = &ht.data[i]
-		handler(i, p)
-	}
-}
-
-func (ht *Array) eachValidBucket(handler func(pos uint32, p *Bucket)) {
-	var size = uint32(len(ht.data))
-	for i := uint32(0); i < size; i++ {
-		var p = &ht.data[i]
-		if p.IsValid() {
-			continue
-		}
-		handler(i, p)
-	}
-}
-
-func (ht *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
-	var size = uint32(len(ht.data))
-	for i := uint32(0); i < size; i++ {
-		var p = &ht.data[i]
-		var data = p.GetVal()
-
-		if data.IsIndirect() {
-			data = data.GetZv()
-		}
-		if data.IsUndef() {
-			return
-		}
-
-		handler(i, p, data)
-	}
 }
 
 func (ht *Array) applyValidBucket(apply_func func(p *Bucket) int) {
@@ -358,10 +322,10 @@ func (ht *Array) RecalcElements() uint32 {
 
 func (ht *Array) Count() uint32 {
 	var num uint32
-	if ht.IsHasEmptyInd() {
+	if ht.HasEmptyIndex() {
 		num = ht.RecalcElements()
 		if ht.elementsCount == num {
-			ht.UnsetIsHasEmptyInd()
+			ht.UnmarkHasEmptyIndex()
 		}
 	} else if ht == zend.EG__().GetSymbolTable() {
 		num = ht.RecalcElements()
