@@ -413,7 +413,7 @@ func ProcessNestedData(
 					}
 				}
 				if b.Assign(&old_data, ht.KeyFind(key.GetStr().GetStr())) != nil {
-					if old_data.IsType(types.IS_INDIRECT) {
+					if old_data.IsIndirect() {
 						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)

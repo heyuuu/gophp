@@ -1,10 +1,4 @@
-// <<generate>>
-
 package standard
-
-import (
-	b "sik/builtin"
-)
 
 func CompareRight(a **byte, aend *byte, b **byte, bend *byte) int {
 	var bias int = 0
@@ -55,6 +49,10 @@ func CompareLeft(a **byte, aend *byte, b **byte, bend *byte) int {
 		*b++
 	}
 	return 0
+}
+
+func StrnatcmpExEx(s1 string, s2 string, fold_case int) int {
+	return StrnatcmpEx()
 }
 func StrnatcmpEx(a *byte, a_len int, b *byte, b_len int, fold_case int) int {
 	var ca uint8

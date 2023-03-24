@@ -215,7 +215,7 @@ func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key
 	var track_vars_array *types.Zval = b.VaArg(&va).(*types.Zval)
 	if hash_key.IsStrKey() {
 		var keyBuf strings.Builder
-		for _, c := range []byte(hash_key.KeyKey()) {
+		for _, c := range []byte(hash_key.StrKey()) {
 			if c == '-' {
 				keyBuf.WriteByte(c)
 			} else {

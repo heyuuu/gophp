@@ -53,10 +53,10 @@ func (ht *Array) recalcElements() uint32 {
 /**
  * Sort
  */
-type ArraySortFunc func(a *Bucket, b *Bucket) bool
-type ArraySortExFunc func(a *Bucket, b *Bucket) int
+type ArrayCompareFunc func(a *Bucket, b *Bucket) bool
+type ArrayCompareExFunc func(a *Bucket, b *Bucket) int
 
-func (ht *Array) Sort(comparer ArraySortFunc, renumber bool) {
+func (ht *Array) Sort(comparer ArrayCompareFunc, renumber bool) {
 	ht.assertRc1()
 
 	if ht.elementsCount == 0 || (ht.elementsCount == 1 && !renumber) {
@@ -385,7 +385,7 @@ func (ht *Array) KeyDeleteIndirect(key string) bool {
  */
 func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return ht.KeyAdd(key.KeyKey(), pData)
+		return ht.KeyAdd(key.StrKey(), pData)
 	} else {
 		return ht.IndexAdd(key.IndexKey(), pData)
 	}
@@ -393,7 +393,7 @@ func (ht *Array) Add(key ArrayKey, pData *Zval) *Zval {
 
 func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return ht.KeyAddIndirect(key.KeyKey(), pData)
+		return ht.KeyAddIndirect(key.StrKey(), pData)
 	} else {
 		return ht.IndexAdd(key.IndexKey(), pData)
 	}
@@ -401,7 +401,7 @@ func (ht *Array) AddIndirect(key ArrayKey, pData *Zval) *Zval {
 
 func (ht *Array) Update(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return ht.KeyUpdate(key.KeyKey(), pData)
+		return ht.KeyUpdate(key.StrKey(), pData)
 	} else {
 		return ht.IndexUpdate(key.IndexKey(), pData)
 	}
@@ -409,7 +409,7 @@ func (ht *Array) Update(key ArrayKey, pData *Zval) *Zval {
 
 func (ht *Array) UpdateIndirect(key ArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
-		return ht.KeyUpdateIndirect(key.KeyKey(), pData)
+		return ht.KeyUpdateIndirect(key.StrKey(), pData)
 	} else {
 		return ht.IndexUpdate(key.IndexKey(), pData)
 	}

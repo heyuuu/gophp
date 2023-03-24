@@ -10,14 +10,14 @@ import (
  */
 func (this *Bucket) GetH() uint {
 	if this.IsStrKey() {
-		return b.HashStr(this.key.KeyKey())
+		return b.HashStr(this.key.StrKey())
 	} else {
 		return uint(this.key.index)
 	}
 }
 func (this *Bucket) GetKey() *String {
 	if this.IsStrKey() {
-		return NewString(this.key.KeyKey())
+		return NewString(this.key.StrKey())
 	} else {
 		return nil
 	}

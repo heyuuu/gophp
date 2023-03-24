@@ -199,7 +199,7 @@ func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *ty
 					zend.ArrayInit(&tmp)
 					gpc_element_p = symtable1.SymtableUpdateInd(b.CastStr(index, index_len), &tmp)
 				} else {
-					if gpc_element_p.IsType(types.IS_INDIRECT) {
+					if gpc_element_p.IsIndirect() {
 						gpc_element_p = gpc_element_p.GetZv()
 					}
 					if gpc_element_p.GetType() != types.IS_ARRAY {

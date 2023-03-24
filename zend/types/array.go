@@ -20,7 +20,14 @@ func MakeIndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
 
 func (this ArrayKey) IsStrKey() bool { return this.key != nil }
 func (this ArrayKey) IndexKey() int  { return this.index }
-func (this ArrayKey) KeyKey() string { return *this.key }
+func (this ArrayKey) StrKey() string { return *this.key }
+func (this ArrayKey) Keys() (index int, key string, isStrKey bool) {
+	if this.IsStrKey() {
+		return 0, *this.key, true
+	} else {
+		return this.index, "", false
+	}
+}
 
 /**
  * Bucket
@@ -46,9 +53,11 @@ func NewIndexBucket(indexKey int, zval *Zval) *Bucket {
 	return NewBucket(key, zval)
 }
 
-func (this *Bucket) IsStrKey() bool        { return this.key.IsStrKey() }
-func (this *Bucket) StrKey() string        { return this.key.KeyKey() }
-func (this *Bucket) IndexKey() int         { return this.key.IndexKey() }
+func (this *Bucket) IsStrKey() bool            { return this.key.IsStrKey() }
+func (this *Bucket) StrKey() string            { return this.key.StrKey() }
+func (this *Bucket) IndexKey() int             { return this.key.IndexKey() }
+func (this *Bucket) Keys() (int, string, bool) { return this.key.Keys() }
+
 func (this *Bucket) SetStrKey(key string)  { this.key = MakeStrKey(key) }
 func (this *Bucket) SetIndexKey(index int) { this.key = MakeIndexKey(index) }
 func (this *Bucket) GetArrayKey() ArrayKey { return this.key }
@@ -316,14 +325,14 @@ func (ht *Array) resetHash() {
 }
 func (ht *Array) addHash(key ArrayKey, pos uint32) {
 	if key.IsStrKey() {
-		ht.keyMap[key.KeyKey()] = pos
+		ht.keyMap[key.StrKey()] = pos
 	} else {
 		ht.indexMap[key.IndexKey()] = pos
 	}
 }
 func (ht *Array) deleteHash(key ArrayKey) {
 	if key.IsStrKey() {
-		delete(ht.keyMap, key.KeyKey())
+		delete(ht.keyMap, key.StrKey())
 	} else {
 		delete(ht.indexMap, key.IndexKey())
 	}

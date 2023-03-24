@@ -658,7 +658,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 		var __ht *types.Array = pieces.GetArr()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -677,7 +677,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 	var __ht *types.Array = pieces.GetArr()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
-		if _z.IsType(types.IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
 			if _z.IsUndef() {
 				continue
@@ -2010,7 +2010,7 @@ func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *types.Zva
 		var __ht *types.Array = str.GetArr()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -2466,7 +2466,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 		var __ht *types.Array = pats
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -2929,7 +2929,7 @@ func ZifStrtr(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 			var __ht *types.Array = pats
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
-				if _z.IsType(types.IS_INDIRECT) {
+				if _z.IsIndirect() {
 					_z = _z.GetZv()
 					if _z.IsUndef() {
 						continue
@@ -3436,7 +3436,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 		var __ht *types.Array = search.GetArr()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -3603,7 +3603,7 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 		var __ht *types.Array = subject.GetArr()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue

@@ -210,7 +210,7 @@ try_again:
 	fetch_dim_string:
 		retval = ht.SymtableFind(offset_key.GetStr())
 		if retval != nil {
-			if retval.IsType(types.IS_INDIRECT) {
+			if retval.IsIndirect() {
 				retval = retval.GetZv()
 				if retval.IsUndef() {
 					switch type_ {
@@ -426,7 +426,7 @@ try_again:
 		} else {
 			var data *types.Zval = ht.SymtableFind(offset.GetStr().GetStr())
 			if data != nil {
-				if data.IsType(types.IS_INDIRECT) {
+				if data.IsIndirect() {
 					data = data.GetZv()
 					if data.IsUndef() {
 						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.GetStr().GetVal())
@@ -748,7 +748,7 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *types.Array) int {
 		for {
 			if types.ZendHashGetCurrentKeyEx(aht, &string_key, &num_key, pos_ptr) == types.HASH_KEY_IS_STRING {
 				data = types.ZendHashGetCurrentDataEx(aht, pos_ptr)
-				if data != nil && data.IsType(types.IS_INDIRECT) && b.Assign(&data, data.GetZv()).GetType() == types.IS_UNDEF {
+				if data != nil && data.IsIndirect() && b.Assign(&data, data.GetZv()).GetType() == types.IS_UNDEF {
 
 				} else if string_key.GetLen() == 0 || string_key.GetVal()[0] {
 					return types.SUCCESS
@@ -798,7 +798,7 @@ func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *types.Zval {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
 		var data *types.Zval = types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, object))
-		if data != nil && data.IsType(types.IS_INDIRECT) {
+		if data != nil && data.IsIndirect() {
 			data = data.GetZv()
 		}
 		return data
@@ -1044,7 +1044,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 
 			key = _p.GetKey()
 			val = _z
-			if val.IsType(types.IS_INDIRECT) {
+			if val.IsIndirect() {
 				if types.Z_INDIRECT_P(val).IsUndef() {
 					continue
 				}
@@ -1158,7 +1158,7 @@ func zim_spl_Array_current(executeData *zend.ZendExecuteData, return_value *type
 	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
-	if entry.IsType(types.IS_INDIRECT) {
+	if entry.IsIndirect() {
 		entry = entry.GetZv()
 		if entry.IsUndef() {
 			return
@@ -1208,7 +1208,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 		return_value.SetFalse()
 		return
 	}
-	if entry.IsType(types.IS_INDIRECT) {
+	if entry.IsIndirect() {
 		entry = entry.GetZv()
 	}
 	entry = types.ZVAL_DEREF(entry)
@@ -1227,7 +1227,7 @@ func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *
 	if b.Assign(&entry, types.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
-	if entry.IsType(types.IS_INDIRECT) {
+	if entry.IsIndirect() {
 		entry = entry.GetZv()
 	}
 	entry = types.ZVAL_DEREF(entry)

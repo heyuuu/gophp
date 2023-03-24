@@ -95,7 +95,7 @@ again:
 		var __ht *types.Array = myht
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -138,7 +138,7 @@ again:
 				key = _p.GetKey()
 				val = _z
 				var prop_info *zend.ZendPropertyInfo = nil
-				if val.IsType(types.IS_INDIRECT) {
+				if val.IsIndirect() {
 					val = val.GetZv()
 					if key != nil {
 						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
@@ -276,7 +276,7 @@ again:
 		var __ht *types.Array = myht
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -319,7 +319,7 @@ again:
 				key = _p.GetKey()
 				val = _z
 				var prop_info *zend.ZendPropertyInfo = nil
-				if val.IsType(types.IS_INDIRECT) {
+				if val.IsIndirect() {
 					val = val.GetZv()
 					if key != nil {
 						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
@@ -491,7 +491,7 @@ again:
 		var __ht *types.Array = myht
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -539,7 +539,7 @@ again:
 			var __ht *types.Array = myht
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
-				if _z.IsType(types.IS_INDIRECT) {
+				if _z.IsIndirect() {
 					_z = _z.GetZv()
 					if _z.IsUndef() {
 						continue
@@ -712,7 +712,7 @@ func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *t
 	if val == nil {
 		return types.FAILURE
 	}
-	if val.IsType(types.IS_INDIRECT) {
+	if val.IsIndirect() {
 		val = val.GetZv()
 		if val.IsUndef() {
 			var info *zend.ZendPropertyInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
@@ -742,7 +742,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 	var __ht *types.Array = sleep_retval
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
-		if _z.IsType(types.IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
 			if _z.IsUndef() {
 				continue
@@ -815,7 +815,7 @@ func PhpVarSerializeNestedData(
 		var __ht *types.Array = ht
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
-			if _z.IsType(types.IS_INDIRECT) {
+			if _z.IsIndirect() {
 				_z = _z.GetZv()
 				if _z.IsUndef() {
 					continue
@@ -945,7 +945,7 @@ again:
 			var __ht *types.Array = retval.GetArr()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
-				if _z.IsType(types.IS_INDIRECT) {
+				if _z.IsIndirect() {
 					_z = _z.GetZv()
 					if _z.IsUndef() {
 						continue

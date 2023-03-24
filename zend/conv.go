@@ -10,11 +10,40 @@ import (
 	"strings"
 )
 
+func StrToDouble(str string) float64 {
+	// todo 注意，此处异常有差异未处理
+	// - 越界时，返回 +INF 或 -INF；此时逻辑一致
+	// - 语法错误，但前序字符串合法时，PHP 返回前序字符串对应值，Golang 返回 0。此处不一致待修改
+	d, _ := strconv.ParseFloat(str, 64)
+	return d
+}
+
+func StrToNumberEx(str string, mode ConvertNumericMode) (num types.Number, ok bool) {
+	result := ConvertNumericStr(str, mode)
+	switch result.Type {
+	case types.IS_LONG:
+		return types.IntNumber(result.Lval), true
+	case types.IS_DOUBLE:
+		return types.FloatNumber(result.Dval), true
+	default:
+		return // fail
+	}
+}
+func StrToNumberStrict(str string) (types.Number, bool) {
+	return StrToNumberEx(str, ConvertRefuseErrors)
+}
+func StrToNumberAllowErrors(str string) (types.Number, bool) {
+	return StrToNumberEx(str, ConvertContinueOnErrors)
+}
+func StrToNumberNoticeErrors(str string) (types.Number, bool) {
+	return StrToNumberEx(str, ConvertNoticeOnErrors)
+}
+
 /**
  * ConvertNumericStr 解析结果
  */
 type NumericStrResult struct {
-	Overflow uint8           // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
+	Overflow int             // 溢出信息。1 正数溢出，-1 负数溢出，0 无溢出或本身就是浮点数格式
 	Type     types.ZendUchar // 数字类型，可能值为 0, IS_LONG, IS_DOUBLE
 	Lval     int             // 数字为整数时的值，其他情况为 0
 	Dval     float64         // 数字为浮点数时的值，默认为 0.0
