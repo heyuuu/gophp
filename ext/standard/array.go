@@ -409,27 +409,10 @@ func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) types.CompareFu
 	}
 	return nil
 }
-func ZifKrsort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var array *types.Zval
-	var sort_type = PHP_SORT_REGULAR
-	var cmp types.CompareFuncT
 
-	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	array = fp.ParseArrayEx(false, true)
-	fp.StartOptional()
-	sort_type = fp.ParseLong()
-	if fp.HasError() {
-		return_value.SetFalse()
-		return
-	}
-
-	cmp = PhpGetKeyCompareFunc(sort_type, 1)
-	if !array.GetArr().SortCompatible(cmp, 0) {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
+func ZifKrsort(executeData *zend.ZendExecuteData, return_value *types.Zval, arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
+	cmp := PhpGetKeyCompareFunc(sortFlags, 1)
+	return arg.GetArr().SortCompatible(cmp, 0)
 }
 
 func ZifKsort(arg zpp.DefRefArray, _ zpp.DefOpt, sortFlags int) bool {
@@ -463,23 +446,11 @@ func PhpCountRecursive(ht *types.Array) zend.ZendLong {
 	}
 	return cnt
 }
-func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var array *types.Zval
-	var mode = COUNT_NORMAL
+
+//@zif -alias sizeof
+func ZifCount(executeData *zend.ZendExecuteData, return_value *types.Zval, var_ *types.Zval, _ zpp.DefOpt, mode int) {
+	var array *types.Zval = var_
 	var cnt zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			array = fp.ParseZval()
-			fp.StartOptional()
-			mode = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 	switch array.GetType() {
 	case types.IS_NULL:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Parameter must be an array or an object that implements Countable")
