@@ -67,7 +67,10 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 	funcName := funcDecl.Name.Name
 
 	// 从注解获取信息
-	annoArgs := getAnnoArgs(funcDecl.Doc)
+	annoArgs, err := getAnnoArgs(funcDecl.Doc)
+	if err != nil {
+		log.Fatalf("解析 ZifInfo 失败: funcName=%s, error=%s\n", funcName, err.Error())
+	}
 
 	// 构建 zif 信息
 	zifName := annoArgs.name
@@ -102,7 +105,7 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 	return zifInfo, true
 }
 
-func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
+func getAnnoArgs(doc *ast.CommentGroup) (zifAnnoFlags, error) {
 	annoFlags := zifAnnoFlags{maxNumArgs: -1}
 
 	// 从注释中找到注解文本
@@ -117,7 +120,7 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 		}
 	}
 	if len(args) <= 1 {
-		return annoFlags
+		return annoFlags, nil
 	}
 
 	var strAlias, strNumArgs string
@@ -130,7 +133,7 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 	flagSet.BoolVar(&annoFlags.oldMode, "old", false, "use old mode")
 	err := flagSet.Parse(args[1:])
 	if err != nil {
-		return annoFlags
+		return annoFlags, err
 	}
 
 	// 解析 -alias 参数
@@ -138,7 +141,7 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 		annoFlags.aliasNames = strings.Split(strAlias, ",")
 		for _, name := range annoFlags.aliasNames {
 			if !isValidName(name) {
-				log.Fatalf("@zif 的 --alias 参数错误: 参数值不是合法函数名")
+				return annoFlags, errors.New("@zif 的 --alias 参数错误: 参数值不是合法函数名")
 			}
 		}
 	}
@@ -166,12 +169,12 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 		}
 	}
 
-	return annoFlags
+	return annoFlags, nil
 }
 
 func isValidName(str string) bool {
 	for i, c := range str {
-		valid := ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || (i != 0 && '0' <= c && c <= 'Z')
+		valid := ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' || (i != 0 && '0' <= c && c <= 'Z')
 		if !valid {
 			return false
 		}

@@ -52,7 +52,7 @@ func genFileNode(name string, infos []*ZifInfo) *ast.File {
 			fb.AddDecl(
 				f.ValueSpecDeclEx(
 					f.DocComment("\n// generate by "+zifInfo.funcName),
-					f.Ident("Zif"+strutil.UpperCamelCase(aliasName)),
+					f.Ident("DefZif"+strutil.UpperCamelCase(aliasName)),
 					&ast.CallExpr{
 						Fun:  defPkgIdent("DefFunc"),
 						Args: genDefFuncArgs(zifInfo, aliasName),
