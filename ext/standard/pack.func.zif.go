@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifPack
-var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	format := fp.ParseZval()
 	fp.StartOptional()
@@ -18,7 +18,7 @@ var DefZifPack = def.DefFunc("pack", 1, -1, []def.ArgInfo{{Name: "format"}, {Nam
 })
 
 // generate by ZifUnpack
-var DefZifUnpack = def.DefFunc("unpack", 2, 3, []def.ArgInfo{{Name: "format"}, {Name: "input"}, {Name: "offset"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifUnpack = def.DefFunc("unpack", 2, 3, []def.ArgInfo{{Name: "format"}, {Name: "input"}, {Name: "offset"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	format := fp.ParseZval()
 	input := fp.ParseZval()

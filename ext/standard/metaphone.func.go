@@ -7,7 +7,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifMetaphone(executeData zpp.DefEx, return_value zpp.DefReturn, text *types.Zval, _ zpp.DefOpt, phones *types.Zval) {
+func ZifMetaphone(executeData zpp.Ex, return_value zpp.Ret, text *types.Zval, _ zpp.Opt, phones *types.Zval) {
 	var str *types.String
 	var result *types.String = nil
 	var phones zend.ZendLong = 0

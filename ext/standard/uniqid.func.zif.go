@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifUniqid
-var DefZifUniqid = def.DefFunc("uniqid", 0, 2, []def.ArgInfo{{Name: "prefix"}, {Name: "more_entropy"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifUniqid = def.DefFunc("uniqid", 0, 2, []def.ArgInfo{{Name: "prefix"}, {Name: "more_entropy"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	prefix := fp.ParseZval()

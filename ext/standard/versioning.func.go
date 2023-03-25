@@ -186,7 +186,7 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	zend.Efree(ver2)
 	return compare
 }
-func ZifVersionCompare(executeData zpp.DefEx, return_value zpp.DefReturn, ver1 *types.Zval, ver2 *types.Zval, _ zpp.DefOpt, oper *types.Zval) {
+func ZifVersionCompare(executeData zpp.Ex, return_value zpp.Ret, ver1 *types.Zval, ver2 *types.Zval, _ zpp.Opt, oper *types.Zval) {
 	var v1 *byte
 	var v2 *byte
 	var op *byte = nil

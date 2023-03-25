@@ -182,13 +182,13 @@ func PhpExecEx(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 		zend.ZEND_TRY_ASSIGN_REF_LONG(ret_code, ret)
 	}
 }
-func ZifExec(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, _ zpp.DefOpt, output zpp.DefRef, returnValue zpp.DefRef) {
+func ZifExec(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, output zpp.RefZval, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 0)
 }
-func ZifSystem(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, _ zpp.DefOpt, returnValue zpp.DefRef) {
+func ZifSystem(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 1)
 }
-func ZifPassthru(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval, _ zpp.DefOpt, returnValue zpp.DefRef) {
+func ZifPassthru(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, _ zpp.Opt, returnValue zpp.RefZval) {
 	PhpExecEx(executeData, return_value, 3)
 }
 func PhpEscapeShellCmd(str *byte) *types.String {
@@ -359,7 +359,7 @@ func PhpEscapeShellArg(str *byte) *types.String {
 	cmd.SetLen(y)
 	return cmd
 }
-func ZifEscapeshellcmd(executeData zpp.DefEx, return_value zpp.DefReturn, command *types.Zval) {
+func ZifEscapeshellcmd(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval) {
 	var command *byte
 	var command_len int
 	for {
@@ -383,7 +383,7 @@ func ZifEscapeshellcmd(executeData zpp.DefEx, return_value zpp.DefReturn, comman
 		zend.ZVAL_EMPTY_STRING(return_value)
 	}
 }
-func ZifEscapeshellarg(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
+func ZifEscapeshellarg(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {
 	var argument *byte
 	var argument_len int
 	for {
@@ -405,7 +405,7 @@ func ZifEscapeshellarg(executeData zpp.DefEx, return_value zpp.DefReturn, arg *t
 		return_value.SetString(PhpEscapeShellArg(argument))
 	}
 }
-func ZifShellExec(executeData zpp.DefEx, return_value zpp.DefReturn, cmd *types.Zval) {
+func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
 	var in *r.FILE
 	var command *byte
 	var command_len int

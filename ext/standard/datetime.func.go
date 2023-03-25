@@ -22,7 +22,7 @@ func PhpStdDate(t int64) *byte {
 	str[79] = 0
 	return str
 }
-func ZifStrptime(executeData zpp.DefEx, return_value zpp.DefReturn, timestamp *types.Zval, format *types.Zval) {
+func ZifStrptime(executeData zpp.Ex, return_value zpp.Ret, timestamp *types.Zval, format *types.Zval) {
 	var ts *byte
 	var ts_length int
 	var format *byte

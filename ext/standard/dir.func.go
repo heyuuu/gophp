@@ -96,13 +96,13 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *types.Zval, 
 		core.PhpStreamToZval(dirp, return_value)
 	}
 }
-func ZifOpendir(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval, _ zpp.DefOpt, context *types.Zval) {
+func ZifOpendir(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, context *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 0)
 }
-func ZifGetdir(executeData zpp.DefEx, return_value zpp.DefReturn, directory *types.Zval, _ zpp.DefOpt, context *types.Zval) {
+func ZifGetdir(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval, _ zpp.Opt, context *types.Zval) {
 	_phpDoOpendir(executeData, return_value, 1)
 }
-func ZifClosedir(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, dirHandle *types.Zval) {
+func ZifClosedir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle *types.Zval) {
 	var id *types.Zval = nil
 	var tmp *types.Zval
 	var myself *types.Zval
@@ -155,7 +155,7 @@ func ZifClosedir(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt
 		PhpSetDefaultDir(nil)
 	}
 }
-func ZifChroot(executeData zpp.DefEx, return_value zpp.DefReturn, directory *types.Zval) {
+func ZifChroot(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -187,7 +187,7 @@ func ZifChroot(executeData zpp.DefEx, return_value zpp.DefReturn, directory *typ
 	return_value.SetTrue()
 	return
 }
-func ZifChdir(executeData zpp.DefEx, return_value zpp.DefReturn, directory *types.Zval) {
+func ZifChdir(executeData zpp.Ex, return_value zpp.Ret, directory *types.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -224,7 +224,7 @@ func ZifChdir(executeData zpp.DefEx, return_value zpp.DefReturn, directory *type
 	return_value.SetTrue()
 	return
 }
-func ZifGetcwd(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetcwd(executeData zpp.Ex, return_value zpp.Ret) {
 	var path []byte
 	var ret *byte = nil
 	if !executeData.CheckNumArgsNone(false) {
@@ -239,7 +239,7 @@ func ZifGetcwd(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifRewinddir(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, dirHandle *types.Zval) {
+func ZifRewinddir(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, dirHandle *types.Zval) {
 	var id *types.Zval = nil
 	var tmp *types.Zval
 	var myself *types.Zval
@@ -341,7 +341,7 @@ func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifGlob(executeData zpp.DefEx, return_value zpp.DefReturn, pattern *types.Zval, _ zpp.DefOpt, flags *types.Zval) {
+func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zpp.Opt, flags *types.Zval) {
 	var cwd_skip int = 0
 	var pattern *byte = nil
 	var pattern_len int
@@ -435,7 +435,7 @@ func ZifGlob(executeData zpp.DefEx, return_value zpp.DefReturn, pattern *types.Z
 		return
 	}
 }
-func ZifScandir(executeData zpp.DefEx, return_value zpp.DefReturn, dir *types.Zval, _ zpp.DefOpt, sortingOrder *types.Zval, context *types.Zval) {
+func ZifScandir(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, _ zpp.Opt, sortingOrder *types.Zval, context *types.Zval) {
 	var dirn *byte
 	var dirn_len int
 	var flags zend.ZendLong = 0

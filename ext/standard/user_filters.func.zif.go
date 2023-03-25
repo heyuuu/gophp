@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifUserFilterNop
-var DefZifUserFilterNop = def.DefFunc("user_filter_nop", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifUserFilterNop = def.DefFunc("user_filter_nop", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -14,7 +14,7 @@ var DefZifUserFilterNop = def.DefFunc("user_filter_nop", 0, 0, []def.ArgInfo{}, 
 })
 
 // generate by ZifStreamBucketMakeWriteable
-var DefZifStreamBucketMakeWriteable = def.DefFunc("stream_bucket_make_writeable", 1, 1, []def.ArgInfo{{Name: "brigade"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamBucketMakeWriteable = def.DefFunc("stream_bucket_make_writeable", 1, 1, []def.ArgInfo{{Name: "brigade"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	brigade := fp.ParseZval()
 	if fp.HasError() {
@@ -24,7 +24,7 @@ var DefZifStreamBucketMakeWriteable = def.DefFunc("stream_bucket_make_writeable"
 })
 
 // generate by ZifStreamBucketPrepend
-var DefZifStreamBucketPrepend = def.DefFunc("stream_bucket_prepend", 2, 2, []def.ArgInfo{{Name: "brigade"}, {Name: "bucket"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamBucketPrepend = def.DefFunc("stream_bucket_prepend", 2, 2, []def.ArgInfo{{Name: "brigade"}, {Name: "bucket"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	brigade := fp.ParseZval()
 	bucket := fp.ParseZval()
@@ -35,7 +35,7 @@ var DefZifStreamBucketPrepend = def.DefFunc("stream_bucket_prepend", 2, 2, []def
 })
 
 // generate by ZifStreamBucketAppend
-var DefZifStreamBucketAppend = def.DefFunc("stream_bucket_append", 2, 2, []def.ArgInfo{{Name: "brigade"}, {Name: "bucket"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamBucketAppend = def.DefFunc("stream_bucket_append", 2, 2, []def.ArgInfo{{Name: "brigade"}, {Name: "bucket"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	brigade := fp.ParseZval()
 	bucket := fp.ParseZval()
@@ -46,7 +46,7 @@ var DefZifStreamBucketAppend = def.DefFunc("stream_bucket_append", 2, 2, []def.A
 })
 
 // generate by ZifStreamBucketNew
-var DefZifStreamBucketNew = def.DefFunc("stream_bucket_new", 2, 2, []def.ArgInfo{{Name: "stream"}, {Name: "buffer"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamBucketNew = def.DefFunc("stream_bucket_new", 2, 2, []def.ArgInfo{{Name: "stream"}, {Name: "buffer"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	stream := fp.ParseZval()
 	buffer := fp.ParseZval()
@@ -57,7 +57,7 @@ var DefZifStreamBucketNew = def.DefFunc("stream_bucket_new", 2, 2, []def.ArgInfo
 })
 
 // generate by ZifStreamGetFilters
-var DefZifStreamGetFilters = def.DefFunc("stream_get_filters", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamGetFilters = def.DefFunc("stream_get_filters", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -65,7 +65,7 @@ var DefZifStreamGetFilters = def.DefFunc("stream_get_filters", 0, 0, []def.ArgIn
 })
 
 // generate by ZifStreamFilterRegister
-var DefZifStreamFilterRegister = def.DefFunc("stream_filter_register", 2, 2, []def.ArgInfo{{Name: "filtername"}, {Name: "classname"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamFilterRegister = def.DefFunc("stream_filter_register", 2, 2, []def.ArgInfo{{Name: "filtername"}, {Name: "classname"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	filtername := fp.ParseZval()
 	classname := fp.ParseZval()

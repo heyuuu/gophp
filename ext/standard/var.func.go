@@ -169,7 +169,7 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifVarDump(executeData zpp.DefEx, return_value zpp.DefReturn, vars []*types.Zval) {
+func ZifVarDump(executeData zpp.Ex, return_value zpp.Ret, vars []*types.Zval) {
 	var args *types.Zval
 	var argc int
 	var i int
@@ -350,7 +350,7 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifDebugZvalDump(executeData zpp.DefEx, return_value zpp.DefReturn, vars []*types.Zval) {
+func ZifDebugZvalDump(executeData zpp.Ex, return_value zpp.Ret, vars []*types.Zval) {
 	var args *types.Zval
 	var argc int
 	var i int
@@ -573,7 +573,7 @@ func PhpVarExport(struc *types.Zval, level int) {
 	core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
 	buf.Free()
 }
-func ZifVarExport(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval, _ zpp.DefOpt, return_ *types.Zval) {
+func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
 	var return_output types.ZendBool = 0
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -1081,7 +1081,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 		BG__().serialize.data = nil
 	}
 }
-func ZifSerialize(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
+func ZifSerialize(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 	var struc *types.Zval
 	var var_hash PhpSerializeDataT
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -1112,7 +1112,7 @@ func ZifSerialize(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types
 		return
 	}
 }
-func ZifUnserialize(executeData zpp.DefEx, return_value zpp.DefReturn, variableRepresentation *types.Zval, _ zpp.DefOpt, allowedClasses *types.Zval) {
+func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresentation *types.Zval, _ zpp.Opt, allowedClasses *types.Zval) {
 	var buf *byte = nil
 	var buf_len int
 	var p *uint8
@@ -1251,7 +1251,7 @@ cleanup:
 	 * the very end, because __wakeup() calls performed during UNSERIALIZE_DESTROY might affect
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 }
-func ZifMemoryGetUsage(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, realUsage *types.Zval) {
+func ZifMemoryGetUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, realUsage *types.Zval) {
 	var real_usage types.ZendBool = 0
 	for {
 		for {
@@ -1269,7 +1269,7 @@ func ZifMemoryGetUsage(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.
 	return_value.SetLong(zend.ZendMemoryUsage(real_usage))
 	return
 }
-func ZifMemoryGetPeakUsage(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, realUsage *types.Zval) {
+func ZifMemoryGetPeakUsage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, realUsage *types.Zval) {
 	var real_usage types.ZendBool = 0
 	for {
 		for {

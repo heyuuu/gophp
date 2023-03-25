@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifApacheRequestHeaders
-var DefZifApacheRequestHeaders = def.DefFunc("apache_request_headers", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifApacheRequestHeaders = def.DefFunc("apache_request_headers", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -14,7 +14,7 @@ var DefZifApacheRequestHeaders = def.DefFunc("apache_request_headers", 0, 0, []d
 })
 
 // generate by ZifApacheResponseHeaders
-var DefZifApacheResponseHeaders = def.DefFunc("apache_response_headers", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifApacheResponseHeaders = def.DefFunc("apache_response_headers", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}

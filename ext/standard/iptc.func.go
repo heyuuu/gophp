@@ -90,7 +90,7 @@ func PhpIptcNextMarker(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	}
 	return uint(c)
 }
-func ZifIptcembed(executeData zpp.DefEx, return_value zpp.DefReturn, iptcdata *types.Zval, jpegFileName *types.Zval, _ zpp.DefOpt, spool *types.Zval) {
+func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval, jpegFileName *types.Zval, _ zpp.Opt, spool *types.Zval) {
 	var iptcdata *byte
 	var jpeg_file *byte
 	var iptcdata_len int
@@ -220,7 +220,7 @@ func ZifIptcembed(executeData zpp.DefEx, return_value zpp.DefReturn, iptcdata *t
 		return
 	}
 }
-func ZifIptcparse(executeData zpp.DefEx, return_value zpp.DefReturn, iptcdata *types.Zval) {
+func ZifIptcparse(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval) {
 	var inx int = 0
 	var len_ int
 	var tagsfound uint = 0

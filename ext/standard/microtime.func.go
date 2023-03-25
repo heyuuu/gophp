@@ -43,13 +43,13 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 		return
 	}
 }
-func ZifMicrotime(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, getAsFloat *types.Zval) {
+func ZifMicrotime(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, getAsFloat *types.Zval) {
 	_phpGettimeofday(executeData, return_value, 0)
 }
-func ZifGettimeofday(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, getAsFloat *types.Zval) {
+func ZifGettimeofday(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, getAsFloat *types.Zval) {
 	_phpGettimeofday(executeData, return_value, 1)
 }
-func ZifGetrusage(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, who *types.Zval) {
+func ZifGetrusage(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, who *types.Zval) {
 	var usg __struct__rusage
 	var pwho zend.ZendLong = 0
 	var who int = RUSAGE_SELF

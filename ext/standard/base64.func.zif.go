@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifBase64Encode
-var DefZifBase64Encode = def.DefFunc("base64_encode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifBase64Encode = def.DefFunc("base64_encode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -16,7 +16,7 @@ var DefZifBase64Encode = def.DefFunc("base64_encode", 1, 1, []def.ArgInfo{{Name:
 })
 
 // generate by ZifBase64Decode
-var DefZifBase64Decode = def.DefFunc("base64_decode", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "strict"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifBase64Decode = def.DefFunc("base64_decode", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "strict"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()

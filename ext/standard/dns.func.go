@@ -9,7 +9,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifGethostname(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGethostname(executeData zpp.Ex, return_value zpp.Ret) {
 	var buf []byte
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -22,7 +22,7 @@ func ZifGethostname(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	return_value.SetRawString(b.CastStrAuto(buf))
 	return
 }
-func ZifGethostbyaddr(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress *types.Zval) {
+func ZifGethostbyaddr(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval) {
 	var addr *byte
 	var addr_len int
 	var hostname *types.String
@@ -61,7 +61,7 @@ func PhpGethostbyaddr(ip *byte) *types.String {
 	}
 	return types.NewString(hp.h_name)
 }
-func ZifGethostbyname(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval) {
+func ZifGethostbyname(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	for {
@@ -86,7 +86,7 @@ func ZifGethostbyname(executeData zpp.DefEx, return_value zpp.DefReturn, hostnam
 	return_value.SetString(PhpGethostbyname(hostname))
 	return
 }
-func ZifGethostbynamel(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval) {
+func ZifGethostbynamel(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var hp *__struct__hostent
@@ -152,7 +152,7 @@ func PhpGethostbyname(name *byte) *types.String {
 }
 
 //@zif -alias checkdnsrr
-func ZifDnsCheckRecord(executeData zpp.DefEx, return_value zpp.DefReturn, host *types.Zval, _ zpp.DefOpt, type_ *types.Zval) {
+func ZifDnsCheckRecord(executeData zpp.Ex, return_value zpp.Ret, host *types.Zval, _ zpp.Opt, type_ *types.Zval) {
 	var hp *HEADER
 	var answer Querybuf
 	var hostname *byte
@@ -916,7 +916,7 @@ func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *types.Zval
 }
 
 //@zif -alias getmxrr
-func ZifDnsGetMx(executeData zpp.DefEx, return_value zpp.DefReturn, hostname *types.Zval, mxhosts zpp.DefRef, _ zpp.DefOpt, weight zpp.DefRef) {
+func ZifDnsGetMx(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval, mxhosts zpp.RefZval, _ zpp.Opt, weight zpp.RefZval) {
 	var hostname *byte
 	var hostname_len int
 	var mx_list *types.Zval

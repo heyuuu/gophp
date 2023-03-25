@@ -26,7 +26,7 @@ func MAIL_ASCIIZ_CHECK(str __auto__, len_ int) {
 		*p = ' '
 	}
 }
-func ZifEzmlmHash(executeData zpp.DefEx, return_value zpp.DefReturn, addr *types.Zval) {
+func ZifEzmlmHash(executeData zpp.Ex, return_value zpp.Ret, addr *types.Zval) {
 	var str *byte = nil
 	var h uint = 5381
 	var j int
@@ -221,7 +221,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.String {
 	s.ZeroTail()
 	return s.GetS()
 }
-func ZifMail(executeData zpp.DefEx, return_value zpp.DefReturn, to *types.Zval, subject *types.Zval, message *types.Zval, _ zpp.DefOpt, additionalHeaders *types.Zval, additionalParameters *types.Zval) {
+func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *types.Zval, message *types.Zval, _ zpp.Opt, additionalHeaders *types.Zval, additionalParameters *types.Zval) {
 	var to *byte = nil
 	var message *byte = nil
 	var subject *byte = nil

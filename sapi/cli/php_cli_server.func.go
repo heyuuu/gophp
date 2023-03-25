@@ -87,7 +87,7 @@ func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 }
 
 //@zif -alias getallheaders
-func ZifApacheRequestHeaders(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 	var client *PhpCliServerClient
 	var headers *types.Array
 	var key *types.String
@@ -136,7 +136,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
 		}
 	}
 }
-func ZifApacheResponseHeaders(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifApacheResponseHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

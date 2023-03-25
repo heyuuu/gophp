@@ -133,7 +133,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 		return result
 	}
 }
-func ZifCrypt(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, salt *types.Zval) {
+func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, salt *types.Zval) {
 	var salt []byte
 	var str *byte
 	var salt_in *byte = nil

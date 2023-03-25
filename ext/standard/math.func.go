@@ -182,7 +182,7 @@ func PhpAcosh(x float64) float64 { return acosh(x) }
 func PhpAtanh(z float64) float64 { return atanh(z) }
 func PhpLog1p(x float64) float64 { return log1p(x) }
 func PhpExpm1(x float64) float64 { return expm1(x) }
-func ZifAbs(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAbs(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var value *types.Zval
 	for {
 		for {
@@ -211,7 +211,7 @@ func ZifAbs(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zva
 	return_value.SetFalse()
 	return
 }
-func ZifCeil(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifCeil(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var value *types.Zval
 	for {
 		for {
@@ -235,7 +235,7 @@ func ZifCeil(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetFalse()
 	return
 }
-func ZifFloor(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifFloor(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var value *types.Zval
 	for {
 		for {
@@ -259,7 +259,7 @@ func ZifFloor(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetFalse()
 	return
 }
-func ZifRound(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, _ zpp.DefOpt, precision *types.Zval, mode *types.Zval) {
+func ZifRound(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, precision *types.Zval, mode *types.Zval) {
 	var value *types.Zval
 	var places int = 0
 	var precision zend.ZendLong = 0
@@ -319,7 +319,7 @@ func ZifRound(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 		return
 	}
 }
-func ZifSin(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifSin(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -335,7 +335,7 @@ func ZifSin(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zva
 	return_value.SetDouble(sin(num))
 	return
 }
-func ZifCos(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifCos(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -351,7 +351,7 @@ func ZifCos(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zva
 	return_value.SetDouble(cos(num))
 	return
 }
-func ZifTan(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifTan(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -367,7 +367,7 @@ func ZifTan(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zva
 	return_value.SetDouble(tan(num))
 	return
 }
-func ZifAsin(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAsin(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -383,7 +383,7 @@ func ZifAsin(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(asin(num))
 	return
 }
-func ZifAcos(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAcos(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -399,7 +399,7 @@ func ZifAcos(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(acos(num))
 	return
 }
-func ZifAtan(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAtan(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -415,7 +415,7 @@ func ZifAtan(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(atan(num))
 	return
 }
-func ZifAtan2(executeData zpp.DefEx, return_value zpp.DefReturn, y *types.Zval, x *types.Zval) {
+func ZifAtan2(executeData zpp.Ex, return_value zpp.Ret, y *types.Zval, x *types.Zval) {
 	var num1 float64
 	var num2 float64
 	for {
@@ -433,7 +433,7 @@ func ZifAtan2(executeData zpp.DefEx, return_value zpp.DefReturn, y *types.Zval, 
 	return_value.SetDouble(atan2(num1, num2))
 	return
 }
-func ZifSinh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifSinh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -449,7 +449,7 @@ func ZifSinh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(sinh(num))
 	return
 }
-func ZifCosh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifCosh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -465,7 +465,7 @@ func ZifCosh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(cosh(num))
 	return
 }
-func ZifTanh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifTanh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -481,7 +481,7 @@ func ZifTanh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(tanh(num))
 	return
 }
-func ZifAsinh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAsinh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -497,7 +497,7 @@ func ZifAsinh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetDouble(PhpAsinh(num))
 	return
 }
-func ZifAcosh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAcosh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -513,7 +513,7 @@ func ZifAcosh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetDouble(PhpAcosh(num))
 	return
 }
-func ZifAtanh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifAtanh(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -529,11 +529,11 @@ func ZifAtanh(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetDouble(PhpAtanh(num))
 	return
 }
-func ZifPi(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifPi(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetDouble(M_PI)
 	return
 }
-func ZifIsFinite(executeData zpp.DefEx, return_value zpp.DefReturn, val *types.Zval) {
+func ZifIsFinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
 	var dval float64
 	for {
 		for {
@@ -549,7 +549,7 @@ func ZifIsFinite(executeData zpp.DefEx, return_value zpp.DefReturn, val *types.Z
 	types.ZVAL_BOOL(return_value, core.ZendFinite(dval))
 	return
 }
-func ZifIsInfinite(executeData zpp.DefEx, return_value zpp.DefReturn, val *types.Zval) {
+func ZifIsInfinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
 	var dval float64
 	for {
 		for {
@@ -565,7 +565,7 @@ func ZifIsInfinite(executeData zpp.DefEx, return_value zpp.DefReturn, val *types
 	types.ZVAL_BOOL(return_value, core.ZendIsInf(dval))
 	return
 }
-func ZifIsNan(executeData zpp.DefEx, return_value zpp.DefReturn, val *types.Zval) {
+func ZifIsNan(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
 	var dval float64
 	for {
 		for {
@@ -581,7 +581,7 @@ func ZifIsNan(executeData zpp.DefEx, return_value zpp.DefReturn, val *types.Zval
 	types.ZVAL_BOOL(return_value, core.ZendIsNaN(dval))
 	return
 }
-func ZifPow(executeData zpp.DefEx, return_value zpp.DefReturn, base *types.Zval, exponent *types.Zval) {
+func ZifPow(executeData zpp.Ex, return_value zpp.Ret, base *types.Zval, exponent *types.Zval) {
 	var zbase *types.Zval
 	var zexp *types.Zval
 	for {
@@ -598,7 +598,7 @@ func ZifPow(executeData zpp.DefEx, return_value zpp.DefReturn, base *types.Zval,
 	}
 	zend.PowFunction(return_value, zbase, zexp)
 }
-func ZifExp(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifExp(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -614,7 +614,7 @@ func ZifExp(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zva
 	return_value.SetDouble(exp(num))
 	return
 }
-func ZifExpm1(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifExpm1(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -630,7 +630,7 @@ func ZifExpm1(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetDouble(PhpExpm1(num))
 	return
 }
-func ZifLog1p(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifLog1p(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -646,7 +646,7 @@ func ZifLog1p(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetDouble(PhpLog1p(num))
 	return
 }
-func ZifLog(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, _ zpp.DefOpt, base *types.Zval) {
+func ZifLog(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, base *types.Zval) {
 	var num float64
 	var base float64 = 0
 	for {
@@ -682,7 +682,7 @@ func ZifLog(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zva
 	return_value.SetDouble(log(num) / log(base))
 	return
 }
-func ZifLog10(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifLog10(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -698,7 +698,7 @@ func ZifLog10(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Z
 	return_value.SetDouble(log10(num))
 	return
 }
-func ZifSqrt(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifSqrt(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var num float64
 	for {
 		for {
@@ -714,7 +714,7 @@ func ZifSqrt(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zv
 	return_value.SetDouble(sqrt(num))
 	return
 }
-func ZifHypot(executeData zpp.DefEx, return_value zpp.DefReturn, num1 *types.Zval, num2 *types.Zval) {
+func ZifHypot(executeData zpp.Ex, return_value zpp.Ret, num1 *types.Zval, num2 *types.Zval) {
 	var num1 float64
 	var num2 float64
 	for {
@@ -732,7 +732,7 @@ func ZifHypot(executeData zpp.DefEx, return_value zpp.DefReturn, num1 *types.Zva
 	return_value.SetDouble(hypot(num1, num2))
 	return
 }
-func ZifDeg2rad(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifDeg2rad(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var deg float64
 	for {
 		for {
@@ -748,7 +748,7 @@ func ZifDeg2rad(executeData zpp.DefEx, return_value zpp.DefReturn, number *types
 	return_value.SetDouble(deg / 180.0 * M_PI)
 	return
 }
-func ZifRad2deg(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval) {
+func ZifRad2deg(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	var rad float64
 	for {
 		for {
@@ -932,7 +932,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 	}
 	return _phpMathLongtobase(arg, base)
 }
-func ZifBindec(executeData zpp.DefEx, return_value zpp.DefReturn, binaryNumber *types.Zval) {
+func ZifBindec(executeData zpp.Ex, return_value zpp.Ret, binaryNumber *types.Zval) {
 	var arg *types.Zval
 	for {
 		for {
@@ -951,7 +951,7 @@ func ZifBindec(executeData zpp.DefEx, return_value zpp.DefReturn, binaryNumber *
 		return
 	}
 }
-func ZifHexdec(executeData zpp.DefEx, return_value zpp.DefReturn, hexadecimalNumber *types.Zval) {
+func ZifHexdec(executeData zpp.Ex, return_value zpp.Ret, hexadecimalNumber *types.Zval) {
 	var arg *types.Zval
 	for {
 		for {
@@ -970,7 +970,7 @@ func ZifHexdec(executeData zpp.DefEx, return_value zpp.DefReturn, hexadecimalNum
 		return
 	}
 }
-func ZifOctdec(executeData zpp.DefEx, return_value zpp.DefReturn, octalNumber *types.Zval) {
+func ZifOctdec(executeData zpp.Ex, return_value zpp.Ret, octalNumber *types.Zval) {
 	var arg *types.Zval
 	for {
 		for {
@@ -989,7 +989,7 @@ func ZifOctdec(executeData zpp.DefEx, return_value zpp.DefReturn, octalNumber *t
 		return
 	}
 }
-func ZifDecbin(executeData zpp.DefEx, return_value zpp.DefReturn, decimalNumber *types.Zval) {
+func ZifDecbin(executeData zpp.Ex, return_value zpp.Ret, decimalNumber *types.Zval) {
 	var arg *types.Zval
 	var result *types.String
 	for {
@@ -1010,7 +1010,7 @@ func ZifDecbin(executeData zpp.DefEx, return_value zpp.DefReturn, decimalNumber 
 	return_value.SetString(result)
 	return
 }
-func ZifDecoct(executeData zpp.DefEx, return_value zpp.DefReturn, decimalNumber *types.Zval) {
+func ZifDecoct(executeData zpp.Ex, return_value zpp.Ret, decimalNumber *types.Zval) {
 	var arg *types.Zval
 	var result *types.String
 	for {
@@ -1031,7 +1031,7 @@ func ZifDecoct(executeData zpp.DefEx, return_value zpp.DefReturn, decimalNumber 
 	return_value.SetString(result)
 	return
 }
-func ZifDechex(executeData zpp.DefEx, return_value zpp.DefReturn, decimalNumber *types.Zval) {
+func ZifDechex(executeData zpp.Ex, return_value zpp.Ret, decimalNumber *types.Zval) {
 	var arg *types.Zval
 	var result *types.String
 	for {
@@ -1052,7 +1052,7 @@ func ZifDechex(executeData zpp.DefEx, return_value zpp.DefReturn, decimalNumber 
 	return_value.SetString(result)
 	return
 }
-func ZifBaseConvert(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, frombase *types.Zval, tobase *types.Zval) {
+func ZifBaseConvert(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, frombase *types.Zval, tobase *types.Zval) {
 	var number *types.Zval
 	var temp types.Zval
 	var frombase zend.ZendLong
@@ -1232,7 +1232,7 @@ func _phpMathNumberFormatEx(
 	types.ZendStringReleaseEx(tmpbuf, 0)
 	return res
 }
-func ZifNumberFormat(executeData zpp.DefEx, return_value zpp.DefReturn, number *types.Zval, _ zpp.DefOpt, numDecimalPlaces *types.Zval, decSeparator *types.Zval, thousandsSeparator *types.Zval) {
+func ZifNumberFormat(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, numDecimalPlaces *types.Zval, decSeparator *types.Zval, thousandsSeparator *types.Zval) {
 	var num float64
 	var dec zend.ZendLong = 0
 	var thousand_sep *byte = nil
@@ -1278,7 +1278,7 @@ func ZifNumberFormat(executeData zpp.DefEx, return_value zpp.DefReturn, number *
 		return
 	}
 }
-func ZifFmod(executeData zpp.DefEx, return_value zpp.DefReturn, x *types.Zval, y *types.Zval) {
+func ZifFmod(executeData zpp.Ex, return_value zpp.Ret, x *types.Zval, y *types.Zval) {
 	var num1 float64
 	var num2 float64
 	for {
@@ -1296,7 +1296,7 @@ func ZifFmod(executeData zpp.DefEx, return_value zpp.DefReturn, x *types.Zval, y
 	return_value.SetDouble(fmod(num1, num2))
 	return
 }
-func ZifIntdiv(executeData zpp.DefEx, return_value zpp.DefReturn, dividend *types.Zval, divisor *types.Zval) {
+func ZifIntdiv(executeData zpp.Ex, return_value zpp.Ret, dividend *types.Zval, divisor *types.Zval) {
 	var dividend zend.ZendLong
 	var divisor zend.ZendLong
 	for {

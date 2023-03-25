@@ -82,7 +82,7 @@ func ZmDeactivateAssert(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmInfoAssert(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
-func ZifAssert(executeData zpp.DefEx, return_value zpp.DefReturn, assertion *types.Zval, _ zpp.DefOpt, description *types.Zval) {
+func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, _ zpp.Opt, description *types.Zval) {
 	var assertion *types.Zval
 	var description *types.Zval = nil
 	var val int
@@ -209,7 +209,7 @@ func ZifAssert(executeData zpp.DefEx, return_value zpp.DefReturn, assertion *typ
 	return_value.SetFalse()
 	return
 }
-func ZifAssertOptions(executeData zpp.DefEx, return_value zpp.DefReturn, what *types.Zval, _ zpp.DefOpt, value *types.Zval) {
+func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval, _ zpp.Opt, value *types.Zval) {
 	var value *types.Zval = nil
 	var what zend.ZendLong
 	var oldint types.ZendBool

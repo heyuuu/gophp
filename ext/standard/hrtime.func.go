@@ -5,6 +5,7 @@ import (
 	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func _timerInit() int {
@@ -25,7 +26,7 @@ func PHP_RETURN_HRTIME(t __auto__) {
 	return_value.SetLong(zend.ZendLong(t))
 	return
 }
-func ZifHrtime(executeData zpp.DefEx, return_value zpp.DefReturn, getAsNumber *types.Zval) {
+func ZifHrtime(executeData zpp.Ex, return_value zpp.Ret, getAsNumber *types.Zval) {
 	return_value.SetFalse()
 	return
 }

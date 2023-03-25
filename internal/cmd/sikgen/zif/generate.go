@@ -15,8 +15,8 @@ var (
 	// types
 	//typeEx         = f.RefType(f.Type("ZendExecuteData"))
 	//typeZval       = f.RefType(f.PkgIdent("types", "Zval"))
-	typeEx         = zppPkgIdent("DefEx")
-	typeZval       = zppPkgIdent("DefReturn")
+	typeEx         = zppPkgIdent("Ex")
+	typeZval       = zppPkgIdent("Ret")
 	typeArgInfo    = defPkgIdent("ArgInfo")
 	typeReturnInfo = defPkgIdent("ReturnInfo")
 

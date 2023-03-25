@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifEzmlmHash
-var DefZifEzmlmHash = def.DefFunc("ezmlm_hash", 1, 1, []def.ArgInfo{{Name: "addr"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifEzmlmHash = def.DefFunc("ezmlm_hash", 1, 1, []def.ArgInfo{{Name: "addr"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	addr := fp.ParseZval()
 	if fp.HasError() {
@@ -16,7 +16,7 @@ var DefZifEzmlmHash = def.DefFunc("ezmlm_hash", 1, 1, []def.ArgInfo{{Name: "addr
 })
 
 // generate by ZifMail
-var DefZifMail = def.DefFunc("mail", 3, 5, []def.ArgInfo{{Name: "to"}, {Name: "subject"}, {Name: "message"}, {Name: "additional_headers"}, {Name: "additional_parameters"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifMail = def.DefFunc("mail", 3, 5, []def.ArgInfo{{Name: "to"}, {Name: "subject"}, {Name: "message"}, {Name: "additional_headers"}, {Name: "additional_parameters"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 5, 0)
 	to := fp.ParseZval()
 	subject := fp.ParseZval()

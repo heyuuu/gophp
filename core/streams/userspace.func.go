@@ -8,6 +8,7 @@ import (
 	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func StreamWrapperDtor(rsrc *types.ZendResource) {
@@ -254,7 +255,7 @@ func UserWrapperOpendir(
 	standard.FG(user_stream_current_filename) = nil
 	return stream
 }
-func ZifStreamWrapperRegister(executeData zpp.DefEx, return_value zpp.DefReturn, protocol *types.Zval, classname *types.Zval, _ zpp.DefOpt, flags *types.Zval) {
+func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol *types.Zval, classname *types.Zval, _ zpp.Opt, flags *types.Zval) {
 	var protocol *types.String
 	var classname *types.String
 	var uwrap *PhpUserStreamWrapper
@@ -301,7 +302,7 @@ func ZifStreamWrapperRegister(executeData zpp.DefEx, return_value zpp.DefReturn,
 	return_value.SetFalse()
 	return
 }
-func ZifStreamWrapperUnregister(executeData zpp.DefEx, return_value zpp.DefReturn, protocol *types.Zval) {
+func ZifStreamWrapperUnregister(executeData zpp.Ex, return_value zpp.Ret, protocol *types.Zval) {
 	var protocol *types.String
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == types.FAILURE {
 		return_value.SetFalse()
@@ -318,7 +319,7 @@ func ZifStreamWrapperUnregister(executeData zpp.DefEx, return_value zpp.DefRetur
 	return_value.SetTrue()
 	return
 }
-func ZifStreamWrapperRestore(executeData zpp.DefEx, return_value zpp.DefReturn, protocol *types.Zval) {
+func ZifStreamWrapperRestore(executeData zpp.Ex, return_value zpp.Ret, protocol *types.Zval) {
 	var protocol *types.String
 	var wrapper *core.PhpStreamWrapper
 	var global_wrapper_hash *types.Array

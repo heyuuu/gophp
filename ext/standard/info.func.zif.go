@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifPhpversion
-var DefZifPhpversion = def.DefFunc("phpversion", 0, 1, []def.ArgInfo{{Name: "extension"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPhpversion = def.DefFunc("phpversion", 0, 1, []def.ArgInfo{{Name: "extension"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	extension := fp.ParseZval()
@@ -17,7 +17,7 @@ var DefZifPhpversion = def.DefFunc("phpversion", 0, 1, []def.ArgInfo{{Name: "ext
 })
 
 // generate by ZifPhpcredits
-var DefZifPhpcredits = def.DefFunc("phpcredits", 0, 1, []def.ArgInfo{{Name: "flag"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPhpcredits = def.DefFunc("phpcredits", 0, 1, []def.ArgInfo{{Name: "flag"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	flag := fp.ParseZval()
@@ -28,7 +28,7 @@ var DefZifPhpcredits = def.DefFunc("phpcredits", 0, 1, []def.ArgInfo{{Name: "fla
 })
 
 // generate by ZifPhpSapiName
-var DefZifPhpSapiName = def.DefFunc("php_sapi_name", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPhpSapiName = def.DefFunc("php_sapi_name", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -36,7 +36,7 @@ var DefZifPhpSapiName = def.DefFunc("php_sapi_name", 0, 0, []def.ArgInfo{}, func
 })
 
 // generate by ZifPhpUname
-var DefZifPhpUname = def.DefFunc("php_uname", 0, 1, []def.ArgInfo{{Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPhpUname = def.DefFunc("php_uname", 0, 1, []def.ArgInfo{{Name: "mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	mode := fp.ParseZval()
@@ -47,7 +47,7 @@ var DefZifPhpUname = def.DefFunc("php_uname", 0, 1, []def.ArgInfo{{Name: "mode"}
 })
 
 // generate by ZifPhpIniScannedFiles
-var DefZifPhpIniScannedFiles = def.DefFunc("php_ini_scanned_files", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPhpIniScannedFiles = def.DefFunc("php_ini_scanned_files", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -55,7 +55,7 @@ var DefZifPhpIniScannedFiles = def.DefFunc("php_ini_scanned_files", 0, 0, []def.
 })
 
 // generate by ZifPhpIniLoadedFile
-var DefZifPhpIniLoadedFile = def.DefFunc("php_ini_loaded_file", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPhpIniLoadedFile = def.DefFunc("php_ini_loaded_file", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}

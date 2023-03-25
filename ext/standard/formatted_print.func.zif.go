@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifUserSprintf
-var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	format := fp.ParseZval()
 	fp.StartOptional()
@@ -18,7 +18,7 @@ var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}
 })
 
 // generate by ZifVsprintf
-var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	format := fp.ParseZval()
 	args := fp.ParseZval()
@@ -29,7 +29,7 @@ var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"
 })
 
 // generate by ZifUserPrintf
-var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	format := fp.ParseZval()
 	fp.StartOptional()
@@ -41,7 +41,7 @@ var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, 
 })
 
 // generate by ZifVprintf
-var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	format := fp.ParseZval()
 	args := fp.ParseZval()
@@ -52,7 +52,7 @@ var DefZifVprintf = def.DefFunc("vprintf", 2, 2, []def.ArgInfo{{Name: "format"},
 })
 
 // generate by ZifFprintf
-var DefZifFprintf = def.DefFunc("fprintf", 2, -1, []def.ArgInfo{{Name: "stream"}, {Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFprintf = def.DefFunc("fprintf", 2, -1, []def.ArgInfo{{Name: "stream"}, {Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, -1, 0)
 	stream := fp.ParseZval()
 	format := fp.ParseZval()
@@ -65,7 +65,7 @@ var DefZifFprintf = def.DefFunc("fprintf", 2, -1, []def.ArgInfo{{Name: "stream"}
 })
 
 // generate by ZifVfprintf
-var DefZifVfprintf = def.DefFunc("vfprintf", 3, 3, []def.ArgInfo{{Name: "stream"}, {Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifVfprintf = def.DefFunc("vfprintf", 3, 3, []def.ArgInfo{{Name: "stream"}, {Name: "format"}, {Name: "args"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	stream := fp.ParseZval()
 	format := fp.ParseZval()

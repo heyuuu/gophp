@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifGethostname
-var DefZifGethostname = def.DefFunc("gethostname", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGethostname = def.DefFunc("gethostname", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -14,7 +14,7 @@ var DefZifGethostname = def.DefFunc("gethostname", 0, 0, []def.ArgInfo{}, func(e
 })
 
 // generate by ZifGethostbyaddr
-var DefZifGethostbyaddr = def.DefFunc("gethostbyaddr", 1, 1, []def.ArgInfo{{Name: "ip_address"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGethostbyaddr = def.DefFunc("gethostbyaddr", 1, 1, []def.ArgInfo{{Name: "ip_address"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	ip_address := fp.ParseZval()
 	if fp.HasError() {
@@ -24,7 +24,7 @@ var DefZifGethostbyaddr = def.DefFunc("gethostbyaddr", 1, 1, []def.ArgInfo{{Name
 })
 
 // generate by ZifGethostbyname
-var DefZifGethostbyname = def.DefFunc("gethostbyname", 1, 1, []def.ArgInfo{{Name: "hostname"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGethostbyname = def.DefFunc("gethostbyname", 1, 1, []def.ArgInfo{{Name: "hostname"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	hostname := fp.ParseZval()
 	if fp.HasError() {
@@ -34,7 +34,7 @@ var DefZifGethostbyname = def.DefFunc("gethostbyname", 1, 1, []def.ArgInfo{{Name
 })
 
 // generate by ZifGethostbynamel
-var DefZifGethostbynamel = def.DefFunc("gethostbynamel", 1, 1, []def.ArgInfo{{Name: "hostname"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGethostbynamel = def.DefFunc("gethostbynamel", 1, 1, []def.ArgInfo{{Name: "hostname"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	hostname := fp.ParseZval()
 	if fp.HasError() {
@@ -44,7 +44,7 @@ var DefZifGethostbynamel = def.DefFunc("gethostbynamel", 1, 1, []def.ArgInfo{{Na
 })
 
 // generate by ZifDnsCheckRecord
-var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	host := fp.ParseZval()
 	fp.StartOptional()
@@ -56,7 +56,7 @@ var DefZifDnsCheckRecord = def.DefFunc("dns_check_record", 1, 2, []def.ArgInfo{{
 })
 
 // generate by ZifDnsCheckRecord
-var DefZifCheckdnsrr = def.DefFunc("checkdnsrr", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifCheckdnsrr = def.DefFunc("checkdnsrr", 1, 2, []def.ArgInfo{{Name: "host"}, {Name: "type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	host := fp.ParseZval()
 	fp.StartOptional()
@@ -68,7 +68,7 @@ var DefZifCheckdnsrr = def.DefFunc("checkdnsrr", 1, 2, []def.ArgInfo{{Name: "hos
 })
 
 // generate by ZifDnsGetMx
-var DefZifDnsGetMx = def.DefFunc("dns_get_mx", 2, 3, []def.ArgInfo{{Name: "hostname"}, {Name: "mxhosts"}, {Name: "weight"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifDnsGetMx = def.DefFunc("dns_get_mx", 2, 3, []def.ArgInfo{{Name: "hostname"}, {Name: "mxhosts"}, {Name: "weight"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	hostname := fp.ParseZval()
 	mxhosts := fp.ParseZvalEx(false, true)
@@ -81,7 +81,7 @@ var DefZifDnsGetMx = def.DefFunc("dns_get_mx", 2, 3, []def.ArgInfo{{Name: "hostn
 })
 
 // generate by ZifDnsGetMx
-var DefZifGetmxrr = def.DefFunc("getmxrr", 2, 3, []def.ArgInfo{{Name: "hostname"}, {Name: "mxhosts"}, {Name: "weight"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGetmxrr = def.DefFunc("getmxrr", 2, 3, []def.ArgInfo{{Name: "hostname"}, {Name: "mxhosts"}, {Name: "weight"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	hostname := fp.ParseZval()
 	mxhosts := fp.ParseZvalEx(false, true)

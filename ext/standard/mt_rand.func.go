@@ -94,7 +94,7 @@ func PhpMtRand() uint32 {
 }
 
 //@zif -alias srand
-func ZifMtSrand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, seed *types.Zval, mode *types.Zval) {
+func ZifMtSrand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, seed *types.Zval, mode *types.Zval) {
 	var seed zend.ZendLong = 0
 	var mode zend.ZendLong = MT_RAND_MT19937
 	for {
@@ -170,7 +170,7 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	RAND_RANGE_BADSCALING(n, min, max, PHP_MT_RAND_MAX)
 	return n
 }
-func ZifMtRand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, min *types.Zval, max *types.Zval) {
+func ZifMtRand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, min *types.Zval, max *types.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var argc int = executeData.NumArgs()
@@ -203,7 +203,7 @@ func ZifMtRand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, 
 }
 
 //@zif -alias getrandmax
-func ZifMtGetrandmax(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifMtGetrandmax(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

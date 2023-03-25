@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifOpendir
-var DefZifOpendir = def.DefFunc("opendir", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifOpendir = def.DefFunc("opendir", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "context"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	path := fp.ParseZval()
 	fp.StartOptional()
@@ -18,7 +18,7 @@ var DefZifOpendir = def.DefFunc("opendir", 1, 2, []def.ArgInfo{{Name: "path"}, {
 })
 
 // generate by ZifGetdir
-var DefZifGetdir = def.DefFunc("getdir", 1, 2, []def.ArgInfo{{Name: "directory"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGetdir = def.DefFunc("getdir", 1, 2, []def.ArgInfo{{Name: "directory"}, {Name: "context"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	directory := fp.ParseZval()
 	fp.StartOptional()
@@ -30,7 +30,7 @@ var DefZifGetdir = def.DefFunc("getdir", 1, 2, []def.ArgInfo{{Name: "directory"}
 })
 
 // generate by ZifClosedir
-var DefZifClosedir = def.DefFunc("closedir", 0, 1, []def.ArgInfo{{Name: "dir_handle"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifClosedir = def.DefFunc("closedir", 0, 1, []def.ArgInfo{{Name: "dir_handle"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	dir_handle := fp.ParseZval()
@@ -41,7 +41,7 @@ var DefZifClosedir = def.DefFunc("closedir", 0, 1, []def.ArgInfo{{Name: "dir_han
 })
 
 // generate by ZifChroot
-var DefZifChroot = def.DefFunc("chroot", 1, 1, []def.ArgInfo{{Name: "directory"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifChroot = def.DefFunc("chroot", 1, 1, []def.ArgInfo{{Name: "directory"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	directory := fp.ParseZval()
 	if fp.HasError() {
@@ -51,7 +51,7 @@ var DefZifChroot = def.DefFunc("chroot", 1, 1, []def.ArgInfo{{Name: "directory"}
 })
 
 // generate by ZifChdir
-var DefZifChdir = def.DefFunc("chdir", 1, 1, []def.ArgInfo{{Name: "directory"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifChdir = def.DefFunc("chdir", 1, 1, []def.ArgInfo{{Name: "directory"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	directory := fp.ParseZval()
 	if fp.HasError() {
@@ -61,7 +61,7 @@ var DefZifChdir = def.DefFunc("chdir", 1, 1, []def.ArgInfo{{Name: "directory"}},
 })
 
 // generate by ZifGetcwd
-var DefZifGetcwd = def.DefFunc("getcwd", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGetcwd = def.DefFunc("getcwd", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -69,7 +69,7 @@ var DefZifGetcwd = def.DefFunc("getcwd", 0, 0, []def.ArgInfo{}, func(executeData
 })
 
 // generate by ZifRewinddir
-var DefZifRewinddir = def.DefFunc("rewinddir", 0, 1, []def.ArgInfo{{Name: "dir_handle"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifRewinddir = def.DefFunc("rewinddir", 0, 1, []def.ArgInfo{{Name: "dir_handle"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	dir_handle := fp.ParseZval()
@@ -80,7 +80,7 @@ var DefZifRewinddir = def.DefFunc("rewinddir", 0, 1, []def.ArgInfo{{Name: "dir_h
 })
 
 // generate by ZifGlob
-var DefZifGlob = def.DefFunc("glob", 1, 2, []def.ArgInfo{{Name: "pattern"}, {Name: "flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGlob = def.DefFunc("glob", 1, 2, []def.ArgInfo{{Name: "pattern"}, {Name: "flags"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	pattern := fp.ParseZval()
 	fp.StartOptional()
@@ -92,7 +92,7 @@ var DefZifGlob = def.DefFunc("glob", 1, 2, []def.ArgInfo{{Name: "pattern"}, {Nam
 })
 
 // generate by ZifScandir
-var DefZifScandir = def.DefFunc("scandir", 1, 3, []def.ArgInfo{{Name: "dir"}, {Name: "sorting_order"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifScandir = def.DefFunc("scandir", 1, 3, []def.ArgInfo{{Name: "dir"}, {Name: "sorting_order"}, {Name: "context"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	dir := fp.ParseZval()
 	fp.StartOptional()

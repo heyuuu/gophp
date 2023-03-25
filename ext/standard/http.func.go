@@ -228,7 +228,7 @@ func PhpUrlEncodeHashEx(
 	}
 	return types.SUCCESS
 }
-func ZifHttpBuildQuery(executeData zpp.DefEx, return_value zpp.DefReturn, formdata *types.Zval, _ zpp.DefOpt, prefix *types.Zval, argSeparator *types.Zval, encType *types.Zval) {
+func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types.Zval, _ zpp.Opt, prefix *types.Zval, argSeparator *types.Zval, encType *types.Zval) {
 	var formdata *types.Zval
 	var prefix *byte = nil
 	var arg_sep *byte = nil

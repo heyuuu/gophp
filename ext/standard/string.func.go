@@ -89,7 +89,7 @@ func LocaleconvR(out *__struct__lconv) *__struct__lconv {
 	*out = (*localeconv)()
 	return out
 }
-func ZifBin2hex(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Zval) {
+func ZifBin2hex(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
 	var result *types.String
 	var data *types.String
 	for {
@@ -111,7 +111,7 @@ func ZifBin2hex(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Z
 	return_value.SetString(result)
 	return
 }
-func ZifHex2bin(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Zval) {
+func ZifHex2bin(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
 	var result *types.String
 	var data *types.String
 	for {
@@ -194,13 +194,13 @@ func PhpSpnCommonHandler(executeData *zend.ZendExecuteData, return_value *types.
 		return
 	}
 }
-func ZifStrspn(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, mask *types.Zval, _ zpp.DefOpt, start *types.Zval, len_ *types.Zval) {
+func ZifStrspn(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, mask *types.Zval, _ zpp.Opt, start *types.Zval, len_ *types.Zval) {
 	PhpSpnCommonHandler(executeData, return_value, STR_STRSPN)
 }
-func ZifStrcspn(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, mask *types.Zval, _ zpp.DefOpt, start *types.Zval, len_ *types.Zval) {
+func ZifStrcspn(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, mask *types.Zval, _ zpp.Opt, start *types.Zval, len_ *types.Zval) {
 	PhpSpnCommonHandler(executeData, return_value, STR_STRCSPN)
 }
-func ZifStrcoll(executeData zpp.DefEx, return_value zpp.DefReturn, str1 *types.Zval, str2 *types.Zval) {
+func ZifStrcoll(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, str2 *types.Zval) {
 	var s1 *types.String
 	var s2 *types.String
 	for {
@@ -357,18 +357,18 @@ func PhpDoTrim(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 	}
 	return_value.SetString(PhpTrimInt(str, b.CondF1(what != nil, func() []byte { return what.GetVal() }, nil), b.CondF1(what != nil, func() int { return what.GetLen() }, 0), mode))
 }
-func ZifTrim(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, characterMask *types.Zval) {
+func ZifTrim(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, characterMask *types.Zval) {
 	PhpDoTrim(executeData, return_value, 3)
 }
 
 //@zif -alias chop
-func ZifRtrim(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, characterMask *types.Zval) {
+func ZifRtrim(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, characterMask *types.Zval) {
 	PhpDoTrim(executeData, return_value, 2)
 }
-func ZifLtrim(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, characterMask *types.Zval) {
+func ZifLtrim(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, characterMask *types.Zval) {
 	PhpDoTrim(executeData, return_value, 1)
 }
-func ZifWordwrap(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, width *types.Zval, break_ *types.Zval, cut *types.Zval) {
+func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, width *types.Zval, break_ *types.Zval, cut *types.Zval) {
 	var text *types.String
 	var breakchar *byte = "\n"
 	var newtextlen int
@@ -592,7 +592,7 @@ func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_valu
 		zend.Efree(any(positions))
 	}
 }
-func ZifExplode(executeData zpp.DefEx, return_value zpp.DefReturn, separator *types.Zval, str *types.Zval, _ zpp.DefOpt, limit *types.Zval) {
+func ZifExplode(executeData zpp.Ex, return_value zpp.Ret, separator *types.Zval, str *types.Zval, _ zpp.Opt, limit *types.Zval) {
 	var str *types.String
 	var delim *types.String
 	var limit zend.ZendLong = zend.ZEND_LONG_MAX
@@ -740,7 +740,7 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 }
 
 //@zif -alias join
-func ZifImplode(executeData zpp.DefEx, return_value zpp.DefReturn, glue *types.Zval, pieces *types.Zval) {
+func ZifImplode(executeData zpp.Ex, return_value zpp.Ret, glue *types.Zval, pieces *types.Zval) {
 	var arg1 *types.Zval
 	var arg2 *types.Zval = nil
 	var pieces *types.Zval
@@ -784,7 +784,7 @@ func ZifImplode(executeData zpp.DefEx, return_value zpp.DefReturn, glue *types.Z
 	zend.ZendTmpStringRelease(tmp_glue)
 }
 func STRTOK_TABLE(p *byte) __auto__ { return BG__().strtok_table[uint8(*p)] }
-func ZifStrtok(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, token *types.Zval) {
+func ZifStrtok(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, token *types.Zval) {
 	var str *types.String
 	var tok *types.String = nil
 	var token *byte
@@ -900,7 +900,7 @@ func PhpStringToupper(s *types.String) *types.String {
 	}
 	return s.Copy()
 }
-func ZifStrtoupper(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStrtoupper(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var arg *types.String
 	for {
 		for {
@@ -952,7 +952,7 @@ func PhpStringTolower(s *types.String) *types.String {
 	}
 	return s.Copy()
 }
-func ZifStrtolower(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStrtolower(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -1027,7 +1027,7 @@ quit_loop:
 	ret = types.NewString(b.CastStr(comp, len_))
 	return ret
 }
-func ZifBasename(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval, _ zpp.DefOpt, suffix *types.Zval) {
+func ZifBasename(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, suffix *types.Zval) {
 	var string *byte
 	var suffix *byte = nil
 	var string_len int
@@ -1049,7 +1049,7 @@ func ZifBasename(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.
 	return
 }
 func PhpDirname(path *byte, len_ int) int { return zend.ZendDirname(path, len_) }
-func ZifDirname(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval, _ zpp.DefOpt, levels *types.Zval) {
+func ZifDirname(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, levels *types.Zval) {
 	var str *byte
 	var str_len int
 	var ret *types.String
@@ -1097,7 +1097,7 @@ func ZifDirname(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Z
 	return_value.SetString(ret)
 	return
 }
-func ZifPathinfo(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval, _ zpp.DefOpt, options *types.Zval) {
+func ZifPathinfo(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, options *types.Zval) {
 	var tmp types.Zval
 	var path *byte
 	var dirname *byte
@@ -1234,7 +1234,7 @@ func PhpNeedleChar(needle *types.Zval, target *byte) int {
 		return types.FAILURE
 	}
 }
-func ZifStristr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, part *types.Zval) {
+func ZifStristr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, part *types.Zval) {
 	var needle *types.Zval
 	var haystack *types.String
 	var found *byte = nil
@@ -1292,7 +1292,7 @@ func ZifStristr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *typ
 }
 
 //@zif -alias strchr
-func ZifStrstr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, part *types.Zval) {
+func ZifStrstr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, part *types.Zval) {
 	var needle *types.Zval
 	var haystack *types.String
 	var found *byte = nil
@@ -1342,7 +1342,7 @@ func ZifStrstr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *type
 	return_value.SetFalse()
 	return
 }
-func ZifStrpos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, offset *types.Zval) {
+func ZifStrpos(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, offset *types.Zval) {
 	var needle *types.Zval
 	var haystack *types.String
 	var found *byte = nil
@@ -1394,7 +1394,7 @@ func ZifStrpos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *type
 		return
 	}
 }
-func ZifStripos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, offset *types.Zval) {
+func ZifStripos(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, offset *types.Zval) {
 	var found *byte = nil
 	var haystack *types.String
 	var offset zend.ZendLong = 0
@@ -1457,7 +1457,7 @@ func ZifStripos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *typ
 		types.ZendStringReleaseEx(needle_dup, 0)
 	}
 }
-func ZifStrrpos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, offset *types.Zval) {
+func ZifStrrpos(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, offset *types.Zval) {
 	var zneedle *types.Zval
 	var haystack *types.String
 	var needle_len int
@@ -1527,7 +1527,7 @@ func ZifStrrpos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *typ
 	return_value.SetFalse()
 	return
 }
-func ZifStrripos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, offset *types.Zval) {
+func ZifStrripos(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, offset *types.Zval) {
 	var zneedle *types.Zval
 	var needle *types.String
 	var haystack *types.String
@@ -1651,7 +1651,7 @@ func ZifStrripos(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *ty
 		return
 	}
 }
-func ZifStrrchr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval) {
+func ZifStrrchr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval) {
 	var needle *types.Zval
 	var haystack *types.String
 	var found *byte = nil
@@ -1729,7 +1729,7 @@ func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *
 	dest.SetLen(q - dest.GetVal())
 	return dest
 }
-func ZifChunkSplit(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, chunklen *types.Zval, ending *types.Zval) {
+func ZifChunkSplit(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, chunklen *types.Zval, ending *types.Zval) {
 	var str *types.String
 	var end *byte = "\r\n"
 	var endlen int = 2
@@ -1778,7 +1778,7 @@ func ZifChunkSplit(executeData zpp.DefEx, return_value zpp.DefReturn, str *types
 		return
 	}
 }
-func ZifSubstr(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, start *types.Zval, _ zpp.DefOpt, length *types.Zval) {
+func ZifSubstr(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, start *types.Zval, _ zpp.Opt, length *types.Zval) {
 	var str *types.String
 	var l zend.ZendLong = 0
 	var f zend.ZendLong
@@ -1869,7 +1869,7 @@ func ZifSubstr(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zva
 	return_value.SetRawString(b.CastStr(str.GetVal()+f, l))
 	return
 }
-func ZifSubstrReplace(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, replace *types.Zval, start *types.Zval, _ zpp.DefOpt, length *types.Zval) {
+func ZifSubstrReplace(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, replace *types.Zval, start *types.Zval, _ zpp.Opt, length *types.Zval) {
 	var str *types.Zval
 	var from *types.Zval
 	var len_ *types.Zval = nil
@@ -2131,7 +2131,7 @@ func ZifSubstrReplace(executeData zpp.DefEx, return_value zpp.DefReturn, str *ty
 		}
 	}
 }
-func ZifQuotemeta(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifQuotemeta(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var old *types.String
 	var old_end *byte
 	var p *byte
@@ -2191,7 +2191,7 @@ func ZifQuotemeta(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.
 	return_value.SetString(types.ZendStringTruncate(str, q-str.GetVal(), 0))
 	return
 }
-func ZifOrd(executeData zpp.DefEx, return_value zpp.DefReturn, character *types.Zval) {
+func ZifOrd(executeData zpp.Ex, return_value zpp.Ret, character *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -2207,7 +2207,7 @@ func ZifOrd(executeData zpp.DefEx, return_value zpp.DefReturn, character *types.
 	return_value.SetLong(uint8(str.GetVal()[0]))
 	return
 }
-func ZifChr(executeData zpp.DefEx, return_value zpp.DefReturn, codepoint *types.Zval) {
+func ZifChr(executeData zpp.Ex, return_value zpp.Ret, codepoint *types.Zval) {
 	var c zend.ZendLong
 	for {
 		for {
@@ -2234,7 +2234,7 @@ func PhpUcfirst(str *types.String) *types.String {
 		return s
 	}
 }
-func ZifUcfirst(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifUcfirst(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -2264,7 +2264,7 @@ func PhpLcfirst(str *types.String) *types.String {
 		return s
 	}
 }
-func ZifLcfirst(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifLcfirst(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -2284,7 +2284,7 @@ func ZifLcfirst(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zv
 	return_value.SetString(PhpLcfirst(str))
 	return
 }
-func ZifUcwords(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, delimiters *types.Zval) {
+func ZifUcwords(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, delimiters *types.Zval) {
 	var str *types.String
 	var delims *byte = " \t\r\nfv"
 	var r *byte
@@ -2886,7 +2886,7 @@ func PhpStrToStr(
 		return new_str
 	}
 }
-func ZifStrtr(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, from *types.Zval, _ zpp.DefOpt, to *types.Zval) {
+func ZifStrtr(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, from *types.Zval, _ zpp.Opt, to *types.Zval) {
 	var from *types.Zval
 	var str *types.String
 	var to *byte = nil
@@ -2971,7 +2971,7 @@ func ZifStrtr(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval
 		return
 	}
 }
-func ZifStrrev(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStrrev(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	var s *byte
 	var e *byte
@@ -3048,7 +3048,7 @@ func PhpSimilarChar(txt1 *byte, len1 int, txt2 *byte, len2 int) int {
 	}
 	return sum
 }
-func ZifSimilarText(executeData zpp.DefEx, return_value zpp.DefReturn, str1 *types.Zval, str2 *types.Zval, _ zpp.DefOpt, percent zpp.DefRef) {
+func ZifSimilarText(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, str2 *types.Zval, _ zpp.Opt, percent zpp.RefZval) {
 	var t1 *types.String
 	var t2 *types.String
 	var percent *types.Zval = nil
@@ -3082,7 +3082,7 @@ func ZifSimilarText(executeData zpp.DefEx, return_value zpp.DefReturn, str1 *typ
 	return_value.SetLong(sim)
 	return
 }
-func ZifAddcslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, charlist *types.Zval) {
+func ZifAddcslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, charlist *types.Zval) {
 	var str *types.String
 	var what *types.String
 	for {
@@ -3108,7 +3108,7 @@ func ZifAddcslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *type
 	return_value.SetString(PhpAddcslashesStr(str.GetVal(), str.GetLen(), what.GetVal(), what.GetLen()))
 	return
 }
-func ZifAddslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifAddslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -3128,7 +3128,7 @@ func ZifAddslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *types
 	return_value.SetString(PhpAddslashes(str))
 	return
 }
-func ZifStripcslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStripcslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -3144,7 +3144,7 @@ func ZifStripcslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *ty
 	return_value.SetRawString(str.GetStr())
 	PhpStripcslashes(return_value.GetStr())
 }
-func ZifStripslashes(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStripslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
 	for {
 		for {
@@ -3645,10 +3645,10 @@ func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zcount, count)
 	}
 }
-func ZifStrReplace(executeData zpp.DefEx, return_value zpp.DefReturn, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.DefOpt, replaceCount zpp.DefRef) {
+func ZifStrReplace(executeData zpp.Ex, return_value zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
 	PhpStrReplaceCommon(executeData, return_value, 1)
 }
-func ZifStrIreplace(executeData zpp.DefEx, return_value zpp.DefReturn, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.DefOpt, replaceCount zpp.DefRef) {
+func ZifStrIreplace(executeData zpp.Ex, return_value zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
 	PhpStrReplaceCommon(executeData, return_value, 0)
 }
 func PhpHebrev(executeData *zend.ZendExecuteData, return_value *types.Zval, convert_newlines int) {
@@ -3818,15 +3818,15 @@ func PhpHebrev(executeData *zend.ZendExecuteData, return_value *types.Zval, conv
 		return
 	}
 }
-func ZifHebrev(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, maxCharsPerLine *types.Zval) {
+func ZifHebrev(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, maxCharsPerLine *types.Zval) {
 	PhpHebrev(executeData, return_value, 0)
 }
-func ZifHebrevc(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, maxCharsPerLine *types.Zval) {
+func ZifHebrevc(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, maxCharsPerLine *types.Zval) {
 	PhpHebrev(executeData, return_value, 1)
 }
 
 /* in brief this inserts <br /> or <br> before matched regexp \n\r?|\r\n? */
-func ZifNl2br(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, isXhtml *types.Zval) {
+func ZifNl2br(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, isXhtml *types.Zval) {
 
 	var tmp *byte
 	var end *byte
@@ -3903,7 +3903,7 @@ func ZifNl2br(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval
 	return_value.SetString(result)
 	return
 }
-func ZifStripTags(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, allowableTags *types.Zval) {
+func ZifStripTags(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, allowableTags *types.Zval) {
 	var buf *types.String
 	var str *types.String
 	var allow *types.Zval = nil
@@ -3958,7 +3958,7 @@ func ZifStripTags(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.
 	return_value.SetString(buf)
 	return
 }
-func ZifSetlocale(executeData zpp.DefEx, return_value zpp.DefReturn, category *types.Zval, locales []*types.Zval) {
+func ZifSetlocale(executeData zpp.Ex, return_value zpp.Ret, category *types.Zval, locales []*types.Zval) {
 	var args *types.Zval = nil
 	var plocale *types.Zval
 	var loc *types.String
@@ -4058,7 +4058,7 @@ func ZifSetlocale(executeData zpp.DefEx, return_value zpp.DefReturn, category *t
 	return_value.SetFalse()
 	return
 }
-func ZifParseStr(executeData zpp.DefEx, return_value zpp.DefReturn, encodedString *types.Zval, _ zpp.DefOpt, result zpp.DefRef) {
+func ZifParseStr(executeData zpp.Ex, return_value zpp.Ret, encodedString *types.Zval, _ zpp.Opt, result zpp.RefZval) {
 	var arg *byte
 	var arrayArg *types.Zval = nil
 	var res *byte = nil
@@ -4495,7 +4495,7 @@ finish:
 	}
 	return size_t(rp - rbuf)
 }
-func ZifStrGetcsv(executeData zpp.DefEx, return_value zpp.DefReturn, string *types.Zval, _ zpp.DefOpt, delimiter *types.Zval, enclosure *types.Zval, escape *types.Zval) {
+func ZifStrGetcsv(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, delimiter *types.Zval, enclosure *types.Zval, escape *types.Zval) {
 	var str *types.String
 	var delim byte = ','
 	var enc byte = '"'
@@ -4540,7 +4540,7 @@ func ZifStrGetcsv(executeData zpp.DefEx, return_value zpp.DefReturn, string *typ
 	}
 	PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
-func ZifStrRepeat(executeData zpp.DefEx, return_value zpp.DefReturn, input *types.Zval, mult *types.Zval) {
+func ZifStrRepeat(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, mult *types.Zval) {
 	var input_str *types.String
 	var mult zend.ZendLong
 	var result *types.String
@@ -4601,7 +4601,7 @@ func ZifStrRepeat(executeData zpp.DefEx, return_value zpp.DefReturn, input *type
 	return_value.SetString(result)
 	return
 }
-func ZifCountChars(executeData zpp.DefEx, return_value zpp.DefReturn, input *types.Zval, _ zpp.DefOpt, mode *types.Zval) {
+func ZifCountChars(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, _ zpp.Opt, mode *types.Zval) {
 	var input *types.String
 	var chars []int
 	var mymode zend.ZendLong = 0
@@ -4699,10 +4699,10 @@ func StringNaturalCaseCompareFunction(result *types.Zval, op1 *types.Zval, op2 *
 func StringNaturalCompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	return StringNaturalCompareFunctionEx(result, op1, op2, 0)
 }
-func ZifStrnatcmp(executeData zpp.DefEx, return_value zpp.DefReturn, s1 *types.Zval, s2 *types.Zval) {
+func ZifStrnatcmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
 	PhpStrnatcmp(executeData, return_value, 0)
 }
-func ZifLocaleconv(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifLocaleconv(executeData zpp.Ex, return_value zpp.Ret) {
 	var grouping types.Zval
 	var mon_grouping types.Zval
 	var len_ int
@@ -4751,10 +4751,10 @@ func ZifLocaleconv(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	return_value.GetArr().KeyUpdate("grouping", &grouping)
 	return_value.GetArr().KeyUpdate("mon_grouping", &mon_grouping)
 }
-func ZifStrnatcasecmp(executeData zpp.DefEx, return_value zpp.DefReturn, s1 *types.Zval, s2 *types.Zval) {
+func ZifStrnatcasecmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
 	PhpStrnatcmp(executeData, return_value, 1)
 }
-func ZifSubstrCount(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, offset *types.Zval, length *types.Zval) {
+func ZifSubstrCount(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, offset *types.Zval, length *types.Zval) {
 	var haystack *byte
 	var needle *byte
 	var offset zend.ZendLong = 0
@@ -4824,7 +4824,7 @@ func ZifSubstrCount(executeData zpp.DefEx, return_value zpp.DefReturn, haystack 
 	return
 }
 
-func ZifStrPad(executeData zpp.DefEx, return_value zpp.DefReturn, input *types.Zval, padLength *types.Zval, _ zpp.DefOpt, padString *types.Zval, padType *types.Zval) {
+func ZifStrPad(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, padLength *types.Zval, _ zpp.Opt, padString *types.Zval, padType *types.Zval) {
 	/* Input arguments */
 	var input *types.String
 	var pad_length zend.ZendLong
@@ -4968,7 +4968,7 @@ func PhpStrRot13(str *types.String) *types.String {
 	*target = '0'
 	return ret
 }
-func ZifStrRot13(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStrRot13(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var arg *types.String
 	for {
 		for {
@@ -5006,7 +5006,7 @@ func PhpStringShuffle(str *byte, len_ zend.ZendLong) {
 		}
 	}
 }
-func ZifStrShuffle(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifStrShuffle(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var arg *types.String
 	for {
 		for {
@@ -5024,7 +5024,7 @@ func ZifStrShuffle(executeData zpp.DefEx, return_value zpp.DefReturn, str *types
 		PhpStringShuffle(return_value.GetStr().GetVal(), zend.ZendLong(return_value.GetStr().GetLen()))
 	}
 }
-func ZifStrWordCount(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, format *types.Zval, charlist *types.Zval) {
+func ZifStrWordCount(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, format *types.Zval, charlist *types.Zval) {
 	var str *types.String
 	var char_list *byte = nil
 	var ch []*byte
@@ -5108,7 +5108,7 @@ func ZifStrWordCount(executeData zpp.DefEx, return_value zpp.DefReturn, str *typ
 		return
 	}
 }
-func ZifMoneyFormat(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, value *types.Zval) {
+func ZifMoneyFormat(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, value *types.Zval) {
 	var format_len int = 0
 	var format *byte
 	var p *byte
@@ -5154,7 +5154,7 @@ func ZifMoneyFormat(executeData zpp.DefEx, return_value zpp.DefReturn, format *t
 	return_value.SetString(types.ZendStringTruncate(str, str.GetLen(), 0))
 	return
 }
-func ZifStrSplit(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, splitLength *types.Zval) {
+func ZifStrSplit(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, splitLength *types.Zval) {
 	var str *types.String
 	var split_length zend.ZendLong = 1
 	var p *byte
@@ -5193,7 +5193,7 @@ func ZifStrSplit(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Z
 		zend.AddNextIndexStringl(return_value, p, str.GetVal()+str.GetLen()-p)
 	}
 }
-func ZifStrpbrk(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, charList *types.Zval) {
+func ZifStrpbrk(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, charList *types.Zval) {
 	var haystack *types.String
 	var char_list *types.String
 	var haystack_ptr *byte
@@ -5227,7 +5227,7 @@ func ZifStrpbrk(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *typ
 	return_value.SetFalse()
 	return
 }
-func ZifSubstrCompare(executeData zpp.DefEx, return_value zpp.DefReturn, mainStr *types.Zval, str *types.Zval, offset *types.Zval, _ zpp.DefOpt, length *types.Zval, caseSensitivity *types.Zval) {
+func ZifSubstrCompare(executeData zpp.Ex, return_value zpp.Ret, mainStr *types.Zval, str *types.Zval, offset *types.Zval, _ zpp.Opt, length *types.Zval, caseSensitivity *types.Zval) {
 	var s1 *types.String
 	var s2 *types.String
 	var offset zend.ZendLong
@@ -5338,7 +5338,7 @@ func PhpUtf8Decode(s *byte, len_ int) *types.String {
 	}
 	return str
 }
-func ZifUtf8Encode(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Zval) {
+func ZifUtf8Encode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
 	var arg *byte
 	var arg_len int
 	for {
@@ -5355,7 +5355,7 @@ func ZifUtf8Encode(executeData zpp.DefEx, return_value zpp.DefReturn, data *type
 	return_value.SetString(PhpUtf8Encode(arg, arg_len))
 	return
 }
-func ZifUtf8Decode(executeData zpp.DefEx, return_value zpp.DefReturn, data *types.Zval) {
+func ZifUtf8Decode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
 	var arg *byte
 	var arg_len int
 	for {

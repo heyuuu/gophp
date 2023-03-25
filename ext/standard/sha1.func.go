@@ -9,7 +9,7 @@ import (
 )
 
 func MakeSha1Digest(sha1str *byte, digest *uint8) { MakeDigestEx(sha1str, digest, 20) }
-func ZifSha1(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, rawOutput *types.Zval) {
+func ZifSha1(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, rawOutput *types.Zval) {
 	var arg *types.String
 	var raw_output types.ZendBool = 0
 	var context PHP_SHA1_CTX
@@ -38,7 +38,7 @@ func ZifSha1(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval,
 		MakeDigestEx(return_value.GetStr().GetVal(), digest, 20)
 	}
 }
-func ZifSha1File(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval, _ zpp.DefOpt, rawOutput *types.Zval) {
+func ZifSha1File(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, rawOutput *types.Zval) {
 	var arg *byte
 	var arg_len int
 	var raw_output types.ZendBool = 0

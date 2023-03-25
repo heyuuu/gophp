@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifHeaderRegisterCallback
-var DefZifHeaderRegisterCallback = def.DefFunc("header_register_callback", 1, 1, []def.ArgInfo{{Name: "callback"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifHeaderRegisterCallback = def.DefFunc("header_register_callback", 1, 1, []def.ArgInfo{{Name: "callback"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	callback := fp.ParseZval()
 	if fp.HasError() {

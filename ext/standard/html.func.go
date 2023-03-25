@@ -1372,10 +1372,10 @@ func RegisterHtmlConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("ENT_XHTML", ENT_XHTML, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 	zend.RegisterLongConstant("ENT_HTML5", ENT_HTML5, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 }
-func ZifHtmlspecialchars(executeData zpp.DefEx, return_value zpp.DefReturn, string *types.Zval, _ zpp.DefOpt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
+func ZifHtmlspecialchars(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 0)
 }
-func ZifHtmlspecialcharsDecode(executeData zpp.DefEx, return_value zpp.DefReturn, string *types.Zval, _ zpp.DefOpt, quoteStyle *types.Zval) {
+func ZifHtmlspecialcharsDecode(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval) {
 	var str *types.String
 	var quote_style zend.ZendLong = ENT_COMPAT
 	var replaced *types.String
@@ -1400,7 +1400,7 @@ func ZifHtmlspecialcharsDecode(executeData zpp.DefEx, return_value zpp.DefReturn
 	return_value.SetFalse()
 	return
 }
-func ZifHtmlEntityDecode(executeData zpp.DefEx, return_value zpp.DefReturn, string *types.Zval, _ zpp.DefOpt, quoteStyle *types.Zval, encoding *types.Zval) {
+func ZifHtmlEntityDecode(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval) {
 	var str *types.String
 	var hint_charset *types.String = nil
 	var default_charset *byte
@@ -1431,7 +1431,7 @@ func ZifHtmlEntityDecode(executeData zpp.DefEx, return_value zpp.DefReturn, stri
 	return_value.SetFalse()
 	return
 }
-func ZifHtmlentities(executeData zpp.DefEx, return_value zpp.DefReturn, string *types.Zval, _ zpp.DefOpt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
+func ZifHtmlentities(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, quoteStyle *types.Zval, encoding *types.Zval, doubleEncode *types.Zval) {
 	PhpHtmlEntities(executeData, return_value, 1)
 }
 func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset, arr *types.Zval) {
@@ -1476,7 +1476,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 		}
 	}
 }
-func ZifGetHtmlTranslationTable(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, table *types.Zval, quoteStyle *types.Zval, encoding *types.Zval) {
+func ZifGetHtmlTranslationTable(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, table *types.Zval, quoteStyle *types.Zval, encoding *types.Zval) {
 	var all zend.ZendLong = HTML_SPECIALCHARS
 	var flags zend.ZendLong = ENT_COMPAT
 	var doctype int

@@ -295,7 +295,7 @@ just_path:
 	}
 	return ret
 }
-func ZifParseUrl(executeData zpp.DefEx, return_value zpp.DefReturn, url *types.Zval, _ zpp.DefOpt, component *types.Zval) {
+func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zpp.Opt, component *types.Zval) {
 	var str *byte
 	var str_len int
 	var resource *PhpUrl
@@ -452,7 +452,7 @@ func PhpUrlEncode(s *byte, len_ int) *types.String {
 	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
 	return start
 }
-func ZifUrlencode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifUrlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var in_str *types.String
 	for {
 		for {
@@ -468,7 +468,7 @@ func ZifUrlencode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.
 	return_value.SetString(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifUrldecode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifUrldecode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var in_str *types.String
 	var out_str *types.String
 	for {
@@ -530,7 +530,7 @@ func PhpRawUrlEncode(s *byte, len_ int) *types.String {
 	str = types.ZendStringTruncate(str, y, 0)
 	return str
 }
-func ZifRawurlencode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var in_str *types.String
 	for {
 		for {
@@ -546,7 +546,7 @@ func ZifRawurlencode(executeData zpp.DefEx, return_value zpp.DefReturn, str *typ
 	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifRawurldecode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifRawurldecode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var in_str *types.String
 	var out_str *types.String
 	for {
@@ -582,7 +582,7 @@ func PhpRawUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func ZifGetHeaders(executeData zpp.DefEx, return_value zpp.DefReturn, url *types.Zval, _ zpp.DefOpt, format *types.Zval, context *types.Zval) {
+func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zpp.Opt, format *types.Zval, context *types.Zval) {
 	var url *byte
 	var url_len int
 	var stream *core.PhpStream

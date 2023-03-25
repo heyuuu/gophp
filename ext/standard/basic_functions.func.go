@@ -294,7 +294,7 @@ func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
 	PhpInfoPrintTableEnd()
 	ZmInfoAssert(zend_module)
 }
-func ZifConstant(executeData zpp.DefEx, return_value zpp.DefReturn, constName *types.Zval) {
+func ZifConstant(executeData zpp.Ex, return_value zpp.Ret, constName *types.Zval) {
 	var const_name *types.String
 	var c *types.Zval
 	var scope *types.ClassEntry
@@ -326,7 +326,7 @@ func ZifConstant(executeData zpp.DefEx, return_value zpp.DefReturn, constName *t
 		return
 	}
 }
-func ZifInetNtop(executeData zpp.DefEx, return_value zpp.DefReturn, inAddr *types.Zval) {
+func ZifInetNtop(executeData zpp.Ex, return_value zpp.Ret, inAddr *types.Zval) {
 	var address *byte
 	var address_len int
 	var af int = AF_INET
@@ -356,7 +356,7 @@ func ZifInetNtop(executeData zpp.DefEx, return_value zpp.DefReturn, inAddr *type
 	return_value.SetRawString(b.CastStrAuto(buffer))
 	return
 }
-func ZifInetPton(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress string) {
+func ZifInetPton(executeData zpp.Ex, return_value zpp.Ret, ipAddress string) {
 	var ret int
 	var af int = AF_INET
 	var address *byte
@@ -389,7 +389,7 @@ func ZifInetPton(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress st
 	return_value.SetRawString(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
 	return
 }
-func ZifIp2long(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress *types.Zval) {
+func ZifIp2long(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval) {
 	var addr *byte
 	var addr_len int
 	var ip __struct__in_addr
@@ -411,7 +411,7 @@ func ZifIp2long(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress *ty
 	return_value.SetLong(ntohl(ip.s_addr))
 	return
 }
-func ZifLong2ip(executeData zpp.DefEx, return_value zpp.DefReturn, properAddress *types.Zval) {
+func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types.Zval) {
 	var ip zend.ZendUlong
 	var sip zend.ZendLong
 	var myaddr __struct__in_addr
@@ -440,7 +440,7 @@ func ZifLong2ip(executeData zpp.DefEx, return_value zpp.DefReturn, properAddress
 		return
 	}
 }
-func ZifGetenv(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, varname *types.Zval, localOnly *types.Zval) {
+func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *types.Zval, localOnly *types.Zval) {
 	var ptr *byte
 	var str *byte = nil
 	var str_len int
@@ -493,7 +493,7 @@ func ZifGetenv(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, 
 	return_value.SetFalse()
 	return
 }
-func ZifPutenv(executeData zpp.DefEx, return_value zpp.DefReturn, setting *types.Zval) {
+func ZifPutenv(executeData zpp.Ex, return_value zpp.Ret, setting *types.Zval) {
 	var setting *byte
 	var setting_len int
 	var p *byte
@@ -600,7 +600,7 @@ func ParseOpts(opts *byte, result **core.Opt) int {
 	}
 	return count
 }
-func ZifGetopt(executeData zpp.DefEx, return_value zpp.DefReturn, options *types.Zval, _ zpp.DefOpt, opts *types.Zval, optind zpp.DefRef) {
+func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ zpp.Opt, opts *types.Zval, optind zpp.RefZval) {
 	var options *byte = nil
 	var argv **byte = nil
 	var opt []byte = []byte{'0'}
@@ -819,13 +819,13 @@ func ZifGetopt(executeData zpp.DefEx, return_value zpp.DefReturn, options *types
 	zend.Efree(orig_opts)
 	FreeArgv(argv, argc)
 }
-func ZifFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifFlush(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	core.SapiFlush()
 }
-func ZifSleep(executeData zpp.DefEx, return_value zpp.DefReturn, seconds *types.Zval) {
+func ZifSleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval) {
 	var num zend.ZendLong
 	for {
 		for {
@@ -847,7 +847,7 @@ func ZifSleep(executeData zpp.DefEx, return_value zpp.DefReturn, seconds *types.
 	return_value.SetLong(core.PhpSleep(uint(num)))
 	return
 }
-func ZifUsleep(executeData zpp.DefEx, return_value zpp.DefReturn, microSeconds *types.Zval) {
+func ZifUsleep(executeData zpp.Ex, return_value zpp.Ret, microSeconds *types.Zval) {
 	var num zend.ZendLong
 	for {
 		for {
@@ -867,7 +867,7 @@ func ZifUsleep(executeData zpp.DefEx, return_value zpp.DefReturn, microSeconds *
 	}
 	usleep(uint(num))
 }
-func ZifTimeNanosleep(executeData zpp.DefEx, return_value zpp.DefReturn, seconds *types.Zval, nanoseconds *types.Zval) {
+func ZifTimeNanosleep(executeData zpp.Ex, return_value zpp.Ret, seconds *types.Zval, nanoseconds *types.Zval) {
 	var tv_sec zend.ZendLong
 	var tv_nsec zend.ZendLong
 	var php_req __struct__timespec
@@ -910,7 +910,7 @@ func ZifTimeNanosleep(executeData zpp.DefEx, return_value zpp.DefReturn, seconds
 	return_value.SetFalse()
 	return
 }
-func ZifTimeSleepUntil(executeData zpp.DefEx, return_value zpp.DefReturn, timestamp *types.Zval) {
+func ZifTimeSleepUntil(executeData zpp.Ex, return_value zpp.Ret, timestamp *types.Zval) {
 	var target_secs float64
 	var tm __struct__timeval
 	var php_req __struct__timespec
@@ -956,7 +956,7 @@ func ZifTimeSleepUntil(executeData zpp.DefEx, return_value zpp.DefReturn, timest
 	return_value.SetTrue()
 	return
 }
-func ZifGetCurrentUser(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetCurrentUser(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -992,7 +992,7 @@ func AddConfigEntries(hash *types.Array, return_value *types.Zval) {
 		AddConfigEntry(h, key, zv, return_value)
 	}
 }
-func ZifGetCfgVar(executeData zpp.DefEx, return_value zpp.DefReturn, optionName *types.Zval) {
+func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zval) {
 	var varname *byte
 	var varname_len int
 	var retval *types.Zval
@@ -1022,21 +1022,21 @@ func ZifGetCfgVar(executeData zpp.DefEx, return_value zpp.DefReturn, optionName 
 		return
 	}
 }
-func ZifGetMagicQuotesRuntime(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetMagicQuotesRuntime(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetFalse()
 	return
 }
-func ZifGetMagicQuotesGpc(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetMagicQuotesGpc(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetFalse()
 	return
 }
-func ZifErrorLog(executeData zpp.DefEx, return_value zpp.DefReturn, message *types.Zval, _ zpp.DefOpt, messageType *types.Zval, destination *types.Zval, extraHeaders *types.Zval) {
+func ZifErrorLog(executeData zpp.Ex, return_value zpp.Ret, message *types.Zval, _ zpp.Opt, messageType *types.Zval, destination *types.Zval, extraHeaders *types.Zval) {
 	var message *byte
 	var opt *byte = nil
 	var headers *byte = nil
@@ -1106,7 +1106,7 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 	}
 	return types.SUCCESS
 }
-func ZifErrorGetLast(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifErrorGetLast(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1122,7 +1122,7 @@ func ZifErrorGetLast(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		zend.AddAssocLongEx(return_value, "line", core.PG__().last_error_lineno)
 	}
 }
-func ZifErrorClearLast(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifErrorClearLast(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1137,7 +1137,7 @@ func ZifErrorClearLast(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		}
 	}
 }
-func ZifCallUserFunc(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval, _ zpp.DefOpt, parameters []*types.Zval) {
+func ZifCallUserFunc(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	var retval types.Zval
 	var fci types.ZendFcallInfo
 	var fci_cache types.ZendFcallInfoCache
@@ -1167,7 +1167,7 @@ func ZifCallUserFunc(executeData zpp.DefEx, return_value zpp.DefReturn, function
 		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 }
-func ZifCallUserFuncArray(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval, parameters *types.Zval) {
+func ZifCallUserFuncArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, parameters *types.Zval) {
 	var params *types.Zval
 	var retval types.Zval
 	var fci types.ZendFcallInfo
@@ -1194,7 +1194,7 @@ func ZifCallUserFuncArray(executeData zpp.DefEx, return_value zpp.DefReturn, fun
 	}
 	zend.ZendFcallInfoArgsClear(&fci, 1)
 }
-func ZifForwardStaticCall(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval, _ zpp.DefOpt, parameters []*types.Zval) {
+func ZifForwardStaticCall(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	var retval types.Zval
 	var fci types.ZendFcallInfo
 	var fci_cache types.ZendFcallInfoCache
@@ -1240,7 +1240,7 @@ func ZifForwardStaticCall(executeData zpp.DefEx, return_value zpp.DefReturn, fun
 		types.ZVAL_COPY_VALUE(return_value, &retval)
 	}
 }
-func ZifForwardStaticCallArray(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval, parameters *types.Zval) {
+func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, parameters *types.Zval) {
 	var params *types.Zval
 	var retval types.Zval
 	var fci types.ZendFcallInfo
@@ -1381,7 +1381,7 @@ func PhpFreeShutdownFunctions() {
 		zend.EG__().SetBailout(__orig_bailout)
 	}
 }
-func ZifRegisterShutdownFunction(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval, _ zpp.DefOpt, parameters []*types.Zval) {
+func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	var shutdown_function_entry PhpShutdownFunctionEntry
 	var i int
 	shutdown_function_entry.SetArgCount(executeData.NumArgs())
@@ -1447,7 +1447,7 @@ func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 }
 
 //@zif -alias show_source
-func ZifHighlightFile(executeData zpp.DefEx, return_value zpp.DefReturn, fileName *types.Zval, _ zpp.DefOpt, return_ *types.Zval) {
+func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var ret int
@@ -1491,7 +1491,7 @@ func ZifHighlightFile(executeData zpp.DefEx, return_value zpp.DefReturn, fileNam
 		return
 	}
 }
-func ZifPhpStripWhitespace(executeData zpp.DefEx, return_value zpp.DefReturn, fileName *types.Zval) {
+func ZifPhpStripWhitespace(executeData zpp.Ex, return_value zpp.Ret, fileName *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var original_lex_state zend.ZendLexState
@@ -1523,7 +1523,7 @@ func ZifPhpStripWhitespace(executeData zpp.DefEx, return_value zpp.DefReturn, fi
 	core.PhpOutputGetContents(return_value)
 	core.PhpOutputDiscard()
 }
-func ZifHighlightString(executeData zpp.DefEx, return_value zpp.DefReturn, string *types.Zval, _ zpp.DefOpt, return_ *types.Zval) {
+func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var expr *types.Zval
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 	var hicompiled_string_description *byte
@@ -1571,7 +1571,7 @@ func ZifHighlightString(executeData zpp.DefEx, return_value zpp.DefReturn, strin
 		return
 	}
 }
-func ZifIniGet(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types.Zval) {
+func ZifIniGet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval) {
 	var varname *types.String
 	var val *types.String
 	for {
@@ -1598,7 +1598,7 @@ func ZifIniGet(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types
 		return_value.SetString(val.Copy())
 	}
 }
-func ZifIniGetAll(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, extension *types.Zval, details *types.Zval) {
+func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension *types.Zval, details *types.Zval) {
 	var extname *byte = nil
 	var extname_len int = 0
 	var module_number int = 0
@@ -1676,7 +1676,7 @@ func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, 
 }
 
 //@zif -alias ini_alter
-func ZifIniSet(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types.Zval, newvalue *types.Zval) {
+func ZifIniSet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval, newvalue *types.Zval) {
 	var varname *types.String
 	var new_value *types.String
 	var val *types.String
@@ -1727,7 +1727,7 @@ func ZifIniSet(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types
 		return
 	}
 }
-func ZifIniRestore(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types.Zval) {
+func ZifIniRestore(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval) {
 	var varname *types.String
 	for {
 		for {
@@ -1742,7 +1742,7 @@ func ZifIniRestore(executeData zpp.DefEx, return_value zpp.DefReturn, varname *t
 	}
 	zend.ZendRestoreIniEntry(varname, core.PHP_INI_STAGE_RUNTIME)
 }
-func ZifSetIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn, newIncludePath *types.Zval) {
+func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath *types.Zval) {
 	var new_value *types.String
 	var old_value *byte
 	var key *types.String
@@ -1775,7 +1775,7 @@ func ZifSetIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn, newInc
 	}
 	types.ZendStringReleaseEx(key, 0)
 }
-func ZifGetIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 	var str *byte
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -1788,7 +1788,7 @@ func ZifGetIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	return_value.SetRawString(b.CastStrAuto(str))
 	return
 }
-func ZifRestoreIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifRestoreIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 	var key *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -1797,7 +1797,7 @@ func ZifRestoreIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
 	types.ZendStringEfree(key)
 }
-func ZifPrintR(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval, _ zpp.DefOpt, return_ *types.Zval) {
+func ZifPrintR(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
 	var do_return types.ZendBool = 0
 	for {
@@ -1823,15 +1823,15 @@ func ZifPrintR(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zv
 		return
 	}
 }
-func ZifConnectionAborted(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifConnectionAborted(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetLong(core.PG__().connection_status & core.PHP_CONNECTION_ABORTED)
 	return
 }
-func ZifConnectionStatus(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifConnectionStatus(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetLong(core.PG__().connection_status)
 	return
 }
-func ZifIgnoreUserAbort(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, value *types.Zval) {
+func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, value *types.Zval) {
 	var arg types.ZendBool = 0
 	var old_setting int
 	for {
@@ -1855,7 +1855,7 @@ func ZifIgnoreUserAbort(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp
 	return_value.SetLong(old_setting)
 	return
 }
-func ZifGetservbyname(executeData zpp.DefEx, return_value zpp.DefReturn, service *types.Zval, protocol *types.Zval) {
+func ZifGetservbyname(executeData zpp.Ex, return_value zpp.Ret, service *types.Zval, protocol *types.Zval) {
 	var name *byte
 	var proto *byte
 	var name_len int
@@ -1885,7 +1885,7 @@ func ZifGetservbyname(executeData zpp.DefEx, return_value zpp.DefReturn, service
 	return_value.SetLong(ntohs(serv.s_port))
 	return
 }
-func ZifGetservbyport(executeData zpp.DefEx, return_value zpp.DefReturn, port *types.Zval, protocol *types.Zval) {
+func ZifGetservbyport(executeData zpp.Ex, return_value zpp.Ret, port *types.Zval, protocol *types.Zval) {
 	var proto *byte
 	var proto_len int
 	var port zend.ZendLong
@@ -1910,7 +1910,7 @@ func ZifGetservbyport(executeData zpp.DefEx, return_value zpp.DefReturn, port *t
 	return_value.SetRawString(b.CastStrAuto(serv.s_name))
 	return
 }
-func ZifGetprotobyname(executeData zpp.DefEx, return_value zpp.DefReturn, name *types.Zval) {
+func ZifGetprotobyname(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval) {
 	var name *byte
 	var name_len int
 	var ent *__struct__protoent
@@ -1933,7 +1933,7 @@ func ZifGetprotobyname(executeData zpp.DefEx, return_value zpp.DefReturn, name *
 	return_value.SetLong(ent.p_proto)
 	return
 }
-func ZifGetprotobynumber(executeData zpp.DefEx, return_value zpp.DefReturn, proto *types.Zval) {
+func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types.Zval) {
 	var proto zend.ZendLong
 	var ent *__struct__protoent
 	for {
@@ -1955,7 +1955,7 @@ func ZifGetprotobynumber(executeData zpp.DefEx, return_value zpp.DefReturn, prot
 	return_value.SetRawString(b.CastStrAuto(ent.p_name))
 	return
 }
-func ZifRegisterTickFunction(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval, _ zpp.DefOpt, parameters []*types.Zval) {
+func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
 	var tick_fe UserTickFunctionEntry
 	var i int
 	var function_name *types.String = nil
@@ -1995,7 +1995,7 @@ func ZifRegisterTickFunction(executeData zpp.DefEx, return_value zpp.DefReturn, 
 	return_value.SetTrue()
 	return
 }
-func ZifUnregisterTickFunction(executeData zpp.DefEx, return_value zpp.DefReturn, functionName *types.Zval) {
+func ZifUnregisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
 	var function *types.Zval
 	var tick_fe UserTickFunctionEntry
 	for {
@@ -2021,7 +2021,7 @@ func ZifUnregisterTickFunction(executeData zpp.DefEx, return_value zpp.DefReturn
 	zend.ZendLlistDelElement(BG__().user_tick_functions, &tick_fe, (func(any, any) int)(UserTickFunctionCompare))
 	zend.Efree(tick_fe.GetArguments())
 }
-func ZifIsUploadedFile(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval) {
+func ZifIsUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
 	var path *byte
 	var path_len int
 	if !(core.SG__().rfc1867_uploaded_files) {
@@ -2047,7 +2047,7 @@ func ZifIsUploadedFile(executeData zpp.DefEx, return_value zpp.DefReturn, path *
 		return
 	}
 }
-func ZifMoveUploadedFile(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval, newPath *types.Zval) {
+func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, newPath *types.Zval) {
 	var path *byte
 	var new_path *byte
 	var path_len int
@@ -2165,7 +2165,7 @@ func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.
 		PhpSimpleIniParserCb(arg1, arg2, arg3, callback_type, active_arr)
 	}
 }
-func ZifParseIniFile(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval, _ zpp.DefOpt, processSections *types.Zval, scannerMode *types.Zval) {
+func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, processSections *types.Zval, scannerMode *types.Zval) {
 	var filename *byte = nil
 	var filename_len int = 0
 	var process_sections types.ZendBool = 0
@@ -2212,7 +2212,7 @@ func ZifParseIniFile(executeData zpp.DefEx, return_value zpp.DefReturn, filename
 		return
 	}
 }
-func ZifParseIniString(executeData zpp.DefEx, return_value zpp.DefReturn, iniString *types.Zval, _ zpp.DefOpt, processSections *types.Zval, scannerMode *types.Zval) {
+func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *types.Zval, _ zpp.Opt, processSections *types.Zval, scannerMode *types.Zval) {
 	var string *byte = nil
 	var str *byte = nil
 	var str_len int = 0
@@ -2259,7 +2259,7 @@ func ZifParseIniString(executeData zpp.DefEx, return_value zpp.DefReturn, iniStr
 	}
 	zend.Efree(string)
 }
-func ZifSysGetloadavg(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifSysGetloadavg(executeData zpp.Ex, return_value zpp.Ret) {
 	var load []float64
 	if !executeData.CheckNumArgsNone(false) {
 		return

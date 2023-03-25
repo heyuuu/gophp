@@ -6,7 +6,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifSoundex(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifSoundex(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *byte
 	var i int
 	var _small int

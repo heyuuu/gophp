@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifConvertCyrString
-var DefZifConvertCyrString = def.DefFunc("convert_cyr_string", 3, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifConvertCyrString = def.DefFunc("convert_cyr_string", 3, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 3, 0)
 	str := fp.ParseZval()
 	from := fp.ParseZval()

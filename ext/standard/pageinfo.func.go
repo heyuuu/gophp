@@ -3,6 +3,7 @@ package standard
 import (
 	"sik/core"
 	"sik/zend"
+	"sik/zend/zpp"
 )
 
 func PhpStatpage() {
@@ -28,7 +29,7 @@ func PhpGetgid() zend.ZendLong {
 	PhpStatpage()
 	return BG__().page_gid
 }
-func ZifGetmyuid(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetmyuid(executeData zpp.Ex, return_value zpp.Ret) {
 	var uid zend.ZendLong
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -42,7 +43,7 @@ func ZifGetmyuid(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifGetmygid(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetmygid(executeData zpp.Ex, return_value zpp.Ret) {
 	var gid zend.ZendLong
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -56,7 +57,7 @@ func ZifGetmygid(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifGetmypid(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetmypid(executeData zpp.Ex, return_value zpp.Ret) {
 	var pid zend.ZendLong
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -70,7 +71,7 @@ func ZifGetmypid(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifGetmyinode(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetmyinode(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -87,7 +88,7 @@ func PhpGetlastmod() int64 {
 	PhpStatpage()
 	return BG__().page_mtime
 }
-func ZifGetlastmod(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifGetlastmod(executeData zpp.Ex, return_value zpp.Ret) {
 	var lm zend.ZendLong
 	if !executeData.CheckNumArgsNone(false) {
 		return

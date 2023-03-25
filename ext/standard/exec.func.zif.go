@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifExec
-var DefZifExec = def.DefFunc("exec", 1, 3, []def.ArgInfo{{Name: "command"}, {Name: "output"}, {Name: "return_value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifExec = def.DefFunc("exec", 1, 3, []def.ArgInfo{{Name: "command"}, {Name: "output"}, {Name: "return_value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	command := fp.ParseZval()
 	fp.StartOptional()
@@ -19,7 +19,7 @@ var DefZifExec = def.DefFunc("exec", 1, 3, []def.ArgInfo{{Name: "command"}, {Nam
 })
 
 // generate by ZifSystem
-var DefZifSystem = def.DefFunc("system", 1, 2, []def.ArgInfo{{Name: "command"}, {Name: "return_value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifSystem = def.DefFunc("system", 1, 2, []def.ArgInfo{{Name: "command"}, {Name: "return_value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	command := fp.ParseZval()
 	fp.StartOptional()
@@ -31,7 +31,7 @@ var DefZifSystem = def.DefFunc("system", 1, 2, []def.ArgInfo{{Name: "command"}, 
 })
 
 // generate by ZifPassthru
-var DefZifPassthru = def.DefFunc("passthru", 1, 2, []def.ArgInfo{{Name: "command"}, {Name: "return_value"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPassthru = def.DefFunc("passthru", 1, 2, []def.ArgInfo{{Name: "command"}, {Name: "return_value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	command := fp.ParseZval()
 	fp.StartOptional()
@@ -43,7 +43,7 @@ var DefZifPassthru = def.DefFunc("passthru", 1, 2, []def.ArgInfo{{Name: "command
 })
 
 // generate by ZifEscapeshellcmd
-var DefZifEscapeshellcmd = def.DefFunc("escapeshellcmd", 1, 1, []def.ArgInfo{{Name: "command"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifEscapeshellcmd = def.DefFunc("escapeshellcmd", 1, 1, []def.ArgInfo{{Name: "command"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	command := fp.ParseZval()
 	if fp.HasError() {
@@ -53,7 +53,7 @@ var DefZifEscapeshellcmd = def.DefFunc("escapeshellcmd", 1, 1, []def.ArgInfo{{Na
 })
 
 // generate by ZifEscapeshellarg
-var DefZifEscapeshellarg = def.DefFunc("escapeshellarg", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifEscapeshellarg = def.DefFunc("escapeshellarg", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -63,7 +63,7 @@ var DefZifEscapeshellarg = def.DefFunc("escapeshellarg", 1, 1, []def.ArgInfo{{Na
 })
 
 // generate by ZifShellExec
-var DefZifShellExec = def.DefFunc("shell_exec", 1, 1, []def.ArgInfo{{Name: "cmd"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifShellExec = def.DefFunc("shell_exec", 1, 1, []def.ArgInfo{{Name: "cmd"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	cmd := fp.ParseZval()
 	if fp.HasError() {

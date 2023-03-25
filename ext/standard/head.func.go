@@ -9,7 +9,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifHeader(executeData zpp.DefEx, return_value zpp.DefReturn, header *types.Zval, _ zpp.DefOpt, replace *types.Zval, httpResponseCode *types.Zval) {
+func ZifHeader(executeData zpp.Ex, return_value zpp.Ret, header *types.Zval, _ zpp.Opt, replace *types.Zval, httpResponseCode *types.Zval) {
 	var rep types.ZendBool = 1
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int
@@ -30,7 +30,7 @@ func ZifHeader(executeData zpp.DefEx, return_value zpp.DefReturn, header *types.
 	ctr.SetLineLen(uint32(len_))
 	core.SapiHeaderOp(b.Cond(rep != 0, core.SAPI_HEADER_REPLACE, core.SAPI_HEADER_ADD), &ctr)
 }
-func ZifHeaderRemove(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, name *types.Zval) {
+func ZifHeaderRemove(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, name *types.Zval) {
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int = 0
 	for {
@@ -217,7 +217,7 @@ func PhpHeadParseCookieOptionsArray(
 
 	/* Array is not empty but no valid keys were found */
 }
-func ZifSetcookie(executeData zpp.DefEx, return_value zpp.DefReturn, name *types.Zval, _ zpp.DefOpt, value *types.Zval, expiresOrOptions *types.Zval, path *types.Zval, domain *types.Zval, secure *types.Zval, httponly *types.Zval) {
+func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ zpp.Opt, value *types.Zval, expiresOrOptions *types.Zval, path *types.Zval, domain *types.Zval, secure *types.Zval, httponly *types.Zval) {
 	var expires_or_options *types.Zval = nil
 	var name *types.String
 	var value *types.String = nil
@@ -276,7 +276,7 @@ func ZifSetcookie(executeData zpp.DefEx, return_value zpp.DefReturn, name *types
 		}
 	}
 }
-func ZifSetrawcookie(executeData zpp.DefEx, return_value zpp.DefReturn, name *types.Zval, _ zpp.DefOpt, value *types.Zval, expiresOrOptions *types.Zval, path *types.Zval, domain *types.Zval, secure *types.Zval, httponly *types.Zval) {
+func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ zpp.Opt, value *types.Zval, expiresOrOptions *types.Zval, path *types.Zval, domain *types.Zval, secure *types.Zval, httponly *types.Zval) {
 	var expires_or_options *types.Zval = nil
 	var name *types.String
 	var value *types.String = nil
@@ -335,7 +335,7 @@ func ZifSetrawcookie(executeData zpp.DefEx, return_value zpp.DefReturn, name *ty
 		}
 	}
 }
-func ZifHeadersSent(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, file zpp.DefRef, line zpp.DefRef) {
+func ZifHeadersSent(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, file zpp.RefZval, line zpp.RefZval) {
 	var arg1 *types.Zval = nil
 	var arg2 *types.Zval = nil
 	var file *byte = ""
@@ -382,14 +382,14 @@ func PhpHeadApplyHeaderListToHash(data any, arg any) {
 		zend.AddNextIndexString((*types.Zval)(arg), (*byte)(sapi_header.GetHeader()))
 	}
 }
-func ZifHeadersList(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifHeadersList(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	zend.ArrayInit(return_value)
 	core.SG__().sapi_headers.headers.ApplyWithArgument(PhpHeadApplyHeaderListToHash, return_value)
 }
-func ZifHttpResponseCode(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, responseCode *types.Zval) {
+func ZifHttpResponseCode(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, responseCode *types.Zval) {
 	var response_code zend.ZendLong = 0
 	for {
 		for {

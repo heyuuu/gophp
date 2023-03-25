@@ -3,6 +3,7 @@ package standard
 import (
 	"sik/zend"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func MODMULT(a int, b int, c int, m int, s int) {
@@ -47,7 +48,7 @@ func ZmStartupLcg(type_ int, module_number int) int {
 	LcgInitGlobals(&LcgGlobals)
 	return types.SUCCESS
 }
-func ZifLcgValue(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifLcgValue(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

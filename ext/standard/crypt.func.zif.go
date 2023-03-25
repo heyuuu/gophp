@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifCrypt
-var DefZifCrypt = def.DefFunc("crypt", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "salt"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifCrypt = def.DefFunc("crypt", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "salt"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	str := fp.ParseZval()
 	fp.StartOptional()

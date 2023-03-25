@@ -8,7 +8,7 @@ import (
 
 func PhpSrand(seed zend.ZendLong) { PhpMtSrand(seed) }
 func PhpRand() zend.ZendLong      { return PhpMtRand() }
-func ZifRand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, min *types.Zval, max *types.Zval) {
+func ZifRand(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, min *types.Zval, max *types.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var argc int = executeData.NumArgs()

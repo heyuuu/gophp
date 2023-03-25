@@ -579,7 +579,7 @@ func RegisterPhpinfoConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("CREDITS_QA", PHP_CREDITS_QA, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 	zend.RegisterLongConstant("CREDITS_ALL", PHP_CREDITS_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 }
-func ZifPhpversion(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, extension *types.Zval) {
+func ZifPhpversion(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension *types.Zval) {
 	var ext_name *byte = nil
 	var ext_name_len int = 0
 	for {
@@ -608,7 +608,7 @@ func ZifPhpversion(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefO
 		return
 	}
 }
-func ZifPhpcredits(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, flag *types.Zval) {
+func ZifPhpcredits(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, flag *types.Zval) {
 	var flag zend.ZendLong = PHP_CREDITS_ALL
 	for {
 		for {
@@ -626,14 +626,14 @@ func ZifPhpcredits(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefO
 	return_value.SetTrue()
 	return
 }
-func ZifPhpSapiName(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifPhpSapiName(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetRawString(core.SM__().Name())
 	return
 }
-func ZifPhpUname(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, mode *types.Zval) {
+func ZifPhpUname(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mode *types.Zval) {
 	var mode *byte = "a"
 	var modelen int = b.SizeOf("\"a\"") - 1
 	for {
@@ -651,7 +651,7 @@ func ZifPhpUname(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt
 	return_value.SetString(PhpGetUname(*mode))
 	return
 }
-func ZifPhpIniScannedFiles(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifPhpIniScannedFiles(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -663,7 +663,7 @@ func ZifPhpIniScannedFiles(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifPhpIniLoadedFile(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifPhpIniLoadedFile(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}

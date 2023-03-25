@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifParseUrl
-var DefZifParseUrl = def.DefFunc("parse_url", 1, 2, []def.ArgInfo{{Name: "url"}, {Name: "component"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifParseUrl = def.DefFunc("parse_url", 1, 2, []def.ArgInfo{{Name: "url"}, {Name: "component"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	url := fp.ParseZval()
 	fp.StartOptional()
@@ -18,7 +18,7 @@ var DefZifParseUrl = def.DefFunc("parse_url", 1, 2, []def.ArgInfo{{Name: "url"},
 })
 
 // generate by ZifUrlencode
-var DefZifUrlencode = def.DefFunc("urlencode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifUrlencode = def.DefFunc("urlencode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -28,7 +28,7 @@ var DefZifUrlencode = def.DefFunc("urlencode", 1, 1, []def.ArgInfo{{Name: "str"}
 })
 
 // generate by ZifUrldecode
-var DefZifUrldecode = def.DefFunc("urldecode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifUrldecode = def.DefFunc("urldecode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -38,7 +38,7 @@ var DefZifUrldecode = def.DefFunc("urldecode", 1, 1, []def.ArgInfo{{Name: "str"}
 })
 
 // generate by ZifRawurlencode
-var DefZifRawurlencode = def.DefFunc("rawurlencode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifRawurlencode = def.DefFunc("rawurlencode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -48,7 +48,7 @@ var DefZifRawurlencode = def.DefFunc("rawurlencode", 1, 1, []def.ArgInfo{{Name: 
 })
 
 // generate by ZifRawurldecode
-var DefZifRawurldecode = def.DefFunc("rawurldecode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifRawurldecode = def.DefFunc("rawurldecode", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	str := fp.ParseZval()
 	if fp.HasError() {
@@ -58,7 +58,7 @@ var DefZifRawurldecode = def.DefFunc("rawurldecode", 1, 1, []def.ArgInfo{{Name: 
 })
 
 // generate by ZifGetHeaders
-var DefZifGetHeaders = def.DefFunc("get_headers", 1, 3, []def.ArgInfo{{Name: "url"}, {Name: "format"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGetHeaders = def.DefFunc("get_headers", 1, 3, []def.ArgInfo{{Name: "url"}, {Name: "format"}, {Name: "context"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	url := fp.ParseZval()
 	fp.StartOptional()

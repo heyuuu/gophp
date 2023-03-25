@@ -6,7 +6,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifUniqid(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, prefix *types.Zval, moreEntropy *types.Zval) {
+func ZifUniqid(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, prefix *types.Zval, moreEntropy *types.Zval) {
 	var prefix *byte = ""
 	var more_entropy types.ZendBool = 0
 	var uniqid *types.String

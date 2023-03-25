@@ -17,7 +17,7 @@ func PhpSelect(m core.PhpSocketT, r *fd_set, w *fd_set, e *fd_set, t *__struct__
 func GET_CTX_OPT(stream *core.PhpStream, wrapper string, name string, val *types.Zval) bool {
 	return core.PHP_STREAM_CONTEXT(stream) != nil && nil != b.Assign(&val, streams.PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), wrapper, name))
 }
-func ZifStreamSocketPair(executeData zpp.DefEx, return_value zpp.DefReturn, domain *types.Zval, type_ *types.Zval, protocol *types.Zval) {
+func ZifStreamSocketPair(executeData zpp.Ex, return_value zpp.Ret, domain *types.Zval, type_ *types.Zval, protocol *types.Zval) {
 	var domain zend.ZendLong
 	var type_ zend.ZendLong
 	var protocol zend.ZendLong
@@ -56,7 +56,7 @@ func ZifStreamSocketPair(executeData zpp.DefEx, return_value zpp.DefReturn, doma
 	zend.AddNextIndexResource(return_value, s1.GetRes())
 	zend.AddNextIndexResource(return_value, s2.GetRes())
 }
-func ZifStreamSocketClient(executeData zpp.DefEx, return_value zpp.DefReturn, remoteaddress *types.Zval, _ zpp.DefOpt, errcode zpp.DefRef, errstring zpp.DefRef, timeout *types.Zval, flags *types.Zval, context *types.Zval) {
+func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddress *types.Zval, _ zpp.Opt, errcode zpp.RefZval, errstring zpp.RefZval, timeout *types.Zval, flags *types.Zval, context *types.Zval) {
 	var host *types.String
 	var zerrno *types.Zval = nil
 	var zerrstr *types.Zval = nil
@@ -134,7 +134,7 @@ func ZifStreamSocketClient(executeData zpp.DefEx, return_value zpp.DefReturn, re
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifStreamSocketServer(executeData zpp.DefEx, return_value zpp.DefReturn, localaddress *types.Zval, _ zpp.DefOpt, errcode zpp.DefRef, errstring zpp.DefRef, flags *types.Zval, context *types.Zval) {
+func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddress *types.Zval, _ zpp.Opt, errcode zpp.RefZval, errstring zpp.RefZval, flags *types.Zval, context *types.Zval) {
 	var host *byte
 	var host_len int
 	var zerrno *types.Zval = nil
@@ -194,7 +194,7 @@ func ZifStreamSocketServer(executeData zpp.DefEx, return_value zpp.DefReturn, lo
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifStreamSocketAccept(executeData zpp.DefEx, return_value zpp.DefReturn, serverstream *types.Zval, _ zpp.DefOpt, timeout *types.Zval, peername zpp.DefRef) {
+func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstream *types.Zval, _ zpp.Opt, timeout *types.Zval, peername zpp.RefZval) {
 	var timeout float64 = float64(FG(default_socket_timeout))
 	var zpeername *types.Zval = nil
 	var peername *types.String = nil
@@ -242,7 +242,7 @@ func ZifStreamSocketAccept(executeData zpp.DefEx, return_value zpp.DefReturn, se
 		types.ZendStringReleaseEx(errstr, 0)
 	}
 }
-func ZifStreamSocketGetName(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, wantPeer *types.Zval) {
+func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, wantPeer *types.Zval) {
 	var stream *core.PhpStream
 	var zstream *types.Zval
 	var want_peer types.ZendBool
@@ -272,7 +272,7 @@ func ZifStreamSocketGetName(executeData zpp.DefEx, return_value zpp.DefReturn, s
 	}
 	return_value.SetString(name)
 }
-func ZifStreamSocketSendto(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, data *types.Zval, _ zpp.DefOpt, flags *types.Zval, targetAddr *types.Zval) {
+func ZifStreamSocketSendto(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, data *types.Zval, _ zpp.Opt, flags *types.Zval, targetAddr *types.Zval) {
 	var stream *core.PhpStream
 	var zstream *types.Zval
 	var flags zend.ZendLong = 0
@@ -315,7 +315,7 @@ func ZifStreamSocketSendto(executeData zpp.DefEx, return_value zpp.DefReturn, st
 	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
-func ZifStreamSocketRecvfrom(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, amount *types.Zval, _ zpp.DefOpt, flags *types.Zval, remoteAddr zpp.DefRef) {
+func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, amount *types.Zval, _ zpp.Opt, flags *types.Zval, remoteAddr zpp.RefZval) {
 	var stream *core.PhpStream
 	var zstream *types.Zval
 	var zremote *types.Zval = nil
@@ -364,7 +364,7 @@ func ZifStreamSocketRecvfrom(executeData zpp.DefEx, return_value zpp.DefReturn, 
 	return_value.SetFalse()
 	return
 }
-func ZifStreamGetContents(executeData zpp.DefEx, return_value zpp.DefReturn, source *types.Zval, _ zpp.DefOpt, maxlen *types.Zval, offset *types.Zval) {
+func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *types.Zval, _ zpp.Opt, maxlen *types.Zval, offset *types.Zval) {
 	var stream *core.PhpStream
 	var zsrc *types.Zval
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
@@ -426,7 +426,7 @@ func ZifStreamGetContents(executeData zpp.DefEx, return_value zpp.DefReturn, sou
 		return
 	}
 }
-func ZifStreamCopyToStream(executeData zpp.DefEx, return_value zpp.DefReturn, source *types.Zval, dest *types.Zval, _ zpp.DefOpt, maxlen *types.Zval, pos *types.Zval) {
+func ZifStreamCopyToStream(executeData zpp.Ex, return_value zpp.Ret, source *types.Zval, dest *types.Zval, _ zpp.Opt, maxlen *types.Zval, pos *types.Zval) {
 	var src *core.PhpStream
 	var dest *core.PhpStream
 	var zsrc *types.Zval
@@ -466,7 +466,7 @@ func ZifStreamCopyToStream(executeData zpp.DefEx, return_value zpp.DefReturn, so
 	return_value.SetLong(len_)
 	return
 }
-func ZifStreamGetMetaData(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
+func ZifStreamGetMetaData(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	var zstream *types.Zval
 	var stream *core.PhpStream
 	for {
@@ -502,7 +502,7 @@ func ZifStreamGetMetaData(executeData zpp.DefEx, return_value zpp.DefReturn, fp 
 		zend.AddAssocString(return_value, "uri", stream.GetOrigPath())
 	}
 }
-func ZifStreamGetTransports(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifStreamGetTransports(executeData zpp.Ex, return_value zpp.Ret) {
 	var stream_xport_hash *types.Array
 	var stream_xport *types.String
 	if !executeData.CheckNumArgsNone(false) {
@@ -522,7 +522,7 @@ func ZifStreamGetTransports(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifStreamGetWrappers(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifStreamGetWrappers(executeData zpp.Ex, return_value zpp.Ret) {
 	var url_stream_wrappers_hash *types.Array
 	var stream_protocol *types.String
 	if !executeData.CheckNumArgsNone(false) {
@@ -708,7 +708,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	}
 	return ret
 }
-func ZifStreamSelect(executeData zpp.DefEx, return_value zpp.DefReturn, readStreams zpp.DefRef, writeStreams zpp.DefRef, exceptStreams zpp.DefRef, tvSec *types.Zval, _ zpp.DefOpt, tvUsec *types.Zval) {
+func ZifStreamSelect(executeData zpp.Ex, return_value zpp.Ret, readStreams zpp.RefZval, writeStreams zpp.RefZval, exceptStreams zpp.RefZval, tvSec *types.Zval, _ zpp.Opt, tvUsec *types.Zval) {
 	var r_array *types.Zval
 	var w_array *types.Zval
 	var e_array *types.Zval
@@ -941,7 +941,7 @@ func DecodeContextParam(contextresource *types.Zval) *core.PhpStreamContext {
 	}
 	return context
 }
-func ZifStreamContextGetOptions(executeData zpp.DefEx, return_value zpp.DefReturn, streamOrContext *types.Zval) {
+func ZifStreamContextGetOptions(executeData zpp.Ex, return_value zpp.Ret, streamOrContext *types.Zval) {
 	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
@@ -964,7 +964,7 @@ func ZifStreamContextGetOptions(executeData zpp.DefEx, return_value zpp.DefRetur
 	}
 	types.ZVAL_COPY(return_value, context.GetOptions())
 }
-func ZifStreamContextSetOption(executeData zpp.DefEx, return_value zpp.DefReturn, streamOrContext *types.Zval, wrappername *types.Zval, _ zpp.DefOpt, optionname *types.Zval, value *types.Zval) {
+func ZifStreamContextSetOption(executeData zpp.Ex, return_value zpp.Ret, streamOrContext *types.Zval, wrappername *types.Zval, _ zpp.Opt, optionname *types.Zval, value *types.Zval) {
 	var zcontext *types.Zval = nil
 	var context *core.PhpStreamContext
 	if executeData.NumArgs() == 2 {
@@ -1030,7 +1030,7 @@ func ZifStreamContextSetOption(executeData zpp.DefEx, return_value zpp.DefReturn
 		return
 	}
 }
-func ZifStreamContextSetParams(executeData zpp.DefEx, return_value zpp.DefReturn, streamOrContext *types.Zval, options *types.Zval) {
+func ZifStreamContextSetParams(executeData zpp.Ex, return_value zpp.Ret, streamOrContext *types.Zval, options *types.Zval) {
 	var params *types.Zval
 	var zcontext *types.Zval
 	var context *core.PhpStreamContext
@@ -1055,7 +1055,7 @@ func ZifStreamContextSetParams(executeData zpp.DefEx, return_value zpp.DefReturn
 	}
 	types.ZVAL_BOOL(return_value, ParseContextParams(context, params) == types.SUCCESS)
 }
-func ZifStreamContextGetParams(executeData zpp.DefEx, return_value zpp.DefReturn, streamOrContext *types.Zval) {
+func ZifStreamContextGetParams(executeData zpp.Ex, return_value zpp.Ret, streamOrContext *types.Zval) {
 	var zcontext *types.Zval
 	var context *core.PhpStreamContext
 	for {
@@ -1084,7 +1084,7 @@ func ZifStreamContextGetParams(executeData zpp.DefEx, return_value zpp.DefReturn
 	context.GetOptions().TryAddRefcount()
 	zend.AddAssocZvalEx(return_value, "options", context.GetOptions())
 }
-func ZifStreamContextGetDefault(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, options *types.Zval) {
+func ZifStreamContextGetDefault(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, options *types.Zval) {
 	var params *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
@@ -1109,7 +1109,7 @@ func ZifStreamContextGetDefault(executeData zpp.DefEx, return_value zpp.DefRetur
 	}
 	streams.PhpStreamContextToZval(context, return_value)
 }
-func ZifStreamContextSetDefault(executeData zpp.DefEx, return_value zpp.DefReturn, options *types.Zval) {
+func ZifStreamContextSetDefault(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval) {
 	var options *types.Zval = nil
 	var context *core.PhpStreamContext
 	for {
@@ -1130,7 +1130,7 @@ func ZifStreamContextSetDefault(executeData zpp.DefEx, return_value zpp.DefRetur
 	ParseContextOptions(context, options)
 	streams.PhpStreamContextToZval(context, return_value)
 }
-func ZifStreamContextCreate(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, options *types.Zval, params *types.Zval) {
+func ZifStreamContextCreate(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, options *types.Zval, params *types.Zval) {
 	var options *types.Zval = nil
 	var params *types.Zval = nil
 	var context *core.PhpStreamContext
@@ -1243,13 +1243,13 @@ func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_v
 		return
 	}
 }
-func ZifStreamFilterPrepend(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, filtername *types.Zval, _ zpp.DefOpt, readWrite *types.Zval, filterparams *types.Zval) {
+func ZifStreamFilterPrepend(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, filtername *types.Zval, _ zpp.Opt, readWrite *types.Zval, filterparams *types.Zval) {
 	ApplyFilterToStream(0, executeData, return_value)
 }
-func ZifStreamFilterAppend(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, filtername *types.Zval, _ zpp.DefOpt, readWrite *types.Zval, filterparams *types.Zval) {
+func ZifStreamFilterAppend(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, filtername *types.Zval, _ zpp.Opt, readWrite *types.Zval, filterparams *types.Zval) {
 	ApplyFilterToStream(1, executeData, return_value)
 }
-func ZifStreamFilterRemove(executeData zpp.DefEx, return_value zpp.DefReturn, streamFilter *types.Zval) {
+func ZifStreamFilterRemove(executeData zpp.Ex, return_value zpp.Ret, streamFilter *types.Zval) {
 	var zfilter *types.Zval
 	var filter *core.PhpStreamFilter
 	for {
@@ -1285,7 +1285,7 @@ func ZifStreamFilterRemove(executeData zpp.DefEx, return_value zpp.DefReturn, st
 		return
 	}
 }
-func ZifStreamGetLine(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, maxlen *types.Zval, _ zpp.DefOpt, ending *types.Zval) {
+func ZifStreamGetLine(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, maxlen *types.Zval, _ zpp.Opt, ending *types.Zval) {
 	var str *byte = nil
 	var str_len int = 0
 	var max_length zend.ZendLong
@@ -1326,7 +1326,7 @@ func ZifStreamGetLine(executeData zpp.DefEx, return_value zpp.DefReturn, stream 
 }
 
 //@zif -alias socket_set_blocking
-func ZifStreamSetBlocking(executeData zpp.DefEx, return_value zpp.DefReturn, socket *types.Zval, mode *types.Zval) {
+func ZifStreamSetBlocking(executeData zpp.Ex, return_value zpp.Ret, socket *types.Zval, mode *types.Zval) {
 	var zstream *types.Zval
 	var block types.ZendBool
 	var stream *core.PhpStream
@@ -1350,7 +1350,7 @@ func ZifStreamSetBlocking(executeData zpp.DefEx, return_value zpp.DefReturn, soc
 	return_value.SetTrue()
 	return
 }
-func ZifStreamSetTimeout(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, seconds *types.Zval, _ zpp.DefOpt, microseconds *types.Zval) {
+func ZifStreamSetTimeout(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, seconds *types.Zval, _ zpp.Opt, microseconds *types.Zval) {
 	var socket *types.Zval
 	var seconds zend.ZendLong
 	var microseconds zend.ZendLong = 0
@@ -1388,7 +1388,7 @@ func ZifStreamSetTimeout(executeData zpp.DefEx, return_value zpp.DefReturn, stre
 }
 
 //@zif -alias set_file_buffer
-func ZifStreamSetWriteBuffer(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, buffer *types.Zval) {
+func ZifStreamSetWriteBuffer(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, buffer *types.Zval) {
 	var arg1 *types.Zval
 	var ret int
 	var arg2 zend.ZendLong
@@ -1420,7 +1420,7 @@ func ZifStreamSetWriteBuffer(executeData zpp.DefEx, return_value zpp.DefReturn, 
 	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
-func ZifStreamSetChunkSize(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, chunkSize *types.Zval) {
+func ZifStreamSetChunkSize(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, chunkSize *types.Zval) {
 	var ret int
 	var csize zend.ZendLong
 	var zstream *types.Zval
@@ -1459,7 +1459,7 @@ func ZifStreamSetChunkSize(executeData zpp.DefEx, return_value zpp.DefReturn, fp
 	return_value.SetLong(b.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
 	return
 }
-func ZifStreamSetReadBuffer(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, buffer *types.Zval) {
+func ZifStreamSetReadBuffer(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, buffer *types.Zval) {
 	var arg1 *types.Zval
 	var ret int
 	var arg2 zend.ZendLong
@@ -1491,7 +1491,7 @@ func ZifStreamSetReadBuffer(executeData zpp.DefEx, return_value zpp.DefReturn, f
 	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
-func ZifStreamSocketEnableCrypto(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, enable *types.Zval, _ zpp.DefOpt, cryptokind *types.Zval, sessionstream *types.Zval) {
+func ZifStreamSocketEnableCrypto(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, enable *types.Zval, _ zpp.Opt, cryptokind *types.Zval, sessionstream *types.Zval) {
 	var cryptokind zend.ZendLong = 0
 	var zstream *types.Zval
 	var zsessstream *types.Zval = nil
@@ -1548,7 +1548,7 @@ func ZifStreamSocketEnableCrypto(executeData zpp.DefEx, return_value zpp.DefRetu
 		return
 	}
 }
-func ZifStreamResolveIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval) {
+func ZifStreamResolveIncludePath(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
 	var resolved_path *string
@@ -1571,7 +1571,7 @@ func ZifStreamResolveIncludePath(executeData zpp.DefEx, return_value zpp.DefRetu
 	return_value.SetFalse()
 	return
 }
-func ZifStreamIsLocal(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval) {
+func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval) {
 	var zstream *types.Zval
 	var stream *core.PhpStream = nil
 	var wrapper *core.PhpStreamWrapper = nil
@@ -1607,7 +1607,7 @@ func ZifStreamIsLocal(executeData zpp.DefEx, return_value zpp.DefReturn, stream 
 	types.ZVAL_BOOL(return_value, wrapper.GetIsUrl() == 0)
 	return
 }
-func ZifStreamSupportsLock(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval) {
+func ZifStreamSupportsLock(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval) {
 	var stream *core.PhpStream
 	var zsrc *types.Zval
 	for {
@@ -1630,7 +1630,7 @@ func ZifStreamSupportsLock(executeData zpp.DefEx, return_value zpp.DefReturn, st
 	return_value.SetTrue()
 	return
 }
-func ZifStreamIsatty(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval) {
+func ZifStreamIsatty(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval) {
 	var zsrc *types.Zval
 	var stream *core.PhpStream
 	var fileno core.PhpSocketT
@@ -1662,7 +1662,7 @@ func ZifStreamIsatty(executeData zpp.DefEx, return_value zpp.DefReturn, stream *
 
 	/* Check if the file descriptor identifier is a terminal */
 }
-func ZifStreamSocketShutdown(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, how *types.Zval) {
+func ZifStreamSocketShutdown(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, how *types.Zval) {
 	var how zend.ZendLong
 	var zstream *types.Zval
 	var stream *core.PhpStream

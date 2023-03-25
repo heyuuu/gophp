@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifMicrotime
-var DefZifMicrotime = def.DefFunc("microtime", 0, 1, []def.ArgInfo{{Name: "get_as_float"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifMicrotime = def.DefFunc("microtime", 0, 1, []def.ArgInfo{{Name: "get_as_float"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	get_as_float := fp.ParseZval()
@@ -17,7 +17,7 @@ var DefZifMicrotime = def.DefFunc("microtime", 0, 1, []def.ArgInfo{{Name: "get_a
 })
 
 // generate by ZifGettimeofday
-var DefZifGettimeofday = def.DefFunc("gettimeofday", 0, 1, []def.ArgInfo{{Name: "get_as_float"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGettimeofday = def.DefFunc("gettimeofday", 0, 1, []def.ArgInfo{{Name: "get_as_float"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	get_as_float := fp.ParseZval()
@@ -28,7 +28,7 @@ var DefZifGettimeofday = def.DefFunc("gettimeofday", 0, 1, []def.ArgInfo{{Name: 
 })
 
 // generate by ZifGetrusage
-var DefZifGetrusage = def.DefFunc("getrusage", 0, 1, []def.ArgInfo{{Name: "who"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifGetrusage = def.DefFunc("getrusage", 0, 1, []def.ArgInfo{{Name: "who"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	who := fp.ParseZval()

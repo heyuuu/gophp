@@ -6,6 +6,7 @@ import (
 	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpInetNtop(addr *__struct__sockaddr) *types.String {
@@ -75,7 +76,7 @@ func IfaceAppendUnicast(
 	}
 	zend.AddNextIndexZval(unicast, &u)
 }
-func ZifNetGetInterfaces(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifNetGetInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
 	if !executeData.CheckNumArgsNone(false) {

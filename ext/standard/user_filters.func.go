@@ -10,7 +10,7 @@ import (
 	"sik/zend/zpp"
 )
 
-func ZifUserFilterNop(executeData zpp.DefEx, return_value zpp.DefReturn) {}
+func ZifUserFilterNop(executeData zpp.Ex, return_value zpp.Ret) {}
 func PhpBucketDtor(res *types.ZendResource) {
 	var bucket *streams.PhpStreamBucket = (*streams.PhpStreamBucket)(res.GetPtr())
 	if bucket != nil {
@@ -323,7 +323,7 @@ func FilterItemDtor(zv *types.Zval) {
 	types.ZendStringReleaseEx(fdat.GetClassname(), 0)
 	zend.Efree(fdat)
 }
-func ZifStreamBucketMakeWriteable(executeData zpp.DefEx, return_value zpp.DefReturn, brigade *types.Zval) {
+func ZifStreamBucketMakeWriteable(executeData zpp.Ex, return_value zpp.Ret, brigade *types.Zval) {
 	var zbrigade *types.Zval
 	var zbucket types.Zval
 	var brigade *streams.PhpStreamBucketBrigade
@@ -418,13 +418,13 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 	 * multiple times. See bug35916.phpt for reference.
 	 */
 }
-func ZifStreamBucketPrepend(executeData zpp.DefEx, return_value zpp.DefReturn, brigade *types.Zval, bucket *types.Zval) {
+func ZifStreamBucketPrepend(executeData zpp.Ex, return_value zpp.Ret, brigade *types.Zval, bucket *types.Zval) {
 	PhpStreamBucketAttach(0, executeData, return_value)
 }
-func ZifStreamBucketAppend(executeData zpp.DefEx, return_value zpp.DefReturn, brigade *types.Zval, bucket *types.Zval) {
+func ZifStreamBucketAppend(executeData zpp.Ex, return_value zpp.Ret, brigade *types.Zval, bucket *types.Zval) {
 	PhpStreamBucketAttach(1, executeData, return_value)
 }
-func ZifStreamBucketNew(executeData zpp.DefEx, return_value zpp.DefReturn, stream *types.Zval, buffer *types.Zval) {
+func ZifStreamBucketNew(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, buffer *types.Zval) {
 	var zstream *types.Zval
 	var zbucket types.Zval
 	var stream *core.PhpStream
@@ -463,7 +463,7 @@ func ZifStreamBucketNew(executeData zpp.DefEx, return_value zpp.DefReturn, strea
 	zend.AddPropertyStringl(return_value, "data", b.CastStr(bucket.GetBuf(), bucket.GetBuflen()))
 	zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 }
-func ZifStreamGetFilters(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifStreamGetFilters(executeData zpp.Ex, return_value zpp.Ret) {
 	var filter_name *types.String
 	var filters_hash *types.Array
 	if !executeData.CheckNumArgsNone(false) {
@@ -483,7 +483,7 @@ func ZifStreamGetFilters(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		}
 	}
 }
-func ZifStreamFilterRegister(executeData zpp.DefEx, return_value zpp.DefReturn, filtername *types.Zval, classname *types.Zval) {
+func ZifStreamFilterRegister(executeData zpp.Ex, return_value zpp.Ret, filtername *types.Zval, classname *types.Zval) {
 	var filtername *types.String
 	var classname *types.String
 	var fdat *PhpUserFilterData

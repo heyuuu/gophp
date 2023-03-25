@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifHeader
-var DefZifHeader = def.DefFunc("header", 1, 3, []def.ArgInfo{{Name: "header"}, {Name: "replace"}, {Name: "http_response_code"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifHeader = def.DefFunc("header", 1, 3, []def.ArgInfo{{Name: "header"}, {Name: "replace"}, {Name: "http_response_code"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	header := fp.ParseZval()
 	fp.StartOptional()
@@ -19,7 +19,7 @@ var DefZifHeader = def.DefFunc("header", 1, 3, []def.ArgInfo{{Name: "header"}, {
 })
 
 // generate by ZifHeaderRemove
-var DefZifHeaderRemove = def.DefFunc("header_remove", 0, 1, []def.ArgInfo{{Name: "name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifHeaderRemove = def.DefFunc("header_remove", 0, 1, []def.ArgInfo{{Name: "name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	name := fp.ParseZval()
@@ -30,7 +30,7 @@ var DefZifHeaderRemove = def.DefFunc("header_remove", 0, 1, []def.ArgInfo{{Name:
 })
 
 // generate by ZifSetcookie
-var DefZifSetcookie = def.DefFunc("setcookie", 1, 7, []def.ArgInfo{{Name: "name"}, {Name: "value"}, {Name: "expires_or_options"}, {Name: "path"}, {Name: "domain"}, {Name: "secure"}, {Name: "httponly"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifSetcookie = def.DefFunc("setcookie", 1, 7, []def.ArgInfo{{Name: "name"}, {Name: "value"}, {Name: "expires_or_options"}, {Name: "path"}, {Name: "domain"}, {Name: "secure"}, {Name: "httponly"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 7, 0)
 	name := fp.ParseZval()
 	fp.StartOptional()
@@ -47,7 +47,7 @@ var DefZifSetcookie = def.DefFunc("setcookie", 1, 7, []def.ArgInfo{{Name: "name"
 })
 
 // generate by ZifSetrawcookie
-var DefZifSetrawcookie = def.DefFunc("setrawcookie", 1, 7, []def.ArgInfo{{Name: "name"}, {Name: "value"}, {Name: "expires_or_options"}, {Name: "path"}, {Name: "domain"}, {Name: "secure"}, {Name: "httponly"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifSetrawcookie = def.DefFunc("setrawcookie", 1, 7, []def.ArgInfo{{Name: "name"}, {Name: "value"}, {Name: "expires_or_options"}, {Name: "path"}, {Name: "domain"}, {Name: "secure"}, {Name: "httponly"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 7, 0)
 	name := fp.ParseZval()
 	fp.StartOptional()
@@ -64,7 +64,7 @@ var DefZifSetrawcookie = def.DefFunc("setrawcookie", 1, 7, []def.ArgInfo{{Name: 
 })
 
 // generate by ZifHeadersSent
-var DefZifHeadersSent = def.DefFunc("headers_sent", 0, 2, []def.ArgInfo{{Name: "file"}, {Name: "line"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifHeadersSent = def.DefFunc("headers_sent", 0, 2, []def.ArgInfo{{Name: "file"}, {Name: "line"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	file := fp.ParseZvalEx(false, true)
@@ -76,7 +76,7 @@ var DefZifHeadersSent = def.DefFunc("headers_sent", 0, 2, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifHeadersList
-var DefZifHeadersList = def.DefFunc("headers_list", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifHeadersList = def.DefFunc("headers_list", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -84,7 +84,7 @@ var DefZifHeadersList = def.DefFunc("headers_list", 0, 0, []def.ArgInfo{}, func(
 })
 
 // generate by ZifHttpResponseCode
-var DefZifHttpResponseCode = def.DefFunc("http_response_code", 0, 1, []def.ArgInfo{{Name: "response_code"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifHttpResponseCode = def.DefFunc("http_response_code", 0, 1, []def.ArgInfo{{Name: "response_code"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
 	response_code := fp.ParseZval()

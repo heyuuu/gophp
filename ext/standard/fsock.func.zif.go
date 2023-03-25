@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifFsockopen
-var DefZifFsockopen = def.DefFunc("fsockopen", 1, 5, []def.ArgInfo{{Name: "hostname"}, {Name: "port"}, {Name: "errno"}, {Name: "errstr"}, {Name: "timeout"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFsockopen = def.DefFunc("fsockopen", 1, 5, []def.ArgInfo{{Name: "hostname"}, {Name: "port"}, {Name: "errno"}, {Name: "errstr"}, {Name: "timeout"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 5, 0)
 	hostname := fp.ParseZval()
 	fp.StartOptional()
@@ -21,7 +21,7 @@ var DefZifFsockopen = def.DefFunc("fsockopen", 1, 5, []def.ArgInfo{{Name: "hostn
 })
 
 // generate by ZifPfsockopen
-var DefZifPfsockopen = def.DefFunc("pfsockopen", 1, 5, []def.ArgInfo{{Name: "hostname"}, {Name: "port"}, {Name: "errno"}, {Name: "errstr"}, {Name: "timeout"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPfsockopen = def.DefFunc("pfsockopen", 1, 5, []def.ArgInfo{{Name: "hostname"}, {Name: "port"}, {Name: "errno"}, {Name: "errstr"}, {Name: "timeout"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 5, 0)
 	hostname := fp.ParseZval()
 	fp.StartOptional()

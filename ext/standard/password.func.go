@@ -340,7 +340,7 @@ func PhpPasswordAlgoIdentifyEx(hash *types.String, default_algo *PhpPasswordAlgo
 		return algo
 	}
 }
-func ZifPasswordGetInfo(executeData zpp.DefEx, return_value zpp.DefReturn, hash *types.Zval) {
+func ZifPasswordGetInfo(executeData zpp.Ex, return_value zpp.Ret, hash *types.Zval) {
 	var algo *PhpPasswordAlgo
 	var hash *types.String
 	var ident *types.String
@@ -380,7 +380,7 @@ func ZifPasswordGetInfo(executeData zpp.DefEx, return_value zpp.DefReturn, hash 
 	}
 	zend.AddAssocZval(return_value, "options", &options)
 }
-func ZifPasswordNeedsRehash(executeData zpp.DefEx, return_value zpp.DefReturn, hash *types.Zval, algo *types.Zval, _ zpp.DefOpt, options *types.Zval) {
+func ZifPasswordNeedsRehash(executeData zpp.Ex, return_value zpp.Ret, hash *types.Zval, algo *types.Zval, _ zpp.Opt, options *types.Zval) {
 	var old_algo *PhpPasswordAlgo
 	var new_algo *PhpPasswordAlgo
 	var hash *types.String
@@ -419,7 +419,7 @@ func ZifPasswordNeedsRehash(executeData zpp.DefEx, return_value zpp.DefReturn, h
 	types.ZVAL_BOOL(return_value, old_algo.GetNeedsRehash()(hash, options) != 0)
 	return
 }
-func ZifPasswordVerify(executeData zpp.DefEx, return_value zpp.DefReturn, password *types.Zval, hash *types.Zval) {
+func ZifPasswordVerify(executeData zpp.Ex, return_value zpp.Ret, password *types.Zval, hash *types.Zval) {
 	var password *types.String
 	var hash *types.String
 	var algo *PhpPasswordAlgo
@@ -440,7 +440,7 @@ func ZifPasswordVerify(executeData zpp.DefEx, return_value zpp.DefReturn, passwo
 	types.ZVAL_BOOL(return_value, algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
 	return
 }
-func ZifPasswordHash(executeData zpp.DefEx, return_value zpp.DefReturn, password *types.Zval, algo *types.Zval, _ zpp.DefOpt, options *types.Zval) {
+func ZifPasswordHash(executeData zpp.Ex, return_value zpp.Ret, password *types.Zval, algo *types.Zval, _ zpp.Opt, options *types.Zval) {
 	var password *types.String
 	var digest *types.String = nil
 	var zalgo *types.Zval
@@ -479,7 +479,7 @@ func ZifPasswordHash(executeData zpp.DefEx, return_value zpp.DefReturn, password
 	return_value.SetString(digest)
 	return
 }
-func ZifPasswordAlgos(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifPasswordAlgos(executeData zpp.Ex, return_value zpp.Ret) {
 	var algo *types.String
 	if !executeData.CheckNumArgsNone(false) {
 		return

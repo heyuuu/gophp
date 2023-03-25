@@ -7,6 +7,7 @@ import (
 	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 )
 
 func PhpOutputInitGlobals(G *ZendOutputGlobals) { memset(G, 0, b.SizeOf("* G")) }
@@ -900,7 +901,7 @@ func PhpOutputHandlerDefaultFunc(handler_context *any, output_context *PhpOutput
 func PhpOutputHandlerDevnullFunc(handler_context *any, output_context *PhpOutputContext) int {
 	return types.SUCCESS
 }
-func ZifObStart(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, userFunction *types.Zval, chunkSize *types.Zval, flags *types.Zval) {
+func ZifObStart(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, userFunction *types.Zval, chunkSize *types.Zval, flags *types.Zval) {
 	var output_handler *types.Zval = nil
 	var chunk_size zend.ZendLong = 0
 	var flags zend.ZendLong = PHP_OUTPUT_HANDLER_STDFLAGS
@@ -918,7 +919,7 @@ func ZifObStart(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt,
 	return_value.SetTrue()
 	return
 }
-func ZifObFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObFlush(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -935,7 +936,7 @@ func ZifObFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	return_value.SetTrue()
 	return
 }
-func ZifObClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObClean(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -952,7 +953,7 @@ func ZifObClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	return_value.SetTrue()
 	return
 }
-func ZifObEndFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObEndFlush(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -964,7 +965,7 @@ func ZifObEndFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputEnd())
 	return
 }
-func ZifObEndClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObEndClean(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -976,7 +977,7 @@ func ZifObEndClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputDiscard())
 	return
 }
-func ZifObGetFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObGetFlush(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -989,7 +990,7 @@ func ZifObGetFlush(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObGetClean(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1006,7 +1007,7 @@ func ZifObGetClean(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		PhpErrorDocref("ref.outcontrol", faults.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetContents(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObGetContents(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1015,14 +1016,14 @@ func ZifObGetContents(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifObGetLevel(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObGetLevel(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	return_value.SetLong(PhpOutputGetLevel())
 	return
 }
-func ZifObGetLength(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObGetLength(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1031,7 +1032,7 @@ func ZifObGetLength(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		return
 	}
 }
-func ZifObListHandlers(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifObListHandlers(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1041,7 +1042,7 @@ func ZifObListHandlers(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	}
 	zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
 }
-func ZifObGetStatus(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, fullStatus *types.Zval) {
+func ZifObGetStatus(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, fullStatus *types.Zval) {
 	var full_status types.ZendBool = 0
 	if zend.ZendParseParameters(executeData.NumArgs(), "|b", &full_status) == types.FAILURE {
 		return
@@ -1057,14 +1058,14 @@ func ZifObGetStatus(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.Def
 		PhpOutputHandlerStatus(OG(active), return_value)
 	}
 }
-func ZifObImplicitFlush(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, flag *types.Zval) {
+func ZifObImplicitFlush(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, flag *types.Zval) {
 	var flag zend.ZendLong = 1
 	if zend.ZendParseParameters(executeData.NumArgs(), "|l", &flag) == types.FAILURE {
 		return
 	}
 	PhpOutputSetImplicitFlush(flag)
 }
-func ZifOutputResetRewriteVars(executeData zpp.DefEx, return_value zpp.DefReturn) {
+func ZifOutputResetRewriteVars(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
@@ -1076,7 +1077,7 @@ func ZifOutputResetRewriteVars(executeData zpp.DefEx, return_value zpp.DefReturn
 		return
 	}
 }
-func ZifOutputAddRewriteVar(executeData zpp.DefEx, return_value zpp.DefReturn, name *types.Zval, value *types.Zval) {
+func ZifOutputAddRewriteVar(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, value *types.Zval) {
 	var name *byte
 	var value *byte
 	var name_len int

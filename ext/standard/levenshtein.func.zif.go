@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifLevenshtein
-var DefZifLevenshtein = def.DefFunc("levenshtein", 2, 5, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "cost_ins"}, {Name: "cost_rep"}, {Name: "cost_del"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifLevenshtein = def.DefFunc("levenshtein", 2, 5, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "cost_ins"}, {Name: "cost_rep"}, {Name: "cost_del"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 5, 0)
 	str1 := fp.ParseZval()
 	str2 := fp.ParseZval()

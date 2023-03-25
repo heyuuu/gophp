@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifStreamWrapperRegister
-var DefZifStreamWrapperRegister = def.DefFunc("stream_wrapper_register", 2, 3, []def.ArgInfo{{Name: "protocol"}, {Name: "classname"}, {Name: "flags"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamWrapperRegister = def.DefFunc("stream_wrapper_register", 2, 3, []def.ArgInfo{{Name: "protocol"}, {Name: "classname"}, {Name: "flags"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	protocol := fp.ParseZval()
 	classname := fp.ParseZval()
@@ -19,7 +19,7 @@ var DefZifStreamWrapperRegister = def.DefFunc("stream_wrapper_register", 2, 3, [
 })
 
 // generate by ZifStreamWrapperUnregister
-var DefZifStreamWrapperUnregister = def.DefFunc("stream_wrapper_unregister", 1, 1, []def.ArgInfo{{Name: "protocol"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamWrapperUnregister = def.DefFunc("stream_wrapper_unregister", 1, 1, []def.ArgInfo{{Name: "protocol"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	protocol := fp.ParseZval()
 	if fp.HasError() {
@@ -29,7 +29,7 @@ var DefZifStreamWrapperUnregister = def.DefFunc("stream_wrapper_unregister", 1, 
 })
 
 // generate by ZifStreamWrapperRestore
-var DefZifStreamWrapperRestore = def.DefFunc("stream_wrapper_restore", 1, 1, []def.ArgInfo{{Name: "protocol"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStreamWrapperRestore = def.DefFunc("stream_wrapper_restore", 1, 1, []def.ArgInfo{{Name: "protocol"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	protocol := fp.ParseZval()
 	if fp.HasError() {

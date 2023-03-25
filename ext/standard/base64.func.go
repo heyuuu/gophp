@@ -136,7 +136,7 @@ func PhpBase64DecodeEx(str *uint8, length int, strict types.ZendBool) *types.Str
 	result.SetLen(outl)
 	return result
 }
-func ZifBase64Encode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval) {
+func ZifBase64Encode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *byte
 	var str_len int
 	var result *types.String
@@ -155,7 +155,7 @@ func ZifBase64Encode(executeData zpp.DefEx, return_value zpp.DefReturn, str *typ
 	return_value.SetString(result)
 	return
 }
-func ZifBase64Decode(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, strict *types.Zval) {
+func ZifBase64Decode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, strict *types.Zval) {
 	var str *byte
 	var strict types.ZendBool = 0
 	var str_len int

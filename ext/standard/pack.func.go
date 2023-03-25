@@ -83,7 +83,7 @@ func PhpPackParseDouble(is_little_endian int, src any) float64 {
 	}
 	return m.d
 }
-func ZifPack(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, _ zpp.DefOpt, args []*types.Zval) {
+func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp.Opt, args []*types.Zval) {
 	var argv *types.Zval = nil
 	var num_args int = 0
 	var i int
@@ -600,7 +600,7 @@ func PhpUnpack(data *byte, size int, issigned int, map_ *int) zend.ZendLong {
 	}
 	return result
 }
-func ZifUnpack(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, input *types.Zval, _ zpp.DefOpt, offset *types.Zval) {
+func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, input *types.Zval, _ zpp.Opt, offset *types.Zval) {
 	var format *byte
 	var input *byte
 	var formatarg *types.String

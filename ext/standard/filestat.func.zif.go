@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifDiskTotalSpace
-var DefZifDiskTotalSpace = def.DefFunc("disk_total_space", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifDiskTotalSpace = def.DefFunc("disk_total_space", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	path := fp.ParseZval()
 	if fp.HasError() {
@@ -16,7 +16,7 @@ var DefZifDiskTotalSpace = def.DefFunc("disk_total_space", 1, 1, []def.ArgInfo{{
 })
 
 // generate by ZifDiskFreeSpace
-var DefZifDiskFreeSpace = def.DefFunc("disk_free_space", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifDiskFreeSpace = def.DefFunc("disk_free_space", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	path := fp.ParseZval()
 	if fp.HasError() {
@@ -26,7 +26,7 @@ var DefZifDiskFreeSpace = def.DefFunc("disk_free_space", 1, 1, []def.ArgInfo{{Na
 })
 
 // generate by ZifDiskFreeSpace
-var DefZifDiskfreespace = def.DefFunc("diskfreespace", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifDiskfreespace = def.DefFunc("diskfreespace", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	path := fp.ParseZval()
 	if fp.HasError() {
@@ -36,7 +36,7 @@ var DefZifDiskfreespace = def.DefFunc("diskfreespace", 1, 1, []def.ArgInfo{{Name
 })
 
 // generate by ZifChgrp
-var DefZifChgrp = def.DefFunc("chgrp", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "group"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifChgrp = def.DefFunc("chgrp", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "group"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	filename := fp.ParseZval()
 	group := fp.ParseZval()
@@ -47,7 +47,7 @@ var DefZifChgrp = def.DefFunc("chgrp", 2, 2, []def.ArgInfo{{Name: "filename"}, {
 })
 
 // generate by ZifLchgrp
-var DefZifLchgrp = def.DefFunc("lchgrp", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "group"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifLchgrp = def.DefFunc("lchgrp", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "group"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	filename := fp.ParseZval()
 	group := fp.ParseZval()
@@ -58,7 +58,7 @@ var DefZifLchgrp = def.DefFunc("lchgrp", 2, 2, []def.ArgInfo{{Name: "filename"},
 })
 
 // generate by ZifChown
-var DefZifChown = def.DefFunc("chown", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "user"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifChown = def.DefFunc("chown", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "user"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	filename := fp.ParseZval()
 	user := fp.ParseZval()
@@ -69,7 +69,7 @@ var DefZifChown = def.DefFunc("chown", 2, 2, []def.ArgInfo{{Name: "filename"}, {
 })
 
 // generate by ZifLchown
-var DefZifLchown = def.DefFunc("lchown", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "user"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifLchown = def.DefFunc("lchown", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "user"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	filename := fp.ParseZval()
 	user := fp.ParseZval()
@@ -80,7 +80,7 @@ var DefZifLchown = def.DefFunc("lchown", 2, 2, []def.ArgInfo{{Name: "filename"},
 })
 
 // generate by ZifChmod
-var DefZifChmod = def.DefFunc("chmod", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifChmod = def.DefFunc("chmod", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	filename := fp.ParseZval()
 	mode := fp.ParseZval()
@@ -91,7 +91,7 @@ var DefZifChmod = def.DefFunc("chmod", 2, 2, []def.ArgInfo{{Name: "filename"}, {
 })
 
 // generate by ZifTouch
-var DefZifTouch = def.DefFunc("touch", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "time"}, {Name: "atime"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifTouch = def.DefFunc("touch", 1, 3, []def.ArgInfo{{Name: "filename"}, {Name: "time"}, {Name: "atime"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	filename := fp.ParseZval()
 	fp.StartOptional()
@@ -104,7 +104,7 @@ var DefZifTouch = def.DefFunc("touch", 1, 3, []def.ArgInfo{{Name: "filename"}, {
 })
 
 // generate by ZifClearstatcache
-var DefZifClearstatcache = def.DefFunc("clearstatcache", 0, 2, []def.ArgInfo{{Name: "clear_realpath_cache"}, {Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifClearstatcache = def.DefFunc("clearstatcache", 0, 2, []def.ArgInfo{{Name: "clear_realpath_cache"}, {Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 2, 0)
 	fp.StartOptional()
 	clear_realpath_cache := fp.ParseZval()
@@ -116,7 +116,7 @@ var DefZifClearstatcache = def.DefFunc("clearstatcache", 0, 2, []def.ArgInfo{{Na
 })
 
 // generate by ZifFileperms
-var DefZifFileperms = def.DefFunc("fileperms", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFileperms = def.DefFunc("fileperms", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -126,7 +126,7 @@ var DefZifFileperms = def.DefFunc("fileperms", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFileinode
-var DefZifFileinode = def.DefFunc("fileinode", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFileinode = def.DefFunc("fileinode", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -136,7 +136,7 @@ var DefZifFileinode = def.DefFunc("fileinode", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFilesize
-var DefZifFilesize = def.DefFunc("filesize", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFilesize = def.DefFunc("filesize", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -146,7 +146,7 @@ var DefZifFilesize = def.DefFunc("filesize", 1, 1, []def.ArgInfo{{Name: "filenam
 })
 
 // generate by ZifFileowner
-var DefZifFileowner = def.DefFunc("fileowner", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFileowner = def.DefFunc("fileowner", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -156,7 +156,7 @@ var DefZifFileowner = def.DefFunc("fileowner", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFilegroup
-var DefZifFilegroup = def.DefFunc("filegroup", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFilegroup = def.DefFunc("filegroup", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -166,7 +166,7 @@ var DefZifFilegroup = def.DefFunc("filegroup", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFileatime
-var DefZifFileatime = def.DefFunc("fileatime", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFileatime = def.DefFunc("fileatime", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -176,7 +176,7 @@ var DefZifFileatime = def.DefFunc("fileatime", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFilemtime
-var DefZifFilemtime = def.DefFunc("filemtime", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFilemtime = def.DefFunc("filemtime", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -186,7 +186,7 @@ var DefZifFilemtime = def.DefFunc("filemtime", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFilectime
-var DefZifFilectime = def.DefFunc("filectime", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFilectime = def.DefFunc("filectime", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -196,7 +196,7 @@ var DefZifFilectime = def.DefFunc("filectime", 1, 1, []def.ArgInfo{{Name: "filen
 })
 
 // generate by ZifFiletype
-var DefZifFiletype = def.DefFunc("filetype", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFiletype = def.DefFunc("filetype", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -206,7 +206,7 @@ var DefZifFiletype = def.DefFunc("filetype", 1, 1, []def.ArgInfo{{Name: "filenam
 })
 
 // generate by ZifIsWritable
-var DefZifIsWritable = def.DefFunc("is_writable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsWritable = def.DefFunc("is_writable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -216,7 +216,7 @@ var DefZifIsWritable = def.DefFunc("is_writable", 1, 1, []def.ArgInfo{{Name: "fi
 })
 
 // generate by ZifIsWritable
-var DefZifIsWriteable = def.DefFunc("is_writeable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsWriteable = def.DefFunc("is_writeable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -226,7 +226,7 @@ var DefZifIsWriteable = def.DefFunc("is_writeable", 1, 1, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifIsReadable
-var DefZifIsReadable = def.DefFunc("is_readable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsReadable = def.DefFunc("is_readable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -236,7 +236,7 @@ var DefZifIsReadable = def.DefFunc("is_readable", 1, 1, []def.ArgInfo{{Name: "fi
 })
 
 // generate by ZifIsExecutable
-var DefZifIsExecutable = def.DefFunc("is_executable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsExecutable = def.DefFunc("is_executable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -246,7 +246,7 @@ var DefZifIsExecutable = def.DefFunc("is_executable", 1, 1, []def.ArgInfo{{Name:
 })
 
 // generate by ZifIsFile
-var DefZifIsFile = def.DefFunc("is_file", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsFile = def.DefFunc("is_file", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -256,7 +256,7 @@ var DefZifIsFile = def.DefFunc("is_file", 1, 1, []def.ArgInfo{{Name: "filename"}
 })
 
 // generate by ZifIsDir
-var DefZifIsDir = def.DefFunc("is_dir", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsDir = def.DefFunc("is_dir", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -266,7 +266,7 @@ var DefZifIsDir = def.DefFunc("is_dir", 1, 1, []def.ArgInfo{{Name: "filename"}},
 })
 
 // generate by ZifIsLink
-var DefZifIsLink = def.DefFunc("is_link", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifIsLink = def.DefFunc("is_link", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -276,7 +276,7 @@ var DefZifIsLink = def.DefFunc("is_link", 1, 1, []def.ArgInfo{{Name: "filename"}
 })
 
 // generate by ZifFileExists
-var DefZifFileExists = def.DefFunc("file_exists", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifFileExists = def.DefFunc("file_exists", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	filename := fp.ParseZval()
 	if fp.HasError() {
@@ -286,7 +286,7 @@ var DefZifFileExists = def.DefFunc("file_exists", 1, 1, []def.ArgInfo{{Name: "fi
 })
 
 // generate by ZifLstat
-var DefZifLstat = def.DefFunc("lstat", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifLstat = def.DefFunc("lstat", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -294,7 +294,7 @@ var DefZifLstat = def.DefFunc("lstat", 0, 0, []def.ArgInfo{}, func(executeData z
 })
 
 // generate by ZifStat
-var DefZifStat = def.DefFunc("stat", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifStat = def.DefFunc("stat", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -302,7 +302,7 @@ var DefZifStat = def.DefFunc("stat", 0, 0, []def.ArgInfo{}, func(executeData zpp
 })
 
 // generate by ZifRealpathCacheSize
-var DefZifRealpathCacheSize = def.DefFunc("realpath_cache_size", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifRealpathCacheSize = def.DefFunc("realpath_cache_size", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
@@ -310,7 +310,7 @@ var DefZifRealpathCacheSize = def.DefFunc("realpath_cache_size", 0, 0, []def.Arg
 })
 
 // generate by ZifRealpathCacheGet
-var DefZifRealpathCacheGet = def.DefFunc("realpath_cache_get", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifRealpathCacheGet = def.DefFunc("realpath_cache_get", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifVersionCompare
-var DefZifVersionCompare = def.DefFunc("version_compare", 2, 3, []def.ArgInfo{{Name: "ver1"}, {Name: "ver2"}, {Name: "oper"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifVersionCompare = def.DefFunc("version_compare", 2, 3, []def.ArgInfo{{Name: "ver1"}, {Name: "ver2"}, {Name: "oper"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	ver1 := fp.ParseZval()
 	ver2 := fp.ParseZval()
