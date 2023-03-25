@@ -71,13 +71,3 @@ var DefZifShellExec = def.DefFunc("shell_exec", 1, 1, []def.ArgInfo{{Name: "cmd"
 	}
 	ZifShellExec(executeData, returnValue, cmd)
 })
-
-// generate by ZifProcNice
-var DefZifProcNice = def.DefFunc("proc_nice", 1, 1, []def.ArgInfo{{Name: "priority"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	priority := fp.ParseZval()
-	if fp.HasError() {
-		return
-	}
-	ZifProcNice(executeData, returnValue, priority)
-})

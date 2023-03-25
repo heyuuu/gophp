@@ -12,3 +12,10 @@
 - `cli_get_process_title`
 - `apache_child_terminate`
 - `phpinfo`
+
+进程控制函数
+- `proc_open`
+- `proc_close`
+- `proc_terminate`
+- `proc_get_status`
+- `proc_nice`

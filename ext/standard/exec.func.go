@@ -444,27 +444,3 @@ func ZifShellExec(executeData zpp.DefEx, return_value zpp.DefReturn, cmd *types.
 		return_value.SetString(ret)
 	}
 }
-func ZifProcNice(executeData zpp.DefEx, return_value zpp.DefReturn, priority *types.Zval) {
-	var pri zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			pri = fp.ParseLong()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	errno = 0
-	core.PhpIgnoreValue(nice(pri))
-	if errno {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Only a super user may attempt to increase the priority of a process")
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetTrue()
-	return
-}
