@@ -308,6 +308,17 @@ var DefZifStreamSetBlocking = def.DefFunc("stream_set_blocking", 2, 2, []def.Arg
 	ZifStreamSetBlocking(executeData, returnValue, socket, mode)
 })
 
+// generate by ZifStreamSetBlocking
+var DefZifSocketSetBlocking = def.DefFunc("socket_set_blocking", 2, 2, []def.ArgInfo{{Name: "socket"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	socket := fp.ParseZval()
+	mode := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetBlocking(executeData, returnValue, socket, mode)
+})
+
 // generate by ZifStreamSetTimeout
 var DefZifStreamSetTimeout = def.DefFunc("stream_set_timeout", 2, 3, []def.ArgInfo{{Name: "stream"}, {Name: "seconds"}, {Name: "microseconds"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
@@ -323,6 +334,17 @@ var DefZifStreamSetTimeout = def.DefFunc("stream_set_timeout", 2, 3, []def.ArgIn
 
 // generate by ZifStreamSetWriteBuffer
 var DefZifStreamSetWriteBuffer = def.DefFunc("stream_set_write_buffer", 2, 2, []def.ArgInfo{{Name: "fp"}, {Name: "buffer"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	fp := fp.ParseZval()
+	buffer := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetWriteBuffer(executeData, returnValue, fp, buffer)
+})
+
+// generate by ZifStreamSetWriteBuffer
+var DefZifSetFileBuffer = def.DefFunc("set_file_buffer", 2, 2, []def.ArgInfo{{Name: "fp"}, {Name: "buffer"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	fp := fp.ParseZval()
 	buffer := fp.ParseZval()

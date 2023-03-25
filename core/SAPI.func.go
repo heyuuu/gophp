@@ -16,6 +16,23 @@ func SapiAddHeader(str string) int {
 	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 }
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
+
+//@alias -old
+func ZifHeaderRegisterCallback(callback *types.Zval) bool {
+	if zend.ZendIsCallable(callback, 0, nil) == 0 {
+		return false
+	}
+
+	if SG__().callback_func.IsNotUndef() {
+		zend.ZvalPtrDtor(&SG__().callback_func)
+		SG__().fci_cache = zend.EmptyFcallInfoCache
+	}
+
+	types.ZVAL_COPY(&SG__().callback_func, callback)
+
+	return true
+}
+
 func SapiRunHeaderCallback(callback *types.Zval) {
 	var error int
 	var fci types.ZendFcallInfo

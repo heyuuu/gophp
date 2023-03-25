@@ -402,8 +402,28 @@ var DefZifGetIncludedFiles = def.DefFunc("get_included_files", 0, 0, []def.ArgIn
 	ZifGetIncludedFiles(executeData, returnValue)
 })
 
+// generate by ZifGetIncludedFiles
+var DefZifGetRequiredFiles = def.DefFunc("get_required_files", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifGetIncludedFiles(executeData, returnValue)
+})
+
 // generate by ZifTriggerError
 var DefZifTriggerError = def.DefFunc("trigger_error", 1, 2, []def.ArgInfo{{Name: "message"}, {Name: "error_type"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	message := fp.ParseZval()
+	fp.StartOptional()
+	error_type := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifTriggerError(executeData, returnValue, message, nil, error_type)
+})
+
+// generate by ZifTriggerError
+var DefZifUserError = def.DefFunc("user_error", 1, 2, []def.ArgInfo{{Name: "message"}, {Name: "error_type"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
 	message := fp.ParseZval()
 	fp.StartOptional()

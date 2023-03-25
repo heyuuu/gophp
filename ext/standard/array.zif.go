@@ -43,6 +43,18 @@ var DefZifCount = def.DefFunc("count", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name
 	ZifCount(returnValue, var_, nil, mode)
 })
 
+// generate by ZifCount
+var DefZifSizeof = def.DefFunc("sizeof", 1, 2, []def.ArgInfo{{Name: "var_"}, {Name: "mode"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	var_ := fp.ParseZval()
+	fp.StartOptional()
+	mode := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ZifCount(returnValue, var_, nil, mode)
+})
+
 // generate by ZifNatsort
 var DefZifNatsort = def.DefFunc("natsort", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -190,6 +202,16 @@ var DefZifReset = def.DefFunc("reset", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(
 
 // generate by ZifCurrent
 var DefZifCurrent = def.DefFunc("current", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	arg := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifCurrent(executeData, returnValue, arg)
+})
+
+// generate by ZifCurrent
+var DefZifPos = def.DefFunc("pos", 1, 1, []def.ArgInfo{{Name: "arg"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	arg := fp.ParseZval()
 	if fp.HasError() {
@@ -831,6 +853,17 @@ var DefZifArrayMap = def.DefFunc("array_map", -1, -1, []def.ArgInfo{{Name: "call
 
 // generate by ZifArrayKeyExists
 var DefZifArrayKeyExists = def.DefFunc("array_key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "search"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	key := fp.ParseZval()
+	search := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifArrayKeyExists(executeData, returnValue, key, search)
+})
+
+// generate by ZifArrayKeyExists
+var DefZifKeyExists = def.DefFunc("key_exists", 2, 2, []def.ArgInfo{{Name: "key"}, {Name: "search"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	key := fp.ParseZval()
 	search := fp.ParseZval()

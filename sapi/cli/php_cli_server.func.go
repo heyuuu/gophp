@@ -11,6 +11,7 @@ import (
 	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"sik/zend/zpp"
 	"strconv"
 	"strings"
 )
@@ -84,6 +85,8 @@ func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 	}
 	return nil
 }
+
+//@zif -alias getallheaders
 func ZifApacheRequestHeaders(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var client *PhpCliServerClient
 	var headers *types.Array

@@ -25,6 +25,16 @@ var DefZifInetNtop = def.DefFunc("inet_ntop", 1, 1, []def.ArgInfo{{Name: "in_add
 	ZifInetNtop(executeData, returnValue, in_addr)
 })
 
+// generate by ZifInetPton
+var DefZifInetPton = def.DefFunc("inet_pton", 1, 1, []def.ArgInfo{{Name: "ip_address"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	ip_address := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ZifInetPton(executeData, returnValue, ip_address)
+})
+
 // generate by ZifIp2long
 var DefZifIp2long = def.DefFunc("ip2long", 1, 1, []def.ArgInfo{{Name: "ip_address"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -263,6 +273,18 @@ var DefZifHighlightFile = def.DefFunc("highlight_file", 1, 2, []def.ArgInfo{{Nam
 	ZifHighlightFile(executeData, returnValue, file_name, nil, return_)
 })
 
+// generate by ZifHighlightFile
+var DefZifShowSource = def.DefFunc("show_source", 1, 2, []def.ArgInfo{{Name: "file_name"}, {Name: "return_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	file_name := fp.ParseZval()
+	fp.StartOptional()
+	return_ := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifHighlightFile(executeData, returnValue, file_name, nil, return_)
+})
+
 // generate by ZifPhpStripWhitespace
 var DefZifPhpStripWhitespace = def.DefFunc("php_strip_whitespace", 1, 1, []def.ArgInfo{{Name: "file_name"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -309,6 +331,17 @@ var DefZifIniGetAll = def.DefFunc("ini_get_all", 0, 2, []def.ArgInfo{{Name: "ext
 
 // generate by ZifIniSet
 var DefZifIniSet = def.DefFunc("ini_set", 2, 2, []def.ArgInfo{{Name: "varname"}, {Name: "newvalue"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	varname := fp.ParseZval()
+	newvalue := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifIniSet(executeData, returnValue, varname, newvalue)
+})
+
+// generate by ZifIniSet
+var DefZifIniAlter = def.DefFunc("ini_alter", 2, 2, []def.ArgInfo{{Name: "varname"}, {Name: "newvalue"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	varname := fp.ParseZval()
 	newvalue := fp.ParseZval()

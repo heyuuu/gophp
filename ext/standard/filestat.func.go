@@ -88,6 +88,8 @@ func PhpDiskFreeSpace(path *byte, space *float64) int {
 	*space = bytesfree
 	return types.SUCCESS
 }
+
+//@zif -alias diskfreespace
 func ZifDiskFreeSpace(executeData zpp.DefEx, return_value zpp.DefReturn, path *types.Zval) {
 	var bytesfree float64
 	var path *byte
@@ -893,6 +895,8 @@ func ZifFiletype(executeData zpp.DefEx, return_value zpp.DefReturn, filename *ty
 	}
 	PhpStat(filename, filename_len, FS_TYPE, return_value)
 }
+
+//@zif -alias is_writeable
 func ZifIsWritable(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval) {
 	var filename *byte
 	var filename_len int
@@ -1005,7 +1009,7 @@ func ZifFileExists(executeData zpp.DefEx, return_value zpp.DefReturn, filename *
 	}
 	PhpStat(filename, filename_len, FS_EXISTS, return_value)
 }
-func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifLstat(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var filename *byte
 	var filename_len int
 	for {
@@ -1021,7 +1025,7 @@ func PhpIfLstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	}
 	PhpStat(filename, filename_len, FS_LSTAT, return_value)
 }
-func PhpIfStat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifStat(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var filename *byte
 	var filename_len int
 	for {

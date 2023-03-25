@@ -25,6 +25,16 @@ var DefZifDiskFreeSpace = def.DefFunc("disk_free_space", 1, 1, []def.ArgInfo{{Na
 	ZifDiskFreeSpace(executeData, returnValue, path)
 })
 
+// generate by ZifDiskFreeSpace
+var DefZifDiskfreespace = def.DefFunc("diskfreespace", 1, 1, []def.ArgInfo{{Name: "path"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	path := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifDiskFreeSpace(executeData, returnValue, path)
+})
+
 // generate by ZifChgrp
 var DefZifChgrp = def.DefFunc("chgrp", 2, 2, []def.ArgInfo{{Name: "filename"}, {Name: "group"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
@@ -205,6 +215,16 @@ var DefZifIsWritable = def.DefFunc("is_writable", 1, 1, []def.ArgInfo{{Name: "fi
 	ZifIsWritable(executeData, returnValue, filename)
 })
 
+// generate by ZifIsWritable
+var DefZifIsWriteable = def.DefFunc("is_writeable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	filename := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifIsWritable(executeData, returnValue, filename)
+})
+
 // generate by ZifIsReadable
 var DefZifIsReadable = def.DefFunc("is_readable", 1, 1, []def.ArgInfo{{Name: "filename"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -263,6 +283,22 @@ var DefZifFileExists = def.DefFunc("file_exists", 1, 1, []def.ArgInfo{{Name: "fi
 		return
 	}
 	ZifFileExists(executeData, returnValue, filename)
+})
+
+// generate by ZifLstat
+var DefZifLstat = def.DefFunc("lstat", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifLstat(executeData, returnValue)
+})
+
+// generate by ZifStat
+var DefZifStat = def.DefFunc("stat", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifStat(executeData, returnValue)
 })
 
 // generate by ZifRealpathCacheSize

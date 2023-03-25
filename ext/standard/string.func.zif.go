@@ -88,6 +88,18 @@ var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 	ZifRtrim(executeData, returnValue, str, nil, character_mask)
 })
 
+// generate by ZifRtrim
+var DefZifChop = def.DefFunc("chop", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	str := fp.ParseZval()
+	fp.StartOptional()
+	character_mask := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifRtrim(executeData, returnValue, str, nil, character_mask)
+})
+
 // generate by ZifLtrim
 var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -129,6 +141,17 @@ var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator
 
 // generate by ZifImplode
 var DefZifImplode = def.DefFunc("implode", 2, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	glue := fp.ParseZval()
+	pieces := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifImplode(executeData, returnValue, glue, pieces)
+})
+
+// generate by ZifImplode
+var DefZifJoin = def.DefFunc("join", 2, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	glue := fp.ParseZval()
 	pieces := fp.ParseZval()
@@ -221,6 +244,19 @@ var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"
 
 // generate by ZifStrstr
 var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 3, 0)
+	haystack := fp.ParseZval()
+	needle := fp.ParseZval()
+	fp.StartOptional()
+	part := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStrstr(executeData, returnValue, haystack, needle, nil, part)
+})
+
+// generate by ZifStrstr
+var DefZifStrchr = def.DefFunc("strchr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	haystack := fp.ParseZval()
 	needle := fp.ParseZval()

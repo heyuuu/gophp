@@ -6,7 +6,7 @@ import (
 )
 
 // generate by ZifUserSprintf
-var DefZifUserSprintf = def.DefFunc("user_sprintf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifSprintf = def.DefFunc("sprintf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	format := fp.ParseZval()
 	fp.StartOptional()
@@ -29,7 +29,7 @@ var DefZifVsprintf = def.DefFunc("vsprintf", 2, 2, []def.ArgInfo{{Name: "format"
 })
 
 // generate by ZifUserPrintf
-var DefZifUserPrintf = def.DefFunc("user_printf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+var DefZifPrintf = def.DefFunc("printf", 1, -1, []def.ArgInfo{{Name: "format"}, {Name: "args"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	format := fp.ParseZval()
 	fp.StartOptional()

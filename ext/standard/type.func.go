@@ -154,6 +154,8 @@ func ZifIntval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zv
 	}
 	return_value.SetLong(zend.ZEND_STRTOL(num.GetStr().GetVal(), nil, base))
 }
+
+//@zif -alias doubleval
 func ZifFloatval(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	var num *types.Zval
 	for {
@@ -253,9 +255,13 @@ func ZifIsBool(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zv
 	types.ZVAL_BOOL(return_value, arg.IsType(types.IS_FALSE) || arg.IsType(types.IS_TRUE))
 	return
 }
+
+//@zif -alias is_integer,is_long
 func ZifIsInt(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_LONG)
 }
+
+//@zif -alias is_double
 func ZifIsFloat(executeData zpp.DefEx, return_value zpp.DefReturn, var_ *types.Zval) {
 	PhpIsType(executeData, return_value, types.IS_DOUBLE)
 }

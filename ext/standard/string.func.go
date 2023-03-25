@@ -360,6 +360,8 @@ func PhpDoTrim(executeData *zend.ZendExecuteData, return_value *types.Zval, mode
 func ZifTrim(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, characterMask *types.Zval) {
 	PhpDoTrim(executeData, return_value, 3)
 }
+
+//@zif -alias chop
 func ZifRtrim(executeData zpp.DefEx, return_value zpp.DefReturn, str *types.Zval, _ zpp.DefOpt, characterMask *types.Zval) {
 	PhpDoTrim(executeData, return_value, 2)
 }
@@ -736,6 +738,8 @@ func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval
 	return_value.SetString(str)
 	return
 }
+
+//@zif -alias join
 func ZifImplode(executeData zpp.DefEx, return_value zpp.DefReturn, glue *types.Zval, pieces *types.Zval) {
 	var arg1 *types.Zval
 	var arg2 *types.Zval = nil
@@ -1286,6 +1290,8 @@ func ZifStristr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *typ
 	}
 	zend.Efree(haystack_dup)
 }
+
+//@zif -alias strchr
 func ZifStrstr(executeData zpp.DefEx, return_value zpp.DefReturn, haystack *types.Zval, needle *types.Zval, _ zpp.DefOpt, part *types.Zval) {
 	var needle *types.Zval
 	var haystack *types.String

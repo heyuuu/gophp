@@ -993,6 +993,8 @@ func ZifClassAlias(executeData zpp.DefEx, return_value zpp.DefReturn, userClassN
 		return
 	}
 }
+
+//@zif -alias get_required_files
 func ZifGetIncludedFiles(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var entry *types.String
 	if !executeData.CheckNumArgsNone(false) {
@@ -1009,6 +1011,8 @@ func ZifGetIncludedFiles(executeData zpp.DefEx, return_value zpp.DefReturn) {
 		}
 	}
 }
+
+//@zif -alias user_error
 func ZifTriggerError(executeData zpp.DefEx, return_value zpp.DefReturn, message *types.Zval, _ zpp.DefOpt, errorType *types.Zval) {
 	var error_type = faults.E_USER_NOTICE
 	var message *byte

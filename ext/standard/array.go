@@ -766,6 +766,8 @@ func ZifReset(executeData zpp.DefEx, return_value zpp.DefReturn, arg zpp.DefRef)
 		types.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
+
+//@zif -alias pos
 func ZifCurrent(executeData zpp.DefEx, return_value zpp.DefReturn, arg *types.Zval) {
 	var array *types.Array
 	var entry *types.Zval
@@ -6332,6 +6334,8 @@ func ZifArrayMap(executeData zpp.DefEx, return_value zpp.DefReturn, callback *ty
 		zend.Efree(array_pos)
 	}
 }
+
+//@zif -alias key_exists
 func ZifArrayKeyExists(executeData zpp.DefEx, return_value zpp.DefReturn, key *types.Zval, search *types.Zval) {
 	var key *types.Zval
 	var array *types.Zval

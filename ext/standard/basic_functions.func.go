@@ -361,7 +361,7 @@ func ZifInetNtop(executeData zpp.DefEx, return_value zpp.DefReturn, inAddr *type
 	return_value.SetRawString(b.CastStrAuto(buffer))
 	return
 }
-func PhpInetPton(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifInetPton(executeData zpp.DefEx, return_value zpp.DefReturn, ipAddress string) {
 	var ret int
 	var af int = AF_INET
 	var address *byte
@@ -1450,6 +1450,8 @@ func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 	syntax_highlighter_ini.SetHighlightKeyword(zend.INI_STR("highlight.keyword"))
 	syntax_highlighter_ini.SetHighlightString(zend.INI_STR("highlight.string"))
 }
+
+//@zif -alias show_source
 func ZifHighlightFile(executeData zpp.DefEx, return_value zpp.DefReturn, fileName *types.Zval, _ zpp.DefOpt, return_ *types.Zval) {
 	var filename *byte
 	var filename_len int
@@ -1677,6 +1679,8 @@ func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, 
 	}
 	return !(strncmp(option_name, new_option_name, option_len))
 }
+
+//@zif -alias ini_alter
 func ZifIniSet(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types.Zval, newvalue *types.Zval) {
 	var varname *types.String
 	var new_value *types.String
@@ -1722,7 +1726,7 @@ func ZifIniSet(executeData zpp.DefEx, return_value zpp.DefReturn, varname *types
 			}
 		}
 	}
-	if zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
+	if !zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 
 		return_value.SetFalse()
 		return
@@ -1768,7 +1772,7 @@ func ZifSetIncludePath(executeData zpp.DefEx, return_value zpp.DefReturn, newInc
 		return_value.SetFalse()
 	}
 	key = types.NewString("include_path")
-	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == types.FAILURE {
+	if !zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 		types.ZendStringReleaseEx(key, 0)
 
 		return_value.SetFalse()

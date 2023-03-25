@@ -14,6 +14,8 @@ type (
 	DefReturn = *types.Zval
 	// Type: 'L', FAST_ZPP: Z_PARAM_STRICT_LONG
 	DefStrictLong = int
+	// Type: 'z', FAST_ZPP: Z_PARAM_ZVAL_DEREF, Code: ParseZvalDeref()
+	DefZvalDeref = *types.Zval
 
 	DefRef      = *types.Zval //
 	DefRefArray = *types.Zval // fp.ParseArrayEx(false, true)

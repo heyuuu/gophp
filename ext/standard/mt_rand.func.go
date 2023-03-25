@@ -92,6 +92,8 @@ func PhpMtRand() uint32 {
 	s1 ^= s1 << 15 & 0xefc60000
 	return s1 ^ s1>>18
 }
+
+//@zif -alias srand
 func ZifMtSrand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, seed *types.Zval, mode *types.Zval) {
 	var seed zend.ZendLong = 0
 	var mode zend.ZendLong = MT_RAND_MT19937
@@ -199,6 +201,8 @@ func ZifMtRand(executeData zpp.DefEx, return_value zpp.DefReturn, _ zpp.DefOpt, 
 	return_value.SetLong(PhpMtRandCommon(min, max))
 	return
 }
+
+//@zif -alias getrandmax
 func ZifMtGetrandmax(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	if !executeData.CheckNumArgsNone(false) {
 		return

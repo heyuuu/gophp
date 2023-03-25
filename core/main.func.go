@@ -9,6 +9,7 @@ import (
 	"sik/zend"
 	"sik/zend/faults"
 	"sik/zend/types"
+	"strconv"
 )
 
 func SAFE_FILENAME(f __auto__) string {
@@ -1044,6 +1045,12 @@ func PhpGetCurrentUser() *byte {
 		return SG__().request_info.current_user
 	}
 }
+
+//@alias -old
+func ZifSetTimeLimit(seconds int) bool {
+	return zend.ZendAlterIniEntryChars("max_execution_time", strconv.Itoa(seconds), PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
+}
+
 func PhpFopenWrapperForZend(filename string, opened_path *string) *r.FILE {
 	var opened_path_zstr **types.String
 	f := streams.PhpStreamOpenWrapperAsFile((*byte)(filename), "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path_zstr)

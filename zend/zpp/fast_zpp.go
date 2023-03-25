@@ -541,7 +541,7 @@ func (p *FastParser) ParseZvalDeref() (dest *types.Zval) {
 	return p.ParseZvalDerefEx(false, false)
 }
 func (p *FastParser) ParseZvalDerefEx(checkNull bool, separate bool) (dest *types.Zval) {
-	p.parsePrologue(separate, separate)
+	p.parsePrologue(true, separate)
 	if p.IsFinish() {
 		return
 	}

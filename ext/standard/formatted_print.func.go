@@ -502,6 +502,8 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	*argc = n
 	return args
 }
+
+//@zif -name sprintf
 func ZifUserSprintf(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, _ zpp.DefOpt, args []*types.Zval) {
 	var result *types.String
 	var format *types.Zval
@@ -559,6 +561,8 @@ func ZifVsprintf(executeData zpp.DefEx, return_value zpp.DefReturn, format *type
 	}
 	return_value.SetString(result)
 }
+
+//@zif -name printf
 func ZifUserPrintf(executeData zpp.DefEx, return_value zpp.DefReturn, format *types.Zval, _ zpp.DefOpt, args []*types.Zval) {
 	var result *types.String
 	var rlen int

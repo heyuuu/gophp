@@ -1324,6 +1324,8 @@ func ZifStreamGetLine(executeData zpp.DefEx, return_value zpp.DefReturn, stream 
 		return
 	}
 }
+
+//@zif -alias socket_set_blocking
 func ZifStreamSetBlocking(executeData zpp.DefEx, return_value zpp.DefReturn, socket *types.Zval, mode *types.Zval) {
 	var zstream *types.Zval
 	var block types.ZendBool
@@ -1384,6 +1386,8 @@ func ZifStreamSetTimeout(executeData zpp.DefEx, return_value zpp.DefReturn, stre
 	return_value.SetFalse()
 	return
 }
+
+//@zif -alias set_file_buffer
 func ZifStreamSetWriteBuffer(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, buffer *types.Zval) {
 	var arg1 *types.Zval
 	var ret int

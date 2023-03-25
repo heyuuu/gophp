@@ -59,5 +59,5 @@ var CliServerModuleEntry = zend.MakeZendModuleEntry(
 var ServerAdditionalFunctions = []types.ZendFunctionEntry{
 	DefZifApacheRequestHeaders,
 	DefZifApacheResponseHeaders,
-	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, nil),
+	DefZifGetallheaders,
 }

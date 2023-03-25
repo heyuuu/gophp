@@ -48,6 +48,16 @@ var DefZifFloatval = def.DefFunc("floatval", 1, 1, []def.ArgInfo{{Name: "var_"}}
 	ZifFloatval(executeData, returnValue, var_)
 })
 
+// generate by ZifFloatval
+var DefZifDoubleval = def.DefFunc("doubleval", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	var_ := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifFloatval(executeData, returnValue, var_)
+})
+
 // generate by ZifBoolval
 var DefZifBoolval = def.DefFunc("boolval", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -108,8 +118,38 @@ var DefZifIsInt = def.DefFunc("is_int", 1, 1, []def.ArgInfo{{Name: "var_"}}, fun
 	ZifIsInt(executeData, returnValue, var_)
 })
 
+// generate by ZifIsInt
+var DefZifIsInteger = def.DefFunc("is_integer", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	var_ := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifIsInt(executeData, returnValue, var_)
+})
+
+// generate by ZifIsInt
+var DefZifIsLong = def.DefFunc("is_long", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	var_ := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifIsInt(executeData, returnValue, var_)
+})
+
 // generate by ZifIsFloat
 var DefZifIsFloat = def.DefFunc("is_float", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	var_ := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifIsFloat(executeData, returnValue, var_)
+})
+
+// generate by ZifIsFloat
+var DefZifIsDouble = def.DefFunc("is_double", 1, 1, []def.ArgInfo{{Name: "var_"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
 	var_ := fp.ParseZval()
 	if fp.HasError() {

@@ -83,6 +83,28 @@ var DefZifTempnam = def.DefFunc("tempnam", 2, 2, []def.ArgInfo{{Name: "dir"}, {N
 	ZifTempnam(executeData, returnValue, dir, prefix)
 })
 
+// generate by ZifTmpfile
+var DefZifTmpfile = def.DefFunc("tmpfile", 0, 0, []def.ArgInfo{}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	if !zpp.CheckNumArgsNoneError(executeData) {
+		return
+	}
+	ZifTmpfile(executeData, returnValue)
+})
+
+// generate by ZifOpen
+var DefZifOpen = def.DefFunc("open", 2, 4, []def.ArgInfo{{Name: "filename"}, {Name: "mode"}, {Name: "use_include_path"}, {Name: "context"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 4, 0)
+	filename := fp.ParseZval()
+	mode := fp.ParseZval()
+	fp.StartOptional()
+	use_include_path := fp.ParseZval()
+	context := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifOpen(executeData, returnValue, filename, mode, nil, use_include_path, context)
+})
+
 // generate by ZifFclose
 var DefZifFclose = def.DefFunc("fclose", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
@@ -161,6 +183,19 @@ var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{Name: "fp"}, {Name
 
 // generate by ZifFwrite
 var DefZifFwrite = def.DefFunc("fwrite", 2, 3, []def.ArgInfo{{Name: "fp"}, {Name: "str"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 3, 0)
+	fp := fp.ParseZval()
+	str := fp.ParseZval()
+	fp.StartOptional()
+	length := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifFwrite(executeData, returnValue, fp, str, nil, length)
+})
+
+// generate by ZifFwrite
+var DefZifFputs = def.DefFunc("fputs", 2, 3, []def.ArgInfo{{Name: "fp"}, {Name: "str"}, {Name: "length"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	fp := fp.ParseZval()
 	str := fp.ParseZval()
@@ -298,6 +333,27 @@ var DefZifUnlink = def.DefFunc("unlink", 1, 2, []def.ArgInfo{{Name: "filename"},
 		return
 	}
 	ZifUnlink(executeData, returnValue, filename, nil, context)
+})
+
+// generate by ZifFtruncate
+var DefZifFtruncate = def.DefFunc("ftruncate", 2, 2, []def.ArgInfo{{Name: "fp"}, {Name: "size"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	fp := fp.ParseZval()
+	size := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifFtruncate(executeData, returnValue, fp, size)
+})
+
+// generate by ZifFstat
+var DefZifFstat = def.DefFunc("fstat", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	fp := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifFstat(executeData, returnValue, fp)
 })
 
 // generate by ZifCopy

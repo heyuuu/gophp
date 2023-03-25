@@ -662,7 +662,7 @@ func ZifTempnam(executeData zpp.DefEx, return_value zpp.DefReturn, dir *types.Zv
 	}
 	types.ZendStringReleaseEx(p, 0)
 }
-func PhpIfTmpfile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifTmpfile(executeData zpp.DefEx, return_value zpp.DefReturn) {
 	var stream *core.PhpStream
 	if !executeData.CheckNumArgsNone(false) {
 		return
@@ -675,7 +675,7 @@ func PhpIfTmpfile(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
-func PhpIfFopen(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifOpen(executeData zpp.DefEx, return_value zpp.DefReturn, filename *types.Zval, mode *types.Zval, _ zpp.DefOpt, use_include_path *types.Zval, context *types.Zval) {
 	var filename *byte
 	var mode *byte
 	var filename_len int
@@ -1016,6 +1016,8 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		return
 	}
 }
+
+//@zif -alias fputs
 func ZifFwrite(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, str *types.Zval, _ zpp.DefOpt, length *types.Zval) {
 	var res *types.Zval
 	var input *byte
@@ -1380,7 +1382,7 @@ func ZifUnlink(executeData zpp.DefEx, return_value zpp.DefReturn, filename *type
 	types.ZVAL_BOOL(return_value, wrapper.GetWops().GetUnlink()(wrapper, filename, core.REPORT_ERRORS, context) != 0)
 	return
 }
-func PhpIfFtruncate(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFtruncate(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval, size *types.Zval) {
 	var fp *types.Zval
 	var size zend.ZendLong
 	var stream *core.PhpStream
@@ -1411,7 +1413,7 @@ func PhpIfFtruncate(executeData *zend.ZendExecuteData, return_value *types.Zval)
 	types.ZVAL_BOOL(return_value, 0 == core.PhpStreamTruncateSetSize(stream, size))
 	return
 }
-func PhpIfFstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifFstat(executeData zpp.DefEx, return_value zpp.DefReturn, fp *types.Zval) {
 	var fp *types.Zval
 	var stat_dev types.Zval
 	var stat_ino types.Zval
