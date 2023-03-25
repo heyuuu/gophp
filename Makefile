@@ -15,6 +15,6 @@ sikgen-clear:
 	${GO} build -o ${BULIDPATH} ./internal/cmd/sikgen
 	${BULIDPATH}sikgen -cmd clear-func
 
-build-php:
+gophp:
 	${GO} build -o ${BULIDPATH} ./cmd/gophp/
 	${BULIDPATH}gophp

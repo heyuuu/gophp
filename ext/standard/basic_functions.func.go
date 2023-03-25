@@ -63,8 +63,6 @@ func BasicGlobalsDtor(basic_globals_p *PhpBasicGlobals) {
 	basic_globals_p.GetUrlAdaptSessionHostsHt().Destroy()
 	basic_globals_p.GetUrlAdaptOutputHostsHt().Destroy()
 }
-func PhpGetNan() float64 { return zend.ZEND_NAN }
-func PhpGetInf() float64 { return zend.ZEND_INFINITY }
 func ZmStartupBasic(type_ int, module_number int) int {
 	BasicGlobalsCtor(&BasicGlobals)
 	IncompleteClassEntry = PhpCreateIncompleteClass()

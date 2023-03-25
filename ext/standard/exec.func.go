@@ -65,7 +65,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 				/* strip trailing whitespaces */
 
 				l = bufl
-				for b.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
+				for builtin.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
 
 				}
 				if l != bufl-1 {
@@ -91,7 +91,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 
 			if type_ == 2 && buf != b || type_ != 2 {
 				l = bufl
-				for b.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
+				for builtin.PostDec(&l) > 0 && isspace((*uint8)(buf)[l]) {
 
 				}
 				if l != bufl-1 {
@@ -112,7 +112,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 		}
 	} else {
 		var read ssize_t
-		for b.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
+		for builtin.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
 			core.PHPWRITE(buf, read)
 		}
 	}

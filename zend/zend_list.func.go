@@ -156,7 +156,6 @@ func ZendCloseRsrcList(ht *types.Array) {
 		}
 	}
 }
-func ZendDestroyRsrcList(ht *types.Array) { ht.GracefulReverseDestroy() }
 func CleanModuleResource(zv *types.Zval, arg any) int {
 	var resource_id int = *((*int)(arg))
 	return types.Z_RES_TYPE_P(zv) == resource_id
