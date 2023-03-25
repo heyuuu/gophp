@@ -9,14 +9,61 @@ import (
  * 此处的类型用于 sikgen 脚本生成代码
  */
 type (
-	DefOpt    any
-	DefEx     = *zend.ZendExecuteData
-	DefReturn = *types.Zval
-	// Type: 'L', FAST_ZPP: Z_PARAM_STRICT_LONG
-	DefStrictLong = int
-	// Type: 'z', FAST_ZPP: Z_PARAM_ZVAL_DEREF, Code: ParseZvalDeref()
-	DefZvalDeref = *types.Zval
+	/* special */
+	Ex  = *zend.ZendExecuteData
+	Ret = *types.Zval
 
-	DefRef      = *types.Zval //
-	DefRefArray = *types.Zval // fp.ParseArrayEx(false, true)
+	// FAST_ZPP: Z_PARAM_OPTIONAL
+	Opt any
+
+	/* base type */
+
+	// FAST_ZPP: Z_PARAM_BOOL, Type: 'b'，直接使用 bool (略有差异，使用 bool 类型而非 ZendBool 类型)
+	//Bool = bool
+
+	// FAST_ZPP: Z_PARAM_LONG, Type: 'l'，直接使用 int
+	//Long = int
+
+	// FAST_ZPP: Z_PARAM_STRICT_LONG, Type: 'L'
+	StrictLong = int
+
+	// FAST_ZPP: Z_PARAM_DOUBLE, Type: 'd'，直接使用 double
+	//Double = float64
+
+	// FAST_ZPP: Z_PARAM_PATH, Type: 'p', 直接使用 string (略有差异，使用 string 类型而非 *byte+len 类型爽字段)
+	//String = string
+
+	// FAST_ZPP: Z_PARAM_STRING, Type: 's' (略有差异，使用 string 类型而非 *byte+len 类型爽字段)
+	Path = string
+
+	// FAST_ZPP: Z_PARAM_ARRAY_HT, Type: 'h'，直接使用	 *types.Array
+	ArrayHt = *types.Array
+
+	// FAST_ZPP: Z_PARAM_ARRAY_OR_OBJECT_HT, Type: 'H'
+	ArrayOrObjectHt = *types.Array
+
+	// FAST_ZPP: Z_PARAM_ARRAY, Type: 'a'
+	Array = *types.Zval
+
+	// FAST_ZPP: Z_PARAM_ARRAY_OR_OBJECT, Type: 'A'
+	ArrayOrObject = *types.Zval
+
+	// FAST_ZPP: Z_PARAM_CLASS, Type: 'C'
+	Class = *types.ClassEntry
+
+	// FAST_ZPP: Z_PARAM_OBJECT, Type: 'o'
+	Object = *types.Zval
+
+	// FAST_ZPP: Z_PARAM_ZVAL, Type: 'z', 直接使用 *types.Zval
+	//Zval = *types.Zval
+
+	// FAST_ZPP: Z_PARAM_ZVAL_DEREF, Type: ''
+	ZvalDeref = *types.Zval
+
+	// FAST_ZPP: Z_PARAM_VARIADIC, Type: '*' or '+', 直接使用 []*types.Zval
+	//Variadic = []*types.Zval
+
+	/* ref type */
+	RefZval  = *types.Zval //
+	RefArray = *types.Zval // fp.ParseArrayEx(false, true)
 )

@@ -8,25 +8,31 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[ZppTypeBool-1]
-	_ = x[ZppTypeLong-2]
-	_ = x[ZppTypeDouble-3]
-	_ = x[ZppTypeString-4]
-	_ = x[ZppTypeZendBool-5]
-	_ = x[ZppTypeZendString-6]
-	_ = x[ZppTypeZendArray-7]
-	_ = x[ZppTypeZval-8]
-	_ = x[ZppTypeZendArrayRef-9]
-	_ = x[ZppTypeZvalRef-10]
-	_ = x[ZppTypeEx-11]
-	_ = x[ZppTypeRet-12]
-	_ = x[ZppTypeOpt-13]
-	_ = x[ZppTypeVariadic-14]
+	_ = x[ZppTypeEx-1]
+	_ = x[ZppTypeRet-2]
+	_ = x[ZppTypeOpt-3]
+	_ = x[ZppTypeBool-4]
+	_ = x[ZppTypeLong-5]
+	_ = x[ZppTypeStrictLong-6]
+	_ = x[ZppTypeDouble-7]
+	_ = x[ZppTypeString-8]
+	_ = x[ZppTypePath-9]
+	_ = x[ZppTypeArrayHt-10]
+	_ = x[ZppTypeArrayOrObjectHt-11]
+	_ = x[ZppTypeArray-12]
+	_ = x[ZppTypeArrayOrObject-13]
+	_ = x[ZppTypeClass-14]
+	_ = x[ZppTypeObject-15]
+	_ = x[ZppTypeZval-16]
+	_ = x[ZppTypeZvalDeref-17]
+	_ = x[ZppTypeVariadic-18]
+	_ = x[ZppTypeRefZval-19]
+	_ = x[ZppTypeRefArray-20]
 }
 
-const _ZppType_name = "ZppTypeBoolZppTypeLongZppTypeDoubleZppTypeStringZppTypeZendBoolZppTypeZendStringZppTypeZendArrayZppTypeZvalZppTypeZendArrayRefZppTypeZvalRefZppTypeExZppTypeRetZppTypeOptZppTypeVariadic"
+const _ZppType_name = "ZppTypeExZppTypeRetZppTypeOptZppTypeBoolZppTypeLongZppTypeStrictLongZppTypeDoubleZppTypeStringZppTypePathZppTypeArrayHtZppTypeArrayOrObjectHtZppTypeArrayZppTypeArrayOrObjectZppTypeClassZppTypeObjectZppTypeZvalZppTypeZvalDerefZppTypeVariadicZppTypeRefZvalZppTypeRefArray"
 
-var _ZppType_index = [...]uint8{0, 11, 22, 35, 48, 63, 80, 96, 107, 126, 140, 149, 159, 169, 184}
+var _ZppType_index = [...]uint16{0, 9, 19, 29, 40, 51, 68, 81, 94, 105, 119, 141, 153, 173, 185, 198, 209, 225, 240, 254, 269}
 
 func (i ZppType) String() string {
 	i -= 1

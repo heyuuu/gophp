@@ -428,6 +428,33 @@ func (p *FastParser) ParsePathEx(checkNull bool, separate bool) (strPtr *byte, s
 	return
 }
 
+func (p *FastParser) ParsePathVal() string {
+	str := p.ParsePathValEx(false, false)
+	if str == nil {
+		return ""
+	} else {
+		return *str
+	}
+}
+func (p *FastParser) ParsePathValEx(checkNull bool, separate bool) *string {
+	p.parsePrologue(separate, separate)
+	if p.IsFinish() {
+		return nil
+	}
+
+	zs, ok := ParsePathStr(p.arg, checkNull, p.useWeakTypes())
+	if !ok {
+		p.triggerError(ZPP_ERROR_WRONG_ARG, Z_EXPECTED_PATH)
+	}
+
+	if checkNull && zs == nil {
+		return nil
+	} else {
+		str := zs.GetStr()
+		return &str
+	}
+}
+
 // @see Micro: Z_PARAM_PATH_STR，Old: 'P'
 func (p *FastParser) ParsePathStr() (dest *types.String) {
 	return p.ParsePathStrEx(false, false)

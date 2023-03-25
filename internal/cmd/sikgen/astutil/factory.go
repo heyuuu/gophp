@@ -24,6 +24,8 @@ func NilLit() *ast.Ident { return nilIdent }
 func IntLit(val int) *ast.BasicLit {
 	return &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(val)}
 }
+func True() ast.Expr  { return trueIdent }
+func False() ast.Expr { return falseIdent }
 func BoolLit(val bool) ast.Expr {
 	if val {
 		return trueIdent

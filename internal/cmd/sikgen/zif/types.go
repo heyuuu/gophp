@@ -47,97 +47,99 @@ type ZppType int
 
 const (
 	_ ZppType = iota
-	ZppTypeBool
-	ZppTypeLong
-	ZppTypeDouble
-	ZppTypeString
-	ZppTypeZendBool
-	ZppTypeZendString
-	ZppTypeZendArray
-	ZppTypeZval
-	// ref
-	ZppTypeZendArrayRef
-	ZppTypeZvalRef
 	// special
 	ZppTypeEx
 	ZppTypeRet
 	ZppTypeOpt
+	// base type
+	ZppTypeBool
+	ZppTypeLong
+	ZppTypeStrictLong
+	ZppTypeDouble
+	ZppTypeString
+	ZppTypePath
+	ZppTypeArrayHt
+	ZppTypeArrayOrObjectHt
+	ZppTypeArray
+	ZppTypeArrayOrObject
+	ZppTypeClass
+	ZppTypeObject
+	ZppTypeZval
+	ZppTypeZvalDeref
 	ZppTypeVariadic
+	// ref
+	ZppTypeRefZval
+	ZppTypeRefArray
 )
 
-func toZppType(typ string) (ZppType, bool) {
-	switch typ {
-	case "bool":
-		return ZppTypeBool, true
-	case "int":
-		return ZppTypeLong, true
-	case "float64":
-		return ZppTypeDouble, true
-	case "string":
-		return ZppTypeString, true
-	case "types.ZendBool":
-		return ZppTypeZendBool, true
-	case "*types.Array":
-		return ZppTypeZendArray, true
-	case "*types.String":
-		return ZppTypeZendString, true
-	case "*types.Zval":
-		return ZppTypeZval, true
-	// ref
-	case "zpp.DefRefArray":
-		return ZppTypeZendArrayRef, true
-	case "zpp.DefRef":
-		return ZppTypeZvalRef, true
+var zppInfos = []struct {
+	typ    ZppType
+	def    string
+	parser string
+	args   []ast.Expr
+}{
 	// special
-	case "zpp.DefEx":
-		return ZppTypeEx, true
-	case "zpp.DefReturn":
-		return ZppTypeRet, true
-	case "zpp.DefOpt":
-		return ZppTypeOpt, true
-	case "[]*types.Zval":
-		return ZppTypeVariadic, true
-
-	default:
-		return 0, false
-	}
+	{ZppTypeEx, "zpp.Ex", "", nil},
+	{ZppTypeRet, "zpp.Ret", "", nil},
+	{ZppTypeOpt, "zpp.Opt", "", nil},
+	// base type
+	{ZppTypeBool, "bool", "ParseBoolVal", nil},
+	{ZppTypeLong, "int", "ParseLong", nil},
+	{ZppTypeStrictLong, "zpp.StrictLong", "ParseStrictLong", nil},
+	{ZppTypeDouble, "float64", "ParseDouble", nil},
+	{ZppTypeString, "string", "ParseStringVal", nil},
+	{ZppTypePath, "zpp.Path", "ParsePathVal", nil},
+	{ZppTypeArrayHt, "*types.Array", "ParseArrayHt", nil},
+	{ZppTypeArrayOrObjectHt, "zpp.ArrayOrObjectHt", "ParseArrayOrObjectHt", nil},
+	{ZppTypeArray, "zpp.Array", "ParseArray", nil},
+	{ZppTypeArrayOrObject, "zpp.ArrayOrObject", "ParseArrayOrObject", nil},
+	{ZppTypeClass, "zpp.Class", "ParseClass", nil},
+	{ZppTypeObject, "zpp.Object", "ParseObject", nil},
+	{ZppTypeZval, "*types.Zval", "ParseZval", nil},
+	{ZppTypeZvalDeref, "zpp.ZvalDeref", "ParseZvalDeref", nil},
+	{ZppTypeVariadic, "[]*types.Zval", "ParseVariadic", nil},
+	// ref type
+	{ZppTypeRefZval, "zpp.RefZval", "ParseZvalEx", []ast.Expr{f.False(), f.True()}},
+	{ZppTypeRefArray, "zpp.RefArray", "ParseArrayEx", []ast.Expr{f.False(), f.True()}},
 }
 
-func toZppParseMethod(typ ZppType) (string, bool) {
-	switch typ {
-	case ZppTypeBool:
-		return "ParseBoolVal", true
-	case ZppTypeLong:
-		return "ParseLong", true
-	case ZppTypeDouble:
-		return "ParseDouble", true
-	case ZppTypeString:
-		return "ParseStringVal", true
-	case ZppTypeZendBool:
-		return "ParseBool", true
-	case ZppTypeZendString:
-		return "ParseStr", true
-	case ZppTypeZendArray:
-		return "ParseArray", true
-	case ZppTypeZval:
-		return "ParseZval", true
-	case ZppTypeVariadic:
-		return "ParseVariadic", true
-	default:
-		return "", false
+var toZppTypeMap map[string]ZppType
+
+func toZppType(typCode string) (ZppType, bool) {
+	if toZppTypeMap == nil {
+		toZppTypeMap = make(map[string]ZppType)
+		for _, info := range zppInfos {
+			if len(info.def) != 0 {
+				toZppTypeMap[info.def] = info.typ
+			}
+		}
 	}
+	if typ, ok := toZppTypeMap[typCode]; ok {
+		return typ, true
+	}
+	return 0, false
 }
+
+type parseMethod struct {
+	parser string
+	args   []ast.Expr
+}
+
+var toZppParseMap map[ZppType]parseMethod
 
 func toZppParseMethodEx(typ ZppType) (string, []ast.Expr, bool) {
-	switch typ {
-	case ZppTypeZvalRef:
-		return "ParseZvalEx", []ast.Expr{f.BoolLit(false), f.BoolLit(true)}, true
-	case ZppTypeZendArrayRef:
-		return "ParseArrayEx", []ast.Expr{f.BoolLit(false), f.BoolLit(true)}, true
-	default:
-		method, ok := toZppParseMethod(typ)
-		return method, nil, ok
+	if toZppParseMap == nil {
+		toZppParseMap = make(map[ZppType]parseMethod)
+		for _, info := range zppInfos {
+			if len(info.parser) != 0 {
+				toZppParseMap[info.typ] = parseMethod{parser: info.parser, args: info.args}
+			}
+		}
 	}
+	if method, ok := toZppParseMap[typ]; ok {
+		return method.parser, method.args, true
+	}
+	return "", nil, false
 }
 
 func toZppSetMethod(typ ZppType) (string, bool) {
@@ -150,9 +152,7 @@ func toZppSetMethod(typ ZppType) (string, bool) {
 		return "SetDouble", true
 	case ZppTypeString:
 		return "SetStringVal", true
-	case ZppTypeZendString:
-		return "SetString", true
-	case ZppTypeZendArray:
+	case ZppTypeArrayHt:
 		return "SetArray", true
 	default:
 		return "", false
