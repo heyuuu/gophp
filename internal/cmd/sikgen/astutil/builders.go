@@ -3,6 +3,7 @@ package astutil
 import (
 	"go/ast"
 	"go/token"
+	"sort"
 )
 
 type FileBuilder struct {
@@ -29,13 +30,20 @@ func (f *FileBuilder) Build() *ast.File {
 		Decls: decls,
 	}
 }
+
 func (f *FileBuilder) buildImportDecl() *ast.GenDecl {
 	if len(f.imports) == 0 {
 		return nil
 	}
 
-	importSpecs := make([]ast.Spec, 0, len(f.imports))
+	var names []string
 	for name, _ := range f.imports {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	importSpecs := make([]ast.Spec, 0, len(f.imports))
+	for _, name := range names {
 		importSpecs = append(importSpecs, &ast.ImportSpec{
 			Path: StrLit(name),
 		})
