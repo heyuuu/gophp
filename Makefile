@@ -1,15 +1,20 @@
-GOBIN=/Users/heyu/go/go1.18.2/bin/go
+GO=/Users/heyu/go/go1.18.2/bin/go
+GOFMT=/Users/heyu/go/go1.18.2/bin/gofmt
+BULIDPATH=./debug/
 
-clear:
-	ls | grep -v builtin | grep -v go.mod | grep -v Makefile | xargs rm -rf
 lexer:
 	go generate ./parser/zend_language_scanner.go
 	go fmt ./zend/zend_language_scanner_gen.go
 
-sikgen-func:
-	${GOBIN} build ./internal/cmd/sikgen
-	./sikgen -cmd gen-func
+sikgen:
+	${GO} build -o ${BULIDPATH} ./internal/cmd/sikgen
+	${BULIDPATH}sikgen -cmd gen-func
+	${GOFMT} -w .
 
-sikgen-func-clear:
-	${GOBIN} build ./internal/cmd/sikgen
-	./sikgen -cmd clear-func
+sikgen-clear:
+	${GO} build -o ${BULIDPATH} ./internal/cmd/sikgen
+	${BULIDPATH}sikgen -cmd clear-func
+
+build-php:
+	${GO} build -o ${BULIDPATH} ./cmd/gophp/
+	${BULIDPATH}gophp
