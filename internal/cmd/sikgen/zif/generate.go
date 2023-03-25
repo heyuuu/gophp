@@ -114,7 +114,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 	var stmts []ast.Stmt
 
 	// check num args
-	if zifInfo.minNumArgs == 0 && zifInfo.maxNumArgs <= 0 {
+	if zifInfo.minNumArgs == 0 && zifInfo.maxNumArgs == 0 {
 		method := "CheckNumArgsNoneError"
 		if zifInfo.strict {
 			method = "CheckNumArgsNoneException"

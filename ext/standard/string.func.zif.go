@@ -587,8 +587,8 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"
 })
 
 // generate by ZifSetlocale
-var DefZifSetlocale = def.DefFunc("setlocale", -1, -1, []def.ArgInfo{{Name: "category"}, {Name: "locales"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
-	fp := zpp.FastParseStart(executeData, -1, -1, 0)
+var DefZifSetlocale = def.DefFunc("setlocale", 1, -1, []def.ArgInfo{{Name: "category"}, {Name: "locales"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 1, -1, 0)
 	category := fp.ParseZval()
 	locales := fp.ParseVariadic()
 	if fp.HasError() {

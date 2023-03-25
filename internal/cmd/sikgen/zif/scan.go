@@ -258,7 +258,7 @@ func parseReturnInfo(funcDecl *ast.FuncDecl) (*ReturnInfo, error) {
 }
 
 func calcNumArgs(argInfos []ArgInfo) (minNumArgs int, maxNumArgs int) {
-	minNumArgs, maxNumArgs = -1, 0
+	minNumArgs, maxNumArgs, hasVararg := -1, 0, false
 outer:
 	for _, info := range argInfos {
 		switch info.typ {
@@ -267,7 +267,7 @@ outer:
 		case ZppTypeOpt:
 			minNumArgs = maxNumArgs
 		case ZppTypeVariadic:
-			maxNumArgs = -1
+			hasVararg = true
 			break outer
 		default:
 			maxNumArgs++
@@ -275,6 +275,9 @@ outer:
 	}
 	if minNumArgs < 0 {
 		minNumArgs = maxNumArgs
+	}
+	if hasVararg {
+		maxNumArgs = -1
 	}
 	return minNumArgs, maxNumArgs
 }

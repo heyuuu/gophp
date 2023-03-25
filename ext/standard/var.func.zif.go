@@ -6,8 +6,8 @@ import (
 )
 
 // generate by ZifVarDump
-var DefZifVarDump = def.DefFunc("var_dump", -1, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
-	fp := zpp.FastParseStart(executeData, -1, -1, 0)
+var DefZifVarDump = def.DefFunc("var_dump", 0, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	vars := fp.ParseVariadic()
 	if fp.HasError() {
 		return
@@ -16,8 +16,8 @@ var DefZifVarDump = def.DefFunc("var_dump", -1, -1, []def.ArgInfo{{Name: "vars"}
 })
 
 // generate by ZifDebugZvalDump
-var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", -1, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
-	fp := zpp.FastParseStart(executeData, -1, -1, 0)
+var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", 0, -1, []def.ArgInfo{{Name: "vars"}}, func(executeData zpp.DefEx, returnValue zpp.DefReturn) {
+	fp := zpp.FastParseStart(executeData, 0, -1, 0)
 	vars := fp.ParseVariadic()
 	if fp.HasError() {
 		return
