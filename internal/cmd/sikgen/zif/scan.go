@@ -76,11 +76,12 @@ func parseZifInfo(funcDecl *ast.FuncDecl) (*ZifInfo, bool) {
 	}
 
 	zifInfo := &ZifInfo{
-		funcName: funcName,
-		defName:  "Def" + funcName,
-		name:     zifName,
-		strict:   annoArgs.strict,
-		oldMode:  annoArgs.oldMode,
+		funcName:   funcName,
+		defName:    "Def" + funcName,
+		name:       zifName,
+		aliasNames: annoArgs.aliasNames,
+		strict:     annoArgs.strict,
+		oldMode:    annoArgs.oldMode,
 	}
 
 	// 从参数类型获取信息
@@ -119,9 +120,11 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 		return annoFlags
 	}
 
+	var strAlias, strNumArgs string
 	flagSet := flag.NewFlagSet(zifAnnoName, flag.ContinueOnError)
 	flagSet.StringVar(&annoFlags.name, "n", "", "name")
-	flagSet.StringVar(&annoFlags.strNumArgs, "c", "", "num of args")
+	flagSet.StringVar(&strAlias, "alias", "", "alias name")
+	flagSet.StringVar(&strNumArgs, "c", "", "num of args")
 	flagSet.BoolVar(&annoFlags.strict, "s", false, "use strict mode")
 	flagSet.BoolVar(&annoFlags.quiet, "q", false, "use quite mode")
 	flagSet.BoolVar(&annoFlags.oldMode, "old", false, "use old mode")
@@ -130,14 +133,23 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 		return annoFlags
 	}
 
+	// 解析 -alias 参数
+	if strAlias != "" {
+		annoFlags.aliasNames = strings.Split(strAlias, ",")
+		for _, name := range annoFlags.aliasNames {
+			if !isValidName(name) {
+				log.Fatalf("@zif 的 --alias 参数错误: 参数值不是合法函数名")
+			}
+		}
+	}
+
 	/**
 	 * 解析 -c 参数，支持多种写法
 	 * -c m    // 最小、最大参数个数相同
 	 * -c m,n  // 分别设置最小、最大参数个数
 	 * -c m,   // 只设置最小参数个数
 	 */
-	if len(annoFlags.strNumArgs) != 0 {
-		strNumArgs := annoFlags.strNumArgs
+	if strNumArgs != "" {
 		errMsg := "解析注解失败，-c 参数值不合法: " + strNumArgs
 		pos := strings.IndexByte(strNumArgs, ',')
 		if pos < 0 {
@@ -155,6 +167,16 @@ func getAnnoArgs(doc *ast.CommentGroup) zifAnnoFlags {
 	}
 
 	return annoFlags
+}
+
+func isValidName(str string) bool {
+	for i, c := range str {
+		valid := ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || (i != 0 && '0' <= c && c <= 'Z')
+		if !valid {
+			return false
+		}
+	}
+	return true
 }
 
 func parseArgInfos(funcDecl *ast.FuncDecl) ([]ArgInfo, error) {

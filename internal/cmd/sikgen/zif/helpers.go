@@ -1,6 +1,9 @@
 package zif
 
-import "strings"
+import (
+	"io/ioutil"
+	"strings"
+)
 
 func lcName(name string) string {
 	var buf strings.Builder
@@ -15,4 +18,14 @@ func lcName(name string) string {
 		}
 	}
 	return buf.String()
+}
+
+func writeFileIfChanged(fileName string, content string) (changed bool, err error) {
+	existContent, err := ioutil.ReadFile(fileName)
+	if err == nil && string(existContent) == content {
+		return false, nil
+	}
+
+	err = ioutil.WriteFile(fileName, []byte(content), 0644)
+	return true, err
 }

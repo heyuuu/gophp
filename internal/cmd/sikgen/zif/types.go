@@ -9,6 +9,7 @@ type ZifInfo struct {
 	funcName   string
 	defName    string
 	name       string
+	aliasNames []string
 	minNumArgs int
 	maxNumArgs int
 	argInfos   []ArgInfo
@@ -33,7 +34,7 @@ const zifAnnoName = "@zif"
 
 type zifAnnoFlags struct {
 	name       string
-	strNumArgs string
+	aliasNames []string
 	minNumArgs int
 	maxNumArgs int
 	quiet      bool

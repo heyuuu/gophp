@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
+	"sik/builtin/strutil"
 	f "sik/internal/cmd/sikgen/astutil"
 )
 
@@ -34,7 +35,6 @@ var (
 func genFileNode(name string, infos []*ZifInfo) *ast.File {
 	fb := f.NewFileBuilder(name)
 	fb.AddImport("sik/zend/def")
-	fb.AddImport("sik/zend/types")
 	fb.AddImport("sik/zend/zpp")
 
 	for _, zifInfo := range infos {
@@ -44,17 +44,29 @@ func genFileNode(name string, infos []*ZifInfo) *ast.File {
 				f.Ident(zifInfo.defName),
 				&ast.CallExpr{
 					Fun:  defPkgIdent("DefFunc"),
-					Args: genDefFuncArgs(zifInfo),
+					Args: genDefFuncArgs(zifInfo, zifInfo.name),
 				},
 			),
 		)
+		for _, aliasName := range zifInfo.aliasNames {
+			fb.AddDecl(
+				f.ValueSpecDeclEx(
+					f.DocComment("\n// generate by "+zifInfo.funcName),
+					f.Ident("Zif"+strutil.UpperCamelCase(aliasName)),
+					&ast.CallExpr{
+						Fun:  defPkgIdent("DefFunc"),
+						Args: genDefFuncArgs(zifInfo, aliasName),
+					},
+				),
+			)
+		}
 	}
 
 	return fb.Build()
 }
 
-func genDefFuncArgs(zifInfo *ZifInfo) []ast.Expr {
-	log.Printf("ZifInfo: %+v\n", *zifInfo)
+func genDefFuncArgs(zifInfo *ZifInfo, phpFuncName string) []ast.Expr {
+	//log.Printf("ZifInfo: %+v\n", *zifInfo)
 
 	// 构建 ArgInfos
 	var realArgInfos []ast.Expr
@@ -72,7 +84,7 @@ func genDefFuncArgs(zifInfo *ZifInfo) []ast.Expr {
 	}
 
 	return []ast.Expr{
-		f.StrLit(zifInfo.name),
+		f.StrLit(phpFuncName),
 		f.IntLit(zifInfo.minNumArgs),
 		f.IntLit(zifInfo.maxNumArgs),
 		&ast.CompositeLit{Type: f.ArrayType(typeArgInfo), Elts: realArgInfos},
