@@ -2,7 +2,6 @@ package zend
 
 import (
 	"sik/zend/def"
-	"sik/zend/types"
 	"sik/zend/zpp"
 )
 
