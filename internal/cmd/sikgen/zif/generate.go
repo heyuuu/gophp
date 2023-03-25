@@ -38,31 +38,24 @@ func genFileNode(name string, infos []*ZifInfo) *ast.File {
 	fb.AddImport("sik/zend/zpp")
 
 	for _, zifInfo := range infos {
-		fb.AddDecl(
-			f.ValueSpecDeclEx(
-				f.DocComment("\n// generate by "+zifInfo.funcName),
-				f.Ident(zifInfo.defName),
-				&ast.CallExpr{
-					Fun:  defPkgIdent("DefFunc"),
-					Args: genDefFuncArgs(zifInfo, zifInfo.name),
-				},
-			),
-		)
+		fb.AddDecl(genDefValueSpec(zifInfo, zifInfo.name))
 		for _, aliasName := range zifInfo.aliasNames {
-			fb.AddDecl(
-				f.ValueSpecDeclEx(
-					f.DocComment("\n// generate by "+zifInfo.funcName),
-					f.Ident("DefZif"+strutil.UpperCamelCase(aliasName)),
-					&ast.CallExpr{
-						Fun:  defPkgIdent("DefFunc"),
-						Args: genDefFuncArgs(zifInfo, aliasName),
-					},
-				),
-			)
+			fb.AddDecl(genDefValueSpec(zifInfo, aliasName))
 		}
 	}
 
 	return fb.Build()
+}
+
+func genDefValueSpec(zifInfo *ZifInfo, phpFuncName string) *ast.GenDecl {
+	return f.ValueSpecDeclEx(
+		f.DocComment("\n// generate by "+zifInfo.funcName),
+		f.Ident("DefZif"+strutil.UpperCamelCase(phpFuncName)),
+		&ast.CallExpr{
+			Fun:  defPkgIdent("DefFunc"),
+			Args: genDefFuncArgs(zifInfo, phpFuncName),
+		},
+	)
 }
 
 func genDefFuncArgs(zifInfo *ZifInfo, phpFuncName string) []ast.Expr {

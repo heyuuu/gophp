@@ -125,7 +125,7 @@ func getAnnoArgs(doc *ast.CommentGroup) (zifAnnoFlags, error) {
 
 	var strAlias, strNumArgs string
 	flagSet := flag.NewFlagSet(zifAnnoName, flag.ContinueOnError)
-	flagSet.StringVar(&annoFlags.name, "n", "", "name")
+	flagSet.StringVar(&annoFlags.name, "name", "", "name")
 	flagSet.StringVar(&strAlias, "alias", "", "alias name")
 	flagSet.StringVar(&strNumArgs, "c", "", "num of args")
 	flagSet.BoolVar(&annoFlags.strict, "s", false, "use strict mode")
