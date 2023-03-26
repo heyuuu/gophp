@@ -1,7 +1,5 @@
 package core
 
-// Source: <main/php_syslog.h>
-
 /*
   +----------------------------------------------------------------------+
   | PHP Version 7                                                        |
@@ -28,8 +26,6 @@ const PHP_SYSLOG_FILTER_ASCII = 2
 const PHP_SYSLOG_FILTER_RAW = 3
 
 var PhpOpenlog func(*byte, int, int)
-
-// Source: <main/php_syslog.c>
 
 /*
    +----------------------------------------------------------------------+

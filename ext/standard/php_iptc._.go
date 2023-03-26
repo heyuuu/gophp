@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/php_iptc.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

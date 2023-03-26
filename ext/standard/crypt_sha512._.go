@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/crypt_sha512.c>
-
 /* SHA512-based Unix crypt implementation.
    Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 

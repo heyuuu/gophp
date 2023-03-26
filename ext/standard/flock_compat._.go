@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/flock_compat.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -31,8 +29,6 @@ const PHP_LOCK_SH = 1
 const PHP_LOCK_EX = 2
 const PHP_LOCK_UN = 3
 const PHP_LOCK_NB = 4
-
-// Source: <ext/standard/flock_compat.c>
 
 /*
    +----------------------------------------------------------------------+

@@ -4,8 +4,6 @@ import (
 	"sik/zend"
 )
 
-// Source: <main/php_memory_streams.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

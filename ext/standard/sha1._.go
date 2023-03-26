@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/sha1.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -21,8 +19,6 @@ package standard
 */
 
 /* SHA1 context. */
-
-// Source: <ext/standard/sha1.c>
 
 /*
    +----------------------------------------------------------------------+

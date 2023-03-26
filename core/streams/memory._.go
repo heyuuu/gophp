@@ -4,8 +4,6 @@ import (
 	"sik/core"
 )
 
-// Source: <main/streams/memory.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

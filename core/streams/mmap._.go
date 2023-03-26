@@ -1,7 +1,5 @@
 package streams
 
-// Source: <main/streams/mmap.c>
-
 /*
   +----------------------------------------------------------------------+
   | PHP Version 7                                                        |

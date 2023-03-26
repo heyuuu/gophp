@@ -1,15 +1,11 @@
 package standard
 
-// Source: <ext/standard/crypt_freesec.h>
-
 const MD5_HASH_MAX_LEN = 120
 
 /*
  * _crypt_extended_init() must be called explicitly before first use of
  * _crypt_extended_r().
  */
-
-// Source: <ext/standard/crypt_freesec.c>
 
 /*
  * This version is derived from the original implementation of FreeSec

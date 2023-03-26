@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/php_filestat.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

@@ -4,8 +4,6 @@ import (
 	b "sik/builtin"
 )
 
-// Source: <main/php_content_types.h>
-
 /*
   +----------------------------------------------------------------------+
   | PHP Version 7                                                        |
@@ -25,8 +23,6 @@ import (
 */
 
 const DEFAULT_POST_CONTENT_TYPE = "application/x-www-form-urlencoded"
-
-// Source: <main/php_content_types.c>
 
 /*
    +----------------------------------------------------------------------+

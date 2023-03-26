@@ -2,8 +2,6 @@ package zend
 
 import "sik/zend/types"
 
-// Source: <Zend/zend_iterators.h>
-
 /*
    +----------------------------------------------------------------------+
    | Zend Engine                                                          |
@@ -26,8 +24,6 @@ import "sik/zend/types"
 /* given a zval, returns stuff that can be used to iterate it. */
 
 /* given an iterator, wrap it up as a zval for use by the engine opcodes */
-
-// Source: <Zend/zend_iterators.c>
 
 /*
    +----------------------------------------------------------------------+

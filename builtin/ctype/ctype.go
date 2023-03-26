@@ -6,6 +6,14 @@ func IsAscii(c byte) bool {
 	return c <= 0x7f
 }
 
+func IsAlphaNum(c byte) bool {
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+}
+
+func IsAlpha(c byte) bool {
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+}
+
 func IsLower(c byte) bool {
 	return c >= 'a' && c <= 'z'
 }

@@ -82,14 +82,14 @@ func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendB
 	}
 	buf.AppendString("(\n")
 	indent += PRINT_ZVAL_INDENT
-	ht.eachValidBucketIndirect(func(_ uint32, p *types.Bucket, z *types.Zval) {
+	ht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
 		for i := 0; i < indent; i++ {
 			buf.AppendByte(' ')
 		}
 		buf.AppendByte('[')
-		if p.IsStrKey() {
+		if key.IsStrKey() {
 			if is_object != 0 {
-				className, propName, mangled := ZendUnmanglePropertyName_Ex(p.StrKey())
+				className, propName, mangled := ZendUnmanglePropertyName_Ex(key.StrKey())
 				buf.AppendString(propName)
 				if className != "" && mangled {
 					if className[0] == '*' {
@@ -101,13 +101,13 @@ func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendB
 					}
 				}
 			} else {
-				buf.AppendString(p.StrKey())
+				buf.AppendString(key.StrKey())
 			}
 		} else {
-			buf.AppendLong(p.IndexKey())
+			buf.AppendLong(key.IndexKey())
 		}
 		buf.AppendString("] => ")
-		ZendPrintZvalRToBuf(buf, z, indent+PRINT_ZVAL_INDENT)
+		ZendPrintZvalRToBuf(buf, value, indent+PRINT_ZVAL_INDENT)
 		buf.AppendString("\n")
 	})
 	indent -= PRINT_ZVAL_INDENT

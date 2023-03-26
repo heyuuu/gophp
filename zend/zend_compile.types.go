@@ -746,15 +746,12 @@ func (this *ZendLoopVar) SetTryCatchOffset(value uint32)   { this.try_catch_offs
  * ReservedClassName
  */
 type ReservedClassName struct {
-	name *byte
+	name string
 	len_ int
 }
 
-func MakeReservedClassName(name *byte, len_ int) ReservedClassName {
-	return ReservedClassName{
-		name: name,
-		len_: len_,
-	}
+func MakeReservedClassName(name string) ReservedClassName {
+	return ReservedClassName{name: name}
 }
 func (this *ReservedClassName) GetName() *byte { return this.name }
 func (this *ReservedClassName) GetLen() int    { return this.len_ }

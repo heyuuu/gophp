@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/ftok.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

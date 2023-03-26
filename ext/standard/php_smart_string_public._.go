@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/php_smart_string_public.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

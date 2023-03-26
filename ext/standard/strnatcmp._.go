@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/strnatcmp.c>
-
 /*
 
   Modified for PHP by Andrei Zmievski <andrei@ispi.net>

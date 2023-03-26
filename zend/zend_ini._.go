@@ -2,8 +2,6 @@ package zend
 
 import "sik/zend/types"
 
-// Source: <Zend/zend_ini.h>
-
 /*
    +----------------------------------------------------------------------+
    | Zend Engine                                                          |

@@ -5,27 +5,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <Zend/zend_compile.h>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   +----------------------------------------------------------------------+
-*/
-
 /* On 64-bit systems less optimal, but more compact VM code leads to better
  * performance. So on 32-bit systems we use absolute addresses for jump
  * targets and constants, but on 64-bit systems realtive 32-bit offsets */
@@ -529,28 +508,6 @@ const ZEND_COMPILE_DEFAULT = ZEND_COMPILE_HANDLE_OP_ARRAY
 /* The default value for CG(compiler_options) during eval() */
 
 const ZEND_COMPILE_DEFAULT_FOR_EVAL = 0
-
-// Source: <Zend/zend_compile.c>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   |          Nikita Popov <nikic@php.net>                                |
-   +----------------------------------------------------------------------+
-*/
 
 var CompilerGlobals ZendCompilerGlobals
 var ExecutorGlobals ZendExecutorGlobals

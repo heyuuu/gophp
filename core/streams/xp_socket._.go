@@ -4,8 +4,6 @@ import (
 	"sik/core"
 )
 
-// Source: <main/streams/xp_socket.c>
-
 /*
   +----------------------------------------------------------------------+
   | PHP Version 7                                                        |

@@ -58,7 +58,6 @@ const FCGI_HASH_SEG_SIZE = 4096
 
 type FcgiLogger func(type_ int, fmt *byte, _ ...any)
 
-// Source: <main/fastcgi.c>
 const INADDR_NONE = uint64(-1)
 
 var FcgiLog FcgiLogger

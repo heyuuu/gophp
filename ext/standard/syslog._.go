@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/syslog.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

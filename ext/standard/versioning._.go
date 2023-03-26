@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/versioning.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

@@ -4,8 +4,6 @@ import (
 	b "sik/builtin"
 )
 
-// Source: <ext/standard/html_tables.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

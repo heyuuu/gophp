@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/php_metaphone.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

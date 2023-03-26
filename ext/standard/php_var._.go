@@ -4,8 +4,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <ext/standard/php_var.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

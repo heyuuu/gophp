@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/browscap.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

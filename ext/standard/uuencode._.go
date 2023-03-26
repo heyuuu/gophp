@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/uuencode.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

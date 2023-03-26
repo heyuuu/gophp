@@ -1,9 +1,7 @@
 package main
 
+import "sik/sapi/cli"
+
 func main() {
-
-}
-
-type cliOpts struct {
-	iniPathOverride *string
+	cli.Main()
 }

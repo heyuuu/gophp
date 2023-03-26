@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/lcg.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/formatted_print.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

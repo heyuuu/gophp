@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/head.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -29,8 +27,6 @@ const COOKIE_HTTPONLY = "; HttpOnly"
 const COOKIE_SAMESITE = "; SameSite="
 
 var ZmActivateHead func(type_ int, module_number int) int
-
-// Source: <ext/standard/head.c>
 
 /*
    +----------------------------------------------------------------------+

@@ -6,8 +6,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <Zend/zend_language_parser.h>
-
 /* A Bison parser, made by GNU Bison 3.0.2.  */
 
 // #define YY_ZEND_ZEND_ZEND_LANGUAGE_PARSER_H_INCLUDED
@@ -166,8 +164,6 @@ const (
 )
 
 /* Value type.  */
-
-// Source: <Zend/zend_language_parser.c>
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
 

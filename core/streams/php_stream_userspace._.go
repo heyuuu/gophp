@@ -1,7 +1,5 @@
 package streams
 
-// Source: <main/streams/php_stream_userspace.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

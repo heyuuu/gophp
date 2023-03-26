@@ -10,11 +10,8 @@ import (
 )
 
 func ZmStartupCore(type_ int, module_number int) int {
-	var class_entry types.ClassEntry
-	memset(&class_entry, 0, b.SizeOf("zend_class_entry"))
-	class_entry.SetName(types.ZendStringInitInterned("stdClass", b.SizeOf("\"stdClass\"")-1, 1))
-	class_entry.SetBuiltinFunctions(nil)
-	ZendStandardClassDef = ZendRegisterInternalClass(&class_entry)
+	classEntry := types.NewClassEntry("stdClass", nil)
+	ZendStandardClassDef = ZendRegisterInternalClass(classEntry)
 	ZendRegisterDefaultClasses()
 	return types.SUCCESS
 }

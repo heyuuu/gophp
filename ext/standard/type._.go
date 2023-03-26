@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/type.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

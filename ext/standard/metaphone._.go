@@ -4,8 +4,6 @@ import (
 	b "sik/builtin"
 )
 
-// Source: <ext/standard/metaphone.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

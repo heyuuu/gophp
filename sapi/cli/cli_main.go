@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	. "sik/builtin/ctype"
 	"sik/core"
 	"sik/zend"
 	"strings"
 )
 
-func isAlphaNum(c byte) bool {
-	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-}
-
-func main() int {
+func Main() int {
 	args := os.Args
 
 	var use_extended_info int = 0
@@ -44,7 +41,7 @@ loop:
 			if pos := strings.IndexByte(optVal.Value, '='); pos >= 0 {
 				defName := optVal.Value[0:pos]
 				defValue := optVal.Value[pos+1:]
-				if len(defValue) > 0 && !isAlphaNum(defValue[0]) && defValue[0] != '"' && defValue[0] != '\'' {
+				if len(defValue) > 0 && !IsAlphaNum(defValue[0]) && defValue[0] != '"' && defValue[0] != '\'' {
 					ini_entries += defName + "\"" + defValue + "\"\n"
 				} else {
 					ini_entries += optVal.Value + "\n"

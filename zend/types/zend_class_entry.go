@@ -7,7 +7,7 @@ import "sik/zend"
  */
 type ClassEntry struct {
 	type_ byte
-	name  *String
+	name  string // *String
 	__0   struct /* union */ {
 		parent      *ClassEntry
 		parent_name *String
@@ -62,7 +62,7 @@ type ClassEntry struct {
 			doc_comment *String
 		}
 		internal struct {
-			builtin_functions *ZendFunctionEntry
+			builtin_functions []ZendFunctionEntry
 			module            *zend.ZendModuleEntry
 		}
 	}
@@ -99,15 +99,24 @@ func (this *ClassEntry) InitMethods(functions []ZendFunctionEntry) {
 	this.SetBuiltinFunctions(functions)
 }
 
-func (this *ClassEntry) Name() string { return this.name.GetStr() }
+func NewClassEntry(name string, functions []ZendFunctionEntry) *ClassEntry {
+	class := &ClassEntry{
+		name: name,
+	}
+	class.info.internal.builtin_functions = functions
+	return class
+}
+
+func (this *ClassEntry) Name() string { return this.name }
 
 /**
  * Getter / Setter
  */
+func (this *ClassEntry) GetName() *String      { return NewString(this.name) }
+func (this *ClassEntry) SetName(value *String) { this.name = value.GetStr() }
+
 func (this *ClassEntry) GetType() byte                  { return this.type_ }
 func (this *ClassEntry) SetType(value byte)             { this.type_ = value }
-func (this *ClassEntry) GetName() *String               { return this.name }
-func (this *ClassEntry) SetName(value *String)          { this.name = value }
 func (this *ClassEntry) GetParent() *ClassEntry         { return this.__0.parent }
 func (this *ClassEntry) SetParent(value *ClassEntry)    { this.__0.parent = value }
 func (this *ClassEntry) GetParentName() *String         { return this.__0.parent_name }

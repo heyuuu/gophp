@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/winver.h>
-
 const SM_TABLETPC = 86
 const SM_MEDIACENTER = 87
 const SM_STARTER = 88

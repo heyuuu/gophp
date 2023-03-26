@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/hrtime.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -29,8 +27,6 @@ const PHP_HRTIME_PLATFORM_AIX = 0
 const HRTIME_AVAILABLE = PHP_HRTIME_PLATFORM_POSIX || PHP_HRTIME_PLATFORM_WINDOWS || PHP_HRTIME_PLATFORM_APPLE || PHP_HRTIME_PLATFORM_HPUX || PHP_HRTIME_PLATFORM_AIX
 
 type PhpHrtimeT = uint64
-
-// Source: <ext/standard/hrtime.c>
 
 /*
    +----------------------------------------------------------------------+

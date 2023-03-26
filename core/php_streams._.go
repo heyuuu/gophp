@@ -6,8 +6,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <main/php_streams.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -226,7 +224,7 @@ const PHP_STREAM_CAST_RELEASE = 0x40000000
 const PHP_STREAM_CAST_INTERNAL = 0x20000000
 const PHP_STREAM_CAST_MASK = PHP_STREAM_CAST_TRY_HARD | PHP_STREAM_CAST_RELEASE | PHP_STREAM_CAST_INTERNAL
 
-var _phpStreamCast func(stream *PhpStream, castas int, ret *any, show_err int) int
+var _phpStreamCast = streams.O_phpStreamCast
 
 /* use this to check if a stream can be cast into another form */
 

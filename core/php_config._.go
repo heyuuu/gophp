@@ -1,7 +1,5 @@
 package core
 
-// Source: <main/php_config.h>
-
 /* main/php_config.h.  Generated from php_config.h.in by configure.  */
 
 /* */

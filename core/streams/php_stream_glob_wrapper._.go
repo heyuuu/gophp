@@ -1,7 +1,5 @@
 package streams
 
-// Source: <main/streams/php_stream_glob_wrapper.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

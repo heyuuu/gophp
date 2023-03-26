@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/soundex.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

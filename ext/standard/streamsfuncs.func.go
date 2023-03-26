@@ -1350,6 +1350,8 @@ func ZifStreamSetBlocking(executeData zpp.Ex, return_value zpp.Ret, socket *type
 	return_value.SetTrue()
 	return
 }
+
+//@zif -alias
 func ZifStreamSetTimeout(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, seconds *types.Zval, _ zpp.Opt, microseconds *types.Zval) {
 	var socket *types.Zval
 	var seconds zend.ZendLong

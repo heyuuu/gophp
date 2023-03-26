@@ -2,27 +2,6 @@ package zend
 
 import "sik/zend/types"
 
-// Source: <Zend/zend_object_handlers.h>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   +----------------------------------------------------------------------+
-*/
-
 const ZEND_WRONG_PROPERTY_INFO *ZendPropertyInfo = (*ZendPropertyInfo)(intptr_t - 1)
 const ZEND_DYNAMIC_PROPERTY_OFFSET = uintPtr(intptr_t)(-1)
 
@@ -143,28 +122,6 @@ const ZEND_PROPERTY_EXISTS = 0x2
 
 /* Will call get_properties_for handler or use default behavior. For use by
  * consumers of the get_properties_for API. */
-
-// Source: <Zend/zend_object_handlers.c>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   |          Dmitry Stogov <dmitry@php.net>                              |
-   +----------------------------------------------------------------------+
-*/
 
 const DEBUG_OBJECT_HANDLERS = 0
 const ZEND_WRONG_PROPERTY_OFFSET = 0

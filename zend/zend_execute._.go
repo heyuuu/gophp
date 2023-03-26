@@ -30,8 +30,6 @@ type ZendFreeOp *types.Zval
 
 const CACHE_SPECIAL = 1 << 0
 
-// Source: <Zend/zend_execute.c>
-
 /* Virtual current working directory support */
 const _CONST_CODE = 0
 const _TMP_CODE = 1

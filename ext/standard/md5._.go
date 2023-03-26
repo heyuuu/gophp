@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/md5.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -30,8 +28,6 @@ package standard
  *
  * See md5.c for more information.
  */
-
-// Source: <ext/standard/md5.c>
 
 /*
    +----------------------------------------------------------------------+

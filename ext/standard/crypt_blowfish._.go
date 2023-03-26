@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/crypt_blowfish.h>
-
 /*
  * Written by Solar Designer <solar at openwall.com> in 2000-2011.
  * No copyright is claimed, and the software is hereby placed in the public
@@ -17,8 +15,6 @@ package standard
  *
  * See crypt_blowfish.c for more information.
  */
-
-// Source: <ext/standard/crypt_blowfish.c>
 
 /*
  * The crypt_blowfish homepage is:

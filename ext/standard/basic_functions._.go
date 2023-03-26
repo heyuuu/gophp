@@ -18,8 +18,6 @@ const MT_N = 624
 
 var BasicGlobals PhpBasicGlobals
 
-// Source: <ext/standard/basic_functions.c>
-
 var IncompleteClassEntry *types.ClassEntry = nil
 
 var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
@@ -403,11 +401,7 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	DefZifStreamGetMetaData,
 	DefZifStreamGetLine,
 	streams.DefZifStreamWrapperRegister,
-	types.MakeZendFunctionEntryEx("stream_register_wrapper", 0, ZifStreamWrapperRegister, []zend.ArgInfo{zend.MakeReturnArgInfo(2),
-		zend.MakeArgName("protocol"),
-		zend.MakeArgName("classname"),
-		zend.MakeArgName("flags"),
-	}),
+	streams.DefZifStreamRegisterWrapper,
 	streams.DefZifStreamWrapperUnregister,
 	streams.DefZifStreamWrapperRestore,
 	DefZifStreamGetWrappers,

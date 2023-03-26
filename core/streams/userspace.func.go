@@ -255,6 +255,8 @@ func UserWrapperOpendir(
 	standard.FG(user_stream_current_filename) = nil
 	return stream
 }
+
+//@zif -alias stream_register_wrapper
 func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol *types.Zval, classname *types.Zval, _ zpp.Opt, flags *types.Zval) {
 	var protocol *types.String
 	var classname *types.String

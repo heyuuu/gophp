@@ -1,7 +1,5 @@
 package core
 
-// Source: <main/php_reentrancy.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

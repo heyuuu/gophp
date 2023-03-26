@@ -612,7 +612,7 @@ func Zendlex(elem *ZendParserStackElem) int {
 	return ret
 }
 func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBool) {
-	var persistent_hashes types.ZendBool = ce.GetType() == ZEND_INTERNAL_CLASS
+	var persistent_hashes = ce.GetType() == ZEND_INTERNAL_CLASS
 	ce.SetRefcount(1)
 	ce.SetCeFlags(ZEND_ACC_CONSTANTS_UPDATED)
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_GUARDS) != 0 {
@@ -620,7 +620,7 @@ func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBo
 	}
 	ce.SetDefaultPropertiesTable(nil)
 	ce.SetDefaultStaticMembersTable(nil)
-	ce.GetPropertiesInfo() = types.MakeArrayEx(8, b.Cond(persistent_hashes != 0, ZendDestroyPropertyInfoInternal, nil), persistent_hashes)
+	ce.GetPropertiesInfo() = types.MakeArrayEx(8, b.Cond(persistent_hashes, ZendDestroyPropertyInfoInternal, nil), persistent_hashes)
 	ce.GetConstantsTable() = types.MakeArrayEx(8, nil, persistent_hashes)
 	ce.GetFunctionTable() = types.MakeArrayEx(8, ZEND_FUNCTION_DTOR, persistent_hashes)
 	if ce.GetType() == ZEND_INTERNAL_CLASS {

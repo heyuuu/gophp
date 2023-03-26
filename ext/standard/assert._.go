@@ -6,8 +6,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <ext/standard/assert.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

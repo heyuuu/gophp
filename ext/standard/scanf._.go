@@ -4,8 +4,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <ext/standard/scanf.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -42,8 +40,6 @@ const SCAN_ERROR_INTERNAL = SCAN_ERROR_WRONG_PARAM_COUNT - 1
  * The following are here solely for the benefit of the scanf type functions
  * e.g. fscanf
  */
-
-// Source: <ext/standard/scanf.c>
 
 /*
    +----------------------------------------------------------------------+

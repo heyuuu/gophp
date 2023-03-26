@@ -1,7 +1,5 @@
 package zend
 
-// Source: <Zend/zend_virtual_cwd.h>
-
 const MAXPATHLEN = 256
 const DEFAULT_SLASH = '/'
 const DEFAULT_DIR_SEPARATOR = ':'
@@ -46,8 +44,6 @@ const _IFIFO = 010000
 const S_IFIFO = _IFIFO
 const _IFBLK = 060000
 const S_IFBLK = _IFBLK
-
-// Source: <Zend/zend_virtual_cwd.c>
 
 var MainCwdState CwdState
 

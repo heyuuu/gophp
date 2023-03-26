@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/url.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -30,8 +28,6 @@ const PHP_URL_QUERY = 6
 const PHP_URL_FRAGMENT = 7
 const PHP_QUERY_RFC1738 = 1
 const PHP_QUERY_RFC3986 = 2
-
-// Source: <ext/standard/url.c>
 
 /*
    +----------------------------------------------------------------------+

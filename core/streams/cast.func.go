@@ -48,10 +48,6 @@ func PhpStreamModeSanitizeFdopenFopencookie(stream *core.PhpStream, result *byte
 		 * truncate anything in fdopen/fopencookie */
 
 		result[b.PostInc(&res_curs)] = 'w'
-
-		/* assume cur_mode[0] is 'c' or 'x'; substitute by 'w', which should not
-		 * truncate anything in fdopen/fopencookie */
-
 	}
 
 	/* assume current mode has at most length 4 (e.g. wbn+) */
@@ -71,7 +67,7 @@ func PhpStreamModeSanitizeFdopenFopencookie(stream *core.PhpStream, result *byte
 	}
 	result[res_curs] = '0'
 }
-func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) int {
+func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) int {
 	var flags int = castas & core.PHP_STREAM_CAST_MASK
 	castas &= ^core.PHP_STREAM_CAST_MASK
 
@@ -134,41 +130,6 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 
 		core.PhpErrorDocref(nil, faults.E_ERROR, "fopencookie failed")
 		return types.FAILURE
-		if !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, nil) == types.SUCCESS {
-			if types.FAILURE == stream.GetOps().GetCast()(stream, castas, ret) {
-				return types.FAILURE
-			}
-			goto exit_success
-		} else if (flags & core.PHP_STREAM_CAST_TRY_HARD) != 0 {
-			var newstream *core.PhpStream
-			newstream = _phpStreamFopenTmpfile(0)
-			if newstream != nil {
-				var retcopy int = core.PhpStreamCopyToStreamEx(stream, newstream, core.PHP_STREAM_COPY_ALL, nil)
-				if retcopy != types.SUCCESS {
-					core.PhpStreamClose(newstream)
-				} else {
-					var retcast int = core.PhpStreamCast(newstream, castas|flags, (*any)(ret), show_err)
-					if retcast == types.SUCCESS {
-						r.Rewind(*((**r.FILE)(ret)))
-					}
-
-					/* do some specialized cleanup */
-
-					if (flags & core.PHP_STREAM_CAST_RELEASE) != 0 {
-						core.PhpStreamFree(stream, core.PHP_STREAM_FREE_CLOSE_CASTED)
-					}
-
-					/* TODO: we probably should be setting .stdiocast and .fclose_stdiocast or
-					 * we may be leaking the FILE*. Needs investigation, though. */
-
-					return retcast
-
-					/* TODO: we probably should be setting .stdiocast and .fclose_stdiocast or
-					 * we may be leaking the FILE*. Needs investigation, though. */
-
-				}
-			}
-		}
 	}
 	if PhpStreamIsFiltered(stream) {
 		if show_err != 0 {

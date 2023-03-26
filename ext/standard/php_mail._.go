@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/php_mail.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/link.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

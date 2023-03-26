@@ -4,8 +4,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <main/streams/transports.c>
-
 /*
   +----------------------------------------------------------------------+
   | PHP Version 7                                                        |

@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/base64.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -59,8 +57,6 @@ package standard
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-// Source: <ext/standard/base64.c>
 
 /*
    +----------------------------------------------------------------------+

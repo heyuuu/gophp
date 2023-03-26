@@ -4,8 +4,6 @@ import (
 	"sik/core"
 )
 
-// Source: <ext/standard/php_standard.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

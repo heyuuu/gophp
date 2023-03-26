@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/levenshtein.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

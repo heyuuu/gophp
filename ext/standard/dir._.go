@@ -5,8 +5,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <ext/standard/dir.c>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

@@ -4,8 +4,6 @@ import (
 	"sik/core"
 )
 
-// Source: <main/streams/php_stream_context.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

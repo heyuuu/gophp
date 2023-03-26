@@ -165,7 +165,7 @@ func ZendNextFreeModule() int {
 	return ModuleRegistry.Len() + 1
 }
 func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
-	var class_entry *types.ClassEntry = Malloc(b.SizeOf("zend_class_entry"))
+	var class_entry = &types.ClassEntry{}
 	var lowercase_name *types.String
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)

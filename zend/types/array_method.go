@@ -437,6 +437,33 @@ func (ht *Array) ForeachReserve(handler func(key ArrayKey, value *Zval)) {
 	}
 }
 
+func (ht *Array) ForeachIndirect(handler func(key ArrayKey, value *Zval)) {
+	for i, _ := range ht.data {
+		p := &ht.data[i]
+		data := p.GetVal()
+		if data.IsIndirect() {
+			data = data.GetZv()
+		}
+		if data.IsUndef() {
+			return
+		}
+		handler(p.GetArrayKey(), data)
+	}
+}
+func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval)) {
+	for i := len(ht.data) - 1; i >= 0; i-- {
+		p := &ht.data[i]
+		data := p.GetVal()
+		if data.IsIndirect() {
+			data = data.GetZv()
+		}
+		if data.IsUndef() {
+			return
+		}
+		handler(p.GetArrayKey(), data)
+	}
+}
+
 // todo 逐渐替换为 Foreach 或其他更高效代码
 func (ht *Array) ForeachData() []*Bucket {
 	var data = make([]*Bucket, 0)

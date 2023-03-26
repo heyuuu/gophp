@@ -4,8 +4,6 @@ import (
 	"sik/zend"
 )
 
-// Source: <main/streams/php_stream_filter_api.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

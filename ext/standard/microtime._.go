@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/microtime.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -19,8 +17,6 @@ package standard
    | Author: Paul Panotzki - Bunyip Information Systems                   |
    +----------------------------------------------------------------------+
 */
-
-// Source: <ext/standard/microtime.c>
 
 /*
    +----------------------------------------------------------------------+

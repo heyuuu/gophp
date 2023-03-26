@@ -1,7 +1,5 @@
 package core
 
-// Source: <main/php_open_temporary_file.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -29,8 +27,6 @@ const PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS uint32 = PHP_TMP_FILE_OPEN_BASEDIR_
 /* for compatibility purpose */
 
 const PHP_TMP_FILE_OPEN_BASEDIR_CHECK = PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ON_FALLBACK
-
-// Source: <main/php_open_temporary_file.c>
 
 /*
    +----------------------------------------------------------------------+

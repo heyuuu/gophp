@@ -1,7 +1,5 @@
 package standard
 
-// Source: <ext/standard/cyr_convert.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |
@@ -19,8 +17,6 @@ package standard
    | Author: Kirill Maximov <kir@rus.net>                                 |
    +----------------------------------------------------------------------+
 */
-
-// Source: <ext/standard/cyr_convert.c>
 
 /*
    +----------------------------------------------------------------------+

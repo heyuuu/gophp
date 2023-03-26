@@ -4,8 +4,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <ext/standard/php_incomplete_class.h>
-
 /*
    +----------------------------------------------------------------------+
    | PHP Version 7                                                        |

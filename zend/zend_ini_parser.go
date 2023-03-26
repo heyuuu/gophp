@@ -7,8 +7,6 @@ import (
 	"sik/zend/types"
 )
 
-// Source: <Zend/zend_ini_parser.h>
-
 /* A Bison parser, made by GNU Bison 3.0.2.  */
 
 // #define YY_INI_ZEND_ZEND_INI_PARSER_H_INCLUDED
@@ -50,8 +48,6 @@ const YYSTYPE_IS_TRIVIAL = 1
 const YYSTYPE_IS_DECLARED = 1
 
 var IniParse func() int
-
-// Source: <Zend/zend_ini_parser.c>
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
 
