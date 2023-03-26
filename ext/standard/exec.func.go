@@ -105,7 +105,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 
 			/* Return last line from the shell command */
 
-			return_value.SetRawString(builtin.CastStr(buf, bufl))
+			return_value.SetStringVal(builtin.CastStr(buf, bufl))
 
 		} else {
 			zend.ZVAL_EMPTY_STRING(return_value)

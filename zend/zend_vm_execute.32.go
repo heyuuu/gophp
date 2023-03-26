@@ -596,7 +596,7 @@ func ZEND_GET_TYPE_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
-		EX_VAR(opline.GetResult().GetVar()).SetRawString("unknown type")
+		EX_VAR(opline.GetResult().GetVar()).SetStringVal("unknown type")
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }

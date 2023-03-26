@@ -855,7 +855,7 @@ func ZifFgets(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.Op
 
 		// TODO: avoid reallocation ???
 
-		return_value.SetRawString(b.CastStr(buf, line_len))
+		return_value.SetStringVal(b.CastStr(buf, line_len))
 		zend.Efree(buf)
 	} else if argc > 1 {
 		if len_ <= 0 {
@@ -906,7 +906,7 @@ func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	} else {
 		buf[0] = result
 		buf[1] = '0'
-		return_value.SetRawString(b.CastStr(buf, 1))
+		return_value.SetStringVal(b.CastStr(buf, 1))
 		return
 	}
 }
@@ -964,7 +964,7 @@ func ZifFgetss(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.O
 
 	// TODO: avoid reallocation ???
 
-	return_value.SetRawString(b.CastStr(retval, retval_len))
+	return_value.SetStringVal(b.CastStr(retval, retval_len))
 	zend.Efree(retval)
 }
 func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2250,7 +2250,7 @@ func ZifRealpath(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		return_value.SetRawString(b.CastStrAuto(resolved_path_buff))
+		return_value.SetStringVal(b.CastStrAuto(resolved_path_buff))
 		return
 	} else {
 		return_value.SetFalse()
@@ -2377,6 +2377,6 @@ func ZifSysGetTempDir(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	return_value.SetRawString(b.CastStrAuto((*byte)(core.PhpGetTemporaryDirectory())))
+	return_value.SetStringVal(b.CastStrAuto((*byte)(core.PhpGetTemporaryDirectory())))
 	return
 }

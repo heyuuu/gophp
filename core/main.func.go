@@ -729,7 +729,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsUndef() || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp types.Zval
-		tmp.SetRawString(b.CastStr(buffer, buffer_len))
+		tmp.SetStringVal(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
@@ -1011,7 +1011,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	}
 	if PG__().track_errors && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
 		var tmp types.Zval
-		tmp.SetRawString(b.CastStr(buffer, buffer_len))
+		tmp.SetStringVal(b.CastStr(buffer, buffer_len))
 		if zend.CurrEX() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", &tmp, 0) == types.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
@@ -1198,7 +1198,7 @@ func PhpRequestStartup() int {
 		}
 		if PG__().output_handler && PG__().output_handler[0] {
 			var oh types.Zval
-			oh.SetRawString(b.CastStrAuto(PG__().output_handler))
+			oh.SetStringVal(b.CastStrAuto(PG__().output_handler))
 			PhpOutputStartUser(&oh, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 			zend.ZvalPtrDtor(&oh)
 		} else if PG__().output_buffering {

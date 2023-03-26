@@ -124,7 +124,7 @@ func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format st
 			va_end(usr_copy)
 			params[0].SetLong(type_)
 			if error_filename != nil {
-				params[2].SetRawString(b.CastStrAuto(error_filename))
+				params[2].SetStringVal(b.CastStrAuto(error_filename))
 			} else {
 				params[2].SetNull()
 			}

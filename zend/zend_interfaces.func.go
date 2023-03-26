@@ -70,7 +70,7 @@ func ZendCallMethod(
 		/* no interest in caching and no information already present that is
 		 * needed later inside zend_call_function. */
 
-		fci.GetFunctionName().SetRawString(b.CastStr(function_name, function_name_len))
+		fci.GetFunctionName().SetStringVal(b.CastStr(function_name, function_name_len))
 		result = ZendCallFunction(&fci, nil)
 		ZvalPtrDtor(fci.GetFunctionName())
 	} else {
@@ -421,7 +421,7 @@ func ZendUserUnserialize(object *types.Zval, ce *types.ClassEntry, buf *uint8, b
 	if ObjectInitEx(object, ce) != types.SUCCESS {
 		return types.FAILURE
 	}
-	zdata.SetRawString(b.CastStr((*byte)(buf), buf_len))
+	zdata.SetStringVal(b.CastStr((*byte)(buf), buf_len))
 	ZendCallMethodWith1Params(object, ce, ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
 	ZvalPtrDtor(&zdata)
 	if EG__().GetException() != nil {

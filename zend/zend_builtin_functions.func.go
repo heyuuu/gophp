@@ -1261,10 +1261,10 @@ func ZifGetResourceType(executeData zpp.Ex, return_value zpp.Ret, res *types.Zva
 	}
 	resource_type = ZendRsrcListGetRsrcType(z_resource_type.GetRes())
 	if resource_type != nil {
-		return_value.SetRawString(b.CastStrAuto(resource_type))
+		return_value.SetStringVal(b.CastStrAuto(resource_type))
 		return
 	} else {
-		return_value.SetRawString("Unknown")
+		return_value.SetStringVal("Unknown")
 		return
 	}
 }

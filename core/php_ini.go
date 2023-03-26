@@ -18,7 +18,7 @@ func (this *Configuration) Init() {
 
 func (this *Configuration) Set(key string, value string) *types.Zval {
 	var zv types.Zval
-	zv.SetRawString(value)
+	zv.SetStringVal(value)
 	this.hash.KeyUpdate(key, &zv)
 }
 

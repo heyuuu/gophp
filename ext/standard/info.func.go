@@ -593,7 +593,7 @@ func ZifPhpversion(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extensio
 		break
 	}
 	if ext_name == nil {
-		return_value.SetRawString(b.CastStrAuto(core.PHP_VERSION))
+		return_value.SetStringVal(b.CastStrAuto(core.PHP_VERSION))
 		return
 	} else {
 		var version *byte
@@ -602,7 +602,7 @@ func ZifPhpversion(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extensio
 			return_value.SetFalse()
 			return
 		}
-		return_value.SetRawString(b.CastStrAuto(version))
+		return_value.SetStringVal(b.CastStrAuto(version))
 		return
 	}
 }
@@ -628,7 +628,7 @@ func ZifPhpSapiName(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	return_value.SetRawString(core.SM__().Name())
+	return_value.SetStringVal(core.SM__().Name())
 	return
 }
 func ZifPhpUname(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, mode *types.Zval) {
@@ -654,7 +654,7 @@ func ZifPhpIniScannedFiles(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if PhpIniScannedFiles != nil {
-		return_value.SetRawString(b.CastStrAuto(PhpIniScannedFiles))
+		return_value.SetStringVal(b.CastStrAuto(PhpIniScannedFiles))
 		return
 	} else {
 		return_value.SetFalse()
@@ -666,7 +666,7 @@ func ZifPhpIniLoadedFile(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if PhpIniOpenedPath != nil {
-		return_value.SetRawString(b.CastStrAuto(PhpIniOpenedPath))
+		return_value.SetStringVal(b.CastStrAuto(PhpIniOpenedPath))
 		return
 	} else {
 		return_value.SetFalse()

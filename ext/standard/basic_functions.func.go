@@ -353,7 +353,7 @@ func ZifInetNtop(executeData zpp.Ex, return_value zpp.Ret, inAddr *types.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetRawString(b.CastStrAuto(buffer))
+	return_value.SetStringVal(b.CastStrAuto(buffer))
 	return
 }
 func ZifInetPton(executeData zpp.Ex, return_value zpp.Ret, ipAddress string) {
@@ -386,7 +386,7 @@ func ZifInetPton(executeData zpp.Ex, return_value zpp.Ret, ipAddress string) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetRawString(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
+	return_value.SetStringVal(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
 	return
 }
 func ZifIp2long(executeData zpp.Ex, return_value zpp.Ret, ipAddress *types.Zval) {
@@ -433,7 +433,7 @@ func ZifLong2ip(executeData zpp.Ex, return_value zpp.Ret, properAddress *types.Z
 	ip = zend.ZendUlong(sip)
 	myaddr.s_addr = htonl(ip)
 	if inet_ntop(AF_INET, &myaddr, str, b.SizeOf("str")) {
-		return_value.SetRawString(b.CastStrAuto(str))
+		return_value.SetStringVal(b.CastStrAuto(str))
 		return
 	} else {
 		return_value.SetFalse()
@@ -473,7 +473,7 @@ func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *typ
 
 			// TODO: avoid realocation ???
 
-			return_value.SetRawString(b.CastStrAuto(ptr))
+			return_value.SetStringVal(b.CastStrAuto(ptr))
 			zend.Efree(ptr)
 			return
 		}
@@ -484,7 +484,7 @@ func ZifGetenv(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, varname *typ
 
 	ptr = getenv(str)
 	if ptr != nil {
-		return_value.SetRawString(b.CastStrAuto(ptr))
+		return_value.SetStringVal(b.CastStrAuto(ptr))
 	}
 	tsrm_env_unlock()
 	if ptr != nil {
@@ -769,7 +769,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 
 			/* keep the arg as binary, since the encoding is not known */
 
-			val.SetRawString(b.CastStrAuto(php_optarg))
+			val.SetStringVal(b.CastStrAuto(php_optarg))
 
 		} else {
 			val.SetFalse()
@@ -960,7 +960,7 @@ func ZifGetCurrentUser(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	return_value.SetRawString(b.CastStrAuto(core.PhpGetCurrentUser()))
+	return_value.SetStringVal(b.CastStrAuto(core.PhpGetCurrentUser()))
 	return
 }
 func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retval *types.Zval) {
@@ -1014,7 +1014,7 @@ func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zv
 			AddConfigEntries(retval.GetArr(), return_value)
 			return
 		} else {
-			return_value.SetRawString(b.CastStrAuto(retval.GetStr().GetVal()))
+			return_value.SetStringVal(b.CastStrAuto(retval.GetStr().GetVal()))
 			return
 		}
 	} else {
@@ -1762,7 +1762,7 @@ func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath 
 	/* copy to return here, because alter might free it! */
 
 	if old_value != nil {
-		return_value.SetRawString(b.CastStrAuto(old_value))
+		return_value.SetStringVal(b.CastStrAuto(old_value))
 	} else {
 		return_value.SetFalse()
 	}
@@ -1785,7 +1785,7 @@ func ZifGetIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetRawString(b.CastStrAuto(str))
+	return_value.SetStringVal(b.CastStrAuto(str))
 	return
 }
 func ZifRestoreIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
@@ -1907,7 +1907,7 @@ func ZifGetservbyport(executeData zpp.Ex, return_value zpp.Ret, port *types.Zval
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetRawString(b.CastStrAuto(serv.s_name))
+	return_value.SetStringVal(b.CastStrAuto(serv.s_name))
 	return
 }
 func ZifGetprotobyname(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval) {
@@ -1952,7 +1952,7 @@ func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types.
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetRawString(b.CastStrAuto(ent.p_name))
+	return_value.SetStringVal(b.CastStrAuto(ent.p_name))
 	return
 }
 func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {

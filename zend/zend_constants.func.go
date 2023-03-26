@@ -134,7 +134,7 @@ func ZendRegisterDoubleConstant(name string, dval float64, flags int, module_num
 }
 func ZendRegisterStringlConstant(name string, str string, flags int, module_number int) {
 	c := NewZendConstant(name)
-	c.Value().SetRawString(str)
+	c.Value().SetStringVal(str)
 
 	ZEND_CONSTANT_SET_FLAGS(c, flags, module_number)
 	ZendRegisterConstant(c)

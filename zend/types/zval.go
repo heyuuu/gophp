@@ -235,9 +235,10 @@ func NewZvalNull() *Zval                      { var tmp Zval; tmp.SetNull(); ret
 func NewZvalFalse() *Zval                     { var tmp Zval; tmp.SetFalse(); return &tmp }
 func NewZvalTrue() *Zval                      { var tmp Zval; tmp.SetTrue(); return &tmp }
 func NewZvalBool(b bool) *Zval                { var tmp Zval; tmp.SetBool(b); return &tmp }
-func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetRawString(str); return &tmp }
+func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetStringVal(str); return &tmp }
 func NewZvalLong(l int) *Zval                 { var tmp Zval; tmp.SetLong(l); return &tmp }
 func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); return &tmp }
+func NewZvalArray(arr *Array) *Zval           { var tmp Zval; tmp.SetArray(arr); return &tmp }
 func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
 func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetAsPtr(ptr); return &tmp }
 
@@ -257,7 +258,6 @@ func (zv *Zval) SetBool(b bool) {
 }
 func (zv *Zval) SetLong(l int)               { zv.SetTypeLong(); zv.SetLval(l) }
 func (zv *Zval) SetDouble(d float64)         { zv.SetTypeDouble(); zv.SetDval(d) }
-func (zv *Zval) SetRawString(s string)       { zv.SetString(NewString(s)) }
 func (zv *Zval) SetStringVal(s string)       { zv.SetString(NewString(s)) }
 func (zv *Zval) SetString(s *String)         { zv.SetTypeString(); zv.SetStr(s) }
 func (zv *Zval) SetInternedString(s *String) { zv.SetTypeInternedString(); zv.SetStr(s) }

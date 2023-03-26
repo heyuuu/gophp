@@ -539,7 +539,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 	if SG__().request_info.argc {
 		var i int
 		for i = 0; i < SG__().request_info.argc; i++ {
-			tmp.SetRawString(b.CastStrAuto(SG__().request_info.argv[i]))
+			tmp.SetStringVal(b.CastStrAuto(SG__().request_info.argv[i]))
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				types.ZendStringEfree(tmp.GetStr())
 			}
@@ -554,7 +554,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 
 			/* auto-type */
 
-			tmp.SetRawString(b.CastStrAuto(ss))
+			tmp.SetStringVal(b.CastStrAuto(ss))
 			count++
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				types.ZendStringEfree(tmp.GetStr())
@@ -604,15 +604,15 @@ func PhpRegisterServerVariables() {
 	/* PHP Authentication support */
 
 	if SG__().request_info.auth_user {
-		tmp.SetRawString(b.CastStrAuto(SG__().request_info.auth_user))
+		tmp.SetStringVal(b.CastStrAuto(SG__().request_info.auth_user))
 		PhpRegisterVariableQuick("PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1, &tmp, ht)
 	}
 	if SG__().request_info.auth_password {
-		tmp.SetRawString(b.CastStrAuto(SG__().request_info.auth_password))
+		tmp.SetStringVal(b.CastStrAuto(SG__().request_info.auth_password))
 		PhpRegisterVariableQuick("PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1, &tmp, ht)
 	}
 	if SG__().request_info.auth_digest {
-		tmp.SetRawString(b.CastStrAuto(SG__().request_info.auth_digest))
+		tmp.SetStringVal(b.CastStrAuto(SG__().request_info.auth_digest))
 		PhpRegisterVariableQuick("PHP_AUTH_DIGEST", b.SizeOf("\"PHP_AUTH_DIGEST\"")-1, &tmp, ht)
 	}
 
@@ -709,7 +709,7 @@ func CheckHttpProxy(var_table *types.Array) {
 			types.ZendHashStrDel(var_table, "HTTP_PROXY")
 		} else {
 			var local_zval types.Zval
-			local_zval.SetRawString(b.CastStrAuto(local_proxy))
+			local_zval.SetStringVal(b.CastStrAuto(local_proxy))
 			var_table.KeyUpdate("HTTP_PROXY", &local_zval)
 		}
 	}

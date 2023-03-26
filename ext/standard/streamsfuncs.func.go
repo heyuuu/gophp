@@ -466,6 +466,8 @@ func ZifStreamCopyToStream(executeData zpp.Ex, return_value zpp.Ret, source *typ
 	return_value.SetLong(len_)
 	return
 }
+
+//@zif -alias socket_get_status
 func ZifStreamGetMetaData(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 	var zstream *types.Zval
 	var stream *core.PhpStream
@@ -846,7 +848,7 @@ func UserSpaceStreamNotifier(
 	zvs[0].SetLong(notifycode)
 	zvs[1].SetLong(severity)
 	if xmsg != nil {
-		zvs[2].SetRawString(b.CastStrAuto(xmsg))
+		zvs[2].SetStringVal(b.CastStrAuto(xmsg))
 	} else {
 		zvs[2].SetNull()
 	}
@@ -1351,7 +1353,7 @@ func ZifStreamSetBlocking(executeData zpp.Ex, return_value zpp.Ret, socket *type
 	return
 }
 
-//@zif -alias
+//@zif -alias socket_set_timeout
 func ZifStreamSetTimeout(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, seconds *types.Zval, _ zpp.Opt, microseconds *types.Zval) {
 	var socket *types.Zval
 	var seconds zend.ZendLong

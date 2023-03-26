@@ -538,7 +538,7 @@ func PhpExplode(delim *types.String, str *types.String, return_value *types.Zval
 			} else if l == 1 {
 				tmp.SetInternedString(types.ZSTR_CHAR(zend_uchar(*p1)))
 			} else {
-				tmp.SetRawString(b.CastStr(p1, p2-p1))
+				tmp.SetStringVal(b.CastStr(p1, p2-p1))
 			}
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 			p1 = p2 + delim.GetLen()
@@ -548,7 +548,7 @@ func PhpExplode(delim *types.String, str *types.String, return_value *types.Zval
 			}
 		}
 		if p1 <= endp {
-			tmp.SetRawString(b.CastStr(p1, endp-p1))
+			tmp.SetStringVal(b.CastStr(p1, endp-p1))
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 		}
 	}
@@ -586,7 +586,7 @@ func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_valu
 		/* limit is at least -1 therefore no need of bounds checking : i will be always less than found */
 
 		for i = 0; i < to_return; i++ {
-			tmp.SetRawString(b.CastStr(positions[i], positions[i+1]-delim.GetLen()-positions[i]))
+			tmp.SetStringVal(b.CastStr(positions[i], positions[i+1]-delim.GetLen()-positions[i]))
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 		}
 		zend.Efree(any(positions))
@@ -809,7 +809,7 @@ func ZifStrtok(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.
 		tok = str
 	} else {
 		zend.ZvalPtrDtor(&(BG__().strtok_zval))
-		(BG__().strtok_zval).SetRawString(str.GetStr())
+		(BG__().strtok_zval).SetStringVal(str.GetStr())
 		BG__().strtok_string = BG__().strtok_zval.GetStr().GetVal()
 		BG__().strtok_last = BG__().strtok_string
 		BG__().strtok_len = str.GetLen()
@@ -849,7 +849,7 @@ func ZifStrtok(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.
 	}
 	if p-BG__().strtok_last != 0 {
 	return_token:
-		return_value.SetRawString(b.CastStr(BG__().strtok_last+skipped, p-BG__().strtok_last-skipped))
+		return_value.SetStringVal(b.CastStr(BG__().strtok_last+skipped, p-BG__().strtok_last-skipped))
 		BG__().strtok_last = p + 1
 	} else {
 		return_value.SetFalse()
@@ -1281,9 +1281,9 @@ func ZifStristr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, 
 	if found != nil {
 		found_offset = found - haystack_dup
 		if part != 0 {
-			return_value.SetRawString(b.CastStr(haystack.GetVal(), found_offset))
+			return_value.SetStringVal(b.CastStr(haystack.GetVal(), found_offset))
 		} else {
-			return_value.SetRawString(b.CastStr(haystack.GetVal()+found_offset, haystack.GetLen()-found_offset))
+			return_value.SetStringVal(b.CastStr(haystack.GetVal()+found_offset, haystack.GetLen()-found_offset))
 		}
 	} else {
 		return_value.SetFalse()
@@ -1332,10 +1332,10 @@ func ZifStrstr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, n
 	if found != nil {
 		found_offset = found - haystack.GetVal()
 		if part != 0 {
-			return_value.SetRawString(b.CastStr(haystack.GetVal(), found_offset))
+			return_value.SetStringVal(b.CastStr(haystack.GetVal(), found_offset))
 			return
 		} else {
-			return_value.SetRawString(b.CastStr(found, haystack.GetLen()-found_offset))
+			return_value.SetStringVal(b.CastStr(found, haystack.GetLen()-found_offset))
 			return
 		}
 	}
@@ -1681,7 +1681,7 @@ func ZifStrrchr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, 
 	}
 	if found != nil {
 		found_offset = found - haystack.GetVal()
-		return_value.SetRawString(b.CastStr(found, haystack.GetLen()-found_offset))
+		return_value.SetStringVal(b.CastStr(found, haystack.GetLen()-found_offset))
 		return
 	} else {
 		return_value.SetFalse()
@@ -1866,7 +1866,7 @@ func ZifSubstr(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, start 
 		return_value.SetStringCopy(str)
 		return
 	}
-	return_value.SetRawString(b.CastStr(str.GetVal()+f, l))
+	return_value.SetStringVal(b.CastStr(str.GetVal()+f, l))
 	return
 }
 func ZifSubstrReplace(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, replace *types.Zval, start *types.Zval, _ zpp.Opt, length *types.Zval) {
@@ -2309,7 +2309,7 @@ func ZifUcwords(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp
 		return
 	}
 	PhpCharmask((*uint8)(delims), delims_len, mask)
-	return_value.SetRawString(str.GetStr())
+	return_value.SetStringVal(str.GetStr())
 	r = return_value.GetStr().GetVal()
 	*r = toupper(uint8(*r))
 	for r_end = r + return_value.GetStr().GetLen() - 1; r < r_end; {
@@ -3141,7 +3141,7 @@ func ZifStripcslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval)
 		}
 		break
 	}
-	return_value.SetRawString(str.GetStr())
+	return_value.SetStringVal(str.GetStr())
 	PhpStripcslashes(return_value.GetStr())
 }
 func ZifStripslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
@@ -3157,7 +3157,7 @@ func ZifStripslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) 
 		}
 		break
 	}
-	return_value.SetRawString(str.GetStr())
+	return_value.SetStringVal(str.GetStr())
 	PhpStripslashes(return_value.GetStr())
 }
 func PhpStripcslashes(str *types.String) {
@@ -4041,7 +4041,7 @@ func ZifSetlocale(executeData zpp.Ex, return_value zpp.Ret, category *types.Zval
 				}
 				types.ZendStringReleaseEx(loc, 0)
 			}
-			return_value.SetRawString(b.CastStrAuto(retval))
+			return_value.SetStringVal(b.CastStrAuto(retval))
 			return
 		}
 		if loc != nil {
@@ -4661,7 +4661,7 @@ func ZifCountChars(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, 
 		}
 	}
 	if mymode >= 3 && mymode <= 4 {
-		return_value.SetRawString(b.CastStr(retstr, retlen))
+		return_value.SetStringVal(b.CastStr(retstr, retlen))
 		return
 	}
 }
@@ -5019,7 +5019,7 @@ func ZifStrShuffle(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 		}
 		break
 	}
-	return_value.SetRawString(arg.GetStr())
+	return_value.SetStringVal(arg.GetStr())
 	if return_value.GetStr().GetLen() > 1 {
 		PhpStringShuffle(return_value.GetStr().GetVal(), zend.ZendLong(return_value.GetStr().GetLen()))
 	}
@@ -5219,7 +5219,7 @@ func ZifStrpbrk(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, 
 	for haystack_ptr = haystack.GetVal(); haystack_ptr < haystack.GetVal()+haystack.GetLen(); haystack_ptr++ {
 		for cl_ptr = char_list.GetVal(); cl_ptr < char_list.GetVal()+char_list.GetLen(); cl_ptr++ {
 			if (*cl_ptr) == (*haystack_ptr) {
-				return_value.SetRawString(b.CastStr(haystack_ptr, haystack.GetVal()+haystack.GetLen()-haystack_ptr))
+				return_value.SetStringVal(b.CastStr(haystack_ptr, haystack.GetVal()+haystack.GetLen()-haystack_ptr))
 				return
 			}
 		}

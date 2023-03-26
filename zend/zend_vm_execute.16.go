@@ -191,7 +191,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(prop_name, prop_name_len))
+					EX_VAR(opline.GetResult().GetVar()).SetStringVal(b.CastStr(prop_name, prop_name_len))
 				}
 			}
 			EG__().GetHtIterators()[types.Z_FE_ITER_P(array)].SetPos(pos + 1)
@@ -359,7 +359,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(prop_name, prop_name_len))
+					EX_VAR(opline.GetResult().GetVar()).SetStringVal(b.CastStr(prop_name, prop_name_len))
 				}
 			}
 			EG__().GetHtIterators()[types.Z_FE_ITER_P(EX_VAR(opline.GetOp1().GetVar()))].SetPos(pos + 1)

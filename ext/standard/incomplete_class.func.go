@@ -81,6 +81,6 @@ func PhpLookupClassName(object *types.Zval) *types.String {
 }
 func PhpStoreClassName(object *types.Zval, name *byte, len_ int) {
 	var val types.Zval
-	val.SetRawString(b.CastStr(name, len_))
+	val.SetStringVal(b.CastStr(name, len_))
 	types.Z_OBJPROP_P(object).KeyUpdate(b.CastStrAuto(MAGIC_MEMBER), &val)
 }

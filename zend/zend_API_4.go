@@ -270,7 +270,7 @@ func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 }
 func AddNextIndexString(arg *types.Zval, str *byte) int {
 	var tmp types.Zval
-	tmp.SetRawString(b.CastStrAuto(str))
+	tmp.SetStringVal(b.CastStrAuto(str))
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
@@ -279,7 +279,7 @@ func AddNextIndexString(arg *types.Zval, str *byte) int {
 }
 func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 	var tmp types.Zval
-	tmp.SetRawString(b.CastStr(str, length))
+	tmp.SetStringVal(b.CastStr(str, length))
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {

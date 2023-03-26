@@ -174,7 +174,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 					EX_VAR(opline.GetResult().GetVar()).SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
 				} else {
 					actual++
-					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
+					EX_VAR(opline.GetResult().GetVar()).SetStringVal(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
 				}
 
 				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal(), EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal())

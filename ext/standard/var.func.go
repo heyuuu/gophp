@@ -670,7 +670,7 @@ func PhpVarSerializeClassName(buf *zend.SmartStr, struc *types.Zval) types.ZendB
 func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	var fname types.Zval
 	var res int
-	fname.SetRawString("__sleep")
+	fname.SetStringVal("__sleep")
 	BG__().serialize_lock++
 	res = zend.CallUserFunction(nil, struc, &fname, retval, 0, 0)
 	BG__().serialize_lock--
@@ -689,7 +689,7 @@ func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int {
 	var fname types.Zval
 	var res int
-	fname.SetRawString("__serialize")
+	fname.SetStringVal("__serialize")
 	BG__().serialize_lock++
 	res = zend.CallUserFunction(obj, &fname, retval, 0, 0)
 	BG__().serialize_lock--

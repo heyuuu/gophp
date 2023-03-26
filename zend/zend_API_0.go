@@ -238,7 +238,7 @@ func _ZEND_TRY_ASSIGN_STRING(zv *types.Zval, string *byte, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		_zv.SetRawString(b.CastStrAuto(string))
+		_zv.SetStringVal(b.CastStrAuto(string))
 		break
 	}
 }
@@ -258,7 +258,7 @@ func _ZEND_TRY_ASSIGN_STRINGL(zv *types.Zval, string *byte, len_ int, is_ref int
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		_zv.SetRawString(b.CastStr(string, len_))
+		_zv.SetStringVal(b.CastStr(string, len_))
 		break
 	}
 }

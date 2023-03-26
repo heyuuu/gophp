@@ -148,16 +148,16 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		return
 	}
 	if ASSERTG(callback).IsUndef() && ASSERTG(cb) {
-		(ASSERTG(callback)).SetRawString(b.CastStrAuto(ASSERTG(cb)))
+		(ASSERTG(callback)).SetStringVal(b.CastStrAuto(ASSERTG(cb)))
 	}
 	if ASSERTG(callback).IsNotUndef() {
 		var args []types.Zval
 		var retval types.Zval
 		var lineno uint32 = zend.ZendGetExecutedLineno()
 		var filename *byte = zend.ZendGetExecutedFilename()
-		args[0].SetRawString(b.CastStrAuto(SAFE_STRING(filename)))
+		args[0].SetStringVal(b.CastStrAuto(SAFE_STRING(filename)))
 		args[1].SetLong(lineno)
-		args[2].SetRawString(b.CastStrAuto(SAFE_STRING(myeval)))
+		args[2].SetStringVal(b.CastStrAuto(SAFE_STRING(myeval)))
 		retval.SetFalse()
 
 		/* XXX do we want to check for error here? */
@@ -289,7 +289,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 		if ASSERTG(callback).IsNotUndef() {
 			types.ZVAL_COPY(return_value, &(ASSERTG(callback)))
 		} else if ASSERTG(cb) {
-			return_value.SetRawString(b.CastStrAuto(ASSERTG(cb)))
+			return_value.SetStringVal(b.CastStrAuto(ASSERTG(cb)))
 		} else {
 			return_value.SetNull()
 		}

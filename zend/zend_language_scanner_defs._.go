@@ -14,4 +14,7 @@ const (
 	yycINITIAL
 	yycST_END_HEREDOC
 	yycST_NOWDOC
+
+
+	LANG_YYC_INITIAL
 )

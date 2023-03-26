@@ -810,7 +810,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	}
 	local_retval.SetUndef()
 	if name.GetVal()[0] == '\\' {
-		args[0].SetRawString(b.CastStr(name.GetVal()+1, name.GetLen()-1))
+		args[0].SetStringVal(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 	} else {
 		args[0].SetStringCopy(name)
 	}
@@ -884,7 +884,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 		pv.GetStr().GetVal()[pv.GetStr().GetLen()] = '0'
 	} else {
 		/*printf("Evaluating '%s'\n", pv.value.str.val);*/
-		pv.SetRawString(b.CastStr(str, str_len))
+		pv.SetStringVal(b.CastStr(str, str_len))
 	}
 
 	original_compiler_options = CG__().GetCompilerOptions()

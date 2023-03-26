@@ -28,7 +28,7 @@ func ZifGettype(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		return_value.SetInternedString(type_)
 		return
 	} else {
-		return_value.SetRawString("unknown type")
+		return_value.SetStringVal("unknown type")
 		return
 	}
 }

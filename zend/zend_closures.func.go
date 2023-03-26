@@ -410,7 +410,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 			var_ = _z
 			if var_.IsConstant() {
 				ZvalPtrDtor(var_)
-				var_.SetRawString("<constant ast>")
+				var_.SetStringVal("<constant ast>")
 			}
 		}
 	}

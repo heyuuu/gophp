@@ -182,14 +182,14 @@ func (sc *LangScanner) segLen(len_ uint) string {
 }
 
 func (sc *LangScanner) setStr(str string) {
-	sc.zendlval.SetRawString(str)
+	sc.zendlval.SetStringVal(str)
 }
 
 func (sc *LangScanner) setStrFiltered(str string) {
 	if sc.outputFilter != nil {
 		str = sc.outputFilter(str)
 	}
-	sc.zendlval.SetRawString(str)
+	sc.zendlval.SetStringVal(str)
 }
 
 func (sc *LangScanner) isParserMode() bool {
@@ -228,6 +228,10 @@ func (sc *LangScanner) returnOrSkipToken(token int) (int, bool) {
 		return 0, true
 	}
 	return sc.token(token)
+}
+
+func (sc *LangScanner) Begin(state int) {
+	sc.state = state
 }
 
 func (sc *LangScanner) begin(state int) {

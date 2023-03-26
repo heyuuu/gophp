@@ -1087,7 +1087,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *types.Zval,
 	var function_name types.Zval
 	var params []types.Zval
 	var arg *types.Zval = nil
-	function_name.SetRawString(b.CastStr(fname, fname_len))
+	function_name.SetStringVal(b.CastStr(fname, fname_len))
 	params[0].SetNewEmptyRef()
 	types.Z_REFVAL(params[0]).SetArray(aht)
 	aht.AddRefcount()

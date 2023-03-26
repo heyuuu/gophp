@@ -40,7 +40,7 @@ func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	PHP_MD5Update(&context, arg.GetVal(), arg.GetLen())
 	PHP_MD5Final(digest, &context)
 	if raw_output != 0 {
-		return_value.SetRawString(b.CastStr((*byte)(digest), 16))
+		return_value.SetStringVal(b.CastStr((*byte)(digest), 16))
 		return
 	} else {
 		return_value.SetString(types.ZendStringAlloc(32, 0))
@@ -90,7 +90,7 @@ func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	core.PhpStreamClose(stream)
 	PHP_MD5Final(digest, &context)
 	if raw_output != 0 {
-		return_value.SetRawString(b.CastStr((*byte)(digest), 16))
+		return_value.SetStringVal(b.CastStr((*byte)(digest), 16))
 		return
 	} else {
 		return_value.SetString(types.ZendStringAlloc(32, 0))

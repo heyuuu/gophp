@@ -7588,7 +7588,7 @@ func _lexScan(zendlval *types.Zval, elem *ZendParserStackElem, sc *LangScanner) 
 				if !overflow {
 					sc.zendlval.SetLong(lVal)
 				} else {
-					sc.zendlval.SetRawString(str)
+					sc.zendlval.SetStringVal(str)
 				}
 				return sc.tokenWithVal(T_NUM_STRING)
 			}

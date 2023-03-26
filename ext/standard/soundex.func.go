@@ -69,6 +69,6 @@ func ZifSoundex(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 		soundex[b.PostInc(&_small)] = '0'
 	}
 	soundex[_small] = '0'
-	return_value.SetRawString(b.CastStr(soundex, _small))
+	return_value.SetStringVal(b.CastStr(soundex, _small))
 	return
 }

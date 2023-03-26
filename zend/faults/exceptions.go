@@ -220,7 +220,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	trace.SetRefcount(0)
 	base_ce = GetExceptionBase(&obj)
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, zend.ZendGetCompiledFilename())) {
-		tmp.SetRawString(b.CastStrAuto(zend.ZendGetExecutedFilename()))
+		tmp.SetStringVal(b.CastStrAuto(zend.ZendGetExecutedFilename()))
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.ZSTR_FILE, &tmp)
 		zend.ZvalPtrDtor(&tmp)
 		tmp.SetLong(zend.ZendGetExecutedLineno())
@@ -730,7 +730,7 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	}
 	zend.ObjectInitEx(&ex, exception_ce)
 	if message {
-		tmp.SetRawString(b.CastStrAuto(message))
+		tmp.SetStringVal(b.CastStrAuto(message))
 		zend.ZendUpdatePropertyEx(exception_ce, &ex, types.ZSTR_MESSAGE, &tmp)
 		zend.ZvalPtrDtor(&tmp)
 	}

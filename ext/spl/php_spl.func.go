@@ -264,7 +264,7 @@ func ZifSplAutoloadExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Op
 		SPL_G(autoload_extensions) = file_exts.Copy()
 	}
 	if SPL_G(autoload_extensions) == nil {
-		return_value.SetRawString(SPL_DEFAULT_FILE_EXTENSIONS)
+		return_value.SetStringVal(SPL_DEFAULT_FILE_EXTENSIONS)
 		return
 	} else {
 		SPL_G(autoload_extensions).AddRefcount()

@@ -177,7 +177,7 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	}
 	return retval
 }
-func ZendPrepareStringForScanning(str *types.Zval, filename *byte) int {
+func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	var buf *byte
 	var size int
 	var old_len int

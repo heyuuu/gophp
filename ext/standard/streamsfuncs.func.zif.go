@@ -137,6 +137,16 @@ var DefZifStreamGetMetaData = def.DefFunc("stream_get_meta_data", 1, 1, []def.Ar
 	ZifStreamGetMetaData(executeData, returnValue, fp)
 })
 
+// generate by ZifStreamGetMetaData
+var DefZifSocketGetStatus = def.DefFunc("socket_get_status", 1, 1, []def.ArgInfo{{Name: "fp"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	fp := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamGetMetaData(executeData, returnValue, fp)
+})
+
 // generate by ZifStreamGetTransports
 var DefZifStreamGetTransports = def.DefFunc("stream_get_transports", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	if !zpp.CheckNumArgsNoneError(executeData) {
@@ -321,6 +331,19 @@ var DefZifSocketSetBlocking = def.DefFunc("socket_set_blocking", 2, 2, []def.Arg
 
 // generate by ZifStreamSetTimeout
 var DefZifStreamSetTimeout = def.DefFunc("stream_set_timeout", 2, 3, []def.ArgInfo{{Name: "stream"}, {Name: "seconds"}, {Name: "microseconds"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 2, 3, 0)
+	stream := fp.ParseZval()
+	seconds := fp.ParseZval()
+	fp.StartOptional()
+	microseconds := fp.ParseZval()
+	if fp.HasError() {
+		return
+	}
+	ZifStreamSetTimeout(executeData, returnValue, stream, seconds, nil, microseconds)
+})
+
+// generate by ZifStreamSetTimeout
+var DefZifSocketSetTimeout = def.DefFunc("socket_set_timeout", 2, 3, []def.ArgInfo{{Name: "stream"}, {Name: "seconds"}, {Name: "microseconds"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
 	stream := fp.ParseZval()
 	seconds := fp.ParseZval()

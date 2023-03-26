@@ -155,7 +155,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 				if delayed_call_failed == 0 {
 					var retval types.Zval
 					if wakeup_name.IsUndef() {
-						wakeup_name.SetRawString("__wakeup")
+						wakeup_name.SetStringVal("__wakeup")
 					}
 					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == types.FAILURE || retval.IsUndef() {
@@ -179,7 +179,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					var param types.Zval
 					types.ZVAL_COPY(&param, var_dtor_hash.GetData()[i+1])
 					if unserialize_name.IsUndef() {
-						unserialize_name.SetRawString("__unserialize")
+						unserialize_name.SetStringVal("__unserialize")
 					}
 					BG__().serialize_lock++
 					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == types.FAILURE || retval.IsUndef() {
@@ -855,7 +855,7 @@ yy18:
 
 		/* Call unserialize callback */
 
-		user_func.SetRawString(b.CastStrAuto(core.PG__().unserialize_callback_func))
+		user_func.SetStringVal(b.CastStrAuto(core.PG__().unserialize_callback_func))
 		args[0].SetStringCopy(class_name)
 		BG__().serialize_lock++
 		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {
@@ -1112,7 +1112,7 @@ yy36:
 	} else if as_key != 0 {
 		rval.SetString(types.ZendStringInitInterned(str, len_, 0))
 	} else {
-		rval.SetRawString(b.CastStr(str, len_))
+		rval.SetStringVal(b.CastStr(str, len_))
 	}
 	return 1
 yy41:

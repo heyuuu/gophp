@@ -80,7 +80,7 @@ func (sc *LangScanner) tokenWithNumStr(offset int, base int) (int, bool) {
 
 func (sc *LangScanner) lexerOffsetNum() (int, bool) {
 	str := sc.seg()
-	sc.zendlval.SetRawString(str)
+	sc.zendlval.SetStringVal(str)
 	return sc.tokenWithVal(T_NUM_STRING)
 }
 func (sc *LangScanner) lexerDNum() (int, bool) {

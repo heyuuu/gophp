@@ -31,7 +31,7 @@ func ZifSha1(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Op
 	PHP_SHA1Update(&context, (*uint8)(arg.GetVal()), arg.GetLen())
 	PHP_SHA1Final(digest, &context)
 	if raw_output != 0 {
-		return_value.SetRawString(b.CastStr((*byte)(digest), 20))
+		return_value.SetStringVal(b.CastStr((*byte)(digest), 20))
 		return
 	} else {
 		return_value.SetString(types.ZendStringAlloc(40, 0))
@@ -72,7 +72,7 @@ func ZifSha1File(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval,
 	PHP_SHA1Final(digest, &context)
 	core.PhpStreamClose(stream)
 	if raw_output != 0 {
-		return_value.SetRawString(b.CastStr((*byte)(digest), 20))
+		return_value.SetStringVal(b.CastStr((*byte)(digest), 20))
 		return
 	} else {
 		return_value.SetString(types.ZendStringAlloc(40, 0))

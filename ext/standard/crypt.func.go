@@ -180,10 +180,10 @@ func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.O
 	salt[salt_in_len] = '0'
 	if b.Assign(&result, PhpCrypt(str, int(str_len), salt, int(salt_in_len), 0)) == nil {
 		if salt[0] == '*' && salt[1] == '0' {
-			return_value.SetRawString("*1")
+			return_value.SetStringVal("*1")
 			return
 		} else {
-			return_value.SetRawString("*0")
+			return_value.SetStringVal("*0")
 			return
 		}
 	}
