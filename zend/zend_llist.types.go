@@ -38,17 +38,6 @@ type ZendLlist struct {
 	traverse_ptr *ZendLlistElement
 }
 
-func NewZendLlist(size int, dtor LlistDtorFuncT, persistent uint8) *ZendLlist {
-	l := &ZendLlist{}
-	l.head = nil
-	l.tail = nil
-	l.count = 0
-	l.size = size
-	l.dtor = dtor
-	l.persistent = persistent
-	return l
-}
-
 func (l *ZendLlist) Init(size int, dtor LlistDtorFuncT, persistent uint8) {
 	l.head = nil
 	l.tail = nil

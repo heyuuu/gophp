@@ -1,10 +1,10 @@
 package spl
 
 import (
-	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
 	"sik/zend/types"
+	"unsafe"
 )
 
 const PHP_SPL_VERSION = core.PHP_VERSION
@@ -47,4 +47,17 @@ var SplFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 /* {{{ spl_module_entry
  */
 
-var SplModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "SPL", SplFunctions, ZmStartupSpl, nil, ZmActivateSpl, ZmDeactivateSpl, ZmInfoSpl, PHP_SPL_VERSION, core.PHP_MODULE_GLOBALS(spl), (func(any))(ZmGlobalsCtorSpl), nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+var SplModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(
+	"SPL",
+	SplFunctions,
+	ZmStartupSpl,
+	nil,
+	ZmActivateSpl,
+	ZmDeactivateSpl,
+	ZmInfoSpl,
+	PHP_SPL_VERSION,
+	unsafe.Sizeof(ZendSplGlobals),
+	SplGlobals,
+	(func(any))(ZmGlobalsCtorSpl),
+	nil,
+)

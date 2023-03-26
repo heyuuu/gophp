@@ -1,7 +1,6 @@
 package cli
 
 import (
-	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
 	"sik/zend/types"
@@ -28,14 +27,8 @@ const PHP_CLI_SERVER_LOG_ERROR = 2
 const PHP_CLI_SERVER_LOG_MESSAGE = 3
 
 var PhpCliServerLogLevel int = 3
-var PhpCliServerRequestErrorUnexpectedEof = "Unexpected EOF"
 
 var CliServerModuleEntry = zend.MakeZendModuleEntry(
-	b.SizeOf("zend_module_entry"),
-	zend.ZEND_MODULE_API_NO,
-	0, zend.USING_ZTS,
-	nil,
-	nil,
 	"cli_server",
 	nil,
 	ZmStartupCliServer,
@@ -48,12 +41,6 @@ var CliServerModuleEntry = zend.MakeZendModuleEntry(
 	nil,
 	nil,
 	nil,
-	nil,
-	0,
-	0,
-	nil,
-	0,
-	"API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS,
 )
 
 var ServerAdditionalFunctions = []types.ZendFunctionEntry{

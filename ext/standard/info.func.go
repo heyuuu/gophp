@@ -83,7 +83,7 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 	}
 }
 func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
-	if zend_module.GetInfoFunc() != nil || zend_module.GetVersion() != nil {
+	if zend_module.GetInfoFunc() != nil {
 		if core.SM__().GetPhpinfoAsText() == 0 {
 			var url_name *types.String = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
 			PhpStrtolower(url_name.GetVal(), url_name.GetLen())
@@ -334,9 +334,7 @@ func PhpPrintInfo(flag int) {
 			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()
-			if module.GetInfoFunc() != nil || module.GetVersion() != nil {
-				PhpInfoPrintModule(module)
-			}
+			PhpInfoPrintModule(module)
 		}
 		SECTION("Additional Modules")
 		PhpInfoPrintTableStart()
@@ -346,7 +344,7 @@ func PhpPrintInfo(flag int) {
 			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()
-			if module.GetInfoFunc() == nil && module.GetVersion() == nil {
+			if module.GetInfoFunc() == nil {
 				PhpInfoPrintModule(module)
 			}
 		}

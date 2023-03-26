@@ -280,7 +280,7 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 	}
 	return result
 }
-func ZendGetModuleVersion(module_name *byte) *byte {
+func ZendGetModuleVersion(module_name *byte) string {
 	var lname *types.String
 	var name_len int = strlen(module_name)
 	var module *ZendModuleEntry
@@ -288,11 +288,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 	ZendStrTolowerCopy(lname.GetVal(), module_name, name_len)
 	module = types.ZendHashFindPtr(&ModuleRegistry, lname.GetStr())
 	types.ZendStringEfree(lname)
-	if module != nil {
-		return module.GetVersion()
-	} else {
-		return nil
-	}
+	return module.GetVersion()
 }
 func ZvalMakeInternedString(zv *types.Zval) *types.String {
 	b.Assert(zv.IsString())

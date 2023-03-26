@@ -20,7 +20,7 @@ func PhpLoadShlib(path *byte, errp **byte) any {
 	}
 	return handle
 }
-func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
+func PhpLoadExtension(filename *byte) int {
 	var handle any
 	var libpath *byte
 	var module_entry *zend.ZendModuleEntry
@@ -30,16 +30,8 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 	var extension_dir *byte
 	var err1 *byte
 	var err2 *byte
-	if type_ == zend.MODULE_PERSISTENT {
-		extension_dir = zend.INI_STR("extension_dir")
-	} else {
-		extension_dir = core.PG__().extension_dir
-	}
-	if type_ == zend.MODULE_TEMPORARY {
-		error_type = faults.E_WARNING
-	} else {
-		error_type = faults.E_CORE_WARNING
-	}
+	extension_dir = zend.INI_STR("extension_dir")
+	error_type = faults.E_CORE_WARNING
 
 	/* Check if passed filename contains directory separators */
 
@@ -47,24 +39,16 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 
 		/* Passing modules with full path is not supported for dynamically loaded extensions */
 
-		if type_ == zend.MODULE_TEMPORARY {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Temporary module name should contain only filename")
-			return types.FAILURE
-		}
 		libpath = zend.Estrdup(filename)
 	} else if extension_dir != nil && extension_dir[0] {
 		slash_suffix = zend.IS_SLASH(extension_dir[strlen(extension_dir)-1])
 
 		/* Try as filename first */
-
 		if slash_suffix != 0 {
 			core.Spprintf(&libpath, 0, "%s%s", extension_dir, filename)
 		} else {
 			core.Spprintf(&libpath, 0, "%s%c%s", extension_dir, zend.DEFAULT_SLASH, filename)
 		}
-
-		/* Try as filename first */
-
 	} else {
 		return types.FAILURE
 	}
@@ -112,33 +96,11 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		return types.FAILURE
 	}
 	module_entry = get_module()
-	if module_entry.GetZendApi() != zend.ZEND_MODULE_API_NO {
-		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with module API=%d\n"+"PHP    compiled with module API=%d\n"+"These options need to match\n", module_entry.GetName(), module_entry.GetZendApi(), zend.ZEND_MODULE_API_NO)
-		zend.DL_UNLOAD(handle)
-		return types.FAILURE
-	}
-	if strcmp(module_entry.GetBuildId(), "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS) {
-		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with build ID=%s\n"+"PHP    compiled with build ID=%s\n"+"These options need to match\n", module_entry.GetName(), module_entry.GetBuildId(), "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
-		zend.DL_UNLOAD(handle)
-		return types.FAILURE
-	}
-	module_entry.SetType(type_)
 	module_entry.SetModuleNumber(zend.ZendNextFreeModule())
 	module_entry.SetHandle(handle)
 	if b.Assign(&module_entry, zend.ZendRegisterModuleEx(module_entry)) == nil {
 		zend.DL_UNLOAD(handle)
 		return types.FAILURE
-	}
-	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && zend.ZendStartupModuleEx(module_entry) == types.FAILURE {
-		zend.DL_UNLOAD(handle)
-		return types.FAILURE
-	}
-	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && module_entry.GetRequestStartupFunc() != nil {
-		if module_entry.GetRequestStartupFunc()(type_, module_entry.GetModuleNumber()) == types.FAILURE {
-			core.PhpErrorDocref(nil, error_type, "Unable to initialize module '%s'", module_entry.GetName())
-			zend.DL_UNLOAD(handle)
-			return types.FAILURE
-		}
 	}
 	return types.SUCCESS
 }

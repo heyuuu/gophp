@@ -15,36 +15,7 @@ func ZendStartupModuleZval(zv *types.Zval) int {
 	}
 }
 func ZendSortModules(base any, count int, siz int, compare types.CompareFuncT, swp types.SwapFuncT) {
-	var b1 *types.Bucket = base
-	var b2 *types.Bucket
-	var end *types.Bucket = b1 + count
-	var tmp types.Bucket
-	var m *ZendModuleEntry
-	var r *ZendModuleEntry
-	for b1 < end {
-	try_again:
-		m = (*ZendModuleEntry)(b1.GetVal().GetPtr())
-		if m.GetModuleStarted() == 0 && m.GetDeps() != nil {
-			var dep *ZendModuleDep = m.GetDeps()
-			for dep.GetName() != nil {
-				if dep.GetType() == MODULE_DEP_REQUIRED || dep.GetType() == MODULE_DEP_OPTIONAL {
-					b2 = b1 + 1
-					for b2 < end {
-						r = (*ZendModuleEntry)(b2.GetVal().GetPtr())
-						if strcasecmp(dep.GetName(), r.GetName()) == 0 {
-							tmp = *b1
-							*b1 = *b2
-							*b2 = tmp
-							goto try_again
-						}
-						b2++
-					}
-				}
-				dep++
-			}
-		}
-		b1++
-	}
+	// empty
 }
 func ZendCollectModuleHandlers() {
 	var module *ZendModuleEntry
@@ -67,9 +38,6 @@ func ZendCollectModuleHandlers() {
 		if module.GetRequestShutdownFunc() != nil {
 			shutdown_count++
 		}
-		if module.GetPostDeactivateFunc() != nil {
-			post_deactivate_count++
-		}
 	}
 	ModuleRequestStartupHandlers = (**ZendModuleEntry)(Malloc(b.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
 	ModuleRequestStartupHandlers[startup_count] = nil
@@ -88,9 +56,6 @@ func ZendCollectModuleHandlers() {
 		}
 		if module.GetRequestShutdownFunc() != nil {
 			ModuleRequestShutdownHandlers[b.PreDec(&shutdown_count)] = module
-		}
-		if module.GetPostDeactivateFunc() != nil {
-			ModulePostDeactivateHandlers[b.PreDec(&post_deactivate_count)] = module
 		}
 	}
 
@@ -139,26 +104,6 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 
 	/* Check module dependencies */
 
-	if module.GetDeps() != nil {
-		var dep *ZendModuleDep = module.GetDeps()
-		for dep.GetName() != nil {
-			if dep.GetType() == MODULE_DEP_CONFLICTS {
-				name_len = strlen(dep.GetName())
-				lcname = types.ZendStringAlloc(name_len, 0)
-				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if &ModuleRegistry.KeyExists(lcname.GetStr()) || ZendGetExtension(dep.GetName()) != nil {
-					types.ZendStringEfree(lcname)
-
-					/* TODO: Check version relationship */
-
-					faults.Error(faults.E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
-					return nil
-				}
-				types.ZendStringEfree(lcname)
-			}
-			dep++
-		}
-	}
 	name_len = strlen(module.GetName())
 	lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
 	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
@@ -183,7 +128,6 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 }
 func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
 	module.SetModuleNumber(ZendNextFreeModule())
-	module.SetType(MODULE_PERSISTENT)
 	return ZendRegisterModuleEx(module)
 }
 func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *ZendFunction, error_type int) {

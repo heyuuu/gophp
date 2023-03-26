@@ -1,7 +1,6 @@
 package cgi
 
 import (
-	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
 	"sik/zend/types"
@@ -89,4 +88,18 @@ var CgiFunctions = []types.ZendFunctionEntry{
 	DefZifApacheResponseHeaders,
 	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var CgiModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+var CgiModuleEntry = zend.MakeZendModuleEntry(
+	"cgi-fcgi",
+	CgiFunctions,
+	ZmStartupCgi,
+	ZmShutdownCgi,
+	nil,
+	nil,
+	ZmInfoCgi,
+	core.PHP_VERSION,
+
+	0,
+	nil,
+	nil,
+	nil,
+)

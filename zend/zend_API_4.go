@@ -340,40 +340,12 @@ func AddPropertyZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 	return types.SUCCESS
 }
 func ZendStartupModuleEx(module *ZendModuleEntry) int {
-	var name_len int
-	var lcname *types.String
 	if module.GetModuleStarted() != 0 {
 		return types.SUCCESS
 	}
 	module.SetModuleStarted(1)
 
-	/* Check module dependencies */
-
-	if module.GetDeps() != nil {
-		var dep *ZendModuleDep = module.GetDeps()
-		for dep.GetName() != nil {
-			if dep.GetType() == MODULE_DEP_REQUIRED {
-				var req_mod *ZendModuleEntry
-				name_len = strlen(dep.GetName())
-				lcname = types.ZendStringAlloc(name_len, 0)
-				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if b.Assign(&req_mod, types.ZendHashFindPtr(&ModuleRegistry, lcname.GetStr())) == nil || req_mod.GetModuleStarted() == 0 {
-					types.ZendStringEfree(lcname)
-
-					/* TODO: Check version relationship */
-
-					faults.Error(faults.E_CORE_WARNING, "Cannot load module '%s' because required module '%s' is not loaded", module.GetName(), dep.GetName())
-					module.SetModuleStarted(0)
-					return types.FAILURE
-				}
-				types.ZendStringEfree(lcname)
-			}
-			dep++
-		}
-	}
-
 	/* Initialize module globals */
-
 	if module.GetGlobalsSize() != 0 {
 		if module.GetGlobalsCtor() != nil {
 			module.GetGlobalsCtor()(module.GetGlobalsPtr())

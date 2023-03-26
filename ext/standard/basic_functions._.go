@@ -1,7 +1,6 @@
 package standard
 
 import (
-	b "sik/builtin"
 	"sik/core"
 	"sik/core/streams"
 	"sik/zend"
@@ -596,8 +595,17 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	core.DefZifOutputResetRewriteVars,
 	DefZifSysGetTempDir,
 }
-var StandardDeps []zend.ZendModuleDep = []zend.ZendModuleDep{
-	zend.MakeZendModuleDep("session", nil, nil, zend.MODULE_DEP_OPTIONAL),
-	zend.MakeZendModuleDep(nil, nil, nil, 0),
-}
-var BasicFunctionsModule zend.ZendModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, StandardDeps, "standard", BasicFunctions, ZmStartupBasic, ZmShutdownBasic, ZmActivateBasic, ZmDeactivateBasic, ZmInfoBasic, PHP_STANDARD_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+var BasicFunctionsModule = zend.MakeZendModuleEntry(
+	"standard",
+	BasicFunctions,
+	ZmStartupBasic,
+	ZmShutdownBasic,
+	ZmActivateBasic,
+	ZmDeactivateBasic,
+	ZmInfoBasic,
+	core.PHP_VERSION,
+	0,
+	nil,
+	nil,
+	nil,
+)

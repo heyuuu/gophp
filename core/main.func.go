@@ -1431,7 +1431,6 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	var retval int = types.SUCCESS
 	var module_number int = 0
 	var php_os = PHP_OS
-	var module *zend.ZendModuleEntry
 	ModuleShutdown = 0
 	ModuleStartup = 1
 	SapiInitializeEmptyRequest()
@@ -1562,7 +1561,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	/* register additional functions */
 
 	if SM__().GetAdditionalFunctions() != nil {
-		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard")) != nil {
+		if module, ok := zend.ModuleRegistryMap["standard"]; ok {
 			zend.EG__().SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
 			zend.EG__().SetCurrentModule(nil)
@@ -1575,9 +1574,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	PhpDisableClasses()
 
 	/* make core report what it should */
-
-	if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, "core")) != nil {
-		module.SetVersion(PHP_VERSION)
+	if module, ok := zend.ModuleRegistryMap["core"]; ok {
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}
 	ModuleInitialized = 1

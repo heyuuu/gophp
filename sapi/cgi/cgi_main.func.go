@@ -28,7 +28,7 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 func PrintModules() {
 	var modules = zend.CopyRegistryModules()
 	sort.Slice(modules, func(i, j int) bool {
-		return b.StrCaseCompare(modules[i].GetNameStr(), modules[j].GetNameStr())
+		return b.StrCaseCompare(modules[i].GetName(), modules[j].GetName())
 	})
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())

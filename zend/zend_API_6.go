@@ -119,9 +119,6 @@ func ZendPostDeactivateModules() {
 			var _z *types.Zval = _p.GetVal()
 
 			module = _z.GetPtr()
-			if module.GetPostDeactivateFunc() != nil {
-				module.GetPostDeactivateFunc()()
-			}
 		}
 		var __ht__1 *types.Array = &ModuleRegistry
 		for _, _p := range __ht__1.ForeachDataReserve() {
@@ -154,11 +151,11 @@ func ZendPostDeactivateModules() {
 		__ht__1.SetNNumUsed(_idx)
 	} else {
 		var p **ZendModuleEntry = ModulePostDeactivateHandlers
-		for (*p) != nil {
-			var module *ZendModuleEntry = *p
-			module.GetPostDeactivateFunc()()
-			p++
-		}
+		//for (*p) != nil {
+		//	var module *ZendModuleEntry = *p
+		//	module.GetPostDeactivateFunc()()
+		//	p++
+		//}
 	}
 }
 func ZendNextFreeModule() int {

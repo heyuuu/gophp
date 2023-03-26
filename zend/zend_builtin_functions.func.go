@@ -15,14 +15,9 @@ func ZmStartupCore(type_ int, module_number int) int {
 	ZendRegisterDefaultClasses()
 	return types.SUCCESS
 }
-func ZendStartupBuiltinFunctions() int {
-	ZendBuiltinModule.SetModuleNumber(0)
-	ZendBuiltinModule.SetType(MODULE_PERSISTENT)
-	if b.Assign(&(EG__().GetCurrentModule()), ZendRegisterModuleEx(&ZendBuiltinModule)) == nil {
-		return types.FAILURE
-	} else {
-		return types.SUCCESS
-	}
+func ZendStartupBuiltinFunctions() {
+	module := ZendRegisterModuleEx(&ZendBuiltinModule)
+	EG__().SetCurrentModule(module)
 }
 
 func ZifZendVersion() string  { return ZEND_VERSION }

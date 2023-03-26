@@ -56,13 +56,10 @@ const usage string = `Usage: %s [options] [-f] <file> [--] [args...]
   --ri <name>      Show configuration for extension <name>.
 `
 
-func PhpSelect(m core.PhpSocketT, r fd_set, w __auto__, e __auto__, t *__struct__timeval) __auto__ {
-	return select_(m, r, w, e, t)
-}
 func PrintModules() {
 	var modules = zend.CopyRegistryModules()
 	sort.Slice(modules, func(i, j int) bool {
-		return b.StrCaseCompare(modules[i].GetNameStr(), modules[j].GetNameStr())
+		return b.StrCaseCompare(modules[i].GetName(), modules[j].GetName())
 	})
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
