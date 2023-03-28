@@ -455,7 +455,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprNew":
 		node = &ast.NewExpr{
-			Class: data["class"],
+			Class: data["class"].(ast.Node),
 			Args:  asSlice[any](data["args"]),
 		}
 	case "ExprNullsafeMethodCall":
@@ -559,14 +559,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "Name":
 		node = &ast.Name{
+			Kind:  ast.NameNormal,
 			Parts: asSlice[string](data["parts"]),
 		}
 	case "NameFullyQualified":
-		node = &ast.NameFullyQualified{
+		node = &ast.Name{
+			Kind:  ast.NameFullyQualified,
 			Parts: asSlice[string](data["parts"]),
 		}
 	case "NameRelative":
-		node = &ast.NameRelative{
+		node = &ast.Name{
+			Kind:  ast.NameRelative,
 			Parts: asSlice[string](data["parts"]),
 		}
 	case "NullableType":
@@ -801,7 +804,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtPropertyProperty":
 		node = &ast.PropertyPropertyStmt{
-			Name:    data["name"].(*ast.VarLikeIdentifier),
+			Name:    data["name"].(*ast.Ident),
 			Default: asTypeOrNil[ast.Expr](data["default"]),
 		}
 	case "StmtReturn":
@@ -882,8 +885,9 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Types: asSlice[any](data["types"]),
 		}
 	case "VarLikeIdentifier":
-		node = &ast.VarLikeIdentifier{
-			Name: data["name"].(string),
+		node = &ast.Ident{
+			Name:    data["name"].(string),
+			VarLike: true,
 		}
 	case "VariadicPlaceholder":
 		node = &ast.VariadicPlaceholder{}

@@ -2,6 +2,7 @@ package ast
 
 import (
 	"gophp/php/token"
+	"strings"
 )
 
 type (
@@ -79,6 +80,14 @@ type (
 
 	Ident struct {
 		Name string // @var string Ident as string
+		/**
+		 * Represents a name that is written in source code with a leading dollar,
+		 * but is not a proper variable. The leading dollar is not stored as part of the name.
+		 *
+		 * Examples: Names in property declarations are formatted as variables. Names in static property
+		 * lookups are also formatted as variables.
+		 */
+		VarLike bool
 	}
 
 	// IntersectionType : ComplexType
@@ -89,20 +98,6 @@ type (
 	MatchArm struct {
 		Conds []Expr // @var Expr|null[]
 		Body  Expr   // @var Expr
-	}
-
-	Name struct {
-		Parts []string // @var string[] Parts of the name
-	}
-
-	// NameFullyQualified : Name
-	NameFullyQualified struct {
-		Parts []string // @var string[] Parts of the name
-	}
-
-	// NameRelative : Name
-	NameRelative struct {
-		Parts []string // @var string[] Parts of the name
 	}
 
 	// NullableType : ComplexType
@@ -125,15 +120,41 @@ type (
 		Types []any // @var (Ident|Name|IntersectionType)[] Types
 	}
 
-	// VarLikeIdent : Ident
-	VarLikeIdentifier struct {
-		Name string // @var string Ident as string
-	}
-
 	// VariadicPlaceholder : PhpParserNodeAbstract
-	VariadicPlaceholder struct {
-	}
+	VariadicPlaceholder struct{}
 )
+
+/**
+ *	Name
+ */
+type NameType int
+
+const (
+	NameNormal NameType = iota
+	NameFullyQualified
+	NameRelative
+)
+
+type Name struct {
+	Kind  NameType // 0 normal, 1 full-qualified, 2 relative
+	Parts []string // @var string[] Parts of the name
+}
+
+func (n *Name) IsUnqualified() bool    { return n.Kind == NameNormal && len(n.Parts) == 1 }
+func (n *Name) IsQualified() bool      { return n.Kind == NameNormal && len(n.Parts) > 1 }
+func (n *Name) IsFullyQualified() bool { return n.Kind == NameFullyQualified }
+func (n *Name) IsRelative() bool       { return n.Kind == NameRelative }
+func (n *Name) ToString() string       { return strings.Join(n.Parts, "\\") }
+func (n *Name) ToCodeString() string {
+	switch n.Kind {
+	case NameFullyQualified:
+		return "\\" + n.ToString()
+	case NameRelative:
+		return "namespace\\" + n.ToString()
+	default:
+		return n.ToString()
+	}
+}
 
 // Expr
 type (
@@ -282,7 +303,7 @@ type (
 
 	// ExprNew : ExprCallLike
 	NewExpr struct {
-		Class any   // @var Name|Expr|ClassStmt Class name
+		Class Node  // @var Name|Expr|ClassStmt Class name
 		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
@@ -581,8 +602,8 @@ type (
 	}
 
 	PropertyPropertyStmt struct {
-		Name    *VarLikeIdentifier // @var VarLikeIdent Name
-		Default Expr               // @var Expr|null Default
+		Name    *Ident // @var Ident     Name
+		Default Expr   // @var Expr|null Default
 	}
 
 	StaticStmt struct {
@@ -710,10 +731,6 @@ func (*IntersectionType) complexTypeNode() {}
 func (*NullableType) complexTypeNode()     {}
 func (*UnionType) complexTypeNode()        {}
 
-// Name
-func (*NameFullyQualified) nameNode() {}
-func (*NameRelative) nameNode()       {}
-
 // Scalar
 func (*FloatLit) scalarNode()                 {}
 func (*EncapsedScalar) scalarNode()           {}
@@ -781,6 +798,3 @@ func (*TraitStmt) stmtClassLikeNode()     {}
 // StmtTraitUseAdaptation
 func (*TraitUseAdaptationAliasStmt) stmtTraitUseAdaptationNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) stmtTraitUseAdaptationNode() {}
-
-// Ident
-func (*VarLikeIdentifier) identifierNode() {}
