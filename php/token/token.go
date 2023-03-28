@@ -217,7 +217,7 @@ func IsCastKind(token Token) bool {
 	return cast_begin < token && token < cast_end
 }
 
-func IsMagicKind(token Token) bool {
+func IsMagicConstKind(token Token) bool {
 	return magic_const_begin < token && token < magic_const_end
 }
 

@@ -591,11 +591,21 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Value: asFloat(data["value"]),
 		}
 	case "ScalarEncapsed":
-		node = &ast.EncapsedScalar{
-			Parts: asSlice[ast.Expr](data["parts"]),
+		parts := asSlice[ast.Expr](data["parts"])
+		if len(parts) == 0 {
+			return nil, fmt.Errorf("ScalarEncapsed need at least 1 part.")
 		}
+		expr := parts[0]
+		for _, next := range parts[1:] {
+			expr = &ast.BinaryExpr{
+				Op:    token.Concat,
+				Left:  expr,
+				Right: next,
+			}
+		}
+		node = expr
 	case "ScalarEncapsedStringPart":
-		node = &ast.EncapsedStringPartScalar{
+		node = &ast.StringLit{
 			Value: data["value"].(string),
 		}
 	case "ScalarLNumber":
@@ -603,21 +613,21 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Value: asInt(data["value"]),
 		}
 	case "ScalarMagicConstClass":
-		node = &ast.MagicConstScalar{Op: token.ClassConst}
+		node = &ast.MagicConstExpr{Kind: token.ClassConst}
 	case "ScalarMagicConstDir":
-		node = &ast.MagicConstScalar{Op: token.DirConst}
+		node = &ast.MagicConstExpr{Kind: token.DirConst}
 	case "ScalarMagicConstFile":
-		node = &ast.MagicConstScalar{Op: token.FileConst}
+		node = &ast.MagicConstExpr{Kind: token.FileConst}
 	case "ScalarMagicConstFunction":
-		node = &ast.MagicConstScalar{Op: token.FunctionConst}
+		node = &ast.MagicConstExpr{Kind: token.FunctionConst}
 	case "ScalarMagicConstLine":
-		node = &ast.MagicConstScalar{Op: token.LineConst}
+		node = &ast.MagicConstExpr{Kind: token.LineConst}
 	case "ScalarMagicConstMethod":
-		node = &ast.MagicConstScalar{Op: token.MethodConst}
+		node = &ast.MagicConstExpr{Kind: token.MethodConst}
 	case "ScalarMagicConstNamespace":
-		node = &ast.MagicConstScalar{Op: token.NamespaceConst}
+		node = &ast.MagicConstExpr{Kind: token.NamespaceConst}
 	case "ScalarMagicConstTrait":
-		node = &ast.MagicConstScalar{Op: token.TraitConst}
+		node = &ast.MagicConstExpr{Kind: token.TraitConst}
 	case "ScalarString":
 		node = &ast.StringLit{
 			Value: data["value"].(string),

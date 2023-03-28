@@ -29,12 +29,6 @@ type (
 		functionLikeNode()
 	}
 
-	// Scalar : Expr
-	Scalar interface {
-		Expr
-		scalarNode()
-	}
-
 	// StmtClassLike : Stmt
 	ClassLikeStmt interface {
 		Stmt
@@ -393,18 +387,8 @@ type (
 		Expr Expr // @var Expr Expression to yield from
 	}
 
-	// ScalarEncapsed : Scalar
-	EncapsedScalar struct {
-		Parts []Expr // @var Expr[] list of string parts
-	}
-
-	// ScalarEncapsedStringPart : Scalar
-	EncapsedStringPartScalar struct {
-		Value string // @var string String value
-	}
-
-	MagicConstScalar struct {
-		Op token.Token
+	MagicConstExpr struct {
+		Kind token.Token // token.IsMagicConstKind()
 	}
 )
 
@@ -689,7 +673,11 @@ func (*UnionType) typeNode()        {}
 func (*NullableType) typeNode()     {}
 
 // Expr
+func (*IntLit) exprNode()                    {}
+func (*FloatLit) exprNode()                  {}
+func (*StringLit) exprNode()                 {}
 func (*ArrayExpr) exprNode()                 {}
+func (*MagicConstExpr) exprNode()            {}
 func (*IndexExpr) exprNode()                 {}
 func (*ArrayItemExpr) exprNode()             {}
 func (*ArrowFunctionExpr) exprNode()         {}
@@ -739,21 +727,6 @@ func (*MethodCallExpr) exprNode()         {}
 func (*NewExpr) exprNode()                {}
 func (*NullsafeMethodCallExpr) exprNode() {}
 func (*StaticCallExpr) exprNode()         {}
-
-// Scalar
-func (*FloatLit) scalarNode()                 {}
-func (*EncapsedScalar) scalarNode()           {}
-func (*EncapsedStringPartScalar) scalarNode() {}
-func (*IntLit) scalarNode()                   {}
-func (*MagicConstScalar) scalarNode()         {}
-func (*StringLit) scalarNode()                {}
-
-func (*FloatLit) exprNode()                 {}
-func (*EncapsedScalar) exprNode()           {}
-func (*EncapsedStringPartScalar) exprNode() {}
-func (*IntLit) exprNode()                   {}
-func (*MagicConstScalar) exprNode()         {}
-func (*StringLit) exprNode()                {}
 
 // Stmt
 func (*BreakStmt) stmtNode()            {}
