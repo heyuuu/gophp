@@ -18,15 +18,34 @@ class Application
         $this->encoder = new NodeEncoder();
     }
 
-    function run(string $src, string $output): int
+    function parseCode(string $code, string $output = null): int
     {
-        foreach ($this->eachFile($src) as [$file, $relativeFile]) {
-            $ast = $this->parse($file);
-            if (!$ast) {
-                throw new \Exception("解析文件语法失败: " . $relativeFile);
-            }
-            $json = $this->encoder->encode($ast);
+        $json = $this->parseCodeToJson($code);
+        if ($output) {
+            $outputFile = $output . DIRECTORY_SEPARATOR . "ast.php.json";
+            $this->safeWriteFile($outputFile, $json);
+        } else {
+            echo $json;
+        }
+        return 0;
+    }
 
+    function parseFile(string $outputFile, string $output = null): int
+    {
+        $json = $this->parseFileToJson($outputFile);
+        if ($output) {
+            $outputFile = $output . DIRECTORY_SEPARATOR . basename($outputFile) . ".json";
+            $this->safeWriteFile($outputFile, $json);
+        } else {
+            echo $json;
+        }
+        return 0;
+    }
+
+    function parseDir(string $dir, string $output): int
+    {
+        foreach ($this->eachFile($dir) as [$file, $relativeFile]) {
+            $json       = $this->parseFileToJson($file);
             $outputFile = $output . DIRECTORY_SEPARATOR . $relativeFile . '.json';
             $this->safeWriteFile($outputFile, $json);
         }
@@ -34,29 +53,40 @@ class Application
         return 0;
     }
 
-    private function eachFile(string $src)
+    private function eachFile(string $dir)
     {
-        $src = realpath($src);
-        if (!$src) {
-            throw new \Exception("src 文件地址不存在");
+        $dir = realpath($dir);
+        if (!$dir) {
+            throw new \Exception("目标路径不存在: " . $dir);
+        } elseif (!is_dir($dir)) {
+            throw new \Exception("目标路径不是个文件夹: " . $dir);
         }
 
-        if (is_file($src)) {
-            yield [$src, basename($src)];
-        } elseif (is_dir($src)) {
-            $finder = new Finder();
-            $finder->in($src)->files()->name("*.php");
-            /** @var SplFileInfo $fileInfo */
-            foreach ($finder as $fileInfo) {
-                yield [$fileInfo->getPathname(), $fileInfo->getRelativePathname()];
-            }
+        $finder = new Finder();
+        $finder->in($dir)->files()->name("*.php");
+        /** @var SplFileInfo $fileInfo */
+        foreach ($finder as $fileInfo) {
+            yield [$fileInfo->getPathname(), $fileInfo->getRelativePathname()];
         }
     }
 
-    private function parse(string $file): ?array
+    private function parseFileToJson(string $file): string
     {
         $code = file_get_contents($file);
-        return $this->parser->parse($code);
+        $ast  = $this->parser->parse($code);
+        if (!$ast) {
+            throw new \Exception("解析文件语法失败: " . $file);
+        }
+        return $this->encoder->encode($ast);
+    }
+
+    private function parseCodeToJson(string $code): string
+    {
+        $ast = $this->parser->parse($code);
+        if (!$ast) {
+            throw new \Exception("解析文件语法失败");
+        }
+        return $this->encoder->encode($ast);
     }
 
     private function safeWriteFile(string $outputFile, string $content)
