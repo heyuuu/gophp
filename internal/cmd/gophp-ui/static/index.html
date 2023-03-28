@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ast UI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+</head>
+<body>
+<div class="container-fluid">
+    <form>
+        <div class="row">
+            <div class="col-sm-6">
+                <button class="btn btn-link" id="link-pretty">精简模式</button>
+                <button class="btn btn-link" id="link-raw">原始模式</button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <textarea class="form-control" id="input" rows="20">package main</textarea>
+                            <div class="card-body">
+                                <pre id="error" style="color: red"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card" style="height: 100vh">
+                    <pre id="output" style="margin: 0; padding: 1rem 0"></pre>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
+<script>
+    function postJson(url, data, success, onError) {
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: success,
+            error: onError,
+            dataType: "json"
+        })
+    }
+
+    function isRawMode() {
+        return window.location.hash === '#raw'
+    }
+
+    function refresh() {
+        const apiUri = "/api"
+        const $input = $("#input")
+        const $output = $("#output")
+        const $error = $("#error")
+
+        const input = $input.val()
+        const raw = isRawMode()
+
+        postJson(apiUri, {input, raw}, function (data) {
+            console.log({data})
+            if ($input.val() === input && isRawMode() === raw) { // 确认文本内容没变才更新
+                const output = data.Output
+                const error = data.Error
+                if (error === "") {
+                    $output.html(output)
+                }
+                $error.html(error)
+            }
+        }, function () {
+            $error.val("请求失败，确认服务是否可用")
+        })
+    }
+
+    $(function () {
+        console.log("ready")
+
+        const storageKey = "code"
+        const saveCode = localStorage.getItem(storageKey)
+        if (saveCode) {
+            $("#input").val(saveCode)
+        }
+
+        let oldCode = ""
+        setInterval(function () {
+            const newCode = $("#input").val()
+            if (newCode !== oldCode) {
+                console.log({"newCode": newCode})
+                oldCode = newCode
+                refresh()
+                localStorage.setItem(storageKey, newCode)
+            }
+        }, 1000)
+
+        $("#link-pretty").click(function () {
+            window.location.hash = ""
+            refresh()
+        })
+
+        $("#link-raw").click(function () {
+            window.location.hash = "#raw"
+            refresh()
+        })
+    })
+</script>
+</body>
+</html>
