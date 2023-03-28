@@ -37,9 +37,9 @@ func Fprint(w io.Writer, fset *token.FileSet, x any, f FieldFilter) error {
 	return fprint(w, fset, x, f)
 }
 
-func Sprint(fset *token.FileSet, x any, f FieldFilter) (string, error) {
+func Sprint(x any) (string, error) {
 	var buf strings.Builder
-	err := fprint(&buf, fset, x, f)
+	err := fprint(&buf, nil, x, nil)
 	if err != nil {
 		return "", err
 	}
