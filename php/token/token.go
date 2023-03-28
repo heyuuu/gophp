@@ -3,81 +3,95 @@ package token
 type Token int
 
 const (
-	_ = iota
+	_          = iota
+	Comment    // [T_COMMENT]
+	DocComment // [T_DOC_COMMENT]
 
-	// binary op tokens
-	BitwiseAnd
-	BitwiseOr
-	BitwiseXor
-	BooleanAnd
-	BooleanOr
-	Coalesce
-	Concat
-	Div
-	Equal
-	Greater
-	GreaterOrEqual
-	Identical
-	LogicalAnd
-	LogicalOr
-	LogicalXor
-	Minus
-	Mod
-	Mul
-	NotEqual
-	NotIdentical
-	Plus
-	Pow
-	ShiftLeft
-	ShiftRight
-	Smaller
-	SmallerOrEqual
-	Spaceship
+	// literal
+	Ident  // main 		[T_STRING]
+	Int    // 12345 	[T_LNUMBER]
+	Float  // 123.45 	[T_DNUMBER]
+	String // "abc" 	[T_CONSTANT_ENCAPSED_STRING]
 
-	// assign op Tokens
-	BitwiseAndEquals
-	BitwiseOrEquals
-	BitwiseXorEquals
-	CoalesceEquals
-	ConcatEquals
-	DivEquals
-	MinusEquals
-	ModEquals
-	MulEquals
-	PlusEquals
-	PowEquals
-	ShiftLeftEquals
-	ShiftRightEquals
+	// unary operators
+	Inc // ++ [T_INC]
+	Dec // -- [T_DEC]
+	Not // !
+
+	// binary operators
+	Add      // +
+	Sub      // -
+	Mul      // *
+	Div      // /
+	Mod      // %
+	Pow      // ** [T_POW]
+	Concat   // .
+	Coalesce // ??	[T_COALESCE]
+
+	And        // &
+	Or         // |
+	Xor        // ^
+	ShiftLeft  // << [T_SL]
+	ShiftRight // >> [T_SR]
+
+	BooleanAnd // &&	[T_BOOLEAN_AND]
+	BooleanOr  // ||	[T_BOOLEAN_OR]
+	LogicalAnd // and 	[T_LOGICAL_AND]
+	LogicalOr  // or 	[T_LOGICAL_OR]
+	LogicalXor // xor 	[T_LOGICAL_XOR]
+
+	Equal          // ==  [T_IS_EQUAL]
+	NotEqual       // !=  [T_IS_NOT_EQUAL]
+	Identical      // === [T_IS_IDENTICAL]
+	NotIdentical   // !== [T_IS_NOT_IDENTICAL]
+	Greater        // >
+	GreaterOrEqual // >=  [T_IS_GREATER_OR_EQUAL]
+	Smaller        // <
+	SmallerOrEqual // <=  [T_IS_SMALLER_OR_EQUAL]
+	Spaceship      // <=> [T_SPACESHIP]
+
+	// assign operators
+	AddAssign      // +=  [T_PLUS_EQUAL]
+	SubAssign      // -=  [T_MINUS_EQUAL]
+	MulAssign      // *=  [T_MUL_EQUAL]
+	DivAssign      // /=  [T_DIV_EQUAL]
+	ModAssign      // %=  [T_MOD_EQUAL]
+	PowAssign      // **= [T_POW_EQUAL]
+	ConcatAssign   // .=  [T_CONCAT_EQUAL]
+	CoalesceAssign // ??= [T_COALESCE_EQUAL]
+
+	AndAssign        // &=  [T_AND_EQUAL]
+	OrAssign         // |=  [T_OR_EQUAL]
+	XorAssign        // ^=  [T_XOR_EQUAL]
+	ShiftLeftAssign  // <<= [T_SL_EQUAL]
+	ShiftRightAssign // >>= [T_SR_EQUAL]
 
 	// cast op tokens
-	ArrayCast
-	BoolCast
-	DoubleCast
-	IntCast
-	ObjectCast
-	StringCast
-	UnsetCast
+	BoolCast   // (bool)              [T_BOOL_CAST]
+	IntCast    // (int) or (integer)  [T_INT_CAST]
+	DoubleCast // (float) or (double) [T_DOUBLE_CAST]
+	StringCast // (string)            [T_STRING_CAST]
+	ArrayCast  // (array)             [T_ARRAY_CAST]
+	ObjectCast // (object)            [T_OBJECT_CAST]
+	UnsetCast  // (unset)             [T_UNSET_CAST]
 
 	// magic const op tokens
-	ClassConst
-	DirConst
-	FileConst
-	FunctionConst
-	LineConst
-	MethodConst
-	NamespaceConst
-	TraitConst
+	DirConst       // __DIR__       [T_DIR]
+	FileConst      // __FILE__      [T_FILE]
+	LineConst      // __LINE__      [T_LINE]
+	NamespaceConst // __NAMESPACE__ [T_NS_C]
+	FunctionConst  // __FUNCTION__  [T_FUNC_C]
+	ClassConst     // __CLASS__     [T_CLASS_C]
+	MethodConst    // __METHOD__    [T_METHOD_C]
+	TraitConst     // __TRAIT__     [T_TRAIT_C]
 
-	LNUMBER                                 Token = 260 + iota
-	DNUMBER                                 Token = 261
-	STRING                                  Token = 262
+	// others
 	NAME_FULLY_QUALIFIED                    Token = 263
 	NAME_RELATIVE                           Token = 264
 	NAME_QUALIFIED                          Token = 265
 	VARIABLE                                Token = 266
 	INLINE_HTML                             Token = 267
 	ENCAPSED_AND_WHITESPACE                 Token = 268
-	CONSTANT_ENCAPSED_STRING                Token = 269
 	STRING_VARNAME                          Token = 270
 	NUM_STRING                              Token = 271
 	INCLUDE                                 Token = 272
@@ -85,9 +99,6 @@ const (
 	EVAL                                    Token = 274
 	REQUIRE                                 Token = 275
 	REQUIRE_ONCE                            Token = 276
-	LOGICAL_OR                              Token = 277
-	LOGICAL_XOR                             Token = 278
-	LOGICAL_AND                             Token = 279
 	PRINT                                   Token = 280
 	YIELD                                   Token = 281
 	YIELD_FROM                              Token = 282
@@ -151,47 +162,7 @@ const (
 	LIST                                    Token = 340
 	ARRAY                                   Token = 341
 	CALLABLE                                Token = 342
-	LINE                                    Token = 343
-	FILE                                    Token = 344
-	DIR                                     Token = 345
-	CLASS_C                                 Token = 346
-	TRAIT_C                                 Token = 347
-	METHOD_C                                Token = 348
-	FUNC_C                                  Token = 349
-	NS_C                                    Token = 350
 	ATTRIBUTE                               Token = 351
-	PLUS_EQUAL                              Token = 352
-	MINUS_EQUAL                             Token = 353
-	MUL_EQUAL                               Token = 354
-	DIV_EQUAL                               Token = 355
-	CONCAT_EQUAL                            Token = 356
-	MOD_EQUAL                               Token = 357
-	AND_EQUAL                               Token = 358
-	OR_EQUAL                                Token = 359
-	XOR_EQUAL                               Token = 360
-	SL_EQUAL                                Token = 361
-	SR_EQUAL                                Token = 362
-	COALESCE_EQUAL                          Token = 363
-	BOOLEAN_OR                              Token = 364
-	BOOLEAN_AND                             Token = 365
-	IS_EQUAL                                Token = 366
-	IS_NOT_EQUAL                            Token = 367
-	IS_IDENTICAL                            Token = 368
-	IS_NOT_IDENTICAL                        Token = 369
-	IS_SMALLER_OR_EQUAL                     Token = 370
-	IS_GREATER_OR_EQUAL                     Token = 371
-	SPACESHIP                               Token = 372
-	SL                                      Token = 373
-	SR                                      Token = 374
-	INC                                     Token = 375
-	DEC                                     Token = 376
-	INT_CAST                                Token = 377
-	DOUBLE_CAST                             Token = 378
-	STRING_CAST                             Token = 379
-	ARRAY_CAST                              Token = 380
-	OBJECT_CAST                             Token = 381
-	BOOL_CAST                               Token = 382
-	UNSET_CAST                              Token = 383
 	OBJECT_OPERATOR                         Token = 384
 	NULLSAFE_OBJECT_OPERATOR                Token = 385
 	DOUBLE_ARROW                            Token = 386
@@ -209,9 +180,6 @@ const (
 	DOUBLE_COLON                            Token = 397
 	NS_SEPARATOR                            Token = 398
 	ELLIPSIS                                Token = 399
-	COALESCE                                Token = 400
-	POW                                     Token = 401
-	POW_EQUAL                               Token = 402
 	AMPERSAND_FOLLOWED_BY_VAR_OR_VARARG     Token = 403
 	AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG Token = 404
 	BAD_CHARACTER                           Token = 405

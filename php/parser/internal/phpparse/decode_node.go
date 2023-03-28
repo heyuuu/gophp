@@ -62,79 +62,79 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprAssignOpBitwiseAnd":
 		node = &ast.AssignOpExpr{
-			Op:   token.BitwiseAndEquals,
+			Op:   token.AndAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpBitwiseOr":
 		node = &ast.AssignOpExpr{
-			Op:   token.BitwiseOrEquals,
+			Op:   token.OrAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpBitwiseXor":
 		node = &ast.AssignOpExpr{
-			Op:   token.BitwiseXorEquals,
+			Op:   token.XorAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpCoalesce":
 		node = &ast.AssignOpExpr{
-			Op:   token.CoalesceEquals,
+			Op:   token.CoalesceAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpConcat":
 		node = &ast.AssignOpExpr{
-			Op:   token.ConcatEquals,
+			Op:   token.ConcatAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpDiv":
 		node = &ast.AssignOpExpr{
-			Op:   token.DivEquals,
+			Op:   token.DivAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpMinus":
 		node = &ast.AssignOpExpr{
-			Op:   token.MinusEquals,
+			Op:   token.SubAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpMod":
 		node = &ast.AssignOpExpr{
-			Op:   token.ModEquals,
+			Op:   token.ModAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpMul":
 		node = &ast.AssignOpExpr{
-			Op:   token.MulEquals,
+			Op:   token.MulAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpPlus":
 		node = &ast.AssignOpExpr{
-			Op:   token.PlusEquals,
+			Op:   token.AddAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpPow":
 		node = &ast.AssignOpExpr{
-			Op:   token.PowEquals,
+			Op:   token.PowAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpShiftLeft":
 		node = &ast.AssignOpExpr{
-			Op:   token.ShiftLeftEquals,
+			Op:   token.ShiftLeftAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpShiftRight":
 		node = &ast.AssignOpExpr{
-			Op:   token.ShiftRightEquals,
+			Op:   token.ShiftRightAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
@@ -145,19 +145,19 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprBinaryOpBitwiseAnd":
 		node = &ast.BinaryOpExpr{
-			Op:    token.BitwiseAnd,
+			Op:    token.And,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpBitwiseOr":
 		node = &ast.BinaryOpExpr{
-			Op:    token.BitwiseOr,
+			Op:    token.Or,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpBitwiseXor":
 		node = &ast.BinaryOpExpr{
-			Op:    token.BitwiseXor,
+			Op:    token.Xor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
@@ -235,7 +235,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprBinaryOpMinus":
 		node = &ast.BinaryOpExpr{
-			Op:    token.Minus,
+			Op:    token.Sub,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
@@ -265,7 +265,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprBinaryOpPlus":
 		node = &ast.BinaryOpExpr{
-			Op:    token.Plus,
+			Op:    token.Add,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
