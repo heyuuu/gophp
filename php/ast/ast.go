@@ -1,5 +1,9 @@
 package ast
 
+import (
+	"gophp/php/token"
+)
+
 type Node interface{}
 
 type (
@@ -15,28 +19,10 @@ type (
 		exprNode()
 	}
 
-	// ExprAssignOp : Expr
-	AssignOpExpr interface {
-		Expr
-		assignOpExprNode()
-	}
-
-	// ExprBinaryOp : Expr
-	BinaryOpExpr interface {
-		Expr
-		binaryOpExprNode()
-	}
-
-	// ExprCallLike : Expr
+	// CallLikeExpr : Expr
 	CallLikeExpr interface {
 		Expr
 		callLikeExprNode()
-	}
-
-	// ExprCast : Expr
-	CastExpr interface {
-		Expr
-		castExprNode()
 	}
 
 	// FunctionLike
@@ -48,12 +34,6 @@ type (
 	Scalar interface {
 		Expr
 		scalarNode()
-	}
-
-	// ScalarMagicConst : Scalar
-	MagicConstScalar interface {
-		Scalar
-		magicConstScalarNode()
 	}
 
 	// Stmt : PhpParserNodeAbstract
@@ -136,82 +116,10 @@ type (
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprAssignOpBitwiseAnd : ExprAssignOp
-	AssignOpBitwiseAndExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpBitwiseOr : ExprAssignOp
-	AssignOpBitwiseOrExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpBitwiseXor : ExprAssignOp
-	AssignOpBitwiseXorExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpCoalesce : ExprAssignOp
-	AssignOpCoalesceExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpConcat : ExprAssignOp
-	AssignOpConcatExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpDiv : ExprAssignOp
-	AssignOpDivExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpMinus : ExprAssignOp
-	AssignOpMinusExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpMod : ExprAssignOp
-	AssignOpModExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpMul : ExprAssignOp
-	AssignOpMulExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpPlus : ExprAssignOp
-	AssignOpPlusExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpPow : ExprAssignOp
-	AssignOpPowExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpShiftLeft : ExprAssignOp
-	AssignOpShiftLeftExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprAssignOpShiftRight : ExprAssignOp
-	AssignOpShiftRightExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
+	AssignOpExpr struct {
+		Op   token.Token //
+		Var  Expr        // @var Expr Variable
+		Expr Expr        // @var Expr Expression
 	}
 
 	// ExprAssignRef : Expr
@@ -220,164 +128,8 @@ type (
 		Expr Expr // @var Expr Variable which is referenced
 	}
 
-	// ExprBinaryOpBitwiseAnd : ExprBinaryOp
-	BinaryOpBitwiseAndExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpBitwiseOr : ExprBinaryOp
-	BinaryOpBitwiseOrExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpBitwiseXor : ExprBinaryOp
-	BinaryOpBitwiseXorExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpBooleanAnd : ExprBinaryOp
-	BinaryOpBooleanAndExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpBooleanOr : ExprBinaryOp
-	BinaryOpBooleanOrExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpCoalesce : ExprBinaryOp
-	BinaryOpCoalesceExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpConcat : ExprBinaryOp
-	BinaryOpConcatExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpDiv : ExprBinaryOp
-	BinaryOpDivExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpEqual : ExprBinaryOp
-	BinaryOpEqualExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpGreater : ExprBinaryOp
-	BinaryOpGreaterExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpGreaterOrEqual : ExprBinaryOp
-	BinaryOpGreaterOrEqualExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpIdentical : ExprBinaryOp
-	BinaryOpIdenticalExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpLogicalAnd : ExprBinaryOp
-	BinaryOpLogicalAndExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpLogicalOr : ExprBinaryOp
-	BinaryOpLogicalOrExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpLogicalXor : ExprBinaryOp
-	BinaryOpLogicalXorExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpMinus : ExprBinaryOp
-	BinaryOpMinusExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpMod : ExprBinaryOp
-	BinaryOpModExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpMul : ExprBinaryOp
-	BinaryOpMulExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpNotEqual : ExprBinaryOp
-	BinaryOpNotEqualExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpNotIdentical : ExprBinaryOp
-	BinaryOpNotIdenticalExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpPlus : ExprBinaryOp
-	BinaryOpPlusExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpPow : ExprBinaryOp
-	BinaryOpPowExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpShiftLeft : ExprBinaryOp
-	BinaryOpShiftLeftExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpShiftRight : ExprBinaryOp
-	BinaryOpShiftRightExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpSmaller : ExprBinaryOp
-	BinaryOpSmallerExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpSmallerOrEqual : ExprBinaryOp
-	BinaryOpSmallerOrEqualExpr struct {
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBinaryOpSpaceship : ExprBinaryOp
-	BinaryOpSpaceshipExpr struct {
+	BinaryOpExpr struct {
+		Op    token.Token
 		Left  Expr // @var Expr The left hand side expression
 		Right Expr // @var Expr The right hand side expression
 	}
@@ -392,38 +144,8 @@ type (
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprCastArray : ExprCast
-	CastArrayExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprCastBool : ExprCast
-	CastBoolExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprCastDouble : ExprCast
-	CastDoubleExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprCastInt : ExprCast
-	CastIntExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprCastObject : ExprCast
-	CastObjectExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprCastString : ExprCast
-	CastStringExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprCastUnset : ExprCast
-	CastUnsetExpr struct {
+	CastExpr struct {
+		Op   token.Token
 		Expr Expr // @var Expr Expression
 	}
 
@@ -698,36 +420,8 @@ type (
 		Value int // @var int Number value
 	}
 
-	// ScalarMagicConstClass : ScalarMagicConst
-	MagicConstClassScalar struct {
-	}
-
-	// ScalarMagicConstDir : ScalarMagicConst
-	MagicConstDirScalar struct {
-	}
-
-	// ScalarMagicConstFile : ScalarMagicConst
-	MagicConstFileScalar struct {
-	}
-
-	// ScalarMagicConstFunction : ScalarMagicConst
-	MagicConstFunctionScalar struct {
-	}
-
-	// ScalarMagicConstLine : ScalarMagicConst
-	MagicConstLineScalar struct {
-	}
-
-	// ScalarMagicConstMethod : ScalarMagicConst
-	MagicConstMethodScalar struct {
-	}
-
-	// ScalarMagicConstNamespace : ScalarMagicConst
-	MagicConstNamespaceScalar struct {
-	}
-
-	// ScalarMagicConstTrait : ScalarMagicConst
-	MagicConstTraitScalar struct {
+	MagicConstScalar struct {
+		Op token.Token
 	}
 
 	// ScalarString : Scalar
@@ -1073,9 +767,12 @@ func (*ArrayDimFetchExpr) exprNode()         {}
 func (*ArrayItemExpr) exprNode()             {}
 func (*ArrowFunctionExpr) exprNode()         {}
 func (*AssignExpr) exprNode()                {}
+func (*AssignOpExpr) exprNode()              {}
 func (*AssignRefExpr) exprNode()             {}
+func (*BinaryOpExpr) exprNode()              {}
 func (*BitwiseNotExpr) exprNode()            {}
 func (*BooleanNotExpr) exprNode()            {}
+func (*CastExpr) exprNode()                  {}
 func (*ClassConstFetchExpr) exprNode()       {}
 func (*CloneExpr) exprNode()                 {}
 func (*ClosureExpr) exprNode()               {}
@@ -1114,65 +811,18 @@ func (*ClosureExpr) functionLikeNode()       {}
 func (*ClassMethodStmt) functionLikeNode()   {}
 func (*FunctionStmt) functionLikeNode()      {}
 
-// ExprAssignOp
-func (*AssignOpBitwiseAndExpr) exprAssignOpNode() {}
-func (*AssignOpBitwiseOrExpr) exprAssignOpNode()  {}
-func (*AssignOpBitwiseXorExpr) exprAssignOpNode() {}
-func (*AssignOpCoalesceExpr) exprAssignOpNode()   {}
-func (*AssignOpConcatExpr) exprAssignOpNode()     {}
-func (*AssignOpDivExpr) exprAssignOpNode()        {}
-func (*AssignOpMinusExpr) exprAssignOpNode()      {}
-func (*AssignOpModExpr) exprAssignOpNode()        {}
-func (*AssignOpMulExpr) exprAssignOpNode()        {}
-func (*AssignOpPlusExpr) exprAssignOpNode()       {}
-func (*AssignOpPowExpr) exprAssignOpNode()        {}
-func (*AssignOpShiftLeftExpr) exprAssignOpNode()  {}
-func (*AssignOpShiftRightExpr) exprAssignOpNode() {}
-
-// ExprBinaryOp
-func (*BinaryOpBitwiseAndExpr) exprBinaryOpNode()     {}
-func (*BinaryOpBitwiseOrExpr) exprBinaryOpNode()      {}
-func (*BinaryOpBitwiseXorExpr) exprBinaryOpNode()     {}
-func (*BinaryOpBooleanAndExpr) exprBinaryOpNode()     {}
-func (*BinaryOpBooleanOrExpr) exprBinaryOpNode()      {}
-func (*BinaryOpCoalesceExpr) exprBinaryOpNode()       {}
-func (*BinaryOpConcatExpr) exprBinaryOpNode()         {}
-func (*BinaryOpDivExpr) exprBinaryOpNode()            {}
-func (*BinaryOpEqualExpr) exprBinaryOpNode()          {}
-func (*BinaryOpGreaterExpr) exprBinaryOpNode()        {}
-func (*BinaryOpGreaterOrEqualExpr) exprBinaryOpNode() {}
-func (*BinaryOpIdenticalExpr) exprBinaryOpNode()      {}
-func (*BinaryOpLogicalAndExpr) exprBinaryOpNode()     {}
-func (*BinaryOpLogicalOrExpr) exprBinaryOpNode()      {}
-func (*BinaryOpLogicalXorExpr) exprBinaryOpNode()     {}
-func (*BinaryOpMinusExpr) exprBinaryOpNode()          {}
-func (*BinaryOpModExpr) exprBinaryOpNode()            {}
-func (*BinaryOpMulExpr) exprBinaryOpNode()            {}
-func (*BinaryOpNotEqualExpr) exprBinaryOpNode()       {}
-func (*BinaryOpNotIdenticalExpr) exprBinaryOpNode()   {}
-func (*BinaryOpPlusExpr) exprBinaryOpNode()           {}
-func (*BinaryOpPowExpr) exprBinaryOpNode()            {}
-func (*BinaryOpShiftLeftExpr) exprBinaryOpNode()      {}
-func (*BinaryOpShiftRightExpr) exprBinaryOpNode()     {}
-func (*BinaryOpSmallerExpr) exprBinaryOpNode()        {}
-func (*BinaryOpSmallerOrEqualExpr) exprBinaryOpNode() {}
-func (*BinaryOpSpaceshipExpr) exprBinaryOpNode()      {}
-
-// ExprCast
-func (*CastArrayExpr) exprCastNode()  {}
-func (*CastBoolExpr) exprCastNode()   {}
-func (*CastDoubleExpr) exprCastNode() {}
-func (*CastIntExpr) exprCastNode()    {}
-func (*CastObjectExpr) exprCastNode() {}
-func (*CastStringExpr) exprCastNode() {}
-func (*CastUnsetExpr) exprCastNode()  {}
-
 // ExprCallLike
 func (*FuncCallExpr) exprCallLikeNode()           {}
 func (*MethodCallExpr) exprCallLikeNode()         {}
 func (*NewExpr) exprCallLikeNode()                {}
 func (*NullsafeMethodCallExpr) exprCallLikeNode() {}
 func (*StaticCallExpr) exprCallLikeNode()         {}
+
+func (*FuncCallExpr) exprNode()           {}
+func (*MethodCallExpr) exprNode()         {}
+func (*NewExpr) exprNode()                {}
+func (*NullsafeMethodCallExpr) exprNode() {}
+func (*StaticCallExpr) exprNode()         {}
 
 // ComplexType
 func (*IntersectionType) complexTypeNode() {}
@@ -1188,17 +838,15 @@ func (*DNumberScalar) scalarNode()            {}
 func (*EncapsedScalar) scalarNode()           {}
 func (*EncapsedStringPartScalar) scalarNode() {}
 func (*LNumberScalar) scalarNode()            {}
+func (*MagicConstScalar) scalarNode()         {}
 func (*StringScalar) scalarNode()             {}
 
-// ScalarMagicConst
-func (*MagicConstClassScalar) scalarMagicConstNode()     {}
-func (*MagicConstDirScalar) scalarMagicConstNode()       {}
-func (*MagicConstFileScalar) scalarMagicConstNode()      {}
-func (*MagicConstFunctionScalar) scalarMagicConstNode()  {}
-func (*MagicConstLineScalar) scalarMagicConstNode()      {}
-func (*MagicConstMethodScalar) scalarMagicConstNode()    {}
-func (*MagicConstNamespaceScalar) scalarMagicConstNode() {}
-func (*MagicConstTraitScalar) scalarMagicConstNode()     {}
+func (*DNumberScalar) exprNode()            {}
+func (*EncapsedScalar) exprNode()           {}
+func (*EncapsedStringPartScalar) exprNode() {}
+func (*LNumberScalar) exprNode()            {}
+func (*MagicConstScalar) exprNode()         {}
+func (*StringScalar) exprNode()             {}
 
 // Stmt
 func (*BreakStmt) stmtNode()            {}

@@ -3,6 +3,71 @@ package token
 type Token int
 
 const (
+	_ = iota
+
+	// binary op tokens
+	BitwiseAnd
+	BitwiseOr
+	BitwiseXor
+	BooleanAnd
+	BooleanOr
+	Coalesce
+	Concat
+	Div
+	Equal
+	Greater
+	GreaterOrEqual
+	Identical
+	LogicalAnd
+	LogicalOr
+	LogicalXor
+	Minus
+	Mod
+	Mul
+	NotEqual
+	NotIdentical
+	Plus
+	Pow
+	ShiftLeft
+	ShiftRight
+	Smaller
+	SmallerOrEqual
+	Spaceship
+
+	// assign op Tokens
+	BitwiseAndEquals
+	BitwiseOrEquals
+	BitwiseXorEquals
+	CoalesceEquals
+	ConcatEquals
+	DivEquals
+	MinusEquals
+	ModEquals
+	MulEquals
+	PlusEquals
+	PowEquals
+	ShiftLeftEquals
+	ShiftRightEquals
+
+	// cast op tokens
+	ArrayCast
+	BoolCast
+	DoubleCast
+	IntCast
+	ObjectCast
+	StringCast
+	UnsetCast
+
+	// magic const op tokens
+	ClassConst
+	DirConst
+	FileConst
+	FunctionConst
+	LineConst
+	MethodConst
+	NamespaceConst
+	TraitConst
+
 	LNUMBER                                 Token = 260 + iota
 	DNUMBER                                 Token = 261
 	STRING                                  Token = 262
