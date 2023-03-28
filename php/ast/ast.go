@@ -114,7 +114,7 @@ type (
 		Type       any               // @var Ident|Name|ComplexType|null Type declaration
 		ByRef      bool              // @var bool Whether parameter is passed by reference
 		Variadic   bool              // @var bool Whether this is a variadic argument
-		Var        VariableExpr      // @var VariableExpr Parameter variable
+		Var        *VariableExpr     // @var VariableExpr Parameter variable
 		Default    Expr              // @var Expr|null Default value
 		Flags      int               // @var int
 		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
@@ -137,19 +137,21 @@ type (
 
 // Expr
 type (
-	BinaryExpr struct {
-		Op    token.Token
-		Left  Expr // @var Expr The left-hand side expression
-		Right Expr // @var Expr The right-hand side expression
+	// literal
+	IntLit struct {
+		Value int // number value
+	}
+
+	FloatLit struct {
+		Value float64 // @var float Number value
+	}
+
+	StringLit struct {
+		Value string // @var string String value
 	}
 
 	ArrayExpr struct {
 		Items []*ArrayItemExpr // @var (ArrayItem|null)[] Items
-	}
-
-	ArrayDimFetchExpr struct {
-		Var Expr // @var Expr Variable
-		Dim Expr // @var Expr|null Array index / dim
 	}
 
 	ArrayItemExpr struct {
@@ -157,49 +159,6 @@ type (
 		Value  Expr // @var Expr Value
 		ByRef  bool // @var bool Whether to assign by reference
 		Unpack bool // @var bool Whether to unpack the argument
-	}
-
-	// ExprArrowFunction : Expr, FunctionLike
-	ArrowFunctionExpr struct {
-		Static     bool              // @var bool
-		ByRef      bool              // @var bool
-		Params     []*Param          // @var Param[]
-		ReturnType any               // @var Ident|Name|ComplexType|null
-		Expr       Expr              // @var Expr
-		AttrGroups []*AttributeGroup // @var AttributeGroup[]
-	}
-
-	AssignExpr struct {
-		Op   token.Token //
-		Var  Expr        // @var Expr Variable
-		Expr Expr        // @var Expr Expression
-	}
-
-	AssignRefExpr struct {
-		Var  Expr // @var Expr Variable reference is assigned to
-		Expr Expr // @var Expr Variable which is referenced
-	}
-
-	BitwiseNotExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	BooleanNotExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	CastExpr struct {
-		Op   token.Token
-		Expr Expr // @var Expr Expression
-	}
-
-	ClassConstFetchExpr struct {
-		Class any    // @var Name|Expr Class name
-		Name  *Ident // @var Ident Constant name
-	}
-
-	CloneExpr struct {
-		Expr Expr // @var Expr Expression
 	}
 
 	// ExprClosure : Expr, FunctionLike
@@ -218,19 +177,73 @@ type (
 		ByRef bool          // @var bool Whether to use by reference
 	}
 
+	// ExprArrowFunction : Expr, FunctionLike
+	ArrowFunctionExpr struct {
+		Static     bool              // @var bool
+		ByRef      bool              // @var bool
+		Params     []*Param          // @var Param[]
+		ReturnType any               // @var Ident|Name|ComplexType|null
+		Expr       Expr              // @var Expr
+		AttrGroups []*AttributeGroup // @var AttributeGroup[]
+	}
+
+	// IndexExpr
+	IndexExpr struct {
+		Var Expr // @var Expr       Variable
+		Dim Expr // @var Expr|null  Array index / dim
+	}
+
+	// CastExpr
+	CastExpr struct {
+		Op   token.Token // token.
+		Expr Expr        // @var Expr Expression
+	}
+
+	// UnaryExpr
+	UnaryExpr struct {
+		Kind token.Token // token.Not, token.Tilde, token.PreInc, token.PreDec, token.PostInc or token.PostDec
+		Var  Expr        // variable
+	}
+
+	// BinaryExpr
+	BinaryExpr struct {
+		Op    token.Token // token.IsBinaryOp()
+		Left  Expr        // @var Expr The left-hand side expression
+		Right Expr        // @var Expr The right-hand side expression
+	}
+
+	// AssignExpr
+	AssignExpr struct {
+		Op   token.Token // token.IsAssignOp()
+		Var  Expr        // @var Expr Variable
+		Expr Expr        // @var Expr Expression
+	}
+
+	AssignRefExpr struct {
+		Var  Expr // @var Expr Variable reference is assigned to
+		Expr Expr // @var Expr Variable which is referenced
+	}
+
+	// InternalCallExpr
+	InternalCallExpr struct {
+		Kind token.Token // token.IsInternalCall()
+		Args []Expr      // arguments
+	}
+
+	ClassConstFetchExpr struct {
+		Class any    // @var Name|Expr Class name
+		Name  *Ident // @var Ident Constant name
+	}
+
+	CloneExpr struct {
+		Expr Expr // @var Expr Expression
+	}
+
 	ConstFetchExpr struct {
 		Name *Name // @var Name Constant name
 	}
 
-	EmptyExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
 	ErrorSuppressExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	EvalExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
@@ -244,18 +257,9 @@ type (
 		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
-	IncludeExpr struct {
-		Expr Expr // @var Expr Expression
-		Type int  // @var int Type of include
-	}
-
 	InstanceofExpr struct {
 		Expr  Expr // @var Expr Expression
 		Class any  // @var Name|Expr Class name
-	}
-
-	IssetExpr struct {
-		Vars []Expr // @var Expr[] Variables
 	}
 
 	// ExprList : Expr
@@ -289,33 +293,11 @@ type (
 		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
-	// ExprNullsafePropertyFetch : Expr
 	NullsafePropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
 		Name any  // @var Ident|Expr Property name
 	}
 
-	// ExprPostDec : Expr
-	PostDecExpr struct {
-		Var Expr // @var Expr Variable
-	}
-
-	// ExprPostInc : Expr
-	PostIncExpr struct {
-		Var Expr // @var Expr Variable
-	}
-
-	// ExprPreDec : Expr
-	PreDecExpr struct {
-		Var Expr // @var Expr Variable
-	}
-
-	// ExprPreInc : Expr
-	PreIncExpr struct {
-		Var Expr // @var Expr Variable
-	}
-
-	// ExprPrint : Expr
 	PrintExpr struct {
 		Expr Expr // @var Expr Expression
 	}
@@ -382,11 +364,6 @@ type (
 		Expr Expr // @var Expr Expression to yield from
 	}
 
-	// ScalarDNumber : Scalar
-	DNumberScalar struct {
-		Value float64 // @var float Number value
-	}
-
 	// ScalarEncapsed : Scalar
 	EncapsedScalar struct {
 		Parts []Expr // @var Expr[] list of string parts
@@ -397,18 +374,8 @@ type (
 		Value string // @var string String value
 	}
 
-	// ScalarLNumber : Scalar
-	LNumberScalar struct {
-		Value int // @var int Number value
-	}
-
 	MagicConstScalar struct {
 		Op token.Token
-	}
-
-	// ScalarString : Scalar
-	StringScalar struct {
-		Value string // @var string String value
 	}
 )
 
@@ -688,35 +655,26 @@ type (
 
 // Expr
 func (*ArrayExpr) exprNode()                 {}
-func (*ArrayDimFetchExpr) exprNode()         {}
+func (*IndexExpr) exprNode()                 {}
 func (*ArrayItemExpr) exprNode()             {}
 func (*ArrowFunctionExpr) exprNode()         {}
 func (*AssignExpr) exprNode()                {}
 func (*AssignRefExpr) exprNode()             {}
 func (*BinaryExpr) exprNode()                {}
-func (*BitwiseNotExpr) exprNode()            {}
-func (*BooleanNotExpr) exprNode()            {}
 func (*CastExpr) exprNode()                  {}
 func (*ClassConstFetchExpr) exprNode()       {}
 func (*CloneExpr) exprNode()                 {}
 func (*ClosureExpr) exprNode()               {}
 func (*ClosureUseExpr) exprNode()            {}
 func (*ConstFetchExpr) exprNode()            {}
-func (*EmptyExpr) exprNode()                 {}
+func (*InternalCallExpr) exprNode()          {}
 func (*ErrorSuppressExpr) exprNode()         {}
-func (*EvalExpr) exprNode()                  {}
 func (*ExitExpr) exprNode()                  {}
-func (*IncludeExpr) exprNode()               {}
 func (*InstanceofExpr) exprNode()            {}
-func (*IssetExpr) exprNode()                 {}
 func (*ListExpr) exprNode()                  {}
 func (*MatchExpr) exprNode()                 {}
 func (*NullsafePropertyFetchExpr) exprNode() {}
-func (*PostDecExpr) exprNode()               {}
-func (*PostIncExpr) exprNode()               {}
-func (*PreDecExpr) exprNode()                {}
-func (*PreIncExpr) exprNode()                {}
-func (*PrintExpr) exprNode()                 {}
+func (*UnaryExpr) exprNode()                 {}
 func (*PropertyFetchExpr) exprNode()         {}
 func (*ShellExecExpr) exprNode()             {}
 func (*StaticPropertyFetchExpr) exprNode()   {}
@@ -757,19 +715,19 @@ func (*NameFullyQualified) nameNode() {}
 func (*NameRelative) nameNode()       {}
 
 // Scalar
-func (*DNumberScalar) scalarNode()            {}
+func (*FloatLit) scalarNode()                 {}
 func (*EncapsedScalar) scalarNode()           {}
 func (*EncapsedStringPartScalar) scalarNode() {}
-func (*LNumberScalar) scalarNode()            {}
+func (*IntLit) scalarNode()                   {}
 func (*MagicConstScalar) scalarNode()         {}
-func (*StringScalar) scalarNode()             {}
+func (*StringLit) scalarNode()                {}
 
-func (*DNumberScalar) exprNode()            {}
+func (*FloatLit) exprNode()                 {}
 func (*EncapsedScalar) exprNode()           {}
 func (*EncapsedStringPartScalar) exprNode() {}
-func (*LNumberScalar) exprNode()            {}
+func (*IntLit) exprNode()                   {}
 func (*MagicConstScalar) exprNode()         {}
-func (*StringScalar) exprNode()             {}
+func (*StringLit) exprNode()                {}
 
 // Stmt
 func (*BreakStmt) stmtNode()            {}

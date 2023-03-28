@@ -1,6 +1,7 @@
 package phpparse
 
 import (
+	"fmt"
 	"gophp/php/ast"
 	"gophp/php/token"
 )
@@ -35,7 +36,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Items: asSlice[*ast.ArrayItemExpr](data["items"]),
 		}
 	case "ExprArrayDimFetch":
-		node = &ast.ArrayDimFetchExpr{
+		node = &ast.IndexExpr{
 			Var: data["var"].(ast.Expr),
 			Dim: asTypeOrNil[ast.Expr](data["dim"]),
 		}
@@ -307,12 +308,14 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBitwiseNot":
-		node = &ast.BitwiseNotExpr{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.Tilde,
+			Var:  data["expr"].(ast.Expr),
 		}
 	case "ExprBooleanNot":
-		node = &ast.BooleanNotExpr{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.Not,
+			Var:  data["expr"].(ast.Expr),
 		}
 	case "ExprCastArray":
 		node = &ast.CastExpr{
@@ -378,16 +381,22 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name: data["name"].(*ast.Name),
 		}
 	case "ExprEmpty":
-		node = &ast.EmptyExpr{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.InternalCallExpr{
+			Kind: token.Empty,
+			Args: []ast.Expr{
+				data["expr"].(ast.Expr),
+			},
 		}
 	case "ExprErrorSuppress":
 		node = &ast.ErrorSuppressExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprEval":
-		node = &ast.EvalExpr{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.InternalCallExpr{
+			Kind: token.Eval,
+			Args: []ast.Expr{
+				data["expr"].(ast.Expr),
+			},
 		}
 	case "ExprExit":
 		node = &ast.ExitExpr{
@@ -399,9 +408,25 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Args: asSlice[any](data["args"]),
 		}
 	case "ExprInclude":
-		node = &ast.IncludeExpr{
-			Expr: data["expr"].(ast.Expr),
-			Type: asInt(data["type"]),
+		var Kind token.Token
+		typ := asInt(data["type"])
+		switch typ {
+		case 1:
+			Kind = token.Include
+		case 2:
+			Kind = token.IncludeOnce
+		case 3:
+			Kind = token.Require
+		case 4:
+			Kind = token.RequireOnce
+		default:
+			return nil, fmt.Errorf("unexpteted ExprInclude.type: %d", typ)
+		}
+		node = &ast.InternalCallExpr{
+			Kind: Kind,
+			Args: []ast.Expr{
+				data["expr"].(ast.Expr),
+			},
 		}
 	case "ExprInstanceof":
 		node = &ast.InstanceofExpr{
@@ -409,8 +434,9 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Class: data["class"],
 		}
 	case "ExprIsset":
-		node = &ast.IssetExpr{
-			Vars: asSlice[ast.Expr](data["vars"]),
+		node = &ast.InternalCallExpr{
+			Kind: token.Isset,
+			Args: asSlice[ast.Expr](data["vars"]),
 		}
 	case "ExprList":
 		node = &ast.ListExpr{
@@ -444,20 +470,24 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name: data["name"],
 		}
 	case "ExprPostDec":
-		node = &ast.PostDecExpr{
-			Var: data["var"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.PostDec,
+			Var:  data["var"].(ast.Expr),
 		}
 	case "ExprPostInc":
-		node = &ast.PostIncExpr{
-			Var: data["var"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.PostInc,
+			Var:  data["var"].(ast.Expr),
 		}
 	case "ExprPreDec":
-		node = &ast.PreDecExpr{
-			Var: data["var"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.PreDec,
+			Var:  data["var"].(ast.Expr),
 		}
 	case "ExprPreInc":
-		node = &ast.PreIncExpr{
-			Var: data["var"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.PreInc,
+			Var:  data["var"].(ast.Expr),
 		}
 	case "ExprPrint":
 		node = &ast.PrintExpr{
@@ -548,13 +578,13 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Type:       data["type"],
 			ByRef:      data["byRef"].(bool),
 			Variadic:   data["variadic"].(bool),
-			Var:        data["var"].(ast.VariableExpr),
+			Var:        data["var"].(*ast.VariableExpr),
 			Default:    asTypeOrNil[ast.Expr](data["default"]),
 			Flags:      asInt(data["flags"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
 	case "ScalarDNumber":
-		node = &ast.DNumberScalar{
+		node = &ast.FloatLit{
 			Value: asFloat(data["value"]),
 		}
 	case "ScalarEncapsed":
@@ -566,7 +596,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Value: data["value"].(string),
 		}
 	case "ScalarLNumber":
-		node = &ast.LNumberScalar{
+		node = &ast.IntLit{
 			Value: asInt(data["value"]),
 		}
 	case "ScalarMagicConstClass":
@@ -586,7 +616,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ScalarMagicConstTrait":
 		node = &ast.MagicConstScalar{Op: token.TraitConst}
 	case "ScalarString":
-		node = &ast.StringScalar{
+		node = &ast.StringLit{
 			Value: data["value"].(string),
 		}
 	case "StmtBreak":

@@ -14,10 +14,17 @@ const (
 	String // "abc" 	[T_CONSTANT_ENCAPSED_STRING]
 
 	// unary operators
-	Inc // ++ [T_INC]
-	Dec // -- [T_DEC]
-	Not // !
+	Not   // !
+	Tilde // ~
+	Inc   // ++ [T_INC]
+	Dec   // -- [T_DEC]
 
+	PreInc  // 并非真实 token，用于 UnaryExpr.Kind 与 PostInc 区分
+	PreDec  // 并非真实 token，用于 UnaryExpr.Kind 与 PostDec 区分
+	PostInc // 并非真实 token，用于 UnaryExpr.Kind 与 PreInc 区分
+	PostDec // 并非真实 token，用于 UnaryExpr.Kind 与 PreDec 区分
+
+	binary_begin
 	// binary operators
 	Add      // +
 	Sub      // -
@@ -50,6 +57,9 @@ const (
 	SmallerOrEqual // <=  [T_IS_SMALLER_OR_EQUAL]
 	Spaceship      // <=> [T_SPACESHIP]
 
+	binary_end
+
+	assign_begin
 	// assign operators
 	Assign         // =
 	AddAssign      // +=  [T_PLUS_EQUAL]
@@ -66,7 +76,9 @@ const (
 	XorAssign        // ^=  [T_XOR_EQUAL]
 	ShiftLeftAssign  // <<= [T_SL_EQUAL]
 	ShiftRightAssign // >>= [T_SR_EQUAL]
+	assign_end
 
+	cast_begin
 	// cast op tokens
 	BoolCast   // (bool)              [T_BOOL_CAST]
 	IntCast    // (int) or (integer)  [T_INT_CAST]
@@ -75,7 +87,9 @@ const (
 	ArrayCast  // (array)             [T_ARRAY_CAST]
 	ObjectCast // (object)            [T_OBJECT_CAST]
 	UnsetCast  // (unset)             [T_UNSET_CAST]
+	cast_end
 
+	magic_const_begin
 	// magic const op tokens
 	DirConst       // __DIR__       [T_DIR]
 	FileConst      // __FILE__      [T_FILE]
@@ -85,6 +99,18 @@ const (
 	ClassConst     // __CLASS__     [T_CLASS_C]
 	MethodConst    // __METHOD__    [T_METHOD_C]
 	TraitConst     // __TRAIT__     [T_TRAIT_C]
+	magic_const_end
+
+	internal_call_begin
+	// internal call as expr
+	Isset       // isset        [T_ISSET]
+	Empty       // empty        [T_EMPTY]
+	Include     // include      [T_INCLUDE]
+	IncludeOnce // include_once [T_INCLUDE_ONCE]
+	Require     // require      [T_REQUIRE]
+	RequireOnce // require_once [T_REQUIRE_ONCE]
+	Eval        // eval         [T_EVAL]
+	internal_call_end
 
 	// others
 	NAME_FULLY_QUALIFIED                    Token = 263
@@ -95,11 +121,6 @@ const (
 	ENCAPSED_AND_WHITESPACE                 Token = 268
 	STRING_VARNAME                          Token = 270
 	NUM_STRING                              Token = 271
-	INCLUDE                                 Token = 272
-	INCLUDE_ONCE                            Token = 273
-	EVAL                                    Token = 274
-	REQUIRE                                 Token = 275
-	REQUIRE_ONCE                            Token = 276
 	PRINT                                   Token = 280
 	YIELD                                   Token = 281
 	YIELD_FROM                              Token = 282
@@ -150,8 +171,6 @@ const (
 	READONLY                                Token = 327
 	VAR                                     Token = 328
 	UNSET                                   Token = 329
-	ISSET                                   Token = 330
-	EMPTY                                   Token = 331
 	HALT_COMPILER                           Token = 332
 	CLASS                                   Token = 333
 	TRAIT                                   Token = 334
@@ -185,3 +204,23 @@ const (
 	AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG Token = 404
 	BAD_CHARACTER                           Token = 405
 )
+
+func IsBinaryOp(token Token) bool {
+	return binary_begin < token && token < binary_end
+}
+
+func IsAssignOp(token Token) bool {
+	return assign_begin < token && token < assign_end
+}
+
+func IsCastKind(token Token) bool {
+	return cast_begin < token && token < cast_end
+}
+
+func IsMagicKind(token Token) bool {
+	return magic_const_begin < token && token < magic_const_end
+}
+
+func IsInternalCall(token Token) bool {
+	return internal_call_begin < token && token < internal_call_end
+}
