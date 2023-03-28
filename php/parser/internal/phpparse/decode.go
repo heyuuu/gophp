@@ -106,6 +106,10 @@ func asTypeOrNil[T any](data any) T {
 }
 
 func asSlice[T any](data any) []T {
+	if data == nil {
+		return nil
+	}
+
 	var items []T
 	for _, item := range data.([]any) {
 		items = append(items, item.(T))

@@ -4,19 +4,23 @@ import (
 	"gophp/php/token"
 )
 
-type Node interface{}
-
 type (
+	Node interface{}
+
+	Expr interface {
+		Node
+		exprNode()
+	}
+
+	Stmt interface {
+		Node
+		stmtNode()
+	}
+
 	// ComplexType : PhpParserNodeAbstract
 	ComplexType interface {
 		Node
 		complexTypeNode()
-	}
-
-	// Expr : PhpParserNodeAbstract
-	Expr interface {
-		Node
-		exprNode()
 	}
 
 	// CallLikeExpr : Expr
@@ -36,12 +40,6 @@ type (
 		scalarNode()
 	}
 
-	// Stmt : PhpParserNodeAbstract
-	Stmt interface {
-		Node
-		stmtNode()
-	}
-
 	// StmtClassLike : Stmt
 	ClassLikeStmt interface {
 		Stmt
@@ -54,47 +52,108 @@ type (
 		traitUseAdaptationStmtNode()
 	}
 )
+
+// misc
 type (
-	// Arg : PhpParserNodeAbstract
 	Arg struct {
-		Name   *Identifier // @var Identifier|null Parameter name (for named parameters)
-		Value  Expr        // @var Expr Value to pass
-		ByRef  bool        // @var bool Whether to pass by ref
-		Unpack bool        // @var bool Whether to unpack the argument
+		Name   *Ident // @var Ident|null Parameter name (for named parameters)
+		Value  Expr   // @var Expr Value to pass
+		ByRef  bool   // @var bool Whether to pass by ref
+		Unpack bool   // @var bool Whether to unpack the argument
 	}
 
-	// Attribute : PhpParserNodeAbstract
 	Attribute struct {
 		Name *Name  // @var Name Attribute name
 		Args []*Arg // @var Arg[] Attribute arguments
 	}
 
-	// AttributeGroup : PhpParserNodeAbstract
 	AttributeGroup struct {
 		Attrs []*Attribute // @var Attribute[] Attributes
 	}
 
-	// Const : PhpParserNodeAbstract
 	Const struct {
-		Name           *Identifier // @var Identifier Name
-		Value          Expr        // @var Expr Value
-		NamespacedName *Name       // @var Name|null Namespaced name (if using NameResolver)
+		Name           *Ident // @var Ident Name
+		Value          Expr   // @var Expr Value
+		NamespacedName *Name  // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// ExprArray : Expr
+	Ident struct {
+		Name string // @var string Ident as string
+	}
+
+	// IntersectionType : ComplexType
+	IntersectionType struct {
+		Types []any // @var (Ident|Name)[] Types
+	}
+
+	MatchArm struct {
+		Conds []Expr // @var Expr|null[]
+		Body  Expr   // @var Expr
+	}
+
+	Name struct {
+		Parts []string // @var string[] Parts of the name
+	}
+
+	// NameFullyQualified : Name
+	NameFullyQualified struct {
+		Parts []string // @var string[] Parts of the name
+	}
+
+	// NameRelative : Name
+	NameRelative struct {
+		Parts []string // @var string[] Parts of the name
+	}
+
+	// NullableType : ComplexType
+	NullableType struct {
+		Type any // @var Ident|Name Type
+	}
+
+	Param struct {
+		Type       any               // @var Ident|Name|ComplexType|null Type declaration
+		ByRef      bool              // @var bool Whether parameter is passed by reference
+		Variadic   bool              // @var bool Whether this is a variadic argument
+		Var        VariableExpr      // @var VariableExpr Parameter variable
+		Default    Expr              // @var Expr|null Default value
+		Flags      int               // @var int
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+	}
+
+	// UnionType : ComplexType
+	UnionType struct {
+		Types []any // @var (Ident|Name|IntersectionType)[] Types
+	}
+
+	// VarLikeIdent : Ident
+	VarLikeIdentifier struct {
+		Name string // @var string Ident as string
+	}
+
+	// VariadicPlaceholder : PhpParserNodeAbstract
+	VariadicPlaceholder struct {
+	}
+)
+
+// Expr
+type (
+	BinaryExpr struct {
+		Op    token.Token
+		Left  Expr // @var Expr The left-hand side expression
+		Right Expr // @var Expr The right-hand side expression
+	}
+
 	ArrayExpr struct {
 		Items []*ArrayItemExpr // @var (ArrayItem|null)[] Items
 	}
 
-	// ExprArrayDimFetch : Expr
 	ArrayDimFetchExpr struct {
 		Var Expr // @var Expr Variable
-		Dim Expr // @var null|Expr Array index / dim
+		Dim Expr // @var Expr|null Array index / dim
 	}
 
-	// ExprArrayItem : Expr
 	ArrayItemExpr struct {
-		Key    Expr // @var null|Expr Key
+		Key    Expr // @var Expr|null Key
 		Value  Expr // @var Expr Value
 		ByRef  bool // @var bool Whether to assign by reference
 		Unpack bool // @var bool Whether to unpack the argument
@@ -104,42 +163,27 @@ type (
 	ArrowFunctionExpr struct {
 		Static     bool              // @var bool
 		ByRef      bool              // @var bool
-		Params     []*Param          // @var Node\Param[]
-		ReturnType any               // @var null|Node\Identifier|Node\Name|Node\ComplexType
+		Params     []*Param          // @var Param[]
+		ReturnType any               // @var Ident|Name|ComplexType|null
 		Expr       Expr              // @var Expr
-		AttrGroups []*AttributeGroup // @var Node\AttributeGroup[]
+		AttrGroups []*AttributeGroup // @var AttributeGroup[]
 	}
 
-	// ExprAssign : Expr
 	AssignExpr struct {
-		Var  Expr // @var Expr Variable
-		Expr Expr // @var Expr Expression
-	}
-
-	AssignOpExpr struct {
 		Op   token.Token //
 		Var  Expr        // @var Expr Variable
 		Expr Expr        // @var Expr Expression
 	}
 
-	// ExprAssignRef : Expr
 	AssignRefExpr struct {
 		Var  Expr // @var Expr Variable reference is assigned to
 		Expr Expr // @var Expr Variable which is referenced
 	}
 
-	BinaryOpExpr struct {
-		Op    token.Token
-		Left  Expr // @var Expr The left hand side expression
-		Right Expr // @var Expr The right hand side expression
-	}
-
-	// ExprBitwiseNot : Expr
 	BitwiseNotExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprBooleanNot : Expr
 	BooleanNotExpr struct {
 		Expr Expr // @var Expr Expression
 	}
@@ -149,13 +193,11 @@ type (
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprClassConstFetch : Expr
 	ClassConstFetchExpr struct {
-		Class any // @var Name|Expr Class name
-		Name  any // @var Identifier|Error Constant name
+		Class any    // @var Name|Expr Class name
+		Name  *Ident // @var Ident Constant name
 	}
 
-	// ExprClone : Expr
 	CloneExpr struct {
 		Expr Expr // @var Expr Expression
 	}
@@ -164,67 +206,54 @@ type (
 	ClosureExpr struct {
 		Static     bool              // @var bool Whether the closure is static
 		ByRef      bool              // @var bool Whether to return by reference
-		Params     []*Param          // @var Node\Param[] Parameters
+		Params     []*Param          // @var Param[] Parameters
 		Uses       []*ClosureUseExpr // @var ClosureUse[] use()s
-		ReturnType any               // @var null|Node\Identifier|Node\Name|Node\ComplexType Return type
-		Stmts      []Stmt            // @var Node\Stmt[] Statements
-		AttrGroups []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+		ReturnType any               // @var Ident|Name|ComplexType|null Return type
+		Stmts      []Stmt            // @var Stmt[] Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
-	// ExprClosureUse : Expr
 	ClosureUseExpr struct {
-		Var   *VariableExpr // @var Expr\Variable Variable to use
+		Var   *VariableExpr // @var VariableExpr Variable to use
 		ByRef bool          // @var bool Whether to use by reference
 	}
 
-	// ExprConstFetch : Expr
 	ConstFetchExpr struct {
 		Name *Name // @var Name Constant name
 	}
 
-	// ExprEmpty : Expr
 	EmptyExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprError : Expr
-	ErrorExpr struct {
-	}
-
-	// ExprErrorSuppress : Expr
 	ErrorSuppressExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprEval : Expr
 	EvalExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
-	// ExprExit : Expr
 	ExitExpr struct {
-		Expr Expr // @var null|Expr Expression
+		Expr Expr // @var Expr|null Expression
 	}
 
 	// ExprFuncCall : ExprCallLike
 	FuncCallExpr struct {
-		Name any   // @var Node\Name|Expr Function name
-		Args []any // @var array<Node\Arg|Node\VariadicPlaceholder> Arguments
+		Name any   // @var Name|Expr Function name
+		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
-	// ExprInclude : Expr
 	IncludeExpr struct {
 		Expr Expr // @var Expr Expression
 		Type int  // @var int Type of include
 	}
 
-	// ExprInstanceof : Expr
 	InstanceofExpr struct {
 		Expr  Expr // @var Expr Expression
 		Class any  // @var Name|Expr Class name
 	}
 
-	// ExprIsset : Expr
 	IssetExpr struct {
 		Vars []Expr // @var Expr[] Variables
 	}
@@ -236,34 +265,34 @@ type (
 
 	// ExprMatch : Expr
 	MatchExpr struct {
-		Cond Expr        // @var Node\Expr
+		Cond Expr        // @var Expr
 		Arms []*MatchArm // @var MatchArm[]
 	}
 
 	// ExprMethodCall : ExprCallLike
 	MethodCallExpr struct {
 		Var  Expr  // @var Expr Variable holding object
-		Name any   // @var Identifier|Expr Method name
+		Name any   // @var Ident|Expr Method name
 		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// ExprNew : ExprCallLike
 	NewExpr struct {
-		Class any   // @var Node\Name|Expr|Node\Stmt\Class_ Class name
+		Class any   // @var Name|Expr|ClassStmt Class name
 		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// ExprNullsafeMethodCall : ExprCallLike
 	NullsafeMethodCallExpr struct {
 		Var  Expr  // @var Expr Variable holding object
-		Name any   // @var Identifier|Expr Method name
+		Name any   // @var Ident|Expr Method name
 		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// ExprNullsafePropertyFetch : Expr
 	NullsafePropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
-		Name any  // @var Identifier|Expr Property name
+		Name any  // @var Ident|Expr Property name
 	}
 
 	// ExprPostDec : Expr
@@ -294,7 +323,7 @@ type (
 	// ExprPropertyFetch : Expr
 	PropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
-		Name any  // @var Identifier|Expr Property name
+		Name any  // @var Ident|Expr Property name
 	}
 
 	// ExprShellExec : Expr
@@ -304,27 +333,27 @@ type (
 
 	// ExprStaticCall : ExprCallLike
 	StaticCallExpr struct {
-		Class any   // @var Node\Name|Expr Class name
-		Name  any   // @var Identifier|Expr Method name
+		Class any   // @var Name|Expr Class name
+		Name  any   // @var Ident|Expr Method name
 		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// ExprStaticPropertyFetch : Expr
 	StaticPropertyFetchExpr struct {
 		Class any // @var Name|Expr Class name
-		Name  any // @var VarLikeIdentifier|Expr Property name
+		Name  any // @var VarLikeIdent|Expr Property name
 	}
 
 	// ExprTernary : Expr
 	TernaryExpr struct {
 		Cond Expr // @var Expr Condition
-		If   Expr // @var null|Expr Expression for true
+		If   Expr // @var Expr|null Expression for true
 		Else Expr // @var Expr Expression for false
 	}
 
 	// ExprThrow : Expr
 	ThrowExpr struct {
-		Expr Expr // @var Node\Expr Expression
+		Expr Expr // @var Expr Expression
 	}
 
 	// ExprUnaryMinus : Expr
@@ -344,60 +373,13 @@ type (
 
 	// ExprYield : Expr
 	YieldExpr struct {
-		Key   Expr // @var null|Expr Key expression
-		Value Expr // @var null|Expr Value expression
+		Key   Expr // @var Expr|null Key expression
+		Value Expr // @var Expr|null Value expression
 	}
 
 	// ExprYieldFrom : Expr
 	YieldFromExpr struct {
 		Expr Expr // @var Expr Expression to yield from
-	}
-
-	// Identifier : PhpParserNodeAbstract
-	Identifier struct {
-		Name string // @var string Identifier as string
-	}
-
-	// IntersectionType : ComplexType
-	IntersectionType struct {
-		Types []any // @var (Identifier|Name)[] Types
-	}
-
-	// MatchArm : PhpParserNodeAbstract
-	MatchArm struct {
-		Conds []Expr // @var null|Node\Expr[]
-		Body  Expr   // @var Node\Expr
-	}
-
-	// Name : PhpParserNodeAbstract
-	Name struct {
-		Parts []string // @var string[] Parts of the name
-	}
-
-	// NameFullyQualified : Name
-	NameFullyQualified struct {
-		Parts []string // @var string[] Parts of the name
-	}
-
-	// NameRelative : Name
-	NameRelative struct {
-		Parts []string // @var string[] Parts of the name
-	}
-
-	// NullableType : ComplexType
-	NullableType struct {
-		Type any // @var Identifier|Name Type
-	}
-
-	// Param : PhpParserNodeAbstract
-	Param struct {
-		Type       any               // @var null|Identifier|Name|ComplexType Type declaration
-		ByRef      bool              // @var bool Whether parameter is passed by reference
-		Variadic   bool              // @var bool Whether this is a variadic argument
-		Var        any               // @var Expr\Variable|Expr\Error Parameter variable
-		Default    Expr              // @var null|Expr Default value
-		Flags      int               // @var int
-		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
 	// ScalarDNumber : Scalar
@@ -428,338 +410,281 @@ type (
 	StringScalar struct {
 		Value string // @var string String value
 	}
+)
 
-	// StmtBreak : Stmt
-	BreakStmt struct {
-		Num Expr // @var null|Node\Expr Number of loops to break
+// Stmt
+type (
+	EmptyStmt struct{}
+
+	LabelStmt struct {
+		Name *Ident // @var Ident Name
 	}
 
-	// StmtCase : Stmt
+	ExprStmt struct {
+		Expr Expr // @var Expr Expression
+	}
+
+	ReturnStmt struct {
+		Expr Expr // @var Expr|null Expression
+	}
+
+	// IfStmt
+	IfStmt struct {
+		Cond    Expr          // @var Expr 			condition expression
+		Stmts   []Stmt        // @var Stmt[] 		body statements
+		Elseifs []*ElseIfStmt // @var ElseIf_[] 	elseif branches
+		Else    *ElseStmt     // @var ElseStmt|null else branch; or nil
+	}
+
+	ElseIfStmt struct {
+		Cond  Expr   // @var Expr 	Condition
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	ElseStmt struct {
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	// SwitchStmt
+	SwitchStmt struct {
+		Cond  Expr        // @var Expr Condition
+		Cases []*CaseStmt // @var Case_[] Case list
+	}
+
 	CaseStmt struct {
-		Cond  Expr   // @var null|Node\Expr Condition (null for default)
-		Stmts []Stmt // @var Node\Stmt[] Statements
+		Cond  Expr   // @var Expr|null Condition (null for default)
+		Stmts []Stmt // @var Stmt[] Statements
 	}
 
-	// StmtCatch : Stmt
+	// ForStmt
+	ForStmt struct {
+		Init  []Expr // @var Expr[] Init expressions
+		Cond  []Expr // @var Expr[] Loop conditions
+		Loop  []Expr // @var Expr[] Loop expressions
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	// ForeachStmt
+	ForeachStmt struct {
+		Expr     Expr   // @var Expr Expression to iterate
+		KeyVar   Expr   // @var Expr|null Variable to assign key to
+		ByRef    bool   // @var bool Whether to assign value by reference
+		ValueVar Expr   // @var Expr Variable to assign value to
+		Stmts    []Stmt // @var Stmt[] Statements
+	}
+
+	BreakStmt struct {
+		Num Expr // @var Expr|null Number of loops to break
+	}
+
 	CatchStmt struct {
-		Types []*Name       // @var Node\Name[] Types of exceptions to catch
-		Var   *VariableExpr // @var Expr\Variable|null Variable for exception
-		Stmts []Stmt        // @var Node\Stmt[] Statements
+		Types []*Name       // @var Name[] Types of exceptions to catch
+		Var   *VariableExpr // @var VariableExpr|null Variable for exception
+		Stmts []Stmt        // @var Stmt[] Statements
 	}
 
 	// StmtClass : StmtClassLike
 	ClassStmt struct {
-		Flags          int               // @var int Type
-		Extends        *Name             // @var null|Node\Name Name of extended class
-		Implements     []*Name           // @var Node\Name[] Names of implemented interfaces
-		Name           *Identifier       // @var Node\Identifier|null Name
-		Stmts          []Stmt            // @var Node\Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+		Flags          int               // @var int        Type
+		Extends        *Name             // @var Name|null  Name of extended class
+		Implements     []*Name           // @var Name[]     Names of implemented interfaces
+		Name           *Ident            // @var Ident|null Name
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
 	}
 
 	// StmtClassConst : Stmt
 	ClassConstStmt struct {
 		Flags      int               // @var int Modifiers
-		Consts     []*Const          // @var Node\Const_[] Constant declarations
-		AttrGroups []*AttributeGroup // @var Node\AttributeGroup[]
+		Consts     []*Const          // @var Const_[] Constant declarations
+		AttrGroups []*AttributeGroup // @var AttributeGroup[]
 	}
 
 	// StmtClassMethod : Stmt, FunctionLike
 	ClassMethodStmt struct {
 		Flags      int               // @var int Flags
 		ByRef      bool              // @var bool Whether to return by reference
-		Name       *Identifier       // @var Node\Identifier Name
-		Params     []*Param          // @var Node\Param[] Parameters
-		ReturnType any               // @var null|Node\Identifier|Node\Name|Node\ComplexType Return type
-		Stmts      []Stmt            // @var Node\Stmt[]|null Statements
-		AttrGroups []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+		Name       *Ident            // @var Ident Name
+		Params     []*Param          // @var Param[] Parameters
+		ReturnType any               // @var Ident|Name|ComplexType|null Return type
+		Stmts      []Stmt            // @var Stmt[]|null Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
-	// StmtConst : Stmt
 	ConstStmt struct {
-		Consts []*Const // @var Node\Const_[] Constant declarations
+		Consts []*Const // @var Const_[] Constant declarations
 	}
 
-	// StmtContinue : Stmt
 	ContinueStmt struct {
-		Num Expr // @var null|Node\Expr Number of loops to continue
+		Num Expr // @var Expr|null Number of loops to continue
 	}
 
-	// StmtDeclare : Stmt
 	DeclareStmt struct {
 		Declares []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
-		Stmts    []Stmt                // @var Node\Stmt[]|null Statements
+		Stmts    []Stmt                // @var Stmt[]|null Statements
 	}
 
-	// StmtDeclareDeclare : Stmt
 	DeclareDeclareStmt struct {
-		Key   *Identifier // @var Node\Identifier Key
-		Value Expr        // @var Node\Expr Value
+		Key   *Ident // @var Ident Key
+		Value Expr   // @var Expr Value
 	}
 
-	// StmtDo : Stmt
 	DoStmt struct {
-		Stmts []Stmt // @var Node\Stmt[] Statements
-		Cond  Expr   // @var Node\Expr Condition
+		Stmts []Stmt // @var Stmt[] Statements
+		Cond  Expr   // @var Expr Condition
 	}
 
 	// StmtEcho : Stmt
 	EchoStmt struct {
-		Exprs []Expr // @var Node\Expr[] Expressions
-	}
-
-	// StmtElse : Stmt
-	ElseStmt struct {
-		Stmts []Stmt // @var Node\Stmt[] Statements
-	}
-
-	// StmtElseIf : Stmt
-	ElseIfStmt struct {
-		Cond  Expr   // @var Node\Expr Condition
-		Stmts []Stmt // @var Node\Stmt[] Statements
+		Exprs []Expr // @var Expr[] Expressions
 	}
 
 	// StmtEnum : StmtClassLike
 	EnumStmt struct {
-		ScalarType     *Identifier       // @var null|Node\Identifier Scalar Type
-		Implements     []*Name           // @var Node\Name[] Names of implemented interfaces
-		Name           *Identifier       // @var Node\Identifier|null Name
-		Stmts          []Stmt            // @var Node\Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+		ScalarType     *Ident            // @var Ident|null Scalar Type
+		Implements     []*Name           // @var Name[] Names of implemented interfaces
+		Name           *Ident            // @var Ident|null Name
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// StmtEnumCase : Stmt
 	EnumCaseStmt struct {
-		Name       *Identifier       // @var Node\Identifier Enum case name
-		Expr       Expr              // @var Node\Expr|null Enum case expression
-		AttrGroups []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+		Name       *Ident            // @var Ident Enum case name
+		Expr       Expr              // @var Expr|null Enum case expression
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
-	// StmtExpression : Stmt
-	ExpressionStmt struct {
-		Expr Expr // @var Node\Expr Expression
-	}
-
-	// StmtFinally : Stmt
 	FinallyStmt struct {
-		Stmts []Stmt // @var Node\Stmt[] Statements
-	}
-
-	// StmtFor : Stmt
-	ForStmt struct {
-		Init  []Expr // @var Node\Expr[] Init expressions
-		Cond  []Expr // @var Node\Expr[] Loop conditions
-		Loop  []Expr // @var Node\Expr[] Loop expressions
-		Stmts []Stmt // @var Node\Stmt[] Statements
-	}
-
-	// StmtForeach : Stmt
-	ForeachStmt struct {
-		Expr     Expr   // @var Node\Expr Expression to iterate
-		KeyVar   Expr   // @var null|Node\Expr Variable to assign key to
-		ByRef    bool   // @var bool Whether to assign value by reference
-		ValueVar Expr   // @var Node\Expr Variable to assign value to
-		Stmts    []Stmt // @var Node\Stmt[] Statements
+		Stmts []Stmt // @var Stmt[] Statements
 	}
 
 	// StmtFunction : Stmt, FunctionLike
 	FunctionStmt struct {
 		ByRef          bool              // @var bool Whether function returns by reference
-		Name           *Identifier       // @var Node\Identifier Name
-		Params         []*Param          // @var Node\Param[] Parameters
-		ReturnType     any               // @var null|Node\Identifier|Node\Name|Node\ComplexType Return type
-		Stmts          []Stmt            // @var Node\Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+		Name           *Ident            // @var Ident Name
+		Params         []*Param          // @var Param[] Parameters
+		ReturnType     any               // @var Ident|Name|ComplexType|null Return type
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// StmtGlobal : Stmt
 	GlobalStmt struct {
-		Vars []Expr // @var Node\Expr[] Variables
+		Vars []Expr // @var Expr[] Variables
 	}
 
-	// StmtGoto : Stmt
 	GotoStmt struct {
-		Name *Identifier // @var Identifier Name of label to jump to
+		Name *Ident // @var Ident Name of label to jump to
 	}
 
-	// StmtGroupUse : Stmt
 	GroupUseStmt struct {
 		Type   int           // @var int Type of group use
 		Prefix *Name         // @var Name Prefix for uses
 		Uses   []*UseUseStmt // @var UseUse[] Uses
 	}
 
-	// StmtHaltCompiler : Stmt
 	HaltCompilerStmt struct {
 		Remaining string // @var string Remaining text after halt compiler statement.
 	}
 
-	// StmtIf : Stmt
-	IfStmt struct {
-		Cond    Expr          // @var Node\Expr Condition expression
-		Stmts   []Stmt        // @var Node\Stmt[] Statements
-		Elseifs []*ElseIfStmt // @var ElseIf_[] Elseif clauses
-		Else    *ElseStmt     // @var null|Else_ Else clause
-	}
-
-	// StmtInlineHTML : Stmt
 	InlineHTMLStmt struct {
 		Value string // @var string String
 	}
 
-	// StmtInterface : StmtClassLike
 	InterfaceStmt struct {
-		Extends        []*Name           // @var Node\Name[] Extended interfaces
-		Name           *Identifier       // @var Node\Identifier|null Name
-		Stmts          []Stmt            // @var Node\Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+		Extends        []*Name           // @var Name[] Extended interfaces
+		Name           *Ident            // @var Ident|null Name
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// StmtLabel : Stmt
-	LabelStmt struct {
-		Name *Identifier // @var Identifier Name
-	}
-
-	// StmtNamespace : Stmt
 	NamespaceStmt struct {
-		Name  *Name  // @var null|Node\Name Name
-		Stmts []Stmt // @var Node\Stmt[] Statements
+		Name  *Name  // @var Name|null Name
+		Stmts []Stmt // @var Stmt[] Statements
 	}
 
-	// StmtNop : Stmt
-	NopStmt struct {
-	}
-
-	// StmtProperty : Stmt
 	PropertyStmt struct {
 		Flags      int                     // @var int Modifiers
 		Props      []*PropertyPropertyStmt // @var PropertyProperty[] Properties
-		Type       any                     // @var null|Identifier|Name|ComplexType Type declaration
-		AttrGroups []*AttributeGroup       // @var Node\AttributeGroup[] PHP attribute groups
+		Type       any                     // @var Ident|Name|ComplexType|null Type declaration
+		AttrGroups []*AttributeGroup       // @var AttributeGroup[] PHP attribute groups
 	}
 
-	// StmtPropertyProperty : Stmt
 	PropertyPropertyStmt struct {
-		Name    *VarLikeIdentifier // @var Node\VarLikeIdentifier Name
-		Default Expr               // @var null|Node\Expr Default
+		Name    *VarLikeIdentifier // @var VarLikeIdent Name
+		Default Expr               // @var Expr|null Default
 	}
 
-	// StmtReturn : Stmt
-	ReturnStmt struct {
-		Expr Expr // @var null|Node\Expr Expression
-	}
-
-	// StmtStatic : Stmt
 	StaticStmt struct {
 		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
 	}
 
-	// StmtStaticVar : Stmt
 	StaticVarStmt struct {
-		Var     *VariableExpr // @var Expr\Variable Variable
-		Default Expr          // @var null|Node\Expr Default value
+		Var     *VariableExpr // @var VariableExpr Variable
+		Default Expr          // @var Expr|null Default value
 	}
 
-	// StmtSwitch : Stmt
-	SwitchStmt struct {
-		Cond  Expr        // @var Node\Expr Condition
-		Cases []*CaseStmt // @var Case_[] Case list
-	}
-
-	// StmtThrow : Stmt
 	ThrowStmt struct {
-		Expr Expr // @var Node\Expr Expression
+		Expr Expr // @var Expr Expression
 	}
 
 	// StmtTrait : StmtClassLike
 	TraitStmt struct {
-		Name           *Identifier       // @var Node\Identifier|null Name
-		Stmts          []Stmt            // @var Node\Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+		Name           *Ident            // @var Ident|null Name
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	// StmtTraitUse : Stmt
 	TraitUseStmt struct {
-		Traits      []*Name                   // @var Node\Name[] Traits
+		Traits      []*Name                   // @var Name[] Traits
 		Adaptations []*TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
 	}
 
 	// StmtTraitUseAdaptationAlias : StmtTraitUseAdaptation
 	TraitUseAdaptationAliasStmt struct {
-		NewModifier int         // @var null|int New modifier
-		NewName     *Identifier // @var null|Node\Identifier New name
-		Trait       *Name       // @var Node\Name|null Trait name
-		Method      *Identifier // @var Node\Identifier Method name
+		NewModifier int    // @var int|null New modifier
+		NewName     *Ident // @var Ident|null New name
+		Trait       *Name  // @var Name|null Trait name
+		Method      *Ident // @var Ident Method name
 	}
 
 	// StmtTraitUseAdaptationPrecedence : StmtTraitUseAdaptation
 	TraitUseAdaptationPrecedenceStmt struct {
-		Insteadof []*Name     // @var Node\Name[] Overwritten traits
-		Trait     *Name       // @var Node\Name|null Trait name
-		Method    *Identifier // @var Node\Identifier Method name
+		Insteadof []*Name // @var Name[] Overwritten traits
+		Trait     *Name   // @var Name|null Trait name
+		Method    *Ident  // @var Ident Method name
 	}
 
-	// StmtTryCatch : Stmt
 	TryCatchStmt struct {
-		Stmts   []Stmt       // @var Node\Stmt[] Statements
+		Stmts   []Stmt       // @var Stmt[] Statements
 		Catches []*CatchStmt // @var Catch_[] Catches
-		Finally *FinallyStmt // @var null|Finally_ Optional finally node
+		Finally *FinallyStmt // @var Finally_|null Optional finally node
 	}
 
-	// StmtUnset : Stmt
 	UnsetStmt struct {
-		Vars []Expr // @var Node\Expr[] Variables to unset
+		Vars []Expr // @var Expr[] Variables to unset
 	}
 
-	// StmtUse : Stmt
 	UseStmt struct {
 		Type int           // @var int Type of alias
 		Uses []*UseUseStmt // @var UseUse[] Aliases
 	}
 
-	// StmtUseUse : Stmt
 	UseUseStmt struct {
-		Type  int         // @var int One of the Stmt\Use_::TYPE_* constants. Will only differ from TYPE_UNKNOWN for mixed group uses
-		Name  *Name       // @var Node\Name Namespace, class, function or constant to alias
-		Alias *Identifier // @var Identifier|null Alias
+		Type  int    // @var int One of the Stmt\Use_::TYPE_* constants. Will only differ from TYPE_UNKNOWN for mixed group uses
+		Name  *Name  // @var Name Namespace, class, function or constant to alias
+		Alias *Ident // @var Ident|null Alias
 	}
 
-	// StmtWhile : Stmt
 	WhileStmt struct {
-		Cond  Expr   // @var Node\Expr Condition
-		Stmts []Stmt // @var Node\Stmt[] Statements
-	}
-
-	// UnionType : ComplexType
-	UnionType struct {
-		Types []any // @var (Identifier|Name|IntersectionType)[] Types
-	}
-
-	// VarLikeIdentifier : Identifier
-	VarLikeIdentifier struct {
-		Name string // @var string Identifier as string
-	}
-
-	// VariadicPlaceholder : PhpParserNodeAbstract
-	VariadicPlaceholder struct {
+		Cond  Expr   // @var Expr Condition
+		Stmts []Stmt // @var Stmt[] Statements
 	}
 )
-
-// PhpParserNodeAbstract
-func (*Arg) phpParserNodeAbstractNode()                 {}
-func (*Attribute) phpParserNodeAbstractNode()           {}
-func (*AttributeGroup) phpParserNodeAbstractNode()      {}
-func (*Const) phpParserNodeAbstractNode()               {}
-func (*Identifier) phpParserNodeAbstractNode()          {}
-func (*MatchArm) phpParserNodeAbstractNode()            {}
-func (*Name) phpParserNodeAbstractNode()                {}
-func (*Param) phpParserNodeAbstractNode()               {}
-func (*VariadicPlaceholder) phpParserNodeAbstractNode() {}
 
 // Expr
 func (*ArrayExpr) exprNode()                 {}
@@ -767,9 +692,8 @@ func (*ArrayDimFetchExpr) exprNode()         {}
 func (*ArrayItemExpr) exprNode()             {}
 func (*ArrowFunctionExpr) exprNode()         {}
 func (*AssignExpr) exprNode()                {}
-func (*AssignOpExpr) exprNode()              {}
 func (*AssignRefExpr) exprNode()             {}
-func (*BinaryOpExpr) exprNode()              {}
+func (*BinaryExpr) exprNode()                {}
 func (*BitwiseNotExpr) exprNode()            {}
 func (*BooleanNotExpr) exprNode()            {}
 func (*CastExpr) exprNode()                  {}
@@ -779,7 +703,6 @@ func (*ClosureExpr) exprNode()               {}
 func (*ClosureUseExpr) exprNode()            {}
 func (*ConstFetchExpr) exprNode()            {}
 func (*EmptyExpr) exprNode()                 {}
-func (*ErrorExpr) exprNode()                 {}
 func (*ErrorSuppressExpr) exprNode()         {}
 func (*EvalExpr) exprNode()                  {}
 func (*ExitExpr) exprNode()                  {}
@@ -863,7 +786,7 @@ func (*EchoStmt) stmtNode()             {}
 func (*ElseStmt) stmtNode()             {}
 func (*ElseIfStmt) stmtNode()           {}
 func (*EnumCaseStmt) stmtNode()         {}
-func (*ExpressionStmt) stmtNode()       {}
+func (*ExprStmt) stmtNode()             {}
 func (*FinallyStmt) stmtNode()          {}
 func (*ForStmt) stmtNode()              {}
 func (*ForeachStmt) stmtNode()          {}
@@ -876,7 +799,7 @@ func (*IfStmt) stmtNode()               {}
 func (*InlineHTMLStmt) stmtNode()       {}
 func (*LabelStmt) stmtNode()            {}
 func (*NamespaceStmt) stmtNode()        {}
-func (*NopStmt) stmtNode()              {}
+func (*EmptyStmt) stmtNode()            {}
 func (*PropertyStmt) stmtNode()         {}
 func (*PropertyPropertyStmt) stmtNode() {}
 func (*ReturnStmt) stmtNode()           {}
@@ -901,5 +824,5 @@ func (*TraitStmt) stmtClassLikeNode()     {}
 func (*TraitUseAdaptationAliasStmt) stmtTraitUseAdaptationNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) stmtTraitUseAdaptationNode() {}
 
-// Identifier
+// Ident
 func (*VarLikeIdentifier) identifierNode() {}

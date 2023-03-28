@@ -10,7 +10,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	switch nodeType {
 	case "Arg":
 		node = &ast.Arg{
-			Name:   asTypeOrNil[*ast.Identifier](data["name"]),
+			Name:   asTypeOrNil[*ast.Ident](data["name"]),
 			Value:  data["value"].(ast.Expr),
 			ByRef:  data["byRef"].(bool),
 			Unpack: data["unpack"].(bool),
@@ -26,7 +26,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "Const":
 		node = &ast.Const{
-			Name:           data["name"].(*ast.Identifier),
+			Name:           data["name"].(*ast.Ident),
 			Value:          data["value"].(ast.Expr),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -57,83 +57,84 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprAssign":
 		node = &ast.AssignExpr{
+			Op:   token.Assign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpBitwiseAnd":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.AndAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpBitwiseOr":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.OrAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpBitwiseXor":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.XorAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpCoalesce":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.CoalesceAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpConcat":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.ConcatAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpDiv":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.DivAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpMinus":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.SubAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpMod":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.ModAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpMul":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.MulAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpPlus":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.AddAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpPow":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.PowAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpShiftLeft":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.ShiftLeftAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprAssignOpShiftRight":
-		node = &ast.AssignOpExpr{
+		node = &ast.AssignExpr{
 			Op:   token.ShiftRightAssign,
 			Var:  data["var"].(ast.Expr),
 			Expr: data["expr"].(ast.Expr),
@@ -144,163 +145,163 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprBinaryOpBitwiseAnd":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.And,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpBitwiseOr":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Or,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpBitwiseXor":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Xor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpBooleanAnd":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.BooleanAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpBooleanOr":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.BooleanOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpCoalesce":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Coalesce,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpConcat":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Concat,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpDiv":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Div,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpEqual":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Equal,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpGreater":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Greater,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpGreaterOrEqual":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.GreaterOrEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpIdentical":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Identical,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpLogicalAnd":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.LogicalAnd,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpLogicalOr":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.LogicalOr,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpLogicalXor":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.LogicalXor,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpMinus":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Sub,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpMod":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Mod,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpMul":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Mul,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpNotEqual":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.NotEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpNotIdentical":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.NotIdentical,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpPlus":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Add,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpPow":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Pow,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpShiftLeft":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.ShiftLeft,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpShiftRight":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.ShiftRight,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpSmaller":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Smaller,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpSmallerOrEqual":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.SmallerOrEqual,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
 		}
 	case "ExprBinaryOpSpaceship":
-		node = &ast.BinaryOpExpr{
+		node = &ast.BinaryExpr{
 			Op:    token.Spaceship,
 			Left:  data["left"].(ast.Expr),
 			Right: data["right"].(ast.Expr),
@@ -351,7 +352,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ExprClassConstFetch":
 		node = &ast.ClassConstFetchExpr{
 			Class: data["class"],
-			Name:  data["name"],
+			Name:  data["name"].(*ast.Ident),
 		}
 	case "ExprClone":
 		node = &ast.CloneExpr{
@@ -380,8 +381,6 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.EmptyExpr{
 			Expr: data["expr"].(ast.Expr),
 		}
-	case "ExprError":
-		node = &ast.ErrorExpr{}
 	case "ExprErrorSuppress":
 		node = &ast.ErrorSuppressExpr{
 			Expr: data["expr"].(ast.Expr),
@@ -516,7 +515,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "Identifier":
-		node = &ast.Identifier{
+		node = &ast.Ident{
 			Name: data["name"].(string),
 		}
 	case "IntersectionType":
@@ -549,7 +548,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Type:       data["type"],
 			ByRef:      data["byRef"].(bool),
 			Variadic:   data["variadic"].(bool),
-			Var:        data["var"],
+			Var:        data["var"].(ast.VariableExpr),
 			Default:    asTypeOrNil[ast.Expr](data["default"]),
 			Flags:      asInt(data["flags"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
@@ -610,7 +609,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Flags:          asInt(data["flags"]),
 			Extends:        asTypeOrNil[*ast.Name](data["extends"]),
 			Implements:     asSlice[*ast.Name](data["implements"]),
-			Name:           asTypeOrNil[*ast.Identifier](data["name"]),
+			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asSlice[ast.Stmt](data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
@@ -625,7 +624,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.ClassMethodStmt{
 			Flags:      asInt(data["flags"]),
 			ByRef:      data["byRef"].(bool),
-			Name:       data["name"].(*ast.Identifier),
+			Name:       data["name"].(*ast.Ident),
 			Params:     asSlice[*ast.Param](data["params"]),
 			ReturnType: data["returnType"],
 			Stmts:      asSlice[ast.Stmt](data["stmts"]),
@@ -646,7 +645,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtDeclareDeclare":
 		node = &ast.DeclareDeclareStmt{
-			Key:   data["key"].(*ast.Identifier),
+			Key:   data["key"].(*ast.Ident),
 			Value: data["value"].(ast.Expr),
 		}
 	case "StmtDo":
@@ -669,21 +668,21 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtEnum":
 		node = &ast.EnumStmt{
-			ScalarType:     asTypeOrNil[*ast.Identifier](data["scalarType"]),
+			ScalarType:     asTypeOrNil[*ast.Ident](data["scalarType"]),
 			Implements:     asSlice[*ast.Name](data["implements"]),
-			Name:           asTypeOrNil[*ast.Identifier](data["name"]),
+			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asSlice[ast.Stmt](data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
 	case "StmtEnumCase":
 		node = &ast.EnumCaseStmt{
-			Name:       data["name"].(*ast.Identifier),
+			Name:       data["name"].(*ast.Ident),
 			Expr:       asTypeOrNil[ast.Expr](data["expr"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
 	case "StmtExpression":
-		node = &ast.ExpressionStmt{
+		node = &ast.ExprStmt{
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "StmtFinally":
@@ -708,7 +707,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtFunction":
 		node = &ast.FunctionStmt{
 			ByRef:          data["byRef"].(bool),
-			Name:           data["name"].(*ast.Identifier),
+			Name:           data["name"].(*ast.Ident),
 			Params:         asSlice[*ast.Param](data["params"]),
 			ReturnType:     data["returnType"],
 			Stmts:          asSlice[ast.Stmt](data["stmts"]),
@@ -721,7 +720,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtGoto":
 		node = &ast.GotoStmt{
-			Name: data["name"].(*ast.Identifier),
+			Name: data["name"].(*ast.Ident),
 		}
 	case "StmtGroupUse":
 		node = &ast.GroupUseStmt{
@@ -747,14 +746,14 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtInterface":
 		node = &ast.InterfaceStmt{
 			Extends:        asSlice[*ast.Name](data["extends"]),
-			Name:           asTypeOrNil[*ast.Identifier](data["name"]),
+			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asSlice[ast.Stmt](data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
 	case "StmtLabel":
 		node = &ast.LabelStmt{
-			Name: data["name"].(*ast.Identifier),
+			Name: data["name"].(*ast.Ident),
 		}
 	case "StmtNamespace":
 		node = &ast.NamespaceStmt{
@@ -762,7 +761,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Stmts: asSlice[ast.Stmt](data["stmts"]),
 		}
 	case "StmtNop":
-		node = &ast.NopStmt{}
+		node = &ast.EmptyStmt{}
 	case "StmtProperty":
 		node = &ast.PropertyStmt{
 			Flags:      asInt(data["flags"]),
@@ -799,7 +798,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtTrait":
 		node = &ast.TraitStmt{
-			Name:           asTypeOrNil[*ast.Identifier](data["name"]),
+			Name:           asTypeOrNil[*ast.Ident](data["name"]),
 			Stmts:          asSlice[ast.Stmt](data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
@@ -812,15 +811,15 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtTraitUseAdaptationAlias":
 		node = &ast.TraitUseAdaptationAliasStmt{
 			NewModifier: asInt(data["newModifier"]),
-			NewName:     asTypeOrNil[*ast.Identifier](data["newName"]),
+			NewName:     asTypeOrNil[*ast.Ident](data["newName"]),
 			Trait:       asTypeOrNil[*ast.Name](data["trait"]),
-			Method:      data["method"].(*ast.Identifier),
+			Method:      data["method"].(*ast.Ident),
 		}
 	case "StmtTraitUseAdaptationPrecedence":
 		node = &ast.TraitUseAdaptationPrecedenceStmt{
 			Insteadof: asSlice[*ast.Name](data["insteadof"]),
 			Trait:     asTypeOrNil[*ast.Name](data["trait"]),
-			Method:    data["method"].(*ast.Identifier),
+			Method:    data["method"].(*ast.Ident),
 		}
 	case "StmtTryCatch":
 		node = &ast.TryCatchStmt{
@@ -841,7 +840,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.UseUseStmt{
 			Type:  asInt(data["type"]),
 			Name:  data["name"].(*ast.Name),
-			Alias: asTypeOrNil[*ast.Identifier](data["alias"]),
+			Alias: asTypeOrNil[*ast.Ident](data["alias"]),
 		}
 	case "StmtWhile":
 		node = &ast.WhileStmt{

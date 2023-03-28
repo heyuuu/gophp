@@ -51,6 +51,7 @@ const (
 	Spaceship      // <=> [T_SPACESHIP]
 
 	// assign operators
+	Assign         // =
 	AddAssign      // +=  [T_PLUS_EQUAL]
 	SubAssign      // -=  [T_MINUS_EQUAL]
 	MulAssign      // *=  [T_MUL_EQUAL]
