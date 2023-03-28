@@ -145,6 +145,10 @@ function buildType(ReflectionClass $class): Type
 
     // fields
     foreach ($class->getProperties() as $property) {
+        if ($property->isStatic() || $property->name === 'attributes') {
+            continue;
+        }
+
         $field = new Field();
 
         $field->rawName    = $property->getName();
