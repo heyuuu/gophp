@@ -2,6 +2,7 @@ package phpparse
 
 import (
 	"fmt"
+	"gophp/php/ast"
 	"log"
 	"os/exec"
 	"path/filepath"
@@ -30,6 +31,10 @@ func Test_loadAstJson(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	dump, err := ast.Sprint(nil, data, nil)
+	if err != nil {
+		return
+	}
 	//_ = data
-	fmt.Println(data)
+	fmt.Println(dump)
 }
