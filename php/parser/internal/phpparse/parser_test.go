@@ -28,8 +28,8 @@ func Test_parseToJsonFile(t *testing.T) {
 func Test_loadAstJson(t *testing.T) {
 	data, err := loadAstJson(astFile)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
-	_ = data
-	//fmt.Println(data)
+	//_ = data
+	fmt.Println(data)
 }

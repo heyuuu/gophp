@@ -1,6 +1,8 @@
 <?php
 
 // parse args
+use GoPhp\Tools\Application;
+
 $opts   = getopt("s:o:", ["src:", "output:"]);
 $src    = $opts["src"] ?? $opts["s"] ?? "";
 $output = $opts["output"] ?? $opts["o"] ?? "";
@@ -8,7 +10,7 @@ $output = $opts["output"] ?? $opts["o"] ?? "";
 // main
 if ($src && $output) {
     require_once __DIR__ . '/vendor/autoload.php';
-    $code = (new \GoPhp\Tools\Application())->run($src, $output);
+    $code = (new Application())->run($src, $output);
     exit($code);
 }
 
