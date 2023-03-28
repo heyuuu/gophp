@@ -116,3 +116,32 @@ func asSlice[T any](data any) []T {
 	}
 	return items
 }
+
+func asTypeNode(data any) ast.Type {
+	if data == nil {
+		return nil
+	}
+
+	switch node := data.(type) {
+	case *ast.Ident:
+		return &ast.SimpleType{
+			Name: &ast.Name{Parts: []string{node.Name}},
+		}
+	case *ast.Name:
+		return &ast.SimpleType{Name: node}
+	default:
+		return data.(ast.Type)
+	}
+}
+
+func asTypeNodes(data any) []ast.Type {
+	if data == nil {
+		return nil
+	}
+
+	var items []ast.Type
+	for _, item := range data.([]any) {
+		items = append(items, asTypeNode(item))
+	}
+	return items
+}

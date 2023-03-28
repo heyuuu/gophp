@@ -18,12 +18,6 @@ type (
 		stmtNode()
 	}
 
-	// ComplexType : PhpParserNodeAbstract
-	ComplexType interface {
-		Node
-		complexTypeNode()
-	}
-
 	// CallLikeExpr : Expr
 	CallLikeExpr interface {
 		Expr
@@ -90,23 +84,13 @@ type (
 		VarLike bool
 	}
 
-	// IntersectionType : ComplexType
-	IntersectionType struct {
-		Types []any // @var (Ident|Name)[] Types
-	}
-
 	MatchArm struct {
 		Conds []Expr // @var Expr|null[]
 		Body  Expr   // @var Expr
 	}
 
-	// NullableType : ComplexType
-	NullableType struct {
-		Type any // @var Ident|Name Type
-	}
-
 	Param struct {
-		Type       any               // @var Ident|Name|ComplexType|null Type declaration
+		Type       Type              // @var Type|null Type declaration
 		ByRef      bool              // @var bool Whether parameter is passed by reference
 		Variadic   bool              // @var bool Whether this is a variadic argument
 		Var        *VariableExpr     // @var VariableExpr Parameter variable
@@ -115,13 +99,37 @@ type (
 		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
-	// UnionType : ComplexType
-	UnionType struct {
-		Types []any // @var (Ident|Name|IntersectionType)[] Types
-	}
-
 	// VariadicPlaceholder : PhpParserNodeAbstract
 	VariadicPlaceholder struct{}
+)
+
+/**
+ * Type
+ */
+type Type interface {
+	Node
+	typeNode()
+}
+type (
+	// IntersectionType : A
+	SimpleType struct {
+		Name *Name
+	}
+
+	// IntersectionType : A & B & C
+	IntersectionType struct {
+		Types []Type // possible type: SimpleType
+	}
+
+	// UnionType : A | B | C
+	UnionType struct {
+		Types []Type // possible type: SimpleType or IntersectionType
+	}
+
+	// NullableType : ?A
+	NullableType struct {
+		Type *SimpleType // possible type: SimpleType
+	}
 )
 
 /**
@@ -188,7 +196,7 @@ type (
 		ByRef      bool              // @var bool Whether to return by reference
 		Params     []*Param          // @var Param[] Parameters
 		Uses       []*ClosureUseExpr // @var ClosureUse[] use()s
-		ReturnType any               // @var Ident|Name|ComplexType|null Return type
+		ReturnType Type              // @var Type|null Return type
 		Stmts      []Stmt            // @var Stmt[] Statements
 		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
@@ -203,7 +211,7 @@ type (
 		Static     bool              // @var bool
 		ByRef      bool              // @var bool
 		Params     []*Param          // @var Param[]
-		ReturnType any               // @var Ident|Name|ComplexType|null
+		ReturnType Type              // @var Type|null
 		Expr       Expr              // @var Expr
 		AttrGroups []*AttributeGroup // @var AttributeGroup[]
 	}
@@ -495,7 +503,7 @@ type (
 		ByRef      bool              // @var bool Whether to return by reference
 		Name       *Ident            // @var Ident Name
 		Params     []*Param          // @var Param[] Parameters
-		ReturnType any               // @var Ident|Name|ComplexType|null Return type
+		ReturnType Type              // @var Type|null Return type
 		Stmts      []Stmt            // @var Stmt[]|null Statements
 		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
@@ -553,7 +561,7 @@ type (
 		ByRef          bool              // @var bool Whether function returns by reference
 		Name           *Ident            // @var Ident Name
 		Params         []*Param          // @var Param[] Parameters
-		ReturnType     any               // @var Ident|Name|ComplexType|null Return type
+		ReturnType     Type              // @var Type|null Return type
 		Stmts          []Stmt            // @var Stmt[] Statements
 		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
@@ -597,7 +605,7 @@ type (
 	PropertyStmt struct {
 		Flags      int                     // @var int Modifiers
 		Props      []*PropertyPropertyStmt // @var PropertyProperty[] Properties
-		Type       any                     // @var Ident|Name|ComplexType|null Type declaration
+		Type       Type                    // @var Type|null Type declaration
 		AttrGroups []*AttributeGroup       // @var AttributeGroup[] PHP attribute groups
 	}
 
@@ -674,6 +682,12 @@ type (
 	}
 )
 
+// Type
+func (*SimpleType) typeNode()       {}
+func (*IntersectionType) typeNode() {}
+func (*UnionType) typeNode()        {}
+func (*NullableType) typeNode()     {}
+
 // Expr
 func (*ArrayExpr) exprNode()                 {}
 func (*IndexExpr) exprNode()                 {}
@@ -725,11 +739,6 @@ func (*MethodCallExpr) exprNode()         {}
 func (*NewExpr) exprNode()                {}
 func (*NullsafeMethodCallExpr) exprNode() {}
 func (*StaticCallExpr) exprNode()         {}
-
-// ComplexType
-func (*IntersectionType) complexTypeNode() {}
-func (*NullableType) complexTypeNode()     {}
-func (*UnionType) complexTypeNode()        {}
 
 // Scalar
 func (*FloatLit) scalarNode()                 {}
