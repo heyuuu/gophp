@@ -14,18 +14,27 @@ class GenAstNodes
         $types      = getAllTypes();
         $interfaces = [];
         $classes    = [];
+        $extends    = [];
         foreach ($types as $type) {
             if ($type->isInterface) {
                 $interfaces[] = $this->printInterface($type);
             } else {
                 $classes[] = $this->printClass($type);
+                foreach ($type->supers as $super) {
+                    $superMethod       = lcfirst($super) . "Node";
+                    $extends[$super][] = "func (*{$type->newName}) {$superMethod}() {}\n";
+                }
             }
         }
 
         $code = "package ast\n\n";
         $code .= "type Node interface {}\n\n";
-        $code .= join("\n", $interfaces) . "\n";
-        $code .= join("\n", $classes);
+        $code .= "type (\n" . join("\n", $interfaces) . "\n)\n";
+        $code .= "type (\n" . join("\n", $classes) . "\n)\n";
+        foreach ($extends as $super => $types) {
+            $code .= "\n// $super\n";
+            $code .= join("", $types);
+        }
 
         file_put_contents($this->outputFile, $code);
     }
@@ -33,7 +42,14 @@ class GenAstNodes
     private function printInterface(Type $type): string
     {
         $code = $this->buildClassComment($type) . "\n";
-        $code .= "type {$type->newName} interface {\n";
+        $code .= "{$type->newName} interface {\n";
+        foreach ($type->supers as $super) {
+            if ($super === 'PhpParserNodeAbstract') {
+                $super = 'Node';
+            }
+            $code .= "    $super\n";
+        }
+        $code .= "    " . lcfirst($type->newName) . "Node()\n";
         $code .= "}\n";
         return $code;
     }
@@ -41,7 +57,7 @@ class GenAstNodes
     private function printClass(Type $type): string
     {
         $code = $this->buildClassComment($type) . "\n";
-        $code .= "type {$type->newName} struct {\n";
+        $code .= "{$type->newName} struct {\n";
         foreach ($type->fields as $field) {
             $docComment = $this->clearPropertyDocComment($field->docComment);
             $goType     = $field->typeHint?->toGoType() ?: 'any';

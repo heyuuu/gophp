@@ -137,7 +137,7 @@ function buildType(ReflectionClass $class): Type
         $type->supers[] = toTypeName($class->getParentClass()->getName());
     }
     foreach ($class->getInterfaceNames() as $interfaceName) {
-        if ($interfaceName == JsonSerializable::class || $interfaceName == Node::class) {
+        if ($interfaceName == JsonSerializable::class || $interfaceName == Node::class || $interfaceName == Stringable::class) {
             continue;
         }
         $type->supers[] = toTypeName($interfaceName);
