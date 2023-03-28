@@ -47,7 +47,7 @@ func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
 	if err != nil {
 		return nil, err
 	}
-	stmts = asSlice[ast.Stmt](value)
+	stmts = asStmtList(value)
 	return stmts, nil
 }
 
@@ -117,6 +117,19 @@ func asSlice[T any](data any) []T {
 	return items
 }
 
+func asStmtList(data any) []ast.Stmt {
+	var stmts []ast.Stmt
+	for _, stmt := range asSlice[ast.Stmt](data) {
+		switch stmt.(type) {
+		case *ast.BlockStmt:
+			stmts = append(stmts, stmt.(*ast.BlockStmt).List...)
+		default:
+			stmts = append(stmts, stmt)
+		}
+	}
+	return stmts
+}
+
 func asTypeNode(data any) ast.Type {
 	if data == nil {
 		return nil
@@ -144,4 +157,16 @@ func asTypeNodes(data any) []ast.Type {
 		items = append(items, asTypeNode(item))
 	}
 	return items
+}
+
+func concatName(name1 *ast.Name, name2 *ast.Name) *ast.Name {
+	// 合并 Parts
+	parts := make([]string, len(name1.Parts)+len(name2.Parts))
+	copy(parts, name1.Parts)
+	copy(parts[len(name1.Parts):], name2.Parts)
+
+	// newName 继承 name1 的其他属性
+	var newName = *name1
+	newName.Parts = parts
+	return &newName
 }

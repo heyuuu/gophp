@@ -368,7 +368,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Params:     asSlice[*ast.Param](data["params"]),
 			Uses:       asSlice[*ast.ClosureUseExpr](data["uses"]),
 			ReturnType: asTypeNode(data["returnType"]),
-			Stmts:      asSlice[ast.Stmt](data["stmts"]),
+			Stmts:      asStmtList(data["stmts"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
 	case "ExprClosureUse":
@@ -639,13 +639,13 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtCase":
 		node = &ast.CaseStmt{
 			Cond:  asTypeOrNil[ast.Expr](data["cond"]),
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtCatch":
 		node = &ast.CatchStmt{
 			Types: asSlice[*ast.Name](data["types"]),
 			Var:   asTypeOrNil[*ast.VariableExpr](data["var"]),
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtClass":
 		node = &ast.ClassStmt{
@@ -653,7 +653,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Extends:        asTypeOrNil[*ast.Name](data["extends"]),
 			Implements:     asSlice[*ast.Name](data["implements"]),
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
-			Stmts:          asSlice[ast.Stmt](data["stmts"]),
+			Stmts:          asStmtList(data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -670,7 +670,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name:       data["name"].(*ast.Ident),
 			Params:     asSlice[*ast.Param](data["params"]),
 			ReturnType: asTypeNode(data["returnType"]),
-			Stmts:      asSlice[ast.Stmt](data["stmts"]),
+			Stmts:      asStmtList(data["stmts"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
 	case "StmtConst":
@@ -684,7 +684,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtDeclare":
 		node = &ast.DeclareStmt{
 			Declares: asSlice[*ast.DeclareDeclareStmt](data["declares"]),
-			Stmts:    asSlice[ast.Stmt](data["stmts"]),
+			Stmts:    asStmtList(data["stmts"]),
 		}
 	case "StmtDeclareDeclare":
 		node = &ast.DeclareDeclareStmt{
@@ -693,7 +693,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtDo":
 		node = &ast.DoStmt{
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 			Cond:  data["cond"].(ast.Expr),
 		}
 	case "StmtEcho":
@@ -702,19 +702,19 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtElse":
 		node = &ast.ElseStmt{
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtElseIf":
 		node = &ast.ElseIfStmt{
 			Cond:  data["cond"].(ast.Expr),
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtEnum":
 		node = &ast.EnumStmt{
 			ScalarType:     asTypeOrNil[*ast.Ident](data["scalarType"]),
 			Implements:     asSlice[*ast.Name](data["implements"]),
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
-			Stmts:          asSlice[ast.Stmt](data["stmts"]),
+			Stmts:          asStmtList(data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -730,14 +730,14 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtFinally":
 		node = &ast.FinallyStmt{
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtFor":
 		node = &ast.ForStmt{
 			Init:  asSlice[ast.Expr](data["init"]),
 			Cond:  asSlice[ast.Expr](data["cond"]),
 			Loop:  asSlice[ast.Expr](data["loop"]),
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtForeach":
 		node = &ast.ForeachStmt{
@@ -745,7 +745,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			KeyVar:   asTypeOrNil[ast.Expr](data["keyVar"]),
 			ByRef:    data["byRef"].(bool),
 			ValueVar: data["valueVar"].(ast.Expr),
-			Stmts:    asSlice[ast.Stmt](data["stmts"]),
+			Stmts:    asStmtList(data["stmts"]),
 		}
 	case "StmtFunction":
 		node = &ast.FunctionStmt{
@@ -753,7 +753,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name:           data["name"].(*ast.Ident),
 			Params:         asSlice[*ast.Param](data["params"]),
 			ReturnType:     asTypeNode(data["returnType"]),
-			Stmts:          asSlice[ast.Stmt](data["stmts"]),
+			Stmts:          asStmtList(data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -766,11 +766,25 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Name: data["name"].(*ast.Ident),
 		}
 	case "StmtGroupUse":
-		node = &ast.GroupUseStmt{
-			Type:   asInt(data["type"]),
-			Prefix: data["prefix"].(*ast.Name),
-			Uses:   asSlice[*ast.UseUseStmt](data["uses"]),
+		typ := asInt(data["type"])
+		useType, err := getUseType(typ)
+		if err != nil {
+			return nil, err
 		}
+
+		prefix := data["prefix"].(*ast.Name)
+		uses := asSlice[*ast.UseStmt](data["uses"])
+
+		var stmts []ast.Stmt
+		for _, useStmt := range uses {
+			if useType != ast.UseNormal {
+				useStmt.Type = useType
+			}
+			useStmt.Name = concatName(prefix, useStmt.Name)
+
+			stmts = append(stmts, useStmt)
+		}
+		node = &ast.BlockStmt{List: stmts}
 	case "StmtHaltCompiler":
 		node = &ast.HaltCompilerStmt{
 			Remaining: data["remaining"].(string),
@@ -778,7 +792,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtIf":
 		node = &ast.IfStmt{
 			Cond:    data["cond"].(ast.Expr),
-			Stmts:   asSlice[ast.Stmt](data["stmts"]),
+			Stmts:   asStmtList(data["stmts"]),
 			Elseifs: asSlice[*ast.ElseIfStmt](data["elseifs"]),
 			Else:    asTypeOrNil[*ast.ElseStmt](data["else"]),
 		}
@@ -790,7 +804,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.InterfaceStmt{
 			Extends:        asSlice[*ast.Name](data["extends"]),
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
-			Stmts:          asSlice[ast.Stmt](data["stmts"]),
+			Stmts:          asStmtList(data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -801,7 +815,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtNamespace":
 		node = &ast.NamespaceStmt{
 			Name:  asTypeOrNil[*ast.Name](data["name"]),
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "StmtNop":
 		node = &ast.EmptyStmt{}
@@ -842,7 +856,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtTrait":
 		node = &ast.TraitStmt{
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
-			Stmts:          asSlice[ast.Stmt](data["stmts"]),
+			Stmts:          asStmtList(data["stmts"]),
 			AttrGroups:     asSlice[*ast.AttributeGroup](data["attrGroups"]),
 			NamespacedName: asTypeOrNil[*ast.Name](data["namespacedName"]),
 		}
@@ -866,7 +880,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtTryCatch":
 		node = &ast.TryCatchStmt{
-			Stmts:   asSlice[ast.Stmt](data["stmts"]),
+			Stmts:   asStmtList(data["stmts"]),
 			Catches: asSlice[*ast.CatchStmt](data["catches"]),
 			Finally: asTypeOrNil[*ast.FinallyStmt](data["finally"]),
 		}
@@ -875,20 +889,37 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Vars: asSlice[ast.Expr](data["vars"]),
 		}
 	case "StmtUse":
-		node = &ast.UseStmt{
-			Type: asInt(data["type"]),
-			Uses: asSlice[*ast.UseUseStmt](data["uses"]),
+		typ := asInt(data["type"])
+		useType, err := getUseType(typ)
+		if err != nil {
+			return nil, err
 		}
+
+		uses := asSlice[*ast.UseStmt](data["uses"])
+
+		var stmts []ast.Stmt
+		for _, useStmt := range uses {
+			if useType != ast.UseNormal {
+				useStmt.Type = useType
+			}
+			stmts = append(stmts, useStmt)
+		}
+		node = &ast.BlockStmt{List: stmts}
 	case "StmtUseUse":
-		node = &ast.UseUseStmt{
-			Type:  asInt(data["type"]),
+		typ := asInt(data["type"])
+		useType, err := getUseType(typ)
+		if err != nil {
+			return nil, err
+		}
+		node = &ast.UseStmt{
+			Type:  useType,
 			Name:  data["name"].(*ast.Name),
 			Alias: asTypeOrNil[*ast.Ident](data["alias"]),
 		}
 	case "StmtWhile":
 		node = &ast.WhileStmt{
 			Cond:  data["cond"].(ast.Expr),
-			Stmts: asSlice[ast.Stmt](data["stmts"]),
+			Stmts: asStmtList(data["stmts"]),
 		}
 	case "UnionType":
 		node = &ast.UnionType{
@@ -904,4 +935,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	}
 
 	return node, nil
+}
+
+func getUseType(typ int) (ast.UseType, error) {
+	switch typ {
+	case 0, 1:
+		return ast.UseNormal, nil
+	case 2:
+		return ast.UseFunction, nil
+	case 3:
+		return ast.UseConstant, nil
+	default:
+		return 0, fmt.Errorf("unsupported StmtUseUse.type: %d", typ)
+	}
 }

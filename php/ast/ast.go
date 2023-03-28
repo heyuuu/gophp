@@ -392,9 +392,23 @@ type (
 	}
 )
 
+// UseType for UseStmt
+type UseType int
+
+const (
+	_           = iota
+	UseNormal   = 1 // Class or namespace import
+	UseFunction = 2 // Function import
+	UseConstant = 3 // Constant import
+)
+
 // Stmt
 type (
 	EmptyStmt struct{}
+
+	BlockStmt struct {
+		List []Stmt
+	}
 
 	LabelStmt struct {
 		Name *Ident // @var Ident Name
@@ -559,12 +573,6 @@ type (
 		Name *Ident // @var Ident Name of label to jump to
 	}
 
-	GroupUseStmt struct {
-		Type   int           // @var int Type of group use
-		Prefix *Name         // @var Name Prefix for uses
-		Uses   []*UseUseStmt // @var UseUse[] Uses
-	}
-
 	HaltCompilerStmt struct {
 		Remaining string // @var string Remaining text after halt compiler statement.
 	}
@@ -649,20 +657,15 @@ type (
 		Vars []Expr // @var Expr[] Variables to unset
 	}
 
-	UseStmt struct {
-		Type int           // @var int Type of alias
-		Uses []*UseUseStmt // @var UseUse[] Aliases
-	}
-
-	UseUseStmt struct {
-		Type  int    // @var int One of the Stmt\Use_::TYPE_* constants. Will only differ from TYPE_UNKNOWN for mixed group uses
-		Name  *Name  // @var Name Namespace, class, function or constant to alias
-		Alias *Ident // @var Ident|null Alias
-	}
-
 	WhileStmt struct {
 		Cond  Expr   // @var Expr Condition
 		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	UseStmt struct {
+		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
+		Name  *Name   // @var Name        Namespace, class, function or constant to alias
+		Alias *Ident  // @var Ident|null  Alias Name, or nil
 	}
 )
 
@@ -729,6 +732,8 @@ func (*NullsafeMethodCallExpr) exprNode() {}
 func (*StaticCallExpr) exprNode()         {}
 
 // Stmt
+func (*EmptyStmt) stmtNode()            {}
+func (*BlockStmt) stmtNode()            {}
 func (*BreakStmt) stmtNode()            {}
 func (*CaseStmt) stmtNode()             {}
 func (*CatchStmt) stmtNode()            {}
@@ -750,13 +755,11 @@ func (*ForeachStmt) stmtNode()          {}
 func (*FunctionStmt) stmtNode()         {}
 func (*GlobalStmt) stmtNode()           {}
 func (*GotoStmt) stmtNode()             {}
-func (*GroupUseStmt) stmtNode()         {}
 func (*HaltCompilerStmt) stmtNode()     {}
 func (*IfStmt) stmtNode()               {}
 func (*InlineHTMLStmt) stmtNode()       {}
 func (*LabelStmt) stmtNode()            {}
 func (*NamespaceStmt) stmtNode()        {}
-func (*EmptyStmt) stmtNode()            {}
 func (*PropertyStmt) stmtNode()         {}
 func (*PropertyPropertyStmt) stmtNode() {}
 func (*ReturnStmt) stmtNode()           {}
@@ -768,7 +771,6 @@ func (*TraitUseStmt) stmtNode()         {}
 func (*TryCatchStmt) stmtNode()         {}
 func (*UnsetStmt) stmtNode()            {}
 func (*UseStmt) stmtNode()              {}
-func (*UseUseStmt) stmtNode()           {}
 func (*WhileStmt) stmtNode()            {}
 
 // StmtClassLike
