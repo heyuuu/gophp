@@ -43,7 +43,13 @@ class GenAstNodes
         $code = $this->buildClassComment($type) . "\n";
         $code .= "type {$type->newName} struct {\n";
         foreach ($type->fields as $field) {
-            $code .= "    {$field->newName} {$field->type}\n";
+            $docComment = $this->clearPropertyDocComment($field->docComment);
+            $goType     = $field->typeHint?->toGoType() ?: 'any';
+            if ($docComment) {
+                $code .= "    {$field->newName} {$goType} // {$docComment}\n";
+            } else {
+                $code .= "    {$field->newName} {$goType}\n";
+            }
         }
         $code .= "}\n";
 
@@ -57,5 +63,10 @@ class GenAstNodes
             $comment .= ' : ' . join(', ', $type->supers);
         }
         return $comment;
+    }
+
+    private function clearPropertyDocComment(string $comment): string
+    {
+        return trim(substr($comment, 3, strlen($comment) - 5));
     }
 }

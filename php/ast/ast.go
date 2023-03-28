@@ -1,6 +1,6 @@
 package ast
 
-type Node interface {}
+type Node interface{}
 
 // ComplexType : PhpParserNodeAbstract
 type ComplexType interface {
@@ -52,1150 +52,1150 @@ type TraitUseAdaptationStmt interface {
 
 // Arg : PhpParserNodeAbstract
 type Arg struct {
-    Name any
-    Value any
-    ByRef any
-    Unpack any
-    Attributes any
+	Name       *Identifier // @var Identifier|null Parameter name (for named parameters)
+	Value      Expr        // @var Expr Value to pass
+	ByRef      bool        // @var bool Whether to pass by ref
+	Unpack     bool        // @var bool Whether to unpack the argument
+	Attributes any
 }
 
 // Attribute : PhpParserNodeAbstract
 type Attribute struct {
-    Name any
-    Args any
-    Attributes any
+	Name       *Name  // @var Name Attribute name
+	Args       []*Arg // @var Arg[] Attribute arguments
+	Attributes any
 }
 
 // AttributeGroup : PhpParserNodeAbstract
 type AttributeGroup struct {
-    Attrs any
-    Attributes any
+	Attrs      []*Attribute // @var Attribute[] Attributes
+	Attributes any
 }
 
 // Const : PhpParserNodeAbstract
 type Const struct {
-    Name any
-    Value any
-    NamespacedName any
-    Attributes any
+	Name           *Identifier // @var Identifier Name
+	Value          Expr        // @var Expr Value
+	NamespacedName *Name       // @var Name|null Namespaced name (if using NameResolver)
+	Attributes     any
 }
 
 // ExprArray : Expr
 type ArrayExpr struct {
-    Items any
-    Attributes any
+	Items      []*ArrayItemExpr // @var (ArrayItem|null)[] Items
+	Attributes any
 }
 
 // ExprArrayDimFetch : Expr
 type ArrayDimFetchExpr struct {
-    Var any
-    Dim any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Dim        Expr // @var null|Expr Array index / dim
+	Attributes any
 }
 
 // ExprArrayItem : Expr
 type ArrayItemExpr struct {
-    Key any
-    Value any
-    ByRef any
-    Unpack any
-    Attributes any
+	Key        Expr // @var null|Expr Key
+	Value      Expr // @var Expr Value
+	ByRef      bool // @var bool Whether to assign by reference
+	Unpack     bool // @var bool Whether to unpack the argument
+	Attributes any
 }
 
 // ExprArrowFunction : Expr, FunctionLike
 type ArrowFunctionExpr struct {
-    Static any
-    ByRef any
-    Params any
-    ReturnType any
-    Expr any
-    AttrGroups any
-    Attributes any
+	Static     bool              // @var bool
+	ByRef      bool              // @var bool
+	Params     []*Param          // @var Node\Param[]
+	ReturnType any               // @var null|Node\Identifier|Node\Name|Node\ComplexType
+	Expr       Expr              // @var Expr
+	AttrGroups []*AttributeGroup // @var Node\AttributeGroup[]
+	Attributes any
 }
 
 // ExprAssign : Expr
 type AssignExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpBitwiseAnd : ExprAssignOp
 type AssignOpBitwiseAndExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpBitwiseOr : ExprAssignOp
 type AssignOpBitwiseOrExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpBitwiseXor : ExprAssignOp
 type AssignOpBitwiseXorExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpCoalesce : ExprAssignOp
 type AssignOpCoalesceExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpConcat : ExprAssignOp
 type AssignOpConcatExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpDiv : ExprAssignOp
 type AssignOpDivExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpMinus : ExprAssignOp
 type AssignOpMinusExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpMod : ExprAssignOp
 type AssignOpModExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpMul : ExprAssignOp
 type AssignOpMulExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpPlus : ExprAssignOp
 type AssignOpPlusExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpPow : ExprAssignOp
 type AssignOpPowExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpShiftLeft : ExprAssignOp
 type AssignOpShiftLeftExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignOpShiftRight : ExprAssignOp
 type AssignOpShiftRightExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprAssignRef : Expr
 type AssignRefExpr struct {
-    Var any
-    Expr any
-    Attributes any
+	Var        Expr // @var Expr Variable reference is assigned to
+	Expr       Expr // @var Expr Variable which is referenced
+	Attributes any
 }
 
 // ExprBinaryOpBitwiseAnd : ExprBinaryOp
 type BinaryOpBitwiseAndExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpBitwiseOr : ExprBinaryOp
 type BinaryOpBitwiseOrExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpBitwiseXor : ExprBinaryOp
 type BinaryOpBitwiseXorExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpBooleanAnd : ExprBinaryOp
 type BinaryOpBooleanAndExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpBooleanOr : ExprBinaryOp
 type BinaryOpBooleanOrExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpCoalesce : ExprBinaryOp
 type BinaryOpCoalesceExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpConcat : ExprBinaryOp
 type BinaryOpConcatExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpDiv : ExprBinaryOp
 type BinaryOpDivExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpEqual : ExprBinaryOp
 type BinaryOpEqualExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpGreater : ExprBinaryOp
 type BinaryOpGreaterExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpGreaterOrEqual : ExprBinaryOp
 type BinaryOpGreaterOrEqualExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpIdentical : ExprBinaryOp
 type BinaryOpIdenticalExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpLogicalAnd : ExprBinaryOp
 type BinaryOpLogicalAndExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpLogicalOr : ExprBinaryOp
 type BinaryOpLogicalOrExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpLogicalXor : ExprBinaryOp
 type BinaryOpLogicalXorExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpMinus : ExprBinaryOp
 type BinaryOpMinusExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpMod : ExprBinaryOp
 type BinaryOpModExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpMul : ExprBinaryOp
 type BinaryOpMulExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpNotEqual : ExprBinaryOp
 type BinaryOpNotEqualExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpNotIdentical : ExprBinaryOp
 type BinaryOpNotIdenticalExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpPlus : ExprBinaryOp
 type BinaryOpPlusExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpPow : ExprBinaryOp
 type BinaryOpPowExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpShiftLeft : ExprBinaryOp
 type BinaryOpShiftLeftExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpShiftRight : ExprBinaryOp
 type BinaryOpShiftRightExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpSmaller : ExprBinaryOp
 type BinaryOpSmallerExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpSmallerOrEqual : ExprBinaryOp
 type BinaryOpSmallerOrEqualExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBinaryOpSpaceship : ExprBinaryOp
 type BinaryOpSpaceshipExpr struct {
-    Left any
-    Right any
-    Attributes any
+	Left       Expr // @var Expr The left hand side expression
+	Right      Expr // @var Expr The right hand side expression
+	Attributes any
 }
 
 // ExprBitwiseNot : Expr
 type BitwiseNotExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprBooleanNot : Expr
 type BooleanNotExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastArray : ExprCast
 type CastArrayExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastBool : ExprCast
 type CastBoolExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastDouble : ExprCast
 type CastDoubleExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastInt : ExprCast
 type CastIntExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastObject : ExprCast
 type CastObjectExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastString : ExprCast
 type CastStringExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprCastUnset : ExprCast
 type CastUnsetExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprClassConstFetch : Expr
 type ClassConstFetchExpr struct {
-    Class any
-    Name any
-    Attributes any
+	Class      any // @var Name|Expr Class name
+	Name       any // @var Identifier|Error Constant name
+	Attributes any
 }
 
 // ExprClone : Expr
 type CloneExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprClosure : Expr, FunctionLike
 type ClosureExpr struct {
-    Static any
-    ByRef any
-    Params any
-    Uses any
-    ReturnType any
-    Stmts any
-    AttrGroups any
-    Attributes any
+	Static     bool              // @var bool Whether the closure is static
+	ByRef      bool              // @var bool Whether to return by reference
+	Params     []*Param          // @var Node\Param[] Parameters
+	Uses       []*ClosureUseExpr // @var ClosureUse[] use()s
+	ReturnType any               // @var null|Node\Identifier|Node\Name|Node\ComplexType Return type
+	Stmts      []Stmt            // @var Node\Stmt[] Statements
+	AttrGroups []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	Attributes any
 }
 
 // ExprClosureUse : Expr
 type ClosureUseExpr struct {
-    Var any
-    ByRef any
-    Attributes any
+	Var        *VariableExpr // @var Expr\Variable Variable to use
+	ByRef      bool          // @var bool Whether to use by reference
+	Attributes any
 }
 
 // ExprConstFetch : Expr
 type ConstFetchExpr struct {
-    Name any
-    Attributes any
+	Name       *Name // @var Name Constant name
+	Attributes any
 }
 
 // ExprEmpty : Expr
 type EmptyExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprError : Expr
 type ErrorExpr struct {
-    Attributes any
+	Attributes any
 }
 
 // ExprErrorSuppress : Expr
 type ErrorSuppressExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprEval : Expr
 type EvalExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprExit : Expr
 type ExitExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var null|Expr Expression
+	Attributes any
 }
 
 // ExprFuncCall : ExprCallLike
 type FuncCallExpr struct {
-    Name any
-    Args any
-    Attributes any
+	Name       any   // @var Node\Name|Expr Function name
+	Args       []any // @var array<Node\Arg|Node\VariadicPlaceholder> Arguments
+	Attributes any
 }
 
 // ExprInclude : Expr
 type IncludeExpr struct {
-    Expr any
-    Type any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Type       int  // @var int Type of include
+	Attributes any
 }
 
 // ExprInstanceof : Expr
 type InstanceofExpr struct {
-    Expr any
-    Class any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Class      any  // @var Name|Expr Class name
+	Attributes any
 }
 
 // ExprIsset : Expr
 type IssetExpr struct {
-    Vars any
-    Attributes any
+	Vars       []Expr // @var Expr[] Variables
+	Attributes any
 }
 
 // ExprList : Expr
 type ListExpr struct {
-    Items any
-    Attributes any
+	Items      []*ArrayItemExpr // @var (ArrayItem|null)[] List of items to assign to
+	Attributes any
 }
 
 // ExprMatch : Expr
 type MatchExpr struct {
-    Cond any
-    Arms any
-    Attributes any
+	Cond       Expr        // @var Node\Expr
+	Arms       []*MatchArm // @var MatchArm[]
+	Attributes any
 }
 
 // ExprMethodCall : ExprCallLike
 type MethodCallExpr struct {
-    Var any
-    Name any
-    Args any
-    Attributes any
+	Var        Expr  // @var Expr Variable holding object
+	Name       any   // @var Identifier|Expr Method name
+	Args       []any // @var array<Arg|VariadicPlaceholder> Arguments
+	Attributes any
 }
 
 // ExprNew : ExprCallLike
 type NewExpr struct {
-    Class any
-    Args any
-    Attributes any
+	Class      any   // @var Node\Name|Expr|Node\Stmt\Class_ Class name
+	Args       []any // @var array<Arg|VariadicPlaceholder> Arguments
+	Attributes any
 }
 
 // ExprNullsafeMethodCall : ExprCallLike
 type NullsafeMethodCallExpr struct {
-    Var any
-    Name any
-    Args any
-    Attributes any
+	Var        Expr  // @var Expr Variable holding object
+	Name       any   // @var Identifier|Expr Method name
+	Args       []any // @var array<Arg|VariadicPlaceholder> Arguments
+	Attributes any
 }
 
 // ExprNullsafePropertyFetch : Expr
 type NullsafePropertyFetchExpr struct {
-    Var any
-    Name any
-    Attributes any
+	Var        Expr // @var Expr Variable holding object
+	Name       any  // @var Identifier|Expr Property name
+	Attributes any
 }
 
 // ExprPostDec : Expr
 type PostDecExpr struct {
-    Var any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Attributes any
 }
 
 // ExprPostInc : Expr
 type PostIncExpr struct {
-    Var any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Attributes any
 }
 
 // ExprPreDec : Expr
 type PreDecExpr struct {
-    Var any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Attributes any
 }
 
 // ExprPreInc : Expr
 type PreIncExpr struct {
-    Var any
-    Attributes any
+	Var        Expr // @var Expr Variable
+	Attributes any
 }
 
 // ExprPrint : Expr
 type PrintExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprPropertyFetch : Expr
 type PropertyFetchExpr struct {
-    Var any
-    Name any
-    Attributes any
+	Var        Expr // @var Expr Variable holding object
+	Name       any  // @var Identifier|Expr Property name
+	Attributes any
 }
 
 // ExprShellExec : Expr
 type ShellExecExpr struct {
-    Parts any
-    Attributes any
+	Parts      []any // @var array Encapsed string array
+	Attributes any
 }
 
 // ExprStaticCall : ExprCallLike
 type StaticCallExpr struct {
-    Class any
-    Name any
-    Args any
-    Attributes any
+	Class      any   // @var Node\Name|Expr Class name
+	Name       any   // @var Identifier|Expr Method name
+	Args       []any // @var array<Arg|VariadicPlaceholder> Arguments
+	Attributes any
 }
 
 // ExprStaticPropertyFetch : Expr
 type StaticPropertyFetchExpr struct {
-    Class any
-    Name any
-    Attributes any
+	Class      any // @var Name|Expr Class name
+	Name       any // @var VarLikeIdentifier|Expr Property name
+	Attributes any
 }
 
 // ExprTernary : Expr
 type TernaryExpr struct {
-    Cond any
-    If any
-    Else any
-    Attributes any
+	Cond       Expr // @var Expr Condition
+	If         Expr // @var null|Expr Expression for true
+	Else       Expr // @var Expr Expression for false
+	Attributes any
 }
 
 // ExprThrow : Expr
 type ThrowExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Node\Expr Expression
+	Attributes any
 }
 
 // ExprUnaryMinus : Expr
 type UnaryMinusExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprUnaryPlus : Expr
 type UnaryPlusExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression
+	Attributes any
 }
 
 // ExprVariable : Expr
 type VariableExpr struct {
-    Name any
-    Attributes any
+	Name       any // @var string|Expr Name
+	Attributes any
 }
 
 // ExprYield : Expr
 type YieldExpr struct {
-    Key any
-    Value any
-    Attributes any
+	Key        Expr // @var null|Expr Key expression
+	Value      Expr // @var null|Expr Value expression
+	Attributes any
 }
 
 // ExprYieldFrom : Expr
 type YieldFromExpr struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Expr Expression to yield from
+	Attributes any
 }
 
 // Identifier : PhpParserNodeAbstract, Stringable
 type Identifier struct {
-    Name any
-    SpecialClassNames any
-    Attributes any
+	Name              string // @var string Identifier as string
+	SpecialClassNames any
+	Attributes        any
 }
 
 // IntersectionType : ComplexType
 type IntersectionType struct {
-    Types any
-    Attributes any
+	Types      []any // @var (Identifier|Name)[] Types
+	Attributes any
 }
 
 // MatchArm : PhpParserNodeAbstract
 type MatchArm struct {
-    Conds any
-    Body any
-    Attributes any
+	Conds      []Expr // @var null|Node\Expr[]
+	Body       Expr   // @var Node\Expr
+	Attributes any
 }
 
 // Name : PhpParserNodeAbstract, Stringable
 type Name struct {
-    Parts any
-    SpecialClassNames any
-    Attributes any
+	Parts             []string // @var string[] Parts of the name
+	SpecialClassNames any
+	Attributes        any
 }
 
 // NameFullyQualified : Name, Stringable
 type NameFullyQualified struct {
-    Parts any
-    Attributes any
+	Parts      []string // @var string[] Parts of the name
+	Attributes any
 }
 
 // NameRelative : Name, Stringable
 type NameRelative struct {
-    Parts any
-    Attributes any
+	Parts      []string // @var string[] Parts of the name
+	Attributes any
 }
 
 // NullableType : ComplexType
 type NullableType struct {
-    Type any
-    Attributes any
+	Type       any // @var Identifier|Name Type
+	Attributes any
 }
 
 // Param : PhpParserNodeAbstract
 type Param struct {
-    Type any
-    ByRef any
-    Variadic any
-    Var any
-    Default any
-    Flags any
-    AttrGroups any
-    Attributes any
+	Type       any               // @var null|Identifier|Name|ComplexType Type declaration
+	ByRef      bool              // @var bool Whether parameter is passed by reference
+	Variadic   bool              // @var bool Whether this is a variadic argument
+	Var        any               // @var Expr\Variable|Expr\Error Parameter variable
+	Default    Expr              // @var null|Expr Default value
+	Flags      int               // @var int
+	AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+	Attributes any
 }
 
 // ScalarDNumber : Scalar
 type DNumberScalar struct {
-    Value any
-    Attributes any
+	Value      float64 // @var float Number value
+	Attributes any
 }
 
 // ScalarEncapsed : Scalar
 type EncapsedScalar struct {
-    Parts any
-    Attributes any
+	Parts      []Expr // @var Expr[] list of string parts
+	Attributes any
 }
 
 // ScalarEncapsedStringPart : Scalar
 type EncapsedStringPartScalar struct {
-    Value any
-    Attributes any
+	Value      string // @var string String value
+	Attributes any
 }
 
 // ScalarLNumber : Scalar
 type LNumberScalar struct {
-    Value any
-    Attributes any
+	Value      int // @var int Number value
+	Attributes any
 }
 
 // ScalarMagicConstClass : ScalarMagicConst
 type MagicConstClassScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstDir : ScalarMagicConst
 type MagicConstDirScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstFile : ScalarMagicConst
 type MagicConstFileScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstFunction : ScalarMagicConst
 type MagicConstFunctionScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstLine : ScalarMagicConst
 type MagicConstLineScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstMethod : ScalarMagicConst
 type MagicConstMethodScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstNamespace : ScalarMagicConst
 type MagicConstNamespaceScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarMagicConstTrait : ScalarMagicConst
 type MagicConstTraitScalar struct {
-    Attributes any
+	Attributes any
 }
 
 // ScalarString : Scalar
 type StringScalar struct {
-    Value any
-    Replacements any
-    Attributes any
+	Value        string // @var string String value
+	Replacements any
+	Attributes   any
 }
 
 // StmtBreak : Stmt
 type BreakStmt struct {
-    Num any
-    Attributes any
+	Num        Expr // @var null|Node\Expr Number of loops to break
+	Attributes any
 }
 
 // StmtCase : Stmt
 type CaseStmt struct {
-    Cond any
-    Stmts any
-    Attributes any
+	Cond       Expr   // @var null|Node\Expr Condition (null for default)
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtCatch : Stmt
 type CatchStmt struct {
-    Types any
-    Var any
-    Stmts any
-    Attributes any
+	Types      []*Name       // @var Node\Name[] Types of exceptions to catch
+	Var        *VariableExpr // @var Expr\Variable|null Variable for exception
+	Stmts      []Stmt        // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtClass : StmtClassLike
 type ClassStmt struct {
-    Flags any
-    Extends any
-    Implements any
-    Name any
-    Stmts any
-    AttrGroups any
-    NamespacedName any
-    Attributes any
+	Flags          int               // @var int Type
+	Extends        *Name             // @var null|Node\Name Name of extended class
+	Implements     []*Name           // @var Node\Name[] Names of implemented interfaces
+	Name           *Identifier       // @var Node\Identifier|null Name
+	Stmts          []Stmt            // @var Node\Stmt[] Statements
+	AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+	Attributes     any
 }
 
 // StmtClassConst : Stmt
 type ClassConstStmt struct {
-    Flags any
-    Consts any
-    AttrGroups any
-    Attributes any
+	Flags      int               // @var int Modifiers
+	Consts     []*Const          // @var Node\Const_[] Constant declarations
+	AttrGroups []*AttributeGroup // @var Node\AttributeGroup[]
+	Attributes any
 }
 
 // StmtClassMethod : Stmt, FunctionLike
 type ClassMethodStmt struct {
-    Flags any
-    ByRef any
-    Name any
-    Params any
-    ReturnType any
-    Stmts any
-    AttrGroups any
-    MagicNames any
-    Attributes any
+	Flags      int               // @var int Flags
+	ByRef      bool              // @var bool Whether to return by reference
+	Name       *Identifier       // @var Node\Identifier Name
+	Params     []*Param          // @var Node\Param[] Parameters
+	ReturnType any               // @var null|Node\Identifier|Node\Name|Node\ComplexType Return type
+	Stmts      []Stmt            // @var Node\Stmt[]|null Statements
+	AttrGroups []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	MagicNames any
+	Attributes any
 }
 
 // StmtConst : Stmt
 type ConstStmt struct {
-    Consts any
-    Attributes any
+	Consts     []*Const // @var Node\Const_[] Constant declarations
+	Attributes any
 }
 
 // StmtContinue : Stmt
 type ContinueStmt struct {
-    Num any
-    Attributes any
+	Num        Expr // @var null|Node\Expr Number of loops to continue
+	Attributes any
 }
 
 // StmtDeclare : Stmt
 type DeclareStmt struct {
-    Declares any
-    Stmts any
-    Attributes any
+	Declares   []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
+	Stmts      []Stmt                // @var Node\Stmt[]|null Statements
+	Attributes any
 }
 
 // StmtDeclareDeclare : Stmt
 type DeclareDeclareStmt struct {
-    Key any
-    Value any
-    Attributes any
+	Key        *Identifier // @var Node\Identifier Key
+	Value      Expr        // @var Node\Expr Value
+	Attributes any
 }
 
 // StmtDo : Stmt
 type DoStmt struct {
-    Stmts any
-    Cond any
-    Attributes any
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Cond       Expr   // @var Node\Expr Condition
+	Attributes any
 }
 
 // StmtEcho : Stmt
 type EchoStmt struct {
-    Exprs any
-    Attributes any
+	Exprs      []Expr // @var Node\Expr[] Expressions
+	Attributes any
 }
 
 // StmtElse : Stmt
 type ElseStmt struct {
-    Stmts any
-    Attributes any
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtElseIf : Stmt
 type ElseIfStmt struct {
-    Cond any
-    Stmts any
-    Attributes any
+	Cond       Expr   // @var Node\Expr Condition
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtEnum : StmtClassLike
 type EnumStmt struct {
-    ScalarType any
-    Implements any
-    Name any
-    Stmts any
-    AttrGroups any
-    NamespacedName any
-    Attributes any
+	ScalarType     *Identifier       // @var null|Node\Identifier Scalar Type
+	Implements     []*Name           // @var Node\Name[] Names of implemented interfaces
+	Name           *Identifier       // @var Node\Identifier|null Name
+	Stmts          []Stmt            // @var Node\Stmt[] Statements
+	AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+	Attributes     any
 }
 
 // StmtEnumCase : Stmt
 type EnumCaseStmt struct {
-    Name any
-    Expr any
-    AttrGroups any
-    Attributes any
+	Name       *Identifier       // @var Node\Identifier Enum case name
+	Expr       Expr              // @var Node\Expr|null Enum case expression
+	AttrGroups []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	Attributes any
 }
 
 // StmtExpression : Stmt
 type ExpressionStmt struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Node\Expr Expression
+	Attributes any
 }
 
 // StmtFinally : Stmt
 type FinallyStmt struct {
-    Stmts any
-    Attributes any
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtFor : Stmt
 type ForStmt struct {
-    Init any
-    Cond any
-    Loop any
-    Stmts any
-    Attributes any
+	Init       []Expr // @var Node\Expr[] Init expressions
+	Cond       []Expr // @var Node\Expr[] Loop conditions
+	Loop       []Expr // @var Node\Expr[] Loop expressions
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtForeach : Stmt
 type ForeachStmt struct {
-    Expr any
-    KeyVar any
-    ByRef any
-    ValueVar any
-    Stmts any
-    Attributes any
+	Expr       Expr   // @var Node\Expr Expression to iterate
+	KeyVar     Expr   // @var null|Node\Expr Variable to assign key to
+	ByRef      bool   // @var bool Whether to assign value by reference
+	ValueVar   Expr   // @var Node\Expr Variable to assign value to
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtFunction : Stmt, FunctionLike
 type FunctionStmt struct {
-    ByRef any
-    Name any
-    Params any
-    ReturnType any
-    Stmts any
-    AttrGroups any
-    NamespacedName any
-    Attributes any
+	ByRef          bool              // @var bool Whether function returns by reference
+	Name           *Identifier       // @var Node\Identifier Name
+	Params         []*Param          // @var Node\Param[] Parameters
+	ReturnType     any               // @var null|Node\Identifier|Node\Name|Node\ComplexType Return type
+	Stmts          []Stmt            // @var Node\Stmt[] Statements
+	AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+	Attributes     any
 }
 
 // StmtGlobal : Stmt
 type GlobalStmt struct {
-    Vars any
-    Attributes any
+	Vars       []Expr // @var Node\Expr[] Variables
+	Attributes any
 }
 
 // StmtGoto : Stmt
 type GotoStmt struct {
-    Name any
-    Attributes any
+	Name       *Identifier // @var Identifier Name of label to jump to
+	Attributes any
 }
 
 // StmtGroupUse : Stmt
 type GroupUseStmt struct {
-    Type any
-    Prefix any
-    Uses any
-    Attributes any
+	Type       int           // @var int Type of group use
+	Prefix     *Name         // @var Name Prefix for uses
+	Uses       []*UseUseStmt // @var UseUse[] Uses
+	Attributes any
 }
 
 // StmtHaltCompiler : Stmt
 type HaltCompilerStmt struct {
-    Remaining any
-    Attributes any
+	Remaining  string // @var string Remaining text after halt compiler statement.
+	Attributes any
 }
 
 // StmtIf : Stmt
 type IfStmt struct {
-    Cond any
-    Stmts any
-    Elseifs any
-    Else any
-    Attributes any
+	Cond       Expr          // @var Node\Expr Condition expression
+	Stmts      []Stmt        // @var Node\Stmt[] Statements
+	Elseifs    []*ElseIfStmt // @var ElseIf_[] Elseif clauses
+	Else       *ElseStmt     // @var null|Else_ Else clause
+	Attributes any
 }
 
 // StmtInlineHTML : Stmt
 type InlineHTMLStmt struct {
-    Value any
-    Attributes any
+	Value      string // @var string String
+	Attributes any
 }
 
 // StmtInterface : StmtClassLike
 type InterfaceStmt struct {
-    Extends any
-    Name any
-    Stmts any
-    AttrGroups any
-    NamespacedName any
-    Attributes any
+	Extends        []*Name           // @var Node\Name[] Extended interfaces
+	Name           *Identifier       // @var Node\Identifier|null Name
+	Stmts          []Stmt            // @var Node\Stmt[] Statements
+	AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+	Attributes     any
 }
 
 // StmtLabel : Stmt
 type LabelStmt struct {
-    Name any
-    Attributes any
+	Name       *Identifier // @var Identifier Name
+	Attributes any
 }
 
 // StmtNamespace : Stmt
 type NamespaceStmt struct {
-    Name any
-    Stmts any
-    Attributes any
+	Name       *Name  // @var null|Node\Name Name
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // StmtNop : Stmt
 type NopStmt struct {
-    Attributes any
+	Attributes any
 }
 
 // StmtProperty : Stmt
 type PropertyStmt struct {
-    Flags any
-    Props any
-    Type any
-    AttrGroups any
-    Attributes any
+	Flags      int                     // @var int Modifiers
+	Props      []*PropertyPropertyStmt // @var PropertyProperty[] Properties
+	Type       any                     // @var null|Identifier|Name|ComplexType Type declaration
+	AttrGroups []*AttributeGroup       // @var Node\AttributeGroup[] PHP attribute groups
+	Attributes any
 }
 
 // StmtPropertyProperty : Stmt
 type PropertyPropertyStmt struct {
-    Name any
-    Default any
-    Attributes any
+	Name       *VarLikeIdentifier // @var Node\VarLikeIdentifier Name
+	Default    Expr               // @var null|Node\Expr Default
+	Attributes any
 }
 
 // StmtReturn : Stmt
 type ReturnStmt struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var null|Node\Expr Expression
+	Attributes any
 }
 
 // StmtStatic : Stmt
 type StaticStmt struct {
-    Vars any
-    Attributes any
+	Vars       []*StaticVarStmt // @var StaticVar[] Variable definitions
+	Attributes any
 }
 
 // StmtStaticVar : Stmt
 type StaticVarStmt struct {
-    Var any
-    Default any
-    Attributes any
+	Var        *VariableExpr // @var Expr\Variable Variable
+	Default    Expr          // @var null|Node\Expr Default value
+	Attributes any
 }
 
 // StmtSwitch : Stmt
 type SwitchStmt struct {
-    Cond any
-    Cases any
-    Attributes any
+	Cond       Expr        // @var Node\Expr Condition
+	Cases      []*CaseStmt // @var Case_[] Case list
+	Attributes any
 }
 
 // StmtThrow : Stmt
 type ThrowStmt struct {
-    Expr any
-    Attributes any
+	Expr       Expr // @var Node\Expr Expression
+	Attributes any
 }
 
 // StmtTrait : StmtClassLike
 type TraitStmt struct {
-    Name any
-    Stmts any
-    AttrGroups any
-    NamespacedName any
-    Attributes any
+	Name           *Identifier       // @var Node\Identifier|null Name
+	Stmts          []Stmt            // @var Node\Stmt[] Statements
+	AttrGroups     []*AttributeGroup // @var Node\AttributeGroup[] PHP attribute groups
+	NamespacedName *Name             // @var Node\Name|null Namespaced name (if using NameResolver)
+	Attributes     any
 }
 
 // StmtTraitUse : Stmt
 type TraitUseStmt struct {
-    Traits any
-    Adaptations any
-    Attributes any
+	Traits      []*Name                   // @var Node\Name[] Traits
+	Adaptations []*TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
+	Attributes  any
 }
 
 // StmtTraitUseAdaptationAlias : StmtTraitUseAdaptation
 type TraitUseAdaptationAliasStmt struct {
-    NewModifier any
-    NewName any
-    Trait any
-    Method any
-    Attributes any
+	NewModifier int         // @var null|int New modifier
+	NewName     *Identifier // @var null|Node\Identifier New name
+	Trait       *Name       // @var Node\Name|null Trait name
+	Method      *Identifier // @var Node\Identifier Method name
+	Attributes  any
 }
 
 // StmtTraitUseAdaptationPrecedence : StmtTraitUseAdaptation
 type TraitUseAdaptationPrecedenceStmt struct {
-    Insteadof any
-    Trait any
-    Method any
-    Attributes any
+	Insteadof  []*Name     // @var Node\Name[] Overwritten traits
+	Trait      *Name       // @var Node\Name|null Trait name
+	Method     *Identifier // @var Node\Identifier Method name
+	Attributes any
 }
 
 // StmtTryCatch : Stmt
 type TryCatchStmt struct {
-    Stmts any
-    Catches any
-    Finally any
-    Attributes any
+	Stmts      []Stmt       // @var Node\Stmt[] Statements
+	Catches    []*CatchStmt // @var Catch_[] Catches
+	Finally    *FinallyStmt // @var null|Finally_ Optional finally node
+	Attributes any
 }
 
 // StmtUnset : Stmt
 type UnsetStmt struct {
-    Vars any
-    Attributes any
+	Vars       []Expr // @var Node\Expr[] Variables to unset
+	Attributes any
 }
 
 // StmtUse : Stmt
 type UseStmt struct {
-    Type any
-    Uses any
-    Attributes any
+	Type       int           // @var int Type of alias
+	Uses       []*UseUseStmt // @var UseUse[] Aliases
+	Attributes any
 }
 
 // StmtUseUse : Stmt
 type UseUseStmt struct {
-    Type any
-    Name any
-    Alias any
-    Attributes any
+	Type       int         // @var int One of the Stmt\Use_::TYPE_* constants. Will only differ from TYPE_UNKNOWN for mixed group uses
+	Name       *Name       // @var Node\Name Namespace, class, function or constant to alias
+	Alias      *Identifier // @var Identifier|null Alias
+	Attributes any
 }
 
 // StmtWhile : Stmt
 type WhileStmt struct {
-    Cond any
-    Stmts any
-    Attributes any
+	Cond       Expr   // @var Node\Expr Condition
+	Stmts      []Stmt // @var Node\Stmt[] Statements
+	Attributes any
 }
 
 // UnionType : ComplexType
 type UnionType struct {
-    Types any
-    Attributes any
+	Types      []any // @var (Identifier|Name|IntersectionType)[] Types
+	Attributes any
 }
 
 // VarLikeIdentifier : Identifier, Stringable
 type VarLikeIdentifier struct {
-    Name any
-    Attributes any
+	Name       string // @var string Identifier as string
+	Attributes any
 }
 
 // VariadicPlaceholder : PhpParserNodeAbstract
 type VariadicPlaceholder struct {
-    Attributes any
+	Attributes any
 }

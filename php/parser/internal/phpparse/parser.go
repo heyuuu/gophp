@@ -1,7 +1,6 @@
 package phpparse
 
 import (
-	"encoding/json"
 	"fmt"
 	"gophp/php/ast"
 	"io/ioutil"
@@ -21,19 +20,10 @@ func parseToJsonFile(script string, filename string, output string) error {
 }
 
 func loadAstJson(jsonFile string) ([]ast.Stmt, error) {
-	file, err := ioutil.ReadFile(jsonFile)
+	binData, err := ioutil.ReadFile(jsonFile)
 	if err != nil {
 		return nil, err
 	}
 
-	var data any
-	if err := json.Unmarshal(file, &data); err != nil {
-		return nil, err
-	}
-
-	obj, err := decodeAstData(data)
-	if err != nil {
-		return nil, err
-	}
-	return obj, err
+	return decodeAstData(binData)
 }

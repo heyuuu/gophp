@@ -19,7 +19,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 %s
 	}
 
-	return nil, nil
+	return node, nil
 }
 CODE;
 
@@ -41,7 +41,8 @@ CODE;
         $indent = str_repeat('    ', 3);
         $fields = [];
         foreach ($type->fields as $field) {
-            $fields []= "{$field->newName}: data[\"{$field->rawName}\"],\n";
+            $value     = $this->castValue($field->typeHint, "data[\"{$field->rawName}\"]");
+            $fields [] = "{$field->newName}: $value,\n";
         }
         $fieldsStr = join($indent, $fields);
 
@@ -51,5 +52,33 @@ CODE;
             {$fieldsStr}
         }
 CASE;
+    }
+
+    private function castValue(?TypeHint $typeHint, string $value): string
+    {
+        if ($typeHint === null) {
+            return $value;
+        }
+
+        switch ($typeHint->mode) {
+            case TypeHint::SIMPLE:
+                if ($typeHint->name === 'int') {
+                    return "asInt({$value})";
+                } elseif ($typeHint->name == 'float64') {
+                    return "asFloat({$value})";
+                }
+
+                $name = $typeHint->toGoType('ast.');
+                if ($typeHint->nullable) {
+                    return "asTypeOrNil[{$name}](${value})";
+                } else {
+                    return $value . ".({$name})";
+                }
+            case TypeHint::ARRAY:
+                $item = $typeHint->item->toGoType('ast.');
+                return "asSlice[{$item}]({$value})";
+        }
+
+        return $value;
     }
 }

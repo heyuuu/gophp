@@ -1,17 +1,35 @@
 package phpparse
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"gophp/php/ast"
 )
 
-func decodeAstData(data any) ([]ast.Stmt, error) {
+func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
+	defer func() {
+		if fault := recover(); fault != nil {
+			err = fmt.Errorf("decode ast data failed: %v", fault)
+		}
+	}()
+
+	// json decode
+	var data any
+	decoder := json.NewDecoder(bytes.NewReader(binData))
+	decoder.UseNumber()
+	if err = decoder.Decode(&data); err != nil {
+		return nil, err
+	}
+
+	// build node
 	value, err := decodeData(data)
 	if err != nil {
 		return nil, err
 	}
-	return asSlice[ast.Stmt](value)
+	stmts = asSlice[ast.Stmt](value)
+	return stmts, nil
 }
 
 func decodeData(data any) (any, error) {
@@ -44,48 +62,34 @@ func decodeData(data any) (any, error) {
 	return data, nil
 }
 
-var (
-	TypeError = errors.New("type error")
-)
+func asInt(data any) int {
+	val, err := data.(json.Number).Int64()
+	if err != nil {
+		panic(err)
+	}
+	return int(val)
+}
 
-func asType[T any](data any) (T, error) {
-	val, ok := data.(T)
-	if !ok {
+func asFloat(data any) float64 {
+	val, err := data.(json.Number).Float64()
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func asTypeOrNil[T any](data any) T {
+	if data == nil {
 		var tmp T
-		return tmp, fmt.Errorf("data is not expected type: f=decode.Type(), err=%w", TypeError)
+		return tmp
 	}
-	return val, nil
+	return data.(T)
 }
 
-func asSlice[T any](data any) ([]T, error) {
-	items, ok := data.([]any)
-	if !ok {
-		return nil, fmt.Errorf("data is not a slice: f=decode.Slice(), err=%w", TypeError)
+func asSlice[T any](data any) []T {
+	var items []T
+	for _, item := range data.([]any) {
+		items = append(items, item.(T))
 	}
-	var result []T
-	for i, item := range items {
-		if val, ok := item.(T); ok {
-			result = append(result, val)
-		} else {
-			return nil, fmt.Errorf("data[%d] is not expected type: f=decode.Slice(), err=%w", i, TypeError)
-		}
-	}
-	return result, nil
-}
-
-func asMap[T any](data any) (map[string]T, error) {
-	items, ok := data.(map[string]any)
-	if !ok {
-		return nil, fmt.Errorf("data is not a slice: f=decode.Map(), err=%w", TypeError)
-	}
-
-	var result = make(map[string]T)
-	for key, item := range items {
-		if val, ok := item.(T); ok {
-			result[key] = val
-		} else {
-			return nil, fmt.Errorf("data[%s] is not expected type: f=decode.Map(), err=%w", key, TypeError)
-		}
-	}
-	return result, nil
+	return items
 }
