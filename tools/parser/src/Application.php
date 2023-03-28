@@ -1,7 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace GoPhp\Tools;
 
+use PhpParser\Error;
+use PhpParser\ErrorHandler\Throwing;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use Symfony\Component\Finder\Finder;
@@ -20,36 +22,58 @@ class Application
 
     function parseCode(string $code, string $output = null): int
     {
-        $json = $this->parseCodeToJson($code);
-        if ($output) {
-            $outputFile = $output . DIRECTORY_SEPARATOR . "ast.php.json";
-            $this->safeWriteFile($outputFile, $json);
-        } else {
-            echo $json;
+        try {
+            $json = $this->parseCodeToJson($code);
+            if ($output) {
+                $outputFile = $output . DIRECTORY_SEPARATOR . "ast.php.json";
+                $this->safeWriteFile($outputFile, $json);
+            } else {
+                echo $this->jsonOutput($json);
+            }
+            return 0;
+        } catch (\Exception $exception) {
+            if ($output) {
+                echo $exception->getMessage();
+            } else {
+                echo $this->jsonOutput("", $exception->getMessage());
+            }
+            return 1;
         }
-        return 0;
     }
 
     function parseFile(string $outputFile, string $output = null): int
     {
-        $json = $this->parseFileToJson($outputFile);
-        if ($output) {
-            $outputFile = $output . DIRECTORY_SEPARATOR . basename($outputFile) . ".json";
-            $this->safeWriteFile($outputFile, $json);
-        } else {
-            echo $json;
+        try {
+            $json = $this->parseFileToJson($outputFile);
+            if ($output) {
+                $outputFile = $output . DIRECTORY_SEPARATOR . basename($outputFile) . ".json";
+                $this->safeWriteFile($outputFile, $json);
+            } else {
+                echo $this->jsonOutput($json);
+            }
+        } catch (\Exception $exception) {
+            if ($output) {
+                echo $exception->getMessage();
+            } else {
+                echo $this->jsonOutput("", $exception->getMessage());
+            }
+            return 1;
         }
         return 0;
     }
 
     function parseDir(string $dir, string $output): int
     {
-        foreach ($this->eachFile($dir) as [$file, $relativeFile]) {
-            $json       = $this->parseFileToJson($file);
-            $outputFile = $output . DIRECTORY_SEPARATOR . $relativeFile . '.json';
-            $this->safeWriteFile($outputFile, $json);
+        try {
+            foreach ($this->eachFile($dir) as [$file, $relativeFile]) {
+                $json       = $this->parseFileToJson($file);
+                $outputFile = $output . DIRECTORY_SEPARATOR . $relativeFile . '.json';
+                $this->safeWriteFile($outputFile, $json);
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
+            return 1;
         }
-
         return 0;
     }
 
@@ -82,11 +106,12 @@ class Application
 
     private function parseCodeToJson(string $code): string
     {
-        $ast = $this->parser->parse($code);
-        if (!$ast) {
-            throw new \Exception("解析文件语法失败");
+        try {
+            $ast = $this->parser->parse($code, new Throwing());
+            return $this->encoder->encode($ast);
+        } catch (Error $exception) {
+            throw new \Exception("解析文件语法失败: " . $exception->getMessage());
         }
-        return $this->encoder->encode($ast);
     }
 
     private function safeWriteFile(string $outputFile, string $content)
@@ -95,5 +120,14 @@ class Application
             mkdir($dir, 0755, true);
         }
         file_put_contents($outputFile, $content);
+    }
+
+    private function jsonOutput(string $data, string $error = ""): string
+    {
+        return json_encode([
+            'ok'    => empty($error),
+            'data'  => $data,
+            'error' => $error,
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }

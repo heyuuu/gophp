@@ -23,7 +23,8 @@ if ($code || $file || $dir) {
         }
         $status = $application->parseDir($dir, $output);
     }
-    exit($status);
+    // exit($status);
+    exit();
 }
 
 // Show help

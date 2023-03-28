@@ -11,19 +11,19 @@ import (
 )
 
 func ParseCode(code string) ([]ast.Stmt, error) {
-	json, err := runParser("-c", code)
+	output, err := runParser("-c", code)
 	if err != nil {
 		return nil, err
 	}
-	return decodeAstData(json)
+	return decodeOutput(output)
 }
 
 func ParseFile(file string) ([]ast.Stmt, error) {
-	json, err := runParser("-f", file)
+	output, err := runParser("-f", file)
 	if err != nil {
 		return nil, err
 	}
-	return decodeAstData(json)
+	return decodeOutput(output)
 }
 
 func parseToJsonFile(script string, filename string, output string) error {

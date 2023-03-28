@@ -8,6 +8,25 @@ import (
 	"gophp/php/ast"
 )
 
+type result struct {
+	Ok    bool   `json:"ok"`
+	Data  string `json:"data"`
+	Error string `json:"error"`
+}
+
+func decodeOutput(output []byte) ([]ast.Stmt, error) {
+	var res result
+	if err := json.Unmarshal(output, &res); err != nil {
+		return nil, err
+	}
+
+	if !res.Ok {
+		return nil, errors.New(res.Error)
+	}
+
+	return decodeAstData([]byte(res.Data))
+}
+
 func decodeAstData(binData []byte) (stmts []ast.Stmt, err error) {
 	defer func() {
 		if fault := recover(); fault != nil {

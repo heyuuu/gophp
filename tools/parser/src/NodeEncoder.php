@@ -8,7 +8,7 @@ class NodeEncoder
 {
     function encode(array $ast): string
     {
-        return json_encode($this->transform($ast), JSON_PRETTY_PRINT);
+        return json_encode($this->transform($ast), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     /** 定制 json 格式 */
