@@ -26,6 +26,7 @@ type (
 
 	// FunctionLike
 	FunctionLike interface {
+		Node
 		functionLikeNode()
 	}
 
@@ -35,7 +36,7 @@ type (
 		classLikeStmtNode()
 	}
 
-	// StmtTraitUseAdaptation : Stmt
+	// TraitUseAdaptationStmt : Stmt
 	TraitUseAdaptationStmt interface {
 		Stmt
 		traitUseAdaptationStmtNode()
@@ -224,7 +225,7 @@ type (
 
 	// UnaryExpr
 	UnaryExpr struct {
-		Kind token.Token // token.Not, token.Tilde, token.PreInc, token.PreDec, token.PostInc or token.PostDec
+		Kind token.Token // token.Add, token.Sub, token.Not, token.Tilde, token.PreInc, token.PreDec, token.PostInc or token.PostDec
 		Var  Expr        // variable
 	}
 
@@ -253,17 +254,8 @@ type (
 		Args []Expr      // arguments
 	}
 
-	ClassConstFetchExpr struct {
-		Class any    // @var Name|Expr Class name
-		Name  *Ident // @var Ident Constant name
-	}
-
 	CloneExpr struct {
 		Expr Expr // @var Expr Expression
-	}
-
-	ConstFetchExpr struct {
-		Name *Name // @var Name Constant name
 	}
 
 	ErrorSuppressExpr struct {
@@ -274,20 +266,18 @@ type (
 		Expr Expr // @var Expr|null Expression
 	}
 
-	// ExprFuncCall : ExprCallLike
-	FuncCallExpr struct {
-		Name any   // @var Name|Expr Function name
-		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+	// Const
+	ConstFetchExpr struct {
+		Name *Name // @var Name Constant name
 	}
 
-	InstanceofExpr struct {
-		Expr  Expr // @var Expr Expression
-		Class any  // @var Name|Expr Class name
+	ClassConstFetchExpr struct {
+		Class Expr   // @var Name|Expr Class name
+		Name  *Ident // @var Ident Constant name
 	}
 
-	// ExprList : Expr
-	ListExpr struct {
-		Items []*ArrayItemExpr // @var (ArrayItem|null)[] List of items to assign to
+	MagicConstExpr struct {
+		Kind token.Token // token.IsMagicConstKind()
 	}
 
 	// ExprMatch : Expr
@@ -296,29 +286,13 @@ type (
 		Arms []*MatchArm // @var MatchArm[]
 	}
 
-	// ExprMethodCall : ExprCallLike
-	MethodCallExpr struct {
-		Var  Expr  // @var Expr Variable holding object
-		Name any   // @var Ident|Expr Method name
-		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+	InstanceofExpr struct {
+		Expr  Expr // @var Expr Expression
+		Class Expr // @var Name|Expr Class name
 	}
 
-	// ExprNew : ExprCallLike
-	NewExpr struct {
-		Class Node  // @var Name|Expr|ClassStmt Class name
-		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
-	}
-
-	// ExprNullsafeMethodCall : ExprCallLike
-	NullsafeMethodCallExpr struct {
-		Var  Expr  // @var Expr Variable holding object
-		Name any   // @var Ident|Expr Method name
-		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
-	}
-
-	NullsafePropertyFetchExpr struct {
-		Var  Expr // @var Expr Variable holding object
-		Name any  // @var Ident|Expr Property name
+	ListExpr struct {
+		Items []*ArrayItemExpr // @var (ArrayItem|null)[] List of items to assign to
 	}
 
 	PrintExpr struct {
@@ -331,22 +305,20 @@ type (
 		Name any  // @var Ident|Expr Property name
 	}
 
-	// ExprShellExec : Expr
-	ShellExecExpr struct {
-		Parts []any // @var array Encapsed string array
-	}
-
-	// ExprStaticCall : ExprCallLike
-	StaticCallExpr struct {
-		Class any   // @var Name|Expr Class name
-		Name  any   // @var Ident|Expr Method name
-		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
+	NullsafePropertyFetchExpr struct {
+		Var  Expr // @var Expr Variable holding object
+		Name any  // @var Ident|Expr Property name
 	}
 
 	// ExprStaticPropertyFetch : Expr
 	StaticPropertyFetchExpr struct {
 		Class any // @var Name|Expr Class name
 		Name  any // @var VarLikeIdent|Expr Property name
+	}
+
+	// ExprShellExec : Expr
+	ShellExecExpr struct {
+		Parts []any // @var array Encapsed string array
 	}
 
 	// ExprTernary : Expr
@@ -358,16 +330,6 @@ type (
 
 	// ExprThrow : Expr
 	ThrowExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprUnaryMinus : Expr
-	UnaryMinusExpr struct {
-		Expr Expr // @var Expr Expression
-	}
-
-	// ExprUnaryPlus : Expr
-	UnaryPlusExpr struct {
 		Expr Expr // @var Expr Expression
 	}
 
@@ -387,8 +349,37 @@ type (
 		Expr Expr // @var Expr Expression to yield from
 	}
 
-	MagicConstExpr struct {
-		Kind token.Token // token.IsMagicConstKind()
+	// FuncCallExpr : Expr, CallLikeExpr
+	FuncCallExpr struct {
+		Name any   // @var Name|Expr Function name
+		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+	}
+
+	// NewExpr : CallLikeExpr
+	NewExpr struct {
+		Class Node  // @var Name|Expr|ClassStmt Class name
+		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
+	}
+
+	// MethodCallExpr : CallLikeExpr
+	MethodCallExpr struct {
+		Var  Expr  // @var Expr Variable holding object
+		Name any   // @var Ident|Expr Method name
+		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+	}
+
+	// NullsafeMethodCallExpr : CallLikeExpr
+	NullsafeMethodCallExpr struct {
+		Var  Expr  // @var Expr Variable holding object
+		Name any   // @var Ident|Expr Method name
+		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+	}
+
+	// ExprStaticCall : ExprCallLike
+	StaticCallExpr struct {
+		Class any   // @var Name|Expr Class name
+		Name  any   // @var Ident|Expr Method name
+		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 )
 
@@ -410,16 +401,20 @@ type (
 		List []Stmt
 	}
 
-	LabelStmt struct {
-		Name *Ident // @var Ident Name
-	}
-
 	ExprStmt struct {
 		Expr Expr // @var Expr Expression
 	}
 
 	ReturnStmt struct {
 		Expr Expr // @var Expr|null Expression
+	}
+
+	LabelStmt struct {
+		Name *Ident // @var Ident Name
+	}
+
+	GotoStmt struct {
+		Name *Ident // @var Ident Name of label to jump to
 	}
 
 	// IfStmt
@@ -471,13 +466,120 @@ type (
 		Num Expr // @var Expr|null Number of loops to break
 	}
 
+	ContinueStmt struct {
+		Num Expr // @var Expr|null Number of loops to continue
+	}
+
+	// WhileStmt
+	WhileStmt struct {
+		Cond  Expr   // @var Expr Condition
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	// DoStmt
+	DoStmt struct {
+		Stmts []Stmt // @var Stmt[] Statements
+		Cond  Expr   // @var Expr Condition
+	}
+
+	// try-catch-finally
+	TryCatchStmt struct {
+		Stmts   []Stmt       // @var Stmt[] Statements
+		Catches []*CatchStmt // @var Catch_[] Catches
+		Finally *FinallyStmt // @var Finally_|null Optional finally node
+	}
+
 	CatchStmt struct {
 		Types []*Name       // @var Name[] Types of exceptions to catch
 		Var   *VariableExpr // @var VariableExpr|null Variable for exception
 		Stmts []Stmt        // @var Stmt[] Statements
 	}
 
-	// StmtClass : StmtClassLike
+	FinallyStmt struct {
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	ConstStmt struct {
+		Consts []*Const // @var Const_[] Constant declarations
+	}
+
+	EchoStmt struct {
+		Exprs []Expr // @var Expr[] Expressions
+	}
+
+	GlobalStmt struct {
+		Vars []Expr // @var Expr[] Variables
+	}
+
+	HaltCompilerStmt struct {
+		Remaining string // @var string Remaining text after halt compiler statement.
+	}
+
+	InlineHTMLStmt struct {
+		Value string // @var string String
+	}
+
+	StaticStmt struct {
+		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
+	}
+
+	StaticVarStmt struct {
+		Var     *VariableExpr // @var VariableExpr Variable
+		Default Expr          // @var Expr|null Default value
+	}
+
+	ThrowStmt struct {
+		Expr Expr // @var Expr Expression
+	}
+
+	UnsetStmt struct {
+		Vars []Expr // @var Expr[] Variables to unset
+	}
+
+	UseStmt struct {
+		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
+		Name  *Name   // @var Name        Namespace, class, function or constant to alias
+		Alias *Ident  // @var Ident|null  Alias Name, or nil
+	}
+
+	// DeclareStmt
+	DeclareStmt struct {
+		Declares []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
+		Stmts    []Stmt                // @var Stmt[]|null Statements
+	}
+
+	DeclareDeclareStmt struct {
+		Key   *Ident // @var Ident Key
+		Value Expr   // @var Expr Value
+	}
+
+	// NamespaceStmt
+	NamespaceStmt struct {
+		Name  *Name  // @var Name|null Name
+		Stmts []Stmt // @var Stmt[] Statements
+	}
+
+	// StmtFunction : Stmt, FunctionLike
+	FunctionStmt struct {
+		ByRef          bool              // @var bool Whether function returns by reference
+		Name           *Ident            // @var Ident Name
+		Params         []*Param          // @var Param[] Parameters
+		ReturnType     Type              // @var Type|null Return type
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
+	}
+
+	// InterfaceStmt
+	InterfaceStmt struct {
+		Extends        []*Name           // @var Name[] Extended interfaces
+		Name           *Ident            // @var Ident|null Name
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
+	}
+
+	// StmtClass : Stmt, StmtClassLike
 	ClassStmt struct {
 		Flags          int               // @var int        Type
 		Extends        *Name             // @var Name|null  Name of extended class
@@ -495,105 +597,7 @@ type (
 		AttrGroups []*AttributeGroup // @var AttributeGroup[]
 	}
 
-	// StmtClassMethod : Stmt, FunctionLike
-	ClassMethodStmt struct {
-		Flags      int               // @var int Flags
-		ByRef      bool              // @var bool Whether to return by reference
-		Name       *Ident            // @var Ident Name
-		Params     []*Param          // @var Param[] Parameters
-		ReturnType Type              // @var Type|null Return type
-		Stmts      []Stmt            // @var Stmt[]|null Statements
-		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-	}
-
-	ConstStmt struct {
-		Consts []*Const // @var Const_[] Constant declarations
-	}
-
-	ContinueStmt struct {
-		Num Expr // @var Expr|null Number of loops to continue
-	}
-
-	DeclareStmt struct {
-		Declares []*DeclareDeclareStmt // @var DeclareDeclare[] List of declares
-		Stmts    []Stmt                // @var Stmt[]|null Statements
-	}
-
-	DeclareDeclareStmt struct {
-		Key   *Ident // @var Ident Key
-		Value Expr   // @var Expr Value
-	}
-
-	DoStmt struct {
-		Stmts []Stmt // @var Stmt[] Statements
-		Cond  Expr   // @var Expr Condition
-	}
-
-	// StmtEcho : Stmt
-	EchoStmt struct {
-		Exprs []Expr // @var Expr[] Expressions
-	}
-
-	// StmtEnum : StmtClassLike
-	EnumStmt struct {
-		ScalarType     *Ident            // @var Ident|null Scalar Type
-		Implements     []*Name           // @var Name[] Names of implemented interfaces
-		Name           *Ident            // @var Ident|null Name
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
-	}
-
-	EnumCaseStmt struct {
-		Name       *Ident            // @var Ident Enum case name
-		Expr       Expr              // @var Expr|null Enum case expression
-		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-	}
-
-	FinallyStmt struct {
-		Stmts []Stmt // @var Stmt[] Statements
-	}
-
-	// StmtFunction : Stmt, FunctionLike
-	FunctionStmt struct {
-		ByRef          bool              // @var bool Whether function returns by reference
-		Name           *Ident            // @var Ident Name
-		Params         []*Param          // @var Param[] Parameters
-		ReturnType     Type              // @var Type|null Return type
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
-	}
-
-	GlobalStmt struct {
-		Vars []Expr // @var Expr[] Variables
-	}
-
-	GotoStmt struct {
-		Name *Ident // @var Ident Name of label to jump to
-	}
-
-	HaltCompilerStmt struct {
-		Remaining string // @var string Remaining text after halt compiler statement.
-	}
-
-	InlineHTMLStmt struct {
-		Value string // @var string String
-	}
-
-	InterfaceStmt struct {
-		Extends        []*Name           // @var Name[] Extended interfaces
-		Name           *Ident            // @var Ident|null Name
-		Stmts          []Stmt            // @var Stmt[] Statements
-		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
-		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
-	}
-
-	NamespaceStmt struct {
-		Name  *Name  // @var Name|null Name
-		Stmts []Stmt // @var Stmt[] Statements
-	}
-
+	// PropertyStmt : Stmt
 	PropertyStmt struct {
 		Flags      int                     // @var int Modifiers
 		Props      []*PropertyPropertyStmt // @var PropertyProperty[] Properties
@@ -606,17 +610,15 @@ type (
 		Default Expr   // @var Expr|null Default
 	}
 
-	StaticStmt struct {
-		Vars []*StaticVarStmt // @var StaticVar[] Variable definitions
-	}
-
-	StaticVarStmt struct {
-		Var     *VariableExpr // @var VariableExpr Variable
-		Default Expr          // @var Expr|null Default value
-	}
-
-	ThrowStmt struct {
-		Expr Expr // @var Expr Expression
+	// StmtClassMethod : Stmt, FunctionLike
+	ClassMethodStmt struct {
+		Flags      int               // @var int Flags
+		ByRef      bool              // @var bool Whether to return by reference
+		Name       *Ident            // @var Ident Name
+		Params     []*Param          // @var Param[] Parameters
+		ReturnType Type              // @var Type|null Return type
+		Stmts      []Stmt            // @var Stmt[]|null Statements
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
 	// StmtTrait : StmtClassLike
@@ -647,25 +649,20 @@ type (
 		Method    *Ident  // @var Ident Method name
 	}
 
-	TryCatchStmt struct {
-		Stmts   []Stmt       // @var Stmt[] Statements
-		Catches []*CatchStmt // @var Catch_[] Catches
-		Finally *FinallyStmt // @var Finally_|null Optional finally node
+	// StmtEnum : StmtClassLike
+	EnumStmt struct {
+		ScalarType     *Ident            // @var Ident|null Scalar Type
+		Implements     []*Name           // @var Name[] Names of implemented interfaces
+		Name           *Ident            // @var Ident|null Name
+		Stmts          []Stmt            // @var Stmt[] Statements
+		AttrGroups     []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
+		NamespacedName *Name             // @var Name|null Namespaced name (if using NameResolver)
 	}
 
-	UnsetStmt struct {
-		Vars []Expr // @var Expr[] Variables to unset
-	}
-
-	WhileStmt struct {
-		Cond  Expr   // @var Expr Condition
-		Stmts []Stmt // @var Stmt[] Statements
-	}
-
-	UseStmt struct {
-		Type  UseType // @var UseType     UseNormal UseFunction Or UseConstant
-		Name  *Name   // @var Name        Namespace, class, function or constant to alias
-		Alias *Ident  // @var Ident|null  Alias Name, or nil
+	EnumCaseStmt struct {
+		Name       *Ident            // @var Ident Enum case name
+		Expr       Expr              // @var Expr|null Enum case expression
+		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 )
 
@@ -676,41 +673,110 @@ func (*UnionType) typeNode()        {}
 func (*NullableType) typeNode()     {}
 
 // Expr
-func (*IntLit) exprNode()                    {}
-func (*FloatLit) exprNode()                  {}
-func (*StringLit) exprNode()                 {}
-func (*ArrayExpr) exprNode()                 {}
-func (*MagicConstExpr) exprNode()            {}
-func (*IndexExpr) exprNode()                 {}
-func (*ArrayItemExpr) exprNode()             {}
-func (*ArrowFunctionExpr) exprNode()         {}
-func (*AssignExpr) exprNode()                {}
-func (*AssignRefExpr) exprNode()             {}
-func (*BinaryExpr) exprNode()                {}
-func (*CastExpr) exprNode()                  {}
-func (*ClassConstFetchExpr) exprNode()       {}
-func (*CloneExpr) exprNode()                 {}
-func (*ClosureExpr) exprNode()               {}
-func (*ClosureUseExpr) exprNode()            {}
-func (*ConstFetchExpr) exprNode()            {}
-func (*InternalCallExpr) exprNode()          {}
-func (*ErrorSuppressExpr) exprNode()         {}
-func (*ExitExpr) exprNode()                  {}
+func (*IntLit) exprNode()        {}
+func (*FloatLit) exprNode()      {}
+func (*StringLit) exprNode()     {}
+func (*ArrayExpr) exprNode()     {}
+func (*ArrayItemExpr) exprNode() {}
+
+func (*ClosureExpr) exprNode()       {}
+func (*ClosureUseExpr) exprNode()    {}
+func (*ArrowFunctionExpr) exprNode() {}
+
+func (*IndexExpr) exprNode()     {}
+func (*CastExpr) exprNode()      {}
+func (*UnaryExpr) exprNode()     {}
+func (*BinaryExpr) exprNode()    {}
+func (*AssignExpr) exprNode()    {}
+func (*AssignRefExpr) exprNode() {}
+
+func (*InternalCallExpr) exprNode()  {}
+func (*CloneExpr) exprNode()         {}
+func (*ErrorSuppressExpr) exprNode() {}
+func (*ExitExpr) exprNode()          {}
+
+func (*ConstFetchExpr) exprNode()      {}
+func (*ClassConstFetchExpr) exprNode() {}
+func (*MagicConstExpr) exprNode()      {}
+
+func (*MatchExpr) exprNode()                 {}
 func (*InstanceofExpr) exprNode()            {}
 func (*ListExpr) exprNode()                  {}
-func (*MatchExpr) exprNode()                 {}
-func (*NullsafePropertyFetchExpr) exprNode() {}
-func (*UnaryExpr) exprNode()                 {}
+func (*PrintExpr) exprNode()                 {}
 func (*PropertyFetchExpr) exprNode()         {}
-func (*ShellExecExpr) exprNode()             {}
+func (*NullsafePropertyFetchExpr) exprNode() {}
 func (*StaticPropertyFetchExpr) exprNode()   {}
+func (*ShellExecExpr) exprNode()             {}
 func (*TernaryExpr) exprNode()               {}
 func (*ThrowExpr) exprNode()                 {}
-func (*UnaryMinusExpr) exprNode()            {}
-func (*UnaryPlusExpr) exprNode()             {}
 func (*VariableExpr) exprNode()              {}
 func (*YieldExpr) exprNode()                 {}
 func (*YieldFromExpr) exprNode()             {}
+
+func (*FuncCallExpr) exprNode()           {}
+func (*NewExpr) exprNode()                {}
+func (*MethodCallExpr) exprNode()         {}
+func (*NullsafeMethodCallExpr) exprNode() {}
+func (*StaticCallExpr) exprNode()         {}
+
+// Stmt
+func (*EmptyStmt) stmtNode()  {}
+func (*BlockStmt) stmtNode()  {}
+func (*ExprStmt) stmtNode()   {}
+func (*ReturnStmt) stmtNode() {}
+
+func (*LabelStmt) stmtNode()    {}
+func (*GotoStmt) stmtNode()     {}
+func (*IfStmt) stmtNode()       {}
+func (*ElseIfStmt) stmtNode()   {}
+func (*ElseStmt) stmtNode()     {}
+func (*SwitchStmt) stmtNode()   {}
+func (*CaseStmt) stmtNode()     {}
+func (*ForStmt) stmtNode()      {}
+func (*ForeachStmt) stmtNode()  {}
+func (*BreakStmt) stmtNode()    {}
+func (*ContinueStmt) stmtNode() {}
+func (*WhileStmt) stmtNode()    {}
+func (*DoStmt) stmtNode()       {}
+func (*TryCatchStmt) stmtNode() {}
+func (*CatchStmt) stmtNode()    {}
+func (*FinallyStmt) stmtNode()  {}
+
+func (*ConstStmt) stmtNode()        {}
+func (*EchoStmt) stmtNode()         {}
+func (*GlobalStmt) stmtNode()       {}
+func (*HaltCompilerStmt) stmtNode() {}
+func (*InlineHTMLStmt) stmtNode()   {}
+func (*StaticStmt) stmtNode()       {}
+func (*StaticVarStmt) stmtNode()    {}
+
+func (*ThrowStmt) stmtNode()          {}
+func (*UnsetStmt) stmtNode()          {}
+func (*UseStmt) stmtNode()            {}
+func (*DeclareStmt) stmtNode()        {}
+func (*DeclareDeclareStmt) stmtNode() {}
+
+func (*NamespaceStmt) stmtNode()                    {}
+func (*FunctionStmt) stmtNode()                     {}
+func (*InterfaceStmt) stmtNode()                    {}
+func (*ClassStmt) stmtNode()                        {}
+func (*ClassConstStmt) stmtNode()                   {}
+func (*PropertyStmt) stmtNode()                     {}
+func (*PropertyPropertyStmt) stmtNode()             {}
+func (*ClassMethodStmt) stmtNode()                  {}
+func (*TraitStmt) stmtNode()                        {}
+func (*TraitUseStmt) stmtNode()                     {}
+func (*TraitUseAdaptationAliasStmt) stmtNode()      {}
+func (*TraitUseAdaptationPrecedenceStmt) stmtNode() {}
+func (*EnumStmt) stmtNode()                         {}
+func (*EnumCaseStmt) stmtNode()                     {}
+
+// CallLikeExpr
+func (*FuncCallExpr) callLikeExprNode()           {}
+func (*NewExpr) callLikeExprNode()                {}
+func (*MethodCallExpr) callLikeExprNode()         {}
+func (*NullsafeMethodCallExpr) callLikeExprNode() {}
+func (*StaticCallExpr) callLikeExprNode()         {}
 
 // FunctionLike
 func (*ArrowFunctionExpr) functionLikeNode() {}
@@ -718,67 +784,12 @@ func (*ClosureExpr) functionLikeNode()       {}
 func (*ClassMethodStmt) functionLikeNode()   {}
 func (*FunctionStmt) functionLikeNode()      {}
 
-// ExprCallLike
-func (*FuncCallExpr) exprCallLikeNode()           {}
-func (*MethodCallExpr) exprCallLikeNode()         {}
-func (*NewExpr) exprCallLikeNode()                {}
-func (*NullsafeMethodCallExpr) exprCallLikeNode() {}
-func (*StaticCallExpr) exprCallLikeNode()         {}
+// ClassLikeStmt
+func (*ClassStmt) classLikeStmtNode()     {}
+func (*EnumStmt) classLikeStmtNode()      {}
+func (*InterfaceStmt) classLikeStmtNode() {}
+func (*TraitStmt) classLikeStmtNode()     {}
 
-func (*FuncCallExpr) exprNode()           {}
-func (*MethodCallExpr) exprNode()         {}
-func (*NewExpr) exprNode()                {}
-func (*NullsafeMethodCallExpr) exprNode() {}
-func (*StaticCallExpr) exprNode()         {}
-
-// Stmt
-func (*EmptyStmt) stmtNode()            {}
-func (*BlockStmt) stmtNode()            {}
-func (*BreakStmt) stmtNode()            {}
-func (*CaseStmt) stmtNode()             {}
-func (*CatchStmt) stmtNode()            {}
-func (*ClassConstStmt) stmtNode()       {}
-func (*ClassMethodStmt) stmtNode()      {}
-func (*ConstStmt) stmtNode()            {}
-func (*ContinueStmt) stmtNode()         {}
-func (*DeclareStmt) stmtNode()          {}
-func (*DeclareDeclareStmt) stmtNode()   {}
-func (*DoStmt) stmtNode()               {}
-func (*EchoStmt) stmtNode()             {}
-func (*ElseStmt) stmtNode()             {}
-func (*ElseIfStmt) stmtNode()           {}
-func (*EnumCaseStmt) stmtNode()         {}
-func (*ExprStmt) stmtNode()             {}
-func (*FinallyStmt) stmtNode()          {}
-func (*ForStmt) stmtNode()              {}
-func (*ForeachStmt) stmtNode()          {}
-func (*FunctionStmt) stmtNode()         {}
-func (*GlobalStmt) stmtNode()           {}
-func (*GotoStmt) stmtNode()             {}
-func (*HaltCompilerStmt) stmtNode()     {}
-func (*IfStmt) stmtNode()               {}
-func (*InlineHTMLStmt) stmtNode()       {}
-func (*LabelStmt) stmtNode()            {}
-func (*NamespaceStmt) stmtNode()        {}
-func (*PropertyStmt) stmtNode()         {}
-func (*PropertyPropertyStmt) stmtNode() {}
-func (*ReturnStmt) stmtNode()           {}
-func (*StaticStmt) stmtNode()           {}
-func (*StaticVarStmt) stmtNode()        {}
-func (*SwitchStmt) stmtNode()           {}
-func (*ThrowStmt) stmtNode()            {}
-func (*TraitUseStmt) stmtNode()         {}
-func (*TryCatchStmt) stmtNode()         {}
-func (*UnsetStmt) stmtNode()            {}
-func (*UseStmt) stmtNode()              {}
-func (*WhileStmt) stmtNode()            {}
-
-// StmtClassLike
-func (*ClassStmt) stmtClassLikeNode()     {}
-func (*EnumStmt) stmtClassLikeNode()      {}
-func (*InterfaceStmt) stmtClassLikeNode() {}
-func (*TraitStmt) stmtClassLikeNode()     {}
-
-// StmtTraitUseAdaptation
-func (*TraitUseAdaptationAliasStmt) stmtTraitUseAdaptationNode()      {}
-func (*TraitUseAdaptationPrecedenceStmt) stmtTraitUseAdaptationNode() {}
+// TraitUseAdaptationStmt
+func (*TraitUseAdaptationAliasStmt) traitUseAdaptationStmtNode()      {}
+func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}

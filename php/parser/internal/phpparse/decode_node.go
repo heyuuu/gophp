@@ -354,7 +354,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprClassConstFetch":
 		node = &ast.ClassConstFetchExpr{
-			Class: data["class"],
+			Class: data["class"].(ast.Expr),
 			Name:  data["name"].(*ast.Ident),
 		}
 	case "ExprClone":
@@ -431,7 +431,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ExprInstanceof":
 		node = &ast.InstanceofExpr{
 			Expr:  data["expr"].(ast.Expr),
-			Class: data["class"],
+			Class: data["class"].(ast.Expr),
 		}
 	case "ExprIsset":
 		node = &ast.InternalCallExpr{
@@ -524,12 +524,14 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Expr: data["expr"].(ast.Expr),
 		}
 	case "ExprUnaryMinus":
-		node = &ast.UnaryMinusExpr{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.Sub,
+			Var:  data["expr"].(ast.Expr),
 		}
 	case "ExprUnaryPlus":
-		node = &ast.UnaryPlusExpr{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.UnaryExpr{
+			Kind: token.And,
+			Var:  data["expr"].(ast.Expr),
 		}
 	case "ExprVariable":
 		node = &ast.VariableExpr{
