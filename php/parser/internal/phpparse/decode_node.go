@@ -354,7 +354,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprClassConstFetch":
 		node = &ast.ClassConstFetchExpr{
-			Class: data["class"].(ast.Expr),
+			Class: data["class"].(ast.Node),
 			Name:  data["name"].(*ast.Ident),
 		}
 	case "ExprClone":
@@ -404,8 +404,8 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprFuncCall":
 		node = &ast.FuncCallExpr{
-			Name: data["name"],
-			Args: asSlice[any](data["args"]),
+			Name: data["name"].(ast.Node),
+			Args: asSlice[ast.Node](data["args"]),
 		}
 	case "ExprInclude":
 		var Kind token.Token
@@ -450,24 +450,24 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ExprMethodCall":
 		node = &ast.MethodCallExpr{
 			Var:  data["var"].(ast.Expr),
-			Name: data["name"],
-			Args: asSlice[any](data["args"]),
+			Name: data["name"].(ast.Node),
+			Args: asSlice[ast.Node](data["args"]),
 		}
 	case "ExprNew":
 		node = &ast.NewExpr{
 			Class: data["class"].(ast.Node),
-			Args:  asSlice[any](data["args"]),
+			Args:  asSlice[ast.Node](data["args"]),
 		}
 	case "ExprNullsafeMethodCall":
 		node = &ast.NullsafeMethodCallExpr{
 			Var:  data["var"].(ast.Expr),
-			Name: data["name"],
-			Args: asSlice[any](data["args"]),
+			Name: data["name"].(ast.Node),
+			Args: asSlice[ast.Node](data["args"]),
 		}
 	case "ExprNullsafePropertyFetch":
 		node = &ast.NullsafePropertyFetchExpr{
 			Var:  data["var"].(ast.Expr),
-			Name: data["name"],
+			Name: data["name"].(ast.Node),
 		}
 	case "ExprPostDec":
 		node = &ast.UnaryExpr{
@@ -496,17 +496,17 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ExprPropertyFetch":
 		node = &ast.PropertyFetchExpr{
 			Var:  data["var"].(ast.Expr),
-			Name: data["name"],
+			Name: data["name"].(ast.Node),
 		}
 	case "ExprShellExec":
 		node = &ast.ShellExecExpr{
-			Parts: asSlice[any](data["parts"]),
+			Parts: asSlice[ast.Expr](data["parts"]),
 		}
 	case "ExprStaticCall":
 		node = &ast.StaticCallExpr{
-			Class: data["class"],
-			Name:  data["name"],
-			Args:  asSlice[any](data["args"]),
+			Class: data["class"].(ast.Node),
+			Name:  data["name"].(ast.Node),
+			Args:  asSlice[ast.Node](data["args"]),
 		}
 	case "ExprStaticPropertyFetch":
 		node = &ast.StaticPropertyFetchExpr{

@@ -56,6 +56,10 @@ func (p *printer) print(args ...any) {
 			p.writeString(token.TokenName(v))
 		case ast.Node:
 			p.printNode(v)
+		case []ast.Stmt:
+			p.printStmtList(v)
+		case []ast.Expr:
+			p.printExprList(v)
 		default:
 			_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
 			panic("gophp/php/printer type")
@@ -75,8 +79,6 @@ func (p *printer) printNode(node ast.Node) {
 		p.stmt(x)
 	case ast.Type:
 		p.typeHint(x)
-	case []ast.Stmt:
-		p.printStmtList(x)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
@@ -129,7 +131,8 @@ type Config struct {
 
 func (cfg *Config) sprint(node any) (string, error) {
 	var p = &printer{}
-	p.printNode(node)
+	// todo 需要验证 node 为 print 可以打印的类型范围
+	p.print(node)
 	return p.result()
 }
 

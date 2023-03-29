@@ -6,7 +6,9 @@ import (
 )
 
 type (
-	Node interface{}
+	Node interface {
+		node()
+	}
 
 	Expr interface {
 		Node
@@ -272,7 +274,7 @@ type (
 	}
 
 	ClassConstFetchExpr struct {
-		Class Expr   // @var Name|Expr Class name
+		Class Node   // @var Name|Expr Class name
 		Name  *Ident // @var Ident Constant name
 	}
 
@@ -318,7 +320,7 @@ type (
 
 	// ExprShellExec : Expr
 	ShellExecExpr struct {
-		Parts []any // @var array Encapsed string array
+		Parts []Expr // @var array Encapsed string array
 	}
 
 	// ExprTernary : Expr
@@ -351,35 +353,35 @@ type (
 
 	// FuncCallExpr : Expr, CallLikeExpr
 	FuncCallExpr struct {
-		Name any   // @var Name|Expr Function name
-		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+		Name Node   // @var Name|Expr Function name
+		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// NewExpr : CallLikeExpr
 	NewExpr struct {
-		Class Node  // @var Name|Expr|ClassStmt Class name
-		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
+		Class Node   // @var Name|Expr|ClassStmt Class name
+		Args  []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// MethodCallExpr : CallLikeExpr
 	MethodCallExpr struct {
-		Var  Expr  // @var Expr Variable holding object
-		Name any   // @var Ident|Expr Method name
-		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+		Var  Expr   // @var Expr Variable holding object
+		Name Node   // @var Ident|Expr Method name
+		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// NullsafeMethodCallExpr : CallLikeExpr
 	NullsafeMethodCallExpr struct {
-		Var  Expr  // @var Expr Variable holding object
-		Name any   // @var Ident|Expr Method name
-		Args []any // @var array<Arg|VariadicPlaceholder> Arguments
+		Var  Expr   // @var Expr Variable holding object
+		Name Node   // @var Ident|Expr Method name
+		Args []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 
 	// ExprStaticCall : ExprCallLike
 	StaticCallExpr struct {
-		Class any   // @var Name|Expr Class name
-		Name  any   // @var Ident|Expr Method name
-		Args  []any // @var array<Arg|VariadicPlaceholder> Arguments
+		Class Node   // @var Name|Expr Class name
+		Name  Node   // @var Ident|Expr Method name
+		Args  []Node // @var array<Arg|VariadicPlaceholder> Arguments
 	}
 )
 
@@ -788,3 +790,102 @@ func (*TraitStmt) classLikeStmtNode()     {}
 // TraitUseAdaptationStmt
 func (*TraitUseAdaptationAliasStmt) traitUseAdaptationStmtNode()      {}
 func (*TraitUseAdaptationPrecedenceStmt) traitUseAdaptationStmtNode() {}
+
+// All Node types
+func (*Arg) node()                              {}
+func (*Attribute) node()                        {}
+func (*AttributeGroup) node()                   {}
+func (*Const) node()                            {}
+func (*Ident) node()                            {}
+func (*MatchArm) node()                         {}
+func (*Param) node()                            {}
+func (*VariadicPlaceholder) node()              {}
+func (*SimpleType) node()                       {}
+func (*IntersectionType) node()                 {}
+func (*UnionType) node()                        {}
+func (*NullableType) node()                     {}
+func (*Name) node()                             {}
+func (*IntLit) node()                           {}
+func (*FloatLit) node()                         {}
+func (*StringLit) node()                        {}
+func (*ArrayExpr) node()                        {}
+func (*ArrayItemExpr) node()                    {}
+func (*ClosureExpr) node()                      {}
+func (*ClosureUseExpr) node()                   {}
+func (*ArrowFunctionExpr) node()                {}
+func (*IndexExpr) node()                        {}
+func (*CastExpr) node()                         {}
+func (*UnaryExpr) node()                        {}
+func (*BinaryExpr) node()                       {}
+func (*AssignExpr) node()                       {}
+func (*AssignRefExpr) node()                    {}
+func (*InternalCallExpr) node()                 {}
+func (*CloneExpr) node()                        {}
+func (*ErrorSuppressExpr) node()                {}
+func (*ExitExpr) node()                         {}
+func (*ConstFetchExpr) node()                   {}
+func (*ClassConstFetchExpr) node()              {}
+func (*MagicConstExpr) node()                   {}
+func (*MatchExpr) node()                        {}
+func (*InstanceofExpr) node()                   {}
+func (*ListExpr) node()                         {}
+func (*PrintExpr) node()                        {}
+func (*PropertyFetchExpr) node()                {}
+func (*NullsafePropertyFetchExpr) node()        {}
+func (*StaticPropertyFetchExpr) node()          {}
+func (*ShellExecExpr) node()                    {}
+func (*TernaryExpr) node()                      {}
+func (*ThrowExpr) node()                        {}
+func (*VariableExpr) node()                     {}
+func (*YieldExpr) node()                        {}
+func (*YieldFromExpr) node()                    {}
+func (*FuncCallExpr) node()                     {}
+func (*NewExpr) node()                          {}
+func (*MethodCallExpr) node()                   {}
+func (*NullsafeMethodCallExpr) node()           {}
+func (*StaticCallExpr) node()                   {}
+func (*EmptyStmt) node()                        {}
+func (*BlockStmt) node()                        {}
+func (*ExprStmt) node()                         {}
+func (*ReturnStmt) node()                       {}
+func (*LabelStmt) node()                        {}
+func (*GotoStmt) node()                         {}
+func (*IfStmt) node()                           {}
+func (*ElseIfStmt) node()                       {}
+func (*ElseStmt) node()                         {}
+func (*SwitchStmt) node()                       {}
+func (*CaseStmt) node()                         {}
+func (*ForStmt) node()                          {}
+func (*ForeachStmt) node()                      {}
+func (*BreakStmt) node()                        {}
+func (*ContinueStmt) node()                     {}
+func (*WhileStmt) node()                        {}
+func (*DoStmt) node()                           {}
+func (*TryCatchStmt) node()                     {}
+func (*CatchStmt) node()                        {}
+func (*FinallyStmt) node()                      {}
+func (*ConstStmt) node()                        {}
+func (*EchoStmt) node()                         {}
+func (*GlobalStmt) node()                       {}
+func (*HaltCompilerStmt) node()                 {}
+func (*InlineHTMLStmt) node()                   {}
+func (*StaticStmt) node()                       {}
+func (*StaticVarStmt) node()                    {}
+func (*UnsetStmt) node()                        {}
+func (*UseStmt) node()                          {}
+func (*DeclareStmt) node()                      {}
+func (*DeclareDeclareStmt) node()               {}
+func (*NamespaceStmt) node()                    {}
+func (*FunctionStmt) node()                     {}
+func (*InterfaceStmt) node()                    {}
+func (*ClassStmt) node()                        {}
+func (*ClassConstStmt) node()                   {}
+func (*PropertyStmt) node()                     {}
+func (*PropertyPropertyStmt) node()             {}
+func (*ClassMethodStmt) node()                  {}
+func (*TraitStmt) node()                        {}
+func (*TraitUseStmt) node()                     {}
+func (*TraitUseAdaptationAliasStmt) node()      {}
+func (*TraitUseAdaptationPrecedenceStmt) node() {}
+func (*EnumStmt) node()                         {}
+func (*EnumCaseStmt) node()                     {}
