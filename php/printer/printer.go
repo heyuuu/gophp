@@ -110,6 +110,18 @@ func (cfg *Config) Sprint(node any) (string, error) {
 	return cfg.sprint(node)
 }
 
+func (cfg *Config) SprintFile(node any) (string, error) {
+	code, err := cfg.sprint(node)
+	if err != nil {
+		return "", err
+	}
+	return "<?php\n" + code, nil
+}
+
 func Sprint(node any) (string, error) {
 	return (&Config{Tabwidth: 8}).Sprint(node)
+}
+
+func SprintFile(node any) (string, error) {
+	return (&Config{Tabwidth: 8}).SprintFile(node)
 }

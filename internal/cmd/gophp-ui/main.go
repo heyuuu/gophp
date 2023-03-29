@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"gophp/php/ast"
 	"gophp/php/parser"
+	"gophp/php/printer"
 	"log"
 	"net/http"
 	"os"
@@ -77,33 +78,46 @@ func apiHandler(request *http.Request) (content []byte, err error) {
 	}
 
 	input := request.FormValue("input")
+	mode := request.FormValue("mode")
 
-	output, parseErr := parseCode(input)
+	astDump, printDump, parseErr := parseCode(input, mode)
 	var parseErrStr string
 	if parseErr != nil {
 		parseErrStr = parseErr.Error()
 	}
 
 	content, err = json.Marshal(struct {
-		Code   string
-		Input  string
-		Output string
-		Error  string
+		Code  string
+		Input string
+		Ast   string
+		Print string
+		Error string
 	}{
 		"api",
 		input,
-		output,
+		astDump,
+		printDump,
 		parseErrStr,
 	})
 
 	return
 }
 
-func parseCode(code string) (string, error) {
+func parseCode(code string, mode string) (astDump string, printDump string, err error) {
 	nodes, err := parser.ParseCode(code)
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return ast.Sprint(nodes)
+	astDump, err = ast.Sprint(nodes)
+	if err != nil {
+		return
+	}
+
+	printDump, err = printer.SprintFile(nodes)
+	if err != nil {
+		return
+	}
+
+	return
 }

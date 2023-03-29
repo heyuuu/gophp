@@ -5,38 +5,107 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Ast UI</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <title>GoPhp UI</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container-fluid">
+<div class="container-fluid" v-scope v-cloak>
     <form>
         <div class="row">
-            <div class="col-sm-6">
-                <button class="btn btn-link" id="link-pretty">精简模式</button>
-                <button class="btn btn-link" id="link-raw">原始模式</button>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <textarea class="form-control" id="input" rows="20">package main</textarea>
-                            <div class="card-body">
-                                <pre id="error" style="color: red"></pre>
-                            </div>
-                        </div>
+            <div :class="codeClass">
+                <input type="button" class="btn btn-link" @click="mode = 0" value="默认模式"/>
+                <input type="button" class="btn btn-link" @click="mode = 1" value="AST 模式"/>
+                <input type="button" class="btn btn-link" @click="mode = 2" value="Print 模式"/>
+                <div class="form-group">
+                    <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
+                    <div class="card-body">
+                        <span style="color: red">{{ error }}</span>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">
+            <div :class="astClass" v-if="showAst">
                 <div class="card" style="height: 100vh">
-                    <pre id="output" style="margin: 0; padding: 1rem 0"></pre>
+                    <pre id="ast-output" style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ast }}</pre>
+                </div>
+            </div>
+            <div :class="printClass" v-if="showPrint">
+                <div class="card" style="height: 100vh">
+                    <pre id="printer-output" style="margin: 0; padding: 1rem 0; height: 100vh;">{{ print }}</pre>
                 </div>
             </div>
         </div>
     </form>
 </div>
+
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/petite-vue/0.4.1/petite-vue.iife.min.js"></script>
 <script>
+    // storage
+    const storageKey = "code"
+    let initCode = localStorage.getItem(storageKey)
+    if (!initCode) {
+        initCode = "<?php\n\n"
+    }
+
+    // App
+    const apiUri = "/api"
+    const app = {
+        mode: 0, // 0: all, 1: ast-mode, 2: print-mode
+        code: initCode,
+        oldCode: "",
+        error: "",
+        ast: "",
+        print: "",
+        get showAst() {
+            return this.mode !== 2
+        },
+        get showPrint() {
+            return this.mode !== 1
+        },
+        get codeClass() {
+            return 'col-sm-4'
+        },
+        get astClass() {
+            return this.mode === 1 ? 'col-sm-8' : 'col-sm-4'
+        },
+        get printClass() {
+            return this.mode === 2 ? 'col-sm-8' : 'col-sm-4'
+        },
+        codeChange() {
+            localStorage.setItem(storageKey, this.code)
+            this.refresh()
+        },
+        refresh() {
+            // console.log({code:this.code, oldCode:this.oldCode})
+            if (this.code === this.oldCode) {
+                return
+            }
+
+            const code = this.code
+            postJson(apiUri, {input: code}, (data) => {
+                // console.log({data})
+                // 确认文本内容没变才更新
+                if (this.code !== code) {
+                    return
+                }
+
+                const error = data.Error
+
+                this.oldCode = code
+                this.error = error
+                if (error === "") {
+                    this.ast = data.Ast
+                    this.print = data.Print
+                }
+            }, () => {
+                this.error = "请求失败，确认服务是否可用"
+            })
+        }
+    }
+    PetiteVue.createApp(app).mount()
+
+    app.refresh()
+
     function postJson(url, data, success, onError) {
         $.ajax({
             type: "POST",
@@ -47,65 +116,6 @@
             dataType: "json"
         })
     }
-
-    function isRawMode() {
-        return window.location.hash === '#raw'
-    }
-
-    function refresh() {
-        const apiUri = "/api"
-        const $input = $("#input")
-        const $output = $("#output")
-        const $error = $("#error")
-
-        const input = $input.val()
-        const raw = isRawMode()
-
-        postJson(apiUri, {input, raw}, function (data) {
-            console.log({data})
-            if ($input.val() === input && isRawMode() === raw) { // 确认文本内容没变才更新
-                const output = data.Output
-                const error = data.Error
-                if (error === "") {
-                    $output.html(output)
-                }
-                $error.html(error)
-            }
-        }, function () {
-            $error.val("请求失败，确认服务是否可用")
-        })
-    }
-
-    $(function () {
-        console.log("ready")
-
-        const storageKey = "code"
-        const saveCode = localStorage.getItem(storageKey)
-        if (saveCode) {
-            $("#input").val(saveCode)
-        }
-
-        let oldCode = ""
-        setInterval(function () {
-            const newCode = $("#input").val()
-            if (newCode !== oldCode) {
-                console.log({"newCode": newCode})
-                oldCode = newCode
-                refresh()
-                localStorage.setItem(storageKey, newCode)
-            }
-        }, 1000)
-
-        $("#link-pretty").click(function () {
-            window.location.hash = ""
-            refresh()
-        })
-
-        $("#link-raw").click(function () {
-            window.location.hash = "#raw"
-            refresh()
-        })
-    })
 </script>
 </body>
 </html>
