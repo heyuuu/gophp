@@ -6,6 +6,22 @@ import (
 	"gophp/php/token"
 )
 
+func (p *printer) param(n *ast.Param) {
+	// todo flags
+	if n.Type != nil {
+		p.print(n.Type, " ")
+	}
+	if n.ByRef {
+		p.print("&")
+	}
+	if n.Variadic {
+		p.print("...")
+	}
+	p.print(n.Var)
+	if n.Default != nil {
+		p.print(" = ", n.Default)
+	}
+}
 func (p *printer) typeHint(n ast.Type) {
 	p.typeHint0(n, false)
 }
@@ -135,11 +151,10 @@ func (p *printer) expr(n ast.Expr) {
 		p.print("match (", x.Cond, ") {\n")
 		p.indent++
 		for _, arm := range x.Arms {
-			if len(arm.Conds) == 0 {
-				p.print("default => ", arm.Body, "\n")
+			if len(arm.Conds) != 0 {
+				p.print(arm.Conds, " => ", arm.Body, "\n")
 			} else {
-				printList(p, arm.Conds, ", ")
-				p.print(" => ", arm.Body, "\n")
+				p.print("default => ", arm.Body, "\n")
 			}
 		}
 		p.indent--
@@ -181,30 +196,15 @@ func (p *printer) expr(n ast.Expr) {
 	case *ast.YieldFromExpr:
 		p.print("yield from ", x.Expr)
 	case *ast.FuncCallExpr:
-		p.print(x.Name)
-		p.print("(")
-		printList(p, x.Args, ", ")
-		p.print(")")
+		p.print(x.Name, "(", x.Args, ")")
 	case *ast.NewExpr:
-		p.print("new ", x.Class)
-		p.print("(")
-		printList(p, x.Args, ", ")
-		p.print(")")
+		p.print("new ", x.Class, "(", x.Args, ")")
 	case *ast.MethodCallExpr:
-		p.print(x.Var, "->", x.Name)
-		p.print("(")
-		printList(p, x.Args, ", ")
-		p.print(")")
+		p.print(x.Var, "->", x.Name, "(", x.Args, ")")
 	case *ast.NullsafeMethodCallExpr:
-		p.print(x.Var, "?->", x.Name)
-		p.print("(")
-		printList(p, x.Args, ", ")
-		p.print(")")
+		p.print(x.Var, "?->", x.Name, "(", x.Args, ")")
 	case *ast.StaticCallExpr:
-		p.print(x.Class, "::", x.Name)
-		p.print("(")
-		printList(p, x.Args, ", ")
-		p.print(")")
+		p.print(x.Class, "::", x.Name, "(", x.Args, ")")
 	default:
 		panic("unreachable")
 	}
@@ -259,13 +259,7 @@ func (p *printer) stmt(n ast.Stmt) {
 		}
 		p.print("}")
 	case *ast.ForStmt:
-		p.print("for (")
-		p.printExprList(x.Init)
-		p.print(";")
-		p.printExprList(x.Cond)
-		p.print(";")
-		p.printExprList(x.Loop)
-		p.print(") {\n")
+		p.print("for (", x.Init, ";", x.Cond, ";", x.Loop, ") {\n")
 		p.printStmtList(x.Stmts)
 		p.print("}")
 	case *ast.ForeachStmt:
@@ -289,49 +283,75 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print("continue;")
 		}
 	case *ast.WhileStmt:
-		p.print("while (", x.Cond, ") {\n")
-		p.printStmtList(x.Stmts)
-		p.print("}")
+		p.print("while (", x.Cond, ") {\n", x.Stmts, "}")
 	case *ast.DoStmt:
-		p.print("do {\n")
-		p.printStmtList(x.Stmts)
-		p.print("} while (", x.Cond, ");")
+		p.print("do {\n", x.Stmts, "} while (", x.Cond, ");")
 	case *ast.TryCatchStmt:
-		p.print("try {\n")
-		p.printStmtList(x.Stmts)
-		p.print("}")
+		p.print("try {\n", x.Stmts, "}")
 		for _, catch := range x.Catches {
 			p.print(" catch (")
 			printList(p, catch.Types, "|")
-			p.print(" ", catch.Var, ") {\n")
-			p.printStmtList(catch.Stmts)
-			p.print("}")
+			p.print(" ", catch.Var, ") {\n", catch.Stmts, "}")
 		}
 		if x.Finally != nil {
-			p.print(" finally {\n")
-			p.printStmtList(x.Finally.Stmts)
-			p.print("}")
+			p.print(" finally {\n", x.Finally.Stmts, "}")
 		}
 	case *ast.ConstStmt:
 		// todo
 	case *ast.EchoStmt:
-		p.print("echo ")
-		p.printExprList(x.Exprs)
-		p.print(";")
+		p.print("echo ", x.Exprs, ";")
 	case *ast.GlobalStmt:
-		p.print("global ")
-		p.printExprList(x.Vars)
-		p.print(";")
+		p.print("global ", x.Vars, ";")
 	case *ast.HaltCompilerStmt:
+		p.print("__halt_compiler();", x.Remaining)
 	case *ast.InlineHTMLStmt:
+		p.print("?>", x.Value, "<?php")
 	case *ast.StaticStmt:
+		p.print("static ", x.Vars, ";")
 	case *ast.StaticVarStmt:
+		if x.Default != nil {
+			p.print(x.Var, " = ", x.Default)
+		} else {
+			p.print(x.Var)
+		}
 	case *ast.UnsetStmt:
+		p.print("unset(", x.Vars, ")")
 	case *ast.UseStmt:
+		var useType string
+		switch x.Type {
+		case ast.UseFunction:
+			useType = "function "
+		case ast.UseConstant:
+			useType = "const "
+		}
+
+		if x.Alias != nil {
+			p.print("use ", useType, x.Name, " as ", x.Alias, ";")
+		} else {
+			p.print("use ", useType, x.Name, ";")
+		}
 	case *ast.DeclareStmt:
+		// todo
 	case *ast.DeclareDeclareStmt:
+		// todo
 	case *ast.NamespaceStmt:
+		p.print("namespace ", x.Name, ";\n")
+		p.print(x.Stmts)
 	case *ast.FunctionStmt:
+		p.print("function ")
+		if x.ByRef {
+			p.print("&")
+		}
+		p.print(x.Name, "(", x.Params, ")")
+		if x.ReturnType != nil {
+			p.print(": ", x.ReturnType)
+		}
+		p.print("\n{\n")
+		p.indent++
+		p.print(x.Stmts)
+		p.indent--
+		p.print("}")
+
 	case *ast.InterfaceStmt:
 	case *ast.ClassStmt:
 	case *ast.ClassConstStmt:

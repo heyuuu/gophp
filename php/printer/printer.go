@@ -5,6 +5,7 @@ import (
 	"gophp/php/ast"
 	"gophp/php/token"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -61,8 +62,12 @@ func (p *printer) print(args ...any) {
 		case []ast.Expr:
 			p.printExprList(v)
 		default:
-			_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
-			panic("gophp/php/printer type")
+			if nodes, ok := convertNodeList(arg); ok {
+				printList(p, nodes, ", ")
+			} else {
+				_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
+				panic("gophp/php/printer type")
+			}
 		}
 	}
 }
@@ -79,6 +84,8 @@ func (p *printer) printNode(node ast.Node) {
 		p.stmt(x)
 	case ast.Type:
 		p.typeHint(x)
+	case *ast.Param:
+		p.param(x)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
@@ -99,6 +106,20 @@ func printList[T ast.Node](p *printer, list []T, sep string) {
 		}
 		p.print(item)
 	}
+}
+
+var astNodeType = reflect.TypeOf([]ast.Node{}).Elem()
+
+func convertNodeList(data any) ([]ast.Node, bool) {
+	value := reflect.ValueOf(data)
+	if value.Kind() == reflect.Slice && value.Type().Elem().Implements(astNodeType) {
+		var nodes []ast.Node
+		for i := 0; i < value.Len(); i++ {
+			nodes = append(nodes, value.Index(i).Interface().(ast.Node))
+		}
+		return nodes, true
+	}
+	return nil, false
 }
 
 func (p *printer) printStmtList(stmtList []ast.Stmt) {
