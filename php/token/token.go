@@ -2,6 +2,7 @@ package token
 
 type Token int
 
+//go:generate stringer -type=Token
 const (
 	_          = iota
 	Comment    // [T_COMMENT]
@@ -223,4 +224,101 @@ func IsMagicConstKind(token Token) bool {
 
 func IsInternalCall(token Token) bool {
 	return internal_call_begin < token && token < internal_call_end
+}
+
+var specialTokenNames = map[Token]string{
+	// unary operators
+	Not:   "!",
+	Tilde: "~",
+	Inc:   "++",
+	Dec:   "--",
+
+	PreInc:  "++",
+	PreDec:  "--",
+	PostInc: "++",
+	PostDec: "--",
+
+	// binary operators
+	Add:      "+",
+	Sub:      "-",
+	Mul:      "*",
+	Div:      "/",
+	Mod:      "%",
+	Pow:      "**",
+	Concat:   ".",
+	Coalesce: "??",
+
+	And:        "&",
+	Or:         "|",
+	Xor:        "^",
+	ShiftLeft:  "<<",
+	ShiftRight: ">>",
+
+	BooleanAnd: "&&",
+	BooleanOr:  "||",
+	LogicalAnd: "and",
+	LogicalOr:  "or",
+	LogicalXor: "xor",
+
+	Equal:          "==",
+	NotEqual:       "!=",
+	Identical:      "===",
+	NotIdentical:   "!==",
+	Greater:        ">",
+	GreaterOrEqual: ">=",
+	Smaller:        "<",
+	SmallerOrEqual: "<=",
+	Spaceship:      "<=>",
+
+	// assign operators
+	Assign:         "=",
+	AddAssign:      "+=",
+	SubAssign:      "-=",
+	MulAssign:      "*=",
+	DivAssign:      "/=",
+	ModAssign:      "%=",
+	PowAssign:      "**=",
+	ConcatAssign:   ".=",
+	CoalesceAssign: "??=",
+
+	AndAssign:        "&=",
+	OrAssign:         "|=",
+	XorAssign:        "^=",
+	ShiftLeftAssign:  "<<=",
+	ShiftRightAssign: ">>=",
+
+	// cast op tokens
+	BoolCast:   "(bool)",
+	IntCast:    "(int))",
+	DoubleCast: "(float)",
+	StringCast: "(string)",
+	ArrayCast:  "(array)",
+	ObjectCast: "(object)",
+	UnsetCast:  "(unset)",
+
+	// magic const op tokens
+	DirConst:       "__DIR__",
+	FileConst:      "__FILE__",
+	LineConst:      "__LINE__",
+	NamespaceConst: "__NAMESPACE__",
+	FunctionConst:  "__FUNCTION__",
+	ClassConst:     "__CLASS__",
+	MethodConst:    "__METHOD__",
+	TraitConst:     "__TRAIT__",
+
+	// internal call as expr
+	Isset:       "isset",        // isset        [T_ISSET]
+	Empty:       "empty",        // empty        [T_EMPTY]
+	Include:     "include",      // include      [T_INCLUDE]
+	IncludeOnce: "include_once", // include_once [T_INCLUDE_ONCE]
+	Require:     "require",      // require      [T_REQUIRE]
+	RequireOnce: "require_once", // require_once [T_REQUIRE_ONCE]
+	Eval:        "eval",         // eval         [T_EVAL]
+}
+
+func TokenName(token Token) string {
+	if name, ok := specialTokenNames[token]; ok {
+		return name
+	}
+	return token.String()
 }

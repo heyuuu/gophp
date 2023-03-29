@@ -431,7 +431,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ExprInstanceof":
 		node = &ast.InstanceofExpr{
 			Expr:  data["expr"].(ast.Expr),
-			Class: data["class"].(ast.Expr),
+			Class: data["class"].(ast.Node),
 		}
 	case "ExprIsset":
 		node = &ast.InternalCallExpr{
@@ -510,8 +510,8 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "ExprStaticPropertyFetch":
 		node = &ast.StaticPropertyFetchExpr{
-			Class: data["class"],
-			Name:  data["name"],
+			Class: data["class"].(ast.Node),
+			Name:  data["name"].(ast.Node),
 		}
 	case "ExprTernary":
 		node = &ast.TernaryExpr{
@@ -534,8 +534,15 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Var:  data["expr"].(ast.Expr),
 		}
 	case "ExprVariable":
+		var nameExpr ast.Node
+		switch name := data["name"].(type) {
+		case string:
+			nameExpr = &ast.Ident{Name: name}
+		default:
+			nameExpr = name.(ast.Expr)
+		}
 		node = &ast.VariableExpr{
-			Name: data["name"],
+			Name: nameExpr,
 		}
 	case "ExprYield":
 		node = &ast.YieldExpr{

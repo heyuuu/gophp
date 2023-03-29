@@ -3,14 +3,16 @@ package printer
 import (
 	"fmt"
 	"gophp/php/ast"
+	"gophp/php/token"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type printer struct {
-	buf strings.Builder
-	err error
+	buf    strings.Builder
+	indent int
+	err    error
 }
 
 func (p *printer) checkError(err error) {
@@ -29,6 +31,11 @@ func (p *printer) writeByte(c byte) {
 	p.checkError(err)
 }
 
+func (p *printer) writeRune(c rune) {
+	_, err := p.buf.WriteRune(c)
+	p.checkError(err)
+}
+
 func (p *printer) writeString(s string) {
 	_, err := p.buf.WriteString(s)
 	p.checkError(err)
@@ -41,16 +48,14 @@ func (p *printer) print(args ...any) {
 		}
 
 		switch v := arg.(type) {
-		case byte:
-			p.writeByte(v)
 		case int:
 			p.writeString(strconv.Itoa(v))
 		case string:
 			p.writeString(v)
-		case *ast.Ident:
-			p.writeString(v.Name)
-		case *ast.Name:
-			p.writeString(v.ToCodeString())
+		case token.Token:
+			p.writeString(token.TokenName(v))
+		case ast.Node:
+			p.printNode(v)
 		default:
 			_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
 			panic("gophp/php/printer type")
@@ -58,27 +63,48 @@ func (p *printer) print(args ...any) {
 	}
 }
 
-func (p printer) printNode(node ast.Node) (string, error) {
-	switch n := node.(type) {
+func (p *printer) printNode(node ast.Node) {
+	switch x := node.(type) {
+	case *ast.Ident:
+		p.writeString(x.Name)
+	case *ast.Name:
+		p.writeString(x.ToCodeString())
 	case ast.Expr:
-		p.expr(n)
+		p.expr(x)
 	case ast.Stmt:
-		p.stmt(n)
+		p.stmt(x)
 	case ast.Type:
-		p.typeHint(n)
+		p.typeHint(x)
 	case []ast.Stmt:
-		for _, stmt := range n {
-			p.stmt(stmt)
-		}
+		p.printStmtList(x)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
 	}
+}
 
+func (p *printer) result() (string, error) {
 	if p.err != nil {
 		return "", p.err
 	}
 	return p.buf.String(), p.err
+}
+
+func printList[T ast.Node](p *printer, list []T, sep string) {
+	for i, item := range list {
+		if i != 0 {
+			p.print(sep)
+		}
+		p.print(item)
+	}
+}
+
+func (p *printer) printStmtList(stmtList []ast.Stmt) {
+	printList(p, stmtList, "\n")
+}
+
+func (p *printer) printExprList(exprList []ast.Expr) {
+	printList(p, exprList, ", ")
 }
 
 // ----------------------------------------------------------------------------
@@ -102,8 +128,9 @@ type Config struct {
 }
 
 func (cfg *Config) sprint(node any) (string, error) {
-	var p printer
-	return p.printNode(node)
+	var p = &printer{}
+	p.printNode(node)
+	return p.result()
 }
 
 func (cfg *Config) Sprint(node any) (string, error) {

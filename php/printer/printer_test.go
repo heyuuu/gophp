@@ -3,6 +3,7 @@ package printer
 import (
 	"fmt"
 	"gophp/php/parser"
+	"log"
 	"testing"
 )
 
@@ -44,4 +45,21 @@ func TestSprint(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSprintDev(t *testing.T) {
+	code := `<?php $a = 1;`
+	nodes, err := parser.ParseCode(code)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var p = &printer{}
+	p.printNode(nodes)
+	result, err := p.result()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(result)
 }

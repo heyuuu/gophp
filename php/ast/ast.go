@@ -288,7 +288,7 @@ type (
 
 	InstanceofExpr struct {
 		Expr  Expr // @var Expr Expression
-		Class Expr // @var Name|Expr Class name
+		Class Node // @var Name|Expr Class name
 	}
 
 	ListExpr struct {
@@ -302,18 +302,18 @@ type (
 	// ExprPropertyFetch : Expr
 	PropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
-		Name any  // @var Ident|Expr Property name
+		Name Node // @var Ident|Expr Property name
 	}
 
 	NullsafePropertyFetchExpr struct {
 		Var  Expr // @var Expr Variable holding object
-		Name any  // @var Ident|Expr Property name
+		Name Node // @var Ident|Expr Property name
 	}
 
 	// ExprStaticPropertyFetch : Expr
 	StaticPropertyFetchExpr struct {
-		Class any // @var Name|Expr Class name
-		Name  any // @var VarLikeIdent|Expr Property name
+		Class Node // @var Name|Expr Class name
+		Name  Node // @var Ident|Expr Property name
 	}
 
 	// ExprShellExec : Expr
@@ -335,7 +335,7 @@ type (
 
 	// ExprVariable : Expr
 	VariableExpr struct {
-		Name any // @var string|Expr Name
+		Name Node // @var Ident|Expr Name
 	}
 
 	// ExprYield : Expr
