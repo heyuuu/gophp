@@ -528,10 +528,6 @@ type (
 		Default Expr          // @var Expr|null Default value
 	}
 
-	ThrowStmt struct {
-		Expr Expr // @var Expr Expression
-	}
-
 	UnsetStmt struct {
 		Vars []Expr // @var Expr[] Variables to unset
 	}
@@ -750,7 +746,6 @@ func (*InlineHTMLStmt) stmtNode()   {}
 func (*StaticStmt) stmtNode()       {}
 func (*StaticVarStmt) stmtNode()    {}
 
-func (*ThrowStmt) stmtNode()          {}
 func (*UnsetStmt) stmtNode()          {}
 func (*UseStmt) stmtNode()            {}
 func (*DeclareStmt) stmtNode()        {}

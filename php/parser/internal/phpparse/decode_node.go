@@ -852,8 +852,10 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Cases: asSlice[*ast.CaseStmt](data["cases"]),
 		}
 	case "StmtThrow":
-		node = &ast.ThrowStmt{
-			Expr: data["expr"].(ast.Expr),
+		node = &ast.ExprStmt{
+			Expr: &ast.ThrowExpr{
+				Expr: data["expr"].(ast.Expr),
+			},
 		}
 	case "StmtTrait":
 		node = &ast.TraitStmt{
