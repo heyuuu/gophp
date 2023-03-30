@@ -150,7 +150,7 @@ func ZendFetchDimensionConst(result *types.Zval, container *types.Zval, dim *typ
 func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var hval ZendUlong
 	if offset.IsDouble() {
-		hval = ZendDvalToLval(offset.GetDval())
+		hval = DvalToLval(offset.GetDval())
 	num_idx:
 		return ht.IndexFind(hval)
 	} else if offset.IsNull() {

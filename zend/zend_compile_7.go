@@ -466,7 +466,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			case types.IS_STRING:
 				result.GetArr().SymtableUpdate(key.GetStr().GetStr(), value)
 			case types.IS_DOUBLE:
-				result.GetArr().IndexUpdate(ZendDvalToLval(key.GetDval()), value)
+				result.GetArr().IndexUpdate(DvalToLval(key.GetDval()), value)
 			case types.IS_FALSE:
 				result.GetArr().IndexUpdate(0, value)
 			case types.IS_TRUE:

@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"math"
+	"strconv"
 	"strings"
 )
 
@@ -86,7 +87,7 @@ func (sc *LangScanner) lexerOffsetNum() (int, bool) {
 func (sc *LangScanner) lexerDNum() (int, bool) {
 	str := sc.seg()
 	str = strings.ReplaceAll(str, "_", "")
-	dVal := strToD(str)
+	dVal, _ := strconv.ParseFloat(str, 0)
 	sc.zendlval.SetDouble(dVal)
 	return sc.tokenWithVal(T_DNUMBER)
 }

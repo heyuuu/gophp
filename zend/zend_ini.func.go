@@ -386,7 +386,7 @@ func OnUpdateLong(
 	var p *ZendLong
 	var base *byte = (*byte)(mh_arg2)
 	p = (*ZendLong)(base + int(mh_arg1))
-	*p = ZendAtol(new_value.GetVal(), new_value.GetLen())
+	*p = StrToLongWithUnit(new_value.GetStr())
 	return types.SUCCESS
 }
 func OnUpdateLongGEZero(
@@ -400,7 +400,7 @@ func OnUpdateLongGEZero(
 	var p *ZendLong
 	var tmp ZendLong
 	var base *byte = (*byte)(mh_arg2)
-	tmp = ZendAtol(new_value.GetVal(), new_value.GetLen())
+	tmp = StrToLongWithUnit(new_value.GetStr())
 	if tmp < 0 {
 		return types.FAILURE
 	}

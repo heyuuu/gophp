@@ -29,7 +29,7 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	}
 
 	assertions := EG__().assertions
-	val := ZendAtolEx(*new_value)
+	val := StrToLongWithUnit(*new_value)
 	if stage != ZEND_INI_STAGE_STARTUP && stage != ZEND_INI_STAGE_SHUTDOWN && assertions != val && (assertions < 0 || val < 0) {
 		faults.Error(faults.E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
 		return false

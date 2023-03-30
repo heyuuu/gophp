@@ -242,7 +242,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 			str = types.ZSTR_EMPTY_ALLOC()
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = ZendDvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.GetDval())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -561,7 +561,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			str = types.ZSTR_EMPTY_ALLOC()
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = ZendDvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.GetDval())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0

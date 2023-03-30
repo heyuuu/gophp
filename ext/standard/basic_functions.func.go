@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
 )
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
@@ -107,8 +108,8 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	zend.RegisterDoubleConstant("M_SQRT2", M_SQRT2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterDoubleConstant("M_SQRT1_2", M_SQRT1_2, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterDoubleConstant("M_SQRT3", M_SQRT3, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("INF", zend.ZEND_INFINITY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
-	zend.RegisterDoubleConstant("NAN", zend.ZEND_NAN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterDoubleConstant("INF", math.Inf(1), zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
+	zend.RegisterDoubleConstant("NAN", math.NaN(), zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("PHP_ROUND_HALF_UP", PHP_ROUND_HALF_UP, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("PHP_ROUND_HALF_DOWN", PHP_ROUND_HALF_DOWN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("PHP_ROUND_HALF_EVEN", PHP_ROUND_HALF_EVEN, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
@@ -2115,7 +2116,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 
 		}
 		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetStr(), nil, nil, 0) == types.IS_LONG {
-			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(arg1.GetStr().GetVal(), arg1.GetStr().GetLen()))
+			var key = zend.StrToLongWithUnit(arg1.GetStrVal())
 			if b.Assign(&find_hash, arr.GetArr().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.GetArr().IndexAddNew(key, &hash)

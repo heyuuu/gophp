@@ -19,9 +19,4 @@ const DL_ERROR = dlerror
 
 /* AIX requires this to be the first thing in the file.  */
 
-const ZTS_V = 0
-const LONG_MAX = 2147483647
-
-var ZEND_INFINITY = math.Inf(1)
-
-var ZEND_NAN = math.NaN()
+const LONG_MAX = math.MaxInt32

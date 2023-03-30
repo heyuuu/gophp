@@ -17,21 +17,21 @@ func IsFinite(f float64) bool {
 	return true
 }
 
-func ZEND_DOUBLE_FITS_LONG(d float64) bool {
+func DoubleFitsLong(d float64) bool {
 	return !(d >= ZEND_LONG_MAX || d < ZEND_LONG_MIN)
 }
-func ZendDvalToLval(d float64) ZendLong {
+func DvalToLval(d float64) ZendLong {
 	if !IsFinite(d) {
 		return 0
-	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
+	} else if !(DoubleFitsLong(d)) {
 		return ZendDvalToLvalSlow(d)
 	}
 	return ZendLong(d)
 }
-func ZendDvalToLvalCap(d float64) ZendLong {
+func DvalToLvalCap(d float64) ZendLong {
 	if !IsFinite(d) {
 		return 0
-	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
+	} else if !(DoubleFitsLong(d)) {
 		if d > 0 {
 			return ZEND_LONG_MAX
 		} else {
@@ -199,7 +199,7 @@ again:
 			result = 1
 		}
 	case types.IS_DOUBLE:
-		if op.GetDval() {
+		if op.GetDval() != 0 {
 			result = 1
 		}
 	case types.IS_STRING:
@@ -410,46 +410,7 @@ func ZendUnwrapReference(op *types.Zval) {
 		types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
 	}
 }
-func ZendTolower(c int) int              { return tolower(c) }
 func TYPE_PAIR(t1 uint32, t2 uint32) int { return t1<<4 | t2 }
-func ZendAtolEx(str string) ZendLong {
-	if len(str) == 0 {
-		return 0
-	}
-	retval := ZEND_STRTOL_EX(str, 0)
-	switch str[len(str)-1] {
-	case 'g', 'G':
-		retval *= 1024
-		fallthrough
-	case 'm', 'M':
-		retval *= 1024
-		fallthrough
-	case 'k', 'K':
-		retval *= 1024
-	}
-
-	return int(retval)
-}
-func ZendAtol(str *byte, str_len int) ZendLong {
-	var retval ZendLong
-	if str_len == 0 {
-		str_len = strlen(str)
-	}
-	retval = ZEND_STRTOL(str, nil, 0)
-	if str_len > 0 {
-		switch str[str_len-1] {
-		case 'g', 'G':
-			retval *= 1024
-			fallthrough
-		case 'm', 'M':
-			retval *= 1024
-			fallthrough
-		case 'k', 'K':
-			retval *= 1024
-		}
-	}
-	return retval
-}
 func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func func(op *types.Zval)) {
 	dst.SetUndef()
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
@@ -516,7 +477,19 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		holder.SetLong(1)
 		return holder
 	case types.IS_STRING:
-		if b.Assign(&(holder.GetTypeInfo()), IsNumericString(op.GetStr().GetStr(), &(holder.GetLval()), &(holder.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
+		var mode ConvertNumericMode
+		if silent != 0 {
+			mode = ConvertContinueOnErrors
+		} else {
+			mode = ConvertNoticeOnErrors
+		}
+		r := ConvertNumericStr(op.GetStrVal(), mode)
+		switch r.Type {
+		case types.IS_LONG:
+			holder.SetLong(r.Lval)
+		case types.IS_DOUBLE:
+			holder.SetDouble(r.Dval)
+		default:
 			holder.SetLong(0)
 			if silent == 0 {
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
@@ -584,7 +557,7 @@ try_again:
 	case types.IS_LONG:
 
 	case types.IS_DOUBLE:
-		op.SetLong(ZendDvalToLval(op.GetDval()))
+		op.SetLong(DvalToLval(op.GetDval()))
 	case types.IS_STRING:
 		var str *types.String = op.GetStr()
 		if base == 10 {
@@ -683,9 +656,9 @@ try_again:
 		ZvalPtrDtor(op)
 		types.ZVAL_BOOL(op, l != 0)
 	case types.IS_LONG:
-		types.ZVAL_BOOL(op, b.Cond(op.GetLval() != 0, 1, 0))
+		types.ZVAL_BOOL(op, op.GetLval() != 0)
 	case types.IS_DOUBLE:
-		types.ZVAL_BOOL(op, b.Cond(op.GetDval(), 1, 0))
+		types.ZVAL_BOOL(op, op.GetDval() != 0)
 	case types.IS_STRING:
 		var str *types.String = op.GetStr()
 		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetVal()[0] == '0' {
@@ -695,7 +668,7 @@ try_again:
 		}
 		types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
+		if types.Z_ARRVAL_P(op).Len() != 0 {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -739,7 +712,7 @@ try_again:
 		op.SetString(ZendLongToStr(op.GetLval()))
 	case types.IS_DOUBLE:
 		var str *types.String
-		var dval float64 = Z_DVAL_P(op)
+		var dval = op.GetDval()
 		str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), dval)
 
 		/* %G already handles removing trailing zeros from the fractional part, yay */
@@ -838,7 +811,7 @@ func ConvertToObject(op *types.Zval) {
 try_again:
 	switch op.GetType() {
 	case types.IS_ARRAY:
-		var ht *types.Array = types.ZendSymtableToProptable(Z_ARR_P(op))
+		var ht = types.ZendSymtableToProptable(op.GetArr())
 		var obj *types.ZendObject
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
@@ -886,7 +859,7 @@ try_again:
 	case types.IS_LONG:
 		return op.GetLval()
 	case types.IS_DOUBLE:
-		return ZendDvalToLval(op.GetDval())
+		return DvalToLval(op.GetDval())
 	case types.IS_STRING:
 		var type_ types.ZendUchar
 		var lval ZendLong
@@ -906,17 +879,14 @@ try_again:
 			 * behaviour.
 			 */
 
-			return ZendDvalToLvalCap(dval)
-
+			return DvalToLvalCap(dval)
 		}
-		fallthrough
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
+		if types.Z_ARRVAL_P(op).Len() != 0 {
 			return 1
 		} else {
 			return 0
 		}
-		fallthrough
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_LONG, ConvertToLong)
@@ -925,7 +895,6 @@ try_again:
 		} else {
 			return 1
 		}
-		fallthrough
 	case types.IS_REFERENCE:
 		op = types.Z_REFVAL_P(op)
 		goto try_again
@@ -1679,7 +1648,7 @@ try_again:
 		result.SetLong(^(op1.GetLval()))
 		return types.SUCCESS
 	case types.IS_DOUBLE:
-		result.SetLong(^(ZendDvalToLval(op1.GetDval())))
+		result.SetLong(^(DvalToLval(op1.GetDval())))
 		return types.SUCCESS
 	case types.IS_STRING:
 		var i int

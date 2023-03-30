@@ -624,7 +624,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 			str = types.ZSTR_EMPTY_ALLOC()
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = ZendDvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.GetDval())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0

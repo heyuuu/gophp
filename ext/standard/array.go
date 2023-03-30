@@ -4119,7 +4119,7 @@ func ZifArrayColumn(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, c
 					case types.IS_NULL:
 						return_value.GetArr().KeyUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), colval)
 					case types.IS_DOUBLE:
-						return_value.GetArr().IndexUpdate(zend.ZendDvalToLval(keyval.GetDval()), colval)
+						return_value.GetArr().IndexUpdate(zend.DvalToLval(keyval.GetDval()), colval)
 					case types.IS_TRUE:
 						return_value.GetArr().IndexUpdate(1, colval)
 					case types.IS_FALSE:

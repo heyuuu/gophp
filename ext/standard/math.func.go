@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
 )
 
 func PhpIntlog10abs(value float64) int {
@@ -671,7 +672,7 @@ func ZifLog(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.
 		return
 	}
 	if base == 1.0 {
-		return_value.SetDouble(zend.ZEND_NAN)
+		return_value.SetDouble(math.NaN())
 		return
 	}
 	if base <= 0.0 {
@@ -914,7 +915,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 
 		/* Don't try to convert +/- infinity */
 
-		if fvalue == zend.ZEND_INFINITY || fvalue == -zend.ZEND_INFINITY {
+		if math.IsInf(fvalue, 1) || math.IsInf(fvalue, -1) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Number too large")
 			return types.ZSTR_EMPTY_ALLOC()
 		}

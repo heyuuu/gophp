@@ -1,13 +1,9 @@
 package zend
 
 import (
-	"github.com/heyuuu/gophp/core"
+	"strconv"
 )
 
-func ZEND_LTOA(i __auto__, s []char, len_ __auto__) {
-	var st int = core.Snprintf(s, len_, ZEND_LONG_FMT, i)
-	s[st] = '0'
-}
 func ZEND_ATOL(i __auto__, s __auto__) __auto__ {
 	i = atoll(s)
 	return i
@@ -15,14 +11,43 @@ func ZEND_ATOL(i __auto__, s __auto__) __auto__ {
 func ZEND_STRTOL(s0 __auto__, s1 **byte, base int) __auto__  { return strtoll(s0, s1, base) }
 func ZEND_STRTOUL(s0 __auto__, s1 **byte, base int) __auto__ { return strtoull(s0, s1, base) }
 
-func ZEND_STRTOL_EX(s string, base int) int {
-	// todo
-	panic("未实现方法 ZEND_STRTOL_EX")
-	return 0
+func StrToLong(s string, base int) (int, error) {
+	i := 0
+
+	// skip spaces
+	for i < len(s) && s[i] == ' ' {
+		i++
+	}
+	start := i
+
+	// scan digits
+	for i < len(s) && '0' <= s[i] && s[i] <= '9' {
+		i++
+	}
+
+	// parse
+	val, err := strconv.ParseInt(s[start:i], base, 64)
+	if err != nil {
+		return 0, err
+	}
+	return int(val), err
 }
 
-func ZEND_STRTOUL_EX(s string, base int) int {
-	// todo
-	panic("未实现方法 ZEND_STRTOUL_EX")
-	return 0
+func StrToLongWithUnit(str string) ZendLong {
+	if len(str) == 0 {
+		return 0
+	}
+	retval, _ := StrToLong(str, 0)
+	switch str[len(str)-1] {
+	case 'g', 'G':
+		retval *= 1024
+		fallthrough
+	case 'm', 'M':
+		retval *= 1024
+		fallthrough
+	case 'k', 'K':
+		retval *= 1024
+	}
+
+	return retval
 }

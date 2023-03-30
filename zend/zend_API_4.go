@@ -309,7 +309,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.IndexUpdate(key.GetLval(), value)
 		break
 	case types.IS_DOUBLE:
-		result = ht.IndexUpdate(ZendDvalToLval(key.GetDval()), value)
+		result = ht.IndexUpdate(DvalToLval(key.GetDval()), value)
 		break
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")

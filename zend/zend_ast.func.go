@@ -381,7 +381,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IS_TRUE:
 		result.GetArr().IndexUpdate(1, expr)
 	case types.IS_DOUBLE:
-		result.GetArr().IndexUpdate(ZendDvalToLval(offset.GetDval()), expr)
+		result.GetArr().IndexUpdate(DvalToLval(offset.GetDval()), expr)
 	case types.IS_RESOURCE:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(offset), types.Z_RES_HANDLE_P(offset))
 		result.GetArr().IndexUpdate(types.Z_RES_HANDLE_P(offset), expr)

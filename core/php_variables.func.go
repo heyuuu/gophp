@@ -620,7 +620,7 @@ func PhpRegisterServerVariables() {
 
 	tmp.SetDouble(SapiGetRequestTime())
 	PhpRegisterVariableQuick("REQUEST_TIME_FLOAT", b.SizeOf("\"REQUEST_TIME_FLOAT\"")-1, &tmp, ht)
-	tmp.SetLong(zend.ZendDvalToLval(tmp.GetDval()))
+	tmp.SetLong(zend.DvalToLval(tmp.GetDval()))
 	PhpRegisterVariableQuick("REQUEST_TIME", b.SizeOf("\"REQUEST_TIME\"")-1, &tmp, ht)
 }
 func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {

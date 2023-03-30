@@ -5,11 +5,9 @@ import (
 	"github.com/heyuuu/gophp/core"
 )
 
-func ZEND_IGNORE_VALUE(x __auto__) { void(x) }
-func ZendQuietWrite()              { ZEND_IGNORE_VALUE(write(__VA_ARGS__)) }
-func DL_LOAD(libname *byte) __auto__ {
-	return dlopen(libname, PHP_RTLD_MODE|RTLD_GLOBAL)
-}
+func ZEND_IGNORE_VALUE(x __auto__)      { void(x) }
+func ZendQuietWrite()                   { ZEND_IGNORE_VALUE(write(__VA_ARGS__)) }
+func DL_LOAD(libname string) any        { panic("unsupported") }
 func DoAlloca(p int, use_heap bool) any { return Emalloc(p) }
 func FreeAlloca(p any, use_heap bool)   { Efree(p) }
 func ZEND_BIT_TEST(bits []uint32, bit uint32) int {

@@ -93,9 +93,9 @@ func OnChangeMemoryLimit(
 ) int {
 	var value int
 	if new_value != nil {
-		value = zend.ZendAtol(new_value.GetVal(), new_value.GetLen())
+		value = zend.StrToLongWithUnit(new_value.GetStr())
 	} else {
-		value = int64(1) << 30
+		value = 1 << 30
 	}
 	if zend.ZendSetMemoryLimit(value) == types.FAILURE {
 

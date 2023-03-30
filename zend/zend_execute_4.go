@@ -214,7 +214,7 @@ func SlowIndexConvert(ht *types.Array, dim *types.Zval, value *types.ZendValue, 
 		value.SetStr(types.ZSTR_EMPTY_ALLOC())
 		return types.IS_STRING
 	case types.IS_DOUBLE:
-		value.SetLval(ZendDvalToLval(dim.GetDval()))
+		value.SetLval(DvalToLval(dim.GetDval()))
 		return types.IS_LONG
 	case types.IS_RESOURCE:
 		ZendUseResourceAsOffset(dim)

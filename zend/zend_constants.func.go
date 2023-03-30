@@ -100,7 +100,7 @@ func ZendRegisterStandardConstants() {
 
 	RegisterMainBoolConstant("TRUE", 1, CONST_PERSISTENT|CONST_CT_SUBST)
 	RegisterMainBoolConstant("FALSE", 0, CONST_PERSISTENT|CONST_CT_SUBST)
-	RegisterMainBoolConstant("ZEND_THREAD_SAFE", ZTS_V, CONST_PERSISTENT|CONST_CS)
+	RegisterMainBoolConstant("ZEND_THREAD_SAFE", 0, CONST_PERSISTENT|CONST_CS)
 	RegisterMainBoolConstant("ZEND_DEBUG_BUILD", 0, CONST_PERSISTENT|CONST_CS)
 	RegisterMainNullConstant("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
 }

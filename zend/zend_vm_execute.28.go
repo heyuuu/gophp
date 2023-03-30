@@ -656,7 +656,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			str = types.ZSTR_EMPTY_ALLOC()
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = ZendDvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.GetDval())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -722,7 +722,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			num_index_dim:
 				types.ZendHashIndexDel(ht, hval)
 			} else if offset.IsDouble() {
-				hval = ZendDvalToLval(offset.GetDval())
+				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
 				key = types.ZSTR_EMPTY_ALLOC()

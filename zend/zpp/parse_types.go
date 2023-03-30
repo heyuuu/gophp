@@ -90,12 +90,12 @@ func parseArgWeak_DvalToLval(dval float64, cap bool) (int, bool) {
 		return 0, false
 	}
 	if cap {
-		return zend.ZendDvalToLvalCap(dval), true
+		return zend.DvalToLvalCap(dval), true
 	} else {
-		if !zend.ZEND_DOUBLE_FITS_LONG(dval) {
+		if !zend.DoubleFitsLong(dval) {
 			return 0, false
 		}
-		return zend.ZendDvalToLval(dval), true
+		return zend.DvalToLval(dval), true
 	}
 }
 

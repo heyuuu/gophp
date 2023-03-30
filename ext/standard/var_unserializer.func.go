@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"math"
 )
 
 func PhpVarUnserializeInit() PhpUnserializeDataT {
@@ -1348,11 +1349,11 @@ yy60:
 	YYCURSOR++
 	*p = YYCURSOR
 	if !(strncmp((*byte)(start+2), "NAN", 3)) {
-		rval.SetDouble(zend.ZEND_NAN)
+		rval.SetDouble(math.NaN())
 	} else if !(strncmp((*byte)(start+2), "INF", 3)) {
-		rval.SetDouble(zend.ZEND_INFINITY)
+		rval.SetDouble(math.Inf(1))
 	} else if !(strncmp((*byte)(start+2), "-INF", 4)) {
-		rval.SetDouble(-zend.ZEND_INFINITY)
+		rval.SetDouble(math.Inf(-1))
 	} else {
 		rval.SetNull()
 	}
