@@ -2,13 +2,20 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	. "github.com/heyuuu/gophp/builtin/ctype"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"math"
 	"strings"
 )
+
+func IsFinite(f float64) bool {
+	if math.IsNaN(f) || math.IsInf(f, 1) || math.IsInf(f, -1) {
+		return false
+	}
+	return true
+}
 
 func ZEND_DOUBLE_FITS_LONG(d float64) bool {
 	return !(d >= ZEND_LONG_MAX || d < ZEND_LONG_MIN)
@@ -405,7 +412,6 @@ func ZendUnwrapReference(op *types.Zval) {
 }
 func ZendTolower(c int) int              { return tolower(c) }
 func TYPE_PAIR(t1 uint32, t2 uint32) int { return t1<<4 | t2 }
-func ZendTolowerAscii(c uint8) uint8     { return b.ByteToLowerAscii(c) }
 func ZendAtolEx(str string) ZendLong {
 	if len(str) == 0 {
 		return 0
@@ -2855,19 +2861,16 @@ func ZendStrTolowerCopy(dest *byte, source *byte, length int) *byte {
 	var result *uint8 = (*uint8)(dest)
 	var end *uint8 = str + length
 	for str < end {
-		b.PostInc(&(*result)) = ZendTolowerAscii(b.PostInc(&(*str)))
+		b.PostInc(&(*result)) = ascii.ToLower(b.PostInc(&(*str)))
 	}
 	*result = '0'
 	return dest
-}
-func ZendStrTolowerDup(source *byte, length int) *byte {
-	return ZendStrTolowerCopy((*byte)(Emalloc(length+1)), source, length)
 }
 func ZendStrTolower(str *byte, length int) {
 	var p *uint8 = (*uint8)(str)
 	var end *uint8 = p + length
 	for p < end {
-		*p = ZendTolowerAscii(*p)
+		*p = ascii.ToLower(*p)
 		p++
 	}
 }
@@ -2875,7 +2878,7 @@ func ZendStrTolowerDupEx(source *byte, length int) *byte {
 	var p *uint8 = (*uint8)(source)
 	var end *uint8 = p + length
 	for p < end {
-		if (*p) != ZendTolowerAscii(*p) {
+		if (*p) != ascii.ToLower(*p) {
 			var res *byte = (*byte)(Emalloc(length + 1))
 			var r *uint8
 			if p != (*uint8)(source) {
@@ -2883,7 +2886,7 @@ func ZendStrTolowerDupEx(source *byte, length int) *byte {
 			}
 			r = (*uint8)(p + (res - source))
 			for p < end {
-				*r = ZendTolowerAscii(*p)
+				*r = ascii.ToLower(*p)
 				p++
 				r++
 			}
@@ -2899,7 +2902,7 @@ func ZendStringTolowerEx(str *types.String, persistent int) *types.String {
 	var p *uint8 = (*uint8)(str.GetVal())
 	var end *uint8 = p + str.GetLen()
 	for p < end {
-		if (*p) != ZendTolowerAscii(*p) {
+		if (*p) != ascii.ToLower(*p) {
 			var res *types.String = types.ZendStringAlloc(str.GetLen(), persistent)
 			var r *uint8
 			if p != (*uint8)(str.GetVal()) {
@@ -2907,7 +2910,7 @@ func ZendStringTolowerEx(str *types.String, persistent int) *types.String {
 			}
 			r = p + (res.GetVal() - str.GetVal())
 			for p < end {
-				*r = ZendTolowerAscii(*p)
+				*r = ascii.ToLower(*p)
 				p++
 				r++
 			}
@@ -2930,75 +2933,27 @@ func ZendBinaryStrncmp(s1 string, s2 string, length int) int {
 	}
 	return strings.Compare(s1, s2)
 }
-func ZendBinaryStrcasecmp(s1 string, s2 string) int {
-	var len_ int
-	var c1 int
-	var c2 int
-	if s1 == s2 {
-		return 0
-	}
-	len_ = b.Min(len1, len2)
-	for b.PostDec(&len_) {
-		c1 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s1))))
-		c2 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s2))))
-		if c1 != c2 {
-			return c1 - c2
-		}
-	}
-	return int(len1 - len2)
-}
+func ZendBinaryStrcasecmp(s1 string, s2 string) int { return ascii.StrCaseCompare(s1, s2) }
 func ZendBinaryStrncasecmp(s1 string, s2 string, length int) int {
-	var len_ int
-	var c1 int
-	var c2 int
-	if s1 == s2 {
-		return 0
+	if len(s1) > length {
+		s1 = s1[:length]
 	}
-	len_ = b.Min(length, b.Min(len1, len2))
-	for b.PostDec(&len_) {
-		c1 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s1))))
-		c2 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s2))))
-		if c1 != c2 {
-			return c1 - c2
-		}
+	if len(s2) > length {
+		s2 = s2[:length]
 	}
-	return int(b.Min(length, len1) - b.Min(length, len2))
+	return ascii.StrCaseCompare(s1, s2)
 }
 func ZendBinaryStrcasecmpL(s1 string, s2 string) int {
-	if s1 == s2 {
-		return 0
-	}
-	len_ := b.Min(len(s1), len(s2))
-	for i := 0; i < len_; i++ {
-		c1 := ZendTolower(s1[i])
-		c2 := ZendTolower(s2[i])
-		if c1 < c2 {
-			return -1
-		} else if c1 > c2 {
-			return 1
-		}
-	}
-	return int(len(s1) - len(s2))
+	return ascii.StrCaseCompare(s1, s2)
 }
-func ZendBinaryStrncasecmpL(s1 *byte, len1 int, s2 *byte, len2 int, length int) int {
-	var len_ int
-	var c1 int
-	var c2 int
-	if s1 == s2 {
-		return 0
+func ZendBinaryStrncasecmpL(s1 string, s2 string, length int) int {
+	if len(s1) > length {
+		s1 = s1[:length]
 	}
-	len_ = b.Min(length, b.Min(len1, len2))
-	for b.PostDec(&len_) {
-		c1 = ZendTolower(int(*((*uint8)(b.PostInc(&s1)))))
-		c2 = ZendTolower(int(*((*uint8)(b.PostInc(&s2)))))
-		if c1 != c2 {
-			return c1 - c2
-		}
+	if len(s2) > length {
+		s2 = s2[:length]
 	}
-	return int(b.Min(length, len1) - b.Min(length, len2))
-}
-func ZendBinaryZvalStrcmp(s1 *types.Zval, s2 *types.Zval) int {
-	return ZendBinaryStrcmp(s1.GetStr().GetStr(), s2.GetStr().GetStr())
+	return ascii.StrCaseCompare(s1, s2)
 }
 func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {
 	var ret1 int

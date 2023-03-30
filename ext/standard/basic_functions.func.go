@@ -1334,21 +1334,21 @@ func RunUserTickFunctions(tick_count int, arg any) {
 func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTickFunctionEntry) int {
 	var func1 *types.Zval = tick_fe1.GetArguments()[0]
 	var func2 *types.Zval = tick_fe2.GetArguments()[0]
-	var ret int
+	var ret bool
 	if func1.IsType(types.IS_STRING) && func2.IsType(types.IS_STRING) {
-		ret = zend.ZendBinaryZvalStrcmp(func1, func2) == 0
+		ret = func1.GetStrVal() == func2.GetStrVal()
 	} else if func1.IsType(types.IS_ARRAY) && func2.IsType(types.IS_ARRAY) {
 		ret = zend.ZendCompareArrays(func1, func2) == 0
 	} else if func1.IsType(types.IS_OBJECT) && func2.IsType(types.IS_OBJECT) {
 		ret = zend.ZendCompareObjects(func1, func2) == 0
 	} else {
-		ret = 0
+		ret = false
 	}
-	if ret != 0 && tick_fe1.GetCalling() != 0 {
+	if !ret && tick_fe1.GetCalling() != 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to delete tick function executed at the moment")
 		return 0
 	}
-	return ret
+	return types.IntBool(ret)
 }
 func PhpCallShutdownFunctions() {
 	if BG__().user_shutdown_function_names {

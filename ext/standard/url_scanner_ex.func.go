@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
@@ -270,7 +271,7 @@ func CheckHttpHost(target string) int {
 			if pos := strings.IndexByte(hostStr, ':'); pos >= 0 {
 				hostStr = hostStr[:pos]
 			}
-			if b.AsciiCaseEquals(hostStr, target) {
+			if ascii.StrCaseEquals(hostStr, target) {
 				return types.SUCCESS
 			}
 		}

@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -59,7 +60,7 @@ const usage string = `Usage: %s [options] [-f] <file> [--] [args...]
 func PrintModules() {
 	var modules = zend.CopyRegistryModules()
 	sort.Slice(modules, func(i, j int) bool {
-		return b.StrCaseCompare(modules[i].GetName(), modules[j].GetName())
+		return ascii.StrCaseCompare(modules[i].GetName(), modules[j].GetName()) < 0
 	})
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
@@ -589,11 +590,10 @@ func DoCli(argc int, argv **byte, args []string) int {
 			zend.ZvalPtrDtor(&arg)
 			break
 		case PHP_MODE_REFLECTION_EXT_INFO:
-			var len_ int = strlen(reflection_what)
-			var lcname *byte = zend.ZendStrTolowerDup(reflection_what, len_)
+			var lcname = ascii.StrToLower(b.CastStrAuto(reflection_what))
 			var module *zend.ZendModuleEntry
-			if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, b.CastStr(lcname, len_))) == nil {
-				if !(strcmp(reflection_what, "main")) {
+			if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname)) == nil {
+				if reflection_what == "main" {
 					core.DisplayIniEntries(nil)
 				} else {
 					zend.ZendPrintf("Extension '%s' not present.\n", reflection_what)

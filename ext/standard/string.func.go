@@ -5284,7 +5284,7 @@ func ZifSubstrCompare(executeData zpp.Ex, return_value zpp.Ret, mainStr *types.Z
 		return_value.SetLong(zend.ZendBinaryStrncmp(b.CastStr(s1.GetVal()+offset, s1.GetLen()-offset), s2.GetStr(), cmp_len))
 		return
 	} else {
-		return_value.SetLong(zend.ZendBinaryStrncasecmpL(s1.GetVal()+offset, s1.GetLen()-offset, s2.GetVal(), s2.GetLen(), cmp_len))
+		return_value.SetLong(zend.ZendBinaryStrncasecmpL(b.CastStr(s1.GetVal()+offset, s1.GetLen()-offset), b.CastStr(s2.GetVal(), s2.GetLen()), cmp_len))
 		return
 	}
 }

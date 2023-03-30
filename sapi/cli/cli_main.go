@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	. "github.com/heyuuu/gophp/builtin/ctype"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"log"
@@ -41,7 +41,7 @@ loop:
 			if pos := strings.IndexByte(optVal.Value, '='); pos >= 0 {
 				defName := optVal.Value[0:pos]
 				defValue := optVal.Value[pos+1:]
-				if len(defValue) > 0 && !IsAlphaNum(defValue[0]) && defValue[0] != '"' && defValue[0] != '\'' {
+				if len(defValue) > 0 && !ascii.IsAlphaNum(defValue[0]) && defValue[0] != '"' && defValue[0] != '\'' {
 					ini_entries += defName + "\"" + defValue + "\"\n"
 				} else {
 					ini_entries += optVal.Value + "\n"

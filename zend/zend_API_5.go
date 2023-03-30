@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -231,9 +232,9 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 		if b.Assign(&lc_class_name, ZendMemrchr(scope.GetName().GetVal(), '\\', class_name_len)) {
 			lc_class_name++
 			class_name_len -= lc_class_name - scope.GetName().GetVal()
-			lc_class_name = ZendStrTolowerDup(lc_class_name, class_name_len)
+			lc_class_name = ascii.StrToLower(b.CastStr(lc_class_name, class_name_len))
 		} else {
-			lc_class_name = ZendStrTolowerDup(scope.GetName().GetVal(), class_name_len)
+			lc_class_name = ascii.StrToLower(b.CastStr(scope.GetName().GetVal(), class_name_len))
 		}
 	}
 	for ptr.GetFname() != nil {

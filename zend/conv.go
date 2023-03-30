@@ -2,7 +2,7 @@ package zend
 
 import (
 	"flag"
-	. "github.com/heyuuu/gophp/builtin/ctype"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"log"
@@ -88,7 +88,7 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrRe
 	i := 0
 	for ; i < len(str); i++ {
 		c := str[i]
-		if IsDigit(c) {
+		if ascii.IsDigit(c) {
 			if state == 0 {
 				state = 1
 			}
@@ -103,7 +103,7 @@ func ConvertNumericStr(str string, mode ConvertNumericMode) (result NumericStrRe
 				ptr++
 			}
 			// 判断是否接数字，若是则进入指数部分
-			if ptr < len(str) && IsDigit(str[ptr]) {
+			if ptr < len(str) && ascii.IsDigit(str[ptr]) {
 				state = 3
 				i = ptr
 				continue

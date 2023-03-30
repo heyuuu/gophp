@@ -2,6 +2,7 @@ package cgi
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/sapi/cli"
@@ -28,7 +29,7 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 func PrintModules() {
 	var modules = zend.CopyRegistryModules()
 	sort.Slice(modules, func(i, j int) bool {
-		return b.StrCaseCompare(modules[i].GetName(), modules[j].GetName())
+		return ascii.StrCaseCompare(modules[i].GetName(), modules[j].GetName()) < 0
 	})
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
