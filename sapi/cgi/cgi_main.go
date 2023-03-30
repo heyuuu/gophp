@@ -2,13 +2,13 @@ package cgi
 
 import (
 	"log"
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/core"
-	"sik/core/streams"
-	"sik/ext/standard"
-	"sik/zend"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func main(argc int, argv []*byte) int {

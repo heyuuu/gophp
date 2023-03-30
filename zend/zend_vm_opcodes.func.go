@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 func ZEND_VM_OP1_FLAGS(flags __auto__) int { return flags & 0xff }
 func ZEND_VM_OP2_FLAGS(flags __auto__) int { return flags >> 8 & 0xff }

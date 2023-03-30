@@ -1,8 +1,8 @@
 package standard
 
 import (
-	r "sik/builtin/file"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 var ZmStartupUserStreams func(type_ int, module_number int) int

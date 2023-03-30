@@ -1,9 +1,9 @@
 package streams
 
 import (
-	r "sik/builtin/file"
-	"sik/zend"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**

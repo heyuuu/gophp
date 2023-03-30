@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sik/internal/cmd/sikgen/zif"
+	"github.com/heyuuu/gophp/internal/cmd/sikgen/zif"
 )
 
 func main() {

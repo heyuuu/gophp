@@ -1,8 +1,8 @@
 package core
 
 import (
-	b "sik/builtin"
-	"sik/zend"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
 )
 
 const MULTIPART_CONTENT_TYPE = "multipart/form-data"

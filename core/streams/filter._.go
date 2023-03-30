@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /* Global filter hash, copied to FG(stream_filters) on registration of volatile filter */

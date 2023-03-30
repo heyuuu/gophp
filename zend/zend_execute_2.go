@@ -1,10 +1,10 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) types.ZendBool {

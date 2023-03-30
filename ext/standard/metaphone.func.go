@@ -1,10 +1,10 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/zend"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZifMetaphone(executeData zpp.Ex, return_value zpp.Ret, text *types.Zval, _ zpp.Opt, phones *types.Zval) {

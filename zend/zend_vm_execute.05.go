@@ -1,8 +1,8 @@
 package zend
 
 import (
-	"sik/zend/faults"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {

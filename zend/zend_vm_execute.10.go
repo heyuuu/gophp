@@ -1,10 +1,10 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteData) int {

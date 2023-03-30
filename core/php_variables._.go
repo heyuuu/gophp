@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 const PARSE_POST = 0

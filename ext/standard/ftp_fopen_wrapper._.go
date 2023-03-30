@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 var PhpFtpDirstreamOps = core.MakePhpStreamOps(nil, PhpFtpDirstreamRead, PhpFtpDirstreamClose, nil, "ftpdir", nil, nil, nil, nil)

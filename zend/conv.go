@@ -3,9 +3,9 @@ package zend
 import (
 	"flag"
 	"log"
-	. "sik/builtin/ctype"
-	"sik/zend/faults"
-	"sik/zend/types"
+	. "github.com/heyuuu/gophp/builtin/ctype"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 	"strconv"
 	"strings"
 )

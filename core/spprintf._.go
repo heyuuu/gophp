@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 var Spprintf = zend.ZendSpprintf

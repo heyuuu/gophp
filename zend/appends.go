@@ -2,7 +2,7 @@ package zend
 
 import (
 	"log"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 	"strconv"
 	"strings"
 )

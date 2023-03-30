@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 func PhpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {

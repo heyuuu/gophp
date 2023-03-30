@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 const PHP_IC_ENTRY *types.ClassEntry = BG__().incomplete_class

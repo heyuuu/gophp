@@ -1,9 +1,9 @@
 package streams
 
 import (
-	r "sik/builtin/file"
-	"sik/core"
-	"sik/zend"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func _phpStreamMmapRange(stream *core.PhpStream, offset int, length int, mode PhpStreamMmapAccessT, mapped_len *int) *byte {

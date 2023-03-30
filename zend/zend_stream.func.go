@@ -1,8 +1,8 @@
 package zend
 
 import (
-	r "sik/builtin/file"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZendStreamStdioReader(handle *r.FILE, buf *byte, len_ int) ssize_t {

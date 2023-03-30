@@ -1,10 +1,10 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/zend"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func TagDtor(zv *types.Zval) { zend.Free(zv.GetPtr()) }

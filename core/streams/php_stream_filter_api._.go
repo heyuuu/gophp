@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 const PHP_STREAM_FILTER_READ = 0x1

@@ -1,7 +1,7 @@
 package standard
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 var COMMON = b.Cond(is_ref, "&", "")

@@ -1,9 +1,9 @@
 package streams
 
 import (
-	r "sik/builtin/file"
-	"sik/core"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {

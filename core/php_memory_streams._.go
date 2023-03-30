@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 const PHP_STREAM_MAX_MEM zend.ZendLong = 2 * 1024 * 1024

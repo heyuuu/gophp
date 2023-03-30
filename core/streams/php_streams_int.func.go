@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func PemallocRelOrig(size int, persistent __auto__) any { return zend.Pemalloc(size, persistent) }

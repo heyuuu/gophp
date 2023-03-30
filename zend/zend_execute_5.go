@@ -1,9 +1,9 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func zend_fetch_dimension_address_W(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {

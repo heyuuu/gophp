@@ -1,10 +1,10 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PHP_MAIL_BUILD_HEADER_CHECK(target string, s zend.SmartStr, key *types.String, val *types.Zval) {

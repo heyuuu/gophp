@@ -1,13 +1,13 @@
 package standard
 
 import (
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/core"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func PhpIptcPut1(fp *r.FILE, spool int, c uint8, spoolbuf **uint8) int {

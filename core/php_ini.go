@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func Config() *Configuration {

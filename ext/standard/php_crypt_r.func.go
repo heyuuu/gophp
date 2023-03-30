@@ -1,8 +1,8 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/zend"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func PhpInitCryptR()     {}

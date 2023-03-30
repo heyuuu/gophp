@@ -1,8 +1,8 @@
 package core
 
 import (
-	b "sik/builtin"
-	"sik/zend"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func ICOPY_LIST(src *u_char, dst *u_char, last *u_char) {

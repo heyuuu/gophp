@@ -1,11 +1,11 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func IncompleteClassMessage(object *types.Zval, error_type int) {

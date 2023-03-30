@@ -1,12 +1,12 @@
 package core
 
 import (
-	b "sik/builtin"
-	"sik/core/streams"
-	"sik/ext/standard"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PHP_GAI_STRERROR(x int) __auto__ { return gai_strerror(x) }

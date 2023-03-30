@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 var ZendCeGenerator *types.ClassEntry
 var zend_ce_ClosedGeneratorException *types.ClassEntry

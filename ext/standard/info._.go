@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 const PHP_INFO_GENERAL zend.ZendLong = 1 << 0

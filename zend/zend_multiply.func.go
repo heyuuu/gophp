@@ -1,7 +1,7 @@
 package zend
 
 import (
-	"sik/zend/faults"
+	"github.com/heyuuu/gophp/zend/faults"
 )
 
 func ZEND_SIGNED_MULTIPLY_LONG(a ZendLong, b ZendLong, lval long, dval long__double, usedval ZendLong) {

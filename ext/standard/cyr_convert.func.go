@@ -1,10 +1,10 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func PhpSyslog(priority int, format string, _ ...any) {

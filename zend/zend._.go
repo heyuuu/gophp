@@ -1,8 +1,8 @@
 package zend
 
 import (
-	r "sik/builtin/file"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 const ZEND_VERSION = "3.4.0"

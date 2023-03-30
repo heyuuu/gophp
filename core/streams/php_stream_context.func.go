@@ -1,11 +1,11 @@
 package streams
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/ext/standard"
-	"sik/zend"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpStreamContextFromZval(zcontext *types.Zval, nocontext int) __auto__ {

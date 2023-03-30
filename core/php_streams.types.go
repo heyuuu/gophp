@@ -1,10 +1,10 @@
 package core
 
 import (
-	r "sik/builtin/file"
-	"sik/core/streams"
-	"sik/zend"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**

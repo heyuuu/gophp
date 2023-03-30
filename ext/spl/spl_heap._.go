@@ -1,8 +1,8 @@
 package spl
 
 import (
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 var spl_ce_SplHeap *types.ClassEntry

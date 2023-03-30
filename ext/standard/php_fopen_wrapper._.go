@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 var PhpStreamOutputOps core.PhpStreamOps = core.MakePhpStreamOps(PhpStreamOutputWrite, PhpStreamOutputRead, PhpStreamOutputClose, nil, "Output", nil, nil, nil, nil)

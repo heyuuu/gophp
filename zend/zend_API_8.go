@@ -1,9 +1,9 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZendIsCallableImpl(callable *types.Zval, object *types.ZendObject, check_flags uint32, fcc *types.ZendFcallInfoCache, error **byte) types.ZendBool {

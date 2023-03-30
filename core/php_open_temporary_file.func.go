@@ -1,10 +1,10 @@
 package core
 
 import (
-	r "sik/builtin/file"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **types.String) int {

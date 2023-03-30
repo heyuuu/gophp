@@ -1,11 +1,11 @@
 package spl
 
 import (
-	b "sik/builtin"
-	"sik/ext/standard"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func SplObjectStorageFromObj(obj *types.ZendObject) *spl_SplObjectStorage {

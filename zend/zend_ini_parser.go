@@ -2,9 +2,9 @@ package zend
 
 import (
 	"log"
-	b "sik/builtin"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */

@@ -2,9 +2,9 @@ package zend
 
 import (
 	"bytes"
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**

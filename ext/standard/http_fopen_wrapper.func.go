@@ -1,12 +1,12 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/core/streams"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func StripHeader(header_bag *byte, lc_header_bag *byte, lc_header_name string) {

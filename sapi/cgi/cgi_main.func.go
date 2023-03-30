@@ -2,13 +2,13 @@ package cgi
 
 import (
 	"log"
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/core"
-	"sik/sapi/cli"
-	"sik/zend"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/sapi/cli"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 	"sort"
 )
 

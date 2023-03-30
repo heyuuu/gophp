@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/faults"
+import "github.com/heyuuu/gophp/zend/faults"
 
 func ZendRegisterDefaultClasses() {
 	ZendRegisterInterfaces()

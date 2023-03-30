@@ -1,9 +1,9 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZifUniqid(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, prefix *types.Zval, moreEntropy *types.Zval) {

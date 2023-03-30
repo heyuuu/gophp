@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 var XportHash types.Array

@@ -1,9 +1,9 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/zend"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func PhpStatpage() {

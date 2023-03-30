@@ -1,7 +1,7 @@
 package core
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 var HttpStatusMap = map[int]string{

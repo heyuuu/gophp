@@ -1,9 +1,9 @@
 package zend
 
 import (
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZendParseParametersEx(flags int, num_args int, type_spec string, args ...any) int {

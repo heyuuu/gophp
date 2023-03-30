@@ -1,8 +1,8 @@
 package standard
 
 import (
-	"sik/zend/def"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/zend/def"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 // generate by ZifPasswordGetInfo

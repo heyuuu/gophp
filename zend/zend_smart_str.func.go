@@ -1,7 +1,7 @@
 package zend
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 /* Windows uses VK_ESCAPE instead of \e */

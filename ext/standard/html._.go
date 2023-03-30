@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 const ENT_HTML_QUOTE_NONE = 0

@@ -1,7 +1,7 @@
 package spl
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZmStartupSplExceptions(type_ int, module_number int) int {

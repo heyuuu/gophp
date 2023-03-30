@@ -1,9 +1,9 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 var AssertGlobals ZendAssertGlobals

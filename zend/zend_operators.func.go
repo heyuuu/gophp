@@ -2,11 +2,11 @@ package zend
 
 import (
 	"math"
-	b "sik/builtin"
-	. "sik/builtin/ctype"
-	"sik/core"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	. "github.com/heyuuu/gophp/builtin/ctype"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 	"strings"
 )
 

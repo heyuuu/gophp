@@ -1,7 +1,7 @@
 package core
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 const DEFAULT_POST_CONTENT_TYPE = "application/x-www-form-urlencoded"

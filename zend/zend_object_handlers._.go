@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 const ZEND_WRONG_PROPERTY_INFO *ZendPropertyInfo = (*ZendPropertyInfo)(intptr_t - 1)
 const ZEND_DYNAMIC_PROPERTY_OFFSET = uintPtr(intptr_t)(-1)

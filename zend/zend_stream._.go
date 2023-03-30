@@ -1,7 +1,7 @@
 package zend
 
 import (
-	r "sik/builtin/file"
+	r "github.com/heyuuu/gophp/builtin/file"
 )
 
 type ZendStreamFsizerT func(handle any) int

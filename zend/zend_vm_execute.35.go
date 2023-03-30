@@ -1,8 +1,8 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) any {

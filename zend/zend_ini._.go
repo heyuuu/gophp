@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 const ZEND_INI_USER = 1 << 0
 const ZEND_INI_PERDIR = 1 << 1

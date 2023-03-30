@@ -1,7 +1,7 @@
 package cli
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 func MIN(a int, b int) int {

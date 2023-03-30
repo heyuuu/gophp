@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 func ZendSort2(a any, b any, cmp types.CompareFuncT, swp types.SwapFuncT) {
 	if cmp(a, b) > 0 {

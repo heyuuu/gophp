@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 const HTTP_HEADER_BLOCK_SIZE = 1024

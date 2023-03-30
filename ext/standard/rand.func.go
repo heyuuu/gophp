@@ -1,9 +1,9 @@
 package standard
 
 import (
-	"sik/zend"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func PhpSrand(seed zend.ZendLong) { PhpMtSrand(seed) }

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	. "sik/builtin/ctype"
-	"sik/core"
-	"sik/zend"
+	. "github.com/heyuuu/gophp/builtin/ctype"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
 	"strings"
 )
 

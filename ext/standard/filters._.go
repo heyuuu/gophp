@@ -1,8 +1,8 @@
 package standard
 
 import (
-	"sik/core/streams"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 var Rot13From = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

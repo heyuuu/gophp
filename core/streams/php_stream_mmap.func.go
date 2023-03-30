@@ -1,8 +1,8 @@
 package streams
 
 import (
-	"sik/core"
-	"sik/zend"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func PhpStreamMmapSupported(stream *core.PhpStream) int {

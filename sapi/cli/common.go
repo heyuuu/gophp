@@ -1,6 +1,6 @@
 package cli
 
-import "sik/core"
+import "github.com/heyuuu/gophp/core"
 
 type ICliSapiModule interface {
 	core.ISapiModule

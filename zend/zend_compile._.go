@@ -1,8 +1,8 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /* On 64-bit systems less optimal, but more compact VM code leads to better

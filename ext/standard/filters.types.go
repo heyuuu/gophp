@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 /**

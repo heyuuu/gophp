@@ -1,7 +1,7 @@
 package standard
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 const SH = 'X'

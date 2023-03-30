@@ -1,9 +1,9 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {

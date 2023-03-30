@@ -1,6 +1,6 @@
 package types
 
-import b "sik/builtin"
+import b "github.com/heyuuu/gophp/builtin"
 
 type Number struct {
 	isInt bool

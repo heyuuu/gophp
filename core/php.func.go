@@ -1,8 +1,8 @@
 package core
 
 import (
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PHP_STRLCPY(dst []char, src __auto__, size int, src_size int) {

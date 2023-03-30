@@ -1,11 +1,11 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/sapi/cli"
-	"sik/zend"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/sapi/cli"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func Sha512ProcessBlock(buffer any, len_ int, ctx *Sha512Ctx) {

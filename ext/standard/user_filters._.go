@@ -1,9 +1,9 @@
 package standard
 
 import (
-	"sik/core/streams"
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 const PHP_STREAM_BRIGADE_RES_NAME = "userfilter.bucket brigade"

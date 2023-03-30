@@ -1,8 +1,8 @@
 package core
 
 import (
-	"sik/zend"
-	"sik/zend/faults"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
 )
 
 const PHP_API_VERSION = 20190902

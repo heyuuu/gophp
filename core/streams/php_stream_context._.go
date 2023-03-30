@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 type PhpStreamNotificationFunc func(

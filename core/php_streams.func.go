@@ -1,11 +1,11 @@
 package core
 
 import (
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/core/streams"
-	"sik/zend"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpStreamAllocRel(ops *PhpStreamOps, thisptr any, persistent *byte, mode string) *PhpStream {

@@ -4,8 +4,8 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
-	"sik/builtin/strutil"
-	f "sik/internal/cmd/sikgen/astutil"
+	"github.com/heyuuu/gophp/builtin/strutil"
+	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
 )
 
 var (

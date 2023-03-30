@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 var ZendCeTraversable *types.ClassEntry
 var ZendCeAggregate *types.ClassEntry

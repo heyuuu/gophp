@@ -1,9 +1,9 @@
 package core
 
 import (
-	"sik/ext/spl"
-	"sik/ext/standard"
-	"sik/zend"
+	"github.com/heyuuu/gophp/ext/spl"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
 )
 
 var PhpBuiltinExtensions []*zend.ZendModuleEntry = []*zend.ZendModuleEntry{

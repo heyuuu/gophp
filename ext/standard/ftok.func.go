@@ -1,10 +1,10 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func ZifFtok(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, proj *types.Zval) {

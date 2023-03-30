@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 var PhpGetUidByName func(name *byte, uid *uid_t) int

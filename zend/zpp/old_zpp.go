@@ -1,8 +1,8 @@
 package zpp
 
 import (
-	b "sik/builtin"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ParseVaArgs(numArgs int, typeSpec string, va []any, flags int) bool {

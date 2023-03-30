@@ -1,10 +1,10 @@
 package standard
 
 import (
-	"sik/core"
-	"sik/core/streams"
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 const BasicFunctionsModulePtr = &BasicFunctionsModule

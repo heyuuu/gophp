@@ -1,7 +1,7 @@
 package spl
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 type CreateObjectFuncT func(class_type *types.ClassEntry) *types.ZendObject

@@ -1,6 +1,6 @@
 package zend
 
-import b "sik/builtin"
+import b "github.com/heyuuu/gophp/builtin"
 
 /**
  * ZendExtensionVersionInfo

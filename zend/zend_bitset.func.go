@@ -1,8 +1,8 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_BITSET_ELM_NUM(n uint32) int { return n >> 6 }

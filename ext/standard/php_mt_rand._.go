@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 const PHP_MT_RAND_MAX zend.ZendLong = zend_long(0x7fffffff)

@@ -1,8 +1,8 @@
 package types
 
 import (
-	b "sik/builtin"
-	"sik/zend"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func ZEND_TYPE_NAME(t ZendType) *String   { return t.Name() }

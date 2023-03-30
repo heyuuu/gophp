@@ -2,7 +2,7 @@ package zif
 
 import (
 	"go/ast"
-	f "sik/internal/cmd/sikgen/astutil"
+	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
 )
 
 type ZifInfo struct {

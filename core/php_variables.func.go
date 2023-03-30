@@ -1,13 +1,13 @@
 package core
 
 import (
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/core/streams"
-	"sik/ext/standard"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpRegisterVariable(var_ string, strval *byte, track_vars_array *types.Zval) {

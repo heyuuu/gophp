@@ -1,8 +1,8 @@
 package streams
 
 import (
-	"sik/core"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**

@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func RAND_RANGE_BADSCALING(__n int64, __min zend.ZendLong, __max zend.ZendLong, __tmax float) int64 {

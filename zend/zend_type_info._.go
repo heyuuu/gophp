@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 const MAY_BE_UNDEF = 1 << types.IS_UNDEF
 const MAY_BE_NULL = 1 << types.IS_NULL

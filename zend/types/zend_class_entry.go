@@ -1,6 +1,6 @@
 package types
 
-import "sik/zend"
+import "github.com/heyuuu/gophp/zend"
 
 /**
  * ClassEntry

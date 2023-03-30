@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 func CREDIT_LINE(module string, authors string) { PhpInfoPrintTableRow(2, module, authors) }

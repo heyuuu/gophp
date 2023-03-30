@@ -1,7 +1,7 @@
 package core
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func PhpStreamMemoryCreate(mode int) *PhpStream    { return _phpStreamMemoryCreate(mode) }

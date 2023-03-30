@@ -1,7 +1,7 @@
 package tokenizer
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func TokenizerRegisterConstants(type_ int, module_number int) {

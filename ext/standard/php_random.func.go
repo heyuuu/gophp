@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend"
+	"github.com/heyuuu/gophp/zend"
 )
 
 func PhpRandomBytesThrow(b any, s int) int  { return PhpRandomBytes(b, s, 1) }

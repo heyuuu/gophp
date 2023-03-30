@@ -1,13 +1,13 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/core/streams"
-	"sik/sapi/cli"
-	"sik/zend"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/sapi/cli"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func SECTION(name string) {

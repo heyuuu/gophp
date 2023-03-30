@@ -1,9 +1,9 @@
 package types
 
 import (
-	b "sik/builtin"
-	"sik/zend"
-	"sik/zend/faults"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
 )
 
 var emptyArray *Array

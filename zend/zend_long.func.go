@@ -1,7 +1,7 @@
 package zend
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 func ZEND_LTOA(i __auto__, s []char, len_ __auto__) {

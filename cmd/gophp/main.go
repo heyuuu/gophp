@@ -1,6 +1,6 @@
 package main
 
-import "sik/sapi/cli"
+import "github.com/heyuuu/gophp/sapi/cli"
 
 func main() {
 	cli.Main()

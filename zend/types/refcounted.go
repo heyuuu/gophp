@@ -1,7 +1,7 @@
 package types
 
 import (
-	b "sik/builtin"
+	b "github.com/heyuuu/gophp/builtin"
 )
 
 /**

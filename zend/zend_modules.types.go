@@ -1,7 +1,7 @@
 package zend
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 /**

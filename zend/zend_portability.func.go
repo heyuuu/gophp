@@ -1,9 +1,9 @@
 package zend
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func ZEND_IGNORE_VALUE(x __auto__) { void(x) }

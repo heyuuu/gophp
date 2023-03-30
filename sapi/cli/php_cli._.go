@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 var PhpIniOpenedPath *byte

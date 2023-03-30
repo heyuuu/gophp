@@ -1,8 +1,8 @@
 package standard
 
 import (
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PhpUrlEncodeHash(ht *types.Array, formstr *zend.SmartStr) int {

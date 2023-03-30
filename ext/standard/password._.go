@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 var PhpPasswordAlgos types.Array

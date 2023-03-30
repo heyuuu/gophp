@@ -1,6 +1,6 @@
 package zpp
 
-import "sik/zend"
+import "github.com/heyuuu/gophp/zend"
 
 func currExecuteData() ExecuteData { return zend.CurrEX() }
 

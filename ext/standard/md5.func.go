@@ -1,11 +1,11 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/zend"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func MakeDigest(md5str *byte, digest *uint8) { MakeDigestEx(md5str, digest, 16) }

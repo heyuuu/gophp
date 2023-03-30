@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func PHP_SET_CLASS_ATTRIBUTES(struc *types.Zval) {

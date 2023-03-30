@@ -1,6 +1,6 @@
 package zend
 
-import "sik/zend/types"
+import "github.com/heyuuu/gophp/zend/types"
 
 func GC_MAY_LEAK(ref *types.ZendRefcounted) bool    { return false }
 func GcCheckPossibleRoot(ref *types.ZendRefcounted) {}

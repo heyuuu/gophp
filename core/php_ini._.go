@@ -1,8 +1,8 @@
 package core
 
 import (
-	"sik/zend"
-	"sik/zend/types"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 const PHP_INI_USER = zend.ZEND_INI_USER

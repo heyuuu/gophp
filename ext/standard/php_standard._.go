@@ -1,7 +1,7 @@
 package standard
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 const PHP_STANDARD_VERSION = core.PHP_VERSION

@@ -1,9 +1,9 @@
 package standard
 
 import (
-	b "sik/builtin"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 func PhpBase64EncodeStr(str *types.String) *types.String {

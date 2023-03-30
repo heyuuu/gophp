@@ -1,13 +1,13 @@
 package tokenizer
 
 import (
-	b "sik/builtin"
-	"sik/core"
-	"sik/ext/standard"
-	"sik/zend"
-	"sik/zend/faults"
-	"sik/zend/types"
-	"sik/zend/zpp"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+	"github.com/heyuuu/gophp/zend/zpp"
 )
 
 var TokenizerFunctions = []types.ZendFunctionEntry{

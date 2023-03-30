@@ -2,10 +2,10 @@ package zend
 
 import (
 	"fmt"
-	b "sik/builtin"
-	r "sik/builtin/file"
-	"sik/zend/faults"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func USED_RET() bool {

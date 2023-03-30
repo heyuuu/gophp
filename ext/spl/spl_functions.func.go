@@ -1,9 +1,9 @@
 package spl
 
 import (
-	b "sik/builtin"
-	"sik/zend"
-	"sik/zend/types"
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/types"
 )
 
 func SplRegisterInterface(ppce **types.ClassEntry, class_name string, functions *types.ZendFunctionEntry) {

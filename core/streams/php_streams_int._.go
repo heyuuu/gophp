@@ -1,7 +1,7 @@
 package streams
 
 import (
-	"sik/core"
+	"github.com/heyuuu/gophp/core"
 )
 
 const STREAM_DEBUG = 0
