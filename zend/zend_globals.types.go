@@ -209,7 +209,6 @@ type ZendExecutorGlobals struct {
 	persistent_classes_count            uint32
 	in_autoload                         *types.Array
 	autoload_func                       *ZendFunction
-	full_tables_cleanup                 types.ZendBool
 	no_extensions                       types.ZendBool
 	vm_interrupt                        types.ZendBool
 	timed_out                           types.ZendBool
@@ -234,7 +233,7 @@ type ZendExecutorGlobals struct {
 	prev_exception                      **types.ZendObject
 	opline_before_exception             *ZendOp
 	exception_op                        []ZendOp
-	current_module                      *ZendModuleEntry
+	current_module                      *ModuleEntry
 	active                              types.ZendBool
 	flags                               types.ZendUchar
 	assertions                          ZendLong
@@ -348,16 +347,11 @@ func (this *ZendExecutorGlobals) GetPersistentClassesCount() uint32 {
 func (this *ZendExecutorGlobals) SetPersistentClassesCount(value uint32) {
 	this.persistent_classes_count = value
 }
-func (this *ZendExecutorGlobals) GetInAutoload() *types.Array         { return this.in_autoload }
-func (this *ZendExecutorGlobals) SetInAutoload(value *types.Array)    { this.in_autoload = value }
-func (this *ZendExecutorGlobals) GetAutoloadFunc() *ZendFunction      { return this.autoload_func }
-func (this *ZendExecutorGlobals) SetAutoloadFunc(value *ZendFunction) { this.autoload_func = value }
-func (this *ZendExecutorGlobals) GetFullTablesCleanup() types.ZendBool {
-	return this.full_tables_cleanup
-}
-func (this *ZendExecutorGlobals) SetFullTablesCleanup(value types.ZendBool) {
-	this.full_tables_cleanup = value
-}
+func (this *ZendExecutorGlobals) GetInAutoload() *types.Array          { return this.in_autoload }
+func (this *ZendExecutorGlobals) SetInAutoload(value *types.Array)     { this.in_autoload = value }
+func (this *ZendExecutorGlobals) GetAutoloadFunc() *ZendFunction       { return this.autoload_func }
+func (this *ZendExecutorGlobals) SetAutoloadFunc(value *ZendFunction)  { this.autoload_func = value }
+func (this *ZendExecutorGlobals) GetFullTablesCleanup() types.ZendBool { return 0 }
 func (this *ZendExecutorGlobals) GetNoExtensions() types.ZendBool      { return this.no_extensions }
 func (this *ZendExecutorGlobals) SetNoExtensions(value types.ZendBool) { this.no_extensions = value }
 func (this *ZendExecutorGlobals) GetVmInterrupt() types.ZendBool       { return this.vm_interrupt }
@@ -446,10 +440,10 @@ func (this *ZendExecutorGlobals) GetOplineBeforeException() *ZendOp {
 func (this *ZendExecutorGlobals) SetOplineBeforeException(value *ZendOp) {
 	this.opline_before_exception = value
 }
-func (this *ZendExecutorGlobals) GetExceptionOp() []ZendOp           { return this.exception_op }
-func (this *ZendExecutorGlobals) SetExceptionOp(value []ZendOp)      { this.exception_op = value }
-func (this *ZendExecutorGlobals) GetCurrentModule() *ZendModuleEntry { return this.current_module }
-func (this *ZendExecutorGlobals) SetCurrentModule(value *ZendModuleEntry) {
+func (this *ZendExecutorGlobals) GetExceptionOp() []ZendOp       { return this.exception_op }
+func (this *ZendExecutorGlobals) SetExceptionOp(value []ZendOp)  { this.exception_op = value }
+func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry { return this.current_module }
+func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
 	this.current_module = value
 }
 func (this *ZendExecutorGlobals) GetActive() types.ZendBool                { return this.active }

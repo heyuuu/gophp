@@ -9,38 +9,8 @@ import (
 )
 
 func ZendCollectModuleHandlers() {
-	var startup_count int = 0
-	var shutdown_count int = 0
-	var post_deactivate_count int = 0
 	var ce *types.ClassEntry
 	var class_count int = 0
-
-	/* Collect extensions with request startup/shutdown handlers */
-	globals.G().EachModule(func(module *ModuleEntry) {
-		if module.GetRequestStartupFunc() != nil {
-			startup_count++
-		}
-		if module.GetRequestShutdownFunc() != nil {
-			shutdown_count++
-		}
-	})
-
-	ModuleRequestStartupHandlers = (**ModuleEntry)(Malloc(b.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
-	ModuleRequestStartupHandlers[startup_count] = nil
-	ModuleRequestShutdownHandlers = ModuleRequestStartupHandlers + startup_count + 1
-	ModuleRequestShutdownHandlers[shutdown_count] = nil
-	ModulePostDeactivateHandlers = ModuleRequestShutdownHandlers + shutdown_count + 1
-	ModulePostDeactivateHandlers[post_deactivate_count] = nil
-	startup_count = 0
-
-	globals.G().EachModule(func(module *ModuleEntry) {
-		if module.GetRequestStartupFunc() != nil {
-			ModuleRequestStartupHandlers[b.PostInc(&startup_count)] = module
-		}
-		if module.GetRequestShutdownFunc() != nil {
-			ModuleRequestShutdownHandlers[b.PreDec(&shutdown_count)] = module
-		}
-	})
 
 	/* Collect internal classes with static members */
 	CG__().GetClassTable().Foreach(func(key types.ArrayKey, value *types.Zval) {
@@ -74,7 +44,6 @@ func ZendStartupModules() int {
 }
 func ZendDestroyModules() {
 	Free(ClassCleanupHandlers)
-	Free(ModuleRequestStartupHandlers)
 	globals.G().DestroyModules()
 }
 func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {

@@ -65,33 +65,24 @@ func ModuleDestructor(module *ModuleEntry) {
 	}
 }
 func ZendActivateModules() {
-	var p **ModuleEntry = ModuleRequestStartupHandlers
-	for (*p) != nil {
-		var module *ModuleEntry = *p
+	globals.G().EachModuleReserve(func(module *ModuleEntry) {
+		if module.GetModuleStartupFunc() == nil {
+			return
+		}
 		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
 			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.GetName())
 			exit(1)
 		}
-		p++
-	}
+	})
 }
 func ZendDeactivateModules() {
 	EG__().SetCurrentExecuteData(nil)
 	faults.Try(func() {
-		if EG__().GetFullTablesCleanup() != 0 {
-			globals.G().EachModuleReserve(func(module *ModuleEntry) {
-				if module.GetRequestShutdownFunc() != nil {
-					module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
-				}
-			})
-		} else {
-			var p **ModuleEntry = ModuleRequestShutdownHandlers
-			for (*p) != nil {
-				var module *ModuleEntry = *p
+		globals.G().EachModuleReserve(func(module *ModuleEntry) {
+			if module.GetRequestShutdownFunc() != nil {
 				module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
-				p++
 			}
-		}
+		})
 	})
 }
 func ZendCleanupInternalClasses() {

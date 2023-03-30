@@ -69,7 +69,6 @@ func InitExecutor() {
 	EG__().GetUserErrorHandlers().Init()
 	EG__().GetUserExceptionHandlers().Init()
 	ZendObjectsStoreInit(EG__().GetObjectsStore(), 1024)
-	EG__().SetFullTablesCleanup(0)
 	EG__().SetVmInterrupt(0)
 	EG__().SetTimedOut(0)
 	EG__().SetException(nil)
