@@ -202,10 +202,8 @@ func DoCli(argc int, argv **byte, args []string) int {
 	var interactive int = 0
 	var param_error *byte = nil
 	var hide_argv int = 0
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
+
 		zend.CG__().SetInCompilation(0)
 		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
@@ -613,8 +611,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			zend.ZendPrintf("Additional .ini files parsed:      %s\n", b.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
 			break
 		}
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 out:
 	if request_started != 0 {
 		core.PhpRequestShutdown(any(0))

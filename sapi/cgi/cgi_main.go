@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"log"
 )
@@ -157,17 +158,10 @@ func main(argc int, argv []*byte) int {
 		 */
 
 		if !(getenv("REDIRECT_STATUS")) && !(getenv("HTTP_REDIRECT_STATUS")) && (!(CGIG(redirect_status_env)) || !(getenv(CGIG(redirect_status_env)))) {
-			var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-			var __bailout JMP_BUF
-			zend.EG__().SetBailout(&__bailout)
-			if zend.SETJMP(__bailout) == 0 {
+			faults.Try(func() {
 				core.SG__().sapi_headers.http_response_code = 400
 				core.PUTS("<b>Security Alert!</b> The PHP CGI cannot be accessed directly.\n\n\n<p>This PHP CGI binary was compiled with force-cgi-redirect enabled.  This\n\nmeans that a page will only be served up if the REDIRECT_STATUS CGI variable is\n\nset, e.g. via an Apache Action directive.</p>\n\n<p>For more information as to <i>why</i> this behaviour exists, see the <a href=\"http://php.net/security.cgi-bin\">\nmanual page for CGI security</a>.</p>\n\n<p>For more information about changing this behaviour or re-enabling this webserver,\n\nconsult the installation file that came with this distribution, or visit \n\n<a href=\"http://php.net/install.windows\">the manual page</a>.</p>\n")
-			} else {
-				zend.EG__().SetBailout(__orig_bailout)
-			}
-			zend.EG__().SetBailout(__orig_bailout)
-			zend.Free(bindpath)
+			})
 			return types.FAILURE
 		}
 
@@ -309,11 +303,8 @@ func main(argc int, argv []*byte) int {
 			zend.ZendSignalInit()
 		}
 	}
-	zend.EG__().SetBailout(nil)
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+
+	faults.TryCatch(func() {
 		for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 1, 2)) != -1 {
 			switch c {
 			case 'T':
@@ -560,10 +551,7 @@ func main(argc int, argv []*byte) int {
 
 			if cgi != 0 || fastcgi != 0 || core.SG__().request_info.path_translated {
 				if core.PhpFopenPrimaryScript(&file_handle) == types.FAILURE {
-					var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-					var __bailout JMP_BUF
-					zend.EG__().SetBailout(&__bailout)
-					if zend.SETJMP(__bailout) == 0 {
+					faults.Try(func() {
 						if errno == EACCES {
 							core.SG__().sapi_headers.http_response_code = 403
 							core.PUTS("Access denied.\n")
@@ -571,10 +559,7 @@ func main(argc int, argv []*byte) int {
 							core.SG__().sapi_headers.http_response_code = 404
 							core.PUTS("No input file specified.\n")
 						}
-					} else {
-						zend.EG__().SetBailout(__orig_bailout)
-					}
-					zend.EG__().SetBailout(__orig_bailout)
+					})
 
 					/* we want to serve more requests if this is fastcgi
 					 * so cleanup and continue, request shutdown is
@@ -699,11 +684,9 @@ func main(argc int, argv []*byte) int {
 		if CgiModule.GetIniEntries() != nil {
 			zend.Free(CgiModule.GetIniEntries())
 		}
-	} else {
-		zend.EG__().SetBailout(__orig_bailout)
+	}, func() {
 		exit_status = 255
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 out:
 	if benchmark != 0 {
 		var sec int

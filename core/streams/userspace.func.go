@@ -137,17 +137,14 @@ func UserWrapperOpener(
 	args[2].SetLong(options)
 	args[3].SetNewRef(zend.EG__().GetUninitializedZval())
 	zfuncname.SetStringVal(b.CastStrAuto(USERSTREAM_OPEN))
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+
+	faults.TryCatch(func() {
 		call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &zfuncname, &zretval, 4, args, 0)
-	} else {
-		zend.EG__().SetBailout(__orig_bailout)
+	}, func() {
 		standard.FG(user_stream_current_filename) = nil
 		faults.Bailout()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
+
 	if call_result == types.SUCCESS && zretval.IsNotUndef() && zend.ZvalIsTrue(&zretval) != 0 {
 
 		/* the stream is now open! */

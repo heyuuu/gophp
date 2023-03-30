@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -31,23 +32,12 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 	var result = false
 	if ini_entry.GetModified() != 0 {
 		if ini_entry.HasOnModify() {
-			var __orig_bailout *JMP_BUF = EG__().GetBailout()
-			var __bailout JMP_BUF
-			EG__().SetBailout(&__bailout)
-			if SETJMP(__bailout) == 0 {
-
+			faults.Try(func() {
 				/* even if on_modify bails out, we have to continue on with restoring,
 				   since there can be allocated variables that would be freed on MM shutdown
 				   and would lead to memory corruption later ini entry is modified again */
-
 				result = ini_entry.EmitOnModify(ini_entry.GetOrigValue(), stage)
-
-				/* even if on_modify bails out, we have to continue on with restoring,
-				   since there can be allocated variables that would be freed on MM shutdown
-				   and would lead to memory corruption later ini entry is modified again */
-
-			}
-			EG__().SetBailout(__orig_bailout)
+			})
 		}
 		if stage == ZEND_INI_STAGE_RUNTIME && result == false {
 			/* runtime failure is OK */

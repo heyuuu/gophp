@@ -191,7 +191,6 @@ type ZendExecutorGlobals struct {
 	symtable_cache_ptr                  **types.Array
 	symbol_table                        types.Array
 	included_files                      types.Array
-	bailout                             *JMP_BUF
 	error_reporting                     int
 	exit_status                         int
 	function_table                      *types.Array
@@ -297,8 +296,6 @@ func (this *ZendExecutorGlobals) GetSymbolTable() *types.Array       { return &t
 func (this *ZendExecutorGlobals) SetSymbolTable(value types.Array)   { this.symbol_table = value }
 func (this *ZendExecutorGlobals) GetIncludedFiles() *types.Array     { return &this.included_files }
 func (this *ZendExecutorGlobals) SetIncludedFiles(value types.Array) { this.included_files = value }
-func (this *ZendExecutorGlobals) GetBailout() *JMP_BUF               { return this.bailout }
-func (this *ZendExecutorGlobals) SetBailout(value *JMP_BUF)          { this.bailout = value }
 func (this *ZendExecutorGlobals) GetErrorReporting() int             { return this.error_reporting }
 func (this *ZendExecutorGlobals) SetErrorReporting(value int)        { this.error_reporting = value }
 func (this *ZendExecutorGlobals) GetExitStatus() int                 { return this.exit_status }

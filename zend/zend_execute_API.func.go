@@ -115,10 +115,7 @@ func ShutdownDestructors() {
 	if CG__().GetUncleanShutdown() != 0 {
 		EG__().GetSymbolTable().SetPDestructor(ZendUncleanZvalPtrDtor)
 	}
-	var __orig_bailout *JMP_BUF = EG__().GetBailout()
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
+	faults.TryCatch(func() {
 		var symbols uint32
 		for {
 			symbols = EG__().GetSymbolTable().Len()
@@ -128,37 +125,25 @@ func ShutdownDestructors() {
 			}
 		}
 		ZendObjectsStoreCallDestructors(EG__().GetObjectsStore())
-	} else {
-		EG__().SetBailout(__orig_bailout)
-
+	}, func() {
 		/* if we couldn't destruct cleanly, mark all objects as destructed anyway */
-
 		ZendObjectsStoreMarkDestructed(EG__().GetObjectsStore())
-
-		/* if we couldn't destruct cleanly, mark all objects as destructed anyway */
-
-	}
-	EG__().SetBailout(__orig_bailout)
+	})
 }
 func ShutdownExecutor() {
 	var key *types.String
 	var zv *types.Zval
 	var fast_shutdown types.ZendBool = IsZendMm() != 0 && EG__().GetFullTablesCleanup() == 0
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
+
+	faults.Try(func() {
 		CG__().GetOpenFiles().Destroy()
-	}
-	EG__().SetBailout(__orig_bailout)
+	})
+
 	EG__().SetIsInResourceShutdown(true)
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
+
+	faults.Try(func() {
 		ZendCloseRsrcList(EG__().GetRegularList())
-	}
-	EG__().SetBailout(__orig_bailout)
+	})
 
 	/* No PHP callback functions should be called after this point. */
 
@@ -235,13 +220,11 @@ func ShutdownExecutor() {
 	}
 	ZendObjectsStoreFreeObjectStorage(EG__().GetObjectsStore(), fast_shutdown)
 	ZendWeakrefsShutdown()
-	var __orig_bailout *JMP_BUF = EG__().GetBailout()
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
+
+	faults.Try(func() {
 		ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionDeactivator))
-	}
-	EG__().SetBailout(__orig_bailout)
+	})
+
 	if fast_shutdown != 0 {
 
 		/* Fast Request Shutdown
@@ -895,19 +878,16 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 		var local_retval types.Zval
 		EG__().SetNoExtensions(1)
 		new_op_array.SetScope(ZendGetExecutedScope())
-		var __orig_bailout *JMP_BUF = EG__().GetBailout()
-		var __bailout JMP_BUF
-		EG__().SetBailout(&__bailout)
-		if SETJMP(__bailout) == 0 {
+
+		faults.TryCatch(func() {
 			local_retval.SetUndef()
 			ZendExecute(new_op_array, &local_retval)
-		} else {
-			EG__().SetBailout(__orig_bailout)
+		}, func() {
 			DestroyOpArray(new_op_array)
 			EfreeSize(new_op_array, b.SizeOf("zend_op_array"))
 			faults.Bailout()
-		}
-		EG__().SetBailout(__orig_bailout)
+		})
+
 		if local_retval.IsNotUndef() {
 			if retval_ptr != nil {
 				types.ZVAL_COPY_VALUE(retval_ptr, &local_retval)

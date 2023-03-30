@@ -676,9 +676,9 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 func CfgGetEntry(name string) *types.Zval {
 	return Config().KeyFind(name)
 }
-func CfgGetLong(varname *byte, result *zend.ZendLong) int {
-	var tmp *types.Zval
-	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
+func CfgGetLong(varname string, result *zend.ZendLong) int {
+	tmp := Config().KeyFind(varname)
+	if tmp == nil {
 		*result = 0
 		return types.FAILURE
 	}

@@ -465,6 +465,7 @@ func ZendAppendVersionInfo(extension *ZendExtension) {
 	ZendVersionInfo += fmt.Sprintf("    with %s v%s, %s, by %s\n", extension.GetNameStr(), extension.GetVersionStr(), extension.GetCopyrightStr(), extension.GetAuthorStr())
 }
 func GetZendVersion() string { return ZendVersionInfo }
+
 func ZendActivate() {
 	//GcReset()
 	InitCompiler()
@@ -475,43 +476,22 @@ func ZendActivate() {
 	}
 }
 func ZendCallDestructors() {
-	var __orig_bailout *JMP_BUF = EG__().GetBailout()
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		ShutdownDestructors()
-	}
-	EG__().SetBailout(__orig_bailout)
+	})
 }
 func ZendDeactivate() {
 	/* we're no longer executing anything */
-
 	EG__().SetCurrentExecuteData(nil)
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
-		ShutdownScanner()
-	}
-	EG__().SetBailout(__orig_bailout)
+
+	faults.Try(func() { ShutdownScanner() })
 
 	/* shutdown_executor() takes care of its own bailout handling */
-
 	ShutdownExecutor()
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
-		ZendIniDeactivate()
-	}
-	EG__().SetBailout(__orig_bailout)
-	var __orig_bailout *JMP_BUF = EG__().GetBailout()
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
-		ShutdownCompiler()
-	}
-	EG__().SetBailout(__orig_bailout)
+
+	faults.Try(func() { ZendIniDeactivate() })
+	faults.Try(func() { ShutdownCompiler() })
+
 	EG__().GetRegularList().GracefulReverseDestroy()
 }
 func ZendMessageDispatcher(message ZendLong, data any) {

@@ -1352,33 +1352,22 @@ func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTick
 }
 func PhpCallShutdownFunctions() {
 	if BG__().user_shutdown_function_names {
-		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-		var __bailout JMP_BUF
-		zend.EG__().SetBailout(&__bailout)
-		if zend.SETJMP(__bailout) == 0 {
+		faults.Try(func() {
 			types.ZendHashApply(BG__().user_shutdown_function_names, UserShutdownFunctionCall)
-		}
-		zend.EG__().SetBailout(__orig_bailout)
+		})
 	}
 }
 func PhpFreeShutdownFunctions() {
 	if BG__().user_shutdown_function_names {
-		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-		var __bailout JMP_BUF
-		zend.EG__().SetBailout(&__bailout)
-		if zend.SETJMP(__bailout) == 0 {
+		faults.TryCatch(func() {
 			BG__().user_shutdown_function_names.Destroy()
 			zend.FREE_HASHTABLE(BG__().user_shutdown_function_names)
 			BG__().user_shutdown_function_names = nil
-		} else {
-			zend.EG__().SetBailout(__orig_bailout)
-
+		}, func() {
 			/* maybe shutdown method call exit, we just ignore it */
-
 			zend.FREE_HASHTABLE(BG__().user_shutdown_function_names)
 			BG__().user_shutdown_function_names = nil
-		}
-		zend.EG__().SetBailout(__orig_bailout)
+		})
 	}
 }
 func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {

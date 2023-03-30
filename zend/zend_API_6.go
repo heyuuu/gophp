@@ -76,10 +76,7 @@ func ZendActivateModules() {
 }
 func ZendDeactivateModules() {
 	EG__().SetCurrentExecuteData(nil)
-	var __orig_bailout *JMP_BUF = EG__().GetBailout()
-	var __bailout JMP_BUF
-	EG__().SetBailout(&__bailout)
-	if SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		if EG__().GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
 			var __ht *types.Array = &ModuleRegistry
@@ -99,8 +96,7 @@ func ZendDeactivateModules() {
 				p++
 			}
 		}
-	}
-	EG__().SetBailout(__orig_bailout)
+	})
 }
 func ZendCleanupInternalClasses() {
 	var p **types.ClassEntry = ClassCleanupHandlers

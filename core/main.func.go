@@ -1163,12 +1163,9 @@ func PhpOnTimeout(seconds int) {
 	PG__().connection_status |= PHP_CONNECTION_TIMEOUT
 }
 func PhpRequestStartup() int {
-	var retval int = types.SUCCESS
 	types.ZendInternedStringsActivate()
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+
+	retVal := faults.Try(func() {
 		PG__().in_error_log = 0
 		PG__().during_request_startup = 1
 		PhpOutputActivate()
@@ -1212,13 +1209,10 @@ func PhpRequestStartup() int {
 		PhpHashEnvironment()
 		zend.ZendActivateModules()
 		PG__().modules_activated = 1
-	} else {
-		zend.EG__().SetBailout(__orig_bailout)
-		retval = types.FAILURE
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
+
 	SG__().sapi_started = 1
-	return retval
+	return types.IntBool(retVal)
 }
 func PhpRequestShutdown(dummy any) {
 	var report_memleaks types.ZendBool
@@ -1233,33 +1227,19 @@ func PhpRequestShutdown(dummy any) {
 	PhpDeactivateTicks()
 
 	/* 1. Call all possible shutdown functions registered with register_shutdown_function() */
-
 	if PG__().modules_activated {
-		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-		var __bailout JMP_BUF
-		zend.EG__().SetBailout(&__bailout)
-		if zend.SETJMP(__bailout) == 0 {
+		faults.Try(func() {
 			standard.PhpCallShutdownFunctions()
-		}
-		zend.EG__().SetBailout(__orig_bailout)
+		})
 	}
 
 	/* 2. Call all possible __destruct() functions */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		zend.ZendCallDestructors()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 3. Flush all output buffers */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		var send_buffer types.ZendBool = b.Cond(SG__().request_info.headers_only, 0, 1)
 		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == faults.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
@@ -1269,34 +1249,22 @@ func PhpRequestShutdown(dummy any) {
 		} else {
 			PhpOutputEndAll()
 		}
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 4. Reset max_execution_time (no longer executing php code after response sent) */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		zend.ZendUnsetTimeout()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 5. Call all extensions RSHUTDOWN functions */
-
 	if PG__().modules_activated {
 		zend.ZendDeactivateModules()
 	}
 
 	/* 6. Shutdown output layer (send the set HTTP headers, cleanup output handlers, etc.) */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		PhpOutputDeactivate()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 7. Free shutdown functions */
 
@@ -1305,17 +1273,12 @@ func PhpRequestShutdown(dummy any) {
 	}
 
 	/* 8. Destroy super-globals */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		var i int
 		for i = 0; i < NUM_TRACK_VARS; i++ {
 			zend.ZvalPtrDtor(&PG__().http_globals[i])
 		}
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 9. free request-bound globals */
 
@@ -1326,49 +1289,29 @@ func PhpRequestShutdown(dummy any) {
 	zend.ZendDeactivate()
 
 	/* 11. Call all extensions post-RSHUTDOWN functions */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		zend.ZendPostDeactivateModules()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 12. SAPI related shutdown (free stuff) */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		SapiDeactivate()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 13. free virtual CWD memory */
 
 	zend.VirtualCwdDeactivate()
 
 	/* 14. Destroy stream hashes */
-
-	var __orig_bailout *JMP_BUF = EG__().bailout
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		PhpShutdownStreamHashes()
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* 15. Free Willy (here be crashes) */
-
 	types.ZendInternedStringsDeactivate()
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown() != 0 || report_memleaks == 0, 0)
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 
 	/* Reset memory limit, as the reset during INI_STAGE_DEACTIVATE may have failed.
 	 * At this point, no memory beyond a single chunk should be in use. */
@@ -1428,7 +1371,6 @@ func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ZendModuleEntr
 }
 func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, num_additional_modules uint32) int {
 	var zuv zend.ZendUtilityValues
-	var retval int = types.SUCCESS
 	var module_number int = 0
 	var php_os = PHP_OS
 	ModuleShutdown = 0
@@ -1583,53 +1525,34 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	}
 
 	/* Check for deprecated directives */
-
-	var directives []struct {
-		error_level long
-		phrase      *byte
-		directives  []*byte
-	} = []struct {
-		error_level long
-		phrase      *byte
-		directives  []*byte
+	var directives = []struct {
+		error_level int
+		phrase      string
+		directives  []string
 	}{
 		{
 			faults.E_DEPRECATED,
 			"Directive '%s' is deprecated",
-			{"track_errors", "allow_url_include", nil},
+			[]string{"track_errors", "allow_url_include"},
 		},
 		{
 			faults.E_CORE_ERROR,
 			"Directive '%s' is no longer available in PHP",
-			{"allow_call_time_pass_reference", "asp_tags", "define_syslog_variables", "highlight.bg", "magic_quotes_gpc", "magic_quotes_runtime", "magic_quotes_sybase", "register_globals", "register_long_arrays", "safe_mode", "safe_mode_gid", "safe_mode_include_dir", "safe_mode_exec_dir", "safe_mode_allowed_env_vars", "safe_mode_protected_env_vars", "zend.ze1_compatibility_mode", nil},
+			[]string{"allow_call_time_pass_reference", "asp_tags", "define_syslog_variables", "highlight.bg", "magic_quotes_gpc", "magic_quotes_runtime", "magic_quotes_sybase", "register_globals", "register_long_arrays", "safe_mode", "safe_mode_gid", "safe_mode_include_dir", "safe_mode_exec_dir", "safe_mode_allowed_env_vars", "safe_mode_protected_env_vars", "zend.ze1_compatibility_mode"},
 		},
 	}
-	var i uint
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
 
-		/* 2 = Count of deprecation structs */
-
-		for i = 0; i < 2; i++ {
-			var p **byte = directives[i].directives
-			for (*p) != nil {
+	retval := faults.Try(func() {
+		for _, directive := range directives {
+			for _, p := range directive.directives {
 				var value zend.ZendLong
-				if CfgGetLong((*byte)(*p), &value) == types.SUCCESS && value != 0 {
-					faults.Error(directives[i].error_level, directives[i].phrase, *p)
+				if CfgGetLong(p, &value) == types.SUCCESS && value != 0 {
+					faults.Error(directive.error_level, directive.phrase, p)
 				}
-				p++
 			}
 		}
+	})
 
-		/* 2 = Count of deprecation structs */
-
-	} else {
-		zend.EG__().SetBailout(__orig_bailout)
-		retval = types.FAILURE
-	}
-	zend.EG__().SetBailout(__orig_bailout)
 	zend.VirtualCwdDeactivate()
 	SapiDeactivate()
 	ModuleStartup = 0
@@ -1638,10 +1561,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	types.ZendInternedStringsSwitchStorage(true)
 
 	/* we're done */
-
-	return retval
-
-	/* we're done */
+	return types.IntBool(retval)
 }
 func PhpModuleShutdown() {
 	var module_number int = 0
@@ -1685,10 +1605,8 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	const OLD_CWD_SIZE = 4096
 	old_cwd = zend.DoAlloca(OLD_CWD_SIZE, use_heap)
 	old_cwd[0] = '0'
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+
+	faults.Try(func() {
 		var realfile []byte
 		PG__().during_request_startup = 0
 		if primary_file.GetFilename() != nil && (SG__().options&SAPI_OPTION_NO_CHDIR) == 0 {
@@ -1737,23 +1655,12 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		} else {
 			retval = zend.ZendExecuteScripts(zend.ZEND_REQUIRE, nil, 3, prepend_file_p, primary_file, append_file_p) == types.SUCCESS
 		}
+	})
 
-		/*
-		   If cli primary file has shabang line and there is a prepend file,
-		   the `skip_shebang` will be used by prepend file but not primary file,
-		   save it and restore after prepend file been executed.
-		*/
-
-	}
-	zend.EG__().SetBailout(__orig_bailout)
 	if zend.EG__().GetException() != nil {
-		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-		var __bailout JMP_BUF
-		zend.EG__().SetBailout(&__bailout)
-		if zend.SETJMP(__bailout) == 0 {
+		faults.Try(func() {
 			faults.ExceptionError(zend.EG__().GetException(), faults.E_ERROR)
-		}
-		zend.EG__().SetBailout(__orig_bailout)
+		})
 	}
 	if old_cwd[0] != '0' {
 		PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
@@ -1804,10 +1711,8 @@ func PhpHandleAuthData(auth *byte) int {
 func PhpLintScript(file *zend.ZendFileHandle) int {
 	var op_array *zend.ZendOpArray
 	var retval int = types.FAILURE
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+
+	faults.Try(func() {
 		op_array = zend.ZendCompileFile(file, zend.ZEND_INCLUDE)
 		zend.ZendDestroyFileHandle(file)
 		if op_array != nil {
@@ -1815,8 +1720,7 @@ func PhpLintScript(file *zend.ZendFileHandle) int {
 			zend.Efree(op_array)
 			retval = types.SUCCESS
 		}
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 	if zend.EG__().GetException() != nil {
 		faults.ExceptionError(zend.EG__().GetException(), faults.E_ERROR)
 	}

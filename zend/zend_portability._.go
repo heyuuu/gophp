@@ -19,9 +19,6 @@ const DL_ERROR = dlerror
 
 /* AIX requires this to be the first thing in the file.  */
 
-//const JMP_BUF = sigjmp_buf
-type JMP_BUF struct{}
-
 const ZTS_V = 0
 const LONG_MAX = 2147483647
 

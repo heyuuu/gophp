@@ -30,19 +30,12 @@ const E_CORE = E_CORE_ERROR | E_CORE_WARNING
 /**
  * functions
  */
-func Bailout() { _zendBailout(__FILE__, __LINE__) }
-
-func _zendBailout(filename *byte, lineno uint32) {
-	if zend.EG__().GetBailout() == nil {
-		OutputDebugString(1, "%s(%d) : Bailed out without a bailout address!", filename, lineno)
-		exit(-1)
-	}
-	zend.GcProtect(1)
+func Bailout() {
 	zend.CG__().SetUncleanShutdown(1)
 	zend.CG__().SetActiveClassEntry(nil)
 	zend.CG__().SetInCompilation(0)
 	zend.EG__().SetCurrentExecuteData(nil)
-	zend.LONGJMP(*zend.EG__().GetBailout(), types.FAILURE)
+	throw()
 }
 
 func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format string, args ...any) {

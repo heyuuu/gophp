@@ -489,7 +489,7 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *types.Zval
 		generator.GetValues().SetUndef()
 	}
 
-	/* Throw the exception in the context of the generator. Decrementing the opline
+	/* throw the exception in the context of the generator. Decrementing the opline
 	 * to pretend the exception happened during the YIELD opcode. */
 
 	EG__().SetCurrentExecuteData(generator.GetExecuteData())
@@ -630,7 +630,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 				if yield_from.GetOpcode() == ZEND_YIELD_FROM {
 					if root.GetNode().GetParent().GetRetval().IsUndef() {
 
-						/* Throw the exception in the context of the generator */
+						/* throw the exception in the context of the generator */
 
 						var original_execute_data *ZendExecuteData = CurrEX()
 						EG__().SetCurrentExecuteData(root.GetExecuteData())

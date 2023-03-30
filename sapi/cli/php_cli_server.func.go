@@ -880,13 +880,9 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 	}
 	var zfd zend.ZendFileHandle
 	zend.ZendStreamInitFilename(&zfd, core.SG__().request_info.path_translated)
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		core.PhpExecuteScript(&zfd)
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 	PhpCliServerLogResponse(client, core.SG__().sapi_headers.http_response_code, nil)
 	return types.SUCCESS
 }
@@ -974,34 +970,30 @@ func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClien
 	return types.SUCCESS
 }
 func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient) int {
-	var decline int = 0
+	var decline = false
 	var zfd zend.ZendFileHandle
 	var old_cwd *byte
 	old_cwd = zend.DoAlloca(core.MAXPATHLEN, use_heap)
 	old_cwd[0] = '0'
 	core.PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, core.MAXPATHLEN-1))
 	zend.ZendStreamInitFilename(&zfd, server.GetRouter())
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
+	faults.Try(func() {
 		var retval types.Zval
 		retval.SetUndef()
 		if types.SUCCESS == zend.ZendExecuteScripts(zend.ZEND_REQUIRE, &retval, 1, &zfd) {
 			if retval.IsNotUndef() {
-				decline = retval.IsType(types.IS_FALSE)
+				decline = retval.IsFalse()
 				zend.ZvalPtrDtor(&retval)
 			}
 		} else {
-			decline = 1
+			decline = true
 		}
-	}
-	zend.EG__().SetBailout(__orig_bailout)
+	})
 	if old_cwd[0] != '0' {
 		core.PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
 	}
 	zend.FreeAlloca(old_cwd, use_heap)
-	return decline
+	return types.IntBool(decline)
 }
 func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int {
 	var is_static_file int = 0
