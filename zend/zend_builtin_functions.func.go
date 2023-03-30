@@ -2,8 +2,10 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
@@ -1340,14 +1342,9 @@ func ZifGetLoadedExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	if zendext != 0 {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(AddZendextInfo), return_value)
 	} else {
-		var module *ZendModuleEntry
-		var __ht = &ModuleRegistry
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			module = _z.GetPtr()
+		globals.G().EachModule(func(module *ModuleEntry) {
 			AddNextIndexString(return_value, module.GetName())
-		}
+		})
 	}
 }
 func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, categorize *types.Zval) {
@@ -1361,20 +1358,15 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		var module_number int
 		var modules *types.Zval
 		var const_val types.Zval
-		var module_names **byte
-		var module *ZendModuleEntry
+		var module_names []string
 		var i = 1
-		modules = Ecalloc(ModuleRegistry.Len()+2, b.SizeOf("zval"))
-		module_names = Emalloc((ModuleRegistry.Len() + 2) * b.SizeOf("char *"))
+		modules = Ecalloc(globals.G().CountModules()+2, b.SizeOf("zval"))
+		module_names = make([]string, globals.G().CountModules()+2)
 		module_names[0] = "internal"
-		var __ht = &ModuleRegistry
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			module = _z.GetPtr()
-			module_names[module.GetModuleNumber()] = (*byte)(module.GetName())
+		globals.G().EachModule(func(module *ModuleEntry) {
+			module_names[module.GetModuleNumber()] = module.GetName()
 			i++
-		}
+		})
 		module_names[i] = "user"
 		var __ht__1 = EG__().GetZendConstants()
 		for _, _p := range __ht__1.ForeachData() {
@@ -1410,7 +1402,6 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			types.ZVAL_COPY_OR_DUP(&const_val, val.Value())
 			modules[module_number].GetArr().KeyAddNew(val.GetName().GetStr(), &const_val)
 		}
-		Efree(module_names)
 		Efree(modules)
 	} else {
 		var constant *ZendConstant
@@ -1903,35 +1894,22 @@ func ZifDebugBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, opti
 	}
 	ZendFetchDebugBacktrace(return_value, 1, options, limit)
 }
-func ZifExtensionLoaded(executeData zpp.Ex, return_value zpp.Ret, extensionName *types.Zval) {
-	var extension_name *types.String
-	var lcname *types.String
-	if ZendParseParameters(executeData.NumArgs(), "S", &extension_name) == types.FAILURE {
-		return
-	}
-	lcname = ZendStringTolower(extension_name)
-	if &ModuleRegistry.KeyExists(lcname.GetStr()) {
-		return_value.SetTrue()
-	} else {
-		return_value.SetFalse()
-	}
-	types.ZendStringReleaseEx(lcname, 0)
+func ZifExtensionLoaded(extensionName string) bool {
+	return globals.G().GetModule(extensionName) != nil
 }
 func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionName *types.Zval) {
 	var extension_name *types.String
-	var lcname *types.String
 	var array int
-	var module *ZendModuleEntry
+	var module *ModuleEntry
 	var zif *ZendFunction
 	if ZendParseParameters(executeData.NumArgs(), "S", &extension_name) == types.FAILURE {
 		return
 	}
-	if strncasecmp(extension_name.GetVal(), "zend", b.SizeOf("\"zend\"")) {
-		lcname = ZendStringTolower(extension_name)
-		module = types.ZendHashFindPtr(&ModuleRegistry, lcname.GetStr())
-		types.ZendStringReleaseEx(lcname, 0)
+
+	if !ascii.StrCaseEquals(extension_name.GetStr(), "zend") {
+		module = globals.G().GetModule(extension_name.GetStr())
 	} else {
-		module = types.ZendHashStrFindPtr(&ModuleRegistry, "core")
+		module = globals.G().GetModule("core")
 	}
 	if module == nil {
 		return_value.SetFalse()

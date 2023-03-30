@@ -81,7 +81,7 @@ func ZmDeactivateAssert(type_ int, module_number int) int {
 	}
 	return types.SUCCESS
 }
-func ZmInfoAssert(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
+func ZmInfoAssert(zend_module *zend.ModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
 func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, _ zpp.Opt, description *types.Zval) {
 	var assertion *types.Zval
 	var description *types.Zval = nil

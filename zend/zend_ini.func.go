@@ -15,8 +15,8 @@ func INI_STR(name string) *byte {
 func REGISTER_INI_ENTRIES(module_number int) int {
 	return ZendRegisterIniEntries(IniEntries, module_number)
 }
-func UNREGISTER_INI_ENTRIES(module_number int)         { ZendUnregisterIniEntries(module_number) }
-func DISPLAY_INI_ENTRIES(zend_module *ZendModuleEntry) { DisplayIniEntries(zend_module) }
+func UNREGISTER_INI_ENTRIES(module_number int)     { ZendUnregisterIniEntries(module_number) }
+func DISPLAY_INI_ENTRIES(zend_module *ModuleEntry) { DisplayIniEntries(zend_module) }
 func REGISTER_INI_DISPLAYER(name *byte, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
 	return ZendIniRegisterDisplayer(name, b.SizeOf("name")-1, displayer)
 }

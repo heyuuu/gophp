@@ -63,7 +63,7 @@ type ClassEntry struct {
 		}
 		internal struct {
 			builtin_functions []ZendFunctionEntry
-			module            *zend.ZendModuleEntry
+			module            *zend.ModuleEntry
 		}
 	}
 }
@@ -267,8 +267,8 @@ func (this *ClassEntry) GetBuiltinFunctions() *ZendFunctionEntry {
 func (this *ClassEntry) SetBuiltinFunctions(value *ZendFunctionEntry) {
 	this.info.internal.builtin_functions = value
 }
-func (this *ClassEntry) GetModule() *zend.ZendModuleEntry      { return this.info.internal.module }
-func (this *ClassEntry) SetModule(value *zend.ZendModuleEntry) { this.info.internal.module = value }
+func (this *ClassEntry) GetModule() *zend.ModuleEntry      { return this.info.internal.module }
+func (this *ClassEntry) SetModule(value *zend.ModuleEntry) { this.info.internal.module = value }
 
 /* ClassEntry.ce_flags */
 func (this *ClassEntry) AddCeFlags(value uint32)      { this.ce_flags |= value }

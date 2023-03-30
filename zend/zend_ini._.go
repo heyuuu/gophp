@@ -7,7 +7,7 @@ const ZEND_INI_PERDIR = 1 << 1
 const ZEND_INI_SYSTEM = 1 << 2
 const ZEND_INI_ALL = ZEND_INI_USER | ZEND_INI_PERDIR | ZEND_INI_SYSTEM
 
-var DisplayIniEntries func(module *ZendModuleEntry)
+var DisplayIniEntries func(module *ModuleEntry)
 
 /* Standard message handlers */
 

@@ -2,11 +2,11 @@ package cgi
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/ascii"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"log"
@@ -27,10 +27,7 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 	va_end(ap)
 }
 func PrintModules() {
-	var modules = zend.CopyRegistryModules()
-	sort.Slice(modules, func(i, j int) bool {
-		return ascii.StrCaseCompare(modules[i].GetName(), modules[j].GetName()) < 0
-	})
+	var modules = globals.G().GetSortedModules()
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
@@ -911,7 +908,7 @@ func ZmShutdownCgi(type_ int, module_number int) int {
 	zend.UNREGISTER_INI_ENTRIES(module_number)
 	return types.SUCCESS
 }
-func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
+func ZmInfoCgi(zend_module *zend.ModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
 func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return

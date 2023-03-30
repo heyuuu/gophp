@@ -47,7 +47,7 @@ var SplFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 /* {{{ spl_module_entry
  */
 
-var SplModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(
+var SplModuleEntry zend.ModuleEntry = zend.MakeZendModuleEntry(
 	"SPL",
 	SplFunctions,
 	ZmStartupSpl,

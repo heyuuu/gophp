@@ -5,16 +5,16 @@ import (
 )
 
 /**
- * ZendModuleEntry
+ * ModuleEntry
  */
-type ZendModuleEntry struct {
+type ModuleEntry struct {
 	name                  string
 	functions             []types.ZendFunctionEntry
 	module_startup_func   func(type_ int, module_number int) int
 	module_shutdown_func  func(type_ int, module_number int) int
 	request_startup_func  func(type_ int, module_number int) int
 	request_shutdown_func func(type_ int, module_number int) int
-	info_func             func(zend_module *ZendModuleEntry)
+	info_func             func(zend_module *ModuleEntry)
 	version               string
 	globals_size          int
 	globals_ptr           any
@@ -33,7 +33,7 @@ func MakeZendModuleEntry(
 	module_shutdown_func func(type_ int, module_number int) int,
 	request_startup_func func(type_ int, module_number int) int,
 	request_shutdown_func func(type_ int, module_number int) int,
-	info_func func(zend_module *ZendModuleEntry),
+	info_func func(zend_module *ModuleEntry),
 	version string,
 
 	globals_size int,
@@ -41,8 +41,8 @@ func MakeZendModuleEntry(
 	globals_ctor func(global any),
 	globals_dtor func(global any),
 
-) ZendModuleEntry {
-	return ZendModuleEntry{
+) ModuleEntry {
+	return ModuleEntry{
 		name:                  name,
 		functions:             functions,
 		module_startup_func:   module_startup_func,
@@ -58,34 +58,34 @@ func MakeZendModuleEntry(
 	}
 }
 
-func (this *ZendModuleEntry) SetInfoFunc(value func(zend_module *ZendModuleEntry)) {
+func (this *ModuleEntry) SetInfoFunc(value func(zend_module *ModuleEntry)) {
 	this.info_func = value
 }
-func (this *ZendModuleEntry) SetHandle(value any)        { this.handle = value }
-func (this *ZendModuleEntry) SetModuleNumber(value int)  { this.module_number = value }
-func (this *ZendModuleEntry) SetModuleStarted(value int) { this.module_started = value }
+func (this *ModuleEntry) SetHandle(value any)        { this.handle = value }
+func (this *ModuleEntry) SetModuleNumber(value int)  { this.module_number = value }
+func (this *ModuleEntry) SetModuleStarted(value int) { this.module_started = value }
 
-func (this *ZendModuleEntry) GetName() string                         { return this.name }
-func (this *ZendModuleEntry) GetFunctions() []types.ZendFunctionEntry { return this.functions }
-func (this *ZendModuleEntry) GetModuleStartupFunc() func(type_ int, module_number int) int {
+func (this *ModuleEntry) GetName() string                         { return this.name }
+func (this *ModuleEntry) GetFunctions() []types.ZendFunctionEntry { return this.functions }
+func (this *ModuleEntry) GetModuleStartupFunc() func(type_ int, module_number int) int {
 	return this.module_startup_func
 }
-func (this *ZendModuleEntry) GetModuleShutdownFunc() func(type_ int, module_number int) int {
+func (this *ModuleEntry) GetModuleShutdownFunc() func(type_ int, module_number int) int {
 	return this.module_shutdown_func
 }
-func (this *ZendModuleEntry) GetRequestStartupFunc() func(type_ int, module_number int) int {
+func (this *ModuleEntry) GetRequestStartupFunc() func(type_ int, module_number int) int {
 	return this.request_startup_func
 }
-func (this *ZendModuleEntry) GetRequestShutdownFunc() func(type_ int, module_number int) int {
+func (this *ModuleEntry) GetRequestShutdownFunc() func(type_ int, module_number int) int {
 	return this.request_shutdown_func
 }
-func (this *ZendModuleEntry) GetInfoFunc() func(zend_module *ZendModuleEntry) { return this.info_func }
-func (this *ZendModuleEntry) GetVersion() string                              { return this.version }
-func (this *ZendModuleEntry) GetGlobalsSize() int                             { return this.globals_size }
-func (this *ZendModuleEntry) GetGlobalsPtr() any                              { return this.globals_ptr }
-func (this *ZendModuleEntry) GetGlobalsCtor() func(global any)                { return this.globals_ctor }
-func (this *ZendModuleEntry) GetGlobalsDtor() func(global any)                { return this.globals_dtor }
-func (this *ZendModuleEntry) GetModuleStarted() int                           { return this.module_started }
-func (this *ZendModuleEntry) GetType() uint8                                  { return MODULE_PERSISTENT }
-func (this *ZendModuleEntry) GetHandle() any                                  { return this.handle }
-func (this *ZendModuleEntry) GetModuleNumber() int                            { return this.module_number }
+func (this *ModuleEntry) GetInfoFunc() func(zend_module *ModuleEntry) { return this.info_func }
+func (this *ModuleEntry) GetVersion() string                          { return this.version }
+func (this *ModuleEntry) GetGlobalsSize() int                         { return this.globals_size }
+func (this *ModuleEntry) GetGlobalsPtr() any                          { return this.globals_ptr }
+func (this *ModuleEntry) GetGlobalsCtor() func(global any)            { return this.globals_ctor }
+func (this *ModuleEntry) GetGlobalsDtor() func(global any)            { return this.globals_dtor }
+func (this *ModuleEntry) GetModuleStarted() int                       { return this.module_started }
+func (this *ModuleEntry) GetType() uint8                              { return MODULE_PERSISTENT }
+func (this *ModuleEntry) GetHandle() any                              { return this.handle }
+func (this *ModuleEntry) GetModuleNumber() int                        { return this.module_number }

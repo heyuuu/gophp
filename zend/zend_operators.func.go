@@ -228,7 +228,7 @@ again:
 	}
 	return result
 }
-func ZendStringTolower(str *types.String) *types.String { return ZendStringTolowerEx(str, 0) }
+func ZendStringTolower(str *types.String) *types.String { return ZendStringTolowerEx(str) }
 func ConvertToStringEx(pzv *types.Zval) {
 	if pzv.GetType() != types.IS_STRING {
 		ConvertToString(pzv)
@@ -2866,29 +2866,8 @@ func ZendStrTolowerDupEx(source *byte, length int) *byte {
 	}
 	return nil
 }
-func ZendStringTolowerEx(str *types.String, persistent int) *types.String {
-
-	var p *uint8 = (*uint8)(str.GetVal())
-	var end *uint8 = p + str.GetLen()
-	for p < end {
-		if (*p) != ascii.ToLower(*p) {
-			var res *types.String = types.ZendStringAlloc(str.GetLen(), persistent)
-			var r *uint8
-			if p != (*uint8)(str.GetVal()) {
-				memcpy(res.GetVal(), str.GetVal(), p-(*uint8)(str.GetVal()))
-			}
-			r = p + (res.GetVal() - str.GetVal())
-			for p < end {
-				*r = ascii.ToLower(*p)
-				p++
-				r++
-			}
-			*r = '0'
-			return res
-		}
-		p++
-	}
-	return str.Copy()
+func ZendStringTolowerEx(str *types.String) *types.String {
+	return types.NewString(ascii.StrToLower(str.GetStr()))
 }
 func ZendBinaryStrcmp(s1 string, s2 string) int {
 	return strings.Compare(s1, s2)

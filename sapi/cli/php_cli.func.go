@@ -3,12 +3,12 @@ package cli
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/ascii"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"sort"
 	"strings"
@@ -58,10 +58,7 @@ const usage string = `Usage: %s [options] [-f] <file> [--] [args...]
 `
 
 func PrintModules() {
-	var modules = zend.CopyRegistryModules()
-	sort.Slice(modules, func(i, j int) bool {
-		return ascii.StrCaseCompare(modules[i].GetName(), modules[j].GetName()) < 0
-	})
+	var modules = globals.G().GetSortedModules()
 	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
@@ -204,7 +201,6 @@ func DoCli(argc int, argv **byte, args []string) int {
 	var param_error *byte = nil
 	var hide_argv int = 0
 	faults.Try(func() {
-
 		zend.CG__().SetInCompilation(0)
 		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
@@ -590,19 +586,16 @@ func DoCli(argc int, argv **byte, args []string) int {
 			zend.ZvalPtrDtor(&arg)
 			break
 		case PHP_MODE_REFLECTION_EXT_INFO:
-			var lcname = ascii.StrToLower(b.CastStrAuto(reflection_what))
-			var module *zend.ZendModuleEntry
-			if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname)) == nil {
+			if module := globals.G().GetModule(b.CastStrAuto(reflection_what)); module != nil {
+				standard.PhpInfoPrintModule(module)
+			} else {
 				if reflection_what == "main" {
 					core.DisplayIniEntries(nil)
 				} else {
 					zend.ZendPrintf("Extension '%s' not present.\n", reflection_what)
 					exit_status = 1
 				}
-			} else {
-				standard.PhpInfoPrintModule(module)
 			}
-			zend.Efree(lcname)
 			break
 		case PHP_MODE_SHOW_INI_CONFIG:
 			zend.ZendPrintf("Configuration File (php.ini) Path: %s\n", core.PHP_CONFIG_FILE_PATH)

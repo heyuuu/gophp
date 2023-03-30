@@ -192,7 +192,7 @@ func ZendHashUpdatePtr(ht *Array, key string, pData any) any {
 	return zv.GetPtr()
 }
 func ZendHashAddMem(ht *Array, key string, pData any, size int) any {
-	zv := ht.KeyAdd(key, NewZvalPtr(pData))
+	zv := ht.KeyAdd(key, NewZvalPtr(nil))
 	if zv != nil {
 		zv.SetPtr(zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)

@@ -18,7 +18,7 @@ type CgiModuleType struct {
 func (c *CgiModuleType) Name() string       { return "cgi-fcgi" }
 func (c *CgiModuleType) PrettyName() string { return "CGI/FastCGI" }
 func (c *CgiModuleType) Startup() bool {
-	return core.PhpModuleStartupEx(c, []zend.ZendModuleEntry{CgiModuleEntry})
+	return core.PhpModuleStartupEx(c, []zend.ModuleEntry{CgiModuleEntry})
 }
 
 func (c *CgiModuleType) Shutdown() bool {

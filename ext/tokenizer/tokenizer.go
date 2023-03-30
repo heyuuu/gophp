@@ -14,7 +14,7 @@ var TokenizerFunctions = []types.ZendFunctionEntry{
 	DefZifTokenGetAll,
 	DefZifTokenName,
 }
-var TokenizerModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(
+var TokenizerModuleEntry zend.ModuleEntry = zend.MakeZendModuleEntry(
 	"tokenizer",
 	TokenizerFunctions,
 	ZmStartupTokenizer,
@@ -40,7 +40,7 @@ func ZmStartupTokenizer(type_ int, module_number int) int {
 	TokenizerTokenGetAllRegisterConstants(type_, module_number)
 	return types.SUCCESS
 }
-func ZmInfoTokenizer(zend_module *zend.ZendModuleEntry) {
+func ZmInfoTokenizer(zend_module *zend.ModuleEntry) {
 	standard.PhpInfoPrintTableStart()
 	standard.PhpInfoPrintTableRow(2, "Tokenizer Support", "enabled")
 	standard.PhpInfoPrintTableEnd()

@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
@@ -288,7 +289,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	BG__().page_gid = -1
 	return types.SUCCESS
 }
-func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
+func ZmInfoBasic(zend_module *zend.ModuleEntry) {
 	PhpInfoPrintTableStart()
 	ZmInfoDl(zend_module)
 	ZmInfoMail(zend_module)
@@ -1592,7 +1593,6 @@ func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension
 	var extname *byte = nil
 	var extname_len int = 0
 	var module_number int = 0
-	var module *zend.ZendModuleEntry
 	var details types.ZendBool = 1
 	var key *types.String
 	var ini_entry *zend.ZendIniEntry
@@ -1611,7 +1611,8 @@ func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension
 	}
 	zend.ZendIniSortEntries()
 	if extname != nil {
-		if b.Assign(&module, types.ZendHashStrFindPtr(&zend.ModuleRegistry, b.CastStr(extname, extname_len))) == nil {
+		module := globals.G().GetModule(b.CastStr(extname, extname_len))
+		if module == nil {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to find extension '%s'", extname)
 			return_value.SetFalse()
 			return

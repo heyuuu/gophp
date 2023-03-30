@@ -600,7 +600,7 @@ var DefZifExtensionLoaded = def.DefFunc("extension_loaded", 1, 1, []def.ArgInfo{
 	if fp.HasError() {
 		return
 	}
-	ZifExtensionLoaded(executeData, returnValue, extension_name)
+	ZifExtensionLoaded(returnValue)
 })
 
 // generate by ZifGetExtensionFuncs

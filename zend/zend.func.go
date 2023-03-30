@@ -302,7 +302,7 @@ func PhpScannerGlobalsCtor(scanner_globals_p *ZendPhpScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
 func ModuleDestructorZval(zv *types.Zval) {
-	var module *ZendModuleEntry = (*ZendModuleEntry)(zv.GetPtr())
+	var module *ModuleEntry = (*ModuleEntry)(zv.GetPtr())
 	ModuleDestructor(module)
 	Free(module)
 }
@@ -360,7 +360,6 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	CG__().InitTables()
 	EG__().InitTables()
-	ModuleRegistry = *types.NewArrayEx(32, ModuleDestructorZval, true)
 
 	ZendInitRsrcListDtors()
 	IniScannerGlobalsCtor(&ini_scanner_globals)

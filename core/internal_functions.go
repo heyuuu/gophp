@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-var PhpBuiltinExtensions []*zend.ZendModuleEntry = []*zend.ZendModuleEntry{
+var PhpBuiltinExtensions []*zend.ModuleEntry = []*zend.ModuleEntry{
 	//phpext_date_ptr,
 	//phpext_libxml_ptr,
 	//phpext_pcre_ptr,

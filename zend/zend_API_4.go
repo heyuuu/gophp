@@ -268,9 +268,9 @@ func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 		return types.FAILURE
 	}
 }
-func AddNextIndexString(arg *types.Zval, str *byte) int {
+func AddNextIndexString(arg *types.Zval, str string) int {
 	var tmp types.Zval
-	tmp.SetStringVal(b.CastStrAuto(str))
+	tmp.SetStringVal(str)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
@@ -339,9 +339,9 @@ func AddPropertyZvalEx(arg *types.Zval, key string, value *types.Zval) int {
 	types.Z_OBJ_HT(*arg).GetWriteProperty()(arg, zKey, value, nil)
 	return types.SUCCESS
 }
-func ZendStartupModuleEx(module *ZendModuleEntry) int {
+func ZendStartupModuleEx(module *ModuleEntry) bool {
 	if module.GetModuleStarted() != 0 {
-		return types.SUCCESS
+		return true
 	}
 	module.SetModuleStarted(1)
 
@@ -356,9 +356,9 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unable to start %s module", module.GetName())
 			EG__().SetCurrentModule(nil)
-			return types.FAILURE
+			return false
 		}
 		EG__().SetCurrentModule(nil)
 	}
-	return types.SUCCESS
+	return true
 }

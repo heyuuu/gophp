@@ -17,7 +17,7 @@ type CliServerModuleType struct {
 func (c *CliServerModuleType) Name() string       { return "cli-server" }
 func (c *CliServerModuleType) PrettyName() string { return "Built-in HTTP server" }
 func (c *CliServerModuleType) Startup() bool {
-	if !core.PhpModuleStartupEx(c, []zend.ZendModuleEntry{CliServerModuleEntry}) {
+	if !core.PhpModuleStartupEx(c, []zend.ModuleEntry{CliServerModuleEntry}) {
 		return false
 	}
 	var workers = getenv("PHP_CLI_SERVER_WORKERS")

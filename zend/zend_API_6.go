@@ -3,6 +3,7 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"strings"
 )
@@ -35,7 +36,7 @@ func CleanModuleClass(el *types.Zval, arg any) int {
 func CleanModuleClasses(module_number int) {
 	types.ZendHashApplyWithArgument(EG__().GetClassTable(), CleanModuleClass, any(&module_number))
 }
-func ModuleDestructor(module *ZendModuleEntry) {
+func ModuleDestructor(module *ModuleEntry) {
 	if module.GetType() == MODULE_TEMPORARY {
 		ZendCleanModuleRsrcDtors(module.GetModuleNumber())
 		CleanModuleConstants(module.GetModuleNumber())
@@ -64,9 +65,9 @@ func ModuleDestructor(module *ZendModuleEntry) {
 	}
 }
 func ZendActivateModules() {
-	var p **ZendModuleEntry = ModuleRequestStartupHandlers
+	var p **ModuleEntry = ModuleRequestStartupHandlers
 	for (*p) != nil {
-		var module *ZendModuleEntry = *p
+		var module *ModuleEntry = *p
 		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == types.FAILURE {
 			faults.Error(faults.E_WARNING, "request_startup() for %s module failed", module.GetName())
 			exit(1)
@@ -78,20 +79,15 @@ func ZendDeactivateModules() {
 	EG__().SetCurrentExecuteData(nil)
 	faults.Try(func() {
 		if EG__().GetFullTablesCleanup() != 0 {
-			var module *ZendModuleEntry
-			var __ht *types.Array = &ModuleRegistry
-			for _, _p := range __ht.ForeachDataReserve() {
-				var _z types.Zval = _p.GetVal()
-
-				module = _z.GetPtr()
+			globals.G().EachModuleReserve(func(module *ModuleEntry) {
 				if module.GetRequestShutdownFunc() != nil {
 					module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
 				}
-			}
+			})
 		} else {
-			var p **ZendModuleEntry = ModuleRequestShutdownHandlers
+			var p **ModuleEntry = ModuleRequestShutdownHandlers
 			for (*p) != nil {
-				var module *ZendModuleEntry = *p
+				var module *ModuleEntry = *p
 				module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
 				p++
 			}
@@ -106,56 +102,10 @@ func ZendCleanupInternalClasses() {
 	}
 }
 func ZendPostDeactivateModules() {
-	if EG__().GetFullTablesCleanup() != 0 {
-		var module *ZendModuleEntry
-		var zv *types.Zval
-		var key *types.String
-		var __ht *types.Array = &ModuleRegistry
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			module = _z.GetPtr()
-		}
-		var __ht__1 *types.Array = &ModuleRegistry
-		for _, _p := range __ht__1.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
-
-			key = _p.GetKey()
-			zv = _z
-			module = zv.GetPtr()
-			if module.GetType() != MODULE_TEMPORARY {
-				break
-			}
-			ModuleDestructor(module)
-			Free(module)
-			types.ZendStringReleaseEx(key, 0)
-			__ht__1.Len()--
-			var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
-			var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
-			var i uint32 = types.HT_HASH(__ht__1, nIndex)
-			if j != i {
-				var prev *types.Bucket = __ht__1.Bucket(i)
-				for prev.GetVal().GetNext() != j {
-					i = prev.GetVal().GetNext()
-					prev = __ht__1.Bucket(i)
-				}
-				prev.GetVal().GetNext() = _p.GetVal().GetNext()
-			} else {
-				types.HT_HASH(__ht__1, nIndex) = _p.GetVal().GetNext()
-			}
-		}
-		__ht__1.SetNNumUsed(_idx)
-	} else {
-		var p **ZendModuleEntry = ModulePostDeactivateHandlers
-		//for (*p) != nil {
-		//	var module *ZendModuleEntry = *p
-		//	module.GetPostDeactivateFunc()()
-		//	p++
-		//}
-	}
+	// deleted
 }
 func ZendNextFreeModule() int {
-	return ModuleRegistry.Len() + 1
+	return globals.G().CountModules() + 1
 }
 func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
 	var class_entry = &types.ClassEntry{}
@@ -168,7 +118,7 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	if class_entry.GetBuiltinFunctions() != nil {
 		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), EG__().GetCurrentModule().GetType())
 	}
-	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), EG__().GetCurrentModule().GetType() == MODULE_PERSISTENT)
+	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName())
 	lowercase_name = types.ZendNewInternedString(lowercase_name)
 	types.ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name.GetStr(), class_entry)
 	types.ZendStringReleaseEx(lowercase_name, 1)

@@ -20,7 +20,7 @@ type ZendInternalFunction struct {
 	required_num_args uint32
 	arg_info          *ArgInfo
 	handler           ZifHandler
-	module            *ZendModuleEntry
+	module            *ModuleEntry
 	reserved          [ZEND_MAX_RESERVED_RESOURCES]any
 }
 
@@ -67,14 +67,14 @@ func (this *ZendInternalFunction) GetNumArgs() uint32               { return thi
 func (this *ZendInternalFunction) SetNumArgs(value uint32)          { this.num_args = value }
 
 // func (this *ZendInternalFunction)  GetRequiredNumArgs() uint32      { return this.required_num_args }
-func (this *ZendInternalFunction) SetRequiredNumArgs(value uint32)  { this.required_num_args = value }
-func (this *ZendInternalFunction) GetArgInfo() *ArgInfo             { return this.arg_info }
-func (this *ZendInternalFunction) SetArgInfo(value *ArgInfo)        { this.arg_info = value }
-func (this *ZendInternalFunction) GetHandler() ZifHandler           { return this.handler }
-func (this *ZendInternalFunction) SetHandler(value ZifHandler)      { this.handler = value }
-func (this *ZendInternalFunction) GetModule() *ZendModuleEntry      { return this.module }
-func (this *ZendInternalFunction) SetModule(value *ZendModuleEntry) { this.module = value }
-func (this *ZendInternalFunction) GetReserved() []any               { return this.reserved }
+func (this *ZendInternalFunction) SetRequiredNumArgs(value uint32) { this.required_num_args = value }
+func (this *ZendInternalFunction) GetArgInfo() *ArgInfo            { return this.arg_info }
+func (this *ZendInternalFunction) SetArgInfo(value *ArgInfo)       { this.arg_info = value }
+func (this *ZendInternalFunction) GetHandler() ZifHandler          { return this.handler }
+func (this *ZendInternalFunction) SetHandler(value ZifHandler)     { this.handler = value }
+func (this *ZendInternalFunction) GetModule() *ModuleEntry         { return this.module }
+func (this *ZendInternalFunction) SetModule(value *ModuleEntry)    { this.module = value }
+func (this *ZendInternalFunction) GetReserved() []any              { return this.reserved }
 
 // func (this *ZendInternalFunction) SetReserved(value []any) { this.reserved = value }
 

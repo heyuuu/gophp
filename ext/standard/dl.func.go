@@ -23,8 +23,8 @@ func PhpLoadShlib(path *byte, errp **byte) any {
 func PhpLoadExtension(filename *byte) int {
 	var handle any
 	var libpath *byte
-	var module_entry *zend.ZendModuleEntry
-	var get_module func() *zend.ZendModuleEntry
+	var module_entry *zend.ModuleEntry
+	var get_module func() *zend.ModuleEntry
 	var error_type int
 	var slash_suffix int = 0
 	var extension_dir *byte
@@ -76,14 +76,14 @@ func PhpLoadExtension(filename *byte) int {
 		zend.Efree(err1)
 	}
 	zend.Efree(libpath)
-	get_module = (func() *zend.ZendModuleEntry)(zend.DL_FETCH_SYMBOL(handle, "get_module"))
+	get_module = (func() *zend.ModuleEntry)(zend.DL_FETCH_SYMBOL(handle, "get_module"))
 
 	/* Some OS prepend _ to symbol names while their dynamic linker
 	 * does not do that automatically. Thus we check manually for
 	 * _get_module. */
 
 	if get_module == nil {
-		get_module = (func() *zend.ZendModuleEntry)(zend.DL_FETCH_SYMBOL(handle, "_get_module"))
+		get_module = (func() *zend.ModuleEntry)(zend.DL_FETCH_SYMBOL(handle, "_get_module"))
 	}
 	if get_module == nil {
 		if zend.DL_FETCH_SYMBOL(handle, "zend_extension_entry") || zend.DL_FETCH_SYMBOL(handle, "_zend_extension_entry") {
@@ -104,6 +104,6 @@ func PhpLoadExtension(filename *byte) int {
 	}
 	return types.SUCCESS
 }
-func ZmInfoDl(zend_module *zend.ZendModuleEntry) {
+func ZmInfoDl(zend_module *zend.ModuleEntry) {
 	PhpInfoPrintTableRow(2, "Dynamic Library Support", "enabled")
 }

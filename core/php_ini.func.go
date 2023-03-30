@@ -50,7 +50,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		}
 	}
 }
-func DisplayIniEntries(module *zend.ZendModuleEntry) {
+func DisplayIniEntries(module *zend.ModuleEntry) {
 	var module_number int
 	var ini_entry *zend.ZendIniEntry
 	var first types.ZendBool = 1

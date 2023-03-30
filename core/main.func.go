@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"log"
 	"strconv"
@@ -1342,13 +1343,13 @@ func CoreGlobalsDtor(core_globals *PhpCoreGlobals) {
 	}
 	PhpShutdownTicks()
 }
-func ZmInfoPhpCore(zend_module *zend.ZendModuleEntry) {
+func ZmInfoPhpCore(zend_module *zend.ModuleEntry) {
 	standard.PhpInfoPrintTableStart()
 	standard.PhpInfoPrintTableRow(2, "PHP Version", PHP_VERSION)
 	standard.PhpInfoPrintTableEnd()
 	zend.DISPLAY_INI_ENTRIES()
 }
-func PhpRegisterExtensions(ptrs []*zend.ZendModuleEntry) bool {
+func PhpRegisterExtensions(ptrs []*zend.ModuleEntry) bool {
 	for _, ptr := range ptrs {
 		if zend.ZendRegisterInternalModule(ptr) == nil {
 			return false
@@ -1356,7 +1357,7 @@ func PhpRegisterExtensions(ptrs []*zend.ZendModuleEntry) bool {
 	}
 	return true
 }
-func PhpRegisterExtensionsBc(ptr *zend.ZendModuleEntry, count int) int {
+func PhpRegisterExtensionsBc(ptr *zend.ModuleEntry, count int) int {
 	for b.PostDec(&count) {
 		if zend.ZendRegisterInternalModule(b.PostInc(&ptr)) == nil {
 			return types.FAILURE
@@ -1365,11 +1366,11 @@ func PhpRegisterExtensionsBc(ptr *zend.ZendModuleEntry, count int) int {
 	return types.SUCCESS
 }
 
-func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ZendModuleEntry) bool {
+func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ModuleEntry) bool {
 	retval := PhpModuleStartup(sf, additional_modules, len(additional_modules))
 	return retval != types.FAILURE
 }
-func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, num_additional_modules uint32) int {
+func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_additional_modules uint32) int {
 	var zuv zend.ZendUtilityValues
 	var module_number int = 0
 	var php_os = PHP_OS
@@ -1503,7 +1504,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	/* register additional functions */
 
 	if SM__().GetAdditionalFunctions() != nil {
-		if module, ok := zend.ModuleRegistryMap["standard"]; ok {
+		if module := globals.G().GetModule("standard"); module != nil {
 			zend.EG__().SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
 			zend.EG__().SetCurrentModule(nil)
@@ -1516,7 +1517,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	PhpDisableClasses()
 
 	/* make core report what it should */
-	if module, ok := zend.ModuleRegistryMap["core"]; ok {
+	if module := globals.G().GetModule("core"); module != nil {
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}
 	ModuleInitialized = 1

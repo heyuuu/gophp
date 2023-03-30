@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
@@ -83,7 +84,7 @@ func PhpInfoPrintStreamHash(name string, ht *types.Array) {
 		PhpInfoPrintTableRow(2, name, "disabled")
 	}
 }
-func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
+func PhpInfoPrintModule(zend_module *zend.ModuleEntry) {
 	if zend_module.GetInfoFunc() != nil {
 		if core.SM__().GetPhpinfoAsText() == 0 {
 			var url_name *types.String = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
@@ -219,11 +220,6 @@ func PhpPrintInfoHtmlhead() {
 	PhpInfoPrint("</head>\n")
 	PhpInfoPrint("<body><div class=\"center\">\n")
 }
-func ModuleNameCmp(a any, b any) int {
-	var f *types.Bucket = (*types.Bucket)(a)
-	var s *types.Bucket = (*types.Bucket)(b)
-	return strcasecmp((*zend.ZendModuleEntry)(types.Z_PTR(f.GetVal())).GetName(), (*zend.ZendModuleEntry)(types.Z_PTR(s.GetVal())).GetName())
-}
 func PhpPrintInfo(flag int) {
 	var env **byte
 	var tmp1 **byte
@@ -322,32 +318,20 @@ func PhpPrintInfo(flag int) {
 		}
 	}
 	if (flag & PHP_INFO_MODULES) != 0 {
-		var sorted_registry types.Array
-		var module *zend.ZendModuleEntry
-		&sorted_registry = types.MakeArrayEx(zend.ModuleRegistry.Len(), nil, 1)
-		types.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-		sorted_registry.SortCompatible(ModuleNameCmp, 0)
-		var __ht *types.Array = &sorted_registry
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			module = _z.GetPtr()
+		sortedRegistryModules := globals.G().GetSortedModules()
+		for _, module := range sortedRegistryModules {
 			PhpInfoPrintModule(module)
 		}
+
 		SECTION("Additional Modules")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(1, "Module Name")
-		var __ht__1 *types.Array = &sorted_registry
-		for _, _p := range __ht__1.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			module = _z.GetPtr()
+		for _, module := range sortedRegistryModules {
 			if module.GetInfoFunc() == nil {
 				PhpInfoPrintModule(module)
 			}
 		}
 		PhpInfoPrintTableEnd()
-		sorted_registry.Destroy()
 	}
 	if (flag & PHP_INFO_ENVIRONMENT) != 0 {
 		SECTION("Environment")
@@ -575,33 +559,15 @@ func RegisterPhpinfoConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("CREDITS_QA", PHP_CREDITS_QA, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 	zend.RegisterLongConstant("CREDITS_ALL", PHP_CREDITS_ALL, zend.CONST_PERSISTENT|zend.CONST_CS, module_number)
 }
-func ZifPhpversion(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension *types.Zval) {
-	var ext_name *byte = nil
-	var ext_name_len int = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 0, 1, 0)
-			fp.StartOptional()
-			ext_name, ext_name_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if ext_name == nil {
-		return_value.SetStringVal(b.CastStrAuto(core.PHP_VERSION))
-		return
+func ZifPhpversion(_ zpp.Opt, extension *string) (string, bool) {
+	if extension == nil {
+		return core.PHP_VERSION, true
 	} else {
-		var version *byte
-		version = zend.ZendGetModuleVersion(ext_name)
-		if version == nil {
-			return_value.SetFalse()
-			return
+		module := globals.G().GetModule(*extension)
+		if module == nil {
+			return "", false
 		}
-		return_value.SetStringVal(b.CastStrAuto(version))
-		return
+		return module.GetVersion(), true
 	}
 }
 func ZifPhpcredits(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, flag *types.Zval) {

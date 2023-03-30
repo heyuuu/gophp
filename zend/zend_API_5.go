@@ -4,22 +4,11 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendStartupModuleZval(zv *types.Zval) int {
-	var module *ZendModuleEntry = zv.GetPtr()
-	if ZendStartupModuleEx(module) == types.SUCCESS {
-		return types.ArrayApplyKeep
-	} else {
-		return types.ArrayApplyRemove
-	}
-}
-func ZendSortModules(base any, count int, siz int, compare types.CompareFuncT, swp types.SwapFuncT) {
-	// empty
-}
 func ZendCollectModuleHandlers() {
-	var module *ZendModuleEntry
 	var startup_count int = 0
 	var shutdown_count int = 0
 	var post_deactivate_count int = 0
@@ -27,50 +16,40 @@ func ZendCollectModuleHandlers() {
 	var class_count int = 0
 
 	/* Collect extensions with request startup/shutdown handlers */
-
-	var __ht *types.Array = &ModuleRegistry
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		module = _z.GetPtr()
+	globals.G().EachModule(func(module *ModuleEntry) {
 		if module.GetRequestStartupFunc() != nil {
 			startup_count++
 		}
 		if module.GetRequestShutdownFunc() != nil {
 			shutdown_count++
 		}
-	}
-	ModuleRequestStartupHandlers = (**ZendModuleEntry)(Malloc(b.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
+	})
+
+	ModuleRequestStartupHandlers = (**ModuleEntry)(Malloc(b.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
 	ModuleRequestStartupHandlers[startup_count] = nil
 	ModuleRequestShutdownHandlers = ModuleRequestStartupHandlers + startup_count + 1
 	ModuleRequestShutdownHandlers[shutdown_count] = nil
 	ModulePostDeactivateHandlers = ModuleRequestShutdownHandlers + shutdown_count + 1
 	ModulePostDeactivateHandlers[post_deactivate_count] = nil
 	startup_count = 0
-	var __ht__1 *types.Array = &ModuleRegistry
-	for _, _p := range __ht__1.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		module = _z.GetPtr()
+	globals.G().EachModule(func(module *ModuleEntry) {
 		if module.GetRequestStartupFunc() != nil {
 			ModuleRequestStartupHandlers[b.PostInc(&startup_count)] = module
 		}
 		if module.GetRequestShutdownFunc() != nil {
 			ModuleRequestShutdownHandlers[b.PreDec(&shutdown_count)] = module
 		}
-	}
+	})
 
 	/* Collect internal classes with static members */
-
-	var __ht__2 *types.Array = CG__().GetClassTable()
-	for _, _p := range __ht__2.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		ce = _z.GetPtr()
+	CG__().GetClassTable().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		ce := value.GetPtr().(*types.ClassEntry)
 		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
 			class_count++
 		}
-	}
+	})
+
 	ClassCleanupHandlers = (**types.ClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
@@ -86,48 +65,41 @@ func ZendCollectModuleHandlers() {
 	}
 }
 func ZendStartupModules() int {
-	ModuleRegistry.SortCompatibleEx(ZendSortModules)
-	types.ZendHashApply(&ModuleRegistry, ZendStartupModuleZval)
+	for _, module := range globals.G().GetSortedModules() {
+		if !ZendStartupModuleEx(module) {
+			globals.G().DelModule(module.GetName())
+		}
+	}
 	return types.SUCCESS
 }
 func ZendDestroyModules() {
 	Free(ClassCleanupHandlers)
 	Free(ModuleRequestStartupHandlers)
-	ModuleRegistry.GracefulReverseDestroy()
+	globals.G().DestroyModules()
 }
-func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
-	var name_len int
-	var lcname *types.String
-	var module_ptr *ZendModuleEntry
+func ZendRegisterModuleEx(module *ModuleEntry) *ModuleEntry {
 	if module == nil {
 		return nil
 	}
 
 	/* Check module dependencies */
-
-	name_len = strlen(module.GetName())
-	lcname = types.ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
-	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
-	lcname = types.ZendNewInternedString(lcname)
-	if b.Assign(&module_ptr, types.ZendHashAddMem(&ModuleRegistry, lcname.GetStr(), module, b.SizeOf("zend_module_entry"))) == nil {
+	module = globals.G().RegisterModule(module)
+	if module == nil {
 		faults.Error(faults.E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
-		types.ZendStringRelease(lcname)
 		return nil
 	}
-	module = module_ptr
+
 	EG__().SetCurrentModule(module)
 	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == types.FAILURE {
-		types.ZendHashDel(&ModuleRegistry, lcname.GetStr())
-		types.ZendStringRelease(lcname)
+		globals.G().DelModule(module.GetName())
 		EG__().SetCurrentModule(nil)
 		faults.Error(faults.E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
 		return nil
 	}
 	EG__().SetCurrentModule(nil)
-	types.ZendStringRelease(lcname)
 	return module
 }
-func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
+func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
 	module.SetModuleNumber(ZendNextFreeModule())
 	return ZendRegisterModuleEx(module)
 }
@@ -330,7 +302,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 				return types.FAILURE
 			}
 		}
-		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName(), type_ == MODULE_PERSISTENT)
+		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName())
 		lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = Malloc(b.SizeOf("zend_internal_function"))
 		memcpy(reg_function, &function, b.SizeOf("zend_internal_function"))

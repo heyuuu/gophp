@@ -19,21 +19,8 @@ func ZEND_THIS(executeData *ZendExecuteData) *types.Zval {
 }
 
 /* these variables are true statics/globals, and have to be mutex'ed on every access */
-
-var ModuleRegistry types.Array
-var ModuleRequestStartupHandlers **ZendModuleEntry
-var ModuleRequestShutdownHandlers **ZendModuleEntry
-var ModulePostDeactivateHandlers **ZendModuleEntry
+var ModuleRequestStartupHandlers **ModuleEntry
+var ModuleRequestShutdownHandlers **ModuleEntry
+var ModulePostDeactivateHandlers **ModuleEntry
 var ClassCleanupHandlers **types.ClassEntry
-var DisabledClassNew []types.ZendFunctionEntry = []types.ZendFunctionEntry{}
-
-// todo 使用 ModuleRegistryMap 替换 ModuleRegistry
-var ModuleRegistryMap = make(map[string]*ZendModuleEntry)
-
-func CopyRegistryModules() []*ZendModuleEntry {
-	var modules = make([]*ZendModuleEntry, 0, len(ModuleRegistryMap))
-	for _, module := range ModuleRegistryMap {
-		modules = append(modules, module)
-	}
-	return modules
-}
+var DisabledClassNew = []types.ZendFunctionEntry{}

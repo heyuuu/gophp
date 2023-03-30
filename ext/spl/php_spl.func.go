@@ -734,7 +734,7 @@ func SplBuildClassListString(entry *types.Zval, list **byte) {
 	zend.Efree(*list)
 	*list = res
 }
-func ZmInfoSpl(zend_module *zend.ZendModuleEntry) {
+func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	var list types.Zval
 	var zv *types.Zval
 	var strg *byte

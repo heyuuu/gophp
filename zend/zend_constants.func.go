@@ -393,7 +393,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 	var name *types.String
 	var ret int = types.SUCCESS
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) == 0 {
-		lowercase_name = ZendStringTolowerEx(c.GetName(), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
+		lowercase_name = ZendStringTolowerEx(c.GetName())
 		lowercase_name = types.ZendNewInternedString(lowercase_name)
 		name = lowercase_name
 	} else {
