@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GoPhp UI</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid" v-scope v-cloak>
+    <form>
+        <div class="row">
+            <div :class="codeClass">
+                <input type="button" class="btn btn-link" @click="mode = 0" value="默认模式"/>
+                <input type="button" class="btn btn-link" @click="mode = 1" value="AST 模式"/>
+                <input type="button" class="btn btn-link" @click="mode = 2" value="Print 模式"/>
+                <div class="form-group">
+                    <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
+                    <div class="card-body">
+                        <span style="color: red">{{ error }}</span>
+                    </div>
+                </div>
+            </div>
+            <div :class="astClass" v-if="showAst">
+                <div class="card" style="height: 100vh">
+                    <pre id="ast-output" style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ast }}</pre>
+                </div>
+            </div>
+            <div :class="printClass" v-if="showPrint">
+                <div class="card" style="height: 100vh">
+                    <pre id="printer-output" style="margin: 0; padding: 1rem 0; height: 100vh;">{{ print }}</pre>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/petite-vue/0.4.1/petite-vue.iife.min.js"></script>
+<script>
+    // storage
+    const storageKey = "code"
+    let initCode = localStorage.getItem(storageKey)
+    if (!initCode) {
+        initCode = "<?php\n\n"
+    }
+
+    // App
+    const apiUri = "/api"
+    const app = {
+        mode: 0, // 0: all, 1: ast-mode, 2: print-mode
+        code: initCode,
+        oldCode: "",
+        error: "",
+        ast: "",
+        print: "",
+        get showAst() {
+            return this.mode !== 2
+        },
+        get showPrint() {
+            return this.mode !== 1
+        },
+        get codeClass() {
+            return 'col-sm-4'
+        },
+        get astClass() {
+            return this.mode === 1 ? 'col-sm-8' : 'col-sm-4'
+        },
+        get printClass() {
+            return this.mode === 2 ? 'col-sm-8' : 'col-sm-4'
+        },
+        codeChange() {
+            localStorage.setItem(storageKey, this.code)
+            this.refresh()
+        },
+        refresh() {
+            // console.log({code:this.code, oldCode:this.oldCode})
+            if (this.code === this.oldCode) {
+                return
+            }
+
+            const code = this.code
+            postJson(apiUri, {input: code}, (data) => {
+                // console.log({data})
+                // 确认文本内容没变才更新
+                if (this.code !== code) {
+                    return
+                }
+
+                const error = data.Error
+
+                this.oldCode = code
+                this.error = error
+                if (error === "") {
+                    this.ast = data.Ast
+                    this.print = data.Print
+                }
+            }, () => {
+                this.error = "请求失败，确认服务是否可用"
+            })
+        }
+    }
+    PetiteVue.createApp(app).mount()
+
+    app.refresh()
+
+    function postJson(url, data, success, onError) {
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: success,
+            error: onError,
+            dataType: "json"
+        })
+    }
+</script>
+</body>
+</html>

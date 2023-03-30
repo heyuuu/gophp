@@ -1,10 +1,14 @@
-GO=/Users/heyu/go/go1.18.2/bin/go
-GOFMT=/Users/heyu/go/go1.18.2/bin/gofmt
-BULIDPATH=./debug/
+GO=go
+GOFMT=gofmt
+BULIDPATH=./temp/
+
+gophp-ui:
+	${GO} build -o ${BULIDPATH} ./internal/cmd/gophp-ui
+	${BULIDPATH}gophp-ui
 
 lexer:
-	go generate ./parser/zend_language_scanner.go
-	go fmt ./zend/zend_language_scanner_gen.go
+	${GO} generate ./parser/zend_language_scanner.go
+	${GOFMT} -w ./zend/zend_language_scanner_gen.go
 
 sikgen:
 	${GO} build -o ${BULIDPATH} ./internal/cmd/sikgen

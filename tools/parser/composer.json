@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "GoPhp\\Tools\\": "src"
+        }
+    },
+    "require": {
+        "nikic/php-parser": "^4.15",
+        "symfony/finder": "^6.2"
+    }
+}
