@@ -449,7 +449,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		}
 		request_started = 1
 		zend.CG__().SetSkipShebang(1)
-		zend.ZendRegisterBoolConstant("PHP_CLI_PROCESS_TITLE", 0, false, zend.CONST_CS, 0)
+		zend.ZendRegisterBoolConstant("PHP_CLI_PROCESS_TITLE", 0, zend.CONST_CS, 0)
 		*arg_excp = arg_free
 		if hide_argv != 0 {
 			var i int
@@ -457,7 +457,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				memset(argv[i], 0, strlen(argv[i]))
 			}
 		}
-		zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER"))
+		zend.ZendIsAutoGlobalStr("_SERVER")
 		core.PG__().during_request_startup = 0
 		switch behavior {
 		case PHP_MODE_STANDARD:

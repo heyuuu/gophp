@@ -765,22 +765,16 @@ type BuiltinTypeInfo struct {
 	type_    types.ZendUchar
 }
 
-func MakeBuiltinTypeInfo(name *byte, name_len int, type_ types.ZendUchar) BuiltinTypeInfo {
+func MakeBuiltinTypeInfo(name string, type_ types.ZendUchar) BuiltinTypeInfo {
 	return BuiltinTypeInfo{
 		name:     name,
 		name_len: name_len,
 		type_:    type_,
 	}
 }
-func (this *BuiltinTypeInfo) GetName() *byte { return this.name }
-
-// func (this *BuiltinTypeInfo) SetName(value *byte) { this.name = value }
-func (this *BuiltinTypeInfo) GetNameLen() int { return this.name_len }
-
-// func (this *BuiltinTypeInfo) SetNameLen(value int) { this.name_len = value }
+func (this *BuiltinTypeInfo) GetName() *byte           { return this.name }
+func (this *BuiltinTypeInfo) GetNameLen() int          { return this.name_len }
 func (this *BuiltinTypeInfo) GetType() types.ZendUchar { return this.type_ }
-
-// func (this *BuiltinTypeInfo) SetType(value ZendUchar) { this.type_ = value }
 
 /**
  * ClosureInfo

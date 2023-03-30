@@ -252,7 +252,7 @@ const ZEND_CALL_FAKE_CLOSURE = 1 << 23
 const ZEND_CALL_GENERATOR = 1 << 24
 const ZEND_CALL_DYNAMIC = 1 << 25
 const ZEND_CALL_SEND_ARG_BY_REF uint32 = 1 << 31
-const ZEND_CALL_NESTED_FUNCTION uint32 = ZEND_CALL_FUNCTION | ZEND_CALL_NESTED
+const ZEND_CALL_NESTED_FUNCTION = ZEND_CALL_FUNCTION | ZEND_CALL_NESTED
 const ZEND_CALL_NESTED_CODE = ZEND_CALL_CODE | ZEND_CALL_NESTED
 const ZEND_CALL_TOP_FUNCTION = ZEND_CALL_TOP | ZEND_CALL_FUNCTION
 const ZEND_CALL_TOP_CODE = ZEND_CALL_CODE | ZEND_CALL_TOP
@@ -511,32 +511,30 @@ const ZEND_COMPILE_DEFAULT_FOR_EVAL = 0
 
 var CompilerGlobals ZendCompilerGlobals
 var ExecutorGlobals ZendExecutorGlobals
-var ReservedClassNames []ReservedClassName = []ReservedClassName{
-	MakeReservedClassName(ZEND_STRL("bool")),
-	MakeReservedClassName(ZEND_STRL("false")),
-	MakeReservedClassName(ZEND_STRL("float")),
-	MakeReservedClassName(ZEND_STRL("int")),
-	MakeReservedClassName(ZEND_STRL("null")),
-	MakeReservedClassName(ZEND_STRL("parent")),
-	MakeReservedClassName(ZEND_STRL("self")),
-	MakeReservedClassName(ZEND_STRL("static")),
-	MakeReservedClassName(ZEND_STRL("string")),
-	MakeReservedClassName(ZEND_STRL("true")),
-	MakeReservedClassName(ZEND_STRL("void")),
-	MakeReservedClassName(ZEND_STRL("iterable")),
-	MakeReservedClassName(ZEND_STRL("object")),
-	MakeReservedClassName(nil, 0),
+var ReservedClassNames = []ReservedClassName{
+	MakeReservedClassName("bool"),
+	MakeReservedClassName("false"),
+	MakeReservedClassName("float"),
+	MakeReservedClassName("int"),
+	MakeReservedClassName("null"),
+	MakeReservedClassName("parent"),
+	MakeReservedClassName("self"),
+	MakeReservedClassName("static"),
+	MakeReservedClassName("string"),
+	MakeReservedClassName("true"),
+	MakeReservedClassName("void"),
+	MakeReservedClassName("iterable"),
+	MakeReservedClassName("object"),
 }
 
-var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{
-	MakeBuiltinTypeInfo(ZEND_STRL("int"), types.IS_LONG),
-	MakeBuiltinTypeInfo(ZEND_STRL("float"), types.IS_DOUBLE),
-	MakeBuiltinTypeInfo(ZEND_STRL("string"), types.IS_STRING),
-	MakeBuiltinTypeInfo(ZEND_STRL("bool"), types.IS_BOOL),
-	MakeBuiltinTypeInfo(ZEND_STRL("void"), types.IS_VOID),
-	MakeBuiltinTypeInfo(ZEND_STRL("iterable"), types.IS_ITERABLE),
-	MakeBuiltinTypeInfo(ZEND_STRL("object"), types.IS_OBJECT),
-	MakeBuiltinTypeInfo(nil, 0, types.IS_UNDEF),
+var BuiltinTypes = []BuiltinTypeInfo{
+	MakeBuiltinTypeInfo("int", types.IS_LONG),
+	MakeBuiltinTypeInfo("float", types.IS_DOUBLE),
+	MakeBuiltinTypeInfo("string", types.IS_STRING),
+	MakeBuiltinTypeInfo("bool", types.IS_BOOL),
+	MakeBuiltinTypeInfo("void", types.IS_VOID),
+	MakeBuiltinTypeInfo("iterable", types.IS_ITERABLE),
+	MakeBuiltinTypeInfo("object", types.IS_OBJECT),
 }
 
 /* Common part of zend_add_literal and zend_append_individual_literal */

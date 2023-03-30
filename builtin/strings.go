@@ -20,6 +20,10 @@ func Strlen(s string) int {
 	}
 }
 
+func AsciiCaseEquals(s1 string, s2 string) bool {
+	return strings.ToLower(s1) == strings.ToLower(s2)
+}
+
 func ByteToLowerAscii(c byte) byte {
 	if c >= 'A' && c <= 'Z' {
 		return c + ('a' - 'A')

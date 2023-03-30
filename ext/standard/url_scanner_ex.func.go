@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
+	"strings"
 )
 
 func TagDtor(zv *types.Zval) { zend.Free(zv.GetPtr()) }
@@ -258,27 +259,23 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	ctx.GetResult().AppendString(b.CastStr(start, YYCURSOR-start))
 }
-func CheckHttpHost(target *byte) int {
-	var host *types.Zval
-	var tmp *types.Zval
-	var host_tmp *types.String
-	var colon *byte
-	if b.Assign(&tmp, zend.EG__().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(types.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(types.IS_STRING) {
-		host_tmp = types.NewString(host.GetStr().GetStr())
+func CheckHttpHost(target string) int {
+	tmp := zend.EG__().GetSymbolTable().KeyFind("_SERVER")
+	if tmp != nil && tmp.IsArray() {
+		host := tmp.GetArr().KeyFind("HTTP_HOST")
+		if host != nil && host.IsString() {
+			hostStr := host.GetStrVal()
 
-		/* HTTP_HOST could be 'localhost:8888' etc. */
-
-		colon = strchr(host_tmp.GetVal(), ':')
-		if colon != nil {
-			host_tmp.SetLen(colon - host_tmp.GetVal())
-			host_tmp.GetVal()[host_tmp.GetLen()] = '0'
+			/* HTTP_HOST could be 'localhost:8888' etc. */
+			if pos := strings.IndexByte(hostStr, ':'); pos >= 0 {
+				hostStr = hostStr[:pos]
+			}
+			if b.AsciiCaseEquals(hostStr, target) {
+				return types.SUCCESS
+			}
 		}
-		if !(strcasecmp(host_tmp.GetVal(), target)) {
-			types.ZendStringReleaseEx(host_tmp, 0)
-			return types.SUCCESS
-		}
-		types.ZendStringReleaseEx(host_tmp, 0)
 	}
+
 	return types.FAILURE
 }
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
@@ -964,7 +961,7 @@ func PhpUrlScannerAddVarImpl(
 	}
 	if url_state.GetActive() == 0 {
 		PhpUrlScannerExActivate(type_)
-		core.PhpOutputStartInternal(zend.ZEND_STRL("URL-Rewriter"), handler, 0, core.PHP_OUTPUT_HANDLER_STDFLAGS)
+		core.PhpOutputStartInternal("URL-Rewriter", handler, 0, core.PHP_OUTPUT_HANDLER_STDFLAGS)
 		url_state.SetActive(1)
 	}
 	if url_state.GetUrlApp().GetS() != nil && url_state.GetUrlApp().GetS().GetLen() != 0 {

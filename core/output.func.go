@@ -210,7 +210,7 @@ func PhpOutputGetLength(p *types.Zval) int {
 func PhpOutputGetActiveHandler() *PhpOutputHandler { return OG(active) }
 func PhpOutputStartDefault() int {
 	var handler *PhpOutputHandler
-	handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
+	handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, 0, PHP_OUTPUT_HANDLER_STDFLAGS)
 	if types.SUCCESS == PhpOutputHandlerStart(handler) {
 		return types.SUCCESS
 	}
@@ -219,7 +219,7 @@ func PhpOutputStartDefault() int {
 }
 func PhpOutputStartDevnull() int {
 	var handler *PhpOutputHandler
-	handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDevnullHandlerName), PhpOutputHandlerDevnullFunc, PHP_OUTPUT_HANDLER_DEFAULT_SIZE, 0)
+	handler = PhpOutputHandlerCreateInternal(PhpOutputDevnullHandlerName, PhpOutputHandlerDevnullFunc, PHP_OUTPUT_HANDLER_DEFAULT_SIZE, 0)
 	if types.SUCCESS == PhpOutputHandlerStart(handler) {
 		return types.SUCCESS
 	}
@@ -231,7 +231,7 @@ func PhpOutputStartUser(output_handler *types.Zval, chunk_size int, flags int) i
 	if output_handler != nil {
 		handler = PhpOutputHandlerCreateUser(output_handler, chunk_size, flags)
 	} else {
-		handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, chunk_size, flags)
+		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunk_size, flags)
 	}
 	if types.SUCCESS == PhpOutputHandlerStart(handler) {
 		return types.SUCCESS
@@ -239,9 +239,9 @@ func PhpOutputStartUser(output_handler *types.Zval, chunk_size int, flags int) i
 	PhpOutputHandlerFree(&handler)
 	return types.FAILURE
 }
-func PhpOutputStartInternal(name *byte, name_len int, output_handler PhpOutputHandlerFuncT, chunk_size int, flags int) int {
+func PhpOutputStartInternal(name string, output_handler PhpOutputHandlerFuncT, chunk_size int, flags int) int {
 	var handler *PhpOutputHandler
-	handler = PhpOutputHandlerCreateInternal(name, name_len, PhpOutputHandlerCompatFunc, chunk_size, flags)
+	handler = PhpOutputHandlerCreateInternal(name, PhpOutputHandlerCompatFunc, chunk_size, flags)
 	PhpOutputHandlerSetContext(handler, output_handler, nil)
 	if types.SUCCESS == PhpOutputHandlerStart(handler) {
 		return types.SUCCESS
@@ -257,7 +257,7 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 	var user *PhpOutputHandlerUserFuncT = nil
 	switch output_handler.GetType() {
 	case types.IS_NULL:
-		handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, chunk_size, flags)
+		handler = PhpOutputHandlerCreateInternal(PhpOutputDefaultHandlerName, PhpOutputHandlerDefaultFunc, chunk_size, flags)
 	case types.IS_STRING:
 		if output_handler.GetStr().GetLen() != 0 && b.Assign(&alias, PhpOutputHandlerAlias(output_handler.GetStr().GetVal(), output_handler.GetStr().GetLen())) {
 			handler = alias(output_handler.GetStr().GetVal(), output_handler.GetStr().GetLen(), chunk_size, flags)
@@ -283,9 +283,9 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 	}
 	return handler
 }
-func PhpOutputHandlerCreateInternal(name *byte, name_len int, output_handler PhpOutputHandlerContextFuncT, chunk_size int, flags int) *PhpOutputHandler {
+func PhpOutputHandlerCreateInternal(name string, output_handler PhpOutputHandlerContextFuncT, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
-	var str *types.String = types.NewString(b.CastStr(name, name_len))
+	var str = types.NewString(name)
 	handler = PhpOutputHandlerInit(str, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
 	handler.SetInternal(output_handler)
 	types.ZendStringReleaseEx(str, 0)

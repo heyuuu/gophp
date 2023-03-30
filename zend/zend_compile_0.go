@@ -174,11 +174,10 @@ func ZendGetUnqualifiedName(name *types.String, result **byte, result_len *int) 
 	return 0
 }
 func ZendIsReservedClassName(name *types.String) types.ZendBool {
-	var reserved *ReservedClassName = ReservedClassNames
 	var uqname *byte = name.GetVal()
 	var uqname_len int = name.GetLen()
 	ZendGetUnqualifiedName(name, &uqname, &uqname_len)
-	for ; reserved.GetName() != nil; reserved++ {
+	for _, reserved := range ReservedClassNames {
 		if uqname_len == reserved.GetLen() && ZendBinaryStrcasecmp(b.CastStr(uqname, uqname_len), b.CastStr(reserved.GetName(), reserved.GetLen())) == 0 {
 			return 1
 		}
