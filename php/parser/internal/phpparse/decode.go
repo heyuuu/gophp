@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gophp/php/ast"
+	"github.com/heyuuu/gophp/php/ast"
 )
 
 type result struct {

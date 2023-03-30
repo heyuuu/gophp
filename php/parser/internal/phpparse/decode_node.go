@@ -2,8 +2,8 @@ package phpparse
 
 import (
 	"fmt"
-	"gophp/php/ast"
-	"gophp/php/token"
+	"github.com/heyuuu/gophp/php/ast"
+	"github.com/heyuuu/gophp/php/token"
 )
 
 func decodeNode(data map[string]any) (node ast.Node, err error) {

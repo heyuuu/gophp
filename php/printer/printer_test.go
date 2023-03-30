@@ -2,7 +2,7 @@ package printer
 
 import (
 	"fmt"
-	"gophp/php/parser"
+	"github.com/heyuuu/gophp/php/parser"
 	"log"
 	"testing"
 )
