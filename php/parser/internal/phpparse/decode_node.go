@@ -592,7 +592,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 			Variadic:   data["variadic"].(bool),
 			Var:        data["var"].(*ast.VariableExpr),
 			Default:    asTypeOrNil[ast.Expr](data["default"]),
-			Flags:      asInt(data["flags"]),
+			Flags:      asFlags(data["flags"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
 	case "ScalarDNumber":
@@ -602,7 +602,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "ScalarEncapsed":
 		parts := asSlice[ast.Expr](data["parts"])
 		if len(parts) == 0 {
-			return nil, fmt.Errorf("ScalarEncapsed need at least 1 part.")
+			return nil, fmt.Errorf("scalarEncapsed need at least 1 part")
 		}
 		expr := parts[0]
 		for _, next := range parts[1:] {
@@ -658,7 +658,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtClass":
 		node = &ast.ClassStmt{
-			Flags:          asInt(data["flags"]),
+			Flags:          asFlags(data["flags"]),
 			Extends:        asTypeOrNil[*ast.Name](data["extends"]),
 			Implements:     asSlice[*ast.Name](data["implements"]),
 			Name:           asTypeOrNil[*ast.Ident](data["name"]),
@@ -668,13 +668,13 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		}
 	case "StmtClassConst":
 		node = &ast.ClassConstStmt{
-			Flags:      asInt(data["flags"]),
+			Flags:      asFlags(data["flags"]),
 			Consts:     asSlice[*ast.Const](data["consts"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
 		}
 	case "StmtClassMethod":
 		node = &ast.ClassMethodStmt{
-			Flags:      asInt(data["flags"]),
+			Flags:      asFlags(data["flags"]),
 			ByRef:      data["byRef"].(bool),
 			Name:       data["name"].(*ast.Ident),
 			Params:     asSlice[*ast.Param](data["params"]),
@@ -830,7 +830,7 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 		node = &ast.EmptyStmt{}
 	case "StmtProperty":
 		node = &ast.PropertyStmt{
-			Flags:      asInt(data["flags"]),
+			Flags:      asFlags(data["flags"]),
 			Props:      asSlice[*ast.PropertyPropertyStmt](data["props"]),
 			Type:       asTypeNode(data["type"]),
 			AttrGroups: asSlice[*ast.AttributeGroup](data["attrGroups"]),
@@ -874,11 +874,11 @@ func decodeNode(data map[string]any) (node ast.Node, err error) {
 	case "StmtTraitUse":
 		node = &ast.TraitUseStmt{
 			Traits:      asSlice[*ast.Name](data["traits"]),
-			Adaptations: asSlice[*ast.TraitUseAdaptationStmt](data["adaptations"]),
+			Adaptations: asSlice[ast.TraitUseAdaptationStmt](data["adaptations"]),
 		}
 	case "StmtTraitUseAdaptationAlias":
 		node = &ast.TraitUseAdaptationAliasStmt{
-			NewModifier: asInt(data["newModifier"]),
+			NewModifier: asFlags(data["newModifier"]),
 			NewName:     asTypeOrNil[*ast.Ident](data["newName"]),
 			Trait:       asTypeOrNil[*ast.Name](data["trait"]),
 			Method:      data["method"].(*ast.Ident),

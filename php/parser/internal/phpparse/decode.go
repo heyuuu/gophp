@@ -89,6 +89,17 @@ func asInt(data any) int {
 	return int(val)
 }
 
+func asFlags(data any) ast.Flags {
+	if data == nil {
+		return 0
+	}
+	val, err := data.(json.Number).Int64()
+	if err != nil {
+		panic(err)
+	}
+	return ast.Flags(val)
+}
+
 func asFloat(data any) float64 {
 	val, err := data.(json.Number).Float64()
 	if err != nil {

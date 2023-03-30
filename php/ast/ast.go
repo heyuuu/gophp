@@ -92,7 +92,7 @@ type (
 		Variadic   bool              // @var bool Whether this is a variadic argument
 		Var        *VariableExpr     // @var VariableExpr Parameter variable
 		Default    Expr              // @var Expr|null Default value
-		Flags      int               // @var int
+		Flags      Flags             // @var Flags
 		AttrGroups []*AttributeGroup // @var AttributeGroup[] PHP attribute groups
 	}
 
@@ -395,6 +395,24 @@ const (
 	UseConstant = 3 // Constant import
 )
 
+// flags
+type Flags int
+
+func (f Flags) Is(flags Flags) bool { return f&flags != 0 }
+
+const (
+	// 此处不写成 1 << iota 形式，为了表示与 PHP Parser 对齐
+	FlagPublic    Flags = 1
+	FlagProtected Flags = 2
+	FlagPrivate   Flags = 4
+	FlagStatic    Flags = 8
+	FlagAbstract  Flags = 16
+	FlagFinal     Flags = 32
+	FlagReadonly  Flags = 64
+
+	VisibilityModifierMask = FlagPublic | FlagProtected | FlagPrivate
+)
+
 // Stmt
 type (
 	EmptyStmt struct{}
@@ -579,7 +597,7 @@ type (
 
 	// StmtClass : Stmt, StmtClassLike
 	ClassStmt struct {
-		Flags          int               // @var int        Type
+		Flags          Flags             // @var Flags        Type
 		Extends        *Name             // @var Name|null  Name of extended class
 		Implements     []*Name           // @var Name[]     Names of implemented interfaces
 		Name           *Ident            // @var Ident|null Name
@@ -590,14 +608,14 @@ type (
 
 	// StmtClassConst : Stmt
 	ClassConstStmt struct {
-		Flags      int               // @var int Modifiers
+		Flags      Flags             // @var Flags Modifiers
 		Consts     []*Const          // @var Const_[] Constant declarations
 		AttrGroups []*AttributeGroup // @var AttributeGroup[]
 	}
 
 	// PropertyStmt : Stmt
 	PropertyStmt struct {
-		Flags      int                     // @var int Modifiers
+		Flags      Flags                   // @var Flags Modifiers
 		Props      []*PropertyPropertyStmt // @var PropertyProperty[] Properties
 		Type       Type                    // @var Type|null Type declaration
 		AttrGroups []*AttributeGroup       // @var AttributeGroup[] PHP attribute groups
@@ -610,7 +628,7 @@ type (
 
 	// StmtClassMethod : Stmt, FunctionLike
 	ClassMethodStmt struct {
-		Flags      int               // @var int Flags
+		Flags      Flags             // @var Flags Modifiers
 		ByRef      bool              // @var bool Whether to return by reference
 		Name       *Ident            // @var Ident Name
 		Params     []*Param          // @var Param[] Parameters
@@ -628,15 +646,15 @@ type (
 	}
 
 	TraitUseStmt struct {
-		Traits      []*Name                   // @var Name[] Traits
-		Adaptations []*TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
+		Traits      []*Name                  // @var Name[] Traits
+		Adaptations []TraitUseAdaptationStmt // @var TraitUseAdaptation[] Adaptations
 	}
 
 	// StmtTraitUseAdaptationAlias : StmtTraitUseAdaptation
 	TraitUseAdaptationAliasStmt struct {
-		NewModifier int    // @var int|null New modifier
-		NewName     *Ident // @var Ident|null New name
-		Trait       *Name  // @var Name|null Trait name
+		NewModifier Flags  // @var Flags 	    New modifier, default 0
+		NewName     *Ident // @var Ident|null 	New name, or nil
+		Trait       *Name  // @var Name|null 	Trait name, or nil
 		Method      *Ident // @var Ident Method name
 	}
 

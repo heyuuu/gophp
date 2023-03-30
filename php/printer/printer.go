@@ -22,6 +22,13 @@ func (p *printer) checkError(err error) {
 	}
 }
 
+func (p *printer) result() (string, error) {
+	if p.err != nil {
+		return "", p.err
+	}
+	return p.buf.String(), p.err
+}
+
 func (p *printer) write(data []byte) {
 	_, err := p.buf.Write(data)
 	p.checkError(err)
@@ -57,12 +64,17 @@ func (p *printer) print(args ...any) {
 			p.writeString(token.TokenName(v))
 		case ast.Node:
 			p.printNode(v)
+		// 以下 case 只是为了加快类型匹配
 		case []ast.Stmt:
 			p.printStmtList(v)
 		case []ast.Expr:
-			p.printExprList(v)
+			printList(p, v, ", ")
+		case []ast.Node:
+			printList(p, v, ", ")
 		default:
-			if nodes, ok := convertNodeList(arg); ok {
+			if stmts, ok := convertStmtList(arg); ok {
+				p.printStmtList(stmts)
+			} else if nodes, ok := convertNodeList(arg); ok {
 				printList(p, nodes, ", ")
 			} else {
 				_, _ = fmt.Fprintf(os.Stderr, "print: unsupported argument %v (%T)\n", arg, arg)
@@ -75,6 +87,9 @@ func (p *printer) print(args ...any) {
 func (p *printer) printNode(node ast.Node) {
 	switch x := node.(type) {
 	case *ast.Ident:
+		if x.VarLike {
+			p.writeByte('$')
+		}
 		p.writeString(x.Name)
 	case *ast.Name:
 		p.writeString(x.ToCodeString())
@@ -92,13 +107,6 @@ func (p *printer) printNode(node ast.Node) {
 	}
 }
 
-func (p *printer) result() (string, error) {
-	if p.err != nil {
-		return "", p.err
-	}
-	return p.buf.String(), p.err
-}
-
 func printList[T ast.Node](p *printer, list []T, sep string) {
 	for i, item := range list {
 		if i != 0 {
@@ -108,12 +116,16 @@ func printList[T ast.Node](p *printer, list []T, sep string) {
 	}
 }
 
-var astNodeType = reflect.TypeOf([]ast.Node{}).Elem()
-
 func convertNodeList(data any) ([]ast.Node, bool) {
+	if nodes, ok := data.([]ast.Node); ok {
+		return nodes, true
+	}
+
+	var nodes []ast.Node
+
 	value := reflect.ValueOf(data)
-	if value.Kind() == reflect.Slice && value.Type().Elem().Implements(astNodeType) {
-		var nodes []ast.Node
+	nodeType := reflect.TypeOf(nodes).Elem()
+	if value.Kind() == reflect.Slice && value.Type().Elem().Implements(nodeType) {
 		for i := 0; i < value.Len(); i++ {
 			nodes = append(nodes, value.Index(i).Interface().(ast.Node))
 		}
@@ -122,12 +134,57 @@ func convertNodeList(data any) ([]ast.Node, bool) {
 	return nil, false
 }
 
+func convertStmtList(data any) ([]ast.Stmt, bool) {
+	if nodes, ok := data.([]ast.Stmt); ok {
+		return nodes, true
+	}
+
+	var nodes []ast.Stmt
+
+	value := reflect.ValueOf(data)
+	nodeType := reflect.TypeOf(nodes).Elem()
+	if value.Kind() == reflect.Slice && value.Type().Elem().Implements(nodeType) {
+		for i := 0; i < value.Len(); i++ {
+			nodes = append(nodes, value.Index(i).Interface().(ast.Stmt))
+		}
+		return nodes, true
+	}
+	return nil, false
+}
+
 func (p *printer) printStmtList(stmtList []ast.Stmt) {
 	printList(p, stmtList, "\n")
+	p.print("\n")
 }
 
 func (p *printer) printExprList(exprList []ast.Expr) {
 	printList(p, exprList, ", ")
+}
+
+func (p *printer) printFlags(flags ast.Flags) {
+	var names []string
+	if flags.Is(ast.FlagPublic) {
+		names = append(names, "public")
+	}
+	if flags.Is(ast.FlagProtected) {
+		names = append(names, "protected")
+	}
+	if flags.Is(ast.FlagPrivate) {
+		names = append(names, "private")
+	}
+	if flags.Is(ast.FlagStatic) {
+		names = append(names, "static")
+	}
+	if flags.Is(ast.FlagAbstract) {
+		names = append(names, "abstract")
+	}
+	if flags.Is(ast.FlagFinal) {
+		names = append(names, "final")
+	}
+	if flags.Is(ast.FlagReadonly) {
+		names = append(names, "readonly")
+	}
+	p.print(strings.Join(names, " "))
 }
 
 // ----------------------------------------------------------------------------

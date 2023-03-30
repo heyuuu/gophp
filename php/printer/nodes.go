@@ -7,7 +7,10 @@ import (
 )
 
 func (p *printer) param(n *ast.Param) {
-	// todo flags
+	if n.Flags != 0 {
+		p.printFlags(n.Flags)
+		p.print(" ")
+	}
 	if n.Type != nil {
 		p.print(n.Type, " ")
 	}
@@ -351,18 +354,116 @@ func (p *printer) stmt(n ast.Stmt) {
 		p.print(x.Stmts)
 		p.indent--
 		p.print("}")
-
 	case *ast.InterfaceStmt:
+		p.print("interface ", x.Name)
+		if len(x.Extends) != 0 {
+			p.print(" extends ", x.Extends)
+		}
+		p.print("\n{\n")
+		p.print(x.Stmts)
+		p.print("}")
 	case *ast.ClassStmt:
+		if x.Flags != 0 {
+			p.printFlags(x.Flags)
+			p.print(" ")
+		}
+		p.print("class ", x.Name)
+		if x.Extends != nil {
+			p.print(" extends ", x.Extends)
+		}
+		if len(x.Implements) != 0 {
+			p.print(" implements ", x.Implements)
+		}
+		p.print("\n{\n")
+		p.indent++
+		p.print(x.Stmts)
+		p.indent--
+		p.print("}")
 	case *ast.ClassConstStmt:
+		for _, c := range x.Consts {
+			if x.Flags != 0 {
+				p.printFlags(x.Flags)
+				p.print(" ")
+			}
+			p.print("const ", c.Name, " = ", c.Value)
+		}
 	case *ast.PropertyStmt:
-	case *ast.PropertyPropertyStmt:
+		for _, prop := range x.Props {
+			if x.Flags != 0 {
+				p.printFlags(x.Flags)
+				p.print(" ")
+			}
+			if x.Type != nil {
+				p.print(x.Type, " ")
+			}
+			if prop.Default != nil {
+				p.print(prop.Name, " = ", prop.Default, ";")
+			} else {
+				p.print(prop.Name, ";")
+			}
+		}
 	case *ast.ClassMethodStmt:
+		if x.Flags != 0 {
+			p.printFlags(x.Flags)
+			p.print(" ")
+		}
+		p.print("function ")
+		if x.ByRef {
+			p.print("&")
+		}
+		p.print(x.Name, "(", x.Params, ")")
+		if x.ReturnType != nil {
+			p.print(": ", x.ReturnType)
+		}
+		p.print("\n{\n")
+		p.indent++
+		p.print(x.Stmts)
+		p.indent--
+		p.print("}")
 	case *ast.TraitStmt:
+		p.print("class ", x.Name, "\n{\n")
+		p.print(x.Stmts)
+		p.print("}")
 	case *ast.TraitUseStmt:
-	case *ast.TraitUseAdaptationAliasStmt:
+		if len(x.Adaptations) != 0 {
+			p.print("use ", x.Traits, " {\n")
+			p.indent++
+			p.print(x.Adaptations)
+			p.indent--
+			p.print("};")
+		} else {
+			p.print("use ", x.Traits, ";")
+		}
 	case *ast.TraitUseAdaptationPrecedenceStmt:
+		p.print(x.Trait, "::", x.Method, " insteadof ", x.Insteadof, ";")
+	case *ast.TraitUseAdaptationAliasStmt:
+		p.print(x.Trait, "::", x.Method, " as")
+		if x.NewModifier != 0 {
+			p.print(" ")
+			p.printFlags(x.NewModifier)
+		}
+		if x.NewName != nil {
+			p.print(" ", x.NewName)
+		}
+		p.print(";")
 	case *ast.EnumStmt:
+		p.print("enum ", x.Name)
+		if x.ScalarType != nil {
+			p.print(": ", x.ScalarType)
+		}
+		if len(x.Implements) != 0 {
+			p.print(" implements ", x.Implements)
+		}
+		p.print("\n{\n")
+		p.indent++
+		p.print(x.Stmts)
+		p.indent--
+		p.print("}")
 	case *ast.EnumCaseStmt:
+		if x.Expr != nil {
+			p.print("case ", x.Name, " = ", x.Expr, ";")
+		} else {
+			p.print("case ", x.Name, ";")
+		}
 	}
 }
