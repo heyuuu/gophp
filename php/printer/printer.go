@@ -2,8 +2,8 @@ package printer
 
 import (
 	"fmt"
-	"gophp/php/ast"
-	"gophp/php/token"
+	"github.com/heyuuu/gophp/php/ast"
+	"github.com/heyuuu/gophp/php/token"
 	"os"
 	"reflect"
 	"strconv"

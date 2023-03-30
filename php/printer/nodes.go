@@ -2,8 +2,8 @@ package printer
 
 import (
 	"fmt"
-	"gophp/php/ast"
-	"gophp/php/token"
+	"github.com/heyuuu/gophp/php/ast"
+	"github.com/heyuuu/gophp/php/token"
 )
 
 func (p *printer) arg(n *ast.Arg) {

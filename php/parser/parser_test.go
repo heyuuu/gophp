@@ -2,7 +2,7 @@ package parser
 
 import (
 	"fmt"
-	"gophp/php/ast"
+	"github.com/heyuuu/gophp/php/ast"
 	"log"
 	"os"
 	"path/filepath"

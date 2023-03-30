@@ -1,3 +1,3 @@
 gophp-ui:
-	go build -o ./runtime/ ./internal/cmd/gophp-ui
-	./runtime/gophp-ui
+	go build -o ./temp/ ./internal/cmd/gophp-ui
+	./temp/gophp-ui

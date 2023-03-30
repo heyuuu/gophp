@@ -3,7 +3,7 @@ package phpparse
 import (
 	"errors"
 	"fmt"
-	"gophp/php/ast"
+	"github.com/heyuuu/gophp/php/ast"
 	"io/ioutil"
 	"log"
 	"os"
