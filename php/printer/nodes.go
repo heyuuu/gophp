@@ -6,9 +6,22 @@ import (
 	"gophp/php/token"
 )
 
+func (p *printer) arg(n *ast.Arg) {
+	if n.Name != nil {
+		p.print(n.Name, ": ")
+	}
+	if n.ByRef {
+		p.print("&")
+	}
+	if n.Unpack {
+		p.print("...")
+	}
+	p.print(n.Value)
+}
+
 func (p *printer) param(n *ast.Param) {
 	if n.Flags != 0 {
-		p.printFlags(n.Flags)
+		p.flags(n.Flags)
 		p.print(" ")
 	}
 	if n.Type != nil {
@@ -95,9 +108,7 @@ func (p *printer) expr(n ast.Expr) {
 			p.print(") ")
 		}
 		p.print("{\n")
-		p.indent++
-		p.print(x.Stmts)
-		p.indent--
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.ClosureUseExpr:
 		if x.ByRef {
@@ -216,9 +227,9 @@ func (p *printer) expr(n ast.Expr) {
 func (p *printer) stmt(n ast.Stmt) {
 	switch x := n.(type) {
 	case *ast.EmptyStmt:
-		p.print(";")
+		//p.print(";")
 	case *ast.BlockStmt:
-		p.printStmtList(x.List)
+		p.stmtList(x.List, false)
 	case *ast.ExprStmt:
 		p.print(x.Expr, ";")
 	case *ast.ReturnStmt:
@@ -233,16 +244,16 @@ func (p *printer) stmt(n ast.Stmt) {
 		p.print("goto ", x.Name, ";")
 	case *ast.IfStmt:
 		p.print("if (", x.Cond, ") {\n")
-		p.printStmtList(x.Stmts)
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 		for _, elseif := range x.Elseifs {
 			p.print(" elseif (", elseif.Cond, ") {\n")
-			p.printStmtList(elseif.Stmts)
+			p.stmtList(elseif.Stmts, true)
 			p.print("}")
 		}
 		if x.Else != nil {
 			p.print(" else {\n")
-			p.printStmtList(x.Else.Stmts)
+			p.stmtList(x.Else.Stmts, true)
 			p.print("}")
 		}
 	case *ast.SwitchStmt:
@@ -250,28 +261,24 @@ func (p *printer) stmt(n ast.Stmt) {
 		for _, caseStmt := range x.Cases {
 			if caseStmt.Cond != nil {
 				p.print("case ", caseStmt.Cond, ":\n")
-				p.indent++
-				p.printStmtList(caseStmt.Stmts)
-				p.indent--
+				p.stmtList(caseStmt.Stmts, true)
 			} else {
 				p.print("default:\n")
-				p.indent++
-				p.printStmtList(caseStmt.Stmts)
-				p.indent--
+				p.stmtList(caseStmt.Stmts, true)
 			}
 		}
 		p.print("}")
 	case *ast.ForStmt:
 		p.print("for (", x.Init, ";", x.Cond, ";", x.Loop, ") {\n")
-		p.printStmtList(x.Stmts)
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.ForeachStmt:
 		if x.KeyVar != nil {
-			p.print("foreach (", p.printExprList, " as ", x.KeyVar, " => ", x.ValueVar, ") {\n")
+			p.print("foreach (", x.KeyVar, " as ", x.KeyVar, " => ", x.ValueVar, ") {\n")
 		} else {
-			p.print("foreach (", p.printExprList, " as ", x.ValueVar, ") {\n")
+			p.print("foreach (", x.KeyVar, " as ", x.ValueVar, ") {\n")
 		}
-		p.printStmtList(x.Stmts)
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.BreakStmt:
 		if x.Num != nil {
@@ -290,11 +297,15 @@ func (p *printer) stmt(n ast.Stmt) {
 	case *ast.DoStmt:
 		p.print("do {\n", x.Stmts, "} while (", x.Cond, ");")
 	case *ast.TryCatchStmt:
-		p.print("try {\n", x.Stmts, "}")
+		p.print("try {\n")
+		p.stmtList(x.Stmts, true)
+		p.print("}")
 		for _, catch := range x.Catches {
 			p.print(" catch (")
 			printList(p, catch.Types, "|")
-			p.print(" ", catch.Var, ") {\n", catch.Stmts, "}")
+			p.print(" ", catch.Var, ") {\n")
+			p.stmtList(catch.Stmts, true)
+			p.print("}")
 		}
 		if x.Finally != nil {
 			p.print(" finally {\n", x.Finally.Stmts, "}")
@@ -334,12 +345,21 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print("use ", useType, x.Name, ";")
 		}
 	case *ast.DeclareStmt:
-		// todo
+		p.print("declare(")
+		printList(p, x.Declares, ", ")
+		p.print(")")
+		if len(x.Stmts) == 0 {
+			p.print(";")
+		} else {
+			p.print("{\n")
+			p.stmtList(x.Stmts, true)
+			p.print("}")
+		}
 	case *ast.DeclareDeclareStmt:
-		// todo
+		p.print(x.Key, "=", x.Value)
 	case *ast.NamespaceStmt:
 		p.print("namespace ", x.Name, ";\n")
-		p.print(x.Stmts)
+		p.stmtList(x.Stmts, false)
 	case *ast.FunctionStmt:
 		p.print("function ")
 		if x.ByRef {
@@ -350,9 +370,7 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print(": ", x.ReturnType)
 		}
 		p.print("\n{\n")
-		p.indent++
-		p.print(x.Stmts)
-		p.indent--
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.InterfaceStmt:
 		p.print("interface ", x.Name)
@@ -360,11 +378,11 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print(" extends ", x.Extends)
 		}
 		p.print("\n{\n")
-		p.print(x.Stmts)
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.ClassStmt:
 		if x.Flags != 0 {
-			p.printFlags(x.Flags)
+			p.flags(x.Flags)
 			p.print(" ")
 		}
 		p.print("class ", x.Name)
@@ -375,14 +393,12 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print(" implements ", x.Implements)
 		}
 		p.print("\n{\n")
-		p.indent++
-		p.print(x.Stmts)
-		p.indent--
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.ClassConstStmt:
 		for _, c := range x.Consts {
 			if x.Flags != 0 {
-				p.printFlags(x.Flags)
+				p.flags(x.Flags)
 				p.print(" ")
 			}
 			p.print("const ", c.Name, " = ", c.Value)
@@ -390,7 +406,7 @@ func (p *printer) stmt(n ast.Stmt) {
 	case *ast.PropertyStmt:
 		for _, prop := range x.Props {
 			if x.Flags != 0 {
-				p.printFlags(x.Flags)
+				p.flags(x.Flags)
 				p.print(" ")
 			}
 			if x.Type != nil {
@@ -404,7 +420,7 @@ func (p *printer) stmt(n ast.Stmt) {
 		}
 	case *ast.ClassMethodStmt:
 		if x.Flags != 0 {
-			p.printFlags(x.Flags)
+			p.flags(x.Flags)
 			p.print(" ")
 		}
 		p.print("function ")
@@ -416,13 +432,11 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print(": ", x.ReturnType)
 		}
 		p.print("\n{\n")
-		p.indent++
-		p.print(x.Stmts)
-		p.indent--
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.TraitStmt:
 		p.print("class ", x.Name, "\n{\n")
-		p.print(x.Stmts)
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.TraitUseStmt:
 		if len(x.Adaptations) != 0 {
@@ -440,7 +454,7 @@ func (p *printer) stmt(n ast.Stmt) {
 		p.print(x.Trait, "::", x.Method, " as")
 		if x.NewModifier != 0 {
 			p.print(" ")
-			p.printFlags(x.NewModifier)
+			p.flags(x.NewModifier)
 		}
 		if x.NewName != nil {
 			p.print(" ", x.NewName)
@@ -455,9 +469,7 @@ func (p *printer) stmt(n ast.Stmt) {
 			p.print(" implements ", x.Implements)
 		}
 		p.print("\n{\n")
-		p.indent++
-		p.print(x.Stmts)
-		p.indent--
+		p.stmtList(x.Stmts, true)
 		p.print("}")
 	case *ast.EnumCaseStmt:
 		if x.Expr != nil {

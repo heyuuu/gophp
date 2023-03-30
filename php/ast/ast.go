@@ -50,7 +50,7 @@ type (
 	Arg struct {
 		Name   *Ident // @var Ident|null Parameter name (for named parameters)
 		Value  Expr   // @var Expr Value to pass
-		ByRef  bool   // @var bool Whether to pass by ref
+		ByRef  bool   // @var bool Whether to pass by ref (todo Call-time pass-by-reference has been removed in PHP 5.4)
 		Unpack bool   // @var bool Whether to unpack the argument
 	}
 

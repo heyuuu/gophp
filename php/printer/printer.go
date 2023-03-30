@@ -11,9 +11,10 @@ import (
 )
 
 type printer struct {
-	buf    strings.Builder
-	indent int
-	err    error
+	buf     strings.Builder
+	indent  int
+	err     error
+	newLine bool
 }
 
 func (p *printer) checkError(err error) {
@@ -29,24 +30,25 @@ func (p *printer) result() (string, error) {
 	return p.buf.String(), p.err
 }
 
-func (p *printer) write(data []byte) {
-	_, err := p.buf.Write(data)
-	p.checkError(err)
-}
+func (p *printer) write(s string) {
+	if s == "" {
+		return
+	}
 
-func (p *printer) writeByte(c byte) {
-	err := p.buf.WriteByte(c)
-	p.checkError(err)
-}
+	indentStr := strings.Repeat("    ", p.indent)
+	if p.newLine {
+		p.buf.WriteString(indentStr)
+		p.newLine = false
+	}
 
-func (p *printer) writeRune(c rune) {
-	_, err := p.buf.WriteRune(c)
-	p.checkError(err)
-}
-
-func (p *printer) writeString(s string) {
-	_, err := p.buf.WriteString(s)
-	p.checkError(err)
+	l := len(s)
+	if s[l-1] != '\n' {
+		p.buf.WriteString(strings.ReplaceAll(s, "\n", "\n"+indentStr))
+	} else {
+		p.buf.WriteString(strings.ReplaceAll(s[:l-1], "\n", "\n"+indentStr))
+		p.buf.WriteByte('\n')
+		p.newLine = true
+	}
 }
 
 func (p *printer) print(args ...any) {
@@ -57,23 +59,23 @@ func (p *printer) print(args ...any) {
 
 		switch v := arg.(type) {
 		case int:
-			p.writeString(strconv.Itoa(v))
+			p.write(strconv.Itoa(v))
 		case string:
-			p.writeString(v)
+			p.write(v)
 		case token.Token:
-			p.writeString(token.TokenName(v))
+			p.write(token.TokenName(v))
 		case ast.Node:
 			p.printNode(v)
 		// 以下 case 只是为了加快类型匹配
 		case []ast.Stmt:
-			p.printStmtList(v)
+			p.stmtList(v, false)
 		case []ast.Expr:
 			printList(p, v, ", ")
 		case []ast.Node:
 			printList(p, v, ", ")
 		default:
 			if stmts, ok := convertStmtList(arg); ok {
-				p.printStmtList(stmts)
+				p.stmtList(stmts, false)
 			} else if nodes, ok := convertNodeList(arg); ok {
 				printList(p, nodes, ", ")
 			} else {
@@ -88,11 +90,11 @@ func (p *printer) printNode(node ast.Node) {
 	switch x := node.(type) {
 	case *ast.Ident:
 		if x.VarLike {
-			p.writeByte('$')
+			p.write("$")
 		}
-		p.writeString(x.Name)
+		p.write(x.Name)
 	case *ast.Name:
-		p.writeString(x.ToCodeString())
+		p.write(x.ToCodeString())
 	case ast.Expr:
 		p.expr(x)
 	case ast.Stmt:
@@ -101,6 +103,8 @@ func (p *printer) printNode(node ast.Node) {
 		p.typeHint(x)
 	case *ast.Param:
 		p.param(x)
+	case *ast.Arg:
+		p.arg(x)
 	default:
 		err := fmt.Errorf("printer: unsupported node type %T", node)
 		p.checkError(err)
@@ -152,16 +156,18 @@ func convertStmtList(data any) ([]ast.Stmt, bool) {
 	return nil, false
 }
 
-func (p *printer) printStmtList(stmtList []ast.Stmt) {
+func (p *printer) stmtList(stmtList []ast.Stmt, indent bool) {
+	if indent {
+		p.indent++
+	}
 	printList(p, stmtList, "\n")
 	p.print("\n")
+	if indent {
+		p.indent--
+	}
 }
 
-func (p *printer) printExprList(exprList []ast.Expr) {
-	printList(p, exprList, ", ")
-}
-
-func (p *printer) printFlags(flags ast.Flags) {
+func (p *printer) flags(flags ast.Flags) {
 	var names []string
 	if flags.Is(ast.FlagPublic) {
 		names = append(names, "public")
