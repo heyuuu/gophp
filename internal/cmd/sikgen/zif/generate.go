@@ -1,11 +1,11 @@
 package zif
 
 import (
+	"github.com/heyuuu/gophp/builtin/strutil"
+	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
 	"go/ast"
 	"go/token"
 	"log"
-	"github.com/heyuuu/gophp/builtin/strutil"
-	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
 )
 
 var (

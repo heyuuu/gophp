@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/heyuuu/gophp/internal/cmd/sikgen/zif"
 	"log"
 	"os"
 	"path/filepath"
-	"github.com/heyuuu/gophp/internal/cmd/sikgen/zif"
 )
 
 func main() {

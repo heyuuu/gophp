@@ -1,8 +1,8 @@
 package zend
 
 import (
-	"log"
 	"github.com/heyuuu/gophp/zend/types"
+	"log"
 	"strconv"
 	"strings"
 )

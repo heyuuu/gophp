@@ -1,10 +1,10 @@
 package types
 
 import (
-	"math"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"math"
 )
 
 /**

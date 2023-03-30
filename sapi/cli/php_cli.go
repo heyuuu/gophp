@@ -2,12 +2,12 @@ package cli
 
 import (
 	"errors"
-	"io"
-	"os"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
+	"io"
+	"os"
 )
 
 var CliModule = &CliModuleType{}

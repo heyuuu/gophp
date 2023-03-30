@@ -1,10 +1,10 @@
 package zend
 
 import (
-	"math"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"math"
 	"strings"
 )
 

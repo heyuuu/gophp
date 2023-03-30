@@ -2,11 +2,11 @@ package cli
 
 import (
 	"fmt"
-	"log"
-	"os"
 	. "github.com/heyuuu/gophp/builtin/ctype"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
+	"log"
+	"os"
 	"strings"
 )
 

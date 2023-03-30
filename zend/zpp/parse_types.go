@@ -1,11 +1,11 @@
 package zpp
 
 import (
-	"math"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"math"
 )
 
 func parseArgSucc[T any](val T) (T, bool, bool) { return val, false, true }

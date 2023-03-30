@@ -2,10 +2,10 @@ package zend
 
 import (
 	"flag"
-	"log"
 	. "github.com/heyuuu/gophp/builtin/ctype"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"log"
 	"strconv"
 	"strings"
 )

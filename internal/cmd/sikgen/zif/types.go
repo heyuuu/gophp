@@ -1,8 +1,8 @@
 package zif
 
 import (
-	"go/ast"
 	f "github.com/heyuuu/gophp/internal/cmd/sikgen/astutil"
+	"go/ast"
 )
 
 type ZifInfo struct {

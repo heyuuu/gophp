@@ -1,7 +1,6 @@
 package core
 
 import (
-	"log"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
@@ -9,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"log"
 	"strconv"
 )
 

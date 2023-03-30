@@ -1,9 +1,9 @@
 package core
 
 import (
-	"log"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
+	"log"
 )
 
 func PhpOptError(

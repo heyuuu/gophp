@@ -2,9 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-	"os"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -12,6 +9,9 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"log"
+	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )

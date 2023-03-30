@@ -1,9 +1,9 @@
 package def
 
 import (
-	"log"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
+	"log"
 )
 
 type FuncType = types.ZendFunctionEntry
