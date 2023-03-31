@@ -2478,7 +2478,7 @@ func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname 
 				return 0
 			}
 		} else {
-			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname.GetStr(), ce) == nil {
+			if !CG__().ClassTable().Add(lcname.GetStr(), ce) {
 				return 0
 			}
 		}

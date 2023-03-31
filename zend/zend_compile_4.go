@@ -258,7 +258,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 		var ce *types.ClassEntry = nil
 		if opline.GetOp1Type() == IS_CONST {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
-			ce = types.ZendHashFindPtr(CG__().GetClassTable(), lcname.GetStr())
+			ce = CG__().ClassTable().Get(lcname.GetStr())
 			if ce == nil && CG__().GetActiveClassEntry() != nil && types.ZendStringEqualsCi(CG__().GetActiveClassEntry().GetName(), lcname) {
 				ce = CG__().GetActiveClassEntry()
 			}

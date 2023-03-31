@@ -712,7 +712,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		if CG__().GetActiveClassEntry() != nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class declarations may not be nested")
 		}
-		ZendAssertValidClassName(unqualified_name)
+		ZendAssertValidClassName(unqualified_name.GetStr())
 		name = ZendPrefixWithNs(unqualified_name)
 		name = types.ZendNewInternedString(name)
 		lcname = ZendStringTolower(name)
@@ -724,9 +724,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		}
 		ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_CLASS)
 	} else {
-
 		/* Find an anon class name that is not in use yet. */
-
 		name = nil
 		lcname = nil
 		for {
@@ -734,7 +732,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			ZendTmpStringRelease(lcname)
 			name = ZendGenerateAnonClassName(decl.GetStartLineno())
 			lcname = ZendStringTolower(name)
-			if !CG__().GetClassTable().KeyExists(lcname.GetStr()) {
+			if !CG__().ClassTable().Exists(name.GetStr()) {
 				break
 			}
 		}
@@ -839,7 +837,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 				CG__().SetZendLineno(ast.GetLineno())
 			}
 		} else {
-			if types.ZendHashAddPtr(CG__().GetClassTable(), lcname.GetStr(), ce) != nil {
+			if CG__().ClassTable().Add(lcname.GetStr(), ce) {
 				types.ZendStringRelease(lcname)
 				ZendBuildPropertiesInfoTable(ce)
 				ce.SetIsLinked(true)
@@ -863,14 +861,9 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 		opline.SetResultType(IS_VAR)
 		opline.GetResult().SetVar(GetTemporaryVariable())
-		if !(types.ZendHashAddPtr(CG__().GetClassTable(), lcname.GetStr(), ce)) {
-
+		if !CG__().ClassTable().Add(lcname.GetStr(), ce) {
 			/* We checked above that the class name is not used. This really shouldn't happen. */
-
 			faults.ErrorNoreturn(faults.E_ERROR, "Runtime definition key collision for %s. This is a bug", name.GetVal())
-
-			/* We checked above that the class name is not used. This really shouldn't happen. */
-
 		}
 	} else {
 
@@ -880,7 +873,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		for {
 			ZendTmpStringRelease(key)
 			key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
-			if types.ZendHashAddPtr(CG__().GetClassTable(), key.GetStr(), ce) {
+			if CG__().ClassTable().Add(key.GetStr(), ce) {
 				break
 			}
 		}

@@ -467,7 +467,7 @@ func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *types.ClassEntry) type
 			if ce.IsResolvedParent() {
 				ce = ce.GetParent()
 			} else {
-				ce = ZendHashFindPtrLc(CG__().GetClassTable(), ce.GetParentName().GetVal(), ce.GetParentName().GetLen())
+				ce = CG__().ClassTable().Get(ce.GetParentName().GetStr())
 				if ce == nil {
 					break
 				}
@@ -489,7 +489,7 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *typ
 	if ClassNameRefersToActiveCe(class_name, fetch_type) != 0 {
 		cc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name.GetStr())
 	} else if fetch_type == ZEND_FETCH_CLASS_DEFAULT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0 {
-		var ce *types.ClassEntry = ZendHashFindPtrLc(CG__().GetClassTable(), class_name.GetVal(), class_name.GetLen())
+		ce := CG__().ClassTable().Get(class_name.GetStr())
 		if ce != nil {
 			cc = types.ZendHashFindPtr(ce.GetConstantsTable(), name.GetStr())
 		} else {

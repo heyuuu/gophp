@@ -9,12 +9,10 @@ import (
 )
 
 func ZendCollectModuleHandlers() {
-	var ce *types.ClassEntry
 	var class_count int = 0
 
 	/* Collect internal classes with static members */
-	CG__().GetClassTable().Foreach(func(key types.ArrayKey, value *types.Zval) {
-		ce := value.GetPtr().(*types.ClassEntry)
+	CG__().ClassTable().Foreach(func(ce *types.ClassEntry) {
 		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
 			class_count++
 		}
@@ -22,17 +20,11 @@ func ZendCollectModuleHandlers() {
 
 	ClassCleanupHandlers = (**types.ClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
-	if class_count != 0 {
-		var __ht *types.Array = CG__().GetClassTable()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			ce = _z.GetPtr()
-			if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
-				ClassCleanupHandlers[b.PreDec(&class_count)] = ce
-			}
+	CG__().ClassTable().Foreach(func(ce *types.ClassEntry) {
+		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
+			ClassCleanupHandlers[b.PreDec(&class_count)] = ce
 		}
-	}
+	})
 }
 func ZendStartupModules() int {
 	for _, module := range globals.G().GetSortedModules() {

@@ -1,6 +1,8 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	"github.com/heyuuu/gophp/zend/types"
+)
 
 /**
  * ZnodeOp
@@ -753,8 +755,10 @@ type ReservedClassName struct {
 func MakeReservedClassName(name string) ReservedClassName {
 	return ReservedClassName{name: name}
 }
+func (this *ReservedClassName) Name() string { return this.name }
+
 func (this *ReservedClassName) GetName() *byte { return this.name }
-func (this *ReservedClassName) GetLen() int    { return this.len_ }
+func (this *ReservedClassName) GetLen() int    { return len(this.name) }
 
 /**
  * BuiltinTypeInfo

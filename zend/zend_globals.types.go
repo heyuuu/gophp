@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/internal"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -15,7 +16,7 @@ type ZendCompilerGlobals struct {
 	zend_lineno        int
 	active_op_array    *ZendOpArray
 	function_table     *types.Array
-	class_table        *types.Array
+	classTable         *internal.LcTable[types.ClassEntry]
 	filenamesTable     map[string]string //filenames_table              HashTable
 
 	auto_globals                 *types.Array
@@ -52,16 +53,25 @@ type ZendCompilerGlobals struct {
 
 func (this *ZendCompilerGlobals) InitTables() {
 	this.function_table = types.NewArrayEx(1024, ZEND_FUNCTION_DTOR, true)
-	this.class_table = types.NewArrayEx(64, ZEND_CLASS_DTOR, true)
+	this.classTable = internal.NewLcTable[types.ClassEntry](DestroyZendClassEntry)
 	this.auto_globals = types.NewArrayEx(8, AutoGlobalDtor, true)
+
 }
 
 func (this *ZendCompilerGlobals) DestroyTables() {
 	this.function_table.Destroy()
-	this.class_table.Destroy()
+	this.classTable.Destroy()
 	this.auto_globals.Destroy()
 }
 
+// class table
+func (this *ZendCompilerGlobals) GetClassTable() *types.Array { return nil }
+
+func (this *ZendCompilerGlobals) ClassTable() *internal.LcTable[types.ClassEntry] {
+	return this.classTable
+}
+
+// getter/setter
 func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
 func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
 func (this *ZendCompilerGlobals) GetActiveClassEntry() *types.ClassEntry {
@@ -84,8 +94,6 @@ func (this *ZendCompilerGlobals) GetFunctionTable() *types.Array      { return t
 func (this *ZendCompilerGlobals) SetFunctionTable(value *types.Array) {
 	this.function_table = value
 }
-func (this *ZendCompilerGlobals) GetClassTable() *types.Array           { return this.class_table }
-func (this *ZendCompilerGlobals) SetClassTable(value *types.Array)      { this.class_table = value }
 func (this *ZendCompilerGlobals) GetAutoGlobals() *types.Array          { return this.auto_globals }
 func (this *ZendCompilerGlobals) SetAutoGlobals(value *types.Array)     { this.auto_globals = value }
 func (this *ZendCompilerGlobals) GetParseError() types.ZendBool         { return this.parse_error }

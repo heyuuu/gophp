@@ -75,18 +75,16 @@ func ZendMemnstr(haystack *byte, needle string, needle_len int, end *byte) *byte
 	}
 	return haystack + pos
 }
-func ZendMemrchr(s any, c int, n int) any {
-	var e *uint8
-	if 0 == n {
+func ZendMemrchr(s *byte, c byte, n int) *byte {
+	str := b.CastStr(s, n)
+
+	if pos := strings.LastIndexByte(str, c); pos >= 0 {
+		return s + pos
+	} else {
 		return nil
 	}
-	for e = (*uint8)(s + n - 1); e >= (*uint8)(s); e-- {
-		if (*e) == uint8(c) {
-			return any(e)
-		}
-	}
-	return nil
 }
+
 func ZendMemnrstr(haystack *byte, needle *byte, needle_len int, end *byte) *byte {
 	var p *byte = end
 	var ne byte = needle[needle_len-1]

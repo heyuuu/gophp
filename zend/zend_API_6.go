@@ -100,7 +100,6 @@ func ZendNextFreeModule() int {
 }
 func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32) *types.ClassEntry {
 	var class_entry = &types.ClassEntry{}
-	var lowercase_name *types.String
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
@@ -109,10 +108,7 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	if class_entry.GetBuiltinFunctions() != nil {
 		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), EG__().GetCurrentModule().GetType())
 	}
-	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName())
-	lowercase_name = types.ZendNewInternedString(lowercase_name)
-	types.ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name.GetStr(), class_entry)
-	types.ZendStringReleaseEx(lowercase_name, 1)
+	CG__().ClassTable().Update(class_entry.GetName().GetStr(), class_entry)
 	return class_entry
 }
 func ZendRegisterInternalClassEx(class_entry *types.ClassEntry, parent_ce *types.ClassEntry) *types.ClassEntry {
@@ -140,60 +136,22 @@ func ZendRegisterInternalClass(orig_class_entry *types.ClassEntry) *types.ClassE
 func ZendRegisterInternalInterface(orig_class_entry *types.ClassEntry) *types.ClassEntry {
 	return DoRegisterInternalClass(orig_class_entry, ZEND_ACC_INTERFACE)
 }
-func ZendRegisterClassAliasEx(name *byte, name_len int, ce *types.ClassEntry, persistent int) int {
-	var lcname *types.String
-	var zv types.Zval
-	var ret *types.Zval
-
+func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */
-
 	if persistent != 0 && EG__().GetCurrentModule() != nil && EG__().GetCurrentModule().GetType() == MODULE_TEMPORARY {
 		persistent = 0
 	}
 	if name[0] == '\\' {
-		lcname = types.ZendStringAlloc(name_len-1, persistent)
-		ZendStrTolowerCopy(lcname.GetVal(), name+1, name_len-1)
-	} else {
-		lcname = types.ZendStringAlloc(name_len, persistent)
-		ZendStrTolowerCopy(lcname.GetVal(), name, name_len)
+		name = name[1:]
 	}
-	ZendAssertValidClassName(lcname)
-	lcname = types.ZendNewInternedString(lcname)
-	types.ZVAL_ALIAS_PTR(&zv, ce)
-	ret = CG__().GetClassTable().KeyAdd(lcname.GetStr(), &zv)
-	types.ZendStringReleaseEx(lcname, 0)
-	if ret != nil {
+	ZendAssertValidClassName(name)
+	if CG__().ClassTable().Add(name, ce) {
 		if !ce.IsImmutable() {
 			ce.GetRefcount()++
 		}
 		return types.SUCCESS
 	}
 	return types.FAILURE
-}
-func ZendSetHashSymbol(
-	symbol *types.Zval,
-	name *byte,
-	name_length int,
-	is_ref types.ZendBool,
-	num_symbol_tables int,
-	_ ...any,
-) int {
-	var symbol_table *types.Array
-	var symbol_table_list va_list
-	if num_symbol_tables <= 0 {
-		return types.FAILURE
-	}
-	if is_ref != 0 {
-		types.ZVAL_MAKE_REF(symbol)
-	}
-	va_start(symbol_table_list, num_symbol_tables)
-	for b.PostDec(&num_symbol_tables) > 0 {
-		symbol_table = __va_arg(symbol_table_list, (*types.Array)(_))
-		symbol_table.KeyUpdate(b.CastStr(name, name_length), symbol)
-		symbol.TryAddRefcount()
-	}
-	va_end(symbol_table_list)
-	return types.SUCCESS
 }
 func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())

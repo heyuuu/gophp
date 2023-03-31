@@ -26,14 +26,9 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
 	return intern
 }
-func ZendDisableClass(class_name *byte, class_name_length int) int {
-	var disabled_class *types.ClassEntry
-	var key *types.String
+func ZendDisableClass(className string) int {
 	var fn *ZendFunction
-	key = types.ZendStringAlloc(class_name_length, 0)
-	ZendStrTolowerCopy(key.GetVal(), class_name, class_name_length)
-	disabled_class = types.ZendHashFindPtr(CG__().GetClassTable(), key.GetStr())
-	types.ZendStringReleaseEx(key, 0)
+	disabled_class := CG__().ClassTable().Get(className)
 	if disabled_class == nil {
 		return types.FAILURE
 	}

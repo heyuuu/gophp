@@ -220,8 +220,10 @@ func _destroyZendClassTraitsInfo(ce *types.ClassEntry) {
 	}
 }
 func DestroyZendClass(zv *types.Zval) {
+	DestroyZendClassEntry(zv.GetPtr().(*types.ClassEntry))
+}
+func DestroyZendClassEntry(ce *types.ClassEntry) {
 	var prop_info *ZendPropertyInfo
-	var ce *types.ClassEntry = zv.GetPtr()
 	var fn *ZendFunction
 	if ce.HasCeFlags(ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED) {
 		var op_array *ZendOpArray

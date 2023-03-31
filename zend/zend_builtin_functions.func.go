@@ -968,7 +968,7 @@ func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *type
 	ce = ZendLookupClassEx(class_name, nil, b.Cond(autoload == 0, ZEND_FETCH_CLASS_NO_AUTOLOAD, 0))
 	if ce != nil {
 		if ce.GetType() == ZEND_USER_CLASS {
-			if ZendRegisterClassAliasEx(alias_name, alias_name_len, ce, 0) == types.SUCCESS {
+			if ZendRegisterClassAliasEx(b.CastStr(alias_name, alias_name_len), ce, 0) == types.SUCCESS {
 				return_value.SetTrue()
 				return
 			} else {

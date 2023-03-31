@@ -2,6 +2,8 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -173,22 +175,25 @@ func ZendGetUnqualifiedName(name *types.String, result **byte, result_len *int) 
 	}
 	return 0
 }
-func ZendIsReservedClassName(name *types.String) types.ZendBool {
-	var uqname *byte = name.GetVal()
-	var uqname_len int = name.GetLen()
-	ZendGetUnqualifiedName(name, &uqname, &uqname_len)
+
+func ZendGetUnqualifiedNameEx(name string) (string, bool) {
+	return strutil.LastAfterByte(name, '\\')
+}
+func ZendIsReservedClassName(name string) bool {
+	name, _ = ZendGetUnqualifiedNameEx(name)
 	for _, reserved := range ReservedClassNames {
-		if uqname_len == reserved.GetLen() && ZendBinaryStrcasecmp(b.CastStr(uqname, uqname_len), b.CastStr(reserved.GetName(), reserved.GetLen())) == 0 {
-			return 1
+		if ascii.StrCaseEquals(name, reserved.Name()) {
+			return true
 		}
 	}
-	return 0
+	return false
 }
-func ZendAssertValidClassName(name *types.String) {
-	if ZendIsReservedClassName(name) != 0 {
-		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", name.GetVal())
+func ZendAssertValidClassName(name string) {
+	if ZendIsReservedClassName(name) {
+		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as class name as it is reserved", name)
 	}
 }
+
 func ZendLookupBuiltinTypeByName(name *types.String) types.ZendUchar {
 	var info *BuiltinTypeInfo = &BuiltinTypes[0]
 	for ; info.GetName() != nil; info++ {
@@ -395,24 +400,17 @@ func ZendAddFuncNameLiteral(name *types.String) int {
 	return ret
 }
 func ZendAddNsFuncNameLiteral(name *types.String) int {
-	var unqualified_name *byte
-	var unqualified_name_len int
-
 	/* Original name */
-
 	var ret int = ZendAddLiteralString(&name)
 
 	/* Lowercased name */
-
-	var lc_name *types.String = ZendStringTolower(name)
-	ZendAddLiteralString(&lc_name)
+	lcName := types.NewString(ascii.StrToLower(name.GetStr()))
+	ZendAddLiteralString(&lcName)
 
 	/* Lowercased unqualfied name */
-
-	if ZendGetUnqualifiedName(name, &unqualified_name, &unqualified_name_len) != 0 {
-		lc_name = types.ZendStringAlloc(unqualified_name_len, 0)
-		ZendStrTolowerCopy(lc_name.GetVal(), unqualified_name, unqualified_name_len)
-		ZendAddLiteralString(&lc_name)
+	if unqualifiedName, ok := ZendGetUnqualifiedNameEx(name.GetStr()); ok {
+		uqLcName := types.NewString(ascii.StrToLower(unqualifiedName))
+		ZendAddLiteralString(&uqLcName)
 	}
 	return ret
 }

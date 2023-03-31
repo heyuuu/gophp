@@ -386,15 +386,10 @@ func ZendRegisterStandardIniEntries() {
 	REGISTER_INI_ENTRIES(0)
 }
 func ZendResolvePropertyTypes() {
-	var ce *types.ClassEntry
 	var prop_info *ZendPropertyInfo
-	var __ht *types.Array = CG__().GetClassTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		ce = _z.GetPtr()
+	CG__().ClassTable().Foreach(func(ce *types.ClassEntry) {
 		if ce.GetType() != ZEND_INTERNAL_CLASS {
-			continue
+			return
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
 			var __ht *types.Array = ce.GetPropertiesInfo()
@@ -403,18 +398,15 @@ func ZendResolvePropertyTypes() {
 
 				prop_info = _z.GetPtr()
 				if prop_info.GetType().IsName() {
-					var type_name *types.String = prop_info.GetType().Name()
-					var lc_type_name *types.String = ZendStringTolower(type_name)
-					var prop_ce *types.ClassEntry = types.ZendHashFindPtr(CG__().GetClassTable(), lc_type_name.GetStr())
+					var type_name = prop_info.GetType().Name().GetStr()
+					var prop_ce *types.ClassEntry = CG__().ClassTable().Get(type_name)
 					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
-					types.ZendStringRelease(lc_type_name)
-					types.ZendStringRelease(type_name)
 				}
 			}
 		}
 		ce.SetIsPropertyTypesResolved(true)
-	}
+	})
 }
 func ZendPostStartup() int {
 	ZendResolvePropertyTypes()

@@ -478,7 +478,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 			var fetch_type uint32 = ZendGetClassFetchTypeAst(ast)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				class_name = ZendResolveClassNameAst(ast)
-				ZendAssertValidClassName(class_name)
+				ZendAssertValidClassName(class_name.GetStr())
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
 				class_name.AddRefcount()

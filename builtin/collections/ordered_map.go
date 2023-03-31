@@ -51,6 +51,7 @@ func (o *OrderedMap[K, V]) Del(key K) {
 		}
 		copy(o.keys[i:], o.keys[i+1:])
 		o.keys = o.keys[:len(o.keys)-1]
+		break
 	}
 }
 

@@ -92,7 +92,7 @@ func ZendCompileUse(ast *ZendAst) {
 		} else {
 			lookup_name = ZendStringTolower(new_name)
 		}
-		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name) != 0 {
+		if type_ == ZEND_SYMBOL_CLASS && ZendIsReservedClassName(new_name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use %s as %s because '%s' "+"is a special class name", old_name.GetVal(), new_name.GetVal(), new_name.GetVal())
 		}
 		if current_ns != nil {

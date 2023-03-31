@@ -193,7 +193,7 @@ func PhpDisableClasses() {
 		case ',':
 			if s != nil {
 				*e = '0'
-				zend.ZendDisableClass(s, e-s)
+				zend.ZendDisableClass(b.CastStr(s, e-s))
 				s = nil
 			}
 		default:
@@ -204,7 +204,7 @@ func PhpDisableClasses() {
 		e++
 	}
 	if s != nil {
-		zend.ZendDisableClass(s, e-s)
+		zend.ZendDisableClass(b.CastStr(s, e-s))
 	}
 }
 func PhpBinaryInit() {
