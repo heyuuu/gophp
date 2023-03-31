@@ -1,73 +1,98 @@
 package collections
 
-type orderedBucket[V any] struct {
-	prev  *orderedBucket[V]
-	next  *orderedBucket[V]
-	value V
-}
+import "sort"
 
 type OrderedMap[K comparable, V any] struct {
-	m    map[K]*orderedBucket[V]
-	head *orderedBucket[V]
-	tail *orderedBucket[V]
+	keys []K
+	m    map[K]V
 }
 
 func (o *OrderedMap[K, V]) Len() int {
 	return len(o.m)
 }
 
-func (o *OrderedMap[K, V]) Get(key K) (value V, exists bool) {
+func (o *OrderedMap[K, V]) Exists(key K) bool {
 	if o.m == nil {
-		return value, false
+		return false
 	}
 
-	if b, ok := o.m[key]; ok {
-		return b.value, true
-	} else {
-		return value, false
+	_, ok := o.m[key]
+	return ok
+}
+
+func (o *OrderedMap[K, V]) Get(key K) (V, bool) {
+	if o.m == nil {
+		return nil, false
 	}
+
+	val, ok := o.m[key]
+	return val, ok
 }
 
 func (o *OrderedMap[K, V]) Set(key K, value V) {
 	if o.m == nil {
-		o.m = make(map[K]*orderedBucket[V])
+		o.m = make(map[K]V)
 	}
-	if b, ok := o.m[key]; ok {
-		b.value = value
-	} else {
-		newBucket := &orderedBucket[V]{
-			prev:  o.tail,
-			next:  nil,
-			value: value,
-		}
-		o.m[key] = newBucket
-		if o.head == nil {
-			o.head = newBucket
-		}
-		if o.tail != nil {
-			o.tail.next = newBucket
-		}
-		o.tail = newBucket
+	if _, ok := o.m[key]; !ok {
+		o.keys = append(o.keys, key)
 	}
+	o.m[key] = value
 }
 
 func (o *OrderedMap[K, V]) Del(key K) {
-	if o.m == nil {
+	if !o.Exists(key) {
 		return
 	}
-	if b, ok := o.m[key]; ok {
-		if o.head == b {
-			o.head = b.next
+
+	delete(o.m, key)
+	for i, k := range o.keys {
+		if k != key {
+			continue
 		}
-		if o.tail == b {
-			o.tail = b.prev
-		}
-		if b.prev != nil {
-			b.prev.next = b.next
-		}
-		if b.next != nil {
-			b.next.prev = b.prev
-		}
-		delete(o.m, key)
+		copy(o.keys[i:], o.keys[i+1:])
+		o.keys = o.keys[:len(o.keys)-1]
+	}
+}
+
+func (o *OrderedMap[K, V]) Keys() []K { return o.keys }
+func (o *OrderedMap[K, V]) Values() []V {
+	var values []V
+	for _, k := range o.keys {
+		values = append(values, o.m[k])
+	}
+	return values
+}
+
+func (o *OrderedMap[K, V]) Sort(less func(i, j V) bool) {
+	sort.SliceStable(o.keys, func(i, j int) bool {
+		return less(o.m[o.keys[i]], o.m[o.keys[j]])
+	})
+}
+
+func (o *OrderedMap[K, V]) Foreach(handler func(key K, value V)) {
+	for _, k := range o.keys {
+		handler(k, o.m[k])
+	}
+}
+
+func (o *OrderedMap[K, V]) ForeachReserve(handler func(key K, value V)) {
+	for i := len(o.keys) - 1; i >= 0; i-- {
+		k := o.keys[i]
+		v := o.m[k]
+		handler(k, v)
+	}
+}
+
+func (o *OrderedMap[K, V]) ForeachValues(handler func(value V)) {
+	for _, k := range o.keys {
+		handler(o.m[k])
+	}
+}
+
+func (o *OrderedMap[K, V]) ForeachReserveValues(handler func(value V)) {
+	for i := len(o.keys) - 1; i >= 0; i-- {
+		k := o.keys[i]
+		v := o.m[k]
+		handler(v)
 	}
 }
