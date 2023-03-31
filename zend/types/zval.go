@@ -2,7 +2,6 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend"
 )
 
 /**
@@ -24,7 +23,7 @@ type RawZendValue struct /* union */ {
 	zv      *Zval
 	ptr     any
 	ce      *ClassEntry
-	func_   *zend.ZendFunction
+	func_   *ZendFunction
 }
 
 func (this *ZendValue) GetLval() int                { return this.val.(int) }
@@ -39,7 +38,7 @@ func (this *ZendValue) GetAst() *ZendAstRef         { return this.val.(*ZendAstR
 func (this *ZendValue) GetZv() *Zval                { return this.val.(*Zval) }
 func (this *ZendValue) GetPtr() any                 { return this.val }
 func (this *ZendValue) GetCe() *ClassEntry          { return this.val.(*ClassEntry) }
-func (this *ZendValue) GetFunc() *zend.ZendFunction { return this.val.(*zend.ZendFunction) }
+func (this *ZendValue) GetFunc() *ZendFunction      { return this.val.(*ZendFunction) }
 
 func (this *ZendValue) SetLval(value int)                { this.val = value }
 func (this *ZendValue) SetDval(value float64)            { this.val = value }
@@ -53,7 +52,7 @@ func (this *ZendValue) SetAst(value *ZendAstRef)         { this.val = value }
 func (this *ZendValue) SetZv(value *Zval)                { this.val = value }
 func (this *ZendValue) SetPtr(value any)                 { this.val = value }
 func (this *ZendValue) SetCe(value *ClassEntry)          { this.val = value }
-func (this *ZendValue) SetFunc(value *zend.ZendFunction) { this.val = value }
+func (this *ZendValue) SetFunc(value *ZendFunction)      { this.val = value }
 
 /**
  * Zval
@@ -107,7 +106,7 @@ func (zv *Zval) GetAst() *ZendAstRef         { return zv.value.GetAst() }
 func (zv *Zval) GetZv() *Zval                { return zv.value.GetZv() }
 func (zv *Zval) GetPtr() any                 { return zv.value.GetPtr() }
 func (zv *Zval) GetCe() *ClassEntry          { return zv.value.GetCe() }
-func (zv *Zval) GetFunc() *zend.ZendFunction { return zv.value.GetFunc() }
+func (zv *Zval) GetFunc() *ZendFunction      { return zv.value.GetFunc() }
 
 func (zv *Zval) SetLval(value int)                { zv.SetLval(value) }
 func (zv *Zval) SetDval(value float64)            { zv.SetDval(value) }
@@ -121,7 +120,7 @@ func (zv *Zval) SetAst(value *ZendAstRef)         { zv.SetAst(value) }
 func (zv *Zval) SetZv(value *Zval)                { zv.SetZv(value) }
 func (zv *Zval) SetPtr(value any)                 { zv.SetPtr(value) }
 func (zv *Zval) SetCe(value *ClassEntry)          { zv.SetCe(value) }
-func (zv *Zval) SetFunc(value *zend.ZendFunction) { zv.SetFunc(value) }
+func (zv *Zval) SetFunc(value *ZendFunction)      { zv.SetFunc(value) }
 
 /** Zval.u1 -> type & typeFlags */
 func (zv *Zval) GetType() ZendUchar           { return zv.typ }

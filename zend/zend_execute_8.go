@@ -257,7 +257,7 @@ func ZendSwapOperands(op *ZendOp) {
 	op.SetOp2Type(tmp_type)
 }
 func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExecuteData {
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var func_ *types.Zval
 	var called_scope *types.ClassEntry
 	var lcname *types.String
@@ -319,7 +319,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 	return ZendVmStackPushCallFrame(ZEND_CALL_NESTED_FUNCTION|ZEND_CALL_DYNAMIC, fbc, num_args, called_scope)
 }
 func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecuteData {
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var object_or_called_scope any
 	var called_scope *types.ClassEntry
 	var object *types.ZendObject
@@ -354,7 +354,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 	return ZendVmStackPushCallFrame(call_info, fbc, num_args, object_or_called_scope)
 }
 func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecuteData {
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var object_or_called_scope any
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
 	if function.Len() == 2 {

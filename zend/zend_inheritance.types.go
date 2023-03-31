@@ -6,7 +6,7 @@ import "github.com/heyuuu/gophp/zend/types"
  * ZendAbstractInfo
  */
 type ZendAbstractInfo struct {
-	afn  []*ZendFunction
+	afn  []*types.ZendFunction
 	cnt  int
 	ctor int
 }
@@ -18,7 +18,7 @@ type ZendAbstractInfo struct {
 //         ctor:ctor,
 //     }
 // }
-func (this *ZendAbstractInfo) GetAfn() []*ZendFunction { return this.afn }
+func (this *ZendAbstractInfo) GetAfn() []*types.ZendFunction { return this.afn }
 
 // func (this *ZendAbstractInfo) SetAfn(value []*ZendFunction) { this.afn = value }
 func (this *ZendAbstractInfo) GetCnt() int { return this.cnt }
@@ -35,8 +35,8 @@ type VarianceObligation struct {
 	__0   struct /* union */ {
 		dependency_ce *types.ClassEntry
 		__0           struct {
-			parent_fn    ZendFunction
-			child_fn     ZendFunction
+			parent_fn    types.ZendFunction
+			child_fn     types.ZendFunction
 			always_error types.ZendBool
 		}
 		__1 struct {
@@ -52,10 +52,10 @@ func (this *VarianceObligation) GetDependencyCe() *types.ClassEntry   { return t
 func (this *VarianceObligation) SetDependencyCe(value *types.ClassEntry) {
 	this.__0.dependency_ce = value
 }
-func (this *VarianceObligation) GetParentFn() ZendFunction { return this.__0.__0.parent_fn }
+func (this *VarianceObligation) GetParentFn() types.ZendFunction { return this.__0.__0.parent_fn }
 
 // func (this *VarianceObligation) SetParentFn(value ZendFunction) { this.__0.__0.parent_fn = value }
-func (this *VarianceObligation) GetChildFn() ZendFunction { return this.__0.__0.child_fn }
+func (this *VarianceObligation) GetChildFn() types.ZendFunction { return this.__0.__0.child_fn }
 
 // func (this *VarianceObligation) SetChildFn(value ZendFunction) { this.__0.__0.child_fn = value }
 func (this *VarianceObligation) GetAlwaysError() types.ZendBool { return this.__0.__0.always_error }

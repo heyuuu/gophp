@@ -184,7 +184,7 @@ func ZendFcallInfoArgsRestore(fci *types.ZendFcallInfo, param_count int, params 
 	fci.SetParamCount(param_count)
 	fci.SetParams(params)
 }
-func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ *ZendFunction, args *types.Zval) int {
+func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ *types.ZendFunction, args *types.Zval) int {
 	var arg *types.Zval
 	var params *types.Zval
 	var n uint32 = 1

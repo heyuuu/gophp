@@ -120,13 +120,13 @@ func (this *ZendFcallInfo) SetParamCount(value uint32)     { this.param_count = 
  * ZendFcallInfoCache
  */
 type ZendFcallInfoCache struct {
-	function_handler *zend.ZendFunction
+	function_handler *ZendFunction
 	calling_scope    *ClassEntry
 	called_scope     *ClassEntry
 	object           *ZendObject
 }
 
-func MakeZendFcallInfoCache(function_handler *zend.ZendFunction, calling_scope *ClassEntry, called_scope *ClassEntry, object *ZendObject) ZendFcallInfoCache {
+func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *ClassEntry, called_scope *ClassEntry, object *ZendObject) ZendFcallInfoCache {
 	return ZendFcallInfoCache{
 		function_handler: function_handler,
 		calling_scope:    calling_scope,
@@ -134,8 +134,8 @@ func MakeZendFcallInfoCache(function_handler *zend.ZendFunction, calling_scope *
 		object:           object,
 	}
 }
-func (this *ZendFcallInfoCache) GetFunctionHandler() *zend.ZendFunction { return this.function_handler }
-func (this *ZendFcallInfoCache) SetFunctionHandler(value *zend.ZendFunction) {
+func (this *ZendFcallInfoCache) GetFunctionHandler() *ZendFunction { return this.function_handler }
+func (this *ZendFcallInfoCache) SetFunctionHandler(value *ZendFunction) {
 	this.function_handler = value
 }
 func (this *ZendFcallInfoCache) GetCallingScope() *ClassEntry      { return this.calling_scope }

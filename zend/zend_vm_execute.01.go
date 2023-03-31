@@ -657,7 +657,7 @@ func ZEND_JMP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	var retval types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
@@ -681,7 +681,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 func ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	var retval types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
@@ -705,7 +705,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_DO_UCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	ret = nil
@@ -718,7 +718,7 @@ func ZEND_DO_UCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 func ZEND_DO_UCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	ret = nil
@@ -731,7 +731,7 @@ func ZEND_DO_UCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.GetType() == ZEND_USER_FUNCTION {
@@ -781,7 +781,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.GetType() == ZEND_USER_FUNCTION {
@@ -829,7 +829,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	var retval types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
@@ -908,7 +908,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()
-	var fbc *ZendFunction = call.GetFunc()
+	var fbc *types.ZendFunction = call.GetFunc()
 	var ret *types.Zval
 	var retval types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()

@@ -27,7 +27,7 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 	return intern
 }
 func ZendDisableClass(className string) int {
-	var fn *ZendFunction
+	var fn *types.ZendFunction
 	disabled_class := CG__().ClassTable().Get(className)
 	if disabled_class == nil {
 		return types.FAILURE
@@ -166,7 +166,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	var zv *types.Zval
 	fcc.SetCallingScope(nil)
 	if ce_org == nil {
-		var func_ *ZendFunction
+		var func_ *types.ZendFunction
 		var lmname *types.String
 
 		/* Check if function with given name exists.
@@ -263,7 +263,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			if scope != nil && InstanceofFunction(fcc.GetFunctionHandler().GetScope(), scope) != 0 {
 				zv = scope.GetFunctionTable().KeyFind(lmname.GetStr())
 				if zv != nil {
-					var priv_fbc *ZendFunction = zv.GetPtr()
+					var priv_fbc *types.ZendFunction = zv.GetPtr()
 					if priv_fbc.IsPrivate() && priv_fbc.GetScope() == scope {
 						fcc.SetFunctionHandler(priv_fbc)
 					}
@@ -425,7 +425,7 @@ try_again:
 		}
 	case types.IS_OBJECT:
 		var calling_scope *types.ClassEntry
-		var fptr *ZendFunction
+		var fptr *types.ZendFunction
 		var object *types.ZendObject
 		if types.Z_OBJ_HT(*callable).GetGetClosure() != nil && types.Z_OBJ_HT(*callable).GetGetClosure()(callable, &calling_scope, &fptr, &object) == types.SUCCESS {
 			var ce *types.ClassEntry = types.Z_OBJCE_P(callable)

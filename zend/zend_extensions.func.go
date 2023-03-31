@@ -147,7 +147,7 @@ func ZendExtensionDispatchMessage(message int, arg any) {
 	ZendLlistApplyWithArguments(&ZendExtensions, LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher), 2, message, arg)
 }
 func ZendGetResourceHandle(extension *ZendExtension) int {
-	if LastResourceNumber < ZEND_MAX_RESERVED_RESOURCES {
+	if LastResourceNumber < types.ZEND_MAX_RESERVED_RESOURCES {
 		extension.SetResourceNumber(LastResourceNumber)
 		LastResourceNumber++
 		return LastResourceNumber - 1

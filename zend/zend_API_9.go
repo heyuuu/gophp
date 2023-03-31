@@ -390,8 +390,8 @@ func ZendFindAliasName(ce *types.ClassEntry, name *types.String) *types.String {
 	}
 	return name
 }
-func ZendResolveMethodName(ce *types.ClassEntry, f *ZendFunction) *types.String {
-	var func_ *ZendFunction
+func ZendResolveMethodName(ce *types.ClassEntry, f *types.ZendFunction) *types.String {
+	var func_ *types.ZendFunction
 	var function_table *types.Array
 	var name *types.String
 	if f.GetCommonType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {

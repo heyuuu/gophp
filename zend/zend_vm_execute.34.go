@@ -262,7 +262,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
@@ -800,7 +800,7 @@ func ZendExecute(op_array *ZendOpArray, return_value *types.Zval) {
 	} else {
 		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_HAS_THIS
 	}
-	executeData = ZendVmStackPushCallFrame(call_info, (*ZendFunction)(op_array), 0, object_or_called_scope)
+	executeData = ZendVmStackPushCallFrame(call_info, (*types.ZendFunction)(op_array), 0, object_or_called_scope)
 	if CurrEX() != nil {
 		executeData.SetSymbolTable(ZendRebuildSymbolTable())
 	} else {

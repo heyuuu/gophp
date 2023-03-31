@@ -42,7 +42,7 @@ func IncompleteClassHasProperty(object *types.Zval, member *types.Zval, check_em
 	IncompleteClassMessage(object, faults.E_NOTICE)
 	return 0
 }
-func IncompleteClassGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
+func IncompleteClassGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *types.ZendFunction {
 	var zobject types.Zval
 	zobject.SetObject(*object)
 	IncompleteClassMessage(&zobject, faults.E_ERROR)

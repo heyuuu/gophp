@@ -610,8 +610,8 @@ func zim_spl_RecursiveIteratorIterator_getMaxDepth(executeData *zend.ZendExecute
 		return
 	}
 }
-func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
-	var function_handler *zend.ZendFunction
+func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, key *types.Zval) *types.ZendFunction {
+	var function_handler *types.ZendFunction
 	var object *SplRecursiveItObject = SplRecursiveItFromObj(*zobject)
 	var level zend.ZendLong = object.GetLevel()
 	var zobj *types.Zval
@@ -898,8 +898,8 @@ func zim_spl_RecursiveTreeIterator_key(executeData *zend.ZendExecuteData, return
 	return_value.SetString(str)
 	return
 }
-func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *zend.ZendFunction {
-	var function_handler *zend.ZendFunction
+func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) *types.ZendFunction {
+	var function_handler *types.ZendFunction
 	var intern *SplDualItObject
 	intern = SplDualItFromObj(*object)
 	function_handler = zend.ZendStdGetMethod(object, method, key)

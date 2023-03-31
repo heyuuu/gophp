@@ -74,9 +74,9 @@ type SplFilesystemObject struct {
 			sub_path_len int
 			index        int
 			is_recursive int
-			func_rewind  *zend.ZendFunction
-			func_next    *zend.ZendFunction
-			func_valid   *zend.ZendFunction
+			func_rewind  *types.ZendFunction
+			func_next    *types.ZendFunction
+			func_valid   *types.ZendFunction
 		}
 		file struct {
 			stream           *core.PhpStream
@@ -90,7 +90,7 @@ type SplFilesystemObject struct {
 			max_line_len     int
 			current_line_num zend.ZendLong
 			zresource        types.Zval
-			func_getCurr     *zend.ZendFunction
+			func_getCurr     *types.ZendFunction
 			delimiter        byte
 			enclosure        byte
 			escape           int
@@ -134,14 +134,14 @@ func (this *SplFilesystemObject) GetIndex() int           { return this.u.dir.in
 func (this *SplFilesystemObject) SetIndex(value int)      { this.u.dir.index = value }
 
 // func (this *SplFilesystemObject)  GetIsRecursive() int      { return this.u.dir.is_recursive }
-func (this *SplFilesystemObject) SetIsRecursive(value int)          { this.u.dir.is_recursive = value }
-func (this *SplFilesystemObject) GetFuncRewind() *zend.ZendFunction { return this.u.dir.func_rewind }
+func (this *SplFilesystemObject) SetIsRecursive(value int)           { this.u.dir.is_recursive = value }
+func (this *SplFilesystemObject) GetFuncRewind() *types.ZendFunction { return this.u.dir.func_rewind }
 
 // func (this *SplFilesystemObject) SetFuncRewind(value *zend.ZendFunction) { this.u.dir.func_rewind = value }
-func (this *SplFilesystemObject) GetFuncNext() *zend.ZendFunction { return this.u.dir.func_next }
+func (this *SplFilesystemObject) GetFuncNext() *types.ZendFunction { return this.u.dir.func_next }
 
 // func (this *SplFilesystemObject) SetFuncNext(value *zend.ZendFunction) { this.u.dir.func_next = value }
-func (this *SplFilesystemObject) GetFuncValid() *zend.ZendFunction { return this.u.dir.func_valid }
+func (this *SplFilesystemObject) GetFuncValid() *types.ZendFunction { return this.u.dir.func_valid }
 
 // func (this *SplFilesystemObject) SetFuncValid(value *zend.ZendFunction) { this.u.dir.func_valid = value }
 func (this *SplFilesystemObject) GetStream() *core.PhpStream         { return this.u.file.stream }
@@ -175,8 +175,10 @@ func (this *SplFilesystemObject) SetCurrentLineNum(value zend.ZendLong) {
 func (this *SplFilesystemObject) GetZresource() types.Zval { return this.u.file.zresource }
 
 // func (this *SplFilesystemObject) SetZresource(value zend.Zval) { this.u.file.zresource = value }
-func (this *SplFilesystemObject) GetFuncGetCurr() *zend.ZendFunction { return this.u.file.func_getCurr }
-func (this *SplFilesystemObject) SetFuncGetCurr(value *zend.ZendFunction) {
+func (this *SplFilesystemObject) GetFuncGetCurr() *types.ZendFunction {
+	return this.u.file.func_getCurr
+}
+func (this *SplFilesystemObject) SetFuncGetCurr(value *types.ZendFunction) {
 	this.u.file.func_getCurr = value
 }
 func (this *SplFilesystemObject) GetDelimiter() byte       { return this.u.file.delimiter }

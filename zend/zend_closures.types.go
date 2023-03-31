@@ -7,7 +7,7 @@ import "github.com/heyuuu/gophp/zend/types"
  */
 type ZendClosure struct {
 	std                   types.ZendObject
-	func_                 ZendFunction
+	func_                 types.ZendFunction
 	this_ptr              types.Zval
 	called_scope          *types.ClassEntry
 	orig_internal_handler ZifHandler
@@ -25,7 +25,7 @@ type ZendClosure struct {
 func (this *ZendClosure) GetStd() types.ZendObject { return this.std }
 
 // func (this *ZendClosure) SetStd(value ZendObject) { this.std = value }
-func (this *ZendClosure) GetFunc() ZendFunction { return this.func_ }
+func (this *ZendClosure) GetFunc() types.ZendFunction { return this.func_ }
 
 // func (this *ZendClosure) SetFunc(value ZendFunction) { this.func_ = value }
 func (this *ZendClosure) GetThisPtr() types.Zval { return this.this_ptr }

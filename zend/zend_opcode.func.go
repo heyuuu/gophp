@@ -47,17 +47,17 @@ func InitOpArray(op_array *ZendOpArray, type_ types.ZendUchar, initial_ops_size 
 	op_array.SetLiterals(nil)
 	ZEND_MAP_PTR_INIT(op_array.run_time_cache, nil)
 	op_array.SetCacheSize(ZendOpArrayExtensionHandles * b.SizeOf("void *"))
-	memset(op_array.GetReserved(), 0, ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
+	memset(op_array.GetReserved(), 0, types.ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR) != 0 {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayCtorHandler), op_array)
 	}
 }
-func DestroyZendFunction(function *ZendFunction) {
+func DestroyZendFunction(function *types.ZendFunction) {
 	var tmp types.Zval
 	tmp.SetAsPtr(function)
 	ZendFunctionDtor(&tmp)
 }
-func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
+func ZendFreeInternalArgInfo(function *types.ZendInternalFunction) {
 	if function.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && function.GetArgInfo() != nil {
 		var i uint32
 		var num_args uint32 = function.GetNumArgs() + 1
@@ -74,7 +74,7 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 	}
 }
 func ZendFunctionDtor(zv *types.Zval) {
-	var function *ZendFunction = zv.GetPtr()
+	var function *types.ZendFunction = zv.GetPtr()
 	if function.GetType() == ZEND_USER_FUNCTION {
 		b.Assert(function.GetFunctionName() != nil)
 		DestroyOpArray(function.GetOpArray())
@@ -224,7 +224,7 @@ func DestroyZendClass(zv *types.Zval) {
 }
 func DestroyZendClassEntry(ce *types.ClassEntry) {
 	var prop_info *ZendPropertyInfo
-	var fn *ZendFunction
+	var fn *types.ZendFunction
 	if ce.HasCeFlags(ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED) {
 		var op_array *ZendOpArray
 		if ce.GetDefaultStaticMembersCount() != 0 {

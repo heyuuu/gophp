@@ -195,7 +195,7 @@ func ZendCheckType(
 		return ZendVerifyScalarTypeHint(type_.Code(), arg, b.CondF(is_return_type != 0, func() bool { return CurrEX().IsCallUseStrictTypes() }, func() bool { return CurrEX().IsArgUseStrictTypes() }))
 	}
 }
-func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyArgType(zf *types.ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
 	var ce *types.ClassEntry
 	if arg_num <= zf.GetNumArgs() {
@@ -212,7 +212,7 @@ func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, defaul
 	}
 	return 1
 }
-func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyRecvArgType(zf *types.ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo = zf.GetArgInfo()[arg_num-1]
 	var ce *types.ClassEntry
 	b.Assert(arg_num <= zf.GetNumArgs())
@@ -224,7 +224,7 @@ func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, de
 	}
 	return 1
 }
-func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
+func ZendVerifyVariadicArgType(zf *types.ZendFunction, arg_num uint32, arg *types.Zval, default_value *types.Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
 	var ce *types.ClassEntry
 	b.Assert(arg_num > zf.GetNumArgs())
@@ -237,7 +237,7 @@ func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *types.Zval
 	}
 	return 1
 }
-func ZendVerifyInternalArgTypes(fbc *ZendFunction, call *ZendExecuteData) int {
+func ZendVerifyInternalArgTypes(fbc *types.ZendFunction, call *ZendExecuteData) int {
 	var i uint32
 	var num_args uint32 = call.NumArgs()
 	var p *types.Zval = call.Arg(1)
@@ -260,7 +260,7 @@ func ZendMissingArgError(executeData *ZendExecuteData) {
 		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
 	}
 }
-func ZendVerifyReturnError(zf *ZendFunction, ce *types.ClassEntry, value *types.Zval) {
+func ZendVerifyReturnError(zf *types.ZendFunction, ce *types.ClassEntry, value *types.Zval) {
 	var arg_info *ZendArgInfo = zf.GetArgInfo()[-1]
 	var fname *byte
 	var fsep *byte
@@ -273,14 +273,14 @@ func ZendVerifyReturnError(zf *ZendFunction, ce *types.ClassEntry, value *types.
 	ZendVerifyTypeErrorCommon(zf, arg_info, ce, value, &fname, &fsep, &fclass, &need_msg, &need_kind, &need_or_null, &given_msg, &given_kind)
 	faults.TypeError("Return value of %s%s%s() must %s%s%s, %s%s returned", fclass, fsep, fname, need_msg, need_kind, need_or_null, given_msg, given_kind)
 }
-func ZendVerifyReturnType(zf *ZendFunction, ret *types.Zval, cache_slot *any) {
+func ZendVerifyReturnType(zf *types.ZendFunction, ret *types.Zval, cache_slot *any) {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
 	var ce *types.ClassEntry = nil
 	if ZendCheckType(ret_info.GetType(), ret, &ce, cache_slot, nil, nil, 1) == 0 {
 		ZendVerifyReturnError(zf, ce, ret)
 	}
 }
-func ZendVerifyMissingReturnType(zf *ZendFunction, cache_slot *any) int {
+func ZendVerifyMissingReturnType(zf *types.ZendFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
 	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != types.IS_VOID {
 		var ce *types.ClassEntry = nil

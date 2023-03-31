@@ -39,7 +39,7 @@ const _CV_CODE = 4
 
 type IncdecT func(*types.Zval) int
 
-var ZendPassFunction = MakeInternalFunctionSimplify(ZifPass)
+var ZendPassFunction = types.MakeInternalFunctionSimplify(ZifPass)
 
 const ZEND_VM_STACK_PAGE_SLOTS = 16 * 1024
 

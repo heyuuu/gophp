@@ -12,7 +12,7 @@ type ZendExecuteData struct {
 	opline          *ZendOp
 	call            *ZendExecuteData
 	returnValue     *types.Zval
-	func_           *ZendFunction
+	func_           *types.ZendFunction
 	This            types.Zval
 	prevExecuteData *ZendExecuteData
 	symbolTable     *types.Array
@@ -142,8 +142,8 @@ func (this *ZendExecuteData) GetCall() *ZendExecuteData            { return this
 func (this *ZendExecuteData) SetCall(value *ZendExecuteData)       { this.call = value }
 func (this *ZendExecuteData) GetReturnValue() *types.Zval          { return this.returnValue }
 func (this *ZendExecuteData) SetReturnValue(value *types.Zval)     { this.returnValue = value }
-func (this *ZendExecuteData) GetFunc() *ZendFunction               { return this.func_ }
-func (this *ZendExecuteData) SetFunc(value *ZendFunction)          { this.func_ = value }
+func (this *ZendExecuteData) GetFunc() *types.ZendFunction         { return this.func_ }
+func (this *ZendExecuteData) SetFunc(value *types.ZendFunction)    { this.func_ = value }
 func (this *ZendExecuteData) GetThis() *types.Zval                 { return &this.This }
 func (this *ZendExecuteData) SetThis(zv *types.Zval)               { this.This = *zv }
 func (this *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return this.prevExecuteData }

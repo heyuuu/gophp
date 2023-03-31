@@ -452,7 +452,7 @@ type ZendOpArray struct {
 	fn_flags                  uint32
 	function_name             *types.String
 	scope                     *types.ClassEntry
-	prototype                 *ZendFunction
+	prototype                 *types.ZendFunction
 	num_args                  uint32
 	required_num_args         uint32
 	arg_info                  *ZendArgInfo
@@ -557,9 +557,9 @@ func (this *ZendOpArray) GetScope() *types.ClassEntry         { return this.scop
 func (this *ZendOpArray) SetScope(value *types.ClassEntry)    { this.scope = value }
 
 // func (this *ZendOpArray)  GetPrototype() *ZendFunction      { return this.prototype }
-func (this *ZendOpArray) SetPrototype(value *ZendFunction) { this.prototype = value }
-func (this *ZendOpArray) GetNumArgs() uint32               { return this.num_args }
-func (this *ZendOpArray) SetNumArgs(value uint32)          { this.num_args = value }
+func (this *ZendOpArray) SetPrototype(value *types.ZendFunction) { this.prototype = value }
+func (this *ZendOpArray) GetNumArgs() uint32                     { return this.num_args }
+func (this *ZendOpArray) SetNumArgs(value uint32)                { this.num_args = value }
 
 // func (this *ZendOpArray)  GetRequiredNumArgs() uint32      { return this.required_num_args }
 func (this *ZendOpArray) SetRequiredNumArgs(value uint32) { this.required_num_args = value }

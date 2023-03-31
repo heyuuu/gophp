@@ -368,7 +368,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var call *ZendExecuteData
 
 	/* no function found. try a static method in class */
@@ -420,7 +420,7 @@ func ZEND_VERIFY_RETURN_TYPE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteDat
 func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var result *types.Zval
-	var constructor *ZendFunction
+	var constructor *types.ZendFunction
 	var ce *types.ClassEntry
 	var call *ZendExecuteData
 
@@ -448,7 +448,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* Perform a dummy function call */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (*ZendFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (*types.ZendFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
 
 		/* Perform a dummy function call */
 

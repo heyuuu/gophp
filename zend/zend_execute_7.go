@@ -155,7 +155,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 
 	}
 }
-func ZendWrongCloneCall(clone *ZendFunction, scope *types.ClassEntry) {
+func ZendWrongCloneCall(clone *types.ZendFunction, scope *types.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
 func ExecuteInternal(executeData *ZendExecuteData, return_value *types.Zval) {
@@ -264,7 +264,7 @@ func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 func IInitFuncExecuteData(op_array *ZendOpArray, return_value *types.Zval, may_be_trampoline types.ZendBool, executeData *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
-	b.Assert(executeData.GetFunc() == (*ZendFunction)(op_array))
+	b.Assert(executeData.GetFunc() == (*types.ZendFunction)(op_array))
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value
@@ -298,10 +298,10 @@ func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
-func ZendFetchFunction(name *types.String) *ZendFunction {
+func ZendFetchFunction(name *types.String) *types.ZendFunction {
 	var zv *types.Zval = EG__().GetFunctionTable().KeyFind(name.GetStr())
 	if zv != nil {
-		var fbc *ZendFunction = zv.GetFunc()
+		var fbc *types.ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCacheI(fbc.GetOpArray())
 		}
@@ -309,10 +309,10 @@ func ZendFetchFunction(name *types.String) *ZendFunction {
 	}
 	return nil
 }
-func ZendFetchFunctionStr(name string, len_ int) *ZendFunction {
+func ZendFetchFunctionStr(name string, len_ int) *types.ZendFunction {
 	var zv *types.Zval = EG__().GetFunctionTable().KeyFind(b.CastStr(name, len_))
 	if zv != nil {
-		var fbc *ZendFunction = zv.GetFunc()
+		var fbc *types.ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCacheI(fbc.GetOpArray())
 		}
@@ -326,7 +326,7 @@ func ZendInitFuncRunTimeCache(op_array *ZendOpArray) {
 	}
 }
 func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *types.Zval) {
-	b.Assert(executeData.GetFunc() == (*ZendFunction)(op_array))
+	b.Assert(executeData.GetFunc() == (*types.ZendFunction)(op_array))
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value

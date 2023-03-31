@@ -83,8 +83,8 @@ type ZendObjectGetPropertiesForT func(object *types.Zval, purpose ZendPropPurpos
 /* Used to call methods */
 
 type ZendObjectCallMethodT func(method *types.String, object *types.ZendObject, executeData *ZendExecuteData, return_value *types.Zval) int
-type ZendObjectGetMethodT func(object **types.ZendObject, method *types.String, key *types.Zval) *ZendFunction
-type ZendObjectGetConstructorT func(object *types.ZendObject) *ZendFunction
+type ZendObjectGetMethodT func(object **types.ZendObject, method *types.String, key *types.Zval) *types.ZendFunction
+type ZendObjectGetConstructorT func(object *types.ZendObject) *types.ZendFunction
 
 /* Object maintenance/destruction */
 
@@ -109,7 +109,7 @@ type ZendObjectCastT func(readobj *types.Zval, retval *types.Zval, type_ int) in
  * Returns FAILURE if the object does not have any sense of overloaded dimensions */
 
 type ZendObjectCountElementsT func(object *types.Zval, count *ZendLong) int
-type ZendObjectGetClosureT func(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **ZendFunction, obj_ptr **types.ZendObject) int
+type ZendObjectGetClosureT func(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **types.ZendFunction, obj_ptr **types.ZendObject) int
 type ZendObjectGetGcT func(object *types.Zval, table **types.Zval, n *int) *types.Array
 type ZendObjectDoOperationT func(opcode types.ZendUchar, result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 

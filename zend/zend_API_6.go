@@ -157,7 +157,7 @@ func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *type
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
-	var func_ *ZendInternalFunction
+	var func_ *types.ZendInternalFunction
 	if b.Assign(&func_, types.ZendHashStrFindPtr(CG__().GetFunctionTable(), b.CastStr(function_name, function_name_length))) {
 		ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(ZEND_ACC_VARIADIC | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_HAS_RETURN_TYPE)

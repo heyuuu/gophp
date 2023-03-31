@@ -13,7 +13,7 @@ type spl_SplObjectStorage struct {
 	index         zend.ZendLong
 	pos           types.ArrayPosition
 	flags         zend.ZendLong
-	fptr_get_hash *zend.ZendFunction
+	fptr_get_hash *types.ZendFunction
 	gcdata        *types.Zval
 	gcdata_num    int
 	std           types.ZendObject
@@ -43,14 +43,14 @@ type spl_SplObjectStorage struct {
 func (this *spl_SplObjectStorage) GetStorage() *types.Array { return &this.storage }
 
 // func (this *spl_SplObjectStorage) SetStorage(value zend.HashTable) { this.storage = value }
-func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong            { return this.index }
-func (this *spl_SplObjectStorage) SetIndex(value zend.ZendLong)       { this.index = value }
-func (this *spl_SplObjectStorage) GetPos() types.ArrayPosition        { return this.pos }
-func (this *spl_SplObjectStorage) SetPos(value types.ArrayPosition)   { this.pos = value }
-func (this *spl_SplObjectStorage) GetFlags() zend.ZendLong            { return this.flags }
-func (this *spl_SplObjectStorage) SetFlags(value zend.ZendLong)       { this.flags = value }
-func (this *spl_SplObjectStorage) GetFptrGetHash() *zend.ZendFunction { return this.fptr_get_hash }
-func (this *spl_SplObjectStorage) SetFptrGetHash(value *zend.ZendFunction) {
+func (this *spl_SplObjectStorage) GetIndex() zend.ZendLong             { return this.index }
+func (this *spl_SplObjectStorage) SetIndex(value zend.ZendLong)        { this.index = value }
+func (this *spl_SplObjectStorage) GetPos() types.ArrayPosition         { return this.pos }
+func (this *spl_SplObjectStorage) SetPos(value types.ArrayPosition)    { this.pos = value }
+func (this *spl_SplObjectStorage) GetFlags() zend.ZendLong             { return this.flags }
+func (this *spl_SplObjectStorage) SetFlags(value zend.ZendLong)        { this.flags = value }
+func (this *spl_SplObjectStorage) GetFptrGetHash() *types.ZendFunction { return this.fptr_get_hash }
+func (this *spl_SplObjectStorage) SetFptrGetHash(value *types.ZendFunction) {
 	this.fptr_get_hash = value
 }
 func (this *spl_SplObjectStorage) GetGcdata() *types.Zval      { return this.gcdata }

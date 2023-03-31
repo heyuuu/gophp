@@ -126,7 +126,7 @@ func ZendCompileCompoundAssign(result *Znode, ast *ZendAst) {
 
 	}
 }
-func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
+func ZendCompileArgs(ast *ZendAst, fbc *types.ZendFunction) uint32 {
 	var args *ZendAstList = ZendAstGetList(ast)
 	var i uint32
 	var uses_arg_unpack types.ZendBool = 0
@@ -258,7 +258,7 @@ func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
 	}
 	return arg_count
 }
-func ZendGetCallOp(init_op *ZendOp, fbc *ZendFunction) types.ZendUchar {
+func ZendGetCallOp(init_op *ZendOp, fbc *types.ZendFunction) types.ZendUchar {
 	if fbc != nil {
 		if fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) == 0 {
 			if init_op.GetOpcode() == ZEND_INIT_FCALL && ZendExecuteInternal == nil {
@@ -278,7 +278,7 @@ func ZendGetCallOp(init_op *ZendOp, fbc *ZendFunction) types.ZendUchar {
 	}
 	return ZEND_DO_FCALL
 }
-func ZendCompileCallCommon(result *Znode, args_ast *ZendAst, fbc *ZendFunction) {
+func ZendCompileCallCommon(result *Znode, args_ast *ZendAst, fbc *types.ZendFunction) {
 	var opline *ZendOp
 	var opnum_init uint32 = GetNextOpNumber() - 1
 	var arg_count uint32
@@ -436,13 +436,13 @@ func ZendCompileFuncOrd(result *Znode, args *ZendAstList) int {
 		return types.FAILURE
 	}
 }
-func FbcIsFinalized(fbc *ZendFunction) types.ZendBool {
+func FbcIsFinalized(fbc *types.ZendFunction) types.ZendBool {
 	return !(ZEND_USER_CODE(fbc.GetType())) || fbc.IsDonePassTwo()
 }
 func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	var name *types.String
 	var lcname *types.String
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var opline *ZendOp
 	if name_ast.GetKind() != ZEND_AST_ZVAL || ZendAstGetZval(name_ast).GetType() != types.IS_STRING {
 		return types.FAILURE
@@ -524,7 +524,7 @@ func ZendCompileFuncCuf(result *Znode, args *ZendAstList, lcname *types.String) 
 	ZendEmitOp(result, ZEND_DO_FCALL, nil, nil)
 	return types.SUCCESS
 }
-func ZendCompileAssert(result *Znode, args *ZendAstList, name *types.String, fbc *ZendFunction) {
+func ZendCompileAssert(result *Znode, args *ZendAstList, name *types.String, fbc *types.ZendFunction) {
 	if EG__().GetAssertions() >= 0 {
 		var name_node Znode
 		var opline *ZendOp

@@ -298,7 +298,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 	if SPL_G(autoload_functions) {
 		var pos types.ArrayPosition
 		var num_idx zend.ZendUlong
-		var func_ *zend.ZendFunction
+		var func_ *types.ZendFunction
 		var fci types.ZendFcallInfo
 		var fcic types.ZendFcallInfoCache
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
@@ -381,7 +381,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var zcallable *types.Zval = nil
 	var do_throw types.ZendBool = 1
 	var prepend types.ZendBool = 0
-	var spl_func_ptr *zend.ZendFunction
+	var spl_func_ptr *types.ZendFunction
 	var alfi AutoloadFuncInfo
 	var obj_ptr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
@@ -514,7 +514,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			}
 		}
 		if alfi.GetFuncPtr() == zend.EG__().GetTrampoline() {
-			var copy *zend.ZendFunction = zend.Emalloc(b.SizeOf("zend_op_array"))
+			var copy *types.ZendFunction = zend.Emalloc(b.SizeOf("zend_op_array"))
 			memcpy(copy, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
 			alfi.GetFuncPtr().SetFunctionName(nil)
 			alfi.SetFuncPtr(copy)
@@ -557,7 +557,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 	var lc_name *types.String
 	var zcallable *types.Zval
 	var success int = types.FAILURE
-	var spl_func_ptr *zend.ZendFunction
+	var spl_func_ptr *types.ZendFunction
 	var obj_ptr *types.ZendObject
 	var fcc types.ZendFcallInfoCache
 	if zend.ZendParseParameters(executeData.NumArgs(), "z", &zcallable) == types.FAILURE {
@@ -639,7 +639,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 	return
 }
 func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
-	var fptr *zend.ZendFunction
+	var fptr *types.ZendFunction
 	var alfi *AutoloadFuncInfo
 	if !executeData.CheckNumArgsNone(false) {
 		return

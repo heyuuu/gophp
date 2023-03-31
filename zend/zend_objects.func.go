@@ -64,7 +64,7 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 	}
 }
 func ZendObjectsDestroyObject(object *types.ZendObject) {
-	var destructor *ZendFunction = object.GetCe().GetDestructor()
+	var destructor *types.ZendFunction = object.GetCe().GetDestructor()
 	if destructor != nil {
 		var old_exception *types.ZendObject
 		var orig_fake_scope *types.ClassEntry

@@ -23,26 +23,26 @@ type ClassEntry struct {
 	properties_info              Array
 	constants_table              Array
 	properties_info_table        **zend.ZendPropertyInfo
-	constructor                  *zend.ZendFunction
-	destructor                   *zend.ZendFunction
-	clone                        *zend.ZendFunction
-	__get                        *zend.ZendFunction
-	__set                        *zend.ZendFunction
-	__unset                      *zend.ZendFunction
-	__isset                      *zend.ZendFunction
-	__call                       *zend.ZendFunction
-	__callstatic                 *zend.ZendFunction
-	__tostring                   *zend.ZendFunction
-	__debugInfo                  *zend.ZendFunction
-	serialize_func               *zend.ZendFunction
-	unserialize_func             *zend.ZendFunction
+	constructor                  *ZendFunction
+	destructor                   *ZendFunction
+	clone                        *ZendFunction
+	__get                        *ZendFunction
+	__set                        *ZendFunction
+	__unset                      *ZendFunction
+	__isset                      *ZendFunction
+	__call                       *ZendFunction
+	__callstatic                 *ZendFunction
+	__tostring                   *ZendFunction
+	__debugInfo                  *ZendFunction
+	serialize_func               *ZendFunction
+	unserialize_func             *ZendFunction
 	iterator_funcs_ptr           *zend.ZendClassIteratorFuncs
 	__1                          struct /* union */ {
 		create_object              func(class_type *ClassEntry) *ZendObject
 		interface_gets_implemented func(iface *ClassEntry, class_type *ClassEntry) int
 	}
 	get_iterator      func(ce *ClassEntry, object *Zval, by_ref int) *zend.ZendObjectIterator
-	get_static_method func(ce *ClassEntry, method *String) *zend.ZendFunction
+	get_static_method func(ce *ClassEntry, method *String) *ZendFunction
 	serialize         func(object *Zval, buffer **uint8, buf_len *int, data *zend.ZendSerializeData) int
 	unserialize       func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int
 	num_interfaces    uint32
@@ -159,32 +159,32 @@ func (this *ClassEntry) GetPropertiesInfoTable() **zend.ZendPropertyInfo {
 func (this *ClassEntry) SetPropertiesInfoTable(value **zend.ZendPropertyInfo) {
 	this.properties_info_table = value
 }
-func (this *ClassEntry) GetConstructor() *zend.ZendFunction        { return this.constructor }
-func (this *ClassEntry) SetConstructor(value *zend.ZendFunction)   { this.constructor = value }
-func (this *ClassEntry) GetDestructor() *zend.ZendFunction         { return this.destructor }
-func (this *ClassEntry) SetDestructor(value *zend.ZendFunction)    { this.destructor = value }
-func (this *ClassEntry) GetClone() *zend.ZendFunction              { return this.clone }
-func (this *ClassEntry) SetClone(value *zend.ZendFunction)         { this.clone = value }
-func (this *ClassEntry) GetGet() *zend.ZendFunction                { return this.__get }
-func (this *ClassEntry) SetGet(value *zend.ZendFunction)           { this.__get = value }
-func (this *ClassEntry) GetSet() *zend.ZendFunction                { return this.__set }
-func (this *ClassEntry) SetSet(value *zend.ZendFunction)           { this.__set = value }
-func (this *ClassEntry) GetUnset() *zend.ZendFunction              { return this.__unset }
-func (this *ClassEntry) SetUnset(value *zend.ZendFunction)         { this.__unset = value }
-func (this *ClassEntry) GetIsset() *zend.ZendFunction              { return this.__isset }
-func (this *ClassEntry) SetIsset(value *zend.ZendFunction)         { this.__isset = value }
-func (this *ClassEntry) GetCall() *zend.ZendFunction               { return this.__call }
-func (this *ClassEntry) SetCall(value *zend.ZendFunction)          { this.__call = value }
-func (this *ClassEntry) GetCallstatic() *zend.ZendFunction         { return this.__callstatic }
-func (this *ClassEntry) SetCallstatic(value *zend.ZendFunction)    { this.__callstatic = value }
-func (this *ClassEntry) GetTostring() *zend.ZendFunction           { return this.__tostring }
-func (this *ClassEntry) SetTostring(value *zend.ZendFunction)      { this.__tostring = value }
-func (this *ClassEntry) GetDebugInfo() *zend.ZendFunction          { return this.__debugInfo }
-func (this *ClassEntry) SetDebugInfo(value *zend.ZendFunction)     { this.__debugInfo = value }
-func (this *ClassEntry) GetSerializeFunc() *zend.ZendFunction      { return this.serialize_func }
-func (this *ClassEntry) SetSerializeFunc(value *zend.ZendFunction) { this.serialize_func = value }
-func (this *ClassEntry) GetUnserializeFunc() *zend.ZendFunction    { return this.unserialize_func }
-func (this *ClassEntry) SetUnserializeFunc(value *zend.ZendFunction) {
+func (this *ClassEntry) GetConstructor() *ZendFunction        { return this.constructor }
+func (this *ClassEntry) SetConstructor(value *ZendFunction)   { this.constructor = value }
+func (this *ClassEntry) GetDestructor() *ZendFunction         { return this.destructor }
+func (this *ClassEntry) SetDestructor(value *ZendFunction)    { this.destructor = value }
+func (this *ClassEntry) GetClone() *ZendFunction              { return this.clone }
+func (this *ClassEntry) SetClone(value *ZendFunction)         { this.clone = value }
+func (this *ClassEntry) GetGet() *ZendFunction                { return this.__get }
+func (this *ClassEntry) SetGet(value *ZendFunction)           { this.__get = value }
+func (this *ClassEntry) GetSet() *ZendFunction                { return this.__set }
+func (this *ClassEntry) SetSet(value *ZendFunction)           { this.__set = value }
+func (this *ClassEntry) GetUnset() *ZendFunction              { return this.__unset }
+func (this *ClassEntry) SetUnset(value *ZendFunction)         { this.__unset = value }
+func (this *ClassEntry) GetIsset() *ZendFunction              { return this.__isset }
+func (this *ClassEntry) SetIsset(value *ZendFunction)         { this.__isset = value }
+func (this *ClassEntry) GetCall() *ZendFunction               { return this.__call }
+func (this *ClassEntry) SetCall(value *ZendFunction)          { this.__call = value }
+func (this *ClassEntry) GetCallstatic() *ZendFunction         { return this.__callstatic }
+func (this *ClassEntry) SetCallstatic(value *ZendFunction)    { this.__callstatic = value }
+func (this *ClassEntry) GetTostring() *ZendFunction           { return this.__tostring }
+func (this *ClassEntry) SetTostring(value *ZendFunction)      { this.__tostring = value }
+func (this *ClassEntry) GetDebugInfo() *ZendFunction          { return this.__debugInfo }
+func (this *ClassEntry) SetDebugInfo(value *ZendFunction)     { this.__debugInfo = value }
+func (this *ClassEntry) GetSerializeFunc() *ZendFunction      { return this.serialize_func }
+func (this *ClassEntry) SetSerializeFunc(value *ZendFunction) { this.serialize_func = value }
+func (this *ClassEntry) GetUnserializeFunc() *ZendFunction    { return this.unserialize_func }
+func (this *ClassEntry) SetUnserializeFunc(value *ZendFunction) {
 	this.unserialize_func = value
 }
 func (this *ClassEntry) GetIteratorFuncsPtr() *zend.ZendClassIteratorFuncs {
@@ -211,10 +211,10 @@ func (this *ClassEntry) GetGetIterator() func(ce *ClassEntry, object *Zval, by_r
 func (this *ClassEntry) SetGetIterator(value func(ce *ClassEntry, object *Zval, by_ref int) *zend.ZendObjectIterator) {
 	this.get_iterator = value
 }
-func (this *ClassEntry) GetGetStaticMethod() func(ce *ClassEntry, method *String) *zend.ZendFunction {
+func (this *ClassEntry) GetGetStaticMethod() func(ce *ClassEntry, method *String) *ZendFunction {
 	return this.get_static_method
 }
-func (this *ClassEntry) SetGetStaticMethod(value func(ce *ClassEntry, method *String) *zend.ZendFunction) {
+func (this *ClassEntry) SetGetStaticMethod(value func(ce *ClassEntry, method *String) *ZendFunction) {
 	this.get_static_method = value
 }
 func (this *ClassEntry) GetSerialize() func(object *Zval, buffer **uint8, buf_len *int, data *zend.ZendSerializeData) int {

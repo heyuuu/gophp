@@ -64,7 +64,7 @@ func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
 	module.SetModuleNumber(ZendNextFreeModule())
 	return ZendRegisterModuleEx(module)
 }
-func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *ZendFunction, error_type int) {
+func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *types.ZendFunction, error_type int) {
 	var lcname []byte
 	var name_len int
 	if fptr.GetFunctionName().GetVal()[0] != '_' || fptr.GetFunctionName().GetVal()[1] != '_' {
@@ -129,19 +129,19 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 	var unload int = 0
 	var target_function_table *types.Array = function_table
 	var error_type int
-	var ctor *ZendFunction = nil
-	var dtor *ZendFunction = nil
-	var clone *ZendFunction = nil
-	var __get *ZendFunction = nil
-	var __set *ZendFunction = nil
-	var __unset *ZendFunction = nil
-	var __isset *ZendFunction = nil
-	var __call *ZendFunction = nil
-	var __callstatic *ZendFunction = nil
-	var __tostring *ZendFunction = nil
-	var __debugInfo *ZendFunction = nil
-	var serialize_func *ZendFunction = nil
-	var unserialize_func *ZendFunction = nil
+	var ctor *types.ZendFunction = nil
+	var dtor *types.ZendFunction = nil
+	var clone *types.ZendFunction = nil
+	var __get *types.ZendFunction = nil
+	var __set *types.ZendFunction = nil
+	var __unset *types.ZendFunction = nil
+	var __isset *types.ZendFunction = nil
+	var __call *types.ZendFunction = nil
+	var __callstatic *types.ZendFunction = nil
+	var __tostring *types.ZendFunction = nil
+	var __debugInfo *types.ZendFunction = nil
+	var serialize_func *types.ZendFunction = nil
+	var unserialize_func *types.ZendFunction = nil
 	var lowercase_name *types.String
 	var fname_len int
 	var lc_class_name *byte = nil
@@ -154,10 +154,10 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 	if target_function_table == nil {
 		target_function_table = CG__().GetFunctionTable()
 	}
-	var reg_function *ZendFunction
+	var reg_function *types.ZendFunction
 
-	var internal_function = NewInternalFunction()
-	var function ZendFunction = MakeZendFunctionInternal(internal_function)
+	var internal_function = types.NewInternalFunction()
+	var function types.ZendFunction = types.MakeZendFunctionInternal(internal_function)
 
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {

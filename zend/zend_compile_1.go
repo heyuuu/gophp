@@ -86,7 +86,7 @@ func ZendAddTryElement(try_op uint32) uint32 {
 	elem.SetFinallyEnd(0)
 	return try_catch_offset
 }
-func FunctionAddRef(function *ZendFunction) {
+func FunctionAddRef(function *types.ZendFunction) {
 	if function.GetType() == ZEND_USER_FUNCTION {
 		var op_array = function.GetOpArray()
 		if op_array.GetRefcount() != nil {
@@ -115,9 +115,9 @@ func FunctionAddRef(function *ZendFunction) {
 func DoBindFunctionError(lcname *types.String, op_array *ZendOpArray, compile_time types.ZendBool) {
 	var zv = b.CondF(compile_time != 0, func() *types.Array { return CG__().GetFunctionTable() }, func() *types.Array { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
 	var error_level = b.Cond(compile_time != 0, faults.E_COMPILE_ERROR, faults.E_ERROR)
-	var old_function *ZendFunction
+	var old_function *types.ZendFunction
 	b.Assert(zv != nil)
-	old_function = (*ZendFunction)(zv.GetPtr())
+	old_function = (*types.ZendFunction)(zv.GetPtr())
 	if old_function.GetType() == ZEND_USER_FUNCTION && old_function.GetOpArray().GetLast() > 0 {
 		faults.ErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
 	} else {
@@ -125,7 +125,7 @@ func DoBindFunctionError(lcname *types.String, op_array *ZendOpArray, compile_ti
 	}
 }
 func DoBindFunction(lcname *types.Zval) int {
-	var function *ZendFunction
+	var function *types.ZendFunction
 	var rtd_key *types.Zval
 	var zv *types.Zval
 	rtd_key = lcname + 1
@@ -134,7 +134,7 @@ func DoBindFunction(lcname *types.Zval) int {
 		DoBindFunctionError(lcname.GetStr(), nil, 0)
 		return types.FAILURE
 	}
-	function = (*ZendFunction)(zv.GetPtr())
+	function = (*types.ZendFunction)(zv.GetPtr())
 	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
 		zv = EG__().GetFunctionTable().KeyAdd(lcname.GetStr().GetStr(), zv)
 	} else {

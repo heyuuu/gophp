@@ -738,7 +738,7 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 	var method_name types.Zval
 	var ce *types.ClassEntry = nil
 	var scope *types.ClassEntry
-	var mptr *ZendFunction
+	var mptr *types.ZendFunction
 	var key *types.String
 	if ZendParseParameters(executeData.NumArgs(), "z", &klass) == types.FAILURE {
 		return
@@ -776,7 +776,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 	var method_name *types.String
 	var lcname *types.String
 	var ce *types.ClassEntry
-	var func_ *ZendFunction
+	var func_ *types.ZendFunction
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 2, 2, 0)
@@ -923,7 +923,7 @@ func ZifTraitExists(executeData zpp.Ex, return_value zpp.Ret, traitname *types.Z
 }
 func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
 	var name *types.String
-	var func_ *ZendFunction
+	var func_ *types.ZendFunction
 	var lcname *types.String
 	for {
 		for {
@@ -1158,7 +1158,7 @@ func ZifGetDefinedFunctions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var internal types.Zval
 	var user types.Zval
 	var key *types.String
-	var func_ *ZendFunction
+	var func_ *types.ZendFunction
 	var exclude_disabled = 0
 	if ZendParseParameters(executeData.NumArgs(), "|b", &exclude_disabled) == types.FAILURE {
 		return
@@ -1519,7 +1519,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	var object *types.ZendObject
 	var lineno int
 	var frameno = 0
-	var func_ *ZendFunction
+	var func_ *types.ZendFunction
 	var function_name *byte
 	var filename *byte
 	var class_name *types.String = nil
@@ -1700,7 +1700,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 	var object *types.ZendObject
 	var lineno int
 	var frameno = 0
-	var func_ *ZendFunction
+	var func_ *types.ZendFunction
 	var function_name *types.String
 	var filename *types.String
 	var include_filename *types.String = nil
@@ -1901,7 +1901,7 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 	var extension_name *types.String
 	var array int
 	var module *ModuleEntry
-	var zif *ZendFunction
+	var zif *types.ZendFunction
 	if ZendParseParameters(executeData.NumArgs(), "S", &extension_name) == types.FAILURE {
 		return
 	}

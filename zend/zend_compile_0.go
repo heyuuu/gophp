@@ -34,7 +34,7 @@ func OBJ_PROP_TO_OFFSET(num int) __auto__ {
 func OBJ_PROP_TO_NUM(offset uint32) int {
 	return (offset - OBJ_PROP_TO_OFFSET(0)) / b.SizeOf("zval")
 }
-func ZEND_FN_SCOPE_NAME(function *ZendFunction) string {
+func ZEND_FN_SCOPE_NAME(function *types.ZendFunction) string {
 	if function != nil && function.GetScope() != nil {
 		return function.GetScope().GetName().GetStr()
 	} else {
@@ -95,29 +95,29 @@ func ZendGetUnmangledPropertyName(mangled_prop *types.String) *byte {
 	return prop_name
 }
 func ZEND_USER_CODE(type_ types.ZendUchar) bool { return (type_ & 1) == 0 }
-func ZendCheckArgSendType(zf *ZendFunction, arg_num uint32, mask uint32) int {
+func ZendCheckArgSendType(zf *types.ZendFunction, arg_num uint32, mask uint32) int {
 	return types.IntBool(zf.CheckArgSendType(arg_num, uint8(mask)))
 }
-func ARG_MUST_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
+func ARG_MUST_BE_SENT_BY_REF(zf *types.ZendFunction, arg_num uint32) int {
 	return ZendCheckArgSendType(zf, arg_num, ZEND_SEND_BY_REF)
 }
-func ARG_SHOULD_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
+func ARG_SHOULD_BE_SENT_BY_REF(zf *types.ZendFunction, arg_num uint32) int {
 	return ZendCheckArgSendType(zf, arg_num, ZEND_SEND_BY_REF|ZEND_SEND_PREFER_REF)
 }
-func ARG_MAY_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
+func ARG_MAY_BE_SENT_BY_REF(zf *types.ZendFunction, arg_num uint32) int {
 	return ZendCheckArgSendType(zf, arg_num, ZEND_SEND_PREFER_REF)
 }
 
-func ZEND_CHECK_ARG_FLAG(zf *ZendFunction, arg_num uint32, mask uint8) int {
+func ZEND_CHECK_ARG_FLAG(zf *types.ZendFunction, arg_num uint32, mask uint8) int {
 	return types.IntBool(zf.CheckArgSendType(arg_num, mask))
 }
-func QUICK_ARG_MUST_BE_SENT_BY_REF(zf *ZendFunction, arg_num int) int {
+func QUICK_ARG_MUST_BE_SENT_BY_REF(zf *types.ZendFunction, arg_num int) int {
 	return ZEND_CHECK_ARG_FLAG(zf, arg_num, ZEND_SEND_BY_REF)
 }
-func QUICK_ARG_SHOULD_BE_SENT_BY_REF(zf *ZendFunction, arg_num int) int {
+func QUICK_ARG_SHOULD_BE_SENT_BY_REF(zf *types.ZendFunction, arg_num int) int {
 	return ZEND_CHECK_ARG_FLAG(zf, arg_num, ZEND_SEND_BY_REF|ZEND_SEND_PREFER_REF)
 }
-func QUICK_ARG_MAY_BE_SENT_BY_REF(zf *ZendFunction, arg_num int) int {
+func QUICK_ARG_MAY_BE_SENT_BY_REF(zf *types.ZendFunction, arg_num int) int {
 	return ZEND_CHECK_ARG_FLAG(zf, arg_num, ZEND_SEND_PREFER_REF)
 }
 func ZEND_IS_INCREMENT(opcode types.ZendUchar) bool { return (opcode & 1) == 0 }

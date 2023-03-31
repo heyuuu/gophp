@@ -91,7 +91,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var obj *types.Zval
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
-	var clone *ZendFunction
+	var clone *types.ZendFunction
 	var clone_call ZendObjectCloneObjT
 	obj = EX_VAR(opline.GetOp1().GetVar())
 	for {
@@ -242,7 +242,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return_value = EX_VAR(opline.GetResult().GetVar())
 		}
 		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
-		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (*ZendFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
+		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (*types.ZendFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			call.SetSymbolTable(executeData.GetSymbolTable())
 		} else {

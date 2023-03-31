@@ -266,13 +266,13 @@ type SplRecursiveItObject struct {
 	flags           int
 	max_depth       int
 	in_iteration    types.ZendBool
-	beginIteration  *zend.ZendFunction
-	endIteration    *zend.ZendFunction
-	callHasChildren *zend.ZendFunction
-	callGetChildren *zend.ZendFunction
-	beginChildren   *zend.ZendFunction
-	endChildren     *zend.ZendFunction
-	nextElement     *zend.ZendFunction
+	beginIteration  *types.ZendFunction
+	endIteration    *types.ZendFunction
+	callHasChildren *types.ZendFunction
+	callGetChildren *types.ZendFunction
+	beginChildren   *types.ZendFunction
+	endChildren     *types.ZendFunction
+	nextElement     *types.ZendFunction
 	ce              *types.ClassEntry
 	prefix          []zend.SmartStr
 	postfix         []zend.SmartStr
@@ -326,42 +326,42 @@ func (this *SplRecursiveItObject) GetMode() RecursiveIteratorMode      { return 
 func (this *SplRecursiveItObject) SetMode(value RecursiveIteratorMode) { this.mode = value }
 
 // func (this *SplRecursiveItObject)  GetFlags() int      { return this.flags }
-func (this *SplRecursiveItObject) SetFlags(value int)                    { this.flags = value }
-func (this *SplRecursiveItObject) GetMaxDepth() int                      { return this.max_depth }
-func (this *SplRecursiveItObject) SetMaxDepth(value int)                 { this.max_depth = value }
-func (this *SplRecursiveItObject) GetInIteration() types.ZendBool        { return this.in_iteration }
-func (this *SplRecursiveItObject) SetInIteration(value types.ZendBool)   { this.in_iteration = value }
-func (this *SplRecursiveItObject) GetBeginIteration() *zend.ZendFunction { return this.beginIteration }
-func (this *SplRecursiveItObject) SetBeginIteration(value *zend.ZendFunction) {
+func (this *SplRecursiveItObject) SetFlags(value int)                     { this.flags = value }
+func (this *SplRecursiveItObject) GetMaxDepth() int                       { return this.max_depth }
+func (this *SplRecursiveItObject) SetMaxDepth(value int)                  { this.max_depth = value }
+func (this *SplRecursiveItObject) GetInIteration() types.ZendBool         { return this.in_iteration }
+func (this *SplRecursiveItObject) SetInIteration(value types.ZendBool)    { this.in_iteration = value }
+func (this *SplRecursiveItObject) GetBeginIteration() *types.ZendFunction { return this.beginIteration }
+func (this *SplRecursiveItObject) SetBeginIteration(value *types.ZendFunction) {
 	this.beginIteration = value
 }
-func (this *SplRecursiveItObject) GetEndIteration() *zend.ZendFunction { return this.endIteration }
-func (this *SplRecursiveItObject) SetEndIteration(value *zend.ZendFunction) {
+func (this *SplRecursiveItObject) GetEndIteration() *types.ZendFunction { return this.endIteration }
+func (this *SplRecursiveItObject) SetEndIteration(value *types.ZendFunction) {
 	this.endIteration = value
 }
-func (this *SplRecursiveItObject) GetCallHasChildren() *zend.ZendFunction {
+func (this *SplRecursiveItObject) GetCallHasChildren() *types.ZendFunction {
 	return this.callHasChildren
 }
-func (this *SplRecursiveItObject) SetCallHasChildren(value *zend.ZendFunction) {
+func (this *SplRecursiveItObject) SetCallHasChildren(value *types.ZendFunction) {
 	this.callHasChildren = value
 }
-func (this *SplRecursiveItObject) GetCallGetChildren() *zend.ZendFunction {
+func (this *SplRecursiveItObject) GetCallGetChildren() *types.ZendFunction {
 	return this.callGetChildren
 }
-func (this *SplRecursiveItObject) SetCallGetChildren(value *zend.ZendFunction) {
+func (this *SplRecursiveItObject) SetCallGetChildren(value *types.ZendFunction) {
 	this.callGetChildren = value
 }
-func (this *SplRecursiveItObject) GetBeginChildren() *zend.ZendFunction { return this.beginChildren }
-func (this *SplRecursiveItObject) SetBeginChildren(value *zend.ZendFunction) {
+func (this *SplRecursiveItObject) GetBeginChildren() *types.ZendFunction { return this.beginChildren }
+func (this *SplRecursiveItObject) SetBeginChildren(value *types.ZendFunction) {
 	this.beginChildren = value
 }
-func (this *SplRecursiveItObject) GetEndChildren() *zend.ZendFunction      { return this.endChildren }
-func (this *SplRecursiveItObject) SetEndChildren(value *zend.ZendFunction) { this.endChildren = value }
-func (this *SplRecursiveItObject) GetNextElement() *zend.ZendFunction      { return this.nextElement }
-func (this *SplRecursiveItObject) SetNextElement(value *zend.ZendFunction) { this.nextElement = value }
-func (this *SplRecursiveItObject) GetCe() *types.ClassEntry                { return this.ce }
-func (this *SplRecursiveItObject) SetCe(value *types.ClassEntry)           { this.ce = value }
-func (this *SplRecursiveItObject) GetPrefix() []zend.SmartStr              { return this.prefix }
+func (this *SplRecursiveItObject) GetEndChildren() *types.ZendFunction      { return this.endChildren }
+func (this *SplRecursiveItObject) SetEndChildren(value *types.ZendFunction) { this.endChildren = value }
+func (this *SplRecursiveItObject) GetNextElement() *types.ZendFunction      { return this.nextElement }
+func (this *SplRecursiveItObject) SetNextElement(value *types.ZendFunction) { this.nextElement = value }
+func (this *SplRecursiveItObject) GetCe() *types.ClassEntry                 { return this.ce }
+func (this *SplRecursiveItObject) SetCe(value *types.ClassEntry)            { this.ce = value }
+func (this *SplRecursiveItObject) GetPrefix() []zend.SmartStr               { return this.prefix }
 
 // func (this *SplRecursiveItObject) SetPrefix(value []zend.SmartStr) { this.prefix = value }
 func (this *SplRecursiveItObject) GetPostfix() []zend.SmartStr { return this.postfix }

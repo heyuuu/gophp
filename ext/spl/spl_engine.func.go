@@ -7,19 +7,19 @@ import (
 )
 
 func SplInstantiateArgEx1(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval) int {
-	var func_ *zend.ZendFunction = pce.GetConstructor()
+	var func_ *types.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetVal(), func_.GetFunctionName().GetLen(), nil, 1, arg1, nil)
 	return 0
 }
 func SplInstantiateArgEx2(pce *types.ClassEntry, retval *types.Zval, arg1 *types.Zval, arg2 *types.Zval) int {
-	var func_ *zend.ZendFunction = pce.GetConstructor()
+	var func_ *types.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
 	zend.ZendCallMethod(retval, pce, &func_, func_.GetFunctionName().GetVal(), func_.GetFunctionName().GetLen(), nil, 2, arg1, arg2)
 	return 0
 }
 func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, argv *types.Zval) {
-	var func_ *zend.ZendFunction = pce.GetConstructor()
+	var func_ *types.ZendFunction = pce.GetConstructor()
 	var fci types.ZendFcallInfo
 	var fcc types.ZendFcallInfoCache
 	var dummy types.Zval

@@ -6,13 +6,13 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendCallMethodWith0Params(obj *types.Zval, obj_ce *types.ClassEntry, fn_proxy **ZendFunction, function_name string, retval *types.Zval) *types.Zval {
+func ZendCallMethodWith0Params(obj *types.Zval, obj_ce *types.ClassEntry, fn_proxy **types.ZendFunction, function_name string, retval *types.Zval) *types.Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 0, nil, nil)
 }
 func ZendCallMethodWith1Params(
 	obj *types.Zval,
 	obj_ce *types.ClassEntry,
-	fn_proxy **ZendFunction,
+	fn_proxy **types.ZendFunction,
 	function_name string,
 	retval *types.Zval,
 	arg1 *types.Zval,
@@ -22,7 +22,7 @@ func ZendCallMethodWith1Params(
 func ZendCallMethodWith2Params(
 	obj *types.Zval,
 	obj_ce *types.ClassEntry,
-	fn_proxy **ZendFunction,
+	fn_proxy **types.ZendFunction,
 	function_name string,
 	retval *types.Zval,
 	arg1 *types.Zval,
@@ -33,7 +33,7 @@ func ZendCallMethodWith2Params(
 func ZendCallMethod(
 	object *types.Zval,
 	obj_ce *types.ClassEntry,
-	fn_proxy **ZendFunction,
+	fn_proxy **types.ZendFunction,
 	function_name string,
 	function_name_len int,
 	retval_ptr *types.Zval,

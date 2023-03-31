@@ -157,7 +157,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
-	var fbc *ZendFunction
+	var fbc *types.ZendFunction
 	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData

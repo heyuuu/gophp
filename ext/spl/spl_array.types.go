@@ -1,7 +1,6 @@
 package spl
 
 import (
-	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -13,11 +12,11 @@ type SplArrayObject struct {
 	ht_iter         uint32
 	ar_flags        int
 	nApplyCount     uint8
-	fptr_offset_get *zend.ZendFunction
-	fptr_offset_set *zend.ZendFunction
-	fptr_offset_has *zend.ZendFunction
-	fptr_offset_del *zend.ZendFunction
-	fptr_count      *zend.ZendFunction
+	fptr_offset_get *types.ZendFunction
+	fptr_offset_set *types.ZendFunction
+	fptr_offset_has *types.ZendFunction
+	fptr_offset_del *types.ZendFunction
+	fptr_count      *types.ZendFunction
 	ce_get_iterator *types.ClassEntry
 	std             types.ZendObject
 }
@@ -59,17 +58,17 @@ func (this *SplArrayObject) SetArFlags(value int)   { this.ar_flags = value }
 func (this *SplArrayObject) GetNApplyCount() uint8  { return this.nApplyCount }
 
 // func (this *SplArrayObject) SetNApplyCount(value uint8) { this.nApplyCount = value }
-func (this *SplArrayObject) GetFptrOffsetGet() *zend.ZendFunction      { return this.fptr_offset_get }
-func (this *SplArrayObject) SetFptrOffsetGet(value *zend.ZendFunction) { this.fptr_offset_get = value }
-func (this *SplArrayObject) GetFptrOffsetSet() *zend.ZendFunction      { return this.fptr_offset_set }
-func (this *SplArrayObject) SetFptrOffsetSet(value *zend.ZendFunction) { this.fptr_offset_set = value }
-func (this *SplArrayObject) GetFptrOffsetHas() *zend.ZendFunction      { return this.fptr_offset_has }
-func (this *SplArrayObject) SetFptrOffsetHas(value *zend.ZendFunction) { this.fptr_offset_has = value }
-func (this *SplArrayObject) GetFptrOffsetDel() *zend.ZendFunction      { return this.fptr_offset_del }
-func (this *SplArrayObject) SetFptrOffsetDel(value *zend.ZendFunction) { this.fptr_offset_del = value }
-func (this *SplArrayObject) GetFptrCount() *zend.ZendFunction          { return this.fptr_count }
-func (this *SplArrayObject) SetFptrCount(value *zend.ZendFunction)     { this.fptr_count = value }
-func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry       { return this.ce_get_iterator }
+func (this *SplArrayObject) GetFptrOffsetGet() *types.ZendFunction      { return this.fptr_offset_get }
+func (this *SplArrayObject) SetFptrOffsetGet(value *types.ZendFunction) { this.fptr_offset_get = value }
+func (this *SplArrayObject) GetFptrOffsetSet() *types.ZendFunction      { return this.fptr_offset_set }
+func (this *SplArrayObject) SetFptrOffsetSet(value *types.ZendFunction) { this.fptr_offset_set = value }
+func (this *SplArrayObject) GetFptrOffsetHas() *types.ZendFunction      { return this.fptr_offset_has }
+func (this *SplArrayObject) SetFptrOffsetHas(value *types.ZendFunction) { this.fptr_offset_has = value }
+func (this *SplArrayObject) GetFptrOffsetDel() *types.ZendFunction      { return this.fptr_offset_del }
+func (this *SplArrayObject) SetFptrOffsetDel(value *types.ZendFunction) { this.fptr_offset_del = value }
+func (this *SplArrayObject) GetFptrCount() *types.ZendFunction          { return this.fptr_count }
+func (this *SplArrayObject) SetFptrCount(value *types.ZendFunction)     { this.fptr_count = value }
+func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry        { return this.ce_get_iterator }
 func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }
