@@ -16,7 +16,7 @@ func ZEND_VM_LOOP_INTERRUPT() int {
 	return zend_interrupt_helper_SPEC(executeData)
 }
 func ZEND_VM_DISPATCH(opcode types.ZendUchar, opline *ZendOp) int {
-	return OpcodeHandlerT(ZendVmGetOpcodeHandlerFunc(opcode, opline))(executeData)
+	return OpcodeHandlerT(ZendVmGetOpcodeHandler(opcode, opline))(executeData)
 }
 func zend_add_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()

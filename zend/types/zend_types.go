@@ -37,11 +37,11 @@ func (this ZendType) TypeName() string {
  */
 type ZendObject struct {
 	ZendRefcounted
-	handle           uint32
-	ce               *ClassEntry
-	handlers         *zend.ZendObjectHandlers
-	properties       *Array
-	properties_table []Zval
+	handle          uint32
+	ce              *ClassEntry
+	handlers        *zend.ZendObjectHandlers
+	properties      *Array
+	propertiesTable []Zval
 }
 
 var _ IRefcounted = &ZendObject{}
@@ -54,8 +54,8 @@ func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return thi
 func (this *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { this.handlers = value }
 func (this *ZendObject) GetProperties() *Array                      { return this.properties }
 func (this *ZendObject) SetProperties(value *Array)                 { this.properties = value }
-func (this *ZendObject) GetPropertiesTable() []Zval                 { return this.properties_table }
-func (this *ZendObject) SetPropertiesTable(value []Zval)            { this.properties_table = value }
+func (this *ZendObject) GetPropertiesTable() []Zval                 { return this.propertiesTable }
+func (this *ZendObject) SetPropertiesTable(value []Zval)            { this.propertiesTable = value }
 
 /**
  * ZendResource

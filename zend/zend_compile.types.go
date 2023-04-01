@@ -8,11 +8,11 @@ import (
  * ZnodeOp
  */
 type ZnodeOp struct /* union */ {
-	constant   uint32
-	var_       uint32
-	num        uint32
-	opline_num uint32
-	jmp_offset uint32
+	constant  uint32
+	var_      uint32
+	num       uint32
+	oplineNum uint32
+	jmpOffset uint32
 }
 
 func (this *ZnodeOp) GetConstant() uint32       { return this.constant }
@@ -21,10 +21,10 @@ func (this *ZnodeOp) GetVar() uint32            { return this.var_ }
 func (this *ZnodeOp) SetVar(value uint32)       { this.var_ = value }
 func (this *ZnodeOp) GetNum() uint32            { return this.num }
 func (this *ZnodeOp) SetNum(value uint32)       { this.num = value }
-func (this *ZnodeOp) GetOplineNum() uint32      { return this.opline_num }
-func (this *ZnodeOp) SetOplineNum(value uint32) { this.opline_num = value }
-func (this *ZnodeOp) GetJmpOffset() uint32      { return this.jmp_offset }
-func (this *ZnodeOp) SetJmpOffset(value uint32) { this.jmp_offset = value }
+func (this *ZnodeOp) GetOplineNum() uint32      { return this.oplineNum }
+func (this *ZnodeOp) SetOplineNum(value uint32) { this.oplineNum = value }
+func (this *ZnodeOp) GetJmpOffset() uint32      { return this.jmpOffset }
+func (this *ZnodeOp) SetJmpOffset(value uint32) { this.jmpOffset = value }
 
 /**
  * Znode
@@ -128,38 +128,38 @@ func (this *ZendParserStackElem) GetStr() *types.String { return this.str }
  * ZendOp
  */
 type ZendOp struct {
-	handler        any
-	op1            ZnodeOp
-	op2            ZnodeOp
-	result         ZnodeOp
-	extended_value uint32
-	lineno         uint32
-	opcode         types.ZendUchar
-	op1_type       types.ZendUchar
-	op2_type       types.ZendUchar
-	result_type    types.ZendUchar
+	handler       any // 指令执行 handler
+	op1           ZnodeOp
+	op2           ZnodeOp
+	result        ZnodeOp
+	extendedValue uint32
+	lineno        uint32
+	opcode        types.ZendUchar
+	op1Type       types.ZendUchar
+	op2Type       types.ZendUchar
+	resultType    types.ZendUchar
 }
 
-func (this *ZendOp) GetHandler() any                     { return this.handler }
-func (this *ZendOp) SetHandler(value any)                { this.handler = value }
-func (this *ZendOp) GetOp1() ZnodeOp                     { return this.op1 }
-func (this *ZendOp) SetOp1(value ZnodeOp)                { this.op1 = value }
-func (this *ZendOp) GetOp2() ZnodeOp                     { return this.op2 }
-func (this *ZendOp) SetOp2(value ZnodeOp)                { this.op2 = value }
-func (this *ZendOp) GetResult() ZnodeOp                  { return this.result }
-func (this *ZendOp) SetResult(value ZnodeOp)             { this.result = value }
-func (this *ZendOp) GetExtendedValue() uint32            { return this.extended_value }
-func (this *ZendOp) SetExtendedValue(value uint32)       { this.extended_value = value }
-func (this *ZendOp) GetLineno() uint32                   { return this.lineno }
-func (this *ZendOp) SetLineno(value uint32)              { this.lineno = value }
-func (this *ZendOp) GetOpcode() types.ZendUchar          { return this.opcode }
-func (this *ZendOp) SetOpcode(value types.ZendUchar)     { this.opcode = value }
-func (this *ZendOp) GetOp1Type() types.ZendUchar         { return this.op1_type }
-func (this *ZendOp) SetOp1Type(value types.ZendUchar)    { this.op1_type = value }
-func (this *ZendOp) GetOp2Type() types.ZendUchar         { return this.op2_type }
-func (this *ZendOp) SetOp2Type(value types.ZendUchar)    { this.op2_type = value }
-func (this *ZendOp) GetResultType() types.ZendUchar      { return this.result_type }
-func (this *ZendOp) SetResultType(value types.ZendUchar) { this.result_type = value }
+func (op *ZendOp) GetHandler() any                     { return op.handler }
+func (op *ZendOp) SetHandler(value any)                { op.handler = value }
+func (op *ZendOp) GetOp1() ZnodeOp                     { return op.op1 }
+func (op *ZendOp) SetOp1(value ZnodeOp)                { op.op1 = value }
+func (op *ZendOp) GetOp2() ZnodeOp                     { return op.op2 }
+func (op *ZendOp) SetOp2(value ZnodeOp)                { op.op2 = value }
+func (op *ZendOp) GetResult() ZnodeOp                  { return op.result }
+func (op *ZendOp) SetResult(value ZnodeOp)             { op.result = value }
+func (op *ZendOp) GetExtendedValue() uint32            { return op.extendedValue }
+func (op *ZendOp) SetExtendedValue(value uint32)       { op.extendedValue = value }
+func (op *ZendOp) GetLineno() uint32                   { return op.lineno }
+func (op *ZendOp) SetLineno(value uint32)              { op.lineno = value }
+func (op *ZendOp) GetOpcode() types.ZendUchar          { return op.opcode }
+func (op *ZendOp) SetOpcode(value types.ZendUchar)     { op.opcode = value }
+func (op *ZendOp) GetOp1Type() types.ZendUchar         { return op.op1Type }
+func (op *ZendOp) SetOp1Type(value types.ZendUchar)    { op.op1Type = value }
+func (op *ZendOp) GetOp2Type() types.ZendUchar         { return op.op2Type }
+func (op *ZendOp) SetOp2Type(value types.ZendUchar)    { op.op2Type = value }
+func (op *ZendOp) GetResultType() types.ZendUchar      { return op.resultType }
+func (op *ZendOp) SetResultType(value types.ZendUchar) { op.resultType = value }
 
 /**
  * ZendBrkContElement
@@ -172,15 +172,6 @@ type ZendBrkContElement struct {
 	is_switch types.ZendBool
 }
 
-// func MakeZendBrkContElement(start int, cont int, brk int, parent int, is_switch ZendBool) ZendBrkContElement {
-//     return ZendBrkContElement{
-//         start:start,
-//         cont:cont,
-//         brk:brk,
-//         parent:parent,
-//         is_switch:is_switch,
-//     }
-// }
 func (this *ZendBrkContElement) GetStart() int                    { return this.start }
 func (this *ZendBrkContElement) SetStart(value int)               { this.start = value }
 func (this *ZendBrkContElement) GetCont() int                     { return this.cont }
@@ -200,12 +191,6 @@ type ZendLabel struct {
 	opline_num uint32
 }
 
-// func MakeZendLabel(brk_cont int, opline_num uint32) ZendLabel {
-//     return ZendLabel{
-//         brk_cont:brk_cont,
-//         opline_num:opline_num,
-//     }
-// }
 func (this *ZendLabel) GetBrkCont() int           { return this.brk_cont }
 func (this *ZendLabel) SetBrkCont(value int)      { this.brk_cont = value }
 func (this *ZendLabel) GetOplineNum() uint32      { return this.opline_num }

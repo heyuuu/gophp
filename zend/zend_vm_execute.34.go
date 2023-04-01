@@ -4217,6 +4217,5 @@ func ZendVmInit() {
 		3203,
 	}
 	ZendOpcodeHandlers = labels
-	ZendHandlersCount = b.SizeOf("labels") / b.SizeOf("void *")
 	ZendSpecHandlers = specs
 }

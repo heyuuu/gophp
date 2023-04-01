@@ -720,7 +720,8 @@ func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_USER_OPCODE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var ret int
-	ret = ZendUserOpcodeHandlers[opline.GetOpcode()](executeData)
+	//ret = ZendUserOpcodeHandlers[opline.GetOpcode()](executeData)
+	ret = UserOpcodeHandlerT(nil)(executeData)
 	opline = executeData.GetOpline()
 	switch ret {
 	case ZEND_USER_OPCODE_CONTINUE:

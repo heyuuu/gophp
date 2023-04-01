@@ -27,7 +27,6 @@ func ZendAstGetZnode(ast *ZendAst) *Znode { return (*ZendAstZnode)(ast).GetNode(
 func OBJ_PROP(obj *types.ZendObject, offset *types.ZendObject) *types.Zval {
 	return (*types.Zval)((*byte)(obj + offset))
 }
-func OBJ_PROP_NUM(obj __auto__, num __auto__) __auto__ { return obj.properties_table[num] }
 func OBJ_PROP_TO_OFFSET(num int) __auto__ {
 	return uint32(zend_long((*byte)(&((*types.ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil)) + b.SizeOf("zval")*num)
 }
