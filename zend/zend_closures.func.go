@@ -249,7 +249,7 @@ func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zva
 		call.SetFnFlags(mptr.GetFnFlags() & AccStatic)
 		call.SetScope(mptr.GetScope())
 		ZendFreeTrampoline(mptr)
-		mptr = types.NewZendFunctionInternal(call)
+		mptr = call
 	}
 	if fcc.GetObject() != nil {
 		instance.SetObject(fcc.GetObject())

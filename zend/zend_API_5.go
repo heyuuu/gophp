@@ -157,7 +157,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	var reg_function types.IFunction
 
 	var internal_function = types.NewInternalFunction()
-	var function types.IFunction = types.MakeZendFunctionInternal(internal_function)
+	var function types.IFunction = internal_function
 
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {

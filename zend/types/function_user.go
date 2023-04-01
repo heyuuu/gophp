@@ -33,47 +33,52 @@ type ZendOpArray struct {
 
 var _ IFunction = (*ZendOpArray)(nil)
 
-func (this *ZendOpArray) init() {
-	this.typ = zend.ZEND_USER_FUNCTION
+func (f *ZendOpArray) init() {
+	f.typ = zend.ZEND_USER_FUNCTION
 }
 
-func (this *ZendOpArray) GetCacheSize() int                           { return this.cache_size }
-func (this *ZendOpArray) SetCacheSize(value int)                      { this.cache_size = value }
-func (this *ZendOpArray) GetLastVar() int                             { return this.last_var }
-func (this *ZendOpArray) SetLastVar(value int)                        { this.last_var = value }
-func (this *ZendOpArray) GetT() uint32                                { return this.T }
-func (this *ZendOpArray) SetT(value uint32)                           { this.T = value }
-func (this *ZendOpArray) GetLast() uint32                             { return this.last }
-func (this *ZendOpArray) SetLast(value uint32)                        { this.last = value }
-func (this *ZendOpArray) GetOpcodes() *zend.ZendOp                    { return this.opcodes }
-func (this *ZendOpArray) SetOpcodes(value *zend.ZendOp)               { this.opcodes = value }
-func (this *ZendOpArray) GetRunTimeCachePtr() **any                   { return this.run_time_cache__ptr }
-func (this *ZendOpArray) GetStaticVariables() *Array                  { return this.static_variables }
-func (this *ZendOpArray) SetStaticVariables(value *Array)             { this.static_variables = value }
-func (this *ZendOpArray) GetVars() **String                           { return this.vars }
-func (this *ZendOpArray) SetVars(value **String)                      { this.vars = value }
-func (this *ZendOpArray) GetRefcount() *uint32                        { return this.refcount }
-func (this *ZendOpArray) SetRefcount(value *uint32)                   { this.refcount = value }
-func (this *ZendOpArray) GetLastLiveRange() int                       { return this.last_live_range }
-func (this *ZendOpArray) SetLastLiveRange(value int)                  { this.last_live_range = value }
-func (this *ZendOpArray) GetLastTryCatch() int                        { return this.last_try_catch }
-func (this *ZendOpArray) SetLastTryCatch(value int)                   { this.last_try_catch = value }
-func (this *ZendOpArray) GetLiveRange() *zend.ZendLiveRange           { return this.live_range }
-func (this *ZendOpArray) SetLiveRange(value *zend.ZendLiveRange)      { this.live_range = value }
-func (this *ZendOpArray) GetTryCatchArray() *zend.ZendTryCatchElement { return this.try_catch_array }
-func (this *ZendOpArray) SetTryCatchArray(value *zend.ZendTryCatchElement) {
-	this.try_catch_array = value
+func (f *ZendOpArray) GetOpArray() *ZendOpArray { return f }
+func (f *ZendOpArray) GetInternalFunction() *InternalFunction {
+	panic("*ZendOpArray is not *InternalFunction")
 }
-func (this *ZendOpArray) GetFilename() *String        { return this.filename }
-func (this *ZendOpArray) SetFilename(value *String)   { this.filename = value }
-func (this *ZendOpArray) GetLineStart() uint32        { return this.line_start }
-func (this *ZendOpArray) SetLineStart(value uint32)   { this.line_start = value }
-func (this *ZendOpArray) GetLineEnd() uint32          { return this.line_end }
-func (this *ZendOpArray) SetLineEnd(value uint32)     { this.line_end = value }
-func (this *ZendOpArray) GetDocComment() *String      { return this.doc_comment }
-func (this *ZendOpArray) SetDocComment(value *String) { this.doc_comment = value }
-func (this *ZendOpArray) GetLastLiteral() int         { return this.last_literal }
-func (this *ZendOpArray) SetLastLiteral(value int)    { this.last_literal = value }
-func (this *ZendOpArray) GetLiterals() *Zval          { return this.literals }
-func (this *ZendOpArray) SetLiterals(value *Zval)     { this.literals = value }
-func (this *ZendOpArray) GetReserved() []any          { return this.reserved }
+
+func (f *ZendOpArray) GetCacheSize() int                           { return f.cache_size }
+func (f *ZendOpArray) SetCacheSize(value int)                      { f.cache_size = value }
+func (f *ZendOpArray) GetLastVar() int                             { return f.last_var }
+func (f *ZendOpArray) SetLastVar(value int)                        { f.last_var = value }
+func (f *ZendOpArray) GetT() uint32                                { return f.T }
+func (f *ZendOpArray) SetT(value uint32)                           { f.T = value }
+func (f *ZendOpArray) GetLast() uint32                             { return f.last }
+func (f *ZendOpArray) SetLast(value uint32)                        { f.last = value }
+func (f *ZendOpArray) GetOpcodes() *zend.ZendOp                    { return f.opcodes }
+func (f *ZendOpArray) SetOpcodes(value *zend.ZendOp)               { f.opcodes = value }
+func (f *ZendOpArray) GetRunTimeCachePtr() **any                   { return f.run_time_cache__ptr }
+func (f *ZendOpArray) GetStaticVariables() *Array                  { return f.static_variables }
+func (f *ZendOpArray) SetStaticVariables(value *Array)             { f.static_variables = value }
+func (f *ZendOpArray) GetVars() **String                           { return f.vars }
+func (f *ZendOpArray) SetVars(value **String)                      { f.vars = value }
+func (f *ZendOpArray) GetRefcount() *uint32                        { return f.refcount }
+func (f *ZendOpArray) SetRefcount(value *uint32)                   { f.refcount = value }
+func (f *ZendOpArray) GetLastLiveRange() int                       { return f.last_live_range }
+func (f *ZendOpArray) SetLastLiveRange(value int)                  { f.last_live_range = value }
+func (f *ZendOpArray) GetLastTryCatch() int                        { return f.last_try_catch }
+func (f *ZendOpArray) SetLastTryCatch(value int)                   { f.last_try_catch = value }
+func (f *ZendOpArray) GetLiveRange() *zend.ZendLiveRange           { return f.live_range }
+func (f *ZendOpArray) SetLiveRange(value *zend.ZendLiveRange)      { f.live_range = value }
+func (f *ZendOpArray) GetTryCatchArray() *zend.ZendTryCatchElement { return f.try_catch_array }
+func (f *ZendOpArray) SetTryCatchArray(value *zend.ZendTryCatchElement) {
+	f.try_catch_array = value
+}
+func (f *ZendOpArray) GetFilename() *String        { return f.filename }
+func (f *ZendOpArray) SetFilename(value *String)   { f.filename = value }
+func (f *ZendOpArray) GetLineStart() uint32        { return f.line_start }
+func (f *ZendOpArray) SetLineStart(value uint32)   { f.line_start = value }
+func (f *ZendOpArray) GetLineEnd() uint32          { return f.line_end }
+func (f *ZendOpArray) SetLineEnd(value uint32)     { f.line_end = value }
+func (f *ZendOpArray) GetDocComment() *String      { return f.doc_comment }
+func (f *ZendOpArray) SetDocComment(value *String) { f.doc_comment = value }
+func (f *ZendOpArray) GetLastLiteral() int         { return f.last_literal }
+func (f *ZendOpArray) SetLastLiteral(value int)    { f.last_literal = value }
+func (f *ZendOpArray) GetLiterals() *Zval          { return f.literals }
+func (f *ZendOpArray) SetLiterals(value *Zval)     { f.literals = value }
+func (f *ZendOpArray) GetReserved() []any          { return f.reserved }

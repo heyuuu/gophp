@@ -3,6 +3,11 @@ package types
 import "github.com/heyuuu/gophp/zend"
 
 type IFunction interface {
+	// type cast
+	GetOpArray() *ZendOpArray
+	GetInternalFunction() *InternalFunction
+
+	// common fields
 	GetType() uint8
 	SetType(typ uint8)
 	GetFnFlags() uint32
@@ -106,6 +111,13 @@ type functionHeader struct {
 }
 
 var _ IFunction = (*functionHeader)(nil)
+
+func (f *functionHeader) GetOpArray() *ZendOpArray {
+	panic("*functionHeader is not *ZendOpArray")
+}
+func (f *functionHeader) GetInternalFunction() *InternalFunction {
+	panic("*functionHeader is not *InternalFunction")
+}
 
 func (f *functionHeader) GetType() uint8                  { return f.typ }
 func (f *functionHeader) SetType(typ uint8)               { f.typ = typ }
@@ -212,17 +224,6 @@ func (f *functionHeader) CheckArgSendType(argNum1 uint32, mask uint8) bool {
 	return f.argInfos[argNum].ByReference()&mask != 0
 }
 
-/**
- * ZendFunction
- */
-type ZendFunction struct /* union */ {
-	functionHeader
-	op_array          ZendOpArray
-	internal_function InternalFunction
-}
-
-func NewZendFunctionInternal(intern *InternalFunction) IFunction  { return intern }
-func MakeZendFunctionInternal(intern *InternalFunction) IFunction { return intern }
 func CopyFunction(function IFunction) IFunction {
 	switch f := function.(type) {
 	case *InternalFunction:
@@ -235,6 +236,3 @@ func CopyFunction(function IFunction) IFunction {
 		return nil
 	}
 }
-
-func (this *ZendFunction) GetOpArray() *ZendOpArray               { return &this.op_array }
-func (this *ZendFunction) GetInternalFunction() *InternalFunction { return &this.internal_function }
