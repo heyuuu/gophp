@@ -10,7 +10,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-var TokenizerFunctions = []types.ZendFunctionEntry{
+var TokenizerFunctions = []types.FunctionEntry{
 	DefZifTokenGetAll,
 	DefZifTokenName,
 }

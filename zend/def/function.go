@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-type FuncType = types.ZendFunctionEntry
+type FuncType = types.FunctionEntry
 type FuncHandler = zend.ZifHandler
 type ArgInfo struct {
 	Name string

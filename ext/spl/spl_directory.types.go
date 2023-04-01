@@ -74,9 +74,9 @@ type SplFilesystemObject struct {
 			sub_path_len int
 			index        int
 			is_recursive int
-			func_rewind  *types.ZendFunction
-			func_next    *types.ZendFunction
-			func_valid   *types.ZendFunction
+			func_rewind  types.IFunction
+			func_next    types.IFunction
+			func_valid   types.IFunction
 		}
 		file struct {
 			stream           *core.PhpStream
@@ -133,17 +133,10 @@ func (this *SplFilesystemObject) SetSubPathLen(value int) { this.u.dir.sub_path_
 func (this *SplFilesystemObject) GetIndex() int           { return this.u.dir.index }
 func (this *SplFilesystemObject) SetIndex(value int)      { this.u.dir.index = value }
 
-// func (this *SplFilesystemObject)  GetIsRecursive() int      { return this.u.dir.is_recursive }
 func (this *SplFilesystemObject) SetIsRecursive(value int)           { this.u.dir.is_recursive = value }
-func (this *SplFilesystemObject) GetFuncRewind() *types.ZendFunction { return this.u.dir.func_rewind }
-
-// func (this *SplFilesystemObject) SetFuncRewind(value *zend.ZendFunction) { this.u.dir.func_rewind = value }
-func (this *SplFilesystemObject) GetFuncNext() *types.ZendFunction { return this.u.dir.func_next }
-
-// func (this *SplFilesystemObject) SetFuncNext(value *zend.ZendFunction) { this.u.dir.func_next = value }
-func (this *SplFilesystemObject) GetFuncValid() *types.ZendFunction { return this.u.dir.func_valid }
-
-// func (this *SplFilesystemObject) SetFuncValid(value *zend.ZendFunction) { this.u.dir.func_valid = value }
+func (this *SplFilesystemObject) GetFuncRewind() types.IFunction     { return this.u.dir.func_rewind }
+func (this *SplFilesystemObject) GetFuncNext() types.IFunction       { return this.u.dir.func_next }
+func (this *SplFilesystemObject) GetFuncValid() types.IFunction      { return this.u.dir.func_valid }
 func (this *SplFilesystemObject) GetStream() *core.PhpStream         { return this.u.file.stream }
 func (this *SplFilesystemObject) SetStream(value *core.PhpStream)    { this.u.file.stream = value }
 func (this *SplFilesystemObject) GetContext() *core.PhpStreamContext { return this.u.file.context }

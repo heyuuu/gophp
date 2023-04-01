@@ -7,7 +7,7 @@ import (
 var ZendCeClosure *types.ClassEntry
 
 var ClosureHandlers ZendObjectHandlers
-var ClosureFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ClosureFunctions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", AccPrivate, zim_Closure___construct, nil),
 	types.MakeZendFunctionEntryEx("bind", AccPublic|AccStatic, zim_Closure_bind, []ArgInfo{MakeReturnArgInfo(2),
 		MakeArgName("closure"),

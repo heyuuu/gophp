@@ -61,7 +61,7 @@ const DIT_CTOR_GLOB = 0x2
 var SplFilesystemDirItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFilesystemDirItDtor, SplFilesystemDirItValid, SplFilesystemDirItCurrentData, SplFilesystemDirItCurrentKey, SplFilesystemDirItMoveForward, SplFilesystemDirItRewind, nil)
 var SplFilesystemTreeItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFilesystemTreeItDtor, SplFilesystemDirItValid, SplFilesystemTreeItCurrentData, SplFilesystemTreeItCurrentKey, SplFilesystemTreeItMoveForward, SplFilesystemTreeItRewind, nil)
 
-var spl_SplFileInfo_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_SplFileInfo_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_SplFileInfo___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("file_name"),
 	}),
@@ -110,7 +110,7 @@ var spl_SplFileInfo_functions []types.ZendFunctionEntry = []types.ZendFunctionEn
 	types.MakeZendFunctionEntryEx("_bad_state_ex", zend.AccPublic|zend.AccFinal, zim_spl_SplFileInfo__bad_state_ex, nil),
 	types.MakeZendFunctionEntryEx("__toString", zend.AccPublic, zim_spl_SplFileInfo_getPathname, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_DirectoryIterator_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_DirectoryIterator_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_DirectoryIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("path"),
 	}),
@@ -130,7 +130,7 @@ var spl_DirectoryIterator_functions []types.ZendFunctionEntry = []types.ZendFunc
 	}),
 	types.MakeZendFunctionEntryEx("__toString", zend.AccPublic, zim_spl_DirectoryIterator_getFilename, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_FilesystemIterator_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_FilesystemIterator_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_FilesystemIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("path"),
 		zend.MakeArgName("flags"),
@@ -144,7 +144,7 @@ var spl_FilesystemIterator_functions []types.ZendFunctionEntry = []types.ZendFun
 		zend.MakeArgName("flags"),
 	}),
 }
-var spl_RecursiveDirectoryIterator_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_RecursiveDirectoryIterator_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_RecursiveDirectoryIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("path"),
 		zend.MakeArgName("flags"),
@@ -156,7 +156,7 @@ var spl_RecursiveDirectoryIterator_functions []types.ZendFunctionEntry = []types
 	types.MakeZendFunctionEntryEx("getSubPath", zend.AccPublic, zim_spl_RecursiveDirectoryIterator_getSubPath, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("getSubPathname", zend.AccPublic, zim_spl_RecursiveDirectoryIterator_getSubPathname, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_GlobIterator_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_GlobIterator_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_GlobIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("path"),
 		zend.MakeArgName("flags"),
@@ -164,7 +164,7 @@ var spl_GlobIterator_functions []types.ZendFunctionEntry = []types.ZendFunctionE
 	types.MakeZendFunctionEntryEx("count", zend.AccPublic, zim_spl_GlobIterator_count, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 
-var spl_SplFileObject_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_SplFileObject_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_SplFileObject___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("file_name"),
 		zend.MakeArgName("open_mode"),
@@ -241,7 +241,7 @@ var spl_SplFileObject_functions []types.ZendFunctionEntry = []types.ZendFunction
 	types.MakeZendFunctionEntryEx("getCurrentLine", zend.AccPublic, zim_spl_SplFileObject_fgets, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("__toString", zend.AccPublic, zim_spl_SplFileObject_fgets, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_SplTempFileObject_functions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_SplTempFileObject_functions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_SplTempFileObject___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("max_memory"),
 	}),

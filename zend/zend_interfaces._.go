@@ -11,18 +11,18 @@ var ZendCeCountable *types.ClassEntry
 
 var ZendInterfaceIteratorFuncsIterator ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendUserItDtor, ZendUserItValid, ZendUserItGetCurrentData, ZendUserItGetCurrentKey, ZendUserItMoveForward, ZendUserItRewind, ZendUserItInvalidateCurrent)
 
-var ZendFuncsAggregate []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ZendFuncsAggregate []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("getIterator", AccPublic|AccAbstract, nil, nil),
 }
-var ZendFuncsIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ZendFuncsIterator []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("current", AccPublic|AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("next", AccPublic|AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("key", AccPublic|AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("valid", AccPublic|AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("rewind", AccPublic|AccAbstract, nil, nil),
 }
-var ZendFuncsTraversable *types.ZendFunctionEntry = nil
-var ZendFuncsArrayaccess []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ZendFuncsTraversable *types.FunctionEntry = nil
+var ZendFuncsArrayaccess []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("offsetExists", AccPublic|AccAbstract, nil, []ArgInfo{MakeReturnArgInfo(1),
 		MakeArgName("offset"),
 	}),
@@ -37,12 +37,12 @@ var ZendFuncsArrayaccess []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 		MakeArgName("offset"),
 	}),
 }
-var ZendFuncsSerializable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ZendFuncsSerializable []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("serialize", AccPublic|AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("unserialize", AccPublic|AccAbstract, nil, []ArgInfo{MakeReturnArgInfo(-1),
 		MakeArgName("serialized"),
 	}),
 }
-var ZendFuncsCountable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ZendFuncsCountable []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("count", AccPublic|AccAbstract, nil, []ArgInfo{MakeReturnArgInfo(-1)}),
 }

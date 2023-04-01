@@ -17,7 +17,7 @@ const SPL_DEFAULT_FILE_EXTENSIONS = ".inc,.php"
 var SplAutoloadFn *types.ZendFunction = nil
 var SplAutoloadCallFn *types.ZendFunction = nil
 
-var SplFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var SplFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifSplClasses,
 	DefZifSplAutoload,
 	DefZifSplAutoloadExtensions,

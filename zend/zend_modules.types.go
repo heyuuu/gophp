@@ -9,7 +9,7 @@ import (
  */
 type ModuleEntry struct {
 	name                  string
-	functions             []types.ZendFunctionEntry
+	functions             []types.FunctionEntry
 	module_startup_func   func(type_ int, module_number int) int
 	module_shutdown_func  func(type_ int, module_number int) int
 	request_startup_func  func(type_ int, module_number int) int
@@ -28,7 +28,7 @@ type ModuleEntry struct {
 
 func MakeZendModuleEntry(
 	name string,
-	functions []types.ZendFunctionEntry,
+	functions []types.FunctionEntry,
 	module_startup_func func(type_ int, module_number int) int,
 	module_shutdown_func func(type_ int, module_number int) int,
 	request_startup_func func(type_ int, module_number int) int,
@@ -65,8 +65,8 @@ func (this *ModuleEntry) SetHandle(value any)        { this.handle = value }
 func (this *ModuleEntry) SetModuleNumber(value int)  { this.module_number = value }
 func (this *ModuleEntry) SetModuleStarted(value int) { this.module_started = value }
 
-func (this *ModuleEntry) GetName() string                         { return this.name }
-func (this *ModuleEntry) GetFunctions() []types.ZendFunctionEntry { return this.functions }
+func (this *ModuleEntry) GetName() string                     { return this.name }
+func (this *ModuleEntry) GetFunctions() []types.FunctionEntry { return this.functions }
 func (this *ModuleEntry) GetModuleStartupFunc() func(type_ int, module_number int) int {
 	return this.module_startup_func
 }

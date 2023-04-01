@@ -83,7 +83,7 @@ const STDOUT_FILENO = 1
 const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
 
-var CgiFunctions = []types.ZendFunctionEntry{
+var CgiFunctions = []types.FunctionEntry{
 	DefZifApacheRequestHeaders,
 	DefZifApacheResponseHeaders,
 	types.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),

@@ -10,7 +10,7 @@ var DirClassEntryPtr *types.ClassEntry
 
 /* {{{ arginfo */
 
-var PhpDirClassFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var PhpDirClassFunctions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("close", 0, ZifClosedir, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("directory"),
 		zend.MakeArgName("context"),

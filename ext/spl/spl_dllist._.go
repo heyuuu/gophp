@@ -20,13 +20,13 @@ type SplPtrLlistDtorFunc func(*SplPtrLlistElement)
 type SplPtrLlistCtorFunc func(*SplPtrLlistElement)
 
 var SplDllistItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplDllistItDtor, SplDllistItValid, SplDllistItGetCurrentData, SplDllistItGetCurrentKey, SplDllistItMoveForward, SplDllistItRewind, nil)
-var spl_funcs_SplQueue []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplQueue []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("enqueue", zend.AccPublic, zim_spl_SplDoublyLinkedList_push, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("value"),
 	}),
 	types.MakeZendFunctionEntryEx("dequeue", zend.AccPublic, zim_spl_SplDoublyLinkedList_shift, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_funcs_SplDoublyLinkedList []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplDoublyLinkedList []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("pop", zend.AccPublic, zim_spl_SplDoublyLinkedList_pop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("shift", zend.AccPublic, zim_spl_SplDoublyLinkedList_shift, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("push", zend.AccPublic, zim_spl_SplDoublyLinkedList_push, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),

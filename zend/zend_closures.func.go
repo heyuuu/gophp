@@ -226,9 +226,7 @@ func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zva
 	}
 	mptr = fcc.GetFunctionHandler()
 	if mptr.IsCallViaTrampoline() {
-
 		/* For Closure::fromCallable([$closure, "__invoke"]) return $closure. */
-
 		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && types.ZendStringEqualsLiteral(mptr.GetFunctionName(), "__invoke") {
 			return_value.SetObject(fcc.GetObject())
 			fcc.GetObject().AddRefcount()
@@ -598,11 +596,6 @@ func ZendCreateFakeClosure(res *types.Zval, func_ *types.ZendFunction, scope *ty
 	ZendCreateClosure(res, func_, scope, called_scope, this_ptr)
 	closure = (*ZendClosure)(res.GetObj())
 	closure.GetFunc().SetIsFakeClosure(true)
-}
-func ZendClosureBindVar(closure_zv *types.Zval, var_name *types.String, var_ *types.Zval) {
-	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())
-	var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
-	static_variables.KeyUpdate(var_name.GetStr(), var_)
 }
 func ZendClosureBindVarEx(closure_zv *types.Zval, offset uint32, val *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())

@@ -20,4 +20,4 @@ func ZEND_THIS(executeData *ZendExecuteData) *types.Zval {
 
 /* these variables are true statics/globals, and have to be mutex'ed on every access */
 var ClassCleanupHandlers **types.ClassEntry
-var DisabledClassNew = []types.ZendFunctionEntry{}
+var DisabledClassNew = []types.FunctionEntry{}

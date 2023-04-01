@@ -121,7 +121,7 @@ const (
 	AccHeapRtCache = 1 << 22 /*                               |  X  |     |     */
 	// method flag used by Closure::__invoke() (int only)     |     |     |     */
 	AccUserArgInfo = 1 << 22 /*                               |  X  |     |     */
-	AccGenerator   = 1 << 24 /*                               |  X  |     |     *
+	AccGenerator   = 1 << 24 /*                               |  X  |     |     */
 	// function was processed by pass two (user only)
 	AccDonePassTwo = 1 << 25 /*                               |  X  |     |     */
 	// internal function is allocated at arena (int only)

@@ -16,7 +16,7 @@ const SPL_FIXEDARRAY_OVERLOADED_CURRENT = 0x8
 const SPL_FIXEDARRAY_OVERLOADED_NEXT = 0x10
 
 var SplFixedarrayItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFixedarrayItDtor, SplFixedarrayItValid, SplFixedarrayItGetCurrentData, SplFixedarrayItGetCurrentKey, SplFixedarrayItMoveForward, SplFixedarrayItRewind, nil)
-var spl_funcs_SplFixedArray []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplFixedArray []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_SplFixedArray___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("size"),
 	}),

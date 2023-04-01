@@ -24,7 +24,7 @@ var ZendThrowExceptionHook func(ex *types.Zval)
 
 var DefaultExceptionHandlers zend.ZendObjectHandlers
 
-var ZendFuncsThrowable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ZendFuncsThrowable []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("getMessage", zend.AccPublic|zend.AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("getCode", zend.AccPublic|zend.AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("getFile", zend.AccPublic|zend.AccAbstract, nil, nil),
@@ -34,7 +34,7 @@ var ZendFuncsThrowable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("getTraceAsString", zend.AccPublic|zend.AccAbstract, nil, nil),
 	types.MakeZendFunctionEntryEx("__toString", zend.AccPublic|zend.AccAbstract, nil, nil),
 }
-var DefaultExceptionFunctions = []types.ZendFunctionEntry{
+var DefaultExceptionFunctions = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__clone", zend.AccPrivate|zend.AccFinal, ZimExceptionClone, nil),
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, ZimExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("message"),
@@ -51,7 +51,7 @@ var DefaultExceptionFunctions = []types.ZendFunctionEntry{
 	types.MakeZendFunctionEntryEx("getTraceAsString", zend.AccPublic|zend.AccFinal, zim_exception_getTraceAsString, nil),
 	types.MakeZendFunctionEntryEx("__toString", 0, zim_exception___toString, nil),
 }
-var ErrorExceptionFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var ErrorExceptionFunctions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, ZimErrorExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("message"),
 		zend.MakeArgName("code"),

@@ -14,7 +14,7 @@ var LeUserfilters int
 var LeBucketBrigade int
 var LeBucket int
 
-var UserFilterClassFuncs []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var UserFilterClassFuncs []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("filter", 0, ZifUserFilterNop, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("in"),
 		zend.MakeArgName("out"),

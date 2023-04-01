@@ -6,9 +6,9 @@ import (
 )
 
 /**
- * ZendFunctionEntry
+ * FunctionEntry
  */
-type ZendFunctionEntry struct {
+type FunctionEntry struct {
 	funcName        string
 	handler         zend.ZifHandler
 	requiredNumArgs uint32
@@ -18,11 +18,11 @@ type ZendFunctionEntry struct {
 }
 
 // 只可用于 def.DefFunc 使用，后续会做不兼容修改
-func DefFunctionEntry(funcName string, handler zend.ZifHandler, requiredNumArgs uint32, argInfos []zend.ArgInfo, returnArgInfo *zend.ArgInfo, flags uint32) ZendFunctionEntry {
-	return ZendFunctionEntry{funcName: funcName, handler: handler, requiredNumArgs: requiredNumArgs, argInfos: argInfos, returnArgInfo: returnArgInfo, flags: flags}
+func DefFunctionEntry(funcName string, handler zend.ZifHandler, requiredNumArgs uint32, argInfos []zend.ArgInfo, returnArgInfo *zend.ArgInfo, flags uint32) FunctionEntry {
+	return FunctionEntry{funcName: funcName, handler: handler, requiredNumArgs: requiredNumArgs, argInfos: argInfos, returnArgInfo: returnArgInfo, flags: flags}
 }
 
-func MakeZendFunctionEntryEx(funcName string, flags uint32, handler zend.ZifHandler, inputArgInfos []zend.ArgInfo) ZendFunctionEntry {
+func MakeZendFunctionEntryEx(funcName string, flags uint32, handler zend.ZifHandler, inputArgInfos []zend.ArgInfo) FunctionEntry {
 	var requiredNumArgs int
 	var argInfos []zend.ArgInfo
 	var returnArgInfo *zend.ArgInfo
@@ -37,7 +37,7 @@ func MakeZendFunctionEntryEx(funcName string, flags uint32, handler zend.ZifHand
 		argInfos = inputArgInfos[1:]
 	}
 
-	return ZendFunctionEntry{
+	return FunctionEntry{
 		funcName:        funcName,
 		handler:         handler,
 		requiredNumArgs: uint32(requiredNumArgs),
@@ -47,26 +47,26 @@ func MakeZendFunctionEntryEx(funcName string, flags uint32, handler zend.ZifHand
 	}
 }
 
-func (this *ZendFunctionEntry) FuncName() string             { return this.funcName }
-func (this *ZendFunctionEntry) Handler() zend.ZifHandler     { return this.handler }
-func (this *ZendFunctionEntry) ArgInfos() []zend.ArgInfo     { return this.argInfos }
-func (this *ZendFunctionEntry) ReturnArgInfo() *zend.ArgInfo { return this.returnArgInfo }
-func (this *ZendFunctionEntry) RequiredNumArgs() uint32      { return this.requiredNumArgs }
-func (this *ZendFunctionEntry) NumArgs() uint32              { return uint32(len(this.argInfos)) }
-func (this *ZendFunctionEntry) Flags() uint32                { return this.flags }
+func (this *FunctionEntry) FuncName() string             { return this.funcName }
+func (this *FunctionEntry) Handler() zend.ZifHandler     { return this.handler }
+func (this *FunctionEntry) ArgInfos() []zend.ArgInfo     { return this.argInfos }
+func (this *FunctionEntry) ReturnArgInfo() *zend.ArgInfo { return this.returnArgInfo }
+func (this *FunctionEntry) RequiredNumArgs() uint32      { return this.requiredNumArgs }
+func (this *FunctionEntry) NumArgs() uint32              { return uint32(len(this.argInfos)) }
+func (this *FunctionEntry) Flags() uint32                { return this.flags }
 
-func (this *ZendFunctionEntry) GetFname() *byte { return b.CastStrPtr(this.funcName) }
-func (this *ZendFunctionEntry) GetArgInfo() *zend.ArgInfo {
+func (this *FunctionEntry) GetFname() *byte { return b.CastStrPtr(this.funcName) }
+func (this *FunctionEntry) GetArgInfo() *zend.ArgInfo {
 	return b.Cast[zend.ArgInfo](&this.argInfos)
 }
-func (this *ZendFunctionEntry) GetNumArgs() uint32 { return this.NumArgs() }
-func (this *ZendFunctionEntry) GetFlags() uint32   { return this.flags }
+func (this *FunctionEntry) GetNumArgs() uint32 { return this.NumArgs() }
+func (this *FunctionEntry) GetFlags() uint32   { return this.flags }
 
-/* ZendFunctionEntry.flags */
-func (this *ZendFunctionEntry) HasFlags(value uint32) bool { return this.flags&value != 0 }
-func (this ZendFunctionEntry) IsPppMask() bool             { return this.HasFlags(zend.AccPppMask) }
-func (this ZendFunctionEntry) IsAbstract() bool            { return this.HasFlags(zend.AccAbstract) }
-func (this ZendFunctionEntry) IsStatic() bool              { return this.HasFlags(zend.AccStatic) }
+/* FunctionEntry.flags */
+func (this *FunctionEntry) HasFlags(value uint32) bool { return this.flags&value != 0 }
+func (this FunctionEntry) IsPppMask() bool             { return this.HasFlags(zend.AccPppMask) }
+func (this FunctionEntry) IsAbstract() bool            { return this.HasFlags(zend.AccAbstract) }
+func (this FunctionEntry) IsStatic() bool              { return this.HasFlags(zend.AccStatic) }
 
 /**
  * ZendFcallInfo

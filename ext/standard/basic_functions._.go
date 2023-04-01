@@ -19,7 +19,7 @@ var BasicGlobals PhpBasicGlobals
 
 var IncompleteClassEntry *types.ClassEntry = nil
 
-var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifConstant,
 	DefZifBin2hex,
 	DefZifHex2bin,

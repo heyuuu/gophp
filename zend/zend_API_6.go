@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func ZendUnregisterFunctions(functions []types.ZendFunctionEntry, count int, functionTable *types.Array) {
+func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functionTable *types.Array) {
 	targetFunctionTable := functionTable
 	if targetFunctionTable == nil {
 		targetFunctionTable = CG__().GetFunctionTable()

@@ -31,7 +31,7 @@ const SPL_ARRAY_METHOD_MAY_USER_ARG = 2
 var SplArrayItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplArrayItDtor, SplArrayItValid, SplArrayItGetCurrentData, SplArrayItGetCurrentKey, SplArrayItMoveForward, SplArrayItRewind, nil)
 
 /* ArrayIterator::__construct and ArrayObject::__construct have different signatures */
-var spl_funcs_ArrayObject []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_ArrayObject []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_Array___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("input"),
 		zend.MakeArgName("flags"),
@@ -87,7 +87,7 @@ var spl_funcs_ArrayObject []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	}),
 	types.MakeZendFunctionEntryEx("getIteratorClass", zend.AccPublic, zim_spl_Array_getIteratorClass, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_funcs_ArrayIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_ArrayIterator []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, zim_spl_ArrayIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("array"),
 		zend.MakeArgName("flags"),
@@ -142,7 +142,7 @@ var spl_funcs_ArrayIterator []types.ZendFunctionEntry = []types.ZendFunctionEntr
 		zend.MakeArgName("position"),
 	}),
 }
-var spl_funcs_RecursiveArrayIterator []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_RecursiveArrayIterator []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("hasChildren", zend.AccPublic, zim_spl_Array_hasChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("getChildren", zend.AccPublic, zim_spl_Array_getChildren, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }

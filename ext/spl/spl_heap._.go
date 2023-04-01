@@ -26,19 +26,19 @@ type SplPtrHeapCmpFunc func(any, any, *types.Zval) int
 
 var SplHeapItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplHeapItDtor, SplHeapItValid, SplHeapItGetCurrentData, SplHeapItGetCurrentKey, SplHeapItMoveForward, SplHeapItRewind, nil)
 var SplPqueueItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplHeapItDtor, SplHeapItValid, SplPqueueItGetCurrentData, SplHeapItGetCurrentKey, SplHeapItMoveForward, SplHeapItRewind, nil)
-var spl_funcs_SplMinHeap []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplMinHeap []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("compare", zend.AccProtected, zim_spl_SplMinHeap_compare, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("value1"),
 		zend.MakeArgName("value2"),
 	}),
 }
-var spl_funcs_SplMaxHeap []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplMaxHeap []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("compare", zend.AccProtected, zim_spl_SplMaxHeap_compare, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("value1"),
 		zend.MakeArgName("value2"),
 	}),
 }
-var spl_funcs_SplPriorityQueue []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplPriorityQueue []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("compare", zend.AccPublic, zim_spl_SplPriorityQueue_compare, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("value1"),
 		zend.MakeArgName("value2"),
@@ -64,7 +64,7 @@ var spl_funcs_SplPriorityQueue []types.ZendFunctionEntry = []types.ZendFunctionE
 	types.MakeZendFunctionEntryEx("isCorrupted", zend.AccPublic, zim_spl_SplHeap_isCorrupted, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("__debugInfo", zend.AccPublic, zim_spl_SplPriorityQueue___debugInfo, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
-var spl_funcs_SplHeap []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var spl_funcs_SplHeap []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("extract", zend.AccPublic, zim_spl_SplHeap_extract, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("insert", zend.AccPublic, zim_spl_SplHeap_insert, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("value"),

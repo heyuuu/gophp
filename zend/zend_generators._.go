@@ -13,7 +13,7 @@ var ZEND_GENERATOR_DO_INIT types.ZendUchar = 0x8
 var ZendGeneratorHandlers ZendObjectHandlers
 
 var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil)
-var GeneratorFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
+var GeneratorFunctions []types.FunctionEntry = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("rewind", AccPublic, zim_Generator_rewind, []ArgInfo{MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("valid", AccPublic, zim_Generator_valid, []ArgInfo{MakeReturnArgInfo(-1)}),
 	types.MakeZendFunctionEntryEx("current", AccPublic, zim_Generator_current, []ArgInfo{MakeReturnArgInfo(-1)}),

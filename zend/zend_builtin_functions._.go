@@ -4,7 +4,7 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-var BuiltinFunctions = []types.ZendFunctionEntry{
+var BuiltinFunctions = []types.FunctionEntry{
 	DefZifZendVersion,
 	DefZifFuncNumArgs,
 	DefZifFuncGetArg,

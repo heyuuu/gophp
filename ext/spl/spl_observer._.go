@@ -10,12 +10,12 @@ var spl_ce_SplSubject *types.ClassEntry
 var spl_ce_SplObjectStorage *types.ClassEntry
 var spl_ce_MultipleIterator *types.ClassEntry
 
-var spl_funcs_SplObserver = []types.ZendFunctionEntry{
+var spl_funcs_SplObserver = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("update", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgInfo("subject", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 	}),
 }
-var spl_funcs_SplSubject = []types.ZendFunctionEntry{
+var spl_funcs_SplSubject = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("attach", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgInfo("observer", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
 	}),
@@ -26,7 +26,7 @@ var spl_funcs_SplSubject = []types.ZendFunctionEntry{
 }
 var spl_handler_SplObjectStorage zend.ZendObjectHandlers
 
-var spl_funcs_SplObjectStorage = []types.ZendFunctionEntry{
+var spl_funcs_SplObjectStorage = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("attach", 0, zim_spl_SplObjectStorage_attach, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("object"),
 		zend.MakeArgName("data"),
@@ -94,7 +94,7 @@ const (
 const SPL_MULTIPLE_ITERATOR_GET_ALL_CURRENT = 1
 const SPL_MULTIPLE_ITERATOR_GET_ALL_KEY = 2
 
-var spl_funcs_MultipleIterator = []types.ZendFunctionEntry{
+var spl_funcs_MultipleIterator = []types.FunctionEntry{
 	types.MakeZendFunctionEntryEx("__construct", 0, zim_spl_MultipleIterator___construct, []zend.ArgInfo{zend.MakeReturnArgInfo(1),
 		zend.MakeArgName("flags"),
 	}),
