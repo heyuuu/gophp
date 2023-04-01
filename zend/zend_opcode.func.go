@@ -826,15 +826,6 @@ func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsL
 	}
 	FreeAlloca(last_use, use_heap)
 }
-func ZendRecalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
-	/* We assume that we never create live-ranges where there were none before. */
-
-	b.Assert(op_array.GetLiveRange() != nil)
-	Efree(op_array.GetLiveRange())
-	op_array.SetLiveRange(nil)
-	op_array.SetLastLiveRange(0)
-	ZendCalcLiveRanges(op_array, needs_live_range)
-}
 func PassTwo(op_array *types.ZendOpArray) int {
 	var opline *ZendOp
 	var end *ZendOp

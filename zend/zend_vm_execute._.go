@@ -12,7 +12,7 @@ const SPEC_RULE_COMMUTATIVE = 0x800000
 const SPEC_RULE_ISSET = 0x1000000
 
 var ZendSpecHandlers *uint32
-var ZendOpcodeHandlers *any
+var ZendOpcodeHandlers []OpcodeHandlerT
 
 type OpcodeHandlerT func(executeData *ZendExecuteData) int
 

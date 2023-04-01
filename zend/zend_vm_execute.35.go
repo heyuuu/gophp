@@ -4,21 +4,7 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func vmDecodeByOpType(opType types.ZendUchar) int {
-
-	switch opType {
-	case IS_UNUSED: // 0
-		return _UNUSED_CODE
-	case IS_CONST: // 1<<0
-		return _CONST_CODE
-	case IS_TMP_VAR:
-		return _TMP_CODE
-	case
-
-	}
-}
-
-func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) any {
+func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) OpcodeHandlerT {
 	var zendVmDecodeEx = map[uint8]int{
 		IS_UNUSED:  _UNUSED_CODE, // 0    : 3
 		IS_CONST:   _CONST_CODE,  // 1<<0 : 0
@@ -27,7 +13,6 @@ func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) any {
 		IS_CV:      _CV_CODE,     // 1<<3 : 4
 	}
 
-	var zendVmDecode = []int{_UNUSED_CODE, _CONST_CODE, _TMP_CODE, _UNUSED_CODE, _VAR_CODE, _UNUSED_CODE, _UNUSED_CODE, _UNUSED_CODE, _CV_CODE}
 	var offset = 0
 	if (spec & SPEC_RULE_OP1) != 0 {
 		offset = offset*5 + zendVmDecodeEx[op.GetOp1Type()]
@@ -41,7 +26,7 @@ func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) any {
 		} else if (spec & SPEC_RULE_QUICK_ARG) != 0 {
 			offset = offset*2 + (op.GetOp2().GetNum() <= MAX_ARG_FLAG_NUM)
 		} else if (spec & SPEC_RULE_OP_DATA) != 0 {
-			offset = offset*5 + zendVmDecode[(op+1).GetOp1Type()]
+			offset = offset*5 + zendVmDecodeEx[(op+1).GetOp1Type()]
 		} else if (spec & SPEC_RULE_ISSET) != 0 {
 			offset = offset*2 + (op.GetExtendedValue() & ZEND_ISEMPTY)
 		} else if (spec & SPEC_RULE_SMART_BRANCH) != 0 {
@@ -55,7 +40,7 @@ func ZendVmGetOpcodeHandlerEx(spec uint32, op *ZendOp) any {
 	}
 	return ZendOpcodeHandlers[(spec&SPEC_START_MASK)+offset]
 }
-func ZendVmGetOpcodeHandler(opcode types.ZendUchar, op *ZendOp) any {
+func ZendVmGetOpcodeHandler(opcode types.ZendUchar, op *ZendOp) OpcodeHandlerT {
 	return ZendVmGetOpcodeHandlerEx(ZendSpecHandlers[opcode], op)
 }
 func ZendVmSetOpcodeHandler(op *ZendOp) {
