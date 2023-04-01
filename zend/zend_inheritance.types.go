@@ -24,8 +24,8 @@ type VarianceObligation struct {
 	__0   struct /* union */ {
 		dependency_ce *types.ClassEntry
 		__0           struct {
-			parent_fn    types.ZendFunction
-			child_fn     types.ZendFunction
+			parent_fn    types.IFunction
+			child_fn     types.IFunction
 			always_error types.ZendBool
 		}
 		__1 struct {
@@ -41,9 +41,9 @@ func (this *VarianceObligation) GetDependencyCe() *types.ClassEntry   { return t
 func (this *VarianceObligation) SetDependencyCe(value *types.ClassEntry) {
 	this.__0.dependency_ce = value
 }
-func (this *VarianceObligation) GetParentFn() types.ZendFunction { return this.__0.__0.parent_fn }
-func (this *VarianceObligation) GetChildFn() types.ZendFunction  { return this.__0.__0.child_fn }
-func (this *VarianceObligation) GetAlwaysError() types.ZendBool  { return this.__0.__0.always_error }
+func (this *VarianceObligation) GetParentFn() types.IFunction   { return this.__0.__0.parent_fn }
+func (this *VarianceObligation) GetChildFn() types.IFunction    { return this.__0.__0.child_fn }
+func (this *VarianceObligation) GetAlwaysError() types.ZendBool { return this.__0.__0.always_error }
 func (this *VarianceObligation) SetAlwaysError(value types.ZendBool) {
 	this.__0.__0.always_error = value
 }

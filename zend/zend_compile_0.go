@@ -34,7 +34,7 @@ func OBJ_PROP_TO_OFFSET(num int) __auto__ {
 func OBJ_PROP_TO_NUM(offset uint32) int {
 	return (offset - OBJ_PROP_TO_OFFSET(0)) / b.SizeOf("zval")
 }
-func ZEND_FN_SCOPE_NAME(function *types.ZendFunction) string {
+func ZEND_FN_SCOPE_NAME(function types.IFunction) string {
 	if function != nil && function.GetScope() != nil {
 		return function.GetScope().GetName().GetStr()
 	} else {

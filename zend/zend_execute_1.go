@@ -303,7 +303,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 	return object
 }
 func ZendVerifyTypeErrorCommon(
-	zf *types.ZendFunction,
+	zf types.IFunction,
 	arg_info *ZendArgInfo,
 	ce *types.ClassEntry,
 	value *types.Zval,
@@ -379,7 +379,7 @@ func ZendVerifyTypeErrorCommon(
 		*given_kind = ""
 	}
 }
-func ZendVerifyArgError(zf *types.ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *types.ClassEntry, value *types.Zval) {
+func ZendVerifyArgError(zf types.IFunction, arg_info *ZendArgInfo, arg_num int, ce *types.ClassEntry, value *types.Zval) {
 	var ptr *ZendExecuteData = CurrEX().GetPrevExecuteData()
 	var fname *byte
 	var fsep *byte

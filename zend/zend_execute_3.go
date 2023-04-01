@@ -138,10 +138,10 @@ func ZendWrongPropertyRead(property *types.Zval) {
 	faults.Error(faults.E_NOTICE, "Trying to get property '%s' of non-object", property_name.GetVal())
 	ZendTmpStringRelease(tmp_property_name)
 }
-func ZendDeprecatedFunction(fbc *types.ZendFunction) {
+func ZendDeprecatedFunction(fbc types.IFunction) {
 	faults.Error(faults.E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(fbc.GetScope() != nil, func() []byte { return fbc.GetScope().GetName().GetVal() }, ""), b.Cond(fbc.GetScope() != nil, "::", ""), fbc.GetFunctionName().GetVal())
 }
-func ZendAbstractMethod(fbc *types.ZendFunction) {
+func ZendAbstractMethod(fbc types.IFunction) {
 	faults.ThrowError(nil, "Cannot call abstract method %s::%s()", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
 }
 func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {

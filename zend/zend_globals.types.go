@@ -252,7 +252,7 @@ type ZendExecutorGlobals struct {
 	ht_iterators                        *types.HashTableIterator
 	ht_iterators_slots                  []types.HashTableIterator
 	saved_fpu_cw_ptr                    any
-	trampoline                          types.ZendFunction
+	trampoline                          types.IFunction
 	call_trampoline_op                  ZendOp
 	each_deprecation_thrown             types.ZendBool
 	weakrefs                            types.Array
@@ -357,10 +357,10 @@ func (this *ZendExecutorGlobals) GetPersistentClassesCount() uint32 {
 func (this *ZendExecutorGlobals) SetPersistentClassesCount(value uint32) {
 	this.persistent_classes_count = value
 }
-func (this *ZendExecutorGlobals) GetInAutoload() *types.Array          { return this.in_autoload }
-func (this *ZendExecutorGlobals) SetInAutoload(value *types.Array)     { this.in_autoload = value }
-func (this *ZendExecutorGlobals) GetAutoloadFunc() *types.ZendFunction { return this.autoload_func }
-func (this *ZendExecutorGlobals) SetAutoloadFunc(value *types.ZendFunction) {
+func (this *ZendExecutorGlobals) GetInAutoload() *types.Array      { return this.in_autoload }
+func (this *ZendExecutorGlobals) SetInAutoload(value *types.Array) { this.in_autoload = value }
+func (this *ZendExecutorGlobals) GetAutoloadFunc() types.IFunction { return this.autoload_func }
+func (this *ZendExecutorGlobals) SetAutoloadFunc(value types.IFunction) {
 	this.autoload_func = value
 }
 func (this *ZendExecutorGlobals) GetFullTablesCleanup() types.ZendBool { return 0 }
@@ -478,12 +478,12 @@ func (this *ZendExecutorGlobals) GetHtIteratorsSlots() []types.HashTableIterator
 func (this *ZendExecutorGlobals) SetHtIteratorsSlots(value []types.HashTableIterator) {
 	this.ht_iterators_slots = value
 }
-func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any                  { return this.saved_fpu_cw_ptr }
-func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)             { this.saved_fpu_cw_ptr = value }
-func (this *ZendExecutorGlobals) GetTrampoline() types.ZendFunction      { return this.trampoline }
-func (this *ZendExecutorGlobals) SetTrampoline(value types.ZendFunction) { this.trampoline = value }
-func (this *ZendExecutorGlobals) GetCallTrampolineOp() ZendOp            { return this.call_trampoline_op }
-func (this *ZendExecutorGlobals) SetCallTrampolineOp(value ZendOp)       { this.call_trampoline_op = value }
+func (this *ZendExecutorGlobals) GetSavedFpuCwPtr() any               { return this.saved_fpu_cw_ptr }
+func (this *ZendExecutorGlobals) SetSavedFpuCwPtr(value any)          { this.saved_fpu_cw_ptr = value }
+func (this *ZendExecutorGlobals) GetTrampoline() types.IFunction      { return this.trampoline }
+func (this *ZendExecutorGlobals) SetTrampoline(value types.IFunction) { this.trampoline = value }
+func (this *ZendExecutorGlobals) GetCallTrampolineOp() ZendOp         { return this.call_trampoline_op }
+func (this *ZendExecutorGlobals) SetCallTrampolineOp(value ZendOp)    { this.call_trampoline_op = value }
 func (this *ZendExecutorGlobals) GetEachDeprecationThrown() types.ZendBool {
 	return this.each_deprecation_thrown
 }

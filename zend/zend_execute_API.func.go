@@ -26,7 +26,7 @@ func CleanNonPersistentConstantFull(zv *types.Zval) int {
 	}
 }
 func CleanNonPersistentFunctionFull(zv *types.Zval) int {
-	var function *types.ZendFunction = zv.GetPtr()
+	var function types.IFunction = zv.GetPtr()
 	if function.GetType() == ZEND_INTERNAL_FUNCTION {
 		return types.ArrayApplyKeep
 	} else {
@@ -281,7 +281,7 @@ func ShutdownExecutor() {
 
 				key = _p.GetKey()
 				zv = _z
-				var func_ *types.ZendFunction = zv.GetPtr()
+				var func_ types.IFunction = zv.GetPtr()
 				if _idx == EG__().GetPersistentFunctionsCount() {
 					break
 				}
@@ -483,7 +483,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	var call *ZendExecuteData
 	var dummy_execute_data ZendExecuteData
 	var fci_cache_local types.ZendFcallInfoCache
-	var func_ *types.ZendFunction
+	var func_ types.IFunction
 	var call_info uint32
 	var object_or_called_scope any
 	fci.GetRetval().SetUndef()
@@ -763,7 +763,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 		return nil
 	}
 	if EG__().GetAutoloadFunc() == nil {
-		var func_ *types.ZendFunction = ZendFetchFunction(types.ZSTR_MAGIC_AUTOLOAD)
+		var func_ types.IFunction = ZendFetchFunction(types.ZSTR_MAGIC_AUTOLOAD)
 		if func_ != nil {
 			EG__().SetAutoloadFunc(func_)
 		} else {

@@ -15,7 +15,7 @@ func IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool {
 func ZEND_DECODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset)) - 2) }
 func ZEND_ENCODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset) + 2)) }
 func ZendGetStdObjectHandlers() *ZendObjectHandlers       { return &StdObjectHandlers }
-func ZendGetFunctionRootClass(fbc *types.ZendFunction) *types.ClassEntry {
+func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 	if fbc.GetPrototype() != nil {
 		return fbc.GetPrototype().GetScope()
 	} else {
@@ -1062,9 +1062,9 @@ func ZendStdUnsetDimension(object *types.Zval, offset *types.Zval) {
 		ZendBadArrayAccess(ce)
 	}
 }
-func ZendGetParentPrivateMethod(scope *types.ClassEntry, ce *types.ClassEntry, function_name *types.String) *types.ZendFunction {
+func ZendGetParentPrivateMethod(scope *types.ClassEntry, ce *types.ClassEntry, function_name *types.String) types.IFunction {
 	var func_ *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
 		func_ = scope.GetFunctionTable().KeyFind(function_name.GetStr())
 		if func_ != nil {
@@ -1102,10 +1102,10 @@ func ZendCheckProtected(ce *types.ClassEntry, scope *types.ClassEntry) int {
 	}
 	return 0
 }
-func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, is_static int) *types.ZendFunction {
+func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, is_static int) types.IFunction {
 	var mname_len int
 	var func_ *types.ZendOpArray
-	var fbc *types.ZendFunction = b.CondF(is_static != 0, func() *types.ZendFunction { return ce.GetCallstatic() }, func() *types.ZendFunction { return ce.GetCall() })
+	var fbc types.IFunction = b.CondF(is_static != 0, func() types.IFunction { return ce.GetCallstatic() }, func() types.IFunction { return ce.GetCall() })
 
 	/* We use non-NULL value to avoid useless run_time_cache allocation.
 	 * The low bit must be zero, to not be interpreted as a MAP_PTR offset.
@@ -1161,18 +1161,18 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	func_.SetNumArgs(0)
 	func_.SetRequiredNumArgs(0)
 	func_.SetArgInfo(0)
-	return (*types.ZendFunction)(func_)
+	return (types.IFunction)(func_)
 }
-func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) *types.ZendFunction {
+func ZendGetUserCallFunction(ce *types.ClassEntry, method_name *types.String) types.IFunction {
 	return ZendGetCallTrampolineFunc(ce, method_name, 0)
 }
-func ZendBadMethodCall(fbc *types.ZendFunction, method_name *types.String, scope *types.ClassEntry) {
+func ZendBadMethodCall(fbc types.IFunction, method_name *types.String, scope *types.ClassEntry) {
 	faults.ThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), method_name.GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
-func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key *types.Zval) *types.ZendFunction {
+func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key *types.Zval) types.IFunction {
 	var zobj *types.ZendObject = *obj_ptr
 	var func_ *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var lc_method_name *types.String
 	var scope *types.ClassEntry
 	if key != nil {
@@ -1199,7 +1199,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 		scope = ZendGetExecutedScope()
 		if fbc.GetScope() != scope {
 			if fbc.GetOpArray().IsChanged() {
-				var updated_fbc *types.ZendFunction = ZendGetParentPrivateMethod(scope, zobj.GetCe(), lc_method_name)
+				var updated_fbc types.IFunction = ZendGetParentPrivateMethod(scope, zobj.GetCe(), lc_method_name)
 				if updated_fbc != nil {
 					fbc = updated_fbc
 					goto exit
@@ -1223,11 +1223,11 @@ exit:
 	}
 	return fbc
 }
-func ZendGetUserCallstaticFunction(ce *types.ClassEntry, method_name *types.String) *types.ZendFunction {
+func ZendGetUserCallstaticFunction(ce *types.ClassEntry, method_name *types.String) types.IFunction {
 	return ZendGetCallTrampolineFunc(ce, method_name, 1)
 }
-func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, key *types.Zval) *types.ZendFunction {
-	var fbc *types.ZendFunction = nil
+func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, key *types.Zval) types.IFunction {
+	var fbc types.IFunction = nil
 	var lc_function_name *types.String
 	var object *types.ZendObject
 	var scope *types.ClassEntry
@@ -1360,15 +1360,15 @@ func ZendStdUnsetStaticProperty(ce *types.ClassEntry, property_name *types.Strin
 	faults.ThrowError(nil, "Attempt to unset static property %s::$%s", ce.GetName().GetVal(), property_name.GetVal())
 	return 0
 }
-func ZendBadConstructorCall(constructor *types.ZendFunction, scope *types.ClassEntry) {
+func ZendBadConstructorCall(constructor types.IFunction, scope *types.ClassEntry) {
 	if scope != nil {
 		faults.ThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().GetName().GetVal(), constructor.GetFunctionName().GetVal(), scope.GetName().GetVal())
 	} else {
 		faults.ThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().GetName().GetVal(), constructor.GetFunctionName().GetVal())
 	}
 }
-func ZendStdGetConstructor(zobj *types.ZendObject) *types.ZendFunction {
-	var constructor *types.ZendFunction = zobj.GetCe().GetConstructor()
+func ZendStdGetConstructor(zobj *types.ZendObject) types.IFunction {
+	var constructor types.IFunction = zobj.GetCe().GetConstructor()
 	var scope *types.ClassEntry
 	if constructor != nil {
 		if !constructor.GetOpArray().IsPublic() {
@@ -1602,7 +1602,7 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 	}
 	return types.FAILURE
 }
-func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr **types.ZendFunction, obj_ptr **types.ZendObject) int {
+func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.ZendObject) int {
 	var func_ *types.Zval
 	var ce *types.ClassEntry = types.Z_OBJCE_P(obj)
 	if b.Assign(&func_, ce.GetFunctionTable().KeyFind(types.ZSTR_MAGIC_INVOKE.GetStr())) == nil {

@@ -689,7 +689,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var call *ZendExecuteData
 
 	/* no function found. try a static method in class */

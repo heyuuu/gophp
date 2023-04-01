@@ -44,7 +44,7 @@ func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 	}
 	return types.FAILURE
 }
-func ZendTryCompileSpecialFunc(result *Znode, lcname *types.String, args *ZendAstList, fbc *types.ZendFunction, type_ uint32) int {
+func ZendTryCompileSpecialFunc(result *Znode, lcname *types.String, args *ZendAstList, fbc types.IFunction, type_ uint32) int {
 	if fbc.GetInternalFunction().GetHandler() == ZifDisplayDisabledFunction {
 		return types.FAILURE
 	}
@@ -132,7 +132,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	}
 	var name *types.Zval = name_node.GetConstant()
 	var lcname *types.String
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var opline *ZendOp
 	lcname = ZendStringTolower(name.GetStr())
 	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr())
@@ -166,7 +166,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var obj_node Znode
 	var method_node Znode
 	var opline *ZendOp
-	var fbc *types.ZendFunction = nil
+	var fbc types.IFunction = nil
 	if IsThisFetch(obj_ast) != 0 {
 		obj_node.SetOpType(IS_UNUSED)
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
@@ -220,7 +220,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var class_node Znode
 	var method_node Znode
 	var opline *ZendOp
-	var fbc *types.ZendFunction = nil
+	var fbc types.IFunction = nil
 	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
 	ZendCompileExpr(&method_node, method_ast)
 	if method_node.GetOpType() == IS_CONST {

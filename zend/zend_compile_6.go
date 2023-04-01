@@ -245,15 +245,15 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	} else {
 		if in_trait == 0 && types.ZendStringEqualsCi(lcname, ce.GetName()) {
 			if ce.GetConstructor() == nil {
-				ce.SetConstructor((*types.ZendFunction)(op_array))
+				ce.SetConstructor((types.IFunction)(op_array))
 			}
 		} else if types.ZendStringEqualsLiteral(lcname, "serialize") {
-			ce.SetSerializeFunc((*types.ZendFunction)(op_array))
+			ce.SetSerializeFunc((types.IFunction)(op_array))
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
 			}
 		} else if types.ZendStringEqualsLiteral(lcname, "unserialize") {
-			ce.SetUnserializeFunc((*types.ZendFunction)(op_array))
+			ce.SetUnserializeFunc((types.IFunction)(op_array))
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
 			}
@@ -262,50 +262,50 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 				op_array.SetIsAllowStatic(true)
 			}
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CONSTRUCTOR_FUNC_NAME) {
-			ce.SetConstructor((*types.ZendFunction)(op_array))
+			ce.SetConstructor((types.IFunction)(op_array))
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_DESTRUCTOR_FUNC_NAME) {
-			ce.SetDestructor((*types.ZendFunction)(op_array))
+			ce.SetDestructor((types.IFunction)(op_array))
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CLONE_FUNC_NAME) {
-			ce.SetClone((*types.ZendFunction)(op_array))
+			ce.SetClone((types.IFunction)(op_array))
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CALL_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __call() must have "+"public visibility and cannot be static")
 			}
-			ce.SetCall((*types.ZendFunction)(op_array))
+			ce.SetCall((types.IFunction)(op_array))
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CALLSTATIC_FUNC_NAME) {
 			if is_public == 0 || is_static == 0 {
 				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have "+"public visibility and be static")
 			}
-			ce.SetCallstatic((*types.ZendFunction)(op_array))
+			ce.SetCallstatic((types.IFunction)(op_array))
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_GET_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __get() must have "+"public visibility and cannot be static")
 			}
-			ce.SetGet((*types.ZendFunction)(op_array))
+			ce.SetGet((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_SET_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __set() must have "+"public visibility and cannot be static")
 			}
-			ce.SetSet((*types.ZendFunction)(op_array))
+			ce.SetSet((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_UNSET_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __unset() must have "+"public visibility and cannot be static")
 			}
-			ce.SetUnset((*types.ZendFunction)(op_array))
+			ce.SetUnset((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_ISSET_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __isset() must have "+"public visibility and cannot be static")
 			}
-			ce.SetIsset((*types.ZendFunction)(op_array))
+			ce.SetIsset((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_TOSTRING_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __toString() must have "+"public visibility and cannot be static")
 			}
-			ce.SetTostring((*types.ZendFunction)(op_array))
+			ce.SetTostring((types.IFunction)(op_array))
 		} else if types.ZendStringEqualsLiteral(lcname, ZEND_INVOKE_FUNC_NAME) {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __invoke() must have "+"public visibility and cannot be static")
@@ -314,7 +314,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have "+"public visibility and cannot be static")
 			}
-			ce.SetDebugInfo((*types.ZendFunction)(op_array))
+			ce.SetDebugInfo((types.IFunction)(op_array))
 		} else if is_static == 0 {
 			op_array.SetIsAllowStatic(true)
 		}
@@ -466,7 +466,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	}
 	ZendCompileStmt(stmt_ast)
 	if is_method != 0 {
-		ZendCheckMagicMethodImplementation(CG__().GetActiveClassEntry(), (*types.ZendFunction)(op_array), faults.E_COMPILE_ERROR)
+		ZendCheckMagicMethodImplementation(CG__().GetActiveClassEntry(), (types.IFunction)(op_array), faults.E_COMPILE_ERROR)
 	}
 
 	/* put the implicit return on the really last line */

@@ -215,7 +215,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var obj *types.Zval
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
-	var clone *types.ZendFunction
+	var clone types.IFunction
 	var clone_call ZendObjectCloneObjT
 	obj = &(executeData.GetThis())
 	if obj.IsUndef() {

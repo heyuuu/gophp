@@ -64,7 +64,7 @@ func ZendRegisterInternalModule(module *ModuleEntry) *ModuleEntry {
 	module.SetModuleNumber(ZendNextFreeModule())
 	return ZendRegisterModuleEx(module)
 }
-func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr *types.ZendFunction, error_type int) {
+func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFunction, error_type int) {
 	var lcname []byte
 	var name_len int
 	if fptr.GetFunctionName().GetVal()[0] != '_' || fptr.GetFunctionName().GetVal()[1] != '_' {
@@ -129,19 +129,19 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	var unload int = 0
 	var target_function_table *types.Array = function_table
 	var error_type int
-	var ctor *types.ZendFunction = nil
-	var dtor *types.ZendFunction = nil
-	var clone *types.ZendFunction = nil
-	var __get *types.ZendFunction = nil
-	var __set *types.ZendFunction = nil
-	var __unset *types.ZendFunction = nil
-	var __isset *types.ZendFunction = nil
-	var __call *types.ZendFunction = nil
-	var __callstatic *types.ZendFunction = nil
-	var __tostring *types.ZendFunction = nil
-	var __debugInfo *types.ZendFunction = nil
-	var serialize_func *types.ZendFunction = nil
-	var unserialize_func *types.ZendFunction = nil
+	var ctor types.IFunction = nil
+	var dtor types.IFunction = nil
+	var clone types.IFunction = nil
+	var __get types.IFunction = nil
+	var __set types.IFunction = nil
+	var __unset types.IFunction = nil
+	var __isset types.IFunction = nil
+	var __call types.IFunction = nil
+	var __callstatic types.IFunction = nil
+	var __tostring types.IFunction = nil
+	var __debugInfo types.IFunction = nil
+	var serialize_func types.IFunction = nil
+	var unserialize_func types.IFunction = nil
 	var lowercase_name *types.String
 	var fname_len int
 	var lc_class_name *byte = nil
@@ -154,10 +154,10 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	if target_function_table == nil {
 		target_function_table = CG__().GetFunctionTable()
 	}
-	var reg_function *types.ZendFunction
+	var reg_function types.IFunction
 
 	var internal_function = types.NewInternalFunction()
-	var function types.ZendFunction = types.MakeZendFunctionInternal(internal_function)
+	var function types.IFunction = types.MakeZendFunctionInternal(internal_function)
 
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {
@@ -265,8 +265,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		}
 		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName())
 		lowercase_name = types.ZendNewInternedString(lowercase_name)
-		reg_function = Malloc(b.SizeOf("zend_internal_function"))
-		memcpy(reg_function, &function, b.SizeOf("zend_internal_function"))
+		reg_function = types.CopyFunction(function)
 		if types.ZendHashAddPtr(target_function_table, lowercase_name.GetStr(), reg_function) == nil {
 			unload = 1
 			Free(reg_function)

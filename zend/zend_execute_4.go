@@ -157,14 +157,14 @@ func ZendUndefinedMethod(ce *types.ClassEntry, method *types.String) {
 func ZendInvalidMethodCall(object *types.Zval, function_name *types.Zval) {
 	faults.ThrowError(nil, "Call to a member function %s() on %s", function_name.GetStr().GetVal(), types.ZendGetTypeByConst(object.GetType()))
 }
-func ZendNonStaticMethodCall(fbc *types.ZendFunction) {
+func ZendNonStaticMethodCall(fbc types.IFunction) {
 	if fbc.IsAllowStatic() {
 		faults.Error(faults.E_DEPRECATED, "Non-static method %s::%s() should not be called statically", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
 	} else {
 		faults.ThrowError(faults.ZendCeError, "Non-static method %s::%s() cannot be called statically", fbc.GetScope().GetName().GetVal(), fbc.GetFunctionName().GetVal())
 	}
 }
-func ZendParamMustBeRef(func_ *types.ZendFunction, arg_num uint32) {
+func ZendParamMustBeRef(func_ types.IFunction, arg_num uint32) {
 	faults.Error(faults.E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given", arg_num, b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
 }
 func ZendUseScalarAsArray() {

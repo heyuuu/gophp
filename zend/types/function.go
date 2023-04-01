@@ -221,16 +221,19 @@ type ZendFunction struct /* union */ {
 	internal_function InternalFunction
 }
 
-var _ IFunction = (*ZendFunction)(nil)
-
-func NewZendFunctionInternal(intern *InternalFunction) *ZendFunction {
-	// todo
-	return &ZendFunction{}
-}
-
-func MakeZendFunctionInternal(intern *InternalFunction) ZendFunction {
-	// todo
-	return ZendFunction{}
+func NewZendFunctionInternal(intern *InternalFunction) IFunction  { return intern }
+func MakeZendFunctionInternal(intern *InternalFunction) IFunction { return intern }
+func CopyFunction(function IFunction) IFunction {
+	switch f := function.(type) {
+	case *InternalFunction:
+		var tmp InternalFunction = *f
+		return &tmp
+	case *UserFunction:
+		var tmp UserFunction = *f
+		return &tmp
+	default:
+		return nil
+	}
 }
 
 func (this *ZendFunction) GetOpArray() *ZendOpArray               { return &this.op_array }

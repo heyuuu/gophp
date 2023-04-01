@@ -13,7 +13,7 @@ func ZEND_VERIFY_RETURN_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteD
 func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var result *types.Zval
-	var constructor *types.ZendFunction
+	var constructor types.IFunction
 	var ce *types.ClassEntry
 	var call *ZendExecuteData
 	{
@@ -50,7 +50,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* Perform a dummy function call */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (*types.ZendFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION, (types.IFunction)(&ZendPassFunction), opline.GetExtendedValue(), nil)
 
 		/* Perform a dummy function call */
 
@@ -159,7 +159,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 }
 func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var func_ *types.ZendFunction
+	var func_ types.IFunction
 	var zfunc *types.Zval
 	var object *types.Zval
 	var called_scope *types.ClassEntry
@@ -688,7 +688,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
@@ -769,7 +769,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var call *ZendExecuteData
 	{
 
@@ -853,7 +853,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 	var function_name *types.Zval
 	var fcc types.ZendFcallInfoCache
 	var error *byte = nil
-	var func_ *types.ZendFunction
+	var func_ types.IFunction
 	var object_or_called_scope any
 	var call *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
@@ -906,7 +906,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 		if EG__().GetException() != nil {
 			HANDLE_EXCEPTION()
 		}
-		func_ = (*types.ZendFunction)(&ZendPassFunction)
+		func_ = (types.IFunction)(&ZendPassFunction)
 		object_or_called_scope = nil
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, opline.GetExtendedValue(), object_or_called_scope)

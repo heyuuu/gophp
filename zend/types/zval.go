@@ -52,7 +52,7 @@ func (this *ZendValue) SetAst(value *ZendAstRef)         { this.val = value }
 func (this *ZendValue) SetZv(value *Zval)                { this.val = value }
 func (this *ZendValue) SetPtr(value any)                 { this.val = value }
 func (this *ZendValue) SetCe(value *ClassEntry)          { this.val = value }
-func (this *ZendValue) SetFunc(value *ZendFunction)      { this.val = value }
+func (this *ZendValue) SetFunc(value IFunction)          { this.val = value }
 
 /**
  * Zval
@@ -108,19 +108,19 @@ func (zv *Zval) GetPtr() any                 { return zv.value.GetPtr() }
 func (zv *Zval) GetCe() *ClassEntry          { return zv.value.GetCe() }
 func (zv *Zval) GetFunc() IFunction          { return zv.value.GetFunc() }
 
-func (zv *Zval) SetLval(value int)                { zv.SetLval(value) }
-func (zv *Zval) SetDval(value float64)            { zv.SetDval(value) }
-func (zv *Zval) SetCounted(value *ZendRefcounted) { zv.SetCounted(value) }
-func (zv *Zval) SetStr(value *String)             { zv.SetStr(value) }
-func (zv *Zval) SetArr(value *Array)              { zv.SetArr(value) }
-func (zv *Zval) SetObj(value *ZendObject)         { zv.SetObj(value) }
-func (zv *Zval) SetRes(value *ZendResource)       { zv.SetRes(value) }
-func (zv *Zval) SetRef(value *ZendReference)      { zv.SetRef(value) }
-func (zv *Zval) SetAst(value *ZendAstRef)         { zv.SetAst(value) }
-func (zv *Zval) SetZv(value *Zval)                { zv.SetZv(value) }
-func (zv *Zval) SetPtr(value any)                 { zv.SetPtr(value) }
-func (zv *Zval) SetCe(value *ClassEntry)          { zv.SetCe(value) }
-func (zv *Zval) SetFunc(value *ZendFunction)      { zv.SetFunc(value) }
+func (zv *Zval) SetLval(value int)                { zv.value.SetLval(value) }
+func (zv *Zval) SetDval(value float64)            { zv.value.SetDval(value) }
+func (zv *Zval) SetCounted(value *ZendRefcounted) { zv.value.SetCounted(value) }
+func (zv *Zval) SetStr(value *String)             { zv.value.SetStr(value) }
+func (zv *Zval) SetArr(value *Array)              { zv.value.SetArr(value) }
+func (zv *Zval) SetObj(value *ZendObject)         { zv.value.SetObj(value) }
+func (zv *Zval) SetRes(value *ZendResource)       { zv.value.SetRes(value) }
+func (zv *Zval) SetRef(value *ZendReference)      { zv.value.SetRef(value) }
+func (zv *Zval) SetAst(value *ZendAstRef)         { zv.value.SetAst(value) }
+func (zv *Zval) SetZv(value *Zval)                { zv.value.SetZv(value) }
+func (zv *Zval) SetPtr(value any)                 { zv.value.SetPtr(value) }
+func (zv *Zval) SetCe(value *ClassEntry)          { zv.value.SetCe(value) }
+func (zv *Zval) SetFunc(value IFunction)          { zv.value.SetFunc(value) }
 
 /** Zval.u1 -> type & typeFlags */
 func (zv *Zval) GetType() ZendUchar           { return zv.typ }

@@ -175,7 +175,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
 	var object *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
@@ -262,7 +262,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var call *ZendExecuteData
 	{
 
@@ -354,7 +354,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	var function_name *types.Zval
 	var fcc types.ZendFcallInfoCache
 	var error *byte = nil
-	var func_ *types.ZendFunction
+	var func_ types.IFunction
 	var object_or_called_scope any
 	var call *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
@@ -410,7 +410,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		if EG__().GetException() != nil {
 			HANDLE_EXCEPTION()
 		}
-		func_ = (*types.ZendFunction)(&ZendPassFunction)
+		func_ = (types.IFunction)(&ZendPassFunction)
 		object_or_called_scope = nil
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, opline.GetExtendedValue(), object_or_called_scope)
@@ -927,7 +927,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var call *ZendExecuteData
 	{
 

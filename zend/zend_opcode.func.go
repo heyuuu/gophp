@@ -49,7 +49,7 @@ func InitOpArray(op_array *types.ZendOpArray, initial_ops_size int) {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayCtorHandler), op_array)
 	}
 }
-func DestroyZendFunction(function *types.ZendFunction) {
+func DestroyZendFunction(function types.IFunction) {
 	var tmp types.Zval
 	tmp.SetAsPtr(function)
 	ZendFunctionDtor(&tmp)
@@ -71,7 +71,7 @@ func ZendFreeInternalArgInfo(function *types.InternalFunction) {
 	}
 }
 func ZendFunctionDtor(zv *types.Zval) {
-	var function *types.ZendFunction = zv.GetPtr()
+	var function types.IFunction = zv.GetPtr()
 	if function.GetType() == ZEND_USER_FUNCTION {
 		b.Assert(function.GetFunctionName() != nil)
 		DestroyOpArray(function.GetOpArray())
@@ -221,7 +221,7 @@ func DestroyZendClass(zv *types.Zval) {
 }
 func DestroyZendClassEntry(ce *types.ClassEntry) {
 	var prop_info *ZendPropertyInfo
-	var fn *types.ZendFunction
+	var fn types.IFunction
 	if ce.HasCeFlags(AccImmutable | AccPreloaded) {
 		var op_array *types.ZendOpArray
 		if ce.GetDefaultStaticMembersCount() != 0 {

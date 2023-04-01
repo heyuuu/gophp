@@ -164,7 +164,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			OBJ_RELEASE(executeData.GetCall().This.GetObj())
 		}
 		executeData.GetCall().
-			func_ = (*types.ZendFunction)(&ZendPassFunction)
+			func_ = (types.IFunction)(&ZendPassFunction)
 		executeData.GetCall().
 			This.GetObj() = nil
 		ZEND_CALL_INFO(executeData.GetCall()) &= ^(ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS)
@@ -817,7 +817,7 @@ func ZEND_ASSERT_CHECK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var args *types.Array = nil
-	var fbc *types.ZendFunction = executeData.GetFunc()
+	var fbc types.IFunction = executeData.GetFunc()
 	var ret *types.Zval = executeData.GetReturnValue()
 	var call_info uint32 = EX_CALL_INFO() & (ZEND_CALL_NESTED | ZEND_CALL_TOP | ZEND_CALL_RELEASE_THIS)
 	var num_args uint32 = executeData.NumArgs()
@@ -938,7 +938,7 @@ func zend_interrupt_helper_SPEC(executeData *ZendExecuteData) int {
 }
 func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var function_name *types.Zval
 	var func_ *types.Zval
 	var call *ZendExecuteData
@@ -984,7 +984,7 @@ func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData)
 	var opline *ZendOp = executeData.GetOpline()
 	var func_name *types.Zval
 	var func_ *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var call *ZendExecuteData
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {

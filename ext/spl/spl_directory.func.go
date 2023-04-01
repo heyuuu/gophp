@@ -547,10 +547,10 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 	}
 	return rv
 }
-func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.String, key *types.Zval) *types.ZendFunction {
+func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
 	var fsobj *SplFilesystemObject = SplFilesystemFromObj(*object)
 	if fsobj.GetDirp() == nil && fsobj.GetOrigPath() == nil {
-		var func_ *types.ZendFunction
+		var func_ types.IFunction
 		var tmp *types.String = types.NewString("_bad_state_ex")
 		func_ = zend.ZendStdGetMethod(object, tmp, nil)
 		types.ZendStringReleaseEx(tmp, 0)
@@ -1517,7 +1517,7 @@ func SplFilesystemFileRead(intern *SplFilesystemObject, silent int) int {
 	intern.SetCurrentLineNum(intern.GetCurrentLineNum() + line_add)
 	return types.SUCCESS
 }
-func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *types.ZendFunction, pass_num_args int, return_value *types.Zval, arg2 *types.Zval) int {
+func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr types.IFunction, pass_num_args int, return_value *types.Zval, arg2 *types.Zval) int {
 	var fci types.ZendFcallInfo
 	var fcic types.ZendFcallInfoCache
 	var zresource_ptr *types.Zval = intern.GetZresource()
@@ -2063,8 +2063,8 @@ func zim_spl_SplFileObject_getCsvControl(executeData *zend.ZendExecuteData, retu
 }
 func zim_spl_SplFileObject_flock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var func_ptr *types.ZendFunction
-	func_ptr = (*types.ZendFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "flock"))
+	var func_ptr types.IFunction
+	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "flock"))
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "flock")
 		return
@@ -2147,8 +2147,8 @@ func zim_spl_SplFileObject_fgetss(executeData *zend.ZendExecuteData, return_valu
 	}
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
-	var func_ptr *types.ZendFunction
-	func_ptr = (*types.ZendFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fgetss"))
+	var func_ptr types.IFunction
+	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fgetss"))
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fgetss")
 		return
@@ -2172,8 +2172,8 @@ func zim_spl_SplFileObject_fscanf(executeData *zend.ZendExecuteData, return_valu
 	}
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
-	var func_ptr *types.ZendFunction
-	func_ptr = (*types.ZendFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fscanf"))
+	var func_ptr types.IFunction
+	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fscanf"))
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fscanf")
 		return
@@ -2244,8 +2244,8 @@ func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value
 }
 func zim_spl_SplFileObject_fstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
-	var func_ptr *types.ZendFunction
-	func_ptr = (*types.ZendFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fstat"))
+	var func_ptr types.IFunction
+	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fstat"))
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fstat")
 		return

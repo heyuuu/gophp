@@ -823,7 +823,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
 	var object *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData

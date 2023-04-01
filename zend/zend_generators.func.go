@@ -453,7 +453,7 @@ func ZendGeneratorCreate(class_type *types.ClassEntry) *types.ZendObject {
 	generator.GetStd().SetHandlers(&ZendGeneratorHandlers)
 	return (*types.ZendObject)(generator)
 }
-func ZendGeneratorGetConstructor(object *types.ZendObject) *types.ZendFunction {
+func ZendGeneratorGetConstructor(object *types.ZendObject) types.IFunction {
 	faults.ThrowError(nil, "The \"Generator\" class is reserved for internal use and cannot be manually instantiated")
 	return nil
 }

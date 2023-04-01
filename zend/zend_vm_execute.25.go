@@ -167,7 +167,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 	var function_name *types.Zval
 	var free_op1 ZendFreeOp
 	var object *types.Zval
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var called_scope *types.ClassEntry
 	var obj *types.ZendObject
 	var call *ZendExecuteData
@@ -242,7 +242,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 	var function_name *types.Zval
 	var ce *types.ClassEntry
 	var call_info uint32
-	var fbc *types.ZendFunction
+	var fbc types.IFunction
 	var call *ZendExecuteData
 
 	/* no function found. try a static method in class */

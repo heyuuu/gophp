@@ -77,7 +77,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	return new_op_array
 }
 func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
-	var fbc *types.ZendFunction = call.GetFunc()
+	var fbc types.IFunction = call.GetFunc()
 	var object *types.ZendObject
 
 	/* Not sure what should be done here if it's a static method */
