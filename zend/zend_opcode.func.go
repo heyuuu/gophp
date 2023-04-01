@@ -54,7 +54,7 @@ func DestroyZendFunction(function *types.ZendFunction) {
 	tmp.SetAsPtr(function)
 	ZendFunctionDtor(&tmp)
 }
-func ZendFreeInternalArgInfo(function *types.ZendInternalFunction) {
+func ZendFreeInternalArgInfo(function *types.InternalFunction) {
 	if function.HasFnFlags(AccHasReturnType|AccHasTypeHints) && function.GetArgInfo() != nil {
 		var i uint32
 		var num_args uint32 = function.GetNumArgs() + 1

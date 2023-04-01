@@ -5,6 +5,7 @@ import "github.com/heyuuu/gophp/zend"
 /**
  * ZendOpArray
  */
+type UserFunction = ZendOpArray
 type ZendOpArray struct {
 	functionHeader
 	cache_size                int

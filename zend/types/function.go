@@ -177,15 +177,15 @@ func (this *functionHeader) SetIsTraitClone(cond bool) {
 type ZendFunction struct /* union */ {
 	functionHeader
 	op_array          ZendOpArray
-	internal_function ZendInternalFunction
+	internal_function InternalFunction
 }
 
-func NewZendFunctionInternal(intern *ZendInternalFunction) *ZendFunction {
+func NewZendFunctionInternal(intern *InternalFunction) *ZendFunction {
 	// todo
 	return &ZendFunction{}
 }
 
-func MakeZendFunctionInternal(intern *ZendInternalFunction) ZendFunction {
+func MakeZendFunctionInternal(intern *InternalFunction) ZendFunction {
 	// todo
 	return ZendFunction{}
 }
@@ -205,5 +205,5 @@ func (this *ZendFunction) CheckArgSendType(argNum1 uint32, mask uint8) bool {
 	return this.argInfos[argNum].ByReference()&mask != 0
 }
 
-func (this *ZendFunction) GetOpArray() *ZendOpArray                   { return &this.op_array }
-func (this *ZendFunction) GetInternalFunction() *ZendInternalFunction { return &this.internal_function }
+func (this *ZendFunction) GetOpArray() *ZendOpArray               { return &this.op_array }
+func (this *ZendFunction) GetInternalFunction() *InternalFunction { return &this.internal_function }
