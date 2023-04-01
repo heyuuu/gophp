@@ -105,36 +105,19 @@ type ZendClassIteratorFuncs struct {
 	zf_rewind       types.IFunction
 }
 
-//             func MakeZendClassIteratorFuncs(
-// zf_new_iterator *ZendFunction,
-// zf_valid *ZendFunction,
-// zf_current *ZendFunction,
-// zf_key *ZendFunction,
-// zf_next *ZendFunction,
-// zf_rewind *ZendFunction,
-// ) ZendClassIteratorFuncs {
-//                 return ZendClassIteratorFuncs{
-//                     zf_new_iterator:zf_new_iterator,
-//                     zf_valid:zf_valid,
-//                     zf_current:zf_current,
-//                     zf_key:zf_key,
-//                     zf_next:zf_next,
-//                     zf_rewind:zf_rewind,
-//                 }
-//             }
-func (this *ZendClassIteratorFuncs) GetZfNewIterator() *types.ZendFunction {
+func (this *ZendClassIteratorFuncs) GetZfNewIterator() types.IFunction {
 	return this.zf_new_iterator
 }
-func (this *ZendClassIteratorFuncs) SetZfNewIterator(value *types.ZendFunction) {
+func (this *ZendClassIteratorFuncs) SetZfNewIterator(value types.IFunction) {
 	this.zf_new_iterator = value
 }
-func (this *ZendClassIteratorFuncs) GetZfValid() *types.ZendFunction        { return this.zf_valid }
-func (this *ZendClassIteratorFuncs) SetZfValid(value *types.ZendFunction)   { this.zf_valid = value }
-func (this *ZendClassIteratorFuncs) GetZfCurrent() *types.ZendFunction      { return this.zf_current }
-func (this *ZendClassIteratorFuncs) SetZfCurrent(value *types.ZendFunction) { this.zf_current = value }
-func (this *ZendClassIteratorFuncs) GetZfKey() *types.ZendFunction          { return this.zf_key }
-func (this *ZendClassIteratorFuncs) SetZfKey(value *types.ZendFunction)     { this.zf_key = value }
-func (this *ZendClassIteratorFuncs) GetZfNext() *types.ZendFunction         { return this.zf_next }
-func (this *ZendClassIteratorFuncs) SetZfNext(value *types.ZendFunction)    { this.zf_next = value }
-func (this *ZendClassIteratorFuncs) GetZfRewind() *types.ZendFunction       { return this.zf_rewind }
-func (this *ZendClassIteratorFuncs) SetZfRewind(value *types.ZendFunction)  { this.zf_rewind = value }
+func (this *ZendClassIteratorFuncs) GetZfValid() types.IFunction        { return this.zf_valid }
+func (this *ZendClassIteratorFuncs) SetZfValid(value types.IFunction)   { this.zf_valid = value }
+func (this *ZendClassIteratorFuncs) GetZfCurrent() types.IFunction      { return this.zf_current }
+func (this *ZendClassIteratorFuncs) SetZfCurrent(value types.IFunction) { this.zf_current = value }
+func (this *ZendClassIteratorFuncs) GetZfKey() types.IFunction          { return this.zf_key }
+func (this *ZendClassIteratorFuncs) SetZfKey(value types.IFunction)     { this.zf_key = value }
+func (this *ZendClassIteratorFuncs) GetZfNext() types.IFunction         { return this.zf_next }
+func (this *ZendClassIteratorFuncs) SetZfNext(value types.IFunction)    { this.zf_next = value }
+func (this *ZendClassIteratorFuncs) GetZfRewind() types.IFunction       { return this.zf_rewind }
+func (this *ZendClassIteratorFuncs) SetZfRewind(value types.IFunction)  { this.zf_rewind = value }

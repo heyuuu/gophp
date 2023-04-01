@@ -122,27 +122,27 @@ func (this *SplDllistObject) GetTraversePointer() *SplPtrLlistElement { return t
 func (this *SplDllistObject) SetTraversePointer(value *SplPtrLlistElement) {
 	this.traverse_pointer = value
 }
-func (this *SplDllistObject) GetFlags() int                         { return this.flags }
-func (this *SplDllistObject) SetFlags(value int)                    { this.flags = value }
-func (this *SplDllistObject) GetFptrOffsetGet() *types.ZendFunction { return this.fptr_offset_get }
-func (this *SplDllistObject) SetFptrOffsetGet(value *types.ZendFunction) {
+func (this *SplDllistObject) GetFlags() int                     { return this.flags }
+func (this *SplDllistObject) SetFlags(value int)                { this.flags = value }
+func (this *SplDllistObject) GetFptrOffsetGet() types.IFunction { return this.fptr_offset_get }
+func (this *SplDllistObject) SetFptrOffsetGet(value types.IFunction) {
 	this.fptr_offset_get = value
 }
-func (this *SplDllistObject) GetFptrOffsetSet() *types.ZendFunction { return this.fptr_offset_set }
-func (this *SplDllistObject) SetFptrOffsetSet(value *types.ZendFunction) {
+func (this *SplDllistObject) GetFptrOffsetSet() types.IFunction { return this.fptr_offset_set }
+func (this *SplDllistObject) SetFptrOffsetSet(value types.IFunction) {
 	this.fptr_offset_set = value
 }
-func (this *SplDllistObject) GetFptrOffsetHas() *types.ZendFunction { return this.fptr_offset_has }
-func (this *SplDllistObject) SetFptrOffsetHas(value *types.ZendFunction) {
+func (this *SplDllistObject) GetFptrOffsetHas() types.IFunction { return this.fptr_offset_has }
+func (this *SplDllistObject) SetFptrOffsetHas(value types.IFunction) {
 	this.fptr_offset_has = value
 }
-func (this *SplDllistObject) GetFptrOffsetDel() *types.ZendFunction { return this.fptr_offset_del }
-func (this *SplDllistObject) SetFptrOffsetDel(value *types.ZendFunction) {
+func (this *SplDllistObject) GetFptrOffsetDel() types.IFunction { return this.fptr_offset_del }
+func (this *SplDllistObject) SetFptrOffsetDel(value types.IFunction) {
 	this.fptr_offset_del = value
 }
-func (this *SplDllistObject) GetFptrCount() *types.ZendFunction      { return this.fptr_count }
-func (this *SplDllistObject) SetFptrCount(value *types.ZendFunction) { this.fptr_count = value }
-func (this *SplDllistObject) GetCeGetIterator() *types.ClassEntry    { return this.ce_get_iterator }
+func (this *SplDllistObject) GetFptrCount() types.IFunction       { return this.fptr_count }
+func (this *SplDllistObject) SetFptrCount(value types.IFunction)  { this.fptr_count = value }
+func (this *SplDllistObject) GetCeGetIterator() *types.ClassEntry { return this.ce_get_iterator }
 func (this *SplDllistObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }

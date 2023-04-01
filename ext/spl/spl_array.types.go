@@ -58,17 +58,17 @@ func (this *SplArrayObject) SetArFlags(value int)   { this.ar_flags = value }
 func (this *SplArrayObject) GetNApplyCount() uint8  { return this.nApplyCount }
 
 // func (this *SplArrayObject) SetNApplyCount(value uint8) { this.nApplyCount = value }
-func (this *SplArrayObject) GetFptrOffsetGet() *types.ZendFunction      { return this.fptr_offset_get }
-func (this *SplArrayObject) SetFptrOffsetGet(value *types.ZendFunction) { this.fptr_offset_get = value }
-func (this *SplArrayObject) GetFptrOffsetSet() *types.ZendFunction      { return this.fptr_offset_set }
-func (this *SplArrayObject) SetFptrOffsetSet(value *types.ZendFunction) { this.fptr_offset_set = value }
-func (this *SplArrayObject) GetFptrOffsetHas() *types.ZendFunction      { return this.fptr_offset_has }
-func (this *SplArrayObject) SetFptrOffsetHas(value *types.ZendFunction) { this.fptr_offset_has = value }
-func (this *SplArrayObject) GetFptrOffsetDel() *types.ZendFunction      { return this.fptr_offset_del }
-func (this *SplArrayObject) SetFptrOffsetDel(value *types.ZendFunction) { this.fptr_offset_del = value }
-func (this *SplArrayObject) GetFptrCount() *types.ZendFunction          { return this.fptr_count }
-func (this *SplArrayObject) SetFptrCount(value *types.ZendFunction)     { this.fptr_count = value }
-func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry        { return this.ce_get_iterator }
+func (this *SplArrayObject) GetFptrOffsetGet() types.IFunction      { return this.fptr_offset_get }
+func (this *SplArrayObject) SetFptrOffsetGet(value types.IFunction) { this.fptr_offset_get = value }
+func (this *SplArrayObject) GetFptrOffsetSet() types.IFunction      { return this.fptr_offset_set }
+func (this *SplArrayObject) SetFptrOffsetSet(value types.IFunction) { this.fptr_offset_set = value }
+func (this *SplArrayObject) GetFptrOffsetHas() types.IFunction      { return this.fptr_offset_has }
+func (this *SplArrayObject) SetFptrOffsetHas(value types.IFunction) { this.fptr_offset_has = value }
+func (this *SplArrayObject) GetFptrOffsetDel() types.IFunction      { return this.fptr_offset_del }
+func (this *SplArrayObject) SetFptrOffsetDel(value types.IFunction) { this.fptr_offset_del = value }
+func (this *SplArrayObject) GetFptrCount() types.IFunction          { return this.fptr_count }
+func (this *SplArrayObject) SetFptrCount(value types.IFunction)     { this.fptr_count = value }
+func (this *SplArrayObject) GetCeGetIterator() *types.ClassEntry    { return this.ce_get_iterator }
 func (this *SplArrayObject) SetCeGetIterator(value *types.ClassEntry) {
 	this.ce_get_iterator = value
 }

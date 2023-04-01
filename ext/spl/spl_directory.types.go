@@ -168,10 +168,10 @@ func (this *SplFilesystemObject) SetCurrentLineNum(value zend.ZendLong) {
 func (this *SplFilesystemObject) GetZresource() types.Zval { return this.u.file.zresource }
 
 // func (this *SplFilesystemObject) SetZresource(value zend.Zval) { this.u.file.zresource = value }
-func (this *SplFilesystemObject) GetFuncGetCurr() *types.ZendFunction {
+func (this *SplFilesystemObject) GetFuncGetCurr() types.IFunction {
 	return this.u.file.func_getCurr
 }
-func (this *SplFilesystemObject) SetFuncGetCurr(value *types.ZendFunction) {
+func (this *SplFilesystemObject) SetFuncGetCurr(value types.IFunction) {
 	this.u.file.func_getCurr = value
 }
 func (this *SplFilesystemObject) GetDelimiter() byte       { return this.u.file.delimiter }

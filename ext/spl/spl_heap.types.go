@@ -106,10 +106,10 @@ func (this *SplHeapObject) GetFlags() int                            { return th
 func (this *SplHeapObject) SetFlags(value int)                       { this.flags = value }
 func (this *SplHeapObject) GetCeGetIterator() *types.ClassEntry      { return this.ce_get_iterator }
 func (this *SplHeapObject) SetCeGetIterator(value *types.ClassEntry) { this.ce_get_iterator = value }
-func (this *SplHeapObject) GetFptrCmp() *types.ZendFunction          { return this.fptr_cmp }
-func (this *SplHeapObject) SetFptrCmp(value *types.ZendFunction)     { this.fptr_cmp = value }
-func (this *SplHeapObject) GetFptrCount() *types.ZendFunction        { return this.fptr_count }
-func (this *SplHeapObject) SetFptrCount(value *types.ZendFunction)   { this.fptr_count = value }
+func (this *SplHeapObject) GetFptrCmp() types.IFunction              { return this.fptr_cmp }
+func (this *SplHeapObject) SetFptrCmp(value types.IFunction)         { this.fptr_cmp = value }
+func (this *SplHeapObject) GetFptrCount() types.IFunction            { return this.fptr_count }
+func (this *SplHeapObject) SetFptrCount(value types.IFunction)       { this.fptr_count = value }
 func (this *SplHeapObject) GetStd() types.ZendObject                 { return this.std }
 
 // func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
