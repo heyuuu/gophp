@@ -362,7 +362,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_RETURN_REFERENCE) != 0 {
+		if (executeData.GetFunc().op_array.fn_flags & AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */
@@ -442,7 +442,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	IZvalPtrDtor(variable_ptr)
 	ht = ZEND_MAP_PTR_GET(executeData.GetFunc().op_array.static_variables_ptr)
 	if ht == nil {
-		b.Assert((executeData.GetFunc().op_array.fn_flags & (ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED)) != 0)
+		b.Assert((executeData.GetFunc().op_array.fn_flags & (AccImmutable | AccPreloaded)) != 0)
 		ht = types.ZendArrayDup(executeData.GetFunc().op_array.static_variables)
 		ZEND_MAP_PTR_SET(executeData.GetFunc().op_array.static_variables_ptr, ht)
 	} else if ht.GetRefcount() > 1 {

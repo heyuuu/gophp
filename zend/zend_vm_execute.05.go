@@ -94,7 +94,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_RETURN_REFERENCE) != 0 {
+		if (executeData.GetFunc().op_array.fn_flags & AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */

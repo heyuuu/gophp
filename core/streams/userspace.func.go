@@ -48,7 +48,7 @@ func ZmStartupUserStreams(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStreamContext, object *types.Zval) {
-	if uwrap.GetCe().HasCeFlags(zend.ZEND_ACC_INTERFACE | zend.ZEND_ACC_TRAIT | zend.ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | zend.ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) {
+	if uwrap.GetCe().HasCeFlags(zend.AccInterface | zend.AccTrait | zend.AccImplicitAbstractClass | zend.AccExplicitAbstractClass) {
 		object.SetUndef()
 		return
 	}

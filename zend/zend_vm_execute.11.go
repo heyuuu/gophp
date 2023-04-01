@@ -208,7 +208,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 			ZvalPtrDtorNogc(free_op1)
 			HANDLE_EXCEPTION()
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE|ZEND_ACC_NEVER_CACHE) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		if obj != orig_obj {

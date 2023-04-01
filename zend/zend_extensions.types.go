@@ -1,6 +1,9 @@
 package zend
 
-import b "github.com/heyuuu/gophp/builtin"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
 
 /**
  * ZendExtensionVersionInfo
@@ -96,7 +99,7 @@ func (this *ZendExtension) SetResourceNumber(value int)            { this.resour
  * ZendExtensionPersistData
  */
 type ZendExtensionPersistData struct {
-	op_array *ZendOpArray
+	op_array *types.ZendOpArray
 	size     int
 	mem      *byte
 }
@@ -108,9 +111,9 @@ type ZendExtensionPersistData struct {
 //         mem:mem,
 //     }
 // }
-func (this *ZendExtensionPersistData) GetOpArray() *ZendOpArray      { return this.op_array }
-func (this *ZendExtensionPersistData) SetOpArray(value *ZendOpArray) { this.op_array = value }
-func (this *ZendExtensionPersistData) GetSize() int                  { return this.size }
-func (this *ZendExtensionPersistData) SetSize(value int)             { this.size = value }
-func (this *ZendExtensionPersistData) GetMem() *byte                 { return this.mem }
-func (this *ZendExtensionPersistData) SetMem(value *byte)            { this.mem = value }
+func (this *ZendExtensionPersistData) GetOpArray() *types.ZendOpArray      { return this.op_array }
+func (this *ZendExtensionPersistData) SetOpArray(value *types.ZendOpArray) { this.op_array = value }
+func (this *ZendExtensionPersistData) GetSize() int                        { return this.size }
+func (this *ZendExtensionPersistData) SetSize(value int)                   { this.size = value }
+func (this *ZendExtensionPersistData) GetMem() *byte                       { return this.mem }
+func (this *ZendExtensionPersistData) SetMem(value *byte)                  { this.mem = value }

@@ -369,7 +369,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var new_op_array *ZendOpArray
+	var new_op_array *types.ZendOpArray
 	var free_op1 ZendFreeOp
 	var inc_filename *types.Zval
 	inc_filename = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)

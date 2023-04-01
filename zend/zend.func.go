@@ -537,7 +537,7 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 	var files va_list
 	var i int
 	var file_handle *ZendFileHandle
-	var op_array *ZendOpArray
+	var op_array *types.ZendOpArray
 	va_start(files, file_count)
 	for i = 0; i < file_count; i++ {
 		file_handle = __va_arg(files, (*ZendFileHandle)(_))

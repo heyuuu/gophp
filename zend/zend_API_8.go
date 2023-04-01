@@ -313,10 +313,10 @@ func ZendDeclareTypedProperty(
 	if property.IsString() {
 		ZvalMakeInternedString(property)
 	}
-	if (access_type & ZEND_ACC_PPP_MASK) == 0 {
-		access_type |= ZEND_ACC_PUBLIC
+	if (access_type & AccPppMask) == 0 {
+		access_type |= AccPublic
 	}
-	if (access_type & ZEND_ACC_STATIC) != 0 {
+	if (access_type & AccStatic) != 0 {
 		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
@@ -395,12 +395,12 @@ func ZendDeclareTypedProperty(
 		/* Must be interned to avoid ZTS data races */
 
 	}
-	if (access_type & ZEND_ACC_PUBLIC) != 0 {
+	if (access_type & AccPublic) != 0 {
 		property_info.SetName(name.Copy())
-	} else if (access_type & ZEND_ACC_PRIVATE) != 0 {
+	} else if (access_type & AccPrivate) != 0 {
 		property_info.SetName(ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr()))
 	} else {
-		b.Assert((access_type & ZEND_ACC_PROTECTED) != 0)
+		b.Assert((access_type & AccProtected) != 0)
 		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr()))
 	}
 	property_info.SetName(types.ZendNewInternedString(property_info.GetName()))

@@ -97,7 +97,7 @@ func ZendGeneratorFreezeCallStack(executeData *ZendExecuteData) *ZendExecuteData
 	return prev_call
 }
 func ZendGeneratorCleanupUnfinishedExecution(generator *ZendGenerator, executeData *ZendExecuteData, catch_op_num uint32) {
-	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+	var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 	if executeData.GetOpline() != op_array.GetOpcodes() {
 
 		/* -1 required because we want the last run opcode, not the next to-be-run one. */
@@ -283,7 +283,7 @@ func CalcGcBufferSize(generator *ZendGenerator) uint32 {
 	var size uint32 = 4
 	if generator.GetExecuteData() != nil {
 		var executeData *ZendExecuteData = generator.GetExecuteData()
-		var op_array *ZendOpArray = executeData.GetFunc().op_array
+		var op_array *types.ZendOpArray = executeData.GetFunc().op_array
 
 		/* Compiled variables */
 
@@ -347,7 +347,7 @@ func CalcGcBufferSize(generator *ZendGenerator) uint32 {
 func ZendGeneratorGetGc(object *types.Zval, table **types.Zval, n *int) *types.Array {
 	var generator *ZendGenerator = (*ZendGenerator)(object.GetObj())
 	var executeData *ZendExecuteData = generator.GetExecuteData()
-	var op_array *ZendOpArray
+	var op_array *types.ZendOpArray
 	var gc_buffer *types.Zval
 	var gc_buffer_size uint32
 	if executeData == nil {
@@ -851,7 +851,7 @@ try_again:
 			ZendGeneratorClose(generator, 0)
 			if CurrEX() == nil {
 				faults.ThrowExceptionInternal(nil)
-			} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) {
+			} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) {
 				faults.RethrowException(CurrEX())
 			}
 		} else {

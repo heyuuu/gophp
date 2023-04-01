@@ -64,7 +64,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		} else {
 		recv_init_check_type:
-			if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_HAS_TYPE_HINTS) != 0 {
+			if (executeData.GetFunc().op_array.fn_flags & AccHasTypeHints) != 0 {
 				var default_value *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
 				if ZendVerifyRecvArgType(executeData.GetFunc(), arg_num, param, default_value, CACHE_ADDR(opline.GetExtendedValue())) == 0 {
 					HANDLE_EXCEPTION()
@@ -152,7 +152,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		for {
 			fillScope := types.PackedFillStart(params.GetArr())
 			param = executeData.VarNum(executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T)
-			if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_HAS_TYPE_HINTS) != 0 {
+			if (executeData.GetFunc().op_array.fn_flags & AccHasTypeHints) != 0 {
 				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 				for {
 					ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
@@ -716,7 +716,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var new_op_array *ZendOpArray
+	var new_op_array *types.ZendOpArray
 	var inc_filename *types.Zval
 	inc_filename = RT_CONSTANT(opline, opline.GetOp1())
 	new_op_array = ZendIncludeOrEval(inc_filename, opline.GetExtendedValue())

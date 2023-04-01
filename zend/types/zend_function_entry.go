@@ -64,9 +64,9 @@ func (this *ZendFunctionEntry) GetFlags() uint32   { return this.flags }
 
 /* ZendFunctionEntry.flags */
 func (this *ZendFunctionEntry) HasFlags(value uint32) bool { return this.flags&value != 0 }
-func (this ZendFunctionEntry) IsPppMask() bool             { return this.HasFlags(zend.ZEND_ACC_PPP_MASK) }
-func (this ZendFunctionEntry) IsAbstract() bool            { return this.HasFlags(zend.ZEND_ACC_ABSTRACT) }
-func (this ZendFunctionEntry) IsStatic() bool              { return this.HasFlags(zend.ZEND_ACC_STATIC) }
+func (this ZendFunctionEntry) IsPppMask() bool             { return this.HasFlags(zend.AccPppMask) }
+func (this ZendFunctionEntry) IsAbstract() bool            { return this.HasFlags(zend.AccAbstract) }
+func (this ZendFunctionEntry) IsStatic() bool              { return this.HasFlags(zend.AccStatic) }
 
 /**
  * ZendFcallInfo
@@ -104,7 +104,7 @@ func (this *ZendFcallInfo) GetSize() int          { return this.size }
 func (this *ZendFcallInfo) SetSize(value int)     { this.size = value }
 func (this *ZendFcallInfo) GetFunctionName() Zval { return this.function_name }
 
-// func (this *ZendFcallInfo) SetFunctionName(value Zval) { this.function_name = value }
+// func (this *ZendFcallInfo) SetFunctionName(value Zval) { this.functionName = value }
 func (this *ZendFcallInfo) GetRetval() *Zval               { return this.retval }
 func (this *ZendFcallInfo) SetRetval(value *Zval)          { this.retval = value }
 func (this *ZendFcallInfo) GetParams() *Zval               { return this.params }

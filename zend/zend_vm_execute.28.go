@@ -582,7 +582,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 			}
 			HANDLE_EXCEPTION()
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE|ZEND_ACC_NEVER_CACHE) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		if obj != orig_obj {
@@ -945,7 +945,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_RETURN_REFERENCE) != 0 {
+		if (executeData.GetFunc().op_array.fn_flags & AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */

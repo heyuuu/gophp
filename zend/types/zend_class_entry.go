@@ -282,114 +282,114 @@ func (this *ClassEntry) SwitchCeFlags(value uint32, cond bool) {
 	}
 }
 func (this ClassEntry) IsConstantsUpdated() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_CONSTANTS_UPDATED)
+	return this.HasCeFlags(zend.AccConstantsUpdated)
 }
-func (this ClassEntry) IsInterface() bool { return this.HasCeFlags(zend.ZEND_ACC_INTERFACE) }
-func (this ClassEntry) IsTrait() bool     { return this.HasCeFlags(zend.ZEND_ACC_TRAIT) }
-func (this ClassEntry) IsImmutable() bool { return this.HasCeFlags(zend.ZEND_ACC_IMMUTABLE) }
+func (this ClassEntry) IsInterface() bool { return this.HasCeFlags(zend.AccInterface) }
+func (this ClassEntry) IsTrait() bool     { return this.HasCeFlags(zend.AccTrait) }
+func (this ClassEntry) IsImmutable() bool { return this.HasCeFlags(zend.AccImmutable) }
 func (this ClassEntry) IsResolvedParent() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_RESOLVED_PARENT)
+	return this.HasCeFlags(zend.AccResolvedParent)
 }
-func (this ClassEntry) IsLinked() bool { return this.HasCeFlags(zend.ZEND_ACC_LINKED) }
+func (this ClassEntry) IsLinked() bool { return this.HasCeFlags(zend.AccLinked) }
 func (this ClassEntry) IsImplementTraits() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_IMPLEMENT_TRAITS)
+	return this.HasCeFlags(zend.AccImplementTraits)
 }
 func (this ClassEntry) IsHasStaticInMethods() bool {
-	return this.HasCeFlags(zend.ZEND_HAS_STATIC_IN_METHODS)
+	return this.HasCeFlags(zend.AccHasStaticInMethods)
 }
-func (this ClassEntry) IsNearlyLinked() bool { return this.HasCeFlags(zend.ZEND_ACC_NEARLY_LINKED) }
+func (this ClassEntry) IsNearlyLinked() bool { return this.HasCeFlags(zend.AccNearlyLinked) }
 func (this ClassEntry) IsResolvedInterfaces() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_RESOLVED_INTERFACES)
+	return this.HasCeFlags(zend.AccResolvedInterfaces)
 }
-func (this ClassEntry) IsFinal() bool { return this.HasCeFlags(zend.ZEND_ACC_FINAL) }
+func (this ClassEntry) IsFinal() bool { return this.HasCeFlags(zend.AccFinal) }
 func (this ClassEntry) IsImplementInterfaces() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_IMPLEMENT_INTERFACES)
+	return this.HasCeFlags(zend.AccImplementInterfaces)
 }
 func (this ClassEntry) IsImplicitAbstractClass() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
+	return this.HasCeFlags(zend.AccImplicitAbstractClass)
 }
 func (this ClassEntry) IsUnresolvedVariance() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_UNRESOLVED_VARIANCE)
+	return this.HasCeFlags(zend.AccUnresolvedVariance)
 }
 func (this ClassEntry) IsHasUnlinkedUses() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_HAS_UNLINKED_USES)
+	return this.HasCeFlags(zend.AccHasUnlinkedUses)
 }
-func (this ClassEntry) IsUseGuards() bool { return this.HasCeFlags(zend.ZEND_ACC_USE_GUARDS) }
+func (this ClassEntry) IsUseGuards() bool { return this.HasCeFlags(zend.AccUseGuards) }
 func (this ClassEntry) IsPropertyTypesResolved() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_PROPERTY_TYPES_RESOLVED)
+	return this.HasCeFlags(zend.AccPropertyTypesResolved)
 }
 func (this ClassEntry) IsExplicitAbstractClass() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)
+	return this.HasCeFlags(zend.AccExplicitAbstractClass)
 }
 func (this ClassEntry) IsHasTypeHints() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_HAS_TYPE_HINTS)
+	return this.HasCeFlags(zend.AccHasTypeHints)
 }
-func (this ClassEntry) IsPreloaded() bool { return this.HasCeFlags(zend.ZEND_ACC_PRELOADED) }
-func (this ClassEntry) IsInherited() bool { return this.HasCeFlags(zend.ZEND_ACC_INHERITED) }
-func (this ClassEntry) IsTopLevel() bool  { return this.HasCeFlags(zend.ZEND_ACC_TOP_LEVEL) }
+func (this ClassEntry) IsPreloaded() bool { return this.HasCeFlags(zend.AccPreloaded) }
+func (this ClassEntry) IsInherited() bool { return this.HasCeFlags(zend.AccInherited) }
+func (this ClassEntry) IsTopLevel() bool  { return this.HasCeFlags(zend.AccTopLevel) }
 func (this ClassEntry) IsReuseGetIterator() bool {
-	return this.HasCeFlags(zend.ZEND_ACC_REUSE_GET_ITERATOR)
+	return this.HasCeFlags(zend.AccReuseGetIterator)
 }
 func (this *ClassEntry) SetIsConstantsUpdated(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_CONSTANTS_UPDATED, cond)
+	this.SwitchCeFlags(zend.AccConstantsUpdated, cond)
 }
 func (this *ClassEntry) SetIsInterface(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_INTERFACE, cond)
+	this.SwitchCeFlags(zend.AccInterface, cond)
 }
-func (this *ClassEntry) SetIsTrait(cond bool) { this.SwitchCeFlags(zend.ZEND_ACC_TRAIT, cond) }
+func (this *ClassEntry) SetIsTrait(cond bool) { this.SwitchCeFlags(zend.AccTrait, cond) }
 func (this *ClassEntry) SetIsImmutable(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_IMMUTABLE, cond)
+	this.SwitchCeFlags(zend.AccImmutable, cond)
 }
 func (this *ClassEntry) SetIsResolvedParent(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_RESOLVED_PARENT, cond)
+	this.SwitchCeFlags(zend.AccResolvedParent, cond)
 }
-func (this *ClassEntry) SetIsLinked(cond bool) { this.SwitchCeFlags(zend.ZEND_ACC_LINKED, cond) }
+func (this *ClassEntry) SetIsLinked(cond bool) { this.SwitchCeFlags(zend.AccLinked, cond) }
 func (this *ClassEntry) SetIsImplementTraits(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_IMPLEMENT_TRAITS, cond)
+	this.SwitchCeFlags(zend.AccImplementTraits, cond)
 }
 func (this *ClassEntry) SetIsHasStaticInMethods(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_HAS_STATIC_IN_METHODS, cond)
+	this.SwitchCeFlags(zend.AccHasStaticInMethods, cond)
 }
 func (this *ClassEntry) SetIsNearlyLinked(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_NEARLY_LINKED, cond)
+	this.SwitchCeFlags(zend.AccNearlyLinked, cond)
 }
 func (this *ClassEntry) SetIsResolvedInterfaces(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_RESOLVED_INTERFACES, cond)
+	this.SwitchCeFlags(zend.AccResolvedInterfaces, cond)
 }
-func (this *ClassEntry) SetIsFinal(cond bool) { this.SwitchCeFlags(zend.ZEND_ACC_FINAL, cond) }
+func (this *ClassEntry) SetIsFinal(cond bool) { this.SwitchCeFlags(zend.AccFinal, cond) }
 func (this *ClassEntry) SetIsImplementInterfaces(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_IMPLEMENT_INTERFACES, cond)
+	this.SwitchCeFlags(zend.AccImplementInterfaces, cond)
 }
 func (this *ClassEntry) SetIsImplicitAbstractClass(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_IMPLICIT_ABSTRACT_CLASS, cond)
+	this.SwitchCeFlags(zend.AccImplicitAbstractClass, cond)
 }
 func (this *ClassEntry) SetIsUnresolvedVariance(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_UNRESOLVED_VARIANCE, cond)
+	this.SwitchCeFlags(zend.AccUnresolvedVariance, cond)
 }
 func (this *ClassEntry) SetIsHasUnlinkedUses(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_HAS_UNLINKED_USES, cond)
+	this.SwitchCeFlags(zend.AccHasUnlinkedUses, cond)
 }
 func (this *ClassEntry) SetIsUseGuards(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_USE_GUARDS, cond)
+	this.SwitchCeFlags(zend.AccUseGuards, cond)
 }
 func (this *ClassEntry) SetIsPropertyTypesResolved(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_PROPERTY_TYPES_RESOLVED, cond)
+	this.SwitchCeFlags(zend.AccPropertyTypesResolved, cond)
 }
 func (this *ClassEntry) SetIsExplicitAbstractClass(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_EXPLICIT_ABSTRACT_CLASS, cond)
+	this.SwitchCeFlags(zend.AccExplicitAbstractClass, cond)
 }
 func (this *ClassEntry) SetIsHasTypeHints(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_HAS_TYPE_HINTS, cond)
+	this.SwitchCeFlags(zend.AccHasTypeHints, cond)
 }
 func (this *ClassEntry) SetIsPreloaded(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_PRELOADED, cond)
+	this.SwitchCeFlags(zend.AccPreloaded, cond)
 }
 func (this *ClassEntry) SetIsInherited(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_INHERITED, cond)
+	this.SwitchCeFlags(zend.AccInherited, cond)
 }
 func (this *ClassEntry) SetIsTopLevel(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_TOP_LEVEL, cond)
+	this.SwitchCeFlags(zend.AccTopLevel, cond)
 }
 func (this *ClassEntry) SetIsReuseGetIterator(cond bool) {
-	this.SwitchCeFlags(zend.ZEND_ACC_REUSE_GET_ITERATOR, cond)
+	this.SwitchCeFlags(zend.AccReuseGetIterator, cond)
 }

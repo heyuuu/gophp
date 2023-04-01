@@ -390,11 +390,11 @@ func ProcessNestedData(
 					}
 					unmangled = types.NewString(b.CastStr(unmangled_prop, unmangled_prop_len))
 					existing_propinfo = types.ZendHashFindPtr(obj.GetCe().GetPropertiesInfo(), unmangled.GetStr())
-					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.ZEND_ACC_PPP_MASK) {
-						if existing_propinfo.HasFlags(zend.ZEND_ACC_PROTECTED) {
+					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.AccPppMask) {
+						if existing_propinfo.HasFlags(zend.AccProtected) {
 							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr())
 							types.ZendStringReleaseEx(unmangled, 0)
-						} else if existing_propinfo.HasFlags(zend.ZEND_ACC_PRIVATE) {
+						} else if existing_propinfo.HasFlags(zend.AccPrivate) {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
 								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr())
 							} else {
@@ -402,7 +402,7 @@ func ProcessNestedData(
 							}
 							types.ZendStringReleaseEx(unmangled, 0)
 						} else {
-							b.Assert(existing_propinfo.HasFlags(zend.ZEND_ACC_PUBLIC))
+							b.Assert(existing_propinfo.HasFlags(zend.AccPublic))
 							new_key = unmangled
 						}
 

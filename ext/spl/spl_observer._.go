@@ -11,18 +11,18 @@ var spl_ce_SplObjectStorage *types.ClassEntry
 var spl_ce_MultipleIterator *types.ClassEntry
 
 var spl_funcs_SplObserver = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("update", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+	types.MakeZendFunctionEntryEx("update", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgInfo("subject", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 	}),
 }
 var spl_funcs_SplSubject = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("attach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+	types.MakeZendFunctionEntryEx("attach", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgInfo("observer", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
 	}),
-	types.MakeZendFunctionEntryEx("detach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+	types.MakeZendFunctionEntryEx("detach", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgInfo("observer", zend.ArgInfoType(types.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
 	}),
-	types.MakeZendFunctionEntryEx("notify", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
+	types.MakeZendFunctionEntryEx("notify", zend.AccPublic|zend.AccAbstract, nil, []zend.ArgInfo{zend.MakeReturnArgInfo(-1)}),
 }
 var spl_handler_SplObjectStorage zend.ZendObjectHandlers
 

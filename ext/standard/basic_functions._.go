@@ -323,7 +323,7 @@ var BasicFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
 	DefZifIsInteger,
 	DefZifIsLong,
 	DefZifIsDouble,
-	types.MakeZendFunctionEntryEx("is_real", zend.ZEND_ACC_DEPRECATED, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
+	types.MakeZendFunctionEntryEx("is_real", zend.AccDeprecated, ZifIsFloat, []zend.ArgInfo{zend.MakeReturnArgInfo(-1),
 		zend.MakeArgName("var"),
 	}),
 	DefZifIsNumeric,

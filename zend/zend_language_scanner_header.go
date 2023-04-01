@@ -112,8 +112,8 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	ZendSetCompiledFilename(compiled_filename)
 	return types.SUCCESS
 }
-func ZendCompile(type_ int) *ZendOpArray {
-	var op_array *ZendOpArray = nil
+func ZendCompile(type_ int) *types.ZendOpArray {
+	var op_array *types.ZendOpArray = nil
 	var original_in_compilation zend_bool = CG__().in_compilation
 	CG__().in_compilation = 1
 	CG__().ast = nil
@@ -129,7 +129,7 @@ func ZendCompile(type_ int) *ZendOpArray {
 
 		/* Use heap to not waste arena memory */
 
-		op_array.fn_flags |= ZEND_ACC_HEAP_RT_CACHE
+		op_array.fn_flags |= AccHeapRtCache
 		if zend_ast_process {
 			zend_ast_process(CG__().ast)
 		}
@@ -201,7 +201,7 @@ func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	RESET_DOC_COMMENT()
 	return types.SUCCESS
 }
-func CompileString(source_string *types.Zval, filename *byte) *ZendOpArray {
+func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array int = nil
 	var tmp types.Zval

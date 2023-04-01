@@ -215,7 +215,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 							}
 						}
 					} else {
-						if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&ZEND_ACC_CALL_VIA_TRAMPOLINE) == 0 {
+						if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&AccCallViaTrampoline) == 0 {
 
 							/* don't separate references for __call */
 
@@ -260,7 +260,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 						}
 					}
 				} else {
-					if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&ZEND_ACC_CALL_VIA_TRAMPOLINE) == 0 {
+					if arg.IsReference() && (executeData.GetCall().func_.common.fn_flags&AccCallViaTrampoline) == 0 {
 
 						/* don't separate references for __call */
 
@@ -546,7 +546,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr())
 		if zv == nil {
 			for {
-				b.Assert((executeData.GetFunc().op_array.fn_flags & ZEND_ACC_PRELOADED) != 0)
+				b.Assert((executeData.GetFunc().op_array.fn_flags & AccPreloaded) != 0)
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(executeData.GetFunc().op_array.filename) == types.SUCCESS {
 					zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr())
 					if zv != nil {

@@ -202,7 +202,7 @@ func ZEND_VM_LOOP_INTERRUPT_CHECK() {
 	}
 }
 func ZendCopyExtraArgs(executeData *ZendExecuteData) {
-	var op_array *ZendOpArray = executeData.GetFunc().op_array
+	var op_array *types.ZendOpArray = executeData.GetFunc().op_array
 	var first_extra_arg uint32 = op_array.GetNumArgs()
 	var num_args uint32 = executeData.NumArgs()
 	var src *types.Zval
@@ -261,7 +261,7 @@ func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 		}
 	}
 }
-func IInitFuncExecuteData(op_array *ZendOpArray, return_value *types.Zval, may_be_trampoline types.ZendBool, executeData *ZendExecuteData) {
+func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval, may_be_trampoline types.ZendBool, executeData *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
 	b.Assert(executeData.GetFunc() == (*types.ZendFunction)(op_array))
@@ -290,14 +290,14 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *types.Zval, may_b
 	executeData.GetRunTimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }
-func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
+func InitFuncRunTimeCacheI(op_array *types.ZendOpArray) {
 	var run_time_cache *any
 	b.Assert(RUN_TIME_CACHE(op_array) == nil)
 	run_time_cache = ZendArenaAlloc(CG__().GetArena(), op_array.GetCacheSize())
 	memset(run_time_cache, 0, op_array.GetCacheSize())
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }
-func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
+func InitFuncRunTimeCache(op_array *types.ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *types.String) *types.ZendFunction {
 	var zv *types.Zval = EG__().GetFunctionTable().KeyFind(name.GetStr())
 	if zv != nil {
@@ -320,12 +320,12 @@ func ZendFetchFunctionStr(name string, len_ int) *types.ZendFunction {
 	}
 	return nil
 }
-func ZendInitFuncRunTimeCache(op_array *ZendOpArray) {
+func ZendInitFuncRunTimeCache(op_array *types.ZendOpArray) {
 	if !(RUN_TIME_CACHE(op_array)) {
 		InitFuncRunTimeCacheI(op_array)
 	}
 }
-func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *types.Zval) {
+func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
 	b.Assert(executeData.GetFunc() == (*types.ZendFunction)(op_array))
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
@@ -343,7 +343,7 @@ func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, r
 	executeData.GetRunTimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }
-func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *ZendOpArray, return_value *types.Zval) {
+func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
 	var executeData *ZendExecuteData = ex
 	executeData.GetPrevExecuteData() = CurrEX()
 	if !(RUN_TIME_CACHE(op_array)) {
@@ -351,11 +351,11 @@ func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *ZendOpArray, return_
 	}
 	IInitFuncExecuteData(op_array, return_value, 1, executeData)
 }
-func ZendInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *types.Zval) {
+func ZendInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
 	executeData.GetPrevExecuteData() = CurrEX()
 	IInitCodeExecuteData(executeData, op_array, return_value)
 }
-func ZendInitExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *types.Zval) {
+func ZendInitExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
 	if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 		ZendInitCodeExecuteData(executeData, op_array, return_value)
 	} else {

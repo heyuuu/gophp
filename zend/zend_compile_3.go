@@ -262,7 +262,7 @@ func ZendGetCallOp(init_op *ZendOp, fbc *types.ZendFunction) types.ZendUchar {
 	if fbc != nil {
 		if fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) == 0 {
 			if init_op.GetOpcode() == ZEND_INIT_FCALL && ZendExecuteInternal == nil {
-				if !fbc.HasFnFlags(ZEND_ACC_ABSTRACT | ZEND_ACC_DEPRECATED | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_RETURN_REFERENCE) {
+				if !fbc.HasFnFlags(AccAbstract | AccDeprecated | AccHasTypeHints | AccReturnReference) {
 					return ZEND_DO_ICALL
 				} else {
 					return ZEND_DO_FCALL_BY_NAME

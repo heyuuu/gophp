@@ -341,16 +341,16 @@ func (this *ZendPropertyInfo) SwitchFlags(value uint32, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendPropertyInfo) IsStatic() bool            { return this.HasFlags(ZEND_ACC_STATIC) }
-func (this ZendPropertyInfo) IsProtected() bool         { return this.HasFlags(ZEND_ACC_PROTECTED) }
-func (this ZendPropertyInfo) IsPrivate() bool           { return this.HasFlags(ZEND_ACC_PRIVATE) }
-func (this ZendPropertyInfo) IsPublic() bool            { return this.HasFlags(ZEND_ACC_PUBLIC) }
-func (this ZendPropertyInfo) IsChanged() bool           { return this.HasFlags(ZEND_ACC_CHANGED) }
-func (this *ZendPropertyInfo) SetIsStatic(cond bool)    { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
-func (this *ZendPropertyInfo) SetIsProtected(cond bool) { this.SwitchFlags(ZEND_ACC_PROTECTED, cond) }
-func (this *ZendPropertyInfo) SetIsPrivate(cond bool)   { this.SwitchFlags(ZEND_ACC_PRIVATE, cond) }
-func (this *ZendPropertyInfo) SetIsPublic(cond bool)    { this.SwitchFlags(ZEND_ACC_PUBLIC, cond) }
-func (this *ZendPropertyInfo) SetIsChanged(cond bool)   { this.SwitchFlags(ZEND_ACC_CHANGED, cond) }
+func (this ZendPropertyInfo) IsStatic() bool            { return this.HasFlags(AccStatic) }
+func (this ZendPropertyInfo) IsProtected() bool         { return this.HasFlags(AccProtected) }
+func (this ZendPropertyInfo) IsPrivate() bool           { return this.HasFlags(AccPrivate) }
+func (this ZendPropertyInfo) IsPublic() bool            { return this.HasFlags(AccPublic) }
+func (this ZendPropertyInfo) IsChanged() bool           { return this.HasFlags(AccChanged) }
+func (this *ZendPropertyInfo) SetIsStatic(cond bool)    { this.SwitchFlags(AccStatic, cond) }
+func (this *ZendPropertyInfo) SetIsProtected(cond bool) { this.SwitchFlags(AccProtected, cond) }
+func (this *ZendPropertyInfo) SetIsPrivate(cond bool)   { this.SwitchFlags(AccPrivate, cond) }
+func (this *ZendPropertyInfo) SetIsPublic(cond bool)    { this.SwitchFlags(AccPublic, cond) }
+func (this *ZendPropertyInfo) SetIsChanged(cond bool)   { this.SwitchFlags(AccChanged, cond) }
 
 /**
  * ZendClassConstant
@@ -426,265 +426,13 @@ type ZendInternalFunctionInfo struct {
 	_is_variadic      types.ZendBool
 }
 
-// func MakeZendInternalFunctionInfo(required_num_args ZendUintptrT, type_ ZendType, return_reference ZendBool, _is_variadic ZendBool) ZendInternalFunctionInfo {
-//     return ZendInternalFunctionInfo{
-//         required_num_args:required_num_args,
-//         type_:type_,
-//         return_reference:return_reference,
-//         _is_variadic:_is_variadic,
-//     }
-// }
 func (this *ZendInternalFunctionInfo) GetRequiredNumArgs() types.ZendUintptrT {
 	return this.required_num_args
 }
-
 func (this *ZendInternalFunctionInfo) GetType() types.ZendType { return this.type_ }
 func (this *ZendInternalFunctionInfo) GetReturnReference() types.ZendBool {
 	return this.return_reference
 }
-
-/**
- * ZendOpArray
- */
-type ZendOpArray struct {
-	type_                     types.ZendUchar
-	arg_flags                 []types.ZendUchar
-	fn_flags                  uint32
-	function_name             *types.String
-	scope                     *types.ClassEntry
-	prototype                 *types.ZendFunction
-	num_args                  uint32
-	required_num_args         uint32
-	arg_info                  *ZendArgInfo
-	cache_size                int
-	last_var                  int
-	T                         uint32
-	last                      uint32
-	opcodes                   *ZendOp
-	run_time_cache__ptr       **any
-	static_variables_ptr__ptr **types.Array
-	static_variables          *types.Array
-	vars                      **types.String
-	refcount                  *uint32
-	last_live_range           int
-	last_try_catch            int
-	live_range                *ZendLiveRange
-	try_catch_array           *ZendTryCatchElement
-	filename                  *types.String
-	line_start                uint32
-	line_end                  uint32
-	doc_comment               *types.String
-	last_literal              int
-	literals                  *types.Zval
-	reserved                  []any
-}
-
-//             func MakeZendOpArray(
-// type_ ZendUchar,
-// arg_flags []ZendUchar,
-// fn_flags uint32,
-// function_name *String,
-// scope *ClassEntry,
-// prototype *ZendFunction,
-// num_args uint32,
-// required_num_args uint32,
-// arg_info *ZendArgInfo,
-// cache_size int,
-// last_var int,
-// T uint32,
-// last uint32,
-// opcodes *ZendOp,
-// run_time_cache__ptr **any,
-// static_variables_ptr__ptr **HashTable,
-// static_variables *HashTable,
-// vars **String,
-// refcount *uint32,
-// last_live_range int,
-// last_try_catch int,
-// live_range *ZendLiveRange,
-// try_catch_array *ZendTryCatchElement,
-// filename *String,
-// line_start uint32,
-// line_end uint32,
-// doc_comment *String,
-// last_literal int,
-// literals *Zval,
-// reserved []any,
-// ) ZendOpArray {
-//                 return ZendOpArray{
-//                     type_:type_,
-//                     arg_flags:arg_flags,
-//                     fn_flags:fn_flags,
-//                     function_name:function_name,
-//                     scope:scope,
-//                     prototype:prototype,
-//                     num_args:num_args,
-//                     required_num_args:required_num_args,
-//                     arg_info:arg_info,
-//                     cache_size:cache_size,
-//                     last_var:last_var,
-//                     T:T,
-//                     last:last,
-//                     opcodes:opcodes,
-//                     run_time_cache__ptr:run_time_cache__ptr,
-//                     static_variables_ptr__ptr:static_variables_ptr__ptr,
-//                     static_variables:static_variables,
-//                     vars:vars,
-//                     refcount:refcount,
-//                     last_live_range:last_live_range,
-//                     last_try_catch:last_try_catch,
-//                     live_range:live_range,
-//                     try_catch_array:try_catch_array,
-//                     filename:filename,
-//                     line_start:line_start,
-//                     line_end:line_end,
-//                     doc_comment:doc_comment,
-//                     last_literal:last_literal,
-//                     literals:literals,
-//                     reserved:reserved,
-//                 }
-//             }
-func (this *ZendOpArray) GetType() types.ZendUchar       { return this.type_ }
-func (this *ZendOpArray) SetType(value types.ZendUchar)  { this.type_ = value }
-func (this *ZendOpArray) GetArgFlags() []types.ZendUchar { return this.arg_flags }
-
-// func (this *ZendOpArray) SetArgFlags(value []ZendUchar) { this.arg_flags = value }
-func (this *ZendOpArray) GetFnFlags() uint32                  { return this.fn_flags }
-func (this *ZendOpArray) SetFnFlags(value uint32)             { this.fn_flags = value }
-func (this *ZendOpArray) GetFunctionName() *types.String      { return this.function_name }
-func (this *ZendOpArray) SetFunctionName(value *types.String) { this.function_name = value }
-func (this *ZendOpArray) GetScope() *types.ClassEntry         { return this.scope }
-func (this *ZendOpArray) SetScope(value *types.ClassEntry)    { this.scope = value }
-
-// func (this *ZendOpArray)  GetPrototype() *ZendFunction      { return this.prototype }
-func (this *ZendOpArray) SetPrototype(value *types.ZendFunction) { this.prototype = value }
-func (this *ZendOpArray) GetNumArgs() uint32                     { return this.num_args }
-func (this *ZendOpArray) SetNumArgs(value uint32)                { this.num_args = value }
-
-// func (this *ZendOpArray)  GetRequiredNumArgs() uint32      { return this.required_num_args }
-func (this *ZendOpArray) SetRequiredNumArgs(value uint32) { this.required_num_args = value }
-func (this *ZendOpArray) GetArgInfo() *ZendArgInfo        { return this.arg_info }
-func (this *ZendOpArray) SetArgInfo(value *ZendArgInfo)   { this.arg_info = value }
-func (this *ZendOpArray) GetCacheSize() int               { return this.cache_size }
-func (this *ZendOpArray) SetCacheSize(value int)          { this.cache_size = value }
-func (this *ZendOpArray) GetLastVar() int                 { return this.last_var }
-func (this *ZendOpArray) SetLastVar(value int)            { this.last_var = value }
-func (this *ZendOpArray) GetT() uint32                    { return this.T }
-func (this *ZendOpArray) SetT(value uint32)               { this.T = value }
-func (this *ZendOpArray) GetLast() uint32                 { return this.last }
-func (this *ZendOpArray) SetLast(value uint32)            { this.last = value }
-func (this *ZendOpArray) GetOpcodes() *ZendOp             { return this.opcodes }
-func (this *ZendOpArray) SetOpcodes(value *ZendOp)        { this.opcodes = value }
-func (this *ZendOpArray) GetRunTimeCachePtr() **any       { return this.run_time_cache__ptr }
-
-// func (this *ZendOpArray) SetRunTimeCachePtr(value **any) { this.run_time_cache__ptr = value }
-// func (this *ZendOpArray)  GetStaticVariablesPtrPtr() **HashTable      { return this.static_variables_ptr__ptr }
-// func (this *ZendOpArray) SetStaticVariablesPtrPtr(value **HashTable) { this.static_variables_ptr__ptr = value }
-func (this *ZendOpArray) GetStaticVariables() *types.Array            { return this.static_variables }
-func (this *ZendOpArray) SetStaticVariables(value *types.Array)       { this.static_variables = value }
-func (this *ZendOpArray) GetVars() **types.String                     { return this.vars }
-func (this *ZendOpArray) SetVars(value **types.String)                { this.vars = value }
-func (this *ZendOpArray) GetRefcount() *uint32                        { return this.refcount }
-func (this *ZendOpArray) SetRefcount(value *uint32)                   { this.refcount = value }
-func (this *ZendOpArray) GetLastLiveRange() int                       { return this.last_live_range }
-func (this *ZendOpArray) SetLastLiveRange(value int)                  { this.last_live_range = value }
-func (this *ZendOpArray) GetLastTryCatch() int                        { return this.last_try_catch }
-func (this *ZendOpArray) SetLastTryCatch(value int)                   { this.last_try_catch = value }
-func (this *ZendOpArray) GetLiveRange() *ZendLiveRange                { return this.live_range }
-func (this *ZendOpArray) SetLiveRange(value *ZendLiveRange)           { this.live_range = value }
-func (this *ZendOpArray) GetTryCatchArray() *ZendTryCatchElement      { return this.try_catch_array }
-func (this *ZendOpArray) SetTryCatchArray(value *ZendTryCatchElement) { this.try_catch_array = value }
-func (this *ZendOpArray) GetFilename() *types.String                  { return this.filename }
-func (this *ZendOpArray) SetFilename(value *types.String)             { this.filename = value }
-func (this *ZendOpArray) GetLineStart() uint32                        { return this.line_start }
-func (this *ZendOpArray) SetLineStart(value uint32)                   { this.line_start = value }
-func (this *ZendOpArray) GetLineEnd() uint32                          { return this.line_end }
-func (this *ZendOpArray) SetLineEnd(value uint32)                     { this.line_end = value }
-func (this *ZendOpArray) GetDocComment() *types.String                { return this.doc_comment }
-func (this *ZendOpArray) SetDocComment(value *types.String)           { this.doc_comment = value }
-func (this *ZendOpArray) GetLastLiteral() int                         { return this.last_literal }
-func (this *ZendOpArray) SetLastLiteral(value int)                    { this.last_literal = value }
-func (this *ZendOpArray) GetLiterals() *types.Zval                    { return this.literals }
-func (this *ZendOpArray) SetLiterals(value *types.Zval)               { this.literals = value }
-func (this *ZendOpArray) GetReserved() []any                          { return this.reserved }
-
-// func (this *ZendOpArray) SetReserved(value []any) { this.reserved = value }
-
-/* ZendOpArray.fn_flags */
-func (this *ZendOpArray) AddFnFlags(value uint32)      { this.fn_flags |= value }
-func (this *ZendOpArray) SubFnFlags(value uint32)      { this.fn_flags &^= value }
-func (this *ZendOpArray) HasFnFlags(value uint32) bool { return this.fn_flags&value != 0 }
-func (this *ZendOpArray) SwitchFnFlags(value uint32, cond bool) {
-	if cond {
-		this.AddFnFlags(value)
-	} else {
-		this.SubFnFlags(value)
-	}
-}
-func (this ZendOpArray) IsChanged() bool         { return this.HasFnFlags(ZEND_ACC_CHANGED) }
-func (this ZendOpArray) IsPreloaded() bool       { return this.HasFnFlags(ZEND_ACC_PRELOADED) }
-func (this ZendOpArray) IsHasReturnType() bool   { return this.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE) }
-func (this ZendOpArray) IsEarlyBinding() bool    { return this.HasFnFlags(ZEND_ACC_EARLY_BINDING) }
-func (this ZendOpArray) IsHeapRtCache() bool     { return this.HasFnFlags(ZEND_ACC_HEAP_RT_CACHE) }
-func (this ZendOpArray) IsClosure() bool         { return this.HasFnFlags(ZEND_ACC_CLOSURE) }
-func (this ZendOpArray) IsReturnReference() bool { return this.HasFnFlags(ZEND_ACC_RETURN_REFERENCE) }
-func (this ZendOpArray) IsGenerator() bool       { return this.HasFnFlags(ZEND_ACC_GENERATOR) }
-func (this ZendOpArray) IsHasFinallyBlock() bool { return this.HasFnFlags(ZEND_ACC_HAS_FINALLY_BLOCK) }
-func (this ZendOpArray) IsVariadic() bool        { return this.HasFnFlags(ZEND_ACC_VARIADIC) }
-func (this ZendOpArray) IsPublic() bool          { return this.HasFnFlags(ZEND_ACC_PUBLIC) }
-func (this ZendOpArray) IsStatic() bool          { return this.HasFnFlags(ZEND_ACC_STATIC) }
-func (this ZendOpArray) IsAbstract() bool        { return this.HasFnFlags(ZEND_ACC_ABSTRACT) }
-func (this ZendOpArray) IsPrivate() bool         { return this.HasFnFlags(ZEND_ACC_PRIVATE) }
-func (this ZendOpArray) IsHasTypeHints() bool    { return this.HasFnFlags(ZEND_ACC_HAS_TYPE_HINTS) }
-func (this ZendOpArray) IsCallViaTrampoline() bool {
-	return this.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE)
-}
-func (this ZendOpArray) IsDonePassTwo() bool       { return this.HasFnFlags(ZEND_ACC_DONE_PASS_TWO) }
-func (this ZendOpArray) IsUsesThis() bool          { return this.HasFnFlags(ZEND_ACC_USES_THIS) }
-func (this ZendOpArray) IsStrictTypes() bool       { return this.HasFnFlags(ZEND_ACC_STRICT_TYPES) }
-func (this ZendOpArray) IsAllowStatic() bool       { return this.HasFnFlags(ZEND_ACC_ALLOW_STATIC) }
-func (this ZendOpArray) IsTopLevel() bool          { return this.HasFnFlags(ZEND_ACC_TOP_LEVEL) }
-func (this ZendOpArray) IsTraitClone() bool        { return this.HasFnFlags(ZEND_ACC_TRAIT_CLONE) }
-func (this ZendOpArray) IsImmutable() bool         { return this.HasFnFlags(ZEND_ACC_IMMUTABLE) }
-func (this *ZendOpArray) SetIsChanged(cond bool)   { this.SwitchFnFlags(ZEND_ACC_CHANGED, cond) }
-func (this *ZendOpArray) SetIsPreloaded(cond bool) { this.SwitchFnFlags(ZEND_ACC_PRELOADED, cond) }
-func (this *ZendOpArray) SetIsHasReturnType(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_HAS_RETURN_TYPE, cond)
-}
-func (this *ZendOpArray) SetIsEarlyBinding(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_EARLY_BINDING, cond)
-}
-func (this *ZendOpArray) SetIsHeapRtCache(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_HEAP_RT_CACHE, cond)
-}
-func (this *ZendOpArray) SetIsClosure(cond bool) { this.SwitchFnFlags(ZEND_ACC_CLOSURE, cond) }
-func (this *ZendOpArray) SetIsReturnReference(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_RETURN_REFERENCE, cond)
-}
-func (this *ZendOpArray) SetIsGenerator(cond bool) { this.SwitchFnFlags(ZEND_ACC_GENERATOR, cond) }
-func (this *ZendOpArray) SetIsHasFinallyBlock(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_HAS_FINALLY_BLOCK, cond)
-}
-func (this *ZendOpArray) SetIsVariadic(cond bool) { this.SwitchFnFlags(ZEND_ACC_VARIADIC, cond) }
-func (this *ZendOpArray) SetIsPublic(cond bool)   { this.SwitchFnFlags(ZEND_ACC_PUBLIC, cond) }
-func (this *ZendOpArray) SetIsStatic(cond bool)   { this.SwitchFnFlags(ZEND_ACC_STATIC, cond) }
-func (this *ZendOpArray) SetIsAbstract(cond bool) { this.SwitchFnFlags(ZEND_ACC_ABSTRACT, cond) }
-func (this *ZendOpArray) SetIsPrivate(cond bool)  { this.SwitchFnFlags(ZEND_ACC_PRIVATE, cond) }
-func (this *ZendOpArray) SetIsHasTypeHints(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_HAS_TYPE_HINTS, cond)
-}
-func (this *ZendOpArray) SetIsCallViaTrampoline(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE, cond)
-}
-func (this *ZendOpArray) SetIsDonePassTwo(cond bool) {
-	this.SwitchFnFlags(ZEND_ACC_DONE_PASS_TWO, cond)
-}
-func (this *ZendOpArray) SetIsUsesThis(cond bool)    { this.SwitchFnFlags(ZEND_ACC_USES_THIS, cond) }
-func (this *ZendOpArray) SetIsStrictTypes(cond bool) { this.SwitchFnFlags(ZEND_ACC_STRICT_TYPES, cond) }
-func (this *ZendOpArray) SetIsAllowStatic(cond bool) { this.SwitchFnFlags(ZEND_ACC_ALLOW_STATIC, cond) }
-func (this *ZendOpArray) SetIsTopLevel(cond bool)    { this.SwitchFnFlags(ZEND_ACC_TOP_LEVEL, cond) }
-func (this *ZendOpArray) SetIsTraitClone(cond bool)  { this.SwitchFnFlags(ZEND_ACC_TRAIT_CLONE, cond) }
-func (this *ZendOpArray) SetIsImmutable(cond bool)   { this.SwitchFnFlags(ZEND_ACC_IMMUTABLE, cond) }
 
 /**
  * ZendAutoGlobal

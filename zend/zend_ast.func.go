@@ -1291,14 +1291,14 @@ tail_call:
 	case ZEND_AST_PROP_GROUP:
 		var type_ast *ZendAst = ast.GetChild()[0]
 		var prop_ast *ZendAst = ast.GetChild()[1]
-		if (ast.GetAttr() & ZEND_ACC_PUBLIC) != 0 {
+		if (ast.GetAttr() & AccPublic) != 0 {
 			str.AppendString("public ")
-		} else if (ast.GetAttr() & ZEND_ACC_PROTECTED) != 0 {
+		} else if (ast.GetAttr() & AccProtected) != 0 {
 			str.AppendString("protected ")
-		} else if (ast.GetAttr() & ZEND_ACC_PRIVATE) != 0 {
+		} else if (ast.GetAttr() & AccPrivate) != 0 {
 			str.AppendString("private ")
 		}
-		if (ast.GetAttr() & ZEND_ACC_STATIC) != 0 {
+		if (ast.GetAttr() & AccStatic) != 0 {
 			str.AppendString("static ")
 		}
 		if type_ast != nil {
@@ -1829,11 +1829,11 @@ tail_call:
 		fallthrough
 	case ZEND_AST_TRAIT_ALIAS:
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
-		if (ast.GetAttr() & ZEND_ACC_PUBLIC) != 0 {
+		if (ast.GetAttr() & AccPublic) != 0 {
 			str.AppendString(" as public")
-		} else if (ast.GetAttr() & ZEND_ACC_PROTECTED) != 0 {
+		} else if (ast.GetAttr() & AccProtected) != 0 {
 			str.AppendString(" as protected")
-		} else if (ast.GetAttr() & ZEND_ACC_PRIVATE) != 0 {
+		} else if (ast.GetAttr() & AccPrivate) != 0 {
 			str.AppendString(" as private")
 		} else if ast.GetChild()[1] != nil {
 			str.AppendString(" as")

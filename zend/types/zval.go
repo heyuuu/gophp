@@ -78,7 +78,7 @@ type Zval struct {
 	//	cache_slot     uint32 /* literal cache slot  运行时缓存。在执行函数时会优先去缓存中查找，若缓存中没有，会在全局的function表中查找*/
 	//	opline_num     uint32
 	//	lineno         uint32 /* line number (for ast nodes) 文件执行的行号，应用在AST节点上 */
-	//	num_args       uint32 /* arguments number for EX(This) 函数调用时传入参数的个数 */
+	//	numArgs       uint32 /* arguments number for EX(This) 函数调用时传入参数的个数 */
 	//	fe_pos         uint32 /* foreach position  遍历数组时的当前位置*/
 	//	fe_iter_idx    uint32 /* foreach iterator index */
 	//	access_flags   uint32 /* class constant access flags 对象类的访问标志*/

@@ -115,7 +115,7 @@ func ZendDeclarePropertyStringl(
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, access_type int, doc_comment *types.String) int {
 	var c *ZendClassConstant
 	if ce.IsInterface() {
-		if access_type != ZEND_ACC_PUBLIC {
+		if access_type != AccPublic {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
 		}
 	}
@@ -150,7 +150,7 @@ func ZendDeclareClassConstant(ce *types.ClassEntry, name *byte, name_length int,
 	} else {
 		key = types.NewString(b.CastStr(name, name_length))
 	}
-	ret = ZendDeclareClassConstantEx(ce, key, value, ZEND_ACC_PUBLIC, nil)
+	ret = ZendDeclareClassConstantEx(ce, key, value, AccPublic, nil)
 	types.ZendStringRelease(key)
 	return ret
 }
@@ -394,7 +394,7 @@ func ZendResolveMethodName(ce *types.ClassEntry, f *types.ZendFunction) *types.S
 	var func_ *types.ZendFunction
 	var function_table *types.Array
 	var name *types.String
-	if f.GetCommonType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
+	if f.GetType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
 		return f.GetFunctionName()
 	}
 	function_table = ce.GetFunctionTable()

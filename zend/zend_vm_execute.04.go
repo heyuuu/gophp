@@ -397,7 +397,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 			}
 			HANDLE_EXCEPTION()
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE|ZEND_ACC_NEVER_CACHE) && obj == orig_obj {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), called_scope, fbc)
 		}
 		/* Reset "object" to trigger reference counting */
@@ -460,7 +460,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExec
 			}
 			HANDLE_EXCEPTION()
 		}
-		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE|ZEND_ACC_NEVER_CACHE) {
+		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), ce, fbc)
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {

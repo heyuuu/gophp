@@ -200,7 +200,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 		/* We only know the exact method that is being called if it is either private or final.
 		 * Otherwise an overriding method in a child class may be called. */))
 
-		if fbc != nil && !fbc.HasFnFlags(ZEND_ACC_PRIVATE|ZEND_ACC_FINAL) {
+		if fbc != nil && !fbc.HasFnFlags(AccPrivate|AccFinal) {
 			fbc = nil
 		}
 
@@ -611,7 +611,7 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 	opline.GetOp1().SetNum(CG__().GetContext().GetCurrentBrkCont())
 	opline.GetOp2().SetNum(depth)
 }
-func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
+func ZendResolveGotoLabel(op_array *types.ZendOpArray, opline *ZendOp) {
 	var dest *ZendLabel
 	var current int
 	var remove_oplines int = opline.GetOp1().GetNum()

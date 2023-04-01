@@ -25,34 +25,34 @@ var ZendThrowExceptionHook func(ex *types.Zval)
 var DefaultExceptionHandlers zend.ZendObjectHandlers
 
 var ZendFuncsThrowable []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("getFile", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("getLine", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("getTrace", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("getPrevious", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
-	types.MakeZendFunctionEntryEx("__toString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, nil),
+	types.MakeZendFunctionEntryEx("getMessage", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("getCode", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("getFile", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("getLine", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("getTrace", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("getPrevious", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("getTraceAsString", zend.AccPublic|zend.AccAbstract, nil, nil),
+	types.MakeZendFunctionEntryEx("__toString", zend.AccPublic|zend.AccAbstract, nil, nil),
 }
 var DefaultExceptionFunctions = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("__clone", zend.ZEND_ACC_PRIVATE|zend.ZEND_ACC_FINAL, ZimExceptionClone, nil),
-	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+	types.MakeZendFunctionEntryEx("__clone", zend.AccPrivate|zend.AccFinal, ZimExceptionClone, nil),
+	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, ZimExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("message"),
 		zend.MakeArgName("code"),
 		zend.MakeArgName("previous"),
 	}),
-	types.MakeZendFunctionEntryEx("__wakeup", zend.ZEND_ACC_PUBLIC, ZimExceptionWakeup, nil),
-	types.MakeZendFunctionEntryEx("getMessage", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getMessage, nil),
-	types.MakeZendFunctionEntryEx("getCode", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getCode, nil),
-	types.MakeZendFunctionEntryEx("getFile", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getFile, nil),
-	types.MakeZendFunctionEntryEx("getLine", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getLine, nil),
-	types.MakeZendFunctionEntryEx("getTrace", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTrace, nil),
-	types.MakeZendFunctionEntryEx("getPrevious", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getPrevious, nil),
-	types.MakeZendFunctionEntryEx("getTraceAsString", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_exception_getTraceAsString, nil),
+	types.MakeZendFunctionEntryEx("__wakeup", zend.AccPublic, ZimExceptionWakeup, nil),
+	types.MakeZendFunctionEntryEx("getMessage", zend.AccPublic|zend.AccFinal, zim_exception_getMessage, nil),
+	types.MakeZendFunctionEntryEx("getCode", zend.AccPublic|zend.AccFinal, zim_exception_getCode, nil),
+	types.MakeZendFunctionEntryEx("getFile", zend.AccPublic|zend.AccFinal, zim_exception_getFile, nil),
+	types.MakeZendFunctionEntryEx("getLine", zend.AccPublic|zend.AccFinal, zim_exception_getLine, nil),
+	types.MakeZendFunctionEntryEx("getTrace", zend.AccPublic|zend.AccFinal, zim_exception_getTrace, nil),
+	types.MakeZendFunctionEntryEx("getPrevious", zend.AccPublic|zend.AccFinal, zim_exception_getPrevious, nil),
+	types.MakeZendFunctionEntryEx("getTraceAsString", zend.AccPublic|zend.AccFinal, zim_exception_getTraceAsString, nil),
 	types.MakeZendFunctionEntryEx("__toString", 0, zim_exception___toString, nil),
 }
 var ErrorExceptionFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntry{
-	types.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
+	types.MakeZendFunctionEntryEx("__construct", zend.AccPublic, ZimErrorExceptionConstruct, []zend.ArgInfo{zend.MakeReturnArgInfo(0),
 		zend.MakeArgName("message"),
 		zend.MakeArgName("code"),
 		zend.MakeArgName("severity"),
@@ -60,7 +60,7 @@ var ErrorExceptionFunctions []types.ZendFunctionEntry = []types.ZendFunctionEntr
 		zend.MakeArgName("lineno"),
 		zend.MakeArgName("previous"),
 	}),
-	types.MakeZendFunctionEntryEx("getSeverity", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL, zim_error_exception_getSeverity, nil),
+	types.MakeZendFunctionEntryEx("getSeverity", zend.AccPublic|zend.AccFinal, zim_error_exception_getSeverity, nil),
 }
 
 /**
@@ -170,7 +170,7 @@ func ThrowExceptionInternal(exception *types.Zval) {
 	if ZendThrowExceptionHook != nil {
 		ZendThrowExceptionHook(exception)
 	}
-	if zend.CurrEX().GetFunc() == nil || !(zend.ZEND_USER_CODE(zend.CurrEX().GetFunc().GetCommonType())) || zend.CurrEX().GetOpline().GetOpcode() == zend.ZEND_HANDLE_EXCEPTION {
+	if zend.CurrEX().GetFunc() == nil || !(zend.ZEND_USER_CODE(zend.CurrEX().GetFunc().GetType())) || zend.CurrEX().GetOpline().GetOpcode() == zend.ZEND_HANDLE_EXCEPTION {
 
 		/* no need to rethrow the exception */
 
@@ -660,32 +660,32 @@ func RegisterDefaultException() {
 	ZendCeException = zend.ZendRegisterInternalClassEx(&ce, nil)
 	ZendCeException.SetCreateObject(DefaultExceptionNew)
 	zend.ZendClassImplements(ZendCeException, 1, ZendCeThrowable)
-	zend.ZendDeclarePropertyString(ZendCeException, "message", b.SizeOf("\"message\"")-1, "", zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyString(ZendCeException, "string", b.SizeOf("\"string\"")-1, "", zend.ZEND_ACC_PRIVATE)
-	zend.ZendDeclarePropertyLong(ZendCeException, "code", b.SizeOf("\"code\"")-1, 0, zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyNull(ZendCeException, "file", b.SizeOf("\"file\"")-1, zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyNull(ZendCeException, "line", b.SizeOf("\"line\"")-1, zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyNull(ZendCeException, "trace", b.SizeOf("\"trace\"")-1, zend.ZEND_ACC_PRIVATE)
-	zend.ZendDeclarePropertyNull(ZendCeException, "previous", b.SizeOf("\"previous\"")-1, zend.ZEND_ACC_PRIVATE)
+	zend.ZendDeclarePropertyString(ZendCeException, "message", b.SizeOf("\"message\"")-1, "", zend.AccProtected)
+	zend.ZendDeclarePropertyString(ZendCeException, "string", b.SizeOf("\"string\"")-1, "", zend.AccPrivate)
+	zend.ZendDeclarePropertyLong(ZendCeException, "code", b.SizeOf("\"code\"")-1, 0, zend.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeException, "file", b.SizeOf("\"file\"")-1, zend.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeException, "line", b.SizeOf("\"line\"")-1, zend.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeException, "trace", b.SizeOf("\"trace\"")-1, zend.AccPrivate)
+	zend.ZendDeclarePropertyNull(ZendCeException, "previous", b.SizeOf("\"previous\"")-1, zend.AccPrivate)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("ErrorException", b.SizeOf("\"ErrorException\"")-1, 1))
 	ce.SetBuiltinFunctions(ErrorExceptionFunctions)
 	ZendCeErrorException = zend.ZendRegisterInternalClassEx(&ce, ZendCeException)
 	ZendCeErrorException.SetCreateObject(ErrorExceptionNew)
-	zend.ZendDeclarePropertyLong(ZendCeErrorException, "severity", b.SizeOf("\"severity\"")-1, E_ERROR, zend.ZEND_ACC_PROTECTED)
+	zend.ZendDeclarePropertyLong(ZendCeErrorException, "severity", b.SizeOf("\"severity\"")-1, E_ERROR, zend.AccProtected)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("Error", b.SizeOf("\"Error\"")-1, 1))
 	ce.SetBuiltinFunctions(DefaultExceptionFunctions)
 	ZendCeError = zend.ZendRegisterInternalClassEx(&ce, nil)
 	ZendCeError.SetCreateObject(DefaultExceptionNew)
 	zend.ZendClassImplements(ZendCeError, 1, ZendCeThrowable)
-	zend.ZendDeclarePropertyString(ZendCeError, "message", b.SizeOf("\"message\"")-1, "", zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyString(ZendCeError, "string", b.SizeOf("\"string\"")-1, "", zend.ZEND_ACC_PRIVATE)
-	zend.ZendDeclarePropertyLong(ZendCeError, "code", b.SizeOf("\"code\"")-1, 0, zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyNull(ZendCeError, "file", b.SizeOf("\"file\"")-1, zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyNull(ZendCeError, "line", b.SizeOf("\"line\"")-1, zend.ZEND_ACC_PROTECTED)
-	zend.ZendDeclarePropertyNull(ZendCeError, "trace", b.SizeOf("\"trace\"")-1, zend.ZEND_ACC_PRIVATE)
-	zend.ZendDeclarePropertyNull(ZendCeError, "previous", b.SizeOf("\"previous\"")-1, zend.ZEND_ACC_PRIVATE)
+	zend.ZendDeclarePropertyString(ZendCeError, "message", b.SizeOf("\"message\"")-1, "", zend.AccProtected)
+	zend.ZendDeclarePropertyString(ZendCeError, "string", b.SizeOf("\"string\"")-1, "", zend.AccPrivate)
+	zend.ZendDeclarePropertyLong(ZendCeError, "code", b.SizeOf("\"code\"")-1, 0, zend.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeError, "file", b.SizeOf("\"file\"")-1, zend.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeError, "line", b.SizeOf("\"line\"")-1, zend.AccProtected)
+	zend.ZendDeclarePropertyNull(ZendCeError, "trace", b.SizeOf("\"trace\"")-1, zend.AccPrivate)
+	zend.ZendDeclarePropertyNull(ZendCeError, "previous", b.SizeOf("\"previous\"")-1, zend.AccPrivate)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.ZendStringInitInterned("CompileError", b.SizeOf("\"CompileError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)

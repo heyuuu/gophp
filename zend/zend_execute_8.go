@@ -169,7 +169,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 		}
 	}
 }
-func FindLiveRange(op_array *ZendOpArray, op_num uint32, var_num uint32) *ZendLiveRange {
+func FindLiveRange(op_array *types.ZendOpArray, op_num uint32, var_num uint32) *ZendLiveRange {
 	var i int
 	for i = 0; i < op_array.GetLastLiveRange(); i++ {
 		var range_ *ZendLiveRange = op_array.GetLiveRange()[i]

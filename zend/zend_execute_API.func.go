@@ -158,7 +158,7 @@ func ShutdownExecutor() {
 			var _z types.Zval = _p.GetVal()
 
 			zv = _z
-			var op_array *ZendOpArray = zv.GetPtr()
+			var op_array *types.ZendOpArray = zv.GetPtr()
 			if op_array.GetType() == ZEND_INTERNAL_FUNCTION {
 				break
 			}
@@ -182,7 +182,7 @@ func ShutdownExecutor() {
 				ZendCleanupInternalClassData(ce)
 			}
 			if ce.IsHasStaticInMethods() {
-				var op_array *ZendOpArray
+				var op_array *types.ZendOpArray
 				var __ht *types.Array = ce.GetFunctionTable()
 				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
@@ -506,7 +506,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 
 		memset(&dummy_execute_data, 0, b.SizeOf("zend_execute_data"))
 		EG__().SetCurrentExecuteData(&dummy_execute_data)
-	} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_ICALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_UCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME {
+	} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_ICALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_UCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME {
 
 		/* Insert fake frame in case of include or magic calls */
 
@@ -708,7 +708,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	if EG__().GetException() != nil {
 		if CurrEX() == nil {
 			faults.ThrowExceptionInternal(nil)
-		} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) {
+		} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) {
 			faults.RethrowException(CurrEX())
 		}
 	}
@@ -855,7 +855,7 @@ func ZendGetThisObject(ex *ZendExecuteData) *types.ZendObject {
 }
 func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name *byte) int {
 	var pv types.Zval
-	var new_op_array *ZendOpArray
+	var new_op_array *types.ZendOpArray
 	var original_compiler_options uint32
 	var retval int
 	if retval_ptr != nil {
@@ -1105,7 +1105,7 @@ func ZendRebuildSymbolTable() *types.Array {
 	/* Search for last called user function */
 
 	ex = CurrEX()
-	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetCommonType()))) {
+	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
 	if ex == nil {
@@ -1146,7 +1146,7 @@ func ZendRebuildSymbolTable() *types.Array {
 	return symbol_table
 }
 func ZendAttachSymbolTable(executeData *ZendExecuteData) {
-	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+	var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 	var ht *types.Array = executeData.GetSymbolTable()
 
 	/* copy real values from symbol table into CV slots and create
@@ -1182,7 +1182,7 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 	   INDIRECT references to CV in symbol table  */
 }
 func ZendDetachSymbolTable(executeData *ZendExecuteData) {
-	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+	var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 	var ht *types.Array = executeData.GetSymbolTable()
 
 	/* copy real values from CV slots into symbol table */
@@ -1210,13 +1210,13 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 }
 func ZendSetLocalVar(name *types.String, value *types.Zval, force int) int {
 	var executeData *ZendExecuteData = CurrEX()
-	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
+	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetType()))) {
 		executeData = executeData.GetPrevExecuteData()
 	}
 	if executeData != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			var h ZendUlong = name.GetHash()
-			var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+			var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **types.String = op_array.GetVars()
 				var end **types.String = str + op_array.GetLastVar()
@@ -1248,13 +1248,13 @@ func ZendSetLocalVar(name *types.String, value *types.Zval, force int) int {
 }
 func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 	var executeData *ZendExecuteData = CurrEX()
-	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
+	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetType()))) {
 		executeData = executeData.GetPrevExecuteData()
 	}
 	if executeData != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			var h ZendUlong = b.HashStr(name)
-			var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+			var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **types.String = op_array.GetVars()
 				var end **types.String = str + op_array.GetLastVar()

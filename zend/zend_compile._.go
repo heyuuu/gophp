@@ -26,210 +26,123 @@ const ZEND_LIVE_NEW = 4
 const ZEND_LIVE_MASK = 7
 
 /* Compilation context that is different for each op array. */
-
-/* Class, property and method flags                  class|meth.|prop.|const*/
-
-const ZEND_ACC_PUBLIC uint32 = 1 << 0
-const ZEND_ACC_PROTECTED = 1 << 1
-const ZEND_ACC_PRIVATE = 1 << 2
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_CHANGED = 1 << 3
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_STATIC = 1 << 4
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_FINAL = 1 << 5
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_ABSTRACT = 1 << 6
-const ZEND_ACC_EXPLICIT_ABSTRACT_CLASS = 1 << 6
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_IMMUTABLE = 1 << 7
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_HAS_TYPE_HINTS = 1 << 8
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_TOP_LEVEL = 1 << 9
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_PRELOADED = 1 << 10
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_INTERFACE uint32 = 1 << 0
-const ZEND_ACC_TRAIT = 1 << 1
-const ZEND_ACC_ANON_CLASS = 1 << 2
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_LINKED = 1 << 3
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_IMPLICIT_ABSTRACT_CLASS = 1 << 4
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_USE_GUARDS = 1 << 11
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_CONSTANTS_UPDATED uint32 = 1 << 12
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_INHERITED = 1 << 13
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_IMPLEMENT_INTERFACES = 1 << 14
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_IMPLEMENT_TRAITS = 1 << 15
-
-/*                                                        |     |     |     */
-
-const ZEND_HAS_STATIC_IN_METHODS = 1 << 16
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_PROPERTY_TYPES_RESOLVED = 1 << 17
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_REUSE_GET_ITERATOR = 1 << 18
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_RESOLVED_PARENT = 1 << 19
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_RESOLVED_INTERFACES = 1 << 20
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_UNRESOLVED_VARIANCE = 1 << 21
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_NEARLY_LINKED = 1 << 22
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_HAS_UNLINKED_USES = 1 << 23
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_DEPRECATED = 1 << 11
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_RETURN_REFERENCE = 1 << 12
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_HAS_RETURN_TYPE = 1 << 13
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_VARIADIC = 1 << 14
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_HAS_FINALLY_BLOCK = 1 << 15
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_EARLY_BINDING = 1 << 16
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_ALLOW_STATIC = 1 << 17
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_CALL_VIA_TRAMPOLINE = 1 << 18
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_NEVER_CACHE = 1 << 19
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_CLOSURE = 1 << 20
-const ZEND_ACC_FAKE_CLOSURE = 1 << 21
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_HEAP_RT_CACHE = 1 << 22
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_USER_ARG_INFO = 1 << 22
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_GENERATOR = 1 << 24
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_DONE_PASS_TWO = 1 << 25
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_ARENA_ALLOCATED = 1 << 25
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_TRAIT_CLONE = 1 << 27
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_CTOR = 1 << 28
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_DTOR = 1 << 29
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_USES_THIS = 1 << 30
-
-/*                                                        |     |     |     */
-
-const ZEND_ACC_STRICT_TYPES = 1 << 31
-const ZEND_ACC_PPP_MASK = ZEND_ACC_PUBLIC | ZEND_ACC_PROTECTED | ZEND_ACC_PRIVATE
-
-/* call through internal function handler. e.g. Closure::invoke() */
-
-const ZEND_ACC_CALL_VIA_HANDLER = ZEND_ACC_CALL_VIA_TRAMPOLINE
-
-/* arg_info for internal functions */
-
-/* arg_info for user functions */
-
-/* the following structure repeats the layout of zend_internal_arg_info,
- * but its fields have different meaning. It's used as the first element of
- * arg_info array to define properties __special__  of internal functions.
- * It's also used for the return type.
- */
-
-const ZEND_RETURN_VALUE = 0
-const ZEND_RETURN_REFERENCE = 1
+const (
+
+	/* Class, property and method flags                  class|meth.|prop.|const*/
+	// Common flags
+	// ============
+	/* Visibility flags (public < protected < private)        |     |     |     */
+	AccPublic    = 1 << 0 /*                                  |  X  |  X  |  X  */
+	AccProtected = 1 << 1 /*                                  |  X  |  X  |  X  */
+	AccPrivate   = 1 << 2 /*                                  |  X  |  X  |  X  */
+	/* Property or method overrides private one */
+	AccChanged = 1 << 3 /*                                    |  X  |  X  |     */
+	/* Staic method or property */
+	AccStatic = 1 << 4 /*                                     |  X  |  X  |     */
+	/* Final class or method */
+	AccFinal = 1 << 5 /*                                   X  |  X  |     |     */
+	// Abstract method
+	AccAbstract              = 1 << 6 /*                   X  |  X  |     |     */
+	AccExplicitAbstractClass = 1 << 6 /*                   X  |     |     |     */
+	// Immutable op_array and class_entries
+	// (implemented only for lazy loading of op_arrays)
+	AccImmutable = 1 << 7 /*                               X  |  X  |     |     */
+	// Function has typed arguments / class has typed props
+	AccHasTypeHints = 1 << 8 /*                            X  |  X  |     |     */
+	// Top-level class or function declaration
+	AccTopLevel = 1 << 9 /*                                X  |  X  |     |     */
+	// op_array or class is preloaded
+	AccPreloaded = 1 << 10 /*                              X  |  X  |     |     */
+	// Class Flags (unused: 24...)
+	// ===========
+	// Special class types
+	AccInterface = 1 << 0 /*                               X  |     |     |     */
+	AccTrait     = 1 << 1 /*                               X  |     |     |     */
+	AccAnonClass = 1 << 2 /*                               X  |     |     |     */
+	// Class linked with parent, interfacs and traits
+	AccLinked = 1 << 3 /*                                  X  |     |     |     */
+	// class is abstarct, since it is set by any
+	// abstract method
+	AccImplicitAbstractClass = 1 << 4 /*                   X  |     |     |     */
+	/* Class has magic methods __get/__set/__unset/
+	// __isset that use guards
+	AccUseGuards = 1 << 11 /*                              X  |     |     |     */
+	// Class constants updated
+	AccConstantsUpdated = 1 << 12 /*                       X  |     |     |     */
+	// Class extends another class
+	AccInherited = 1 << 13 /*                              X  |     |     |     */
+	// Class implements interface(s)
+	AccImplementInterfaces = 1 << 14 /*                    X  |     |     |     */
+	// Class uses trait(s)
+	AccImplementTraits = 1 << 15 /*                        X  |     |     |     */
+	// User class has methods with static variables
+	AccHasStaticInMethods = 1 << 16 /*                     X  |     |     |     */
+	// Whether all property types are resolved to CEs
+	AccPropertyTypesResolved = 1 << 17 /*                  X  |     |     |     */
+	// Children must reuse parent get_iterator()
+	AccReuseGetIterator = 1 << 18 /*                       X  |     |     |     */
+	// Parent class is resolved (CE).
+	AccResolvedParent = 1 << 19 /*                         X  |     |     |     */
+	// Interfaces are resolved (CEs).
+	AccResolvedInterfaces = 1 << 20 /*                     X  |     |     |     */
+	// Class has unresolved variance obligations.
+	AccUnresolvedVariance = 1 << 21 /*                     X  |     |     |     */
+	// Class is linked apart from variance obligations.
+	AccNearlyLinked = 1 << 22 /*                           X  |     |     |     */
+	// Whether this class was used in its unlinked state.
+	AccHasUnlinkedUses = 1 << 23 /*                        X  |     |     |     */
+	// Function Flags (unused: 23, 26)
+	// ==============
+	// deprecation flag
+	AccDeprecated = 1 << 11 /*                                |  X  |     |     */
+	// Function returning by reference
+	AccReturnReference = 1 << 12 /*                           |  X  |     |     */
+	// Function has a return type
+	AccHasReturnType = 1 << 13 /*                             |  X  |     |     */
+	// Function with variable number of arguments
+	AccVariadic = 1 << 14 /*                                  |  X  |     |     */
+	// op_array has finally blocks (user only)
+	AccHasFinallyBlock = 1 << 15 /*                           |  X  |     |     */
+	// "main" op_array with
+	// ZEND_DECLARE_CLASS_DELAYED opcodes
+	AccEarlyBinding = 1 << 16 /*                              |  X  |     |     */
+	// method flag (bc only), any method that has this
+	// flag can be used statically and non statically.
+	AccAllowStatic = 1 << 17 /*                               |  X  |     |     */
+	// call through user function trampoline. e.g.
+	// __call, __callstatic
+	AccCallViaTrampoline = 1 << 18 /*                         |  X  |     |     */
+	// disable inline caching
+	AccNeverCache = 1 << 19 /*                                |  X  |     |     */
+	// Closure related
+	AccClosure     = 1 << 20 /*                               |  X  |     |     */
+	AccFakeClosure = 1 << 21 /*                               |  X  |     |     */
+	// run_time_cache allocated on heap (user only)
+	AccHeapRtCache = 1 << 22 /*                               |  X  |     |     */
+	// method flag used by Closure::__invoke() (int only)     |     |     |     */
+	AccUserArgInfo = 1 << 22 /*                               |  X  |     |     */
+	AccGenerator   = 1 << 24 /*                               |  X  |     |     *
+	// function was processed by pass two (user only)
+	AccDonePassTwo = 1 << 25 /*                               |  X  |     |     */
+	// internal function is allocated at arena (int only)
+	AccArenaAllocated = 1 << 25 /*                            |  X  |     |     */
+	// op_array is a clone of trait method
+	AccTraitClone = 1 << 27 /*                                |  X  |     |     */
+	// functions is a constructor
+	AccCtor = 1 << 28 /*                                      |  X  |     |     */
+	// function is a destructor
+	AccDtor = 1 << 29 /*                                      |  X  |     |     */
+	// closure uses $this
+	AccUsesThis = 1 << 30 /*                                  |  X  |     |     */
+	// op_array uses strict mode types
+	AccStrictTypes = 1 << 31 /*                               |  X  |     |     */
+
+	//
+	AccPppMask = AccPublic | AccProtected | AccPrivate
+
+	// call through internal function handler. e.g. Closure::invoke()
+	AccCallViaHandler = AccCallViaTrampoline
+)
 
 /* zend_internal_function_handler */
 
@@ -283,8 +196,8 @@ const IS_VAR types.ZendUchar = 1 << 2
 const IS_CV types.ZendUchar = 1 << 3
 const ZEND_EXTRA_VALUE = 1
 
-var ZendCompileFile func(file_handle *ZendFileHandle, type_ int) *ZendOpArray
-var ZendCompileString func(source_string *types.Zval, filename *byte) *ZendOpArray
+var ZendCompileFile func(file_handle *ZendFileHandle, type_ int) *types.ZendOpArray
+var ZendCompileString func(source_string *types.Zval, filename *byte) *types.ZendOpArray
 
 type UnaryOpType func(*types.Zval, *types.Zval) int
 type BinaryOpType func(*types.Zval, *types.Zval, *types.Zval) int
@@ -302,7 +215,7 @@ const INITIAL_OP_ARRAY_SIZE = 64
 const ZEND_FUNCTION_DTOR types.DtorFuncT = ZendFunctionDtor
 const ZEND_CLASS_DTOR types.DtorFuncT = DestroyZendClass
 
-type ZendNeedsLiveRangeCb func(op_array *ZendOpArray, opline *ZendOp) types.ZendBool
+type ZendNeedsLiveRangeCb func(op_array *types.ZendOpArray, opline *ZendOp) types.ZendBool
 type ZendAutoGlobalCallback func(name *types.String) types.ZendBool
 
 /* BEGIN: OPCODES */

@@ -183,7 +183,7 @@ func ZendExtensionOpArrayPersistHandler(extension *ZendExtension, data *ZendExte
 		}
 	}
 }
-func ZendExtensionsOpArrayPersistCalc(op_array *ZendOpArray) int {
+func ZendExtensionsOpArrayPersistCalc(op_array *types.ZendOpArray) int {
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC) != 0 {
 		var data ZendExtensionPersistData
 		data.SetOpArray(op_array)
@@ -194,7 +194,7 @@ func ZendExtensionsOpArrayPersistCalc(op_array *ZendOpArray) int {
 	}
 	return 0
 }
-func ZendExtensionsOpArrayPersist(op_array *ZendOpArray, mem any) int {
+func ZendExtensionsOpArrayPersist(op_array *types.ZendOpArray, mem any) int {
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST) != 0 {
 		var data ZendExtensionPersistData
 		data.SetOpArray(op_array)

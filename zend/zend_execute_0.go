@@ -204,7 +204,7 @@ func SKIP_EXT_OPLINE(opline __auto__) {
 	}
 }
 func ZEND_CLASS_HAS_TYPE_HINTS(ce *types.ClassEntry) bool {
-	return (ce.GetCeFlags() & ZEND_ACC_HAS_TYPE_HINTS) == ZEND_ACC_HAS_TYPE_HINTS
+	return (ce.GetCeFlags() & AccHasTypeHints) == AccHasTypeHints
 }
 func ZEND_REF_ADD_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo) {
 	ZendRefAddTypeSource(&(ref.GetSources()), source)

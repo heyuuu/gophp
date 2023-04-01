@@ -254,7 +254,7 @@ func ZendVerifyInternalArgTypes(fbc *types.ZendFunction, call *ZendExecuteData) 
 }
 func ZendMissingArgError(executeData *ZendExecuteData) {
 	var ptr *ZendExecuteData = executeData.GetPrevExecuteData()
-	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetCommonType()) {
+	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetType()) {
 		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed in %s on line %d and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)
 	} else {
 		faults.ThrowError(faults.ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed and %s %d expected", b.CondF1(executeData.GetFunc().common.scope, func() []byte { return executeData.GetFunc().common.scope.name.GetVal() }, ""), b.Cond(executeData.GetFunc().common.scope, "::", ""), executeData.GetFunc().common.function_name.GetVal(), executeData.NumArgs(), b.Cond(executeData.GetFunc().common.required_num_args == executeData.GetFunc().common.num_args, "exactly", "at least"), executeData.GetFunc().common.required_num_args)

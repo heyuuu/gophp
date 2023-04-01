@@ -6,8 +6,8 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *ZendOpArray {
-	var new_op_array *ZendOpArray = nil
+func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
+	var new_op_array *types.ZendOpArray = nil
 	var tmp_inc_filename types.Zval
 	tmp_inc_filename.SetUndef()
 	if inc_filename.GetType() != types.IS_STRING {
@@ -42,7 +42,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *ZendOpArray {
 				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
 			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath().GetStr()) != nil {
-				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
+				var op_array *types.ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				if tmp_inc_filename.IsNotUndef() {
 

@@ -913,13 +913,13 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 	}
 }
 func ZifClassExists(executeData zpp.Ex, return_value zpp.Ret, classname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	ClassExistsImpl(executeData, return_value, ZEND_ACC_LINKED, ZEND_ACC_INTERFACE|ZEND_ACC_TRAIT)
+	ClassExistsImpl(executeData, return_value, AccLinked, AccInterface|AccTrait)
 }
 func ZifInterfaceExists(executeData zpp.Ex, return_value zpp.Ret, classname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	ClassExistsImpl(executeData, return_value, ZEND_ACC_LINKED|ZEND_ACC_INTERFACE, 0)
+	ClassExistsImpl(executeData, return_value, AccLinked|AccInterface, 0)
 }
 func ZifTraitExists(executeData zpp.Ex, return_value zpp.Ret, traitname *types.Zval, _ zpp.Opt, autoload *types.Zval) {
-	ClassExistsImpl(executeData, return_value, ZEND_ACC_TRAIT, 0)
+	ClassExistsImpl(executeData, return_value, AccTrait, 0)
 }
 func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
 	var name *types.String
@@ -1146,13 +1146,13 @@ func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval
 	}
 }
 func ZifGetDeclaredTraits(executeData zpp.Ex, return_value zpp.Ret) {
-	GetDeclaredClassImpl(executeData, return_value, ZEND_ACC_TRAIT, 0)
+	GetDeclaredClassImpl(executeData, return_value, AccTrait, 0)
 }
 func ZifGetDeclaredClasses(executeData zpp.Ex, return_value zpp.Ret) {
-	GetDeclaredClassImpl(executeData, return_value, ZEND_ACC_LINKED, ZEND_ACC_INTERFACE|ZEND_ACC_TRAIT)
+	GetDeclaredClassImpl(executeData, return_value, AccLinked, AccInterface|AccTrait)
 }
 func ZifGetDeclaredInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
-	GetDeclaredClassImpl(executeData, return_value, ZEND_ACC_INTERFACE, 0)
+	GetDeclaredClassImpl(executeData, return_value, AccInterface, 0)
 }
 func ZifGetDefinedFunctions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, excludeDisabled *types.Zval) {
 	var internal types.Zval
@@ -1224,7 +1224,7 @@ func ZifCreateFunction(executeData zpp.Ex, return_value zpp.Ret, args *types.Zva
 	Efree(eval_code)
 	Efree(eval_name)
 	if retval == types.SUCCESS {
-		var func_ *ZendOpArray
+		var func_ *types.ZendOpArray
 		var static_variables *types.Array
 		func_ = types.ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
 		if func_ == nil {
@@ -1510,7 +1510,7 @@ func DebugPrintBacktraceArgs(arg_array *types.Zval) {
 	}
 }
 func SkipInternalHandler(skip *ZendExecuteData) types.ZendBool {
-	return !(skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetCommonType())) && skip.GetPrevExecuteData() != nil && skip.GetPrevExecuteData().GetFunc() != nil && ZEND_USER_CODE(skip.GetPrevExecuteData().GetFunc().GetCommonType()) && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_ICALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_UCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL
+	return !(skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetType())) && skip.GetPrevExecuteData() != nil && skip.GetPrevExecuteData().GetFunc() != nil && ZEND_USER_CODE(skip.GetPrevExecuteData().GetFunc().GetType()) && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_ICALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_UCALL && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME && skip.GetPrevExecuteData().GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL
 }
 func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, options *types.Zval, limit *types.Zval) {
 	var call *ZendExecuteData
@@ -1552,7 +1552,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		if SkipInternalHandler(skip) != 0 {
 			skip = skip.GetPrevExecuteData()
 		}
-		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetCommonType()) {
+		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetType()) {
 			filename = skip.GetFunc().GetOpArray().GetFilename().GetVal()
 			if skip.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
 				if EG__().GetOplineBeforeException() != nil {
@@ -1619,7 +1619,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			/* i know this is kinda ugly, but i'm trying to avoid extra cycles in the main execution loop */
 
 			var build_filename_arg = 1
-			if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetCommonType())) || ptr.GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL {
+			if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetType())) || ptr.GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL {
 
 				/* can happen when calling eval from a custom sapi */
 
@@ -1672,11 +1672,11 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			var prev_call = skip
 			var prev = skip.GetPrevExecuteData()
 			for prev != nil {
-				if prev_call != nil && prev_call.GetFunc() != nil && !(ZEND_USER_CODE(prev_call.GetFunc().GetCommonType())) {
+				if prev_call != nil && prev_call.GetFunc() != nil && !(ZEND_USER_CODE(prev_call.GetFunc().GetType())) {
 					prev = nil
 					break
 				}
-				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetCommonType()) {
+				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
 					ZendPrintf(") called at [%s:%d]\n", prev.GetFunc().GetOpArray().GetFilename().GetVal(), prev.GetOpline().GetLineno())
 					break
 				}
@@ -1710,7 +1710,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 	if !(b.Assign(&ptr, CurrEX())) {
 		return
 	}
-	if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetCommonType())) {
+	if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetType())) {
 		call = ptr
 		ptr = ptr.GetPrevExecuteData()
 	}
@@ -1725,7 +1725,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 
 			/* skip "new Exception()" */
 
-			if ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetCommonType()) && ptr.GetOpline().GetOpcode() == ZEND_NEW {
+			if ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetType()) && ptr.GetOpline().GetOpcode() == ZEND_NEW {
 				call = ptr
 				ptr = ptr.GetPrevExecuteData()
 			}
@@ -1749,7 +1749,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 		if SkipInternalHandler(skip) != 0 {
 			skip = skip.GetPrevExecuteData()
 		}
-		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetCommonType()) {
+		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetType()) {
 			filename = skip.GetFunc().GetOpArray().GetFilename()
 			if skip.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
 				if EG__().GetOplineBeforeException() != nil {
@@ -1768,10 +1768,10 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 			var prev_call = skip
 			var prev = skip.GetPrevExecuteData()
 			for prev != nil {
-				if prev_call != nil && prev_call.GetFunc() != nil && !(ZEND_USER_CODE(prev_call.GetFunc().GetCommonType())) && !prev_call.GetFunc().IsCallViaTrampoline() {
+				if prev_call != nil && prev_call.GetFunc() != nil && !(ZEND_USER_CODE(prev_call.GetFunc().GetType())) && !prev_call.GetFunc().IsCallViaTrampoline() {
 					break
 				}
-				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetCommonType()) {
+				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
 					tmp.SetStringCopy(prev.GetFunc().GetOpArray().GetFilename())
 					stack_frame.GetArr().KeyAddNew(types.ZSTR_FILE.GetStr(), &tmp)
 					tmp.SetLong(prev.GetOpline().GetLineno())
@@ -1837,7 +1837,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 
 			var build_filename_arg = 1
 			var pseudo_function_name *types.String
-			if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetCommonType())) || ptr.GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL {
+			if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetType())) || ptr.GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL {
 
 				/* can happen when calling eval from a custom sapi */
 
@@ -1929,7 +1929,7 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 		var _z = _p.GetVal()
 
 		zif = _z.GetPtr()
-		if zif.GetCommonType() == ZEND_INTERNAL_FUNCTION && zif.GetInternalFunction().GetModule() == module {
+		if zif.GetType() == ZEND_INTERNAL_FUNCTION && zif.GetInternalFunction().GetModule() == module {
 			if array == 0 {
 				ArrayInit(return_value)
 				array = 1

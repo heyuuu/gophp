@@ -112,7 +112,7 @@ func FunctionAddRef(function *types.ZendFunction) {
 		}
 	}
 }
-func DoBindFunctionError(lcname *types.String, op_array *ZendOpArray, compile_time types.ZendBool) {
+func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, compile_time types.ZendBool) {
 	var zv = b.CondF(compile_time != 0, func() *types.Array { return CG__().GetFunctionTable() }, func() *types.Array { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
 	var error_level = b.Cond(compile_time != 0, faults.E_COMPILE_ERROR, faults.E_ERROR)
 	var old_function *types.ZendFunction
@@ -209,7 +209,7 @@ func ZendMarkFunctionAsGenerator() {
 	}
 	CG__().GetActiveOpArray().SetIsGenerator(true)
 }
-func ZendBuildDelayedEarlyBindingList(op_array *ZendOpArray) uint32 {
+func ZendBuildDelayedEarlyBindingList(op_array *types.ZendOpArray) uint32 {
 	if op_array.IsEarlyBinding() {
 		var first_early_binding_opline = uint32 - 1
 		var prev_opline_num = &first_early_binding_opline
@@ -227,7 +227,7 @@ func ZendBuildDelayedEarlyBindingList(op_array *ZendOpArray) uint32 {
 	}
 	return uint32 - 1
 }
-func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline uint32) {
+func ZendDoDelayedEarlyBinding(op_array *types.ZendOpArray, first_early_binding_opline uint32) {
 	if first_early_binding_opline != uint32-1 {
 		var orig_in_compilation = CG__().GetInCompilation()
 		var opline_num = first_early_binding_opline
@@ -451,9 +451,9 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	}
 }
 func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *types.ClassEntry) types.ZendBool {
-	if (c.GetValue().GetAccessFlags() & ZEND_ACC_PUBLIC) != 0 {
+	if (c.GetValue().GetAccessFlags() & AccPublic) != 0 {
 		return 1
-	} else if (c.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) != 0 {
+	} else if (c.GetValue().GetAccessFlags() & AccPrivate) != 0 {
 		return c.GetCe() == scope
 	} else {
 		var ce = c.GetCe()
@@ -614,7 +614,7 @@ func Zendlex(elem *ZendParserStackElem) int {
 func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBool) {
 	var persistent_hashes = ce.GetType() == ZEND_INTERNAL_CLASS
 	ce.SetRefcount(1)
-	ce.SetCeFlags(ZEND_ACC_CONSTANTS_UPDATED)
+	ce.SetCeFlags(AccConstantsUpdated)
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_GUARDS) != 0 {
 		ce.SetIsUseGuards(true)
 	}
@@ -666,7 +666,7 @@ func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBo
 		}
 	}
 }
-func ZendGetCompiledVariableName(op_array *ZendOpArray, var_ uint32) *types.String {
+func ZendGetCompiledVariableName(op_array *types.ZendOpArray, var_ uint32) *types.String {
 	return op_array.GetVars()[EX_VAR_TO_NUM(var_)]
 }
 func ZendAstAppendStr(left_ast *ZendAst, right_ast *ZendAst) *ZendAst {

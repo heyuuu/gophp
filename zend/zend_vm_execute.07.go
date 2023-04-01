@@ -173,7 +173,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	}
 	if executeData.GetThis().IsObject() {
 		called_scope = types.Z_OBJCE(executeData.GetThis())
-		if func_.IsStatic() || (executeData.GetFunc().common.fn_flags&ZEND_ACC_STATIC) != 0 {
+		if func_.IsStatic() || (executeData.GetFunc().common.fn_flags&AccStatic) != 0 {
 			object = nil
 		} else {
 			object = &(executeData.GetThis())
@@ -203,7 +203,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded value */
 
 	{
-		if (executeData.GetFunc().op_array.fn_flags & ZEND_ACC_RETURN_REFERENCE) != 0 {
+		if (executeData.GetFunc().op_array.fn_flags & AccReturnReference) != 0 {
 
 			/* Constants and temporary variables aren't yieldable by reference,
 			 * but we still allow them with a notice. */

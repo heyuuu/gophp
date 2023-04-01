@@ -6,9 +6,9 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
+func CompileFile(file_handle *ZendFileHandle, type_ int) *types.ZendOpArray {
 	var original_lex_state ZendLexState
-	var op_array *ZendOpArray = nil
+	var op_array *types.ZendOpArray = nil
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(file_handle) == types.FAILURE {
 		if !(EG__().exception) {

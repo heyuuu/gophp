@@ -492,7 +492,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var arg_infos *ZendArgInfo
 	if return_type_ast != nil {
 

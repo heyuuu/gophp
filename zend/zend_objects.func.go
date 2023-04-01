@@ -71,7 +71,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		var fci types.ZendFcallInfo
 		var fcic types.ZendFcallInfoCache
 		var ret types.Zval
-		if destructor.GetOpArray().HasFnFlags(ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED) {
+		if destructor.GetOpArray().HasFnFlags(AccPrivate | AccProtected) {
 			if destructor.GetOpArray().IsPrivate() {
 
 				/* Ensure that if we're calling a private function, we're allowed to do so.

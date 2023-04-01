@@ -101,7 +101,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 	}
 }
 func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, properties *types.Array) int {
-	if class_type.HasCeFlags(ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) {
+	if class_type.HasCeFlags(AccInterface | AccTrait | AccImplicitAbstractClass | AccExplicitAbstractClass) {
 		if class_type.IsInterface() {
 			faults.ThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
 		} else if class_type.IsTrait() {

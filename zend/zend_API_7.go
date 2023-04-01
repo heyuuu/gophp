@@ -39,7 +39,7 @@ func ZendDisableClass(className string) int {
 		var _z *types.Zval = _p.GetVal()
 
 		fn = _z.GetPtr()
-		if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == disabled_class {
+		if fn.HasFnFlags(AccHasReturnType|AccHasTypeHints) && fn.GetScope() == disabled_class {
 			ZendFreeInternalArgInfo(fn.GetInternalFunction())
 		}
 	}

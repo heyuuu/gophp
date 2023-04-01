@@ -598,7 +598,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		function = "PHP Startup"
 	} else if PhpDuringModuleShutdown() != 0 {
 		function = "PHP Shutdown"
-	} else if zend.CurrEX() != nil && zend.CurrEX().GetFunc() != nil && zend.ZEND_USER_CODE(zend.CurrEX().GetFunc().GetCommonType()) && zend.CurrEX().GetOpline() != nil && zend.CurrEX().GetOpline().GetOpcode() == zend.ZEND_INCLUDE_OR_EVAL {
+	} else if zend.CurrEX() != nil && zend.CurrEX().GetFunc() != nil && zend.ZEND_USER_CODE(zend.CurrEX().GetFunc().GetType()) && zend.CurrEX().GetOpline() != nil && zend.CurrEX().GetOpline().GetOpcode() == zend.ZEND_INCLUDE_OR_EVAL {
 		switch zend.CurrEX().GetOpline().GetExtendedValue() {
 		case zend.ZEND_EVAL:
 			function = "eval"
@@ -1710,7 +1710,7 @@ func PhpHandleAuthData(auth *byte) int {
 	return ret
 }
 func PhpLintScript(file *zend.ZendFileHandle) int {
-	var op_array *zend.ZendOpArray
+	var op_array *types.ZendOpArray
 	var retval int = types.FAILURE
 
 	faults.Try(func() {

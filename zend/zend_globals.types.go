@@ -14,7 +14,7 @@ type ZendCompilerGlobals struct {
 	active_class_entry *types.ClassEntry
 	compiled_filename  *types.String
 	zend_lineno        int
-	active_op_array    *ZendOpArray
+	active_op_array    *types.ZendOpArray
 	function_table     *types.Array
 	classTable         *internal.LcTable[types.ClassEntry]
 	filenamesTable     map[string]string //filenames_table              HashTable
@@ -86,11 +86,13 @@ func (this *ZendCompilerGlobals) GetCompiledFilename() *types.String {
 func (this *ZendCompilerGlobals) SetCompiledFilename(value *types.String) {
 	this.compiled_filename = value
 }
-func (this *ZendCompilerGlobals) GetZendLineno() int                  { return this.zend_lineno }
-func (this *ZendCompilerGlobals) SetZendLineno(value int)             { this.zend_lineno = value }
-func (this *ZendCompilerGlobals) GetActiveOpArray() *ZendOpArray      { return this.active_op_array }
-func (this *ZendCompilerGlobals) SetActiveOpArray(value *ZendOpArray) { this.active_op_array = value }
-func (this *ZendCompilerGlobals) GetFunctionTable() *types.Array      { return this.function_table }
+func (this *ZendCompilerGlobals) GetZendLineno() int                   { return this.zend_lineno }
+func (this *ZendCompilerGlobals) SetZendLineno(value int)              { this.zend_lineno = value }
+func (this *ZendCompilerGlobals) GetActiveOpArray() *types.ZendOpArray { return this.active_op_array }
+func (this *ZendCompilerGlobals) SetActiveOpArray(value *types.ZendOpArray) {
+	this.active_op_array = value
+}
+func (this *ZendCompilerGlobals) GetFunctionTable() *types.Array { return this.function_table }
 func (this *ZendCompilerGlobals) SetFunctionTable(value *types.Array) {
 	this.function_table = value
 }

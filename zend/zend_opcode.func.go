@@ -6,21 +6,18 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZendExtensionOpArrayCtorHandler(extension *ZendExtension, op_array *ZendOpArray) {
+func ZendExtensionOpArrayCtorHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
 	if extension.GetOpArrayCtor() != nil {
 		extension.GetOpArrayCtor()(op_array)
 	}
 }
-func ZendExtensionOpArrayDtorHandler(extension *ZendExtension, op_array *ZendOpArray) {
+func ZendExtensionOpArrayDtorHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
 	if extension.GetOpArrayDtor() != nil {
 		extension.GetOpArrayDtor()(op_array)
 	}
 }
-func InitOpArray(op_array *ZendOpArray, type_ types.ZendUchar, initial_ops_size int) {
-	op_array.SetType(type_)
-	op_array.GetArgFlags()[0] = 0
-	op_array.GetArgFlags()[1] = 0
-	op_array.GetArgFlags()[2] = 0
+func InitOpArray(op_array *types.ZendOpArray, initial_ops_size int) {
+	op_array.init()
 	op_array.SetRefcount((*uint32)(Emalloc(b.SizeOf("uint32_t"))))
 	op_array.refcount = 1
 	op_array.SetLast(0)
@@ -58,7 +55,7 @@ func DestroyZendFunction(function *types.ZendFunction) {
 	ZendFunctionDtor(&tmp)
 }
 func ZendFreeInternalArgInfo(function *types.ZendInternalFunction) {
-	if function.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && function.GetArgInfo() != nil {
+	if function.HasFnFlags(AccHasReturnType|AccHasTypeHints) && function.GetArgInfo() != nil {
 		var i uint32
 		var num_args uint32 = function.GetNumArgs() + 1
 		var arg_info *ArgInfo = function.GetArgInfo() - 1
@@ -225,8 +222,8 @@ func DestroyZendClass(zv *types.Zval) {
 func DestroyZendClassEntry(ce *types.ClassEntry) {
 	var prop_info *ZendPropertyInfo
 	var fn *types.ZendFunction
-	if ce.HasCeFlags(ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED) {
-		var op_array *ZendOpArray
+	if ce.HasCeFlags(AccImmutable | AccPreloaded) {
+		var op_array *types.ZendOpArray
 		if ce.GetDefaultStaticMembersCount() != 0 {
 			ZendCleanupInternalClassData(ce)
 		}
@@ -377,7 +374,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			var _z *types.Zval = _p.GetVal()
 
 			fn = _z.GetPtr()
-			if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == ce {
+			if fn.HasFnFlags(AccHasReturnType|AccHasTypeHints) && fn.GetScope() == ce {
 				ZendFreeInternalArgInfo(fn.GetInternalFunction())
 			}
 		}
@@ -417,7 +414,7 @@ func ZendClassAddRef(zv *types.Zval) {
 		ce.GetRefcount()++
 	}
 }
-func DestroyOpArray(op_array *ZendOpArray) {
+func DestroyOpArray(op_array *types.ZendOpArray) {
 	var i uint32
 	if op_array.GetStaticVariables() != nil {
 		var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
@@ -492,7 +489,7 @@ func DestroyOpArray(op_array *ZendOpArray) {
 		Efree(arg_info)
 	}
 }
-func ZendUpdateExtendedStmts(op_array *ZendOpArray) {
+func ZendUpdateExtendedStmts(op_array *types.ZendOpArray) {
 	var opline *ZendOp = op_array.GetOpcodes()
 	var end *ZendOp = opline + op_array.GetLast()
 	for opline < end {
@@ -513,12 +510,12 @@ func ZendUpdateExtendedStmts(op_array *ZendOpArray) {
 		opline++
 	}
 }
-func ZendExtensionOpArrayHandler(extension *ZendExtension, op_array *ZendOpArray) {
+func ZendExtensionOpArrayHandler(extension *ZendExtension, op_array *types.ZendOpArray) {
 	if extension.GetOpArrayHandler() != nil {
 		extension.GetOpArrayHandler()(op_array)
 	}
 }
-func ZendCheckFinallyBreakout(op_array *ZendOpArray, op_num uint32, dst_num uint32) {
+func ZendCheckFinallyBreakout(op_array *types.ZendOpArray, op_num uint32, dst_num uint32) {
 	var i int
 	for i = 0; i < op_array.GetLastTryCatch(); i++ {
 		if (op_num < op_array.GetTryCatchArray()[i].GetFinallyOp() || op_num >= op_array.GetTryCatchArray()[i].GetFinallyEnd()) && (dst_num >= op_array.GetTryCatchArray()[i].GetFinallyOp() && dst_num <= op_array.GetTryCatchArray()[i].GetFinallyEnd()) {
@@ -534,7 +531,7 @@ func ZendCheckFinallyBreakout(op_array *ZendOpArray, op_num uint32, dst_num uint
 		}
 	}
 }
-func ZendGetBrkContTarget(op_array *ZendOpArray, opline *ZendOp) uint32 {
+func ZendGetBrkContTarget(op_array *types.ZendOpArray, opline *ZendOp) uint32 {
 	var nest_levels int = opline.GetOp2().GetNum()
 	var array_offset int = opline.GetOp1().GetNum()
 	var jmp_to *ZendBrkContElement
@@ -553,7 +550,7 @@ func ZendGetBrkContTarget(op_array *ZendOpArray, opline *ZendOp) uint32 {
 		return jmp_to.GetCont()
 	}
 }
-func EmitLiveRangeRaw(op_array *ZendOpArray, var_num uint32, kind uint32, start uint32, end uint32) {
+func EmitLiveRangeRaw(op_array *types.ZendOpArray, var_num uint32, kind uint32, start uint32, end uint32) {
 	var range_ *ZendLiveRange
 	op_array.GetLastLiveRange()++
 	op_array.SetLiveRange(Erealloc(op_array.GetLiveRange(), b.SizeOf("zend_live_range")*op_array.GetLastLiveRange()))
@@ -564,7 +561,7 @@ func EmitLiveRangeRaw(op_array *ZendOpArray, var_num uint32, kind uint32, start 
 	range_.SetStart(start)
 	range_.SetEnd(end)
 }
-func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint32, needs_live_range ZendNeedsLiveRangeCb) {
+func EmitLiveRange(op_array *types.ZendOpArray, var_num uint32, start uint32, end uint32, needs_live_range ZendNeedsLiveRangeCb) {
 	var def_opline *ZendOp = op_array.GetOpcodes()[start]
 	var orig_def_opline *ZendOp = def_opline
 	var use_opline *ZendOp = op_array.GetOpcodes()[end]
@@ -726,7 +723,7 @@ func SwapLiveRange(a *ZendLiveRange, b *ZendLiveRange) {
 	a.SetEnd(b.GetEnd())
 	b.SetEnd(tmp)
 }
-func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
+func ZendCalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	var opnum uint32 = op_array.GetLast()
 	var opline *ZendOp = op_array.GetOpcodes()[opnum]
 	var var_offset uint32 = op_array.GetLastVar()
@@ -829,7 +826,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 	}
 	FreeAlloca(last_use, use_heap)
 }
-func ZendRecalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
+func ZendRecalcLiveRanges(op_array *types.ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	/* We assume that we never create live-ranges where there were none before. */
 
 	b.Assert(op_array.GetLiveRange() != nil)
@@ -838,7 +835,7 @@ func ZendRecalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveR
 	op_array.SetLastLiveRange(0)
 	ZendCalcLiveRanges(op_array, needs_live_range)
 }
-func PassTwo(op_array *ZendOpArray) int {
+func PassTwo(op_array *types.ZendOpArray) int {
 	var opline *ZendOp
 	var end *ZendOp
 	if !(ZEND_USER_CODE(op_array.GetType())) {

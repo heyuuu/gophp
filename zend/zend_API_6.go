@@ -103,7 +103,7 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	*class_entry = *orig_class_entry
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
-	class_entry.SetCeFlags(ce_flags | ZEND_ACC_CONSTANTS_UPDATED | ZEND_ACC_LINKED | ZEND_ACC_RESOLVED_PARENT | ZEND_ACC_RESOLVED_INTERFACES)
+	class_entry.SetCeFlags(ce_flags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
 	class_entry.SetModule(EG__().GetCurrentModule())
 	if class_entry.GetBuiltinFunctions() != nil {
 		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), EG__().GetCurrentModule().GetType())
@@ -134,7 +134,7 @@ func ZendRegisterInternalClass(orig_class_entry *types.ClassEntry) *types.ClassE
 	return DoRegisterInternalClass(orig_class_entry, 0)
 }
 func ZendRegisterInternalInterface(orig_class_entry *types.ClassEntry) *types.ClassEntry {
-	return DoRegisterInternalClass(orig_class_entry, ZEND_ACC_INTERFACE)
+	return DoRegisterInternalClass(orig_class_entry, AccInterface)
 }
 func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int) int {
 	/* TODO: Move this out of here in 7.4. */
@@ -160,7 +160,7 @@ func ZendDisableFunction(function_name *byte, function_name_length int) int {
 	var func_ *types.ZendInternalFunction
 	if b.Assign(&func_, types.ZendHashStrFindPtr(CG__().GetFunctionTable(), b.CastStr(function_name, function_name_length))) {
 		ZendFreeInternalArgInfo(func_)
-		func_.SubFnFlags(ZEND_ACC_VARIADIC | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_HAS_RETURN_TYPE)
+		func_.SubFnFlags(AccVariadic | AccHasTypeHints | AccHasReturnType)
 		func_.SetNumArgs(0)
 		func_.SetArgInfo(nil)
 		func_.SetHandler(ZifDisplayDisabledFunction)

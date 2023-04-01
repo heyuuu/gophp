@@ -58,7 +58,7 @@ func EX_VAR(n uint32) *types.Zval { return ZEND_CALL_VAR(executeData, n) }
 func EX_VAR_TO_NUM(n uint32) __auto__ {
 	return uint32(ZEND_CALL_VAR(nil, n) - nil.VarNum(0))
 }
-func ZEND_OPLINE_NUM_TO_OFFSET(op_array *ZendOpArray, opline *ZendOp, opline_num uint32) *byte {
+func ZEND_OPLINE_NUM_TO_OFFSET(op_array *types.ZendOpArray, opline *ZendOp, opline_num uint32) *byte {
 	return (*byte)(op_array.GetOpcodes()[opline_num] - (*byte)(opline))
 }
 func ZEND_OFFSET_TO_OPLINE(base *ZendOp, offset uint32) *ZendOp {
@@ -67,10 +67,10 @@ func ZEND_OFFSET_TO_OPLINE(base *ZendOp, offset uint32) *ZendOp {
 func OP_JMP_ADDR(opline *ZendOp, node ZnodeOp) *ZendOp {
 	return ZEND_OFFSET_TO_OPLINE(opline, node.GetJmpOffset())
 }
-func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *ZendOpArray, opline *ZendOp, node ZnodeOp) {
+func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetJmpOffset(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, node.GetOplineNum()))
 }
-func CT_CONSTANT_EX(op_array *ZendOpArray, num *types.Zval) __auto__ {
+func CT_CONSTANT_EX(op_array *types.ZendOpArray, num *types.Zval) __auto__ {
 	return op_array.GetLiterals() + num
 }
 func CT_CONSTANT(node ZnodeOp) __auto__ {
@@ -79,7 +79,7 @@ func CT_CONSTANT(node ZnodeOp) __auto__ {
 func RT_CONSTANT(opline *ZendOp, node ZnodeOp) *types.Zval {
 	return (*types.Zval)((*byte)(opline) + int32(node).constant)
 }
-func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *ZendOpArray, opline *ZendOp, node ZnodeOp) {
+func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetConstant((*byte)(CT_CONSTANT_EX(op_array, node.GetConstant())) - (*byte)(opline))
 }
 func RUN_TIME_CACHE(op_array __auto__) any {
@@ -125,7 +125,7 @@ func ZEND_IS_BINARY_ASSIGN_OP_OPCODE(opcode __auto__) bool {
 	return opcode >= ZEND_ADD && opcode <= ZEND_POW
 }
 func ZendAllocCacheSlots(count unsigned) uint32 {
-	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var ret uint32 = op_array.GetCacheSize()
 	op_array.SetCacheSize(op_array.GetCacheSize() + count*b.SizeOf("void *"))
 	return ret
@@ -140,7 +140,7 @@ func GetNextOpNumber() uint32 {
 	return CG__().GetActiveOpArray().GetLast()
 }
 func GetNextOp() *ZendOp {
-	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var next_op_num uint32 = b.PostInc(&(op_array.GetLast()))
 	var next_op *ZendOp
 	if next_op_num >= CG__().GetContext().GetOpcodesSize() {
@@ -333,7 +333,7 @@ func GetTemporaryVariable() uint32 {
 	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }
 func LookupCv(name *types.String) int {
-	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var i int = 0
 	var hash_value ZendUlong = name.GetHash()
 	for i < op_array.GetLastVar() {
@@ -351,7 +351,7 @@ func LookupCv(name *types.String) int {
 	op_array.GetVars()[i] = name.Copy()
 	return int(types.ZendIntptrT(nil.VarNum(i)))
 }
-func ZendDelLiteral(op_array *ZendOpArray, n int) {
+func ZendDelLiteral(op_array *types.ZendOpArray, n int) {
 	ZvalPtrDtorNogc(CT_CONSTANT_EX(op_array, n))
 	if n+1 == op_array.GetLastLiteral() {
 		op_array.GetLastLiteral()--
@@ -359,7 +359,7 @@ func ZendDelLiteral(op_array *ZendOpArray, n int) {
 		CT_CONSTANT_EX(op_array, n).SetUndef()
 	}
 }
-func ZendInsertLiteral(op_array *ZendOpArray, zv *types.Zval, literal_position int) {
+func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_position int) {
 	var lit *types.Zval = CT_CONSTANT_EX(op_array, literal_position)
 	if zv.IsString() {
 		ZvalMakeInternedString(zv)
@@ -368,7 +368,7 @@ func ZendInsertLiteral(op_array *ZendOpArray, zv *types.Zval, literal_position i
 	lit.SetU2Extra(0)
 }
 func ZendAddLiteral(zv *types.Zval) int {
-	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var i int = op_array.GetLastLiteral()
 	op_array.GetLastLiteral()++
 	if i >= CG__().GetContext().GetLiteralsSize() {
@@ -567,15 +567,15 @@ func ZendDoFree(op1 *Znode) {
 }
 func ZendAddClassModifier(flags uint32, new_flag uint32) uint32 {
 	var new_flags uint32 = flags | new_flag
-	if (flags&ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 && (new_flag&ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 {
+	if (flags&AccExplicitAbstractClass) != 0 && (new_flag&AccExplicitAbstractClass) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
 		return 0
 	}
-	if (flags&ZEND_ACC_FINAL) != 0 && (new_flag&ZEND_ACC_FINAL) != 0 {
+	if (flags&AccFinal) != 0 && (new_flag&AccFinal) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
 		return 0
 	}
-	if (new_flags&ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 && (new_flags&ZEND_ACC_FINAL) != 0 {
+	if (new_flags&AccExplicitAbstractClass) != 0 && (new_flags&AccFinal) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Cannot use the final modifier on an abstract class", 0)
 		return 0
 	}
@@ -583,23 +583,23 @@ func ZendAddClassModifier(flags uint32, new_flag uint32) uint32 {
 }
 func ZendAddMemberModifier(flags uint32, new_flag uint32) uint32 {
 	var new_flags uint32 = flags | new_flag
-	if (flags&ZEND_ACC_PPP_MASK) != 0 && (new_flag&ZEND_ACC_PPP_MASK) != 0 {
+	if (flags&AccPppMask) != 0 && (new_flag&AccPppMask) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Multiple access type modifiers are not allowed", 0)
 		return 0
 	}
-	if (flags&ZEND_ACC_ABSTRACT) != 0 && (new_flag&ZEND_ACC_ABSTRACT) != 0 {
+	if (flags&AccAbstract) != 0 && (new_flag&AccAbstract) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
 		return 0
 	}
-	if (flags&ZEND_ACC_STATIC) != 0 && (new_flag&ZEND_ACC_STATIC) != 0 {
+	if (flags&AccStatic) != 0 && (new_flag&AccStatic) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Multiple static modifiers are not allowed", 0)
 		return 0
 	}
-	if (flags&ZEND_ACC_FINAL) != 0 && (new_flag&ZEND_ACC_FINAL) != 0 {
+	if (flags&AccFinal) != 0 && (new_flag&AccFinal) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
 		return 0
 	}
-	if (new_flags&ZEND_ACC_ABSTRACT) != 0 && (new_flags&ZEND_ACC_FINAL) != 0 {
+	if (new_flags&AccAbstract) != 0 && (new_flags&AccFinal) != 0 {
 		faults.ThrowException(faults.ZendCeCompileError, "Cannot use the final modifier on an abstract class member", 0)
 		return 0
 	}

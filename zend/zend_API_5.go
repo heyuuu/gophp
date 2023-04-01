@@ -177,15 +177,15 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 		internal_function.SetScope(scope)
 		if ptr.GetFlags() != 0 {
 			if !ptr.IsPppMask() {
-				if ptr.GetFlags() != ZEND_ACC_DEPRECATED && scope != nil {
+				if ptr.GetFlags() != AccDeprecated && scope != nil {
 					faults.Error(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 				}
-				internal_function.SetFnFlags(ZEND_ACC_PUBLIC | ptr.GetFlags())
+				internal_function.SetFnFlags(AccPublic | ptr.GetFlags())
 			} else {
 				internal_function.SetFnFlags(ptr.GetFlags())
 			}
 		} else {
-			internal_function.SetFnFlags(ZEND_ACC_PUBLIC)
+			internal_function.SetFnFlags(AccPublic)
 		}
 		if ptr.GetArgInfo() != nil {
 			var info *ZendInternalFunctionInfo = (*ZendInternalFunctionInfo)(ptr.GetArgInfo())
@@ -285,7 +285,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.ZendFunctio
 				}
 			}
 		}
-		if reg_function.GetArgInfo() != nil && reg_function.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) {
+		if reg_function.GetArgInfo() != nil && reg_function.HasFnFlags(AccHasReturnType|AccHasTypeHints) {
 
 			/* convert "const char*" class type names into "zend_string*" */
 

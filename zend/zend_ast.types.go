@@ -159,31 +159,31 @@ func (this *ZendAstDecl) SwitchFlags(value uint32, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendAstDecl) IsPublic() bool          { return this.HasFlags(ZEND_ACC_PUBLIC) }
-func (this ZendAstDecl) IsProtected() bool       { return this.HasFlags(ZEND_ACC_PROTECTED) }
-func (this ZendAstDecl) IsPrivate() bool         { return this.HasFlags(ZEND_ACC_PRIVATE) }
-func (this ZendAstDecl) IsStatic() bool          { return this.HasFlags(ZEND_ACC_STATIC) }
-func (this ZendAstDecl) IsAbstract() bool        { return this.HasFlags(ZEND_ACC_ABSTRACT) }
-func (this ZendAstDecl) IsFinal() bool           { return this.HasFlags(ZEND_ACC_FINAL) }
-func (this ZendAstDecl) IsReturnReference() bool { return this.HasFlags(ZEND_ACC_RETURN_REFERENCE) }
-func (this ZendAstDecl) IsInterface() bool       { return this.HasFlags(ZEND_ACC_INTERFACE) }
-func (this ZendAstDecl) IsTrait() bool           { return this.HasFlags(ZEND_ACC_TRAIT) }
+func (this ZendAstDecl) IsPublic() bool          { return this.HasFlags(AccPublic) }
+func (this ZendAstDecl) IsProtected() bool       { return this.HasFlags(AccProtected) }
+func (this ZendAstDecl) IsPrivate() bool         { return this.HasFlags(AccPrivate) }
+func (this ZendAstDecl) IsStatic() bool          { return this.HasFlags(AccStatic) }
+func (this ZendAstDecl) IsAbstract() bool        { return this.HasFlags(AccAbstract) }
+func (this ZendAstDecl) IsFinal() bool           { return this.HasFlags(AccFinal) }
+func (this ZendAstDecl) IsReturnReference() bool { return this.HasFlags(AccReturnReference) }
+func (this ZendAstDecl) IsInterface() bool       { return this.HasFlags(AccInterface) }
+func (this ZendAstDecl) IsTrait() bool           { return this.HasFlags(AccTrait) }
 func (this ZendAstDecl) IsExplicitAbstractClass() bool {
-	return this.HasFlags(ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)
+	return this.HasFlags(AccExplicitAbstractClass)
 }
-func (this ZendAstDecl) IsAnonClass() bool         { return this.HasFlags(ZEND_ACC_ANON_CLASS) }
-func (this *ZendAstDecl) SetIsPublic(cond bool)    { this.SwitchFlags(ZEND_ACC_PUBLIC, cond) }
-func (this *ZendAstDecl) SetIsProtected(cond bool) { this.SwitchFlags(ZEND_ACC_PROTECTED, cond) }
-func (this *ZendAstDecl) SetIsPrivate(cond bool)   { this.SwitchFlags(ZEND_ACC_PRIVATE, cond) }
-func (this *ZendAstDecl) SetIsStatic(cond bool)    { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
-func (this *ZendAstDecl) SetIsAbstract(cond bool)  { this.SwitchFlags(ZEND_ACC_ABSTRACT, cond) }
-func (this *ZendAstDecl) SetIsFinal(cond bool)     { this.SwitchFlags(ZEND_ACC_FINAL, cond) }
+func (this ZendAstDecl) IsAnonClass() bool         { return this.HasFlags(AccAnonClass) }
+func (this *ZendAstDecl) SetIsPublic(cond bool)    { this.SwitchFlags(AccPublic, cond) }
+func (this *ZendAstDecl) SetIsProtected(cond bool) { this.SwitchFlags(AccProtected, cond) }
+func (this *ZendAstDecl) SetIsPrivate(cond bool)   { this.SwitchFlags(AccPrivate, cond) }
+func (this *ZendAstDecl) SetIsStatic(cond bool)    { this.SwitchFlags(AccStatic, cond) }
+func (this *ZendAstDecl) SetIsAbstract(cond bool)  { this.SwitchFlags(AccAbstract, cond) }
+func (this *ZendAstDecl) SetIsFinal(cond bool)     { this.SwitchFlags(AccFinal, cond) }
 func (this *ZendAstDecl) SetIsReturnReference(cond bool) {
-	this.SwitchFlags(ZEND_ACC_RETURN_REFERENCE, cond)
+	this.SwitchFlags(AccReturnReference, cond)
 }
-func (this *ZendAstDecl) SetIsInterface(cond bool) { this.SwitchFlags(ZEND_ACC_INTERFACE, cond) }
-func (this *ZendAstDecl) SetIsTrait(cond bool)     { this.SwitchFlags(ZEND_ACC_TRAIT, cond) }
+func (this *ZendAstDecl) SetIsInterface(cond bool) { this.SwitchFlags(AccInterface, cond) }
+func (this *ZendAstDecl) SetIsTrait(cond bool)     { this.SwitchFlags(AccTrait, cond) }
 func (this *ZendAstDecl) SetIsExplicitAbstractClass(cond bool) {
-	this.SwitchFlags(ZEND_ACC_EXPLICIT_ABSTRACT_CLASS, cond)
+	this.SwitchFlags(AccExplicitAbstractClass, cond)
 }
-func (this *ZendAstDecl) SetIsAnonClass(cond bool) { this.SwitchFlags(ZEND_ACC_ANON_CLASS, cond) }
+func (this *ZendAstDecl) SetIsAnonClass(cond bool) { this.SwitchFlags(AccAnonClass, cond) }

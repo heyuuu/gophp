@@ -252,7 +252,7 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 	types.ZendStringReleaseEx(name, 0)
 }
 func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
-	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
 	switch ast.GetAttr() {
 	case T_LINE:
