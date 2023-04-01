@@ -97,12 +97,12 @@ func (this *ZendObjectIterator) SetIndex(value ZendUlong)                { this.
  * ZendClassIteratorFuncs
  */
 type ZendClassIteratorFuncs struct {
-	zf_new_iterator *types.ZendFunction
-	zf_valid        *types.ZendFunction
-	zf_current      *types.ZendFunction
-	zf_key          *types.ZendFunction
-	zf_next         *types.ZendFunction
-	zf_rewind       *types.ZendFunction
+	zf_new_iterator types.IFunction
+	zf_valid        types.IFunction
+	zf_current      types.IFunction
+	zf_key          types.IFunction
+	zf_next         types.IFunction
+	zf_rewind       types.IFunction
 }
 
 //             func MakeZendClassIteratorFuncs(

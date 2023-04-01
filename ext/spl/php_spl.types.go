@@ -29,15 +29,15 @@ func (this *ZendSplGlobals) SetAutoloadRunning(value int) { this.autoload_runnin
  * AutoloadFuncInfo
  */
 type AutoloadFuncInfo struct {
-	func_ptr *types.ZendFunction
+	func_ptr types.IFunction
 	obj      types.Zval
 	closure  types.Zval
 	ce       *types.ClassEntry
 }
 
-func (this *AutoloadFuncInfo) GetFuncPtr() *types.ZendFunction      { return this.func_ptr }
-func (this *AutoloadFuncInfo) SetFuncPtr(value *types.ZendFunction) { this.func_ptr = value }
-func (this *AutoloadFuncInfo) GetObj() types.Zval                   { return this.obj }
-func (this *AutoloadFuncInfo) GetClosure() types.Zval               { return this.closure }
-func (this *AutoloadFuncInfo) GetCe() *types.ClassEntry             { return this.ce }
-func (this *AutoloadFuncInfo) SetCe(value *types.ClassEntry)        { this.ce = value }
+func (this *AutoloadFuncInfo) GetFuncPtr() types.IFunction      { return this.func_ptr }
+func (this *AutoloadFuncInfo) SetFuncPtr(value types.IFunction) { this.func_ptr = value }
+func (this *AutoloadFuncInfo) GetObj() types.Zval               { return this.obj }
+func (this *AutoloadFuncInfo) GetClosure() types.Zval           { return this.closure }
+func (this *AutoloadFuncInfo) GetCe() *types.ClassEntry         { return this.ce }
+func (this *AutoloadFuncInfo) SetCe(value *types.ClassEntry)    { this.ce = value }

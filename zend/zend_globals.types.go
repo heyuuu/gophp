@@ -218,7 +218,7 @@ type ZendExecutorGlobals struct {
 	persistent_functions_count          uint32
 	persistent_classes_count            uint32
 	in_autoload                         *types.Array
-	autoload_func                       *types.ZendFunction
+	autoload_func                       types.IFunction
 	no_extensions                       types.ZendBool
 	vm_interrupt                        types.ZendBool
 	timed_out                           types.ZendBool

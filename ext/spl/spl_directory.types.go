@@ -90,7 +90,7 @@ type SplFilesystemObject struct {
 			max_line_len     int
 			current_line_num zend.ZendLong
 			zresource        types.Zval
-			func_getCurr     *types.ZendFunction
+			func_getCurr     types.IFunction
 			delimiter        byte
 			enclosure        byte
 			escape           int

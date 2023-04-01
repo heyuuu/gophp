@@ -29,11 +29,11 @@ func (this *SplFixedarray) SetElements(value *types.Zval) { this.elements = valu
  */
 type SplFixedarrayObject struct {
 	array           SplFixedarray
-	fptr_offset_get *types.ZendFunction
-	fptr_offset_set *types.ZendFunction
-	fptr_offset_has *types.ZendFunction
-	fptr_offset_del *types.ZendFunction
-	fptr_count      *types.ZendFunction
+	fptr_offset_get types.IFunction
+	fptr_offset_set types.IFunction
+	fptr_offset_has types.IFunction
+	fptr_offset_del types.IFunction
+	fptr_count      types.IFunction
 	current         int
 	flags           int
 	ce_get_iterator *types.ClassEntry

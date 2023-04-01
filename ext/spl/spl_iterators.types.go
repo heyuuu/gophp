@@ -266,13 +266,13 @@ type SplRecursiveItObject struct {
 	flags           int
 	max_depth       int
 	in_iteration    types.ZendBool
-	beginIteration  *types.ZendFunction
-	endIteration    *types.ZendFunction
-	callHasChildren *types.ZendFunction
-	callGetChildren *types.ZendFunction
-	beginChildren   *types.ZendFunction
-	endChildren     *types.ZendFunction
-	nextElement     *types.ZendFunction
+	beginIteration  types.IFunction
+	endIteration    types.IFunction
+	callHasChildren types.IFunction
+	callGetChildren types.IFunction
+	beginChildren   types.IFunction
+	endChildren     types.IFunction
+	nextElement     types.IFunction
 	ce              *types.ClassEntry
 	prefix          []zend.SmartStr
 	postfix         []zend.SmartStr

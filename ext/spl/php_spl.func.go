@@ -434,7 +434,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 				return_value.SetFalse()
 				return
 			}
-		} else if fcc.GetFunctionHandler().GetType() == zend.ZEND_INTERNAL_FUNCTION && fcc.GetFunctionHandler().GetInternalFunction().GetHandler() == ZifSplAutoloadCall {
+		} else if interFunc, ok := fcc.GetFunctionHandler().(*types.InternalFunction); ok && interFunc.GetHandler() == ZifSplAutoloadCall {
 			if do_throw != 0 {
 				faults.ThrowExceptionEx(spl_ce_LogicException, 0, "Function spl_autoload_call() cannot be registered")
 			}

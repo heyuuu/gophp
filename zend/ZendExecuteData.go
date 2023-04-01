@@ -12,7 +12,7 @@ type ZendExecuteData struct {
 	opline          *ZendOp
 	call            *ZendExecuteData
 	returnValue     *types.Zval
-	func_           *types.ZendFunction
+	func_           types.IFunction
 	This            types.Zval
 	prevExecuteData *ZendExecuteData
 	symbolTable     *types.Array

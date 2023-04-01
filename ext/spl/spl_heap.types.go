@@ -78,8 +78,8 @@ type SplHeapObject struct {
 	heap            *SplPtrHeap
 	flags           int
 	ce_get_iterator *types.ClassEntry
-	fptr_cmp        *types.ZendFunction
-	fptr_count      *types.ZendFunction
+	fptr_cmp        types.IFunction
+	fptr_count      types.IFunction
 	std             types.ZendObject
 }
 

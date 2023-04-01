@@ -11,8 +11,8 @@ type IFunction interface {
 	SetFunctionName(value *String)
 	GetScope() *ClassEntry
 	SetScope(value *ClassEntry)
-	GetPrototype() *ZendFunction
-	SetPrototype(value *ZendFunction)
+	GetPrototype() IFunction
+	SetPrototype(value IFunction)
 	GetNumArgs() uint32
 	SetNumArgs(value uint32)
 	GetRequiredNumArgs() uint32
@@ -99,28 +99,30 @@ type functionHeader struct {
 	fnFlags         uint32
 	functionName    *String
 	scope           *ClassEntry
-	prototype       *ZendFunction
+	prototype       IFunction
 	numArgs         uint32
 	requiredNumArgs uint32
 	argInfos        []zend.ArgInfo
 }
 
-func (f *functionHeader) GetType() uint8                   { return f.typ }
-func (f *functionHeader) SetType(typ uint8)                { f.typ = typ }
-func (f *functionHeader) GetFnFlags() uint32               { return f.fnFlags }
-func (f *functionHeader) SetFnFlags(flags uint32)          { f.fnFlags = flags }
-func (f *functionHeader) GetFunctionName() *String         { return f.functionName }
-func (f *functionHeader) SetFunctionName(value *String)    { f.functionName = value }
-func (f *functionHeader) GetScope() *ClassEntry            { return f.scope }
-func (f *functionHeader) SetScope(value *ClassEntry)       { f.scope = value }
-func (f *functionHeader) GetPrototype() *ZendFunction      { return f.prototype }
-func (f *functionHeader) SetPrototype(value *ZendFunction) { f.prototype = value }
-func (f *functionHeader) GetNumArgs() uint32               { return uint32(len(f.argInfos)) }
-func (f *functionHeader) SetNumArgs(value uint32)          { f.numArgs = value }
-func (f *functionHeader) GetRequiredNumArgs() uint32       { return f.requiredNumArgs }
-func (f *functionHeader) SetRequiredNumArgs(value uint32)  { f.requiredNumArgs = value }
-func (f *functionHeader) GetArgInfo() []zend.ArgInfo       { return f.argInfos }
-func (f *functionHeader) SetArgInfo(value []zend.ArgInfo)  { f.argInfos = value }
+var _ IFunction = (*functionHeader)(nil)
+
+func (f *functionHeader) GetType() uint8                  { return f.typ }
+func (f *functionHeader) SetType(typ uint8)               { f.typ = typ }
+func (f *functionHeader) GetFnFlags() uint32              { return f.fnFlags }
+func (f *functionHeader) SetFnFlags(flags uint32)         { f.fnFlags = flags }
+func (f *functionHeader) GetFunctionName() *String        { return f.functionName }
+func (f *functionHeader) SetFunctionName(value *String)   { f.functionName = value }
+func (f *functionHeader) GetScope() *ClassEntry           { return f.scope }
+func (f *functionHeader) SetScope(value *ClassEntry)      { f.scope = value }
+func (f *functionHeader) GetPrototype() IFunction         { return f.prototype }
+func (f *functionHeader) SetPrototype(value IFunction)    { f.prototype = value }
+func (f *functionHeader) GetNumArgs() uint32              { return uint32(len(f.argInfos)) }
+func (f *functionHeader) SetNumArgs(value uint32)         { f.numArgs = value }
+func (f *functionHeader) GetRequiredNumArgs() uint32      { return f.requiredNumArgs }
+func (f *functionHeader) SetRequiredNumArgs(value uint32) { f.requiredNumArgs = value }
+func (f *functionHeader) GetArgInfo() []zend.ArgInfo      { return f.argInfos }
+func (f *functionHeader) SetArgInfo(value []zend.ArgInfo) { f.argInfos = value }
 
 /* fnFlags */
 func (f *functionHeader) AddFnFlags(value uint32)      { f.fnFlags |= value }

@@ -12,11 +12,11 @@ type SplArrayObject struct {
 	ht_iter         uint32
 	ar_flags        int
 	nApplyCount     uint8
-	fptr_offset_get *types.ZendFunction
-	fptr_offset_set *types.ZendFunction
-	fptr_offset_has *types.ZendFunction
-	fptr_offset_del *types.ZendFunction
-	fptr_count      *types.ZendFunction
+	fptr_offset_get types.IFunction
+	fptr_offset_set types.IFunction
+	fptr_offset_has types.IFunction
+	fptr_offset_del types.IFunction
+	fptr_count      types.IFunction
 	ce_get_iterator *types.ClassEntry
 	std             types.ZendObject
 }

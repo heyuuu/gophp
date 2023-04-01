@@ -13,7 +13,7 @@ type spl_SplObjectStorage struct {
 	index         zend.ZendLong
 	pos           types.ArrayPosition
 	flags         zend.ZendLong
-	fptr_get_hash *types.ZendFunction
+	fptr_get_hash types.IFunction
 	gcdata        *types.Zval
 	gcdata_num    int
 	std           types.ZendObject
