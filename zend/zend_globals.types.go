@@ -242,7 +242,7 @@ type ZendExecutorGlobals struct {
 	exception                           *types.ZendObject
 	prev_exception                      **types.ZendObject
 	opline_before_exception             *ZendOp
-	exception_op                        []ZendOp
+	exception_op                        [3]ZendOp
 	current_module                      *ModuleEntry
 	active                              types.ZendBool
 	flags                               types.ZendUchar
@@ -452,8 +452,7 @@ func (this *ZendExecutorGlobals) GetOplineBeforeException() *ZendOp {
 func (this *ZendExecutorGlobals) SetOplineBeforeException(value *ZendOp) {
 	this.opline_before_exception = value
 }
-func (this *ZendExecutorGlobals) GetExceptionOp() []ZendOp       { return this.exception_op }
-func (this *ZendExecutorGlobals) SetExceptionOp(value []ZendOp)  { this.exception_op = value }
+func (this *ZendExecutorGlobals) GetExceptionOp() *[3]ZendOp     { return &this.exception_op }
 func (this *ZendExecutorGlobals) GetCurrentModule() *ModuleEntry { return this.current_module }
 func (this *ZendExecutorGlobals) SetCurrentModule(value *ModuleEntry) {
 	this.current_module = value

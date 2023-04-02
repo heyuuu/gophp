@@ -281,13 +281,14 @@ func ZendSetDefaultCompileTimeValues() {
 	CG__().SetRtdKeyCounter(0)
 }
 func ZendInitExceptionOp() {
-	memset(EG__().GetExceptionOp(), 0, b.SizeOf("EG ( exception_op )"))
-	EG__().GetExceptionOp()[0].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZendVmSetOpcodeHandler(EG__().GetExceptionOp())
-	EG__().GetExceptionOp()[1].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZendVmSetOpcodeHandler(EG__().GetExceptionOp() + 1)
-	EG__().GetExceptionOp()[2].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZendVmSetOpcodeHandler(EG__().GetExceptionOp() + 2)
+	exceptionOps := EG__().GetExceptionOp()
+	*exceptionOps = [3]ZendOp{}
+	exceptionOps[0].SetOpcode(ZEND_HANDLE_EXCEPTION)
+	ZendVmSetOpcodeHandler(&exceptionOps[0])
+	exceptionOps[1].SetOpcode(ZEND_HANDLE_EXCEPTION)
+	ZendVmSetOpcodeHandler(&exceptionOps[1])
+	exceptionOps[2].SetOpcode(ZEND_HANDLE_EXCEPTION)
+	ZendVmSetOpcodeHandler(&exceptionOps[2])
 }
 func ZendInitCallTrampolineOp() {
 	memset(EG__().GetCallTrampolineOp(), 0, b.SizeOf("EG ( call_trampoline_op )"))
