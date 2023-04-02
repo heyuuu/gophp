@@ -7,53 +7,6 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result int
-	op1 = EX_VAR(opline.GetOp1().GetVar())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
-	result = op1.GetLval() <= op2.GetLval()
-	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result int
-	op1 = EX_VAR(opline.GetOp1().GetVar())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
-	result = op1.GetDval() <= op2.GetDval()
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result int
-	op1 = EX_VAR(opline.GetOp1().GetVar())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
-	result = op1.GetDval() <= op2.GetDval()
-	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result int
-	op1 = EX_VAR(opline.GetOp1().GetVar())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
-	result = op1.GetDval() <= op2.GetDval()
-	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
 func ZEND_FETCH_LIST_R_SPEC_TMPVARCV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op2 ZendFreeOp

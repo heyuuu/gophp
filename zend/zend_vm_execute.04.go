@@ -49,49 +49,6 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		goto defined_true
 	}
 }
-func ZEND_QM_ASSIGN_LONG_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp1())
-	EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetLval())
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_QM_ASSIGN_DOUBLE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp1())
-	EX_VAR(opline.GetResult().GetVar()).SetDouble(value.GetDval())
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_QM_ASSIGN_NOREF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp1())
-	types.ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), value)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_SEND_VAL_SIMPLE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
-	var arg *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp1())
-	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_SEND_VAL_EX_SIMPLE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var value *types.Zval
-	var arg *types.Zval
-	var arg_num uint32 = opline.GetOp2().GetNum()
-	if QUICK_ARG_MUST_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
-		return zend_cannot_pass_by_ref_helper_SPEC(executeData)
-	}
-	value = RT_CONSTANT(opline, opline.GetOp1())
-	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
-	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
 func ZEND_ADD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
