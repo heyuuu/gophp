@@ -93,7 +93,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* We increment to the next op, so we are at the correct position when the
 	 * generator is resumed. */
 
-	ZEND_VM_INC_OPCODE()
+	ZEND_VM_INC_OPCODE(executeData)
 
 	/* The GOTO VM uses a local opline variable. We need to set the opline
 	 * variable in executeData so we don't resume at an old position. */
@@ -118,7 +118,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_UNUSED_HANDLER(executeData *ZendE
 
 			/* reached end of iteration */
 
-			ZEND_VM_SET_RELATIVE_OPCODE(opline, opline.GetExtendedValue())
+			ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 			return 0
 		}
 		value = p.GetVal()
@@ -141,7 +141,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_UNUSED_HANDLER(executeData *ZendE
 
 	variable_ptr = EX_VAR(opline.GetOp2().GetVar())
 	ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -161,7 +161,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExe
 
 			/* reached end of iteration */
 
-			ZEND_VM_SET_RELATIVE_OPCODE(opline, opline.GetExtendedValue())
+			ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 			return 0
 		}
 		value = p.GetVal()
@@ -188,7 +188,7 @@ func ZEND_FE_FETCH_R_SIMPLE_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExe
 	}
 	variable_ptr = EX_VAR(opline.GetOp2().GetVar())
 	ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -198,7 +198,7 @@ func ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		ZEND_DEL_CALL_FLAG(executeData.GetCall(), ZEND_CALL_SEND_ARG_BY_REF)
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_QUICK_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -208,7 +208,7 @@ func ZEND_CHECK_FUNC_ARG_SPEC_UNUSED_QUICK_HANDLER(executeData *ZendExecuteData)
 	} else {
 		ZEND_DEL_CALL_FLAG(executeData.GetCall(), ZEND_CALL_SEND_ARG_BY_REF)
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -230,7 +230,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
-		HANDLE_EXCEPTION()
+		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
 		scope = executeData.GetFunc().op_array.scope
@@ -238,12 +238,12 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
-				HANDLE_EXCEPTION()
+				return 0
 			}
 		}
 	}
 	EX_VAR(opline.GetResult().GetVar()).SetObject(clone_call(obj))
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var fetch_type uint32
@@ -255,7 +255,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	if scope == nil {
 		faults.ThrowError(nil, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
 		EX_VAR(opline.GetResult().GetVar()).SetUndef()
-		HANDLE_EXCEPTION()
+		return 0
 	}
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
@@ -264,7 +264,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		if scope.GetParent() == nil {
 			faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
-			HANDLE_EXCEPTION()
+			return 0
 		}
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetParent().name)
 	case ZEND_FETCH_CLASS_STATIC:
@@ -277,7 +277,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	default:
 
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -391,7 +391,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 		}
 		break
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -429,7 +429,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 		}
 		break
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -456,7 +456,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 					{
 					fetch_obj_r_fast_copy:
 						types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), retval)
-						ZEND_VM_NEXT_OPCODE()
+						return ZEND_VM_NEXT_OPCODE(executeData, opline)
 					}
 				}
 			} else if zobj.GetProperties() != nil {
@@ -495,7 +495,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	return ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData)
@@ -513,7 +513,7 @@ func ZEND_FETCH_OBJ_W_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS) }, nil), BP_VAR_W, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, 1, opline, executeData)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -528,7 +528,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -555,7 +555,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 					{
 					fetch_obj_is_fast_copy:
 						types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), retval)
-						ZEND_VM_NEXT_OPCODE()
+						return ZEND_VM_NEXT_OPCODE(executeData, opline)
 					}
 				}
 			} else if zobj.GetProperties() != nil {
@@ -593,7 +593,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_is_finish:
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_FUNC_ARG_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_SEND_ARG_BY_REF) != 0 {
@@ -617,7 +617,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	result = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_UNSET, 0, 1, opline, executeData)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()

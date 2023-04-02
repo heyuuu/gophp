@@ -26,7 +26,7 @@ func ZEND_FETCH_DIM_UNSET_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int 
 		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_W_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -41,7 +41,7 @@ func ZEND_FETCH_OBJ_W_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	{
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_RW_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -56,7 +56,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	{
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_FUNC_ARG_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_SEND_ARG_BY_REF) != 0 {
@@ -84,7 +84,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int 
 	{
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_LIST_W_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -99,7 +99,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		zend_fetch_dimension_address_W(container, dim, IS_CV, opline, executeData)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_OBJ_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -589,7 +589,7 @@ func ZEND_ASSIGN_SPEC_VAR_CV_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData)
 			ZvalPtrDtorNogc(free_op1)
 		}
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -607,7 +607,7 @@ func ZEND_ASSIGN_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExecuteData) i
 			ZvalPtrDtorNogc(free_op1)
 		}
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_REF_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -634,7 +634,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -711,11 +711,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 					} else if function_name.IsUndef() {
 						ZVAL_UNDEFINED_OP2()
 						if EG__().GetException() != nil {
-							HANDLE_EXCEPTION()
+							return 0
 						}
 					}
 					faults.ThrowError(nil, "Function name must be a string")
-					HANDLE_EXCEPTION()
+					return 0
 					break
 				}
 			}
@@ -729,7 +729,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
-			HANDLE_EXCEPTION()
+			return 0
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
@@ -743,7 +743,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 		} else {
 			ZendNonStaticMethodCall(fbc)
 			if EG__().GetException() != nil {
-				HANDLE_EXCEPTION()
+				return 0
 			}
 			goto check_parent_and_self
 		}
@@ -756,7 +756,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), ce)
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -823,7 +823,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 		}
 	}
 
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INIT_ARRAY_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var array *types.Zval
@@ -924,7 +924,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -953,5 +953,5 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	if free_op1 != nil {
 		ZvalPtrDtorNogc(free_op1)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

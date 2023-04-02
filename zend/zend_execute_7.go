@@ -191,14 +191,14 @@ func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	}
 }
 func ZendFreeCompiledVariables(executeData *ZendExecuteData) { IFreeCompiledVariables(executeData) }
-func ZEND_VM_INTERRUPT_CHECK() {
+func ZEND_VM_INTERRUPT_CHECK(executeData *ZendExecuteData) {
 	if EG__().GetVmInterrupt() != 0 {
-		ZEND_VM_INTERRUPT()
+		zend_interrupt_helper_SPEC(executeData)
 	}
 }
-func ZEND_VM_LOOP_INTERRUPT_CHECK() {
+func ZEND_VM_LOOP_INTERRUPT_CHECK(executeData *ZendExecuteData) {
 	if EG__().GetVmInterrupt() != 0 {
-		ZEND_VM_LOOP_INTERRUPT()
+		zend_interrupt_helper_SPEC(executeData)
 	}
 }
 func ZendCopyExtraArgs(executeData *ZendExecuteData) {

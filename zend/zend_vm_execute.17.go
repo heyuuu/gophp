@@ -26,7 +26,7 @@ func ZEND_FETCH_DIM_UNSET_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) i
 		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -41,7 +41,7 @@ func ZEND_FETCH_OBJ_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	{
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_RW_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -56,7 +56,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	{
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_FUNC_ARG_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_SEND_ARG_BY_REF) != 0 {
@@ -84,7 +84,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) i
 	{
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_LIST_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -99,7 +99,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	} else {
 		zend_fetch_dimension_address_W(container, dim, IS_CONST, opline, executeData)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -791,7 +791,7 @@ func ZEND_ASSIGN_SPEC_VAR_CONST_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 			ZvalPtrDtorNogc(free_op1)
 		}
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_SPEC_VAR_CONST_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -809,7 +809,7 @@ func ZEND_ASSIGN_SPEC_VAR_CONST_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 			ZvalPtrDtorNogc(free_op1)
 		}
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -886,7 +886,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
-			HANDLE_EXCEPTION()
+			return 0
 		}
 		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) {
 			CACHE_POLYMORPHIC_PTR(opline.GetResult().GetNum(), ce, fbc)
@@ -903,7 +903,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 		} else {
 			ZendNonStaticMethodCall(fbc)
 			if EG__().GetException() != nil {
-				HANDLE_EXCEPTION()
+				return 0
 			}
 			goto check_parent_and_self
 		}
@@ -916,7 +916,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), ce)
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ce *types.ClassEntry
@@ -944,24 +944,24 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 			if ZendVerifyConstAccess(c, scope) == 0 {
 				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 				EX_VAR(opline.GetResult().GetVar()).SetUndef()
-				HANDLE_EXCEPTION()
+				return 0
 			}
 			value = c.GetValue()
 			if value.IsConstant() {
 				ZvalUpdateConstantEx(value, c.GetCe())
 				if EG__().GetException() != nil {
 					EX_VAR(opline.GetResult().GetVar()).SetUndef()
-					HANDLE_EXCEPTION()
+					return 0
 				}
 			}
 			CACHE_POLYMORPHIC_PTR(opline.GetExtendedValue(), ce, value)
 		} else {
 			faults.ThrowError(nil, "Undefined class constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
-			HANDLE_EXCEPTION()
+			return 0
 		}
 		break
 	}
 	types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), value)
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

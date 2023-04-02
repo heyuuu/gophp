@@ -14,7 +14,7 @@ func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	arg.SetUndef()
-	HANDLE_EXCEPTION()
+	return 0
 }
 func ZEND_SEND_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -56,7 +56,7 @@ send_again:
 			if name != nil {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
 				FREE_OP(free_op1)
-				HANDLE_EXCEPTION()
+				return 0
 			}
 			top = executeData.GetCall().Arg(arg_num)
 			if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
@@ -92,7 +92,7 @@ send_again:
 				if EG__().GetException() == nil {
 					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
-				HANDLE_EXCEPTION()
+				return 0
 			}
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
@@ -143,7 +143,7 @@ send_again:
 		faults.Error(faults.E_WARNING, "Only arrays and Traversables can be unpacked")
 	}
 	FREE_OP(free_op1)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -284,7 +284,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	FREE_OP(free_op1)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -299,16 +299,16 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 		ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
-		HANDLE_EXCEPTION()
+		return 0
 	}
 	if EX_VAR(opline.GetResult().GetVar()).GetLval() == 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		EX_VAR(opline.GetResult().GetVar()).SetTrue()
-		ZEND_VM_NEXT_OPCODE()
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		ZEND_VM_SMART_BRANCH_FALSE()
 		EX_VAR(opline.GetResult().GetVar()).SetFalse()
-		ZEND_VM_NEXT_OPCODE()
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
 func ZEND_ADD_ARRAY_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -330,7 +330,7 @@ add_unpack_again:
 			if key != nil {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
 				FREE_OP(free_op1)
-				HANDLE_EXCEPTION()
+				return 0
 			} else {
 				if val.IsReference() && val.GetRefcount() == 1 {
 					val = types.Z_REFVAL_P(val)
@@ -355,7 +355,7 @@ add_unpack_again:
 				if EG__().GetException() == nil {
 					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
-				HANDLE_EXCEPTION()
+				return 0
 			}
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
@@ -398,7 +398,7 @@ add_unpack_again:
 		faults.ThrowError(nil, "Only arrays and Traversables can be unpacked")
 	}
 	FREE_OP(free_op1)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -414,7 +414,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
 				FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
-				HANDLE_EXCEPTION()
+				return 0
 			}
 		}
 	} else if opline.GetOp2Type() == IS_UNUSED {
@@ -422,7 +422,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		if ce == nil {
 			b.Assert(EG__().GetException() != nil)
 			FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
-			HANDLE_EXCEPTION()
+			return 0
 		}
 	} else {
 		ce = EX_VAR(opline.GetOp2().GetVar()).GetCe()
@@ -441,7 +441,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	ZendStdUnsetStaticProperty(ce, name)
 	ZendTmpStringRelease(tmp_name)
 	FREE_OP(free_op1)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -455,7 +455,7 @@ func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) i
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
 	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -480,7 +480,7 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		FREE_OP(free_op1)
 	}
 	faults.Bailout()
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -510,31 +510,31 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_EXT_STMT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if EG__().GetNoExtensions() == 0 {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionStatementHandler), executeData)
-		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_EXT_FCALL_BEGIN_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if EG__().GetNoExtensions() == 0 {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionFcallBeginHandler), executeData)
-		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_EXT_FCALL_END_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if EG__().GetNoExtensions() == 0 {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionFcallEndHandler), executeData)
-		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var zv *types.Zval
@@ -561,18 +561,18 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		ce = zv.GetCe()
 		if !ce.IsLinked() {
 			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return RT_CONSTANT(opline, opline.GetOp2()).GetStr() }, nil)) == types.FAILURE {
-				HANDLE_EXCEPTION()
+				return 0
 			}
 		}
 		CACHE_PTR(opline.GetExtendedValue(), ce)
 	}
 	EX_VAR(opline.GetResult().GetVar()).SetCe(ce)
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_DECLARE_FUNCTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	DoBindFunction(RT_CONSTANT(opline, opline.GetOp1()))
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_TICKS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -580,18 +580,18 @@ func ZEND_TICKS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		EG__().SetTicksCount(0)
 		if ZendTicksFunction != nil {
 			ZendTicksFunction(opline.GetExtendedValue())
-			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	}
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_EXT_NOP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_NOP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num uint32, executeData *ZendExecuteData) int {
 	/* May be NULL during generator closing (only finally blocks are executed) */
@@ -607,7 +607,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 			/* Go to catch block */
 
 			CleanupLiveVars(executeData, op_num, try_catch.GetCatchOp())
-			ZEND_VM_JMP_EX(executeData.GetFunc().op_array.opcodes[try_catch.GetCatchOp()], 0)
+			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().op_array.opcodes[try_catch.GetCatchOp()], 0)
 		} else if op_num < try_catch.GetFinallyOp() {
 
 			/* Go to finally block */
@@ -617,7 +617,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 			fast_call.SetObj(EG__().GetException())
 			EG__().SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
-			ZEND_VM_JMP_EX(executeData.GetFunc().op_array.opcodes[try_catch.GetFinallyOp()], 0)
+			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().op_array.opcodes[try_catch.GetFinallyOp()], 0)
 		} else if op_num < try_catch.GetFinallyEnd() {
 			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().op_array.opcodes[try_catch.GetFinallyEnd()].op1.var_)
 
@@ -740,10 +740,10 @@ func ZEND_USER_OPCODE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	case ZEND_USER_OPCODE_LEAVE:
 		return 2
 	case ZEND_USER_OPCODE_DISPATCH:
-		ZEND_VM_DISPATCH(opline.GetOpcode(), opline)
+		ZEND_VM_DISPATCH(executeData, opline.GetOpcode(), opline)
 		fallthrough
 	default:
-		ZEND_VM_DISPATCH(zend_uchar(ret&0xff), opline)
+		ZEND_VM_DISPATCH(executeData, zend_uchar(ret&0xff), opline)
 	}
 }
 func zend_yield_in_closed_generator_helper_SPEC(executeData *ZendExecuteData) int {
@@ -752,7 +752,7 @@ func zend_yield_in_closed_generator_helper_SPEC(executeData *ZendExecuteData) in
 	FREE_UNFETCHED_OP(opline.GetOp2Type(), opline.GetOp2().GetVar())
 	FREE_UNFETCHED_OP(opline.GetOp1Type(), opline.GetOp1().GetVar())
 	UNDEF_RESULT()
-	HANDLE_EXCEPTION()
+	return 0
 }
 func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -774,7 +774,7 @@ func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		OBJ_RELEASE(fast_call.GetObj())
 		fast_call.SetObj(nil)
 	}
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FAST_CALL_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -784,7 +784,7 @@ func ZEND_FAST_CALL_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	/* set return address */
 
 	fast_call.SetOplineNum(opline - executeData.GetFunc().op_array.opcodes)
-	ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp1()), 0)
+	return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp1()), 0)
 }
 func ZEND_FAST_RET_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -793,7 +793,7 @@ func ZEND_FAST_RET_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var current_op_num uint32
 	if fast_call.GetOplineNum() != uint32-1 {
 		var fast_ret *ZendOp = executeData.GetFunc().op_array.opcodes + fast_call.GetOplineNum()
-		ZEND_VM_JMP_EX(fast_ret+1, 0)
+		return ZEND_VM_JMP_EX(executeData, fast_ret+1, 0)
 	}
 
 	/* special case for unhandled exceptions */
@@ -811,9 +811,9 @@ func ZEND_ASSERT_CHECK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		if RETURN_VALUE_USED(opline) {
 			EX_VAR(opline.GetResult().GetVar()).SetTrue()
 		}
-		ZEND_VM_JMP_EX(target, 0)
+		return ZEND_VM_JMP_EX(executeData, target, 0)
 	} else {
-		ZEND_VM_NEXT_OPCODE()
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
 func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -917,15 +917,10 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {
 		faults.RethrowException(executeData)
-		HANDLE_EXCEPTION_LEAVE()
+		return 2
 	}
-	ZEND_VM_INC_OPCODE()
+	ZEND_VM_INC_OPCODE(executeData)
 	return 2
-}
-func ZEND_JMP_FORWARD_SPEC_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	OPLINE = OP_JMP_ADDR(opline, opline.GetOp1())
-	return 0
 }
 func zend_interrupt_helper_SPEC(executeData *ZendExecuteData) int {
 	EG__().SetVmInterrupt(0)
@@ -959,7 +954,7 @@ func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) in
 	call = _zendVmStackPushCallFrame(ZEND_CALL_NESTED_FUNCTION, fbc, opline.GetExtendedValue(), nil)
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_INIT_DYNAMIC_CALL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -975,11 +970,11 @@ try_function_name:
 		call = nil
 	}
 	if call == nil {
-		HANDLE_EXCEPTION()
+		return 0
 	}
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
-	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
@@ -1006,5 +1001,5 @@ func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData)
 	call = _zendVmStackPushCallFrame(ZEND_CALL_NESTED_FUNCTION, fbc, opline.GetExtendedValue(), nil)
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
-	ZEND_VM_NEXT_OPCODE()
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

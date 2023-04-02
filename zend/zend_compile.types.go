@@ -30,19 +30,19 @@ func (this *ZnodeOp) SetJmpOffset(value uint32) { this.jmpOffset = value }
  * Znode
  */
 type Znode struct {
-	op_type types.ZendUchar
-	flag    types.ZendUchar
+	op_type uint8
+	flag    uint8
 	u       struct /* union */ {
 		op       ZnodeOp
 		constant types.Zval
 	}
 }
 
-func (this *Znode) GetOpType() types.ZendUchar      { return this.op_type }
-func (this *Znode) SetOpType(value types.ZendUchar) { this.op_type = value }
-func (this *Znode) GetOp() ZnodeOp                  { return this.u.op }
-func (this *Znode) SetOp(value ZnodeOp)             { this.u.op = value }
-func (this *Znode) GetConstant() types.Zval         { return this.u.constant }
+func (this *Znode) GetOpType() uint8        { return this.op_type }
+func (this *Znode) SetOpType(value uint8)   { this.op_type = value }
+func (this *Znode) GetOp() ZnodeOp          { return this.u.op }
+func (this *Znode) SetOp(value ZnodeOp)     { this.u.op = value }
+func (this *Znode) GetConstant() types.Zval { return this.u.constant }
 
 /**
  * ZendAstZnode
@@ -134,32 +134,32 @@ type ZendOp struct {
 	result        ZnodeOp
 	extendedValue uint32
 	lineno        uint32
-	opcode        types.ZendUchar
-	op1Type       types.ZendUchar
-	op2Type       types.ZendUchar
-	resultType    types.ZendUchar
+	opcode        OpCode
+	op1Type       uint8
+	op2Type       uint8
+	resultType    uint8
 }
 
-func (op *ZendOp) GetHandler() any                     { return op.handler }
-func (op *ZendOp) SetHandler(value any)                { op.handler = value }
-func (op *ZendOp) GetOp1() ZnodeOp                     { return op.op1 }
-func (op *ZendOp) SetOp1(value ZnodeOp)                { op.op1 = value }
-func (op *ZendOp) GetOp2() ZnodeOp                     { return op.op2 }
-func (op *ZendOp) SetOp2(value ZnodeOp)                { op.op2 = value }
-func (op *ZendOp) GetResult() ZnodeOp                  { return op.result }
-func (op *ZendOp) SetResult(value ZnodeOp)             { op.result = value }
-func (op *ZendOp) GetExtendedValue() uint32            { return op.extendedValue }
-func (op *ZendOp) SetExtendedValue(value uint32)       { op.extendedValue = value }
-func (op *ZendOp) GetLineno() uint32                   { return op.lineno }
-func (op *ZendOp) SetLineno(value uint32)              { op.lineno = value }
-func (op *ZendOp) GetOpcode() types.ZendUchar          { return op.opcode }
-func (op *ZendOp) SetOpcode(value types.ZendUchar)     { op.opcode = value }
-func (op *ZendOp) GetOp1Type() types.ZendUchar         { return op.op1Type }
-func (op *ZendOp) SetOp1Type(value types.ZendUchar)    { op.op1Type = value }
-func (op *ZendOp) GetOp2Type() types.ZendUchar         { return op.op2Type }
-func (op *ZendOp) SetOp2Type(value types.ZendUchar)    { op.op2Type = value }
-func (op *ZendOp) GetResultType() types.ZendUchar      { return op.resultType }
-func (op *ZendOp) SetResultType(value types.ZendUchar) { op.resultType = value }
+func (op *ZendOp) GetHandler() any               { return op.handler }
+func (op *ZendOp) SetHandler(value any)          { op.handler = value }
+func (op *ZendOp) GetOp1() ZnodeOp               { return op.op1 }
+func (op *ZendOp) SetOp1(value ZnodeOp)          { op.op1 = value }
+func (op *ZendOp) GetOp2() ZnodeOp               { return op.op2 }
+func (op *ZendOp) SetOp2(value ZnodeOp)          { op.op2 = value }
+func (op *ZendOp) GetResult() ZnodeOp            { return op.result }
+func (op *ZendOp) SetResult(value ZnodeOp)       { op.result = value }
+func (op *ZendOp) GetExtendedValue() uint32      { return op.extendedValue }
+func (op *ZendOp) SetExtendedValue(value uint32) { op.extendedValue = value }
+func (op *ZendOp) GetLineno() uint32             { return op.lineno }
+func (op *ZendOp) SetLineno(value uint32)        { op.lineno = value }
+func (op *ZendOp) GetOpcode() OpCode             { return op.opcode }
+func (op *ZendOp) SetOpcode(value OpCode)        { op.opcode = value }
+func (op *ZendOp) GetOp1Type() uint8             { return op.op1Type }
+func (op *ZendOp) SetOp1Type(value uint8)        { op.op1Type = value }
+func (op *ZendOp) GetOp2Type() uint8             { return op.op2Type }
+func (op *ZendOp) SetOp2Type(value uint8)        { op.op2Type = value }
+func (op *ZendOp) GetResultType() uint8          { return op.resultType }
+func (op *ZendOp) SetResultType(value uint8)     { op.resultType = value }
 
 /**
  * ZendBrkContElement
@@ -367,7 +367,7 @@ func (this *ZendClassConstant) SetCe(value *types.ClassEntry)     { this.ce = va
 type ZendArgInfo struct {
 	name              *types.String
 	type_             types.ZendType
-	pass_by_reference types.ZendUchar
+	pass_by_reference uint8
 	is_variadic       types.ZendBool
 }
 
@@ -383,7 +383,7 @@ func MakeZendReturnArgInfo(type_ types.ZendType, pass_by_reference bool) ZendArg
 func MakeZendArgInfo(
 	name *types.String,
 	type_ types.ZendType,
-	pass_by_reference types.ZendUchar,
+	pass_by_reference uint8,
 	is_variadic types.ZendBool,
 ) ZendArgInfo {
 	return ZendArgInfo{
@@ -396,10 +396,10 @@ func MakeZendArgInfo(
 
 func (this *ZendArgInfo) SetType(value types.ZendType) { this.type_ = value }
 
-func (this *ZendArgInfo) GetName() *types.String              { return this.name }
-func (this *ZendArgInfo) GetType() types.ZendType             { return this.type_ }
-func (this *ZendArgInfo) GetPassByReference() types.ZendUchar { return this.pass_by_reference }
-func (this *ZendArgInfo) GetIsVariadic() types.ZendBool       { return this.is_variadic }
+func (this *ZendArgInfo) GetName() *types.String        { return this.name }
+func (this *ZendArgInfo) GetType() types.ZendType       { return this.type_ }
+func (this *ZendArgInfo) GetPassByReference() uint8     { return this.pass_by_reference }
+func (this *ZendArgInfo) GetIsVariadic() types.ZendBool { return this.is_variadic }
 
 /**
  * ZendInternalFunctionInfo
@@ -454,13 +454,13 @@ func (this *ZendAutoGlobal) SetArmed(value types.ZendBool) { this.armed = value 
  * ZendLoopVar
  */
 type ZendLoopVar struct {
-	opcode           types.ZendUchar
-	var_type         types.ZendUchar
+	opcode           uint8
+	var_type         uint8
 	var_num          uint32
 	try_catch_offset uint32
 }
 
-func MakeZendLoopVar(opcode types.ZendUchar, var_type types.ZendUchar, var_num uint32, try_catch_offset uint32) ZendLoopVar {
+func MakeZendLoopVar(opcode uint8, var_type uint8, var_num uint32, try_catch_offset uint32) ZendLoopVar {
 	return ZendLoopVar{
 		opcode:           opcode,
 		var_type:         var_type,
@@ -468,14 +468,14 @@ func MakeZendLoopVar(opcode types.ZendUchar, var_type types.ZendUchar, var_num u
 		try_catch_offset: try_catch_offset,
 	}
 }
-func (this *ZendLoopVar) GetOpcode() types.ZendUchar       { return this.opcode }
-func (this *ZendLoopVar) SetOpcode(value types.ZendUchar)  { this.opcode = value }
-func (this *ZendLoopVar) GetVarType() types.ZendUchar      { return this.var_type }
-func (this *ZendLoopVar) SetVarType(value types.ZendUchar) { this.var_type = value }
-func (this *ZendLoopVar) GetVarNum() uint32                { return this.var_num }
-func (this *ZendLoopVar) SetVarNum(value uint32)           { this.var_num = value }
-func (this *ZendLoopVar) GetTryCatchOffset() uint32        { return this.try_catch_offset }
-func (this *ZendLoopVar) SetTryCatchOffset(value uint32)   { this.try_catch_offset = value }
+func (this *ZendLoopVar) GetOpcode() uint8               { return this.opcode }
+func (this *ZendLoopVar) SetOpcode(value uint8)          { this.opcode = value }
+func (this *ZendLoopVar) GetVarType() uint8              { return this.var_type }
+func (this *ZendLoopVar) SetVarType(value uint8)         { this.var_type = value }
+func (this *ZendLoopVar) GetVarNum() uint32              { return this.var_num }
+func (this *ZendLoopVar) SetVarNum(value uint32)         { this.var_num = value }
+func (this *ZendLoopVar) GetTryCatchOffset() uint32      { return this.try_catch_offset }
+func (this *ZendLoopVar) SetTryCatchOffset(value uint32) { this.try_catch_offset = value }
 
 /**
  * ReservedClassName
@@ -499,19 +499,19 @@ func (this *ReservedClassName) GetLen() int    { return len(this.name) }
 type BuiltinTypeInfo struct {
 	name     *byte
 	name_len int
-	type_    types.ZendUchar
+	type_    uint8
 }
 
-func MakeBuiltinTypeInfo(name string, type_ types.ZendUchar) BuiltinTypeInfo {
+func MakeBuiltinTypeInfo(name string, type_ uint8) BuiltinTypeInfo {
 	return BuiltinTypeInfo{
 		name:     name,
 		name_len: name_len,
 		type_:    type_,
 	}
 }
-func (this *BuiltinTypeInfo) GetName() *byte           { return this.name }
-func (this *BuiltinTypeInfo) GetNameLen() int          { return this.name_len }
-func (this *BuiltinTypeInfo) GetType() types.ZendUchar { return this.type_ }
+func (this *BuiltinTypeInfo) GetName() *byte  { return this.name }
+func (this *BuiltinTypeInfo) GetNameLen() int { return this.name_len }
+func (this *BuiltinTypeInfo) GetType() uint8  { return this.type_ }
 
 /**
  * ClosureInfo

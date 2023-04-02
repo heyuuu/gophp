@@ -1,6 +1,6 @@
 package zend
 
-type OpCode = uint8
+type OpCode uint8
 
 const (
 	ZEND_NOP                        OpCode = 0

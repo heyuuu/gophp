@@ -190,10 +190,10 @@ const ZEND_CALL_FRAME_SLOT = int((ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_execute_da
 /* convert constant back from run-time to compile-time */
 
 const IS_UNUSED = 0
-const IS_CONST types.ZendUchar = 1 << 0
-const IS_TMP_VAR types.ZendUchar = 1 << 1
-const IS_VAR types.ZendUchar = 1 << 2
-const IS_CV types.ZendUchar = 1 << 3
+const IS_CONST = 1 << 0
+const IS_TMP_VAR = 1 << 1
+const IS_VAR = 1 << 2
+const IS_CV = 1 << 3
 const ZEND_EXTRA_VALUE = 1
 
 var ZendCompileFile func(file_handle *ZendFileHandle, type_ int) *types.ZendOpArray

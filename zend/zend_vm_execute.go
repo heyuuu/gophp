@@ -1,5 +1,17 @@
 package zend
 
+func ZendVmGetOpcodeHandler(opcode OpCode, op *ZendOp) OpcodeHandlerT {
+	return vmGetHandler(opcode, op)
+}
+func ZendVmSetOpcodeHandler(op *ZendOp) {
+	var opcode = op.GetOpcode()
+	if vmOpcodeIsCommutative(opcode) {
+		if op.GetOp1Type() < op.GetOp2Type() {
+			ZendSwapOperands(op)
+		}
+	}
+	op.SetHandler(ZendVmGetOpcodeHandler(opcode, op))
+}
 func vmOffsetBySpec(spec int, op *ZendOp) int {
 	var nextOp *ZendOp = op + 1
 

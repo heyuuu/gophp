@@ -235,29 +235,31 @@ func ZendQuickGetConstant(key *types.Zval, flags uint32, opline *ZendOp, execute
 func ZendQuickCheckConstant(key *types.Zval, opline *ZendOp, executeData *ZendExecuteData) int {
 	return _zendQuickGetConstant(key, 0, 1, opline, executeData)
 }
-func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION() {
+func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData *ZendExecuteData) int {
 	OPLINE = executeData.GetOpline() + 1
-	ZEND_VM_CONTINUE()
+	return 0
 }
-func ZEND_VM_NEXT_OPCODE() {
+func ZEND_VM_NEXT_OPCODE(executeData *ZendExecuteData, opline *ZendOp) int {
 	b.Assert(EG__().GetException() == nil)
 	OPLINE = opline + 1
-	ZEND_VM_CONTINUE()
+	return 0
 }
-func ZEND_VM_SET_RELATIVE_OPCODE(opline *ZendOp, offset uint32) {
+func ZEND_VM_SET_RELATIVE_OPCODE(executeData *ZendExecuteData, opline *ZendOp, offset uint32) {
 	OPLINE = ZEND_OFFSET_TO_OPLINE(opline, offset)
-	ZEND_VM_INTERRUPT_CHECK()
+	ZEND_VM_INTERRUPT_CHECK(executeData)
 }
-func ZEND_VM_JMP_EX(new_op *ZendOp, check_exception int) {
+func ZEND_VM_JMP_EX(executeData *ZendExecuteData, new_op *ZendOp, check_exception int) int {
 	if check_exception != 0 && EG__().GetException() != nil {
-		HANDLE_EXCEPTION()
+		return 0
 	}
 	OPLINE = new_op
-	ZEND_VM_INTERRUPT_CHECK()
-	ZEND_VM_CONTINUE()
+	ZEND_VM_INTERRUPT_CHECK(executeData)
+	return 0
 }
-func ZEND_VM_JMP(new_op *ZendOp) { ZEND_VM_JMP_EX(new_op, 1) }
-func ZEND_VM_INC_OPCODE() int {
+func ZEND_VM_JMP(executeData *ZendExecuteData, new_op *ZendOp) {
+	ZEND_VM_JMP_EX(executeData, new_op, 1)
+}
+func ZEND_VM_INC_OPCODE(executeData *ZendExecuteData) int {
 	OPLINE++
 	return OPLINE - 1
 }
@@ -271,19 +273,19 @@ func ZEND_VM_SMART_BRANCH(_result __auto__, _check int) {
 				OPLINE = opline + 2
 			} else {
 				OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-				ZEND_VM_INTERRUPT_CHECK()
+				ZEND_VM_INTERRUPT_CHECK(executeData)
 			}
 		} else if (opline + 1).opcode == ZEND_JMPNZ {
 			if !_result {
 				OPLINE = opline + 2
 			} else {
 				OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-				ZEND_VM_INTERRUPT_CHECK()
+				ZEND_VM_INTERRUPT_CHECK(executeData)
 			}
 		} else {
 			break
 		}
-		ZEND_VM_CONTINUE()
+		return 0
 		break
 	}
 }
@@ -296,9 +298,9 @@ func ZEND_VM_SMART_BRANCH_JMPZ(_result int, _check int) {
 			OPLINE = opline + 2
 		} else {
 			OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-			ZEND_VM_INTERRUPT_CHECK()
+			ZEND_VM_INTERRUPT_CHECK(executeData)
 		}
-		ZEND_VM_CONTINUE()
+		return 0
 		break
 	}
 }
@@ -311,49 +313,49 @@ func ZEND_VM_SMART_BRANCH_JMPNZ(_result int, _check int) {
 			OPLINE = opline + 2
 		} else {
 			OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-			ZEND_VM_INTERRUPT_CHECK()
+			ZEND_VM_INTERRUPT_CHECK(executeData)
 		}
-		ZEND_VM_CONTINUE()
+		return 0
 		break
 	}
 }
 func ZEND_VM_SMART_BRANCH_TRUE() {
 	if (opline + 1).opcode == ZEND_JMPNZ {
 		OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-		ZEND_VM_INTERRUPT_CHECK()
-		ZEND_VM_CONTINUE()
+		ZEND_VM_INTERRUPT_CHECK(executeData)
+		return 0
 	} else if (opline + 1).opcode == ZEND_JMPZ {
 		OPLINE = opline + 2
-		ZEND_VM_CONTINUE()
+		return 0
 	}
 }
 func ZEND_VM_SMART_BRANCH_TRUE_JMPZ() {
 	OPLINE = opline + 2
-	ZEND_VM_CONTINUE()
+	return 0
 }
 func ZEND_VM_SMART_BRANCH_TRUE_JMPNZ() {
 	OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-	ZEND_VM_INTERRUPT_CHECK()
-	ZEND_VM_CONTINUE()
+	ZEND_VM_INTERRUPT_CHECK(executeData)
+	return 0
 }
 func ZEND_VM_SMART_BRANCH_FALSE() {
 	if (opline + 1).opcode == ZEND_JMPNZ {
 		OPLINE = opline + 2
-		ZEND_VM_CONTINUE()
+		return 0
 	} else if (opline + 1).opcode == ZEND_JMPZ {
 		OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-		ZEND_VM_INTERRUPT_CHECK()
-		ZEND_VM_CONTINUE()
+		ZEND_VM_INTERRUPT_CHECK(executeData)
+		return 0
 	}
 }
 func ZEND_VM_SMART_BRANCH_FALSE_JMPZ() {
 	OPLINE = OP_JMP_ADDR(opline+1, (opline + 1).op2)
-	ZEND_VM_INTERRUPT_CHECK()
-	ZEND_VM_CONTINUE()
+	ZEND_VM_INTERRUPT_CHECK(executeData)
+	return 0
 }
 func ZEND_VM_SMART_BRANCH_FALSE_JMPNZ() {
 	OPLINE = opline + 2
-	ZEND_VM_CONTINUE()
+	return 0
 }
 func UNDEF_RESULT() {
 	if (opline.result_type & (IS_VAR | IS_TMP_VAR)) != 0 {
