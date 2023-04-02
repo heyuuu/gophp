@@ -353,7 +353,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	/* Set up the default garbage collection implementation. */
 
 	//GcCollectCycles = ZendGcCollectCycles
-	ZendVmInit()
+	//ZendVmInit()
 
 	/* set up version */
 

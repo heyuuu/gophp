@@ -11,9 +11,6 @@ const SPEC_RULE_SMART_BRANCH = 0x200000 // 1 << 21
 const SPEC_RULE_COMMUTATIVE = 0x800000  // 1 << 23
 const SPEC_RULE_ISSET = 0x1000000       // 1 << 24
 
-var ZendSpecHandlers *uint32
-var ZendOpcodeHandlers []OpcodeHandlerT
-
 type OpcodeHandlerT func(executeData *ZendExecuteData) int
 
 const OPLINE = executeData.GetOpline()
