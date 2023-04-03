@@ -92,7 +92,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			/* Not supposed to happen, but we'll allow it */
 
 			faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
-			retval_ptr = opline.getZvalPtrVar1(&free_op1)
+			retval_ptr = opline.Op1Ptr(&free_op1)
 			if !(executeData.GetReturnValue()) {
 				ZvalPtrDtorNogc(free_op1)
 			} else {

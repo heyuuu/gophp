@@ -20,7 +20,7 @@ func ZEND_JMPNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var val *types.Zval
-	val = opline.getZvalPtrVar1(&free_op1)
+	val = opline.Op1Ptr(&free_op1)
 	if val.IsTrue() {
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {

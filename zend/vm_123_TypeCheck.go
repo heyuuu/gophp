@@ -24,7 +24,7 @@ func ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var result int = 0
 	var free_op1 ZendFreeOp
-	value = opline.getZvalPtrVar1(&free_op1)
+	value = opline.Op1Ptr(&free_op1)
 	if (opline.GetExtendedValue() >> uint32(value.GetType()) & 1) != 0 {
 	type_check_resource:
 		if value.GetType() != types.IS_RESOURCE || nil != ZendRsrcListGetRsrcType(value.GetRes()) {

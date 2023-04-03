@@ -5,7 +5,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = opline.getZvalPtrVar1(&free_op1)
+	expr = opline.Op1Ptr(&free_op1)
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
@@ -39,7 +39,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = opline.getZvalPtrVar1(&free_op1)
+	expr = opline.Op1Ptr(&free_op1)
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
@@ -67,7 +67,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = opline.getZvalPtrVar1(&free_op1)
+	expr = opline.Op1Ptr(&free_op1)
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry

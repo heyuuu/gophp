@@ -68,7 +68,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	var object_or_called_scope any
 	var call *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	function_name = opline.getZvalPtrVar2(&free_op2)
+	function_name = opline.Op2Ptr(&free_op2)
 	if ZendIsCallableEx(function_name, nil, 0, nil, &fcc, &error) != 0 {
 		func_ = fcc.GetFunctionHandler()
 		if error != nil {

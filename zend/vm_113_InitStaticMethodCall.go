@@ -92,7 +92,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 
 	{
 		var free_op2 ZendFreeOp
-		function_name = opline.getZvalPtrVar2(&free_op2)
+		function_name = opline.Op2Ptr(&free_op2)
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {
@@ -375,7 +375,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 
 	{
 		var free_op2 ZendFreeOp
-		function_name = opline.getZvalPtrVar2(&free_op2)
+		function_name = opline.Op2Ptr(&free_op2)
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {
@@ -655,7 +655,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 
 	{
 		var free_op2 ZendFreeOp
-		function_name = opline.getZvalPtrVar2(&free_op2)
+		function_name = opline.Op2Ptr(&free_op2)
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {

@@ -1,8 +1,6 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -143,7 +141,7 @@ func ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(executeData *ZendExecuteData) int {
 	var varptr *types.Zval
 	var arg *types.Zval
 	var free_op1 ZendFreeOp
-	varptr = opline.getZvalPtrVar1(&free_op1)
+	varptr = opline.Op1Ptr(&free_op1)
 	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())

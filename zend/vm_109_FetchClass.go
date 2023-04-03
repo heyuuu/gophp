@@ -22,7 +22,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var opline *ZendOp = executeData.GetOpline()
 
 	{
-		class_name = opline.getZvalPtrVar2(&free_op2)
+		class_name = opline.Op2Ptr(&free_op2)
 	try_class_name:
 		if class_name.IsObject() {
 			opline.Result().SetCe(types.Z_OBJCE_P(class_name))

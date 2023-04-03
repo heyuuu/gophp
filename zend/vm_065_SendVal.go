@@ -19,7 +19,7 @@ func ZEND_SEND_VAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var arg *types.Zval
 	var free_op1 ZendFreeOp
-	value = opline.getZvalPtrVar1(&free_op1)
+	value = opline.Op1Ptr(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

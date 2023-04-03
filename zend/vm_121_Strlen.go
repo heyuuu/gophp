@@ -35,7 +35,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var free_op1 ZendFreeOp
-	value = opline.getZvalPtrVar1(&free_op1)
+	value = opline.Op1Ptr(&free_op1)
 	if value.IsString() {
 		opline.Result().SetLong(value.GetStr().GetLen())
 		ZvalPtrDtorNogc(free_op1)

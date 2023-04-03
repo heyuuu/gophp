@@ -7,7 +7,7 @@ func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.getZvalPtrVar1(&free_op1)
+	op1 = opline.Op1Ptr(&free_op1)
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	if op1.IsLong() {
 		if op2.IsLong() {
@@ -62,8 +62,8 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.getZvalPtrVar1(&free_op1)
-	op2 = opline.getZvalPtrVar2(&free_op2)
+	op1 = opline.Op1Ptr(&free_op1)
+	op2 = opline.Op2Ptr(&free_op2)
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() == op2.GetLval() {
@@ -117,7 +117,7 @@ func ZEND_CASE_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.getZvalPtrVar1(&free_op1)
+	op1 = opline.Op1Ptr(&free_op1)
 	op2 = opline.Op2()
 	if op1.IsLong() {
 		if op2.IsLong() {

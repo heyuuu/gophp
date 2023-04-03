@@ -22,7 +22,7 @@ func ZEND_BOOL_NOT_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	var free_op1 ZendFreeOp
-	val = opline.getZvalPtrVar1(&free_op1)
+	val = opline.Op1Ptr(&free_op1)
 	if val.IsTrue() {
 		opline.Result().SetFalse()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {

@@ -43,7 +43,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	rope = (**types.String)(opline.Op1())
 
 	{
-		var_ = opline.getZvalPtrVar2(&free_op2)
+		var_ = opline.Op2Ptr(&free_op2)
 		if var_.IsString() {
 			{
 				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()

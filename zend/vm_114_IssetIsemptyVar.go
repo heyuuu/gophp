@@ -43,7 +43,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = opline.getZvalPtrVar1(&free_op1)
+	varname = opline.Op1Ptr(&free_op1)
 
 	{
 		name = ZvalGetTmpString(varname, &tmp_name)

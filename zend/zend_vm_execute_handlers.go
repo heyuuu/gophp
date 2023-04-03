@@ -224,3 +224,33 @@ func getSrHandler(executeData *ZendExecuteData) int {
 
 	return zend_shift_right_helper_SPEC(op1, op2, executeData)
 }
+
+// ZEND_CONCAT
+func getConcatHandler(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var freeOp1, freeOp2 ZendFreeOp
+	var op1 *types.Zval = opline.ConcatOp1(&freeOp1)
+	var op2 *types.Zval = opline.ConcatOp2(&freeOp2)
+
+	// fast
+	if op1.IsString() && op2.IsString() {
+		opline.Result().SetStringVal(op1.GetStrVal() + op2.GetStrVal())
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	}
+
+	// common
+	if op1.IsUndef() {
+		op1 = ZVAL_UNDEFINED_OP1()
+	}
+	if op2.IsUndef() {
+		op2 = ZVAL_UNDEFINED_OP2()
+	}
+	ConcatFunction(opline.Result(), op1, op2)
+	if freeOp1 != nil {
+		ZvalPtrDtorNogc(freeOp1)
+	}
+	if freeOp2 != nil {
+		ZvalPtrDtorNogc(freeOp2)
+	}
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+}

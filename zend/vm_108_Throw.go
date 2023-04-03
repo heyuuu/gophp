@@ -53,7 +53,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var free_op1 ZendFreeOp
-	value = opline.getZvalPtrVar1(&free_op1)
+	value = opline.Op1Ptr(&free_op1)
 	for {
 		if value.GetType() != types.IS_OBJECT {
 			if value.IsReference() {

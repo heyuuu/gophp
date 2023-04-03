@@ -9,7 +9,7 @@ func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int 
 	if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) == 0 {
 		return ZEND_SEND_VAR_SPEC_VAR_HANDLER(executeData)
 	}
-	varptr = opline.getZvalPtrVar1(&free_op1)
+	varptr = opline.Op1Ptr(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, varptr)
 	if varptr.IsReference() || ARG_MAY_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
@@ -28,7 +28,7 @@ func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData
 	if QUICK_ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) == 0 {
 		return ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(executeData)
 	}
-	varptr = opline.getZvalPtrVar1(&free_op1)
+	varptr = opline.Op1Ptr(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, varptr)
 	if varptr.IsReference() || QUICK_ARG_MAY_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {

@@ -53,7 +53,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var retval_ptr *types.Zval
 	var return_value *types.Zval
 	var free_op1 ZendFreeOp
-	retval_ptr = opline.getZvalPtrVar1(&free_op1)
+	retval_ptr = opline.Op1Ptr(&free_op1)
 	return_value = executeData.GetReturnValue()
 	if retval_ptr.IsUndef() {
 		retval_ptr = ZVAL_UNDEFINED_OP1()

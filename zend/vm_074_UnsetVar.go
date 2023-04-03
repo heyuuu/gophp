@@ -22,7 +22,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
 	var free_op1 ZendFreeOp
-	varname = opline.getZvalPtrVar1(&free_op1)
+	varname = opline.Op1Ptr(&free_op1)
 
 	if varname.IsString() {
 		name = varname.GetStr()

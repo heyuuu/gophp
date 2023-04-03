@@ -89,7 +89,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	assign_dim_op_array:
 		types.SEPARATE_ARRAY(container)
 	assign_dim_op_new_array:
-		dim = opline.getZvalPtrVar2(&free_op2)
+		dim = opline.Op2Ptr(&free_op2)
 
 		{
 
@@ -124,7 +124,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 				goto assign_dim_op_array
 			}
 		}
-		dim = opline.getZvalPtrVar2(&free_op2)
+		dim = opline.Op2Ptr(&free_op2)
 		if container.IsObject() {
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
@@ -367,7 +367,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	assign_dim_op_array:
 		types.SEPARATE_ARRAY(container)
 	assign_dim_op_new_array:
-		dim = opline.getZvalPtrVar2(&free_op2)
+		dim = opline.Op2Ptr(&free_op2)
 
 		{
 
@@ -402,7 +402,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 				goto assign_dim_op_array
 			}
 		}
-		dim = opline.getZvalPtrVar2(&free_op2)
+		dim = opline.Op2Ptr(&free_op2)
 		if container.IsObject() {
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {

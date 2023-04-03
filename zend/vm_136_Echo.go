@@ -24,7 +24,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var z *types.Zval
-	z = opline.getZvalPtrVar1(&free_op1)
+	z = opline.Op1Ptr(&free_op1)
 	if z.IsString() {
 		var str *types.String = z.GetStr()
 		if str.GetLen() != 0 {

@@ -27,7 +27,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var ht *types.Array
 	var result uint32
 	key = RT_CONSTANT(opline, opline.GetOp1())
-	subject = opline.getZvalPtrVar2(&free_op2)
+	subject = opline.Op2Ptr(&free_op2)
 	if subject.IsArray() {
 	array_key_exists_array:
 		ht = subject.GetArr()
@@ -78,7 +78,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	var subject *types.Zval
 	var ht *types.Array
 	var result uint32
-	key = opline.getZvalPtrVar1(&free_op1)
+	key = opline.Op1Ptr(&free_op1)
 	subject = RT_CONSTANT(opline, opline.GetOp2())
 	if subject.IsArray() {
 	array_key_exists_array:
@@ -100,8 +100,8 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var subject *types.Zval
 	var ht *types.Array
 	var result uint32
-	key = opline.getZvalPtrVar1(&free_op1)
-	subject = opline.getZvalPtrVar2(&free_op2)
+	key = opline.Op1Ptr(&free_op1)
+	subject = opline.Op2Ptr(&free_op2)
 	if subject.IsArray() {
 	array_key_exists_array:
 		ht = subject.GetArr()
@@ -128,7 +128,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	var subject *types.Zval
 	var ht *types.Array
 	var result uint32
-	key = opline.getZvalPtrVar1(&free_op1)
+	key = opline.Op1Ptr(&free_op1)
 	subject = opline.Op2()
 	if subject.IsArray() {
 	array_key_exists_array:
@@ -175,7 +175,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var ht *types.Array
 	var result uint32
 	key = opline.Op1()
-	subject = opline.getZvalPtrVar2(&free_op2)
+	subject = opline.Op2Ptr(&free_op2)
 	if subject.IsArray() {
 	array_key_exists_array:
 		ht = subject.GetArr()

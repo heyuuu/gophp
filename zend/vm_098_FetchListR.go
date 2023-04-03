@@ -12,7 +12,7 @@ func ZEND_FETCH_LIST_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var free_op2 ZendFreeOp
 	var container *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	zend_fetch_dimension_address_LIST_r(container, opline.getZvalPtrVar2(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
+	zend_fetch_dimension_address_LIST_r(container, opline.Op2Ptr(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -35,7 +35,7 @@ func ZEND_FETCH_LIST_R_SPEC_TMPVARCV_TMPVAR_HANDLER(executeData *ZendExecuteData
 	var free_op2 ZendFreeOp
 	var container *types.Zval
 	container = opline.Op1()
-	zend_fetch_dimension_address_LIST_r(container, opline.getZvalPtrVar2(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
+	zend_fetch_dimension_address_LIST_r(container, opline.Op2Ptr(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

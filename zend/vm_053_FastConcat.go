@@ -35,7 +35,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var op2_str *types.String
 	var str *types.String
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = opline.getZvalPtrVar2(&free_op2)
+	op2 = opline.Op2Ptr(&free_op2)
 	if op2.IsString() {
 		var op1_str *types.String = op1.GetStr()
 		var op2_str *types.String = op2.GetStr()
@@ -174,7 +174,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 	var op1_str *types.String
 	var op2_str *types.String
 	var str *types.String
-	op1 = opline.getZvalPtrVar1(&free_op1)
+	op1 = opline.Op1Ptr(&free_op1)
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	if op1.IsString() {
 		var op1_str *types.String = op1.GetStr()
@@ -246,8 +246,8 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var op1_str *types.String
 	var op2_str *types.String
 	var str *types.String
-	op1 = opline.getZvalPtrVar1(&free_op1)
-	op2 = opline.getZvalPtrVar2(&free_op2)
+	op1 = opline.Op1Ptr(&free_op1)
+	op2 = opline.Op2Ptr(&free_op2)
 	if (op1.IsString()) && (op2.IsString()) {
 		var op1_str *types.String = op1.GetStr()
 		var op2_str *types.String = op2.GetStr()
@@ -339,7 +339,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var op1_str *types.String
 	var op2_str *types.String
 	var str *types.String
-	op1 = opline.getZvalPtrVar1(&free_op1)
+	op1 = opline.Op1Ptr(&free_op1)
 	op2 = opline.Op2()
 	if (op1.IsString()) && (op2.IsString()) {
 		var op1_str *types.String = op1.GetStr()
@@ -501,7 +501,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var op2_str *types.String
 	var str *types.String
 	op1 = opline.Op1()
-	op2 = opline.getZvalPtrVar2(&free_op2)
+	op2 = opline.Op2Ptr(&free_op2)
 	if (op1.IsString()) && (op2.IsString()) {
 		var op1_str *types.String = op1.GetStr()
 		var op2_str *types.String = op2.GetStr()

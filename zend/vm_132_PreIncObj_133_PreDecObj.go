@@ -64,7 +64,7 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = opline.getZvalPtrVar2(&free_op2)
+	property = opline.Op2Ptr(&free_op2)
 	for {
 		if object.GetType() != types.IS_OBJECT {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -214,7 +214,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = opline.getZvalPtrVar2(&free_op2)
+	property = opline.Op2Ptr(&free_op2)
 	for {
 	pre_incdec_object:
 
@@ -341,7 +341,7 @@ func ZEND_PRE_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = opline.Op1()
-	property = opline.getZvalPtrVar2(&free_op2)
+	property = opline.Op2Ptr(&free_op2)
 	for {
 		if object.GetType() != types.IS_OBJECT {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {

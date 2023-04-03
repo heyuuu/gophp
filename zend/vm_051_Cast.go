@@ -168,7 +168,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var expr *types.Zval
 	var result *types.Zval = opline.Result()
 	var ht *types.Array
-	expr = opline.getZvalPtrVar1(&free_op1)
+	expr = opline.Op1Ptr(&free_op1)
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()

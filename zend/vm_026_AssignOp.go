@@ -39,7 +39,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op2 ZendFreeOp
 	var var_ptr *types.Zval
 	var value *types.Zval
-	value = opline.getZvalPtrVar2(&free_op2)
+	value = opline.Op2Ptr(&free_op2)
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
@@ -135,7 +135,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op2 ZendFreeOp
 	var var_ptr *types.Zval
 	var value *types.Zval
-	value = opline.getZvalPtrVar2(&free_op2)
+	value = opline.Op2Ptr(&free_op2)
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {

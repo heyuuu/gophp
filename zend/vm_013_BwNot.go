@@ -15,7 +15,7 @@ func ZEND_BW_NOT_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
-	op1 = opline.getZvalPtrVar1(&free_op1)
+	op1 = opline.Op1Ptr(&free_op1)
 	if op1.IsLong() {
 		opline.Result().SetLong(^(op1.GetLval()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
