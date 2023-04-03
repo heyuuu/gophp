@@ -13,7 +13,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	assign_dim_op_array:
 		types.SEPARATE_ARRAY(container)
 	assign_dim_op_new_array:
-		dim = RT_CONSTANT(opline, opline.GetOp2())
+		dim = opline.Const2()
 
 		{
 			{
@@ -48,7 +48,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 				goto assign_dim_op_array
 			}
 		}
-		dim = RT_CONSTANT(opline, opline.GetOp2())
+		dim = opline.Const2()
 		if container.IsObject() {
 			if dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 				dim++
@@ -295,7 +295,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 	assign_dim_op_array:
 		types.SEPARATE_ARRAY(container)
 	assign_dim_op_new_array:
-		dim = RT_CONSTANT(opline, opline.GetOp2())
+		dim = opline.Const2()
 
 		{
 			{
@@ -330,7 +330,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 				goto assign_dim_op_array
 			}
 		}
-		dim = RT_CONSTANT(opline, opline.GetOp2())
+		dim = opline.Const2()
 		if container.IsObject() {
 			if dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 				dim++

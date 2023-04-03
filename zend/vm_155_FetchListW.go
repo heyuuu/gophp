@@ -6,7 +6,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var container *types.Zval
 	var dim *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	dim = RT_CONSTANT(opline, opline.GetOp2())
+	dim = opline.Const2()
 	if opline.Op1().GetType() != types.IS_INDIRECT && !(container.IsReference()) {
 		faults.Error(faults.E_NOTICE, "Attempting to set reference to non referenceable value")
 		zend_fetch_dimension_address_LIST_r(container, dim, IS_CONST, opline, executeData)

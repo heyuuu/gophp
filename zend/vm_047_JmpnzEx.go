@@ -4,7 +4,7 @@ func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
 	var ret int
-	val = RT_CONSTANT(opline, opline.GetOp1())
+	val = opline.Const1()
 	if val.IsTrue() {
 		opline.Result().SetTrue()
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)

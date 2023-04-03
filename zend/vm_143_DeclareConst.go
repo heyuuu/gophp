@@ -5,8 +5,8 @@ func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	var name *types.Zval
 	var val *types.Zval
 	var c ZendConstant
-	name = RT_CONSTANT(opline, opline.GetOp1())
-	val = RT_CONSTANT(opline, opline.GetOp2())
+	name = opline.Const1()
+	val = opline.Const2()
 	types.ZVAL_COPY(c.Value(), val)
 	if c.Value().IsConstant() {
 		if ZvalUpdateConstantEx(c.Value(), executeData.GetFunc().op_array.scope) != types.SUCCESS {

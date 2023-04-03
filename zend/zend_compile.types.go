@@ -163,11 +163,12 @@ func (op *ZendOp) SetResultType(value uint8)     { op.resultType = value }
 
 func (op *ZendOp) Offset(offset int) *ZendOp { return op + offset }
 
-func (op *ZendOp) _var(node ZnodeOp) *types.Zval { return EX_VAR(node.GetVar()) }
+func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
+func (op *ZendOp) _var(node ZnodeOp) *types.Zval   { return EX_VAR(node.GetVar()) }
 func (op *ZendOp) _varEx(opType uint8, node ZnodeOp) *types.Zval {
 	switch opType {
 	case IS_CONST:
-		return RT_CONSTANT(op, node)
+		return op._const(node)
 	default:
 		return op._var(node)
 	}
@@ -175,7 +176,7 @@ func (op *ZendOp) _varEx(opType uint8, node ZnodeOp) *types.Zval {
 func (op *ZendOp) _varExEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
 	switch opType {
 	case IS_CONST:
-		return RT_CONSTANT(op, node)
+		return op._const(node)
 	case IS_TMP_VAR, IS_VAR:
 		return op._varAndPtr(node, shouldFree)
 	case IS_CV:
@@ -190,6 +191,8 @@ func (op *ZendOp) _varAndPtr(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
 	return ret
 }
 
+func (op *ZendOp) Const1() *types.Zval { return op._const(op.op1) }
+func (op *ZendOp) Const2() *types.Zval { return op._const(op.op2) }
 func (op *ZendOp) Op1() *types.Zval    { return op._var(op.op1) }
 func (op *ZendOp) Op2() *types.Zval    { return op._var(op.op2) }
 func (op *ZendOp) Result() *types.Zval { return op._var(op.result) }
@@ -217,7 +220,7 @@ func (op *ZendOp) currEx() *ZendExecuteData {
 func (op *ZendOp) _concatOp(freeOp *ZendFreeOp, opType uint8, node ZnodeOp) *types.Zval {
 	switch opType {
 	case IS_CONST:
-		return RT_CONSTANT(op, op.GetOp1())
+		return op.Const1()
 	case IS_TMP_VAR, IS_VAR:
 		return op._varAndPtr(node, freeOp)
 	case IS_CV:

@@ -5,7 +5,7 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	var ret int
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		opline.Result().SetUndef()

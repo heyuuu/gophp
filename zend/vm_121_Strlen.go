@@ -3,7 +3,7 @@ package zend
 func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	if value.IsString() {
 		opline.Result().SetLong(value.GetStr().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)

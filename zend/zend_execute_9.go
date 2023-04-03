@@ -169,18 +169,18 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(ZendMemrchr(RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal(), '\\', RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()))
+				var actual *byte = (*byte)(ZendMemrchr(opline.Const2().GetStr().GetVal(), '\\', opline.Const2().GetStr().GetLen()))
 				if actual == nil {
-					opline.Result().SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
+					opline.Result().SetStringCopy(opline.Const2().GetStr())
 				} else {
 					actual++
-					opline.Result().SetStringVal(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
+					opline.Result().SetStringVal(b.CastStr(actual, opline.Const2().GetStr().GetLen()-(actual-opline.Const2().GetStr().GetVal())))
 				}
 
 				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().GetStr().GetVal(), opline.Result().GetStr().GetVal())
 
 			} else {
-				faults.ThrowError(nil, "Undefined constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
+				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().GetStr().GetVal())
 				opline.Result().SetUndef()
 			}
 		}

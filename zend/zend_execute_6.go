@@ -254,7 +254,7 @@ func ZendFetchStaticPropertyAddressEx(
 	var op1_type types.ZendUchar = opline.GetOp1Type()
 	var op2_type types.ZendUchar = opline.GetOp2Type()
 	if op2_type == IS_CONST {
-		var class_name *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var class_name *types.Zval = opline.Const2()
 		b.Assert(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
 		if b.Assign(&ce, CACHED_PTR(cache_slot)) == nil {
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
@@ -283,7 +283,7 @@ func ZendFetchStaticPropertyAddressEx(
 		}
 	}
 	if op1_type == IS_CONST {
-		name = RT_CONSTANT(opline, opline.GetOp1()).GetStr()
+		name = opline.Const1().GetStr()
 	} else {
 		var varname *types.Zval = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 		if varname.IsString() {

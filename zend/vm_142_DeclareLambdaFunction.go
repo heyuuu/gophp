@@ -8,7 +8,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 	var called_scope *types.ClassEntry
 	func_ = CACHED_PTR(opline.GetExtendedValue())
 	if func_ == nil {
-		zfunc = EG__().GetFunctionTable().KeyFind(RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetStr())
+		zfunc = EG__().GetFunctionTable().KeyFind(opline.Const1().GetStr().GetStr())
 		b.Assert(zfunc != nil)
 		func_ = zfunc.GetFunc()
 		b.Assert(func_.GetType() == ZEND_USER_FUNCTION)

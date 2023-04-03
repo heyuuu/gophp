@@ -7,7 +7,7 @@ func ZEND_SEND_USER_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if ARG_MUST_BE_SENT_BY_REF(executeData.GetCall().func_, opline.GetOp2().GetNum()) != 0 {
 		ZendParamMustBeRef(executeData.GetCall().func_, opline.GetOp2().GetNum())
 	}
-	arg = RT_CONSTANT(opline, opline.GetOp1())
+	arg = opline.Const1()
 	param = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY(param, arg)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

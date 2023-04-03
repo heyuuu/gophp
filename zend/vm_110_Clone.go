@@ -7,7 +7,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var scope *types.ClassEntry
 	var clone types.IFunction
 	var clone_call ZendObjectCloneObjT
-	obj = RT_CONSTANT(opline, opline.GetOp1())
+	obj = opline.Const1()
 	for {
 		{
 			opline.Result().SetUndef()

@@ -3,7 +3,7 @@ package zend
 func ZEND_BW_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
+	op1 = opline.Const1()
 	if op1.IsLong() {
 		opline.Result().SetLong(^(op1.GetLval()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)

@@ -4,7 +4,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var array_ptr *types.Zval
 	var result *types.Zval
-	array_ptr = RT_CONSTANT(opline, opline.GetOp1())
+	array_ptr = opline.Const1()
 	if array_ptr.IsArray() {
 		result = opline.Result()
 		types.ZVAL_COPY_VALUE(result, array_ptr)

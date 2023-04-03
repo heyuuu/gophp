@@ -6,7 +6,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
-		var rtd_key *types.String = RT_CONSTANT(opline, opline.GetOp1()).GetStr()
+		var rtd_key *types.String = opline.Const1().GetStr()
 		zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr())
 		if zv == nil {
 			for {
@@ -24,7 +24,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		b.Assert(zv != nil)
 		ce = zv.GetCe()
 		if !ce.IsLinked() {
-			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return RT_CONSTANT(opline, opline.GetOp2()).GetStr() }, nil)) == types.FAILURE {
+			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().GetStr() }, nil)) == types.FAILURE {
 				return 0
 			}
 		}

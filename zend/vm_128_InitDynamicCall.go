@@ -4,7 +4,7 @@ func ZEND_INIT_DYNAMIC_CALL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var call *ZendExecuteData
-	function_name = RT_CONSTANT(opline, opline.GetOp2())
+	function_name = opline.Const2()
 try_function_name:
 
 	if function_name.IsArray() {

@@ -6,7 +6,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	offset = RT_CONSTANT(opline, opline.GetOp2())
+	offset = opline.Const2()
 	for {
 		if container.GetType() != types.IS_OBJECT {
 			if container.IsReference() {
@@ -97,7 +97,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = RT_CONSTANT(opline, opline.GetOp2())
+	offset = opline.Const2()
 	for {
 		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
@@ -141,7 +141,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	container = opline.Op1()
-	offset = RT_CONSTANT(opline, opline.GetOp2())
+	offset = opline.Const2()
 	for {
 		if container.GetType() != types.IS_OBJECT {
 			if container.IsReference() {

@@ -4,7 +4,7 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var result *types.Zval = opline.Result()
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	{
 		types.ZVAL_COPY_VALUE(result, value)
 		{

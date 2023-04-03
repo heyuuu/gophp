@@ -3,7 +3,7 @@ package zend
 func ZEND_ECHO_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var z *types.Zval
-	z = RT_CONSTANT(opline, opline.GetOp1())
+	z = opline.Const1()
 	if z.IsString() {
 		var str *types.String = z.GetStr()
 		if str.GetLen() != 0 {

@@ -5,10 +5,10 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 	var expr_ptr *types.Zval
 	var new_expr types.Zval
 
-	expr_ptr = RT_CONSTANT(opline, opline.GetOp1())
+	expr_ptr = opline.Const1()
 	expr_ptr.TryAddRefcount()
 	{
-		var offset *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var offset *types.Zval = opline.Const2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -50,7 +50,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var new_expr types.Zval
 
 	{
-		expr_ptr = RT_CONSTANT(opline, opline.GetOp1())
+		expr_ptr = opline.Const1()
 
 		{
 			expr_ptr.TryAddRefcount()
@@ -114,7 +114,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 	var new_expr types.Zval
 
 	{
-		expr_ptr = RT_CONSTANT(opline, opline.GetOp1())
+		expr_ptr = opline.Const1()
 
 		{
 			expr_ptr.TryAddRefcount()
@@ -136,7 +136,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 	var new_expr types.Zval
 
 	{
-		expr_ptr = RT_CONSTANT(opline, opline.GetOp1())
+		expr_ptr = opline.Const1()
 
 		{
 			expr_ptr.TryAddRefcount()
@@ -208,7 +208,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 		expr_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	}
 	{
-		var offset *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var offset *types.Zval = opline.Const2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -417,7 +417,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 		expr_ptr = opline.Op1Ptr(&free_op1)
 	}
 	{
-		var offset *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var offset *types.Zval = opline.Const2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -631,7 +631,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	}
 	{
-		var offset *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var offset *types.Zval = opline.Const2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:

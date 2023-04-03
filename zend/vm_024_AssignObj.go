@@ -8,7 +8,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	var value *types.Zval
 	var tmp types.Zval
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -98,7 +98,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 	var value *types.Zval
 	var tmp types.Zval
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -186,7 +186,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	var value *types.Zval
 	var tmp types.Zval
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -273,7 +273,7 @@ func ZEND_ASSIGN_OBJ_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	var value *types.Zval
 	var tmp types.Zval
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _get_zval_ptr_cv_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -691,7 +691,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CONST_HANDLER(executeData *ZendEx
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
@@ -769,7 +769,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExec
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
@@ -845,7 +845,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExec
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
@@ -920,7 +920,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecu
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _get_zval_ptr_cv_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
 assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
@@ -1225,7 +1225,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 	var value *types.Zval
 	var tmp types.Zval
 	object = opline.Op1()
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -1311,7 +1311,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 	var value *types.Zval
 	var tmp types.Zval
 	object = opline.Op1()
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -1395,7 +1395,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 	var value *types.Zval
 	var tmp types.Zval
 	object = opline.Op1()
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -1478,7 +1478,7 @@ func ZEND_ASSIGN_OBJ_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 	var value *types.Zval
 	var tmp types.Zval
 	object = opline.Op1()
-	property = RT_CONSTANT(opline, opline.GetOp2())
+	property = opline.Const2()
 	value = _get_zval_ptr_cv_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
 	if object.GetType() != types.IS_OBJECT {
 		if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {

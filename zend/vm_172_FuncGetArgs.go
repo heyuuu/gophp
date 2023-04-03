@@ -8,7 +8,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	var skip uint32
 	arg_count = executeData.NumArgs()
 	{
-		skip = RT_CONSTANT(opline, opline.GetOp1()).GetLval()
+		skip = opline.Const1().GetLval()
 		if arg_count < skip {
 			result_size = 0
 		} else {

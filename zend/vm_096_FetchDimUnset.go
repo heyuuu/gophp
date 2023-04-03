@@ -5,7 +5,7 @@ func ZEND_FETCH_DIM_UNSET_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) i
 	var free_op1 ZendFreeOp
 	var container *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	zend_fetch_dimension_address_UNSET(container, RT_CONSTANT(opline, opline.GetOp2()), IS_CONST, opline, executeData)
+	zend_fetch_dimension_address_UNSET(container, opline.Const2(), IS_CONST, opline, executeData)
 	{
 		var result *types.Zval = opline.Result()
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
@@ -43,7 +43,7 @@ func ZEND_FETCH_DIM_UNSET_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) in
 	var free_op1 ZendFreeOp
 	var container *types.Zval
 	container = opline.Op1()
-	zend_fetch_dimension_address_UNSET(container, RT_CONSTANT(opline, opline.GetOp2()), IS_CONST, opline, executeData)
+	zend_fetch_dimension_address_UNSET(container, opline.Const2(), IS_CONST, opline, executeData)
 	{
 		var result *types.Zval = opline.Result()
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)

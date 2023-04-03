@@ -3,7 +3,7 @@ package zend
 func ZEND_FETCH_OBJ_R_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var offset *types.Zval
-	offset = RT_CONSTANT(opline, opline.GetOp2())
+	offset = opline.Const2()
 	ZendWrongPropertyRead(offset)
 	opline.Result().SetNull()
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -14,7 +14,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var free_op2 ZendFreeOp
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = RT_CONSTANT(opline, opline.GetOp1())
+	container = opline.Const1()
 	offset = opline.Op2Ptr(&free_op2)
 	{
 		for {
@@ -52,7 +52,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = RT_CONSTANT(opline, opline.GetOp1())
+	container = opline.Const1()
 	offset = opline.Op2()
 	{
 		for {
@@ -91,7 +91,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = opline.Op1Ptr(&free_op1)
-	offset = RT_CONSTANT(opline, opline.GetOp2())
+	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {

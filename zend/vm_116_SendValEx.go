@@ -9,7 +9,7 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	send_val_by_ref:
 		return zend_cannot_pass_by_ref_helper_SPEC(executeData)
 	}
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
 	{
@@ -27,7 +27,7 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_QUICK_HANDLER(executeData *ZendExecuteData) int
 	if QUICK_ARG_MUST_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 		goto send_val_by_ref
 	}
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, value)
 	{

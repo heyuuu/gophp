@@ -5,8 +5,8 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 	var op1 *types.Zval
 	var op2 *types.Zval
 	var result types.ZendBool
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op1 = opline.Const1()
+	op2 = opline.Const2()
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	types.ZVAL_BOOL(opline.Result(), result != 0)
@@ -19,7 +19,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) 
 	var op2 *types.Zval
 	var result types.ZendBool
 	op1 = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op2 = opline.Const2()
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -49,7 +49,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) 
 	var op2 *types.Zval
 	var result types.ZendBool
 	op1 = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op2 = opline.Const2()
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -94,7 +94,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var op2 *types.Zval
 	var result types.ZendBool
 	op1 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op2 = opline.Const2()
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	types.ZVAL_BOOL(opline.Result(), result != 0)

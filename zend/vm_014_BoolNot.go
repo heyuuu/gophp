@@ -3,7 +3,7 @@ package zend
 func ZEND_BOOL_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
-	val = RT_CONSTANT(opline, opline.GetOp1())
+	val = opline.Const1()
 	if val.IsTrue() {
 		opline.Result().SetFalse()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {

@@ -5,8 +5,8 @@ func ZEND_FETCH_DIM_R_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = RT_CONSTANT(opline, opline.GetOp1())
-	dim = RT_CONSTANT(opline, opline.GetOp2())
+	container = opline.Const1()
+	dim = opline.Const2()
 
 	{
 		zend_fetch_dimension_address_read_R(container, dim, IS_CONST, opline, executeData)
@@ -19,7 +19,7 @@ func ZEND_FETCH_DIM_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = RT_CONSTANT(opline, opline.GetOp1())
+	container = opline.Const1()
 	dim = opline.Op2Ptr(&free_op2)
 
 	{
@@ -33,7 +33,7 @@ func ZEND_FETCH_DIM_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = RT_CONSTANT(opline, opline.GetOp1())
+	container = opline.Const1()
 	dim = opline.Op2()
 
 	{
@@ -48,7 +48,7 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 	var dim *types.Zval
 	var value *types.Zval
 	container = opline.Op1Ptr(&free_op1)
-	dim = RT_CONSTANT(opline, opline.GetOp2())
+	dim = opline.Const2()
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:
@@ -139,7 +139,7 @@ func ZEND_FETCH_DIM_R_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var dim *types.Zval
 	var value *types.Zval
 	container = opline.Op1()
-	dim = RT_CONSTANT(opline, opline.GetOp2())
+	dim = opline.Const2()
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:

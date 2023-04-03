@@ -5,7 +5,7 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var retval_ptr *types.Zval
 	var return_value *types.Zval
 	var free_op1 ZendFreeOp
-	retval_ptr = RT_CONSTANT(opline, opline.GetOp1())
+	retval_ptr = opline.Const1()
 	return_value = executeData.GetReturnValue()
 
 	if return_value == nil {

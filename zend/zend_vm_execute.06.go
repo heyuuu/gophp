@@ -13,7 +13,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = RT_CONSTANT(opline, opline.GetOp1())
+	varname = opline.Const1()
 	{
 		name = varname.GetStr()
 	}

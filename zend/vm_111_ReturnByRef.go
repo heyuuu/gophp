@@ -9,7 +9,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			/* Not supposed to happen, but we'll allow it */
 
 			faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
-			retval_ptr = RT_CONSTANT(opline, opline.GetOp1())
+			retval_ptr = opline.Const1()
 			if !(executeData.GetReturnValue()) {
 			} else {
 				executeData.GetReturnValue().

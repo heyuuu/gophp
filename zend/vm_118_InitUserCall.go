@@ -9,7 +9,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 	var object_or_called_scope any
 	var call *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	function_name = RT_CONSTANT(opline, opline.GetOp2())
+	function_name = opline.Const2()
 	if ZendIsCallableEx(function_name, nil, 0, nil, &fcc, &error) != 0 {
 		func_ = fcc.GetFunctionHandler()
 		if error != nil {
@@ -45,7 +45,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) 
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().GetStr().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			return 0
@@ -114,7 +114,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().GetStr().GetVal(), error)
 		Efree(error)
 		ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
@@ -181,7 +181,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 			InitFuncRunTimeCache(func_.GetOpArray())
 		}
 	} else {
-		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetVal(), error)
+		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().GetStr().GetVal(), error)
 		Efree(error)
 		if EG__().GetException() != nil {
 			return 0

@@ -4,7 +4,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
 	var val *types.Zval
-	val = RT_CONSTANT(opline, opline.GetOp1())
+	val = opline.Const1()
 	if generator.IsForcedClose() {
 		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		UNDEF_RESULT()

@@ -5,7 +5,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var expr *types.Zval
 	var result *types.Zval = opline.Result()
 	var ht *types.Array
-	expr = RT_CONSTANT(opline, opline.GetOp1())
+	expr = opline.Const1()
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()

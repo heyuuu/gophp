@@ -8,7 +8,7 @@ func ZEND_INIT_FCALL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var call *ZendExecuteData
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {
-		fname = (*types.Zval)(RT_CONSTANT(opline, opline.GetOp2()))
+		fname = (*types.Zval)(opline.Const2())
 		func_ = EG__().GetFunctionTable().KeyFind(fname.GetStr().GetStr())
 		if func_ == nil {
 			return zend_undefined_function_helper_SPEC(executeData)

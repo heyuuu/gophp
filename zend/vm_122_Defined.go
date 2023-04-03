@@ -17,7 +17,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		}
 	}
-	if ZendQuickCheckConstant(RT_CONSTANT(opline, opline.GetOp1()), opline, executeData) != types.SUCCESS {
+	if ZendQuickCheckConstant(opline.Const1(), opline, executeData) != types.SUCCESS {
 		CACHE_PTR(opline.GetExtendedValue(), ENCODE_SPECIAL_CACHE_NUM(EG__().GetZendConstants().Len()))
 		goto defined_false
 	} else {

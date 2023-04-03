@@ -3,7 +3,7 @@ package zend
 func ZEND_JMPZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
-	val = RT_CONSTANT(opline, opline.GetOp1())
+	val = opline.Const1()
 	if val.IsTrue() {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {

@@ -6,8 +6,8 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteD
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op1 = opline.Const1()
+	op2 = opline.Const2()
 	return zend_is_smaller_or_equal_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
@@ -16,7 +16,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecu
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
+	op1 = opline.Const1()
 	op2 = opline.Op2()
 
 	if op1.IsLong() {
@@ -59,7 +59,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *Zend
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
+	op1 = opline.Const1()
 	op2 = opline.Op2()
 
 	if op1.IsLong() {
@@ -104,7 +104,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *Zen
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
+	op1 = opline.Const1()
 	op2 = opline.Op2()
 
 	if op1.IsLong() {
@@ -150,7 +150,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecu
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1()
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op2 = opline.Const2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
@@ -193,7 +193,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(executeData *Zend
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1()
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op2 = opline.Const2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
@@ -238,7 +238,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(executeData *Zen
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1()
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
+	op2 = opline.Const2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {

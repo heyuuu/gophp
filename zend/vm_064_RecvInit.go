@@ -8,7 +8,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		arg_num = opline.GetOp1().GetNum()
 		param = opline.Result()
 		if arg_num > executeData.NumArgs() {
-			var default_value *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+			var default_value *types.Zval = opline.Const2()
 			if default_value.IsConstant() {
 				var cache_val *types.Zval = (*types.Zval)(CACHE_ADDR(default_value.GetCacheSlot()))
 
@@ -34,7 +34,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 		recv_init_check_type:
 			if (executeData.GetFunc().op_array.fn_flags & AccHasTypeHints) != 0 {
-				var default_value *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+				var default_value *types.Zval = opline.Const2()
 				if ZendVerifyRecvArgType(executeData.GetFunc(), arg_num, param, default_value, CACHE_ADDR(opline.GetExtendedValue())) == 0 {
 					return 0
 				}

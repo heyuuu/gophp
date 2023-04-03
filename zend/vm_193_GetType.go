@@ -4,7 +4,7 @@ func ZEND_GET_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var type_ *types.String
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
+	op1 = opline.Const1()
 	type_ = types.ZendZvalGetType(op1)
 	if type_ != nil {
 		opline.Result().SetInternedString(type_)

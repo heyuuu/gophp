@@ -5,7 +5,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var var_ptr *types.Zval
 	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp2())
+	value = opline.Const2()
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
@@ -105,7 +105,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
 	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp2())
+	value = opline.Const2()
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {

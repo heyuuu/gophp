@@ -242,7 +242,7 @@ func zend_this_not_in_object_context_helper_SPEC(executeData *ZendExecuteData) i
 func zend_undefined_function_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
-	function_name = RT_CONSTANT(opline, opline.GetOp2())
+	function_name = opline.Const2()
 	faults.ThrowError(nil, "Call to undefined function %s()", function_name.GetStr().GetVal())
 	return 0
 }

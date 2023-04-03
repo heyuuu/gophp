@@ -7,7 +7,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 	var ce *types.ClassEntry
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
-		lcname = RT_CONSTANT(opline, opline.GetOp1())
+		lcname = opline.Const1()
 		zv = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 		if zv != nil {
 			ce = zv.GetCe()
@@ -15,7 +15,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			if zv == nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			} else {
-				if ZendDoLinkClass(ce, RT_CONSTANT(opline, opline.GetOp2()).GetStr()) == types.FAILURE {
+				if ZendDoLinkClass(ce, opline.Const2().GetStr()) == types.FAILURE {
 
 					/* Reload bucket pointer, the hash table may have been reallocated */
 

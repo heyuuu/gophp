@@ -3,7 +3,7 @@ package zend
 func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	for {
 		{
 			faults.ThrowError(nil, "Can only throw objects")

@@ -11,7 +11,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
-	offset = RT_CONSTANT(opline, opline.GetOp2())
+	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {

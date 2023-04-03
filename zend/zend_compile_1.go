@@ -245,11 +245,11 @@ func ZendDoDelayedEarlyBinding(op_array *types.ZendOpArray, first_early_binding_
 		CG__().SetInCompilation(1)
 		for opline_num != uint32-1 {
 			var opline *ZendOp = op_array.GetOpcodes()[opline_num]
-			var lcname = RT_CONSTANT(opline, opline.GetOp1())
+			var lcname = opline.Const1()
 			var zv = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 			if zv != nil {
 				var ce = zv.GetCe()
-				var lc_parent_name = RT_CONSTANT(opline, opline.GetOp2()).GetStr()
+				var lc_parent_name = opline.Const2().GetStr()
 				var parent_ce *types.ClassEntry = types.ZendHashFindPtr(EG__().GetClassTable(), lc_parent_name.GetStr())
 				if parent_ce != nil {
 					if ZendTryEarlyBind(ce, parent_ce, lcname.GetStr(), zv) != 0 {

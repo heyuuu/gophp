@@ -4,7 +4,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var new_op_array *types.ZendOpArray
 	var inc_filename *types.Zval
-	inc_filename = RT_CONSTANT(opline, opline.GetOp1())
+	inc_filename = opline.Const1()
 	new_op_array = ZendIncludeOrEval(inc_filename, opline.GetExtendedValue())
 	if EG__().GetException() != nil {
 		if new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nil {

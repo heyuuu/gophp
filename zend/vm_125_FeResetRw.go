@@ -6,7 +6,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var array_ref *types.Zval
 
 	{
-		array_ptr = RT_CONSTANT(opline, opline.GetOp1())
+		array_ptr = opline.Const1()
 		array_ref = array_ptr
 	}
 	if array_ptr.IsArray() {

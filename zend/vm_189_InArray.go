@@ -3,9 +3,9 @@ package zend
 func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
-	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = opline.Const2().GetArr()
 	var result *types.Zval
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
+	op1 = opline.Const1()
 	if op1.IsString() {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
@@ -44,7 +44,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
-	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = opline.Const2().GetArr()
 	var result *types.Zval
 	op1 = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if op1.IsString() {
@@ -86,7 +86,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
-	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = opline.Const2().GetArr()
 	var result *types.Zval
 	op1 = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if op1.IsString() {
@@ -127,7 +127,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
-	var ht *types.Array = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
+	var ht *types.Array = opline.Const2().GetArr()
 	var result *types.Zval
 	op1 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if op1.IsString() {

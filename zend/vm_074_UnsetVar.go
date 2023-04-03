@@ -6,7 +6,7 @@ func ZEND_UNSET_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = RT_CONSTANT(opline, opline.GetOp1())
+	varname = opline.Const1()
 	{
 		name = varname.GetStr()
 	}

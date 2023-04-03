@@ -26,7 +26,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = RT_CONSTANT(opline, opline.GetOp1())
+				value = opline.Const1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
@@ -45,7 +45,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = RT_CONSTANT(opline, opline.GetOp1())
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -68,7 +68,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -133,7 +133,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = RT_CONSTANT(opline, opline.GetOp1())
+				value = opline.Const1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
@@ -152,7 +152,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = RT_CONSTANT(opline, opline.GetOp1())
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -238,7 +238,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = RT_CONSTANT(opline, opline.GetOp1())
+				value = opline.Const1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
@@ -257,7 +257,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = RT_CONSTANT(opline, opline.GetOp1())
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -343,7 +343,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = RT_CONSTANT(opline, opline.GetOp1())
+				value = opline.Const1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
@@ -362,7 +362,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = RT_CONSTANT(opline, opline.GetOp1())
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -440,7 +440,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = RT_CONSTANT(opline, opline.GetOp1())
+				value = opline.Const1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 				{
 
@@ -459,7 +459,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = RT_CONSTANT(opline, opline.GetOp1())
+			var value *types.Zval = opline.Const1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -579,7 +579,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1059,7 +1059,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1515,7 +1515,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1937,7 +1937,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
+		var key *types.Zval = opline.Const2()
 
 		/* Consts, temporary variables and references need copying */
 

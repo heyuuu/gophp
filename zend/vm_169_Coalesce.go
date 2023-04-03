@@ -4,7 +4,7 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var ref *types.Zval = nil
-	value = RT_CONSTANT(opline, opline.GetOp1())
+	value = opline.Const1()
 	if value.GetType() > types.IS_NULL {
 		var result *types.Zval = opline.Result()
 		types.ZVAL_COPY_VALUE(result, value)

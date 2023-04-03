@@ -10,7 +10,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var target *byte
 	rope = (**types.String)(opline.Op1())
 	{
-		var_ = RT_CONSTANT(opline, opline.GetOp2())
+		var_ = opline.Const2()
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 
 		var_.TryAddRefcount()

@@ -4,7 +4,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var opline *ZendOp = executeData.GetOpline()
 	var retval *types.Zval
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
-	retval = RT_CONSTANT(opline, opline.GetOp1())
+	retval = opline.Const1()
 
 	/* Copy return value into generator->retval */
 

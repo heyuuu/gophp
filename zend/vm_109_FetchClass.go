@@ -7,7 +7,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 	{
 		var ce *types.ClassEntry = CACHED_PTR(opline.GetExtendedValue())
 		if ce == nil {
-			class_name = RT_CONSTANT(opline, opline.GetOp2())
+			class_name = opline.Const2()
 			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), opline.GetOp1().GetNum())
 			CACHE_PTR(opline.GetExtendedValue(), ce)
 		}
