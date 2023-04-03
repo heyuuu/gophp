@@ -5,7 +5,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var arg_num uint32 = opline.GetOp1().GetNum()
 	var arg_count uint32 = executeData.NumArgs()
 	var params *types.Zval
-	params = opline.GetResultZval()
+	params = opline.Result()
 	if arg_num <= arg_count {
 		var param *types.Zval
 		ArrayInitSize(params, arg_count-arg_num+1)

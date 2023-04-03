@@ -7,15 +7,15 @@ import (
 )
 
 func zend_fetch_dimension_address_W(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_W, executeData)
 }
 func zend_fetch_dimension_address_RW(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_RW, executeData)
 }
 func zend_fetch_dimension_address_UNSET(container_ptr *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_UNSET, executeData)
 }
 func ZendFetchDimensionAddressRead(
@@ -129,19 +129,19 @@ func ZendFetchDimensionAddressRead(
 	}
 }
 func zend_fetch_dimension_address_read_R(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 0, 0, executeData)
 }
 func zend_fetch_dimension_address_read_R_slow(container *types.Zval, dim *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, IS_CV, BP_VAR_R, 0, 1, executeData)
 }
 func zend_fetch_dimension_address_read_IS(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_IS, 0, 0, executeData)
 }
 func zend_fetch_dimension_address_LIST_r(container *types.Zval, dim *types.Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 1, 0, executeData)
 }
 func ZendFetchDimensionConst(result *types.Zval, container *types.Zval, dim *types.Zval, type_ int) {

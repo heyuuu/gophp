@@ -29,7 +29,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	exception = EG__().GetException()
-	ex = opline.GetResultZval()
+	ex = opline.Result()
 
 	/* Always perform a strict assignment. There is a reasonable expectation that if you
 	 * write "catch (Exception $e)" then $e will actually be instanceof Exception. As such,

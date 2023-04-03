@@ -51,7 +51,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = opline.GetOp1Zval()
+	varname = opline.Op1()
 
 	if varname.IsString() {
 		name = varname.GetStr()

@@ -25,7 +25,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			return 0
 		}
 	} else {
-		ce = opline.GetOp2Zval().GetCe()
+		ce = opline.Op2().GetCe()
 	}
 	varname = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 	if opline.GetOp1Type() == IS_CONST {

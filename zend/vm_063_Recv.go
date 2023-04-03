@@ -7,7 +7,7 @@ func ZEND_RECV_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		ZendMissingArgError(executeData)
 		return 0
 	} else {
-		var param *types.Zval = opline.GetResultZval()
+		var param *types.Zval = opline.Result()
 		if ZendVerifyRecvArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum())) == 0 {
 			return 0
 		}

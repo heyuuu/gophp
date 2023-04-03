@@ -12,14 +12,14 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			ce = ZendFetchClassByName(RT_CONSTANT(opline, opline.GetOp1()).GetStr(), (RT_CONSTANT(opline, opline.GetOp1()) + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 			CACHE_PTR(opline.GetOp2().GetNum(), ce)
 		}
 	}
 
-	result = opline.GetResultZval()
+	result = opline.Result()
 	if ObjectInitEx(result, ce) != types.SUCCESS {
 		result.SetUndef()
 		return 0
@@ -66,9 +66,9 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var call *ZendExecuteData
 
 	{
-		ce = opline.GetOp1Zval().GetCe()
+		ce = opline.Op1().GetCe()
 	}
-	result = opline.GetResultZval()
+	result = opline.Result()
 	if ObjectInitEx(result, ce) != types.SUCCESS {
 		result.SetUndef()
 		return 0
@@ -118,12 +118,12 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
 			b.Assert(EG__().GetException() != nil)
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 			return 0
 		}
 	}
 
-	result = opline.GetResultZval()
+	result = opline.Result()
 	if ObjectInitEx(result, ce) != types.SUCCESS {
 		result.SetUndef()
 		return 0

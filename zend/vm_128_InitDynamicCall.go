@@ -70,7 +70,7 @@ func ZEND_INIT_DYNAMIC_CALL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var call *ZendExecuteData
-	function_name = opline.GetOp2Zval()
+	function_name = opline.Op2()
 try_function_name:
 	if function_name.IsString() {
 		call = ZendInitDynamicCallString(function_name.GetStr(), opline.GetExtendedValue())

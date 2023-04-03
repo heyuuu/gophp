@@ -26,7 +26,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	 * when the expression is a Generator, it will be overwritten in zend_generator_resume() */
 
 	if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetNull()
+		opline.Result().SetNull()
 	}
 
 	/* This generator has no send target (though the generator we delegate to might have one) */
@@ -78,7 +78,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				return 0
 			} else {
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), new_gen.GetRetval())
+					types.ZVAL_COPY(opline.Result(), new_gen.GetRetval())
 				}
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
@@ -114,7 +114,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	 * when the expression is a Generator, it will be overwritten in zend_generator_resume() */
 
 	if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetNull()
+		opline.Result().SetNull()
 	}
 
 	/* This generator has no send target (though the generator we delegate to might have one) */
@@ -168,7 +168,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				return 0
 			} else {
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), new_gen.GetRetval())
+					types.ZVAL_COPY(opline.Result(), new_gen.GetRetval())
 				}
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
@@ -204,7 +204,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	 * when the expression is a Generator, it will be overwritten in zend_generator_resume() */
 
 	if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetNull()
+		opline.Result().SetNull()
 	}
 
 	/* This generator has no send target (though the generator we delegate to might have one) */
@@ -254,7 +254,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				return 0
 			} else {
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), new_gen.GetRetval())
+					types.ZVAL_COPY(opline.Result(), new_gen.GetRetval())
 				}
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
@@ -288,7 +288,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	 * when the expression is a Generator, it will be overwritten in zend_generator_resume() */
 
 	if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetNull()
+		opline.Result().SetNull()
 	}
 
 	/* This generator has no send target (though the generator we delegate to might have one) */

@@ -6,7 +6,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var param *types.Zval
 	for {
 		arg_num = opline.GetOp1().GetNum()
-		param = opline.GetResultZval()
+		param = opline.Result()
 		if arg_num > executeData.NumArgs() {
 			var default_value *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
 			if default_value.IsConstant() {

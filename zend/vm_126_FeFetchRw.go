@@ -8,10 +8,10 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var fe_ht *types.Array
 	var pos types.ArrayPosition
 	var p *types.Bucket
-	array = opline.GetOp1Zval()
+	array = opline.Op1()
 	array = types.ZVAL_DEREF(array)
 	if array.IsArray() {
-		pos = types.ZendHashIteratorPosEx(opline.GetOp1Zval().GetFeIterIdx(), array)
+		pos = types.ZendHashIteratorPosEx(opline.Op1().GetFeIterIdx(), array)
 		fe_ht = array.GetArr()
 		p = fe_ht.Bucket(pos)
 		for true {
@@ -42,12 +42,12 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if RETURN_VALUE_USED(opline) {
 			if p.GetKey() == nil {
-				opline.GetResultZval().SetLong(p.GetH())
+				opline.Result().SetLong(p.GetH())
 			} else {
-				opline.GetResultZval().SetStringCopy(p.GetKey())
+				opline.Result().SetStringCopy(p.GetKey())
 			}
 		}
-		EG__().GetHtIterators()[types.Z_FE_ITER_P(opline.GetOp1Zval())].SetPos(pos + 1)
+		EG__().GetHtIterators()[types.Z_FE_ITER_P(opline.Op1())].SetPos(pos + 1)
 	} else if array.IsObject() {
 		var iter *ZendObjectIterator
 		if b.Assign(&iter, ZendIteratorUnwrap(array)) == nil {
@@ -55,7 +55,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			/* plain object */
 
 			fe_ht = types.Z_OBJPROP_P(array)
-			pos = types.ZendHashIteratorPos(opline.GetOp1Zval().GetFeIterIdx(), fe_ht)
+			pos = types.ZendHashIteratorPos(opline.Op1().GetFeIterIdx(), fe_ht)
 			p = fe_ht.Bucket(pos)
 			for true {
 				if pos >= fe_ht.GetNNumUsed() {
@@ -93,18 +93,18 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if RETURN_VALUE_USED(opline) {
 				if p.GetKey() == nil {
-					opline.GetResultZval().SetLong(p.GetH())
+					opline.Result().SetLong(p.GetH())
 				} else if p.GetKey().GetVal()[0] {
-					opline.GetResultZval().SetStringCopy(p.GetKey())
+					opline.Result().SetStringCopy(p.GetKey())
 				} else {
 					var class_name *byte
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					opline.GetResultZval().SetStringVal(b.CastStr(prop_name, prop_name_len))
+					opline.Result().SetStringVal(b.CastStr(prop_name, prop_name_len))
 				}
 			}
-			EG__().GetHtIterators()[types.Z_FE_ITER_P(opline.GetOp1Zval())].SetPos(pos + 1)
+			EG__().GetHtIterators()[types.Z_FE_ITER_P(opline.Op1())].SetPos(pos + 1)
 		} else {
 			if b.PreInc(&(iter.GetIndex())) > 0 {
 
@@ -143,13 +143,13 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if RETURN_VALUE_USED(opline) {
 				if iter.GetFuncs().GetGetCurrentKey() != nil {
-					iter.GetFuncs().GetGetCurrentKey()(iter, opline.GetResultZval())
+					iter.GetFuncs().GetGetCurrentKey()(iter, opline.Result())
 					if EG__().GetException() != nil {
 						UNDEF_RESULT()
 						return 0
 					}
 				} else {
-					opline.GetResultZval().SetLong(iter.GetIndex())
+					opline.Result().SetLong(iter.GetIndex())
 				}
 			}
 			value_type = value.GetTypeInfo()
@@ -172,7 +172,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY_VALUE_EX(ref, value, gc, value_type)
 	}
 	if opline.GetOp2Type() == IS_CV {
-		var variable_ptr *types.Zval = opline.GetOp2Zval()
+		var variable_ptr *types.Zval = opline.Op2()
 		if variable_ptr != value {
 			var ref *types.ZendReference
 			ref = value.GetRef()
@@ -182,7 +182,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		value.AddRefcount()
-		opline.GetOp2Zval().SetReference(value.GetRef())
+		opline.Op2().SetReference(value.GetRef())
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

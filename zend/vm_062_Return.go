@@ -79,7 +79,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var retval_ptr *types.Zval
 	var return_value *types.Zval
 	var free_op1 ZendFreeOp
-	retval_ptr = opline.GetOp1Zval()
+	retval_ptr = opline.Op1()
 	return_value = executeData.GetReturnValue()
 	if retval_ptr.IsUndef() {
 		retval_ptr = ZVAL_UNDEFINED_OP1()

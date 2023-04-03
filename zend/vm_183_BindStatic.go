@@ -5,7 +5,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var ht *types.Array
 	var value *types.Zval
 	var variable_ptr *types.Zval
-	variable_ptr = opline.GetOp1Zval()
+	variable_ptr = opline.Op1()
 	IZvalPtrDtor(variable_ptr)
 	ht = ZEND_MAP_PTR_GET(executeData.GetFunc().op_array.static_variables_ptr)
 	if ht == nil {

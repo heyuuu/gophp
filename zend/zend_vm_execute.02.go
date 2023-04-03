@@ -23,20 +23,20 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
-	CompareFunction(opline.GetResultZval(), op_1, op_2)
+	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if opline.GetResultZval().GetLval() == 0 {
+	if opline.Result().GetLval() == 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
-		opline.GetResultZval().SetTrue()
+		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		ZEND_VM_SMART_BRANCH_FALSE()
-		opline.GetResultZval().SetFalse()
+		opline.Result().SetFalse()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }

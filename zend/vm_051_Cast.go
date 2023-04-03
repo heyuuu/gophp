@@ -3,7 +3,7 @@ package zend
 func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	var ht *types.Array
 	expr = RT_CONSTANT(opline, opline.GetOp1())
 	switch opline.GetExtendedValue() {
@@ -81,7 +81,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	var ht *types.Array
 	expr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	switch opline.GetExtendedValue() {
@@ -166,7 +166,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	var ht *types.Array
 	expr = opline.getZvalPtrVar1(&free_op1)
 	switch opline.GetExtendedValue() {
@@ -251,7 +251,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	var ht *types.Array
 	expr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	switch opline.GetExtendedValue() {

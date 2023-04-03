@@ -296,7 +296,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExec
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 
@@ -317,7 +317,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecu
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	value_ptr = _get_zval_ptr_cv_BP_VAR_W((opline + 1).GetOp1().GetVar(), executeData)
 
@@ -337,7 +337,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExe
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	property = opline.getZvalPtrVar2(&free_op2)
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 
@@ -360,7 +360,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExec
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	property = opline.getZvalPtrVar2(&free_op2)
 	value_ptr = _get_zval_ptr_cv_BP_VAR_W((opline + 1).GetOp1().GetVar(), executeData)
 
@@ -380,7 +380,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	value_ptr = _getZvalPtrPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
 
@@ -401,7 +401,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	var property *types.Zval
 	var container *types.Zval
 	var value_ptr *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	value_ptr = _get_zval_ptr_cv_BP_VAR_W((opline + 1).GetOp1().GetVar(), executeData)
 

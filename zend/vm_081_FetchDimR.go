@@ -34,7 +34,7 @@ func ZEND_FETCH_DIM_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var dim *types.Zval
 	var value *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	dim = opline.GetOp2Zval()
+	dim = opline.Op2()
 
 	{
 		zend_fetch_dimension_address_read_R(container, dim, IS_CV, opline, executeData)
@@ -53,7 +53,7 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		if container.IsArray() {
 		fetch_dim_r_array:
 			value = ZendFetchDimensionAddressInner(container.GetArr(), dim, IS_CONST, BP_VAR_R, executeData)
-			types.ZVAL_COPY_DEREF(opline.GetResultZval(), value)
+			types.ZVAL_COPY_DEREF(opline.Result(), value)
 		} else if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
@@ -86,7 +86,7 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		if container.IsArray() {
 		fetch_dim_r_array:
 			value = ZendFetchDimensionAddressInner(container.GetArr(), dim, IS_TMP_VAR|IS_VAR, BP_VAR_R, executeData)
-			types.ZVAL_COPY_DEREF(opline.GetResultZval(), value)
+			types.ZVAL_COPY_DEREF(opline.Result(), value)
 		} else if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
@@ -111,12 +111,12 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var dim *types.Zval
 	var value *types.Zval
 	container = opline.getZvalPtrVar1(&free_op1)
-	dim = opline.GetOp2Zval()
+	dim = opline.Op2()
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:
 			value = ZendFetchDimensionAddressInner(container.GetArr(), dim, IS_CV, BP_VAR_R, executeData)
-			types.ZVAL_COPY_DEREF(opline.GetResultZval(), value)
+			types.ZVAL_COPY_DEREF(opline.Result(), value)
 		} else if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
@@ -138,13 +138,13 @@ func ZEND_FETCH_DIM_R_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	dim = RT_CONSTANT(opline, opline.GetOp2())
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:
 			value = ZendFetchDimensionAddressInner(container.GetArr(), dim, IS_CONST, BP_VAR_R, executeData)
-			types.ZVAL_COPY_DEREF(opline.GetResultZval(), value)
+			types.ZVAL_COPY_DEREF(opline.Result(), value)
 		} else if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
@@ -169,13 +169,13 @@ func ZEND_FETCH_DIM_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	dim = opline.getZvalPtrVar2(&free_op2)
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:
 			value = ZendFetchDimensionAddressInner(container.GetArr(), dim, IS_TMP_VAR|IS_VAR, BP_VAR_R, executeData)
-			types.ZVAL_COPY_DEREF(opline.GetResultZval(), value)
+			types.ZVAL_COPY_DEREF(opline.Result(), value)
 		} else if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {
@@ -197,13 +197,13 @@ func ZEND_FETCH_DIM_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = opline.GetOp1Zval()
-	dim = opline.GetOp2Zval()
+	container = opline.Op1()
+	dim = opline.Op2()
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:
 			value = ZendFetchDimensionAddressInner(container.GetArr(), dim, IS_CV, BP_VAR_R, executeData)
-			types.ZVAL_COPY_DEREF(opline.GetResultZval(), value)
+			types.ZVAL_COPY_DEREF(opline.Result(), value)
 		} else if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
 			if container.IsArray() {

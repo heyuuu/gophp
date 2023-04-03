@@ -2,7 +2,7 @@ package zend
 
 func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	opline.GetResultZval().SetLong(EG__().GetErrorReporting())
+	opline.Result().SetLong(EG__().GetErrorReporting())
 	if EG__().GetErrorReporting() != 0 {
 		for {
 			EG__().SetErrorReporting(0)

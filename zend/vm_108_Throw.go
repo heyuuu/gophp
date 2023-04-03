@@ -83,7 +83,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
-	value = opline.GetOp1Zval()
+	value = opline.Op1()
 	for {
 		if value.GetType() != types.IS_OBJECT {
 			if value.IsReference() {

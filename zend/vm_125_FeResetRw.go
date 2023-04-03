@@ -12,7 +12,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if array_ptr.IsArray() {
 
 		{
-			array_ref = opline.GetResultZval()
+			array_ref = opline.Result()
 			array_ref.SetNewRef(array_ptr)
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
@@ -20,12 +20,12 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		}
 
-		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }
@@ -49,13 +49,13 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				array_ptr = types.Z_REFVAL_P(array_ref)
 			}
 			array_ref.AddRefcount()
-			types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+			types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 		}
 
 		{
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
@@ -66,7 +66,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					array_ptr = types.Z_REFVAL_P(array_ref)
 				}
 				array_ref.AddRefcount()
-				types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
@@ -77,10 +77,10 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.Len() == 0 {
-				opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+				opline.Result().SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
@@ -94,8 +94,8 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }
@@ -119,13 +119,13 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				array_ptr = types.Z_REFVAL_P(array_ref)
 			}
 			array_ref.AddRefcount()
-			types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+			types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 		}
 
 		{
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		{
 			if free_op1 != nil {
 				ZvalPtrDtorNogc(free_op1)
@@ -141,7 +141,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					array_ptr = types.Z_REFVAL_P(array_ref)
 				}
 				array_ref.AddRefcount()
-				types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
@@ -152,13 +152,13 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.Len() == 0 {
-				opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+				opline.Result().SetFeIterIdx(uint32 - 1)
 				if free_op1 != nil {
 					ZvalPtrDtorNogc(free_op1)
 				}
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			if free_op1 != nil {
 				ZvalPtrDtorNogc(free_op1)
 			}
@@ -181,8 +181,8 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		{
 			if free_op1 != nil {
 				ZvalPtrDtorNogc(free_op1)
@@ -211,13 +211,13 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				array_ptr = types.Z_REFVAL_P(array_ref)
 			}
 			array_ref.AddRefcount()
-			types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+			types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 		}
 
 		{
 			types.SEPARATE_ARRAY(array_ptr)
 		}
-		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if array_ptr.IsObject() {
 		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
@@ -228,7 +228,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					array_ptr = types.Z_REFVAL_P(array_ref)
 				}
 				array_ref.AddRefcount()
-				types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
 			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
@@ -239,10 +239,10 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			if properties.Len() == 0 {
-				opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+				opline.Result().SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
-			opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
@@ -256,8 +256,8 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }

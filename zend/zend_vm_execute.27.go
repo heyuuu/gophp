@@ -10,7 +10,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -24,7 +24,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 				ZVAL_UNDEFINED_OP1()
 			}
 			ZendWrongPropertyRead(offset)
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_r_finish
 			break
 		}
@@ -74,10 +74,10 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(executeData *ZendExecuteData)
 		}
 	}
 
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}

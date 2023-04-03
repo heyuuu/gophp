@@ -40,7 +40,7 @@ func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData
 	var op *types.Zval
 	var jump_zv *types.Zval
 	var jumptable *types.Array
-	op = opline.GetOp1Zval()
+	op = opline.Op1()
 	jumptable = RT_CONSTANT(opline, opline.GetOp2()).GetArr()
 	if op.GetType() != types.IS_STRING {
 

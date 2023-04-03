@@ -13,7 +13,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = opline.GetOp1Zval()
+	varname = opline.Op1()
 
 	if varname.IsString() {
 		name = varname.GetStr()
@@ -24,7 +24,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 		}
 		name = ZvalTryGetTmpString(varname, &tmp_name)
 		if name == nil {
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 			return 0
 		}
 	}
@@ -78,9 +78,9 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	}
 	b.Assert(retval != nil)
 	if type_ == BP_VAR_R || type_ == BP_VAR_IS {
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else {
-		opline.GetResultZval().SetIndirect(retval)
+		opline.Result().SetIndirect(retval)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

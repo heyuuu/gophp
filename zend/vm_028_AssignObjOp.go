@@ -38,7 +38,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -70,7 +70,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -126,7 +126,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -158,7 +158,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -214,7 +214,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -246,7 +246,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -291,7 +291,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -323,7 +323,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -365,7 +365,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -397,7 +397,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -439,7 +439,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -471,7 +471,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -495,7 +495,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
@@ -523,7 +523,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -555,7 +555,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -580,7 +580,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	property = opline.getZvalPtrVar2(&free_op2)
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
@@ -607,7 +607,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -639,7 +639,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {
@@ -664,7 +664,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
@@ -691,7 +691,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					opline.GetResultZval().SetNull()
+					opline.Result().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -723,7 +723,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(opline.GetResultZval(), zptr)
+					types.ZVAL_COPY(opline.Result(), zptr)
 				}
 			}
 		} else {

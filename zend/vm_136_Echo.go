@@ -45,7 +45,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var z *types.Zval
-	z = opline.GetOp1Zval()
+	z = opline.Op1()
 	if z.IsString() {
 		var str *types.String = z.GetStr()
 		if str.GetLen() != 0 {

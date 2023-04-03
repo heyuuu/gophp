@@ -30,7 +30,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 
 					{
 					fetch_obj_r_fast_copy:
-						types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+						types.ZVAL_COPY_DEREF(opline.Result(), retval)
 						return ZEND_VM_NEXT_OPCODE(executeData, opline)
 					}
 				}
@@ -62,10 +62,10 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 		}
 	}
 
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}

@@ -140,7 +140,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var container *types.Zval
 	var offset *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if container.GetType() != types.IS_OBJECT {
@@ -166,7 +166,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op2 ZendFreeOp
 	var container *types.Zval
 	var offset *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	offset = opline.getZvalPtrVar2(&free_op2)
 	for {
 		if container.GetType() != types.IS_OBJECT {
@@ -192,7 +192,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var container *types.Zval
 	var offset *types.Zval
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		if container.GetType() != types.IS_OBJECT {

@@ -8,11 +8,11 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if ret != 0 {
-		var result *types.Zval = opline.GetResultZval()
+		var result *types.Zval = opline.Result()
 		types.ZVAL_COPY_VALUE(result, value)
 		{
 
@@ -40,11 +40,11 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		ZvalPtrDtorNogc(free_op1)
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if ret != 0 {
-		var result *types.Zval = opline.GetResultZval()
+		var result *types.Zval = opline.Result()
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{
@@ -74,11 +74,11 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
 		ZvalPtrDtorNogc(free_op1)
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if ret != 0 {
-		var result *types.Zval = opline.GetResultZval()
+		var result *types.Zval = opline.Result()
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{
@@ -106,11 +106,11 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if ret != 0 {
-		var result *types.Zval = opline.GetResultZval()
+		var result *types.Zval = opline.Result()
 		types.ZVAL_COPY_VALUE(result, value)
 
 		{

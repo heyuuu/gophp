@@ -31,7 +31,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
+	types.ZVAL_BOOL(opline.Result(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_TMPVAR_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -45,7 +45,7 @@ try_instanceof:
 		var ce *types.ClassEntry
 
 		{
-			ce = opline.GetOp2Zval().GetCe()
+			ce = opline.Op2().GetCe()
 		}
 		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
@@ -59,7 +59,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
+	types.ZVAL_BOOL(opline.Result(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -77,7 +77,7 @@ try_instanceof:
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
 				ZvalPtrDtorNogc(free_op1)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 		}
@@ -94,14 +94,14 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
+	types.ZVAL_BOOL(opline.Result(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = opline.GetOp1Zval()
+	expr = opline.Op1()
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
@@ -126,20 +126,20 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
+	types.ZVAL_BOOL(opline.Result(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = opline.GetOp1Zval()
+	expr = opline.Op1()
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
 
 		{
-			ce = opline.GetOp2Zval().GetCe()
+			ce = opline.Op2().GetCe()
 		}
 		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
@@ -152,14 +152,14 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
+	types.ZVAL_BOOL(opline.Result(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = opline.GetOp1Zval()
+	expr = opline.Op1()
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
@@ -168,7 +168,7 @@ try_instanceof:
 			ce = ZendFetchClass(nil, opline.GetOp2().GetNum())
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 		}
@@ -184,6 +184,6 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
+	types.ZVAL_BOOL(opline.Result(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

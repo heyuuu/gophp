@@ -17,17 +17,17 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) i
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = opline.GetOp2Zval()
+	op2 = opline.Op2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -60,19 +60,19 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecuteDa
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = opline.GetOp2Zval()
+	op2 = opline.Op2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -105,19 +105,19 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteD
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = opline.GetOp2Zval()
+	op2 = opline.Op2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -149,18 +149,18 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.GetOp1Zval()
+	op1 = opline.Op1()
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -192,7 +192,7 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.GetOp1Zval()
+	op1 = opline.Op1()
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 
 	if op1.IsLong() {
@@ -200,12 +200,12 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -237,7 +237,7 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.GetOp1Zval()
+	op1 = opline.Op1()
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 
 	if op1.IsLong() {
@@ -245,12 +245,12 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -282,18 +282,18 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_TMPVARCV_HANDLER(executeData *ZendExecuteData
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.GetOp1Zval()
-	op2 = opline.GetOp2Zval()
+	op1 = opline.Op1()
+	op2 = opline.Op2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -325,20 +325,20 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecut
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.GetOp1Zval()
-	op2 = opline.GetOp2Zval()
+	op1 = opline.Op1()
+	op2 = opline.Op2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -370,20 +370,20 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecu
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.GetOp1Zval()
-	op2 = opline.GetOp2Zval()
+	op1 = opline.Op1()
+	op2 = opline.Op2()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
-				opline.GetResultZval().SetTrue()
+				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
-				opline.GetResultZval().SetFalse()
+				opline.Result().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {

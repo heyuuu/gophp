@@ -161,7 +161,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 	var call_info uint32
 	object = RT_CONSTANT(opline, opline.GetOp1())
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 	}
 	if function_name.GetType() != types.IS_STRING {
 		for {
@@ -464,7 +464,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	var call_info uint32
 	object = opline.getZvalPtrVar1(&free_op1)
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 	}
 	if function_name.GetType() != types.IS_STRING {
 		for {
@@ -722,7 +722,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 	}
 	if function_name.GetType() != types.IS_STRING {
 		for {
@@ -792,7 +792,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	{
 		for {
 			if object.GetType() != types.IS_OBJECT {
@@ -890,7 +890,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	{
 		function_name = opline.getZvalPtrVar2(&free_op2)
 	}
@@ -1006,9 +1006,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 	}
 	if function_name.GetType() != types.IS_STRING {
 		for {

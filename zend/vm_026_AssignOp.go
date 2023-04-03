@@ -9,7 +9,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	} else {
 		for {
@@ -25,7 +25,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), var_ptr)
+			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	if free_op1 != nil {
@@ -43,7 +43,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	} else {
 		for {
@@ -59,7 +59,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), var_ptr)
+			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	ZvalPtrDtorNogc(free_op2)
@@ -77,7 +77,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	} else {
 		for {
@@ -93,7 +93,7 @@ func ZEND_ASSIGN_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), var_ptr)
+			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	if free_op1 != nil {
@@ -109,7 +109,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	} else {
 		for {
@@ -125,7 +125,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), var_ptr)
+			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -139,7 +139,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	} else {
 		for {
@@ -155,7 +155,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), var_ptr)
+			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	ZvalPtrDtorNogc(free_op2)
@@ -169,7 +169,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var_ptr = _get_zval_ptr_cv_BP_VAR_RW(opline.GetOp1().GetVar(), executeData)
 	if var_ptr.IsError() {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	} else {
 		for {
@@ -185,7 +185,7 @@ func ZEND_ASSIGN_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), var_ptr)
+			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

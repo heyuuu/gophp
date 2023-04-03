@@ -10,7 +10,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	obj = RT_CONSTANT(opline, opline.GetOp1())
 	for {
 		{
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 			faults.ThrowError(nil, "__clone method called on non-object")
 			return 0
 		}
@@ -21,7 +21,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
@@ -29,12 +29,12 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 		}
 	}
-	opline.GetResultZval().SetObject(clone_call(obj))
+	opline.Result().SetObject(clone_call(obj))
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -54,7 +54,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 					break
 				}
 			}
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 			if obj.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 				if EG__().GetException() != nil {
@@ -73,7 +73,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
 		ZvalPtrDtorNogc(free_op1)
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
@@ -82,12 +82,12 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
 				ZvalPtrDtorNogc(free_op1)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 		}
 	}
-	opline.GetResultZval().SetObject(clone_call(obj))
+	opline.Result().SetObject(clone_call(obj))
 	ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -110,7 +110,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
@@ -118,12 +118,12 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 		}
 	}
-	opline.GetResultZval().SetObject(clone_call(obj))
+	opline.Result().SetObject(clone_call(obj))
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -133,7 +133,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var scope *types.ClassEntry
 	var clone types.IFunction
 	var clone_call ZendObjectCloneObjT
-	obj = opline.GetOp1Zval()
+	obj = opline.Op1()
 	for {
 		if obj.GetType() != types.IS_OBJECT {
 			if obj.IsReference() {
@@ -142,7 +142,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					break
 				}
 			}
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 			if obj.IsUndef() {
 				ZVAL_UNDEFINED_OP1()
 				if EG__().GetException() != nil {
@@ -159,7 +159,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
@@ -167,11 +167,11 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 				return 0
 			}
 		}
 	}
-	opline.GetResultZval().SetObject(clone_call(obj))
+	opline.Result().SetObject(clone_call(obj))
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

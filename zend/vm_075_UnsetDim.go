@@ -164,7 +164,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var hval ZendUlong
 	var key *types.String
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	offset = opline.GetOp2Zval()
+	offset = opline.Op2()
 	for {
 		if container.IsArray() {
 			var ht *types.Array
@@ -245,7 +245,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var hval ZendUlong
 	var key *types.String
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	offset = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if container.IsArray() {
@@ -313,7 +313,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var hval ZendUlong
 	var key *types.String
-	container = opline.GetOp1Zval()
+	container = opline.Op1()
 	offset = opline.getZvalPtrVar2(&free_op2)
 	for {
 		if container.IsArray() {
@@ -393,8 +393,8 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var hval ZendUlong
 	var key *types.String
-	container = opline.GetOp1Zval()
-	offset = opline.GetOp2Zval()
+	container = opline.Op1()
+	offset = opline.Op2()
 	for {
 		if container.IsArray() {
 			var ht *types.Array

@@ -5,7 +5,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	if value.IsString() {
-		opline.GetResultZval().SetLong(value.GetStr().GetLen())
+		opline.Result().SetLong(value.GetStr().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict types.ZendBool
@@ -16,7 +16,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
-					opline.GetResultZval().SetLong(str.GetLen())
+					opline.Result().SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
 				}
@@ -25,7 +25,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			break
 		}
 	}
@@ -37,7 +37,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	value = opline.getZvalPtrVar1(&free_op1)
 	if value.IsString() {
-		opline.GetResultZval().SetLong(value.GetStr().GetLen())
+		opline.Result().SetLong(value.GetStr().GetLen())
 		ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
@@ -45,7 +45,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if value.IsReference() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
-				opline.GetResultZval().SetLong(value.GetStr().GetLen())
+				opline.Result().SetLong(value.GetStr().GetLen())
 				ZvalPtrDtorNogc(free_op1)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
@@ -60,7 +60,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
-					opline.GetResultZval().SetLong(str.GetLen())
+					opline.Result().SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
 				}
@@ -69,7 +69,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			break
 		}
 	}
@@ -79,16 +79,16 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
-	value = opline.GetOp1Zval()
+	value = opline.Op1()
 	if value.IsString() {
-		opline.GetResultZval().SetLong(value.GetStr().GetLen())
+		opline.Result().SetLong(value.GetStr().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict types.ZendBool
 		if value.IsReference() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
-				opline.GetResultZval().SetLong(value.GetStr().GetLen())
+				opline.Result().SetLong(value.GetStr().GetLen())
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		}
@@ -102,7 +102,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
-					opline.GetResultZval().SetLong(str.GetLen())
+					opline.Result().SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
 				}
@@ -111,7 +111,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			break
 		}
 	}

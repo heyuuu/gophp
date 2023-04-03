@@ -2,7 +2,7 @@ package zend
 
 func ZEND_UNSET_CV_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var var_ *types.Zval = opline.GetOp1Zval()
+	var var_ *types.Zval = opline.Op1()
 	if var_.IsRefcounted() {
 		var garbage *types.ZendRefcounted = var_.GetCounted()
 		var_.SetUndef()

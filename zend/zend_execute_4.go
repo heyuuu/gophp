@@ -17,7 +17,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 		return
 	}
@@ -36,7 +36,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 		DecrementFunction(&z_copy)
 	}
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.GetResultZval(), &z_copy)
+		types.ZVAL_COPY(opline.Result(), &z_copy)
 	}
 	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	OBJ_RELEASE(obj.GetObj())
@@ -61,7 +61,7 @@ func ZendAssignOpOverloadedProperty(
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 		}
 		return
 	}
@@ -77,7 +77,7 @@ func ZendAssignOpOverloadedProperty(
 		types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &res, cache_slot)
 	}
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.GetResultZval(), &res)
+		types.ZVAL_COPY(opline.Result(), &res)
 	}
 	ZvalPtrDtor(z)
 	ZvalPtrDtor(&res)

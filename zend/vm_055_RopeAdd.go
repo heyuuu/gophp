@@ -7,7 +7,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	/* op1 and result are the same */
 
-	rope = (**types.String)(opline.GetOp1Zval())
+	rope = (**types.String)(opline.Op1())
 	{
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[opline.GetExtendedValue()] = var_.GetStr()
@@ -26,7 +26,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 
 	/* op1 and result are the same */
 
-	rope = (**types.String)(opline.GetOp1Zval())
+	rope = (**types.String)(opline.Op1())
 
 	{
 		var_ = opline.getZvalPtrVar2(&free_op2)
@@ -53,10 +53,10 @@ func ZEND_ROPE_ADD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* op1 and result are the same */
 
-	rope = (**types.String)(opline.GetOp1Zval())
+	rope = (**types.String)(opline.Op1())
 
 	{
-		var_ = opline.GetOp2Zval()
+		var_ = opline.Op2()
 		if var_.IsString() {
 			{
 				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()

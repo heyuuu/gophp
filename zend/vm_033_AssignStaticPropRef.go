@@ -24,7 +24,7 @@ func ZEND_ASSIGN_STATIC_PROP_REF_SPEC_HANDLER(executeData *ZendExecuteData) int 
 		ZendAssignToVariableReference(prop, value_ptr)
 	}
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.GetResultZval(), prop)
+		types.ZVAL_COPY(opline.Result(), prop)
 	}
 	if free_op_data != nil {
 		ZvalPtrDtorNogc(free_op_data)

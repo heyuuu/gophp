@@ -7,7 +7,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 
 	/* Compiler allocates the necessary number of zval slots to keep the rope */
 
-	rope = (**types.String)(opline.GetResultZval())
+	rope = (**types.String)(opline.Result())
 	{
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[0] = var_.GetStr()
@@ -26,7 +26,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 
 	/* Compiler allocates the necessary number of zval slots to keep the rope */
 
-	rope = (**types.String)(opline.GetResultZval())
+	rope = (**types.String)(opline.Result())
 
 	{
 		var_ = opline.getZvalPtrVar2(&free_op2)
@@ -53,10 +53,10 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* Compiler allocates the necessary number of zval slots to keep the rope */
 
-	rope = (**types.String)(opline.GetResultZval())
+	rope = (**types.String)(opline.Result())
 
 	{
-		var_ = opline.GetOp2Zval()
+		var_ = opline.Op2()
 		if var_.IsString() {
 			{
 				rope[0] = var_.GetStr().Copy()

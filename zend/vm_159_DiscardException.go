@@ -2,7 +2,7 @@ package zend
 
 func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var fast_call *types.Zval = opline.GetOp1Zval()
+	var fast_call *types.Zval = opline.Op1()
 
 	/* cleanup incomplete RETURN statement */
 

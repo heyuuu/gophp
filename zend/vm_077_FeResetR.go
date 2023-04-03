@@ -6,7 +6,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	array_ptr = RT_CONSTANT(opline, opline.GetOp1())
 	if array_ptr.IsArray() {
-		result = opline.GetResultZval()
+		result = opline.Result()
 		types.ZVAL_COPY_VALUE(result, array_ptr)
 		if result.IsRefcounted() {
 			array_ptr.AddRefcount()
@@ -15,8 +15,8 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }
@@ -27,7 +27,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	array_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if array_ptr.IsArray() {
-		result = opline.GetResultZval()
+		result = opline.Result()
 		types.ZVAL_COPY_VALUE(result, array_ptr)
 		result.SetFePos(0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -41,7 +41,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
-			result = opline.GetResultZval()
+			result = opline.Result()
 			types.ZVAL_COPY_VALUE(result, array_ptr)
 			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -62,8 +62,8 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
@@ -75,7 +75,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	array_ptr = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if array_ptr.IsArray() {
-		result = opline.GetResultZval()
+		result = opline.Result()
 		types.ZVAL_COPY_VALUE(result, array_ptr)
 		result.SetFePos(0)
 		ZvalPtrDtorNogc(free_op1)
@@ -90,7 +90,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
-			result = opline.GetResultZval()
+			result = opline.Result()
 			types.ZVAL_COPY_VALUE(result, array_ptr)
 			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -113,8 +113,8 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
@@ -125,7 +125,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	array_ptr = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if array_ptr.IsArray() {
-		result = opline.GetResultZval()
+		result = opline.Result()
 		types.ZVAL_COPY_VALUE(result, array_ptr)
 		result.SetFePos(0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -139,7 +139,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
-			result = opline.GetResultZval()
+			result = opline.Result()
 			types.ZVAL_COPY_VALUE(result, array_ptr)
 			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -159,8 +159,8 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		opline.GetResultZval().SetUndef()
-		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		opline.Result().SetUndef()
+		opline.Result().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }

@@ -30,6 +30,6 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		}
 		CACHE_PTR(opline.GetExtendedValue(), ce)
 	}
-	opline.GetResultZval().SetCe(ce)
+	opline.Result().SetCe(ce)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

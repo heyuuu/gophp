@@ -151,7 +151,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	offset = ZendCheckStringOffset(dim, BP_VAR_W, executeData)
 	if EG__().GetException() != nil {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetUndef()
+			opline.Result().SetUndef()
 		}
 		return
 	}
@@ -159,7 +159,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		faults.Error(faults.E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 		return
 	}
@@ -170,7 +170,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		var tmp *types.String = ZvalTryGetStringFunc(value)
 		if tmp == nil {
 			if RETURN_VALUE_USED(opline) {
-				opline.GetResultZval().SetUndef()
+				opline.Result().SetUndef()
 			}
 			return
 		}
@@ -187,7 +187,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		faults.Error(faults.E_WARNING, "Cannot assign an empty string to a string offset")
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 		return
 	}
@@ -213,7 +213,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		/* Return the new character */
 
-		opline.GetResultZval().SetInternedString(types.ZSTR_CHAR(c))
+		opline.Result().SetInternedString(types.ZSTR_CHAR(c))
 
 		/* Return the new character */
 
@@ -347,12 +347,12 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, op
 		}
 	}
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.GetResultZval(), prop)
+		types.ZVAL_COPY(opline.Result(), prop)
 	}
 }
 func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
-		opline.GetResultZval().SetLong(prop.GetLval())
+		opline.Result().SetLong(prop.GetLval())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			FastLongIncrementFunction(prop)
 		} else {
@@ -367,14 +367,14 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, o
 			var ref *types.ZendReference = prop.GetRef()
 			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendIncdecTypedRef(ref, opline.GetResultZval(), opline, executeData)
+				ZendIncdecTypedRef(ref, opline.Result(), opline, executeData)
 				return
 			}
 		}
 		if prop_info != nil {
-			ZendIncdecTypedProp(prop_info, prop, opline.GetResultZval(), opline, executeData)
+			ZendIncdecTypedProp(prop_info, prop, opline.Result(), opline, executeData)
 		} else {
-			types.ZVAL_COPY(opline.GetResultZval(), prop)
+			types.ZVAL_COPY(opline.Result(), prop)
 			if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 				IncrementFunction(prop)
 			} else {
@@ -393,7 +393,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
-		opline.GetResultZval().SetUndef()
+		opline.Result().SetUndef()
 		return
 	}
 	if z.IsObject() && types.Z_OBJ_HT_P(z).GetGet() != nil {
@@ -405,7 +405,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 		types.ZVAL_COPY_VALUE(z, value)
 	}
 	types.ZVAL_COPY_DEREF(&z_copy, z)
-	types.ZVAL_COPY(opline.GetResultZval(), &z_copy)
+	types.ZVAL_COPY(opline.Result(), &z_copy)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 		IncrementFunction(&z_copy)
 	} else {

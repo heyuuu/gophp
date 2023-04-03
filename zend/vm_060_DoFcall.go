@@ -102,7 +102,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if fbc.GetType() == ZEND_USER_FUNCTION {
 		ret = nil
-		ret = opline.GetResultZval()
+		ret = opline.Result()
 		call.SetPrevExecuteData(executeData)
 		executeData = call
 		IInitFuncExecuteData(fbc.GetOpArray(), ret, 1, executeData)
@@ -119,7 +119,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 		if fbc.IsHasTypeHints() && ZendVerifyInternalArgTypes(fbc, call) == 0 {
 			goto fcall_except
 		}
-		ret = opline.GetResultZval()
+		ret = opline.Result()
 		ret.SetNull()
 		if ZendExecuteInternal == nil {
 
@@ -137,7 +137,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 		ZendVmStackFreeArgs(call)
 
 	} else {
-		ret = opline.GetResultZval()
+		ret = opline.Result()
 		call.SetPrevExecuteData(executeData)
 		if ZendDoFcallOverloaded(call, ret) == 0 {
 			UNDEF_RESULT()

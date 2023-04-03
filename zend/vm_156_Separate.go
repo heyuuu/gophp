@@ -3,7 +3,7 @@ package zend
 func ZEND_SEPARATE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
-	var_ptr = opline.GetOp1Zval()
+	var_ptr = opline.Op1()
 	if var_ptr.IsReference() {
 		if var_ptr.GetRefcount() == 1 {
 			types.ZVAL_UNREF(var_ptr)

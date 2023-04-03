@@ -19,7 +19,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
 		ht = types.NewArray(result_size)
-		opline.GetResultZval().SetArray(ht)
+		opline.Result().SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
 		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
@@ -67,7 +67,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 		fillScope.FillEnd()
 		ht.SetNNumOfElements(result_size)
 	} else {
-		opline.GetResultZval().SetEmptyArray()
+		opline.Result().SetEmptyArray()
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
@@ -86,7 +86,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 	if result_size != 0 {
 		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
 		ht = types.NewArray(result_size)
-		opline.GetResultZval().SetArray(ht)
+		opline.Result().SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
 		fillScope := types.PackedFillStart(ht)
 		var p *types.Zval
@@ -134,7 +134,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		fillScope.FillEnd()
 		ht.SetNNumOfElements(result_size)
 	} else {
-		opline.GetResultZval().SetEmptyArray()
+		opline.Result().SetEmptyArray()
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

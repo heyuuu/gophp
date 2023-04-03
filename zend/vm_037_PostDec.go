@@ -6,7 +6,7 @@ func ZEND_POST_DEC_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var var_ptr *types.Zval
 	var_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if var_ptr.IsLong() {
-		opline.GetResultZval().SetLong(var_ptr.GetLval())
+		opline.Result().SetLong(var_ptr.GetLval())
 		FastLongDecrementFunction(var_ptr)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
@@ -15,9 +15,9 @@ func ZEND_POST_DEC_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_POST_DEC_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var var_ptr *types.Zval
-	var_ptr = opline.GetOp1Zval()
+	var_ptr = opline.Op1()
 	if var_ptr.IsLong() {
-		opline.GetResultZval().SetLong(var_ptr.GetLval())
+		opline.Result().SetLong(var_ptr.GetLval())
 		FastLongDecrementFunction(var_ptr)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}

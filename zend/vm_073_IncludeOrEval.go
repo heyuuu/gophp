@@ -15,13 +15,13 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	} else if new_op_array == ZEND_FAKE_OP_ARRAY {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetTrue()
+			opline.Result().SetTrue()
 		}
 	} else if new_op_array != nil {
 		var return_value *types.Zval = nil
 		var call *ZendExecuteData
 		if RETURN_VALUE_USED(opline) {
-			return_value = opline.GetResultZval()
+			return_value = opline.Result()
 		}
 		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
 		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
@@ -47,7 +47,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			return 0
 		}
 	} else if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetFalse()
+		opline.Result().SetFalse()
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
@@ -68,13 +68,13 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 		return 0
 	} else if new_op_array == ZEND_FAKE_OP_ARRAY {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetTrue()
+			opline.Result().SetTrue()
 		}
 	} else if new_op_array != nil {
 		var return_value *types.Zval = nil
 		var call *ZendExecuteData
 		if RETURN_VALUE_USED(opline) {
-			return_value = opline.GetResultZval()
+			return_value = opline.Result()
 		}
 		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
 		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
@@ -100,7 +100,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 			return 0
 		}
 	} else if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetFalse()
+		opline.Result().SetFalse()
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
@@ -119,13 +119,13 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	} else if new_op_array == ZEND_FAKE_OP_ARRAY {
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetTrue()
+			opline.Result().SetTrue()
 		}
 	} else if new_op_array != nil {
 		var return_value *types.Zval = nil
 		var call *ZendExecuteData
 		if RETURN_VALUE_USED(opline) {
-			return_value = opline.GetResultZval()
+			return_value = opline.Result()
 		}
 		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
 		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
@@ -151,7 +151,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			return 0
 		}
 	} else if RETURN_VALUE_USED(opline) {
-		opline.GetResultZval().SetFalse()
+		opline.Result().SetFalse()
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

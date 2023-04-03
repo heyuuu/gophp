@@ -81,7 +81,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 			ce = ZendFetchClassByName(RT_CONSTANT(opline, opline.GetOp1()).GetStr(), (RT_CONSTANT(opline, opline.GetOp1()) + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
-				ZvalPtrDtorNogc(opline.GetOp2Zval())
+				ZvalPtrDtorNogc(opline.Op2())
 				return 0
 			}
 			{
@@ -241,7 +241,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 	}
 
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {
@@ -311,7 +311,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(executeData *ZendExecut
 	/* no function found. try a static method in class */
 
 	{
-		ce = opline.GetOp1Zval().GetCe()
+		ce = opline.Op1().GetCe()
 	}
 
 	if CACHED_PTR(opline.GetResult().GetNum()) == ce {
@@ -370,7 +370,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 	/* no function found. try a static method in class */
 
 	{
-		ce = opline.GetOp1Zval().GetCe()
+		ce = opline.Op1().GetCe()
 	}
 
 	{
@@ -450,7 +450,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecu
 	/* no function found. try a static method in class */
 
 	{
-		ce = opline.GetOp1Zval().GetCe()
+		ce = opline.Op1().GetCe()
 	}
 
 	{
@@ -500,11 +500,11 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 	/* no function found. try a static method in class */
 
 	{
-		ce = opline.GetOp1Zval().GetCe()
+		ce = opline.Op1().GetCe()
 	}
 
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {
@@ -648,7 +648,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
 			b.Assert(EG__().GetException() != nil)
-			ZvalPtrDtorNogc(opline.GetOp2Zval())
+			ZvalPtrDtorNogc(opline.Op2())
 			return 0
 		}
 	}
@@ -808,7 +808,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 	}
 
 	{
-		function_name = opline.GetOp2Zval()
+		function_name = opline.Op2()
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {

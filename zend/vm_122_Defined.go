@@ -8,12 +8,12 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if IS_SPECIAL_CACHE_VAL(c) == 0 {
 		defined_true:
 			ZEND_VM_SMART_BRANCH_TRUE()
-			opline.GetResultZval().SetTrue()
+			opline.Result().SetTrue()
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		} else if EG__().GetZendConstants().Len() == DECODE_SPECIAL_CACHE_NUM(c) {
 		defined_false:
 			ZEND_VM_SMART_BRANCH_FALSE()
-			opline.GetResultZval().SetFalse()
+			opline.Result().SetFalse()
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		}
 	}

@@ -34,7 +34,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 				{
 					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
@@ -86,7 +86,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		}
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 
 				{
@@ -138,7 +138,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 
 				{
@@ -179,7 +179,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 				{
 					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
@@ -217,7 +217,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		}
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 
 				{
@@ -255,7 +255,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 		}
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 
 				{
@@ -277,7 +277,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	property = RT_CONSTANT(opline, opline.GetOp2())
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -303,7 +303,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 				{
 					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
@@ -326,7 +326,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	property = opline.getZvalPtrVar2(&free_op2)
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -351,7 +351,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 		}
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 
 				{
@@ -374,7 +374,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var zptr *types.Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = opline.GetOp1Zval()
+	object = opline.Op1()
 	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	for {
 		if object.GetType() != types.IS_OBJECT {
@@ -399,7 +399,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				opline.GetResultZval().SetNull()
+				opline.Result().SetNull()
 			} else {
 
 				{

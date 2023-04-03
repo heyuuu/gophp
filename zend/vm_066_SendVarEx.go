@@ -56,7 +56,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	send_var_by_ref:
 		return ZEND_SEND_REF_SPEC_CV_HANDLER(executeData)
 	}
-	varptr = opline.GetOp1Zval()
+	varptr = opline.Op1()
 	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
@@ -78,7 +78,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_QUICK_HANDLER(executeData *ZendExecuteData) int {
 	if QUICK_ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 		goto send_var_by_ref
 	}
-	varptr = opline.GetOp1Zval()
+	varptr = opline.Op1()
 	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())

@@ -8,7 +8,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var fe_ht *types.Array
 	var pos types.ArrayPosition
 	var p *types.Bucket
-	array = opline.GetOp1Zval()
+	array = opline.Op1()
 	if array.IsArray() {
 		fe_ht = array.GetArr()
 		pos = array.GetFePos()
@@ -41,9 +41,9 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		array.SetFePos(pos + 1)
 		if RETURN_VALUE_USED(opline) {
 			if p.GetKey() == nil {
-				opline.GetResultZval().SetLong(p.GetH())
+				opline.Result().SetLong(p.GetH())
 			} else {
-				opline.GetResultZval().SetStringCopy(p.GetKey())
+				opline.Result().SetStringCopy(p.GetKey())
 			}
 		}
 	} else {
@@ -84,15 +84,15 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if RETURN_VALUE_USED(opline) {
 				if p.GetKey() == nil {
-					opline.GetResultZval().SetLong(p.GetH())
+					opline.Result().SetLong(p.GetH())
 				} else if p.GetKey().GetVal()[0] {
-					opline.GetResultZval().SetStringCopy(p.GetKey())
+					opline.Result().SetStringCopy(p.GetKey())
 				} else {
 					var class_name *byte
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					opline.GetResultZval().SetStringVal(b.CastStr(prop_name, prop_name_len))
+					opline.Result().SetStringVal(b.CastStr(prop_name, prop_name_len))
 				}
 			}
 			EG__().GetHtIterators()[types.Z_FE_ITER_P(array)].SetPos(pos + 1)
@@ -134,23 +134,23 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			if RETURN_VALUE_USED(opline) {
 				if iter.GetFuncs().GetGetCurrentKey() != nil {
-					iter.GetFuncs().GetGetCurrentKey()(iter, opline.GetResultZval())
+					iter.GetFuncs().GetGetCurrentKey()(iter, opline.Result())
 					if EG__().GetException() != nil {
 						UNDEF_RESULT()
 						return 0
 					}
 				} else {
-					opline.GetResultZval().SetLong(iter.GetIndex())
+					opline.Result().SetLong(iter.GetIndex())
 				}
 			}
 			value_type = value.GetTypeInfo()
 		}
 	}
 	if opline.GetOp2Type() == IS_CV {
-		var variable_ptr *types.Zval = opline.GetOp2Zval()
+		var variable_ptr *types.Zval = opline.Op2()
 		ZendAssignToVariable(variable_ptr, value, IS_CV, executeData.IsCallUseStrictTypes())
 	} else {
-		var res *types.Zval = opline.GetOp2Zval()
+		var res *types.Zval = opline.Op2()
 		var gc *types.ZendRefcounted = value.GetCounted()
 		types.ZVAL_COPY_VALUE_EX(res, value, gc, value_type)
 		if types.Z_TYPE_INFO_REFCOUNTED(value_type) {

@@ -2,7 +2,7 @@ package zend
 
 func ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	opline.GetResultZval().SetNull()
+	opline.Result().SetNull()
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -15,7 +15,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	offset = opline.getZvalPtrVar2(&free_op2)
 	{
 		for {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -25,10 +25,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -45,7 +45,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	{
 		for {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -55,10 +55,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -81,7 +81,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 					break
 				}
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -130,10 +130,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 			}
 		}
 	}
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -158,7 +158,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 					break
 				}
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -168,10 +168,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -196,7 +196,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int 
 					break
 				}
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -206,10 +206,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int 
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -241,7 +241,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 
 					{
 					fetch_obj_is_fast_copy:
-						types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+						types.ZVAL_COPY_DEREF(opline.Result(), retval)
 						return ZEND_VM_NEXT_OPCODE(executeData, opline)
 					}
 				}
@@ -272,10 +272,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 			}
 		}
 	}
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -297,10 +297,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -322,10 +322,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -347,7 +347,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					break
 				}
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -396,10 +396,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	}
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -422,7 +422,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 					break
 				}
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -432,10 +432,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -458,7 +458,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 					break
 				}
 			}
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 			goto fetch_obj_is_finish
 			break
 		}
@@ -468,10 +468,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	var zobj *types.ZendObject = container.GetObj()
 	var retval *types.Zval
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
-	if retval != opline.GetResultZval() {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
+	if retval != opline.Result() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
+		types.ZVAL_COPY_DEREF(opline.Result(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}

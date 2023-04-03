@@ -3,7 +3,7 @@ package zend
 func ZEND_FE_FREE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var var_ *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
-	var_ = opline.GetOp1Zval()
+	var_ = opline.Op1()
 	if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
 		types.ZendHashIteratorDel(var_.GetFeIterIdx())
 	}

@@ -33,7 +33,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	executeData.GetCall() = call.GetPrevExecuteData()
 	call.SetPrevExecuteData(executeData)
 	EG__().SetCurrentExecuteData(call)
-	ret = opline.GetResultZval()
+	ret = opline.Result()
 	ret.SetNull()
 	fbc.GetInternalFunction().GetHandler()(call, ret)
 	EG__().SetCurrentExecuteData(executeData)

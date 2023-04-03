@@ -58,7 +58,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 	executeData.GetCall() = call.GetPrevExecuteData()
 	if fbc.GetType() == ZEND_USER_FUNCTION {
 		ret = nil
-		ret = opline.GetResultZval()
+		ret = opline.Result()
 		call.SetPrevExecuteData(executeData)
 		executeData = call
 		IInitFuncExecuteData(fbc.GetOpArray(), ret, 0, executeData)
@@ -81,7 +81,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData
 
 			goto fcall_by_name_end
 		}
-		ret = opline.GetResultZval()
+		ret = opline.Result()
 		ret.SetNull()
 		fbc.GetInternalFunction().GetHandler()(call, ret)
 		EG__().SetCurrentExecuteData(executeData)

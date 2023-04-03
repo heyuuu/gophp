@@ -20,7 +20,7 @@ func ZEND_DO_UCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 	var ret *types.Zval
 	executeData.GetCall() = call.GetPrevExecuteData()
 	ret = nil
-	ret = opline.GetResultZval()
+	ret = opline.Result()
 	call.SetPrevExecuteData(executeData)
 	executeData = call
 	IInitFuncExecuteData(fbc.GetOpArray(), ret, 0, executeData)

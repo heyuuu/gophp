@@ -126,7 +126,7 @@ func ZendRefDelTypeSource(source_list *types.ZendPropertyInfoSourceList, prop *Z
 	}
 }
 func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
-	var result *types.Zval = opline.GetResultZval()
+	var result *types.Zval = opline.Result()
 	switch type_ {
 	case BP_VAR_R:
 		if executeData.GetThis().IsObject() {

@@ -25,6 +25,6 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExe
 		called_scope = executeData.GetThis().GetCe()
 		object = nil
 	}
-	ZendCreateClosure(opline.GetResultZval(), func_, executeData.GetFunc().op_array.scope, called_scope, object)
+	ZendCreateClosure(opline.Result(), func_, executeData.GetFunc().op_array.scope, called_scope, object)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

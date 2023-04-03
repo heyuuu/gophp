@@ -308,7 +308,7 @@ func ZendIllegalOffset() {
 func ZendAssignToObjectDim(object *types.Zval, dim *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	types.Z_OBJ_HT_P(object).GetWriteDimension()(object, dim, value)
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(opline.GetResultZval(), value)
+		types.ZVAL_COPY(opline.Result(), value)
 	}
 }
 func ZendBinaryOp(ret *types.Zval, op1 *types.Zval, op2 *types.Zval, opline *ZendOp) int {
@@ -342,13 +342,13 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 			ZvalPtrDtor(&rv)
 		}
 		if RETURN_VALUE_USED(opline) {
-			types.ZVAL_COPY(opline.GetResultZval(), &res)
+			types.ZVAL_COPY(opline.Result(), &res)
 		}
 		ZvalPtrDtor(&res)
 	} else {
 		ZendUseObjectAsArray()
 		if RETURN_VALUE_USED(opline) {
-			opline.GetResultZval().SetNull()
+			opline.Result().SetNull()
 		}
 	}
 	FREE_OP(free_op_data1)
