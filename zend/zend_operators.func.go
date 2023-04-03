@@ -226,6 +226,46 @@ again:
 	}
 	return result
 }
+func IZendIsTrueEx(op *types.Zval) bool {
+	var result int = 0
+again:
+	switch op.GetType() {
+	case types.IS_TRUE:
+		result = 1
+	case types.IS_LONG:
+		if op.GetLval() != 0 {
+			result = 1
+		}
+	case types.IS_DOUBLE:
+		if op.GetDval() != 0 {
+			result = 1
+		}
+	case types.IS_STRING:
+		if op.GetStr().GetLen() > 1 || op.GetStr().GetLen() != 0 && op.GetStr().GetVal()[0] != '0' {
+			result = 1
+		}
+	case types.IS_ARRAY:
+		if types.Z_ARRVAL_P(op).Len() {
+			result = 1
+		}
+	case types.IS_OBJECT:
+		if types.Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
+			result = 1
+		} else {
+			result = ZendObjectIsTrue(op)
+		}
+	case types.IS_RESOURCE:
+		if types.Z_RES_HANDLE_P(op) != 0 {
+			result = 1
+		}
+	case types.IS_REFERENCE:
+		op = types.Z_REFVAL_P(op)
+		goto again
+	default:
+
+	}
+	return result
+}
 func ZendStringTolower(str *types.String) *types.String { return ZendStringTolowerEx(str) }
 func ConvertToStringEx(pzv *types.Zval) {
 	if pzv.GetType() != types.IS_STRING {

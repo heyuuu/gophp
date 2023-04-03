@@ -62,17 +62,46 @@ func getPowHandler(executeData *ZendExecuteData) int {
 // ZEND_BW_NOT
 func getBwNotHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
-	//todo
+	var freeOp1 ZendFreeOp
+	var op1 *types.Zval = opline.ConcatOp1(&freeOp1)
+
+	if op1.IsLong() {
+		opline.Result().SetLong(^(op1.GetLval()))
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	}
+	if op1.IsUndef() {
+		op1 = ZVAL_UNDEFINED_OP1()
+	}
+	BitwiseNotFunction(opline.Result(), op1)
+	if freeOp1 != nil {
+		ZvalPtrDtorNogc(freeOp1)
+	}
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
 // ZEND_BOOL_NOT
 func getBoolNotHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
-	//todo
+	var freeOp1 ZendFreeOp
+	var op1 *types.Zval = opline.ConcatOp1(&freeOp1)
+
+	if op1.IsTrue() {
+		opline.Result().SetFalse()
+	} else if op1.GetType() <= types.IS_TRUE {
+		opline.Result().SetTrue()
+		if op1.IsUndef() {
+			ZVAL_UNDEFINED_OP1()
+			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+		}
+	} else {
+		opline.Result().SetBool(!IZendIsTrueEx(op1))
+		if freeOp1 != nil {
+			ZvalPtrDtorNogc(freeOp1)
+		}
+		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+	}
+
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 
 // ZEND_BOOL_XOR

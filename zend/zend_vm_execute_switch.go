@@ -509,60 +509,29 @@ func vmGetBwXorHandler(op *ZendOp) OpcodeHandlerT {
 	return getBwXorHandler
 }
 func vmGetPowHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 276 | SPEC_RULE_OP1 | SPEC_RULE_OP2
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
-		ZEND_POW_SPEC_CONST_CONST_HANDLER,   // IS_CONST * IS_CONST
-		ZEND_POW_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_TMP_VAR
-		ZEND_POW_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_VAR
-		nil,                                 // IS_CONST * IS_UNUSED
-		ZEND_POW_SPEC_CONST_CV_HANDLER,      // IS_CONST * IS_CV
-		ZEND_POW_SPEC_TMPVAR_CONST_HANDLER,  // IS_TMP_VAR * IS_CONST
-		ZEND_POW_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_TMP_VAR * IS_TMP_VAR
-		ZEND_POW_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_TMP_VAR * IS_VAR
-		nil,                                 // IS_TMP_VAR * IS_UNUSED
-		ZEND_POW_SPEC_TMPVAR_CV_HANDLER,     // IS_TMP_VAR * IS_CV
-		ZEND_POW_SPEC_TMPVAR_CONST_HANDLER,  // IS_VAR * IS_CONST
-		ZEND_POW_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_VAR * IS_TMP_VAR
-		ZEND_POW_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_VAR * IS_VAR
-		nil,                                 // IS_VAR * IS_UNUSED
-		ZEND_POW_SPEC_TMPVAR_CV_HANDLER,     // IS_VAR * IS_CV
-		nil,                                 // IS_UNUSED * IS_CONST
-		nil,                                 // IS_UNUSED * IS_TMP_VAR
-		nil,                                 // IS_UNUSED * IS_VAR
-		nil,                                 // IS_UNUSED * IS_UNUSED
-		nil,                                 // IS_UNUSED * IS_CV
-		ZEND_POW_SPEC_CV_CONST_HANDLER,      // IS_CV * IS_CONST
-		ZEND_POW_SPEC_CV_TMPVAR_HANDLER,     // IS_CV * IS_TMP_VAR
-		ZEND_POW_SPEC_CV_TMPVAR_HANDLER,     // IS_CV * IS_VAR
-		nil,                                 // IS_CV * IS_UNUSED
-		ZEND_POW_SPEC_CV_CV_HANDLER,         // IS_CV * IS_CV
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return getPowHandler
 }
 func vmGetBwNotHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 301 | SPEC_RULE_OP1
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
-		ZEND_BW_NOT_SPEC_CONST_HANDLER,  // IS_CONST * ---
-		ZEND_BW_NOT_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
-		ZEND_BW_NOT_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
-		nil,                             // IS_UNUSED * ---
-		ZEND_BW_NOT_SPEC_CV_HANDLER,     // IS_CV * ---
+	// SPEC_RULE_OP1
+	opType1 := op.GetOp1Type()
+	if opType1 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return getBwNotHandler
 }
 func vmGetBoolNotHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 306 | SPEC_RULE_OP1
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [5]OpcodeHandlerT{
-		ZEND_BOOL_NOT_SPEC_CONST_HANDLER,  // IS_CONST * ---
-		ZEND_BOOL_NOT_SPEC_TMPVAR_HANDLER, // IS_TMP_VAR * ---
-		ZEND_BOOL_NOT_SPEC_TMPVAR_HANDLER, // IS_VAR * ---
-		nil,                               // IS_UNUSED * ---
-		ZEND_BOOL_NOT_SPEC_CV_HANDLER,     // IS_CV * ---
+	// SPEC_RULE_OP1
+	opType1 := op.GetOp1Type()
+	if opType1 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return getBoolNotHandler
 }
 func vmGetBoolXorHandler(op *ZendOp) OpcodeHandlerT {
 	spec := 311 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE

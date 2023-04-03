@@ -198,14 +198,14 @@ func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeO
 
 //
 func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
-func (op *ZendOp) _var(node ZnodeOp) *types.Zval   { return EX_VAR(node.GetVar()) }
-func (op *ZendOp) _varAndPtr(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
-	var ret = op._var(node)
+func (op *ZendOp) _op(node ZnodeOp) *types.Zval    { return EX_VAR(node.GetVar()) }
+func (op *ZendOp) _opPtr(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
+	var ret = op._op(node)
 	*shouldFree = ret
 	return ret
 }
 func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
-	ret := op._var(node)
+	ret := op._op(node)
 	if ret.IsUndef() {
 		return ZvalUndefinedCv(node.var_, op.currEx())
 	}
@@ -214,48 +214,43 @@ func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
 
 func (op *ZendOp) Const1() *types.Zval { return op._const(op.op1) }
 func (op *ZendOp) Const2() *types.Zval { return op._const(op.op2) }
-func (op *ZendOp) Op1() *types.Zval    { return op._var(op.op1) }
-func (op *ZendOp) Op2() *types.Zval    { return op._var(op.op2) }
-func (op *ZendOp) Result() *types.Zval { return op._var(op.result) }
+func (op *ZendOp) Op1() *types.Zval    { return op._op(op.op1) }
+func (op *ZendOp) Op2() *types.Zval    { return op._op(op.op2) }
+func (op *ZendOp) Result() *types.Zval { return op._op(op.result) }
 
 //
 func (op *ZendOp) Op1Ptr(shouldFree *ZendFreeOp) *types.Zval {
-	return op._varAndPtr(op.op1, shouldFree)
+	return op._opPtr(op.op1, shouldFree)
 }
 func (op *ZendOp) Op2Ptr(shouldFree *ZendFreeOp) *types.Zval {
-	return op._varAndPtr(op.op2, shouldFree)
+	return op._opPtr(op.op2, shouldFree)
 }
 
 func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
 func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
 
 // VarEx
-func (op *ZendOp) _varEx(opType uint8, node ZnodeOp) *types.Zval {
-	return op._complexOp(opType, node, op._const, op._var, op._var)
+func (op *ZendOp) Op1Ex() *types.Zval {
+	return op._complexOp(op.op1Type, op.op1, op._const, op._op, op._op)
 }
-func (op *ZendOp) Op1Ex() *types.Zval { return op._varEx(op.op1Type, op.op1) }
-func (op *ZendOp) Op2Ex() *types.Zval { return op._varEx(op.op2Type, op.op2) }
+func (op *ZendOp) Op2Ex() *types.Zval {
+	return op._complexOp(op.op2Type, op.op2, op._const, op._op, op._op)
+}
 
 // VarExEx
-func (op *ZendOp) _varExEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
-	return op._complexOpEx(opType, node, shouldFree, op._const, op._varAndPtr, op._cvOrUndef)
-}
 func (op *ZendOp) Op1ExEx(shouldFree *ZendFreeOp) *types.Zval {
-	return op._varExEx(op.op1Type, op.op1, shouldFree)
+	return op._complexOpEx(op.op1Type, op.op1, shouldFree, op._const, op._opPtr, op._cvOrUndef)
 }
 func (op *ZendOp) Op2ExEx(shouldFree *ZendFreeOp) *types.Zval {
-	return op._varExEx(op.op2Type, op.op2, shouldFree)
+	return op._complexOpEx(op.op2Type, op.op2, shouldFree, op._const, op._opPtr, op._cvOrUndef)
 }
 
 //
-func (op *ZendOp) _concatOp(freeOp *ZendFreeOp, opType uint8, node ZnodeOp) *types.Zval {
-	return op._complexOpEx(opType, node, freeOp, op._const, op._varAndPtr, op._var)
-}
 func (op *ZendOp) ConcatOp1(freeOp *ZendFreeOp) *types.Zval {
-	return op._concatOp(freeOp, op.op1Type, op.op1)
+	return op._complexOpEx(op.op1Type, op.op1, freeOp, op._const, op._opPtr, op._op)
 }
 func (op *ZendOp) ConcatOp2(freeOp *ZendFreeOp) *types.Zval {
-	return op._concatOp(freeOp, op.op1Type, op.op1)
+	return op._complexOpEx(op.op1Type, op.op1, freeOp, op._const, op._opPtr, op._op)
 }
 
 /**
