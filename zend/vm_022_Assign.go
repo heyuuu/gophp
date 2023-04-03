@@ -120,7 +120,7 @@ func ZEND_ASSIGN_SPEC_VAR_CV_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData)
 	var free_op1 ZendFreeOp
 	var value *types.Zval
 	var variable_ptr *types.Zval
-	value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	value = opline.Cv2OrUndef()
 	variable_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if variable_ptr.IsError() {
 	} else {
@@ -137,7 +137,7 @@ func ZEND_ASSIGN_SPEC_VAR_CV_RETVAL_USED_HANDLER(executeData *ZendExecuteData) i
 	var free_op1 ZendFreeOp
 	var value *types.Zval
 	var variable_ptr *types.Zval
-	value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	value = opline.Cv2OrUndef()
 	variable_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if variable_ptr.IsError() {
 		opline.Result().SetNull()
@@ -245,7 +245,7 @@ func ZEND_ASSIGN_SPEC_CV_CV_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var variable_ptr *types.Zval
-	value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	value = opline.Cv2OrUndef()
 	variable_ptr = opline.Op1()
 	if variable_ptr.IsError() {
 	} else {
@@ -258,7 +258,7 @@ func ZEND_ASSIGN_SPEC_CV_CV_RETVAL_USED_HANDLER(executeData *ZendExecuteData) in
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var variable_ptr *types.Zval
-	value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	value = opline.Cv2OrUndef()
 	variable_ptr = opline.Op1()
 	if variable_ptr.IsError() {
 		opline.Result().SetNull()

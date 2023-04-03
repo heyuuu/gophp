@@ -146,7 +146,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			/* Not supposed to happen, but we'll allow it */
 
 			faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
-			retval_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+			retval_ptr = opline.Cv1OrUndef()
 			if !(executeData.GetReturnValue()) {
 			} else {
 				if retval_ptr.IsReference() {

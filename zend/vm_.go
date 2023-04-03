@@ -45,8 +45,17 @@ func getBwXorHandler(executeData *ZendExecuteData) int {
 // ZEND_POW
 func getPowHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var freeOp1, freeOp2 ZendFreeOp
+	var op1 *types.Zval = opline.Op1ExEx(&freeOp1)
+	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
+	PowFunction(opline.Result(), op1, op2)
+	if freeOp1 != nil {
+		ZvalPtrDtorNogc(freeOp1)
+	}
+	if freeOp2 != nil {
+		ZvalPtrDtorNogc(freeOp2)
+	}
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	//todo
 }
 

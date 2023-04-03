@@ -118,7 +118,7 @@ func ZEND_PRE_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	property = opline.Cv2OrUndef()
 	for {
 		if object.GetType() != types.IS_OBJECT {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {
@@ -254,7 +254,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	property = opline.Cv2OrUndef()
 	for {
 	pre_incdec_object:
 
@@ -391,7 +391,7 @@ func ZEND_PRE_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = opline.Op1()
-	property = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	property = opline.Cv2OrUndef()
 	for {
 		if object.GetType() != types.IS_OBJECT {
 			if object.IsReference() && types.Z_REFVAL_P(object).IsObject() {

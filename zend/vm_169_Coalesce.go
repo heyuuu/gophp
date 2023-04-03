@@ -76,7 +76,7 @@ func ZEND_COALESCE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var ref *types.Zval = nil
-	value = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
+	value = opline.Cv1()
 	if value.IsReference() {
 		{
 			ref = value

@@ -253,7 +253,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var expr *types.Zval
 	var result *types.Zval = opline.Result()
 	var ht *types.Array
-	expr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+	expr = opline.Cv1OrUndef()
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()

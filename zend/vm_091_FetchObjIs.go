@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	opline.Result().SetNull()
@@ -42,7 +47,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = opline.Const1()
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	offset = opline.Cv2OrUndef()
 	{
 		for {
 			opline.Result().SetNull()
@@ -187,7 +192,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int 
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = opline.Op1Ptr(&free_op1)
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {
@@ -317,7 +322,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	offset = opline.Cv2OrUndef()
 	/* here we are sure we are dealing with an object */
 
 	var zobj *types.ZendObject = container.GetObj()
@@ -337,7 +342,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
+	container = opline.Cv1()
 	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -412,7 +417,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var free_op2 ZendFreeOp
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
+	container = opline.Cv1()
 	offset = opline.Op2Ptr(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -448,8 +453,8 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	container = opline.Cv1()
+	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {

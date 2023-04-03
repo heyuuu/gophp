@@ -108,7 +108,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var new_op_array *types.ZendOpArray
 	var inc_filename *types.Zval
-	inc_filename = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+	inc_filename = opline.Cv1OrUndef()
 	new_op_array = ZendIncludeOrEval(inc_filename, opline.GetExtendedValue())
 	if EG__().GetException() != nil {
 		if new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nil {

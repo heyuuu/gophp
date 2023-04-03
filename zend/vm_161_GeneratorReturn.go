@@ -77,7 +77,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var retval *types.Zval
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
-	retval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+	retval = opline.Cv1OrUndef()
 
 	/* Copy return value into generator->retval */
 

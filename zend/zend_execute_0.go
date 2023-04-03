@@ -407,7 +407,3 @@ func _get_zval_ptr_cv_deref_BP_VAR_R(var_ uint32, executeData *ZendExecuteData) 
 	ret = types.ZVAL_DEREF(ret)
 	return ret
 }
-func _get_zval_ptr_cv_BP_VAR_IS(var_ uint32, executeData *ZendExecuteData) *types.Zval {
-	var ret *types.Zval = EX_VAR(var_)
-	return ret
-}

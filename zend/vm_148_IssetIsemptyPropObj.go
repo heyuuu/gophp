@@ -48,7 +48,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteD
 	var result int
 	var offset *types.Zval
 	container = opline.Const1()
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	offset = opline.Cv2OrUndef()
 	{
 
 		{
@@ -125,7 +125,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecute
 	var result int
 	var offset *types.Zval
 	container = opline.Op1Ptr(&free_op1)
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -188,7 +188,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecute
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	offset = opline.Cv2OrUndef()
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ types.Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -200,7 +200,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteD
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
+	container = opline.Cv1()
 	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -226,7 +226,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecute
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
+	container = opline.Cv1()
 	offset = opline.Op2Ptr(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -252,8 +252,8 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
-	offset = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	container = opline.Cv1()
+	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)

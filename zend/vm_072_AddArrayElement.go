@@ -628,7 +628,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
-		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+		expr_ptr = opline.Cv1OrUndef()
 	}
 	{
 		var offset *types.Zval = opline.Const2()
@@ -679,7 +679,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
-		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+		expr_ptr = opline.Cv1OrUndef()
 	}
 	{
 		var free_op2 ZendFreeOp
@@ -744,7 +744,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
-		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+		expr_ptr = opline.Cv1OrUndef()
 	}
 
 	{
@@ -767,7 +767,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 	} else {
-		expr_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+		expr_ptr = opline.Cv1OrUndef()
 	}
 	{
 		var offset *types.Zval = opline.Op2()

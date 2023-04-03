@@ -81,7 +81,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = _get_zval_ptr_cv_BP_VAR_IS(opline.GetOp1().GetVar(), executeData)
+	varname = opline.Cv1()
 
 	{
 		name = ZvalGetTmpString(varname, &tmp_name)

@@ -87,7 +87,7 @@ func ZEND_ASSIGN_STATIC_PROP_SPEC_OP_DATA_CV_HANDLER(executeData *ZendExecuteDat
 		UNDEF_RESULT()
 		return 0
 	}
-	value = _get_zval_ptr_cv_BP_VAR_R((opline + 1).GetOp1().GetVar(), executeData)
+	value = opline.Offset(1).Cv1OrUndef()
 	if prop_info.GetType() != 0 {
 		value = ZendAssignToTypedProp(prop_info, prop, value, executeData)
 	} else {

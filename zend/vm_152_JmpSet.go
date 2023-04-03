@@ -97,7 +97,7 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	var ret int
-	value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+	value = opline.Cv1OrUndef()
 	if value.IsReference() {
 		{
 			ref = value

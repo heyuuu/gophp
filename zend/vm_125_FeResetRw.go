@@ -197,7 +197,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var array_ptr *types.Zval
 	var array_ref *types.Zval
 	{
-		array_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+		array_ptr = opline.Cv1OrUndef()
 		array_ref = array_ptr
 		if array_ref.IsReference() {
 			array_ptr = types.Z_REFVAL_P(array_ref)

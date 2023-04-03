@@ -180,7 +180,7 @@ func (op *ZendOp) _varExEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp) *
 	case IS_TMP_VAR, IS_VAR:
 		return op._varAndPtr(node, shouldFree)
 	case IS_CV:
-		return _get_zval_ptr_cv_BP_VAR_R(node.GetVar(), op.currEx())
+		return op._cvOrUndef(node)
 	}
 	panic("unreachable")
 }
@@ -220,11 +220,11 @@ func (op *ZendOp) currEx() *ZendExecuteData {
 func (op *ZendOp) _concatOp(freeOp *ZendFreeOp, opType uint8, node ZnodeOp) *types.Zval {
 	switch opType {
 	case IS_CONST:
-		return op.Const1()
+		return op._const(node)
 	case IS_TMP_VAR, IS_VAR:
 		return op._varAndPtr(node, freeOp)
 	case IS_CV:
-		return op.Op1()
+		return op._var(node)
 	default:
 		return nil
 	}
@@ -235,6 +235,18 @@ func (op *ZendOp) ConcatOp1(freeOp *ZendFreeOp) *types.Zval {
 func (op *ZendOp) ConcatOp2(freeOp *ZendFreeOp) *types.Zval {
 	return op._concatOp(freeOp, op.op1Type, op.op1)
 }
+
+func (op *ZendOp) Cv1() *types.Zval { return op._var(op.op1) }
+func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
+	ret := op._var(node)
+	if ret.IsUndef() {
+		return ZvalUndefinedCv(node.var_, op.currEx())
+	}
+	return ret
+}
+
+func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
+func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
 
 /**
  * ZendBrkContElement

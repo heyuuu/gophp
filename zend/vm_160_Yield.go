@@ -482,7 +482,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -965,7 +965,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1433,7 +1433,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1841,7 +1841,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1903,7 +1903,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+				value = opline.Cv1OrUndef()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -1917,7 +1917,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -2002,7 +2002,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+				value = opline.Cv1OrUndef()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -2016,7 +2016,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -2099,7 +2099,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+				value = opline.Cv1OrUndef()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -2113,7 +2113,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -2196,7 +2196,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+				value = opline.Cv1OrUndef()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -2210,7 +2210,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -2285,7 +2285,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+				value = opline.Cv1OrUndef()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -2299,7 +2299,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+			var value *types.Zval = opline.Cv1OrUndef()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -2319,7 +2319,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	/* Set the new yielded key */
 
 	{
-		var key *types.Zval = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+		var key *types.Zval = opline.Cv2OrUndef()
 
 		/* Consts, temporary variables and references need copying */
 

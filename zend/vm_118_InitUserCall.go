@@ -137,7 +137,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 	var object_or_called_scope any
 	var call *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	function_name = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
+	function_name = opline.Cv2OrUndef()
 	if ZendIsCallableEx(function_name, nil, 0, nil, &fcc, &error) != 0 {
 		func_ = fcc.GetFunctionHandler()
 		if error != nil {
