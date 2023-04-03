@@ -37,7 +37,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var param *types.Zval
 	for {
 		arg_num = opline.GetOp1().GetNum()
-		param = EX_VAR(opline.GetResult().GetVar())
+		param = opline.GetResultZval()
 		if arg_num > executeData.NumArgs() {
 			var default_value *types.Zval = RT_CONSTANT(opline, opline.GetOp2())
 			if default_value.IsConstant() {
@@ -132,7 +132,7 @@ func ZEND_RECV_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		ZendMissingArgError(executeData)
 		return 0
 	} else {
-		var param *types.Zval = EX_VAR(opline.GetResult().GetVar())
+		var param *types.Zval = opline.GetResultZval()
 		if ZendVerifyRecvArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum())) == 0 {
 			return 0
 		}
@@ -144,7 +144,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var arg_num uint32 = opline.GetOp1().GetNum()
 	var arg_count uint32 = executeData.NumArgs()
 	var params *types.Zval
-	params = EX_VAR(opline.GetResult().GetVar())
+	params = opline.GetResultZval()
 	if arg_num <= arg_count {
 		var param *types.Zval
 		ArrayInitSize(params, arg_count-arg_num+1)
@@ -191,7 +191,7 @@ func ZEND_INIT_DYNAMIC_CALL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	var call *ZendExecuteData
-	function_name = EX_VAR(opline.GetOp2().GetVar())
+	function_name = opline.GetOp2Zval()
 try_function_name:
 	if function_name.IsString() {
 		call = ZendInitDynamicCallString(function_name.GetStr(), opline.GetExtendedValue())
@@ -236,10 +236,10 @@ func ZEND_BW_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	if op1.IsLong() {
-		EX_VAR(opline.GetResult().GetVar()).SetLong(^(op1.GetLval()))
+		opline.GetResultZval().SetLong(^(op1.GetLval()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
-	BitwiseNotFunction(EX_VAR(opline.GetResult().GetVar()), op1)
+	BitwiseNotFunction(opline.GetResultZval(), op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_BOOL_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -247,15 +247,15 @@ func ZEND_BOOL_NOT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
 	if val.IsTrue() {
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 
 		/* The result and op1 can be the same cv zval */
 
 		var orig_val_type uint32 = val.GetTypeInfo()
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 	} else {
-		types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) == 0)
+		types.ZVAL_BOOL(opline.GetResultZval(), IZendIsTrue(val) == 0)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -335,18 +335,18 @@ func ZEND_JMPZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ret int
 	val = RT_CONSTANT(opline, opline.GetOp1())
 	if val.IsTrue() {
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
 	ret = IZendIsTrue(val)
 	if ret != 0 {
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 		opline++
 	} else {
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
 	}
 	return ZEND_VM_JMP(executeData, opline)
@@ -357,10 +357,10 @@ func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ret int
 	val = RT_CONSTANT(opline, opline.GetOp1())
 	if val.IsTrue() {
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 
 		{
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -368,10 +368,10 @@ func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = IZendIsTrue(val)
 	if ret != 0 {
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
 	} else {
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 		opline++
 	}
 	return ZEND_VM_JMP(executeData, opline)
@@ -507,7 +507,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	exception = EG__().GetException()
-	ex = EX_VAR(opline.GetResult().GetVar())
+	ex = opline.GetResultZval()
 
 	/* Always perform a strict assignment. There is a reasonable expectation that if you
 	 * write "catch (Exception $e)" then $e will actually be instanceof Exception. As such,
@@ -587,15 +587,15 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var val *types.Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
 	if val.IsTrue() {
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 
 		/* The result and op1 can be the same cv zval */
 
 		var orig_val_type uint32 = val.GetTypeInfo()
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 	} else {
-		types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) != 0)
+		types.ZVAL_BOOL(opline.GetResultZval(), IZendIsTrue(val) != 0)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -610,7 +610,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	obj = RT_CONSTANT(opline, opline.GetOp1())
 	for {
 		{
-			EX_VAR(opline.GetResult().GetVar()).SetUndef()
+			opline.GetResultZval().SetUndef()
 			faults.ThrowError(nil, "__clone method called on non-object")
 			return 0
 		}
@@ -621,7 +621,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
+		opline.GetResultZval().SetUndef()
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
@@ -629,18 +629,18 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
-				EX_VAR(opline.GetResult().GetVar()).SetUndef()
+				opline.GetResultZval().SetUndef()
 				return 0
 			}
 		}
 	}
-	EX_VAR(opline.GetResult().GetVar()).SetObject(clone_call(obj))
+	opline.GetResultZval().SetObject(clone_call(obj))
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
-	var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
+	var result *types.Zval = opline.GetResultZval()
 	var ht *types.Array
 	expr = RT_CONSTANT(opline, opline.GetOp1())
 	switch opline.GetExtendedValue() {
@@ -729,13 +729,13 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	} else if new_op_array == ZEND_FAKE_OP_ARRAY {
 		if RETURN_VALUE_USED(opline) {
-			EX_VAR(opline.GetResult().GetVar()).SetTrue()
+			opline.GetResultZval().SetTrue()
 		}
 	} else if new_op_array != nil {
 		var return_value *types.Zval = nil
 		var call *ZendExecuteData
 		if RETURN_VALUE_USED(opline) {
-			return_value = EX_VAR(opline.GetResult().GetVar())
+			return_value = opline.GetResultZval()
 		}
 		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
 		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
@@ -761,7 +761,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			return 0
 		}
 	} else if RETURN_VALUE_USED(opline) {
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
@@ -771,7 +771,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	array_ptr = RT_CONSTANT(opline, opline.GetOp1())
 	if array_ptr.IsArray() {
-		result = EX_VAR(opline.GetResult().GetVar())
+		result = opline.GetResultZval()
 		types.ZVAL_COPY_VALUE(result, array_ptr)
 		if result.IsRefcounted() {
 			array_ptr.AddRefcount()
@@ -780,8 +780,8 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
+		opline.GetResultZval().SetUndef()
+		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }
@@ -797,7 +797,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if array_ptr.IsArray() {
 
 		{
-			array_ref = EX_VAR(opline.GetResult().GetVar())
+			array_ref = opline.GetResultZval()
 			array_ref.SetNewRef(array_ptr)
 			array_ptr = types.Z_REFVAL_P(array_ref)
 		}
@@ -805,12 +805,12 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
 		}
 
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
-		EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
+		opline.GetResultZval().SetUndef()
+		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
 		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 	}
 }
@@ -822,11 +822,11 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
+		opline.GetResultZval().SetUndef()
 		return 0
 	}
 	if ret != 0 {
-		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
+		var result *types.Zval = opline.GetResultZval()
 		types.ZVAL_COPY_VALUE(result, value)
 		{
 
@@ -844,7 +844,7 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ref *types.Zval = nil
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	if value.GetType() > types.IS_NULL {
-		var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
+		var result *types.Zval = opline.GetResultZval()
 		types.ZVAL_COPY_VALUE(result, value)
 		{
 
@@ -859,7 +859,7 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
-	var result *types.Zval = EX_VAR(opline.GetResult().GetVar())
+	var result *types.Zval = opline.GetResultZval()
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	{
 		types.ZVAL_COPY_VALUE(result, value)
@@ -902,7 +902,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	 * when the expression is a Generator, it will be overwritten in zend_generator_resume() */
 
 	if RETURN_VALUE_USED(opline) {
-		EX_VAR(opline.GetResult().GetVar()).SetNull()
+		opline.GetResultZval().SetNull()
 	}
 
 	/* This generator has no send target (though the generator we delegate to might have one) */
@@ -924,7 +924,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	value = RT_CONSTANT(opline, opline.GetOp1())
 	if value.IsString() {
-		EX_VAR(opline.GetResult().GetVar()).SetLong(value.GetStr().GetLen())
+		opline.GetResultZval().SetLong(value.GetStr().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict types.ZendBool
@@ -935,7 +935,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				var tmp types.Zval
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
-					EX_VAR(opline.GetResult().GetVar()).SetLong(str.GetLen())
+					opline.GetResultZval().SetLong(str.GetLen())
 					ZvalPtrDtor(&tmp)
 					break
 				}
@@ -944,7 +944,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
 			}
-			EX_VAR(opline.GetResult().GetVar()).SetNull()
+			opline.GetResultZval().SetNull()
 			break
 		}
 	}

@@ -272,14 +272,14 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 			ZendTmpStringRelease(tmp_property_name)
 		}
 		if RETURN_VALUE_USED(opline) {
-			EX_VAR(opline.GetResult().GetVar()).SetNull()
+			opline.GetResultZval().SetNull()
 		}
 		return nil
 	}
 	if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref.GetRef()) {
 		if zend_verify_ref_stdClass_assignable(ref.GetRef()) == 0 {
 			if RETURN_VALUE_USED(opline) {
-				EX_VAR(opline.GetResult().GetVar()).SetUndef()
+				opline.GetResultZval().SetUndef()
 			}
 			return nil
 		}
@@ -295,7 +295,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 
 		OBJ_RELEASE(obj)
 		if RETURN_VALUE_USED(opline) {
-			EX_VAR(opline.GetResult().GetVar()).SetNull()
+			opline.GetResultZval().SetNull()
 		}
 		return nil
 	}

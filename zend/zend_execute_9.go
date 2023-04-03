@@ -115,7 +115,7 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 		if EG__().GetException() == nil {
 			faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
+		opline.GetResultZval().SetUndef()
 		return 1
 	}
 	iter.SetIndex(0)
@@ -123,19 +123,19 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 		iter.GetFuncs().GetRewind()(iter)
 		if EG__().GetException() != nil {
 			OBJ_RELEASE(iter.GetStd())
-			EX_VAR(opline.GetResult().GetVar()).SetUndef()
+			opline.GetResultZval().SetUndef()
 			return 1
 		}
 	}
 	is_empty = iter.GetFuncs().GetValid()(iter) != types.SUCCESS
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(iter.GetStd())
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
+		opline.GetResultZval().SetUndef()
 		return 1
 	}
 	iter.SetIndex(-1)
-	EX_VAR(opline.GetResult().GetVar()).SetObject(iter.GetStd())
-	EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
+	opline.GetResultZval().SetObject(iter.GetStd())
+	opline.GetResultZval().SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
 func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
@@ -171,23 +171,23 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
 				var actual *byte = (*byte)(ZendMemrchr(RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal(), '\\', RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()))
 				if actual == nil {
-					EX_VAR(opline.GetResult().GetVar()).SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
+					opline.GetResultZval().SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
 				} else {
 					actual++
-					EX_VAR(opline.GetResult().GetVar()).SetStringVal(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
+					opline.GetResultZval().SetStringVal(b.CastStr(actual, RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetLen()-(actual-RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())))
 				}
 
-				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal(), EX_VAR(opline.GetResult().GetVar()).GetStr().GetVal())
+				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.GetResultZval().GetStr().GetVal(), opline.GetResultZval().GetStr().GetVal())
 
 			} else {
 				faults.ThrowError(nil, "Undefined constant '%s'", RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetVal())
-				EX_VAR(opline.GetResult().GetVar()).SetUndef()
+				opline.GetResultZval().SetUndef()
 			}
 		}
 		return types.FAILURE
 	}
 	if check_defined_only == 0 {
-		types.ZVAL_COPY_OR_DUP(EX_VAR(opline.GetResult().GetVar()), c.Value())
+		types.ZVAL_COPY_OR_DUP(opline.GetResultZval(), c.Value())
 		if (ZEND_CONSTANT_FLAGS(c) & (CONST_CS | CONST_CT_SUBST)) == 0 {
 			var ns_sep *byte
 			var shortname_offset int

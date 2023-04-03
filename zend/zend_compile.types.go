@@ -161,6 +161,16 @@ func (op *ZendOp) SetOp2Type(value uint8)        { op.op2Type = value }
 func (op *ZendOp) GetResultType() uint8          { return op.resultType }
 func (op *ZendOp) SetResultType(value uint8)     { op.resultType = value }
 
+func (op *ZendOp) GetOp1Zval() *types.Zval {
+	return EX_VAR(op.GetOp1().GetVar())
+}
+func (op *ZendOp) GetOp2Zval() *types.Zval {
+	return EX_VAR(op.GetOp2().GetVar())
+}
+func (op *ZendOp) GetResultZval() *types.Zval {
+	return EX_VAR(op.GetResult().GetVar())
+}
+
 /**
  * ZendBrkContElement
  */

@@ -223,7 +223,7 @@ func ZendAssignToPropertyReference(
 		}
 	}
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), variable_ptr)
+		types.ZVAL_COPY(opline.GetResultZval(), variable_ptr)
 	}
 }
 func ZendAssignToPropertyReferenceThisConst(container *types.Zval, prop_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
@@ -274,7 +274,7 @@ func ZendFetchStaticPropertyAddressEx(
 				return types.FAILURE
 			}
 		} else {
-			ce = EX_VAR(opline.GetOp2().GetVar()).GetCe()
+			ce = opline.GetOp2Zval().GetCe()
 		}
 		if op1_type == IS_CONST && CACHED_PTR(cache_slot) == ce {
 			*retval = CACHED_PTR(cache_slot + b.SizeOf("void *"))

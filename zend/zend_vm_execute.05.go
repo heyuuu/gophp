@@ -21,7 +21,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData
 		result = ZendArrayKeyExistsSlow(subject, key, opline, executeData)
 	}
 	ZEND_VM_SMART_BRANCH(result == types.IS_TRUE, 1)
-	EX_VAR(opline.GetResult().GetVar()).SetTypeInfo(result)
+	opline.GetResultZval().SetTypeInfo(result)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -167,7 +167,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		/* If the return value of yield is used set the send
 		 * target and initialize it to NULL */
 
-		generator.SetSendTarget(EX_VAR(opline.GetResult().GetVar()))
+		generator.SetSendTarget(opline.GetResultZval())
 		generator.GetSendTarget().SetNull()
 	} else {
 		generator.SetSendTarget(nil)
@@ -286,7 +286,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != nil)
+	types.ZVAL_BOOL(opline.GetResultZval(), result != nil)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ADD_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
@@ -297,11 +297,11 @@ func ZEND_ADD_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			result = EX_VAR(opline.GetResult().GetVar())
+			result = opline.GetResultZval()
 			FastLongAddFunction(result, op1, op2)
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		} else if op2.IsDouble() {
@@ -314,7 +314,7 @@ func ZEND_ADD_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 			d1 = op1.GetDval()
 			d2 = op2.GetDval()
 		add_double:
-			result = EX_VAR(opline.GetResult().GetVar())
+			result = opline.GetResultZval()
 			result.SetDouble(d1 + d2)
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		} else if op2.IsLong() {
@@ -333,11 +333,11 @@ func ZEND_SUB_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			result = EX_VAR(opline.GetResult().GetVar())
+			result = opline.GetResultZval()
 			FastLongSubFunction(result, op1, op2)
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		} else if op2.IsDouble() {
@@ -350,7 +350,7 @@ func ZEND_SUB_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 			d1 = op1.GetDval()
 			d2 = op2.GetDval()
 		sub_double:
-			result = EX_VAR(opline.GetResult().GetVar())
+			result = opline.GetResultZval()
 			result.SetDouble(d1 - d2)
 			return ZEND_VM_NEXT_OPCODE(executeData, opline)
 		} else if op2.IsLong() {
@@ -367,11 +367,11 @@ func ZEND_MOD_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	var result *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			result = EX_VAR(opline.GetResult().GetVar())
+			result = opline.GetResultZval()
 			if op2.GetLval() == 0 {
 				return zend_mod_by_zero_helper_SPEC(executeData)
 			} else if op2.GetLval() == -1 {
@@ -395,13 +395,13 @@ func ZEND_SL_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.GetLval() < SIZEOF_ZEND_LONG*8) != 0 {
 
 		/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
 
-		EX_VAR(opline.GetResult().GetVar()).SetLong(zend_long(ZendUlong(op1.GetLval() << op2.GetLval())))
+		opline.GetResultZval().SetLong(zend_long(ZendUlong(op1.GetLval() << op2.GetLval())))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	return zend_shift_left_helper_SPEC(op1, op2, executeData)
@@ -411,10 +411,10 @@ func ZEND_SR_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 	var op1 *types.Zval
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.GetLval() < SIZEOF_ZEND_LONG*8) != 0 {
-		EX_VAR(opline.GetResult().GetVar()).SetLong(op1.GetLval() >> op2.GetLval())
+		opline.GetResultZval().SetLong(op1.GetLval() >> op2.GetLval())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	return zend_shift_right_helper_SPEC(op1, op2, executeData)
@@ -426,17 +426,17 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) i
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
-				EX_VAR(opline.GetResult().GetVar()).SetTrue()
+				opline.GetResultZval().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
-				EX_VAR(opline.GetResult().GetVar()).SetFalse()
+				opline.GetResultZval().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -469,19 +469,19 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecuteDa
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
-				EX_VAR(opline.GetResult().GetVar()).SetTrue()
+				opline.GetResultZval().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
-				EX_VAR(opline.GetResult().GetVar()).SetFalse()
+				opline.GetResultZval().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -514,19 +514,19 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteD
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() < op2.GetLval() {
 			is_smaller_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
-				EX_VAR(opline.GetResult().GetVar()).SetTrue()
+				opline.GetResultZval().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
-				EX_VAR(opline.GetResult().GetVar()).SetFalse()
+				opline.GetResultZval().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -559,17 +559,17 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecu
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() <= op2.GetLval() {
 			is_smaller_or_equal_true:
-				EX_VAR(opline.GetResult().GetVar()).SetTrue()
+				opline.GetResultZval().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_or_equal_false:
-				EX_VAR(opline.GetResult().GetVar()).SetFalse()
+				opline.GetResultZval().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -602,19 +602,19 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *Zend
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() <= op2.GetLval() {
 			is_smaller_or_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
-				EX_VAR(opline.GetResult().GetVar()).SetTrue()
+				opline.GetResultZval().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_or_equal_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
-				EX_VAR(opline.GetResult().GetVar()).SetFalse()
+				opline.GetResultZval().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -647,19 +647,19 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *Zen
 	var d1 float64
 	var d2 float64
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = EX_VAR(opline.GetOp2().GetVar())
+	op2 = opline.GetOp2Zval()
 
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() <= op2.GetLval() {
 			is_smaller_or_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
-				EX_VAR(opline.GetResult().GetVar()).SetTrue()
+				opline.GetResultZval().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			} else {
 			is_smaller_or_equal_false:
 				ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
-				EX_VAR(opline.GetResult().GetVar()).SetFalse()
+				opline.GetResultZval().SetFalse()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
@@ -692,7 +692,7 @@ func ZEND_DIV_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
-	FastDivFunction(EX_VAR(opline.GetResult().GetVar()), op1, op2)
+	FastDivFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -703,7 +703,7 @@ func ZEND_POW_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
-	PowFunction(EX_VAR(opline.GetResult().GetVar()), op1, op2)
+	PowFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -721,7 +721,7 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 
 		if op2_str.GetLen() == 0 {
 			{
-				EX_VAR(opline.GetResult().GetVar()).SetStringCopy(op1_str)
+				opline.GetResultZval().SetStringCopy(op1_str)
 			}
 
 			{
@@ -731,7 +731,7 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
 			memcpy(str.GetVal(), op1_str.GetVal(), op1_str.GetLen())
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
-			EX_VAR(opline.GetResult().GetVar()).SetString(str)
+			opline.GetResultZval().SetString(str)
 			{
 				types.ZendStringReleaseEx(op2_str, 0)
 			}
@@ -741,7 +741,7 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if op2.IsUndef() {
 			op2 = ZVAL_UNDEFINED_OP2()
 		}
-		ConcatFunction(EX_VAR(opline.GetResult().GetVar()), op1, op2)
+		ConcatFunction(opline.GetResultZval(), op1, op2)
 		ZvalPtrDtorNogc(free_op2)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
@@ -753,7 +753,7 @@ func ZEND_SPACESHIP_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var op2 *types.Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
-	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op1, op2)
+	CompareFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

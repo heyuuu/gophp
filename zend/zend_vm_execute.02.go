@@ -294,20 +294,20 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 	if op_2.IsUndef() {
 		op_2 = ZVAL_UNDEFINED_OP2()
 	}
-	CompareFunction(EX_VAR(opline.GetResult().GetVar()), op_1, op_2)
+	CompareFunction(opline.GetResultZval(), op_1, op_2)
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if EX_VAR(opline.GetResult().GetVar()).GetLval() == 0 {
+	if opline.GetResultZval().GetLval() == 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
-		EX_VAR(opline.GetResult().GetVar()).SetTrue()
+		opline.GetResultZval().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		ZEND_VM_SMART_BRANCH_FALSE()
-		EX_VAR(opline.GetResult().GetVar()).SetFalse()
+		opline.GetResultZval().SetFalse()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
@@ -336,7 +336,7 @@ add_unpack_again:
 					val = types.Z_REFVAL_P(val)
 				}
 				val.TryAddRefcount()
-				if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(val) == nil {
+				if opline.GetResultZval().GetArr().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
 					ZvalPtrDtorNogc(val)
 					break
@@ -383,7 +383,7 @@ add_unpack_again:
 				}
 				val = types.ZVAL_DEREF(val)
 				val.TryAddRefcount()
-				if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(val) == nil {
+				if opline.GetResultZval().GetArr().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
 					ZvalPtrDtorNogc(val)
 				}
@@ -425,7 +425,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			return 0
 		}
 	} else {
-		ce = EX_VAR(opline.GetOp2().GetVar()).GetCe()
+		ce = opline.GetOp2Zval().GetCe()
 	}
 	varname = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 	if opline.GetOp1Type() == IS_CONST {
@@ -454,7 +454,7 @@ func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) i
 		result = result != types.SUCCESS || IZendIsTrue(value) == 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
+	types.ZVAL_BOOL(opline.GetResultZval(), result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -484,7 +484,7 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	EX_VAR(opline.GetResult().GetVar()).SetLong(EG__().GetErrorReporting())
+	opline.GetResultZval().SetLong(EG__().GetErrorReporting())
 	if EG__().GetErrorReporting() != 0 {
 		for {
 			EG__().SetErrorReporting(0)
@@ -566,7 +566,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		}
 		CACHE_PTR(opline.GetExtendedValue(), ce)
 	}
-	EX_VAR(opline.GetResult().GetVar()).SetCe(ce)
+	opline.GetResultZval().SetCe(ce)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_DECLARE_FUNCTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
@@ -756,7 +756,7 @@ func zend_yield_in_closed_generator_helper_SPEC(executeData *ZendExecuteData) in
 }
 func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var fast_call *types.Zval = EX_VAR(opline.GetOp1().GetVar())
+	var fast_call *types.Zval = opline.GetOp1Zval()
 
 	/* cleanup incomplete RETURN statement */
 
@@ -778,7 +778,7 @@ func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FAST_CALL_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var fast_call *types.Zval = EX_VAR(opline.GetResult().GetVar())
+	var fast_call *types.Zval = opline.GetResultZval()
 	fast_call.SetObj(nil)
 
 	/* set return address */
@@ -788,7 +788,7 @@ func ZEND_FAST_CALL_SPEC_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_FAST_RET_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var fast_call *types.Zval = EX_VAR(opline.GetOp1().GetVar())
+	var fast_call *types.Zval = opline.GetOp1Zval()
 	var current_try_catch_offset uint32
 	var current_op_num uint32
 	if fast_call.GetOplineNum() != uint32-1 {
@@ -809,7 +809,7 @@ func ZEND_ASSERT_CHECK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if EG__().GetAssertions() <= 0 {
 		var target *ZendOp = OP_JMP_ADDR(opline, opline.GetOp2())
 		if RETURN_VALUE_USED(opline) {
-			EX_VAR(opline.GetResult().GetVar()).SetTrue()
+			opline.GetResultZval().SetTrue()
 		}
 		return ZEND_VM_JMP_EX(executeData, target, 0)
 	} else {

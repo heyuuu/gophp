@@ -84,7 +84,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* If the return value of yield is used set the send
 		 * target and initialize it to NULL */
 
-		generator.SetSendTarget(EX_VAR(opline.GetResult().GetVar()))
+		generator.SetSendTarget(opline.GetResultZval())
 		generator.GetSendTarget().SetNull()
 	} else {
 		generator.SetSendTarget(nil)
@@ -139,7 +139,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
+		opline.GetResultZval().SetUndef()
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
@@ -147,12 +147,12 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
-				EX_VAR(opline.GetResult().GetVar()).SetUndef()
+				opline.GetResultZval().SetUndef()
 				return 0
 			}
 		}
 	}
-	EX_VAR(opline.GetResult().GetVar()).SetObject(clone_call(obj))
+	opline.GetResultZval().SetObject(clone_call(obj))
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -164,26 +164,26 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	scope = executeData.GetFunc().op_array.scope
 	if scope == nil {
 		faults.ThrowError(nil, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
-		EX_VAR(opline.GetResult().GetVar()).SetUndef()
+		opline.GetResultZval().SetUndef()
 		return 0
 	}
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
-		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetName())
+		opline.GetResultZval().SetStringCopy(scope.GetName())
 	case ZEND_FETCH_CLASS_PARENT:
 		if scope.GetParent() == nil {
 			faults.ThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
-			EX_VAR(opline.GetResult().GetVar()).SetUndef()
+			opline.GetResultZval().SetUndef()
 			return 0
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetParent().name)
+		opline.GetResultZval().SetStringCopy(scope.GetParent().name)
 	case ZEND_FETCH_CLASS_STATIC:
 		if executeData.GetThis().IsObject() {
 			called_scope = types.Z_OBJCE(executeData.GetThis())
 		} else {
 			called_scope = executeData.GetThis().GetCe()
 		}
-		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(called_scope.GetName())
+		opline.GetResultZval().SetStringCopy(called_scope.GetName())
 	default:
 
 	}
@@ -216,7 +216,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					EX_VAR(opline.GetResult().GetVar()).SetNull()
+					opline.GetResultZval().SetNull()
 				}
 			} else {
 				var orig_zptr *types.Zval = zptr
@@ -248,7 +248,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 					break
 				}
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), zptr)
+					types.ZVAL_COPY(opline.GetResultZval(), zptr)
 				}
 			}
 		} else {
@@ -287,7 +287,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
 				if RETURN_VALUE_USED(opline) {
-					EX_VAR(opline.GetResult().GetVar()).SetNull()
+					opline.GetResultZval().SetNull()
 				}
 			} else {
 				{
@@ -326,7 +326,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 
 		if b.Assign(&zptr, types.Z_OBJ_HT_P(object).GetGetPropertyPtrPtr()(object, property, BP_VAR_RW, cache_slot)) != nil {
 			if zptr.IsError() {
-				EX_VAR(opline.GetResult().GetVar()).SetNull()
+				opline.GetResultZval().SetNull()
 			} else {
 				{
 					prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_slot + 2))
@@ -365,7 +365,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 
 					{
 					fetch_obj_r_fast_copy:
-						types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), retval)
+						types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
 						return ZEND_VM_NEXT_OPCODE(executeData, opline)
 					}
 				}
@@ -397,10 +397,10 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(executeData *ZendExecuteD
 		}
 	}
 
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, EX_VAR(opline.GetResult().GetVar()))
-	if retval != EX_VAR(opline.GetResult().GetVar()) {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_R, cache_slot, opline.GetResultZval())
+	if retval != opline.GetResultZval() {
 	fetch_obj_r_copy:
-		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), retval)
+		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -421,7 +421,7 @@ func ZEND_FETCH_OBJ_W_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) in
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = RT_CONSTANT(opline, opline.GetOp2())
-	result = EX_VAR(opline.GetResult().GetVar())
+	result = opline.GetResultZval()
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_FETCH_OBJ_FLAGS) }, nil), BP_VAR_W, opline.GetExtendedValue()&ZEND_FETCH_OBJ_FLAGS, 1, opline, executeData)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -436,7 +436,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = RT_CONSTANT(opline, opline.GetOp2())
-	result = EX_VAR(opline.GetResult().GetVar())
+	result = opline.GetResultZval()
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -464,7 +464,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 
 					{
 					fetch_obj_is_fast_copy:
-						types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), retval)
+						types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
 						return ZEND_VM_NEXT_OPCODE(executeData, opline)
 					}
 				}
@@ -495,10 +495,10 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 			}
 		}
 	}
-	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, EX_VAR(opline.GetResult().GetVar()))
-	if retval != EX_VAR(opline.GetResult().GetVar()) {
+	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.GetResultZval())
+	if retval != opline.GetResultZval() {
 	fetch_obj_is_copy:
-		types.ZVAL_COPY_DEREF(EX_VAR(opline.GetResult().GetVar()), retval)
+		types.ZVAL_COPY_DEREF(opline.GetResultZval(), retval)
 	} else if retval.IsReference() {
 		ZendUnwrapReference(retval)
 	}
@@ -525,7 +525,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
 	property = RT_CONSTANT(opline, opline.GetOp2())
-	result = EX_VAR(opline.GetResult().GetVar())
+	result = opline.GetResultZval()
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_CONST, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_UNSET, 0, 1, opline, executeData)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -558,7 +558,7 @@ assign_object:
 				fast_assign_obj:
 					value = ZendAssignToVariable(property_val, value, IS_CONST, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
-						types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+						types.ZVAL_COPY(opline.GetResultZval(), value)
 					}
 					goto exit_assign_obj
 				}
@@ -588,7 +588,7 @@ assign_object:
 
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+					types.ZVAL_COPY(opline.GetResultZval(), value)
 				}
 				goto exit_assign_obj
 			}
@@ -597,7 +597,7 @@ assign_object:
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+		types.ZVAL_COPY(opline.GetResultZval(), value)
 	}
 exit_assign_obj:
 
@@ -636,7 +636,7 @@ assign_object:
 				fast_assign_obj:
 					value = ZendAssignToVariable(property_val, value, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
-						types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+						types.ZVAL_COPY(opline.GetResultZval(), value)
 					}
 					goto exit_assign_obj
 				}
@@ -660,7 +660,7 @@ assign_object:
 				}
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+					types.ZVAL_COPY(opline.GetResultZval(), value)
 				}
 				goto exit_assign_obj
 			}
@@ -672,7 +672,7 @@ assign_object:
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+		types.ZVAL_COPY(opline.GetResultZval(), value)
 	}
 	ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
@@ -712,7 +712,7 @@ assign_object:
 				fast_assign_obj:
 					value = ZendAssignToVariable(property_val, value, IS_VAR, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
-						types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+						types.ZVAL_COPY(opline.GetResultZval(), value)
 					}
 					goto exit_assign_obj
 				}
@@ -736,7 +736,7 @@ assign_object:
 				}
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+					types.ZVAL_COPY(opline.GetResultZval(), value)
 				}
 				goto exit_assign_obj
 			}
@@ -748,7 +748,7 @@ assign_object:
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+		types.ZVAL_COPY(opline.GetResultZval(), value)
 	}
 	ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
@@ -787,7 +787,7 @@ assign_object:
 				fast_assign_obj:
 					value = ZendAssignToVariable(property_val, value, IS_CV, executeData.IsCallUseStrictTypes())
 					if RETURN_VALUE_USED(opline) {
-						types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+						types.ZVAL_COPY(opline.GetResultZval(), value)
 					}
 					goto exit_assign_obj
 				}
@@ -811,7 +811,7 @@ assign_object:
 				}
 				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
-					types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+					types.ZVAL_COPY(opline.GetResultZval(), value)
 				}
 				goto exit_assign_obj
 			}
@@ -823,7 +823,7 @@ assign_object:
 	value = types.Z_OBJ_HT_P(object).GetWriteProperty()(object, property, value, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
-		types.ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
+		types.ZVAL_COPY(opline.GetResultZval(), value)
 	}
 exit_assign_obj:
 

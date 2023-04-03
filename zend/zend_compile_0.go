@@ -76,7 +76,7 @@ func CT_CONSTANT(node ZnodeOp) __auto__ {
 	return CT_CONSTANT_EX(CG__().GetActiveOpArray(), node.GetConstant())
 }
 func RT_CONSTANT(opline *ZendOp, node ZnodeOp) *types.Zval {
-	return (*types.Zval)((*byte)(opline) + int32(node).constant)
+	return (*types.Zval)((*byte)(opline) + int32(node.constant))
 }
 func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetConstant((*byte)(CT_CONSTANT_EX(op_array, node.GetConstant())) - (*byte)(opline))
