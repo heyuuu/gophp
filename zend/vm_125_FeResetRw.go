@@ -1,0 +1,263 @@
+package zend
+
+func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var array_ptr *types.Zval
+	var array_ref *types.Zval
+
+	{
+		array_ptr = RT_CONSTANT(opline, opline.GetOp1())
+		array_ref = array_ptr
+	}
+	if array_ptr.IsArray() {
+
+		{
+			array_ref = opline.GetResultZval()
+			array_ref.SetNewRef(array_ptr)
+			array_ptr = types.Z_REFVAL_P(array_ref)
+		}
+		{
+			array_ptr.SetArray(types.ZendArrayDup(array_ptr.GetArr()))
+		}
+
+		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	} else {
+		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
+		opline.GetResultZval().SetUndef()
+		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+	}
+}
+func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var free_op1 ZendFreeOp
+	var array_ptr *types.Zval
+	var array_ref *types.Zval
+	{
+		array_ptr = nil
+		array_ref = array_ptr
+		if array_ref.IsReference() {
+			array_ptr = types.Z_REFVAL_P(array_ref)
+		}
+	}
+
+	if array_ptr.IsArray() {
+		{
+			if array_ptr == array_ref {
+				array_ref.SetNewRef(array_ref)
+				array_ptr = types.Z_REFVAL_P(array_ref)
+			}
+			array_ref.AddRefcount()
+			types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+		}
+
+		{
+			types.SEPARATE_ARRAY(array_ptr)
+		}
+		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	} else if array_ptr.IsObject() {
+		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
+			var properties *types.Array
+			{
+				if array_ptr == array_ref {
+					array_ref.SetNewRef(array_ref)
+					array_ptr = types.Z_REFVAL_P(array_ref)
+				}
+				array_ref.AddRefcount()
+				types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+			}
+
+			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
+				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
+				}
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+			}
+			properties = types.Z_OBJPROP_P(array_ptr)
+			if properties.Len() == 0 {
+				opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+			}
+			opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+		} else {
+			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
+			if EG__().GetException() != nil {
+				return 0
+			} else if is_empty != 0 {
+				return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
+			} else {
+				return ZEND_VM_NEXT_OPCODE(executeData, opline)
+			}
+		}
+	} else {
+		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
+		opline.GetResultZval().SetUndef()
+		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+	}
+}
+func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var free_op1 ZendFreeOp
+	var array_ptr *types.Zval
+	var array_ref *types.Zval
+	{
+		array_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+		array_ref = array_ptr
+		if array_ref.IsReference() {
+			array_ptr = types.Z_REFVAL_P(array_ref)
+		}
+	}
+
+	if array_ptr.IsArray() {
+		{
+			if array_ptr == array_ref {
+				array_ref.SetNewRef(array_ref)
+				array_ptr = types.Z_REFVAL_P(array_ref)
+			}
+			array_ref.AddRefcount()
+			types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+		}
+
+		{
+			types.SEPARATE_ARRAY(array_ptr)
+		}
+		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		{
+			if free_op1 != nil {
+				ZvalPtrDtorNogc(free_op1)
+			}
+		}
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	} else if array_ptr.IsObject() {
+		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
+			var properties *types.Array
+			{
+				if array_ptr == array_ref {
+					array_ref.SetNewRef(array_ref)
+					array_ptr = types.Z_REFVAL_P(array_ref)
+				}
+				array_ref.AddRefcount()
+				types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+			}
+
+			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
+				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
+				}
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+			}
+			properties = types.Z_OBJPROP_P(array_ptr)
+			if properties.Len() == 0 {
+				opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+				if free_op1 != nil {
+					ZvalPtrDtorNogc(free_op1)
+				}
+				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+			}
+			opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			if free_op1 != nil {
+				ZvalPtrDtorNogc(free_op1)
+			}
+			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+		} else {
+			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
+			{
+				if free_op1 != nil {
+					ZvalPtrDtorNogc(free_op1)
+				}
+			}
+
+			if EG__().GetException() != nil {
+				return 0
+			} else if is_empty != 0 {
+				return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
+			} else {
+				return ZEND_VM_NEXT_OPCODE(executeData, opline)
+			}
+		}
+	} else {
+		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
+		opline.GetResultZval().SetUndef()
+		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		{
+			if free_op1 != nil {
+				ZvalPtrDtorNogc(free_op1)
+			}
+		}
+
+		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+	}
+}
+func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var array_ptr *types.Zval
+	var array_ref *types.Zval
+	{
+		array_ptr = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
+		array_ref = array_ptr
+		if array_ref.IsReference() {
+			array_ptr = types.Z_REFVAL_P(array_ref)
+		}
+	}
+
+	if array_ptr.IsArray() {
+		{
+			if array_ptr == array_ref {
+				array_ref.SetNewRef(array_ref)
+				array_ptr = types.Z_REFVAL_P(array_ref)
+			}
+			array_ref.AddRefcount()
+			types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+		}
+
+		{
+			types.SEPARATE_ARRAY(array_ptr)
+		}
+		opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	} else if array_ptr.IsObject() {
+		if types.Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
+			var properties *types.Array
+			{
+				if array_ptr == array_ref {
+					array_ref.SetNewRef(array_ref)
+					array_ptr = types.Z_REFVAL_P(array_ref)
+				}
+				array_ref.AddRefcount()
+				types.ZVAL_COPY_VALUE(opline.GetResultZval(), array_ref)
+			}
+
+			if types.Z_OBJ_P(array_ptr).GetProperties() != nil && types.Z_OBJ_P(array_ptr).GetProperties().GetRefcount() > 1 {
+				if (types.Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					types.Z_OBJ_P(array_ptr).GetProperties().DelRefcount()
+				}
+				types.Z_OBJ_P(array_ptr).SetProperties(types.ZendArrayDup(types.Z_OBJ_P(array_ptr).GetProperties()))
+			}
+			properties = types.Z_OBJPROP_P(array_ptr)
+			if properties.Len() == 0 {
+				opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+			}
+			opline.GetResultZval().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
+			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+		} else {
+			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
+			if EG__().GetException() != nil {
+				return 0
+			} else if is_empty != 0 {
+				return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
+			} else {
+				return ZEND_VM_NEXT_OPCODE(executeData, opline)
+			}
+		}
+	} else {
+		faults.Error(faults.E_WARNING, "Invalid argument supplied for foreach()")
+		opline.GetResultZval().SetUndef()
+		opline.GetResultZval().SetFeIterIdx(uint32 - 1)
+		return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
+	}
+}
