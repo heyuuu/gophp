@@ -123,7 +123,7 @@ func (zv *Zval) SetCe(value *ClassEntry)          { zv.value.SetCe(value) }
 func (zv *Zval) SetFunc(value IFunction)          { zv.value.SetFunc(value) }
 
 /** Zval.u1 -> type & typeFlags */
-func (zv *Zval) GetType() ZendUchar           { return zv.typ }
+func (zv *Zval) GetType() ZvalType            { return zv.typ }
 func (zv *Zval) GetTypeFlags() ZendUchar      { return zv.typeFlags }
 func (zv *Zval) SetTypeFlags(value ZendUchar) { zv.typeFlags = value } /* todo remove */
 func (zv *Zval) GetTypeInfo() uint32 {

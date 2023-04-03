@@ -408,7 +408,7 @@ func ZendUnwrapReference(op *types.Zval) {
 		types.ZVAL_COPY(op, types.Z_REFVAL_P(op))
 	}
 }
-func TYPE_PAIR(t1 uint32, t2 uint32) int { return t1<<4 | t2 }
+func TYPE_PAIR(t1 types.ZvalType, t2 types.ZvalType) uint { return uint(t1)<<4 | uint(t2) }
 func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func func(op *types.Zval)) {
 	dst.SetUndef()
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {

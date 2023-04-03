@@ -170,6 +170,20 @@ func (op *ZendOp) GetOp2Zval() *types.Zval {
 func (op *ZendOp) GetResultZval() *types.Zval {
 	return EX_VAR(op.GetResult().GetVar())
 }
+func (op *ZendOp) GetOp1ZvalEx() *types.Zval {
+	if op.GetOp1Type() == IS_CONST {
+		return RT_CONSTANT(op, op.GetOp1())
+	}
+
+	return EX_VAR(op.GetOp1().GetVar())
+}
+func (op *ZendOp) GetOp2ZvalEx() *types.Zval {
+	if op.GetOp2Type() == IS_CONST {
+		return RT_CONSTANT(op, op.GetOp2())
+	}
+
+	return EX_VAR(op.GetOp2().GetVar())
+}
 
 /**
  * ZendBrkContElement

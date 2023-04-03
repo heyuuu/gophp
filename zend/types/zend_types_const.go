@@ -41,37 +41,41 @@ const HT_INVALID_IDX uint32 = math.MaxUint32 // uint32(-1)
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 
-/* regular data types */
-const IS_UNDEF = 0
-const IS_NULL = 1
-const IS_FALSE = 2
-const IS_TRUE = 3
-const IS_LONG = 4
-const IS_DOUBLE = 5
-const IS_STRING = 6
-const IS_ARRAY = 7
-const IS_OBJECT = 8
-const IS_RESOURCE = 9
-const IS_REFERENCE = 10
+type ZvalType = uint8
 
-/* constant expressions */
+const (
+	/* regular data types */
+	IS_UNDEF     ZvalType = 0
+	IS_NULL      ZvalType = 1
+	IS_FALSE     ZvalType = 2
+	IS_TRUE      ZvalType = 3
+	IS_LONG      ZvalType = 4
+	IS_DOUBLE    ZvalType = 5
+	IS_STRING    ZvalType = 6
+	IS_ARRAY     ZvalType = 7
+	IS_OBJECT    ZvalType = 8
+	IS_RESOURCE  ZvalType = 9
+	IS_REFERENCE ZvalType = 10
 
-const IS_CONSTANT_AST = 11
+	/* constant expressions */
 
-/* internal types */
+	IS_CONSTANT_AST ZvalType = 11
 
-const IS_INDIRECT = 13
-const IS_PTR = 14
-const IS_ALIAS_PTR = 15
-const IS_ERROR = 15 // _IS_ERROR
+	/* internal types */
 
-/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */
+	IS_INDIRECT  ZvalType = 13
+	IS_PTR       ZvalType = 14
+	IS_ALIAS_PTR ZvalType = 15
+	IS_ERROR     ZvalType = 15 // _IS_ERROR
 
-const IS_BOOL = 16 // _IS_BOOL
-const IS_CALLABLE = 17
-const IS_ITERABLE = 18
-const IS_VOID = 19
-const IS_NUMBER = 20 // _IS_NUMBER
+	/* fake types used only for type hinting (Z_TYPE(zv) can not use them) */
+
+	IS_BOOL     ZvalType = 16 // _IS_BOOL
+	IS_CALLABLE ZvalType = 17
+	IS_ITERABLE ZvalType = 18
+	IS_VOID     ZvalType = 19
+	IS_NUMBER   ZvalType = 20 // _IS_NUMBER
+)
 
 /* we should never set just Z_TYPE, we should set Z_TYPE_INFO */
 
