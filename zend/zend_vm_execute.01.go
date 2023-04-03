@@ -9,23 +9,6 @@ import (
 func ZEND_VM_DISPATCH(executeData *ZendExecuteData, opcode OpCode, opline *ZendOp) int {
 	return ZendVmGetOpcodeHandler(opcode, opline)(executeData)
 }
-func zend_mul_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	if op_1.IsUndef() {
-		op_1 = ZVAL_UNDEFINED_OP1()
-	}
-	if op_2.IsUndef() {
-		op_2 = ZVAL_UNDEFINED_OP2()
-	}
-	MulFunction(opline.GetResultZval(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
-	}
-	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
-}
 func zend_mod_by_zero_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	faults.ThrowExceptionEx(faults.ZendCeDivisionByZeroError, 0, "Modulo by zero")
