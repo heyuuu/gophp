@@ -450,7 +450,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	var ret int
-	value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	value = opline.getZvalPtrVar1(&free_op1)
 	if value.IsReference() {
 		{
 			ref = value
@@ -483,7 +483,7 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var value *types.Zval
 	var ref *types.Zval = nil
-	value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	value = opline.getZvalPtrVar1(&free_op1)
 	if value.IsReference() {
 		{
 			ref = value
@@ -510,7 +510,7 @@ func ZEND_QM_ASSIGN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var value *types.Zval
 	var result *types.Zval = opline.GetResultZval()
-	value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	value = opline.getZvalPtrVar1(&free_op1)
 	if value.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		result.SetNull()

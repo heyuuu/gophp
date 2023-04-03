@@ -600,15 +600,6 @@ func ZEND_GET_TYPE_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
-func ZEND_DIV_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	op1 = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
-	op2 = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
-	FastDivFunction(opline.GetResultZval(), op1, op2)
-	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
-}
 func ZEND_POW_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval

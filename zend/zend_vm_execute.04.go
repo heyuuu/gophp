@@ -49,26 +49,6 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		goto defined_true
 	}
 }
-func ZEND_MUL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result *types.Zval
-	var d1 float64
-	var d2 float64
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	return zend_mul_helper_SPEC(op1, op2, executeData)
-}
-func ZEND_DIV_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
-	FastDivFunction(opline.GetResultZval(), op1, op2)
-	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
-}
 func ZEND_MOD_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval

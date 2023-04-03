@@ -407,6 +407,7 @@ func vmOpcodeIsCommutative(opcode OpCode) bool {
 	return false
 }
 func vmGetAddHandler(op *ZendOp) OpcodeHandlerT {
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
 	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
@@ -415,6 +416,7 @@ func vmGetAddHandler(op *ZendOp) OpcodeHandlerT {
 	return vmAddHandler
 }
 func vmGetSubHandler(op *ZendOp) OpcodeHandlerT {
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2
 	opType1 := op.GetOp1Type()
 	opType2 := op.GetOp2Type()
 	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
@@ -423,68 +425,22 @@ func vmGetSubHandler(op *ZendOp) OpcodeHandlerT {
 	return vmSubHandler
 }
 func vmGetMulHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 51 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
-		ZEND_MUL_SPEC_CONST_CONST_HANDLER,       // IS_CONST * IS_CONST
-		nil,                                     // IS_CONST * IS_TMP_VAR
-		nil,                                     // IS_CONST * IS_VAR
-		nil,                                     // IS_CONST * IS_UNUSED
-		nil,                                     // IS_CONST * IS_CV
-		ZEND_MUL_SPEC_TMPVARCV_CONST_HANDLER,    // IS_TMP_VAR * IS_CONST
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_TMP_VAR * IS_TMP_VAR
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_TMP_VAR * IS_VAR
-		nil,                                     // IS_TMP_VAR * IS_UNUSED
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_TMP_VAR * IS_CV
-		ZEND_MUL_SPEC_TMPVARCV_CONST_HANDLER,    // IS_VAR * IS_CONST
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_VAR * IS_TMP_VAR
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_VAR * IS_VAR
-		nil,                                     // IS_VAR * IS_UNUSED
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_VAR * IS_CV
-		nil,                                     // IS_UNUSED * IS_CONST
-		nil,                                     // IS_UNUSED * IS_TMP_VAR
-		nil,                                     // IS_UNUSED * IS_VAR
-		nil,                                     // IS_UNUSED * IS_UNUSED
-		nil,                                     // IS_UNUSED * IS_CV
-		ZEND_MUL_SPEC_TMPVARCV_CONST_HANDLER,    // IS_CV * IS_CONST
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_CV * IS_TMP_VAR
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_CV * IS_VAR
-		nil,                                     // IS_CV * IS_UNUSED
-		ZEND_MUL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_CV * IS_CV
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return vmMulHandler
 }
 func vmGetDivHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 76 | SPEC_RULE_OP1 | SPEC_RULE_OP2
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
-		ZEND_DIV_SPEC_CONST_CONST_HANDLER,   // IS_CONST * IS_CONST
-		ZEND_DIV_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_TMP_VAR
-		ZEND_DIV_SPEC_CONST_TMPVAR_HANDLER,  // IS_CONST * IS_VAR
-		nil,                                 // IS_CONST * IS_UNUSED
-		ZEND_DIV_SPEC_CONST_CV_HANDLER,      // IS_CONST * IS_CV
-		ZEND_DIV_SPEC_TMPVAR_CONST_HANDLER,  // IS_TMP_VAR * IS_CONST
-		ZEND_DIV_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_TMP_VAR * IS_TMP_VAR
-		ZEND_DIV_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_TMP_VAR * IS_VAR
-		nil,                                 // IS_TMP_VAR * IS_UNUSED
-		ZEND_DIV_SPEC_TMPVAR_CV_HANDLER,     // IS_TMP_VAR * IS_CV
-		ZEND_DIV_SPEC_TMPVAR_CONST_HANDLER,  // IS_VAR * IS_CONST
-		ZEND_DIV_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_VAR * IS_TMP_VAR
-		ZEND_DIV_SPEC_TMPVAR_TMPVAR_HANDLER, // IS_VAR * IS_VAR
-		nil,                                 // IS_VAR * IS_UNUSED
-		ZEND_DIV_SPEC_TMPVAR_CV_HANDLER,     // IS_VAR * IS_CV
-		nil,                                 // IS_UNUSED * IS_CONST
-		nil,                                 // IS_UNUSED * IS_TMP_VAR
-		nil,                                 // IS_UNUSED * IS_VAR
-		nil,                                 // IS_UNUSED * IS_UNUSED
-		nil,                                 // IS_UNUSED * IS_CV
-		ZEND_DIV_SPEC_CV_CONST_HANDLER,      // IS_CV * IS_CONST
-		ZEND_DIV_SPEC_CV_TMPVAR_HANDLER,     // IS_CV * IS_TMP_VAR
-		ZEND_DIV_SPEC_CV_TMPVAR_HANDLER,     // IS_CV * IS_VAR
-		nil,                                 // IS_CV * IS_UNUSED
-		ZEND_DIV_SPEC_CV_CV_HANDLER,         // IS_CV * IS_CV
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return vmDivHandler
 }
 func vmGetModHandler(op *ZendOp) OpcodeHandlerT {
 	spec := 101 | SPEC_RULE_OP1 | SPEC_RULE_OP2

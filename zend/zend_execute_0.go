@@ -320,9 +320,6 @@ func ZendVmStackExtend(size int) any {
 	EG__().SetVmStackEnd(stack.GetEnd())
 	return ptr
 }
-func ZendGetCompiledVariableValue(executeData *ZendExecuteData, var_ uint32) *types.Zval {
-	return EX_VAR(var_)
-}
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(var_)
 	*should_free = ret

@@ -170,19 +170,51 @@ func (op *ZendOp) GetOp2Zval() *types.Zval {
 func (op *ZendOp) GetResultZval() *types.Zval {
 	return EX_VAR(op.GetResult().GetVar())
 }
-func (op *ZendOp) GetOp1ZvalEx() *types.Zval {
-	if op.GetOp1Type() == IS_CONST {
-		return RT_CONSTANT(op, op.GetOp1())
+func (op *ZendOp) Op1Ex() *types.Zval { return op._opEx(op.op1Type, op.op1) }
+func (op *ZendOp) Op2Ex() *types.Zval { return op._opEx(op.op2Type, op.op2) }
+func (op *ZendOp) _opEx(opType uint8, node ZnodeOp) *types.Zval {
+	switch opType {
+	case IS_CONST:
+		return RT_CONSTANT(op, node)
+	default:
+		return EX_VAR(node.GetVar())
 	}
-
-	return EX_VAR(op.GetOp1().GetVar())
 }
-func (op *ZendOp) GetOp2ZvalEx() *types.Zval {
-	if op.GetOp2Type() == IS_CONST {
-		return RT_CONSTANT(op, op.GetOp2())
-	}
 
-	return EX_VAR(op.GetOp2().GetVar())
+func (op *ZendOp) Op1ExEx(shouldFree *ZendFreeOp) *types.Zval {
+	return op._opExEx(op.op1Type, op.op1, shouldFree)
+}
+func (op *ZendOp) Op2ExEx(shouldFree *ZendFreeOp) *types.Zval {
+	return op._opExEx(op.op2Type, op.op2, shouldFree)
+}
+func (op *ZendOp) _opExEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
+	switch opType {
+	case IS_CONST:
+		return RT_CONSTANT(op, node)
+	case IS_TMP_VAR, IS_VAR:
+		return op._getZvalPtrVar(node, shouldFree)
+	case IS_CV:
+		return _get_zval_ptr_cv_BP_VAR_R(node.GetVar(), op.currEx())
+	}
+	panic("unreachable")
+}
+
+func (op *ZendOp) _getZvalPtrVar(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
+	//return _getZvalPtrVar(node.GetVar(), &shouldFree, op.currEx())
+	var ret = EX_VAR(node.GetVar())
+	*shouldFree = ret
+	return ret
+}
+
+func (op *ZendOp) getZvalPtrVar1(should_free *ZendFreeOp) *types.Zval {
+	return op._getZvalPtrVar(op.op1, should_free)
+}
+func (op *ZendOp) getZvalPtrVar2(should_free *ZendFreeOp) *types.Zval {
+	return op._getZvalPtrVar(op.op2, should_free)
+}
+
+func (op *ZendOp) currEx() *ZendExecuteData {
+	return CurrEX()
 }
 
 /**

@@ -5,8 +5,8 @@ import "github.com/heyuuu/gophp/zend/types"
 // ZEND_ADD
 func vmAddHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.GetOp1ZvalEx()
-	var op2 *types.Zval = opline.GetOp2ZvalEx()
+	var op1 *types.Zval = opline.Op1Ex()
+	var op2 *types.Zval = opline.Op2Ex()
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
@@ -53,8 +53,8 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 // ZEND_SUB
 func vmSubHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.GetOp1ZvalEx()
-	var op2 *types.Zval = opline.GetOp2ZvalEx()
+	var op1 *types.Zval = opline.Op1Ex()
+	var op2 *types.Zval = opline.Op2Ex()
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
@@ -94,6 +94,76 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZvalPtrDtorNogc(op2)
+	}
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+}
+
+// ZEND_MUL
+func vmMulHandler(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var op1 *types.Zval = opline.Op1Ex()
+	var op2 *types.Zval = opline.Op2Ex()
+
+	// fast
+	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
+	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+		var overflow ZendLong
+		result := opline.GetResultZval()
+		ZEND_SIGNED_MULTIPLY_LONG(op1.GetLval(), op2.GetLval(), result.GetLval(), result.GetDval(), overflow)
+		if overflow != 0 {
+			result.SetTypeInfo(types.IS_DOUBLE)
+		} else {
+			result.SetTypeInfo(types.IS_LONG)
+		}
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
+		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
+		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+		var d1, d2 float64
+		if op1.IsLong() {
+			d1 = float64(op1.GetLval())
+		} else {
+			d1 = op1.GetDval()
+		}
+		if op2.IsLong() {
+			d2 = float64(op2.GetLval())
+		} else {
+			d2 = op2.GetDval()
+		}
+		result := opline.GetResultZval()
+		result.SetDouble(d1 * d2)
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	}
+
+	// common
+	if op1.IsUndef() {
+		op1 = ZVAL_UNDEFINED_OP1()
+	}
+	if op2.IsUndef() {
+		op2 = ZVAL_UNDEFINED_OP2()
+	}
+	MulFunction(opline.GetResultZval(), op1, op2)
+	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
+		ZvalPtrDtorNogc(op2)
+	}
+	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
+		ZvalPtrDtorNogc(op2)
+	}
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
+}
+
+// ZEND_DIV
+func vmDivHandler(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var freeOp1, freeOp2 ZendFreeOp
+	var op1 *types.Zval = opline.Op1ExEx(&freeOp1)
+	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
+	FastDivFunction(opline.GetResultZval(), op1, op2)
+	if freeOp1 != nil {
+		ZvalPtrDtorNogc(freeOp1)
+	}
+	if freeOp2 != nil {
+		ZvalPtrDtorNogc(freeOp2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

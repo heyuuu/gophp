@@ -239,48 +239,6 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	return -1
 }
-func ZEND_MUL_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result *types.Zval
-	var d1 float64
-	var d2 float64
-	op1 = opline.GetOp1Zval()
-	op2 = RT_CONSTANT(opline, opline.GetOp2())
-
-	if op1.IsLong() {
-		if op2.IsLong() {
-			var overflow ZendLong
-			result = opline.GetResultZval()
-			ZEND_SIGNED_MULTIPLY_LONG(op1.GetLval(), op2.GetLval(), result.GetLval(), result.GetDval(), overflow)
-			if overflow != 0 {
-				result.SetTypeInfo(types.IS_DOUBLE)
-			} else {
-				result.SetTypeInfo(types.IS_LONG)
-			}
-			return ZEND_VM_NEXT_OPCODE(executeData, opline)
-		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
-			goto mul_double
-		}
-	} else if op1.IsDouble() {
-		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
-		mul_double:
-			result = opline.GetResultZval()
-			result.SetDouble(d1 * d2)
-			return ZEND_VM_NEXT_OPCODE(executeData, opline)
-		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
-			goto mul_double
-		}
-	}
-	return zend_mul_helper_SPEC(op1, op2, executeData)
-}
 func ZEND_MOD_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval

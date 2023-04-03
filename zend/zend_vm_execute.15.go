@@ -533,7 +533,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var retval_ptr *types.Zval
 	var return_value *types.Zval
 	var free_op1 ZendFreeOp
-	retval_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	retval_ptr = opline.getZvalPtrVar1(&free_op1)
 	return_value = executeData.GetReturnValue()
 	if retval_ptr.IsUndef() {
 		retval_ptr = ZVAL_UNDEFINED_OP1()
@@ -564,7 +564,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			/* Not supposed to happen, but we'll allow it */
 
 			faults.Error(faults.E_NOTICE, "Only variable references should be returned by reference")
-			retval_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+			retval_ptr = opline.getZvalPtrVar1(&free_op1)
 			if !(executeData.GetReturnValue()) {
 				ZvalPtrDtorNogc(free_op1)
 			} else {
@@ -614,7 +614,7 @@ func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var retval *types.Zval
 	var free_op1 ZendFreeOp
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
-	retval = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	retval = opline.getZvalPtrVar1(&free_op1)
 
 	/* Copy return value into generator->retval */
 
@@ -636,7 +636,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var free_op1 ZendFreeOp
-	value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	value = opline.getZvalPtrVar1(&free_op1)
 	for {
 		if value.GetType() != types.IS_OBJECT {
 			if value.IsReference() {
@@ -668,7 +668,7 @@ func ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(executeData *ZendExecuteData) int {
 	var varptr *types.Zval
 	var arg *types.Zval
 	var free_op1 ZendFreeOp
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
@@ -690,7 +690,7 @@ func ZEND_SEND_VAR_NO_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var varptr *types.Zval
 	var arg *types.Zval
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, varptr)
 	if varptr.IsReference() {
@@ -709,7 +709,7 @@ func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int 
 	if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) == 0 {
 		return ZEND_SEND_VAR_SPEC_VAR_HANDLER(executeData)
 	}
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, varptr)
 	if varptr.IsReference() || ARG_MAY_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
@@ -728,7 +728,7 @@ func ZEND_SEND_VAR_NO_REF_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData
 	if QUICK_ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) == 0 {
 		return ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(executeData)
 	}
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY_VALUE(arg, varptr)
 	if varptr.IsReference() || QUICK_ARG_MAY_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
@@ -771,7 +771,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	send_var_by_ref:
 		return ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData)
 	}
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
@@ -794,7 +794,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData) int {
 	if QUICK_ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 		goto send_var_by_ref
 	}
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	if varptr.IsUndef() {
 		ZVAL_UNDEFINED_OP1()
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
@@ -816,7 +816,7 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_SEND_ARG_BY_REF) != 0 {
 		return ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData)
 	}
-	varptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varptr = opline.getZvalPtrVar1(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	if varptr.IsReference() {
 		var ref *types.ZendRefcounted = varptr.GetCounted()
@@ -853,7 +853,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var expr *types.Zval
 	var result *types.Zval = opline.GetResultZval()
 	var ht *types.Array
-	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	expr = opline.getZvalPtrVar1(&free_op1)
 	switch opline.GetExtendedValue() {
 	case types.IS_NULL:
 		result.SetNull()

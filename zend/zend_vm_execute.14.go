@@ -456,7 +456,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	rope = (**types.String)(opline.GetOp1Zval())
 
 	{
-		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var_ = opline.getZvalPtrVar2(&free_op2)
 		if var_.IsString() {
 			{
 				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
@@ -485,7 +485,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	rope = (**types.String)(opline.GetOp1Zval())
 
 	{
-		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var_ = opline.getZvalPtrVar2(&free_op2)
 		if var_.IsString() {
 			{
 				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
@@ -537,7 +537,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var offset *types.Zval = opline.getZvalPtrVar2(&free_op2)
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -796,7 +796,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = opline.getZvalPtrVar2(&free_op2)
 
 		/* Consts, temporary variables and references need copying */
 

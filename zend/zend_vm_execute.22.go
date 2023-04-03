@@ -33,7 +33,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+				value = opline.getZvalPtrVar1(&free_op1)
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -44,7 +44,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+			var value *types.Zval = opline.getZvalPtrVar1(&free_op1)
 
 			/* Consts, temporary variables and references need copying */
 

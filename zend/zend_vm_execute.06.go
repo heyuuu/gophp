@@ -13,7 +13,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	{
 		for {
 			if offset.IsUndef() {
@@ -52,7 +52,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	{
 		for {
 			opline.GetResultZval().SetNull()
@@ -94,7 +94,7 @@ func ZEND_FETCH_LIST_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var free_op2 ZendFreeOp
 	var container *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	zend_fetch_dimension_address_LIST_r(container, _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData), IS_TMP_VAR|IS_VAR, opline, executeData)
+	zend_fetch_dimension_address_LIST_r(container, opline.getZvalPtrVar2(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -107,7 +107,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var op2_str *types.String
 	var str *types.String
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
-	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	op2 = opline.getZvalPtrVar2(&free_op2)
 	if op2.IsString() {
 		var op1_str *types.String = op1.GetStr()
 		var op2_str *types.String = op2.GetStr()
@@ -182,7 +182,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var call_info uint32
 	object = RT_CONSTANT(opline, opline.GetOp1())
 	{
-		function_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		function_name = opline.getZvalPtrVar2(&free_op2)
 	}
 	if function_name.GetType() != types.IS_STRING {
 		for {
@@ -284,7 +284,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 
 	{
 		var free_op2 ZendFreeOp
-		function_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		function_name = opline.getZvalPtrVar2(&free_op2)
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {
@@ -358,7 +358,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	var object_or_called_scope any
 	var call *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	function_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	function_name = opline.getZvalPtrVar2(&free_op2)
 	if ZendIsCallableEx(function_name, nil, 0, nil, &fcc, &error) != 0 {
 		func_ = fcc.GetFunctionHandler()
 		if error != nil {
@@ -433,7 +433,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var offset *types.Zval = opline.getZvalPtrVar2(&free_op2)
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -508,7 +508,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 	var hval ZendUlong
 	var offset *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	if container.IsArray() {
 		var ht *types.Array
 		var value *types.Zval
@@ -576,7 +576,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExec
 	var result int
 	var offset *types.Zval
 	container = RT_CONSTANT(opline, opline.GetOp1())
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	{
 
 		{
@@ -599,7 +599,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 	var ht *types.Array
 	var result uint32
 	key = RT_CONSTANT(opline, opline.GetOp1())
-	subject = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	subject = opline.getZvalPtrVar2(&free_op2)
 	if subject.IsArray() {
 	array_key_exists_array:
 		ht = subject.GetArr()
@@ -792,7 +792,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = opline.getZvalPtrVar2(&free_op2)
 
 		/* Consts, temporary variables and references need copying */
 

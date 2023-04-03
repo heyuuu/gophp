@@ -12,8 +12,8 @@ func ZEND_SPACESHIP_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	var free_op2 ZendFreeOp
 	var op1 *types.Zval
 	var op2 *types.Zval
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
+	op2 = opline.getZvalPtrVar2(&free_op2)
 	CompareFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
@@ -25,8 +25,8 @@ func ZEND_BOOL_XOR_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var free_op2 ZendFreeOp
 	var op1 *types.Zval
 	var op2 *types.Zval
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
+	op2 = opline.getZvalPtrVar2(&free_op2)
 	BooleanXorFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
@@ -39,8 +39,8 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var container *types.Zval
 	var dim *types.Zval
 	var value *types.Zval
-	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	container = opline.getZvalPtrVar1(&free_op1)
+	dim = opline.getZvalPtrVar2(&free_op2)
 	{
 		if container.IsArray() {
 		fetch_dim_r_array:
@@ -68,8 +68,8 @@ func ZEND_FETCH_DIM_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var free_op1 ZendFreeOp
 	var free_op2 ZendFreeOp
 	var container *types.Zval
-	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	zend_fetch_dimension_address_read_IS(container, _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData), IS_TMP_VAR|IS_VAR, opline, executeData)
+	container = opline.getZvalPtrVar1(&free_op1)
+	zend_fetch_dimension_address_read_IS(container, opline.getZvalPtrVar2(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
 	ZvalPtrDtorNogc(free_op2)
 	ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -81,8 +81,8 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var free_op2 ZendFreeOp
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	container = opline.getZvalPtrVar1(&free_op1)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {
@@ -131,8 +131,8 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var free_op2 ZendFreeOp
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	container = opline.getZvalPtrVar1(&free_op1)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {
@@ -172,8 +172,8 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var op1_str *types.String
 	var op2_str *types.String
 	var str *types.String
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
+	op2 = opline.getZvalPtrVar2(&free_op2)
 	if (op1.IsString()) && (op2.IsString()) {
 		var op1_str *types.String = op1.GetStr()
 		var op2_str *types.String = op2.GetStr()
@@ -268,9 +268,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var obj *types.ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	object = opline.getZvalPtrVar1(&free_op1)
 	{
-		function_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		function_name = opline.getZvalPtrVar2(&free_op2)
 	}
 	if function_name.GetType() != types.IS_STRING {
 		for {
@@ -387,8 +387,8 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
+	op2 = opline.getZvalPtrVar2(&free_op2)
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.GetLval() == op2.GetLval() {
@@ -443,8 +443,8 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 	var result int
 	var hval ZendUlong
 	var offset *types.Zval
-	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	container = opline.getZvalPtrVar1(&free_op1)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	if container.IsArray() {
 		var ht *types.Array
 		var value *types.Zval
@@ -517,8 +517,8 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExe
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	container = opline.getZvalPtrVar1(&free_op1)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -547,8 +547,8 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	var subject *types.Zval
 	var ht *types.Array
 	var result uint32
-	key = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	subject = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	key = opline.getZvalPtrVar1(&free_op1)
+	subject = opline.getZvalPtrVar2(&free_op2)
 	if subject.IsArray() {
 	array_key_exists_array:
 		ht = subject.GetArr()
@@ -573,7 +573,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	expr = opline.getZvalPtrVar1(&free_op1)
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
@@ -604,7 +604,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varname = opline.getZvalPtrVar1(&free_op1)
 
 	if varname.IsString() {
 		name = varname.GetStr()
@@ -703,7 +703,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
 	var free_op1 ZendFreeOp
-	varname = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varname = opline.getZvalPtrVar1(&free_op1)
 
 	if varname.IsString() {
 		name = varname.GetStr()
@@ -735,7 +735,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	varname = opline.getZvalPtrVar1(&free_op1)
 
 	{
 		name = ZvalGetTmpString(varname, &tmp_name)
@@ -770,7 +770,7 @@ func ZEND_INSTANCEOF_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	var free_op1 ZendFreeOp
 	var expr *types.Zval
 	var result types.ZendBool
-	expr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	expr = opline.getZvalPtrVar1(&free_op1)
 try_instanceof:
 	if expr.IsObject() {
 		var ce *types.ClassEntry
@@ -805,7 +805,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
 	var count ZendLong
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
 	for true {
 		if op1.IsArray() {
 			count = op1.GetArr().Count()
@@ -864,7 +864,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	{
 		var free_op1 ZendFreeOp
 		var op1 *types.Zval
-		op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+		op1 = opline.getZvalPtrVar1(&free_op1)
 		for true {
 			if op1.IsObject() {
 				opline.GetResultZval().SetStringCopy(types.Z_OBJCE_P(op1).GetName())
@@ -887,28 +887,17 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 func ZEND_COPY_TMP_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
-	var value *types.Zval = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	var value *types.Zval = opline.getZvalPtrVar1(&free_op1)
 	var result *types.Zval = opline.GetResultZval()
 	types.ZVAL_COPY(result, value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
-}
-func ZEND_DIV_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var free_op1 ZendFreeOp
-	var op1 *types.Zval
-	var op2 *types.Zval
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	op2 = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
-	FastDivFunction(opline.GetResultZval(), op1, op2)
-	ZvalPtrDtorNogc(free_op1)
-	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POW_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
 	var op2 *types.Zval
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
 	op2 = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	PowFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op1)
@@ -919,7 +908,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
 	var op2 *types.Zval
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
 	op2 = opline.GetOp2Zval()
 	if (op1.IsString()) && (op2.IsString()) {
 		var op1_str *types.String = op1.GetStr()
@@ -971,7 +960,7 @@ func ZEND_SPACESHIP_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var op1 *types.Zval
 	var op2 *types.Zval
-	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+	op1 = opline.getZvalPtrVar1(&free_op1)
 	op2 = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), executeData)
 	CompareFunction(opline.GetResultZval(), op1, op2)
 	ZvalPtrDtorNogc(free_op1)

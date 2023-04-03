@@ -27,7 +27,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 
 	{
 		var free_op2 ZendFreeOp
-		function_name = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		function_name = opline.getZvalPtrVar2(&free_op2)
 		{
 			if function_name.GetType() != types.IS_STRING {
 				for {
@@ -121,7 +121,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	for {
 		types.Z_OBJ_HT_P(container).GetUnsetProperty()(container, offset, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil))
 		break
@@ -139,7 +139,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExe
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+	offset = opline.getZvalPtrVar2(&free_op2)
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ types.Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZvalPtrDtorNogc(free_op2)
@@ -277,7 +277,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, executeData)
+		var key *types.Zval = opline.getZvalPtrVar2(&free_op2)
 
 		/* Consts, temporary variables and references need copying */
 

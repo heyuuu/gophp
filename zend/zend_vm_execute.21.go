@@ -774,7 +774,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
-		expr_ptr = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
+		expr_ptr = opline.getZvalPtrVar1(&free_op1)
 	}
 	{
 		var offset *types.Zval = opline.GetOp2Zval()

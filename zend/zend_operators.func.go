@@ -274,18 +274,11 @@ func FastLongAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	 * ensure that 'result' is not updated until after we
 	 * have read the values of op1 and op2.
 	 */
-
 	if (op1.GetLval()&LONG_SIGN_MASK) == (op2.GetLval()&LONG_SIGN_MASK) && (op1.GetLval()&LONG_SIGN_MASK) != (op1.GetLval()+op2.GetLval()&LONG_SIGN_MASK) {
 		result.SetDouble(float64(op1.GetLval() + float64(op2.GetLval())))
 	} else {
 		result.SetLong(op1.GetLval() + op2.GetLval())
 	}
-
-	/*
-	 * 'result' may alias with op1 or op2, so we need to
-	 * ensure that 'result' is not updated until after we
-	 * have read the values of op1 and op2.
-	 */
 }
 func FastAddFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	if op1.IsLong() {
