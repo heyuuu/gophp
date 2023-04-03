@@ -227,44 +227,32 @@ again:
 	return result
 }
 func IZendIsTrueEx(op *types.Zval) bool {
-	var result int = 0
 again:
 	switch op.GetType() {
 	case types.IS_TRUE:
-		result = 1
+		return true
 	case types.IS_LONG:
-		if op.GetLval() != 0 {
-			result = 1
-		}
+		return op.GetLval() != 0
 	case types.IS_DOUBLE:
-		if op.GetDval() != 0 {
-			result = 1
-		}
+		return op.GetDval() != 0
 	case types.IS_STRING:
-		if op.GetStr().GetLen() > 1 || op.GetStr().GetLen() != 0 && op.GetStr().GetVal()[0] != '0' {
-			result = 1
-		}
+		str := op.GetStrVal()
+		return str != "" && str != "0"
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
-			result = 1
-		}
+		return op.GetArr().Len() != 0
 	case types.IS_OBJECT:
 		if types.Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
-			result = 1
+			return true
 		} else {
-			result = ZendObjectIsTrue(op)
+			return ZendObjectIsTrue(op)
 		}
 	case types.IS_RESOURCE:
-		if types.Z_RES_HANDLE_P(op) != 0 {
-			result = 1
-		}
+		return types.Z_RES_HANDLE_P(op) != 0
 	case types.IS_REFERENCE:
 		op = types.Z_REFVAL_P(op)
 		goto again
-	default:
-
 	}
-	return result
+	return false
 }
 func ZendStringTolower(str *types.String) *types.String { return ZendStringTolowerEx(str) }
 func ConvertToStringEx(pzv *types.Zval) {
@@ -2834,7 +2822,7 @@ try_again:
 }
 func ZendIsTrueEx(op *types.Zval) bool { return IZendIsTrue(op) != 0 }
 func ZendIsTrue(op *types.Zval) int    { return IZendIsTrue(op) }
-func ZendObjectIsTrue(op *types.Zval) int {
+func ZendObjectIsTrue(op *types.Zval) bool {
 	if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
 		var tmp types.Zval
 		if types.Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, types.IS_BOOL) == types.SUCCESS {
@@ -2842,19 +2830,19 @@ func ZendObjectIsTrue(op *types.Zval) int {
 		}
 		faults.Error(faults.E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", types.Z_OBJ_P(op).GetCe().GetName().GetVal())
 	} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
-		var result int
+		var result bool
 		var rv types.Zval
 		var tmp *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, &rv)
 		if tmp.GetType() != types.IS_OBJECT {
 
 			/* for safety - avoid loop */
 
-			result = IZendIsTrue(tmp)
+			result = IZendIsTrueEx(tmp)
 			ZvalPtrDtor(tmp)
 			return result
 		}
 	}
-	return 1
+	return true
 }
 func ZendStrTolowerCopy(dest *byte, source *byte, length int) *byte {
 	var str *uint8 = (*uint8)(source)
