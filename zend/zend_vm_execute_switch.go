@@ -4,7 +4,7 @@ func vmGetHandler(opcode OpCode, op *ZendOp) OpcodeHandlerT {
 	var handler OpcodeHandlerT
 	switch opcode {
 	case ZEND_NOP:
-		handler = ZEND_NOP_SPEC_HANDLER
+		handler = vmNopHandler
 	case ZEND_ADD:
 		handler = vmGetAddHandler(op)
 	case ZEND_SUB:
@@ -452,36 +452,13 @@ func vmGetModHandler(op *ZendOp) OpcodeHandlerT {
 	return vmModHandler
 }
 func vmGetSlHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 126 | SPEC_RULE_OP1 | SPEC_RULE_OP2
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
-		ZEND_SL_SPEC_CONST_CONST_HANDLER,       // IS_CONST * IS_CONST
-		ZEND_SL_SPEC_CONST_TMPVARCV_HANDLER,    // IS_CONST * IS_TMP_VAR
-		ZEND_SL_SPEC_CONST_TMPVARCV_HANDLER,    // IS_CONST * IS_VAR
-		nil,                                    // IS_CONST * IS_UNUSED
-		ZEND_SL_SPEC_CONST_TMPVARCV_HANDLER,    // IS_CONST * IS_CV
-		ZEND_SL_SPEC_TMPVARCV_CONST_HANDLER,    // IS_TMP_VAR * IS_CONST
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_TMP_VAR * IS_TMP_VAR
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_TMP_VAR * IS_VAR
-		nil,                                    // IS_TMP_VAR * IS_UNUSED
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_TMP_VAR * IS_CV
-		ZEND_SL_SPEC_TMPVARCV_CONST_HANDLER,    // IS_VAR * IS_CONST
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_VAR * IS_TMP_VAR
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_VAR * IS_VAR
-		nil,                                    // IS_VAR * IS_UNUSED
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_VAR * IS_CV
-		nil,                                    // IS_UNUSED * IS_CONST
-		nil,                                    // IS_UNUSED * IS_TMP_VAR
-		nil,                                    // IS_UNUSED * IS_VAR
-		nil,                                    // IS_UNUSED * IS_UNUSED
-		nil,                                    // IS_UNUSED * IS_CV
-		ZEND_SL_SPEC_TMPVARCV_CONST_HANDLER,    // IS_CV * IS_CONST
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_CV * IS_TMP_VAR
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_CV * IS_VAR
-		nil,                                    // IS_CV * IS_UNUSED
-		ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER, // IS_CV * IS_CV
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return vmSlHandler
 }
 func vmGetSrHandler(op *ZendOp) OpcodeHandlerT {
 	spec := 151 | SPEC_RULE_OP1 | SPEC_RULE_OP2
