@@ -205,8 +205,22 @@ func vmSlHandler(executeData *ZendExecuteData) int {
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.GetLval() < SIZEOF_ZEND_LONG*8) != 0 {
 		/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
-		opline.GetResultZval().SetLong(zend_long(ZendUlong(op1.GetLval() << op2.GetLval())))
+		opline.GetResultZval().SetLong(ZendLong(ZendUlong(op1.GetLval() << op2.GetLval())))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	return zend_shift_left_helper_SPEC(op1, op2, executeData)
+}
+
+// ZEND_SR
+func getSrHandler(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var op1 *types.Zval = opline.Op1Ex()
+	var op2 *types.Zval = opline.Op2Ex()
+
+	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.GetLval() < SIZEOF_ZEND_LONG*8) != 0 {
+		opline.GetResultZval().SetLong(op1.GetLval() >> op2.GetLval())
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	}
+
+	return zend_shift_right_helper_SPEC(op1, op2, executeData)
 }
