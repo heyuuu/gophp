@@ -167,3 +167,26 @@ func vmDivHandler(executeData *ZendExecuteData) int {
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
+
+// ZEND_MOD
+func vmModHandler(executeData *ZendExecuteData) int {
+	var opline *ZendOp = executeData.GetOpline()
+	var op1 *types.Zval = opline.Op1Ex()
+	var op2 *types.Zval = opline.Op2Ex()
+
+	// fast
+	if op1.IsLong() && op2.IsLong() {
+		result := opline.GetResultZval()
+		if op2.GetLval() == 0 {
+			return zend_mod_by_zero_helper_SPEC(executeData)
+		} else if op2.GetLval() == -1 {
+			/* Prevent overflow error/crash if op1==ZEND_LONG_MIN */
+			result.SetLong(0)
+		} else {
+			result.SetLong(op1.GetLval() % op2.GetLval())
+		}
+		return ZEND_VM_NEXT_OPCODE(executeData, opline)
+	}
+
+	return zend_mod_helper_SPEC(op1, op2, executeData)
+}

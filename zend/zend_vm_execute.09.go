@@ -4,35 +4,6 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZEND_MOD_SPEC_TMPVARCV_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval
-	var op2 *types.Zval
-	var result *types.Zval
-	op1 = opline.GetOp1Zval()
-	op2 = opline.GetOp2Zval()
-
-	if op1.IsLong() {
-		if op2.IsLong() {
-			result = opline.GetResultZval()
-			if op2.GetLval() == 0 {
-				return zend_mod_by_zero_helper_SPEC(executeData)
-			} else if op2.GetLval() == -1 {
-
-				/* Prevent overflow error/crash if op1==ZEND_LONG_MIN */
-
-				result.SetLong(0)
-
-				/* Prevent overflow error/crash if op1==ZEND_LONG_MIN */
-
-			} else {
-				result.SetLong(op1.GetLval() % op2.GetLval())
-			}
-			return ZEND_VM_NEXT_OPCODE(executeData, opline)
-		}
-	}
-	return zend_mod_helper_SPEC(op1, op2, executeData)
-}
 func ZEND_SL_SPEC_TMPVARCV_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
