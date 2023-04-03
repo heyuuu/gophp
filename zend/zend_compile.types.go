@@ -163,31 +163,52 @@ func (op *ZendOp) SetResultType(value uint8)     { op.resultType = value }
 
 func (op *ZendOp) Offset(offset int) *ZendOp { return op + offset }
 
-func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
-func (op *ZendOp) _var(node ZnodeOp) *types.Zval   { return EX_VAR(node.GetVar()) }
-func (op *ZendOp) _varEx(opType uint8, node ZnodeOp) *types.Zval {
-	switch opType {
-	case IS_CONST:
-		return op._const(node)
-	default:
-		return op._var(node)
-	}
+func (op *ZendOp) currEx() *ZendExecuteData {
+	return CurrEX()
 }
-func (op *ZendOp) _varExEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
+
+/**
+ * opGetter
+ */
+type opGetter func(node ZnodeOp) *types.Zval
+type opExGetter func(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval
+
+func (op *ZendOp) _complexOp(opType uint8, node ZnodeOp, constGetter opGetter, varGetter opGetter, cvGetter opGetter) *types.Zval {
 	switch opType {
 	case IS_CONST:
-		return op._const(node)
+		return constGetter(node)
 	case IS_TMP_VAR, IS_VAR:
-		return op._varAndPtr(node, shouldFree)
+		return varGetter(node)
 	case IS_CV:
-		return op._cvOrUndef(node)
+		return cvGetter(node)
 	}
 	panic("unreachable")
 }
+func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp, constGetter opGetter, varGetter opExGetter, cvGetter opGetter) *types.Zval {
+	switch opType {
+	case IS_CONST:
+		return constGetter(node)
+	case IS_TMP_VAR, IS_VAR:
+		return varGetter(node, shouldFree)
+	case IS_CV:
+		return cvGetter(node)
+	}
+	panic("unreachable")
+}
+
+//
+func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
+func (op *ZendOp) _var(node ZnodeOp) *types.Zval   { return EX_VAR(node.GetVar()) }
 func (op *ZendOp) _varAndPtr(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
-	//return _getZvalPtrVar(node.GetVar(), &shouldFree, op.currEx())
 	var ret = op._var(node)
 	*shouldFree = ret
+	return ret
+}
+func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
+	ret := op._var(node)
+	if ret.IsUndef() {
+		return ZvalUndefinedCv(node.var_, op.currEx())
+	}
 	return ret
 }
 
@@ -197,15 +218,7 @@ func (op *ZendOp) Op1() *types.Zval    { return op._var(op.op1) }
 func (op *ZendOp) Op2() *types.Zval    { return op._var(op.op2) }
 func (op *ZendOp) Result() *types.Zval { return op._var(op.result) }
 
-func (op *ZendOp) Op1Ex() *types.Zval { return op._varEx(op.op1Type, op.op1) }
-func (op *ZendOp) Op2Ex() *types.Zval { return op._varEx(op.op2Type, op.op2) }
-func (op *ZendOp) Op1ExEx(shouldFree *ZendFreeOp) *types.Zval {
-	return op._varExEx(op.op1Type, op.op1, shouldFree)
-}
-func (op *ZendOp) Op2ExEx(shouldFree *ZendFreeOp) *types.Zval {
-	return op._varExEx(op.op2Type, op.op2, shouldFree)
-}
-
+//
 func (op *ZendOp) Op1Ptr(shouldFree *ZendFreeOp) *types.Zval {
 	return op._varAndPtr(op.op1, shouldFree)
 }
@@ -213,21 +226,30 @@ func (op *ZendOp) Op2Ptr(shouldFree *ZendFreeOp) *types.Zval {
 	return op._varAndPtr(op.op2, shouldFree)
 }
 
-func (op *ZendOp) currEx() *ZendExecuteData {
-	return CurrEX()
+func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
+func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
+
+// VarEx
+func (op *ZendOp) _varEx(opType uint8, node ZnodeOp) *types.Zval {
+	return op._complexOp(opType, node, op._const, op._var, op._var)
+}
+func (op *ZendOp) Op1Ex() *types.Zval { return op._varEx(op.op1Type, op.op1) }
+func (op *ZendOp) Op2Ex() *types.Zval { return op._varEx(op.op2Type, op.op2) }
+
+// VarExEx
+func (op *ZendOp) _varExEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
+	return op._complexOpEx(opType, node, shouldFree, op._const, op._varAndPtr, op._cvOrUndef)
+}
+func (op *ZendOp) Op1ExEx(shouldFree *ZendFreeOp) *types.Zval {
+	return op._varExEx(op.op1Type, op.op1, shouldFree)
+}
+func (op *ZendOp) Op2ExEx(shouldFree *ZendFreeOp) *types.Zval {
+	return op._varExEx(op.op2Type, op.op2, shouldFree)
 }
 
+//
 func (op *ZendOp) _concatOp(freeOp *ZendFreeOp, opType uint8, node ZnodeOp) *types.Zval {
-	switch opType {
-	case IS_CONST:
-		return op._const(node)
-	case IS_TMP_VAR, IS_VAR:
-		return op._varAndPtr(node, freeOp)
-	case IS_CV:
-		return op._var(node)
-	default:
-		return nil
-	}
+	return op._complexOpEx(opType, node, freeOp, op._const, op._varAndPtr, op._var)
 }
 func (op *ZendOp) ConcatOp1(freeOp *ZendFreeOp) *types.Zval {
 	return op._concatOp(freeOp, op.op1Type, op.op1)
@@ -235,18 +257,6 @@ func (op *ZendOp) ConcatOp1(freeOp *ZendFreeOp) *types.Zval {
 func (op *ZendOp) ConcatOp2(freeOp *ZendFreeOp) *types.Zval {
 	return op._concatOp(freeOp, op.op1Type, op.op1)
 }
-
-func (op *ZendOp) Cv1() *types.Zval { return op._var(op.op1) }
-func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
-	ret := op._var(node)
-	if ret.IsUndef() {
-		return ZvalUndefinedCv(node.var_, op.currEx())
-	}
-	return ret
-}
-
-func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
-func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
 
 /**
  * ZendBrkContElement

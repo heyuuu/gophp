@@ -342,7 +342,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.Cv1()
+	container = opline.Op1()
 	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -417,7 +417,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var free_op2 ZendFreeOp
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.Cv1()
+	container = opline.Op1()
 	offset = opline.Op2Ptr(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -453,7 +453,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.Cv1()
+	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		for {

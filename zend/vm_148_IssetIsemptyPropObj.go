@@ -200,7 +200,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteD
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = opline.Cv1()
+	container = opline.Op1()
 	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -226,7 +226,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecute
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = opline.Cv1()
+	container = opline.Op1()
 	offset = opline.Op2Ptr(&free_op2)
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -252,7 +252,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = opline.Cv1()
+	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {

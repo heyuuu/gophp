@@ -76,7 +76,7 @@ func ZEND_COALESCE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
 	var ref *types.Zval = nil
-	value = opline.Cv1()
+	value = opline.Op1()
 	if value.IsReference() {
 		{
 			ref = value
