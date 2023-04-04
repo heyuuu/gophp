@@ -1,6 +1,7 @@
 package zend
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -202,6 +203,12 @@ func (op *ZendOp) _op(node ZnodeOp) *types.Zval    { return EX_VAR(node.GetVar()
 func (op *ZendOp) _opPtr(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
 	var ret = op._op(node)
 	*shouldFree = ret
+	return ret
+}
+func (op *ZendOp) _opPtrTmp(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
+	var ret = op._op(node)
+	*shouldFree = ret
+	b.Assert(ret.GetType() != types.IS_REFERENCE)
 	return ret
 }
 func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {

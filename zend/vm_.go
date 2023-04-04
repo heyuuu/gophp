@@ -107,17 +107,21 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 // ZEND_BOOL_XOR
 func getBoolXorHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
-	//todo
+	var freeOp1, freeOp2 ZendFreeOp
+	var op1 *types.Zval = opline.Op1ExEx(&freeOp1)
+	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
+
+	BooleanXorFunction(opline.Result(), op1, op2)
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
 // ZEND_IS_IDENTICAL
 func getIsIdenticalHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
-	//todo
+	var freeOp1, freeOp2 ZendFreeOp
+	var op1 *types.Zval = opline.Op1ExEx(&freeOp1)
+	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
+
 }
 
 // ZEND_IS_NOT_IDENTICAL
