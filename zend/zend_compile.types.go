@@ -232,6 +232,12 @@ func (op *ZendOp) Op1Ptr(shouldFree *ZendFreeOp) *types.Zval {
 func (op *ZendOp) Op2Ptr(shouldFree *ZendFreeOp) *types.Zval {
 	return op._opPtr(op.op2, shouldFree)
 }
+func (op *ZendOp) Op1PtrTmp(shouldFree *ZendFreeOp) *types.Zval {
+	return op._opPtrTmp(op.op1, shouldFree)
+}
+func (op *ZendOp) Op2PtrTmp(shouldFree *ZendFreeOp) *types.Zval {
+	return op._opPtrTmp(op.op2, shouldFree)
+}
 
 func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
 func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
