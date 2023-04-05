@@ -12,7 +12,7 @@ var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{Name: "data"}}, 
 	if fp.HasError() {
 		return
 	}
-	ZifBin2hex(executeData, returnValue, data)
+	ZifBin2hex(data)
 })
 
 // generate by ZifHex2bin

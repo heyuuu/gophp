@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"encoding/hex"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/sapi/cli"
@@ -29,56 +30,6 @@ func RegisterStringConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("LC_MONETARY", LC_MONETARY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("LC_ALL", LC_ALL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 }
-func PhpBin2hex(old *uint8, oldlen int) *types.String {
-	var result *types.String
-	var i int
-	var j int
-	result = types.ZendStringSafeAlloc(oldlen, 2*b.SizeOf("char"), 0, 0)
-	j = 0
-	i = j
-	for ; i < oldlen; i++ {
-		result.GetVal()[b.PostInc(&j)] = Hexconvtab[old[i]>>4]
-		result.GetVal()[b.PostInc(&j)] = Hexconvtab[old[i]&15]
-	}
-	result.GetVal()[j] = '0'
-	return result
-}
-func PhpHex2bin(old *uint8, oldlen int) *types.String {
-	var target_length int = oldlen >> 1
-	var str *types.String = types.ZendStringAlloc(target_length, 0)
-	var ret *uint8 = (*uint8)(str.GetVal())
-	var i int
-	var j int
-	j = 0
-	i = j
-	for ; i < target_length; i++ {
-		var c uint8 = old[b.PostInc(&j)]
-		var l uint8 = c & ^0x20
-		var is_letter int = uint(l-'A'^l-'F'-1)>>8*b.SizeOf("unsigned int") - 1
-		var d uint8
-
-		/* basically (c >= '0' && c <= '9') || (l >= 'A' && l <= 'F') */
-
-		if ((c ^ '0') - 10>>8*b.SizeOf("unsigned int") - 1 | is_letter) != 0 {
-			d = l - 0x10 - 0x27*is_letter<<4
-		} else {
-			types.ZendStringEfree(str)
-			return nil
-		}
-		c = old[b.PostInc(&j)]
-		l = c & ^0x20
-		is_letter = uint(l-'A'^l-'F'-1)>>8*b.SizeOf("unsigned int") - 1
-		if ((c ^ '0') - 10>>8*b.SizeOf("unsigned int") - 1 | is_letter) != 0 {
-			d |= l - 0x10 - 0x27*is_letter
-		} else {
-			types.ZendStringEfree(str)
-			return nil
-		}
-		ret[i] = d
-	}
-	ret[i] = '0'
-	return str
-}
 func LocaleconvR(out *__struct__lconv) *__struct__lconv {
 	/*  cur->locinfo is struct __crt_locale_info which implementation is
 	    hidden in vc14. TODO revisit this and check if a workaround available
@@ -89,54 +40,22 @@ func LocaleconvR(out *__struct__lconv) *__struct__lconv {
 	*out = (*localeconv)()
 	return out
 }
-func ZifBin2hex(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
-	var result *types.String
-	var data *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			data = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	result = PhpBin2hex((*uint8)(data.GetVal()), data.GetLen())
-	if result == nil {
-		return_value.SetFalse()
-		return
-	}
-	return_value.SetString(result)
-	return
+
+func ZifBin2hex(data string) string {
+	return hex.EncodeToString([]byte(data))
 }
-func ZifHex2bin(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
-	var result *types.String
-	var data *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			data = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if data.GetLen()%2 != 0 {
+func ZifHex2bin(data string) (string, bool) {
+	if len(data)%2 != 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Hexadecimal input string must have an even length")
-		return_value.SetFalse()
-		return
+		return "", false
 	}
-	result = PhpHex2bin((*uint8)(data.GetVal()), data.GetLen())
-	if result == nil {
+
+	bin, err := hex.DecodeString(data)
+	if err != nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Input string must be hexadecimal string")
-		return_value.SetFalse()
-		return
+		return "", false
 	}
-	return_value.SetString(result)
+	return string(bin), true
 }
 func PhpSpnCommonHandler(executeData *zend.ZendExecuteData, return_value *types.Zval, behavior int) {
 	var s11 *types.String
