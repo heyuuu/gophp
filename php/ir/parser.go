@@ -575,18 +575,27 @@ func parseAstConst(n *ast.Const) *Const {
 	}
 }
 func parseAstIdent(n *ast.Ident) *Ident {
+	if n == nil {
+		return nil
+	}
 	return &Ident{
 		Name:    n.Name,
 		VarLike: n.VarLike,
 	}
 }
 func parseAstMatchArm(n *ast.MatchArm) *MatchArm {
+	if n == nil {
+		return nil
+	}
 	return &MatchArm{
 		Conds: slices.Map(n.Conds, parseAstExpr),
 		Body:  parseAstExpr(n.Body),
 	}
 }
 func parseAstParam(n *ast.Param) *Param {
+	if n == nil {
+		return nil
+	}
 	return &Param{
 		Type:       parseAstType(n.Type),
 		ByRef:      n.ByRef,
@@ -598,17 +607,26 @@ func parseAstParam(n *ast.Param) *Param {
 	}
 }
 func parseAstSimpleType(n *ast.SimpleType) *SimpleType {
+	if n == nil {
+		return nil
+	}
 	return &SimpleType{
 		Name: parseAstName(n.Name),
 	}
 }
 func parseAstName(n *ast.Name) *Name {
+	if n == nil {
+		return nil
+	}
 	return &Name{
 		Kind:  parseAstNameType(n.Kind),
 		Parts: n.Parts,
 	}
 }
 func parseAstArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
+	if n == nil {
+		return nil
+	}
 	return &ArrayItemExpr{
 		Key:    parseAstExpr(n.Key),
 		Value:  parseAstExpr(n.Value),
@@ -617,34 +635,52 @@ func parseAstArrayItemExpr(n *ast.ArrayItemExpr) *ArrayItemExpr {
 	}
 }
 func parseAstClosureUseExpr(n *ast.ClosureUseExpr) *ClosureUseExpr {
+	if n == nil {
+		return nil
+	}
 	return &ClosureUseExpr{
 		Var:   parseAstVariableExpr(n.Var),
 		ByRef: n.ByRef,
 	}
 }
 func parseAstVariableExpr(n *ast.VariableExpr) *VariableExpr {
+	if n == nil {
+		return nil
+	}
 	return &VariableExpr{
 		Name: parseAstNode(n.Name),
 	}
 }
 func parseAstElseIfStmt(n *ast.ElseIfStmt) *ElseIfStmt {
+	if n == nil {
+		return nil
+	}
 	return &ElseIfStmt{
 		Cond:  parseAstExpr(n.Cond),
 		Stmts: slices.Map(n.Stmts, parseAstStmt),
 	}
 }
 func parseAstElseStmt(n *ast.ElseStmt) *ElseStmt {
+	if n == nil {
+		return nil
+	}
 	return &ElseStmt{
 		Stmts: slices.Map(n.Stmts, parseAstStmt),
 	}
 }
 func parseAstCaseStmt(n *ast.CaseStmt) *CaseStmt {
+	if n == nil {
+		return nil
+	}
 	return &CaseStmt{
 		Cond:  parseAstExpr(n.Cond),
 		Stmts: slices.Map(n.Stmts, parseAstStmt),
 	}
 }
 func parseAstCatchStmt(n *ast.CatchStmt) *CatchStmt {
+	if n == nil {
+		return nil
+	}
 	return &CatchStmt{
 		Types: slices.Map(n.Types, parseAstName),
 		Var:   parseAstVariableExpr(n.Var),
@@ -652,23 +688,35 @@ func parseAstCatchStmt(n *ast.CatchStmt) *CatchStmt {
 	}
 }
 func parseAstFinallyStmt(n *ast.FinallyStmt) *FinallyStmt {
+	if n == nil {
+		return nil
+	}
 	return &FinallyStmt{
 		Stmts: slices.Map(n.Stmts, parseAstStmt),
 	}
 }
 func parseAstStaticVarStmt(n *ast.StaticVarStmt) *StaticVarStmt {
+	if n == nil {
+		return nil
+	}
 	return &StaticVarStmt{
 		Var:     parseAstVariableExpr(n.Var),
 		Default: parseAstExpr(n.Default),
 	}
 }
 func parseAstDeclareDeclareStmt(n *ast.DeclareDeclareStmt) *DeclareDeclareStmt {
+	if n == nil {
+		return nil
+	}
 	return &DeclareDeclareStmt{
 		Key:   parseAstIdent(n.Key),
 		Value: parseAstExpr(n.Value),
 	}
 }
 func parseAstPropertyPropertyStmt(n *ast.PropertyPropertyStmt) *PropertyPropertyStmt {
+	if n == nil {
+		return nil
+	}
 	return &PropertyPropertyStmt{
 		Name:    parseAstIdent(n.Name),
 		Default: parseAstExpr(n.Default),
