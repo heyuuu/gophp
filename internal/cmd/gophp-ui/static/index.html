@@ -10,12 +10,13 @@
 </head>
 <body>
 <div class="container-fluid" v-scope v-cloak>
-    <form>
-        <div class="row">
+        <div class="row" style="margin-top: 10px">
             <div :class="codeClass">
-                <input type="button" class="btn btn-link" @click="mode = 0" value="默认模式"/>
-                <input type="button" class="btn btn-link" @click="mode = 1" value="AST 模式"/>
-                <input type="button" class="btn btn-link" @click="mode = 2" value="Print 模式"/>
+                <div style="margin-top: 10px; margin-bottom: 10px">
+                    <input type="button" class="btn" :class="btnClass(1)" @click="toggleMode(1)" value="AST Nodes"/>
+                    <input type="button" class="btn" :class="btnClass(2)" @click="toggleMode(2)" value="Print"/>
+                    <input type="button" class="btn" :class="btnClass(4)" @click="toggleMode(4)" value="Ir Nodes"/>
+                </div>
                 <div class="form-group">
                     <textarea class="form-control" rows="20" v-model="code" @input="codeChange"></textarea>
                     <div class="card-body">
@@ -23,18 +24,22 @@
                     </div>
                 </div>
             </div>
-            <div :class="astClass" v-if="showAst">
+            <div :class="showClass" v-if="showAst">
                 <div class="card" style="height: 100vh">
-                    <pre id="ast-output" style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ast }}</pre>
+                    <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ast }}</pre>
                 </div>
             </div>
-            <div :class="printClass" v-if="showPrint">
+            <div :class="showClass" v-if="showPrint">
                 <div class="card" style="height: 100vh">
-                    <pre id="printer-output" style="margin: 0; padding: 1rem 0; height: 100vh;">{{ print }}</pre>
+                    <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ print }}</pre>
+                </div>
+            </div>
+            <div :class="showClass" v-if="showIr">
+                <div class="card" style="height: 100vh">
+                    <pre style="margin: 0; padding: 1rem 0; height: 100vh;">{{ ir }}</pre>
                 </div>
             </div>
         </div>
-    </form>
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.js"></script>
@@ -47,29 +52,78 @@
         initCode = "<?php\n\n"
     }
 
+    // const
+    const modeAst = 1 << 0
+    const modePrint = 1 << 1
+    const modeIr = 1 << 2
+
     // App
     const apiUri = "/api"
     const app = {
-        mode: 0, // 0: all, 1: ast-mode, 2: print-mode
+        mode: modeAst | modePrint | modeIr,
         code: initCode,
         oldCode: "",
         error: "",
         ast: "",
         print: "",
+        ir: "",
         get showAst() {
-            return this.mode !== 2
+            return (this.mode & modeAst) !== 0
         },
         get showPrint() {
-            return this.mode !== 1
+            return (this.mode & modePrint) !== 0
+        },
+        get showIr() {
+            return (this.mode & modeIr) !== 0
+        },
+        get showCount() {
+            let count = 0
+            if (this.showAst) {
+                count++
+            }
+            if (this.showPrint) {
+                count++
+            }
+            if (this.showIr) {
+                count++
+            }
+            return count
+        },
+        btnClass(mode) {
+            if ((this.mode & mode) !== 0) {
+                return "btn-primary"
+            } else {
+                return "btn-secondary"
+            }
         },
         get codeClass() {
-            return 'col-sm-4'
+            switch (this.showCount) {
+                case 0:
+                    return "col-sm-12"
+                case 1:
+                    return "col-sm-4"
+                case 2:
+                    return "col-sm-4"
+                default:
+                    return "col-sm-3"
+            }
         },
-        get astClass() {
-            return this.mode === 1 ? 'col-sm-8' : 'col-sm-4'
+        get showClass() {
+            switch (this.showCount) {
+                case 1:
+                    return "col-sm-8"
+                case 2:
+                    return "col-sm-4"
+                default:
+                    return "col-sm-3"
+            }
         },
-        get printClass() {
-            return this.mode === 2 ? 'col-sm-8' : 'col-sm-4'
+        toggleMode(mode) {
+            if ((this.mode & mode) !== 0) {
+                this.mode = this.mode & ~mode
+            } else {
+                this.mode = this.mode | mode
+            }
         },
         codeChange() {
             localStorage.setItem(storageKey, this.code)
@@ -96,6 +150,7 @@
                 if (error === "") {
                     this.ast = data.Ast
                     this.print = data.Print
+                    this.ir = data.Ir
                 }
             }, () => {
                 this.error = "请求失败，确认服务是否可用"
