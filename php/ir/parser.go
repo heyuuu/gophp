@@ -5,6 +5,17 @@ import (
 	"github.com/heyuuu/gophp/utils/slices"
 )
 
+func ParseAst(node any) any {
+	switch n := node.(type) {
+	case ast.Node:
+		return parseAstNode(n)
+	case []ast.Stmt:
+		return slices.Map(n, parseAstStmt)
+	default:
+		return n
+	}
+}
+
 // const types
 func parseAstFlags(flags ast.Flags) Flags         { return Flags(flags) }
 func parseAstNameType(kind ast.NameType) NameType { return NameType(kind) }
