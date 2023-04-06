@@ -135,6 +135,19 @@ func ZvalGetDouble(op *types.Zval) float64 {
 		return ZvalGetDoubleFunc(op)
 	}
 }
+
+func ZvalGetStrVal(op *types.Zval) string {
+	if op.IsString() {
+		return op.GetStrVal()
+	} else {
+		zstr := ZvalGetStringFunc(op)
+		if zstr == nil {
+			return ""
+		}
+		return zstr.GetStr()
+	}
+}
+
 func ZvalGetString(op *types.Zval) *types.String {
 	if op.IsString() {
 		return op.GetStr().Copy()

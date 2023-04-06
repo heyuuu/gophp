@@ -385,18 +385,13 @@ func PhpStreamUrlWrapHttpEx(
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
 
 			if tmpstr.GetS() != nil {
-				tmp = PhpTrim(tmpstr.GetS(), nil, 0, 3)
+				tmp = types.NewString(PhpTrimAll(tmpstr.GetStr(), nil))
 				tmpstr.Free()
 			}
-
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
-
 		} else if tmpzval.IsType(types.IS_STRING) && tmpzval.GetStr().GetLen() != 0 {
-
-			tmp = PhpTrim(tmpzval.GetStr(), nil, 0, 3)
-
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
-
+			tmp = types.NewString(PhpTrimAll(tmpzval.GetStrVal(), nil))
 		}
 		if tmp != nil && tmp.GetLen() != 0 {
 			var s *byte

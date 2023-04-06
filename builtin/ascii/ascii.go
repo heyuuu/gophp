@@ -40,24 +40,24 @@ func ToLower(c byte) byte {
 	return c
 }
 
-func StrToLower(s string) string {
-	i := 0
-	for ; i < len(s); i++ {
-		if 'A' <= s[i] && s[i] <= 'Z' {
-			break
+// 字符串转小写。与 strings.ToUpper() 的区别是，它不支持除英文字母外的其他unicode字母
+func StrToUpper(s string) string {
+	return strings.Map(func(r rune) rune {
+		if 'a' <= r && r <= 'z' {
+			return r - 'a' + 'A'
 		}
-	}
-	if i == len(s) {
-		return s
-	}
+		return r
+	}, s)
+}
 
-	var buf strings.Builder
-	buf.Grow(len(s))
-	buf.WriteString(s[:i])
-	for j := i; j < len(s); j++ {
-		buf.WriteByte(ToLower(s[j]))
-	}
-	return buf.String()
+// 字符串转小写。与 strings.ToLower() 的区别是，它不支持除英文字母外的其他unicode字母
+func StrToLower(s string) string {
+	return strings.Map(func(r rune) rune {
+		if 'A' <= r && r <= 'Z' {
+			return r - 'A' + 'a'
+		}
+		return r
+	}, s)
 }
 
 func StrCaseEquals(a string, b string) bool {

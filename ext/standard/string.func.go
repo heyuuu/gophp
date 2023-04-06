@@ -9,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func RegisterStringConstants(type_ int, module_number int) {
@@ -137,6 +138,50 @@ func ZifStrcoll(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, str2
 	return_value.SetLong(strcoll((*byte)(s1.GetVal()), (*byte)(s2.GetVal())))
 	return
 }
+func PhpCharmaskEx(input string) (string, bool) {
+	if pos := strings.Index(input, ".."); pos < 0 {
+		return input, true
+	}
+
+	var buf strings.Builder
+	for {
+		pos := strings.Index(input, "..")
+		if pos < 0 {
+			buf.WriteString(input)
+			break
+		}
+
+		// e.g. "a..z"
+		if pos > 0 && pos+2 < len(input)-1 && input[pos-1] <= input[pos+2] {
+			buf.WriteString(input[:pos-1])
+			for c := input[pos-1]; c < input[pos+2]; c++ {
+				buf.WriteByte(c)
+			}
+			input = input[pos+3:]
+		} else {
+			/* Error, try to be as helpful as possible:
+			   (a range ending/starting with '.' won't be captured here) */
+			if pos == 0 {
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
+				return "", false
+			}
+			if pos+2 >= len(input)-1 {
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
+				return "", false
+			}
+			if input[pos-1] > input[pos+2] {
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
+				return "", false
+			}
+
+			/* FIXME: better error (a..b..c is the only left possibility?) */
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range")
+			return "", false
+		}
+
+	}
+	return buf.String(), true
+}
 func PhpCharmask(input *uint8, len_ int, mask *byte) int {
 	var end *uint8
 	var c uint8
@@ -179,113 +224,45 @@ func PhpCharmask(input *uint8, len_ int, mask *byte) int {
 	}
 	return result
 }
-func PhpTrimInt(str *types.String, what *byte, what_len int, mode int) *types.String {
-	var start *byte = str.GetVal()
-	var end *byte = start + str.GetLen()
-	var mask []byte
+
+func PhpTrimAll(str string, what *string) string {
+	var cutset string
 	if what != nil {
-		if what_len == 1 {
-			var p byte = *what
-			if (mode & 1) != 0 {
-				for start != end {
-					if (*start) == p {
-						start++
-					} else {
-						break
-					}
-				}
-			}
-			if (mode & 2) != 0 {
-				for start != end {
-					if (*(end - 1)) == p {
-						end--
-					} else {
-						break
-					}
-				}
-			}
-		} else {
-			PhpCharmask((*uint8)(what), what_len, mask)
-			if (mode & 1) != 0 {
-				for start != end {
-					if mask[uint8(*start)] {
-						start++
-					} else {
-						break
-					}
-				}
-			}
-			if (mode & 2) != 0 {
-				for start != end {
-					if mask[uint8(*(end - 1))] {
-						end--
-					} else {
-						break
-					}
-				}
-			}
-		}
+		cutset, _ = PhpCharmaskEx(*what)
 	} else {
-		if (mode & 1) != 0 {
-			for start != end {
-				var c uint8 = uint8(*start)
-				if c <= ' ' && (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == 'v' || c == '0') {
-					start++
-				} else {
-					break
-				}
-			}
-		}
-		if (mode & 2) != 0 {
-			for start != end {
-				var c uint8 = uint8(*(end - 1))
-				if c <= ' ' && (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == 'v' || c == '0') {
-					end--
-				} else {
-					break
-				}
-			}
-		}
+		cutset = " \n\r\t\v\x00"
 	}
-	if str.GetLen() == end-start {
-		return str.Copy()
-	} else if end-start == 0 {
-		return types.ZSTR_EMPTY_ALLOC()
+	return strings.Trim(str, cutset)
+}
+func PhpTrimLeft(str string, what *string) string {
+	var cutset string
+	if what != nil {
+		cutset, _ = PhpCharmaskEx(*what)
 	} else {
-		return types.NewString(b.CastStr(start, end-start))
+		cutset = " \n\r\t\v\x00"
 	}
+	return strings.TrimLeft(str, cutset)
 }
-func PhpTrim(str *types.String, what *byte, what_len int, mode int) *types.String {
-	return PhpTrimInt(str, what, what_len, mode)
-}
-func PhpDoTrim(executeData *zend.ZendExecuteData, return_value *types.Zval, mode int) {
-	var str *types.String
-	var what *types.String = nil
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			what = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func PhpTrimRight(str string, what *string) string {
+	var cutset string
+	if what != nil {
+		cutset, _ = PhpCharmaskEx(*what)
+	} else {
+		cutset = " \n\r\t\v\x00"
 	}
-	return_value.SetString(PhpTrimInt(str, b.CondF1(what != nil, func() []byte { return what.GetVal() }, nil), b.CondF1(what != nil, func() int { return what.GetLen() }, 0), mode))
+	return strings.TrimRight(str, cutset)
 }
-func ZifTrim(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, characterMask *types.Zval) {
-	PhpDoTrim(executeData, return_value, 3)
+
+func ZifTrim(str string, _ zpp.Opt, characterMask *string) string {
+	return PhpTrimAll(str, characterMask)
 }
 
 //@zif -alias chop
-func ZifRtrim(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, characterMask *types.Zval) {
-	PhpDoTrim(executeData, return_value, 2)
+func ZifRtrim(str string, _ zpp.Opt, characterMask *string) string {
+	return PhpTrimLeft(str, characterMask)
 }
-func ZifLtrim(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, characterMask *types.Zval) {
-	PhpDoTrim(executeData, return_value, 1)
+func ZifLtrim(str string, _ zpp.Opt, characterMask *string) string {
+	return PhpTrimRight(str, characterMask)
 }
 func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, width *types.Zval, break_ *types.Zval, cut *types.Zval) {
 	var text *types.String
@@ -441,37 +418,6 @@ func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zp
 	/* Special case for a single-character break as it needs no
 	   additional storage space */
 }
-func PhpExplode(delim *types.String, str *types.String, return_value *types.Zval, limit zend.ZendLong) {
-	var p1 *byte = str.GetVal()
-	var endp *byte = str.GetVal() + str.GetLen()
-	var p2 *byte = core.PhpMemnstr(str.GetVal(), delim.GetVal(), delim.GetLen(), endp)
-	var tmp types.Zval
-	if p2 == nil {
-		tmp.SetStringCopy(str)
-		return_value.GetArr().NextIndexInsertNew(&tmp)
-	} else {
-		for {
-			var l int = p2 - p1
-			if l == 0 {
-				zend.ZVAL_EMPTY_STRING(&tmp)
-			} else if l == 1 {
-				tmp.SetInternedString(types.ZSTR_CHAR(zend_uchar(*p1)))
-			} else {
-				tmp.SetStringVal(b.CastStr(p1, p2-p1))
-			}
-			return_value.GetArr().NextIndexInsertNew(&tmp)
-			p1 = p2 + delim.GetLen()
-			p2 = core.PhpMemnstr(p1, delim.GetVal(), delim.GetLen(), endp)
-			if !(p2 != nil && b.PreDec(&limit) > 1) {
-				break
-			}
-		}
-		if p1 <= endp {
-			tmp.SetStringVal(b.CastStr(p1, endp-p1))
-			return_value.GetArr().NextIndexInsertNew(&tmp)
-		}
-	}
-}
 func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_value *types.Zval, limit zend.ZendLong) {
 	// #define EXPLODE_ALLOC_STEP       64
 
@@ -511,46 +457,29 @@ func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_valu
 		zend.Efree(any(positions))
 	}
 }
-func ZifExplode(executeData zpp.Ex, return_value zpp.Ret, separator *types.Zval, str *types.Zval, _ zpp.Opt, limit *types.Zval) {
-	var str *types.String
-	var delim *types.String
-	var limit zend.ZendLong = zend.ZEND_LONG_MAX
-	var tmp types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			delim = fp.ParseStr()
-			str = fp.ParseStr()
-			fp.StartOptional()
-			limit = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifExplode(return_value zpp.Ret, separator string, str string, _ zpp.Opt, limit_ *int) ([]string, bool) {
+	var limit = zend.ZEND_LONG_MAX
+	if limit_ != nil {
+		limit = *limit_
 	}
-	if delim.GetLen() == 0 {
+
+	if len(separator) == 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty delimiter")
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
-	zend.ArrayInit(return_value)
-	if str.GetLen() == 0 {
+	var arr []string
+	if str == "" {
 		if limit >= 0 {
-			zend.ZVAL_EMPTY_STRING(&tmp)
-			return_value.GetArr().IndexAddNew(0, &tmp)
+			arr = []string{""}
 		}
-		return
-	}
-	if limit > 1 {
-		PhpExplode(delim, str, return_value, limit)
+	} else if limit > 1 {
+		arr = strings.SplitN(str, separator, limit)
 	} else if limit < 0 {
-		PhpExplodeNegativeLimit(delim, str, return_value, limit)
+		arr = PhpExplodeNegativeLimit(separator, str, return_value, limit)
 	} else {
-		tmp.SetStringCopy(str)
-		return_value.GetArr().IndexAddNew(0, &tmp)
+		arr = []string{str}
 	}
+	return arr, true
 }
 func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval) {
 	var tmp *types.Zval

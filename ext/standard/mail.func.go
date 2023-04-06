@@ -265,7 +265,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 		case types.IS_STRING:
 			tmp_headers = types.NewString(headers.GetStr().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
-			str_headers = PhpTrim(tmp_headers, nil, 0, 2)
+			str_headers = types.NewString(PhpTrimRight(tmp_headers.GetStr(), nil))
 			types.ZendStringReleaseEx(tmp_headers, 0)
 		case types.IS_ARRAY:
 			str_headers = PhpMailBuildHeaders(headers)

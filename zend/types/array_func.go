@@ -8,6 +8,15 @@ import (
 
 var emptyArray *Array
 
+func NewStringArray(items []string) *Array {
+	// todo
+	arr := NewArray(0)
+	for _, item := range items {
+		arr.NextIndexInsert(NewZvalString(item))
+	}
+	return arr
+}
+
 func init() {
 	emptyArray = NewArray(0)
 	emptyArray.SetImmutable()
