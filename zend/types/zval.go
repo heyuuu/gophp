@@ -291,3 +291,7 @@ func (zv *Zval) SetConstantAst(ast *ZendAstRef)  { zv.SetTypeConstant(); zv.SetA
 func (zv *Zval) SetIndirect(v *Zval)             { zv.SetTypeIndirect(); zv.SetZv(v) }
 func (zv *Zval) SetAsPtr(ptr any)                { zv.SetTypePtr(); zv.SetPtr(ptr) }
 func (zv *Zval) SetAliasPtr(ptr any)             { zv.SetTypeAliasPtr(); zv.SetPtr(ptr) }
+
+func (zv *Zval) SetBy(val *Zval) {
+	ZVAL_COPY_VALUE(zv, val)
+}

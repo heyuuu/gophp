@@ -769,14 +769,19 @@ var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{Name: "st
 // generate by ZifStrWordCount
 var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "format"}, {Name: "charlist"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	format := fp.ParseZval()
-	charlist := fp.ParseZval()
+	format := fp.ParseLong()
+	charlist := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifStrWordCount(executeData, returnValue, str, nil, format, charlist)
+	ret, ok := ZifStrWordCount(str, nil, format, charlist)
+	if ok {
+		returnValue.SetBy(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifMoneyFormat
