@@ -32,16 +32,6 @@ func RegisterStringConstants(type_ int, module_number int) {
 	zend.RegisterLongConstant("LC_MONETARY", LC_MONETARY, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("LC_ALL", LC_ALL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 }
-func LocaleconvR(out *__struct__lconv) *__struct__lconv {
-	/*  cur->locinfo is struct __crt_locale_info which implementation is
-	    hidden in vc14. TODO revisit this and check if a workaround available
-	    and needed. */
-
-	/* localeconv doesn't return an error condition */
-
-	*out = (*localeconv)()
-	return out
-}
 
 func ZifBin2hex(data string) string {
 	return hex.EncodeToString([]byte(data))
@@ -80,23 +70,8 @@ func ZifStrcspn(str string, mask string, _ zpp.Opt, offset int, length *int) (in
 
 	return PhpStrcspnEx(str, mask), true
 }
-func ZifStrcoll(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, str2 *types.Zval) {
-	var s1 *types.String
-	var s2 *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			s1 = fp.ParseStr()
-			s2 = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetLong(strcoll((*byte)(s1.GetVal()), (*byte)(s2.GetVal())))
-	return
+func ZifStrcoll(str1 string, str2 string) int {
+	return strings.Compare(str1, str2)
 }
 func PhpCharmaskEx(input string) (string, bool) {
 	if pos := strings.Index(input, ".."); pos < 0 {
@@ -186,29 +161,23 @@ func PhpCharmask(input *uint8, len_ int, mask *byte) int {
 }
 
 func PhpTrimAll(str string, what *string) string {
-	var cutset string
+	var cutset = " \n\r\t\v\x00"
 	if what != nil {
 		cutset, _ = PhpCharmaskEx(*what)
-	} else {
-		cutset = " \n\r\t\v\x00"
 	}
 	return strings.Trim(str, cutset)
 }
 func PhpTrimLeft(str string, what *string) string {
-	var cutset string
+	var cutset = " \n\r\t\v\x00"
 	if what != nil {
 		cutset, _ = PhpCharmaskEx(*what)
-	} else {
-		cutset = " \n\r\t\v\x00"
 	}
 	return strings.TrimLeft(str, cutset)
 }
 func PhpTrimRight(str string, what *string) string {
-	var cutset string
+	var cutset = " \n\r\t\v\x00"
 	if what != nil {
 		cutset, _ = PhpCharmaskEx(*what)
-	} else {
-		cutset = " \n\r\t\v\x00"
 	}
 	return strings.TrimRight(str, cutset)
 }
@@ -1604,39 +1573,24 @@ func ZifLcfirst(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	return_value.SetString(PhpLcfirst(str))
 	return
 }
-func ZifUcwords(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, delimiters *types.Zval) {
-	var str *types.String
-	var delims *byte = " \t\r\nfv"
-	var r *byte
-	var r_end *byte
-	var delims_len int = 6
-	var mask []byte
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			delims, delims_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifUcwords(str string, _ zpp.Opt, delimiters *string) string {
+	var mask = " \t\r\n\f\v"
+	if delimiters != nil {
+		mask, _ = PhpCharmaskEx(*delimiters)
 	}
-	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
+
+	if str == "" {
+		return ""
 	}
-	PhpCharmask((*uint8)(delims), delims_len, mask)
-	return_value.SetStringVal(str.GetStr())
-	r = return_value.GetStr().GetVal()
-	*r = toupper(uint8(*r))
-	for r_end = r + return_value.GetStr().GetLen() - 1; r < r_end; {
-		if mask[uint8(b.PostInc(&(*r)))] {
-			*r = toupper(uint8(*r))
+
+	chars := []byte(str)
+	chars[0] = ascii.ToUpper(chars[0])
+	for i := 1; i < len(str)-1; i++ {
+		if strings.ContainsRune(mask, rune(chars[i-1])) {
+			chars[i] = ascii.ToUpper(chars[i])
 		}
 	}
+	return string(chars)
 }
 func PhpStrtr(str *byte, len_ int, str_from *byte, str_to *byte, trlen int) *byte {
 	var i int
@@ -2402,51 +2356,20 @@ func ZifSimilarText(executeData zpp.Ex, return_value zpp.Ret, str1 *types.Zval, 
 	return_value.SetLong(sim)
 	return
 }
-func ZifAddcslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, charlist *types.Zval) {
-	var str *types.String
-	var what *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			str = fp.ParseStr()
-			what = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifAddcslashes(str string, charlist string) string {
+	if str == "" {
+		return ""
 	}
-	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
+	if charlist == "" {
+		return str
 	}
-	if what.GetLen() == 0 {
-		return_value.SetStringCopy(str)
-		return
-	}
-	return_value.SetString(PhpAddcslashesStr(str.GetVal(), str.GetLen(), what.GetVal(), what.GetLen()))
-	return
+	return PhpAddcslashes(str, charlist)
 }
-func ZifAddslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifAddslashes(str string) string {
+	if str == "" {
+		return ""
 	}
-	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
-	}
-	return_value.SetString(PhpAddslashes(str))
-	return
+	return PhpAddslashes(str)
 }
 func ZifStripcslashes(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	var str *types.String
@@ -2557,115 +2480,6 @@ func PhpStripcslashes(str *types.String) {
 		*target = '0'
 	}
 	str.SetLen(nlen)
-}
-func PhpAddcslashesStr(str *byte, len_ int, what *byte, wlength int) *types.String {
-	var flags []byte
-	var target *byte
-	var source *byte
-	var end *byte
-	var c byte
-	var newlen int
-	var new_str *types.String = types.ZendStringSafeAlloc(4, len_, 0, 0)
-	PhpCharmask((*uint8)(what), wlength, flags)
-	source = str
-	end = source + len_
-	target = new_str.GetVal()
-	for ; source < end; source++ {
-		c = *source
-		if flags[uint8(c)] {
-			if uint8(c < 32 || uint8(c > 126) != 0) != 0 {
-				b.PostInc(&(*target)) = '\\'
-				switch c {
-				case '\n':
-					b.PostInc(&(*target)) = 'n'
-				case '\t':
-					b.PostInc(&(*target)) = 't'
-				case '\r':
-					b.PostInc(&(*target)) = 'r'
-				case 'a':
-					b.PostInc(&(*target)) = 'a'
-				case 'v':
-					b.PostInc(&(*target)) = 'v'
-				case 'b':
-					b.PostInc(&(*target)) = 'b'
-				case 'f':
-					b.PostInc(&(*target)) = 'f'
-				default:
-					target += sprintf(target, "%03o", uint8(c))
-				}
-				continue
-			}
-			b.PostInc(&(*target)) = '\\'
-		}
-		b.PostInc(&(*target)) = c
-	}
-	*target = 0
-	newlen = target - new_str.GetVal()
-	if newlen < len_*4 {
-		new_str = types.ZendStringTruncate(new_str, newlen, 0)
-	}
-	return new_str
-}
-func PhpAddcslashes(str *types.String, what string, wlength int) *types.String {
-	return PhpAddcslashesStr(str.GetVal(), str.GetLen(), what, wlength)
-}
-func PhpAddslashes(str *types.String) *types.String {
-	/* maximum string length, worst case situation */
-
-	var target *byte
-	var source *byte
-	var end *byte
-	var offset int
-	var new_str *types.String
-	if str == nil {
-		return types.ZSTR_EMPTY_ALLOC()
-	}
-	source = str.GetVal()
-	end = source + str.GetLen()
-	for source < end {
-		switch *source {
-		case '0':
-			fallthrough
-		case '\'':
-			fallthrough
-		case '"':
-			fallthrough
-		case '\\':
-			goto do_escape
-		default:
-			source++
-		}
-	}
-	return str.Copy()
-do_escape:
-	offset = source - (*byte)(str.GetVal())
-	new_str = types.ZendStringSafeAlloc(2, str.GetLen()-offset, offset, 0)
-	memcpy(new_str.GetVal(), str.GetVal(), offset)
-	target = new_str.GetVal() + offset
-	for source < end {
-		switch *source {
-		case '0':
-			b.PostInc(&(*target)) = '\\'
-			b.PostInc(&(*target)) = '0'
-		case '\'':
-			fallthrough
-		case '"':
-			fallthrough
-		case '\\':
-			b.PostInc(&(*target)) = '\\'
-			fallthrough
-		default:
-			b.PostInc(&(*target)) = *source
-		}
-		source++
-	}
-	*target = '0'
-	if new_str.GetLen()-(target-new_str.GetVal()) > 16 {
-		new_str = types.ZendStringTruncate(new_str, target-new_str.GetVal(), 0)
-	} else {
-		new_str.SetLen(target - new_str.GetVal())
-	}
-	return new_str
 }
 func PhpStripslashesImpl(str *byte, out *byte, len_ int) *byte {
 	for len_ > 0 {
@@ -3276,106 +3090,6 @@ func ZifStripTags(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ z
 	buf.SetLen(PhpStripTagsEx(buf.GetVal(), str.GetLen(), nil, allowed_tags, allowed_tags_len, 0))
 	tags_ss.Free()
 	return_value.SetString(buf)
-	return
-}
-func ZifSetlocale(executeData zpp.Ex, return_value zpp.Ret, category *types.Zval, locales []*types.Zval) {
-	var args *types.Zval = nil
-	var plocale *types.Zval
-	var loc *types.String
-	var retval *byte
-	var cat zend.ZendLong
-	var num_args int
-	var i int = 0
-	var idx uint32
-	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			cat = fp.ParseLong()
-			args, num_args = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	idx = 0
-	for true {
-		if args[0].IsType(types.IS_ARRAY) {
-			for idx < types.Z_ARRVAL(args[0]).GetNNumUsed() {
-				plocale = types.Z_ARRVAL(args[0]).GetArData()[idx].GetVal()
-				if plocale.IsNotUndef() {
-					break
-				}
-				idx++
-			}
-			if idx >= types.Z_ARRVAL(args[0]).GetNNumUsed() {
-				break
-			}
-		} else {
-			plocale = &args[i]
-		}
-		loc = zend.ZvalTryGetString(plocale)
-		if loc == nil {
-			return
-		}
-		if !(strcmp("0", loc.GetVal())) {
-			types.ZendStringReleaseEx(loc, 0)
-			loc = nil
-		} else {
-			if loc.GetLen() >= 255 {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Specified locale name is too long")
-				types.ZendStringReleaseEx(loc, 0)
-				break
-			}
-		}
-		retval = PhpMySetlocale(cat, b.CondF1(loc != nil, func() []byte { return loc.GetVal() }, nil))
-		if retval != nil {
-			if loc != nil {
-
-				/* Remember if locale was changed */
-
-				var len_ int = strlen(retval)
-				BG__().locale_changed = 1
-				if cat == LC_CTYPE || cat == LC_ALL {
-					if BG__().locale_string {
-						types.ZendStringReleaseEx(BG__().locale_string, 0)
-					}
-					if len_ == loc.GetLen() && !(memcmp(loc.GetVal(), retval, len_)) {
-						BG__().locale_string = loc.Copy()
-						return_value.SetString(BG__().locale_string)
-						return
-					} else {
-						BG__().locale_string = types.NewString(b.CastStr(retval, len_))
-						types.ZendStringReleaseEx(loc, 0)
-						return_value.SetStringCopy(BG__().locale_string)
-						return
-					}
-				} else if len_ == loc.GetLen() && !(memcmp(loc.GetVal(), retval, len_)) {
-					return_value.SetString(loc)
-					return
-				}
-				types.ZendStringReleaseEx(loc, 0)
-			}
-			return_value.SetStringVal(b.CastStrAuto(retval))
-			return
-		}
-		if loc != nil {
-			types.ZendStringReleaseEx(loc, 0)
-		}
-		if args[0].IsType(types.IS_ARRAY) {
-			idx++
-		} else {
-			if b.PreInc(&i) >= num_args {
-				break
-			}
-		}
-	}
-	return_value.SetFalse()
 	return
 }
 func ZifParseStr(executeData zpp.Ex, return_value zpp.Ret, encodedString *types.Zval, _ zpp.Opt, result zpp.RefZval) {
@@ -4021,55 +3735,6 @@ func StringNaturalCompareFunction(result *types.Zval, op1 *types.Zval, op2 *type
 }
 func ZifStrnatcmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
 	PhpStrnatcmp(executeData, return_value, 0)
-}
-func ZifLocaleconv(executeData zpp.Ex, return_value zpp.Ret) {
-	var grouping types.Zval
-	var mon_grouping types.Zval
-	var len_ int
-	var i int
-
-	/* We don't need no stinkin' parameters... */
-
-	if !executeData.CheckNumArgsNone(false) {
-		return
-	}
-	zend.ArrayInit(return_value)
-	zend.ArrayInit(&grouping)
-	zend.ArrayInit(&mon_grouping)
-	var currlocdata __struct__lconv
-	LocaleconvR(&currlocdata)
-
-	/* Grab the grouping data out of the array */
-
-	len_ = int(strlen(currlocdata.grouping))
-	for i = 0; i < len_; i++ {
-		zend.AddIndexLong(&grouping, i, currlocdata.grouping[i])
-	}
-
-	/* Grab the monetary grouping data out of the array */
-
-	len_ = int(strlen(currlocdata.mon_grouping))
-	for i = 0; i < len_; i++ {
-		zend.AddIndexLong(&mon_grouping, i, currlocdata.mon_grouping[i])
-	}
-	zend.AddAssocString(return_value, "decimal_point", currlocdata.decimal_point)
-	zend.AddAssocString(return_value, "thousands_sep", currlocdata.thousands_sep)
-	zend.AddAssocString(return_value, "int_curr_symbol", currlocdata.int_curr_symbol)
-	zend.AddAssocString(return_value, "currency_symbol", currlocdata.currency_symbol)
-	zend.AddAssocString(return_value, "mon_decimal_point", currlocdata.mon_decimal_point)
-	zend.AddAssocString(return_value, "mon_thousands_sep", currlocdata.mon_thousands_sep)
-	zend.AddAssocString(return_value, "positive_sign", currlocdata.positive_sign)
-	zend.AddAssocString(return_value, "negative_sign", currlocdata.negative_sign)
-	zend.AddAssocLong(return_value, "int_frac_digits", currlocdata.int_frac_digits)
-	zend.AddAssocLong(return_value, "frac_digits", currlocdata.frac_digits)
-	zend.AddAssocLong(return_value, "p_cs_precedes", currlocdata.p_cs_precedes)
-	zend.AddAssocLong(return_value, "p_sep_by_space", currlocdata.p_sep_by_space)
-	zend.AddAssocLong(return_value, "n_cs_precedes", currlocdata.n_cs_precedes)
-	zend.AddAssocLong(return_value, "n_sep_by_space", currlocdata.n_sep_by_space)
-	zend.AddAssocLong(return_value, "p_sign_posn", currlocdata.p_sign_posn)
-	zend.AddAssocLong(return_value, "n_sign_posn", currlocdata.n_sign_posn)
-	return_value.GetArr().KeyUpdate("grouping", &grouping)
-	return_value.GetArr().KeyUpdate("mon_grouping", &mon_grouping)
 }
 func ZifStrnatcasecmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
 	PhpStrnatcmp(executeData, return_value, 1)

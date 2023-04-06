@@ -110,7 +110,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 
 		/* host might contain binary characters */
 
-		var quoted_host *types.String = PhpAddslashes(host)
+		var quoted_host *types.String = types.NewString(PhpAddslashes(host.GetStr()))
 		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 		types.ZendStringReleaseEx(quoted_host, 0)
 	}

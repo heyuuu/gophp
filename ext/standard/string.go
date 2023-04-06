@@ -1,8 +1,10 @@
 package standard
 
 import (
+	"fmt"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/types"
+	"strings"
 )
 
 func PhpStringToupper(s *types.String) *types.String {
@@ -56,4 +58,58 @@ func substr(str string, offset int, length *int) (string, bool) {
 	}
 
 	return str, true
+}
+
+func PhpAddslashes(str string) string {
+	if str == "" {
+		return ""
+	}
+	if pos := strings.IndexByte(str, '\\'); pos < 0 {
+		return str
+	}
+	replacer := strings.NewReplacer(
+		"\\000", "\\0",
+		`'`, `\'`,
+		`"`, `\"`,
+		`\`, `\\`,
+	)
+	return replacer.Replace(str)
+}
+
+func PhpAddcslashes(str string, what string) string {
+	mask, _ := PhpCharmaskEx(what)
+
+	strings.NewReplacer()
+
+	var buf strings.Builder
+	for _, c := range []byte(str) {
+		if strings.ContainsRune(mask, rune(c)) {
+			if c < 32 || c > 126 {
+				buf.WriteByte('\\')
+				switch c {
+				case '\n':
+					buf.WriteByte('n')
+				case '\t':
+					buf.WriteByte('t')
+				case '\r':
+					buf.WriteByte('r')
+				case '\a':
+					buf.WriteByte('a')
+				case '\v':
+					buf.WriteByte('v')
+				case '\b':
+					buf.WriteByte('b')
+				case '\f':
+					buf.WriteByte('f')
+				default:
+					buf.WriteString(fmt.Sprintf("%03o", c))
+				}
+				continue
+			}
+			buf.WriteByte('\\')
+		}
+		buf.WriteByte(c)
+	}
+
+	return buf.String()
 }

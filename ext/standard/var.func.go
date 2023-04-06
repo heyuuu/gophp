@@ -387,7 +387,7 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Stri
 		buf.AppendString(" => ")
 	} else {
 		var tmp_str *types.String
-		var ckey *types.String = PhpAddcslashes(key, "'\\", 2)
+		var ckey *types.String = types.NewString(PhpAddcslashes(key.GetStr(), "'\\"))
 		tmp_str = PhpStrToStr(ckey.GetVal(), ckey.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
 		BufferAppendSpaces(buf, level+1)
 		buf.AppendByte('\'')
@@ -403,16 +403,12 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Stri
 func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.String, level int, buf *zend.SmartStr) {
 	BufferAppendSpaces(buf, level+2)
 	if key != nil {
-		var class_name *byte
-		var prop_name *byte
-		var prop_name_len int
-		var pname_esc *types.String
-		zend.ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len)
-		pname_esc = PhpAddcslashesStr(prop_name, prop_name_len, "'\\", 2)
+		_, propName, _ := zend.ZendUnmanglePropertyName_Ex(key.GetStr())
+
+		propNameEscaped := PhpAddcslashes(propName, "'\\")
 		buf.AppendByte('\'')
-		buf.AppendString(pname_esc.GetStr())
+		buf.AppendString(propNameEscaped)
 		buf.AppendByte('\'')
-		types.ZendStringReleaseEx(pname_esc, 0)
 	} else {
 		buf.AppendLong(zend.ZendLong(index))
 	}
@@ -463,7 +459,7 @@ again:
 			buf.AppendString(".0")
 		}
 	case types.IS_STRING:
-		ztmp = PhpAddcslashes(struc.GetStr(), "'\\", 2)
+		ztmp = types.NewString(PhpAddcslashes(struc.GetStrVal(), "'\\"))
 		ztmp2 = PhpStrToStr(ztmp.GetVal(), ztmp.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
 		buf.AppendByte('\'')
 		buf.AppendString(ztmp2.GetStr())

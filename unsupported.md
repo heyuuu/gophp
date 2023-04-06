@@ -19,3 +19,7 @@
 - `proc_terminate`
 - `proc_get_status`
 - `proc_nice`
+
+字符串函数
+- `localeconv`
+- `setlocale`
