@@ -117,49 +117,6 @@ func PhpCharmaskEx(input string) (string, bool) {
 	}
 	return buf.String(), true
 }
-func PhpCharmask(input *uint8, len_ int, mask *byte) int {
-	var end *uint8
-	var c uint8
-	var result int = types.SUCCESS
-	memset(mask, 0, 256)
-	for end = input + len_; input < end; input++ {
-		c = *input
-		if input+3 < end && input[1] == '.' && input[2] == '.' && input[3] >= c {
-			memset(mask+c, 1, input[3]-c+1)
-			input += 3
-		} else if input+1 < end && input[0] == '.' && input[1] == '.' {
-
-			/* Error, try to be as helpful as possible:
-			   (a range ending/starting with '.' won't be captured here) */
-
-			if end-len_ >= input {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the left of '..'")
-				result = types.FAILURE
-				continue
-			}
-			if input+2 >= end {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, no character to the right of '..'")
-				result = types.FAILURE
-				continue
-			}
-			if input[-1] > input[2] {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range, '..'-range needs to be incrementing")
-				result = types.FAILURE
-				continue
-			}
-
-			/* FIXME: better error (a..b..c is the only left possibility?) */
-
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid '..'-range")
-			result = types.FAILURE
-			continue
-		} else {
-			mask[c] = 1
-		}
-	}
-	return result
-}
-
 func PhpTrimAll(str string, what *string) string {
 	var cutset = " \n\r\t\v\x00"
 	if what != nil {
@@ -193,6 +150,7 @@ func ZifRtrim(str string, _ zpp.Opt, characterMask *string) string {
 func ZifLtrim(str string, _ zpp.Opt, characterMask *string) string {
 	return PhpTrimRight(str, characterMask)
 }
+
 func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, width *types.Zval, break_ *types.Zval, cut *types.Zval) {
 	var text *types.String
 	var breakchar *byte = "\n"
@@ -346,45 +304,6 @@ func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zp
 
 	/* Special case for a single-character break as it needs no
 	   additional storage space */
-}
-func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_value *types.Zval, limit zend.ZendLong) {
-	// #define EXPLODE_ALLOC_STEP       64
-
-	var p1 *byte = str.GetVal()
-	var endp *byte = str.GetVal() + str.GetLen()
-	var p2 *byte = core.PhpMemnstr(str.GetVal(), delim.GetVal(), delim.GetLen(), endp)
-	var tmp types.Zval
-	if p2 == nil {
-
-	} else {
-		var allocated int = 64
-		var found int = 0
-		var i zend.ZendLong
-		var to_return zend.ZendLong
-		var positions **byte = zend.Emalloc(allocated * b.SizeOf("char *"))
-		positions[b.PostInc(&found)] = p1
-		for {
-			if found >= allocated {
-				allocated = found + 64
-				positions = zend.Erealloc(positions, allocated*b.SizeOf("char *"))
-			}
-			p1 = p2 + delim.GetLen()
-			positions[b.PostInc(&found)] = p1
-			p2 = core.PhpMemnstr(p1, delim.GetVal(), delim.GetLen(), endp)
-			if p2 == nil {
-				break
-			}
-		}
-		to_return = limit + found
-
-		/* limit is at least -1 therefore no need of bounds checking : i will be always less than found */
-
-		for i = 0; i < to_return; i++ {
-			tmp.SetStringVal(b.CastStr(positions[i], positions[i+1]-delim.GetLen()-positions[i]))
-			return_value.GetArr().NextIndexInsertNew(&tmp)
-		}
-		zend.Efree(any(positions))
-	}
 }
 func ZifExplode(separator string, str string, _ zpp.Opt, limit_ *int) ([]string, bool) {
 	var limit = zend.ZEND_LONG_MAX
