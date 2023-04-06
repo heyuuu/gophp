@@ -9,11 +9,16 @@ import (
 var DefZifPhpversion = def.DefFunc("phpversion", 0, 1, []def.ArgInfo{{Name: "extension"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 0, 1, 0)
 	fp.StartOptional()
-	extension := fp.ParseZval()
+	extension := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifPhpversion(executeData, returnValue, nil, extension)
+	ret, ok := ZifPhpversion(nil, extension)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifPhpcredits

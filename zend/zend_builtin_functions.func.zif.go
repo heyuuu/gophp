@@ -596,11 +596,12 @@ var DefZifDebugBacktrace = def.DefFunc("debug_backtrace", 0, 2, []def.ArgInfo{{N
 // generate by ZifExtensionLoaded
 var DefZifExtensionLoaded = def.DefFunc("extension_loaded", 1, 1, []def.ArgInfo{{Name: "extension_name"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	extension_name := fp.ParseZval()
+	extension_name := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifExtensionLoaded(returnValue)
+	ret := ZifExtensionLoaded(extension_name)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifGetExtensionFuncs

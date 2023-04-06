@@ -8,21 +8,27 @@ import (
 // generate by ZifBin2hex
 var DefZifBin2hex = def.DefFunc("bin2hex", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	data := fp.ParseZval()
+	data := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifBin2hex(data)
+	ret := ZifBin2hex(data)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifHex2bin
 var DefZifHex2bin = def.DefFunc("hex2bin", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	data := fp.ParseZval()
+	data := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifHex2bin(executeData, returnValue, data)
+	ret, ok := ZifHex2bin(data)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrspn
@@ -67,49 +73,53 @@ var DefZifStrcoll = def.DefFunc("strcoll", 2, 2, []def.ArgInfo{{Name: "str1"}, {
 // generate by ZifTrim
 var DefZifTrim = def.DefFunc("trim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	character_mask := fp.ParseZval()
+	character_mask := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifTrim(executeData, returnValue, str, nil, character_mask)
+	ret := ZifTrim(str, nil, character_mask)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifRtrim
 var DefZifRtrim = def.DefFunc("rtrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	character_mask := fp.ParseZval()
+	character_mask := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifRtrim(executeData, returnValue, str, nil, character_mask)
+	ret := ZifRtrim(str, nil, character_mask)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifRtrim
 var DefZifChop = def.DefFunc("chop", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	character_mask := fp.ParseZval()
+	character_mask := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifRtrim(executeData, returnValue, str, nil, character_mask)
+	ret := ZifRtrim(str, nil, character_mask)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifLtrim
 var DefZifLtrim = def.DefFunc("ltrim", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "character_mask"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	character_mask := fp.ParseZval()
+	character_mask := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifLtrim(executeData, returnValue, str, nil, character_mask)
+	ret := ZifLtrim(str, nil, character_mask)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifWordwrap
@@ -127,38 +137,47 @@ var DefZifWordwrap = def.DefFunc("wordwrap", 1, 4, []def.ArgInfo{{Name: "str"}, 
 })
 
 // generate by ZifExplode
-var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator"}, {Name: "str"}, {Name: "limit"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator"}, {Name: "str"}, {Name: "limit_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	separator := fp.ParseZval()
-	str := fp.ParseZval()
+	separator := fp.ParseStringVal()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	limit := fp.ParseZval()
+	limit_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifExplode(executeData, returnValue, separator, str, nil, limit)
+	ret, ok := ZifExplode(separator, str, nil, limit_)
+	if ok {
+		returnValue.SetArray(types.NewArrayOfString(ret))
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifImplode
-var DefZifImplode = def.DefFunc("implode", 2, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	glue := fp.ParseZval()
-	pieces := fp.ParseZval()
+var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue_"}, {Name: "pieces_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	glue_ := fp.ParseZval()
+	fp.StartOptional()
+	pieces_ := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifImplode(executeData, returnValue, glue, pieces)
+	ret := ZifImplode(executeData, returnValue, glue_, nil, pieces_)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifImplode
-var DefZifJoin = def.DefFunc("join", 2, 2, []def.ArgInfo{{Name: "glue"}, {Name: "pieces"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	glue := fp.ParseZval()
-	pieces := fp.ParseZval()
+var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue_"}, {Name: "pieces_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	glue_ := fp.ParseZval()
+	fp.StartOptional()
+	pieces_ := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifImplode(executeData, returnValue, glue, pieces)
+	ret := ZifImplode(executeData, returnValue, glue_, nil, pieces_)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifStrtok
@@ -176,21 +195,23 @@ var DefZifStrtok = def.DefFunc("strtok", 1, 2, []def.ArgInfo{{Name: "str"}, {Nam
 // generate by ZifStrtoupper
 var DefZifStrtoupper = def.DefFunc("strtoupper", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrtoupper(executeData, returnValue, str)
+	ret := ZifStrtoupper(str)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifStrtolower
 var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrtolower(executeData, returnValue, str)
+	ret := ZifStrtolower(str)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifBasename
