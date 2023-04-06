@@ -3,6 +3,7 @@ package standard
 import (
 	"encoding/hex"
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -457,7 +458,7 @@ func PhpExplodeNegativeLimit(delim *types.String, str *types.String, return_valu
 		zend.Efree(any(positions))
 	}
 }
-func ZifExplode(return_value zpp.Ret, separator string, str string, _ zpp.Opt, limit_ *int) ([]string, bool) {
+func ZifExplode(separator string, str string, _ zpp.Opt, limit_ *int) ([]string, bool) {
 	var limit = zend.ZEND_LONG_MAX
 	if limit_ != nil {
 		limit = *limit_
@@ -467,170 +468,67 @@ func ZifExplode(return_value zpp.Ret, separator string, str string, _ zpp.Opt, l
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty delimiter")
 		return nil, false
 	}
+
+	// doc: If the limit parameter is zero, then this is treated as 1.
+	if limit == 0 {
+		limit = 1
+	}
+
 	var arr []string
-	if str == "" {
-		if limit >= 0 {
-			arr = []string{""}
-		}
-	} else if limit > 1 {
+	if limit > 0 {
 		arr = strings.SplitN(str, separator, limit)
-	} else if limit < 0 {
-		arr = PhpExplodeNegativeLimit(separator, str, return_value, limit)
-	} else {
-		arr = []string{str}
+	} else { // limit < 0
+		arr = strings.Split(str, separator)
+		if len(arr) > -limit {
+			arr = arr[:len(arr)+limit]
+		} else {
+			arr = nil
+		}
 	}
 	return arr, true
 }
-func PhpImplode(glue *types.String, pieces *types.Zval, return_value *types.Zval) {
-	var tmp *types.Zval
-	var numelems int
-	var str *types.String
-	var cptr *byte
-	var len_ int = 0
-	var strings *struct {
-		str  *types.String
-		lval zend.ZendLong
-	}
-	var ptr *struct {
-		str  *types.String
-		lval zend.ZendLong
-	}
-	numelems = types.Z_ARRVAL_P(pieces).Len()
-	if numelems == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
-	} else if numelems == 1 {
-
-		/* loop to search the first not undefined element... */
-
-		var __ht *types.Array = pieces.GetArr()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.GetZv()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			tmp = _z
-			return_value.SetString(zend.ZvalGetString(tmp))
-			return
-		}
-
-		/* loop to search the first not undefined element... */
-
-	}
-	strings = zend.DoAlloca(b.SizeOf("* strings")*numelems, use_heap)
-	ptr = strings
-	var __ht *types.Array = pieces.GetArr()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.GetZv()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		tmp = _z
-		if tmp.IsType(types.IS_STRING) {
-			ptr.str = tmp.GetStr()
-			len_ += ptr.str.GetLen()
-			ptr.lval = 0
-			ptr++
-		} else if tmp.IsType(types.IS_LONG) {
-			var val zend.ZendLong = tmp.GetLval()
-			ptr.str = nil
-			ptr.lval = val
-			ptr++
-			if val <= 0 {
-				len_++
-			}
-			for val != 0 {
-				val /= 10
-				len_++
-			}
-		} else {
-			ptr.str = zend.ZvalGetStringFunc(tmp)
-			len_ += ptr.str.GetLen()
-			ptr.lval = 1
-			ptr++
-		}
-	}
-
-	/* numelems can not be 0, we checked above */
-
-	str = types.ZendStringSafeAlloc(numelems-1, glue.GetLen(), len_, 0)
-	cptr = str.GetVal() + str.GetLen()
-	*cptr = 0
-	for true {
-		ptr--
-		if ptr.str != nil {
-			cptr -= ptr.str.GetLen()
-			memcpy(cptr, ptr.str.GetVal(), ptr.str.GetLen())
-			if ptr.lval != 0 {
-				types.ZendStringReleaseEx(ptr.str, 0)
-			}
-		} else {
-			var oldPtr *byte = cptr
-			var oldVal byte = *cptr
-			cptr = zend.ZendPrintLongToBuf(cptr, ptr.lval)
-			*oldPtr = oldVal
-		}
-		if ptr == strings {
-			break
-		}
-		cptr -= glue.GetLen()
-		memcpy(cptr, glue.GetVal(), glue.GetLen())
-	}
-	zend.FreeAlloca(strings, use_heap)
-	return_value.SetString(str)
-	return
-}
 
 //@zif -alias join
-func ZifImplode(executeData zpp.Ex, return_value zpp.Ret, glue *types.Zval, pieces *types.Zval) {
-	var arg1 *types.Zval
-	var arg2 *types.Zval = nil
-	var pieces *types.Zval
-	var glue *types.String
-	var tmp_glue *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			arg1 = fp.ParseZval()
-			fp.StartOptional()
-			arg2 = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifImplode(executeData zpp.Ex, return_value zpp.Ret, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
+	var arg1 *types.Zval = glue_
+	var arg2 *types.Zval = pieces_
+	var pieces *types.Array
+	var glue string
+
+	// 兼容多种参数传递方法，但后两种会有 E_DEPRECATED 提示
+	// - implode(string $separator, array $array)
+	// - implode(array $array)
+	// - implode(array $array, string $separator)
 	if arg2 == nil {
-		if arg1.GetType() != types.IS_ARRAY {
+		if !arg1.IsArray() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Argument must be an array")
-			return
+			return ""
 		}
-		glue = types.ZSTR_EMPTY_ALLOC()
-		tmp_glue = nil
-		pieces = arg1
+		glue = ""
+		pieces = arg1.GetArr()
 	} else {
 		if arg1.IsType(types.IS_ARRAY) {
-			glue = zend.ZvalGetTmpString(arg2, &tmp_glue)
-			pieces = arg1
+			glue = zend.ZvalGetStrVal(arg2)
+			pieces = arg1.GetArr()
 			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
 		} else if arg2.IsType(types.IS_ARRAY) {
-			glue = zend.ZvalGetTmpString(arg1, &tmp_glue)
-			pieces = arg2
+			glue = zend.ZvalGetStrVal(arg1)
+			pieces = arg2.GetArr()
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid arguments passed")
-			return
+			return ""
 		}
 	}
-	PhpImplode(glue, pieces, return_value)
-	zend.ZendTmpStringRelease(tmp_glue)
+	return PhpImplode(glue, pieces)
 }
+func PhpImplode(glue string, pieces *types.Array) string {
+	var parts []string
+	pieces.ForeachIndirect(func(_ types.ArrayKey, value *types.Zval) {
+		parts = append(parts, zend.ZvalGetStrVal(value))
+	})
+	return strings.Join(parts, glue)
+}
+
 func STRTOK_TABLE(p *byte) __auto__ { return BG__().strtok_table[uint8(*p)] }
 func ZifStrtok(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, token *types.Zval) {
 	var str *types.String
@@ -712,57 +610,8 @@ restore:
 		STRTOK_TABLE(b.PostInc(&token)) = 0
 	}
 }
-func PhpStrtoupper(s *byte, len_ int) *byte {
-	var c *uint8
-	var e *uint8
-	c = (*uint8)(s)
-	e = (*uint8)(c + len_)
-	for c < e {
-		*c = toupper(*c)
-		c++
-	}
-	return s
-}
-func PhpStringToupper(s *types.String) *types.String {
-	var c *uint8
-	var e *uint8
-	c = (*uint8)(s.GetVal())
-	e = c + s.GetLen()
-	for c < e {
-		if islower(*c) {
-			var r *uint8
-			var res *types.String = types.ZendStringAlloc(s.GetLen(), 0)
-			if c != (*uint8)(s.GetVal()) {
-				memcpy(res.GetVal(), s.GetVal(), c-(*uint8)(s.GetVal()))
-			}
-			r = c + (res.GetVal() - s.GetVal())
-			for c < e {
-				*r = toupper(*c)
-				r++
-				c++
-			}
-			*r = '0'
-			return res
-		}
-		c++
-	}
-	return s.Copy()
-}
-func ZifStrtoupper(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var arg *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetString(PhpStringToupper(arg))
-	return
+func ZifStrtoupper(str string) string {
+	return ascii.StrToUpper(str)
 }
 func PhpStrtolower(s *byte, len_ int) *byte {
 	var c *uint8
@@ -775,46 +624,8 @@ func PhpStrtolower(s *byte, len_ int) *byte {
 	}
 	return s
 }
-func PhpStringTolower(s *types.String) *types.String {
-	var c *uint8
-	var e *uint8
-	c = (*uint8)(s.GetVal())
-	e = c + s.GetLen()
-	for c < e {
-		if isupper(*c) {
-			var r *uint8
-			var res *types.String = types.ZendStringAlloc(s.GetLen(), 0)
-			if c != (*uint8)(s.GetVal()) {
-				memcpy(res.GetVal(), s.GetVal(), c-(*uint8)(s.GetVal()))
-			}
-			r = c + (res.GetVal() - s.GetVal())
-			for c < e {
-				*r = tolower(*c)
-				r++
-				c++
-			}
-			*r = '0'
-			return res
-		}
-		c++
-	}
-	return s.Copy()
-}
-func ZifStrtolower(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetString(PhpStringTolower(str))
-	return
+func ZifStrtolower(str string) string {
+	return ascii.StrToLower(str)
 }
 func PhpBasename(s *byte, len_ int, suffix *byte, sufflen int) *types.String {
 	var c *byte
