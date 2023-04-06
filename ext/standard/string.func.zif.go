@@ -2,6 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/zend/def"
+	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
@@ -217,13 +218,14 @@ var DefZifStrtolower = def.DefFunc("strtolower", 1, 1, []def.ArgInfo{{Name: "str
 // generate by ZifBasename
 var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "suffix"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	path := fp.ParseZval()
+	path := fp.ParseStringVal()
 	fp.StartOptional()
-	suffix := fp.ParseZval()
+	suffix := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifBasename(executeData, returnValue, path, nil, suffix)
+	ret := ZifBasename(path, nil, suffix)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifDirname
@@ -299,7 +301,7 @@ var DefZifStrpos = def.DefFunc("strpos", 2, 3, []def.ArgInfo{{Name: "haystack"},
 	if fp.HasError() {
 		return
 	}
-	ZifStrpos(executeData, returnValue, haystack, needle, nil, offset)
+	ZifStrpos(haystack, needle, nil, offset)
 })
 
 // generate by ZifStripos
@@ -312,7 +314,7 @@ var DefZifStripos = def.DefFunc("stripos", 2, 3, []def.ArgInfo{{Name: "haystack"
 	if fp.HasError() {
 		return
 	}
-	ZifStripos(executeData, returnValue, haystack, needle, nil, offset)
+	ZifStripos(haystack, needle, nil, offset)
 })
 
 // generate by ZifStrrpos
@@ -325,7 +327,7 @@ var DefZifStrrpos = def.DefFunc("strrpos", 2, 3, []def.ArgInfo{{Name: "haystack"
 	if fp.HasError() {
 		return
 	}
-	ZifStrrpos(executeData, returnValue, haystack, needle, nil, offset)
+	ZifStrrpos(haystack, needle, nil, offset)
 })
 
 // generate by ZifStrripos
@@ -338,7 +340,7 @@ var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{Name: "haystac
 	if fp.HasError() {
 		return
 	}
-	ZifStrripos(executeData, returnValue, haystack, needle, nil, offset)
+	ZifStrripos(haystack, needle, nil, offset)
 })
 
 // generate by ZifStrrchr

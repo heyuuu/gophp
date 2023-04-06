@@ -758,7 +758,7 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 		fname = intern.GetFileName()
 		flen = intern.GetFileNameLen()
 	}
-	ret = standard.PhpBasename(fname, flen, nil, 0)
+	ret = standard.PhpBasenameZStr(b.CastStr(fname, flen), "")
 	p = zend.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
 	if p != nil {
 		idx = p - ret.GetVal()
@@ -779,7 +779,7 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	fname = standard.PhpBasename(intern.GetEntry().GetDName(), strlen(intern.GetEntry().GetDName()), nil, 0)
+	fname = standard.PhpBasenameZStr(intern.GetEntry().GetDName(), "")
 	p = zend.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
 	if p != nil {
 		idx = p - fname.GetVal()
@@ -809,7 +809,7 @@ func zim_spl_SplFileInfo_getBasename(executeData *zend.ZendExecuteData, return_v
 		fname = intern.GetFileName()
 		flen = intern.GetFileNameLen()
 	}
-	return_value.SetString(standard.PhpBasename(fname, flen, suffix, slen))
+	return_value.SetString(standard.PhpBasenameZStr(b.CastStr(fname, flen), b.CastStr(suffix, slen)))
 	return
 }
 func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -820,7 +820,7 @@ func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, re
 	if zend.ZendParseParameters(executeData.NumArgs(), "|s", &suffix, &slen) == types.FAILURE {
 		return
 	}
-	fname = standard.PhpBasename(intern.GetEntry().GetDName(), strlen(intern.GetEntry().GetDName()), suffix, slen)
+	fname = standard.PhpBasenameZStr(intern.GetEntry().GetDName(), b.CastStr(suffix, slen))
 	return_value.SetString(fname)
 }
 func zim_spl_SplFileInfo_getPathname(executeData *zend.ZendExecuteData, return_value *types.Zval) {

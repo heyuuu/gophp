@@ -450,7 +450,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 	if core.PG__().mail_x_header {
 		var tmp *byte = zend.ZendGetExecutedFilename()
 		var f *types.String
-		f = PhpBasename(tmp, strlen(tmp), nil, 0)
+		f = PhpBasenameZStr(tmp, "")
 		if headers != nil && (*headers) {
 			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s\n%s", PhpGetuid(), f.GetVal(), headers)
 		} else {

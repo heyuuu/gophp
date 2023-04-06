@@ -651,7 +651,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 		}
 		break
 	}
-	p = PhpBasename(prefix, prefix_len, nil, 0)
+	p = PhpBasenameZStr(b.CastStr(prefix, prefix_len), "")
 	if p.GetLen() > 64 {
 		p.GetVal()[63] = '0'
 	}

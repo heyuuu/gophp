@@ -625,7 +625,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if core.PhpStreamGetLine(innerstream, ent.GetDName(), b.SizeOf("ent -> d_name"), &tmp_len) == nil {
 		return -1
 	}
-	basename = PhpBasename(ent.GetDName(), tmp_len, nil, 0)
+	basename = PhpBasenameZStr(b.CastStr(ent.GetDName(), tmp_len), "")
 	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), basename.GetLen()-1)
 	memcpy(ent.GetDName(), basename.GetVal(), tmp_len)
 	ent.GetDName()[tmp_len-1] = '0'
