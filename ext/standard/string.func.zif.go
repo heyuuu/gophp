@@ -647,17 +647,6 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"
 	ZifStripTags(executeData, returnValue, str, nil, allowable_tags)
 })
 
-// generate by ZifSetlocale
-var DefZifSetlocale = def.DefFunc("setlocale", 1, -1, []def.ArgInfo{{Name: "category"}, {Name: "locales"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, -1, 0)
-	category := fp.ParseZval()
-	locales := fp.ParseVariadic()
-	if fp.HasError() {
-		return
-	}
-	ZifSetlocale(executeData, returnValue, category, locales)
-})
-
 // generate by ZifParseStr
 var DefZifParseStr = def.DefFunc("parse_str", 1, 2, []def.ArgInfo{{Name: "encoded_string"}, {Name: "result"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
@@ -716,14 +705,6 @@ var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{Name: "s1"},
 		return
 	}
 	ZifStrnatcmp(executeData, returnValue, s1, s2)
-})
-
-// generate by ZifLocaleconv
-var DefZifLocaleconv = def.DefFunc("localeconv", 0, 0, []def.ArgInfo{}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	if !zpp.CheckNumArgsNoneError(executeData) {
-		return
-	}
-	ZifLocaleconv(executeData, returnValue)
 })
 
 // generate by ZifStrnatcasecmp
