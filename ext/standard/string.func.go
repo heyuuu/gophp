@@ -4009,88 +4009,54 @@ func ZifStrShuffle(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 		PhpStringShuffle(return_value.GetStr().GetVal(), zend.ZendLong(return_value.GetStr().GetLen()))
 	}
 }
-func ZifStrWordCount(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, format *types.Zval, charlist *types.Zval) {
-	var str *types.String
-	var char_list *byte = nil
-	var ch []*byte
-	var p *byte
-	var e *byte
-	var s *byte
-	var char_list_len int = 0
-	var word_count int = 0
-	var type_ zend.ZendLong = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			type_ = fp.ParseLong()
-			char_list, char_list_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*types.Zval, bool) {
+	var mask = ""
+	if charlist != nil {
+		mask, _ = PhpCharmaskEx(*charlist)
 	}
-	switch type_ {
-	case 1:
-		fallthrough
-	case 2:
-		zend.ArrayInit(return_value)
-		if str.GetLen() == 0 {
-			return
+
+	// find spans
+	type span struct {
+		start int
+		end   int
+	}
+	spans := make([]span, 0, 32)
+
+	start := -1
+	for end, c := range []byte(str) {
+		if ascii.IsAscii(c) || (mask != "" && strings.ContainsRune(mask, rune(c))) {
+			if start < 0 {
+				start = end
+			}
+		} else {
+			spans = append(spans, span{start, end})
+			start = -1
 		}
+	}
+	if start > 0 {
+		spans = append(spans, span{start, len(str)})
+	}
+
+	// 区分三种输出格式返回
+	switch format {
 	case 0:
-		if str.GetLen() == 0 {
-			return_value.SetLong(0)
-			return
+		count := len(spans)
+		return types.NewZvalLong(count), true
+	case 1:
+		arr := types.NewArray(len(spans))
+		for _, span := range spans {
+			arr.NextIndexInsert(types.NewZvalString(str[span.start:span.end]))
 		}
-
-		/* nothing to be done */
-
+		return types.NewZvalArray(arr), true
+	case 2:
+		arr := types.NewArray(len(spans))
+		for _, span := range spans {
+			arr.IndexUpdate(span.start, types.NewZvalString(str[span.start:span.end]))
+		}
+		return types.NewZvalArray(arr), true
 	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, type_)
-		return_value.SetFalse()
-		return
-	}
-	if char_list != nil {
-		PhpCharmask((*uint8)(char_list), char_list_len, ch)
-	}
-	p = str.GetVal()
-	e = str.GetVal() + str.GetLen()
-
-	/* first character cannot be ' or -, unless explicitly allowed by the user */
-
-	if (*p) == '\'' && (char_list == nil || ch['\''] == nil) || (*p) == '-' && (char_list == nil || ch['-'] == nil) {
-		p++
-	}
-
-	/* last character cannot be -, unless explicitly allowed by the user */
-
-	if (*(e - 1)) == '-' && (char_list == nil || ch['-'] == nil) {
-		e--
-	}
-	for p < e {
-		s = p
-		for p < e && (isalpha(uint8(*p)) || char_list != nil && ch[uint8(*p)] != nil || (*p) == '\'' || (*p) == '-') {
-			p++
-		}
-		if p > s {
-			switch type_ {
-			case 1:
-				zend.AddNextIndexStringl(return_value, s, p-s)
-			case 2:
-				zend.AddIndexStringl(return_value, s-str.GetVal(), s, p-s)
-			default:
-				word_count++
-			}
-		}
-		p++
-	}
-	if type_ == 0 {
-		return_value.SetLong(word_count)
-		return
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, format)
+		return nil, false
 	}
 }
 func ZifMoneyFormat(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, value *types.Zval) {
