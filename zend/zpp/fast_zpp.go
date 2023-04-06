@@ -215,6 +215,13 @@ func (p *FastParser) ParseBoolVal() (dest bool) {
 	dest, _ = p.ParseBoolValEx(false, false)
 	return
 }
+func (p *FastParser) ParseBoolValNullable() *bool {
+	dest, isNull := p.ParseBoolValEx(false, false)
+	if isNull {
+		return nil
+	}
+	return &dest
+}
 func (p *FastParser) ParseBoolValEx(checkNull bool, separate bool) (dest bool, isNull bool) {
 	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
@@ -252,6 +259,13 @@ func (p *FastParser) ParseClassEx(baseCe *types.ClassEntry, checkNull bool, sepa
 func (p *FastParser) ParseDouble() (dest float64) {
 	dest, _ = p.ParseDoubleEx(false, false)
 	return
+}
+func (p *FastParser) ParseDoubleNullable() *float64 {
+	dest, isNull := p.ParseDoubleEx(false, false)
+	if isNull == types.SUCCESS {
+		return nil
+	}
+	return &dest
 }
 func (p *FastParser) ParseDoubleEx(checkNull bool, separate bool) (dest float64, isNull types.ZendBool) {
 	p.parsePrologue(separate, separate)
@@ -333,6 +347,13 @@ func (p *FastParser) ParseLong() (dest int) {
 	dest, _ = p.ParseLongEx(false, false)
 	return
 }
+func (p *FastParser) ParseLongNullable() *int {
+	dest, isNull := p.ParseLongEx(false, false)
+	if isNull == types.SUCCESS {
+		return nil
+	}
+	return &dest
+}
 func (p *FastParser) ParseLongEx(checkNull bool, separate bool) (dest int, isNull types.ZendBool) {
 	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
@@ -353,6 +374,13 @@ func (p *FastParser) ParseLongEx(checkNull bool, separate bool) (dest int, isNul
 func (p *FastParser) ParseStrictLong() (dest int) {
 	dest, _ = p.ParseStrictLongEx(false, false)
 	return
+}
+func (p *FastParser) ParseStrictLongNullable() *int {
+	dest, isNull := p.ParseStrictLongEx(false, false)
+	if isNull == types.SUCCESS {
+		return nil
+	}
+	return &dest
 }
 func (p *FastParser) ParseStrictLongEx(checkNull bool, separate bool) (dest int, isNull types.ZendBool) {
 	p.parsePrologue(separate, separate)
@@ -436,6 +464,9 @@ func (p *FastParser) ParsePathVal() string {
 		return *str
 	}
 }
+func (p *FastParser) ParsePathValNullable() *string {
+	return p.ParsePathValEx(false, false)
+}
 func (p *FastParser) ParsePathValEx(checkNull bool, separate bool) *string {
 	p.parsePrologue(separate, separate)
 	if p.IsFinish() {
@@ -513,6 +544,13 @@ func (p *FastParser) ParseStringEx(checkNull bool, separate bool) (strPtr *byte,
 func (p *FastParser) ParseStringVal() (dest string) {
 	dest, _ = p.ParseStringValEx(false, false)
 	return
+}
+func (p *FastParser) ParseStringValNullable() *string {
+	dest, isNull := p.ParseStringValEx(false, false)
+	if isNull {
+		return nil
+	}
+	return &dest
 }
 func (p *FastParser) ParseStringValEx(checkNull bool, separate bool) (dest string, isNull bool) {
 	p.parsePrologue(separate, separate)

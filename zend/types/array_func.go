@@ -8,11 +8,27 @@ import (
 
 var emptyArray *Array
 
-func NewStringArray(items []string) *Array {
+func NewArrayOfInt(items []int) *Array {
+	// todo
+	arr := NewArray(0)
+	for _, item := range items {
+		arr.NextIndexInsert(NewZvalLong(item))
+	}
+	return arr
+}
+func NewArrayOfString(items []string) *Array {
 	// todo
 	arr := NewArray(0)
 	for _, item := range items {
 		arr.NextIndexInsert(NewZvalString(item))
+	}
+	return arr
+}
+func NewArrayOfZval(items []*Zval) *Array {
+	// todo
+	arr := NewArray(0)
+	for _, item := range items {
+		arr.NextIndexInsert(item)
 	}
 	return arr
 }

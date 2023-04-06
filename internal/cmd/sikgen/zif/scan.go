@@ -233,10 +233,10 @@ func parseReturnInfo(funcDecl *ast.FuncDecl) (*ReturnInfo, error) {
 		return nil, nil
 	}
 
-	var retTypes []ZppType
+	var retTypes []ZppRetType
 	for _, result := range returns.List {
 		returnTypeSpec := printNode(result.Type)
-		returnType, ok := toZppType(returnTypeSpec)
+		returnType, ok := toZppRetType(returnTypeSpec)
 		if !ok {
 			return nil, errors.New("返回值类型不合法: " + returnTypeSpec)
 		}
@@ -249,7 +249,7 @@ func parseReturnInfo(funcDecl *ast.FuncDecl) (*ReturnInfo, error) {
 	case 1:
 		return &ReturnInfo{typ: retTypes[0]}, nil
 	case 2:
-		if retTypes[1] == ZppTypeBool {
+		if retTypes[1] == RetTypeBool {
 			return &ReturnInfo{typ: retTypes[0], withOk: true}, nil
 		}
 	}

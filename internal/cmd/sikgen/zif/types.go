@@ -26,7 +26,7 @@ type ArgInfo struct {
 }
 
 type ReturnInfo struct {
-	typ    ZppType
+	typ    ZppRetType
 	withOk bool
 }
 
@@ -67,6 +67,13 @@ const (
 	ZppTypeZval
 	ZppTypeZvalDeref
 	ZppTypeVariadic
+	// nullable type
+	ZppTypeBoolNullable
+	ZppTypeLongNullable
+	ZppTypeStrictLongNullable
+	ZppTypeDoubleNullable
+	ZppTypeStringNullable
+	ZppTypePathNullable
 	// ref
 	ZppTypeRefZval
 	ZppTypeRefArray
@@ -98,6 +105,13 @@ var zppInfos = []struct {
 	{ZppTypeZval, "*types.Zval", "ParseZval", nil},
 	{ZppTypeZvalDeref, "zpp.ZvalDeref", "ParseZvalDeref", nil},
 	{ZppTypeVariadic, "[]*types.Zval", "ParseVariadic", nil},
+	// nullable type
+	{ZppTypeBoolNullable, "*bool", "ParseBoolValNullable", nil},
+	{ZppTypeLongNullable, "*int", "ParseLongNullable", nil},
+	{ZppTypeStrictLongNullable, "*zpp.StrictLong", "ParseStrictLongNullable", nil},
+	{ZppTypeDoubleNullable, "*float64", "ParseDoubleNullable", nil},
+	{ZppTypeStringNullable, "*string", "ParseStringValNullable", nil},
+	{ZppTypePathNullable, "*zpp.Path", "ParsePathValNullable", nil},
 	// ref type
 	{ZppTypeRefZval, "zpp.RefZval", "ParseZvalEx", []ast.Expr{f.False(), f.True()}},
 	{ZppTypeRefArray, "zpp.RefArray", "ParseArrayEx", []ast.Expr{f.False(), f.True()}},
@@ -142,19 +156,84 @@ func toZppParseMethodEx(typ ZppType) (string, []ast.Expr, bool) {
 	return "", nil, false
 }
 
-func toZppSetMethod(typ ZppType) (string, bool) {
-	switch typ {
-	case ZppTypeBool:
-		return "SetBool", true
-	case ZppTypeLong:
-		return "SetLong", true
-	case ZppTypeDouble:
-		return "SetDouble", true
-	case ZppTypeString:
-		return "SetStringVal", true
-	case ZppTypeArrayHt:
-		return "SetArray", true
+//go:generate stringer -type=ZppRetType
+type ZppRetType int
+
+const (
+	_ ZppRetType = iota
+	RetTypeBool
+	RetTypeLong
+	RetTypeDouble
+	RetTypeString
+	RetTypeArray
+	RetTypeObject
+	RetTypeZval
+	//
+	RetTypeIntArray
+	RetTypeStringArray
+	RetTypeZvalArray
+)
+
+func toZppRetType(typCode string) (ZppRetType, bool) {
+	switch typCode {
+	case "bool":
+		return RetTypeBool, true
+	case "int":
+		return RetTypeLong, true
+	case "float64":
+		return RetTypeDouble, true
+	case "string":
+		return RetTypeString, true
+	case "*types.Array":
+		return RetTypeArray, true
+	case "*types.ZendObject":
+		return RetTypeObject, true
+	case "*types.Zval":
+		return RetTypeZval, true
+	// special array
+	case "[]int":
+		return RetTypeIntArray, true
+	case "[]string":
+		return RetTypeStringArray, true
+	case "[]*types.Zval":
+		return RetTypeZvalArray, true
 	default:
-		return "", false
+		return 0, false
 	}
+}
+
+func toZppSetMethod(typ ZppRetType, ret ast.Expr) (setter string, args []ast.Expr, ok bool) {
+	// setter
+	switch typ {
+	case RetTypeBool:
+		setter = "SetBool"
+	case RetTypeLong:
+		setter = "SetLong"
+	case RetTypeDouble:
+		setter = "SetDouble"
+	case RetTypeString:
+		setter = "SetStringVal"
+	case RetTypeArray, RetTypeIntArray, RetTypeStringArray, RetTypeZvalArray:
+		setter = "SetArray"
+	default:
+		return
+	}
+
+	// args
+	switch typ {
+	case RetTypeIntArray:
+		arg := f.PkgCallExpr("types", "NewArrayOfInt", []ast.Expr{ret})
+		args = []ast.Expr{arg}
+	case RetTypeStringArray:
+		arg := f.PkgCallExpr("types", "NewArrayOfString", []ast.Expr{ret})
+		args = []ast.Expr{arg}
+	case RetTypeZvalArray:
+		arg := f.PkgCallExpr("types", "NewArrayOfZval", []ast.Expr{ret})
+		args = []ast.Expr{arg}
+	default:
+		args = []ast.Expr{ret}
+	}
+
+	// return
+	return setter, args, true
 }

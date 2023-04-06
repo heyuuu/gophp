@@ -34,8 +34,8 @@ var (
 
 func genFileNode(name string, infos []*ZifInfo) *ast.File {
 	fb := f.NewFileBuilder(name)
-	fb.AddImport("sik/zend/def")
-	fb.AddImport("sik/zend/zpp")
+	fb.AddImport("github.com/heyuuu/gophp/zend/def")
+	fb.AddImport("github.com/heyuuu/gophp/zend/zpp")
 
 	for _, zifInfo := range infos {
 		fb.AddDecl(genDefValueSpec(zifInfo, zifInfo.name))
@@ -199,9 +199,9 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 		stmts = append(stmts, f.ExprStmt(realCallExpr))
 	} else {
 		// 返回值setter
-		setter, ok := toZppSetMethod(retInfo.typ)
+		setter, setterArgs, ok := toZppSetMethod(retInfo.typ, retIdent)
 		if !ok {
-			log.Fatalf("不支持此类型的返回值: typ=%d\n", retInfo.typ)
+			log.Fatalf("不支持此类型的返回值: typ=%s\n", retInfo.typ)
 		}
 
 		if retInfo.withOk {
@@ -212,7 +212,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 				&ast.IfStmt{
 					Cond: okIdent,
 					Body: f.BlockStmt(
-						f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, []ast.Expr{retIdent})),
+						f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, setterArgs)),
 					),
 					Else: f.BlockStmt(
 						f.ExprStmt(f.MethodCallExpr(returnValueIdent, "SetFalse", nil)),
@@ -224,7 +224,7 @@ func genZifHandler(zifInfo *ZifInfo) ast.Expr {
 				// ret := realCall()
 				f.MultiAssignStmt([]ast.Expr{retIdent}, realCallExpr),
 				// returnValue.SetXXX(ret)
-				f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, []ast.Expr{retIdent})),
+				f.ExprStmt(f.MethodCallExpr(returnValueIdent, setter, setterArgs)),
 			)
 		}
 	}
