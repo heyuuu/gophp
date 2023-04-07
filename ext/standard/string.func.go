@@ -496,53 +496,30 @@ func ZifBasename(path string, _ zpp.Opt, suffix string) string {
 	return PhpBasename(path, suffix)
 }
 func PhpDirname(path *byte, len_ int) int { return zend.ZendDirname(path, len_) }
-func ZifDirname(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, levels *types.Zval) {
-	var str *byte
-	var str_len int
-	var ret *types.String
-	var levels zend.ZendLong = 1
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str, str_len = fp.ParseString()
-			fp.StartOptional()
-			levels = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
+	var levels = 1
+	if levels_ != nil {
+		levels = *levels_
 	}
-	ret = types.NewString(b.CastStr(str, str_len))
+
 	if levels == 1 {
-
 		/* Default case */
-
-		ret.SetLen(zend.ZendDirname(ret.GetVal(), str_len))
-
-		/* Default case */
-
+		return zend.ZendDirnameEx(path)
 	} else if levels < 1 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid argument, levels must be >= 1")
-		types.ZendStringEfree(ret)
-		return
+		return ""
 	} else {
-
 		/* Some levels up */
-
-		for {
-			ret.SetLen(zend.ZendDirname(ret.GetVal(), b.Assign(&str_len, ret.GetLen())))
-			if !(ret.GetLen() < str_len && b.PreDec(&levels)) {
+		dir := path
+		for i := 0; i < levels; i++ {
+			newDir := zend.ZendDirnameEx(dir)
+			if newDir == dir {
 				break
 			}
+			dir = newDir
 		}
-
-		/* Some levels up */
-
+		return dir
 	}
-	return_value.SetString(ret)
-	return
 }
 func ZifPathinfo(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ zpp.Opt, options *types.Zval) {
 	var tmp types.Zval
@@ -746,55 +723,21 @@ func ZifStristr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, 
 }
 
 //@zif -alias strchr
-func ZifStrstr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, part *types.Zval) {
-	var needle *types.Zval
-	var haystack *types.String
-	var found *byte = nil
-	var needle_char []byte
-	var found_offset zend.ZendLong
-	var part types.ZendBool = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			haystack = fp.ParseStr()
-			needle = fp.ParseZval()
-			fp.StartOptional()
-			part = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifStrstr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return "", false
 	}
-	if needle.IsType(types.IS_STRING) {
-		if needle.GetStr().GetLen() == 0 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
-			return_value.SetFalse()
-			return
-		}
-		found = core.PhpMemnstr(haystack.GetVal(), needle.GetStr().GetVal(), needle.GetStr().GetLen(), haystack.GetVal()+haystack.GetLen())
-	} else {
-		if PhpNeedleChar(needle, needle_char) != types.SUCCESS {
-			return_value.SetFalse()
-			return
-		}
-		needle_char[1] = 0
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
-		found = core.PhpMemnstr(haystack.GetVal(), needle_char, 1, haystack.GetVal()+haystack.GetLen())
-	}
-	if found != nil {
-		found_offset = found - haystack.GetVal()
-		if part != 0 {
-			return_value.SetStringVal(b.CastStr(haystack.GetVal(), found_offset))
-			return
+
+	if pos := strings.Index(haystack, needleStr); pos >= 0 {
+		if part {
+			return haystack[:pos], true
 		} else {
-			return_value.SetStringVal(b.CastStr(found, haystack.GetLen()-found_offset))
-			return
+			return haystack[pos:], true
 		}
+	} else {
+		return "", false
 	}
-	return_value.SetFalse()
-	return
 }
 
 func posSubstr(str string, offset int) (string, bool) {
@@ -947,41 +890,16 @@ func ZifStrripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (in
 		}
 	}
 }
-func ZifStrrchr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval) {
-	var needle *types.Zval
-	var haystack *types.String
-	var found *byte = nil
-	var found_offset zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			haystack = fp.ParseStr()
-			needle = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifStrrchr(haystack string, needle *types.Zval) (string, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok || needleStr == "" {
+		return "", false
 	}
-	if needle.IsString() {
-		found = zend.ZendMemrchr(haystack.GetVal(), needle.GetStr().GetVal(), haystack.GetLen())
+
+	if pos := strings.LastIndexByte(haystack, needleStr[0]); pos >= 0 {
+		return haystack[pos:], true
 	} else {
-		var needle_chr byte
-		if PhpNeedleChar(needle, &needle_chr) != types.SUCCESS {
-			return_value.SetFalse()
-			return
-		}
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
-		found = zend.ZendMemrchr(haystack.GetVal(), needle_chr, haystack.GetLen())
-	}
-	if found != nil {
-		found_offset = found - haystack.GetVal()
-		return_value.SetStringVal(b.CastStr(found, haystack.GetLen()-found_offset))
-		return
-	} else {
-		return_value.SetFalse()
-		return
+		return "", false
 	}
 }
 func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *types.String {

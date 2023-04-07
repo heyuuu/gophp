@@ -708,17 +708,39 @@ func ZendVerifyNamespace() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")
 	}
 }
+func ZendDirnameEx(path string) string {
+	if path == "" {
+		return ""
+	}
+
+	/* Strip trailing slashes */
+	path = strings.TrimRight(path, "/")
+	if path == "" {
+		/* The path only contained slashes */
+		return "/"
+	}
+
+	/* Strip filename */
+	if pos := strings.LastIndexByte(path, '/'); pos >= 0 {
+		path = path[:pos]
+	} else {
+		/* No slash found, therefore return '.' */
+		return "."
+	}
+
+	/* Strip slashes which came before the file name */
+	path = strings.TrimRight(path, "/")
+	if path == "" {
+		return "."
+	}
+	return path
+}
 func ZendDirname(path *byte, len_ int) int {
 	var end *byte = path + len_ - 1
 	var len_adjust uint = 0
 	if len_ == 0 {
-
 		/* Illegal use of this function */
-
 		return 0
-
-		/* Illegal use of this function */
-
 	}
 
 	/* Strip trailing slashes */

@@ -239,15 +239,16 @@ var DefZifBasename = def.DefFunc("basename", 1, 2, []def.ArgInfo{{Name: "path"},
 })
 
 // generate by ZifDirname
-var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "levels"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "levels_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	path := fp.ParseZval()
+	path := fp.ParseStringVal()
 	fp.StartOptional()
-	levels := fp.ParseZval()
+	levels_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifDirname(executeData, returnValue, path, nil, levels)
+	ret := ZifDirname(path, nil, levels_)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifPathinfo
@@ -278,27 +279,37 @@ var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"
 // generate by ZifStrstr
 var DefZifStrstr = def.DefFunc("strstr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	haystack := fp.ParseZval()
+	haystack := fp.ParseStringVal()
 	needle := fp.ParseZval()
 	fp.StartOptional()
-	part := fp.ParseZval()
+	part := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrstr(executeData, returnValue, haystack, needle, nil, part)
+	ret, ok := ZifStrstr(haystack, needle, nil, part)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrstr
 var DefZifStrchr = def.DefFunc("strchr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	haystack := fp.ParseZval()
+	haystack := fp.ParseStringVal()
 	needle := fp.ParseZval()
 	fp.StartOptional()
-	part := fp.ParseZval()
+	part := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrstr(executeData, returnValue, haystack, needle, nil, part)
+	ret, ok := ZifStrstr(haystack, needle, nil, part)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrpos
@@ -376,12 +387,17 @@ var DefZifStrripos = def.DefFunc("strripos", 2, 3, []def.ArgInfo{{Name: "haystac
 // generate by ZifStrrchr
 var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	haystack := fp.ParseZval()
+	haystack := fp.ParseStringVal()
 	needle := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifStrrchr(executeData, returnValue, haystack, needle)
+	ret, ok := ZifStrrchr(haystack, needle)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifChunkSplit

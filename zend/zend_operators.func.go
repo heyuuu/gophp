@@ -68,7 +68,7 @@ func IsNumericString(str string, lval *ZendLong, dval *float64, allow_errors int
 	return r.Type
 }
 func ZendMemnstr(haystack *byte, needle string, needle_len int, end *byte) *byte {
-	// todo 替换
+	// todo 替换 - 查找haystack中needle首次出现的位置，没出现则返回nil
 	pos := strings.Index(b.CastStr(haystack, end-haystack), b.CastStr(needle))
 	if pos < 0 {
 		return nil
