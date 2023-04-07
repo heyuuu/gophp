@@ -11,9 +11,10 @@ var DefZifVersionCompare = def.DefFunc("version_compare", 2, 3, []def.ArgInfo{{N
 	ver1 := fp.ParseZval()
 	ver2 := fp.ParseZval()
 	fp.StartOptional()
-	oper := fp.ParseZval()
+	oper := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifVersionCompare(executeData, returnValue, ver1, ver2, nil, oper)
+	ret := ZifVersionCompare(ver1, ver2, nil, oper)
+	returnValue.SetBy(ret)
 })

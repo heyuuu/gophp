@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func PhpCanonicalizeVersion(version *byte) *byte {
@@ -56,36 +57,34 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 	b.PostInc(&(*q)) = '0'
 	return buf
 }
-func CompareSpecialVersionForms(form1 *byte, form2 *byte) int {
+func CompareSpecialVersionForms(form1 string, form2 string) int {
 	var found1 int = -1
 	var found2 int = -1
-	var special_forms []SpecialFormsT = []SpecialFormsT{
-		MakeSpecialFormsT("dev", 0),
-		MakeSpecialFormsT("alpha", 1),
-		MakeSpecialFormsT("a", 1),
-		MakeSpecialFormsT("beta", 2),
-		MakeSpecialFormsT("b", 2),
-		MakeSpecialFormsT("RC", 3),
-		MakeSpecialFormsT("rc", 3),
-		MakeSpecialFormsT("#", 4),
-		MakeSpecialFormsT("pl", 5),
-		MakeSpecialFormsT("p", 5),
-		MakeSpecialFormsT(nil, 0),
+	var specialForms = map[string]int{
+		"dev":   0,
+		"alpha": 1,
+		"a":     1,
+		"beta":  2,
+		"b":     2,
+		"RC":    3,
+		"rc":    3,
+		"#":     4,
+		"pl":    5,
+		"p":     5,
 	}
-	var pp *SpecialFormsT
-	for pp = special_forms; pp != nil && pp.GetName() != nil; pp++ {
-		if strncmp(form1, pp.GetName(), strlen(pp.GetName())) == 0 {
-			found1 = pp.GetOrder()
+	for name, order := range specialForms {
+		if strings.HasPrefix(form1, name) {
+			found1 = order
 			break
 		}
 	}
-	for pp = special_forms; pp != nil && pp.GetName() != nil; pp++ {
-		if strncmp(form2, pp.GetName(), strlen(pp.GetName())) == 0 {
-			found2 = pp.GetOrder()
+	for name, order := range specialForms {
+		if strings.HasPrefix(form2, name) {
+			found2 = order
 			break
 		}
 	}
-	return zend.ZEND_NORMALIZE_BOOL(found1 - found2)
+	return b.Compare(found1, found2)
 }
 func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	var ver1 *byte
@@ -186,57 +185,28 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	zend.Efree(ver2)
 	return compare
 }
-func ZifVersionCompare(executeData zpp.Ex, return_value zpp.Ret, ver1 *types.Zval, ver2 *types.Zval, _ zpp.Opt, oper *types.Zval) {
-	var v1 *byte
-	var v2 *byte
-	var op *byte = nil
-	var v1_len int
-	var v2_len int
-	var op_len int = 0
-	var compare int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			v1, v1_len = fp.ParseString()
-			v2, v2_len = fp.ParseString()
-			fp.StartOptional()
-			op, op_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifVersionCompare(ver1 *types.Zval, ver2 *types.Zval, _ zpp.Opt, oper *string) *types.Zval {
+	compare := PhpVersionCompare(ver1, ver2)
+	if oper == nil {
+		return types.NewZvalLong(compare)
 	}
-	compare = PhpVersionCompare(v1, v2)
-	if op == nil {
-		return_value.SetLong(compare)
-		return
+
+	var result bool
+	switch *oper {
+	case "<", "lt":
+		result = compare < 0
+	case "<=", "le":
+		result = compare <= 0
+	case ">", "gt":
+		result = compare > 0
+	case ">=", "ge":
+		result = compare >= 0
+	case "==", "=", "eq":
+		result = compare == 0
+	case "!=", "<>", "ne":
+		result = compare != 0
+	default:
+		return types.NewZvalNull()
 	}
-	if !(strncmp(op, "<", op_len)) || !(strncmp(op, "lt", op_len)) {
-		types.ZVAL_BOOL(return_value, compare == -1)
-		return
-	}
-	if !(strncmp(op, "<=", op_len)) || !(strncmp(op, "le", op_len)) {
-		types.ZVAL_BOOL(return_value, compare != 1)
-		return
-	}
-	if !(strncmp(op, ">", op_len)) || !(strncmp(op, "gt", op_len)) {
-		types.ZVAL_BOOL(return_value, compare == 1)
-		return
-	}
-	if !(strncmp(op, ">=", op_len)) || !(strncmp(op, "ge", op_len)) {
-		types.ZVAL_BOOL(return_value, compare != -1)
-		return
-	}
-	if !(strncmp(op, "==", op_len)) || !(strncmp(op, "=", op_len)) || !(strncmp(op, "eq", op_len)) {
-		types.ZVAL_BOOL(return_value, compare == 0)
-		return
-	}
-	if !(strncmp(op, "!=", op_len)) || !(strncmp(op, "<>", op_len)) || !(strncmp(op, "ne", op_len)) {
-		types.ZVAL_BOOL(return_value, compare != 0)
-		return
-	}
-	return_value.SetNull()
-	return
+	return types.NewZvalBool(result)
 }
