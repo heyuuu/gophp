@@ -493,7 +493,7 @@ func PhpStreamUrlWrapHttpEx(
 			PhpUrlDecode(resource.GetPass().GetVal(), resource.GetPass().GetLen())
 			strcat(scratch, resource.GetPass().GetVal())
 		}
-		stmp = PhpBase64Encode((*uint8)(scratch), strlen(scratch))
+		stmp = types.NewString(PhpBase64Encode(b.CastStrAuto(scratch)))
 		req_buf.AppendString("Authorization: Basic ")
 		req_buf.AppendString(b.CastStrAuto(stmp.GetVal()))
 		req_buf.AppendString("\r\n")

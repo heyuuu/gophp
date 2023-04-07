@@ -35,7 +35,7 @@ func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 	if int(str_len < 0) != 0 {
 		return types.FAILURE
 	}
-	buffer = PhpBase64Encode((*uint8)(str), str_len)
+	buffer = types.NewString(PhpBase64Encode(b.CastStr(str, str_len)))
 	if buffer.GetLen() < out_len {
 
 		/* Too short of an encoded string generated */

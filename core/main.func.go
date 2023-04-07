@@ -1682,7 +1682,7 @@ func PhpHandleAuthData(auth *byte) int {
 	if auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Basic ", b.SizeOf("\"Basic \"")-1) == 0 {
 		var pass *byte
 		var user *types.String
-		user = standard.PhpBase64Decode((*uint8)(auth+6), auth_len-6)
+		user = types.NewString(standard.PhpBase64Decode(b.CastStr((*uint8)(auth+6), auth_len-6)))
 		if user != nil {
 			pass = strchr(user.GetVal(), ':')
 			if pass != nil {

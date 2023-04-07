@@ -539,8 +539,9 @@ func PhpStreamUrlWrapRfc2397(
 	comma++
 	dlen--
 	if base64 != 0 {
-		base64_comma = standard.PhpBase64DecodeEx((*uint8)(comma), dlen, 1)
-		if base64_comma == nil {
+		if ret, ok := standard.PhpBase64DecodeEx(b.CastStr(comma, dlen), true); ok {
+			base64_comma = types.NewString(ret)
+		} else {
 			zend.ZvalPtrDtor(&meta)
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: unable to decode")
 			return nil
