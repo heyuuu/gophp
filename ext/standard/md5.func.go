@@ -1,100 +1,35 @@
 package standard
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
-	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"io/ioutil"
 )
 
-func MakeDigest(md5str *byte, digest *uint8) { MakeDigestEx(md5str, digest, 16) }
-func MakeDigestEx(md5str *byte, digest *uint8, len_ int) {
-	var hexits []byte = "0123456789abcdef"
-	var i int
-	for i = 0; i < len_; i++ {
-		md5str[i*2] = hexits[digest[i]>>4]
-		md5str[i*2+1] = hexits[digest[i]&0xf]
-	}
-	md5str[len_*2] = '0'
-}
-func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *types.String
-	var raw_output types.ZendBool = 0
-	var context PHP_MD5_CTX
-	var digest []uint8
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			arg = fp.ParseStr()
-			fp.StartOptional()
-			raw_output = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	PHP_MD5Init(&context)
-	PHP_MD5Update(&context, arg.GetVal(), arg.GetLen())
-	PHP_MD5Final(digest, &context)
-	if raw_output != 0 {
-		return_value.SetStringVal(b.CastStr((*byte)(digest), 16))
-		return
+func ZifMd5(str string, _ zpp.Opt, rawOutput bool) string {
+	sum := md5.Sum([]byte(str))
+
+	if rawOutput {
+		return string(sum[:])
 	} else {
-		return_value.SetString(types.ZendStringAlloc(32, 0))
-		MakeDigestEx(return_value.GetStr().GetVal(), digest, 16)
+		return hex.EncodeToString(sum[:])
 	}
 }
-func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *types.Zval) {
-	var arg *byte
-	var arg_len int
-	var raw_output types.ZendBool = 0
-	var buf []uint8
-	var digest []uint8
-	var context PHP_MD5_CTX
-	var n ssize_t
-	var stream *core.PhpStream
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			arg, arg_len = fp.ParsePath()
-			fp.StartOptional()
-			raw_output = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	stream = core.PhpStreamOpenWrapper(arg, "rb", core.REPORT_ERRORS, nil)
-	if stream == nil {
-		return_value.SetFalse()
-		return
-	}
-	PHP_MD5Init(&context)
-	for b.Assign(&n, core.PhpStreamRead(stream, (*byte)(buf), b.SizeOf("buf"))) > 0 {
-		PHP_MD5Update(&context, buf, n)
+func ZifMd5File(filename string, _ zpp.Opt, rawOutput bool) (string, bool) {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return "", false
 	}
 
-	/* XXX this probably can be improved with some number of retries */
+	sum := md5.Sum(data)
 
-	if core.PhpStreamEof(stream) == 0 {
-		core.PhpStreamClose(stream)
-		PHP_MD5Final(digest, &context)
-		return_value.SetFalse()
-		return
-	}
-	core.PhpStreamClose(stream)
-	PHP_MD5Final(digest, &context)
-	if raw_output != 0 {
-		return_value.SetStringVal(b.CastStr((*byte)(digest), 16))
-		return
+	if rawOutput {
+		return string(sum[:]), true
 	} else {
-		return_value.SetString(types.ZendStringAlloc(32, 0))
-		MakeDigestEx(return_value.GetStr().GetVal(), digest, 16)
+		return hex.EncodeToString(sum[:]), true
 	}
 }
 func F(x uint32, y uint32, z uint32) int { return z ^ x&(y^z) }
