@@ -336,7 +336,7 @@ func ZifExplode(separator string, str string, _ zpp.Opt, limit_ *int) ([]string,
 }
 
 //@zif -alias join
-func ZifImplode(executeData zpp.Ex, return_value zpp.Ret, glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
+func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 	var arg1 *types.Zval = glue_
 	var arg2 *types.Zval = pieces_
 	var pieces *types.Array
@@ -600,11 +600,6 @@ func ZifPathinfo(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ z
 		zend.ZvalPtrDtor(&tmp)
 	}
 }
-func PhpStristr(s *byte, t *byte, s_len int, t_len int) *byte {
-	PhpStrtolower(s, s_len)
-	PhpStrtolower(t, t_len)
-	return (*byte)(core.PhpMemnstr(s, t, t_len, s+s_len))
-}
 func PhpStrspnEx(s1 string, s2 string) int {
 	if s1 == "" {
 		return 0
@@ -627,30 +622,7 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 	}
 	return len(s1)
 }
-func PhpNeedleChar(needle *types.Zval, target *byte) int {
-	switch needle.GetType() {
-	case types.IS_LONG:
-		*target = byte(needle.GetLval())
-		return types.SUCCESS
-	case types.IS_NULL:
-		fallthrough
-	case types.IS_FALSE:
-		*target = '0'
-		return types.SUCCESS
-	case types.IS_TRUE:
-		*target = '1'
-		return types.SUCCESS
-	case types.IS_DOUBLE:
-		fallthrough
-	case types.IS_OBJECT:
-		*target = byte(zend.ZvalGetLong(needle))
-		return types.SUCCESS
-	default:
-		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
-		return types.FAILURE
-	}
-}
-func PhpNeedleCharEx(needle *types.Zval) (byte, bool) {
+func PhpNeedleChar(needle *types.Zval) (byte, bool) {
 	switch needle.GetType() {
 	case types.IS_LONG:
 		return byte(needle.GetLval()), true
@@ -731,7 +703,7 @@ func parseNeedle(needle *types.Zval) (string, bool) {
 		 * 在 PHP 8.0.0 之前，如果 needle 不是字符串，它将被转换为整数并作为字符的序数值应用。
 		 * 从 PHP 7.3.0 开始，这种行为已被废弃，不鼓励依赖它。根据预期的行为，应该明确地将 needle 转换成字符串，或者明确地调用 chr()。
 		 */
-		needleChar, ok := PhpNeedleCharEx(needle)
+		needleChar, ok := PhpNeedleChar(needle)
 		if !ok {
 			return "", false
 		}

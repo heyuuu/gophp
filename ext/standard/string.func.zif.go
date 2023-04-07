@@ -174,7 +174,7 @@ var DefZifImplode = def.DefFunc("implode", 1, 2, []def.ArgInfo{{Name: "glue_"}, 
 	if fp.HasError() {
 		return
 	}
-	ret := ZifImplode(executeData, returnValue, glue_, nil, pieces_)
+	ret := ZifImplode(glue_, nil, pieces_)
 	returnValue.SetStringVal(ret)
 })
 
@@ -187,7 +187,7 @@ var DefZifJoin = def.DefFunc("join", 1, 2, []def.ArgInfo{{Name: "glue_"}, {Name:
 	if fp.HasError() {
 		return
 	}
-	ret := ZifImplode(executeData, returnValue, glue_, nil, pieces_)
+	ret := ZifImplode(glue_, nil, pieces_)
 	returnValue.SetStringVal(ret)
 })
 
