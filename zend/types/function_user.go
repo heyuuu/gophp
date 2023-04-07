@@ -16,7 +16,7 @@ type ZendOpArray struct {
 	run_time_cache__ptr       **any
 	static_variables_ptr__ptr **Array
 	static_variables          *Array
-	vars                      **String
+	vars                      []*String
 	refcount                  *uint32
 	last_live_range           int
 	last_try_catch            int
@@ -55,8 +55,8 @@ func (f *ZendOpArray) SetOpcodes(value *zend.ZendOp)               { f.opcodes =
 func (f *ZendOpArray) GetRunTimeCachePtr() **any                   { return f.run_time_cache__ptr }
 func (f *ZendOpArray) GetStaticVariables() *Array                  { return f.static_variables }
 func (f *ZendOpArray) SetStaticVariables(value *Array)             { f.static_variables = value }
-func (f *ZendOpArray) GetVars() **String                           { return f.vars }
-func (f *ZendOpArray) SetVars(value **String)                      { f.vars = value }
+func (f *ZendOpArray) GetVars() []*String                          { return f.vars }
+func (f *ZendOpArray) SetVars(value []*String)                     { f.vars = value }
 func (f *ZendOpArray) GetRefcount() *uint32                        { return f.refcount }
 func (f *ZendOpArray) SetRefcount(value *uint32)                   { f.refcount = value }
 func (f *ZendOpArray) GetLastLiveRange() int                       { return f.last_live_range }

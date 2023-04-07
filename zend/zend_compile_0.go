@@ -330,15 +330,14 @@ func GetTemporaryVariable() uint32 {
 }
 func LookupCv(name *types.String) int {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()
-	var i int = 0
-	var hash_value ZendUlong = name.GetHash()
-	for i < op_array.GetLastVar() {
-		if op_array.GetVars()[i].GetH() == hash_value && types.ZendStringEquals(op_array.GetVars()[i], name) != 0 {
+
+	for i := 0; i < op_array.GetLastVar(); i++ {
+		if op_array.GetVars()[i].GetStr() == name.GetStr() {
 			return int(types.ZendIntptrT(nil.VarNum(i)))
 		}
-		i++
 	}
-	i = op_array.GetLastVar()
+
+	i := op_array.GetLastVar()
 	op_array.GetLastVar()++
 	if op_array.GetLastVar() > CG__().GetContext().GetVarsSize() {
 		CG__().GetContext().SetVarsSize(CG__().GetContext().GetVarsSize() + 16)
@@ -346,14 +345,6 @@ func LookupCv(name *types.String) int {
 	}
 	op_array.GetVars()[i] = name.Copy()
 	return int(types.ZendIntptrT(nil.VarNum(i)))
-}
-func ZendDelLiteral(op_array *types.ZendOpArray, n int) {
-	ZvalPtrDtorNogc(CT_CONSTANT_EX(op_array, n))
-	if n+1 == op_array.GetLastLiteral() {
-		op_array.GetLastLiteral()--
-	} else {
-		CT_CONSTANT_EX(op_array, n).SetUndef()
-	}
 }
 func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_position int) {
 	var lit *types.Zval = CT_CONSTANT_EX(op_array, literal_position)

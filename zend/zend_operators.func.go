@@ -354,7 +354,7 @@ func ZendFastEqualStrings(s1 *types.String, s2 *types.String) int {
 	if s1 == s2 {
 		return 1
 	} else if s1.GetVal()[0] > '9' || s2.GetVal()[0] > '9' {
-		return types.ZendStringEqualContent(s1, s2)
+		return types.IntBool(s1.GetStr() == s2.GetStr())
 	} else {
 		return ZendiSmartStreq(s1, s2)
 	}
@@ -2990,7 +2990,7 @@ func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {
 		}
 	} else {
 	string_cmp:
-		return types.ZendStringEqualContent(s1, s2)
+		return IntBool(s1.GetStr() == s2.GetStr())
 	}
 }
 func ZendiSmartStrcmp(s1 string, s2 string) int {

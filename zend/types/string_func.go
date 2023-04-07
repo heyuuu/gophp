@@ -59,9 +59,6 @@ func ZendStringFree(s *String)             {} // todo remove
 func ZendStringEfree(s *String)            {} // todo remove
 func ZendStringRelease(s *String)          {} // todo remove
 func ZendStringReleaseEx(s *String, _ int) {} // todo remove
-func ZendStringEqualContent(s1 *String, s2 *String) ZendBool {
-	return IntBool(s1.GetStr() == s2.GetStr())
-}
 func ZendStringEquals(s1 *String, s2 *String) ZendBool {
 	return IntBool(s1.GetStr() == s2.GetStr())
 }

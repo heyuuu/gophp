@@ -1208,44 +1208,6 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 
 	/* copy real values from CV slots into symbol table */
 }
-func ZendSetLocalVar(name *types.String, value *types.Zval, force int) int {
-	var executeData *ZendExecuteData = CurrEX()
-	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetType()))) {
-		executeData = executeData.GetPrevExecuteData()
-	}
-	if executeData != nil {
-		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
-			var h ZendUlong = name.GetHash()
-			var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
-			if op_array.GetLastVar() != 0 {
-				var str **types.String = op_array.GetVars()
-				var end **types.String = str + op_array.GetLastVar()
-				for {
-					if str.GetH() == h && types.ZendStringEqualContent(*str, name) != 0 {
-						var var_ *types.Zval = executeData.VarNum(str - op_array.GetVars())
-						types.ZVAL_COPY_VALUE(var_, value)
-						return types.SUCCESS
-					}
-					str++
-					if str == end {
-						break
-					}
-				}
-			}
-			if force != 0 {
-				var symbol_table *types.Array = ZendRebuildSymbolTable()
-				if symbol_table != nil {
-					symbol_table.KeyUpdate(name.GetStr(), value)
-					return types.SUCCESS
-				}
-			}
-		} else {
-			executeData.GetSymbolTable().KeyUpdateIndirect(name.GetStr(), value)
-			return types.SUCCESS
-		}
-	}
-	return types.FAILURE
-}
 func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 	var executeData *ZendExecuteData = CurrEX()
 	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetType()))) {

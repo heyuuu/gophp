@@ -170,7 +170,6 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String, persistent t
 		}
 		types.ZendHashAddNewPtr(ctx.GetStrInterned(), interned.GetStr(), interned)
 	}
-	lcname.Free()
 	return interned
 }
 func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, persistent types.ZendBool) {

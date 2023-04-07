@@ -521,7 +521,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
 	if zv.IsString() {
 		var str *types.String = zv.GetStr()
-		if str == member || str.GetH() == member.GetHash() && types.ZendStringEqualContent(str, member) != 0 {
+		if str.GetStr() == member.GetStr() {
 			return &(zv.GetPropertyGuard())
 		} else if zv.GetPropertyGuard() == 0 {
 
@@ -594,7 +594,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-					if p.GetVal().IsNotUndef() && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
+					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name.GetStr() {
 						retval = p.GetVal()
 						goto exit
 					}
@@ -1489,7 +1489,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
 				if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 					var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-					if p.GetVal().IsNotUndef() && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && types.ZendStringEqualContent(p.GetKey(), name) != 0) {
+					if p.GetVal().IsNotUndef() && p.IsStrKey() && p.StrKey() == name.GetStr() {
 						value = p.GetVal()
 						goto found
 					}
