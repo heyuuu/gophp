@@ -186,7 +186,7 @@ func PhpPasswordBcryptNeedsRehash(hash *types.String, options *types.Array) type
 func PhpPasswordBcryptVerify(password *types.String, hash *types.String) types.ZendBool {
 	var i int
 	var status int = 0
-	var ret *types.String = PhpCrypt(password.GetVal(), int(password.GetLen()), hash.GetVal(), int(hash.GetLen()), 1)
+	var ret *types.String = PhpCrypt(password.GetStr(), hash.GetStr(), true)
 	if ret == nil {
 		return 0
 	}
@@ -233,7 +233,7 @@ func PhpPasswordBcryptHash(password *types.String, options *types.Array) *types.
 
 	/* This cast is safe, since both values are defined here in code and cannot overflow */
 
-	result = PhpCrypt(password.GetVal(), int(password.GetLen()), hash.GetVal(), int(hash.GetLen()), 1)
+	result = PhpCrypt(password.GetStr(), hash.GetStr(), true)
 	// types.ZendStringReleaseEx(hash, 0)
 	if result == nil {
 		return nil

@@ -6,13 +6,14 @@ import (
 )
 
 // generate by ZifCrypt
-var DefZifCrypt = def.DefFunc("crypt", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "salt"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifCrypt = def.DefFunc("crypt", 1, 2, []def.ArgInfo{{Name: "str_"}, {Name: "salt_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str_ := fp.ParseStringVal()
 	fp.StartOptional()
-	salt := fp.ParseZval()
+	salt_ := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifCrypt(executeData, returnValue, str, nil, salt)
+	ret := ZifCrypt(executeData, returnValue, str_, nil, salt_)
+	returnValue.SetStringVal(ret)
 })

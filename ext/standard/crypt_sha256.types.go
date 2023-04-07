@@ -10,14 +10,6 @@ type Sha256Ctx struct {
 	buffer []byte
 }
 
-// func MakeSha256Ctx(H []uint32, total []uint32, buflen uint32, buffer []byte) Sha256Ctx {
-//     return Sha256Ctx{
-//         H:H,
-//         total:total,
-//         buflen:buflen,
-//         buffer:buffer,
-//     }
-// }
 func (this *Sha256Ctx) GetH() []uint32 { return this.H }
 
 // func (this *Sha256Ctx) SetH(value []uint32) { this.H = value }

@@ -1,8 +1,9 @@
 package standard
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/zend"
+	"bytes"
+	"crypto/md5"
+	"strings"
 )
 
 func PhpInitCryptR()     {}
@@ -14,141 +15,105 @@ func _cryptExtendedInitR() {
 		_cryptExtendedInit()
 	}
 }
-func To64(s *byte, v int32, n int) {
-	for b.PreDec(&n) >= 0 {
-		b.PostInc(&(*s)) = Itoa64[v&0x3f]
+func To64(v uint32, n int) []byte {
+	buf := make([]byte, n)
+	for i := 0; i < n; i++ {
+		buf[i] = Itoa64[v&0x3f]
 		v >>= 6
 	}
+	return buf
 }
-func PhpMd5CryptR(pw *byte, salt *byte, out *byte) *byte {
-	var passwd []byte
-	var p *byte
-	var sp *byte
-	var ep *byte
-	var final []uint8
-	var i uint
-	var sl uint
-	var pwl uint
-	var ctx PHP_MD5_CTX
-	var ctx1 PHP_MD5_CTX
-	var l uint32
-	var pl int
-	pwl = strlen(pw)
-
-	/* Refine the salt first */
-
-	sp = salt
-
-	/* If it starts with the magic string, then skip that */
-
-	if strncmp(sp, "$1$", 3) == 0 {
-		sp += 3
+func PhpMd5CryptR(password string, salt string) string {
+	/* If salt starts with the magic string, then skip that */
+	if strings.HasPrefix(salt, "$1$") {
+		salt = salt[3:]
 	}
 
 	/* It stops at the first '$', max 8 chars */
-
-	for ep = sp; (*ep) != '0' && (*ep) != '$' && ep < sp+8; ep++ {
-
+	if pos := strings.IndexByte(salt, '$'); pos >= 0 {
+		salt = salt[:pos]
+	}
+	if len(salt) > 8 {
+		salt = salt[:8]
 	}
 
 	/* get the length of the true salt */
-
-	sl = ep - sp
-	PHP_MD5Init(&ctx)
+	var buf bytes.Buffer
 
 	/* The password first, since that is what is most unknown */
-
-	PHP_MD5Update(&ctx, (*uint8)(pw), pwl)
+	buf.WriteString(password)
 
 	/* Then our magic string */
-
-	PHP_MD5Update(&ctx, (*uint8)("$1$"), 3)
+	buf.WriteString("$1$")
 
 	/* Then the raw salt */
-
-	PHP_MD5Update(&ctx, (*uint8)(sp), sl)
+	buf.WriteString(salt)
 
 	/* Then just as many characters of the MD5(pw,salt,pw) */
-
-	PHP_MD5Init(&ctx1)
-	PHP_MD5Update(&ctx1, (*uint8)(pw), pwl)
-	PHP_MD5Update(&ctx1, (*uint8)(sp), sl)
-	PHP_MD5Update(&ctx1, (*uint8)(pw), pwl)
-	PHP_MD5Final(final, &ctx1)
-	for pl = pwl; pl > 0; pl -= 16 {
-		PHP_MD5Update(&ctx, final, uint(b.Cond(pl > 16, 16, pl)))
+	final1 := md5.Sum([]byte(password + salt + password))
+	for i := len(password) - 1; i >= 0; i -= 16 {
+		if i > 16 {
+			buf.Write(final1[:])
+		} else {
+			buf.Write(final1[:i])
+		}
 	}
 
-	/* Don't leave anything around in vm they could use. */
-
-	zend.ZEND_SECURE_ZERO(final, b.SizeOf("final"))
-
 	/* Then something really weird... */
-
-	for i = pwl; i != 0; i >>= 1 {
+	for i := len(password); i != 0; i >>= 1 {
 		if (i & 1) != 0 {
-			PHP_MD5Update(&ctx, final, 1)
+			buf.WriteByte(final1[0])
 		} else {
-			PHP_MD5Update(&ctx, (*uint8)(pw), 1)
+			buf.WriteByte(password[0])
 		}
 	}
 
 	/* Now make the output string */
-
-	memcpy(passwd, "$1$", 3)
-	strlcpy(passwd+3, sp, sl+1)
-	strcat(passwd, "$")
-	PHP_MD5Final(final, &ctx)
+	final := md5.Sum(buf.Bytes())
 
 	/*
 	 * And now, just to make sure things don't run too fast. On a 60 MHz
 	 * Pentium this takes 34 msec, so you would need 30 seconds to build
 	 * a 1000 entry dictionary...
 	 */
-
-	for i = 0; i < 1000; i++ {
-		PHP_MD5Init(&ctx1)
+	for i := 0; i < 1000; i++ {
+		var buf bytes.Buffer
 		if (i & 1) != 0 {
-			PHP_MD5Update(&ctx1, (*uint8)(pw), pwl)
+			buf.WriteString(password)
 		} else {
-			PHP_MD5Update(&ctx1, final, 16)
+			buf.Write(final[:])
 		}
 		if i%3 != 0 {
-			PHP_MD5Update(&ctx1, (*uint8)(sp), sl)
+			buf.WriteString(salt)
 		}
 		if i%7 != 0 {
-			PHP_MD5Update(&ctx1, (*uint8)(pw), pwl)
+			buf.WriteString(password)
 		}
 		if (i & 1) != 0 {
-			PHP_MD5Update(&ctx1, final, 16)
+			buf.Write(final[:])
 		} else {
-			PHP_MD5Update(&ctx1, (*uint8)(pw), pwl)
+			buf.WriteString(password)
 		}
-		PHP_MD5Final(final, &ctx1)
+		final = md5.Sum(buf.Bytes())
 	}
-	p = passwd + sl + 3 + 1
-	l = final[0]<<16 | final[6]<<8 | final[12]
-	To64(p, l, 4)
-	p += 4
-	l = final[1]<<16 | final[7]<<8 | final[13]
-	To64(p, l, 4)
-	p += 4
-	l = final[2]<<16 | final[8]<<8 | final[14]
-	To64(p, l, 4)
-	p += 4
-	l = final[3]<<16 | final[9]<<8 | final[15]
-	To64(p, l, 4)
-	p += 4
-	l = final[4]<<16 | final[10]<<8 | final[5]
-	To64(p, l, 4)
-	p += 4
-	l = final[11]
-	To64(p, l, 2)
-	p += 2
-	*p = '0'
+
+	//return "$1$" + salt + "$" + base64.NewEncoding(Itoa64).EncodeToString(final[:])
+	var result strings.Builder
+	var l uint32
+	result.WriteString("$1$" + salt + "$")
+	l = uint32(final[0])<<16 | uint32(final[6])<<8 | uint32(final[12])
+	result.Write(To64(l, 4))
+	l = uint32(final[1])<<16 | uint32(final[7])<<8 | uint32(final[13])
+	result.Write(To64(l, 4))
+	l = uint32(final[2])<<16 | uint32(final[8])<<8 | uint32(final[14])
+	result.Write(To64(l, 4))
+	l = uint32(final[3])<<16 | uint32(final[9])<<8 | uint32(final[15])
+	result.Write(To64(l, 4))
+	l = uint32(final[4])<<16 | uint32(final[10])<<8 | uint32(final[5])
+	result.Write(To64(l, 4))
+	l = uint32(final[11])
+	result.Write(To64(l, 42))
 
 	/* Don't leave anything around in vm they could use. */
-
-	zend.ZEND_SECURE_ZERO(final, b.SizeOf("final"))
-	return passwd
+	return result.String()
 }

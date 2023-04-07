@@ -34,7 +34,8 @@ func PhpTo64(s *byte, n int) {
 		s++
 	}
 }
-func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet types.ZendBool) *types.String {
+
+func PhpCrypt(password string, salt string, quiet bool) *types.String {
 	var crypt_res *byte
 	var result *types.String
 	if salt[0] == '*' && (salt[1] == '0' || salt[1] == '1') {
@@ -46,13 +47,8 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 
 	var buffer PhpCryptExtendedData
 	if salt[0] == '$' && salt[1] == '1' && salt[2] == '$' {
-		var output []byte
-		var out *byte
-		out = PhpMd5CryptR(password, salt, output)
-		if out != nil {
-			return types.NewString(out)
-		}
-		return nil
+		out := PhpMd5CryptR(password, salt)
+		return types.NewString(out)
 	} else if salt[0] == '$' && salt[1] == '6' && salt[2] == '$' {
 		var output *byte
 		output = zend.Emalloc(PHP_MAX_SALT_LEN)
@@ -96,23 +92,14 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 	} else {
 
 		/* DES Fallback */
-
 		if salt[0] != '_' {
-
 			/* DES style hashes */
-
 			if !(IS_VALID_SALT_CHARACTER(salt[0])) || !(IS_VALID_SALT_CHARACTER(salt[1])) {
 				if quiet == 0 {
-
 					/* error consistently about invalid DES fallbacks */
-
 					core.PhpErrorDocref(nil, faults.E_DEPRECATED, DES_INVALID_SALT_ERROR)
-
-					/* error consistently about invalid DES fallbacks */
-
 				}
 			}
-
 			/* DES style hashes */
 
 		}
@@ -133,7 +120,7 @@ func PhpCrypt(password *byte, pass_len int, salt *byte, salt_len int, quiet type
 		return result
 	}
 }
-func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, salt *types.Zval) {
+func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str_ string, _ zpp.Opt, salt_ string) string {
 	var salt []byte
 	var str *byte
 	var salt_in *byte = nil
@@ -153,8 +140,8 @@ func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.O
 		}
 		break
 	}
-	salt[PHP_MAX_SALT_LEN] = '0'
-	salt[0] = salt[PHP_MAX_SALT_LEN]
+	salt[PHP_MAX_SALT_LEN] = '\000'
+	salt[0] = '\000'
 
 	/* This will produce suitable results if people depend on DES-encryption
 	 * available (passing always 2-character salt). At least for glibc6.1 */
@@ -178,15 +165,14 @@ func ZifCrypt(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.O
 		salt_in_len = cli.MIN(PHP_MAX_SALT_LEN, salt_in_len)
 	}
 	salt[salt_in_len] = '0'
-	if b.Assign(&result, PhpCrypt(str, int(str_len), salt, int(salt_in_len), 0)) == nil {
+
+	result = PhpCrypt(b.CastStr(str, str_len), b.CastStr(salt, salt_in_len), false)
+	if result == nil {
 		if salt[0] == '*' && salt[1] == '0' {
-			return_value.SetStringVal("*1")
-			return
+			return "*1"
 		} else {
-			return_value.SetStringVal("*0")
-			return
+			return "*0"
 		}
 	}
-	return_value.SetString(result)
-	return
+	return result.GetStr()
 }
