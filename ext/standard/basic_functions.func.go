@@ -148,9 +148,6 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	if ZmStartupCrypt(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}
-	if ZmStartupLcg(type_, module_number) != types.SUCCESS {
-		return types.FAILURE
-	}
 	if ZmStartupDir(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}

@@ -10,5 +10,6 @@ var DefZifLcgValue = def.DefFunc("lcg_value", 0, 0, []def.ArgInfo{}, func(execut
 	if !zpp.CheckNumArgsNoneError(executeData) {
 		return
 	}
-	ZifLcgValue(executeData, returnValue)
+	ret := ZifLcgValue()
+	returnValue.SetDouble(ret)
 })

@@ -2,6 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/zend"
+	"math/rand"
 )
 
 func RAND_RANGE_BADSCALING(__n int64, __min zend.ZendLong, __max zend.ZendLong, __tmax float) int64 {
@@ -9,5 +10,5 @@ func RAND_RANGE_BADSCALING(__n int64, __min zend.ZendLong, __max zend.ZendLong, 
 	return __n
 }
 func GENERATE_SEED() int {
-	return zend_long(time(0)*getpid()) ^ zend_long(1000000.0*PhpCombinedLcg())
+	return int(time(0)*getpid()) ^ int(1000000.0*rand.Float64())
 }

@@ -23,3 +23,8 @@
 字符串函数
 - `localeconv`
 - `setlocale`
+
+
+# 实现细节不同的方法
+
+- 默认随机数直接使用了 golang 的 rand。影响 `lcg_value`
