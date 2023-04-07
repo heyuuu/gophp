@@ -31,6 +31,7 @@ func PhpBase64DecodeEx(str string, strict bool) (string, bool) {
 func base64CleanStr(str string, strict bool) (string, bool) {
 	var buf strings.Builder
 	for _, c := range []byte(str) {
+		// todo 此处可优化为 mask 数组 (参考 strings.asciiSet)
 		if strings.ContainsRune(base64Table, rune(c)) {
 			buf.WriteByte(c)
 		} else if c == ' ' {
