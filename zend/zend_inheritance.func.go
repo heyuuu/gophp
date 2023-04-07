@@ -15,9 +15,9 @@ func OverriddenPtrDtor(zv *types.Zval) {
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"), 1)
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
-	new_property_info.GetName().AddRefcount()
+	//new_property_info.GetName().AddRefcount()
 	if new_property_info.GetType().IsName() {
-		new_property_info.GetType().Name().AddRefcount()
+		//new_property_info.GetType().Name().AddRefcount()
 	}
 	return new_property_info
 }
@@ -32,7 +32,7 @@ func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) 
 		new_function.SetIsArenaAllocated(true)
 	}
 	if new_function.GetFunctionName() != nil {
-		new_function.GetFunctionName().AddRefcount()
+		//new_function.GetFunctionName().AddRefcount()
 	}
 	return new_function
 }
@@ -1989,7 +1989,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 				doc_comment = nil
 			}
 			if property_info.GetType().IsName() {
-				property_info.GetType().Name().AddRefcount()
+				//property_info.GetType().Name().AddRefcount()
 			}
 			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
 			// types.ZendStringReleaseEx(prop_name, 0)

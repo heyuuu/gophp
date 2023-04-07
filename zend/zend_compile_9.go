@@ -38,7 +38,7 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		class_name = ZendResolveClassNameAst(class_ast)
 	} else {
-		class_name.AddRefcount()
+		//class_name.AddRefcount()
 	}
 	name = ZendConcat3(class_name.GetVal(), class_name.GetLen(), "::", 2, const_name.GetVal(), const_name.GetLen())
 	ZendAstDestroy(ast)

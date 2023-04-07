@@ -261,7 +261,7 @@ func (zv *Zval) SetStringVal(s string)       { zv.SetString(NewString(s)) }
 func (zv *Zval) SetString(s *String)         { zv.SetTypeString(); zv.SetStr(s) }
 func (zv *Zval) SetInternedString(s *String) { zv.SetTypeInternedString(); zv.SetStr(s) }
 func (zv *Zval) SetStringCopy(s *String) {
-	s.AddRefcount()
+	//s.AddRefcount()
 	zv.SetString(s)
 }
 func (zv *Zval) SetArray(arr *Array) { zv.SetTypeArray(); zv.SetArr(arr) }

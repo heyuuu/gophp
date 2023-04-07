@@ -237,7 +237,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* Try to fetch find static method of given class. */
 
 		mname = callable.GetStr()
-		mname.AddRefcount()
+		//mname.AddRefcount()
 		ftable = ce_org.GetFunctionTable()
 		fcc.SetCallingScope(ce_org)
 	} else {

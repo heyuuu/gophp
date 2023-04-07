@@ -481,7 +481,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null types.ZendBool) types.Ze
 				ZendAssertValidClassName(class_name.GetStr())
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
-				class_name.AddRefcount()
+				//class_name.AddRefcount()
 			}
 			type_ = types.ZEND_TYPE_ENCODE_CLASS(class_name, allow_null)
 		}

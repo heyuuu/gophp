@@ -952,7 +952,7 @@ func zim_spl_Array_getIteratorClass(executeData *zend.ZendExecuteData, return_va
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	intern.GetCeGetIterator().GetName().AddRefcount()
+	//intern.GetCeGetIterator().GetName().AddRefcount()
 	return_value.SetString(intern.GetCeGetIterator().GetName())
 	return
 }

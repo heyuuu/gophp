@@ -2276,7 +2276,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 
 		/* Duplicate subject string for repeated replacement */
 
-		subject_str.AddRefcount()
+		//subject_str.AddRefcount()
 		if replace.IsType(types.IS_ARRAY) {
 			replace_idx = 0
 		} else {
@@ -2365,7 +2365,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 			zend.ZendTmpStringRelease(tmp_search_str)
 			zend.ZendTmpStringRelease(tmp_replace_entry_str)
 			if subject_str == tmp_result {
-				subject_str.DelRefcount()
+				//subject_str.DelRefcount()
 			} else {
 				// types.ZendStringReleaseEx(subject_str, 0)
 				subject_str = tmp_result

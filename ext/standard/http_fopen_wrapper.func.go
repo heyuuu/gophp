@@ -397,10 +397,10 @@ func PhpStreamUrlWrapHttpEx(
 			var s *byte
 			var t *byte
 			user_headers = zend.Estrndup(tmp.GetVal(), tmp.GetLen())
-			if tmp.GetRefcount() > 1 {
-				tmp.DelRefcount()
-				tmp = types.NewString(tmp.GetStr())
-			}
+			//if tmp.GetRefcount() > 1 {
+			//	tmp.DelRefcount()
+			//	tmp = types.NewString(tmp.GetStr())
+			//}
 
 			/* Make lowercase for easy comparison against 'standard' headers */
 

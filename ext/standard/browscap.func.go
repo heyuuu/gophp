@@ -146,7 +146,7 @@ func BrowscapConvertPattern(pattern *types.String, persistent int) *types.String
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String, persistent types.ZendBool) *types.String {
 	var interned *types.String = types.ZendHashFindPtr(ctx.GetStrInterned(), str.GetStr())
 	if interned != nil {
-		interned.AddRefcount()
+		//interned.AddRefcount()
 	} else {
 		interned = str.Copy()
 		if persistent != 0 {
@@ -160,7 +160,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String, persistent t
 	lcName := ascii.StrToLower(str.GetStr())
 	interned := types.ZendHashFindPtr(ctx.GetStrInterned(), lcName).(*types.String)
 	if interned != nil {
-		interned.AddRefcount()
+		//interned.AddRefcount()
 	} else {
 		interned = types.NewString(lcName)
 		if persistent != 0 {

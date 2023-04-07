@@ -344,7 +344,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 		var opline *ZendOp = ZendEmitOp(&result, ZEND_FETCH_W, &name_node, nil)
 		opline.SetExtendedValue(ZEND_FETCH_GLOBAL_LOCK)
 		if name_node.GetOpType() == IS_CONST {
-			name_node.GetConstant().GetStr().AddRefcount()
+			//name_node.GetConstant().GetStr().AddRefcount()
 		}
 		ZendEmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
 	}

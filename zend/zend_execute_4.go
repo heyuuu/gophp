@@ -311,7 +311,7 @@ try_again:
 
 				/* Key may be released while throwing the undefined index warning. */
 
-				offset_key.AddRefcount()
+				//offset_key.AddRefcount()
 				if ZendUndefinedIndexWrite(ht, offset_key) == types.FAILURE {
 					// types.ZendStringRelease(offset_key)
 					return nil

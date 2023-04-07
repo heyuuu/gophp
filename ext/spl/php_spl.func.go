@@ -318,7 +318,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 			if func_.HasFnFlags(zend.AccCallViaTrampoline) {
 				func_ = zend.Emalloc(b.SizeOf("zend_op_array"))
 				memcpy(func_, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
-				func_.GetOpArray().GetFunctionName().AddRefcount()
+				//func_.GetOpArray().GetFunctionName().AddRefcount()
 			}
 			retval.SetUndef()
 			fcic.SetFunctionHandler(func_)

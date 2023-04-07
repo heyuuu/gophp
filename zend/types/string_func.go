@@ -25,14 +25,14 @@ func ZendStringExtend(s *String, len_ int, persistent int) *String {
 	b.Assert(len_ >= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr + b.EmptyString(len_-len(oldStr))
-	s.DelRefcount()
+	//s.DelRefcount()
 	return NewString(newStr)
 }
 func ZendStringTruncate(s *String, len_ int, persistent int) *String {
 	b.Assert(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]
-	s.DelRefcount()
+	//s.DelRefcount()
 	return NewString(newStr)
 }
 func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *String {
@@ -45,7 +45,7 @@ func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *Stri
 	//}
 	ret = ZendStringSafeAlloc(n, m, l, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), b.Min(n*m+l, s.GetLen())+1)
-	s.DelRefcount()
+	//s.DelRefcount()
 	return ret
 }
 func ZendStringEquals(s1 *String, s2 *String) ZendBool {

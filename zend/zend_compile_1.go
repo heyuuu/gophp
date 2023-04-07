@@ -25,7 +25,7 @@ func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 		if name.GetVal()[0] == '\\' {
 			name = types.NewString(b.CastStr(name.GetVal()+1, name.GetLen()-1))
 		} else {
-			name.AddRefcount()
+			//name.AddRefcount()
 		}
 
 		/* Ensure that \self, \parent and \static are not used */
@@ -110,7 +110,7 @@ func FunctionAddRef(function types.IFunction) {
 		}
 	} else if function.GetType() == ZEND_INTERNAL_FUNCTION {
 		if function.GetFunctionName() != nil {
-			function.GetFunctionName().AddRefcount()
+			//function.GetFunctionName().AddRefcount()
 		}
 	}
 }

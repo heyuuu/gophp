@@ -109,7 +109,7 @@ func ZendCompileUse(ast *ZendAst) {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
 			}
 		}
-		old_name.AddRefcount()
+		//old_name.AddRefcount()
 		old_name = types.ZendNewInternedString(old_name)
 		if !(types.ZendHashAddPtr(current_import, lookup_name.GetStr(), old_name)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())

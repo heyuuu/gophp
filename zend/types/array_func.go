@@ -879,7 +879,7 @@ convert:
 		zv = _z
 		if str_key == nil {
 			str_key = zend.ZendLongToStr(num_key)
-			str_key.DelRefcount()
+			//str_key.DelRefcount()
 		}
 		for {
 			if zv.IsRefcounted() {
