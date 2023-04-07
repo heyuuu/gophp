@@ -319,7 +319,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			op_array.SetIsAllowStatic(true)
 		}
 	}
-	types.ZendStringReleaseEx(lcname, 0)
+	// types.ZendStringReleaseEx(lcname, 0)
 }
 func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAstDecl, toplevel types.ZendBool) {
 	var params_ast *ZendAst = decl.GetChild()[0]
@@ -352,7 +352,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 		if types.ZendHashAddPtr(CG__().GetFunctionTable(), lcname.GetStr(), op_array) == nil {
 			DoBindFunctionError(lcname, op_array, 1)
 		}
-		types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
 		return
 	}
 
@@ -384,7 +384,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 		/* RTD key is placed after lcname literal in op1 */
 
 	}
-	types.ZendStringReleaseEx(lcname, 0)
+	// types.ZendStringReleaseEx(lcname, 0)
 }
 func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel types.ZendBool) {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
@@ -772,7 +772,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		}
 		extends_name = extends_node.GetConstant().GetStr()
 		ce.SetParentName(ZendResolveClassName(extends_name, b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
-		types.ZendStringReleaseEx(extends_name, 0)
+		// types.ZendStringReleaseEx(extends_name, 0)
 		ce.SetIsInherited(true)
 	}
 	CG__().SetActiveClassEntry(ce)
@@ -831,14 +831,14 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 				CG__().SetZendLineno(decl.GetEndLineno())
 				if ZendTryEarlyBind(ce, parent_ce, lcname, nil) != 0 {
 					CG__().SetZendLineno(ast.GetLineno())
-					types.ZendStringRelease(lcname)
+					// types.ZendStringRelease(lcname)
 					return nil
 				}
 				CG__().SetZendLineno(ast.GetLineno())
 			}
 		} else {
 			if CG__().ClassTable().Add(lcname.GetStr(), ce) {
-				types.ZendStringRelease(lcname)
+				// types.ZendStringRelease(lcname)
 				ZendBuildPropertiesInfoTable(ce)
 				ce.SetIsLinked(true)
 				return nil

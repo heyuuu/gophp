@@ -99,7 +99,7 @@ func ConfigZvalDtor(zvalue *types.Zval) {
 		zvalue.GetArr().Destroy()
 		zend.Free(zvalue.GetArr())
 	} else if zvalue.IsType(types.IS_STRING) {
-		types.ZendStringReleaseEx(zvalue.GetStr(), 1)
+		// types.ZendStringReleaseEx(zvalue.GetStr(), 1)
 	}
 }
 func RESET_ACTIVE_INI_HASH() {
@@ -435,7 +435,7 @@ func PhpInitConfig() int {
 		tmp.SetString(types.NewString(fh.GetFilename()))
 		Config().Set("cfg_file_path", fh.GetFilenameStr())
 		if opened_path != nil {
-			types.ZendStringReleaseEx(opened_path, 0)
+			// types.ZendStringReleaseEx(opened_path, 0)
 		} else {
 			zend.Efree((*byte)(fh.GetFilename()))
 		}

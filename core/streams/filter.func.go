@@ -25,7 +25,7 @@ func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilte
 	} else {
 		ret = types.FAILURE
 	}
-	types.ZendStringReleaseEx(str, 1)
+	// types.ZendStringReleaseEx(str, 1)
 	return ret
 }
 func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {

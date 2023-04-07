@@ -72,7 +72,7 @@ func ZendDeclarePropertyEx(ce *types.ClassEntry, name *types.String, property *t
 func ZendDeclareProperty(ce *types.ClassEntry, name *byte, name_length int, property *types.Zval, access_type int) int {
 	var key *types.String = types.NewString(b.CastStr(name, name_length))
 	var ret int = ZendDeclarePropertyEx(ce, key, property, access_type, nil)
-	types.ZendStringRelease(key)
+	// types.ZendStringRelease(key)
 	return ret
 }
 func ZendDeclarePropertyNull(ce *types.ClassEntry, name string, name_length int, access_type int) int {
@@ -151,7 +151,7 @@ func ZendDeclareClassConstant(ce *types.ClassEntry, name *byte, name_length int,
 		key = types.NewString(b.CastStr(name, name_length))
 	}
 	ret = ZendDeclareClassConstantEx(ce, key, value, AccPublic, nil)
-	types.ZendStringRelease(key)
+	// types.ZendStringRelease(key)
 	return ret
 }
 func ZendDeclareClassConstantNull(ce *types.ClassEntry, name *byte, name_length int) int {
@@ -284,7 +284,7 @@ func ZendUpdateStaticPropertyEx(scope *types.ClassEntry, name *types.String, val
 func ZendUpdateStaticProperty(scope *types.ClassEntry, name *byte, name_length int, value *types.Zval) int {
 	var key *types.String = types.NewString(b.CastStr(name, name_length))
 	var retval int = ZendUpdateStaticPropertyEx(scope, key, value)
-	types.ZendStringEfree(key)
+	// types.ZendStringEfree(key)
 	return retval
 }
 func ZendUpdateStaticPropertyNull(scope *types.ClassEntry, name *byte, name_length int) int {
@@ -341,7 +341,7 @@ func ZendReadProperty(
 	var str *types.String
 	str = types.NewString(b.CastStr(name, name_length))
 	value = ZendReadPropertyEx(scope, object, str, silent, rv)
-	types.ZendStringReleaseEx(str, 0)
+	// types.ZendStringReleaseEx(str, 0)
 	return value
 }
 func ZendReadStaticPropertyEx(scope *types.ClassEntry, name *types.String, silent types.ZendBool) *types.Zval {
@@ -355,7 +355,7 @@ func ZendReadStaticPropertyEx(scope *types.ClassEntry, name *types.String, silen
 func ZendReadStaticProperty(scope *types.ClassEntry, name *byte, name_length int, silent types.ZendBool) *types.Zval {
 	var key *types.String = types.NewString(b.CastStr(name, name_length))
 	var property *types.Zval = ZendReadStaticPropertyEx(scope, key, silent)
-	types.ZendStringEfree(key)
+	// types.ZendStringEfree(key)
 	return property
 }
 func ZendSaveErrorHandling(current *ZendErrorHandling) {

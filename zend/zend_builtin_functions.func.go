@@ -241,7 +241,7 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 					p.SetModified(1)
 				}
 			} else if p.GetOrigValue() != p.GetValue() {
-				types.ZendStringReleaseEx(p.GetValue(), 0)
+				// types.ZendStringReleaseEx(p.GetValue(), 0)
 			}
 			p.SetValue(new_val)
 			if newErrorLevel.IsLong() {
@@ -730,7 +730,7 @@ func SameName(key *types.String, name *types.String) int {
 	}
 	lcname = ZendStringTolower(name)
 	ret = memcmp(lcname.GetVal(), key.GetVal(), key.GetLen()) == 0
-	types.ZendStringReleaseEx(lcname, 0)
+	// types.ZendStringReleaseEx(lcname, 0)
 	return ret
 }
 func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Zval) {
@@ -802,7 +802,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 	}
 	lcname = ZendStringTolower(method_name)
 	func_ = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname.GetStr())
-	types.ZendStringReleaseEx(lcname, 0)
+	// types.ZendStringReleaseEx(lcname, 0)
 	if func_ != nil {
 
 		/* Exclude shadow properties when checking a method on a specific class. Include
@@ -821,7 +821,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 				/* Returns true to the fake Closure's __invoke */
 
 				types.ZVAL_BOOL(return_value, func_.GetScope() == ZendCeClosure && types.ZendStringEqualsLiteral(method_name, ZEND_INVOKE_FUNC_NAME))
-				types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
+				// types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
 				ZendFreeTrampoline(func_)
 				return
 			}
@@ -900,7 +900,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 			lcname = ZendStringTolower(name)
 		}
 		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr())
-		types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
 	} else {
 		ce = ZendLookupClass(name)
 	}
@@ -946,7 +946,7 @@ func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *t
 		lcname = ZendStringTolower(name)
 	}
 	func_ = types.ZendHashFindPtr(EG__().GetFunctionTable(), lcname.GetStr())
-	types.ZendStringReleaseEx(lcname, 0)
+	// types.ZendStringReleaseEx(lcname, 0)
 
 	/*
 	 * A bit of a hack, but not a bad one: we see if the handler of the function
@@ -1042,7 +1042,7 @@ func ZifSetErrorHandler(executeData zpp.Ex, return_value zpp.Ret, errorHandler *
 		if ZendIsCallable(error_handler, 0, nil) == 0 {
 			var error_handler_name = ZendGetCallableName(error_handler)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(error_handler_name != nil, func() []byte { return error_handler_name.GetVal() }, "unknown"))
-			types.ZendStringReleaseEx(error_handler_name, 0)
+			// types.ZendStringReleaseEx(error_handler_name, 0)
 			return
 		}
 	}
@@ -1090,7 +1090,7 @@ func ZifSetExceptionHandler(executeData zpp.Ex, return_value zpp.Ret, exceptionH
 		if ZendIsCallable(exception_handler, 0, nil) == 0 {
 			var exception_handler_name = ZendGetCallableName(exception_handler)
 			faults.Error(faults.E_WARNING, "%s() expects the argument (%s) to be a valid callback", GetActiveFunctionName(), b.CondF1(exception_handler_name != nil, func() []byte { return exception_handler_name.GetVal() }, "unknown"))
-			types.ZendStringReleaseEx(exception_handler_name, 0)
+			// types.ZendStringReleaseEx(exception_handler_name, 0)
 			return
 		}
 	}
@@ -1658,7 +1658,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			ZEND_PUTS(class_name.GetStr())
 			ZEND_PUTS(call_type)
 			if object != nil && func_.GetScope() == nil && object.GetHandlers().GetGetClassName() != ZendStdGetClassName {
-				types.ZendStringReleaseEx(class_name, 0)
+				// types.ZendStringReleaseEx(class_name, 0)
 			}
 		}
 		ZendPrintf("%s(", function_name)

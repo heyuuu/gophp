@@ -144,7 +144,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xff {
 		r.Fclose(fp)
 		if spoolbuf != nil {
-			types.ZendStringEfree(spoolbuf)
+			// types.ZendStringEfree(spoolbuf)
 		}
 		return_value.SetFalse()
 		return
@@ -152,7 +152,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xd8 {
 		r.Fclose(fp)
 		if spoolbuf != nil {
-			types.ZendStringEfree(spoolbuf)
+			// types.ZendStringEfree(spoolbuf)
 		}
 		return_value.SetFalse()
 		return

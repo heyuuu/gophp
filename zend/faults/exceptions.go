@@ -464,7 +464,7 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		str.AppendString("Object(")
 		str.AppendString(b.CastStrAuto(class_name.GetVal()))
 		str.AppendString("), ")
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 	}
 }
 func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
@@ -603,7 +603,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		}
 		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
 			var real_message *types.String = zend.ZendStrpprintf(0, "%s and defined", message.GetVal())
-			types.ZendStringReleaseEx(message, 0)
+			// types.ZendStringReleaseEx(message, 0)
 			message = real_message
 		}
 		if message.GetLen() > 0 {
@@ -611,9 +611,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		} else {
 			str = zend.ZendStrpprintf(0, "%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.GetStr().GetLen() != 0, func() []byte { return trace.GetStr().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
-		types.ZendStringReleaseEx(prev_str, 0)
-		types.ZendStringReleaseEx(message, 0)
-		types.ZendStringReleaseEx(file, 0)
+		// types.ZendStringReleaseEx(prev_str, 0)
+		// types.ZendStringReleaseEx(message, 0)
+		// types.ZendStringReleaseEx(file, 0)
 		zend.ZvalPtrDtor(&trace)
 		exception.ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.ZSTR_PREVIOUS)
@@ -621,7 +621,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			break
 		}
 	}
-	types.ZendStringReleaseEx(fname, 0)
+	// types.ZendStringReleaseEx(fname, 0)
 	exception = zend.ZEND_THIS(executeData)
 
 	/* Reset apply counts */
@@ -779,8 +779,8 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 		var file *types.String = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.ZSTR_FILE))
 		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.ZSTR_LINE))
 		ErrorHelper(b.Cond(ce_exception == ZendCeParseError, E_PARSE, E_COMPILE_ERROR), file.GetVal(), line, "%s", message.GetVal())
-		types.ZendStringReleaseEx(file, 0)
-		types.ZendStringReleaseEx(message, 0)
+		// types.ZendStringReleaseEx(file, 0)
+		// types.ZendStringReleaseEx(message, 0)
 	} else if zend.InstanceofFunction(ce_exception, ZendCeThrowable) != 0 {
 		var tmp types.Zval
 		var str *types.String
@@ -807,15 +807,15 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 			}
 			ErrorVa(E_WARNING, b.CondF1(file != nil && file.GetLen() > 0, func() []byte { return file.GetVal() }, nil), line, "Uncaught %s in exception handling during call to %s::__tostring()", types.Z_OBJCE(zv).GetName().GetVal(), ce_exception.GetName().GetVal())
 			if file != nil {
-				types.ZendStringReleaseEx(file, 0)
+				// types.ZendStringReleaseEx(file, 0)
 			}
 		}
 		str = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.ZSTR_STRING))
 		file = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.ZSTR_FILE))
 		line = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.ZSTR_LINE))
 		ErrorVa(severity, b.CondF1(file != nil && file.GetLen() > 0, func() []byte { return file.GetVal() }, nil), line, "Uncaught %s\n  thrown", str.GetVal())
-		types.ZendStringReleaseEx(str, 0)
-		types.ZendStringReleaseEx(file, 0)
+		// types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(file, 0)
 	} else {
 		Error(severity, "Uncaught exception '%s'", ce_exception.GetName().GetVal())
 	}

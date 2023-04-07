@@ -586,7 +586,7 @@ func ZifPathinfo(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ z
 		zend.AddAssocStringl(&tmp, "filename", ret.GetVal(), idx)
 	}
 	if ret != nil {
-		types.ZendStringReleaseEx(ret, 0)
+		// types.ZendStringReleaseEx(ret, 0)
 	}
 	if opt == PHP_PATHINFO_ALL {
 		types.ZVAL_COPY_VALUE(return_value, &tmp)
@@ -1478,7 +1478,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 
 					/* skip long patterns */
 
-					types.ZendStringRelease(key_used)
+					// types.ZendStringRelease(key_used)
 					continue
 				}
 				if len_ > maxlen {
@@ -1507,7 +1507,7 @@ func PhpStrtrArray(return_value *types.Zval, input *types.String, pats *types.Ar
 			}
 			str_hash.KeyAdd(key_used.GetStr(), entry)
 			if str_key == nil {
-				types.ZendStringReleaseEx(key_used, 0)
+				// types.ZendStringReleaseEx(key_used, 0)
 			}
 		}
 		pats = &str_hash
@@ -1745,7 +1745,7 @@ func PhpStrToStrIEx(
 				memcpy(new_str.GetVal()+(r-lc_haystack), str, str_len)
 				*replace_count++
 			}
-			types.ZendStringReleaseEx(lc_needle, 0)
+			// types.ZendStringReleaseEx(lc_needle, 0)
 			if new_str == nil {
 				goto nothing_todo
 			}
@@ -1765,7 +1765,7 @@ func PhpStrToStrIEx(
 
 				/* Needle doesn't occur, shortcircuit the actual replacement. */
 
-				types.ZendStringReleaseEx(lc_needle, 0)
+				// types.ZendStringReleaseEx(lc_needle, 0)
 				goto nothing_todo
 			}
 			if str_len > lc_needle.GetLen() {
@@ -1787,7 +1787,7 @@ func PhpStrToStrIEx(
 				e += end - p
 			}
 			*e = '0'
-			types.ZendStringReleaseEx(lc_needle, 0)
+			// types.ZendStringReleaseEx(lc_needle, 0)
 			return new_str
 		}
 	} else if needle.GetLen() > haystack.GetLen() {
@@ -1796,10 +1796,10 @@ func PhpStrToStrIEx(
 	} else {
 		lc_needle = PhpStringTolower(needle)
 		if memcmp(lc_haystack, lc_needle.GetVal(), lc_needle.GetLen()) {
-			types.ZendStringReleaseEx(lc_needle, 0)
+			// types.ZendStringReleaseEx(lc_needle, 0)
 			goto nothing_todo
 		}
-		types.ZendStringReleaseEx(lc_needle, 0)
+		// types.ZendStringReleaseEx(lc_needle, 0)
 		new_str = types.NewString(b.CastStr(str, str_len))
 		*replace_count++
 		return new_str
@@ -2340,7 +2340,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 				var old_replace_count zend.ZendLong = replace_count
 				tmp_result = PhpCharToStrEx(subject_str, search_str.GetVal()[0], replace_value, replace_len, case_sensitivity, &replace_count)
 				if lc_subject_str != nil && replace_count != old_replace_count {
-					types.ZendStringReleaseEx(lc_subject_str, 0)
+					// types.ZendStringReleaseEx(lc_subject_str, 0)
 					lc_subject_str = nil
 				}
 			} else if search_str.GetLen() > 1 {
@@ -2353,7 +2353,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 					}
 					tmp_result = PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search_str, replace_value, replace_len, &replace_count)
 					if replace_count != old_replace_count {
-						types.ZendStringReleaseEx(lc_subject_str, 0)
+						// types.ZendStringReleaseEx(lc_subject_str, 0)
 						lc_subject_str = nil
 					}
 				}
@@ -2367,13 +2367,13 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 			if subject_str == tmp_result {
 				subject_str.DelRefcount()
 			} else {
-				types.ZendStringReleaseEx(subject_str, 0)
+				// types.ZendStringReleaseEx(subject_str, 0)
 				subject_str = tmp_result
 				if subject_str.GetLen() == 0 {
-					types.ZendStringReleaseEx(subject_str, 0)
+					// types.ZendStringReleaseEx(subject_str, 0)
 					zend.ZVAL_EMPTY_STRING(result)
 					if lc_subject_str != nil {
-						types.ZendStringReleaseEx(lc_subject_str, 0)
+						// types.ZendStringReleaseEx(lc_subject_str, 0)
 					}
 					zend.ZendTmpStringRelease(tmp_subject_str)
 					return replace_count
@@ -2382,7 +2382,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 		}
 		result.SetString(subject_str)
 		if lc_subject_str != nil {
-			types.ZendStringReleaseEx(lc_subject_str, 0)
+			// types.ZendStringReleaseEx(lc_subject_str, 0)
 		}
 	} else {
 		b.Assert(search.IsType(types.IS_STRING))
@@ -2394,7 +2394,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 			} else {
 				lc_subject_str = PhpStringTolower(subject_str)
 				result.SetString(PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search.GetStr(), replace.GetStr().GetVal(), replace.GetStr().GetLen(), &replace_count))
-				types.ZendStringReleaseEx(lc_subject_str, 0)
+				// types.ZendStringReleaseEx(lc_subject_str, 0)
 			}
 		} else {
 			result.SetStringCopy(subject_str)
@@ -2660,7 +2660,7 @@ func PhpHebrev(executeData *zend.ZendExecuteData, return_value *types.Zval, conv
 	zend.Efree(heb_str)
 	if convert_newlines != 0 {
 		return_value.SetString(PhpCharToStrEx(broken_str, '\n', "<br />\n", 7, 1, nil))
-		types.ZendStringReleaseEx(broken_str, 0)
+		// types.ZendStringReleaseEx(broken_str, 0)
 	} else {
 		return_value.SetString(broken_str)
 		return
@@ -2784,7 +2784,7 @@ func ZifStripTags(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ z
 				tags_ss.AppendByte('<')
 				tags_ss.AppendString(tag.GetStr())
 				tags_ss.AppendByte('>')
-				types.ZendStringRelease(tag)
+				// types.ZendStringRelease(tag)
 			}
 			if tags_ss.GetS() != nil {
 				tags_ss.ZeroTail()
@@ -3705,7 +3705,7 @@ func ZifMoneyFormat(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval
 	}
 	str = types.ZendStringSafeAlloc(format_len, 1, 1024, 0)
 	if b.Assign(&res_len, strfmon(str.GetVal(), str.GetLen(), format, value)) < 0 {
-		types.ZendStringEfree(str)
+		// types.ZendStringEfree(str)
 		return_value.SetFalse()
 		return
 	}

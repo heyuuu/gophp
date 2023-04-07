@@ -73,7 +73,9 @@ func ZendResolveClassNameAst(ast *ZendAst) *types.String {
 func LabelPtrDtor(zv *types.Zval) {
 	EfreeSize(zv.GetPtr(), b.SizeOf("zend_label"))
 }
-func StrDtor(zv *types.Zval) { types.ZendStringReleaseEx(zv.GetStr(), 0) }
+func StrDtor(zv *types.Zval) {
+	// types.ZendStringReleaseEx(zv.GetStr(), 0)
+}
 func ZendAddTryElement(try_op uint32) uint32 {
 	var op_array = CG__().GetActiveOpArray()
 	var try_catch_offset uint32 = b.PostInc(&(op_array.GetLastTryCatch()))
@@ -680,7 +682,7 @@ func ZendAstAppendStr(left_ast *ZendAst, right_ast *ZendAst) *ZendAst {
 	result.GetVal()[left_len] = '\\'
 	memcpy(&result.GetVal()[left_len+1], right.GetVal(), right.GetLen())
 	result.GetVal()[len_] = '0'
-	types.ZendStringReleaseEx(right, 0)
+	// types.ZendStringReleaseEx(right, 0)
 	left_zv.SetString(result)
 	return left_ast
 }

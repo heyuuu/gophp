@@ -255,10 +255,10 @@ func ShutdownExecutor() {
 				}
 				ZvalPtrDtorNogc(c.Value())
 				if c.GetName() != nil {
-					types.ZendStringReleaseEx(c.GetName(), 0)
+					// types.ZendStringReleaseEx(c.GetName(), 0)
 				}
 				Efree(c)
-				types.ZendStringReleaseEx(key, 0)
+				// types.ZendStringReleaseEx(key, 0)
 				__ht.Len()--
 				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
@@ -286,7 +286,7 @@ func ShutdownExecutor() {
 					break
 				}
 				DestroyOpArray(func_.GetOpArray())
-				types.ZendStringReleaseEx(key, 0)
+				// types.ZendStringReleaseEx(key, 0)
 				__ht__1.Len()--
 				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 				var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
@@ -313,7 +313,7 @@ func ShutdownExecutor() {
 					break
 				}
 				DestroyZendClass(zv)
-				types.ZendStringReleaseEx(key, 0)
+				// types.ZendStringReleaseEx(key, 0)
 				__ht__2.Len()--
 				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
 				var nIndex uint32 = _p.GetH() | __ht__2.GetNTableMask()
@@ -527,7 +527,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 				var callable_name *types.String = ZendGetCallableNameEx(fci.GetFunctionName(), fci.GetObject())
 				faults.Error(faults.E_WARNING, "Invalid callback %s, %s", callable_name.GetVal(), error)
 				Efree(error)
-				types.ZendStringReleaseEx(callable_name, 0)
+				// types.ZendStringReleaseEx(callable_name, 0)
 			}
 			if CurrEX() == &dummy_execute_data {
 				EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
@@ -693,7 +693,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		}
 		ZendVmStackFreeArgs(call)
 		if func_.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
-			types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
+			// types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
 		}
 		Efree(func_)
 		if EG__().GetException() != nil {
@@ -739,7 +739,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	zv = EG__().GetClassTable().KeyFind(lc_name.GetStr())
 	if zv != nil {
 		if key == nil {
-			types.ZendStringReleaseEx(lc_name, 0)
+			// types.ZendStringReleaseEx(lc_name, 0)
 		}
 		ce = (*types.ClassEntry)(zv.GetPtr())
 		if !ce.IsLinked() {
@@ -758,7 +758,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 
 	if (flags&ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 || ZendIsCompiling() != 0 {
 		if key == nil {
-			types.ZendStringReleaseEx(lc_name, 0)
+			// types.ZendStringReleaseEx(lc_name, 0)
 		}
 		return nil
 	}
@@ -768,7 +768,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 			EG__().SetAutoloadFunc(func_)
 		} else {
 			if key == nil {
-				types.ZendStringReleaseEx(lc_name, 0)
+				// types.ZendStringReleaseEx(lc_name, 0)
 			}
 			return nil
 		}
@@ -777,7 +777,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	/* Verify class name before passing it to __autoload() */
 
 	if key == nil && strspn(name.GetVal(), "0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ200201202203204205206207210211212213214215216217220221222223224225226227230231232233234235236237240241242243244245246247250251252253254255256257260261262263264265266267270271272273274275276277300301302303304305306307310311312313314315316317320321322323324325326327330331332333334335336337340341342343344345346347350351352353354355356357360361362363364365366367370371372373374375376377\\") != name.GetLen() {
-		types.ZendStringReleaseEx(lc_name, 0)
+		// types.ZendStringReleaseEx(lc_name, 0)
 		return nil
 	}
 	if EG__().GetInAutoload() == nil {
@@ -786,7 +786,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	}
 	if types.ZendHashAddEmptyElement(EG__().GetInAutoload(), lc_name.GetStr()) == nil {
 		if key == nil {
-			types.ZendStringReleaseEx(lc_name, 0)
+			// types.ZendStringReleaseEx(lc_name, 0)
 		}
 		return nil
 	}
@@ -818,7 +818,7 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	types.ZendHashDel(EG__().GetInAutoload(), lc_name.GetStr())
 	ZvalPtrDtor(&local_retval)
 	if key == nil {
-		types.ZendStringReleaseEx(lc_name, 0)
+		// types.ZendStringReleaseEx(lc_name, 0)
 	}
 	return ce
 }

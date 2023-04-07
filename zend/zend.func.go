@@ -185,7 +185,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 		var properties *types.Array
 		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		ZendPrintf("%s Object (", class_name.GetVal())
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		if expr.GetCounted().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
 			return
@@ -226,7 +226,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 		var properties *types.Array
 		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		buf.AppendString(class_name.GetStr())
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		buf.AppendString(" Object\n")
 		if expr.GetObj().IsRecursive() {
 			buf.AppendString(" *RECURSION*")
@@ -252,7 +252,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 	default:
 		var str *types.String = ZvalGetStringFunc(expr)
 		buf.AppendString(str.GetStr())
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 		break
 	}
 }
@@ -265,7 +265,7 @@ func ZendPrintZvalRToStr(expr *types.Zval, indent int) *types.String {
 func ZendPrintZvalR(expr *types.Zval, indent int) {
 	var str *types.String = ZendPrintZvalRToStr(expr, indent)
 	ZendWrite(str.GetStr())
-	types.ZendStringReleaseEx(str, 0)
+	// types.ZendStringReleaseEx(str, 0)
 }
 func ZendFopenWrapper(filename string, opened_path *string) *r.FILE {
 	if opened_path != nil {

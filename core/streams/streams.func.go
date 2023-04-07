@@ -663,7 +663,7 @@ func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *types.String {
 	var str *types.String = types.ZendStringAlloc(len_, 0)
 	var read ssize_t = core.PhpStreamRead(stream, str.GetVal(), len_)
 	if read < 0 {
-		types.ZendStringEfree(str)
+		// types.ZendStringEfree(str)
 		return nil
 	}
 	str.SetLen(read)
@@ -1323,7 +1323,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *types
 			/* Only truncate if the savings are large enough */
 
 		} else {
-			types.ZendStringFree(result)
+			//types.ZendStringFree(result)
 			result = nil
 		}
 		return result
@@ -1360,7 +1360,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *types
 		result = types.ZendStringTruncate(result, len_, persistent)
 		result.GetVal()[len_] = '0'
 	} else {
-		types.ZendStringFree(result)
+		//types.ZendStringFree(result)
 		result = nil
 	}
 	return result
@@ -1554,7 +1554,7 @@ func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper
 	} else {
 		ret = types.FAILURE
 	}
-	types.ZendStringReleaseEx(str, 1)
+	// types.ZendStringReleaseEx(str, 1)
 	return ret
 }
 func PhpUnregisterUrlStreamWrapper(protocol string) int {
@@ -1901,7 +1901,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 	if stream == nil && (options&core.REPORT_ERRORS) != 0 {
 		PhpStreamDisplayWrapperErrors(wrapper, path, "failed to open stream")
 		if opened_path != nil && (*opened_path) != nil {
-			types.ZendStringReleaseEx(*opened_path, 0)
+			// types.ZendStringReleaseEx(*opened_path, 0)
 			*opened_path = nil
 		}
 	}

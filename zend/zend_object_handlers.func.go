@@ -466,7 +466,7 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 		ZendUnmanglePropertyNameEx(prop_info_name, &class_name, &prop_name, &prop_name_len)
 		member = types.NewString(b.CastStr(prop_name, prop_name_len))
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), member, 1)
-		types.ZendStringReleaseEx(member, 0)
+		// types.ZendStringReleaseEx(member, 0)
 		if property_info == nil || property_info == ZEND_WRONG_PROPERTY_INFO {
 			return types.FAILURE
 		}
@@ -1183,7 +1183,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 	}
 	if b.Assign(&func_, zobj.GetCe().GetFunctionTable().KeyFind(lc_method_name.GetStr())) == nil {
 		if key == nil {
-			lc_method_name.Free()
+			//lc_method_name.Free()
 		}
 		if zobj.GetCe().GetCall() != nil {
 			return ZendGetUserCallFunction(zobj.GetCe(), method_name)
@@ -1219,7 +1219,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 	}
 exit:
 	if key == nil {
-		lc_method_name.Free()
+		//lc_method_name.Free()
 	}
 	return fbc
 }
@@ -1243,7 +1243,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 		fbc = ce.GetConstructor()
 	} else {
 		if key == nil {
-			types.ZendStringReleaseEx(lc_function_name, 0)
+			// types.ZendStringReleaseEx(lc_function_name, 0)
 		}
 		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
 
@@ -1275,7 +1275,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 		}
 	}
 	if key == nil {
-		types.ZendStringReleaseEx(lc_function_name, 0)
+		// types.ZendStringReleaseEx(lc_function_name, 0)
 	}
 	return fbc
 }

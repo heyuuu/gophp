@@ -13,7 +13,7 @@ func IncompleteClassMessage(object *types.Zval, error_type int) {
 	class_name = PhpLookupClassName(object)
 	if class_name != nil {
 		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 	} else {
 		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, "unknown")
 	}

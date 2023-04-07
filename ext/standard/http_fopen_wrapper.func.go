@@ -139,7 +139,7 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	if errstr != nil {
 		streams.PhpStreamWrapperLogError(wrapper, options, "%s", errstr.GetVal())
-		types.ZendStringReleaseEx(errstr, 0)
+		// types.ZendStringReleaseEx(errstr, 0)
 		errstr = nil
 	}
 	zend.Efree(transport_string)
@@ -467,7 +467,7 @@ func PhpStreamUrlWrapHttpEx(
 
 		}
 		if tmp != nil {
-			types.ZendStringReleaseEx(tmp, 0)
+			// types.ZendStringReleaseEx(tmp, 0)
 		}
 	}
 
@@ -498,7 +498,7 @@ func PhpStreamUrlWrapHttpEx(
 		req_buf.AppendString(b.CastStrAuto(stmp.GetVal()))
 		req_buf.AppendString("\r\n")
 		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, nil, 0)
-		types.ZendStringFree(stmp)
+		//types.ZendStringFree(stmp)
 		zend.Efree(scratch)
 	}
 
@@ -803,7 +803,7 @@ func PhpStreamUrlWrapHttpEx(
 						if s == nil {
 							s = resource.GetPath().GetVal()
 							if resource.GetPath().GetLen() == 0 {
-								types.ZendStringReleaseEx(resource.GetPath(), 0)
+								// types.ZendStringReleaseEx(resource.GetPath(), 0)
 								resource.SetPath(types.NewString("/"))
 								s = resource.GetPath().GetVal()
 							} else {

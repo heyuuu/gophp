@@ -150,7 +150,7 @@ func PhpUudecode(src *byte, src_len int) *types.String {
 	dest.GetVal()[dest.GetLen()] = '0'
 	return dest
 err:
-	types.ZendStringEfree(dest)
+	// types.ZendStringEfree(dest)
 	return nil
 }
 func ZifConvertUuencode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {

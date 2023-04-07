@@ -1650,7 +1650,7 @@ func PhpExtractPrefixIfExists(arr *types.Array, symbol_table *types.Array, prefi
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
 						if zend.EG__().GetException() != nil {
-							types.ZendStringReleaseEx(final_name.GetStr(), 0)
+							// types.ZendStringReleaseEx(final_name.GetStr(), 0)
 							return -1
 						}
 					} else {
@@ -1793,7 +1793,7 @@ func PhpExtractPrefixSame(arr *types.Array, symbol_table *types.Array, prefix *t
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
 						if zend.EG__().GetException() != nil {
-							types.ZendStringReleaseEx(final_name.GetStr(), 0)
+							// types.ZendStringReleaseEx(final_name.GetStr(), 0)
 							return -1
 						}
 					} else {
@@ -1846,7 +1846,7 @@ func PhpExtractRefPrefixAll(arr *types.Array, symbol_table *types.Array, prefix 
 		} else {
 			var str = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
-			types.ZendStringReleaseEx(str, 0)
+			// types.ZendStringReleaseEx(str, 0)
 		}
 		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
@@ -1901,7 +1901,7 @@ func PhpExtractPrefixAll(arr *types.Array, symbol_table *types.Array, prefix *ty
 		} else {
 			var str = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
-			types.ZendStringReleaseEx(str, 0)
+			// types.ZendStringReleaseEx(str, 0)
 		}
 		if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) != 0 {
 			if types.ZendStringEqualsLiteral(final_name.GetStr(), "this") {
@@ -1915,7 +1915,7 @@ func PhpExtractPrefixAll(arr *types.Array, symbol_table *types.Array, prefix *ty
 					}
 					zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
 					if zend.EG__().GetException() != nil {
-						types.ZendStringReleaseEx(final_name.GetStr(), 0)
+						// types.ZendStringReleaseEx(final_name.GetStr(), 0)
 						return -1
 					}
 				} else {
@@ -1961,7 +1961,7 @@ func PhpExtractRefPrefixInvalid(arr *types.Array, symbol_table *types.Array, pre
 		} else {
 			var str = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
-			types.ZendStringReleaseEx(str, 0)
+			// types.ZendStringReleaseEx(str, 0)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
 
 				continue
@@ -2023,7 +2023,7 @@ func PhpExtractPrefixInvalid(arr *types.Array, symbol_table *types.Array, prefix
 		} else {
 			var str = zend.ZendLongToStr(num_key)
 			PhpPrefixVarname(&final_name, prefix, str.GetVal(), str.GetLen(), 1)
-			types.ZendStringReleaseEx(str, 0)
+			// types.ZendStringReleaseEx(str, 0)
 			if PhpValidVarName(final_name.GetStr().GetVal(), final_name.GetStr().GetLen()) == 0 {
 
 				continue
@@ -2040,7 +2040,7 @@ func PhpExtractPrefixInvalid(arr *types.Array, symbol_table *types.Array, prefix
 				}
 				zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
 				if zend.EG__().GetException() != nil {
-					types.ZendStringReleaseEx(final_name.GetStr(), 0)
+					// types.ZendStringReleaseEx(final_name.GetStr(), 0)
 					return -1
 				}
 			} else {
@@ -2766,7 +2766,7 @@ func PhpArrayDataShuffle(array *types.Zval) {
 	for j = 0; j < n_elems; j++ {
 		p = hash.Bucket(j)
 		if p.GetKey() != nil {
-			types.ZendStringReleaseEx(p.GetKey(), 0)
+			// types.ZendStringReleaseEx(p.GetKey(), 0)
 		}
 		p.SetH(j)
 		p.SetKey(nil)
@@ -4391,7 +4391,7 @@ func ZifArrayChangeKeyCase(executeData zpp.Ex, return_value zpp.Ret, input *type
 				new_key = PhpStringTolower(string_key)
 			}
 			entry = return_value.GetArr().KeyUpdate(new_key.GetStr(), entry)
-			types.ZendStringReleaseEx(new_key, 0)
+			// types.ZendStringReleaseEx(new_key, 0)
 		}
 		zend.ZvalAddRef(entry)
 	}

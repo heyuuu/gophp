@@ -400,7 +400,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 				result.SetOpType(IS_UNUSED)
 				result.GetOp().SetNum(fetch_type | fetch_flags)
 			}
-			types.ZendStringReleaseEx(name, 0)
+			// types.ZendStringReleaseEx(name, 0)
 		} else {
 			var opline *ZendOp = ZendEmitOp(result, ZEND_FETCH_CLASS, nil, &name_node)
 			opline.GetOp1().SetNum(ZEND_FETCH_CLASS_DEFAULT | fetch_flags)
@@ -441,7 +441,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 		result.SetOpType(IS_CV)
 		result.GetOp().SetVar(LookupCv(name))
 		if zv.GetType() != types.IS_STRING {
-			types.ZendStringReleaseEx(name, 0)
+			// types.ZendStringReleaseEx(name, 0)
 		}
 		return types.SUCCESS
 	}
@@ -736,8 +736,8 @@ func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
 	var name1 *types.String = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
 	var name2 *types.String = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
 	var result types.ZendBool = types.ZendStringEquals(name1, name2)
-	types.ZendStringReleaseEx(name1, 0)
-	types.ZendStringReleaseEx(name2, 0)
+	// types.ZendStringReleaseEx(name1, 0)
+	// types.ZendStringReleaseEx(name2, 0)
 	return result
 }
 func ZendCompileAssign(result *Znode, ast *ZendAst) {

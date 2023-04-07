@@ -73,7 +73,7 @@ func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, p
 		buffer.AppendString("Date: ")
 		buffer.AppendString(b.CastStrAuto(dt.GetVal()))
 		buffer.AppendString(" GMT\r\n")
-		types.ZendStringReleaseEx(dt, 0)
+		// types.ZendStringReleaseEx(dt, 0)
 	}
 	buffer.AppendString("Connection: close\r\n")
 }
@@ -759,7 +759,7 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	core.PhpNetworkPopulateNameFromSockaddr(addr, addr_len, &addr_str, nil, 0)
 	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen(), 1))
 	client.SetAddrStrLen(addr_str.GetLen())
-	types.ZendStringReleaseEx(addr_str, 0)
+	// types.ZendStringReleaseEx(addr_str, 0)
 	PhpHttpParserInit(client.GetParser(), PHP_HTTP_REQUEST)
 	client.SetRequestRead(0)
 	client.SetLastHeaderElement(HEADER_NONE)
@@ -859,13 +859,13 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	if errstr != nil {
 		zend.Pefree(errstr, 1)
 	}
-	types.ZendStringFree(escaped_request_uri)
+	//types.ZendStringFree(escaped_request_uri)
 	return types.SUCCESS
 fail:
 	if errstr != nil {
 		zend.Pefree(errstr, 1)
 	}
-	types.ZendStringFree(escaped_request_uri)
+	//types.ZendStringFree(escaped_request_uri)
 	return types.FAILURE
 }
 func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient) int {
@@ -1148,7 +1148,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 	if server_sock == core.SOCK_ERR {
 		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "?"))
 		if errstr != nil {
-			types.ZendStringReleaseEx(errstr, 0)
+			// types.ZendStringReleaseEx(errstr, 0)
 		}
 		retval = types.FAILURE
 		goto out

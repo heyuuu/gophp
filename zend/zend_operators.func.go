@@ -166,7 +166,7 @@ func ZvalGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 }
 func ZendTmpStringRelease(tmp *types.String) {
 	if tmp != nil {
-		types.ZendStringReleaseEx(tmp, 0)
+		// types.ZendStringReleaseEx(tmp, 0)
 	}
 }
 func ZvalTryGetString(op *types.Zval) *types.String {
@@ -472,7 +472,7 @@ try_again:
 				faults.Error(faults.E_WARNING, "A non-numeric value encountered")
 			}
 		}
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_NULL:
 		fallthrough
 	case types.IS_FALSE:
@@ -597,7 +597,7 @@ try_again:
 		} else {
 			op.SetLong(ZEND_STRTOL(str.GetVal(), nil, base))
 		}
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
 		if types.Z_ARRVAL_P(op).Len() {
 			tmp = 1
@@ -644,7 +644,7 @@ try_again:
 	case types.IS_STRING:
 		var str *types.String = op.GetStr()
 		op.SetDouble(ZendStrtod(str.GetVal(), nil))
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
 		if types.Z_ARRVAL_P(op).Len() {
 			tmp = 1
@@ -698,7 +698,7 @@ try_again:
 		} else {
 			op.SetTrue()
 		}
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
 		if types.Z_ARRVAL_P(op).Len() != 0 {
 			tmp = 1
@@ -2712,7 +2712,7 @@ func IncrementString(str *types.Zval) {
 		case LOWER_CASE:
 			t.GetVal()[0] = 'a'
 		}
-		types.ZendStringFree(str.GetStr())
+		//types.ZendStringFree(str.GetStr())
 		str.SetString(t)
 	}
 }

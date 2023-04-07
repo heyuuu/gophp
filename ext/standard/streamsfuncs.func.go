@@ -112,7 +112,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 
 		var quoted_host *types.String = types.NewString(PhpAddslashes(host.GetStr()))
 		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
-		types.ZendStringReleaseEx(quoted_host, 0)
+		// types.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
 		zend.Efree(hashkey)
@@ -124,13 +124,13 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 		if zerrstr != nil && errstr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 		} else if errstr != nil {
-			types.ZendStringReleaseEx(errstr, 0)
+			// types.ZendStringReleaseEx(errstr, 0)
 		}
 		return_value.SetFalse()
 		return
 	}
 	if errstr != nil {
-		types.ZendStringReleaseEx(errstr, 0)
+		// types.ZendStringReleaseEx(errstr, 0)
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
@@ -184,13 +184,13 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 		if zerrstr != nil && errstr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 		} else if errstr != nil {
-			types.ZendStringReleaseEx(errstr, 0)
+			// types.ZendStringReleaseEx(errstr, 0)
 		}
 		return_value.SetFalse()
 		return
 	}
 	if errstr != nil {
-		types.ZendStringReleaseEx(errstr, 0)
+		// types.ZendStringReleaseEx(errstr, 0)
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
@@ -233,13 +233,13 @@ func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstrea
 		core.PhpStreamToZval(clistream, return_value)
 	} else {
 		if peername != nil {
-			types.ZendStringRelease(peername)
+			// types.ZendStringRelease(peername)
 		}
 		core.PhpErrorDocref(nil, faults.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
 		return_value.SetFalse()
 	}
 	if errstr != nil {
-		types.ZendStringReleaseEx(errstr, 0)
+		// types.ZendStringReleaseEx(errstr, 0)
 	}
 }
 func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, wantPeer *types.Zval) {
@@ -266,7 +266,7 @@ func ZifStreamSocketGetName(executeData zpp.Ex, return_value zpp.Ret, stream *ty
 		return
 	}
 	if name.GetLen() == 0 || name.GetVal()[0] == 0 {
-		types.ZendStringReleaseEx(name, 0)
+		// types.ZendStringReleaseEx(name, 0)
 		return_value.SetFalse()
 		return
 	}
@@ -360,7 +360,7 @@ func ZifStreamSocketRecvfrom(executeData zpp.Ex, return_value zpp.Ret, stream *t
 		return_value.SetString(read_buf)
 		return
 	}
-	types.ZendStringEfree(read_buf)
+	// types.ZendStringEfree(read_buf)
 	return_value.SetFalse()
 	return
 }

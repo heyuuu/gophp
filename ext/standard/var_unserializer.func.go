@@ -216,12 +216,12 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 	var str *types.String = types.ZendStringSafeAlloc(1, len_, 0, 0)
 	var end *uint8 = *((**uint8)(p + maxlen))
 	if end < (*p) {
-		types.ZendStringEfree(str)
+		// types.ZendStringEfree(str)
 		return nil
 	}
 	for i = 0; i < len_; i++ {
 		if (*p) >= end {
-			types.ZendStringEfree(str)
+			// types.ZendStringEfree(str)
 			return nil
 		}
 		if (*(*p)) != '\\' {
@@ -237,7 +237,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 				} else if (*(*p)) >= 'A' && (*(*p)) <= 'F' {
 					ch = (ch << 4) + ((*(*p)) - 'A' + 10)
 				} else {
-					types.ZendStringEfree(str)
+					// types.ZendStringEfree(str)
 					return nil
 				}
 			}
@@ -262,7 +262,7 @@ func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserialize
 	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
 	res = types.IntBool(classes.KeyExists(lcname.GetStr()))
-	lcname.Free()
+	//lcname.Free()
 	return res
 }
 func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
@@ -393,14 +393,14 @@ func ProcessNestedData(
 					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.AccPppMask) {
 						if existing_propinfo.HasFlags(zend.AccProtected) {
 							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr())
-							types.ZendStringReleaseEx(unmangled, 0)
+							// types.ZendStringReleaseEx(unmangled, 0)
 						} else if existing_propinfo.HasFlags(zend.AccPrivate) {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
 								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr())
 							} else {
 								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().GetName().GetStr(), unmangled.GetStr())
 							}
-							types.ZendStringReleaseEx(unmangled, 0)
+							// types.ZendStringReleaseEx(unmangled, 0)
 						} else {
 							b.Assert(existing_propinfo.HasFlags(zend.AccPublic))
 							new_key = unmangled
@@ -408,7 +408,7 @@ func ProcessNestedData(
 
 						key.SetString(new_key)
 					} else {
-						types.ZendStringReleaseEx(unmangled, 0)
+						// types.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
 				if b.Assign(&old_data, ht.KeyFind(key.GetStr().GetStr())) != nil {
@@ -835,14 +835,14 @@ yy18:
 		if ce != nil {
 			BG__().serialize_lock--
 			if zend.EG__().GetException() != nil {
-				types.ZendStringReleaseEx(class_name, 0)
+				// types.ZendStringReleaseEx(class_name, 0)
 				return 0
 			}
 			break
 		}
 		BG__().serialize_lock--
 		if zend.EG__().GetException() != nil {
-			types.ZendStringReleaseEx(class_name, 0)
+			// types.ZendStringReleaseEx(class_name, 0)
 			return 0
 		}
 
@@ -862,7 +862,7 @@ yy18:
 		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != types.SUCCESS {
 			BG__().serialize_lock--
 			if zend.EG__().GetException() != nil {
-				types.ZendStringReleaseEx(class_name, 0)
+				// types.ZendStringReleaseEx(class_name, 0)
 				zend.ZvalPtrDtor(&user_func)
 				zend.ZvalPtrDtor(&args[0])
 				return 0
@@ -877,7 +877,7 @@ yy18:
 		BG__().serialize_lock--
 		zend.ZvalPtrDtor(&retval)
 		if zend.EG__().GetException() != nil {
-			types.ZendStringReleaseEx(class_name, 0)
+			// types.ZendStringReleaseEx(class_name, 0)
 			zend.ZvalPtrDtor(&user_func)
 			zend.ZvalPtrDtor(&args[0])
 			return 0
@@ -904,17 +904,17 @@ yy18:
 		if ret != 0 && incomplete_class != 0 {
 			PhpStoreClassName(rval, class_name.GetVal(), len2)
 		}
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		return ret
 	}
 	if (*p) >= max-2 {
 		faults.Error(faults.E_WARNING, "Bad unserialize data")
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	elements = ParseIv2((*p)+2, p)
 	if elements < 0 || elements > max-YYCURSOR {
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	*p += 2
@@ -927,17 +927,17 @@ yy18:
 
 	if ce.GetSerialize() != nil && has_unserialize == 0 {
 		faults.Error(faults.E_WARNING, "Erroneous data format for unserializing '%s'", ce.GetName().GetVal())
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	if zend.ObjectInitEx(rval, ce) == types.FAILURE {
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	if incomplete_class != 0 {
 		PhpStoreClassName(rval, class_name.GetVal(), len2)
 	}
-	types.ZendStringReleaseEx(class_name, 0)
+	// types.ZendStringReleaseEx(class_name, 0)
 	return ObjectCommon(rval, p, max, var_hash, elements, has_unserialize)
 yy23:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -1044,7 +1044,7 @@ yy30:
 		return 0
 	}
 	if (*YYCURSOR) != '"' {
-		types.ZendStringEfree(str)
+		// types.ZendStringEfree(str)
 		*p = YYCURSOR
 		return 0
 	}

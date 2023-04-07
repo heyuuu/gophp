@@ -13,17 +13,17 @@ import (
 func BROWSCAP_G(v __auto__) __auto__ { return BrowscapGlobals.v }
 func BrowscapEntryDtor(zvalue *types.Zval) {
 	var entry *BrowscapEntry = zvalue.GetPtr()
-	types.ZendStringReleaseEx(entry.GetPattern(), 0)
+	// types.ZendStringReleaseEx(entry.GetPattern(), 0)
 	if entry.GetParent() != nil {
-		types.ZendStringReleaseEx(entry.GetParent(), 0)
+		// types.ZendStringReleaseEx(entry.GetParent(), 0)
 	}
 	zend.Efree(entry)
 }
 func BrowscapEntryDtorPersistent(zvalue *types.Zval) {
 	var entry *BrowscapEntry = zvalue.GetPtr()
-	types.ZendStringReleaseEx(entry.GetPattern(), 1)
+	// types.ZendStringReleaseEx(entry.GetPattern(), 1)
 	if entry.GetParent() != nil {
-		types.ZendStringReleaseEx(entry.GetParent(), 1)
+		// types.ZendStringReleaseEx(entry.GetParent(), 1)
 	}
 	zend.Pefree(entry, 1)
 }
@@ -230,7 +230,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
-					types.ZendStringRelease(ctx.GetCurrentEntry().GetParent())
+					// types.ZendStringRelease(ctx.GetCurrentEntry().GetParent())
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
@@ -250,13 +250,13 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 		if persistent != 0 {
 			pattern = types.ZendNewInternedString(pattern.Copy())
-			types.ZendStringRelease(pattern)
+			// types.ZendStringRelease(pattern)
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
 		entry = ctx.GetCurrentEntry()
 		types.ZendHashUpdatePtr(bdata.GetHtab(), pattern.GetStr(), entry)
 		if ctx.GetCurrentSectionName() != nil {
-			types.ZendStringRelease(ctx.GetCurrentSectionName())
+			// types.ZendStringRelease(ctx.GetCurrentSectionName())
 		}
 		ctx.SetCurrentSectionName(pattern.Copy())
 		entry.SetPattern(pattern.Copy())
@@ -270,7 +270,9 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 	}
 }
-func StrInternedDtor(zv *types.Zval) { types.ZendStringRelease(zv.GetStr()) }
+func StrInternedDtor(zv *types.Zval) {
+	// types.ZendStringRelease(zv.GetStr())
+}
 func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int {
 	var fh zend.ZendFileHandle
 	var ctx BrowscapParserCtx = MakeBrowscapParserCtx(0)
@@ -299,7 +301,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	/* Destroy parser context */
 
 	if ctx.GetCurrentSectionName() != nil {
-		types.ZendStringRelease(ctx.GetCurrentSectionName())
+		// types.ZendStringRelease(ctx.GetCurrentSectionName())
 	}
 	ctx.GetStrInterned().Destroy()
 	return types.SUCCESS
@@ -311,8 +313,8 @@ func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 		zend.Pefree(bdata.GetHtab(), persistent)
 		bdata.SetHtab(nil)
 		for i = 0; i < bdata.GetKvUsed(); i++ {
-			types.ZendStringRelease(bdata.GetKv()[i].GetKey())
-			types.ZendStringRelease(bdata.GetKv()[i].GetValue())
+			// types.ZendStringRelease(bdata.GetKv()[i].GetKey())
+			// types.ZendStringRelease(bdata.GetKv()[i].GetValue())
 		}
 		zend.Pefree(bdata.GetKv(), persistent)
 		bdata.SetKv(nil)
@@ -413,7 +415,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 		if entry.GetContainsLen()[i] != 0 {
 			cur = zend.ZendMemnstr(cur, pattern_lc.GetVal()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetVal()+agent_name.GetLen())
 			if cur == nil {
-				pattern_lc.Free()
+				//pattern_lc.Free()
 				return 0
 			}
 			cur += entry.GetContainsLen()[i]
@@ -424,20 +426,20 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 
 	if types.ZendStringEquals(agent_name, pattern_lc) != 0 {
 		*found_entry_ptr = entry
-		pattern_lc.Free()
+		//pattern_lc.Free()
 		return 1
 	}
 	regex = BrowscapConvertPattern(entry.GetPattern(), 0)
 	re = pcre_get_compiled_regex(regex, &capture_count)
 	if re == nil {
-		pattern_lc.Free()
-		types.ZendStringRelease(regex)
+		//pattern_lc.Free()
+		// types.ZendStringRelease(regex)
 		return 0
 	}
 	match_data = php_pcre_create_match_data(capture_count, re)
 	if match_data == nil {
-		pattern_lc.Free()
-		types.ZendStringRelease(regex)
+		//pattern_lc.Free()
+		// types.ZendStringRelease(regex)
 		return 0
 	}
 	rc = pcre2_match(re, PCRE2_SPTR(agent_name.GetVal()), agent_name.GetLen(), 0, 0, match_data, php_pcre_mctx())
@@ -498,8 +500,8 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 		   the previous match found and the current match. */
 
 	}
-	pattern_lc.Free()
-	types.ZendStringRelease(regex)
+	//pattern_lc.Free()
+	//// types.ZendStringRelease(regex)
 	return 0
 }
 func BrowscapZvalCopyCtor(p *types.Zval) {
@@ -574,7 +576,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		if found_entry == nil {
 			found_entry = types.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME)
 			if found_entry == nil {
-				types.ZendStringRelease(lookup_browser_name)
+				// types.ZendStringRelease(lookup_browser_name)
 				return_value.SetFalse()
 				return
 			}
@@ -600,5 +602,5 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		agent_ht.Destroy()
 		zend.Efree(agent_ht)
 	}
-	types.ZendStringReleaseEx(lookup_browser_name, 0)
+	// types.ZendStringReleaseEx(lookup_browser_name, 0)
 }

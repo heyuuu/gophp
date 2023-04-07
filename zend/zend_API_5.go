@@ -269,7 +269,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		if types.ZendHashAddPtr(target_function_table, lowercase_name.GetStr(), reg_function) == nil {
 			unload = 1
 			Free(reg_function)
-			types.ZendStringRelease(lowercase_name)
+			// types.ZendStringRelease(lowercase_name)
 			break
 		}
 
@@ -365,7 +365,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		}
 		ptr++
 		count++
-		types.ZendStringRelease(lowercase_name)
+		// types.ZendStringRelease(lowercase_name)
 	}
 	if unload != 0 {
 		if scope != nil {
@@ -378,7 +378,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			if target_function_table.KeyExists(lowercase_name.GetStr()) {
 				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
-			types.ZendStringEfree(lowercase_name)
+			// types.ZendStringEfree(lowercase_name)
 			ptr++
 		}
 		ZendUnregisterFunctions(functions, count, target_function_table)

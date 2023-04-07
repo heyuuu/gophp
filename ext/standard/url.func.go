@@ -12,25 +12,25 @@ import (
 
 func PhpUrlFree(theurl *PhpUrl) {
 	if theurl.GetScheme() != nil {
-		types.ZendStringReleaseEx(theurl.GetScheme(), 0)
+		// types.ZendStringReleaseEx(theurl.GetScheme(), 0)
 	}
 	if theurl.GetUser() != nil {
-		types.ZendStringReleaseEx(theurl.GetUser(), 0)
+		// types.ZendStringReleaseEx(theurl.GetUser(), 0)
 	}
 	if theurl.GetPass() != nil {
-		types.ZendStringReleaseEx(theurl.GetPass(), 0)
+		// types.ZendStringReleaseEx(theurl.GetPass(), 0)
 	}
 	if theurl.GetHost() != nil {
-		types.ZendStringReleaseEx(theurl.GetHost(), 0)
+		// types.ZendStringReleaseEx(theurl.GetHost(), 0)
 	}
 	if theurl.GetPath() != nil {
-		types.ZendStringReleaseEx(theurl.GetPath(), 0)
+		// types.ZendStringReleaseEx(theurl.GetPath(), 0)
 	}
 	if theurl.GetQuery() != nil {
-		types.ZendStringReleaseEx(theurl.GetQuery(), 0)
+		// types.ZendStringReleaseEx(theurl.GetQuery(), 0)
 	}
 	if theurl.GetFragment() != nil {
-		types.ZendStringReleaseEx(theurl.GetFragment(), 0)
+		// types.ZendStringReleaseEx(theurl.GetFragment(), 0)
 	}
 	zend.Efree(theurl)
 }

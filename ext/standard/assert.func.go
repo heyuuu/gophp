@@ -126,7 +126,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			} else {
 				var str *types.String = zend.ZvalGetString(description)
 				faults.ThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
-				types.ZendStringReleaseEx(str, 0)
+				// types.ZendStringReleaseEx(str, 0)
 			}
 			if ASSERTG(bail) {
 				faults.Bailout()
@@ -184,7 +184,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		} else {
 			var str *types.String = zend.ZvalGetString(description)
 			faults.ThrowException(AssertionErrorCe, str.GetVal(), faults.E_ERROR)
-			types.ZendStringReleaseEx(str, 0)
+			// types.ZendStringReleaseEx(str, 0)
 		}
 	} else if ASSERTG(warning) {
 		if description == nil {
@@ -200,7 +200,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "%s failed", str.GetVal())
 			}
-			types.ZendStringReleaseEx(str, 0)
+			// types.ZendStringReleaseEx(str, 0)
 		}
 	}
 	if ASSERTG(bail) {
@@ -238,8 +238,8 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 			}
 			key = types.NewString("assert.active")
 			zend.ZendAlterIniEntryEx(key, value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
-			types.ZendStringReleaseEx(key, 0)
-			types.ZendStringReleaseEx(value_str, 0)
+			// types.ZendStringReleaseEx(key, 0)
+			// types.ZendStringReleaseEx(value_str, 0)
 		}
 		return_value.SetLong(oldint)
 		return
@@ -252,8 +252,8 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 			}
 			key = types.NewString("assert.bail")
 			zend.ZendAlterIniEntryEx(key, value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
-			types.ZendStringReleaseEx(key, 0)
-			types.ZendStringReleaseEx(value_str, 0)
+			// types.ZendStringReleaseEx(key, 0)
+			// types.ZendStringReleaseEx(value_str, 0)
 		}
 		return_value.SetLong(oldint)
 		return
@@ -266,8 +266,8 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 			}
 			key = types.NewString("assert.quiet_eval")
 			zend.ZendAlterIniEntryEx(key, value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
-			types.ZendStringReleaseEx(key, 0)
-			types.ZendStringReleaseEx(value_str, 0)
+			// types.ZendStringReleaseEx(key, 0)
+			// types.ZendStringReleaseEx(value_str, 0)
 		}
 		return_value.SetLong(oldint)
 		return
@@ -280,8 +280,8 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 			}
 			key = types.NewString("assert.warning")
 			zend.ZendAlterIniEntryEx(key, value_str, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
-			types.ZendStringReleaseEx(key, 0)
-			types.ZendStringReleaseEx(value_str, 0)
+			// types.ZendStringReleaseEx(key, 0)
+			// types.ZendStringReleaseEx(value_str, 0)
 		}
 		return_value.SetLong(oldint)
 		return
@@ -307,8 +307,8 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 			}
 			key = types.NewString("assert.exception")
 			zend.ZendAlterIniEntryEx(key, val, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0)
-			types.ZendStringReleaseEx(val, 0)
-			types.ZendStringReleaseEx(key, 0)
+			// types.ZendStringReleaseEx(val, 0)
+			// types.ZendStringReleaseEx(key, 0)
 		}
 		return_value.SetLong(oldint)
 		return

@@ -1230,7 +1230,7 @@ func _phpMathNumberFormatEx(
 		b.PostDec(&(*t)) = '-'
 	}
 	res.SetLen(reslen)
-	types.ZendStringReleaseEx(tmpbuf, 0)
+	// types.ZendStringReleaseEx(tmpbuf, 0)
 	return res
 }
 func ZifNumberFormat(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zpp.Opt, numDecimalPlaces *types.Zval, decSeparator *types.Zval, thousandsSeparator *types.Zval) {

@@ -320,7 +320,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 }
 func FilterItemDtor(zv *types.Zval) {
 	var fdat *PhpUserFilterData = zv.GetPtr()
-	types.ZendStringReleaseEx(fdat.GetClassname(), 0)
+	// types.ZendStringReleaseEx(fdat.GetClassname(), 0)
 	zend.Efree(fdat)
 }
 func ZifStreamBucketMakeWriteable(executeData zpp.Ex, return_value zpp.Ret, brigade *types.Zval) {
@@ -518,7 +518,7 @@ func ZifStreamFilterRegister(executeData zpp.Ex, return_value zpp.Ret, filternam
 	if types.ZendHashAddPtr(BG__().user_filter_map, filtername.GetStr(), fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == types.SUCCESS {
 		return_value.SetTrue()
 	} else {
-		types.ZendStringReleaseEx(classname, 0)
+		// types.ZendStringReleaseEx(classname, 0)
 		zend.Efree(fdat)
 	}
 }

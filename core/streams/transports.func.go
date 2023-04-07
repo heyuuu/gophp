@@ -13,7 +13,7 @@ func PhpStreamXportGetHash() *types.Array { return &XportHash }
 func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) int {
 	var str *types.String = types.ZendStringInitInterned(protocol, strlen(protocol), 1)
 	types.ZendHashUpdatePtr(&XportHash, str.GetStr(), factory)
-	types.ZendStringReleaseEx(str, 1)
+	// types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }
 func PhpStreamXportUnregister(protocol *byte) int {
@@ -32,7 +32,7 @@ func ERR_RETURN(out_err **types.String, local_err *types.String, fmt string) {
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
 		if local_err != nil {
-			types.ZendStringReleaseEx(local_err, 0)
+			// types.ZendStringReleaseEx(local_err, 0)
 			local_err = nil
 		}
 	}

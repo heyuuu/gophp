@@ -108,7 +108,7 @@ func PhpUrlEncodeHashEx(
 				}
 				memcpy(p, ekey.GetVal(), ekey.GetLen())
 				p += ekey.GetLen()
-				types.ZendStringFree(ekey)
+				//types.ZendStringFree(ekey)
 				if key_suffix {
 					memcpy(p, key_suffix, key_suffix_len)
 					p += key_suffix_len
@@ -181,7 +181,7 @@ func PhpUrlEncodeHashEx(
 					ekey = PhpUrlEncode(prop_name, prop_len)
 				}
 				formstr.AppendString(ekey.GetStr())
-				types.ZendStringFree(ekey)
+				//types.ZendStringFree(ekey)
 			} else {
 
 				/* Numeric key */
@@ -204,7 +204,7 @@ func PhpUrlEncodeHashEx(
 					ekey = PhpUrlEncode(zdata.GetStr().GetVal(), zdata.GetStr().GetLen())
 				}
 				formstr.AppendString(ekey.GetStr())
-				types.ZendStringFree(ekey)
+				//types.ZendStringFree(ekey)
 			case types.IS_LONG:
 				formstr.AppendLong(zdata.GetLval())
 			case types.IS_FALSE:
@@ -222,7 +222,7 @@ func PhpUrlEncodeHashEx(
 				}
 				formstr.AppendString(ekey.GetStr())
 				zend.ZendTmpStringRelease(tmp)
-				types.ZendStringFree(ekey)
+				//types.ZendStringFree(ekey)
 			}
 		}
 	}

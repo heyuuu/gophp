@@ -179,11 +179,11 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 		zend.AddAssocZvalEx(&tmp, "obj", element.GetObj())
 		zend.AddAssocZvalEx(&tmp, "inf", element.GetInf())
 		storage.GetArr().KeyUpdate(md5str.GetStr(), &tmp)
-		types.ZendStringReleaseEx(md5str, 0)
+		// types.ZendStringReleaseEx(md5str, 0)
 	}
 	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage")
 	debug_info.SymtableUpdate(zname.GetStr(), &storage)
-	types.ZendStringReleaseEx(zname, 0)
+	// types.ZendStringReleaseEx(zname, 0)
 	return debug_info
 }
 func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array {

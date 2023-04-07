@@ -168,7 +168,7 @@ func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
 func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {
 	var name_str *types.String = ZendAstGetStr(name)
 	if types.ZendStringEqualsLiteralCi(name_str, "class") {
-		types.ZendStringRelease(name_str)
+		// types.ZendStringRelease(name_str)
 		return ZendAstCreate(ZEND_AST_CLASS_NAME, class_name)
 	} else {
 		return ZendAstCreate(ZEND_AST_CLASS_CONST, class_name, name)
@@ -758,14 +758,14 @@ tail_call:
 			goto tail_call
 		}
 	} else if ast.GetKind() == ZEND_AST_CONSTANT {
-		types.ZendStringReleaseEx(ZendAstGetConstantName(ast), 0)
+		// types.ZendStringReleaseEx(ZendAstGetConstantName(ast), 0)
 	} else if ast.GetKind() >= ZEND_AST_FUNC_DECL {
 		var decl *ZendAstDecl = (*ZendAstDecl)(ast)
 		if decl.GetName() != nil {
-			types.ZendStringReleaseEx(decl.GetName(), 0)
+			// types.ZendStringReleaseEx(decl.GetName(), 0)
 		}
 		if decl.GetDocComment() != nil {
-			types.ZendStringReleaseEx(decl.GetDocComment(), 0)
+			// types.ZendStringReleaseEx(decl.GetDocComment(), 0)
 		}
 		ZendAstDestroy(decl.GetChild()[0])
 		ZendAstDestroy(decl.GetChild()[1])
@@ -1069,7 +1069,7 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 	case types.IS_DOUBLE:
 		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
 		str.AppendString(key.GetStr())
-		types.ZendStringReleaseEx(key, 0)
+		// types.ZendStringReleaseEx(key, 0)
 	case types.IS_STRING:
 		str.AppendByte('\'')
 		ZendAstExportStr(str, zv.GetStr())

@@ -140,13 +140,13 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			ZendSpprintf(error, 0, "class '%.*s' not found", int(name_len), name.GetVal())
 		}
 	}
-	lcname.Free()
+	//lcname.Free()
 	return ret
 }
 func ZendReleaseFcallInfoCache(fcc *types.ZendFcallInfoCache) {
 	if fcc.GetFunctionHandler() != nil && (fcc.GetFunctionHandler().IsCallViaTrampoline() || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION) {
 		if fcc.GetFunctionHandler().GetType() != ZEND_OVERLOADED_FUNCTION && fcc.GetFunctionHandler().GetFunctionName() != nil {
-			types.ZendStringReleaseEx(fcc.GetFunctionHandler().GetFunctionName(), 0)
+			// types.ZendStringReleaseEx(fcc.GetFunctionHandler().GetFunctionName(), 0)
 		}
 		ZendFreeTrampoline(fcc.GetFunctionHandler())
 	}
@@ -179,7 +179,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen()-1)
 			ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal()+1, callable.GetStr().GetLen()-1)
 			func_ = ZendFetchFunction(lmname)
-			lmname.Free()
+			//lmname.Free()
 		} else {
 			lmname = callable.GetStr()
 			func_ = ZendFetchFunction(lmname)
@@ -187,7 +187,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 				types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen())
 				ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal(), callable.GetStr().GetLen())
 				func_ = ZendFetchFunction(lmname)
-				lmname.Free()
+				//lmname.Free()
 			}
 		}
 		if func_ != nil {
@@ -220,10 +220,10 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		}
 		cname = types.NewString(b.CastStr(callable.GetStr().GetVal(), clen))
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
-			types.ZendStringReleaseEx(cname, 0)
+			// types.ZendStringReleaseEx(cname, 0)
 			return 0
 		}
-		types.ZendStringReleaseEx(cname, 0)
+		// types.ZendStringReleaseEx(cname, 0)
 		ftable = fcc.GetCallingScope().GetFunctionTable()
 		if ce_org != nil && InstanceofFunction(ce_org, fcc.GetCallingScope()) == 0 {
 			if error != nil {
@@ -378,8 +378,8 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			}
 		}
 	}
-	types.ZendStringReleaseEx(lmname, 0)
-	types.ZendStringReleaseEx(mname, 0)
+	// types.ZendStringReleaseEx(lmname, 0)
+	// types.ZendStringReleaseEx(mname, 0)
 	if fcc.GetObject() != nil {
 		fcc.SetCalledScope(fcc.GetObject().GetCe())
 		if fcc.GetFunctionHandler() != nil && fcc.GetFunctionHandler().IsStatic() {

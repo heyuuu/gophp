@@ -562,7 +562,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 				if !(strncmp(ptr, "image/", b.SizeOf("\"image/\"")-1)) {
 					var key *types.String = types.NewString("zlib.output_compression")
 					zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
-					types.ZendStringReleaseEx(key, 0)
+					// types.ZendStringReleaseEx(key, 0)
 				}
 				mimetype = zend.Estrdup(ptr)
 				newlen = SapiApplyDefaultCharset(&mimetype, len_)
@@ -590,7 +590,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 
 				var key *types.String = types.NewString("zlib.output_compression")
 				zend.ZendAlterIniEntryChars(key.GetStr(), "0", PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
-				types.ZendStringReleaseEx(key, 0)
+				// types.ZendStringReleaseEx(key, 0)
 			} else if !(strcasecmp(header_line, "Location")) {
 				if (SG__().sapi_headers.http_response_code < 300 || SG__().sapi_headers.http_response_code > 399) && SG__().sapi_headers.http_response_code != 201 {
 
@@ -714,7 +714,7 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	} else {
 		ret = types.FAILURE
 	}
-	types.ZendStringReleaseEx(key, 1)
+	// types.ZendStringReleaseEx(key, 1)
 	return ret
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {

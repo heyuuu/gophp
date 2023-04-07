@@ -42,7 +42,7 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	}
 	name = ZendConcat3(class_name.GetVal(), class_name.GetLen(), "::", 2, const_name.GetVal(), const_name.GetLen())
 	ZendAstDestroy(ast)
-	types.ZendStringReleaseEx(class_name, 0)
+	// types.ZendStringReleaseEx(class_name, 0)
 	*ast_ptr = ZendAstCreateConstant(name, fetch_type|ZEND_FETCH_CLASS_EXCEPTION)
 }
 func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
@@ -57,7 +57,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 
 		/* For the const-eval representation store the fetch type instead of the name. */
 
-		types.ZendStringRelease(class_name)
+		// types.ZendStringRelease(class_name)
 		ast.GetChild()[0] = nil
 		ast.SetAttr(fetch_type)
 		return
@@ -77,7 +77,7 @@ func ZendCompileConstExprConst(ast_ptr **ZendAst) {
 	var resolved_name *types.String
 	resolved_name = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
 	if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) != 0 {
-		types.ZendStringReleaseEx(resolved_name, 0)
+		// types.ZendStringReleaseEx(resolved_name, 0)
 		ZendAstDestroy(ast)
 		*ast_ptr = ZendAstCreateZval(&result)
 		return
@@ -632,10 +632,10 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		var is_fully_qualified types.ZendBool
 		var resolved_name *types.String = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
 		if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) == 0 {
-			types.ZendStringReleaseEx(resolved_name, 0)
+			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
-		types.ZendStringReleaseEx(resolved_name, 0)
+		// types.ZendStringReleaseEx(resolved_name, 0)
 	case ZEND_AST_CLASS_CONST:
 		var class_ast *ZendAst
 		var name_ast *ZendAst
@@ -649,10 +649,10 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 		resolved_name = ZendResolveClassNameAst(class_ast)
 		if ZendTryCtEvalClassConst(&result, resolved_name, ZendAstGetStr(name_ast)) == 0 {
-			types.ZendStringReleaseEx(resolved_name, 0)
+			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
-		types.ZendStringReleaseEx(resolved_name, 0)
+		// types.ZendStringReleaseEx(resolved_name, 0)
 	case ZEND_AST_CLASS_NAME:
 		var class_ast *ZendAst = ast.GetChild()[0]
 		if ZendTryCompileConstExprResolveClassName(&result, class_ast) == 0 {

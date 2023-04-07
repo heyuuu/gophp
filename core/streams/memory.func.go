@@ -578,7 +578,7 @@ func PhpStreamUrlWrapRfc2397(
 		types.ZVAL_COPY_VALUE(ts.GetMeta(), &meta)
 	}
 	if base64_comma != nil {
-		types.ZendStringFree(base64_comma)
+		//types.ZendStringFree(base64_comma)
 	} else {
 		zend.Efree(comma)
 	}

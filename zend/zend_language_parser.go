@@ -3,7 +3,6 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/zend/types"
 )
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
@@ -1175,7 +1174,7 @@ func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
 		ZendAstDestroy(yyvaluep.GetAst())
 	case 273:
 		if yyvaluep.GetStr() != nil {
-			types.ZendStringReleaseEx(yyvaluep.GetStr(), 0)
+			// types.ZendStringReleaseEx(yyvaluep.GetStr(), 0)
 		}
 	case 277:
 		ZendAstDestroy(yyvaluep.GetAst())

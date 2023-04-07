@@ -157,7 +157,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 
 		if zend.EG__().GetException() != nil {
 			if allowed_tags != nil {
-				types.ZendStringRelease(allowed_tags)
+				// types.ZendStringRelease(allowed_tags)
 			}
 			return nil
 		}
@@ -172,7 +172,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *types.Zval, persis
 		zend.Pefree(inst, persistent)
 	}
 	if allowed_tags != nil {
-		types.ZendStringRelease(allowed_tags)
+		// types.ZendStringRelease(allowed_tags)
 	}
 	return filter
 }

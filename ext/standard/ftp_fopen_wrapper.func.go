@@ -606,7 +606,7 @@ errexit:
 	}
 	if error_message != nil {
 		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", error_message.GetVal())
-		types.ZendStringRelease(error_message)
+		// types.ZendStringRelease(error_message)
 	}
 	return nil
 }
@@ -629,7 +629,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), basename.GetLen()-1)
 	memcpy(ent.GetDName(), basename.GetVal(), tmp_len)
 	ent.GetDName()[tmp_len-1] = '0'
-	types.ZendStringReleaseEx(basename, 0)
+	// types.ZendStringReleaseEx(basename, 0)
 
 	/* Trim off trailing whitespace characters */
 

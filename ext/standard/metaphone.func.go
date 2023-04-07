@@ -28,7 +28,7 @@ func ZifMetaphone(executeData zpp.Ex, return_value zpp.Ret, text *types.Zval, _ 
 		return_value.SetString(result)
 	} else {
 		if result != nil {
-			types.ZendStringFree(result)
+			//types.ZendStringFree(result)
 		}
 		return_value.SetFalse()
 		return

@@ -24,7 +24,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
-		types.ZendStringEfree(ret)
+		// types.ZendStringEfree(ret)
 	}
 
 	/* Fallback on getnameinfo() */
@@ -43,7 +43,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *types.String {
 			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
-		types.ZendStringEfree(ret)
+		// types.ZendStringEfree(ret)
 	}
 	return nil
 }

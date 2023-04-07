@@ -278,7 +278,7 @@ func PhpOutputHandlerCreateUser(output_handler *types.Zval, chunk_size int, flag
 			zend.Efree(error)
 		}
 		if handler_name != nil {
-			types.ZendStringReleaseEx(handler_name, 0)
+			// types.ZendStringReleaseEx(handler_name, 0)
 		}
 	}
 	return handler
@@ -288,7 +288,7 @@ func PhpOutputHandlerCreateInternal(name string, output_handler PhpOutputHandler
 	var str = types.NewString(name)
 	handler = PhpOutputHandlerInit(str, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_INTERNAL)
 	handler.SetInternal(output_handler)
-	types.ZendStringReleaseEx(str, 0)
+	// types.ZendStringReleaseEx(str, 0)
 	return handler
 }
 func PhpOutputHandlerSetContext(handler *PhpOutputHandler, opaq any, dtor func(any)) {
@@ -360,7 +360,7 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
 	types.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str.GetStr(), check_func)
-	types.ZendStringReleaseEx(str, 1)
+	// types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }
 func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
@@ -385,7 +385,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 		}
 		str = types.ZendStringInitInterned(name, name_len, 1)
 		types.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str.GetStr(), &rev, b.SizeOf("HashTable"))
-		types.ZendStringReleaseEx(str, 1)
+		// types.ZendStringReleaseEx(str, 1)
 		return types.SUCCESS
 	}
 }
@@ -400,7 +400,7 @@ func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHand
 	}
 	str = types.ZendStringInitInterned(name, name_len, 1)
 	types.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str.GetStr(), func_)
-	types.ZendStringReleaseEx(str, 1)
+	// types.ZendStringReleaseEx(str, 1)
 	return types.SUCCESS
 }
 func PhpOutputHandlerHook(type_ PhpOutputHandlerHookT, arg any) int {
@@ -429,7 +429,7 @@ func PhpOutputHandlerHook(type_ PhpOutputHandlerHookT, arg any) int {
 }
 func PhpOutputHandlerDtor(handler *PhpOutputHandler) {
 	if handler.GetName() != nil {
-		types.ZendStringReleaseEx(handler.GetName(), 0)
+		// types.ZendStringReleaseEx(handler.GetName(), 0)
 	}
 	if handler.GetBuffer().GetData() != nil {
 		zend.Efree(handler.GetBuffer().GetData())

@@ -179,7 +179,7 @@ func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_pa
 	if core.PhpStreamCast(stream, core.PHP_STREAM_AS_STDIO|core.PHP_STREAM_CAST_TRY_HARD|core.PHP_STREAM_CAST_RELEASE, (*any)(&fp), core.REPORT_ERRORS) == types.FAILURE {
 		core.PhpStreamClose(stream)
 		if opened_path != nil && (*opened_path) != nil {
-			types.ZendStringReleaseEx(*opened_path, 0)
+			// types.ZendStringReleaseEx(*opened_path, 0)
 		}
 		return nil
 	}

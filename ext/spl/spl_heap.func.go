@@ -360,11 +360,11 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Arr
 	pnstr = SplGenPrivatePropName(ce, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
-	types.ZendStringReleaseEx(pnstr, 0)
+	// types.ZendStringReleaseEx(pnstr, 0)
 	pnstr = SplGenPrivatePropName(ce, "isCorrupted")
 	types.ZVAL_BOOL(&tmp, intern.GetHeap().IsHeapCorrupted())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
-	types.ZendStringReleaseEx(pnstr, 0)
+	// types.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&heap_array)
 	for i = 0; i < intern.GetHeap().GetCount(); i++ {
 		if ce == spl_ce_SplPriorityQueue {
@@ -380,7 +380,7 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Arr
 	}
 	pnstr = SplGenPrivatePropName(ce, "heap")
 	debug_info.KeyUpdate(pnstr.GetStr(), &heap_array)
-	types.ZendStringReleaseEx(pnstr, 0)
+	// types.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
 }
 func SplHeapObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {

@@ -602,13 +602,13 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 		if last != nil && last.GetKind() == ZEND_AST_HALT_COMPILER {
 			result.SetOpType(IS_CONST)
 			result.GetConstant().SetLong(ZendAstGetZval(last.GetChild()[0]).GetLval())
-			types.ZendStringReleaseEx(resolved_name, 0)
+			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
 	}
 	if ZendTryCtEvalConst(result.GetConstant(), resolved_name, is_fully_qualified) != 0 {
 		result.SetOpType(IS_CONST)
-		types.ZendStringReleaseEx(resolved_name, 0)
+		// types.ZendStringReleaseEx(resolved_name, 0)
 		return
 	}
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CONSTANT, nil, nil)
@@ -641,10 +641,10 @@ func ZendCompileClassConst(result *Znode, ast *ZendAst) {
 		resolved_name = ZendResolveClassNameAst(class_ast)
 		if const_ast.GetKind() == ZEND_AST_ZVAL && ZendTryCtEvalClassConst(result.GetConstant(), resolved_name, ZendAstGetStr(const_ast)) != 0 {
 			result.SetOpType(IS_CONST)
-			types.ZendStringReleaseEx(resolved_name, 0)
+			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
-		types.ZendStringReleaseEx(resolved_name, 0)
+		// types.ZendStringReleaseEx(resolved_name, 0)
 	}
 	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_EXCEPTION)
 	ZendCompileExpr(&const_node, const_ast)

@@ -92,7 +92,7 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 			return 0
 		}
 	}
-	types.ZendStringRelease(name)
+	// types.ZendStringRelease(name)
 	*type_ = types.ZEND_TYPE_ENCODE_CE(ce, type_.AllowNull())
 	return 1
 }

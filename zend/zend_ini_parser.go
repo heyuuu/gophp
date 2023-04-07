@@ -111,7 +111,7 @@ func GetIntVal(op *types.Zval) int {
 		return int(op.GetDval())
 	case types.IS_STRING:
 		var val int = atoi(op.GetStr().GetVal())
-		types.ZendStringFree(op.GetStr())
+		//types.ZendStringFree(op.GetStr())
 		return val
 	default:
 
@@ -204,9 +204,9 @@ func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
 		}
 		result.SetString(types.NewString(c.GetStr().GetStr()))
 		if c == &tmp {
-			types.ZendStringRelease(tmp.GetStr())
+			// types.ZendStringRelease(tmp.GetStr())
 		}
-		types.ZendStringFree(name.GetStr())
+		//types.ZendStringFree(name.GetStr())
 	} else {
 		*result = *name
 	}
@@ -281,7 +281,7 @@ func ZendParseIniString(str *byte, unbuffered_errors types.ZendBool, scanner_mod
 
 func ZvalIniDtor(zv *types.Zval) {
 	if zv.IsString() {
-		types.ZendStringRelease(zv.GetStr())
+		// types.ZendStringRelease(zv.GetStr())
 	}
 }
 

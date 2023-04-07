@@ -103,7 +103,7 @@ func ZendCompileUse(ast *ZendAst) {
 			if ZendHaveSeenSymbol(ns_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, ns_name)
 			}
-			types.ZendStringEfree(ns_name)
+			// types.ZendStringEfree(ns_name)
 		} else {
 			if ZendHaveSeenSymbol(lookup_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
@@ -114,8 +114,8 @@ func ZendCompileUse(ast *ZendAst) {
 		if !(types.ZendHashAddPtr(current_import, lookup_name.GetStr(), old_name)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
-		types.ZendStringReleaseEx(lookup_name, 0)
-		types.ZendStringReleaseEx(new_name, 0)
+		// types.ZendStringReleaseEx(lookup_name, 0)
+		// types.ZendStringReleaseEx(new_name, 0)
 	}
 }
 func ZendCompileGroupUse(ast *ZendAst) {
@@ -128,7 +128,7 @@ func ZendCompileGroupUse(ast *ZendAst) {
 		var name_zval *types.Zval = ZendAstGetZval(use.GetChild()[0])
 		var name *types.String = name_zval.GetStr()
 		var compound_ns *types.String = ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
-		types.ZendStringReleaseEx(name, 0)
+		// types.ZendStringReleaseEx(name, 0)
 		name_zval.SetString(compound_ns)
 		inline_use = ZendAstCreateList(1, ZEND_AST_USE, use)
 		if ast.GetAttr() != 0 {
@@ -216,7 +216,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 		}
 	}
 	if FC__().GetCurrentNamespace() != nil {
-		types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
+		// types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
 	}
 	if name_ast != nil {
 		name = ZendAstGetStr(name_ast)
@@ -249,7 +249,7 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 	filename = ZendGetCompiledFilename()
 	name = ZendManglePropertyName_ZStr(const_name, filename.GetStr())
 	ZendRegisterLongConstant(name.GetVal(), name.GetLen(), offset, CONST_CS, 0)
-	types.ZendStringReleaseEx(name, 0)
+	// types.ZendStringReleaseEx(name, 0)
 }
 func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	var op_array *types.ZendOpArray = CG__().GetActiveOpArray()

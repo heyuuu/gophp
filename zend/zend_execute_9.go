@@ -85,7 +85,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	if call.GetThis().GetType() != types.IS_OBJECT {
 		ZendVmStackFreeArgs(call)
 		if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
-			types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
+			// types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
 		}
 		Efree(fbc)
 		ZendVmStackFreeCallFrame(call)
@@ -99,7 +99,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 	EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 	ZendVmStackFreeArgs(call)
 	if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
-		types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
+		// types.ZendStringReleaseEx(fbc.GetFunctionName(), 0)
 	}
 	Efree(fbc)
 	return 1

@@ -313,11 +313,11 @@ try_again:
 
 				offset_key.AddRefcount()
 				if ZendUndefinedIndexWrite(ht, offset_key) == types.FAILURE {
-					types.ZendStringRelease(offset_key)
+					// types.ZendStringRelease(offset_key)
 					return nil
 				}
 				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
-				types.ZendStringRelease(offset_key)
+				// types.ZendStringRelease(offset_key)
 			case BP_VAR_W:
 				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
 			}

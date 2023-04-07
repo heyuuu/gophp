@@ -1161,7 +1161,7 @@ func PhpEscapeHtmlEntitiesEx(
 				len_ += replacement_len
 				continue
 			} else {
-				types.ZendStringEfree(replaced)
+				// types.ZendStringEfree(replaced)
 				return types.ZSTR_EMPTY_ALLOC()
 			}
 

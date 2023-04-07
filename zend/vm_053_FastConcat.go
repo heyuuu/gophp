@@ -47,7 +47,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 			}
 
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -55,7 +55,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -81,7 +81,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 					}
 				}
 				opline.Result().SetString(op1_str)
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 				break
 			}
 		}
@@ -90,7 +90,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op2_str, 0)
+			// types.ZendStringReleaseEx(op2_str, 0)
 		}
 		break
 	}
@@ -117,7 +117,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -125,7 +125,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -151,7 +151,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 					}
 				}
 				opline.Result().SetString(op1_str)
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 				break
 			}
 		}
@@ -160,7 +160,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op2_str, 0)
+			// types.ZendStringReleaseEx(op2_str, 0)
 		}
 		break
 	}
@@ -186,7 +186,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 			}
 
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -194,7 +194,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -221,7 +221,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 					}
 				}
 				opline.Result().SetString(op2_str)
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 				break
 			}
 		}
@@ -230,7 +230,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op1_str, 0)
+			// types.ZendStringReleaseEx(op1_str, 0)
 		}
 		break
 	}
@@ -258,7 +258,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 			}
 
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		} else if op2_str.GetLen() == 0 {
 			{
@@ -266,7 +266,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 			}
 
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -274,10 +274,10 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -304,14 +304,14 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		{
 			if op1_str.GetLen() == 0 {
 				opline.Result().SetString(op2_str)
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 				break
 			}
 		}
 		{
 			if op2_str.GetLen() == 0 {
 				opline.Result().SetString(op1_str)
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 				break
 			}
 		}
@@ -320,10 +320,10 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op1_str, 0)
+			// types.ZendStringReleaseEx(op1_str, 0)
 		}
 		{
-			types.ZendStringReleaseEx(op2_str, 0)
+			// types.ZendStringReleaseEx(op2_str, 0)
 		}
 		break
 	}
@@ -351,7 +351,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		} else if op2_str.GetLen() == 0 {
 			{
@@ -359,7 +359,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -367,10 +367,10 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -397,14 +397,14 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		{
 			if op1_str.GetLen() == 0 {
 				opline.Result().SetString(op2_str)
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 				break
 			}
 		}
 		{
 			if op2_str.GetLen() == 0 {
 				opline.Result().SetString(op1_str)
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 				break
 			}
 		}
@@ -413,10 +413,10 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op1_str, 0)
+			// types.ZendStringReleaseEx(op1_str, 0)
 		}
 		{
-			types.ZendStringReleaseEx(op2_str, 0)
+			// types.ZendStringReleaseEx(op2_str, 0)
 		}
 		break
 	}
@@ -442,7 +442,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -450,7 +450,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -477,7 +477,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					}
 				}
 				opline.Result().SetString(op2_str)
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 				break
 			}
 		}
@@ -486,7 +486,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op1_str, 0)
+			// types.ZendStringReleaseEx(op1_str, 0)
 		}
 		break
 	}
@@ -512,7 +512,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		} else if op2_str.GetLen() == 0 {
 			{
@@ -520,7 +520,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -528,10 +528,10 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -558,14 +558,14 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		{
 			if op1_str.GetLen() == 0 {
 				opline.Result().SetString(op2_str)
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 				break
 			}
 		}
 		{
 			if op2_str.GetLen() == 0 {
 				opline.Result().SetString(op1_str)
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 				break
 			}
 		}
@@ -574,10 +574,10 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op1_str, 0)
+			// types.ZendStringReleaseEx(op1_str, 0)
 		}
 		{
-			types.ZendStringReleaseEx(op2_str, 0)
+			// types.ZendStringReleaseEx(op2_str, 0)
 		}
 		break
 	}
@@ -603,7 +603,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 		} else if op2_str.GetLen() == 0 {
 			{
@@ -611,7 +611,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		} else {
 			str = types.ZendStringAlloc(op1_str.GetLen()+op2_str.GetLen(), 0)
@@ -619,10 +619,10 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 			opline.Result().SetString(str)
 			{
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 			}
 			{
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -649,14 +649,14 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		{
 			if op1_str.GetLen() == 0 {
 				opline.Result().SetString(op2_str)
-				types.ZendStringReleaseEx(op1_str, 0)
+				// types.ZendStringReleaseEx(op1_str, 0)
 				break
 			}
 		}
 		{
 			if op2_str.GetLen() == 0 {
 				opline.Result().SetString(op1_str)
-				types.ZendStringReleaseEx(op2_str, 0)
+				// types.ZendStringReleaseEx(op2_str, 0)
 				break
 			}
 		}
@@ -665,10 +665,10 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		memcpy(str.GetVal()+op1_str.GetLen(), op2_str.GetVal(), op2_str.GetLen()+1)
 		opline.Result().SetString(str)
 		{
-			types.ZendStringReleaseEx(op1_str, 0)
+			// types.ZendStringReleaseEx(op1_str, 0)
 		}
 		{
-			types.ZendStringReleaseEx(op2_str, 0)
+			// types.ZendStringReleaseEx(op2_str, 0)
 		}
 		break
 	}

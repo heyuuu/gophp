@@ -266,7 +266,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 			tmp_headers = types.NewString(headers.GetStr().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = types.NewString(PhpTrimRight(tmp_headers.GetStr(), nil))
-			types.ZendStringReleaseEx(tmp_headers, 0)
+			// types.ZendStringReleaseEx(tmp_headers, 0)
 		case types.IS_ARRAY:
 			str_headers = PhpMailBuildHeaders(headers)
 		default:
@@ -329,10 +329,10 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 		return_value.SetFalse()
 	}
 	if str_headers != nil {
-		types.ZendStringReleaseEx(str_headers, 0)
+		// types.ZendStringReleaseEx(str_headers, 0)
 	}
 	if extra_cmd != nil {
-		types.ZendStringReleaseEx(extra_cmd, 0)
+		// types.ZendStringReleaseEx(extra_cmd, 0)
 	}
 	if to_r != to {
 		zend.Efree(to_r)
@@ -442,7 +442,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			date_str = php_format_date("d-M-Y H:i:s e", 13, curtime, 1)
 			len_ = core.Spprintf(&tmp, 0, "[%s] %s%s", date_str.GetVal(), logline, core.PHP_EOL)
 			PhpMailLogToFile(mail_log, tmp, len_)
-			types.ZendStringFree(date_str)
+			//types.ZendStringFree(date_str)
 			zend.Efree(tmp)
 		}
 		zend.Efree(logline)
@@ -456,7 +456,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		} else {
 			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s", PhpGetuid(), f.GetVal())
 		}
-		types.ZendStringReleaseEx(f, 0)
+		// types.ZendStringReleaseEx(f, 0)
 	}
 	if hdr != nil && PhpMailDetectMultipleCrlf(hdr) != 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Multiple or malformed newlines found in additional_header")

@@ -664,7 +664,7 @@ func SplArrayGetDebugInfo(obj *types.Zval) *types.Array {
 		}
 		zname = SplGenPrivatePropName(base, "storage")
 		debug_info.SymtableUpdate(zname.GetStr(), storage)
-		types.ZendStringReleaseEx(zname, 0)
+		// types.ZendStringReleaseEx(zname, 0)
 		return debug_info
 	}
 }
@@ -1125,7 +1125,7 @@ exit:
 	}
 	types.Z_REFVAL(params[0]).SetNull()
 	zend.ZvalPtrDtor(&params[0])
-	types.ZendStringFree(function_name.GetStr())
+	//types.ZendStringFree(function_name.GetStr())
 }
 func zim_spl_Array_asort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	SplArrayMethod(executeData, return_value, "asort", b.SizeOf("\"asort\"")-1, SPL_ARRAY_METHOD_MAY_USER_ARG)

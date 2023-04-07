@@ -108,7 +108,7 @@ func RegisterHttpPostFilesVariableEx(var_ *byte, val *types.Zval, http_post_file
 }
 func FreeFilename(el *types.Zval) {
 	var filename *types.String = el.GetStr()
-	types.ZendStringReleaseEx(filename, 0)
+	// types.ZendStringReleaseEx(filename, 0)
 }
 func DestroyUploadedFilesHash() {
 	var el *types.Zval
@@ -884,7 +884,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 					if cancel_upload != UPLOAD_ERROR_E {
 						unlink(temp_filename.GetVal())
 					}
-					types.ZendStringReleaseEx(temp_filename, 0)
+					// types.ZendStringReleaseEx(temp_filename, 0)
 				}
 				temp_filename = nil
 			} else {

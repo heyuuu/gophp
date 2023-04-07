@@ -55,10 +55,6 @@ func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *Stri
 	s.DelRefcount()
 	return ret
 }
-func ZendStringFree(s *String)             {} // todo remove
-func ZendStringEfree(s *String)            {} // todo remove
-func ZendStringRelease(s *String)          {} // todo remove
-func ZendStringReleaseEx(s *String, _ int) {} // todo remove
 func ZendStringEquals(s1 *String, s2 *String) ZendBool {
 	return IntBool(s1.GetStr() == s2.GetStr())
 }

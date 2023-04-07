@@ -103,7 +103,7 @@ func PhpSetcookie(
 		buf.AppendString("=deleted; expires=")
 		buf.AppendString(dt.GetStr())
 		buf.AppendString("; Max-Age=0")
-		types.ZendStringFree(dt)
+		//types.ZendStringFree(dt)
 	} else {
 		buf.AppendString("Set-Cookie: ")
 		buf.AppendString(name.GetStr())
@@ -111,7 +111,7 @@ func PhpSetcookie(
 		if url_encode != 0 {
 			var encoded_value *types.String = PhpRawUrlEncode(value.GetVal(), value.GetLen())
 			buf.AppendString(encoded_value.GetStr())
-			types.ZendStringReleaseEx(encoded_value, 0)
+			// types.ZendStringReleaseEx(encoded_value, 0)
 		} else {
 			buf.AppendString(value.GetStr())
 		}
@@ -125,13 +125,13 @@ func PhpSetcookie(
 
 			p = zend.ZendMemrchr(dt.GetVal(), '-', dt.GetLen())
 			if p == nil || (*(p + 5)) != ' ' {
-				types.ZendStringFree(dt)
+				//types.ZendStringFree(dt)
 				buf.Free()
 				faults.Error(faults.E_WARNING, "Expiry date cannot have a year greater than 9999")
 				return types.FAILURE
 			}
 			buf.AppendString(dt.GetStr())
-			types.ZendStringFree(dt)
+			//types.ZendStringFree(dt)
 			diff = difftime(expires, php_time())
 			if diff < 0 {
 				diff = 0
@@ -161,7 +161,7 @@ func PhpSetcookie(
 	ctr.SetLine(buf.GetS().GetVal())
 	ctr.SetLineLen(uint32(buf.GetS().GetLen()))
 	result = core.SapiHeaderOp(core.SAPI_HEADER_ADD, &ctr)
-	types.ZendStringRelease(buf.GetS())
+	// types.ZendStringRelease(buf.GetS())
 	return result
 }
 func PhpHeadParseCookieOptionsArray(
@@ -266,13 +266,13 @@ func ZifSetcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval, _ 
 	}
 	if expires_or_options != nil && expires_or_options.IsType(types.IS_ARRAY) {
 		if path != nil {
-			types.ZendStringRelease(path)
+			// types.ZendStringRelease(path)
 		}
 		if domain != nil {
-			types.ZendStringRelease(domain)
+			// types.ZendStringRelease(domain)
 		}
 		if samesite != nil {
-			types.ZendStringRelease(samesite)
+			// types.ZendStringRelease(samesite)
 		}
 	}
 }
@@ -325,13 +325,13 @@ func ZifSetrawcookie(executeData zpp.Ex, return_value zpp.Ret, name *types.Zval,
 	}
 	if expires_or_options != nil && expires_or_options.IsType(types.IS_ARRAY) {
 		if path != nil {
-			types.ZendStringRelease(path)
+			// types.ZendStringRelease(path)
 		}
 		if domain != nil {
-			types.ZendStringRelease(domain)
+			// types.ZendStringRelease(domain)
 		}
 		if samesite != nil {
-			types.ZendStringRelease(samesite)
+			// types.ZendStringRelease(samesite)
 		}
 	}
 }

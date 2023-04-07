@@ -17,7 +17,6 @@ func (zs *String) GetLen() int    { return len(zs.str) }
 func (zs *String) GetVal() []byte      { return []byte(zs.str) }         // todo remove
 func (zs *String) GetValPtr() *byte    { tmp := zs.str[0]; return &tmp } // todo remove
 func (zs *String) SetLen(value int)    { zs.str = zs.str[:value] }       // todo remove
-func (zs *String) Free()               {}                                // todo remove
 func (zs *String) GetRefcount() uint32 { panic("implement me") }         // todo remove
 func (zs *String) AddRefcount() uint32 { panic("implement me") }         // todo remove
 func (zs *String) DelRefcount() uint32 { panic("implement me") }         // todo remove

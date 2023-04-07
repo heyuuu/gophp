@@ -498,7 +498,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 	path = SplFilesystemObjectGetPathname(intern, &path_len)
 	tmp.SetStringVal(b.CastStr(b.Cond(path != nil, path, ""), path_len))
 	rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-	types.ZendStringReleaseEx(pnstr, 0)
+	// types.ZendStringReleaseEx(pnstr, 0)
 	if intern.GetFileName() != nil {
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileInfo, "fileName")
 		SplFilesystemObjectGetPath(intern, &path_len)
@@ -508,7 +508,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 			tmp.SetStringVal(b.CastStr(intern.GetFileName(), intern.GetFileNameLen()))
 		}
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-		types.ZendStringReleaseEx(pnstr, 0)
+		// types.ZendStringReleaseEx(pnstr, 0)
 	}
 	if intern.GetType() == SPL_FS_DIR {
 		pnstr = SplGenPrivatePropName(spl_ce_DirectoryIterator, "glob")
@@ -518,7 +518,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 			tmp.SetFalse()
 		}
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-		types.ZendStringReleaseEx(pnstr, 0)
+		// types.ZendStringReleaseEx(pnstr, 0)
 		pnstr = SplGenPrivatePropName(spl_ce_RecursiveDirectoryIterator, "subPathName")
 		if intern.GetSubPath() != nil {
 			tmp.SetStringVal(b.CastStr(intern.GetSubPath(), intern.GetSubPathLen()))
@@ -526,24 +526,24 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 			zend.ZVAL_EMPTY_STRING(&tmp)
 		}
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-		types.ZendStringReleaseEx(pnstr, 0)
+		// types.ZendStringReleaseEx(pnstr, 0)
 	}
 	if intern.GetType() == SPL_FS_FILE {
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileObject, "openMode")
 		tmp.SetStringVal(b.CastStr(intern.GetOpenMode(), intern.GetOpenModeLen()))
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-		types.ZendStringReleaseEx(pnstr, 0)
+		// types.ZendStringReleaseEx(pnstr, 0)
 		stmp[1] = '0'
 		stmp[0] = intern.GetDelimiter()
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileObject, "delimiter")
 		tmp.SetStringVal(b.CastStr(stmp, 1))
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-		types.ZendStringReleaseEx(pnstr, 0)
+		// types.ZendStringReleaseEx(pnstr, 0)
 		stmp[0] = intern.GetEnclosure()
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileObject, "enclosure")
 		tmp.SetStringVal(b.CastStr(stmp, 1))
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
-		types.ZendStringReleaseEx(pnstr, 0)
+		// types.ZendStringReleaseEx(pnstr, 0)
 	}
 	return rv
 }
@@ -553,7 +553,7 @@ func SplFilesystemObjectGetMethodCheck(object **types.ZendObject, method *types.
 		var func_ types.IFunction
 		var tmp *types.String = types.NewString("_bad_state_ex")
 		func_ = zend.ZendStdGetMethod(object, tmp, nil)
-		types.ZendStringReleaseEx(tmp, 0)
+		// types.ZendStringReleaseEx(tmp, 0)
 		return func_
 	}
 	return zend.ZendStdGetMethod(object, method, key)
@@ -763,10 +763,10 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 	if p != nil {
 		idx = p - ret.GetVal()
 		return_value.SetStringVal(b.CastStr(ret.GetVal()+idx+1, ret.GetLen()-idx-1))
-		types.ZendStringReleaseEx(ret, 0)
+		// types.ZendStringReleaseEx(ret, 0)
 		return
 	} else {
-		types.ZendStringReleaseEx(ret, 0)
+		// types.ZendStringReleaseEx(ret, 0)
 		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
@@ -784,9 +784,9 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 	if p != nil {
 		idx = p - fname.GetVal()
 		return_value.SetStringVal(b.CastStr(fname.GetVal()+idx+1, fname.GetLen()-idx-1))
-		types.ZendStringReleaseEx(fname, 0)
+		// types.ZendStringReleaseEx(fname, 0)
 	} else {
-		types.ZendStringReleaseEx(fname, 0)
+		// types.ZendStringReleaseEx(fname, 0)
 		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}

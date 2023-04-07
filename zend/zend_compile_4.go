@@ -37,10 +37,10 @@ func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 			first.SetOpType(IS_CONST)
 			first.GetConstant().SetLong(zv.GetLval())
 			ZendEmitOpTmp(result, ZEND_FUNC_GET_ARGS, &first, nil)
-			types.ZendStringReleaseEx(name, 0)
+			// types.ZendStringReleaseEx(name, 0)
 			return types.SUCCESS
 		}
-		types.ZendStringReleaseEx(name, 0)
+		// types.ZendStringReleaseEx(name, 0)
 	}
 	return types.FAILURE
 }
@@ -139,17 +139,17 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 
 	if fbc != nil && types.ZendStringEqualsLiteral(lcname, "assert") {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
-		types.ZendStringRelease(lcname)
+		// types.ZendStringRelease(lcname)
 		ZvalPtrDtor(name_node.GetConstant())
 		return
 	}
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
-		types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
 		ZendCompileDynamicCall(result, &name_node, args_ast)
 		return
 	}
 	if ZendTryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == types.SUCCESS {
-		types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
 		ZvalPtrDtor(name_node.GetConstant())
 		return
 	}

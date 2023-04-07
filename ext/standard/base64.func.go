@@ -130,7 +130,7 @@ func PhpBase64DecodeEx(str *uint8, length int, strict types.ZendBool) *types.Str
 	var outl int = 0
 	result = types.ZendStringAlloc(length, 0)
 	if PhpBase64DecodeImpl(str, length, (*uint8)(result.GetVal()), &outl, strict) == 0 {
-		types.ZendStringEfree(result)
+		// types.ZendStringEfree(result)
 		return nil
 	}
 	result.SetLen(outl)

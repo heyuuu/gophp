@@ -54,7 +54,7 @@ try_function_name:
 		if EG__().GetException() != nil {
 			if call != nil {
 				if call.GetFunc().IsCallViaTrampoline() {
-					types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
+					// types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 					ZendFreeTrampoline(call.GetFunc())
 				}
 				ZendVmStackFreeCallFrame(call)
@@ -98,7 +98,7 @@ try_function_name:
 		if EG__().GetException() != nil {
 			if call != nil {
 				if call.GetFunc().IsCallViaTrampoline() {
-					types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
+					// types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 					ZendFreeTrampoline(call.GetFunc())
 				}
 				ZendVmStackFreeCallFrame(call)

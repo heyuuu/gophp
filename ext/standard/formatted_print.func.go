@@ -350,7 +350,7 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 				if (*temppos) == '$' {
 					argnum = PhpSprintfGetnumber(&format, &format_len)
 					if argnum <= 0 {
-						types.ZendStringEfree(result)
+						// types.ZendStringEfree(result)
 						core.PhpErrorDocref(nil, faults.E_WARNING, "Argument number must be greater than zero")
 						return nil
 					}
@@ -592,7 +592,7 @@ func ZifUserPrintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval,
 		return
 	}
 	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
-	types.ZendStringEfree(result)
+	// types.ZendStringEfree(result)
 	return_value.SetLong(rlen)
 	return
 }
@@ -624,7 +624,7 @@ func ZifVprintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, ar
 		return
 	}
 	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
-	types.ZendStringEfree(result)
+	// types.ZendStringEfree(result)
 	return_value.SetLong(rlen)
 	return
 }
@@ -665,7 +665,7 @@ func ZifFprintf(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, fo
 	}
 	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
 	return_value.SetLong(result.GetLen())
-	types.ZendStringEfree(result)
+	// types.ZendStringEfree(result)
 }
 func ZifVfprintf(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, format *types.Zval, args *types.Zval) {
 	var stream *core.PhpStream
@@ -703,5 +703,5 @@ func ZifVfprintf(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval, f
 	}
 	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
 	return_value.SetLong(result.GetLen())
-	types.ZendStringEfree(result)
+	// types.ZendStringEfree(result)
 }

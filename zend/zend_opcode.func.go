@@ -64,7 +64,7 @@ func ZendFreeInternalArgInfo(function *types.InternalFunction) {
 		}
 		for i = 0; i < num_args; i++ {
 			if arg_info[i].GetType().IsClass() {
-				types.ZendStringReleaseEx(arg_info[i].GetType().Name(), 1)
+				// types.ZendStringReleaseEx(arg_info[i].GetType().Name(), 1)
 			}
 		}
 		Free(arg_info)
@@ -78,7 +78,7 @@ func ZendFunctionDtor(zv *types.Zval) {
 	} else {
 		b.Assert(function.GetType() == ZEND_INTERNAL_FUNCTION)
 		b.Assert(function.GetFunctionName() != nil)
-		types.ZendStringReleaseEx(function.GetFunctionName(), 1)
+		// types.ZendStringReleaseEx(function.GetFunctionName(), 1)
 
 		/* For methods this will be called explicitly. */
 
@@ -180,21 +180,21 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 func _destroyZendClassTraitsInfo(ce *types.ClassEntry) {
 	var i uint32
 	for i = 0; i < ce.GetNumTraits(); i++ {
-		types.ZendStringReleaseEx(ce.GetTraitNames()[i].GetName(), 0)
-		types.ZendStringReleaseEx(ce.GetTraitNames()[i].GetLcName(), 0)
+		// types.ZendStringReleaseEx(ce.GetTraitNames()[i].GetName(), 0)
+		// types.ZendStringReleaseEx(ce.GetTraitNames()[i].GetLcName(), 0)
 	}
 	Efree(ce.GetTraitNames())
 	if ce.GetTraitAliases() != nil {
 		i = 0
 		for ce.GetTraitAliases()[i] != nil {
 			if ce.GetTraitAliases()[i].GetTraitMethod().GetMethodName() != nil {
-				types.ZendStringReleaseEx(ce.GetTraitAliases()[i].GetTraitMethod().GetMethodName(), 0)
+				// types.ZendStringReleaseEx(ce.GetTraitAliases()[i].GetTraitMethod().GetMethodName(), 0)
 			}
 			if ce.GetTraitAliases()[i].GetTraitMethod().GetClassName() != nil {
-				types.ZendStringReleaseEx(ce.GetTraitAliases()[i].GetTraitMethod().GetClassName(), 0)
+				// types.ZendStringReleaseEx(ce.GetTraitAliases()[i].GetTraitMethod().GetClassName(), 0)
 			}
 			if ce.GetTraitAliases()[i].GetAlias() != nil {
-				types.ZendStringReleaseEx(ce.GetTraitAliases()[i].GetAlias(), 0)
+				// types.ZendStringReleaseEx(ce.GetTraitAliases()[i].GetAlias(), 0)
 			}
 			Efree(ce.GetTraitAliases()[i])
 			i++
@@ -205,10 +205,10 @@ func _destroyZendClassTraitsInfo(ce *types.ClassEntry) {
 		var j uint32
 		i = 0
 		for ce.GetTraitPrecedences()[i] != nil {
-			types.ZendStringReleaseEx(ce.GetTraitPrecedences()[i].GetTraitMethod().GetMethodName(), 0)
-			types.ZendStringReleaseEx(ce.GetTraitPrecedences()[i].GetTraitMethod().GetClassName(), 0)
+			// types.ZendStringReleaseEx(ce.GetTraitPrecedences()[i].GetTraitMethod().GetMethodName(), 0)
+			// types.ZendStringReleaseEx(ce.GetTraitPrecedences()[i].GetTraitMethod().GetClassName(), 0)
 			for j = 0; j < ce.GetTraitPrecedences()[i].GetNumExcludes(); j++ {
-				types.ZendStringReleaseEx(ce.GetTraitPrecedences()[i].GetExcludeClassNames()[j], 0)
+				// types.ZendStringReleaseEx(ce.GetTraitPrecedences()[i].GetExcludeClassNames()[j], 0)
 			}
 			Efree(ce.GetTraitPrecedences()[i])
 			i++
@@ -245,7 +245,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 	switch ce.GetType() {
 	case ZEND_USER_CLASS:
 		if ce.GetParentName() && !ce.IsResolvedParent() {
-			types.ZendStringReleaseEx(ce.GetParentName(), 0)
+			// types.ZendStringReleaseEx(ce.GetParentName(), 0)
 		}
 		if ce.GetDefaultPropertiesTable() != nil {
 			var p *types.Zval = ce.GetDefaultPropertiesTable()
@@ -298,17 +298,17 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 
 			prop_info = _z.GetPtr()
 			if prop_info.GetCe() == ce {
-				types.ZendStringReleaseEx(prop_info.GetName(), 0)
+				// types.ZendStringReleaseEx(prop_info.GetName(), 0)
 				if prop_info.GetDocComment() != nil {
-					types.ZendStringReleaseEx(prop_info.GetDocComment(), 0)
+					// types.ZendStringReleaseEx(prop_info.GetDocComment(), 0)
 				}
 				if prop_info.GetType().IsName() {
-					types.ZendStringRelease(prop_info.GetType().Name())
+					// types.ZendStringRelease(prop_info.GetType().Name())
 				}
 			}
 		}
 		ce.GetPropertiesInfo().Destroy()
-		types.ZendStringReleaseEx(ce.GetName(), 0)
+		// types.ZendStringReleaseEx(ce.GetName(), 0)
 		ce.GetFunctionTable().Destroy()
 		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
@@ -320,7 +320,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 				if c.GetCe() == ce {
 					ZvalPtrDtorNogc(c.GetValue())
 					if c.GetDocComment() != nil {
-						types.ZendStringReleaseEx(c.GetDocComment(), 0)
+						// types.ZendStringReleaseEx(c.GetDocComment(), 0)
 					}
 				}
 			}
@@ -330,14 +330,14 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			if !ce.IsResolvedInterfaces() {
 				var i uint32
 				for i = 0; i < ce.GetNumInterfaces(); i++ {
-					types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
-					types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
+					// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
+					// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
 				}
 			}
 			Efree(ce.GetInterfaces())
 		}
 		if ce.GetDocComment() != nil {
-			types.ZendStringReleaseEx(ce.GetDocComment(), 0)
+			// types.ZendStringReleaseEx(ce.GetDocComment(), 0)
 		}
 		if ce.GetNumTraits() > 0 {
 			_destroyZendClassTraitsInfo(ce)
@@ -365,7 +365,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			}
 		}
 		ce.GetPropertiesInfo().Destroy()
-		types.ZendStringReleaseEx(ce.GetName(), 1)
+		// types.ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
 
@@ -389,7 +389,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 				if c.GetCe() == ce {
 					ZvalInternalPtrDtor(c.GetValue())
 					if c.GetDocComment() != nil {
-						types.ZendStringReleaseEx(c.GetDocComment(), 1)
+						// types.ZendStringReleaseEx(c.GetDocComment(), 1)
 					}
 				}
 				Free(c)
@@ -435,7 +435,7 @@ func DestroyOpArray(op_array *types.ZendOpArray) {
 		i = op_array.GetLastVar()
 		for i > 0 {
 			i--
-			types.ZendStringReleaseEx(op_array.GetVars()[i], 0)
+			// types.ZendStringReleaseEx(op_array.GetVars()[i], 0)
 		}
 		Efree(op_array.GetVars())
 	}
@@ -452,10 +452,10 @@ func DestroyOpArray(op_array *types.ZendOpArray) {
 	}
 	Efree(op_array.GetOpcodes())
 	if op_array.GetFunctionName() != nil {
-		types.ZendStringReleaseEx(op_array.GetFunctionName(), 0)
+		// types.ZendStringReleaseEx(op_array.GetFunctionName(), 0)
 	}
 	if op_array.GetDocComment() != nil {
-		types.ZendStringReleaseEx(op_array.GetDocComment(), 0)
+		// types.ZendStringReleaseEx(op_array.GetDocComment(), 0)
 	}
 	if op_array.GetLiveRange() != nil {
 		Efree(op_array.GetLiveRange())
@@ -480,10 +480,10 @@ func DestroyOpArray(op_array *types.ZendOpArray) {
 		}
 		for i = 0; i < num_args; i++ {
 			if arg_info[i].GetName() != nil {
-				types.ZendStringReleaseEx(arg_info[i].GetName(), 0)
+				// types.ZendStringReleaseEx(arg_info[i].GetName(), 0)
 			}
 			if arg_info[i].GetType().IsClass() {
-				types.ZendStringReleaseEx(arg_info[i].GetType().Name(), 0)
+				// types.ZendStringReleaseEx(arg_info[i].GetType().Name(), 0)
 			}
 		}
 		Efree(arg_info)

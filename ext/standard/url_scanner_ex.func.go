@@ -54,7 +54,7 @@ func PhpIniOnUpdateTags(
 			str = types.NewString(b.CastStr(key, keylen))
 			types.GC_MAKE_PERSISTENT_LOCAL(str)
 			types.ZendHashAddMem(ctx.GetTags(), str.GetStr(), val, strlen(val)+1)
-			types.ZendStringReleaseEx(str, 1)
+			// types.ZendStringReleaseEx(str, 1)
 		}
 	}
 	zend.Efree(tmp)
@@ -114,7 +114,7 @@ func PhpIniOnUpdateHosts(
 		if keylen > 0 {
 			tmp_key = types.NewString(b.CastStr(key, keylen))
 			types.ZendHashAddEmptyElement(hosts, tmp_key.GetStr())
-			types.ZendStringReleaseEx(tmp_key, 0)
+			// types.ZendStringReleaseEx(tmp_key, 0)
 		}
 	}
 	zend.Efree(tmp)
@@ -173,12 +173,12 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	if url_parts.GetHost() != nil {
 		var tmp *types.String = zend.ZendStringTolower(url_parts.GetHost())
 		if !&(BG__().url_adapt_session_hosts_ht).KeyExists(tmp.GetStr()) {
-			types.ZendStringReleaseEx(tmp, 0)
+			// types.ZendStringReleaseEx(tmp, 0)
 			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)
 			return
 		}
-		types.ZendStringReleaseEx(tmp, 0)
+		// types.ZendStringReleaseEx(tmp, 0)
 	}
 
 	/*
@@ -826,7 +826,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, strlen(name))
 		url_app.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 	} else {
 		url_app.AppendString(b.CastStrAuto(name))
 	}
@@ -834,7 +834,7 @@ func PhpUrlScannerAdaptSingleUrl(
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(value, strlen(value))
 		url_app.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 	} else {
 		url_app.AppendString(b.CastStrAuto(value))
 	}
@@ -971,16 +971,16 @@ func PhpUrlScannerAddVarImpl(
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, name_len)
 		sname.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 		encoded = PhpRawUrlEncode(value, value_len)
 		svalue.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name), name_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
 		hname.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(value), value_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
 		hvalue.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 	} else {
 		sname.AppendString(b.CastStr(name, name_len))
 		svalue.AppendString(b.CastStr(value, value_len))
@@ -1056,10 +1056,10 @@ func PhpUrlScannerResetVarImpl(name *types.String, encode int, type_ int) int {
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name.GetVal(), name.GetLen())
 		sname.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name.GetVal()), name.GetLen(), 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG__().default_charset, 0)
 		hname.AppendString(encoded.GetStr())
-		types.ZendStringFree(encoded)
+		//types.ZendStringFree(encoded)
 	} else {
 		sname.AppendString(name.GetStr())
 		hname.AppendString(name.GetStr())

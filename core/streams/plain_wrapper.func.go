@@ -284,7 +284,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 
 			/* temporary streams are never persistent */
 
-			types.ZendStringReleaseEx(data.GetTempName(), 0)
+			// types.ZendStringReleaseEx(data.GetTempName(), 0)
 			data.SetTempName(nil)
 		}
 	} else {
@@ -640,7 +640,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **types.String, opt
 				r = DoFstat(self, 0)
 				if r == 0 && !(zend.S_ISREG(self.GetSb().st_mode)) {
 					if opened_path != nil {
-						types.ZendStringReleaseEx(*opened_path, 0)
+						// types.ZendStringReleaseEx(*opened_path, 0)
 						*opened_path = nil
 					}
 					core.PhpStreamClose(ret)

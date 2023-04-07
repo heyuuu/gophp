@@ -627,7 +627,7 @@ func ZifFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ z
 
 	}
 	if target_buf != nil {
-		types.ZendStringFree(target_buf)
+		//types.ZendStringFree(target_buf)
 	}
 	core.PhpStreamClose(stream)
 }
@@ -660,7 +660,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 		close(fd)
 		return_value.SetString(opened_path)
 	}
-	types.ZendStringReleaseEx(p, 0)
+	// types.ZendStringReleaseEx(p, 0)
 }
 func ZifTmpfile(executeData zpp.Ex, return_value zpp.Ret) {
 	var stream *core.PhpStream
@@ -865,7 +865,7 @@ func ZifFgets(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.Op
 		}
 		str = types.ZendStringAlloc(len_, 0)
 		if core.PhpStreamGetLine(stream, str.GetVal(), len_, &line_len) == nil {
-			types.ZendStringEfree(str)
+			// types.ZendStringEfree(str)
 			return_value.SetFalse()
 			return
 		}

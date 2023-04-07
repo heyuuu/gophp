@@ -982,7 +982,7 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
 	types.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
-	types.ZendStringReleaseEx(key, 1)
+	// types.ZendStringReleaseEx(key, 1)
 }
 func FcgiFreeMgmtVarCb(zv *types.Zval) { zend.Pefree(zv.GetStr(), 1) }
 func FcgiGetLastClientIp() *byte {

@@ -53,13 +53,13 @@ func FreeZendConstant(zv *types.Zval) {
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
 		ZvalPtrDtorNogc(c.Value())
 		if c.GetName() != nil {
-			types.ZendStringReleaseEx(c.GetName(), 0)
+			// types.ZendStringReleaseEx(c.GetName(), 0)
 		}
 		Efree(c)
 	} else {
 		ZvalInternalPtrDtor(c.Value())
 		if c.GetName() != nil {
-			types.ZendStringReleaseEx(c.GetName(), 1)
+			// types.ZendStringReleaseEx(c.GetName(), 1)
 		}
 		Free(c)
 	}
@@ -314,8 +314,8 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 			}
 		}
 	failure:
-		types.ZendStringReleaseEx(class_name, 0)
-		types.ZendStringEfree(constant_name)
+		// types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringEfree(constant_name)
 		return ret_constant
 	}
 
@@ -418,14 +418,14 @@ func ZendRegisterConstant(c *ZendConstant) int {
 
 		}
 		faults.Error(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
-		types.ZendStringRelease(c.GetName())
+		// types.ZendStringRelease(c.GetName())
 		if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
 			ZvalPtrDtorNogc(c.Value())
 		}
 		ret = types.FAILURE
 	}
 	if lowercase_name != nil {
-		types.ZendStringRelease(lowercase_name)
+		// types.ZendStringRelease(lowercase_name)
 	}
 	return ret
 }

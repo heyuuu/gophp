@@ -16,7 +16,7 @@ func ZEND_ECHO_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 		}
 
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -37,7 +37,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		} else if z.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	}
 	ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -58,7 +58,7 @@ func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		} else if z.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}
-		types.ZendStringReleaseEx(str, 0)
+		// types.ZendStringReleaseEx(str, 0)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

@@ -31,7 +31,7 @@ func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_a
 func PhpRegisterVariableQuick(name *byte, name_len int, val *types.Zval, ht *types.Array) {
 	var key *types.String = types.ZendStringInitInterned(name, name_len, 0)
 	ht.KeyUpdateIndirect(key.GetStr(), val)
-	types.ZendStringReleaseEx(key, 0)
+	// types.ZendStringReleaseEx(key, 0)
 }
 func PhpRegisterVariableEx(var_name *byte, val *types.Zval, track_vars_array *types.Zval) {
 	var p *byte = nil
@@ -541,7 +541,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 		for i = 0; i < SG__().request_info.argc; i++ {
 			tmp.SetStringVal(b.CastStrAuto(SG__().request_info.argv[i]))
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
-				types.ZendStringEfree(tmp.GetStr())
+				// types.ZendStringEfree(tmp.GetStr())
 			}
 		}
 	} else if s != nil && (*s) {
@@ -557,7 +557,7 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 			tmp.SetStringVal(b.CastStrAuto(ss))
 			count++
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
-				types.ZendStringEfree(tmp.GetStr())
+				// types.ZendStringEfree(tmp.GetStr())
 			}
 			if space != nil {
 				*space = '+'

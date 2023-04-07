@@ -123,7 +123,7 @@ again:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		class_name = types.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			var num zend.ZendUlong
 			var key *types.String
@@ -307,7 +307,7 @@ again:
 		}
 		class_name = types.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
-		types.ZendStringReleaseEx(class_name, 0)
+		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			var __ht *types.Array = myht
 			for _, _p := range __ht.ForeachData() {
@@ -393,8 +393,8 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Stri
 		buf.AppendByte('\'')
 		buf.AppendString(tmp_str.GetStr())
 		buf.AppendString("' => ")
-		types.ZendStringFree(ckey)
-		types.ZendStringFree(tmp_str)
+		//types.ZendStringFree(ckey)
+		//types.ZendStringFree(tmp_str)
 	}
 	PhpVarExportEx(zv, level+2, buf)
 	buf.AppendByte(',')
@@ -464,8 +464,8 @@ again:
 		buf.AppendByte('\'')
 		buf.AppendString(ztmp2.GetStr())
 		buf.AppendByte('\'')
-		types.ZendStringFree(ztmp)
-		types.ZendStringFree(ztmp2)
+		//types.ZendStringFree(ztmp)
+		//types.ZendStringFree(ztmp2)
 	case types.IS_ARRAY:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
@@ -764,10 +764,10 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		priv_name = zend.ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == types.SUCCESS {
 			zend.ZendTmpStringRelease(tmp_name)
-			types.ZendStringRelease(priv_name)
+			// types.ZendStringRelease(priv_name)
 			continue
 		}
-		types.ZendStringRelease(priv_name)
+		// types.ZendStringRelease(priv_name)
 		if zend.EG__().GetException() != nil {
 			zend.ZendTmpStringRelease(tmp_name)
 			retval = types.FAILURE
@@ -776,10 +776,10 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		prot_name = zend.ZendManglePropertyName_ZStr("*", name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == types.SUCCESS {
 			zend.ZendTmpStringRelease(tmp_name)
-			types.ZendStringRelease(prot_name)
+			// types.ZendStringRelease(prot_name)
 			continue
 		}
-		types.ZendStringRelease(prot_name)
+		// types.ZendStringRelease(prot_name)
 		if zend.EG__().GetException() != nil {
 			zend.ZendTmpStringRelease(tmp_name)
 			retval = types.FAILURE
@@ -1166,7 +1166,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 				zend.ConvertToStringEx(entry)
 				lcname = zend.ZendStringTolower(entry.GetStr())
 				types.ZendHashAddEmptyElement(class_hash, lcname.GetStr())
-				types.ZendStringReleaseEx(lcname, 0)
+				// types.ZendStringReleaseEx(lcname, 0)
 			}
 
 			/* Exception during string conversion. */

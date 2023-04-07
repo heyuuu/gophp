@@ -394,11 +394,11 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 	}
 	name = ZvalGetString(ZendAstGetZval(args.GetChild()[0]))
 	if ZendMemrchr(name.GetVal(), '\\', name.GetLen()) || ZendMemrchr(name.GetVal(), ':', name.GetLen()) {
-		types.ZendStringReleaseEx(name, 0)
+		// types.ZendStringReleaseEx(name, 0)
 		return types.FAILURE
 	}
 	if ZendTryCtEvalConst(result.GetConstant(), name, 0) != 0 {
-		types.ZendStringReleaseEx(name, 0)
+		// types.ZendStringReleaseEx(name, 0)
 		ZvalPtrDtor(result.GetConstant())
 		result.GetConstant().SetTrue()
 		result.SetOpType(IS_CONST)
@@ -451,7 +451,7 @@ func ZendTryCompileCtBoundInitUserFunc(name_ast *ZendAst, num_args uint32) int {
 	lcname = ZendStringTolower(name)
 	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr())
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
-		types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
 		return types.FAILURE
 	}
 	opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, nil)
@@ -495,11 +495,11 @@ func ZendCompileFuncCufa(result *Znode, args *ZendAstList, lcname *types.String)
 				opline = ZendEmitOp(nil, ZEND_SEND_ARRAY, &arg_node, &len_node)
 				opline.SetExtendedValue(zv.GetLval())
 				ZendEmitOp(result, ZEND_DO_FCALL, nil, nil)
-				types.ZendStringReleaseEx(name, 0)
+				// types.ZendStringReleaseEx(name, 0)
 				return types.SUCCESS
 			}
 		}
-		types.ZendStringReleaseEx(name, 0)
+		// types.ZendStringReleaseEx(name, 0)
 	}
 	ZendCompileExpr(&arg_node, args.GetChild()[1])
 	ZendEmitOp(nil, ZEND_SEND_ARRAY, &arg_node, nil)
@@ -560,7 +560,7 @@ func ZendCompileAssert(result *Znode, args *ZendAstList, name *types.String, fbc
 		}
 	} else {
 		if fbc == nil {
-			types.ZendStringReleaseEx(name, 0)
+			// types.ZendStringReleaseEx(name, 0)
 		}
 		result.SetOpType(IS_CONST)
 		result.GetConstant().SetTrue()
@@ -580,10 +580,10 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 			var is_fully_qualified types.ZendBool
 			var resolved_name *types.String = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
 			if ZendTryCtEvalConst(&value, resolved_name, is_fully_qualified) == 0 {
-				types.ZendStringReleaseEx(resolved_name, 0)
+				// types.ZendStringReleaseEx(resolved_name, 0)
 				return types.FAILURE
 			}
-			types.ZendStringReleaseEx(resolved_name, 0)
+			// types.ZendStringReleaseEx(resolved_name, 0)
 			strict = ZendIsTrue(&value)
 			ZvalPtrDtor(&value)
 		} else {

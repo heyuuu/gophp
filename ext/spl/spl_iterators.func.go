@@ -1503,13 +1503,13 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 			zend.ZvalPtrDtor(intern.GetData())
 			intern.GetData().SetString(result)
 		}
-		types.ZendStringRelease(replacement_str)
+		// types.ZendStringRelease(replacement_str)
 		types.ZVAL_BOOL(return_value, count > 0)
 	}
 	if intern.IsInverted() {
 		types.ZVAL_BOOL(return_value, return_value.GetType() != types.IS_TRUE)
 	}
-	types.ZendStringReleaseEx(subject, 0)
+	// types.ZendStringReleaseEx(subject, 0)
 }
 func zim_spl_RegexIterator_getRegex(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS(executeData))
@@ -1698,7 +1698,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 			php_pcre_pce_decref(object.GetPce())
 		}
 		if object.GetURegexRegex() != nil {
-			types.ZendStringReleaseEx(object.GetURegexRegex(), 0)
+			// types.ZendStringReleaseEx(object.GetURegexRegex(), 0)
 		}
 	}
 	if object.GetDitType() == DIT_CallbackFilterIterator || object.GetDitType() == DIT_RecursiveCallbackFilterIterator {

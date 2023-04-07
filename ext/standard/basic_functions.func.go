@@ -266,7 +266,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 		setlocale(LC_ALL, "C")
 		setlocale(LC_CTYPE, "")
 		if BG__().locale_string {
-			types.ZendStringReleaseEx(BG__().locale_string, 0)
+			// types.ZendStringReleaseEx(BG__().locale_string, 0)
 			BG__().locale_string = nil
 		}
 	}
@@ -1296,7 +1296,7 @@ func UserShutdownFunctionCall(zv *types.Zval) int {
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
 		var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpError(faults.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
-		types.ZendStringReleaseEx(function_name, 0)
+		// types.ZendStringReleaseEx(function_name, 0)
 		return 0
 	}
 	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == types.SUCCESS {
@@ -1393,7 +1393,7 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 		var callback_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
-		types.ZendStringReleaseEx(callback_name, 0)
+		// types.ZendStringReleaseEx(callback_name, 0)
 		return_value.SetFalse()
 	} else {
 		if !(BG__().user_shutdown_function_names) {
@@ -1759,12 +1759,12 @@ func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath 
 	}
 	key = types.NewString("include_path")
 	if !zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
-		types.ZendStringReleaseEx(key, 0)
+		// types.ZendStringReleaseEx(key, 0)
 
 		return_value.SetFalse()
 		return
 	}
-	types.ZendStringReleaseEx(key, 0)
+	// types.ZendStringReleaseEx(key, 0)
 }
 func ZifGetIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 	var str *byte
@@ -1786,7 +1786,7 @@ func ZifRestoreIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	key = types.NewString("include_path")
 	zend.ZendRestoreIniEntry(key, core.PHP_INI_STAGE_RUNTIME)
-	types.ZendStringEfree(key)
+	// types.ZendStringEfree(key)
 }
 func ZifPrintR(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
 	var var_ *types.Zval
@@ -1841,7 +1841,7 @@ func ZifIgnoreUserAbort(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, val
 	if executeData.NumArgs() != 0 {
 		var key *types.String = types.NewString("ignore_user_abort")
 		zend.ZendAlterIniEntryChars(key.GetStr(), b.CastStr(b.Cond(arg != 0, "1", "0"), 1), core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
-		types.ZendStringReleaseEx(key, 0)
+		// types.ZendStringReleaseEx(key, 0)
 	}
 	return_value.SetLong(old_setting)
 	return
@@ -1965,11 +1965,11 @@ func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionN
 	if zend.ZendIsCallable(tick_fe.GetArguments()[0], 0, &function_name) == 0 {
 		zend.Efree(tick_fe.GetArguments())
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
-		types.ZendStringReleaseEx(function_name, 0)
+		// types.ZendStringReleaseEx(function_name, 0)
 		return_value.SetFalse()
 		return
 	} else if function_name != nil {
-		types.ZendStringReleaseEx(function_name, 0)
+		// types.ZendStringReleaseEx(function_name, 0)
 	}
 	if tick_fe.GetArguments()[0].GetType() != types.IS_ARRAY && tick_fe.GetArguments()[0].GetType() != types.IS_OBJECT {
 		zend.ConvertToStringEx(tick_fe.GetArguments()[0])

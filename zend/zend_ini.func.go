@@ -44,7 +44,7 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 			return 1
 		}
 		if ini_entry.GetValue() != ini_entry.GetOrigValue() {
-			types.ZendStringRelease(ini_entry.GetValue())
+			// types.ZendStringRelease(ini_entry.GetValue())
 		}
 		ini_entry.SetValue(ini_entry.GetOrigValue())
 		ini_entry.SetModifiable(ini_entry.GetOrigModifiable())
@@ -57,10 +57,10 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 func FreeIniEntry(zv *types.Zval) {
 	var entry *ZendIniEntry = (*ZendIniEntry)(zv.GetPtr())
 	if entry.GetValue() != nil {
-		types.ZendStringRelease(entry.GetValue())
+		// types.ZendStringRelease(entry.GetValue())
 	}
 	if entry.GetOrigValue() != nil {
-		types.ZendStringReleaseEx(entry.GetOrigValue(), 1)
+		// types.ZendStringReleaseEx(entry.GetOrigValue(), 1)
 	}
 	Free(entry)
 }
@@ -131,7 +131,7 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 		p := NewZendIniEntry(iniEntryDef, moduleNumber)
 		if types.ZendHashAddPtr(directives, p.GetName().GetStr(), any(p)) == nil {
 			if p.GetName() != nil {
-				types.ZendStringReleaseEx(p.GetName(), 1)
+				// types.ZendStringReleaseEx(p.GetName(), 1)
 			}
 			ZendUnregisterIniEntries(moduleNumber)
 			return types.FAILURE
@@ -184,11 +184,11 @@ func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_typ
 	duplicate = new_value.Copy()
 	if ini_entry.EmitOnModify(duplicate, stage) {
 		if modified != 0 && ini_entry.GetOrigValue() != ini_entry.GetValue() {
-			types.ZendStringRelease(ini_entry.GetValue())
+			// types.ZendStringRelease(ini_entry.GetValue())
 		}
 		ini_entry.SetValue(duplicate)
 	} else {
-		types.ZendStringRelease(duplicate)
+		// types.ZendStringRelease(duplicate)
 		return false
 	}
 	return true

@@ -26,7 +26,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		memcpy(target, rope[i].GetVal(), rope[i].GetLen())
 		target += rope[i].GetLen()
-		types.ZendStringReleaseEx(rope[i], 0)
+		// types.ZendStringReleaseEx(rope[i], 0)
 	}
 	*target = '0'
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -57,7 +57,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			ZvalPtrDtorNogc(free_op2)
 			if EG__().GetException() != nil {
 				for i = 0; i <= opline.GetExtendedValue(); i++ {
-					types.ZendStringReleaseEx(rope[i], 0)
+					// types.ZendStringReleaseEx(rope[i], 0)
 				}
 				opline.Result().SetUndef()
 				return 0
@@ -73,7 +73,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		memcpy(target, rope[i].GetVal(), rope[i].GetLen())
 		target += rope[i].GetLen()
-		types.ZendStringReleaseEx(rope[i], 0)
+		// types.ZendStringReleaseEx(rope[i], 0)
 	}
 	*target = '0'
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -102,7 +102,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 			rope[opline.GetExtendedValue()] = ZvalGetStringFunc(var_)
 			if EG__().GetException() != nil {
 				for i = 0; i <= opline.GetExtendedValue(); i++ {
-					types.ZendStringReleaseEx(rope[i], 0)
+					// types.ZendStringReleaseEx(rope[i], 0)
 				}
 				opline.Result().SetUndef()
 				return 0
@@ -118,7 +118,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	for i = 0; i <= opline.GetExtendedValue(); i++ {
 		memcpy(target, rope[i].GetVal(), rope[i].GetLen())
 		target += rope[i].GetLen()
-		types.ZendStringReleaseEx(rope[i], 0)
+		// types.ZendStringReleaseEx(rope[i], 0)
 	}
 	*target = '0'
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

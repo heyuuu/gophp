@@ -157,7 +157,7 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 			if call.GetFunc().IsClosure() {
 				ZendObjectRelease(ZEND_CLOSURE_OBJECT(call.GetFunc()))
 			} else if call.GetFunc().IsCallViaTrampoline() {
-				types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
+				// types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 				ZendFreeTrampoline(call.GetFunc())
 			}
 			executeData.GetCall() = call.GetPrevExecuteData()
@@ -217,11 +217,11 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 						last--
 					}
 					if last.GetOpcode() == ZEND_ROPE_INIT {
-						types.ZendStringReleaseEx(*rope, 0)
+						// types.ZendStringReleaseEx(*rope, 0)
 					} else {
 						var j int = last.GetExtendedValue()
 						for {
-							types.ZendStringReleaseEx(rope[j], 0)
+							// types.ZendStringReleaseEx(rope[j], 0)
 							if !(b.PostDec(&j)) {
 								break
 							}
@@ -269,7 +269,7 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		lcname = types.NewString(b.CastStr(function.GetVal(), cname_length))
 		called_scope = ZendFetchClassByName(lcname, nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 		if called_scope == nil {
-			types.ZendStringReleaseEx(lcname, 0)
+			// types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
 		mname = types.NewString(b.CastStr(function.GetVal()+(cname_length+b.SizeOf("\"::\"")-1), mname_length))
@@ -282,12 +282,12 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(called_scope, mname)
 			}
-			types.ZendStringReleaseEx(lcname, 0)
-			types.ZendStringReleaseEx(mname, 0)
+			// types.ZendStringReleaseEx(lcname, 0)
+			// types.ZendStringReleaseEx(mname, 0)
 			return nil
 		}
-		types.ZendStringReleaseEx(lcname, 0)
-		types.ZendStringReleaseEx(mname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(mname, 0)
 		if !fbc.IsStatic() {
 			ZendNonStaticMethodCall(fbc)
 			if EG__().GetException() != nil {
@@ -306,10 +306,10 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		}
 		if b.Assign(&func_, EG__().GetFunctionTable().KeyFind(lcname.GetStr())) == nil {
 			faults.ThrowError(nil, "Call to undefined function %s()", function.GetVal())
-			types.ZendStringReleaseEx(lcname, 0)
+			// types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		types.ZendStringReleaseEx(lcname, 0)
+		// types.ZendStringReleaseEx(lcname, 0)
 		fbc = func_.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())

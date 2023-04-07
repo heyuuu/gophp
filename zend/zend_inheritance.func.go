@@ -643,8 +643,8 @@ func EmitIncompatibleMethodError(
 	} else {
 		faults.ErrorAt(error_level, nil, FuncLineno(child), "Declaration of %s %s be compatible with %s", child_prototype.GetVal(), error_verb, parent_prototype.GetVal())
 	}
-	types.ZendStringEfree(child_prototype)
-	types.ZendStringEfree(parent_prototype)
+	// types.ZendStringEfree(child_prototype)
+	// types.ZendStringEfree(parent_prototype)
 }
 func EmitIncompatibleMethodErrorOrWarning(child types.IFunction, parent types.IFunction, status InheritanceStatus, unresolved_class *types.String, always_error types.ZendBool) {
 	var error_level int
@@ -1053,7 +1053,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 
 	}
 	if ce.GetParentName() {
-		types.ZendStringReleaseEx(ce.GetParentName(), 0)
+		// types.ZendStringReleaseEx(ce.GetParentName(), 0)
 	}
 	ce.SetParent(parent_ce)
 	ce.SetIsResolvedParent(true)
@@ -1444,8 +1444,8 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 		}
 	}
 	for i = 0; i < ce.GetNumInterfaces(); i++ {
-		types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
-		types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
+		// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
+		// types.ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
 	}
 	Efree(ce.GetInterfaceNames())
 	ce.SetNumInterfaces(num_interfaces)
@@ -1502,7 +1502,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 			ce.SetConstructor(fe)
 			fe.SetIsCtor(true)
 		}
-		types.ZendStringReleaseEx(lowercase_name, 0)
+		// types.ZendStringReleaseEx(lowercase_name, 0)
 	}
 }
 func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn types.IFunction, overridden **types.Array) {
@@ -1626,7 +1626,7 @@ func ZendTraitsCopyFunctions(
 				}
 				lcname = ZendStringTolower(alias.GetAlias())
 				ZendAddTraitMethod(ce, alias.GetAlias().GetVal(), lcname, &fn_copy, overridden)
-				types.ZendStringReleaseEx(lcname, 0)
+				// types.ZendStringReleaseEx(lcname, 0)
 
 				/* Record the trait from which this alias was resolved. */
 
@@ -1774,7 +1774,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				   exclude_from_classes, for consistency */
 
 			}
-			types.ZendStringReleaseEx(lcname, 0)
+			// types.ZendStringReleaseEx(lcname, 0)
 			i++
 		}
 		ce.SetTraitPrecedences(precedences)
@@ -1805,7 +1805,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				if !trait.GetFunctionTable().KeyExists(lcname.GetStr()) {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 				}
-				types.ZendStringReleaseEx(lcname, 0)
+				// types.ZendStringReleaseEx(lcname, 0)
 			}
 			i++
 		}
@@ -1969,7 +1969,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 					if not_compatible != 0 {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().GetName().GetVal(), prop_name.GetVal(), ce.GetName().GetVal())
 					}
-					types.ZendStringReleaseEx(prop_name, 0)
+					// types.ZendStringReleaseEx(prop_name, 0)
 					continue
 				}
 			}
@@ -1992,7 +1992,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 				property_info.GetType().Name().AddRefcount()
 			}
 			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
-			types.ZendStringReleaseEx(prop_name, 0)
+			// types.ZendStringReleaseEx(prop_name, 0)
 		}
 	}
 
@@ -2034,10 +2034,10 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 
 					lc_method_name = ZendStringTolower(cur_alias.GetTraitMethod().GetMethodName())
 					if ce.GetFunctionTable().KeyExists(lc_method_name.GetStr()) {
-						types.ZendStringReleaseEx(lc_method_name, 0)
+						// types.ZendStringReleaseEx(lc_method_name, 0)
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", cur_alias.GetTraitMethod().GetMethodName().GetVal())
 					} else {
-						types.ZendStringReleaseEx(lc_method_name, 0)
+						// types.ZendStringReleaseEx(lc_method_name, 0)
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers of the trait method %s() are changed, but this method does not exist. Error", cur_alias.GetTraitMethod().GetMethodName().GetVal())
 					}
 				}

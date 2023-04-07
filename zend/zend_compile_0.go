@@ -19,7 +19,7 @@ func MAKE_NOP(opline *ZendOp) {
 }
 func RESET_DOC_COMMENT() {
 	if CG__().GetDocComment() != nil {
-		types.ZendStringReleaseEx(CG__().GetDocComment(), 0)
+		// types.ZendStringReleaseEx(CG__().GetDocComment(), 0)
 		CG__().SetDocComment(nil)
 	}
 }
@@ -154,7 +154,7 @@ func GetNextBrkContElement() *ZendBrkContElement {
 }
 func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
 	var property_info *ZendPropertyInfo = zv.GetPtr()
-	types.ZendStringRelease(property_info.GetName())
+	// types.ZendStringRelease(property_info.GetName())
 	Free(property_info)
 }
 func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
@@ -244,7 +244,7 @@ func ZendEndNamespace() {
 	FC__().SetInNamespace(0)
 	ZendResetImportTables()
 	if FC__().GetCurrentNamespace() != nil {
-		types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
+		// types.ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
 		FC__().SetCurrentNamespace(nil)
 	}
 }
@@ -625,7 +625,7 @@ func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 	types.ZSTR_ALLOCA_ALLOC(lcname, len_)
 	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
 	result = types.ZendHashFindPtr(ht, lcname.GetStr())
-	lcname.Free()
+	//lcname.Free()
 	return result
 }
 func ZendResolveNonClassName(name *types.String, type_ uint32, is_fully_qualified *types.ZendBool, case_sensitive types.ZendBool, current_import_sub *types.Array) *types.String {

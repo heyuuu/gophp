@@ -527,7 +527,7 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 			len_ = Spprintf(&tmp, 0, "[%s] %s%s", error_time_str.GetVal(), log_message, PHP_EOL)
 			PhpIgnoreValue(write(fd, tmp, len_))
 			zend.Efree(tmp)
-			types.ZendStringFree(error_time_str)
+			//types.ZendStringFree(error_time_str)
 			close(fd)
 			PG__().in_error_log = 0
 			return
@@ -721,7 +721,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		Spprintf(&message, 0, "%s: %s", origin, buffer)
 	}
 	if replace_origin != nil {
-		types.ZendStringFree(replace_origin)
+		//types.ZendStringFree(replace_origin)
 	} else {
 		zend.Efree(origin)
 	}
@@ -740,7 +740,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		}
 	}
 	if replace_buffer != nil {
-		types.ZendStringFree(replace_buffer)
+		//types.ZendStringFree(replace_buffer)
 	} else {
 		zend.Efree(buffer)
 	}
@@ -933,7 +933,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 					if type_ == faults.E_ERROR || type_ == faults.E_PARSE {
 						var buf *types.String = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
-						types.ZendStringFree(buf)
+						//types.ZendStringFree(buf)
 					} else {
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))
 					}
@@ -1691,7 +1691,7 @@ func PhpHandleAuthData(auth *byte) int {
 				SG__().request_info.auth_password = zend.Estrdup(pass)
 				ret = 0
 			}
-			types.ZendStringFree(user)
+			//types.ZendStringFree(user)
 		}
 	}
 	if ret == -1 {

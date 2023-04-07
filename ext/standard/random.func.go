@@ -88,7 +88,7 @@ func ZifRandomBytes(executeData zpp.Ex, return_value zpp.Ret, length *types.Zval
 	}
 	bytes = types.ZendStringAlloc(size, 0)
 	if PhpRandomBytesThrow(bytes.GetVal(), size) == types.FAILURE {
-		types.ZendStringReleaseEx(bytes, 0)
+		// types.ZendStringReleaseEx(bytes, 0)
 		return
 	}
 	bytes.GetVal()[size] = '0'

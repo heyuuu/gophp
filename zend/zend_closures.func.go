@@ -21,7 +21,7 @@ func zim_Closure___invoke(executeData *ZendExecuteData, return_value *types.Zval
 
 	/* destruct the function also, then - we have allocated it in get_method */
 
-	types.ZendStringReleaseEx(func_.GetInternalFunction().GetFunctionName(), 0)
+	// types.ZendStringReleaseEx(func_.GetInternalFunction().GetFunctionName(), 0)
 	Efree(func_)
 }
 func ZendValidClosureBinding(closure *ZendClosure, newthis *types.Zval, scope *types.ClassEntry) types.ZendBool {
@@ -357,7 +357,7 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
 		DestroyOpArray(closure.GetFunc().GetOpArray())
 	} else if closure.GetOrigInternalHandler() == ZendClosureCallMagic {
-		types.ZendStringRelease(closure.GetFunc().GetFunctionName())
+		// types.ZendStringRelease(closure.GetFunc().GetFunctionName())
 	}
 	if closure.GetThisPtr().IsNotUndef() {
 		ZvalPtrDtor(closure.GetThisPtr())
@@ -439,7 +439,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 			}
 			info.SetString(ZendStrpprintf(0, "%s", b.Cond(i >= required, "<optional>", "<required>")))
 			val.GetArr().KeyUpdate(name.GetStr(), &info)
-			types.ZendStringReleaseEx(name, 0)
+			// types.ZendStringReleaseEx(name, 0)
 			arg_info++
 		}
 		debug_info.KeyUpdate("parameter", &val)

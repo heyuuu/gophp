@@ -25,7 +25,7 @@ func PhpInfoPrintHtmlEsc(str *byte, len_ int) int {
 	var new_str *types.String
 	new_str = PhpEscapeHtmlEntities((*uint8)(str), len_, 0, ENT_QUOTES, "utf-8")
 	written = core.PhpOutputWrite(new_str.GetVal(), new_str.GetLen())
-	types.ZendStringFree(new_str)
+	//types.ZendStringFree(new_str)
 	return written
 }
 
@@ -155,7 +155,7 @@ func PhpPrintGpcseArray(name string) {
 					PhpInfoPrint("<pre>")
 					PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
 					PhpInfoPrint("</pre>")
-					types.ZendStringReleaseEx(str, 0)
+					// types.ZendStringReleaseEx(str, 0)
 				} else {
 					zend.ZendPrintZvalR(tmp, 0)
 				}
@@ -302,7 +302,7 @@ func PhpPrintInfo(flag int) {
 			zend.ZendHtmlPuts(zend_version, strlen(zend_version))
 		}
 		PhpInfoPrintBoxEnd()
-		types.ZendStringFree(php_uname)
+		//types.ZendStringFree(php_uname)
 	}
 	zend.ZendIniSortEntries()
 	if (flag & PHP_INFO_CONFIGURATION) != 0 {

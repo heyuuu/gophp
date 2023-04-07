@@ -76,7 +76,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 			if zerrstr != nil {
 				zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 			} else {
-				types.ZendStringRelease(errstr)
+				// types.ZendStringRelease(errstr)
 			}
 		}
 		return_value.SetFalse()
@@ -89,7 +89,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
 	}
 	if errstr != nil {
-		types.ZendStringReleaseEx(errstr, 0)
+		// types.ZendStringReleaseEx(errstr, 0)
 	}
 	core.PhpStreamToZval(stream, return_value)
 }

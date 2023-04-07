@@ -64,10 +64,10 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 					if class_name != nil && class_name[0] != '*' {
 						var cname *types.String = types.NewString(class_name)
 						EG__().SetFakeScope(ZendLookupClass(cname))
-						types.ZendStringReleaseEx(cname, 0)
+						// types.ZendStringReleaseEx(cname, 0)
 					}
 					property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
-					types.ZendStringReleaseEx(pname, 0)
+					// types.ZendStringReleaseEx(pname, 0)
 					EG__().SetFakeScope(prev_scope)
 				} else {
 					property_info = ZEND_WRONG_PROPERTY_INFO

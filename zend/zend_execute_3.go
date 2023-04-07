@@ -176,7 +176,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		}
 		string_len = tmp.GetLen()
 		c = types.ZendUchar(tmp.GetVal()[0])
-		types.ZendStringReleaseEx(tmp, 0)
+		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
 		string_len = value.GetStr().GetLen()
 		c = types.ZendUchar(value.GetStr().GetVal()[0])
