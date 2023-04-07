@@ -581,7 +581,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	str = types.ZSTR_EMPTY_ALLOC()
+	str = types.NewString("")
 	exception = zend.ZEND_THIS(executeData)
 	fname = types.NewString("gettraceasstring")
 	for exception != nil && exception.IsObject() && zend.InstanceofFunction(types.Z_OBJCE_P(exception), ZendCeThrowable) != 0 {

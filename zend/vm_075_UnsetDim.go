@@ -32,7 +32,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else if offset.IsFalse() {
 				hval = 0
@@ -112,7 +112,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else if offset.IsFalse() {
 				hval = 0
@@ -125,7 +125,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2()
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else {
 				faults.Error(faults.E_WARNING, "Illegal offset type in unset")
@@ -196,7 +196,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else if offset.IsFalse() {
 				hval = 0
@@ -209,7 +209,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2()
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else {
 				faults.Error(faults.E_WARNING, "Illegal offset type in unset")
@@ -270,7 +270,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else if offset.IsFalse() {
 				hval = 0
@@ -346,7 +346,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else if offset.IsFalse() {
 				hval = 0
@@ -359,7 +359,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2()
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else {
 				faults.Error(faults.E_WARNING, "Illegal offset type in unset")
@@ -426,7 +426,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				hval = DvalToLval(offset.GetDval())
 				goto num_index_dim
 			} else if offset.IsNull() {
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else if offset.IsFalse() {
 				hval = 0
@@ -439,7 +439,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				goto num_index_dim
 			} else if offset.IsUndef() {
 				ZVAL_UNDEFINED_OP2()
-				key = types.ZSTR_EMPTY_ALLOC()
+				key = types.NewString("")
 				goto str_index_dim
 			} else {
 				faults.Error(faults.E_WARNING, "Illegal offset type in unset")

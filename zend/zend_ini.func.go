@@ -293,7 +293,7 @@ func ZendIniGetValue(name *types.String) *types.String {
 		if ini_entry.GetValue() != nil {
 			return ini_entry.GetValue()
 		} else {
-			return types.ZSTR_EMPTY_ALLOC()
+			return types.NewString("")
 		}
 	} else {
 		return nil

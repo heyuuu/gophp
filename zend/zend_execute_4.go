@@ -211,7 +211,7 @@ func SlowIndexConvert(ht *types.Array, dim *types.Zval, value *types.ZendValue, 
 		}
 		fallthrough
 	case types.IS_NULL:
-		value.SetStr(types.ZSTR_EMPTY_ALLOC())
+		value.SetStr(types.NewString(""))
 		return types.IS_STRING
 	case types.IS_DOUBLE:
 		value.SetLval(DvalToLval(dim.GetDval()))

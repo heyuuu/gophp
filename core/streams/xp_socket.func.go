@@ -193,7 +193,7 @@ func SockRecvfrom(
 			core.PhpNetworkPopulateNameFromSockaddr((*__struct__sockaddr)(&sa), sl, textaddr, addr, addrlen)
 		} else {
 			if textaddr != nil {
-				*textaddr = types.ZSTR_EMPTY_ALLOC()
+				*textaddr = types.NewString("")
 			}
 			if addr != nil {
 				*addr = nil

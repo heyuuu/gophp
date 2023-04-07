@@ -886,7 +886,7 @@ func _phpMathLongtobase(arg *types.Zval, base int) *types.String {
 	var end *byte
 	var value zend.ZendUlong
 	if arg.GetType() != types.IS_LONG || base < 2 || base > 36 {
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	value = arg.GetLval()
 	ptr = buf + b.SizeOf("buf") - 1
@@ -905,7 +905,7 @@ func _phpMathLongtobase(arg *types.Zval, base int) *types.String {
 func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
 	if arg.GetType() != types.IS_LONG && arg.GetType() != types.IS_DOUBLE || base < 2 || base > 36 {
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	if arg.IsType(types.IS_DOUBLE) {
 		var fvalue float64 = floor(arg.GetDval())
@@ -917,7 +917,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 
 		if math.IsInf(fvalue, 1) || math.IsInf(fvalue, -1) {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Number too large")
-			return types.ZSTR_EMPTY_ALLOC()
+			return types.NewString("")
 		}
 		ptr = buf + b.SizeOf("buf") - 1
 		end = ptr

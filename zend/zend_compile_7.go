@@ -472,7 +472,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			case types.IS_TRUE:
 				result.GetArr().IndexUpdate(1, value)
 			case types.IS_NULL:
-				result.GetArr().KeyUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), value)
+				result.GetArr().KeyUpdate(types.NewString("").GetStr(), value)
 			default:
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal offset type")
 			}

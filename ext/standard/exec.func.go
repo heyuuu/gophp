@@ -203,7 +203,7 @@ func PhpEscapeShellCmd(str *byte) *types.String {
 
 	if l > CmdMaxLen-2-1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Command exceeds the allowed length of %zu bytes", CmdMaxLen)
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	cmd = types.ZendStringSafeAlloc(2, l, 0, 0)
 	x = 0
@@ -284,7 +284,7 @@ func PhpEscapeShellCmd(str *byte) *types.String {
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		// types.ZendStringReleaseEx(cmd, 0)
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	if estimate-y > 4096 {
 
@@ -311,7 +311,7 @@ func PhpEscapeShellArg(str *byte) *types.String {
 
 	if l > CmdMaxLen-2-1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Argument exceeds the allowed length of %zu bytes", CmdMaxLen)
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	cmd = types.ZendStringSafeAlloc(4, l, 2, 0)
 	cmd.GetVal()[b.PostInc(&y)] = '\''
@@ -343,7 +343,7 @@ func PhpEscapeShellArg(str *byte) *types.String {
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, faults.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		// types.ZendStringReleaseEx(cmd, 0)
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	if estimate-y > 4096 {
 

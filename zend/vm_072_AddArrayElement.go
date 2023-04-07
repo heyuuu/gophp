@@ -21,7 +21,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 		num_index:
 			opline.Result().GetArr().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -80,7 +80,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -97,7 +97,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -165,7 +165,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -182,7 +182,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -221,7 +221,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 		num_index:
 			opline.Result().GetArr().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -282,7 +282,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -299,7 +299,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -371,7 +371,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -388,7 +388,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -430,7 +430,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 		num_index:
 			opline.Result().GetArr().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -494,7 +494,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -511,7 +511,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -589,7 +589,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -606,7 +606,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -644,7 +644,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 		num_index:
 			opline.Result().GetArr().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -704,7 +704,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -721,7 +721,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()
@@ -791,7 +791,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			offset = types.Z_REFVAL_P(offset)
 			goto add_again
 		} else if offset.IsNull() {
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
 			hval = DvalToLval(offset.GetDval())
@@ -808,7 +808,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			goto num_index
 		} else if offset.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
-			str = types.ZSTR_EMPTY_ALLOC()
+			str = types.NewString("")
 			goto str_index
 		} else {
 			ZendIllegalOffset()

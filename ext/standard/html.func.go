@@ -1162,7 +1162,7 @@ func PhpEscapeHtmlEntitiesEx(
 				continue
 			} else {
 				// types.ZendStringEfree(replaced)
-				return types.ZSTR_EMPTY_ALLOC()
+				return types.NewString("")
 			}
 
 			/* invalid MB sequence */

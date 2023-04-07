@@ -217,7 +217,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 			if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
 				new_value = types.ZSTR_CHAR('1')
 			} else if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.GetStr().GetLen() == 5 && !(strncasecmp(arg2.GetStr().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
-				new_value = types.ZSTR_EMPTY_ALLOC()
+				new_value = types.NewString("")
 			} else {
 				new_value = BrowscapInternStr(ctx, arg2.GetStr(), persistent)
 			}

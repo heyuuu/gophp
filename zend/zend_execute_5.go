@@ -155,7 +155,7 @@ func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *Zend
 		return ht.IndexFind(hval)
 	} else if offset.IsNull() {
 	str_idx:
-		return types.ZendHashFindInd(ht, types.ZSTR_EMPTY_ALLOC().GetStr())
+		return types.ZendHashFindInd(ht, types.NewString("").GetStr())
 	} else if offset.IsFalse() {
 		hval = 0
 		goto num_idx
@@ -277,7 +277,7 @@ try_again:
 		if key.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}
-		str = types.ZSTR_EMPTY_ALLOC()
+		str = types.NewString("")
 		goto str_key
 	} else {
 		faults.Error(faults.E_WARNING, "array_key_exists(): The first argument should be either a string or an integer")

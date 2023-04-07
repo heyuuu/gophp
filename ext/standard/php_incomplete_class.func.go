@@ -15,4 +15,6 @@ func PHP_SET_CLASS_ATTRIBUTES(struc *types.Zval) {
 		class_name = types.Z_OBJCE_P(struc).GetName().Copy()
 	}
 }
-func PHP_CLEANUP_CLASS_ATTRIBUTES() { // types.ZendStringReleaseEx(class_name, 0) }
+func PHP_CLEANUP_CLASS_ATTRIBUTES() {
+	// types.ZendStringReleaseEx(class_name, 0)
+}

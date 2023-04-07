@@ -293,7 +293,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.SymtableUpdate(key.GetStr().GetStr(), value)
 		break
 	case types.IS_NULL:
-		result = ht.SymtableUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), value)
+		result = ht.SymtableUpdate(types.NewString("").GetStr(), value)
 		break
 	case types.IS_RESOURCE:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(key), types.Z_RES_HANDLE_P(key))

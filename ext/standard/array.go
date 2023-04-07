@@ -4117,7 +4117,7 @@ func ZifArrayColumn(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, c
 						return_value.GetArr().SymtableUpdate(key.GetStr(), colval)
 						zend.ZendTmpStringRelease(tmp_key)
 					case types.IS_NULL:
-						return_value.GetArr().KeyUpdate(types.ZSTR_EMPTY_ALLOC().GetStr(), colval)
+						return_value.GetArr().KeyUpdate(types.NewString("").GetStr(), colval)
 					case types.IS_DOUBLE:
 						return_value.GetArr().IndexUpdate(zend.DvalToLval(keyval.GetDval()), colval)
 					case types.IS_TRUE:
@@ -6364,7 +6364,7 @@ func ZifArrayKeyExists(executeData zpp.Ex, return_value zpp.Ret, key *types.Zval
 	case types.IS_LONG:
 		types.ZVAL_BOOL(return_value, ht.IndexExists(key.GetLval()))
 	case types.IS_NULL:
-		types.ZVAL_BOOL(return_value, ht.KeyExistsIndirect(types.ZSTR_EMPTY_ALLOC().GetStr()))
+		types.ZVAL_BOOL(return_value, ht.KeyExistsIndirect(types.NewString("").GetStr()))
 	default:
 		core.PhpErrorDocref(nil, faults.E_WARNING, "The first argument should be either a string or an integer")
 		return_value.SetFalse()

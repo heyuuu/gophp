@@ -6,17 +6,10 @@ import (
 	"strings"
 )
 
-func ZSTR_EMPTY_ALLOC() *String { return ZSTR_EMPTY }
-func ZSTR_CHAR(c int) *String   { return oneCharStrings[c] }
+func ZSTR_CHAR(c int) *String { return oneCharStrings[c] }
 
 func ZSTR_ALLOCA_ALLOC(str *String, _len int) {
 	*str = *ZendStringAlloc(_len, 0)
-}
-
-func ZendStringForgetHashVal(s *String) {
-	// todo remove
-	//s.SetH(0)
-	//s.DelGcFlags(IS_STR_VALID_UTF8)
 }
 
 func ZendStringAlloc(len_ int, persistent int) *String {

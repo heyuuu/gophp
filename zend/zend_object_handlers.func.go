@@ -1137,7 +1137,7 @@ func ZendGetCallTrampolineFunc(ce *types.ClassEntry, method_name *types.String, 
 	if fbc.GetType() == ZEND_USER_FUNCTION {
 		func_.SetFilename(fbc.GetOpArray().GetFilename())
 	} else {
-		func_.SetFilename(types.ZSTR_EMPTY_ALLOC())
+		func_.SetFilename(types.NewString(""))
 	}
 	if fbc.GetType() == ZEND_USER_FUNCTION {
 		func_.SetLineStart(fbc.GetOpArray().GetLineStart())

@@ -201,7 +201,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 try_again:
 	switch offset.GetType() {
 	case types.IS_NULL:
-		offset_key = types.ZSTR_EMPTY_ALLOC()
+		offset_key = types.NewString("")
 		goto fetch_dim_string
 	case types.IS_STRING:
 		offset_key = offset.GetStr()

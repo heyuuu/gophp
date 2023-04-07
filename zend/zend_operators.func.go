@@ -986,7 +986,7 @@ try_again:
 	case types.IS_NULL:
 		fallthrough
 	case types.IS_FALSE:
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	case types.IS_TRUE:
 		return types.ZSTR_CHAR('1')
 	case types.IS_RESOURCE:
@@ -1024,7 +1024,7 @@ try_again:
 		if try != 0 {
 			return nil
 		} else {
-			return types.ZSTR_EMPTY_ALLOC()
+			return types.NewString("")
 		}
 		fallthrough
 	case types.IS_REFERENCE:
@@ -2657,7 +2657,7 @@ func IncrementString(str *types.Zval) {
 		str.DelRefcount()
 		str.SetStr(types.NewString(str.GetStr().GetStr()))
 	} else {
-		types.ZendStringForgetHashVal(str.GetStr())
+		//types.ZendStringForgetHashVal(str.GetStr())
 	}
 	s = str.GetStr().GetVal()
 	for {

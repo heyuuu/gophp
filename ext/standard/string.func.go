@@ -1710,7 +1710,7 @@ func PhpStrToStrEx(
 		return haystack.Copy()
 	} else {
 		if str_len == 0 {
-			new_str = types.ZSTR_EMPTY_ALLOC()
+			new_str = types.NewString("")
 		} else if str_len == 1 {
 			new_str = types.ZSTR_CHAR(zend_uchar(*str))
 		} else {
@@ -3543,7 +3543,7 @@ func PhpStrRot13(str *types.String) *types.String {
 	var e *byte
 	var target *byte
 	if str.GetLen() == 0 {
-		return types.ZSTR_EMPTY_ALLOC()
+		return types.NewString("")
 	}
 	ret = types.ZendStringAlloc(str.GetLen(), 0)
 	p = str.GetVal()
