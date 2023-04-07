@@ -665,67 +665,37 @@ func PhpNeedleCharEx(needle *types.Zval) (byte, bool) {
 		return 0, false
 	}
 }
-func ZifStristr(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, part *types.Zval) {
-	var needle *types.Zval
-	var haystack *types.String
-	var found *byte = nil
-	var found_offset int
-	var haystack_dup *byte
-	var needle_char []byte
-	var part types.ZendBool = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 3, 0)
-			haystack = fp.ParseStr()
-			needle = fp.ParseZval()
-			fp.StartOptional()
-			part = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifStristr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return "", false
 	}
-	haystack_dup = zend.Estrndup(haystack.GetVal(), haystack.GetLen())
-	if needle.IsType(types.IS_STRING) {
-		var orig_needle *byte
-		if needle.GetStr().GetLen() == 0 {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
-			zend.Efree(haystack_dup)
-			return_value.SetFalse()
-			return
-		}
-		orig_needle = zend.Estrndup(needle.GetStr().GetVal(), needle.GetStr().GetLen())
-		found = PhpStristr(haystack_dup, orig_needle, haystack.GetLen(), needle.GetStr().GetLen())
-		zend.Efree(orig_needle)
-	} else {
-		if PhpNeedleChar(needle, needle_char) != types.SUCCESS {
-			zend.Efree(haystack_dup)
-			return_value.SetFalse()
-			return
-		}
-		needle_char[1] = 0
-		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
-		found = PhpStristr(haystack_dup, needle_char, haystack.GetLen(), 1)
+	if needleStr == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
+		return "", false
 	}
-	if found != nil {
-		found_offset = found - haystack_dup
-		if part != 0 {
-			return_value.SetStringVal(b.CastStr(haystack.GetVal(), found_offset))
+
+	haystackLc := ascii.StrToLower(haystack)
+	needleStrLc := ascii.StrToLower(needleStr)
+	if pos := strings.Index(haystackLc, needleStrLc); pos >= 0 {
+		if part {
+			return haystack[:pos], true
 		} else {
-			return_value.SetStringVal(b.CastStr(haystack.GetVal()+found_offset, haystack.GetLen()-found_offset))
+			return haystack[pos:], true
 		}
 	} else {
-		return_value.SetFalse()
+		return "", false
 	}
-	zend.Efree(haystack_dup)
 }
 
 //@zif -alias strchr
 func ZifStrstr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
 	needleStr, ok := parseNeedle(needle)
 	if !ok {
+		return "", false
+	}
+	if needleStr == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
 		return "", false
 	}
 
@@ -902,95 +872,34 @@ func ZifStrrchr(haystack string, needle *types.Zval) (string, bool) {
 		return "", false
 	}
 }
-func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *types.String {
-	var q *byte
-	var p *byte
-	var chunks int
-	var restlen int
-	var out_len int
-	var dest *types.String
-	chunks = srclen / chunklen
-	restlen = srclen - chunks*chunklen
-	if chunks > core.INT_MAX-1 {
-		return nil
-	}
-	out_len = chunks + 1
-	if endlen != 0 && out_len > core.INT_MAX/endlen {
-		return nil
-	}
-	out_len *= endlen
-	if out_len > core.INT_MAX-srclen-1 {
-		return nil
-	}
-	out_len += srclen + 1
-	dest = types.ZendStringAlloc(out_len*b.SizeOf("char"), 0)
-	p = src
-	q = dest.GetVal()
-	for p < src+srclen-chunklen+1 {
-		memcpy(q, p, chunklen)
-		q += chunklen
-		memcpy(q, end, endlen)
-		q += endlen
-		p += chunklen
-	}
-	if restlen != 0 {
-		memcpy(q, p, restlen)
-		q += restlen
-		memcpy(q, end, endlen)
-		q += endlen
-	}
-	*q = '0'
-	dest.SetLen(q - dest.GetVal())
-	return dest
-}
-func ZifChunkSplit(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, chunklen *types.Zval, ending *types.Zval) {
-	var str *types.String
-	var end *byte = "\r\n"
-	var endlen int = 2
-	var chunklen zend.ZendLong = 76
-	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			chunklen = fp.ParseLong()
-			end, endlen = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifChunkSplit(str string, _ zpp.Opt, chunklen_ *int, ending_ *string) (string, bool) {
+	chunklen := b.Option(chunklen_, 76)
+	ending := b.Option(ending_, "\r\n")
+
 	if chunklen <= 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Chunk length should be greater than zero")
-		return_value.SetFalse()
-		return
+		return "", false
 	}
-	if int(chunklen > str.GetLen()) != 0 {
 
-		/* to maintain BC, we must return original string + ending */
+	// fast
+	if ending == "" {
+		return str, true
+	}
+	if chunklen >= len(str) {
+		return str + ending, true
+	}
 
-		result = types.ZendStringSafeAlloc(str.GetLen(), 1, endlen, 0)
-		memcpy(result.GetVal(), str.GetVal(), str.GetLen())
-		memcpy(result.GetVal()+str.GetLen(), end, endlen)
-		result.GetVal()[result.GetLen()] = '0'
-		return_value.SetString(result)
-		return
+	// common
+	var buf strings.Builder
+	for i := 0; i < len(str); i += chunklen {
+		if i+chunklen <= len(str) {
+			buf.WriteString(str[i : i+chunklen])
+		} else {
+			buf.WriteString(str[i:])
+		}
+		buf.WriteString(ending)
 	}
-	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
-	}
-	result = PhpChunkSplit(str.GetVal(), str.GetLen(), end, endlen, int(chunklen))
-	if result != nil {
-		return_value.SetString(result)
-		return
-	} else {
-		return_value.SetFalse()
-		return
-	}
+	return buf.String(), true
 }
 func ZifSubstr(str string, offset int, _ zpp.Opt, length *int) (string, bool) {
 	return substr(str, offset, length)
@@ -3411,66 +3320,17 @@ func ZifStrGetcsv(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, 
 	}
 	PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
-func ZifStrRepeat(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, mult *types.Zval) {
-	var input_str *types.String
-	var mult zend.ZendLong
-	var result *types.String
-	var result_len int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			input_str = fp.ParseStr()
-			mult = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifStrRepeat(input string, mult int) (string, bool) {
 	if mult < 0 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be greater than or equal to 0")
-		return
+		return "", false
 	}
-
 	/* Don't waste our time if it's empty */
-
-	if input_str.GetLen() == 0 || mult == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
+	if input == "" || mult == 0 {
+		return "", true
 	}
 
-	/* Initialize the result string */
-
-	result = types.ZendStringSafeAlloc(input_str.GetLen(), mult, 0, 0)
-	result_len = input_str.GetLen() * mult
-
-	/* Heavy optimization for situations where input string is 1 byte long */
-
-	if input_str.GetLen() == 1 {
-		memset(result.GetVal(), input_str.GetVal(), mult)
-	} else {
-		var s *byte
-		var ee *byte
-		var e *byte
-		var l ptrdiff_t = 0
-		memcpy(result.GetVal(), input_str.GetVal(), input_str.GetLen())
-		s = result.GetVal()
-		e = result.GetVal() + input_str.GetLen()
-		ee = result.GetVal() + result_len
-		for e < ee {
-			if e-s < ee-e {
-				l = e - s
-			} else {
-				l = ee - e
-			}
-			memmove(e, s, l)
-			e += l
-		}
-	}
-	result.GetVal()[result_len] = '0'
-	return_value.SetString(result)
-	return
+	return strings.Repeat(input, mult), true
 }
 func ZifCountChars(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, _ zpp.Opt, mode *types.Zval) {
 	var input *types.String
@@ -3553,22 +3413,6 @@ func PhpStrnatcmp(executeData *zend.ZendExecuteData, return_value *types.Zval, f
 	}
 	return_value.SetLong(StrnatcmpEx(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), fold_case))
 	return
-}
-func StringNaturalCompareFunctionEx(result *types.Zval, op1 *types.Zval, op2 *types.Zval, case_insensitive types.ZendBool) int {
-	var tmp_str1 *types.String
-	var tmp_str2 *types.String
-	var str1 *types.String = zend.ZvalGetTmpString(op1, &tmp_str1)
-	var str2 *types.String = zend.ZvalGetTmpString(op2, &tmp_str2)
-	result.SetLong(StrnatcmpEx(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen(), case_insensitive))
-	zend.ZendTmpStringRelease(tmp_str1)
-	zend.ZendTmpStringRelease(tmp_str2)
-	return types.SUCCESS
-}
-func StringNaturalCaseCompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	return StringNaturalCompareFunctionEx(result, op1, op2, 1)
-}
-func StringNaturalCompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	return StringNaturalCompareFunctionEx(result, op1, op2, 0)
 }
 func ZifStrnatcmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
 	PhpStrnatcmp(executeData, return_value, 0)

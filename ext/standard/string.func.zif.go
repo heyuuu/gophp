@@ -697,7 +697,7 @@ var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "inpu
 	if fp.HasError() {
 		return
 	}
-	ZifStrRepeat(executeData, returnValue, input, mult)
+	ZifStrRepeat(input, mult)
 })
 
 // generate by ZifCountChars

@@ -70,3 +70,11 @@ func HashBytes(bytes []byte) uint {
 func EmptyString(len_ int) string {
 	return string(make([]byte, len_))
 }
+
+func Option[T any](ptr *T, defaultValue T) T {
+	if ptr != nil {
+		return *ptr
+	} else {
+		return defaultValue
+	}
+}
