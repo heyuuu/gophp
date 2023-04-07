@@ -266,14 +266,19 @@ var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{Name: "path"},
 // generate by ZifStristr
 var DefZifStristr = def.DefFunc("stristr", 2, 3, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "part"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	haystack := fp.ParseZval()
+	haystack := fp.ParseStringVal()
 	needle := fp.ParseZval()
 	fp.StartOptional()
-	part := fp.ParseZval()
+	part := fp.ParseBoolVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStristr(executeData, returnValue, haystack, needle, nil, part)
+	ret, ok := ZifStristr(haystack, needle, nil, part)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrstr
@@ -401,16 +406,21 @@ var DefZifStrrchr = def.DefFunc("strrchr", 2, 2, []def.ArgInfo{{Name: "haystack"
 })
 
 // generate by ZifChunkSplit
-var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "chunklen"}, {Name: "ending"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifChunkSplit = def.DefFunc("chunk_split", 1, 3, []def.ArgInfo{{Name: "str"}, {Name: "chunklen_"}, {Name: "ending_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	chunklen := fp.ParseZval()
-	ending := fp.ParseZval()
+	chunklen_ := fp.ParseLongNullable()
+	ending_ := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifChunkSplit(executeData, returnValue, str, nil, chunklen, ending)
+	ret, ok := ZifChunkSplit(str, nil, chunklen_, ending_)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifSubstr
@@ -692,12 +702,17 @@ var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{Name: "stri
 // generate by ZifStrRepeat
 var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "input"}, {Name: "mult"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	input := fp.ParseZval()
-	mult := fp.ParseZval()
+	input := fp.ParseStringVal()
+	mult := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifStrRepeat(input, mult)
+	ret, ok := ZifStrRepeat(input, mult)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifCountChars
@@ -749,17 +764,22 @@ var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "
 })
 
 // generate by ZifStrPad
-var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {Name: "pad_length"}, {Name: "pad_string"}, {Name: "pad_type"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {Name: "pad_length"}, {Name: "pad_string_"}, {Name: "pad_type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
-	input := fp.ParseZval()
-	pad_length := fp.ParseZval()
+	input := fp.ParseStringVal()
+	pad_length := fp.ParseLong()
 	fp.StartOptional()
-	pad_string := fp.ParseZval()
-	pad_type := fp.ParseZval()
+	pad_string_ := fp.ParseStringValNullable()
+	pad_type_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifStrPad(executeData, returnValue, input, pad_length, nil, pad_string, pad_type)
+	ret, ok := ZifStrPad(input, pad_length, nil, pad_string_, pad_type_)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrRot13
@@ -852,11 +872,12 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Nam
 // generate by ZifUtf8Encode
 var DefZifUtf8Encode = def.DefFunc("utf8_encode", 1, 1, []def.ArgInfo{{Name: "data"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	data := fp.ParseZval()
+	data := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifUtf8Encode(executeData, returnValue, data)
+	ret := ZifUtf8Encode(data)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifUtf8Decode

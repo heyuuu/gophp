@@ -3,10 +3,7 @@ package standard
 import (
 	"fmt"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	"github.com/heyuuu/gophp/core"
-	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
-	"github.com/heyuuu/gophp/zend/zpp"
 	"strings"
 )
 
@@ -115,27 +112,4 @@ func PhpAddcslashes(str string, what string) string {
 	}
 
 	return buf.String()
-}
-
-func ZifStristrEx(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
-	needleStr, ok := parseNeedle(needle)
-	if !ok {
-		return "", false
-	}
-	if needleStr == "" {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
-		return "", false
-	}
-
-	haystackLc := ascii.StrToLower(haystack)
-	needleStrLc := ascii.StrToLower(needleStr)
-	if pos := strings.Index(haystackLc, needleStrLc); pos >= 0 {
-		if part {
-			return haystack[:pos], true
-		} else {
-			return haystack[pos:], true
-		}
-	} else {
-		return "", false
-	}
 }

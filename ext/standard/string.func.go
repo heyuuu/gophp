@@ -2308,13 +2308,9 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 		if replace.IsType(types.IS_ARRAY) {
 			replace_idx = 0
 		} else {
-
 			/* Set replacement value to the passed one */
-
 			replace_value = replace.GetStr().GetVal()
-			replace_len = replace.GetStr().
-
-				/* For each entry in the search array, get the entry */ GetLen()
+			replace_len = replace.GetStr().GetLen()
 		}
 
 		var __ht *types.Array = search.GetArr()
@@ -3490,93 +3486,53 @@ func ZifSubstrCount(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zv
 	return
 }
 
-func ZifStrPad(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, padLength *types.Zval, _ zpp.Opt, padString *types.Zval, padType *types.Zval) {
-	/* Input arguments */
-	var input *types.String
-	var pad_length zend.ZendLong
-
-	/* Helper variables */
-
-	var num_pad_chars int
-	var pad_str *byte = " "
-	var pad_str_len int = 1
-	var pad_type_val zend.ZendLong = STR_PAD_RIGHT
-	var i int
-	var left_pad int = 0
-	var right_pad int = 0
-	var result *types.String = nil
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 4, 0)
-			input = fp.ParseStr()
-			pad_length = fp.ParseLong()
-			fp.StartOptional()
-			pad_str, pad_str_len = fp.ParseString()
-			pad_type_val = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifStrPad(input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) (string, bool) {
+	padString := b.Option(padString_, " ")
+	padType := b.Option(padType_, STR_PAD_RIGHT)
 
 	/* If resulting string turns out to be shorter than input string,
 	   we simply copy the input and return. */
-
-	if pad_length < 0 || int(pad_length <= input.GetLen()) != 0 {
-		return_value.SetStringCopy(input)
-		return
+	if padLength < 0 || padLength < len(input) {
+		return input, true
 	}
-	if pad_str_len == 0 {
+	if padString == "" {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding string cannot be empty")
-		return
+		return "", false
 	}
-	if pad_type_val < STR_PAD_LEFT || pad_type_val > STR_PAD_BOTH {
+	if padType < STR_PAD_LEFT || padType > STR_PAD_BOTH {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
-		return
+		return "", false
 	}
-	num_pad_chars = pad_length - input.GetLen()
-	if num_pad_chars >= core.INT_MAX {
+	numPadChars := padLength - len(input)
+	if numPadChars >= core.INT_MAX {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding length is too long")
-		return
+		return "", false
 	}
-	result = types.ZendStringSafeAlloc(1, input.GetLen(), num_pad_chars, 0)
-	result.SetLen(0)
 
 	/* We need to figure out the left/right padding lengths. */
-
-	switch pad_type_val {
+	var leftPad, rightPad int
+	switch padType {
 	case STR_PAD_RIGHT:
-		left_pad = 0
-		right_pad = num_pad_chars
+		leftPad = 0
+		rightPad = numPadChars
 	case STR_PAD_LEFT:
-		left_pad = num_pad_chars
-		right_pad = 0
+		leftPad = numPadChars
+		rightPad = 0
 	case STR_PAD_BOTH:
-		left_pad = num_pad_chars / 2
-		right_pad = num_pad_chars - left_pad
+		leftPad = numPadChars / 2
+		rightPad = numPadChars - leftPad
 	}
 
-	/* First we pad on the left. */
-
-	for i = 0; i < left_pad; i++ {
-		result.GetVal()[b.PostInc(&(result.GetLen()))] = pad_str[i%pad_str_len]
+	var buf strings.Builder
+	for i := 0; i < leftPad; i++ {
+		buf.WriteByte(padString[i%len(padString)])
+	}
+	buf.WriteString(input)
+	for i := 0; i < rightPad; i++ {
+		buf.WriteByte(padString[i%len(padString)])
 	}
 
-	/* Then we copy the input string. */
-
-	memcpy(result.GetVal()+result.GetLen(), input.GetVal(), input.GetLen())
-	result.SetLen(result.GetLen() + input.GetLen())
-
-	/* Finally, we pad on the right. */
-
-	for i = 0; i < right_pad; i++ {
-		result.GetVal()[b.PostInc(&(result.GetLen()))] = pad_str[i%pad_str_len]
-	}
-	result.GetVal()[result.GetLen()] = '0'
-	return_value.SetString(result)
-	return
+	return buf.String(), true
 }
 func ZifSscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var args *types.Zval = nil
@@ -3920,30 +3876,17 @@ func ZifSubstrCompare(executeData zpp.Ex, return_value zpp.Ret, mainStr *types.Z
 		return
 	}
 }
-func PhpUtf8Encode(s *byte, len_ int) *types.String {
-	var pos int = len_
-	var str *types.String
-	var c uint8
-	str = types.ZendStringSafeAlloc(len_, 2, 0, 0)
-	str.SetLen(0)
-	for pos > 0 {
-
-		/* The lower 256 codepoints of Unicode are identical to Latin-1,
-		 * so we don't need to do any mapping here. */
-
-		c = uint8(*s)
+func PhpUtf8EncodeEx(s string) string {
+	var buf strings.Builder
+	for _, c := range []byte(s) {
 		if c < 0x80 {
-			str.GetVal()[b.PostInc(&(str.GetLen()))] = byte(c)
+			buf.WriteByte(c)
 		} else {
-			str.GetVal()[b.PostInc(&(str.GetLen()))] = 0xc0 | c>>6
-			str.GetVal()[b.PostInc(&(str.GetLen()))] = 0x80 | c&0x3f
+			buf.WriteByte(0xc0 | c>>6)
+			buf.WriteByte(0x80 | c&0x3f)
 		}
-		pos--
-		s++
 	}
-	str.GetVal()[str.GetLen()] = '0'
-	str = types.ZendStringTruncate(str, str.GetLen(), 0)
-	return str
+	return buf.String()
 }
 func PhpUtf8Decode(s *byte, len_ int) *types.String {
 	var pos int = 0
@@ -3970,22 +3913,8 @@ func PhpUtf8Decode(s *byte, len_ int) *types.String {
 	}
 	return str
 }
-func ZifUtf8Encode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
-	var arg *byte
-	var arg_len int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg, arg_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetString(PhpUtf8Encode(arg, arg_len))
-	return
+func ZifUtf8Encode(data string) string {
+	return PhpUtf8EncodeEx(data)
 }
 func ZifUtf8Decode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
 	var arg *byte
