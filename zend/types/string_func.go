@@ -2,8 +2,8 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend"
-	"strings"
 )
 
 func ZSTR_CHAR(c int) *String { return oneCharStrings[c] }
@@ -52,20 +52,13 @@ func ZendStringEquals(s1 *String, s2 *String) ZendBool {
 	return IntBool(s1.GetStr() == s2.GetStr())
 }
 func ZendStringEqualsCi(s1 *String, s2 *String) bool {
-	return strCaseEquals(s1.GetStr(), s2.GetStr())
+	return ascii.StrCaseEquals(s1.GetStr(), s2.GetStr())
 }
 func ZendStringEqualsLiteralCi(str *String, c string) bool {
-	return strCaseEquals(str.GetStr(), c)
+	return ascii.StrCaseEquals(str.GetStr(), c)
 }
 func ZendStringEqualsLiteral(str *String, literal string) bool {
 	return str.GetStr() == literal
-}
-
-func strCaseEquals(str1 string, str2 string) bool {
-	if str1 == str2 {
-		return true
-	}
-	return strings.EqualFold(str1, str2)
 }
 
 /**

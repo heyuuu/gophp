@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -156,15 +157,12 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String, persistent typ
 	return interned
 }
 func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String, persistent types.ZendBool) *types.String {
-	var lcname *types.String
-	var interned *types.String
-	types.ZSTR_ALLOCA_ALLOC(lcname, str.GetLen())
-	zend.ZendStrTolowerCopy(lcname.GetVal(), str.GetVal(), str.GetLen())
-	interned = types.ZendHashFindPtr(ctx.GetStrInterned(), lcname.GetStr())
+	lcName := ascii.StrToLower(str.GetStr())
+	interned := types.ZendHashFindPtr(ctx.GetStrInterned(), lcName).(*types.String)
 	if interned != nil {
 		interned.AddRefcount()
 	} else {
-		interned = lcname.Copy()
+		interned = types.NewString(lcName)
 		if persistent != 0 {
 			interned = types.ZendNewInternedString(interned)
 		}

@@ -8,12 +8,6 @@ var InternedStringsPermanent = NewInternedStrings()
 
 const ZSTR_MAX_LEN = math.MaxInt
 
-/**
- * 预初始化常用 String
- */
-// ZendEmptyString
-var ZSTR_EMPTY = initString("")
-
 // ZendOneCharString
 var oneCharStrings []*String
 

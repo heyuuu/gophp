@@ -102,22 +102,12 @@ func (this *BrowserData) GetKvSize() uint32          { return this.kv_size }
 func (this *BrowserData) SetKvSize(value uint32)     { this.kv_size = value }
 func (this *BrowserData) GetFilename() []byte        { return this.filename }
 
-// func (this *BrowserData) SetFilename(value []byte) { this.filename = value }
-
 /**
  * ZendBrowscapGlobals
  */
 type ZendBrowscapGlobals struct {
 	activation_bdata BrowserData
 }
-
-// func MakeZendBrowscapGlobals(activation_bdata BrowserData) ZendBrowscapGlobals {
-//     return ZendBrowscapGlobals{
-//         activation_bdata:activation_bdata,
-//     }
-// }
-// func (this *ZendBrowscapGlobals)  GetActivationBdata() BrowserData      { return this.activation_bdata }
-// func (this *ZendBrowscapGlobals) SetActivationBdata(value BrowserData) { this.activation_bdata = value }
 
 /**
  * BrowscapParserCtx
@@ -148,5 +138,3 @@ func (this *BrowscapParserCtx) SetCurrentSectionName(value *types.String) {
 	this.current_section_name = value
 }
 func (this *BrowscapParserCtx) GetStrInterned() types.Array { return this.str_interned }
-
-// func (this *BrowscapParserCtx) SetStrInterned(value zend.HashTable) { this.str_interned = value }

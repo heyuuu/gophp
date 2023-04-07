@@ -990,7 +990,7 @@ func ZifSubstrReplace(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval,
 				if repl_idx < types.Z_ARRVAL_P(repl).GetNNumUsed() {
 					repl_str = zend.ZvalGetTmpString(tmp_repl, &tmp_repl_str)
 				} else {
-					repl_str = types.ZSTR_EMPTY
+					repl_str = types.NewString("")
 				}
 			} else {
 				repl_str = repl.GetStr()
