@@ -54,7 +54,7 @@ func PhpCrypt(password string, salt string, quiet bool) *types.String {
 		output = zend.Emalloc(PHP_MAX_SALT_LEN)
 		crypt_res = PhpSha512CryptR(password, salt, output, PHP_MAX_SALT_LEN)
 		if crypt_res == nil {
-			zend.ZEND_SECURE_ZERO(output, PHP_MAX_SALT_LEN)
+			zend.ZEND_SECURE_ZERO(utput, PHP_MAX_SALT_LEN)
 			zend.Efree(output)
 			return nil
 		} else {

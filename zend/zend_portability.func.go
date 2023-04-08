@@ -24,8 +24,14 @@ func ZEND_NORMALIZE_BOOL(n ZendLong) int {
 		return 0
 	}
 }
-func ZEND_SECURE_ZERO(var_ __auto__, size __auto__) __auto__ { return core.ExplicitBzero(var_, size) }
-func ZEND_VALID_SOCKET(sock core.PhpSocketT) bool            { return sock >= 0 }
+func ZEND_SECURE_ZERO(dst *byte, siz int) {
+	var i int = 0
+	var buf *uint8 = (*uint8)(dst)
+	for ; i < siz; i++ {
+		buf[i] = 0
+	}
+}
+func ZEND_VALID_SOCKET(sock core.PhpSocketT) bool { return sock >= 0 }
 func VaCopy(dest ...any, src ...any) __auto__ {
 	return memcpy(&dest, &src, b.SizeOf("va_list"))
 }

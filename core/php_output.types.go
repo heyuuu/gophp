@@ -154,36 +154,6 @@ type ZendOutputGlobals struct {
 	flags                 int
 }
 
-//             func MakeZendOutputGlobals(
-// handlers zend.ZendStack,
-// active *PhpOutputHandler,
-// running *PhpOutputHandler,
-// output_start_filename *byte,
-// output_start_lineno int,
-// flags int,
-// ) ZendOutputGlobals {
-//                 return ZendOutputGlobals{
-//                     handlers:handlers,
-//                     active:active,
-//                     running:running,
-//                     output_start_filename:output_start_filename,
-//                     output_start_lineno:output_start_lineno,
-//                     flags:flags,
-//                 }
-//             }
-// func (this *ZendOutputGlobals)  GetHandlers() zend.ZendStack      { return this.handlers }
-// func (this *ZendOutputGlobals) SetHandlers(value zend.ZendStack) { this.handlers = value }
-// func (this *ZendOutputGlobals)  GetActive() *PhpOutputHandler      { return this.active }
-// func (this *ZendOutputGlobals) SetActive(value *PhpOutputHandler) { this.active = value }
-// func (this *ZendOutputGlobals)  GetRunning() *PhpOutputHandler      { return this.running }
-// func (this *ZendOutputGlobals) SetRunning(value *PhpOutputHandler) { this.running = value }
-// func (this *ZendOutputGlobals)  GetOutputStartFilename() *byte      { return this.output_start_filename }
-// func (this *ZendOutputGlobals) SetOutputStartFilename(value *byte) { this.output_start_filename = value }
-// func (this *ZendOutputGlobals)  GetOutputStartLineno() int      { return this.output_start_lineno }
-// func (this *ZendOutputGlobals) SetOutputStartLineno(value int) { this.output_start_lineno = value }
-// func (this *ZendOutputGlobals)  GetFlags() int      { return this.flags }
-// func (this *ZendOutputGlobals) SetFlags(value int) { this.flags = value }
-
 /* ZendOutputGlobals.flags */
 func (this *ZendOutputGlobals) AddFlags(value int)      { this.flags |= value }
 func (this *ZendOutputGlobals) SubFlags(value int)      { this.flags &^= value }
