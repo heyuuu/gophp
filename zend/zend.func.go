@@ -8,8 +8,16 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func USED_RET() bool {
-	return !(executeData.GetPrevExecuteData()) || !(ZEND_USER_CODE(executeData.GetPrevExecuteData().func_.common.type_)) || executeData.GetPrevExecuteData().opline.result_type != IS_UNUSED
+func USED_RET(executeData *ZendExecuteData) bool {
+	prev := executeData.GetPrevExecuteData()
+	if prev == nil {
+		return true
+	}
+	if !(ZEND_USER_CODE(prev.func_.GetType())) {
+		return true
+	}
+
+	return prev.opline.GetResultType() != IS_UNUSED
 }
 func ZEND_PUTS(str string) int { return ZendWrite(str) }
 func ZEND_PUTC(c byte) int     { return ZendWrite(string([]byte{c})) }
@@ -301,11 +309,6 @@ func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 }
 func PhpScannerGlobalsCtor(scanner_globals_p *ZendPhpScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
-}
-func ModuleDestructorZval(zv *types.Zval) {
-	var module *ModuleEntry = (*ModuleEntry)(zv.GetPtr())
-	ModuleDestructor(module)
-	Free(module)
 }
 func PhpAutoGlobalsCreateGlobals(name *types.String) types.ZendBool {
 	var globals types.Zval

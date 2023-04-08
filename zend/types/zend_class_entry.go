@@ -48,8 +48,8 @@ type ClassEntry struct {
 	num_interfaces    uint32
 	num_traits        uint32
 	__2               struct /* union */ {
-		interfaces      **ClassEntry
-		interface_names *zend.ZendClassName
+		interfaces      []*ClassEntry
+		interface_names []zend.ZendClassName
 	}
 	trait_names       *zend.ZendClassName
 	trait_aliases     **zend.ZendTraitAlias
@@ -229,14 +229,14 @@ func (this *ClassEntry) GetUnserialize() func(object *Zval, ce *ClassEntry, buf 
 func (this *ClassEntry) SetUnserialize(value func(object *Zval, ce *ClassEntry, buf *uint8, buf_len int, data *zend.ZendUnserializeData) int) {
 	this.unserialize = value
 }
-func (this *ClassEntry) GetNumInterfaces() uint32               { return this.num_interfaces }
-func (this *ClassEntry) SetNumInterfaces(value uint32)          { this.num_interfaces = value }
-func (this *ClassEntry) GetNumTraits() uint32                   { return this.num_traits }
-func (this *ClassEntry) SetNumTraits(value uint32)              { this.num_traits = value }
-func (this *ClassEntry) GetInterfaces() **ClassEntry            { return this.__2.interfaces }
-func (this *ClassEntry) SetInterfaces(value **ClassEntry)       { this.__2.interfaces = value }
-func (this *ClassEntry) GetInterfaceNames() *zend.ZendClassName { return this.__2.interface_names }
-func (this *ClassEntry) SetInterfaceNames(value *zend.ZendClassName) {
+func (this *ClassEntry) GetNumInterfaces() uint32                { return this.num_interfaces }
+func (this *ClassEntry) SetNumInterfaces(value uint32)           { this.num_interfaces = value }
+func (this *ClassEntry) GetNumTraits() uint32                    { return this.num_traits }
+func (this *ClassEntry) SetNumTraits(value uint32)               { this.num_traits = value }
+func (this *ClassEntry) GetInterfaces() []*ClassEntry            { return this.__2.interfaces }
+func (this *ClassEntry) SetInterfaces(value []*ClassEntry)       { this.__2.interfaces = value }
+func (this *ClassEntry) GetInterfaceNames() []zend.ZendClassName { return this.__2.interface_names }
+func (this *ClassEntry) SetInterfaceNames(value []zend.ZendClassName) {
 	this.__2.interface_names = value
 }
 func (this *ClassEntry) GetTraitNames() *zend.ZendClassName          { return this.trait_names }

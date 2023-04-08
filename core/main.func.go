@@ -1390,7 +1390,6 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	zend.ZendStartup(&zendUtilityFunctions)
 	setlocale(LC_CTYPE, "")
 	tzset()
-	zend.LeIndexPtr = zend.ZendRegisterListDestructorsEx(nil, nil, "index pointer", 0)
 
 	/* Register constants */
 

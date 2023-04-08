@@ -675,7 +675,7 @@ func ZendCompileUseTrait(ast *ZendAst) {
 func ZendCompileImplements(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var ce *types.ClassEntry = CG__().GetActiveClassEntry()
-	var interface_names *ZendClassName
+	var interface_names []ZendClassName
 	var i uint32
 	interface_names = Emalloc(b.SizeOf("zend_class_name") * list.GetChildren())
 	for i = 0; i < list.GetChildren(); i++ {
