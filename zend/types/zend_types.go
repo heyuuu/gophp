@@ -23,7 +23,7 @@ func (this ZendType) Ce() *ClassEntry {
 	var ptr = this &^ 0x3
 	return b.CastPtr[ClassEntry](ptr)
 }
-func (this ZendType) Code() int       { return this >> int64(2) }
+func (this ZendType) Code() ZendUchar { return this >> int64(2) }
 func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
 
 // todo 不明确作用

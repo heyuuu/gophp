@@ -1,5 +1,7 @@
 package zend
 
+import b "github.com/heyuuu/gophp/builtin"
+
 /**
  * ZendRsrcListDtorsEntry
  */
@@ -11,15 +13,7 @@ type ZendRsrcListDtorsEntry struct {
 	resource_id   int
 }
 
-// func MakeZendRsrcListDtorsEntry(list_dtor_ex RsrcDtorFuncT, plist_dtor_ex RsrcDtorFuncT, type_name *byte, module_number int, resource_id int) ZendRsrcListDtorsEntry {
-//     return ZendRsrcListDtorsEntry{
-//         list_dtor_ex:list_dtor_ex,
-//         plist_dtor_ex:plist_dtor_ex,
-//         type_name:type_name,
-//         module_number:module_number,
-//         resource_id:resource_id,
-//     }
-// }
+func (this *ZendRsrcListDtorsEntry) TypeName() string                   { return b.CastStrAuto(this.type_name) }
 func (this *ZendRsrcListDtorsEntry) GetListDtorEx() RsrcDtorFuncT       { return this.list_dtor_ex }
 func (this *ZendRsrcListDtorsEntry) SetListDtorEx(value RsrcDtorFuncT)  { this.list_dtor_ex = value }
 func (this *ZendRsrcListDtorsEntry) GetPlistDtorEx() RsrcDtorFuncT      { return this.plist_dtor_ex }

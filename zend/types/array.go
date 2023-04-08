@@ -18,9 +18,10 @@ type ArrayKey struct {
 func MakeStrKey(str string) ArrayKey  { return ArrayKey{0, &str} }
 func MakeIndexKey(index int) ArrayKey { return ArrayKey{index, nil} }
 
-func (this ArrayKey) IsStrKey() bool { return this.key != nil }
-func (this ArrayKey) IndexKey() int  { return this.index }
-func (this ArrayKey) StrKey() string { return *this.key }
+func (this ArrayKey) IsStrKey() bool          { return this.key != nil }
+func (this ArrayKey) IndexKey() int           { return this.index }
+func (this ArrayKey) StrKey() string          { return *this.key }
+func (this ArrayKey) StrKeyNullable() *string { return this.key }
 func (this ArrayKey) Keys() (index int, key string, isStrKey bool) {
 	if this.IsStrKey() {
 		return 0, *this.key, true

@@ -9,75 +9,83 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func PhpArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
-	if key == nil {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', index)
-	} else {
+func PhpArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
+	if key.IsStrKey() {
 		core.PhpPrintf("%*c[\"", level+1, ' ')
-		core.PHPWRITE(key.GetVal(), key.GetLen())
+		core.PhpOutputWrite(key.StrKey())
 		core.PhpPrintf("\"]=>\n")
+	} else {
+		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IndexKey())
 	}
 	PhpVarDump(zv, level+2)
 }
-func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
-	var prop_name *byte
-	var class_name *byte
-	if key == nil {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', index)
+func PhpObjectPropertyDump(propInfo *zend.ZendPropertyInfo, zv *types.Zval, key_ types.ArrayKey, level int) {
+	if !key_.IsStrKey() {
+		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key_.IndexKey())
 	} else {
-		var unmangle int = zend.ZendUnmanglePropertyName(key, &class_name, &prop_name)
+		className, propName, ok := zend.ZendUnmanglePropertyName_Ex(key_.StrKey())
 		core.PhpPrintf("%*c[", level+1, ' ')
-		if class_name != nil && unmangle == types.SUCCESS {
-			if class_name[0] == '*' {
-				core.PhpPrintf("\"%s\":protected", prop_name)
+		if ok {
+			if className[0] == '*' {
+				core.PhpPrintf("\"%s\":protected", propName)
 			} else {
-				core.PhpPrintf("\"%s\":\"%s\":private", prop_name, class_name)
+				core.PhpPrintf("\"%s\":\"%s\":private", propName, className)
 			}
 		} else {
 			core.PhpPrintf("\"")
-			core.PHPWRITE(key.GetVal(), key.GetLen())
+			core.PhpOutputWrite(key_.StrKey())
 			core.PhpPrintf("\"")
 		}
 		zend.ZEND_PUTS("]=>\n")
 	}
 	if zv.IsUndef() {
-		b.Assert(prop_info.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
-			return b.CondF(prop_info.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.String { return prop_info.GetType().Name() }).GetVal()
-		}, func() *byte { return types.ZendGetTypeByConst(prop_info.GetType().Code()) }))
+		b.Assert(propInfo.GetType() != 0)
+		var typ string
+		if propInfo.GetType().IsClass() {
+			if propInfo.GetType().IsCe() {
+				typ = types.ZEND_TYPE_CE(propInfo.GetType()).Name()
+			} else {
+				typ = propInfo.GetType().Name().GetStr()
+			}
+		} else {
+			typ = types.ZendGetTypeByConst(propInfo.GetType().Code())
+		}
+		if propInfo.GetType().AllowNull() {
+			typ = "?" + typ
+		}
+
+		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', typ)
 	} else {
 		PhpVarDump(zv, level+2)
 	}
 }
 func PhpVarDump(struc *types.Zval, level int) {
-	var myht *types.Array
-	var class_name *types.String
-	var is_ref int = 0
-	var num zend.ZendUlong
-	var key *types.String
-	var val *types.Zval
-	var count uint32
+	isRef := false
 	if level > 1 {
 		core.PhpPrintf("%*c", level-1, ' ')
 	}
 again:
+	common := ""
+	if isRef {
+		common = "&"
+	}
 	switch struc.GetType() {
 	case types.IS_FALSE:
-		core.PhpPrintf("%sbool(false)\n", COMMON)
+		core.PhpPrintf("%sbool(false)\n", common)
 	case types.IS_TRUE:
-		core.PhpPrintf("%sbool(true)\n", COMMON)
+		core.PhpPrintf("%sbool(true)\n", common)
 	case types.IS_NULL:
-		core.PhpPrintf("%sNULL\n", COMMON)
+		core.PhpPrintf("%sNULL\n", common)
 	case types.IS_LONG:
-		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", COMMON, struc.GetLval())
+		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", common, struc.GetLval())
 	case types.IS_DOUBLE:
-		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
+		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.GetDval())
 	case types.IS_STRING:
-		core.PhpPrintf("%sstring(%zd) \"", COMMON, struc.GetStr().GetLen())
-		core.PHPWRITE(struc.GetStr().GetVal(), struc.GetStr().GetLen())
+		core.PhpPrintf("%sstring(%zd) \"", common, struc.GetStr().GetLen())
+		core.PhpOutputWrite(struc.GetStrVal())
 		core.PUTS("\"\n")
 	case types.IS_ARRAY:
-		myht = struc.GetArr()
+		myht := struc.GetArr()
 		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				if myht.IsRecursive() {
@@ -88,22 +96,11 @@ again:
 			}
 			myht.AddRefcount()
 		}
-		count = myht.Count()
-		core.PhpPrintf("%sarray(%d) {\n", COMMON, count)
-		var __ht *types.Array = myht
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.GetZv()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			num = _p.GetH()
-			key = _p.GetKey()
-			val = _z
-			PhpArrayElementDump(val, num, key, level)
-		}
+		count := myht.Count()
+		core.PhpPrintf("%sarray(%d) {\n", common, count)
+		myht.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+			PhpArrayElementDump(value, key, level)
+		})
 		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				myht.UnprotectRecursive()
@@ -120,33 +117,22 @@ again:
 			return
 		}
 		struc.ProtectRecursive()
-		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
-		class_name = types.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
-		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
-		// types.ZendStringReleaseEx(class_name, 0)
+		myht := zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
+		className := types.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
+		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", common, className.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() int { return myht.Count() }, 0))
 		if myht != nil {
-			var num zend.ZendUlong
-			var key *types.String
-			var val *types.Zval
-			var __ht *types.Array = myht
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				num = _p.GetH()
-				key = _p.GetKey()
-				val = _z
+			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
 				var prop_info *zend.ZendPropertyInfo = nil
-				if val.IsIndirect() {
-					val = val.GetZv()
-					if key != nil {
-						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
+				if value.IsIndirect() {
+					value = value.GetZv()
+					if key.IsStrKey() {
+						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), value)
 					}
 				}
-				if !(val.IsUndef()) || prop_info != nil {
-					PhpObjectPropertyDump(prop_info, val, num, key, level)
+				if !value.IsUndef() || prop_info != nil {
+					PhpObjectPropertyDump(prop_info, value, key, level)
 				}
-			}
-			zend.ZendReleaseProperties(myht)
+			})
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
@@ -154,42 +140,22 @@ again:
 		core.PUTS("}\n")
 		struc.UnprotectRecursive()
 	case types.IS_RESOURCE:
-		var type_name *byte = zend.ZendRsrcListGetRsrcType(types.Z_RES_P(struc))
-		core.PhpPrintf("%sresource(%d) of type (%s)\n", COMMON, types.Z_RES_P(struc).GetHandle(), b.Cond(type_name != nil, type_name, "Unknown"))
+		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(types.Z_RES_P(struc)), "Unknown")
+		core.PhpPrintf("%sresource(%d) of type (%s)\n", common, types.Z_RES_P(struc).GetHandle(), typeName)
 	case types.IS_REFERENCE:
-
 		//??? hide references with refcount==1 (for compatibility)
-
 		if struc.GetRefcount() > 1 {
-			is_ref = 1
+			isRef = true
 		}
 		struc = types.Z_REFVAL_P(struc)
 		goto again
 	default:
-		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
+		core.PhpPrintf("%sUNKNOWN:0\n", common)
 	}
 }
-func ZifVarDump(executeData zpp.Ex, return_value zpp.Ret, vars []*types.Zval) {
-	var args *types.Zval
-	var argc int
-	var i int
-	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	for i = 0; i < argc; i++ {
-		PhpVarDump(&args[i], 1)
+func ZifVarDump(vars []*types.Zval) {
+	for _, zv := range vars {
+		PhpVarDump(zv, 1)
 	}
 }
 func ZvalArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
@@ -197,35 +163,33 @@ func ZvalArrayElementDump(zv *types.Zval, index zend.ZendUlong, key *types.Strin
 		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', index)
 	} else {
 		core.PhpPrintf("%*c[\"", level+1, ' ')
-		core.PHPWRITE(key.GetVal(), key.GetLen())
+		core.PhpOutputWrite(key.GetStr())
 		core.PhpPrintf("\"]=>\n")
 	}
 	PhpDebugZvalDump(zv, level+2)
 }
-func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *types.Zval, index zend.ZendUlong, key *types.String, level int) {
-	var prop_name *byte
-	var class_name *byte
-	if key == nil {
-		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', index)
+func ZvalObjectPropertyDump(propInfo *zend.ZendPropertyInfo, zv *types.Zval, key types.ArrayKey, level int) {
+	if !key.IsStrKey() {
+		core.PhpPrintf("%*c["+zend.ZEND_LONG_FMT+"]=>\n", level+1, ' ', key.IndexKey())
 	} else {
-		zend.ZendUnmanglePropertyName(key, &class_name, &prop_name)
+		className, propName, ok := zend.ZendUnmanglePropertyName_Ex(key.StrKey())
 		core.PhpPrintf("%*c[", level+1, ' ')
-		if class_name != nil {
-			if class_name[0] == '*' {
-				core.PhpPrintf("\"%s\":protected", prop_name)
+		if ok {
+			if className[0] == '*' {
+				core.PhpPrintf("\"%s\":protected", propName)
 			} else {
-				core.PhpPrintf("\"%s\":\"%s\":private", prop_name, class_name)
+				core.PhpPrintf("\"%s\":\"%s\":private", propName, className)
 			}
 		} else {
-			core.PhpPrintf("\"%s\"", prop_name)
+			core.PhpPrintf("\"%s\"", propName)
 		}
 		zend.ZEND_PUTS("]=>\n")
 	}
-	if prop_info != nil && zv.IsUndef() {
-		b.Assert(prop_info.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
-			return b.CondF(prop_info.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *types.String { return prop_info.GetType().Name() }).GetVal()
-		}, func() *byte { return types.ZendGetTypeByConst(prop_info.GetType().Code()) }))
+	if propInfo != nil && zv.IsUndef() {
+		b.Assert(propInfo.GetType() != 0)
+		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(propInfo.GetType().AllowNull(), "?", ""), b.CondF(propInfo.GetType().IsClass(), func() []byte {
+			return b.CondF(propInfo.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(propInfo.GetType()).GetName() }, func() *types.String { return propInfo.GetType().Name() }).GetVal()
+		}, func() *byte { return types.ZendGetTypeByConst(propInfo.GetType().Code()) }))
 	} else {
 		PhpDebugZvalDump(zv, level+2)
 	}
@@ -309,34 +273,27 @@ again:
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
 		// types.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
-			var __ht *types.Array = myht
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				index = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				var prop_info *zend.ZendPropertyInfo = nil
-				if val.IsIndirect() {
-					val = val.GetZv()
-					if key != nil {
-						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
+			myht.Foreach(func(key types.ArrayKey, value *types.Zval) {
+				var propInfo *zend.ZendPropertyInfo = nil
+				if value.IsIndirect() {
+					value = value.GetZv()
+					if key.IsStrKey() {
+						propInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), value)
 					}
 				}
-				if !(val.IsUndef()) || prop_info != nil {
-					ZvalObjectPropertyDump(prop_info, val, index, key, level)
+				if !(val.IsUndef()) || propInfo != nil {
+					ZvalObjectPropertyDump(propInfo, val, key, level)
 				}
-			}
+			})
 			myht.UnprotectRecursive()
-			zend.ZendReleaseProperties(myht)
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
 	case types.IS_RESOURCE:
-		var type_name *byte = zend.ZendRsrcListGetRsrcType(types.Z_RES_P(struc))
-		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, types.Z_RES_P(struc).GetHandle(), b.Cond(type_name != nil, type_name, "Unknown"), struc.GetRefcount())
+		typeName := b.Option(zend.ZendRsrcListGetRsrcTypeEx(types.Z_RES_P(struc)), "Unknown")
+		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, types.Z_RES_P(struc).GetHandle(), typeName, struc.GetRefcount())
 	case types.IS_REFERENCE:
 
 		//??? hide references with refcount==1 (for compatibility)
@@ -350,27 +307,9 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifDebugZvalDump(executeData zpp.Ex, return_value zpp.Ret, vars []*types.Zval) {
-	var args *types.Zval
-	var argc int
-	var i int
-	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	for i = 0; i < argc; i++ {
-		PhpDebugZvalDump(&args[i], 1)
+func ZifDebugZvalDump(vars []*types.Zval) {
+	for _, zval := range vars {
+		PhpDebugZvalDump(zval, 1)
 	}
 }
 func BufferAppendSpaces(buf *zend.SmartStr, num_spaces int) {

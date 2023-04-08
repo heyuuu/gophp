@@ -217,6 +217,15 @@ func ZendRsrcListGetRsrcType(res *types.ZendResource) *byte {
 		return nil
 	}
 }
+func ZendRsrcListGetRsrcTypeEx(res *types.ZendResource) *string {
+	var lde *ZendRsrcListDtorsEntry
+	lde = types.ZendHashIndexFindPtr(&ListDestructors, res.GetType())
+	if lde == nil {
+		return nil
+	}
+	var typeName = lde.TypeName()
+	return &typeName
+}
 func ZendRegisterPersistentResourceEx(key *types.String, rsrc_pointer any, rsrc_type int) *types.ZendResource {
 	var zv *types.Zval
 	var tmp types.Zval
