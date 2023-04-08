@@ -46,20 +46,6 @@ func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
 		BG__().unserialize.data = nil
 	}
 }
-func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *types.Array {
-	return d.GetAllowedClasses()
-}
-func PhpVarUnserializeSetAllowedClasses(d PhpUnserializeDataT, classes *types.Array) {
-	d.SetAllowedClasses(classes)
-}
-func PhpVarUnserializeSetMaxDepth(d PhpUnserializeDataT, max_depth zend.ZendLong) {
-	d.SetMaxDepth(max_depth)
-}
-func PhpVarUnserializeGetMaxDepth(d PhpUnserializeDataT) zend.ZendLong { return d.GetMaxDepth() }
-func PhpVarUnserializeSetCurDepth(d PhpUnserializeDataT, cur_depth zend.ZendLong) {
-	d.SetCurDepth(cur_depth)
-}
-func PhpVarUnserializeGetCurDepth(d PhpUnserializeDataT) zend.ZendLong { return d.GetCurDepth() }
 func VarPush(var_hashx *PhpUnserializeDataT, rval *types.Zval) {
 	var var_hash *VarEntries = var_hashx.GetLast()
 	if var_hash.GetUsedSlots() == VAR_ENTRIES_MAX {

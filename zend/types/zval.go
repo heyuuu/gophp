@@ -180,7 +180,6 @@ func (zv *Zval) IsError() bool               { return zv.typ == IS_ERROR }
 
 /** Zval.u2 */
 func (zv *Zval) GetNext() uint32               { return zv.u2 }
-func (zv *Zval) SetNext(value uint32)          { zv.u2 = value }
 func (zv *Zval) GetCacheSlot() uint32          { return zv.u2 }
 func (zv *Zval) SetCacheSlot(value uint32)     { zv.u2 = value }
 func (zv *Zval) GetOplineNum() uint32          { return zv.u2 }
