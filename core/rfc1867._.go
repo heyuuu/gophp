@@ -20,8 +20,6 @@ type PhpRfc1867GetwordT func(encoding *zend.ZendEncoding, line **byte, stop byte
 type PhpRfc1867GetwordConfT func(encoding *zend.ZendEncoding, str *byte) *byte
 type PhpRfc1867BasenameT func(encoding *zend.ZendEncoding, str *byte) *byte
 
-const DEBUG_FILE_UPLOAD = 0
-
 var PhpRfc1867EncodingTranslation PhpRfc1867EncodingTranslationT = DummyEncodingTranslation
 var PhpRfc1867GetDetectOrder PhpRfc1867GetDetectOrderT = nil
 var PhpRfc1867SetInputEncoding PhpRfc1867SetInputEncodingT = nil

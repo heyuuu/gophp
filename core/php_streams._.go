@@ -8,12 +8,6 @@ import (
 
 var PhpFileLeStream func() int
 var PhpFileLePstream func() int
-var PhpFileLeStreamFilter func() int
-
-/* {{{ Streams memory debugging stuff */
-
-/* these functions relay the file/line number information. They are depth aware, so they will pass
- * the ultimate ancestor, which is useful, because there can be several layers of calls */
 
 type PhpStreamContext = streams.PhpStreamContext
 type PhpStreamFilter = streams.PhpStreamFilter
@@ -25,11 +19,6 @@ const PHP_STREAM_FLAG_NO_BUFFER = 0x2
 const PHP_STREAM_FLAG_EOL_UNIX = 0x0
 const PHP_STREAM_FLAG_DETECT_EOL = 0x4
 const PHP_STREAM_FLAG_EOL_MAC = 0x8
-
-/* set this when the stream might represent "interactive" data.
- * When set, the read buffer will avoid certain operations that
- * might otherwise cause the read to block for much longer than
- * is strictly required. */
 
 const PHP_STREAM_FLAG_AVOID_BLOCKING = 0x10
 const PHP_STREAM_FLAG_NO_CLOSE = 0x20
@@ -43,19 +32,9 @@ const PHP_STREAM_FCLOSE_NONE = 0
 const PHP_STREAM_FCLOSE_FDOPEN = 1
 const PHP_STREAM_FCLOSE_FOPENCOOKIE = 2
 
-/* allocate a new stream for a particular ops */
-
 var _phpStreamAlloc func(ops *PhpStreamOps, abstract any, persistent_id *byte, mode *byte) *PhpStream
 
-/* use this to tell the stream that it is OK if we don't explicitly close it */
-
-/* use this to assign the stream to a zval and tell the stream that is
- * has been exported to the engine; it will expect to be closed automatically
- * when the resources are auto-destructed */
-
-var PhpStreamEncloses func(enclosing *PhpStream, enclosed *PhpStream) *PhpStream
 var _phpStreamFreeEnclosed func(stream_enclosed *PhpStream, close_options int) int
-var PhpStreamFromPersistentId func(persistent_id *byte, stream **PhpStream) int
 
 const PHP_STREAM_PERSISTENT_SUCCESS = 0
 const PHP_STREAM_PERSISTENT_FAILURE = 1
@@ -73,23 +52,20 @@ const PHP_STREAM_FREE_CLOSE_PERSISTENT = PHP_STREAM_FREE_CLOSE | PHP_STREAM_FREE
 
 var _phpStreamFree func(stream *PhpStream, close_options int) int
 var _phpStreamSeek func(stream *PhpStream, offset zend.ZendOffT, whence int) int
-var _phpStreamTell func(stream *PhpStream) zend.ZendOffT
 var _phpStreamRead func(stream *PhpStream, buf *byte, count int) ssize_t
-var PhpStreamReadToStr func(stream *PhpStream, len_ int) *types.String
 var _phpStreamWrite func(stream *PhpStream, buf *byte, count int) ssize_t
 var _phpStreamFillReadBuffer func(stream *PhpStream, size int) int
 var _phpStreamPrintf func(stream *PhpStream, fmt *byte, _ ...any) ssize_t
 
 /* php_stream_printf macro & function require */
 
-const PhpStreamPrintf = _phpStreamPrintf
+var PhpStreamPrintf = _phpStreamPrintf
 
 var _phpStreamEof func(stream *PhpStream) int
 var _phpStreamGetc func(stream *PhpStream) int
 var _phpStreamPutc func(stream *PhpStream, c int) int
 var _phpStreamFlush func(stream *PhpStream, closing int) int
 var _phpStreamGetLine func(stream *PhpStream, buf *byte, maxlen int, returned_len *int) *byte
-var PhpStreamGetRecord func(stream *PhpStream, maxlen int, delim *byte, delim_len int) *types.String
 
 /* CAREFUL! this is equivalent to puts NOT fputs! */
 
@@ -100,8 +76,6 @@ var _phpStreamMkdir func(path *byte, mode int, options int, context *PhpStreamCo
 var _phpStreamRmdir func(path *byte, options int, context *PhpStreamContext) int
 var _phpStreamOpendir func(path *byte, options int, context *PhpStreamContext) *PhpStream
 var _phpStreamReaddir func(dirstream *PhpStream, ent *PhpStreamDirent) *PhpStreamDirent
-var PhpStreamDirentAlphasort func(a **types.String, b **types.String) int
-var PhpStreamDirentAlphasortr func(a **types.String, b **types.String) int
 var _phpStreamScandir func(dirname *byte, namelist []**types.String, flags int, context *PhpStreamContext, compare func(a **types.String, b **types.String) int) int
 var _phpStreamSetOption func(stream *PhpStream, option int, value int, ptrparam any) int
 
@@ -284,18 +258,10 @@ const IGNORE_URL_WIN = 0
 var PhpInitStreamWrappers func(module_number int) int
 var PhpShutdownStreamWrappers func(module_number int) int
 var PhpShutdownStreamHashes func()
-var ZmDeactivateStreams func(type_ int, module_number int) int
-var PhpRegisterUrlStreamWrapper func(protocol *byte, wrapper *PhpStreamWrapper) int
-var PhpUnregisterUrlStreamWrapper func(protocol *byte) int
-var PhpRegisterUrlStreamWrapperVolatile func(protocol *types.String, wrapper *PhpStreamWrapper) int
-var PhpUnregisterUrlStreamWrapperVolatile func(protocol *types.String) int
 var _phpStreamOpenWrapperEx func(path *byte, mode *byte, options int, opened_path **types.String, context *PhpStreamContext) *PhpStream
 var PhpStreamLocateUrlWrapper func(path *byte, path_for_open **byte, options int) *PhpStreamWrapper
-var PhpStreamLocateEol func(stream *PhpStream, buf *types.String) *byte
 
 /* pushes an error message onto the stack for a wrapper instance */
-
-var PhpStreamWrapperLogError func(wrapper *PhpStreamWrapper, options int, fmt *byte, _ ...any)
 
 const PHP_STREAM_UNCHANGED = 0
 const PHP_STREAM_RELEASED = 1
@@ -312,10 +278,7 @@ var _phpStreamMakeSeekable func(origstream *PhpStream, newstream **PhpStream, fl
 /* Give other modules access to the url_stream_wrappers_hash and stream_filters_hash */
 
 var _phpStreamGetUrlStreamWrappersHash func() *types.Array
-var PhpStreamGetUrlStreamWrappersHashGlobal func() *types.Array
 var _phpGetStreamFiltersHash func() *types.Array
-var PhpGetStreamFiltersHashGlobal func() *types.Array
-var PhpStreamUserWrapperOps *PhpStreamWrapperOps
 
 /* Definitions for user streams */
 

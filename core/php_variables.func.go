@@ -518,10 +518,6 @@ func _phpImportEnvironmentVariables(array_ptr *types.Zval) {
 	}
 	tsrm_env_unlock()
 }
-func PhpStdAutoGlobalCallback(name *byte, name_len uint32) types.ZendBool {
-	zend.ZendPrintf("%s\n", name)
-	return 0
-}
 func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 	var arr types.Zval
 	var argc types.Zval

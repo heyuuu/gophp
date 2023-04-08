@@ -1105,18 +1105,3 @@ fileupload_done:
 		zend.Efree(mbuff)
 	}
 }
-func PhpRfc1867SetMultibyteCallbacks(
-	encoding_translation PhpRfc1867EncodingTranslationT,
-	get_detect_order PhpRfc1867GetDetectOrderT,
-	set_input_encoding PhpRfc1867SetInputEncodingT,
-	getword PhpRfc1867GetwordT,
-	getword_conf PhpRfc1867GetwordConfT,
-	basename PhpRfc1867BasenameT,
-) {
-	PhpRfc1867EncodingTranslation = encoding_translation
-	PhpRfc1867GetDetectOrder = get_detect_order
-	PhpRfc1867SetInputEncoding = set_input_encoding
-	PhpRfc1867Getword = getword
-	PhpRfc1867GetwordConf = getword_conf
-	PhpRfc1867Basename = basename
-}
