@@ -240,8 +240,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	FG__().stream_wrappers = nil
 
 	/* Default to global filters only */
-
-	FG__().stream_filters = nil
+	FG__().SetStreamFilters(nil)
 	return types.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {

@@ -2,6 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -67,62 +68,50 @@ type PhpFileGlobals struct {
 	user_stream_current_filename *byte
 	default_context              *core.PhpStreamContext
 	stream_wrappers              *types.Array
-	stream_filters               *types.Array
+	stream_filters               map[string]*streams.PhpStreamFilterFactory
 	wrapper_errors               *types.Array
 	pclose_wait                  int
 }
 
-//             func MakePhpFileGlobals(
-// pclose_ret int,
-// def_chunk_size int,
-// auto_detect_line_endings zend.ZendBool,
-// default_socket_timeout zend.ZendLong,
-// user_agent *byte,
-// from_address *byte,
-// user_stream_current_filename *byte,
-// default_context *core.PhpStreamContext,
-// stream_wrappers *zend.HashTable,
-// stream_filters *zend.HashTable,
-// wrapper_errors *zend.HashTable,
-// pclose_wait int,
-// ) PhpFileGlobals {
-//                 return PhpFileGlobals{
-//                     pclose_ret:pclose_ret,
-//                     def_chunk_size:def_chunk_size,
-//                     auto_detect_line_endings:auto_detect_line_endings,
-//                     default_socket_timeout:default_socket_timeout,
-//                     user_agent:user_agent,
-//                     from_address:from_address,
-//                     user_stream_current_filename:user_stream_current_filename,
-//                     default_context:default_context,
-//                     stream_wrappers:stream_wrappers,
-//                     stream_filters:stream_filters,
-//                     wrapper_errors:wrapper_errors,
-//                     pclose_wait:pclose_wait,
-//                 }
-//             }
-// func (this *PhpFileGlobals)  GetPcloseRet() int      { return this.pclose_ret }
-// func (this *PhpFileGlobals) SetPcloseRet(value int) { this.pclose_ret = value }
-// func (this *PhpFileGlobals)  GetDefChunkSize() int      { return this.def_chunk_size }
 func (this *PhpFileGlobals) SetDefChunkSize(value int) { this.def_chunk_size = value }
 
-// func (this *PhpFileGlobals)  GetAutoDetectLineEndings() zend.ZendBool      { return this.auto_detect_line_endings }
-// func (this *PhpFileGlobals) SetAutoDetectLineEndings(value zend.ZendBool) { this.auto_detect_line_endings = value }
-// func (this *PhpFileGlobals)  GetDefaultSocketTimeout() zend.ZendLong      { return this.default_socket_timeout }
-// func (this *PhpFileGlobals) SetDefaultSocketTimeout(value zend.ZendLong) { this.default_socket_timeout = value }
-// func (this *PhpFileGlobals)  GetUserAgent() *byte      { return this.user_agent }
-// func (this *PhpFileGlobals) SetUserAgent(value *byte) { this.user_agent = value }
-// func (this *PhpFileGlobals)  GetFromAddress() *byte      { return this.from_address }
-// func (this *PhpFileGlobals) SetFromAddress(value *byte) { this.from_address = value }
-// func (this *PhpFileGlobals)  GetUserStreamCurrentFilename() *byte      { return this.user_stream_current_filename }
-// func (this *PhpFileGlobals) SetUserStreamCurrentFilename(value *byte) { this.user_stream_current_filename = value }
-// func (this *PhpFileGlobals)  GetDefaultContext() *core.PhpStreamContext      { return this.default_context }
-// func (this *PhpFileGlobals) SetDefaultContext(value *core.PhpStreamContext) { this.default_context = value }
-// func (this *PhpFileGlobals)  GetStreamWrappers() *zend.HashTable      { return this.stream_wrappers }
-// func (this *PhpFileGlobals) SetStreamWrappers(value *zend.HashTable) { this.stream_wrappers = value }
-// func (this *PhpFileGlobals)  GetStreamFilters() *zend.HashTable      { return this.stream_filters }
-// func (this *PhpFileGlobals) SetStreamFilters(value *zend.HashTable) { this.stream_filters = value }
-// func (this *PhpFileGlobals)  GetWrapperErrors() *zend.HashTable      { return this.wrapper_errors }
-// func (this *PhpFileGlobals) SetWrapperErrors(value *zend.HashTable) { this.wrapper_errors = value }
-// func (this *PhpFileGlobals)  GetPcloseWait() int      { return this.pclose_wait }
-// func (this *PhpFileGlobals) SetPcloseWait(value int) { this.pclose_wait = value }
+func (this *PhpFileGlobals) GetAutoDetectLineEndings() types.ZendBool {
+	return this.auto_detect_line_endings
+}
+func (this *PhpFileGlobals) SetAutoDetectLineEndings(value types.ZendBool) {
+	this.auto_detect_line_endings = value
+}
+func (this *PhpFileGlobals) GetDefaultSocketTimeout() zend.ZendLong {
+	return this.default_socket_timeout
+}
+func (this *PhpFileGlobals) SetDefaultSocketTimeout(value zend.ZendLong) {
+	this.default_socket_timeout = value
+}
+func (this *PhpFileGlobals) GetUserAgent() *byte        { return this.user_agent }
+func (this *PhpFileGlobals) SetUserAgent(value *byte)   { this.user_agent = value }
+func (this *PhpFileGlobals) GetFromAddress() *byte      { return this.from_address }
+func (this *PhpFileGlobals) SetFromAddress(value *byte) { this.from_address = value }
+func (this *PhpFileGlobals) GetUserStreamCurrentFilename() *byte {
+	return this.user_stream_current_filename
+}
+func (this *PhpFileGlobals) SetUserStreamCurrentFilename(value *byte) {
+	this.user_stream_current_filename = value
+}
+func (this *PhpFileGlobals) GetDefaultContext() *core.PhpStreamContext { return this.default_context }
+func (this *PhpFileGlobals) SetDefaultContext(value *core.PhpStreamContext) {
+	this.default_context = value
+}
+func (this *PhpFileGlobals) GetStreamWrappers() *types.Array      { return this.stream_wrappers }
+func (this *PhpFileGlobals) SetStreamWrappers(value *types.Array) { this.stream_wrappers = value }
+
+func (this *PhpFileGlobals) GetStreamFilters() map[string]*streams.PhpStreamFilterFactory {
+	return this.stream_filters
+}
+func (this *PhpFileGlobals) SetStreamFilters(value map[string]*streams.PhpStreamFilterFactory) {
+	this.stream_filters = value
+}
+
+func (this *PhpFileGlobals) GetWrapperErrors() *types.Array      { return this.wrapper_errors }
+func (this *PhpFileGlobals) SetWrapperErrors(value *types.Array) { this.wrapper_errors = value }
+func (this *PhpFileGlobals) GetPcloseWait() int                  { return this.pclose_wait }
+func (this *PhpFileGlobals) SetPcloseWait(value int)             { this.pclose_wait = value }

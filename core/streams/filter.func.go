@@ -9,31 +9,32 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilterFactory) int {
-	var ret int
-	var str *types.String = types.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
-	if types.ZendHashAddPtr(&StreamFiltersHash, str.GetStr(), any(factory)) {
-		ret = types.SUCCESS
-	} else {
-		ret = types.FAILURE
-	}
-	// types.ZendStringReleaseEx(str, 1)
-	return ret
-}
-func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
-	return types.ZendHashStrDel(&StreamFiltersHash, filterpattern)
-}
-func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
-	if !(standard.FG__().stream_filters) {
-		zend.ALLOC_HASHTABLE(standard.FG__().stream_filters)
-		standard.FG__().stream_filters = types.MakeArrayEx(StreamFiltersHash.Len()+1, nil, 0)
-		types.ZendHashCopy(standard.FG__().stream_filters, &StreamFiltersHash, nil)
-	}
-	if types.ZendHashAddPtr(standard.FG__().stream_filters, filterpattern.GetStr(), any(factory)) {
-		return types.SUCCESS
-	} else {
+func PhpStreamFilterRegisterFactory(filterpattern string, factory *PhpStreamFilterFactory) int {
+	if _, exists := StreamFiltersHash[filterpattern]; exists {
 		return types.FAILURE
 	}
+
+	StreamFiltersHash[filterpattern] = factory
+	return types.SUCCESS
+}
+func PhpStreamFilterUnregisterFactory(filterpattern string) {
+	delete(StreamFiltersHash, filterpattern)
+}
+func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
+	if standard.FG__().GetStreamFilters() == nil {
+		streamFilters := make(map[string]*PhpStreamFilterFactory, len(StreamFiltersHash))
+		for k, v := range StreamFiltersHash {
+			streamFilters[k] = v
+		}
+		standard.FG__().SetStreamFilters(streamFilters)
+	}
+
+	if _, exists := standard.FG__().GetStreamFilters()[filterpattern.GetStr()]; exists {
+		return types.FAILURE
+	}
+
+	standard.FG__().GetStreamFilters()[filterpattern.GetStr()] = factory
+	return types.SUCCESS
 }
 func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf uint8, buf_persistent uint8) *PhpStreamBucket {
 	var is_persistent int = stream.GetIsPersistent()
@@ -123,7 +124,10 @@ func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
 	bucket.SetNext(bucket.GetPrev())
 }
 func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
-	var filter_hash *types.Array = b.CondF1(standard.FG__().stream_filters, func() __auto__ { return standard.FG__().stream_filters }, &StreamFiltersHash)
+	var filter_hash = standard.FG__().GetStreamFilters()
+	if filter_hash == nil {
+		filter_hash = StreamFiltersHash
+	}
 	var factory *PhpStreamFilterFactory = nil
 	var filter *core.PhpStreamFilter = nil
 	var n int

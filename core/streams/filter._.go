@@ -1,7 +1,3 @@
 package streams
 
-import (
-	"github.com/heyuuu/gophp/zend/types"
-)
-
-var StreamFiltersHash types.Array
+var StreamFiltersHash = make(map[string]*PhpStreamFilterFactory)
