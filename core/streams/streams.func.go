@@ -283,40 +283,6 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 	ret_buf.GetVal()[ret_buf.GetLen()] = '0'
 	return ret_buf
 }
-func _phpStreamSetOption(stream *core.PhpStream, option int, value int, ptrparam any) int {
-	var ret int = core.PHP_STREAM_OPTION_RETURN_NOTIMPL
-	if stream.GetOps().GetSetOption() != nil {
-		ret = stream.GetOps().GetSetOption()(stream, option, value, ptrparam)
-	}
-	if ret == core.PHP_STREAM_OPTION_RETURN_NOTIMPL {
-		switch option {
-		case core.PHP_STREAM_OPTION_SET_CHUNK_SIZE:
-
-			/* XXX chunk size itself is of size_t, that might be ok or not for a particular case*/
-
-			if stream.GetChunkSize() > core.INT_MAX {
-				ret = core.INT_MAX
-			} else {
-				ret = int(stream.GetChunkSize())
-			}
-			stream.SetChunkSize(value)
-			return ret
-		case core.PHP_STREAM_OPTION_READ_BUFFER:
-
-			/* try to match the buffer mode as best we can */
-
-			if value == core.PHP_STREAM_BUFFER_NONE {
-				stream.AddFlags(core.PHP_STREAM_FLAG_NO_BUFFER)
-			} else if stream.HasFlags(core.PHP_STREAM_FLAG_NO_BUFFER) {
-				stream.SetFlags(stream.GetFlags() ^ core.PHP_STREAM_FLAG_NO_BUFFER)
-			}
-			ret = core.PHP_STREAM_OPTION_RETURN_OK
-		default:
-
-		}
-	}
-	return ret
-}
 func PhpStreamWrapperSchemeValidate(protocol *byte, protocol_len uint) int {
 	var i uint
 	for i = 0; i < protocol_len; i++ {

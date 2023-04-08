@@ -10,15 +10,6 @@ import (
 )
 
 func PhpStreamXportGetHash() *types.Array { return &XportHash }
-func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) int {
-	var str *types.String = types.ZendStringInitInterned(protocol, strlen(protocol), 1)
-	types.ZendHashUpdatePtr(&XportHash, str.GetStr(), factory)
-	// types.ZendStringReleaseEx(str, 1)
-	return types.SUCCESS
-}
-func PhpStreamXportUnregister(protocol *byte) int {
-	return types.ZendHashStrDel(&XportHash, protocol)
-}
 func ERR_REPORT(out_err **types.String, fmt string, arg []byte) {
 	if out_err != nil {
 		*out_err = core.Strpprintf(0, fmt, arg)

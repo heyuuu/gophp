@@ -10,14 +10,8 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func PhpStreamFopenFromFdInt(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
-	return _phpStreamFopenFromFdInt(fd, mode, persistent_id)
-}
 func PhpStreamFopenFromFdIntRel(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
 	return _phpStreamFopenFromFdInt(fd, mode, persistent_id)
-}
-func PhpStreamFopenFromFileInt(file *r.FILE, mode *byte) *core.PhpStream {
-	return _phpStreamFopenFromFileInt(file, mode)
 }
 func PhpStreamFopenFromFileIntRel(file *r.FILE, mode *byte) *core.PhpStream {
 	return _phpStreamFopenFromFileInt(file, mode)
@@ -918,111 +912,4 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	}
 	standard.PhpClearStatCache(0, nil, 0)
 	return 1
-}
-func _phpStreamFopenWithPath(filename *byte, mode *byte, path *byte, opened_path **types.String, options int) *core.PhpStream {
-	/* code ripped off from fopen_wrappers.c */
-
-	var pathbuf *byte
-	var end *byte
-	var ptr *byte
-	var trypath []byte
-	var stream *core.PhpStream
-	var filename_length int
-	var exec_filename *types.String
-	if opened_path != nil {
-		*opened_path = nil
-	}
-	if filename == nil {
-		return nil
-	}
-	filename_length = strlen(filename)
-	void(filename_length)
-
-	/* Relative path open */
-
-	if (*filename) == '.' && (zend.IS_SLASH(filename[1]) || filename[1] == '.') {
-
-		/* further checks, we could have ....... filenames */
-
-		ptr = filename + 1
-		if (*ptr) == '.' {
-			for (*(b.PreInc(&ptr))) == '.' {
-
-			}
-			if !(zend.IS_SLASH(*ptr)) {
-				goto not_relative_path
-			}
-		}
-		if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(filename) != 0 {
-			return nil
-		}
-		return core.PhpStreamFopenRel(filename, mode, opened_path, options)
-	}
-not_relative_path:
-
-	/* Absolute path open */
-
-	if zend.IS_ABSOLUTE_PATH(filename, filename_length) {
-		if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(filename) != 0 {
-			return nil
-		}
-		return core.PhpStreamFopenRel(filename, mode, opened_path, options)
-	}
-	if path == nil || !(*path) {
-		return core.PhpStreamFopenRel(filename, mode, opened_path, options)
-	}
-
-	/* check in provided path */
-
-	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = exec_filename.GetVal()
-		var exec_fname_length int = exec_filename.GetLen()
-		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
-
-		}
-		if exec_fname_length <= 0 {
-
-			/* no path */
-
-			pathbuf = zend.Estrdup(path)
-
-			/* no path */
-
-		} else {
-			var path_length int = strlen(path)
-			pathbuf = (*byte)(zend.Emalloc(exec_fname_length + path_length + 1 + 1))
-			memcpy(pathbuf, path, path_length)
-			pathbuf[path_length] = zend.DEFAULT_DIR_SEPARATOR
-			memcpy(pathbuf+path_length+1, exec_fname, exec_fname_length)
-			pathbuf[path_length+exec_fname_length+1] = '0'
-		}
-	} else {
-		pathbuf = zend.Estrdup(path)
-	}
-	ptr = pathbuf
-	for ptr != nil && (*ptr) {
-		end = strchr(ptr, zend.DEFAULT_DIR_SEPARATOR)
-		if end != nil {
-			*end = '0'
-			end++
-		}
-		if (*ptr) == '0' {
-			goto stream_skip
-		}
-		if core.Snprintf(trypath, core.MAXPATHLEN, "%s/%s", ptr, filename) >= core.MAXPATHLEN {
-			core.PhpErrorDocref(nil, faults.E_NOTICE, "%s/%s path was truncated to %d", ptr, filename, core.MAXPATHLEN)
-		}
-		if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedirEx(trypath, 0) != 0 {
-			goto stream_skip
-		}
-		stream = core.PhpStreamFopenRel(trypath, mode, opened_path, options)
-		if stream != nil {
-			zend.Efree(pathbuf)
-			return stream
-		}
-	stream_skip:
-		ptr = end
-	}
-	zend.Efree(pathbuf)
-	return nil
 }

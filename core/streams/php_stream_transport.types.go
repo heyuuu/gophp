@@ -68,13 +68,10 @@ func (this *PhpStreamXportParam) GetClient() *core.PhpStream              { retu
 func (this *PhpStreamXportParam) SetClient(value *core.PhpStream)         { this.outputs.client = value }
 func (this *PhpStreamXportParam) GetOutputsAddr() *__struct__sockaddr     { return this.outputs.addr }
 
-// func (this *PhpStreamXportParam) SetOutputsAddr(value *__struct__sockaddr) { this.outputs.addr = value }
 func (this *PhpStreamXportParam) GetOutputsAddrlen() socklen_t { return this.outputs.addrlen }
 
-// func (this *PhpStreamXportParam) SetOutputsAddrlen(value socklen_t) { this.outputs.addrlen = value }
 func (this *PhpStreamXportParam) GetTextaddr() *types.String { return this.outputs.textaddr }
 
-// func (this *PhpStreamXportParam) SetTextaddr(value *zend.String) { this.outputs.textaddr = value }
 func (this *PhpStreamXportParam) GetErrorText() *types.String { return this.outputs.error_text }
 func (this *PhpStreamXportParam) SetErrorText(value *types.String) {
 	this.outputs.error_text = value
@@ -111,18 +108,13 @@ type PhpStreamXportCryptoParam struct {
 	op int
 }
 
-// func (this *PhpStreamXportCryptoParam)  GetSession() *core.PhpStream      { return this.inputs.session }
 func (this *PhpStreamXportCryptoParam) SetSession(value *core.PhpStream) { this.inputs.session = value }
 
-// func (this *PhpStreamXportCryptoParam)  GetActivate() int      { return this.inputs.activate }
 func (this *PhpStreamXportCryptoParam) SetActivate(value int) { this.inputs.activate = value }
 
-// func (this *PhpStreamXportCryptoParam)  GetMethod() PhpStreamXportCryptMethodT      { return this.inputs.method }
 func (this *PhpStreamXportCryptoParam) SetMethod(value PhpStreamXportCryptMethodT) {
 	this.inputs.method = value
 }
 func (this *PhpStreamXportCryptoParam) GetReturncode() int { return this.outputs.returncode }
 
-// func (this *PhpStreamXportCryptoParam) SetReturncode(value int) { this.outputs.returncode = value }
-// func (this *PhpStreamXportCryptoParam)  GetOp() int      { return this.op }
 func (this *PhpStreamXportCryptoParam) SetOp(value int) { this.op = value }

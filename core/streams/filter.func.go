@@ -9,14 +9,6 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func PhpGetStreamFiltersHashGlobal() *types.Array { return &StreamFiltersHash }
-func _phpGetStreamFiltersHash() *types.Array {
-	if standard.FG(stream_filters) {
-		return standard.FG(stream_filters)
-	} else {
-		return &StreamFiltersHash
-	}
-}
 func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilterFactory) int {
 	var ret int
 	var str *types.String = types.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
@@ -81,23 +73,6 @@ func PhpStreamBucketMakeWriteable(bucket *PhpStreamBucket) *PhpStreamBucket {
 	retval.SetOwnBuf(1)
 	PhpStreamBucketDelref(bucket)
 	return retval
-}
-func PhpStreamBucketSplit(in *PhpStreamBucket, left **PhpStreamBucket, right **PhpStreamBucket, length int) int {
-	*left = (*PhpStreamBucket)(zend.Pecalloc(1, b.SizeOf("php_stream_bucket"), in.GetIsPersistent()))
-	*right = (*PhpStreamBucket)(zend.Pecalloc(1, b.SizeOf("php_stream_bucket"), in.GetIsPersistent()))
-	left.SetBuf(zend.Pemalloc(length, in.GetIsPersistent()))
-	left.SetBuflen(length)
-	memcpy(left.GetBuf(), in.GetBuf(), length)
-	left.SetRefcount(1)
-	left.SetOwnBuf(1)
-	left.SetIsPersistent(in.GetIsPersistent())
-	right.SetBuflen(in.GetBuflen() - length)
-	right.SetBuf(zend.Pemalloc(right.GetBuflen(), in.GetIsPersistent()))
-	memcpy(right.GetBuf(), in.GetBuf()+length, right.GetBuflen())
-	right.SetRefcount(1)
-	right.SetOwnBuf(1)
-	right.SetIsPersistent(in.GetIsPersistent())
-	return types.SUCCESS
 }
 func PhpStreamBucketDelref(bucket *PhpStreamBucket) {
 	if b.PreDec(&(bucket.GetRefcount())) == 0 {

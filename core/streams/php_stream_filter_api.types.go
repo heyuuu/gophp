@@ -19,27 +19,6 @@ type PhpStreamBucket struct {
 	refcount      int
 }
 
-//             func MakePhpStreamBucket(
-// next *PhpStreamBucket,
-// prev **PhpStreamBucket,
-// brigade *PhpStreamBucketBrigade,
-// buf *byte,
-// buflen int,
-// own_buf uint8,
-// is_persistent uint8,
-// refcount int,
-// ) PhpStreamBucket {
-//                 return PhpStreamBucket{
-//                     next:next,
-//                     prev:prev,
-//                     brigade:brigade,
-//                     buf:buf,
-//                     buflen:buflen,
-//                     own_buf:own_buf,
-//                     is_persistent:is_persistent,
-//                     refcount:refcount,
-//                 }
-//             }
 func (this *PhpStreamBucket) GetNext() *PhpStreamBucket                { return this.next }
 func (this *PhpStreamBucket) SetNext(value *PhpStreamBucket)           { this.next = value }
 func (this *PhpStreamBucket) GetPrev() **PhpStreamBucket               { return this.prev }
@@ -128,10 +107,7 @@ func (this *PhpStreamFilterOps) SetFilter(value func(
 }
 func (this *PhpStreamFilterOps) GetDtor() func(thisfilter *core.PhpStreamFilter) { return this.dtor }
 
-// func (this *PhpStreamFilterOps) SetDtor(value func(thisfilter *core.PhpStreamFilter)) { this.dtor = value }
 func (this *PhpStreamFilterOps) GetLabel() *byte { return this.label }
-
-// func (this *PhpStreamFilterOps) SetLabel(value *byte) { this.label = value }
 
 /**
  * PhpStreamFilterChain
@@ -142,13 +118,6 @@ type PhpStreamFilterChain struct {
 	stream *core.PhpStream
 }
 
-// func MakePhpStreamFilterChain(head *core.PhpStreamFilter, tail **core.PhpStreamFilter, stream *core.PhpStream) PhpStreamFilterChain {
-//     return PhpStreamFilterChain{
-//         head:head,
-//         tail:tail,
-//         stream:stream,
-//     }
-// }
 func (this *PhpStreamFilterChain) GetHead() *core.PhpStreamFilter       { return this.head }
 func (this *PhpStreamFilterChain) SetHead(value *core.PhpStreamFilter)  { this.head = value }
 func (this *PhpStreamFilterChain) GetTail() **core.PhpStreamFilter      { return this.tail }
@@ -170,32 +139,9 @@ type PhpStreamFilter struct {
 	res           *types.ZendResource
 }
 
-//             func MakePhpStreamFilter(
-// fops *PhpStreamFilterOps,
-// abstract zend.Zval,
-// next *core.PhpStreamFilter,
-// prev *core.PhpStreamFilter,
-// is_persistent int,
-// chain *PhpStreamFilterChain,
-// buffer PhpStreamBucketBrigade,
-// res *zend.ZendResource,
-// ) PhpStreamFilter {
-//                 return PhpStreamFilter{
-//                     fops:fops,
-//                     abstract:abstract,
-//                     next:next,
-//                     prev:prev,
-//                     is_persistent:is_persistent,
-//                     chain:chain,
-//                     buffer:buffer,
-//                     res:res,
-//                 }
-//             }
-func (this *PhpStreamFilter) GetFops() *PhpStreamFilterOps      { return this.fops }
-func (this *PhpStreamFilter) SetFops(value *PhpStreamFilterOps) { this.fops = value }
-func (this *PhpStreamFilter) GetAbstract() types.Zval           { return this.abstract }
-
-// func (this *PhpStreamFilter) SetAbstract(value zend.Zval) { this.abstract = value }
+func (this *PhpStreamFilter) GetFops() *PhpStreamFilterOps         { return this.fops }
+func (this *PhpStreamFilter) SetFops(value *PhpStreamFilterOps)    { this.fops = value }
+func (this *PhpStreamFilter) GetAbstract() types.Zval              { return this.abstract }
 func (this *PhpStreamFilter) GetNext() *core.PhpStreamFilter       { return this.next }
 func (this *PhpStreamFilter) SetNext(value *core.PhpStreamFilter)  { this.next = value }
 func (this *PhpStreamFilter) GetPrev() *core.PhpStreamFilter       { return this.prev }
@@ -205,8 +151,6 @@ func (this *PhpStreamFilter) SetIsPersistent(value int)            { this.is_per
 func (this *PhpStreamFilter) GetChain() *PhpStreamFilterChain      { return this.chain }
 func (this *PhpStreamFilter) SetChain(value *PhpStreamFilterChain) { this.chain = value }
 
-// func (this *PhpStreamFilter)  GetBuffer() PhpStreamBucketBrigade      { return this.buffer }
-// func (this *PhpStreamFilter) SetBuffer(value PhpStreamBucketBrigade) { this.buffer = value }
 func (this *PhpStreamFilter) GetRes() *types.ZendResource      { return this.res }
 func (this *PhpStreamFilter) SetRes(value *types.ZendResource) { this.res = value }
 
@@ -225,5 +169,3 @@ func MakePhpStreamFilterFactory(create_filter func(filtername *byte, filterparam
 func (this *PhpStreamFilterFactory) GetCreateFilter() func(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
 	return this.create_filter
 }
-
-// func (this *PhpStreamFilterFactory) SetCreateFilter(value func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter) { this.create_filter = value }

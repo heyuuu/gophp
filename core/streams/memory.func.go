@@ -206,54 +206,6 @@ func PhpStreamModeFromStr(mode *byte) int {
 	}
 	return core.TEMP_STREAM_READONLY
 }
-func _phpStreamModeToStr(mode int) *byte {
-	if mode == core.TEMP_STREAM_READONLY {
-		return "rb"
-	} else if mode == core.TEMP_STREAM_APPEND {
-		return "a+b"
-	}
-	return "w+b"
-}
-func _phpStreamMemoryCreate(mode int) *core.PhpStream {
-	var self *PhpStreamMemoryData
-	var stream *core.PhpStream
-	self = zend.Emalloc(b.SizeOf("* self"))
-	self.SetData(nil)
-	self.SetFpos(0)
-	self.SetFsize(0)
-	self.SetSmax(^0)
-	self.SetMode(mode)
-	stream = core.PhpStreamAllocRel(&PhpStreamMemoryOps, self, 0, _phpStreamModeToStr(mode))
-	stream.AddFlags(core.PHP_STREAM_FLAG_NO_BUFFER)
-	return stream
-}
-func _phpStreamMemoryOpen(mode int, buf *byte, length int) *core.PhpStream {
-	var stream *core.PhpStream
-	var ms *PhpStreamMemoryData
-	if b.Assign(&stream, core.PhpStreamMemoryCreateRel(mode)) != nil {
-		ms = (*PhpStreamMemoryData)(stream.GetAbstract())
-		if mode == core.TEMP_STREAM_READONLY || mode == core.TEMP_STREAM_TAKE_BUFFER {
-
-			/* use the buffer directly */
-
-			ms.SetData(buf)
-			ms.SetFsize(length)
-		} else {
-			if length != 0 {
-				b.Assert(buf != nil)
-				core.PhpStreamWrite(stream, buf, length)
-			}
-		}
-	}
-	return stream
-}
-func _phpStreamMemoryGetBuffer(stream *core.PhpStream, length *int) *byte {
-	var ms *PhpStreamMemoryData = (*PhpStreamMemoryData)(stream.GetAbstract())
-	b.Assert(ms != nil)
-	b.Assert(length != 0)
-	*length = ms.GetFsize()
-	return ms.GetData()
-}
 func PhpStreamTempWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var ts *PhpStreamTempData = (*PhpStreamTempData)(stream.GetAbstract())
 	b.Assert(ts != nil)
@@ -392,41 +344,6 @@ func PhpStreamTempSetOption(stream *core.PhpStream, option int, value int, ptrpa
 		}
 		return core.PHP_STREAM_OPTION_RETURN_NOTIMPL
 	}
-}
-func _phpStreamTempCreateEx(mode int, max_memory_usage int, tmpdir *byte) *core.PhpStream {
-	var self *PhpStreamTempData
-	var stream *core.PhpStream
-	self = zend.Ecalloc(1, b.SizeOf("* self"))
-	self.SetSmax(max_memory_usage)
-	self.SetMode(mode)
-	self.GetMeta().SetUndef()
-	if tmpdir != nil {
-		self.SetTmpdir(zend.Estrdup(tmpdir))
-	}
-	stream = core.PhpStreamAllocRel(&PhpStreamTempOps, self, 0, _phpStreamModeToStr(mode))
-	stream.AddFlags(core.PHP_STREAM_FLAG_NO_BUFFER)
-	self.SetInnerstream(core.PhpStreamMemoryCreateRel(mode))
-	PhpStreamEncloses(stream, self.GetInnerstream())
-	return stream
-}
-func _phpStreamTempCreate(mode int, max_memory_usage int) *core.PhpStream {
-	return core.PhpStreamTempCreateEx(mode, max_memory_usage, nil)
-}
-func _phpStreamTempOpen(mode int, max_memory_usage int, buf *byte, length int) *core.PhpStream {
-	var stream *core.PhpStream
-	var ts *PhpStreamTempData
-	var newoffs zend.ZendOffT
-	if b.Assign(&stream, core.PhpStreamTempCreateRel(mode, max_memory_usage)) != nil {
-		if length != 0 {
-			b.Assert(buf != nil)
-			PhpStreamTempWrite(stream, buf, length)
-			PhpStreamTempSeek(stream, 0, r.SEEK_SET, &newoffs)
-		}
-		ts = (*PhpStreamTempData)(stream.GetAbstract())
-		b.Assert(ts != nil)
-		ts.SetMode(mode)
-	}
-	return stream
 }
 func PhpStreamUrlWrapRfc2397(
 	wrapper *core.PhpStreamWrapper,

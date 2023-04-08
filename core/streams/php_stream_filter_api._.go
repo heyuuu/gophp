@@ -16,10 +16,6 @@ const (
 	PSFS_PASS_ON
 )
 
-/* Buckets API. */
-
 const PSFS_FLAG_NORMAL = 0
 const PSFS_FLAG_FLUSH_INC = 1
 const PSFS_FLAG_FLUSH_CLOSE = 2
-
-/* stack filter onto a stream */

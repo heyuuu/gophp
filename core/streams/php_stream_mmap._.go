@@ -16,10 +16,3 @@ const (
 	PHP_STREAM_MAP_MODE_SHARED_READONLY
 	PHP_STREAM_MAP_MODE_SHARED_READWRITE
 )
-const PHP_STREAM_MMAP_ALL = 0
-const PHP_STREAM_MMAP_MAX = 512 * 1024 * 1024
-
-/* Returns 1 if the stream in its current state can be memory mapped,
- * 0 otherwise */
-
-/* un-maps the last mapped range */

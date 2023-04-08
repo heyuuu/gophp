@@ -185,32 +185,3 @@ func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_pa
 	}
 	return fp
 }
-func _phpStreamMakeSeekable(origstream *core.PhpStream, newstream **core.PhpStream, flags int) int {
-	if newstream == nil {
-		return core.PHP_STREAM_FAILED
-	}
-	*newstream = nil
-	if (flags&core.PHP_STREAM_FORCE_CONVERSION) == 0 && origstream.GetOps().GetSeek() != nil {
-		*newstream = origstream
-		return core.PHP_STREAM_UNCHANGED
-	}
-
-	/* Use a tmpfile and copy the old streams contents into it */
-
-	if (flags & core.PHP_STREAM_PREFER_STDIO) != 0 {
-		*newstream = _phpStreamFopenTmpfile(0)
-	} else {
-		*newstream = core.PhpStreamTempNew()
-	}
-	if (*newstream) == nil {
-		return core.PHP_STREAM_FAILED
-	}
-	if core.PhpStreamCopyToStreamEx(origstream, *newstream, core.PHP_STREAM_COPY_ALL, nil) != types.SUCCESS {
-		core.PhpStreamClose(*newstream)
-		*newstream = nil
-		return core.PHP_STREAM_CRITICAL
-	}
-	core.PhpStreamClose(origstream)
-	core.PhpStreamSeek(*newstream, 0, r.SEEK_SET)
-	return core.PHP_STREAM_RELEASED
-}
