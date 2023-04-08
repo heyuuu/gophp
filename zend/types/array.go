@@ -142,7 +142,7 @@ func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
 
 	// GC 信息
 	ht.SetRefcount(1)
-	ht.SetGcTypeInfo(IS_ARRAY)
+	ht.SetGcTypeInfo(uint32(IS_ARRAY))
 	if persistent {
 		ht.AddGcFlags(GC_PERSISTENT)
 	} else {

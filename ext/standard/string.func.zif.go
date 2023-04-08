@@ -159,7 +159,7 @@ var DefZifExplode = def.DefFunc("explode", 2, 3, []def.ArgInfo{{Name: "separator
 	}
 	ret, ok := ZifExplode(separator, str, nil, limit_)
 	if ok {
-		returnValue.SetArray(types.NewArrayOfString(ret))
+		returnValue.SetArrayOfString(ret)
 	} else {
 		returnValue.SetFalse()
 	}

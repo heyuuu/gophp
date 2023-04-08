@@ -213,8 +213,14 @@ func toZppSetMethod(typ ZppRetType, ret ast.Expr) (setter string, args []ast.Exp
 		setter = "SetDouble"
 	case RetTypeString:
 		setter = "SetStringVal"
-	case RetTypeArray, RetTypeIntArray, RetTypeStringArray, RetTypeZvalArray:
+	case RetTypeArray:
 		setter = "SetArray"
+	case RetTypeIntArray:
+		setter = "SetArrayOfInt"
+	case RetTypeStringArray:
+		setter = "SetArrayOfString"
+	case RetTypeZvalArray:
+		setter = "SetArrayOfZval"
 	case RetTypeObject:
 		setter = "SetObject"
 	case RetTypeZval:
@@ -225,15 +231,15 @@ func toZppSetMethod(typ ZppRetType, ret ast.Expr) (setter string, args []ast.Exp
 
 	// args
 	switch typ {
-	case RetTypeIntArray:
-		arg := f.PkgCallExpr("types", "NewArrayOfInt", []ast.Expr{ret})
-		args = []ast.Expr{arg}
-	case RetTypeStringArray:
-		arg := f.PkgCallExpr("types", "NewArrayOfString", []ast.Expr{ret})
-		args = []ast.Expr{arg}
-	case RetTypeZvalArray:
-		arg := f.PkgCallExpr("types", "NewArrayOfZval", []ast.Expr{ret})
-		args = []ast.Expr{arg}
+	//case RetTypeIntArray:
+	//	arg := f.PkgCallExpr("types", "NewArrayOfInt", []ast.Expr{ret})
+	//	args = []ast.Expr{arg}
+	//case RetTypeStringArray:
+	//	arg := f.PkgCallExpr("types", "NewArrayOfString", []ast.Expr{ret})
+	//	args = []ast.Expr{arg}
+	//case RetTypeZvalArray:
+	//	arg := f.PkgCallExpr("types", "NewArrayOfZval", []ast.Expr{ret})
+	//	args = []ast.Expr{arg}
 	default:
 		args = []ast.Expr{ret}
 	}

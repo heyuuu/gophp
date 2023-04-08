@@ -59,8 +59,6 @@ func genDefValueSpec(zifInfo *ZifInfo, phpFuncName string) *ast.GenDecl {
 }
 
 func genDefFuncArgs(zifInfo *ZifInfo, phpFuncName string) []ast.Expr {
-	//log.Printf("ZifInfo: %+v\n", *zifInfo)
-
 	// 构建 ArgInfos
 	var realArgInfos []ast.Expr
 	for _, argInfo := range zifInfo.argInfos {
@@ -82,22 +80,6 @@ func genDefFuncArgs(zifInfo *ZifInfo, phpFuncName string) []ast.Expr {
 		f.IntLit(zifInfo.maxNumArgs),
 		&ast.CompositeLit{Type: f.ArrayType(typeArgInfo), Elts: realArgInfos},
 		genZifHandler(zifInfo),
-		//genDefFuncOpts(zifInfo),
-	}
-}
-
-func genDefFuncOpts(zifInfo *ZifInfo) ast.Expr {
-	// 构建 DefFuncOpts 字段
-	var optElements []ast.Expr
-
-	if len(optElements) == 0 {
-		return f.NilLit()
-	}
-
-	// 构建结构体字面量
-	return &ast.CompositeLit{
-		Type: defPkgIdent("DefFuncOpts"),
-		Elts: optElements,
 	}
 }
 

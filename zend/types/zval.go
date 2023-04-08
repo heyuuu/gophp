@@ -272,6 +272,9 @@ func (zv *Zval) SetImmutableArray(arr *Array) {
 func (zv *Zval) SetEmptyArray() {
 	zv.SetImmutableArray(emptyArray)
 }
+func (zv *Zval) SetArrayOfInt(arr []int)       { zv.SetArray(NewArrayOfInt(arr)) }
+func (zv *Zval) SetArrayOfString(arr []string) { zv.SetArray(NewArrayOfString(arr)) }
+func (zv *Zval) SetArrayOfZval(arr []*Zval)    { zv.SetArray(NewArrayOfZval(arr)) }
 
 func (zv *Zval) SetObject(obj *ZendObject)     { zv.SetTypeObject(); zv.SetObj(obj) }
 func (zv *Zval) SetResource(res *ZendResource) { zv.SetTypeResource(); zv.SetRes(res) }
