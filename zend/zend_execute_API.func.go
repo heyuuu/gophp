@@ -52,7 +52,7 @@ func InitExecutor() {
 	EG__().SetSymtableCacheLimit(EG__().GetSymtableCache() + SYMTABLE_CACHE_SIZE)
 	EG__().SetNoExtensions(0)
 	EG__().SetFunctionTable(CG__().GetFunctionTable())
-	EG__().SetClassTable(CG__().GetClassTable())
+	EG__().SetClassTable(CG__().ClassTable())
 	EG__().SetInAutoload(nil)
 	EG__().SetAutoloadFunc(nil)
 	EG__().SetErrorHandling(EH_NORMAL)

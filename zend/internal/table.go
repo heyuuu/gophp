@@ -104,6 +104,20 @@ func (t *LcTable[T]) ForeachReserve(handler func(*T)) {
 	}
 }
 
+// todo 此方法不是并发安全的，待优化
+func (t *LcTable[T]) Filter(handler func(*T) bool) {
+	var newKeys = make([]string, 0, cap(t.keys))
+	for _, key := range t.keys {
+		v := t.m[key]
+		if v != nil && handler(v) {
+			newKeys = append(newKeys, key)
+		} else {
+			delete(t.m, key)
+		}
+	}
+	t.keys = newKeys
+}
+
 func (t *LcTable[T]) Destroy() {
 	if t.destructor != nil {
 		t.Foreach(t.destructor)

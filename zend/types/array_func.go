@@ -217,6 +217,7 @@ func ZendHashUpdatePtr(ht *Array, key string, pData any) any {
 	zv := ht.KeyUpdate(key, NewZvalPtr(pData))
 	return zv.GetPtr()
 }
+
 func ZendHashAddMem(ht *Array, key string, pData any, size int) any {
 	zv := ht.KeyAdd(key, NewZvalPtr(nil))
 	if zv != nil {

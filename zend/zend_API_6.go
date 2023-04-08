@@ -24,17 +24,11 @@ func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functio
 	}
 }
 
-func CleanModuleClass(el *types.Zval, arg any) int {
-	var ce *types.ClassEntry = (*types.ClassEntry)(el.GetPtr())
-	var module_number int = *((*int)(arg))
-	if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == module_number {
-		return types.ArrayApplyRemove
-	} else {
-		return types.ArrayApplyKeep
-	}
-}
-func CleanModuleClasses(module_number int) {
-	types.ZendHashApplyWithArgument(EG__().GetClassTable(), CleanModuleClass, any(&module_number))
+func CleanModuleClasses(moduleNumber int) {
+	EG__().ClassTable().Filter(func(ce *types.ClassEntry) bool {
+		needClean := ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == moduleNumber
+		return !needClean
+	})
 }
 func ModuleDestructor(module *ModuleEntry) {
 	if module.GetType() == MODULE_TEMPORARY {

@@ -19,9 +19,7 @@ func ZmGlobalsCtorSpl(spl_globals *ZendSplGlobals) {
 func SplFindCeByName(name *types.String, autoload types.ZendBool) *types.ClassEntry {
 	var ce *types.ClassEntry
 	if autoload == 0 {
-		var lc_name *types.String = zend.ZendStringTolower(name)
-		ce = types.ZendHashFindPtr(zend.EG__().GetClassTable(), lc_name.GetStr())
-		// types.ZendStringRelease(lc_name)
+		ce = zend.EG__().ClassTable().Get(name.GetStr())
 	} else {
 		ce = zend.ZendLookupClass(name)
 	}
@@ -203,7 +201,7 @@ func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext
 				zend.ZvalPtrDtor(&result)
 			}
 			zend.Efree(class_file)
-			return types.IntBool(zend.EG__().GetClassTable().KeyExists(lc_name.GetStr()))
+			return types.IntBool(zend.EG__().ClassTable().Exists(lc_name.GetStr()))
 		}
 	}
 	zend.Efree(class_file)
@@ -340,7 +338,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 			if zend.EG__().GetException() != nil {
 				break
 			}
-			if pos+1 == SPL_G(autoload_functions).nNumUsed || zend.EG__().GetClassTable().KeyExists(lc_name.GetStr()) {
+			if pos+1 == SPL_G(autoload_functions).nNumUsed || zend.EG__().ClassTable().Exists(lc_name.GetStr()) {
 				break
 			}
 			types.ZendHashMoveForwardEx(SPL_G(autoload_functions), &pos)
