@@ -1,9 +1,5 @@
 package core
 
-import (
-	b "github.com/heyuuu/gophp/builtin"
-)
-
 var HttpStatusMap = map[int]string{
 	100: "Continue",
 	101: "Switching Protocols",
@@ -54,4 +50,3 @@ var HttpStatusMap = map[int]string{
 	506: "Variant Also Negotiates",
 	511: "Network Authentication Required",
 }
-var HttpStatusMapLen int = b.SizeOf("http_status_map")/b.SizeOf("http_response_status_code_pair") - 1

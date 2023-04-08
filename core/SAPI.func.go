@@ -691,30 +691,25 @@ func SapiSendHeaders() int {
 	SapiSendHeadersFree()
 	return ret
 }
-func SapiRegisterPostEntries(post_entries *SapiPostEntry) int {
-	var p *SapiPostEntry = post_entries
-	for p.GetContentType() != nil {
+func SapiRegisterPostEntries(postEntries []SapiPostEntry) int {
+	for i := range postEntries {
+		p := &postEntries[i]
 		if SapiRegisterPostEntry(p) == types.FAILURE {
 			return types.FAILURE
 		}
-		p++
 	}
 	return types.SUCCESS
 }
-func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
+func SapiRegisterPostEntry(postEntry *SapiPostEntry) int {
 	var ret int
-	var key *types.String
-	if SG__().sapi_started && zend.CurrEX() != nil {
+	if SG__().sapi_started == types.SUCCESS && zend.CurrEX() != nil {
 		return types.FAILURE
 	}
-	key = types.NewString(b.CastStr(post_entry.GetContentType(), post_entry.GetContentTypeLen()))
-	types.GC_MAKE_PERSISTENT_LOCAL(key)
-	if types.ZendHashAddMem(&(SG__().known_post_content_types), key.GetStr(), any(post_entry), b.SizeOf("sapi_post_entry")) {
+	if types.ZendHashAddMem(&(SG__().known_post_content_types), postEntry.GetContentType(), any(postEntry), b.SizeOf("sapi_post_entry")) {
 		ret = types.SUCCESS
 	} else {
 		ret = types.FAILURE
 	}
-	// types.ZendStringReleaseEx(key, 1)
 	return ret
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {

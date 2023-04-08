@@ -28,9 +28,7 @@ func (this *FcgiHeader) GetContentLengthB0() uint8      { return this.contentLen
 func (this *FcgiHeader) SetContentLengthB0(value uint8) { this.contentLengthB0 = value }
 func (this *FcgiHeader) GetPaddingLength() uint8        { return this.paddingLength }
 func (this *FcgiHeader) SetPaddingLength(value uint8)   { this.paddingLength = value }
-
-// func (this *FcgiHeader)  GetReserved() uint8      { return this.reserved }
-func (this *FcgiHeader) SetReserved(value uint8) { this.reserved = value }
+func (this *FcgiHeader) SetReserved(value uint8)        { this.reserved = value }
 
 /**
  * FcgiBeginRequest

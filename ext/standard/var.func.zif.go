@@ -22,7 +22,7 @@ var DefZifDebugZvalDump = def.DefFunc("debug_zval_dump", 0, -1, []def.ArgInfo{{N
 	if fp.HasError() {
 		return
 	}
-	ZifDebugZvalDump(executeData, returnValue, vars)
+	ZifDebugZvalDump(vars)
 })
 
 // generate by ZifVarExport

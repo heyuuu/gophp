@@ -144,20 +144,18 @@ func (this *SapiHeaderLine) GetResponseCode() zend.ZendLong { return this.respon
  * SapiPostEntry
  */
 type SapiPostEntry struct {
-	content_type     *byte
-	content_type_len uint32
-	post_reader      func()
-	post_handler     func(content_type_dup *byte, arg any)
+	content_type string
+	post_reader  func()
+	post_handler func(content_type_dup *byte, arg any)
 }
 
-func MakeSapiPostEntry(content_type *byte, content_type_len uint32, post_reader func(), post_handler func(content_type_dup *byte, arg any)) SapiPostEntry {
+func MakeSapiPostEntry(content_type string, post_reader func(), post_handler func(content_type_dup *byte, arg any)) SapiPostEntry {
 	return SapiPostEntry{
-		content_type:     content_type,
-		content_type_len: content_type_len,
-		post_reader:      post_reader,
-		post_handler:     post_handler,
+		content_type: content_type,
+		post_reader:  post_reader,
+		post_handler: post_handler,
 	}
 }
-func (this *SapiPostEntry) GetContentType() *byte     { return this.content_type }
+func (this *SapiPostEntry) GetContentType() string    { return this.content_type }
 func (this *SapiPostEntry) GetContentTypeLen() uint32 { return this.content_type_len }
 func (this *SapiPostEntry) GetPostReader() func()     { return this.post_reader }

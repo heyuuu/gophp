@@ -342,50 +342,6 @@ func FcgiListen(path *byte, backlog int) int {
 	FcgiSetupSignals()
 	return listen_socket
 }
-func FcgiSetAllowedClients(ip *byte) {
-	var cur *byte
-	var end *byte
-	var n int
-	if ip != nil {
-		ip = strdup(ip)
-		cur = ip
-		n = 0
-		for *cur {
-			if (*cur) == ',' {
-				n++
-			}
-			cur++
-		}
-		if AllowedClients != nil {
-			zend.Free(AllowedClients)
-		}
-		AllowedClients = zend.Malloc(b.SizeOf("sa_t") * (n + 2))
-		n = 0
-		cur = ip
-		for cur != nil {
-			end = strchr(cur, ',')
-			if end != nil {
-				*end = 0
-				end++
-			}
-			if inet_pton(AF_INET, cur, AllowedClients[n].GetSaInet().sin_addr) > 0 {
-				AllowedClients[n].GetSa().sa_family = AF_INET
-				n++
-			} else if inet_pton(AF_INET6, cur, AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
-				AllowedClients[n].GetSa().sa_family = AF_INET6
-				n++
-			} else {
-				FcgiLog(FCGI_ERROR, "Wrong IP address '%s' in listen.allowed_clients", cur)
-			}
-			cur = end
-		}
-		AllowedClients[n].GetSa().sa_family = 0
-		zend.Free(ip)
-		if n == 0 {
-			FcgiLog(FCGI_ERROR, "There are no allowed addresses")
-		}
-	}
-}
 func FcgiHookDummy() { return }
 func FcgiInitRequest(listen_socket int, on_accept func(), on_read func(), on_close func()) *FcgiRequest {
 	var req *FcgiRequest = calloc(1, b.SizeOf("fcgi_request"))
@@ -729,7 +685,6 @@ func FcgiClose(req *FcgiRequest, force int, destroy int) {
 		req.GetHook().GetOnClose()()
 	}
 }
-func FcgiIsClosed(req *FcgiRequest) int { return req.GetFd() < 0 }
 func FcgiIsAllowed() int {
 	var i int
 	if ClientSa.GetSa().sa_family == AF_UNIX {
@@ -952,17 +907,6 @@ func FcgiGetenv(req *FcgiRequest, var_ *byte, var_len int) *byte {
 func FcgiQuickGetenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint) *byte {
 	var val_len uint
 	return FcgiHashGet(req.GetEnv(), hash_value, (*byte)(var_), var_len, &val_len)
-}
-func FcgiPutenv(req *FcgiRequest, var_ *byte, var_len int, val *byte) *byte {
-	if req == nil {
-		return nil
-	}
-	if val == nil {
-		FcgiHashDel(req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len)
-		return nil
-	} else {
-		return FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len, val, uint(strlen(val)))
-	}
 }
 func FcgiQuickPutenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint, val *byte) *byte {
 	if val == nil {
