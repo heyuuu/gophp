@@ -20,26 +20,9 @@ func PhpPollfdFor(fd PhpSocketT, events int, timeouttv *__struct__timeval) int {
 	}
 	return n
 }
-func PhpPollfdForMs(fd PhpSocketT, events int, timeout int) int {
-	var p PhpPollfd
-	var n int
-	p.fd = fd
-	p.events = events
-	p.revents = 0
-	n = PhpPoll2(&p, 1, timeout)
-	if n > 0 {
-		return p.revents
-	}
-	return n
-}
 func PHP_SAFE_FD_SET(fd PhpSocketT, set *fd_set) {
 	if fd < FD_SETSIZE {
 		FD_SET(fd, set)
-	}
-}
-func PHP_SAFE_FD_CLR(fd PhpSocketT, set fd_set) {
-	if fd < FD_SETSIZE {
-		FD_CLR(fd, set)
 	}
 }
 func PHP_SAFE_FD_ISSET(fd PhpSocketT, set *fd_set) bool {
@@ -51,21 +34,9 @@ func PHP_SAFE_MAX_FD(m PhpSocketT, n int) {
 		m = FD_SETSIZE - 1
 	}
 }
-func PhpConnectNonb(sock PhpSocketT, addr *__struct__sockaddr, addrlen socklen_t, timeout *__struct__timeval) int {
-	return PhpNetworkConnectSocket(sock, addr, addrlen, 0, timeout, nil, nil)
-}
 func PhpStreamSockOpenFromSocket(socket PhpSocketT, persistent int) *PhpStream {
 	return _phpStreamSockOpenFromSocket(socket, persistent)
 }
 func PhpStreamSockOpenHost(host *byte, port uint16, socktype int, timeout int, persistent int) *PhpStream {
 	return _phpStreamSockOpenHost(host, port, socktype, timeout, persistent)
-}
-func PhpStreamSockOpenFromSocketRel(socket PhpSocketT, persistent *byte) *PhpStream {
-	return _phpStreamSockOpenFromSocket(socket, persistent)
-}
-func PhpStreamSockOpenHostRel(host *byte, port uint16, socktype int, timeout *__struct__timeval, persistent *byte) *PhpStream {
-	return _phpStreamSockOpenHost(host, port, socktype, timeout, persistent)
-}
-func PhpStreamSockOpenUnixRel(path __auto__, pathlen __auto__, persistent __auto__, timeval __auto__) __auto__ {
-	return _php_stream_sock_open_unix(path, pathlen, persistent, timeval)
 }

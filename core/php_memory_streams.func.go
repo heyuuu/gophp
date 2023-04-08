@@ -24,6 +24,3 @@ func PhpStreamTempCreateEx(mode int, max_memory_usage int, tmpdir *byte) *PhpStr
 func PhpStreamTempCreateRel(mode int, max_memory_usage int) *PhpStream {
 	return _phpStreamTempCreate(mode, max_memory_usage)
 }
-func PhpStreamTempOpen(mode int, max_memory_usage int, buf *byte, length int) *PhpStream {
-	return _phpStreamTempOpen(mode, max_memory_usage, buf, length)
-}

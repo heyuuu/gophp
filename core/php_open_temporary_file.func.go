@@ -1,7 +1,6 @@
 package core
 
 import (
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -125,16 +124,4 @@ func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **types.String, fl
 }
 func PhpOpenTemporaryFd(dir *byte, pfx string, opened_path_p **types.String) int {
 	return PhpOpenTemporaryFdEx(dir, pfx, opened_path_p, PHP_TMP_FILE_DEFAULT)
-}
-func PhpOpenTemporaryFile(dir *byte, pfx *byte, opened_path_p **types.String) *r.FILE {
-	var fp *r.FILE
-	var fd int = PhpOpenTemporaryFd(dir, pfx, opened_path_p)
-	if fd == -1 {
-		return nil
-	}
-	fp = fdopen(fd, "r+b")
-	if fp == nil {
-		close(fd)
-	}
-	return fp
 }

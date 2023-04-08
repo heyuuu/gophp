@@ -2,27 +2,22 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"os"
 )
 
 func PhpOutputInitGlobals(G *ZendOutputGlobals) { memset(G, 0, b.SizeOf("* G")) }
-func PhpOutputStdout(str *byte, str_len int) int {
-	r.Fwrite(str, 1, str_len, stdout)
-	return str_len
+func PhpOutputStdout(str string) int {
+	os.Stdout.WriteString(str)
+	return len(str)
 }
-func PhpOutputStderr(str *byte, str_len int) int {
-	r.Fwrite(str, 1, str_len, stderr)
-
-	/* See http://support.microsoft.com/kb/190351 */
-
-	return str_len
-
-	/* See http://support.microsoft.com/kb/190351 */
+func PhpOutputStderr(str string) int {
+	os.Stderr.WriteString(str)
+	return len(str)
 }
 func PhpOutputHeader() {
 	if !(SG__().headers_sent) {
@@ -90,25 +85,23 @@ func PhpOutputRegisterConstants() {
 func PhpOutputSetStatus(status int) {
 	OG__().flags = OG__().flags & ^0xf | status&0xf
 }
-func PhpOutputWriteUnbuffered(str *byte, len_ int) int {
+func PhpOutputWriteUnbuffered(str string) int {
 	if (OG__().flags & PHP_OUTPUT_ACTIVATED) != 0 {
-		s := b.CastStr(str, len_)
-		return SM__().UbWrite(s)
+		return SM__().UbWrite(str)
 	}
-	return PhpOutputDirect(str, len_)
+	return PhpOutputDirect(str)
 }
 func PhpOutputWrite(str string) int {
-	ptr := b.CastStrPtr(str)
-	len_ := len(str)
-
 	if (OG__().flags & PHP_OUTPUT_ACTIVATED) != 0 {
+		ptr := b.CastStrPtr(str)
+		len_ := len(str)
 		PhpOutputOp(PHP_OUTPUT_HANDLER_WRITE, ptr, len_)
-		return len_
+		return len(str)
 	}
 	if (OG__().flags & PHP_OUTPUT_DISABLED) != 0 {
 		return 0
 	}
-	return PhpOutputDirect(str, len_)
+	return PhpOutputDirect(str)
 }
 func PhpOutputFlush() int {
 	var context PhpOutputContext

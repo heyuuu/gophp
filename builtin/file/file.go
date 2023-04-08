@@ -28,5 +28,4 @@ var Getc func(*FILE) int
 var Perror func(*byte)
 var Printf func(*byte, ...any) int
 var Rename func(__old *byte, __new *byte) int
-var Rewind func(*FILE)
 var Setvbuf func(*FILE, *byte, int, int) int

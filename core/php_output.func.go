@@ -12,7 +12,7 @@ func PHPWRITE(str *byte, str_len int) int { return PhpOutputWrite(str, str_len) 
 func PHPWRITE_H(str *byte, str_len int) int {
 	return PhpOutputWriteUnbuffered(str, str_len)
 }
-func PUTC(c __auto__) int { return PhpOutputWrite((*byte)(&c), 1) }
+func PUTC(c byte) int { return PhpOutputWrite(&c, 1) }
 func PUTS(str string) {
 	var __str *byte = str
 	PhpOutputWrite(__str, strlen(__str))

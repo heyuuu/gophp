@@ -16,15 +16,6 @@ type PhpOutputBuffer struct {
 	_reserved uint32
 }
 
-// func MakePhpOutputBuffer(data *byte, size int, used int, free uint32, _reserved uint32) PhpOutputBuffer {
-//     return PhpOutputBuffer{
-//         data:data,
-//         size:size,
-//         used:used,
-//         free:free,
-//         _reserved:_reserved,
-//     }
-// }
 func (this *PhpOutputBuffer) GetData() *byte       { return this.data }
 func (this *PhpOutputBuffer) SetData(value *byte)  { this.data = value }
 func (this *PhpOutputBuffer) GetSize() int         { return this.size }
@@ -33,9 +24,6 @@ func (this *PhpOutputBuffer) GetUsed() int         { return this.used }
 func (this *PhpOutputBuffer) SetUsed(value int)    { this.used = value }
 func (this *PhpOutputBuffer) GetFree() uint32      { return this.free }
 func (this *PhpOutputBuffer) SetFree(value uint32) { this.free = value }
-
-// func (this *PhpOutputBuffer)  GetReserved() uint32      { return this._reserved }
-// func (this *PhpOutputBuffer) SetReserved(value uint32) { this._reserved = value }
 
 /**
  * PhpOutputContext
@@ -60,22 +48,9 @@ type PhpOutputHandlerUserFuncT struct {
 	zoh types.Zval
 }
 
-// func MakePhpOutputHandlerUserFuncT(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, zoh zend.Zval) PhpOutputHandlerUserFuncT {
-//     return PhpOutputHandlerUserFuncT{
-//         fci:fci,
-//         fcc:fcc,
-//         zoh:zoh,
-//     }
-// }
-func (this *PhpOutputHandlerUserFuncT) GetFci() types.ZendFcallInfo { return this.fci }
-
-// func (this *PhpOutputHandlerUserFuncT) SetFci(value zend.ZendFcallInfo) { this.fci = value }
+func (this *PhpOutputHandlerUserFuncT) GetFci() types.ZendFcallInfo      { return this.fci }
 func (this *PhpOutputHandlerUserFuncT) GetFcc() types.ZendFcallInfoCache { return this.fcc }
-
-// func (this *PhpOutputHandlerUserFuncT) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }
-func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval { return this.zoh }
-
-// func (this *PhpOutputHandlerUserFuncT) SetZoh(value zend.Zval) { this.zoh = value }
+func (this *PhpOutputHandlerUserFuncT) GetZoh() types.Zval               { return this.zoh }
 
 /**
  * PhpOutputHandler

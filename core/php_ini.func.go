@@ -98,8 +98,6 @@ func ConfigZvalDtor(zvalue *types.Zval) {
 	if zvalue.IsType(types.IS_ARRAY) {
 		zvalue.GetArr().Destroy()
 		zend.Free(zvalue.GetArr())
-	} else if zvalue.IsType(types.IS_STRING) {
-		// types.ZendStringReleaseEx(zvalue.GetStr(), 1)
 	}
 }
 func RESET_ACTIVE_INI_HASH() {
@@ -683,23 +681,5 @@ func CfgGetLong(varname string, result *zend.ZendLong) int {
 		return types.FAILURE
 	}
 	*result = zend.ZvalGetLong(tmp)
-	return types.SUCCESS
-}
-func CfgGetDouble(varname *byte, result *float64) int {
-	var tmp *types.Zval
-	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
-		*result = float64(0)
-		return types.FAILURE
-	}
-	*result = zend.ZvalGetDouble(tmp)
-	return types.SUCCESS
-}
-func CfgGetString(varname *byte, result **byte) int {
-	var tmp *types.Zval
-	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
-		*result = nil
-		return types.FAILURE
-	}
-	*result = tmp.GetStr().GetVal()
 	return types.SUCCESS
 }
