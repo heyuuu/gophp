@@ -304,13 +304,12 @@ func ZendInitDynamicCallString(function *types.String, num_args uint32) *ZendExe
 		} else {
 			lcname = ZendStringTolower(function)
 		}
-		if b.Assign(&func_, EG__().GetFunctionTable().KeyFind(lcname.GetStr())) == nil {
+
+		fbc = EG__().FunctionTable().Get(lcname.GetStr())
+		if fbc == nil {
 			faults.ThrowError(nil, "Call to undefined function %s()", function.GetVal())
-			// types.ZendStringReleaseEx(lcname, 0)
 			return nil
 		}
-		// types.ZendStringReleaseEx(lcname, 0)
-		fbc = func_.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}

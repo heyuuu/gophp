@@ -202,7 +202,6 @@ type ZendExecutorGlobals struct {
 	included_files                      types.Array
 	error_reporting                     int
 	exit_status                         int
-	function_table                      *types.Array
 	functionTable                       FunctionTable
 	classTable                          ClassTable
 	zend_constants                      *types.Array
@@ -278,7 +277,6 @@ func (this *ZendExecutorGlobals) HtIterators() []types.HashTableIterator {
 func (this *ZendExecutorGlobals) ClassTable() ClassTable     { return this.classTable }
 func (this *ZendExecutorGlobals) SetClassTable(t ClassTable) { this.classTable = t }
 
-func (this *ZendExecutorGlobals) GetFunctionTable() *types.Array   { return this.function_table }
 func (this *ZendExecutorGlobals) FunctionTable() FunctionTable     { return this.functionTable }
 func (this *ZendExecutorGlobals) SetFunctionTable(t FunctionTable) { this.functionTable = t }
 

@@ -1,22 +1,24 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var func_name *types.Zval
-	var func_ *types.Zval
 	var fbc types.IFunction
 	var call *ZendExecuteData
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {
 		func_name = (*types.Zval)(opline.Const2())
-		func_ = EG__().GetFunctionTable().KeyFind((func_name + 1).GetStr().GetStr())
-		if func_ == nil {
-			func_ = EG__().GetFunctionTable().KeyFind((func_name + 2).GetStr().GetStr())
-			if func_ == nil {
+		var func_name_1 *types.Zval = func_name + 1
+		fbc = EG__().FunctionTable().Get(func_name_1.GetStrVal())
+		if fbc == nil {
+			var func_name_2 *types.Zval = func_name + 2
+			fbc = EG__().FunctionTable().Get(func_name_2.GetStrVal())
+			if fbc == nil {
 				return zend_undefined_function_helper_SPEC(executeData)
 			}
 		}
-		fbc = func_.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}

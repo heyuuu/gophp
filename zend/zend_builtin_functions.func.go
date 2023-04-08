@@ -939,8 +939,7 @@ func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *t
 	} else {
 		lcname = ZendStringTolower(name)
 	}
-	func_ = types.ZendHashFindPtr(EG__().GetFunctionTable(), lcname.GetStr())
-	// types.ZendStringReleaseEx(lcname, 0)
+	func_ = EG__().FunctionTable().Get(lcname.GetStr())
 
 	/*
 	 * A bit of a hack, but not a bad one: we see if the handler of the function
@@ -1145,8 +1144,6 @@ func ZifGetDeclaredInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
 func ZifGetDefinedFunctions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, excludeDisabled *types.Zval) {
 	var internal types.Zval
 	var user types.Zval
-	var key *types.String
-	var func_ types.IFunction
 	var exclude_disabled = 0
 	if ZendParseParameters(executeData.NumArgs(), "|b", &exclude_disabled) == types.FAILURE {
 		return
@@ -1154,20 +1151,17 @@ func ZifGetDefinedFunctions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	ArrayInit(&internal)
 	ArrayInit(&user)
 	ArrayInit(return_value)
-	var __ht = EG__().GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
 
-		key = _p.GetKey()
-		func_ = _z.GetPtr()
-		if key != nil && key.GetVal()[0] != 0 {
+	EG__().FunctionTable().Foreach(func(key string, func_ types.IFunction) {
+		if key != "" {
 			if func_.GetType() == ZEND_INTERNAL_FUNCTION && (exclude_disabled == 0 || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction) {
-				AddNextIndexStr(&internal, key.Copy())
+				AddNextIndexStrEx(&internal, key)
 			} else if func_.GetType() == ZEND_USER_FUNCTION {
-				AddNextIndexStr(&user, key.Copy())
+				AddNextIndexStrEx(&user, key)
 			}
 		}
-	}
+	})
+
 	return_value.GetArr().KeyAddNew("internal", &internal)
 	return_value.GetArr().KeyAddNew("user", &user)
 }
@@ -1214,31 +1208,34 @@ func ZifCreateFunction(executeData zpp.Ex, return_value zpp.Ret, args *types.Zva
 	if retval == types.SUCCESS {
 		var func_ *types.ZendOpArray
 		var static_variables *types.Array
-		func_ = types.ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
-		if func_ == nil {
+
+		ifunc_ := EG__().FunctionTable().Get(LAMBDA_TEMP_FUNCNAME)
+		if ifunc_ == nil {
 			faults.ErrorNoreturn(faults.E_CORE_ERROR, "Unexpected inconsistency in create_function()")
 			return_value.SetFalse()
 			return
 		}
+		func_ = ifunc_.GetOpArray()
+
 		if func_.GetRefcount() != nil {
 			func_.refcount++
 		}
 		static_variables = func_.GetStaticVariables()
 		func_.SetStaticVariables(nil)
-		types.ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
+		EG__().FunctionTable().Del(LAMBDA_TEMP_FUNCNAME)
 		func_.SetStaticVariables(static_variables)
 		function_name = types.ZendStringAlloc(b.SizeOf("\"0lambda_\"")+MAX_LENGTH_OF_LONG, 0)
 		function_name.GetVal()[0] = '0'
 		for {
 			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(EG__().GetLambdaCount()))) + 1)
-			if types.ZendHashAddPtr(EG__().GetFunctionTable(), function_name.GetStr(), func_) != nil {
+			if EG__().FunctionTable().Add(function_name.GetStr(), func_) {
 				break
 			}
 		}
 		return_value.SetString(function_name)
 		return
 	} else {
-		types.ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME)
+		EG__().FunctionTable().Del(LAMBDA_TEMP_FUNCNAME)
 		return_value.SetFalse()
 		return
 	}

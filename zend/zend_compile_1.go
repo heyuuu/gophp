@@ -122,10 +122,7 @@ func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, comp
 		oldFunction = CG__().FunctionTable().Get(lcname.GetStr())
 	} else {
 		errorLevel = faults.E_ERROR
-		zv := EG__().GetFunctionTable().KeyFind(lcname.GetStr())
-		if zv != nil {
-			oldFunction = zv.GetPtr()
-		}
+		oldFunction = EG__().FunctionTable().Get(lcname.GetStr())
 	}
 
 	b.Assert(oldFunction != nil)
@@ -138,22 +135,23 @@ func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, comp
 func DoBindFunction(lcname *types.Zval) int {
 	var function types.IFunction
 	var rtd_key *types.Zval
-	var zv *types.Zval
 	rtd_key = lcname + 1
-	zv = EG__().GetFunctionTable().KeyFind(rtd_key.GetStr().GetStr())
-	if zv == nil {
+	function = EG__().FunctionTable().Get(rtd_key.GetStr().GetStr())
+	if function == nil {
 		DoBindFunctionError(lcname.GetStr(), nil, 0)
 		return types.FAILURE
 	}
-	function = (types.IFunction)(zv.GetPtr())
-	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
-		zv = EG__().GetFunctionTable().KeyAdd(lcname.GetStr().GetStr(), zv)
-	} else {
-		zv = types.ZendHashSetBucketKey(EG__().GetFunctionTable(), (*types.Bucket)(zv), lcname.GetStr().GetStr())
-	}
-	if zv == nil {
+
+	if EG__().FunctionTable().Exists(lcname.GetStrVal()) {
 		DoBindFunctionError(lcname.GetStr(), function.GetOpArray(), 0)
 		return types.FAILURE
+	}
+
+	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
+		EG__().FunctionTable().Add(lcname.GetStrVal(), function)
+	} else {
+		EG__().FunctionTable().Del(rtd_key.GetStrVal())
+		EG__().FunctionTable().Add(lcname.GetStrVal(), function)
 	}
 	return types.SUCCESS
 }

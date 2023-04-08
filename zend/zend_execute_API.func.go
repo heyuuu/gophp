@@ -25,14 +25,6 @@ func CleanNonPersistentConstantFull(zv *types.Zval) int {
 		return types.ArrayApplyRemove
 	}
 }
-func CleanNonPersistentFunctionFull(zv *types.Zval) int {
-	var function types.IFunction = zv.GetPtr()
-	if function.GetType() == ZEND_INTERNAL_FUNCTION {
-		return types.ArrayApplyKeep
-	} else {
-		return types.ArrayApplyRemove
-	}
-}
 func InitExecutor() {
 	ZendInitFpu()
 	EG__().GetUninitializedZval().SetNull()
@@ -73,7 +65,7 @@ func InitExecutor() {
 	memset(EG__().GetHtIterators(), 0, b.SizeOf("EG ( ht_iterators_slots )"))
 	EG__().SetEachDeprecationThrown(0)
 	EG__().SetPersistentConstantsCount(EG__().GetZendConstants().GetNNumUsed())
-	EG__().SetPersistentFunctionsCount(EG__().GetFunctionTable().GetNNumUsed())
+	EG__().SetPersistentFunctionsCount(uint32(EG__().FunctionTable().Len()))
 	EG__().SetPersistentClassesCount(uint32(EG__().ClassTable().Len()))
 	ZendWeakrefsInit()
 	EG__().SetActive(1)
@@ -144,26 +136,22 @@ func ShutdownExecutor() {
 
 		/* Release static properties and static variables prior to the final GC run,
 		 * as they may hold GC roots. */
-
-		var __ht *types.Array = EG__().GetFunctionTable()
-		for _, _p := range __ht.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
-
-			zv = _z
-			var op_array *types.ZendOpArray = zv.GetPtr()
-			if op_array.GetType() == ZEND_INTERNAL_FUNCTION {
-				break
+		EG__().FunctionTable().ForeachReserve(func(_ string, f types.IFunction) {
+			if f.GetType() == ZEND_INTERNAL_FUNCTION {
+				return
 			}
-			if op_array.GetStaticVariables() != nil {
-				var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+
+			opArray := f.GetOpArray()
+			if opArray.GetStaticVariables() != nil {
+				var ht *types.Array = ZEND_MAP_PTR_GET(opArray.static_variables_ptr)
 				if ht != nil {
 					if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 						ht.DestroyEx()
 					}
-					ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
+					ZEND_MAP_PTR_SET(opArray.static_variables_ptr, nil)
 				}
 			}
-		}
+		})
 
 		EG__().ClassTable().ForeachReserve(func(_ string, ce *types.ClassEntry) {
 			if ce.GetDefaultStaticMembersCount() != 0 {
@@ -221,7 +209,9 @@ func ShutdownExecutor() {
 		 */
 
 		EG__().GetZendConstants().Discard(EG__().GetPersistentConstantsCount())
-		EG__().GetFunctionTable().Discard(EG__().GetPersistentFunctionsCount())
+		EG__().FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
+			return f.GetType() == ZEND_INTERNAL_FUNCTION
+		})
 		EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
 			return ce.GetType() == ZEND_INTERNAL_CLASS
 		})
@@ -230,7 +220,9 @@ func ShutdownExecutor() {
 		ZendVmStackDestroy()
 		if EG__().GetFullTablesCleanup() != 0 {
 			types.ZendHashReverseApply(EG__().GetZendConstants(), CleanNonPersistentConstantFull)
-			types.ZendHashReverseApply(EG__().GetFunctionTable(), CleanNonPersistentFunctionFull)
+			EG__().FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
+				return f.GetType() == ZEND_INTERNAL_FUNCTION
+			})
 			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
 				return ce.GetType() == ZEND_INTERNAL_CLASS
 			})
@@ -268,34 +260,15 @@ func ShutdownExecutor() {
 				}
 			}
 			__ht.SetNNumUsed(_idx)
-			var __ht__1 *types.Array = EG__().GetFunctionTable()
-			for _, _p := range __ht__1.ForeachDataReserve() {
-				var _z types.Zval = _p.GetVal()
 
-				key = _p.GetKey()
-				zv = _z
-				var func_ types.IFunction = zv.GetPtr()
-				if _idx == EG__().GetPersistentFunctionsCount() {
-					break
+			EG__().FunctionTable().FilterReserve(func(key string, f types.IFunction) bool {
+				if f.GetType() == ZEND_INTERNAL_FUNCTION {
+					return true
 				}
-				DestroyOpArray(func_.GetOpArray())
-				// types.ZendStringReleaseEx(key, 0)
-				__ht__1.Len()--
-				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
-				var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
-				var i uint32 = types.HT_HASH(__ht__1, nIndex)
-				if j != i {
-					var prev *types.Bucket = __ht__1.Bucket(i)
-					for prev.GetVal().GetNext() != j {
-						i = prev.GetVal().GetNext()
-						prev = __ht__1.Bucket(i)
-					}
-					prev.GetVal().GetNext() = _p.GetVal().GetNext()
-				} else {
-					types.HT_HASH(__ht__1, nIndex) = _p.GetVal().GetNext()
-				}
-			}
-			__ht__1.SetNNumUsed(_idx)
+
+				DestroyOpArray(f.GetOpArray())
+				return false
+			})
 
 			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
 				if ce.GetType() == ZEND_INTERNAL_CLASS {

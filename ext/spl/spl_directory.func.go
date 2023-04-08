@@ -2064,7 +2064,7 @@ func zim_spl_SplFileObject_getCsvControl(executeData *zend.ZendExecuteData, retu
 func zim_spl_SplFileObject_flock(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var func_ptr types.IFunction
-	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "flock"))
+	func_ptr = zend.EG__().FunctionTable().Get("flock")
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "flock")
 		return
@@ -2148,7 +2148,7 @@ func zim_spl_SplFileObject_fgetss(executeData *zend.ZendExecuteData, return_valu
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
 	var func_ptr types.IFunction
-	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fgetss"))
+	func_ptr = zend.EG__().FunctionTable().Get("fgetss")
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fgetss")
 		return
@@ -2173,7 +2173,7 @@ func zim_spl_SplFileObject_fscanf(executeData *zend.ZendExecuteData, return_valu
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
 	var func_ptr types.IFunction
-	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fscanf"))
+	func_ptr = zend.EG__().FunctionTable().Get("fscanf")
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fscanf")
 		return
@@ -2245,7 +2245,7 @@ func zim_spl_SplFileObject_fread(executeData *zend.ZendExecuteData, return_value
 func zim_spl_SplFileObject_fstat(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS(executeData))
 	var func_ptr types.IFunction
-	func_ptr = (types.IFunction)(types.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fstat"))
+	func_ptr = zend.EG__().FunctionTable().Get("fstat")
 	if func_ptr == nil {
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fstat")
 		return

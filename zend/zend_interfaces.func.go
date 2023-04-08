@@ -96,7 +96,7 @@ func ZendCallMethod(
 
 				}
 			} else {
-				fcic.SetFunctionHandler(ZendFetchFunctionStr(function_name, function_name_len))
+				fcic.SetFunctionHandler(ZendFetchFunctionStr(b.CastStr(function_name, function_name_len)))
 				if fcic.GetFunctionHandler() == nil {
 
 					/* error at c-level */

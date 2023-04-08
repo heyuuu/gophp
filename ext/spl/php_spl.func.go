@@ -643,7 +643,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if zend.EG__().GetAutoloadFunc() == nil {
-		if b.Assign(&fptr, types.ZendHashFindPtr(zend.EG__().GetFunctionTable(), types.ZSTR_MAGIC_AUTOLOAD.GetStr())) {
+		if fptr := zend.EG__().FunctionTable().Get(types.ZSTR_MAGIC_AUTOLOAD.GetStr()); fptr != nil {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
 			tmp.SetStringCopy(types.ZSTR_MAGIC_AUTOLOAD)

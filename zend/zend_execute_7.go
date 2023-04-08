@@ -299,31 +299,17 @@ func InitFuncRunTimeCacheI(op_array *types.ZendOpArray) {
 }
 func InitFuncRunTimeCache(op_array *types.ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *types.String) types.IFunction {
-	var zv *types.Zval = EG__().GetFunctionTable().KeyFind(name.GetStr())
-	if zv != nil {
-		var fbc types.IFunction = zv.GetFunc()
+	return ZendFetchFunctionStr(name.GetStr())
+}
+func ZendFetchFunctionStr(name string) types.IFunction {
+	var fbc types.IFunction = EG__().FunctionTable().Get(name)
+	if fbc != nil {
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCacheI(fbc.GetOpArray())
 		}
 		return fbc
 	}
 	return nil
-}
-func ZendFetchFunctionStr(name string, len_ int) types.IFunction {
-	var zv *types.Zval = EG__().GetFunctionTable().KeyFind(b.CastStr(name, len_))
-	if zv != nil {
-		var fbc types.IFunction = zv.GetFunc()
-		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
-			InitFuncRunTimeCacheI(fbc.GetOpArray())
-		}
-		return fbc
-	}
-	return nil
-}
-func ZendInitFuncRunTimeCache(op_array *types.ZendOpArray) {
-	if !(RUN_TIME_CACHE(op_array)) {
-		InitFuncRunTimeCacheI(op_array)
-	}
 }
 func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
 	b.Assert(executeData.GetFunc() == (types.IFunction)(op_array))
