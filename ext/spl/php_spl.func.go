@@ -883,8 +883,8 @@ func ZmStartupSpl(type_ int, module_number int) int {
 	ZmStartupSplHeap(type_, module_number)
 	ZmStartupSplFixedarray(type_, module_number)
 	ZmStartupSplObserver(type_, module_number)
-	SplAutoloadFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload")
-	SplAutoloadCallFn = types.ZendHashStrFindPtr(zend.CG__().GetFunctionTable(), "spl_autoload_call")
+	SplAutoloadFn = zend.CG__().FunctionTable().Get("spl_autoload")
+	SplAutoloadCallFn = zend.CG__().FunctionTable().Get("spl_autoload_call")
 	b.Assert(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
 	return types.SUCCESS
 }

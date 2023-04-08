@@ -349,7 +349,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	}
 	ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_FUNCTION)
 	if toplevel != 0 {
-		if types.ZendHashAddPtr(CG__().GetFunctionTable(), lcname.GetStr(), op_array) == nil {
+		if !CG__().FunctionTable().Add(lcname.GetStr(), op_array) {
 			DoBindFunctionError(lcname, op_array, 1)
 		}
 		// types.ZendStringReleaseEx(lcname, 0)
@@ -362,7 +362,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	for {
 		ZendTmpStringRelease(key)
 		key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
-		if types.ZendHashAddPtr(CG__().GetFunctionTable(), key.GetStr(), op_array) {
+		if CG__().FunctionTable().Add(key.GetStr(), op_array) {
 			break
 		}
 	}

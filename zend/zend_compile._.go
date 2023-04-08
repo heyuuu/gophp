@@ -206,14 +206,11 @@ type BinaryOpType func(*types.Zval, *types.Zval, *types.Zval) int
 
 /* parser-driven code generators */
 
-var ZendDoExtendedInfo func()
-
 const INITIAL_OP_ARRAY_SIZE = 64
 
 /* helper functions in zend_language_scanner.l */
 
 const ZEND_FUNCTION_DTOR types.DtorFuncT = ZendFunctionDtor
-const ZEND_CLASS_DTOR types.DtorFuncT = DestroyZendClass
 
 type ZendNeedsLiveRangeCb func(op_array *types.ZendOpArray, opline *ZendOp) types.ZendBool
 type ZendAutoGlobalCallback func(name *types.String) types.ZendBool

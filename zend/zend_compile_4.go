@@ -135,8 +135,8 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var fbc types.IFunction
 	var opline *ZendOp
 	lcname = ZendStringTolower(name.GetStr())
-	fbc = types.ZendHashFindPtr(CG__().GetFunctionTable(), lcname.GetStr())
 
+	fbc = CG__().FunctionTable().Get(lcname.GetStr())
 	if fbc != nil && types.ZendStringEqualsLiteral(lcname, "assert") {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
 		// types.ZendStringRelease(lcname)
@@ -197,8 +197,8 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
 		fbc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetFunctionTable(), lcname.GetStr(
 
-		/* We only know the exact method that is being called if it is either private or final.
-		 * Otherwise an overriding method in a child class may be called. */))
+			/* We only know the exact method that is being called if it is either private or final.
+			 * Otherwise an overriding method in a child class may be called. */))
 
 		if fbc != nil && !fbc.HasFnFlags(AccPrivate|AccFinal) {
 			fbc = nil

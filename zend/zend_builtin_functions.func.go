@@ -1889,7 +1889,6 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 	var extension_name *types.String
 	var array int
 	var module *ModuleEntry
-	var zif types.IFunction
 	if ZendParseParameters(executeData.NumArgs(), "S", &extension_name) == types.FAILURE {
 		return
 	}
@@ -1912,19 +1911,15 @@ func ZifGetExtensionFuncs(executeData zpp.Ex, return_value zpp.Ret, extensionNam
 	} else {
 		array = 0
 	}
-	var __ht = CG__().GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		zif = _z.GetPtr()
-		if zif.GetType() == ZEND_INTERNAL_FUNCTION && zif.GetInternalFunction().GetModule() == module {
+	CG__().FunctionTable().Foreach(func(_ string, f types.IFunction) {
+		if f.GetType() == ZEND_INTERNAL_FUNCTION && f.GetInternalFunction().GetModule() == module {
 			if array == 0 {
 				ArrayInit(return_value)
 				array = 1
 			}
-			AddNextIndexStr(return_value, zif.GetFunctionName().Copy())
+			AddNextIndexStr(return_value, f.GetFunctionName().Copy())
 		}
-	}
+	})
 	if array == 0 {
 		return_value.SetFalse()
 		return

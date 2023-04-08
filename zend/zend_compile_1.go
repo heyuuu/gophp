@@ -115,15 +115,24 @@ func FunctionAddRef(function types.IFunction) {
 	}
 }
 func DoBindFunctionError(lcname *types.String, op_array *types.ZendOpArray, compile_time types.ZendBool) {
-	var zv = b.CondF(compile_time != 0, func() *types.Array { return CG__().GetFunctionTable() }, func() *types.Array { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
-	var error_level = b.Cond(compile_time != 0, faults.E_COMPILE_ERROR, faults.E_ERROR)
-	var old_function types.IFunction
-	b.Assert(zv != nil)
-	old_function = (types.IFunction)(zv.GetPtr())
-	if old_function.GetType() == ZEND_USER_FUNCTION && old_function.GetOpArray().GetLast() > 0 {
-		faults.ErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
+	var oldFunction types.IFunction
+	var errorLevel int
+	if compile_time != 0 {
+		errorLevel = faults.E_COMPILE_ERROR
+		oldFunction = CG__().FunctionTable().Get(lcname.GetStr())
 	} else {
-		faults.ErrorNoreturn(error_level, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }))
+		errorLevel = faults.E_ERROR
+		zv := EG__().GetFunctionTable().KeyFind(lcname.GetStr())
+		if zv != nil {
+			oldFunction = zv.GetPtr()
+		}
+	}
+
+	b.Assert(oldFunction != nil)
+	if oldFunction.GetType() == ZEND_USER_FUNCTION && oldFunction.GetOpArray().GetLast() > 0 {
+		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return oldFunction.GetFunctionName().GetVal() }), oldFunction.GetOpArray().GetFilename().GetVal(), oldFunction.GetOpArray().GetOpcodes()[0].GetLineno())
+	} else {
+		faults.ErrorNoreturn(errorLevel, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return oldFunction.GetFunctionName().GetVal() }))
 	}
 }
 func DoBindFunction(lcname *types.Zval) int {

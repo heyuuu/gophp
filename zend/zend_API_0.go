@@ -83,10 +83,22 @@ func AddPropertyZval(arg *types.Zval, key string, __value *types.Zval) int {
 	return AddPropertyZvalEx(arg, key, __value)
 }
 func CallUserFunction(object *types.Zval, function_name *types.Zval, retval_ptr *types.Zval, param_count uint32, params []types.Zval) int {
-	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)
+	return CallUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)
 }
 func CallUserFunctionEx(object *types.Zval, function_name *types.Zval, retval_ptr *types.Zval, param_count uint32, params []types.Zval, no_separation int) int {
-	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, no_separation)
+	var fci types.ZendFcallInfo
+	fci.SetSize(b.SizeOf("fci"))
+	if object != nil {
+		fci.SetObject(object.GetObj())
+	} else {
+		fci.SetObject(nil)
+	}
+	types.ZVAL_COPY_VALUE(fci.GetFunctionName(), function_name)
+	fci.SetRetval(retval_ptr)
+	fci.SetParamCount(param_count)
+	fci.SetParams(params)
+	fci.SetNoSeparation(types.ZendBool(no_separation))
+	return ZendCallFunction(&fci, nil)
 }
 func ZendForbidDynamicCall(func_name string) int {
 	var ex *ZendExecuteData = CurrEX()

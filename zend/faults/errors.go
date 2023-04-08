@@ -149,7 +149,7 @@ func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format st
 			}
 			orig_fake_scope = zend.EG__().GetFakeScope()
 			zend.EG__().SetFakeScope(nil)
-			if zend.CallUserFunction(zend.CG__().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == types.SUCCESS {
+			if zend.CallUserFunction(nil, &orig_user_error_handler, &retval, 5, params) == types.SUCCESS {
 				if retval.IsNotUndef() {
 					if retval.IsFalse() {
 						zend.ZendErrorCb(type_, error_filename, error_lineno, format, args)

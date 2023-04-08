@@ -12,7 +12,7 @@ type ZendOpArray struct {
 	last_var                  int
 	T                         uint32
 	last                      uint32
-	opcodes                   *zend.ZendOp
+	opcodes                   []zend.ZendOp
 	run_time_cache__ptr       **any
 	static_variables_ptr__ptr **Array
 	static_variables          *Array
@@ -50,8 +50,8 @@ func (f *ZendOpArray) GetT() uint32                                { return f.T 
 func (f *ZendOpArray) SetT(value uint32)                           { f.T = value }
 func (f *ZendOpArray) GetLast() uint32                             { return f.last }
 func (f *ZendOpArray) SetLast(value uint32)                        { f.last = value }
-func (f *ZendOpArray) GetOpcodes() *zend.ZendOp                    { return f.opcodes }
-func (f *ZendOpArray) SetOpcodes(value *zend.ZendOp)               { f.opcodes = value }
+func (f *ZendOpArray) GetOpcodes() []zend.ZendOp                   { return f.opcodes }
+func (f *ZendOpArray) SetOpcodes(value []zend.ZendOp)              { f.opcodes = value }
 func (f *ZendOpArray) GetRunTimeCachePtr() **any                   { return f.run_time_cache__ptr }
 func (f *ZendOpArray) GetStaticVariables() *Array                  { return f.static_variables }
 func (f *ZendOpArray) SetStaticVariables(value *Array)             { f.static_variables = value }

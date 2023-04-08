@@ -6,7 +6,8 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-type ClassTable = *internal.LcTable[types.ClassEntry]
+type ClassTable = *internal.LcTable[*types.ClassEntry]
+type FunctionTable = *internal.LcTable[types.IFunction]
 
 /**
  * ZendCompilerGlobals
@@ -18,6 +19,7 @@ type ZendCompilerGlobals struct {
 	zend_lineno        int
 	active_op_array    *types.ZendOpArray
 	function_table     *types.Array
+	functionTable      FunctionTable
 	classTable         ClassTable
 	filenamesTable     map[string]string //filenames_table              HashTable
 
@@ -70,6 +72,8 @@ func (this *ZendCompilerGlobals) ClassTable() ClassTable {
 	return this.classTable
 }
 
+func (this *ZendCompilerGlobals) FunctionTable() FunctionTable { return this.functionTable }
+
 // getter/setter
 func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
 func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
@@ -90,10 +94,6 @@ func (this *ZendCompilerGlobals) SetZendLineno(value int)              { this.ze
 func (this *ZendCompilerGlobals) GetActiveOpArray() *types.ZendOpArray { return this.active_op_array }
 func (this *ZendCompilerGlobals) SetActiveOpArray(value *types.ZendOpArray) {
 	this.active_op_array = value
-}
-func (this *ZendCompilerGlobals) GetFunctionTable() *types.Array { return this.function_table }
-func (this *ZendCompilerGlobals) SetFunctionTable(value *types.Array) {
-	this.function_table = value
 }
 func (this *ZendCompilerGlobals) GetAutoGlobals() *types.Array          { return this.auto_globals }
 func (this *ZendCompilerGlobals) SetAutoGlobals(value *types.Array)     { this.auto_globals = value }
@@ -203,7 +203,8 @@ type ZendExecutorGlobals struct {
 	error_reporting                     int
 	exit_status                         int
 	function_table                      *types.Array
-	classTable                          *internal.LcTable[types.ClassEntry]
+	functionTable                       FunctionTable
+	classTable                          ClassTable
 	zend_constants                      *types.Array
 	vm_stack_top                        *types.Zval
 	vm_stack_end                        *types.Zval
@@ -277,6 +278,10 @@ func (this *ZendExecutorGlobals) HtIterators() []types.HashTableIterator {
 func (this *ZendExecutorGlobals) ClassTable() ClassTable     { return this.classTable }
 func (this *ZendExecutorGlobals) SetClassTable(t ClassTable) { this.classTable = t }
 
+func (this *ZendExecutorGlobals) GetFunctionTable() *types.Array   { return this.function_table }
+func (this *ZendExecutorGlobals) FunctionTable() FunctionTable     { return this.functionTable }
+func (this *ZendExecutorGlobals) SetFunctionTable(t FunctionTable) { this.functionTable = t }
+
 /**
  * 以下是自动生成的方法
  */
@@ -311,11 +316,7 @@ func (this *ZendExecutorGlobals) GetErrorReporting() int             { return th
 func (this *ZendExecutorGlobals) SetErrorReporting(value int)        { this.error_reporting = value }
 func (this *ZendExecutorGlobals) GetExitStatus() int                 { return this.exit_status }
 func (this *ZendExecutorGlobals) SetExitStatus(value int)            { this.exit_status = value }
-func (this *ZendExecutorGlobals) GetFunctionTable() *types.Array     { return this.function_table }
-func (this *ZendExecutorGlobals) SetFunctionTable(value *types.Array) {
-	this.function_table = value
-}
-func (this *ZendExecutorGlobals) GetZendConstants() *types.Array { return this.zend_constants }
+func (this *ZendExecutorGlobals) GetZendConstants() *types.Array     { return this.zend_constants }
 func (this *ZendExecutorGlobals) SetZendConstants(value *types.Array) {
 	this.zend_constants = value
 }

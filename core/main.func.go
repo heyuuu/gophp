@@ -164,7 +164,7 @@ func PhpDisableFunctions() {
 		case ',':
 			if s != nil {
 				*e = '0'
-				zend.ZendDisableFunction(s, e-s)
+				zend.ZendDisableFunction(b.CastStr(s, e-s))
 				s = nil
 			}
 		default:
@@ -175,7 +175,7 @@ func PhpDisableFunctions() {
 		e++
 	}
 	if s != nil {
-		zend.ZendDisableFunction(s, e-s)
+		zend.ZendDisableFunction(b.CastStr(s, e-s))
 	}
 }
 func PhpDisableClasses() {

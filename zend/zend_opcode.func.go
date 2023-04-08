@@ -49,11 +49,6 @@ func InitOpArray(op_array *types.ZendOpArray, initial_ops_size int) {
 		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayCtorHandler), op_array)
 	}
 }
-func DestroyZendFunction(function types.IFunction) {
-	var tmp types.Zval
-	tmp.SetAsPtr(function)
-	ZendFunctionDtor(&tmp)
-}
 func ZendFreeInternalArgInfo(function *types.InternalFunction) {
 	if function.HasFnFlags(AccHasReturnType|AccHasTypeHints) && function.GetArgInfo() != nil {
 		var i uint32

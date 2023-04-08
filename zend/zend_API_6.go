@@ -5,13 +5,12 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
-	"strings"
 )
 
-func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functionTable *types.Array) {
+func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functionTable FunctionTable) {
 	targetFunctionTable := functionTable
 	if targetFunctionTable == nil {
-		targetFunctionTable = CG__().GetFunctionTable()
+		targetFunctionTable = CG__().FunctionTable()
 	}
 
 	for i, ptr := range functions {
@@ -19,8 +18,7 @@ func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functio
 		if count == -1 || i >= count {
 			break
 		}
-		lcName := strings.ToLower(ptr.FuncName())
-		functionTable.KeyDelete(lcName)
+		functionTable.Del(ptr.FuncName())
 	}
 }
 
@@ -150,9 +148,10 @@ func ZendRegisterClassAliasEx(name string, ce *types.ClassEntry, persistent int)
 func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *types.Zval) {
 	faults.Error(faults.E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
-func ZendDisableFunction(function_name *byte, function_name_length int) int {
-	var func_ *types.InternalFunction
-	if b.Assign(&func_, types.ZendHashStrFindPtr(CG__().GetFunctionTable(), b.CastStr(function_name, function_name_length))) {
+func ZendDisableFunction(functionName string) int {
+	f := CG__().FunctionTable().Get(functionName)
+	if f != nil {
+		func_ := f.(*types.InternalFunction)
 		ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(AccVariadic | AccHasTypeHints | AccHasReturnType)
 		func_.SetNumArgs(0)

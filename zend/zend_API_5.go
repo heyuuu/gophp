@@ -123,11 +123,11 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFuncti
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, function_table *types.Array, type_ int) int {
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, function_table FunctionTable, type_ int) int {
 	var ptr *types.FunctionEntry = functions
 	var count int = 0
 	var unload int = 0
-	var target_function_table *types.Array = function_table
+	var target_function_table FunctionTable = function_table
 	var error_type int
 	var ctor types.IFunction = nil
 	var dtor types.IFunction = nil
@@ -152,7 +152,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 		error_type = faults.E_WARNING
 	}
 	if target_function_table == nil {
-		target_function_table = CG__().GetFunctionTable()
+		target_function_table = CG__().FunctionTable()
 	}
 	var reg_function types.IFunction
 

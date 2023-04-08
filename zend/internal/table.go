@@ -1,7 +1,6 @@
 package internal
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"sort"
 )
@@ -15,25 +14,25 @@ import (
  */
 type LcTable[T any] struct {
 	keys       []string
-	m          map[string]*T
-	destructor func(*T)
+	m          map[string]T
+	destructor func(T)
 }
 
-func NewLcTable[T any](destructor func(*T)) *LcTable[T] {
+func NewLcTable[T any](destructor func(T)) *LcTable[T] {
 	return &LcTable[T]{
 		keys:       nil,
-		m:          make(map[string]*T),
+		m:          make(map[string]T),
 		destructor: destructor,
 	}
 }
 
 func (t *LcTable[T]) realKey(key string) string { return ascii.StrToLower(key) }
 
-func (t *LcTable[T]) Clean()                 { t.keys, t.m = nil, make(map[string]*T) }
+func (t *LcTable[T]) Clean()                 { t.keys, t.m = nil, make(map[string]T) }
 func (t *LcTable[T]) Len() int               { return len(t.m) }
-func (t *LcTable[T]) Get(key string) *T      { return t.m[t.realKey(key)] }
+func (t *LcTable[T]) Get(key string) T       { return t.m[t.realKey(key)] }
 func (t *LcTable[T]) Exists(key string) bool { return t.m[t.realKey(key)] != nil }
-func (t *LcTable[T]) Add(key string, val *T) bool {
+func (t *LcTable[T]) Add(key string, val T) bool {
 	if val == nil {
 		panic("LcTable.Add(key, val) 方法参数 val 不可为 nil")
 	}
@@ -47,14 +46,13 @@ func (t *LcTable[T]) Add(key string, val *T) bool {
 		return true
 	}
 }
-func (t *LcTable[T]) Update(key string, val *T) {
+func (t *LcTable[T]) Update(key string, val T) {
 	if val == nil {
 		panic("LcTable.Add(key, val) 方法参数 val 不可为 nil")
 	}
 
 	key = t.realKey(key)
 	if oldVal, ok := t.m[key]; ok {
-		b.Assert(val != oldVal)
 		if t.destructor != nil {
 			t.destructor(oldVal)
 		}
@@ -79,25 +77,25 @@ func (t *LcTable[T]) Del(key string) {
 		break
 	}
 }
-func (t *LcTable[T]) Values() []*T {
-	var values []*T
+func (t *LcTable[T]) Values() []T {
+	var values []T
 	for _, key := range t.keys {
 		values = append(values, t.m[key])
 	}
 	return values
 }
-func (t *LcTable[T]) Sort(less func(i, j *T) bool) {
+func (t *LcTable[T]) Sort(less func(i, j T) bool) {
 	sort.SliceStable(t.keys, func(i, j int) bool {
 		return less(t.m[t.keys[i]], t.m[t.keys[j]])
 	})
 }
-func (t *LcTable[T]) Foreach(handler func(string, *T)) {
+func (t *LcTable[T]) Foreach(handler func(string, T)) {
 	for _, k := range t.keys {
 		v := t.m[k]
 		handler(k, v)
 	}
 }
-func (t *LcTable[T]) ForeachReserve(handler func(string, *T)) {
+func (t *LcTable[T]) ForeachReserve(handler func(string, T)) {
 	for i := len(t.keys) - 1; i >= 0; i-- {
 		k := t.keys[i]
 		v := t.m[k]
@@ -106,7 +104,7 @@ func (t *LcTable[T]) ForeachReserve(handler func(string, *T)) {
 }
 
 // todo 此方法不是并发安全的，待优化
-func (t *LcTable[T]) Filter(handler func(string, *T) bool) {
+func (t *LcTable[T]) Filter(handler func(string, T) bool) {
 	var newKeys = make([]string, 0, cap(t.keys))
 	for _, k := range t.keys {
 		v := t.m[k]
@@ -120,7 +118,7 @@ func (t *LcTable[T]) Filter(handler func(string, *T) bool) {
 }
 
 // todo 此方法不是并发安全的，待优化
-func (t *LcTable[T]) FilterReserve(handler func(string, *T) bool) {
+func (t *LcTable[T]) FilterReserve(handler func(string, T) bool) {
 	var newKeys = make([]string, 0, cap(t.keys))
 	for i := len(t.keys) - 1; i >= 0; i-- {
 		k := t.keys[i]
@@ -136,7 +134,7 @@ func (t *LcTable[T]) FilterReserve(handler func(string, *T) bool) {
 
 func (t *LcTable[T]) Destroy() {
 	if t.destructor != nil {
-		t.Foreach(func(_ string, v *T) { t.destructor(v) })
+		t.Foreach(func(_ string, v T) { t.destructor(v) })
 	}
 	t.Clean()
 }

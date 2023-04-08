@@ -43,7 +43,7 @@ func InitExecutor() {
 	EG__().SetSymtableCachePtr(EG__().GetSymtableCache())
 	EG__().SetSymtableCacheLimit(EG__().GetSymtableCache() + SYMTABLE_CACHE_SIZE)
 	EG__().SetNoExtensions(0)
-	EG__().SetFunctionTable(CG__().GetFunctionTable())
+	EG__().SetFunctionTable(CG__().FunctionTable())
 	EG__().SetClassTable(CG__().ClassTable())
 	EG__().SetInAutoload(nil)
 	EG__().SetAutoloadFunc(nil)
@@ -430,28 +430,6 @@ func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 		}
 	}
 	return types.SUCCESS
-}
-func _callUserFunctionEx(
-	object *types.Zval,
-	function_name *types.Zval,
-	retval_ptr *types.Zval,
-	param_count uint32,
-	params []types.Zval,
-	no_separation int,
-) int {
-	var fci types.ZendFcallInfo
-	fci.SetSize(b.SizeOf("fci"))
-	if object != nil {
-		fci.SetObject(object.GetObj())
-	} else {
-		fci.SetObject(nil)
-	}
-	types.ZVAL_COPY_VALUE(fci.GetFunctionName(), function_name)
-	fci.SetRetval(retval_ptr)
-	fci.SetParamCount(param_count)
-	fci.SetParams(params)
-	fci.SetNoSeparation(types.ZendBool(no_separation))
-	return ZendCallFunction(&fci, nil)
 }
 func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCache) int {
 	var i uint32
