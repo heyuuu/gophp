@@ -343,24 +343,6 @@ func ZendHashGetCurrentDataPtrEx(ht *Array, pos *ArrayPosition) any {
 func ZendHashGetCurrentDataPtr(ht *Array) any {
 	return ZendHashGetCurrentDataPtrEx(ht, ht.GetNInternalPointer())
 }
-
-func ZendHashCheckSize(nSize uint32) uint32 {
-	/* Use big enough power of 2 */
-
-	if nSize <= HT_MIN_SIZE {
-		return HT_MIN_SIZE
-	} else if nSize >= HT_MAX_SIZE {
-		faults.ErrorNoreturn(faults.E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", nSize, b.SizeOf("Bucket"), b.SizeOf("Bucket"))
-	}
-	nSize -= 1
-	nSize |= nSize >> 1
-	nSize |= nSize >> 2
-	nSize |= nSize >> 4
-	nSize |= nSize >> 8
-	nSize |= nSize >> 16
-	return nSize + 1
-}
-
 func ZendHashRealInitPacked(ht *Array) { /* ignore simplify */ ht.RealInit() }
 func ZendHashRealInitMixed(ht *Array)  { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *Array) {
