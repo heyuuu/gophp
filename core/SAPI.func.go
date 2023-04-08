@@ -351,7 +351,7 @@ func SapiDeactivate() {
 		zend.Efree(SG__().request_info.current_user)
 	}
 	SM__().Deactivate()
-	if SG__().rfc1867_uploaded_files {
+	if SG__().rfc1867_uploaded_files != nil {
 		DestroyUploadedFilesHash()
 	}
 	if SG__().sapi_headers.mimetype {

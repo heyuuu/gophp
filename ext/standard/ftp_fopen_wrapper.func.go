@@ -207,8 +207,8 @@ func PhpFtpFopenConnect(
 			/* if the user has configured who they are,
 			   send that as the password */
 
-			if FG(from_address) {
-				core.PhpStreamPrintf(stream, "PASS %s\r\n", FG(from_address))
+			if FG__().from_address {
+				core.PhpStreamPrintf(stream, "PASS %s\r\n", FG__().from_address)
 			} else {
 				core.PhpStreamWriteString(stream, "PASS anonymous\r\n")
 			}

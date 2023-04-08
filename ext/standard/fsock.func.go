@@ -16,7 +16,7 @@ func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *types.Z
 	var port zend.ZendLong = -1
 	var zerrno *types.Zval = nil
 	var zerrstr *types.Zval = nil
-	var timeout float64 = float64(FG(default_socket_timeout))
+	var timeout float64 = float64(FG__().default_socket_timeout)
 	var conv int64
 	var tv __struct__timeval
 	var hashkey *byte = nil

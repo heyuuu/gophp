@@ -61,7 +61,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 	var zerrno *types.Zval = nil
 	var zerrstr *types.Zval = nil
 	var zcontext *types.Zval = nil
-	var timeout float64 = float64(FG(default_socket_timeout))
+	var timeout float64 = float64(FG__().default_socket_timeout)
 	var conv PhpTimeoutUll
 	var tv __struct__timeval
 	var hashkey *byte = nil
@@ -195,7 +195,7 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 	core.PhpStreamToZval(stream, return_value)
 }
 func ZifStreamSocketAccept(executeData zpp.Ex, return_value zpp.Ret, serverstream *types.Zval, _ zpp.Opt, timeout *types.Zval, peername zpp.RefZval) {
-	var timeout float64 = float64(FG(default_socket_timeout))
+	var timeout float64 = float64(FG__().default_socket_timeout)
 	var zpeername *types.Zval = nil
 	var peername *types.String = nil
 	var conv PhpTimeoutUll
@@ -1102,10 +1102,10 @@ func ZifStreamContextGetDefault(executeData zpp.Ex, return_value zpp.Ret, _ zpp.
 		}
 		break
 	}
-	if FG(default_context) == nil {
-		FG(default_context) = streams.PhpStreamContextAlloc()
+	if FG__().default_context == nil {
+		FG__().default_context = streams.PhpStreamContextAlloc()
 	}
-	context = FG(default_context)
+	context = FG__().default_context
 	if params != nil {
 		ParseContextOptions(context, params)
 	}
@@ -1125,10 +1125,10 @@ func ZifStreamContextSetDefault(executeData zpp.Ex, return_value zpp.Ret, option
 		}
 		break
 	}
-	if FG(default_context) == nil {
-		FG(default_context) = streams.PhpStreamContextAlloc()
+	if FG__().default_context == nil {
+		FG__().default_context = streams.PhpStreamContextAlloc()
 	}
-	context = FG(default_context)
+	context = FG__().default_context
 	ParseContextOptions(context, options)
 	streams.PhpStreamContextToZval(context, return_value)
 }

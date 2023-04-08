@@ -24,12 +24,12 @@ func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
 	return types.ZendHashStrDel(&StreamFiltersHash, filterpattern)
 }
 func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory *PhpStreamFilterFactory) int {
-	if !(standard.FG(stream_filters)) {
-		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
-		standard.FG(stream_filters) = types.MakeArrayEx(StreamFiltersHash.Len()+1, nil, 0)
-		types.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
+	if !(standard.FG__().stream_filters) {
+		zend.ALLOC_HASHTABLE(standard.FG__().stream_filters)
+		standard.FG__().stream_filters = types.MakeArrayEx(StreamFiltersHash.Len()+1, nil, 0)
+		types.ZendHashCopy(standard.FG__().stream_filters, &StreamFiltersHash, nil)
 	}
-	if types.ZendHashAddPtr(standard.FG(stream_filters), filterpattern.GetStr(), any(factory)) {
+	if types.ZendHashAddPtr(standard.FG__().stream_filters, filterpattern.GetStr(), any(factory)) {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -123,7 +123,7 @@ func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
 	bucket.SetNext(bucket.GetPrev())
 }
 func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persistent uint8) *core.PhpStreamFilter {
-	var filter_hash *types.Array = b.CondF1(standard.FG(stream_filters), func() __auto__ { return standard.FG(stream_filters) }, &StreamFiltersHash)
+	var filter_hash *types.Array = b.CondF1(standard.FG__().stream_filters, func() __auto__ { return standard.FG__().stream_filters }, &StreamFiltersHash)
 	var factory *PhpStreamFilterFactory = nil
 	var filter *core.PhpStreamFilter = nil
 	var n int

@@ -12,7 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func FG(v __auto__) __auto__ { return FileGlobals.v }
+func FG__() *PhpFileGlobals { return &FileGlobals }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
 	b.Assert(arg.IsType(types.IS_RESOURCE))
 	core.PhpStreamFromRes(stream, arg.GetRes())
@@ -790,10 +790,10 @@ func ZifPclose(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 		break
 	}
 	PHP_STREAM_TO_ZVAL(stream, res)
-	FG(pclose_wait) = 1
+	FG__().pclose_wait = 1
 	zend.ZendListClose(stream.GetRes())
-	FG(pclose_wait) = 0
-	return_value.SetLong(FG(pclose_ret))
+	FG__().pclose_wait = 0
+	return_value.SetLong(FG__().pclose_ret)
 	return
 }
 func ZifFeof(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {

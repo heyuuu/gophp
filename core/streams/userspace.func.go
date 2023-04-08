@@ -77,11 +77,11 @@ func UserWrapperOpener(
 
 	/* Try to catch bad usage without preventing flexibility */
 
-	if standard.FG(user_stream_current_filename) != nil && strcmp(filename, standard.FG(user_stream_current_filename)) == 0 {
+	if standard.FG__().user_stream_current_filename != nil && strcmp(filename, standard.FG__().user_stream_current_filename) == 0 {
 		PhpStreamWrapperLogError(wrapper, options, "infinite recursion prevented")
 		return nil
 	}
-	standard.FG(user_stream_current_filename) = filename
+	standard.FG__().user_stream_current_filename = filename
 
 	/* if the user stream was registered as local and we are in include context,
 	   we add allow_url_include restrictions to allow_url_fopen ones */
@@ -94,7 +94,7 @@ func UserWrapperOpener(
 	us.SetWrapper(uwrap)
 	UserStreamCreateObject(uwrap, context, us.GetObject())
 	if us.GetObject().IsUndef() {
-		standard.FG(user_stream_current_filename) = nil
+		standard.FG__().user_stream_current_filename = nil
 		core.PG__().in_user_include = old_in_user_include
 		zend.Efree(us)
 		return nil
@@ -111,7 +111,7 @@ func UserWrapperOpener(
 	faults.TryCatch(func() {
 		call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &zfuncname, &zretval, 4, args, 0)
 	}, func() {
-		standard.FG(user_stream_current_filename) = nil
+		standard.FG__().user_stream_current_filename = nil
 		faults.Bailout()
 	})
 
@@ -150,7 +150,7 @@ func UserWrapperOpener(
 	zend.ZvalPtrDtor(&args[2])
 	zend.ZvalPtrDtor(&args[1])
 	zend.ZvalPtrDtor(&args[0])
-	standard.FG(user_stream_current_filename) = nil
+	standard.FG__().user_stream_current_filename = nil
 	core.PG__().in_user_include = old_in_user_include
 	return stream
 }
@@ -172,16 +172,16 @@ func UserWrapperOpendir(
 
 	/* Try to catch bad usage without preventing flexibility */
 
-	if standard.FG(user_stream_current_filename) != nil && strcmp(filename, standard.FG(user_stream_current_filename)) == 0 {
+	if standard.FG__().user_stream_current_filename != nil && strcmp(filename, standard.FG__().user_stream_current_filename) == 0 {
 		PhpStreamWrapperLogError(wrapper, options, "infinite recursion prevented")
 		return nil
 	}
-	standard.FG(user_stream_current_filename) = filename
+	standard.FG__().user_stream_current_filename = filename
 	us = zend.Emalloc(b.SizeOf("* us"))
 	us.SetWrapper(uwrap)
 	UserStreamCreateObject(uwrap, context, us.GetObject())
 	if us.GetObject().IsUndef() {
-		standard.FG(user_stream_current_filename) = nil
+		standard.FG__().user_stream_current_filename = nil
 		zend.Efree(us)
 		return nil
 	}
@@ -219,7 +219,7 @@ func UserWrapperOpendir(
 	zend.ZvalPtrDtor(&zfuncname)
 	zend.ZvalPtrDtor(&args[1])
 	zend.ZvalPtrDtor(&args[0])
-	standard.FG(user_stream_current_filename) = nil
+	standard.FG__().user_stream_current_filename = nil
 	return stream
 }
 

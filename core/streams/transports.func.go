@@ -47,7 +47,7 @@ func _phpStreamXportCreate(
 	var failed int = 0
 	var error_text *types.String = nil
 	var default_timeout __struct__timeval = __struct__timeval{0, 0}
-	default_timeout.tv_sec = standard.FG(default_socket_timeout)
+	default_timeout.tv_sec = standard.FG__().default_socket_timeout
 	if timeout == nil {
 		timeout = &default_timeout
 	}

@@ -130,7 +130,7 @@ func PhpStreamUrlWrapHttpEx(
 		timeout.tv_sec = int64(d)
 		timeout.tv_usec = size_t((d - timeout.tv_sec) * 1000000)
 	} else {
-		timeout.tv_sec = FG(default_socket_timeout)
+		timeout.tv_sec = FG__().default_socket_timeout
 		timeout.tv_usec = 0
 	}
 	stream = streams.PhpStreamXportCreate(transport_string, transport_len, options, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, &timeout, context, &errstr, nil)
@@ -504,9 +504,9 @@ func PhpStreamUrlWrapHttpEx(
 
 	/* if the user has configured who they are, send a From: line */
 
-	if (have_header&HTTP_HEADER_FROM) == 0 && FG(from_address) {
+	if (have_header&HTTP_HEADER_FROM) == 0 && FG__().from_address {
 		req_buf.AppendString("From: ")
-		req_buf.AppendString(b.CastStrAuto(FG(from_address)))
+		req_buf.AppendString(b.CastStrAuto(FG__().from_address))
 		req_buf.AppendString("\r\n")
 	}
 
@@ -534,8 +534,8 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsType(types.IS_STRING) {
 		ua_str = ua_zval.GetStr().GetVal()
-	} else if FG(user_agent) {
-		ua_str = FG(user_agent)
+	} else if FG__().user_agent {
+		ua_str = FG__().user_agent
 	}
 	if (have_header&HTTP_HEADER_USER_AGENT) == 0 && ua_str != nil {
 		const _UA_HEADER = "User-Agent: %s\r\n"

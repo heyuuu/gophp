@@ -9,11 +9,11 @@ import (
 )
 
 func PhpStreamContextFromZval(zcontext *types.Zval, nocontext int) __auto__ {
-	if b.CondF2(b.CondF1(zcontext != nil, func() any { return zend.ZendFetchResourceEx(zcontext, "Stream-Context", standard.PhpLeStreamContext()) }, nocontext), nil, func() __auto__ { return standard.FG(default_context) }) {
-		return standard.FG(default_context)
+	if b.CondF2(b.CondF1(zcontext != nil, func() any { return zend.ZendFetchResourceEx(zcontext, "Stream-Context", standard.PhpLeStreamContext()) }, nocontext), nil, func() __auto__ { return standard.FG__().default_context }) {
+		return standard.FG__().default_context
 	} else {
-		standard.FG(default_context) = PhpStreamContextAlloc()
-		return standard.FG(default_context)
+		standard.FG__().default_context = PhpStreamContextAlloc()
+		return standard.FG__().default_context
 	}
 }
 func PhpStreamContextToZval(context *core.PhpStreamContext, zval *types.Zval) {

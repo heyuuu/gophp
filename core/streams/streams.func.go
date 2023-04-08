@@ -94,16 +94,16 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 		zend.Efree(buffer)
 	} else {
 		var list *zend.ZendLlist = nil
-		if !(standard.FG(wrapper_errors)) {
-			zend.ALLOC_HASHTABLE(standard.FG(wrapper_errors))
-			standard.FG(wrapper_errors) = types.MakeArrayEx(8, WrapperListDtor, 0)
+		if !(standard.FG__().wrapper_errors) {
+			zend.ALLOC_HASHTABLE(standard.FG__().wrapper_errors)
+			standard.FG__().wrapper_errors = types.MakeArrayEx(8, WrapperListDtor, 0)
 		} else {
-			list = types.ZendHashStrFindPtr(standard.FG(wrapper_errors), b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
+			list = types.ZendHashStrFindPtr(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
 		}
 		if list == nil {
 			var new_list zend.ZendLlist
 			new_list.Init(b.SizeOf("buffer"), WrapperErrorDtor, 0)
-			list = types.ZendHashStrUpdateMem(standard.FG(wrapper_errors), b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")), &new_list, b.SizeOf("new_list"))
+			list = types.ZendHashStrUpdateMem(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")), &new_list, b.SizeOf("new_list"))
 		}
 
 		/* append to linked list */
@@ -312,31 +312,31 @@ func PhpUnregisterUrlStreamWrapper(protocol string) int {
 	return types.ZendHashStrDel(&UrlStreamWrappersHash, protocol)
 }
 func CloneWrapperHash() {
-	zend.ALLOC_HASHTABLE(standard.FG(stream_wrappers))
-	standard.FG(stream_wrappers) = types.MakeArrayEx(UrlStreamWrappersHash.Len(), nil, 0)
-	types.ZendHashCopy(standard.FG(stream_wrappers), &UrlStreamWrappersHash, nil)
+	zend.ALLOC_HASHTABLE(standard.FG__().stream_wrappers)
+	standard.FG__().stream_wrappers = types.MakeArrayEx(UrlStreamWrappersHash.Len(), nil, 0)
+	types.ZendHashCopy(standard.FG__().stream_wrappers, &UrlStreamWrappersHash, nil)
 }
 func PhpRegisterUrlStreamWrapperVolatile(protocol *types.String, wrapper *core.PhpStreamWrapper) int {
 	if PhpStreamWrapperSchemeValidate(protocol.GetVal(), protocol.GetLen()) == types.FAILURE {
 		return types.FAILURE
 	}
-	if !(standard.FG(stream_wrappers)) {
+	if !(standard.FG__().stream_wrappers) {
 		CloneWrapperHash()
 	}
-	if types.ZendHashAddPtr(standard.FG(stream_wrappers), protocol.GetStr(), wrapper) {
+	if types.ZendHashAddPtr(standard.FG__().stream_wrappers, protocol.GetStr(), wrapper) {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
 	}
 }
 func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.String) int {
-	if !(standard.FG(stream_wrappers)) {
+	if !(standard.FG__().stream_wrappers) {
 		CloneWrapperHash()
 	}
-	return types.ZendHashDel(standard.FG(stream_wrappers), protocol.GetStr())
+	return types.ZendHashDel(standard.FG__().stream_wrappers, protocol.GetStr())
 }
 func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *core.PhpStreamWrapper {
-	var wrapper_hash *types.Array = b.CondF1(standard.FG(stream_wrappers), func() __auto__ { return standard.FG(stream_wrappers) }, &UrlStreamWrappersHash)
+	var wrapper_hash *types.Array = b.CondF1(standard.FG__().stream_wrappers, func() __auto__ { return standard.FG__().stream_wrappers }, &UrlStreamWrappersHash)
 	var wrapper *core.PhpStreamWrapper = nil
 	var p *byte
 	var protocol *byte = nil
@@ -406,7 +406,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 		if (options & core.STREAM_LOCATE_WRAPPERS_ONLY) != 0 {
 			return nil
 		}
-		if standard.FG(stream_wrappers) {
+		if standard.FG__().stream_wrappers {
 
 			/* The file:// wrapper may have been disabled/overridden */
 

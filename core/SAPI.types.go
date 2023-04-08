@@ -85,7 +85,7 @@ type SapiGlobals struct {
 	global_stat              zend.ZendStatT
 	default_mimetype         *byte
 	default_charset          *byte
-	rfc1867_uploaded_files   *types.Array
+	rfc1867_uploaded_files   map[string]bool
 	post_max_size            zend.ZendLong
 	options                  int
 	sapi_started             types.ZendBool

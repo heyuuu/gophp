@@ -233,15 +233,15 @@ func ZmActivateBasic(type_ int, module_number int) int {
 
 	/* Setup default context */
 
-	FG(default_context) = nil
+	FG__().default_context = nil
 
 	/* Default to global wrappers only */
 
-	FG(stream_wrappers) = nil
+	FG__().stream_wrappers = nil
 
 	/* Default to global filters only */
 
-	FG(stream_filters) = nil
+	FG__().stream_filters = nil
 	return types.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
@@ -268,7 +268,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 		}
 	}
 
-	/* FG(stream_wrappers) and FG(stream_filters) are destroyed
+	/* FG__().stream_wrappers and FG__().stream_filters are destroyed
 	 * during php_request_shutdown() */
 
 	ZmDeactivateFilestat(type_, module_number)

@@ -13,7 +13,6 @@ func PhpSysReadlink(link *byte, target *byte, target_len int) __auto__ {
 	return readlink(link, target, target_len)
 }
 func CWDG(v __auto__) __auto__                                   { return CwdGlobals.v }
-func VCWD_CREAT(path __auto__, mode __auto__) __auto__           { return creat(path, mode) }
 func VCWD_FOPEN(path *byte, mode string) *r.FILE                 { return r.Fopen(path, mode) }
 func VCWD_OPEN(path *byte, flags __auto__) __auto__              { return open(path, flags) }
 func VCWD_OPEN_MODE(path __auto__, flags int, mode int) __auto__ { return open(path, flags, mode) }
@@ -26,7 +25,6 @@ func VCWD_ACCESS(pathname *byte, mode __auto__) __auto__         { return access
 func VCWD_GETCWD(buff []byte, size int) __auto__                 { return getcwd(buff, size) }
 func VCWD_CHMOD(path *byte, mode mode_t) __auto__                { return chmod(path, mode) }
 func VCWD_CHDIR_FILE(path *byte) int                             { return VirtualChdirFile(path, chdir) }
-func VCWD_GETWD(buf __auto__) __auto__                           { return getwd(buf) }
 func VCWD_STAT(path __auto__, buff *ZendStatT) __auto__          { return PhpSysStat(path, buff) }
 func VCWD_LSTAT(path *byte, buff *ZendStatT) __auto__            { return lstat(path, buff) }
 func VCWD_OPENDIR(pathname *byte) __auto__                       { return opendir(pathname) }
@@ -50,21 +48,6 @@ func CWD_STATE_COPY(d __auto__, s *CwdState) {
 func CWD_STATE_FREE(s *CwdState) {
 	Efree(s.GetCwd())
 	s.SetCwdLength(0)
-}
-func CWD_STATE_FREE_ERR(state *CwdState) { CWD_STATE_FREE(state) }
-func PhpIsDirOk(state *CwdState) int {
-	var buf ZendStatT
-	if PhpSysStat(state.GetCwd(), &buf) == 0 && S_ISDIR(buf.st_mode) {
-		return 0
-	}
-	return 1
-}
-func PhpIsFileOk(state *CwdState) int {
-	var buf ZendStatT
-	if PhpSysStat(state.GetCwd(), &buf) == 0 && S_ISREG(buf.st_mode) {
-		return 0
-	}
-	return 1
 }
 func CwdGlobalsCtor(cwd_g *VirtualCwdGlobals) {
 	CWD_STATE_COPY(cwd_g.GetCwd(), &MainCwdState)
@@ -122,43 +105,6 @@ func VirtualCwdDeactivate() int {
 		CWDG(cwd).cwd = nil
 	}
 	return 0
-}
-func VirtualGetcwdEx(length *int) *byte {
-	var state *CwdState
-	state = &(CWDG(cwd))
-	if state.GetCwdLength() == 0 {
-		var retval *byte
-		*length = 1
-		retval = (*byte)(Emalloc(2))
-		retval[0] = DEFAULT_SLASH
-		retval[1] = '0'
-		return retval
-	}
-	if state.GetCwd() == nil {
-		*length = 0
-		return nil
-	}
-	*length = state.GetCwdLength()
-	return Estrdup(state.GetCwd())
-}
-func VirtualGetcwd(buf *byte, size int) *byte {
-	var length int
-	var cwd *byte
-	cwd = VirtualGetcwdEx(&length)
-	if buf == nil {
-		return cwd
-	}
-	if length > size-1 {
-		Efree(cwd)
-		errno = ERANGE
-		return nil
-	}
-	if cwd == nil {
-		return nil
-	}
-	memcpy(buf, cwd, length+1)
-	Efree(cwd)
-	return buf
 }
 func RealpathCacheKey(path *byte, path_len int) ZendUlong {
 	var h ZendUlong
@@ -259,9 +205,6 @@ func RealpathCacheFind(path *byte, path_len int, t int64) *RealpathCacheBucket {
 		}
 	}
 	return nil
-}
-func RealpathCacheLookup(path *byte, path_len int, t int64) *RealpathCacheBucket {
-	return RealpathCacheFind(path, path_len, t)
 }
 func RealpathCacheSize() ZendLong { return CWDG(RealpathCacheSize) }
 func RealpathCacheMaxBuckets() ZendLong {
@@ -574,13 +517,6 @@ func VirtualFileEx(state *CwdState, path *byte, verify_path VerifyPathFunc, use_
 	}
 	return ret
 }
-func VirtualChdir(path *byte) int {
-	if VirtualFileEx(&(CWDG(cwd)), path, PhpIsDirOk, CWD_REALPATH) != 0 {
-		return -1
-	} else {
-		return 0
-	}
-}
 func VirtualChdirFile(path *byte, p_chdir func(path *byte) int) int {
 	var length int = strlen(path)
 	var temp *byte
@@ -606,298 +542,6 @@ func VirtualChdirFile(path *byte, p_chdir func(path *byte) int) int {
 	temp[length] = 0
 	retval = p_chdir(temp)
 	FreeAlloca(temp, use_heap)
-	return retval
-}
-func VirtualRealpath(path *byte, real_path *byte) *byte {
-	var new_state CwdState
-	var retval *byte
-	var cwd []byte
-
-	/* realpath("") returns CWD */
-
-	if !(*path) {
-		new_state.SetCwd((*byte)(Emalloc(1)))
-		new_state.GetCwd()[0] = '0'
-		new_state.SetCwdLength(0)
-		if VCWD_GETCWD(cwd, MAXPATHLEN) {
-			path = cwd
-		}
-	} else if !(IS_ABSOLUTE_PATH(path, strlen(path))) {
-		CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	} else {
-		new_state.SetCwd((*byte)(Emalloc(1)))
-		new_state.GetCwd()[0] = '0'
-		new_state.SetCwdLength(0)
-	}
-	if VirtualFileEx(&new_state, path, nil, CWD_REALPATH) == 0 {
-		var len_ int = b.CondF2(new_state.GetCwdLength() > MAXPATHLEN-1, MAXPATHLEN-1, func() int { return new_state.GetCwdLength() })
-		memcpy(real_path, new_state.GetCwd(), len_)
-		real_path[len_] = '0'
-		retval = real_path
-	} else {
-		retval = nil
-	}
-	CWD_STATE_FREE(&new_state)
-	return retval
-}
-func VirtualFilepathEx(path *byte, filepath **byte, verify_path VerifyPathFunc) int {
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	retval = VirtualFileEx(&new_state, path, verify_path, CWD_FILEPATH)
-	*filepath = new_state.GetCwd()
-	return retval
-}
-func VirtualFilepath(path *byte, filepath **byte) int {
-	return VirtualFilepathEx(path, filepath, PhpIsFileOk)
-}
-func VirtualFopen(path *byte, mode *byte) *r.FILE {
-	var new_state CwdState
-	var f *r.FILE
-	if path[0] == '0' {
-		return nil
-	}
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, path, nil, CWD_EXPAND) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return nil
-	}
-	f = r.Fopen(new_state.GetCwd(), mode)
-	CWD_STATE_FREE_ERR(&new_state)
-	return f
-}
-func VirtualAccess(pathname *byte, mode int) int {
-	var new_state CwdState
-	var ret int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, pathname, nil, CWD_REALPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	ret = access(new_state.GetCwd(), mode)
-	CWD_STATE_FREE_ERR(&new_state)
-	return ret
-}
-func VirtualUtime(filename *byte, buf *__struct__utimbuf) int {
-	var new_state CwdState
-	var ret int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, filename, nil, CWD_REALPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	ret = utime(new_state.GetCwd(), buf)
-	CWD_STATE_FREE_ERR(&new_state)
-	return ret
-}
-func VirtualChmod(filename *byte, mode mode_t) int {
-	var new_state CwdState
-	var ret int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, filename, nil, CWD_REALPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	ret = chmod(new_state.GetCwd(), mode)
-	CWD_STATE_FREE_ERR(&new_state)
-	return ret
-}
-func VirtualChown(filename *byte, owner uid_t, group gid_t, link int) int {
-	var new_state CwdState
-	var ret int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, filename, nil, CWD_REALPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	if link != 0 {
-		ret = lchown(new_state.GetCwd(), owner, group)
-	} else {
-		ret = chown(new_state.GetCwd(), owner, group)
-	}
-	CWD_STATE_FREE_ERR(&new_state)
-	return ret
-}
-func VirtualOpen(path *byte, flags int, _ ...any) int {
-	var new_state CwdState
-	var f int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, path, nil, CWD_FILEPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	if (flags & O_CREAT) != 0 {
-		var mode mode_t
-		var arg va_list
-		va_start(arg, flags)
-		mode = mode_t(__va_arg(arg, int(_)))
-		va_end(arg)
-		f = open(new_state.GetCwd(), flags, mode)
-	} else {
-		f = open(new_state.GetCwd(), flags)
-	}
-	CWD_STATE_FREE_ERR(&new_state)
-	return f
-}
-func VirtualCreat(path *byte, mode mode_t) int {
-	var new_state CwdState
-	var f int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, path, nil, CWD_FILEPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	f = creat(new_state.GetCwd(), mode)
-	CWD_STATE_FREE_ERR(&new_state)
-	return f
-}
-func VirtualRename(oldname *byte, newname *byte) int {
-	var old_state CwdState
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&old_state, &(CWDG(cwd)))
-	if VirtualFileEx(&old_state, oldname, nil, CWD_EXPAND) != 0 {
-		CWD_STATE_FREE_ERR(&old_state)
-		return -1
-	}
-	oldname = old_state.GetCwd()
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, newname, nil, CWD_EXPAND) != 0 {
-		CWD_STATE_FREE_ERR(&old_state)
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	newname = new_state.GetCwd()
-
-	/* rename on windows will fail if newname already exists.
-	   MoveFileEx has to be used */
-
-	retval = r.Rename(oldname, newname)
-	CWD_STATE_FREE_ERR(&old_state)
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualStat(path *byte, buf *ZendStatT) int {
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, path, nil, CWD_REALPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	retval = PhpSysStat(new_state.GetCwd(), buf)
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualLstat(path *byte, buf *ZendStatT) int {
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, path, nil, CWD_EXPAND) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	retval = PhpSysLstat(new_state.GetCwd(), buf)
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualUnlink(path *byte) int {
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, path, nil, CWD_EXPAND) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	retval = unlink(new_state.GetCwd())
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualMkdir(pathname *byte, mode mode_t) int {
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, pathname, nil, CWD_FILEPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	retval = mkdir(new_state.GetCwd(), mode)
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualRmdir(pathname *byte) int {
-	var new_state CwdState
-	var retval int
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, pathname, nil, CWD_EXPAND) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return -1
-	}
-	retval = rmdir(new_state.GetCwd())
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualOpendir(pathname *byte) *DIR {
-	var new_state CwdState
-	var retval *DIR
-	CWD_STATE_COPY(&new_state, &(CWDG(cwd)))
-	if VirtualFileEx(&new_state, pathname, nil, CWD_REALPATH) != 0 {
-		CWD_STATE_FREE_ERR(&new_state)
-		return nil
-	}
-	retval = opendir(new_state.GetCwd())
-	CWD_STATE_FREE_ERR(&new_state)
-	return retval
-}
-func VirtualPopen(command *byte, type_ *byte) *r.FILE {
-	var command_length int
-	var dir_length int
-	var extra int = 0
-	var command_line *byte
-	var ptr *byte
-	var dir *byte
-	var retval *r.FILE
-	command_length = strlen(command)
-	dir_length = CWDG(cwd).cwd_length
-	dir = CWDG(cwd).cwd
-	for dir_length > 0 {
-		if (*dir) == '\'' {
-			extra += 3
-		}
-		dir++
-		dir_length--
-	}
-	dir_length = CWDG(cwd).cwd_length
-	dir = CWDG(cwd).cwd
-	command_line = (*byte)(Emalloc(command_length + b.SizeOf("\"cd '' ; \"") + dir_length + extra + 1 + 1))
-	ptr = command_line
-	memcpy(ptr, "cd ", b.SizeOf("\"cd \"")-1)
-	ptr += b.SizeOf("\"cd \"") - 1
-	if CWDG(cwd).cwd_length == 0 {
-		b.PostInc(&(*ptr)) = DEFAULT_SLASH
-	} else {
-		b.PostInc(&(*ptr)) = '\''
-		for dir_length > 0 {
-			switch *dir {
-			case '\'':
-				b.PostInc(&(*ptr)) = '\''
-				b.PostInc(&(*ptr)) = '\\'
-				b.PostInc(&(*ptr)) = '\''
-				fallthrough
-			default:
-				b.PostInc(&(*ptr)) = *dir
-			}
-			dir++
-			dir_length--
-		}
-		b.PostInc(&(*ptr)) = '\''
-	}
-	b.PostInc(&(*ptr)) = ' '
-	b.PostInc(&(*ptr)) = ';'
-	b.PostInc(&(*ptr)) = ' '
-	memcpy(ptr, command, command_length+1)
-	retval = popen(command_line, type_)
-	Efree(command_line)
 	return retval
 }
 func TsrmRealpath(path *byte, real_path *byte) *byte {

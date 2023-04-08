@@ -652,7 +652,7 @@ func _phpStreamSockOpenFromSocket(socket PhpSocketT, persistent_id *byte) *PhpSt
 	sock = zend.Pemalloc(b.SizeOf("php_netstream_data_t"), b.Cond(persistent_id != nil, 1, 0))
 	memset(sock, 0, b.SizeOf("php_netstream_data_t"))
 	sock.SetIsBlocked(1)
-	sock.GetTimeout().tv_sec = standard.FG(default_socket_timeout)
+	sock.GetTimeout().tv_sec = standard.FG__().default_socket_timeout
 	sock.GetTimeout().tv_usec = 0
 	sock.SetSocket(socket)
 	stream = PhpStreamAllocRel(&PhpStreamGenericSocketOps, sock, persistent_id, "r+")

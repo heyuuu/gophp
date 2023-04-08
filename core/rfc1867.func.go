@@ -106,22 +106,11 @@ func RegisterHttpPostFilesVariable(strvar *byte, val *byte, http_post_files *typ
 func RegisterHttpPostFilesVariableEx(var_ *byte, val *types.Zval, http_post_files *types.Zval, override_protection types.ZendBool) {
 	SafePhpRegisterVariableEx(var_, val, http_post_files, override_protection)
 }
-func FreeFilename(el *types.Zval) {
-	var filename *types.String = el.GetStr()
-	// types.ZendStringReleaseEx(filename, 0)
-}
 func DestroyUploadedFilesHash() {
-	var el *types.Zval
-	var __ht *types.Array = SG__().rfc1867_uploaded_files
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		el = _z
-		var filename *types.String = el.GetStr()
-		zend.VCWD_UNLINK(filename.GetVal())
+	for filename, _ := range SG__().rfc1867_uploaded_files {
+		zend.VCWD_UNLINK(filename)
 	}
-	SG__().rfc1867_uploaded_files.Destroy()
-	zend.FREE_HASHTABLE(SG__().rfc1867_uploaded_files)
+	SG__().rfc1867_uploaded_files = nil
 }
 func FillBuffer(self *MultipartBuffer) int {
 	var bytes_to_read int
@@ -529,7 +518,6 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	var skip_upload int = 0
 	var anonindex int = 0
 	var is_anonymous int
-	var uploaded_files *types.Array = nil
 	var mbuff *MultipartBuffer
 	var array_ptr *types.Zval = (*types.Zval)(arg)
 	var fd int = -1
@@ -606,9 +594,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	/* Initialize $_FILES[] */
 
 	&(PG__().rfc1867_protected_variables) = types.MakeArrayEx(8, nil, 0)
-	zend.ALLOC_HASHTABLE(uploaded_files)
-	uploaded_files = types.MakeArrayEx(8, FreeFilename, 0)
-	SG__().rfc1867_uploaded_files = uploaded_files
+	SG__().rfc1867_uploaded_files = make(map[string]bool)
 	if PG__().http_globals[TRACK_VARS_FILES].GetType() != types.IS_ARRAY {
 
 		/* php_auto_globals_create_files() might have already done that */
@@ -888,7 +874,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				}
 				temp_filename = nil
 			} else {
-				types.ZendHashAddPtr(SG__().rfc1867_uploaded_files, temp_filename.GetStr(), temp_filename)
+				SG__().rfc1867_uploaded_files[temp_filename.GetStr()] = true
 			}
 
 			/* is_arr_upload is true when name of file upload field

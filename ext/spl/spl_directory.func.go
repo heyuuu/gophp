@@ -184,7 +184,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 	var skip_dots int = SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_SKIPDOTS)
 	intern.SetType(SPL_FS_DIR)
 	intern.SetPathLen(strlen(path))
-	intern.SetDirp(core.PhpStreamOpendir(path, core.REPORT_ERRORS, standard.FG(default_context)))
+	intern.SetDirp(core.PhpStreamOpendir(path, core.REPORT_ERRORS, standard.FG__().default_context))
 	if intern.GetPathLen() > 1 && IS_SLASH_AT(path, intern.GetPathLen()-1) {
 		intern.SetPath(zend.Estrndup(path, b.PreDec(&(intern.GetPathLen()))))
 	} else {

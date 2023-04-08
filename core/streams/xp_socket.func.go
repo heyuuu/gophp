@@ -225,7 +225,7 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		var alive int = 1
 		if value == -1 {
 			if sock.GetTimeout().tv_sec == -1 {
-				tv.tv_sec = standard.FG(default_socket_timeout)
+				tv.tv_sec = standard.FG__().default_socket_timeout
 				tv.tv_usec = 0
 			} else {
 				tv = sock.GetTimeout()
