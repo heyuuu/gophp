@@ -7,7 +7,7 @@ import (
 )
 
 func ZendDoInheritance(ce *types.ClassEntry, parent_ce *types.ClassEntry) {
-	ZendDoInheritanceEx(ce, parent_ce, 0)
+	ZendDoInheritanceEx(ce, parent_ce, false)
 }
 func OverriddenPtrDtor(zv *types.Zval) {
 	EfreeSize(zv.GetPtr(), b.SizeOf("zend_function"))
@@ -1019,7 +1019,7 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 		}
 	}
 }
-func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, checked types.ZendBool) {
+func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, checked bool) {
 	var property_info *ZendPropertyInfo
 	var func_ types.IFunction
 	var key *types.String
@@ -1272,7 +1272,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	}
 	if parent_ce.GetFunctionTable().Len() {
 		ce.GetFunctionTable().Extend(ce.GetFunctionTable().Len() + parent_ce.GetFunctionTable().Len())
-		if checked != 0 {
+		if checked {
 			var __ht *types.Array = parent_ce.GetFunctionTable()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
@@ -2469,18 +2469,11 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 	}
 	return ret
 }
-func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname *types.String, delayed_early_binding *types.Zval) types.ZendBool {
+func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname *types.String) bool {
 	var status InheritanceStatus = ZendCanEarlyBind(ce, parent_ce)
 	if status != INHERITANCE_UNRESOLVED {
-		if delayed_early_binding != nil {
-			if types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(delayed_early_binding), lcname.GetStr()) == nil {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
-				return 0
-			}
-		} else {
-			if !CG__().ClassTable().Add(lcname.GetStr(), ce) {
-				return 0
-			}
+		if !CG__().ClassTable().Add(lcname.GetStr(), ce) {
+			return false
 		}
 		ZendDoInheritanceEx(ce, parent_ce, status == INHERITANCE_SUCCESS)
 		ZendBuildPropertiesInfoTable(ce)
@@ -2489,7 +2482,7 @@ func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname 
 		}
 		b.Assert(!ce.IsUnresolvedVariance())
 		ce.SetIsLinked(true)
-		return 1
+		return true
 	}
-	return 0
+	return false
 }

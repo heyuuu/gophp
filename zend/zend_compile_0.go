@@ -248,22 +248,6 @@ func ZendEndNamespace() {
 		FC__().SetCurrentNamespace(nil)
 	}
 }
-func ZendFileContextBegin(prev_context *ZendFileContext) {
-	*prev_context = CG__().GetFileContext()
-	FC__().SetImports(nil)
-	FC__().SetImportsFunction(nil)
-	FC__().SetImportsConst(nil)
-	FC__().SetCurrentNamespace(nil)
-	FC__().SetInNamespace(0)
-	FC__().SetHasBracketedNamespaces(0)
-	FC__().GetDeclarables().SetTicks(0)
-	&(FC__().GetSeenSymbols()) = types.MakeArrayEx(8, nil, 0)
-}
-func ZendFileContextEnd(prev_context *ZendFileContext) {
-	ZendEndNamespace()
-	FC__().GetSeenSymbols().Destroy()
-	CG__().SetFileContext(*prev_context)
-}
 func ZendInitCompilerDataStructures() {
 	CG__().GetLoopVarStack().Init()
 	CG__().GetDelayedOplinesStack().Init()
@@ -457,12 +441,6 @@ func LITERAL_STR(op ZnodeOp, str *types.String) {
 	_c.SetString(str)
 	op.SetConstant(ZendAddLiteral(&_c))
 }
-func ZendStopLexing() {
-	if INI_SCNG__().on_event {
-		INI_SCNG__().on_event(ON_STOP, END, 0, INI_SCNG__().on_event_context)
-	}
-	INI_SCNG__().SetYyCursor(INI_SCNG__().GetYyLimit())
-}
 func ZendBeginLoop(free_opcode types.ZendUchar, loop_var *Znode, is_switch types.ZendBool) {
 	var brk_cont_element *ZendBrkContElement
 	var parent int = CG__().GetContext().GetCurrentBrkCont()
@@ -551,46 +529,6 @@ func ZendDoFree(op1 *Znode) {
 		 * become invalid. GC would cause such a reference in the root buffer. */
 
 	}
-}
-func ZendAddClassModifier(flags uint32, new_flag uint32) uint32 {
-	var new_flags uint32 = flags | new_flag
-	if (flags&AccExplicitAbstractClass) != 0 && (new_flag&AccExplicitAbstractClass) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
-		return 0
-	}
-	if (flags&AccFinal) != 0 && (new_flag&AccFinal) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
-		return 0
-	}
-	if (new_flags&AccExplicitAbstractClass) != 0 && (new_flags&AccFinal) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Cannot use the final modifier on an abstract class", 0)
-		return 0
-	}
-	return new_flags
-}
-func ZendAddMemberModifier(flags uint32, new_flag uint32) uint32 {
-	var new_flags uint32 = flags | new_flag
-	if (flags&AccPppMask) != 0 && (new_flag&AccPppMask) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Multiple access type modifiers are not allowed", 0)
-		return 0
-	}
-	if (flags&AccAbstract) != 0 && (new_flag&AccAbstract) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Multiple abstract modifiers are not allowed", 0)
-		return 0
-	}
-	if (flags&AccStatic) != 0 && (new_flag&AccStatic) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Multiple static modifiers are not allowed", 0)
-		return 0
-	}
-	if (flags&AccFinal) != 0 && (new_flag&AccFinal) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Multiple final modifiers are not allowed", 0)
-		return 0
-	}
-	if (new_flags&AccAbstract) != 0 && (new_flags&AccFinal) != 0 {
-		faults.ThrowException(faults.ZendCeCompileError, "Cannot use the final modifier on an abstract class member", 0)
-		return 0
-	}
-	return new_flags
 }
 func ZendConcat3(
 	str1 *byte,

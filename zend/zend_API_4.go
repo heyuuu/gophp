@@ -259,6 +259,15 @@ func AddNextIndexDouble(arg *types.Zval, d float64) int {
 		return types.FAILURE
 	}
 }
+func AddNextIndexStrEx(arg *types.Zval, str string) int {
+	var tmp types.Zval
+	tmp.SetStringVal(str)
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+		return types.SUCCESS
+	} else {
+		return types.FAILURE
+	}
+}
 func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 	var tmp types.Zval
 	tmp.SetString(str)

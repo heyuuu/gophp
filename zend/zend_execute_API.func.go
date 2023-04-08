@@ -33,14 +33,6 @@ func CleanNonPersistentFunctionFull(zv *types.Zval) int {
 		return types.ArrayApplyRemove
 	}
 }
-func CleanNonPersistentClassFull(zv *types.Zval) int {
-	var ce *types.ClassEntry = zv.GetPtr()
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		return types.ArrayApplyKeep
-	} else {
-		return types.ArrayApplyRemove
-	}
-}
 func InitExecutor() {
 	ZendInitFpu()
 	EG__().GetUninitializedZval().SetNull()
@@ -82,7 +74,7 @@ func InitExecutor() {
 	EG__().SetEachDeprecationThrown(0)
 	EG__().SetPersistentConstantsCount(EG__().GetZendConstants().GetNNumUsed())
 	EG__().SetPersistentFunctionsCount(EG__().GetFunctionTable().GetNNumUsed())
-	EG__().SetPersistentClassesCount(EG__().GetClassTable().GetNNumUsed())
+	EG__().SetPersistentClassesCount(uint32(EG__().ClassTable().Len()))
 	ZendWeakrefsInit()
 	EG__().SetActive(1)
 }
@@ -172,12 +164,8 @@ func ShutdownExecutor() {
 				}
 			}
 		}
-		var __ht__1 *types.Array = EG__().GetClassTable()
-		for _, _p := range __ht__1.ForeachDataReserve() {
-			var _z types.Zval = _p.GetVal()
 
-			zv = _z
-			var ce *types.ClassEntry = zv.GetPtr()
+		EG__().ClassTable().ForeachReserve(func(_ string, ce *types.ClassEntry) {
 			if ce.GetDefaultStaticMembersCount() != 0 {
 				ZendCleanupInternalClassData(ce)
 			}
@@ -201,7 +189,7 @@ func ShutdownExecutor() {
 					}
 				}
 			}
-		}
+		})
 
 		/* Also release error and exception handlers, which may hold objects. */
 
@@ -234,14 +222,19 @@ func ShutdownExecutor() {
 
 		EG__().GetZendConstants().Discard(EG__().GetPersistentConstantsCount())
 		EG__().GetFunctionTable().Discard(EG__().GetPersistentFunctionsCount())
-		EG__().GetClassTable().Discard(EG__().GetPersistentClassesCount())
+		EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+			return ce.GetType() == ZEND_INTERNAL_CLASS
+		})
 		ZendCleanupInternalClasses()
 	} else {
 		ZendVmStackDestroy()
 		if EG__().GetFullTablesCleanup() != 0 {
 			types.ZendHashReverseApply(EG__().GetZendConstants(), CleanNonPersistentConstantFull)
 			types.ZendHashReverseApply(EG__().GetFunctionTable(), CleanNonPersistentFunctionFull)
-			types.ZendHashReverseApply(EG__().GetClassTable(), CleanNonPersistentClassFull)
+			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+				return ce.GetType() == ZEND_INTERNAL_CLASS
+			})
+
 		} else {
 			var __ht *types.Array = EG__().GetZendConstants()
 			for _, _p := range __ht.ForeachDataReserve() {
@@ -303,33 +296,15 @@ func ShutdownExecutor() {
 				}
 			}
 			__ht__1.SetNNumUsed(_idx)
-			var __ht__2 *types.Array = EG__().GetClassTable()
-			for _, _p := range __ht__2.ForeachDataReserve() {
-				var _z types.Zval = _p.GetVal()
 
-				key = _p.GetKey()
-				zv = _z
-				if _idx == EG__().GetPersistentClassesCount() {
-					break
+			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
+				if ce.GetType() == ZEND_INTERNAL_CLASS {
+					return true
 				}
+
 				DestroyZendClass(zv)
-				// types.ZendStringReleaseEx(key, 0)
-				__ht__2.Len()--
-				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
-				var nIndex uint32 = _p.GetH() | __ht__2.GetNTableMask()
-				var i uint32 = types.HT_HASH(__ht__2, nIndex)
-				if j != i {
-					var prev *types.Bucket = __ht__2.Bucket(i)
-					for prev.GetVal().GetNext() != j {
-						i = prev.GetVal().GetNext()
-						prev = __ht__2.Bucket(i)
-					}
-					prev.GetVal().GetNext() = _p.GetVal().GetNext()
-				} else {
-					types.HT_HASH(__ht__2, nIndex) = _p.GetVal().GetNext()
-				}
-			}
-			__ht__2.SetNNumUsed(_idx)
+				return false
+			})
 		}
 		for EG__().GetSymtableCachePtr() > EG__().GetSymtableCache() {
 			EG__().GetSymtableCachePtr()--
@@ -715,9 +690,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 	return types.SUCCESS
 }
 func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *types.ClassEntry {
-	var ce *types.ClassEntry = nil
 	var args []types.Zval
-	var zv *types.Zval
 	var local_retval types.Zval
 	var lc_name *types.String
 	var fcall_info types.ZendFcallInfo
@@ -736,12 +709,8 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 			lc_name = ZendStringTolower(name)
 		}
 	}
-	zv = EG__().GetClassTable().KeyFind(lc_name.GetStr())
-	if zv != nil {
-		if key == nil {
-			// types.ZendStringReleaseEx(lc_name, 0)
-		}
-		ce = (*types.ClassEntry)(zv.GetPtr())
+
+	if ce := EG__().ClassTable().Get(lc_name.GetStr()); ce != nil {
 		if !ce.IsLinked() {
 			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.IsNearlyLinked() {
 				ce.SetIsHasUnlinkedUses(true)
@@ -809,17 +778,17 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 	orig_fake_scope = EG__().GetFakeScope()
 	EG__().SetFakeScope(nil)
 	faults.ExceptionSave()
+
+	var ce *types.ClassEntry = nil
 	if ZendCallFunction(&fcall_info, &fcall_cache) == types.SUCCESS && EG__().GetException() == nil {
-		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lc_name.GetStr())
+		ce = EG__().ClassTable().Get(lc_name.GetStr())
 	}
+
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
 	ZvalPtrDtor(&args[0])
 	types.ZendHashDel(EG__().GetInAutoload(), lc_name.GetStr())
 	ZvalPtrDtor(&local_retval)
-	if key == nil {
-		// types.ZendStringReleaseEx(lc_name, 0)
-	}
 	return ce
 }
 func ZendLookupClass(name *types.String) *types.ClassEntry {

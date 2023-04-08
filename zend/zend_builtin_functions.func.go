@@ -725,6 +725,9 @@ func SameName(key *types.String, name *types.String) bool {
 	}
 	return key.GetStr() == ascii.StrToLower(name.GetStr())
 }
+func SameNameEx(key string, name string) bool {
+	return key == ascii.StrToLower(name)
+}
 func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Zval) {
 	var klass *types.Zval
 	var method_name types.Zval
@@ -891,8 +894,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		} else {
 			lcname = ZendStringTolower(name)
 		}
-		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr())
-		// types.ZendStringReleaseEx(lcname, 0)
+		ce = EG__().ClassTable().Get(lcname.GetStr())
 	} else {
 		ce = ZendLookupClass(name)
 	}
@@ -1113,29 +1115,23 @@ func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
 	return_value.SetTrue()
 	return
 }
-func CopyClassOrInterfaceName(array *types.Zval, key *types.String, ce *types.ClassEntry) {
-	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameName(key, ce.GetName()) {
-		key = ce.GetName()
+func CopyClassOrInterfaceName(array *types.Zval, key string, ce *types.ClassEntry) {
+	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameNameEx(key, ce.Name()) {
+		key = ce.Name()
 	}
-	AddNextIndexStr(array, key.Copy())
+	AddNextIndexStrEx(array, key)
 }
 func GetDeclaredClassImpl(executeData *ZendExecuteData, return_value *types.Zval, flags int, skip_flags int) {
-	var key *types.String
-	var ce *types.ClassEntry
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
 	ArrayInit(return_value)
-	var __ht = EG__().GetClassTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
 
-		key = _p.GetKey()
-		ce = _z.GetPtr()
-		if key != nil && key.GetVal()[0] != 0 && ce.HasCeFlags(flags) && !ce.HasCeFlags(skip_flags) {
+	EG__().ClassTable().Foreach(func(key string, ce *types.ClassEntry) {
+		if key != "" && ce.HasCeFlags(flags) && !ce.HasCeFlags(skip_flags) {
 			CopyClassOrInterfaceName(return_value, key, ce)
 		}
-	}
+	})
 }
 func ZifGetDeclaredTraits(executeData zpp.Ex, return_value zpp.Ret) {
 	GetDeclaredClassImpl(executeData, return_value, AccTrait, 0)

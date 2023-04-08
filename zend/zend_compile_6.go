@@ -829,7 +829,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			var parent_ce *types.ClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (parent_ce.GetType() != ZEND_INTERNAL_CLASS || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (parent_ce.GetType() != ZEND_USER_CLASS || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
 				CG__().SetZendLineno(decl.GetEndLineno())
-				if ZendTryEarlyBind(ce, parent_ce, lcname, nil) != 0 {
+				if ZendTryEarlyBind(ce, parent_ce, lcname) {
 					CG__().SetZendLineno(ast.GetLineno())
 					// types.ZendStringRelease(lcname)
 					return nil

@@ -203,7 +203,6 @@ type ZendExecutorGlobals struct {
 	error_reporting                     int
 	exit_status                         int
 	function_table                      *types.Array
-	class_table                         *types.Array
 	classTable                          *internal.LcTable[types.ClassEntry]
 	zend_constants                      *types.Array
 	vm_stack_top                        *types.Zval
@@ -316,7 +315,6 @@ func (this *ZendExecutorGlobals) GetFunctionTable() *types.Array     { return th
 func (this *ZendExecutorGlobals) SetFunctionTable(value *types.Array) {
 	this.function_table = value
 }
-func (this *ZendExecutorGlobals) GetClassTable() *types.Array    { return this.class_table }
 func (this *ZendExecutorGlobals) GetZendConstants() *types.Array { return this.zend_constants }
 func (this *ZendExecutorGlobals) SetZendConstants(value *types.Array) {
 	this.zend_constants = value

@@ -149,48 +149,39 @@ func DoBindFunction(lcname *types.Zval) int {
 	return types.SUCCESS
 }
 func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
-	var ce *types.ClassEntry
-	var rtd_key *types.Zval
-	var zv *types.Zval
-	rtd_key = lcname + 1
-	zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
-	if zv == nil {
-		ce = types.ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr().GetStr())
-		if ce != nil {
+	var rtd_key *types.Zval = lcname + 1
+
+	ce := EG__().ClassTable().Get(rtd_key.GetStrVal())
+	if ce == nil {
+		if EG__().ClassTable().Exists(lcname.GetStrVal()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			return types.FAILURE
 		} else {
-			for {
-				b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
-				if ZendPreloadAutoload != nil && ZendPreloadAutoload(CurrEX().GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
-					zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
-					if zv != nil {
-						break
-					}
+			b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
+			if ZendPreloadAutoload != nil && ZendPreloadAutoload(CurrEX().GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
+				ce = EG__().ClassTable().Get(rtd_key.GetStrVal())
+				if ce != nil {
+					goto afterGetCe
 				}
-				faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.GetStr().GetVal())
-				return types.FAILURE
-				break
 			}
+			faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.GetStr().GetVal())
+			return types.FAILURE
 		}
 	}
+afterGetCe:
 
-	/* Register the derived class */
-
-	ce = (*types.ClassEntry)(zv.GetPtr())
-	zv = types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), lcname.GetStr().GetStr())
-	if zv == nil {
+	if EG__().ClassTable().Exists(lcname.GetStrVal()) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 		return types.FAILURE
 	}
+
 	if ZendDoLinkClass(ce, lc_parent_name) == types.FAILURE {
-
-		/* Reload bucket pointer, the hash table may have been reallocated */
-
-		zv = EG__().GetClassTable().KeyFind(lcname.GetStr().GetStr())
-		types.ZendHashSetBucketKey(EG__().GetClassTable(), (*types.Bucket)(zv), rtd_key.GetStr().GetStr())
 		return types.FAILURE
 	}
+
+	EG__().ClassTable().Del(rtd_key.GetStrVal())
+	EG__().ClassTable().Add(lcname.GetStrVal(), ce)
+
 	return types.SUCCESS
 }
 func ZendMarkFunctionAsGenerator() {
@@ -210,65 +201,6 @@ func ZendMarkFunctionAsGenerator() {
 		}
 	}
 	CG__().GetActiveOpArray().SetIsGenerator(true)
-}
-func ZendBuildDelayedEarlyBindingList(op_array *types.ZendOpArray) uint32 {
-	if op_array.IsEarlyBinding() {
-		var first_early_binding_opline = uint32 - 1
-		var prev_opline_num = &first_early_binding_opline
-		var opline = op_array.GetOpcodes()
-		var end *ZendOp = opline + op_array.GetLast()
-		for opline < end {
-			if opline.GetOpcode() == ZEND_DECLARE_CLASS_DELAYED {
-				*prev_opline_num = opline - op_array.GetOpcodes()
-				prev_opline_num = opline.GetResult().GetOplineNum()
-			}
-			opline++
-		}
-		*prev_opline_num = -1
-		return first_early_binding_opline
-	}
-	return uint32 - 1
-}
-func ZendDoDelayedEarlyBinding(op_array *types.ZendOpArray, first_early_binding_opline uint32) {
-	if first_early_binding_opline != uint32-1 {
-		var orig_in_compilation = CG__().GetInCompilation()
-		var opline_num = first_early_binding_opline
-		var run_time_cache *any
-		if op_array.GetRunTimeCachePtr() == nil {
-			var ptr any
-			b.Assert(op_array.IsHeapRtCache())
-			ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
-			ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
-			ptr = (*byte)(ptr + b.SizeOf("void *"))
-			ZEND_MAP_PTR_SET(op_array.run_time_cache, ptr)
-			memset(ptr, 0, op_array.GetCacheSize())
-		}
-		run_time_cache = RUN_TIME_CACHE(op_array)
-		CG__().SetInCompilation(1)
-		for opline_num != uint32-1 {
-			var opline *ZendOp = op_array.GetOpcodes()[opline_num]
-			var lcname = opline.Const1()
-			var zv = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
-			if zv != nil {
-				var ce = zv.GetCe()
-				var lc_parent_name = opline.Const2().GetStr()
-				var parent_ce *types.ClassEntry = types.ZendHashFindPtr(EG__().GetClassTable(), lc_parent_name.GetStr())
-				if parent_ce != nil {
-					if ZendTryEarlyBind(ce, parent_ce, lcname.GetStr(), zv) != 0 {
-
-						/* Store in run-time cache */
-
-						(*any)((*byte)(run_time_cache + opline.GetExtendedValue()))[0] = ce
-
-						/* Store in run-time cache */
-
-					}
-				}
-			}
-			opline_num = op_array.GetOpcodes()[opline_num].GetResult().GetOplineNum()
-		}
-		CG__().SetInCompilation(orig_in_compilation)
-	}
 }
 
 func ZendManglePropertyName_Ex(src1 string, src2 string) string {
@@ -667,43 +599,6 @@ func ZendInitializeClassData(ce *types.ClassEntry, nullify_handlers types.ZendBo
 			ce.SetBuiltinFunctions(nil)
 		}
 	}
-}
-func ZendGetCompiledVariableName(op_array *types.ZendOpArray, var_ uint32) *types.String {
-	return op_array.GetVars()[EX_VAR_TO_NUM(var_)]
-}
-func ZendAstAppendStr(left_ast *ZendAst, right_ast *ZendAst) *ZendAst {
-	var left_zv = ZendAstGetZval(left_ast)
-	var left = left_zv.GetStr()
-	var right = ZendAstGetStr(right_ast)
-	var result *types.String
-	var left_len = left.GetLen()
-	var len_ = left_len + right.GetLen() + 1
-	result = types.ZendStringExtend(left, len_, 0)
-	result.GetVal()[left_len] = '\\'
-	memcpy(&result.GetVal()[left_len+1], right.GetVal(), right.GetLen())
-	result.GetVal()[len_] = '0'
-	// types.ZendStringReleaseEx(right, 0)
-	left_zv.SetString(result)
-	return left_ast
-}
-func ZendNegateNumString(ast *ZendAst) *ZendAst {
-	var zv = ZendAstGetZval(ast)
-	if zv.IsLong() {
-		if zv.GetLval() == 0 {
-			zv.SetString(types.NewString("-0"))
-		} else {
-			b.Assert(zv.GetLval() > 0)
-			zv.SetLval(zv.GetLval() * -1)
-		}
-	} else if zv.IsString() {
-		var orig_len = zv.GetStr().GetLen()
-		zv.SetStr(types.ZendStringExtend(zv.GetStr(), orig_len+1, 0))
-		memmove(zv.GetStr().GetVal()+1, zv.GetStr().GetVal(), orig_len+1)
-		zv.GetStr().GetVal()[0] = '-'
-	} else {
-		b.Assert(false)
-	}
-	return ast
 }
 func ZendVerifyNamespace() {
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {

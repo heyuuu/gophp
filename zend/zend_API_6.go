@@ -25,7 +25,7 @@ func ZendUnregisterFunctions(functions []types.FunctionEntry, count int, functio
 }
 
 func CleanModuleClasses(moduleNumber int) {
-	EG__().ClassTable().Filter(func(ce *types.ClassEntry) bool {
+	EG__().ClassTable().Filter(func(_ string, ce *types.ClassEntry) bool {
 		needClean := ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == moduleNumber
 		return !needClean
 	})

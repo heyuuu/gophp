@@ -391,7 +391,7 @@ func ZendRegisterStandardIniEntries() {
 }
 func ZendResolvePropertyTypes() {
 	var prop_info *ZendPropertyInfo
-	CG__().ClassTable().Foreach(func(ce *types.ClassEntry) {
+	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
 		if ce.GetType() != ZEND_INTERNAL_CLASS {
 			return
 		}

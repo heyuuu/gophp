@@ -91,28 +91,44 @@ func (t *LcTable[T]) Sort(less func(i, j *T) bool) {
 		return less(t.m[t.keys[i]], t.m[t.keys[j]])
 	})
 }
-func (t *LcTable[T]) Foreach(handler func(*T)) {
-	for _, key := range t.keys {
-		v := t.m[key]
-		handler(v)
+func (t *LcTable[T]) Foreach(handler func(string, *T)) {
+	for _, k := range t.keys {
+		v := t.m[k]
+		handler(k, v)
 	}
 }
-func (t *LcTable[T]) ForeachReserve(handler func(*T)) {
+func (t *LcTable[T]) ForeachReserve(handler func(string, *T)) {
 	for i := len(t.keys) - 1; i >= 0; i-- {
-		v := t.m[t.keys[i]]
-		handler(v)
+		k := t.keys[i]
+		v := t.m[k]
+		handler(k, v)
 	}
 }
 
 // todo 此方法不是并发安全的，待优化
-func (t *LcTable[T]) Filter(handler func(*T) bool) {
+func (t *LcTable[T]) Filter(handler func(string, *T) bool) {
 	var newKeys = make([]string, 0, cap(t.keys))
-	for _, key := range t.keys {
-		v := t.m[key]
-		if v != nil && handler(v) {
-			newKeys = append(newKeys, key)
+	for _, k := range t.keys {
+		v := t.m[k]
+		if v != nil && handler(k, v) {
+			newKeys = append(newKeys, k)
 		} else {
-			delete(t.m, key)
+			delete(t.m, k)
+		}
+	}
+	t.keys = newKeys
+}
+
+// todo 此方法不是并发安全的，待优化
+func (t *LcTable[T]) FilterReserve(handler func(string, *T) bool) {
+	var newKeys = make([]string, 0, cap(t.keys))
+	for i := len(t.keys) - 1; i >= 0; i-- {
+		k := t.keys[i]
+		v := t.m[k]
+		if v != nil && handler(k, v) {
+			newKeys = append(newKeys, k)
+		} else {
+			delete(t.m, k)
 		}
 	}
 	t.keys = newKeys
@@ -120,7 +136,7 @@ func (t *LcTable[T]) Filter(handler func(*T) bool) {
 
 func (t *LcTable[T]) Destroy() {
 	if t.destructor != nil {
-		t.Foreach(t.destructor)
+		t.Foreach(func(_ string, v *T) { t.destructor(v) })
 	}
 	t.Clean()
 }
