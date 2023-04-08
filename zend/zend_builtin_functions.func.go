@@ -719,19 +719,11 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 	return_value.SetArray(properties)
 	return
 }
-func SameName(key *types.String, name *types.String) int {
-	var lcname *types.String
-	var ret int
+func SameName(key *types.String, name *types.String) bool {
 	if key == name {
-		return 1
+		return true
 	}
-	if key.GetLen() != name.GetLen() {
-		return 0
-	}
-	lcname = ZendStringTolower(name)
-	ret = memcmp(lcname.GetVal(), key.GetVal(), key.GetLen()) == 0
-	// types.ZendStringReleaseEx(lcname, 0)
-	return ret
+	return key.GetStr() == ascii.StrToLower(name.GetStr())
 }
 func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Zval) {
 	var klass *types.Zval
@@ -761,7 +753,7 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 		key = _p.GetKey()
 		mptr = _z.GetPtr()
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
-			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
+			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && !SameName(key, mptr.GetFunctionName()) {
 				method_name.SetStringCopy(ZendFindAliasName(mptr.GetScope(), key))
 				return_value.GetArr().NextIndexInsertNew(&method_name)
 			} else {
@@ -1122,7 +1114,7 @@ func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
 	return
 }
 func CopyClassOrInterfaceName(array *types.Zval, key *types.String, ce *types.ClassEntry) {
-	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameName(key, ce.GetName()) != 0 {
+	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameName(key, ce.GetName()) {
 		key = ce.GetName()
 	}
 	AddNextIndexStr(array, key.Copy())

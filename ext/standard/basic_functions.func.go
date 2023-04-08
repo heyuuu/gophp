@@ -236,8 +236,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	FG__().default_context = nil
 
 	/* Default to global wrappers only */
-
-	FG__().stream_wrappers = nil
+	FG__().SetStreamWrappers(nil)
 
 	/* Default to global filters only */
 	FG__().SetStreamFilters(nil)

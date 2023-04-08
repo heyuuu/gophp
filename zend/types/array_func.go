@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
+	"strconv"
 )
 
 var emptyArray *Array
@@ -869,17 +870,13 @@ func ZendSymtableToProptable(ht *Array) *Array {
 	}
 	return ht
 convert:
-	var new_ht *Array = NewArray(ht.Len())
-	var __ht__1 *Array = ht
-	for _, _p := range __ht__1.ForeachData() {
-		var _z *Zval = _p.GetVal()
-
-		num_key = _p.GetH()
-		str_key = _p.GetKey()
-		zv = _z
-		if str_key == nil {
-			str_key = zend.ZendLongToStr(num_key)
-			//str_key.DelRefcount()
+	var newHt *Array = NewArray(ht.Len())
+	ht.Foreach(func(key ArrayKey, zv *Zval) {
+		var strKey string
+		if key.IsStrKey() {
+			strKey = key.StrKey()
+		} else {
+			strKey = strconv.Itoa(key.IndexKey())
 		}
 		for {
 			if zv.IsRefcounted() {
@@ -893,9 +890,9 @@ convert:
 			}
 			break
 		}
-		new_ht.KeyUpdate(str_key.GetStr(), zv)
-	}
-	return new_ht
+		newHt.KeyUpdate(strKey, zv)
+	})
+	return newHt
 }
 func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 	var num_key zend.ZendUlong

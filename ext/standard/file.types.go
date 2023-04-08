@@ -20,40 +20,18 @@ type PhpMetaTagsData struct {
 	in_meta      int
 }
 
-//             func MakePhpMetaTagsData(
-// stream *core.PhpStream,
-// ulc int,
-// lc int,
-// input_buffer *byte,
-// token_data *byte,
-// token_len int,
-// in_meta int,
-// ) PhpMetaTagsData {
-//                 return PhpMetaTagsData{
-//                     stream:stream,
-//                     ulc:ulc,
-//                     lc:lc,
-//                     input_buffer:input_buffer,
-//                     token_data:token_data,
-//                     token_len:token_len,
-//                     in_meta:in_meta,
-//                 }
-//             }
 func (this *PhpMetaTagsData) GetStream() *core.PhpStream      { return this.stream }
 func (this *PhpMetaTagsData) SetStream(value *core.PhpStream) { this.stream = value }
 func (this *PhpMetaTagsData) GetUlc() int                     { return this.ulc }
 func (this *PhpMetaTagsData) SetUlc(value int)                { this.ulc = value }
 func (this *PhpMetaTagsData) GetLc() int                      { return this.lc }
 func (this *PhpMetaTagsData) SetLc(value int)                 { this.lc = value }
-
-// func (this *PhpMetaTagsData)  GetInputBuffer() *byte      { return this.input_buffer }
-// func (this *PhpMetaTagsData) SetInputBuffer(value *byte) { this.input_buffer = value }
-func (this *PhpMetaTagsData) GetTokenData() *byte      { return this.token_data }
-func (this *PhpMetaTagsData) SetTokenData(value *byte) { this.token_data = value }
-func (this *PhpMetaTagsData) GetTokenLen() int         { return this.token_len }
-func (this *PhpMetaTagsData) SetTokenLen(value int)    { this.token_len = value }
-func (this *PhpMetaTagsData) GetInMeta() int           { return this.in_meta }
-func (this *PhpMetaTagsData) SetInMeta(value int)      { this.in_meta = value }
+func (this *PhpMetaTagsData) GetTokenData() *byte             { return this.token_data }
+func (this *PhpMetaTagsData) SetTokenData(value *byte)        { this.token_data = value }
+func (this *PhpMetaTagsData) GetTokenLen() int                { return this.token_len }
+func (this *PhpMetaTagsData) SetTokenLen(value int)           { this.token_len = value }
+func (this *PhpMetaTagsData) GetInMeta() int                  { return this.in_meta }
+func (this *PhpMetaTagsData) SetInMeta(value int)             { this.in_meta = value }
 
 /**
  * PhpFileGlobals

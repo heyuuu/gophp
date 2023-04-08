@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"math"
+	"strconv"
 	"strings"
 )
 
@@ -3063,21 +3064,8 @@ func ZendCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	}
 }
 func ZendLongToStr(num ZendLong) *types.String {
-	if ZendUlong(num <= 9) != 0 {
-		return types.ZSTR_CHAR(types.ZendUchar('0' + types.ZendUchar(num)))
-	} else {
-		var buf []byte
-		var res *byte = ZendPrintLongToBuf(buf+b.SizeOf("buf")-1, num)
-		return types.NewString(b.CastStr(res, buf+b.SizeOf("buf")-1-res))
-	}
-}
-func IsNumericStrFunction(str *types.String, lval *ZendLong, dval *float64) types.ZendUchar {
-	result := ConvertNumericStr(str.GetStr(), ConvertNoticeOnErrors)
-	*lval = result.Lval
-	if dval != nil {
-		*dval = result.Dval
-	}
-	return result.Type
+	var res = strconv.Itoa(num)
+	return types.NewString(res)
 }
 
 func ZendMemnstrExPre(td []uint, needle *byte, needle_len int, reverse int) {
