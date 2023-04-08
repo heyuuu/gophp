@@ -193,7 +193,7 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 			RcDtorFunc(garbage)
 			return
 		} else {
-			GcCheckPossibleRoot(garbage)
+			//GcCheckPossibleRoot(garbage)
 		}
 	}
 	variable_ptr.SetReference(ref)

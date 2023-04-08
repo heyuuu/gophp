@@ -116,15 +116,15 @@ type BrowscapParserCtx struct {
 	bdata                *BrowserData
 	current_entry        *BrowscapEntry
 	current_section_name *types.String
-	str_interned         types.Array
+	strInterned          *types.InternedStrings
 }
 
-func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *types.String, str_interned types.Array) BrowscapParserCtx {
+func MakeBrowscapParserCtx(bdata *BrowserData) BrowscapParserCtx {
 	return BrowscapParserCtx{
 		bdata:                bdata,
-		current_entry:        current_entry,
-		current_section_name: current_section_name,
-		str_interned:         str_interned,
+		current_entry:        nil,
+		current_section_name: nil,
+		strInterned:          types.NewInternedStrings(),
 	}
 }
 func (this *BrowscapParserCtx) GetBdata() *BrowserData               { return this.bdata }
@@ -137,4 +137,5 @@ func (this *BrowscapParserCtx) GetCurrentSectionName() *types.String {
 func (this *BrowscapParserCtx) SetCurrentSectionName(value *types.String) {
 	this.current_section_name = value
 }
-func (this *BrowscapParserCtx) GetStrInterned() types.Array { return this.str_interned }
+func (this *BrowscapParserCtx) StrInterned() *types.InternedStrings { return this.strInterned }
+func (this *BrowscapParserCtx) InitStrInterned()                    { this.strInterned = types.NewInternedStrings() }

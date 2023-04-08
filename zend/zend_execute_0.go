@@ -59,15 +59,10 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_typ
 			if garbage.DelRefcount() == 0 {
 				RcDtorFunc(garbage)
 			} else {
-
 				/* optimized version of GC_ZVAL_CHECK_POSSIBLE_ROOT(variable_ptr) */
-
-				if GC_MAY_LEAK(garbage) {
-					GcPossibleRoot(garbage)
-				}
-
-				/* optimized version of GC_ZVAL_CHECK_POSSIBLE_ROOT(variable_ptr) */
-
+				//if GC_MAY_LEAK(garbage) {
+				//	GcPossibleRoot(garbage)
+				//}
 			}
 			return variable_ptr
 		}
@@ -119,7 +114,7 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 					p.SetNull()
 					RcDtorFunc(r)
 				} else {
-					GcCheckPossibleRoot(r)
+					//GcCheckPossibleRoot(r)
 				}
 			}
 			p++

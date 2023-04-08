@@ -24,8 +24,8 @@ func ZendObjectStoreCtorFailed(obj *types.ZendObject) { obj.AddGcFlags(types.IS_
 func ZendObjectRelease(obj *types.ZendObject) {
 	if obj.DelRefcount() == 0 {
 		ZendObjectsStoreDel(obj)
-	} else if GC_MAY_LEAK((*types.ZendRefcounted)(obj)) {
-		GcPossibleRoot((*types.ZendRefcounted)(obj))
+		//} else if GC_MAY_LEAK((*types.ZendRefcounted)(obj)) {
+		//	GcPossibleRoot((*types.ZendRefcounted)(obj))
 	}
 }
 func ZendObjectPropertiesSize(ce *types.ClassEntry) int {

@@ -16,8 +16,6 @@ func IZvalPtrDtor(zval_ptr *types.Zval) {
 		var ref = zval_ptr.GetCounted()
 		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
-		} else {
-			GcCheckPossibleRoot(ref)
 		}
 	}
 }

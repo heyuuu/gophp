@@ -1158,8 +1158,8 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 	} else if BG__().unserialize.level > 1 {
 		types.ZVAL_COPY(return_value, retval)
 	} else if return_value.IsRefcounted() {
-		var ref *types.ZendRefcounted = return_value.GetCounted()
-		zend.GcCheckPossibleRoot(ref)
+		//var ref *types.ZendRefcounted = return_value.GetCounted()
+		//zend.GcCheckPossibleRoot(ref)
 	}
 cleanup:
 	if class_hash != nil {

@@ -12,8 +12,8 @@ func IZvalPtrDtorNoref(zval_ptr *types.Zval) {
 		b.Assert(zval_ptr.GetType() != types.IS_REFERENCE)
 		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
-		} else if GC_MAY_LEAK(ref) {
-			GcPossibleRoot(ref)
+			//} else if GC_MAY_LEAK(ref) {
+			//	GcPossibleRoot(ref)
 		}
 	}
 }
@@ -183,7 +183,7 @@ func IFreeCompiledVariables(executeData *ZendExecuteData) {
 				cv.SetNull()
 				RcDtorFunc(r)
 			} else {
-				GcCheckPossibleRoot(r)
+				//GcCheckPossibleRoot(r)
 			}
 		}
 		cv++

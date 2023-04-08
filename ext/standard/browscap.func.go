@@ -143,32 +143,14 @@ func BrowscapConvertPattern(pattern *types.String, persistent int) *types.String
 	zend.FreeAlloca(lc_pattern, use_heap)
 	return res
 }
-func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String, persistent types.ZendBool) *types.String {
-	var interned *types.String = types.ZendHashFindPtr(ctx.GetStrInterned(), str.GetStr())
-	if interned != nil {
-		//interned.AddRefcount()
-	} else {
-		interned = str.Copy()
-		if persistent != 0 {
-			interned = types.ZendNewInternedString(str)
-		}
-		types.ZendHashAddNewPtr(ctx.GetStrInterned(), interned.GetStr(), interned)
-	}
-	return interned
+func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String) *types.String {
+	zs, _ := ctx.StrInterned().GetOrInsertZendString(str.GetStr())
+	return zs
 }
-func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String, persistent types.ZendBool) *types.String {
+func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String) *types.String {
 	lcName := ascii.StrToLower(str.GetStr())
-	interned := types.ZendHashFindPtr(ctx.GetStrInterned(), lcName).(*types.String)
-	if interned != nil {
-		//interned.AddRefcount()
-	} else {
-		interned = types.NewString(lcName)
-		if persistent != 0 {
-			interned = types.ZendNewInternedString(interned)
-		}
-		types.ZendHashAddNewPtr(ctx.GetStrInterned(), interned.GetStr(), interned)
-	}
-	return interned
+	zs, _ := ctx.StrInterned().GetOrInsertZendString(lcName)
+	return zs
 }
 func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, persistent types.ZendBool) {
 	if bdata.GetKvUsed() == bdata.GetKvSize() {
@@ -217,7 +199,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 			} else if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.GetStr().GetLen() == 5 && !(strncasecmp(arg2.GetStr().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = types.NewString("")
 			} else {
-				new_value = BrowscapInternStr(ctx, arg2.GetStr(), persistent)
+				new_value = BrowscapInternStr(ctx, arg2.GetStr())
 			}
 			if !(strcasecmp(arg1.GetStr().GetVal(), "parent")) {
 
@@ -232,7 +214,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
-				new_key = BrowscapInternStrCi(ctx, arg1.GetStr(), persistent)
+				new_key = BrowscapInternStrCi(ctx, arg1.GetStr())
 				BrowscapAddKv(bdata, new_key, new_value, persistent)
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
@@ -268,12 +250,8 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 	}
 }
-func StrInternedDtor(zv *types.Zval) {
-	// types.ZendStringRelease(zv.GetStr())
-}
 func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int {
 	var fh zend.ZendFileHandle
-	var ctx BrowscapParserCtx = MakeBrowscapParserCtx(0)
 	if filename == nil || filename[0] == '0' {
 		return types.FAILURE
 	}
@@ -289,19 +267,11 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv")*browdata.GetKvSize(), persistent))
 
 	/* Create parser context */
-
-	ctx.SetBdata(browdata)
-	ctx.SetCurrentEntry(nil)
-	ctx.SetCurrentSectionName(nil)
-	ctx.GetStrInterned() = types.MakeArrayEx(8, StrInternedDtor, persistent)
+	var ctx BrowscapParserCtx = MakeBrowscapParserCtx(browdata)
 	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
 
 	/* Destroy parser context */
-
-	if ctx.GetCurrentSectionName() != nil {
-		// types.ZendStringRelease(ctx.GetCurrentSectionName())
-	}
-	ctx.GetStrInterned().Destroy()
+	ctx.StrInterned().Destroy()
 	return types.SUCCESS
 }
 func BrowscapBdataDtor(bdata *BrowserData, persistent int) {

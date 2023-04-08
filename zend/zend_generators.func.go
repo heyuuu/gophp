@@ -527,8 +527,7 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 		node.SetChildSingleChild(child)
 	} else {
 		if node.GetChildren() == 1 {
-			var ht *types.Array = Emalloc(b.SizeOf("HashTable"))
-			ht = types.MakeArrayEx(0, nil, 0)
+			var ht *types.Array = types.NewArrayEx(0, nil, false)
 			types.ZendHashIndexAddPtr(ht, ZendUlong(node.GetChildSingleLeaf()), node.GetChildSingleChild())
 			node.SetHt(ht)
 		}
