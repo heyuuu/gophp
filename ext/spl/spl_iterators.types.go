@@ -318,7 +318,7 @@ type SplRecursiveItObject struct {
 //                     std:std,
 //                 }
 //             }
-func (this *SplRecursiveItObject) GetIterators() *SplSubIterator       { return this.iterators }
+func (this *SplRecursiveItObject) GetIterators() []SplSubIterator      { return this.iterators }
 func (this *SplRecursiveItObject) SetIterators(value *SplSubIterator)  { this.iterators = value }
 func (this *SplRecursiveItObject) GetLevel() int                       { return this.level }
 func (this *SplRecursiveItObject) SetLevel(value int)                  { this.level = value }

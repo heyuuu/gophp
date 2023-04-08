@@ -371,31 +371,31 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 	intern.SetMaxDepth(-1)
 	intern.SetInIteration(0)
 	intern.SetCe(types.Z_OBJCE_P(object))
-	intern.SetBeginIteration(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), "beginiteration"))
+	intern.SetBeginIteration(intern.GetCe().FunctionTable().Get("beginiteration"))
 	if intern.GetBeginIteration().GetScope() == ce_base {
 		intern.SetBeginIteration(nil)
 	}
-	intern.SetEndIteration(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), "enditeration"))
+	intern.SetEndIteration(intern.GetCe().FunctionTable().Get("enditeration"))
 	if intern.GetEndIteration().GetScope() == ce_base {
 		intern.SetEndIteration(nil)
 	}
-	intern.SetCallHasChildren(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), b.CastStr("callhaschildren", b.SizeOf("\"callHasChildren\"")-1)))
+	intern.SetCallHasChildren(intern.GetCe().FunctionTable().Get("callhaschildren"))
 	if intern.GetCallHasChildren().GetScope() == ce_base {
 		intern.SetCallHasChildren(nil)
 	}
-	intern.SetCallGetChildren(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), b.CastStr("callgetchildren", b.SizeOf("\"callGetChildren\"")-1)))
+	intern.SetCallGetChildren(intern.GetCe().FunctionTable().Get("callgetchildren"))
 	if intern.GetCallGetChildren().GetScope() == ce_base {
 		intern.SetCallGetChildren(nil)
 	}
-	intern.SetBeginChildren(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), "beginchildren"))
+	intern.SetBeginChildren(intern.GetCe().FunctionTable().Get("beginchildren"))
 	if intern.GetBeginChildren().GetScope() == ce_base {
 		intern.SetBeginChildren(nil)
 	}
-	intern.SetEndChildren(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), "endchildren"))
+	intern.SetEndChildren(intern.GetCe().FunctionTable().Get("endchildren"))
 	if intern.GetEndChildren().GetScope() == ce_base {
 		intern.SetEndChildren(nil)
 	}
-	intern.SetNextElement(types.ZendHashStrFindPtr(intern.GetCe().GetFunctionTable(), b.CastStr("nextelement", b.SizeOf("\"nextElement\"")-1)))
+	intern.SetNextElement(intern.GetCe().FunctionTable().Get("nextelement"))
 	if intern.GetNextElement().GetScope() == ce_base {
 		intern.SetNextElement(nil)
 	}
@@ -621,7 +621,7 @@ func SplRecursiveItGetMethod(zobject **types.ZendObject, method *types.String, k
 	zobj = object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)
 	if function_handler == nil {
-		if b.Assign(&function_handler, types.ZendHashFindPtr(types.Z_OBJCE_P(zobj).GetFunctionTable(), method.GetStr())) == nil {
+		if b.Assign(&function_handler, types.Z_OBJCE_P(zobj).FunctionTable().Get(method.GetStr())) == nil {
 			*zobject = zobj.GetObj()
 			function_handler = zobject.GetHandlers().GetGetMethod()(zobject, method, key)
 		} else {
@@ -904,7 +904,7 @@ func SplDualItGetMethod(object **types.ZendObject, method *types.String, key *ty
 	intern = SplDualItFromObj(*object)
 	function_handler = zend.ZendStdGetMethod(object, method, key)
 	if function_handler == nil && intern.GetCe() != nil {
-		if b.Assign(&function_handler, types.ZendHashFindPtr(intern.GetCe().GetFunctionTable(), method.GetStr())) == nil {
+		if b.Assign(&function_handler, intern.GetCe().FunctionTable().Get(method.GetStr())) == nil {
 			if types.Z_OBJ_HT(intern.GetZobject()).GetGetMethod() != nil {
 				*object = intern.GetZobject().GetObj()
 				function_handler = object.GetHandlers().GetGetMethod()(object, method, key)

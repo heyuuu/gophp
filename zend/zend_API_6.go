@@ -98,7 +98,7 @@ func DoRegisterInternalClass(orig_class_entry *types.ClassEntry, ce_flags uint32
 	class_entry.SetCeFlags(ce_flags | AccConstantsUpdated | AccLinked | AccResolvedParent | AccResolvedInterfaces)
 	class_entry.SetModule(EG__().GetCurrentModule())
 	if class_entry.GetBuiltinFunctions() != nil {
-		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), EG__().GetCurrentModule().GetType())
+		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.FunctionTable(), EG__().GetCurrentModule().GetType())
 	}
 	CG__().ClassTable().Update(class_entry.GetName().GetStr(), class_entry)
 	return class_entry

@@ -1,6 +1,12 @@
 package types
 
-import "github.com/heyuuu/gophp/zend"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/zend/internal"
+)
+
+type FunctionTable = *internal.LcTable[IFunction]
 
 /**
  * ClassEntry
@@ -19,7 +25,7 @@ type ClassEntry struct {
 	default_properties_table     *Zval
 	default_static_members_table *Zval
 	static_members_table__ptr    **Zval
-	function_table               Array
+	functionTable                FunctionTable
 	properties_info              Array
 	constants_table              Array
 	properties_info_table        **zend.ZendPropertyInfo
@@ -52,8 +58,8 @@ type ClassEntry struct {
 		interface_names []zend.ZendClassName
 	}
 	trait_names       *zend.ZendClassName
-	trait_aliases     **zend.ZendTraitAlias
-	trait_precedences **zend.ZendTraitPrecedence
+	trait_aliases     []*zend.ZendTraitAlias
+	trait_precedences []*zend.ZendTraitPrecedence
 	info              struct /* union */ {
 		user struct {
 			filename    *String
@@ -106,8 +112,15 @@ func NewClassEntry(name string, functions []FunctionEntry) *ClassEntry {
 	class.info.internal.builtin_functions = functions
 	return class
 }
+func (this *ClassEntry) InitTables(persistentHashes bool) {
+	this.properties_info = MakeArrayEx(8, b.Cond(persistentHashes, zend.ZendDestroyPropertyInfoInternal, nil), IntBool(persistentHashes))
+	this.constants_table = MakeArrayEx(8, nil, IntBool(persistentHashes))
+	this.functionTable = internal.NewLcTable[IFunction](zend.ZendFunctionDtorEx)
+}
 
 func (this *ClassEntry) Name() string { return this.name }
+
+func (this *ClassEntry) FunctionTable() FunctionTable { return this.functionTable }
 
 /**
  * Getter / Setter
@@ -150,7 +163,6 @@ func (this *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 func (this *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return this.static_members_table__ptr
 }
-func (this *ClassEntry) GetFunctionTable() Array  { return this.function_table }
 func (this *ClassEntry) GetPropertiesInfo() Array { return this.properties_info }
 func (this *ClassEntry) GetConstantsTable() Array { return this.constants_table }
 func (this *ClassEntry) GetPropertiesInfoTable() **zend.ZendPropertyInfo {
@@ -239,14 +251,14 @@ func (this *ClassEntry) GetInterfaceNames() []zend.ZendClassName { return this._
 func (this *ClassEntry) SetInterfaceNames(value []zend.ZendClassName) {
 	this.__2.interface_names = value
 }
-func (this *ClassEntry) GetTraitNames() *zend.ZendClassName          { return this.trait_names }
-func (this *ClassEntry) SetTraitNames(value *zend.ZendClassName)     { this.trait_names = value }
-func (this *ClassEntry) GetTraitAliases() **zend.ZendTraitAlias      { return this.trait_aliases }
-func (this *ClassEntry) SetTraitAliases(value **zend.ZendTraitAlias) { this.trait_aliases = value }
-func (this *ClassEntry) GetTraitPrecedences() **zend.ZendTraitPrecedence {
+func (this *ClassEntry) GetTraitNames() *zend.ZendClassName           { return this.trait_names }
+func (this *ClassEntry) SetTraitNames(value *zend.ZendClassName)      { this.trait_names = value }
+func (this *ClassEntry) GetTraitAliases() []*zend.ZendTraitAlias      { return this.trait_aliases }
+func (this *ClassEntry) SetTraitAliases(value []*zend.ZendTraitAlias) { this.trait_aliases = value }
+func (this *ClassEntry) GetTraitPrecedences() []*zend.ZendTraitPrecedence {
 	return this.trait_precedences
 }
-func (this *ClassEntry) SetTraitPrecedences(value **zend.ZendTraitPrecedence) {
+func (this *ClassEntry) SetTraitPrecedences(value []*zend.ZendTraitPrecedence) {
 	this.trait_precedences = value
 }
 func (this *ClassEntry) GetFilename() *String      { return this.info.user.filename }

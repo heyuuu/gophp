@@ -128,7 +128,7 @@ func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *type
 	for parent != nil {
 		if parent == spl_ce_SplObjectStorage {
 			if class_type != spl_ce_SplObjectStorage {
-				intern.SetFptrGetHash(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "gethash"))
+				intern.SetFptrGetHash(class_type.FunctionTable().Get("gethash"))
 				if intern.GetFptrGetHash().GetScope() == spl_ce_SplObjectStorage {
 					intern.SetFptrGetHash(nil)
 				}

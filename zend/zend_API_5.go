@@ -123,11 +123,11 @@ func ZendCheckMagicMethodImplementation(ce *types.ClassEntry, fptr types.IFuncti
 		faults.Error(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
-func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, function_table FunctionTable, type_ int) int {
+func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEntry, functionTable FunctionTable, type_ int) int {
 	var ptr *types.FunctionEntry = functions
 	var count int = 0
 	var unload int = 0
-	var target_function_table FunctionTable = function_table
+	var targetFunctionTable FunctionTable = functionTable
 	var error_type int
 	var ctor types.IFunction = nil
 	var dtor types.IFunction = nil
@@ -151,8 +151,8 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 	} else {
 		error_type = faults.E_WARNING
 	}
-	if target_function_table == nil {
-		target_function_table = CG__().FunctionTable()
+	if targetFunctionTable == nil {
+		targetFunctionTable = CG__().FunctionTable()
 	}
 	var reg_function types.IFunction
 
@@ -259,14 +259,14 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 					Efree((*byte)(lc_class_name))
 				}
 				faults.Error(error_type, "Method %s%s%s() cannot be a NULL function", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
-				ZendUnregisterFunctions(functions, count, target_function_table)
+				ZendUnregisterFunctions(functions, count, targetFunctionTable)
 				return types.FAILURE
 			}
 		}
 		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName())
 		lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = types.CopyFunction(function)
-		if types.ZendHashAddPtr(target_function_table, lowercase_name.GetStr(), reg_function) == nil {
+		if !targetFunctionTable.Add(lowercase_name.GetStr(), reg_function) {
 			unload = 1
 			Free(reg_function)
 			// types.ZendStringRelease(lowercase_name)
@@ -375,13 +375,13 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			fname_len = strlen(ptr.GetFname())
 			lowercase_name = types.ZendStringAlloc(fname_len, 0)
 			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
-			if target_function_table.KeyExists(lowercase_name.GetStr()) {
+			if targetFunctionTable.Exists(lowercase_name.GetStr()) {
 				faults.Error(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			// types.ZendStringEfree(lowercase_name)
 			ptr++
 		}
-		ZendUnregisterFunctions(functions, count, target_function_table)
+		ZendUnregisterFunctions(functions, count, targetFunctionTable)
 		return types.FAILURE
 	}
 	if scope != nil {

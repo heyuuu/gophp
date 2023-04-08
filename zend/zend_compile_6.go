@@ -199,7 +199,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	op_array.SetFunctionName(name.Copy())
 	lcname = ZendStringTolower(name)
 	lcname = types.ZendNewInternedString(lcname)
-	if types.ZendHashAddPtr(ce.GetFunctionTable(), lcname.GetStr(), op_array) == nil {
+	if !ce.FunctionTable().Add(name.GetStr(), op_array) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
 	}
 	if in_interface != 0 {

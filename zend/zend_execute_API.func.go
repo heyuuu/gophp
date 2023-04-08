@@ -158,24 +158,20 @@ func ShutdownExecutor() {
 				ZendCleanupInternalClassData(ce)
 			}
 			if ce.IsHasStaticInMethods() {
-				var op_array *types.ZendOpArray
-				var __ht *types.Array = ce.GetFunctionTable()
-				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
-
-					op_array = _z.GetPtr()
-					if op_array.GetType() == ZEND_USER_FUNCTION {
-						if op_array.GetStaticVariables() != nil {
-							var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+				ce.FunctionTable().Foreach(func(_ string, f types.IFunction) {
+					if f.GetType() == ZEND_USER_FUNCTION {
+						opArray := f.GetOpArray()
+						if opArray.GetStaticVariables() != nil {
+							var ht *types.Array = ZEND_MAP_PTR_GET(opArray.static_variables_ptr)
 							if ht != nil {
 								if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 									ht.DestroyEx()
 								}
-								ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
+								ZEND_MAP_PTR_SET(opArray.static_variables_ptr, nil)
 							}
 						}
 					}
-				}
+				})
 			}
 		})
 

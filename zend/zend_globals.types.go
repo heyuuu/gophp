@@ -18,7 +18,6 @@ type ZendCompilerGlobals struct {
 	compiled_filename  *types.String
 	zend_lineno        int
 	active_op_array    *types.ZendOpArray
-	function_table     *types.Array
 	functionTable      FunctionTable
 	classTable         ClassTable
 	filenamesTable     map[string]string //filenames_table              HashTable
@@ -56,13 +55,13 @@ type ZendCompilerGlobals struct {
 }
 
 func (this *ZendCompilerGlobals) InitTables() {
-	this.function_table = types.NewArrayEx(1024, ZEND_FUNCTION_DTOR, true)
-	this.classTable = internal.NewLcTable[types.ClassEntry](DestroyZendClassEntry)
+	this.functionTable = internal.NewLcTable[types.IFunction](ZendFunctionDtorEx)
+	this.classTable = internal.NewLcTable[*types.ClassEntry](DestroyZendClassEntry)
 	this.auto_globals = types.NewArrayEx(8, AutoGlobalDtor, true)
 }
 
 func (this *ZendCompilerGlobals) DestroyTables() {
-	this.function_table.Destroy()
+	this.functionTable.Destroy()
 	this.classTable.Destroy()
 	this.auto_globals.Destroy()
 }

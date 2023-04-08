@@ -48,7 +48,7 @@ func (t *LcTable[T]) Add(key string, val T) bool {
 }
 func (t *LcTable[T]) Update(key string, val T) {
 	if val == nil {
-		panic("LcTable.Add(key, val) 方法参数 val 不可为 nil")
+		panic("LcTable.Update(key, val) 方法参数 val 不可为 nil")
 	}
 
 	key = t.realKey(key)
@@ -56,6 +56,19 @@ func (t *LcTable[T]) Update(key string, val T) {
 		if t.destructor != nil {
 			t.destructor(oldVal)
 		}
+		t.m[key] = val
+	} else {
+		t.keys = append(t.keys, key)
+		t.m[key] = val
+	}
+}
+func (t *LcTable[T]) UpdateDirect(key string, val T) {
+	if val == nil {
+		panic("LcTable.UpdateDirect(key, val) 方法参数 val 不可为 nil")
+	}
+
+	key = t.realKey(key)
+	if _, ok := t.m[key]; ok {
 		t.m[key] = val
 	} else {
 		t.keys = append(t.keys, key)
@@ -100,6 +113,14 @@ func (t *LcTable[T]) ForeachReserve(handler func(string, T)) {
 		k := t.keys[i]
 		v := t.m[k]
 		handler(k, v)
+	}
+}
+func (t *LcTable[T]) ForeachEx(handler func(string, T) bool) {
+	for _, k := range t.keys {
+		v := t.m[k]
+		if !handler(k, v) {
+			break
+		}
 	}
 }
 

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -375,46 +376,32 @@ func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
 	EG__().SetErrorHandling(saved.GetHandling())
 	EG__().SetExceptionClass(saved.GetException())
 }
-func ZendFindAliasName(ce *types.ClassEntry, name *types.String) *types.String {
-	var alias *ZendTraitAlias
-	var alias_ptr **ZendTraitAlias
-	if b.Assign(&alias_ptr, ce.GetTraitAliases()) {
-		alias = *alias_ptr
-		for alias != nil {
-			if alias.GetAlias() != nil && types.ZendStringEqualsCi(alias.GetAlias(), name) {
-				return alias.GetAlias()
-			}
-			alias_ptr++
-			alias = *alias_ptr
+func ZendFindAliasName(ce *types.ClassEntry, name string) *types.String {
+	for _, alias := range ce.GetTraitAliases() {
+		if alias.GetAlias() != nil && ascii.StrCaseEquals(alias.GetAlias().GetStr(), name) {
+			return alias.GetAlias()
 		}
 	}
-	return name
+	return types.NewString(name)
 }
 func ZendResolveMethodName(ce *types.ClassEntry, f types.IFunction) *types.String {
-	var func_ types.IFunction
-	var function_table *types.Array
-	var name *types.String
 	if f.GetType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
 		return f.GetFunctionName()
 	}
-	function_table = ce.GetFunctionTable()
-	var __ht *types.Array = function_table
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		name = _p.GetKey()
-		func_ = _z.GetPtr()
-		if func_ == f {
-			if name == nil {
-				return f.GetFunctionName()
-			}
-			if name.GetLen() == f.GetFunctionName().GetLen() && !(strncasecmp(name.GetVal(), f.GetFunctionName().GetVal(), f.GetFunctionName().GetLen())) {
-				return f.GetFunctionName()
-			}
-			return ZendFindAliasName(f.GetScope(), name)
+	var ret = f.GetFunctionName()
+	ce.FunctionTable().ForeachEx(func(name string, func_ types.IFunction) bool {
+		if func_ != f {
+			return true
 		}
-	}
-	return f.GetFunctionName()
+
+		if name != "" && !ascii.StrCaseEquals(name, f.GetFunctionName().GetStr()) {
+			ret = ZendFindAliasName(f.GetScope(), name)
+		}
+		return false
+	})
+
+	return ret
 }
 func ZendGetObjectType(ce *types.ClassEntry) *byte {
 	if ce.IsTrait() {

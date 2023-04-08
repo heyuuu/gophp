@@ -257,7 +257,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	intern.SetDelimiter(',')
 	intern.SetEnclosure('"')
 	intern.SetEscape(uint8('\\'))
-	intern.SetFuncGetCurr(types.ZendHashStrFindPtr(intern.GetStd().GetCe().GetFunctionTable(), "getcurrentline"))
+	intern.SetFuncGetCurr(intern.GetStd().GetCe().FunctionTable().Get("getcurrentline"))
 	return types.SUCCESS
 }
 func SplFilesystemObjectClone(zobject *types.Zval) *types.ZendObject {

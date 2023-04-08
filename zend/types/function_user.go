@@ -33,6 +33,14 @@ type ZendOpArray struct {
 
 var _ IFunction = (*ZendOpArray)(nil)
 
+func NewOpArray() *ZendOpArray {
+	return &ZendOpArray{}
+}
+func CopyOpArray(array *ZendOpArray) *ZendOpArray {
+	// todo 处理 copy 逻辑
+	return NewOpArray()
+}
+
 func (f *ZendOpArray) init() {
 	f.typ = zend.ZEND_USER_FUNCTION
 }

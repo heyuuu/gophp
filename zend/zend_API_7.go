@@ -27,23 +27,18 @@ func DisplayDisabledClass(class_type *types.ClassEntry) *types.ZendObject {
 	return intern
 }
 func ZendDisableClass(className string) int {
-	var fn types.IFunction
 	disabled_class := CG__().ClassTable().Get(className)
 	if disabled_class == nil {
 		return types.FAILURE
 	}
 	disabled_class.InitMethods(DisabledClassNew)
 	disabled_class.SetCreateObject(DisplayDisabledClass)
-	var __ht *types.Array = disabled_class.GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		fn = _z.GetPtr()
+	disabled_class.FunctionTable().Foreach(func(_ string, fn types.IFunction) {
 		if fn.HasFnFlags(AccHasReturnType|AccHasTypeHints) && fn.GetScope() == disabled_class {
 			ZendFreeInternalArgInfo(fn.(*types.InternalFunction))
 		}
-	}
-	disabled_class.GetFunctionTable().Clean()
+	})
+	disabled_class.FunctionTable().Destroy()
 	return types.SUCCESS
 }
 func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error **byte) int {
@@ -160,7 +155,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	var lmname *types.String
 	var colon *byte
 	var clen int
-	var ftable *types.Array
+	var ftable FunctionTable
 	var call_via_handler int = 0
 	var scope *types.ClassEntry
 	var zv *types.Zval
@@ -224,7 +219,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			return 0
 		}
 		// types.ZendStringReleaseEx(cname, 0)
-		ftable = fcc.GetCallingScope().GetFunctionTable()
+		ftable = fcc.GetCallingScope().FunctionTable()
 		if ce_org != nil && InstanceofFunction(ce_org, fcc.GetCallingScope()) == 0 {
 			if error != nil {
 				ZendSpprintf(error, 0, "class '%s' is not a subclass of '%s'", ce_org.GetName().GetVal(), fcc.GetCallingScope().GetName().GetVal())
@@ -238,7 +233,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 
 		mname = callable.GetStr()
 		//mname.AddRefcount()
-		ftable = ce_org.GetFunctionTable()
+		ftable = ce_org.FunctionTable()
 		fcc.SetCallingScope(ce_org)
 	} else {
 
@@ -255,15 +250,13 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		if fcc.GetFunctionHandler() != nil {
 			retval = 1
 		}
-	} else if b.Assign(&zv, ftable.KeyFind(lmname.GetStr())) != nil {
-		fcc.SetFunctionHandler(zv.GetPtr())
+	} else if zif := ftable.Get(lmname.GetStr()); zif != nil {
+		fcc.SetFunctionHandler(zif)
 		retval = 1
 		if fcc.GetFunctionHandler().GetOpArray().IsChanged() && strict_class == 0 {
 			scope = ZendGetExecutedScope()
 			if scope != nil && InstanceofFunction(fcc.GetFunctionHandler().GetScope(), scope) != 0 {
-				zv = scope.GetFunctionTable().KeyFind(lmname.GetStr())
-				if zv != nil {
-					var priv_fbc types.IFunction = zv.GetPtr()
+				if priv_fbc := scope.FunctionTable().Get(lmname.GetStr()); priv_fbc != nil {
 					if priv_fbc.IsPrivate() && priv_fbc.GetScope() == scope {
 						fcc.SetFunctionHandler(priv_fbc)
 					}

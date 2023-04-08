@@ -733,8 +733,6 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 	var method_name types.Zval
 	var ce *types.ClassEntry = nil
 	var scope *types.ClassEntry
-	var mptr types.IFunction
-	var key *types.String
 	if ZendParseParameters(executeData.NumArgs(), "z", &klass) == types.FAILURE {
 		return
 	}
@@ -749,14 +747,9 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 	}
 	ArrayInit(return_value)
 	scope = ZendGetExecutedScope()
-	var __ht *types.Array = ce.GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
-
-		key = _p.GetKey()
-		mptr = _z.GetPtr()
+	ce.FunctionTable().Foreach(func(key string, mptr types.IFunction) {
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
-			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && !SameName(key, mptr.GetFunctionName()) {
+			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.GetOpArray().refcount > 1) && key != nil && !SameName(key, mptr.GetFunctionName()) {
 				method_name.SetStringCopy(ZendFindAliasName(mptr.GetScope(), key))
 				return_value.GetArr().NextIndexInsertNew(&method_name)
 			} else {
@@ -764,12 +757,11 @@ func ZifGetClassMethods(executeData zpp.Ex, return_value zpp.Ret, class *types.Z
 				return_value.GetArr().NextIndexInsertNew(&method_name)
 			}
 		}
-	}
+	})
 }
 func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, method *types.Zval) {
 	var klass *types.Zval
 	var method_name *types.String
-	var lcname *types.String
 	var ce *types.ClassEntry
 	var func_ types.IFunction
 	for {
@@ -795,11 +787,8 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 		return_value.SetFalse()
 		return
 	}
-	lcname = ZendStringTolower(method_name)
-	func_ = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname.GetStr())
-	// types.ZendStringReleaseEx(lcname, 0)
+	func_ = ce.FunctionTable().Get(method_name.GetStr())
 	if func_ != nil {
-
 		/* Exclude shadow properties when checking a method on a specific class. Include
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */

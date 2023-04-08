@@ -1066,9 +1066,8 @@ func ZendGetParentPrivateMethod(scope *types.ClassEntry, ce *types.ClassEntry, f
 	var func_ *types.Zval
 	var fbc types.IFunction
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
-		func_ = scope.GetFunctionTable().KeyFind(function_name.GetStr())
-		if func_ != nil {
-			fbc = func_.GetFunc()
+		fbc = scope.FunctionTable().Get(function_name.GetStr())
+		if fbc != nil {
 			if fbc.IsPrivate() && fbc.GetScope() == scope {
 				return fbc
 			}
@@ -1181,17 +1180,14 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 		types.ZSTR_ALLOCA_ALLOC(lc_method_name, method_name.GetLen())
 		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
 	}
-	if b.Assign(&func_, zobj.GetCe().GetFunctionTable().KeyFind(lc_method_name.GetStr())) == nil {
-		if key == nil {
-			//lc_method_name.Free()
-		}
+	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name.GetStr())
+	if fbc == nil {
 		if zobj.GetCe().GetCall() != nil {
 			return ZendGetUserCallFunction(zobj.GetCe(), method_name)
 		} else {
 			return nil
 		}
 	}
-	fbc = func_.GetFunc()
 
 	/* Check access level */
 
@@ -1227,7 +1223,6 @@ func ZendGetUserCallstaticFunction(ce *types.ClassEntry, method_name *types.Stri
 	return ZendGetCallTrampolineFunc(ce, method_name, 1)
 }
 func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, key *types.Zval) types.IFunction {
-	var fbc types.IFunction = nil
 	var lc_function_name *types.String
 	var object *types.ZendObject
 	var scope *types.ClassEntry
@@ -1236,17 +1231,14 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	} else {
 		lc_function_name = ZendStringTolower(function_name)
 	}
-	var func_ *types.Zval = ce.GetFunctionTable().KeyFind(lc_function_name.GetStr())
-	if func_ != nil {
-		fbc = func_.GetFunc()
+
+	fbc := ce.FunctionTable().Get(lc_function_name.GetStr())
+	if fbc != nil {
+		// pass
 	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetStr(), b.CastStr(ce.GetName().GetVal(), lc_function_name.GetLen()), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetVal()[0] != '_' || ce.GetConstructor().GetFunctionName().GetVal()[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
-		if key == nil {
-			// types.ZendStringReleaseEx(lc_function_name, 0)
-		}
 		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
-
 			/* Call the top-level defined __call().
 			 * see: tests/classes/__call_004.phpt  */
 
@@ -1603,14 +1595,14 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 	return types.FAILURE
 }
 func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.ZendObject) int {
-	var func_ *types.Zval
 	var ce *types.ClassEntry = types.Z_OBJCE_P(obj)
-	if b.Assign(&func_, ce.GetFunctionTable().KeyFind(types.ZSTR_MAGIC_INVOKE.GetStr())) == nil {
+	fptr := ce.FunctionTable().Get(types.ZSTR_MAGIC_INVOKE.GetStr())
+	if fptr == nil {
 		return types.FAILURE
 	}
-	*fptr_ptr = func_.GetFunc()
+	*fptr_ptr = fptr
 	*ce_ptr = ce
-	if fptr_ptr.IsStatic() {
+	if fptr.IsStatic() {
 		if obj_ptr != nil {
 			*obj_ptr = nil
 		}

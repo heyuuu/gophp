@@ -195,11 +195,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 
 	if opline.GetOp1Type() == IS_UNUSED && opline.GetOp2Type() == IS_CONST && CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
 		var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
-		fbc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetFunctionTable(), lcname.GetStr(
-
-			/* We only know the exact method that is being called if it is either private or final.
-			 * Otherwise an overriding method in a child class may be called. */))
-
+		fbc = CG__().GetActiveClassEntry().FunctionTable().Get(lcname.GetStr())
 		if fbc != nil && !fbc.HasFnFlags(AccPrivate|AccFinal) {
 			fbc = nil
 		}
@@ -267,7 +263,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 		}
 		if ce != nil {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp2()) + 1).GetStr()
-			fbc = types.ZendHashFindPtr(ce.GetFunctionTable(), lcname.GetStr())
+			fbc = ce.FunctionTable().Get(lcname.GetStr())
 			if fbc != nil && !fbc.IsPublic() {
 				if ce != CG__().GetActiveClassEntry() && (fbc.IsPrivate() || !fbc.GetScope().IsLinked() || CG__().GetActiveClassEntry() != nil && !CG__().GetActiveClassEntry().IsLinked() || ZendCheckProtected(ZendGetFunctionRootClass(fbc), CG__().GetActiveClassEntry()) == 0) {
 

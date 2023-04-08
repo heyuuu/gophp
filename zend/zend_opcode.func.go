@@ -85,6 +85,24 @@ func ZendFunctionDtor(zv *types.Zval) {
 		}
 	}
 }
+func ZendFunctionDtorEx(function types.IFunction) {
+	if function.GetType() == ZEND_USER_FUNCTION {
+		b.Assert(function.GetFunctionName() != nil)
+		DestroyOpArray(function.GetOpArray())
+	} else {
+		b.Assert(function.GetType() == ZEND_INTERNAL_FUNCTION)
+		b.Assert(function.GetFunctionName() != nil)
+		// types.ZendStringReleaseEx(function.GetFunctionName(), 1)
+
+		/* For methods this will be called explicitly. */
+		if function.GetScope() == nil {
+			ZendFreeInternalArgInfo(function.GetInternalFunction())
+		}
+		if !function.IsArenaAllocated() {
+			Pefree(function, 1)
+		}
+	}
+}
 func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 	if CE_STATIC_MEMBERS(ce) != nil {
 		var static_members *types.Zval = CE_STATIC_MEMBERS(ce)
@@ -218,20 +236,15 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 	var prop_info *ZendPropertyInfo
 	var fn types.IFunction
 	if ce.HasCeFlags(AccImmutable | AccPreloaded) {
-		var op_array *types.ZendOpArray
 		if ce.GetDefaultStaticMembersCount() != 0 {
 			ZendCleanupInternalClassData(ce)
 		}
 		if ce.IsHasStaticInMethods() {
-			var __ht *types.Array = ce.GetFunctionTable()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				op_array = _z.GetPtr()
-				if op_array.GetType() == ZEND_USER_FUNCTION {
-					DestroyOpArray(op_array)
+			ce.FunctionTable().Foreach(func(_ string, f types.IFunction) {
+				if f.GetType() == ZEND_USER_FUNCTION {
+					DestroyOpArray(f.GetOpArray())
 				}
-			}
+			})
 		}
 		return
 	} else if b.PreDec(&(ce.GetRefcount())) > 0 {
@@ -304,7 +317,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 		}
 		ce.GetPropertiesInfo().Destroy()
 		// types.ZendStringReleaseEx(ce.GetName(), 0)
-		ce.GetFunctionTable().Destroy()
+		ce.FunctionTable().Destroy()
 		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
 			var __ht *types.Array = ce.GetConstantsTable()
@@ -363,17 +376,13 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 		// types.ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
-
-		var __ht *types.Array = ce.GetFunctionTable()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			fn = _z.GetPtr()
+		ce.FunctionTable().Foreach(func(_ string, fn types.IFunction) {
 			if fn.HasFnFlags(AccHasReturnType|AccHasTypeHints) && fn.GetScope() == ce {
 				ZendFreeInternalArgInfo(fn.GetInternalFunction())
 			}
-		}
-		ce.GetFunctionTable().Destroy()
+		})
+		ce.FunctionTable().Destroy()
+
 		if ce.GetConstantsTable().Len() {
 			var c *ZendClassConstant
 			var __ht *types.Array = ce.GetConstantsTable()

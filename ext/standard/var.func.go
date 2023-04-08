@@ -857,7 +857,7 @@ again:
 		var ce *types.ClassEntry = types.Z_OBJCE_P(struc)
 		var incomplete_class types.ZendBool
 		var count uint32
-		if ce.GetFunctionTable().KeyExists("__serialize") {
+		if ce.FunctionTable().Exists("__serialize") {
 			var retval types.Zval
 			var obj types.Zval
 			var key *types.String
@@ -931,7 +931,7 @@ again:
 			}
 			return
 		}
-		if ce != PHP_IC_ENTRY && ce.GetFunctionTable().KeyExists("__sleep") {
+		if ce != PHP_IC_ENTRY && ce.FunctionTable().Exists("__sleep") {
 			var retval types.Zval
 			var tmp types.Zval
 			struc.AddRefcount()

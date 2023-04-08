@@ -66,6 +66,7 @@ type IFunction interface {
 	SetIsPublic(b bool)
 	SetIsProtected(b bool)
 	SetIsPrivate(b bool)
+	SetIsChanged(b bool)
 	SetIsStatic(b bool)
 	SetIsAbstract(b bool)
 	SetIsVariadic(b bool)
@@ -183,6 +184,7 @@ func (f *functionHeader) IsTraitClone() bool        { return f.HasFnFlags(zend.A
 func (f *functionHeader) SetIsPublic(b bool)        { f.SwitchFnFlags(zend.AccPublic, b) }
 func (f *functionHeader) SetIsProtected(b bool)     { f.SwitchFnFlags(zend.AccProtected, b) }
 func (f *functionHeader) SetIsPrivate(b bool)       { f.SwitchFnFlags(zend.AccPrivate, b) }
+func (f *functionHeader) SetIsChanged(b bool)       { f.SwitchFnFlags(zend.AccChanged, b) }
 func (f *functionHeader) SetIsStatic(b bool)        { f.SwitchFnFlags(zend.AccStatic, b) }
 func (f *functionHeader) SetIsAbstract(b bool)      { f.SwitchFnFlags(zend.AccAbstract, b) }
 func (f *functionHeader) SetIsVariadic(b bool)      { f.SwitchFnFlags(zend.AccVariadic, b) }

@@ -678,7 +678,7 @@ func DoInheritanceCheckOnMethodEx(
 	child types.IFunction,
 	parent types.IFunction,
 	ce *types.ClassEntry,
-	child_zv *types.Zval,
+	child_dup_callback func(types.IFunction),
 	check_only types.ZendBool,
 	checked types.ZendBool,
 ) InheritanceStatus {
@@ -739,21 +739,15 @@ func DoInheritanceCheckOnMethodEx(
 		for {
 			if child.GetScope() != ce && child.GetType() == ZEND_USER_FUNCTION && child.GetOpArray().GetStaticVariables() == nil {
 				if ce.IsInterface() {
-
 					/* Few parent interfaces contain the same method */
-
 					break
-
-					/* Few parent interfaces contain the same method */
-
-				} else if child_zv != nil {
+				} else if child_dup_callback != nil {
 
 					/* op_array wasn't duplicated yet */
 
-					var new_function types.IFunction = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
-					memcpy(new_function, child, b.SizeOf("zend_op_array"))
+					var new_function types.IFunction = types.CopyOpArray(child.GetOpArray())
 					child = new_function
-					child_zv.SetPtr(child)
+					child_dup_callback(child)
 				}
 			}
 			child.SetPrototype(proto)
@@ -778,37 +772,31 @@ func DoInheritanceCheckOnMethodEx(
 	}
 	return INHERITANCE_SUCCESS
 }
-func DoInheritanceCheckOnMethod(child types.IFunction, parent types.IFunction, ce *types.ClassEntry, child_zv *types.Zval) {
-	DoInheritanceCheckOnMethodEx(child, parent, ce, child_zv, 0, 0)
-}
-func DoInheritMethod(key *types.String, parent types.IFunction, ce *types.ClassEntry, is_interface types.ZendBool, checked types.ZendBool) {
-	var child *types.Zval = ce.GetFunctionTable().KeyFind(key.GetStr())
-	if child != nil {
-		var func_ types.IFunction = (types.IFunction)(child.GetPtr())
+func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, is_interface types.ZendBool, checked types.ZendBool) {
+	var func_ = ce.FunctionTable().Get(key)
+	if func_ != nil {
 		if is_interface != 0 && func_ == parent {
-
 			/* The same method in interface may be inherited few times */
-
 			return
-
-			/* The same method in interface may be inherited few times */
-
 		}
+		dupCallback := func(f types.IFunction) { ce.FunctionTable().UpdateDirect(key, f) }
 		if checked != 0 {
-			DoInheritanceCheckOnMethodEx(func_, parent, ce, child, 0, checked)
+			DoInheritanceCheckOnMethodEx(func_, parent, ce, dupCallback, 0, checked)
 		} else {
-			DoInheritanceCheckOnMethod(func_, parent, ce, child)
+			DoInheritanceCheckOnMethodEx(func_, parent, ce, dupCallback, 0, 0)
 		}
 	} else {
 		if is_interface != 0 || parent.IsAbstract() {
 			ce.SetIsImplicitAbstractClass(true)
 		}
 		parent = ZendDuplicateFunction(parent, ce, is_interface)
-		if is_interface == 0 {
-			types._zendHashAppendPtr(ce.GetFunctionTable(), key, parent)
-		} else {
-			types.ZendHashAddNewPtr(ce.GetFunctionTable(), key.GetStr(), parent)
-		}
+		ce.FunctionTable().Add(key, parent)
+		// todo 考虑下 interface 是否会有多个同名函数同时存在
+		//if is_interface == 0 {
+		//	types._zendHashAppendPtr(ce.GetFunctionTable(), key, parent)
+		//} else {
+		//	types.ZendHashAddNewPtr(ce.GetFunctionTable(), key.GetStr(), parent)
+		//}
 	}
 }
 func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendPropertyInfo) InheritanceStatus {
@@ -1270,26 +1258,15 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			DoInheritClassConstant(key, c, ce)
 		}
 	}
-	if parent_ce.GetFunctionTable().Len() {
-		ce.GetFunctionTable().Extend(ce.GetFunctionTable().Len() + parent_ce.GetFunctionTable().Len())
+	if parent_ce.FunctionTable().Len() != 0 {
 		if checked {
-			var __ht *types.Array = parent_ce.GetFunctionTable()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				key = _p.GetKey()
-				func_ = _z.GetPtr()
+			parent_ce.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
 				DoInheritMethod(key, func_, ce, 0, 1)
-			}
+			})
 		} else {
-			var __ht *types.Array = parent_ce.GetFunctionTable()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				key = _p.GetKey()
-				func_ = _z.GetPtr()
+			parent_ce.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
 				DoInheritMethod(key, func_, ce, 0, 0)
-			}
+			})
 		}
 	}
 	DoInheritParentConstructor(ce)
@@ -1338,14 +1315,9 @@ func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
 		c = _z.GetPtr()
 		DoInheritIfaceConstant(key, c, ce, iface)
 	}
-	var __ht__1 *types.Array = iface.GetFunctionTable()
-	for _, _p := range __ht__1.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		key = _p.GetKey()
-		func_ = _z.GetPtr()
+	iface.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
 		DoInheritMethod(key, func_, ce, 1, 0)
-	}
+	})
 	DoImplementInterface(ce, iface)
 	if iface.GetNumInterfaces() != 0 {
 		ZendDoInheritInterfaces(ce, iface)
@@ -1508,7 +1480,7 @@ func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFu
 func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn types.IFunction, overridden **types.Array) {
 	var existing_fn types.IFunction = nil
 	var new_fn types.IFunction
-	if b.Assign(&existing_fn, types.ZendHashFindPtr(ce.GetFunctionTable(), key.GetStr())) != nil {
+	if b.Assign(&existing_fn, ce.FunctionTable().Get(key.GetStr())) != nil {
 
 		/* if it is the same function with the same visibility and has not been assigned a class scope yet, regardless
 		 * of where it is coming from there is no conflict and we do not need to add it again */
@@ -1563,7 +1535,7 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 
 			/* inherited members are overridden by members inserted by traits */
 
-			DoInheritanceCheckOnMethod(fn, existing_fn, ce, nil)
+			DoInheritanceCheckOnMethodEx(fn, existing_fn, ce, nil, 0, 0)
 			fn.SetPrototype(nil)
 		}
 	}
@@ -1578,8 +1550,8 @@ func ZendAddTraitMethod(ce *types.ClassEntry, name *byte, key *types.String, fn 
 		new_fn.GetOpArray().SetIsImmutable(false)
 	}
 	FunctionAddRef(new_fn)
-	fn = types.ZendHashUpdatePtr(ce.GetFunctionTable(), key.GetStr(), new_fn)
-	ZendAddMagicMethods(ce, key, fn)
+	ce.FunctionTable().Update(key.GetStr(), new_fn)
+	ZendAddMagicMethods(ce, key, new_fn)
 }
 func ZendFixupTraitMethod(fn types.IFunction, ce *types.ClassEntry) {
 	if (fn.GetScope().GetCeFlags() & AccTrait) == AccTrait {
@@ -1593,7 +1565,7 @@ func ZendFixupTraitMethod(fn types.IFunction, ce *types.ClassEntry) {
 	}
 }
 func ZendTraitsCopyFunctions(
-	fnname *types.String,
+	fnname string,
 	fn types.IFunction,
 	ce *types.ClassEntry,
 	overridden **types.Array,
@@ -1736,7 +1708,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 			/** Ensure that the preferred method is actually available. */
 
 			lcname = ZendStringTolower(cur_method_ref.GetMethodName())
-			if !trait.GetFunctionTable().KeyExists(lcname.GetStr()) {
+			if !trait.FunctionTable().Exists(lcname.GetStr()) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "A precedence rule was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 			}
 
@@ -1802,7 +1774,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 				/** And, ensure that the referenced method is resolvable, too. */
 
 				lcname = ZendStringTolower(cur_method_ref.GetMethodName())
-				if !trait.GetFunctionTable().KeyExists(lcname.GetStr()) {
+				if !trait.FunctionTable().Exists(lcname.GetStr()) {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "An alias was defined for %s::%s but this method does not exist", trait.GetName().GetVal(), cur_method_ref.GetMethodName().GetVal())
 				}
 				// types.ZendStringReleaseEx(lcname, 0)
@@ -1813,25 +1785,17 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 	*exclude_tables_ptr = exclude_tables
 	*aliases_ptr = aliases
 }
-func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, exclude_tables **types.Array, aliases **types.ClassEntry) {
+func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits []*types.ClassEntry, exclude_tables []*types.Array, aliases **types.ClassEntry) {
 	var i uint32
 	var overridden *types.Array = nil
-	var key *types.String
-	var fn types.IFunction
 	if exclude_tables != nil {
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
 
 				/* copies functions, applies defined aliasing, and excludes unused trait methods */
-
-				var __ht *types.Array = traits[i].GetFunctionTable()
-				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
-
-					key = _p.GetKey()
-					fn = _z.GetPtr()
+				traits[i].FunctionTable().Foreach(func(key string, fn types.IFunction) {
 					ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
-				}
+				})
 				if exclude_tables[i] != nil {
 					exclude_tables[i].Destroy()
 					FREE_HASHTABLE(exclude_tables[i])
@@ -1842,24 +1806,15 @@ func ZendDoTraitsMethodBinding(ce *types.ClassEntry, traits **types.ClassEntry, 
 	} else {
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
-				var __ht *types.Array = traits[i].GetFunctionTable()
-				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
-
-					key = _p.GetKey()
-					fn = _z.GetPtr()
+				traits[i].FunctionTable().Foreach(func(key string, fn types.IFunction) {
 					ZendTraitsCopyFunctions(key, fn, ce, &overridden, nil, aliases)
-				}
+				})
 			}
 		}
 	}
-	var __ht *types.Array = ce.GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		fn = _z.GetPtr()
+	ce.FunctionTable().Foreach(func(_ string, fn types.IFunction) {
 		ZendFixupTraitMethod(fn, ce)
-	}
+	})
 	if overridden != nil {
 		overridden.Destroy()
 		FREE_HASHTABLE(overridden)
@@ -2033,7 +1988,7 @@ func ZendDoCheckForInconsistentTraitsAliasing(ce *types.ClassEntry, aliases **ty
 					     as in the case where alias is set. */
 
 					lc_method_name = ZendStringTolower(cur_alias.GetTraitMethod().GetMethodName())
-					if ce.GetFunctionTable().KeyExists(lc_method_name.GetStr()) {
+					if ce.FunctionTable().Exists(lc_method_name.GetStr()) {
 						// types.ZendStringReleaseEx(lc_method_name, 0)
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "The modifiers for the trait alias %s() need to be changed in the same statement in which the alias is defined. Error", cur_alias.GetTraitMethod().GetMethodName().GetVal())
 					} else {
@@ -2148,17 +2103,12 @@ func ZendVerifyAbstractClassFunction(fn types.IFunction, ai *ZendAbstractInfo) {
 	}
 }
 func ZendVerifyAbstractClass(ce *types.ClassEntry) {
-	var func_ types.IFunction
 	var ai ZendAbstractInfo
 	b.Assert((ce.GetCeFlags() & (AccImplicitAbstractClass | AccInterface | AccTrait | AccExplicitAbstractClass)) == AccImplicitAbstractClass)
 	memset(&ai, 0, b.SizeOf("ai"))
-	var __ht *types.Array = ce.GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		func_ = _z.GetPtr()
+	ce.FunctionTable().Foreach(func(_ string, func_ types.IFunction) {
 		ZendVerifyAbstractClassFunction(func_, &ai)
-	}
+	})
 	if ai.GetCnt() != 0 {
 		faults.ErrorNoreturn(faults.E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.GetName().GetVal(), ai.GetCnt(), b.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
 	} else {
@@ -2421,27 +2371,24 @@ func ZendDoLinkClass(ce *types.ClassEntry, lc_parent_name *types.String) int {
 func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) InheritanceStatus {
 	var ret InheritanceStatus = INHERITANCE_SUCCESS
 	var key *types.String
-	var parent_func types.IFunction
 	var parent_info *ZendPropertyInfo
-	var __ht *types.Array = parent_ce.GetFunctionTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		key = _p.GetKey()
-		parent_func = _z.GetPtr()
-		var zv *types.Zval = ce.GetFunctionTable().KeyFind(key.GetStr())
-		if zv != nil {
-			var child_func types.IFunction = zv.GetFunc()
+	parent_ce.FunctionTable().ForeachEx(func(key string, parent_func types.IFunction) bool {
+		var child_func types.IFunction = ce.FunctionTable().Get(key)
+		if child_func != nil {
 			var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
 			if status != INHERITANCE_SUCCESS {
-				if status == INHERITANCE_UNRESOLVED {
-					return INHERITANCE_UNRESOLVED
-				}
-				b.Assert(status == INHERITANCE_ERROR)
-				ret = INHERITANCE_ERROR
+				b.Assert(status == INHERITANCE_UNRESOLVED || status == INHERITANCE_ERROR)
+				ret = status
+				return false
 			}
 		}
+		return true
+	})
+	if ret == INHERITANCE_UNRESOLVED {
+		return ret
 	}
+
 	var __ht__1 *types.Array = parent_ce.GetPropertiesInfo()
 	for _, _p := range __ht__1.ForeachData() {
 		var _z *types.Zval = _p.GetVal()

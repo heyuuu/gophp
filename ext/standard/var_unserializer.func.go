@@ -537,7 +537,7 @@ func ObjectCommon(
 		types.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.Z_OBJCE_P(rval).GetFunctionTable().KeyExists("__wakeup")
+	has_wakeup = types.Z_OBJCE_P(rval) != PHP_IC_ENTRY && types.Z_OBJCE_P(rval).FunctionTable().Exists("__wakeup")
 	ht = types.Z_OBJPROP_P(rval)
 	if elements >= zend_long(types.HT_MAX_SIZE-ht.Len()) {
 		return 0
@@ -904,7 +904,7 @@ yy18:
 		return 0
 	}
 	*p += 2
-	has_unserialize = incomplete_class == 0 && ce.GetFunctionTable().KeyExists("__unserialize")
+	has_unserialize = incomplete_class == 0 && ce.FunctionTable().Exists("__unserialize")
 
 	/* If this class implements Serializable, it should not land here but in object_custom().
 	 * The passed string obviously doesn't descend from the regular serializer. However, if

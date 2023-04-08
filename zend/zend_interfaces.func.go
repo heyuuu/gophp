@@ -7,7 +7,7 @@ import (
 )
 
 func ZendCallMethodWith0Params(obj *types.Zval, obj_ce *types.ClassEntry, fn_proxy *types.IFunction, function_name string, retval *types.Zval) *types.Zval {
-	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 0, nil, nil)
+	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, retval, 0, nil, nil)
 }
 func ZendCallMethodWith1Params(
 	obj *types.Zval,
@@ -17,7 +17,7 @@ func ZendCallMethodWith1Params(
 	retval *types.Zval,
 	arg1 *types.Zval,
 ) *types.Zval {
-	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 1, arg1, nil)
+	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, retval, 1, arg1, nil)
 }
 func ZendCallMethodWith2Params(
 	obj *types.Zval,
@@ -28,14 +28,13 @@ func ZendCallMethodWith2Params(
 	arg1 *types.Zval,
 	arg2 *types.Zval,
 ) *types.Zval {
-	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 2, arg1, arg2)
+	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, retval, 2, arg1, arg2)
 }
 func ZendCallMethod(
 	object *types.Zval,
 	obj_ce *types.ClassEntry,
 	fn_proxy *types.IFunction,
 	function_name string,
-	function_name_len int,
 	retval_ptr *types.Zval,
 	param_count int,
 	arg1 *types.Zval,
@@ -70,7 +69,7 @@ func ZendCallMethod(
 		/* no interest in caching and no information already present that is
 		 * needed later inside zend_call_function. */
 
-		fci.GetFunctionName().SetStringVal(b.CastStr(function_name, function_name_len))
+		fci.GetFunctionName().SetStringVal(function_name)
 		result = ZendCallFunction(&fci, nil)
 		ZvalPtrDtor(fci.GetFunctionName())
 	} else {
@@ -85,7 +84,7 @@ func ZendCallMethod(
 		}
 		if fn_proxy == nil || (*fn_proxy) == nil {
 			if obj_ce != nil {
-				fcic.SetFunctionHandler(types.ZendHashStrFindPtr(obj_ce.GetFunctionTable(), b.CastStr(function_name, function_name_len)))
+				fcic.SetFunctionHandler(obj_ce.FunctionTable().Get(function_name))
 				if fcic.GetFunctionHandler() == nil {
 
 					/* error at c-level */
@@ -96,7 +95,7 @@ func ZendCallMethod(
 
 				}
 			} else {
-				fcic.SetFunctionHandler(ZendFetchFunctionStr(b.CastStr(function_name, function_name_len)))
+				fcic.SetFunctionHandler(ZendFetchFunctionStr(function_name))
 				if fcic.GetFunctionHandler() == nil {
 
 					/* error at c-level */
@@ -318,7 +317,7 @@ func ZendImplementAggregate(interface_ *types.ClassEntry, class_type *types.Clas
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		}
-		funcs_ptr.SetZfNewIterator(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "getiterator"))
+		funcs_ptr.SetZfNewIterator(class_type.FunctionTable().Get("getiterator"))
 	} else {
 		if funcs_ptr == nil {
 			funcs_ptr = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_iterator_funcs"))
@@ -363,11 +362,11 @@ func ZendImplementIterator(interface_ *types.ClassEntry, class_type *types.Class
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		} else {
-			funcs_ptr.SetZfRewind(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "rewind"))
-			funcs_ptr.SetZfValid(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "valid"))
-			funcs_ptr.SetZfKey(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "key"))
-			funcs_ptr.SetZfCurrent(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "current"))
-			funcs_ptr.SetZfNext(types.ZendHashStrFindPtr(class_type.GetFunctionTable(), "next"))
+			funcs_ptr.SetZfRewind(class_type.FunctionTable().Get("rewind"))
+			funcs_ptr.SetZfValid(class_type.FunctionTable().Get("valid"))
+			funcs_ptr.SetZfKey(class_type.FunctionTable().Get("key"))
+			funcs_ptr.SetZfCurrent(class_type.FunctionTable().Get("current"))
+			funcs_ptr.SetZfNext(class_type.FunctionTable().Get("next"))
 		}
 	} else {
 		if funcs_ptr == nil {
