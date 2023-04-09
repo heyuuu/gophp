@@ -166,7 +166,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 		} else {
 			var tmp_class_name *types.String
 			var class_name *types.String = ZvalGetTmpString(scope_arg, &tmp_class_name)
-			if types.ZendStringEqualsLiteral(class_name, "static") {
+			if class_name.GetStr() == "static" {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
 				faults.Error(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
@@ -227,7 +227,7 @@ func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zva
 	mptr = fcc.GetFunctionHandler()
 	if mptr.IsCallViaTrampoline() {
 		/* For Closure::fromCallable([$closure, "__invoke"]) return $closure. */
-		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && types.ZendStringEqualsLiteral(mptr.GetFunctionName(), "__invoke") {
+		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && mptr.GetFunctionName().GetStr() == "__invoke" {
 			return_value.SetObject(fcc.GetObject())
 			fcc.GetObject().AddRefcount()
 			ZendFreeTrampoline(mptr)

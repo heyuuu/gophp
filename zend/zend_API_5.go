@@ -264,7 +264,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 			}
 		}
 		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName())
-		lowercase_name = types.ZendNewInternedString(lowercase_name)
+		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		reg_function = types.CopyFunction(function)
 		if !targetFunctionTable.Add(lowercase_name.GetStr(), reg_function) {
 			unload = 1
@@ -321,40 +321,40 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 
 			if fname_len == class_name_len && ctor == nil && !(memcmp(lowercase_name.GetVal(), lc_class_name, class_name_len+1)) {
 				ctor = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, "serialize") {
+			} else if lowercase_name.GetStr() == "serialize" {
 				serialize_func = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, "unserialize") {
+			} else if lowercase_name.GetStr() == "unserialize" {
 				unserialize_func = reg_function
 			} else if lowercase_name.GetVal()[0] != '_' || lowercase_name.GetVal()[1] != '_' {
 				reg_function = nil
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CONSTRUCTOR_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 				ctor = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_DESTRUCTOR_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_DESTRUCTOR_FUNC_NAME {
 				dtor = reg_function
 				if internal_function.GetNumArgs() != 0 {
 					faults.Error(error_type, "Destructor %s::%s() cannot take arguments", scope.GetName().GetVal(), ptr.GetFname())
 				}
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CLONE_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_CLONE_FUNC_NAME {
 				clone = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CALL_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_CALL_FUNC_NAME {
 				__call = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_CALLSTATIC_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
 				__callstatic = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_TOSTRING_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_TOSTRING_FUNC_NAME {
 				__tostring = reg_function
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_GET_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_GET_FUNC_NAME {
 				__get = reg_function
 				scope.SetIsUseGuards(true)
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_SET_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_SET_FUNC_NAME {
 				__set = reg_function
 				scope.SetIsUseGuards(true)
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_UNSET_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_UNSET_FUNC_NAME {
 				__unset = reg_function
 				scope.SetIsUseGuards(true)
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_ISSET_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_ISSET_FUNC_NAME {
 				__isset = reg_function
 				scope.SetIsUseGuards(true)
-			} else if types.ZendStringEqualsLiteral(lowercase_name, ZEND_DEBUGINFO_FUNC_NAME) {
+			} else if lowercase_name.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 				__debugInfo = reg_function
 			} else {
 				reg_function = nil

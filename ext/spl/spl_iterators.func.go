@@ -2006,7 +2006,7 @@ func zim_spl_CachingIterator___toString(executeData *zend.ZendExecuteData, retur
 		return_value.SetStringCopy(intern.GetZstr().GetStr())
 		return
 	} else {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 }

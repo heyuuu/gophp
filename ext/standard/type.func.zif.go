@@ -12,18 +12,20 @@ var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{Name: "var_"}}, 
 	if fp.HasError() {
 		return
 	}
-	ZifGettype(var_)
+	ret := ZifGettype(var_)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifSettype
-var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{Name: "var_"}, {Name: "type_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{Name: "var_"}, {Name: "typ"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
 	var_ := fp.ParseZvalEx(false, true)
-	type_ := fp.ParseZval()
+	typ := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifSettype(var_, type_)
+	ret := ZifSettype(var_, typ)
+	returnValue.SetBool(ret)
 })
 
 // generate by ZifIntval

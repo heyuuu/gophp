@@ -479,7 +479,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		if scope != nil {
 			result.SetStringCopy(scope.GetName())
 		} else {
-			ZVAL_EMPTY_STRING(result)
+			result.SetStringVal("")
 		}
 	case ZEND_AST_CLASS_NAME:
 		if scope == nil {

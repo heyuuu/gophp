@@ -917,7 +917,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	   (or a 21/0 0/21 combination which is also "same")
 	  Also require paths to/from */
 
-	if resource_from == nil || resource_to == nil || resource_from.GetScheme() == nil || resource_to.GetScheme() == nil || types.ZendStringEquals(resource_from.GetScheme(), resource_to.GetScheme()) == 0 || resource_from.GetHost() == nil || resource_to.GetHost() == nil || types.ZendStringEquals(resource_from.GetHost(), resource_to.GetHost()) == 0 || resource_from.GetPort() != resource_to.GetPort() && resource_from.GetPort()*resource_to.GetPort() != 0 && resource_from.GetPort()+resource_to.GetPort() != 21 || resource_from.GetPath() == nil || resource_to.GetPath() == nil {
+	if resource_from == nil || resource_to == nil || resource_from.GetScheme() == nil || resource_to.GetScheme() == nil || resource_from.GetScheme().GetStr() != resource_to.GetScheme().GetStr() || resource_from.GetHost() == nil || resource_to.GetHost() == nil || resource_from.GetHost().GetStr() != resource_to.GetHost().GetStr() || resource_from.GetPort() != resource_to.GetPort() && resource_from.GetPort()*resource_to.GetPort() != 0 && resource_from.GetPort()+resource_to.GetPort() != 21 || resource_from.GetPath() == nil || resource_to.GetPath() == nil {
 		goto rename_errexit
 	}
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)

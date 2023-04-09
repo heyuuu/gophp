@@ -250,7 +250,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	var orig_memoized_exprs *types.Array = CG__().GetMemoizedExprs()
 	var orig_memoize_mode int = CG__().GetMemoizeMode()
 	ZendEnsureWritableVariable(var_ast)
-	if IsThisFetch(var_ast) != 0 {
+	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ALLOC_HASHTABLE(CG__().GetMemoizedExprs())
@@ -442,7 +442,7 @@ func ZendCompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 	}
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
-		if IsThisFetch(var_ast) != 0 {
+		if IsThisFetch(var_ast) {
 			opline = ZendEmitOp(result, ZEND_ISSET_ISEMPTY_THIS, nil, nil)
 			CG__().GetActiveOpArray().SetIsUsesThis(true)
 		} else if ZendTryCompileCv(&var_node, var_ast) == types.SUCCESS {
@@ -590,7 +590,7 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 	var is_fully_qualified types.ZendBool
 	var orig_name *types.String = ZendAstGetStr(name_ast)
 	var resolved_name *types.String = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
-	if types.ZendStringEqualsLiteral(resolved_name, "__COMPILER_HALT_OFFSET__") || name_ast.GetAttr() != ZEND_NAME_RELATIVE && types.ZendStringEqualsLiteral(orig_name, "__COMPILER_HALT_OFFSET__") {
+	if resolved_name.GetStr() == "__COMPILER_HALT_OFFSET__" || name_ast.GetAttr() != ZEND_NAME_RELATIVE && orig_name.GetStr() == "__COMPILER_HALT_OFFSET__" {
 		var last *ZendAst = CG__().GetAst()
 		for last != nil && last.GetKind() == ZEND_AST_STMT_LIST {
 			var list *ZendAstList = ZendAstGetList(last)
@@ -775,7 +775,7 @@ func ZendCompileEncapsList(result *Znode, ast *ZendAst) {
 		if last_const_node.GetOpType() == IS_CONST {
 			types.ZVAL_COPY_VALUE(result.GetConstant(), last_const_node.GetConstant())
 		} else {
-			ZVAL_EMPTY_STRING(result.GetConstant())
+			result.GetConstant().SetStringVal("")
 		}
 		CG__().GetActiveOpArray().SetLast(reserved_op_number - 1)
 		return

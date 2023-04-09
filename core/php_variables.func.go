@@ -14,19 +14,11 @@ func PhpRegisterVariable(var_ string, strval *byte, track_vars_array *types.Zval
 	PhpRegisterVariableSafe(var_, strval, strlen(strval), track_vars_array)
 }
 func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_array *types.Zval) {
-	var new_entry types.Zval
 	b.Assert(strval != nil)
 
 	/* Prepare value */
-
-	if str_len == 0 {
-		zend.ZVAL_EMPTY_STRING(&new_entry)
-	} else if str_len == 1 {
-		new_entry.SetInternedString(types.ZstrChar(zend_uchar * strval))
-	} else {
-		new_entry.SetString(types.NewString(b.CastStr(strval, str_len)))
-	}
-	PhpRegisterVariableEx(var_, &new_entry, track_vars_array)
+	tmp := types.NewZvalString(b.CastStr(strval, str_len))
+	PhpRegisterVariableEx(var_, tmp, track_vars_array)
 }
 func PhpRegisterVariableQuick(name *byte, name_len int, val *types.Zval, ht *types.Array) {
 	var key *types.String = types.ZendStringInitInterned(name, name_len, 0)
@@ -481,33 +473,20 @@ func ValidEnvironmentName(name *byte, end *byte) int {
 func ImportEnvironmentVariable(ht *types.Array, env *byte) {
 	var p *byte
 	var name_len int
-	var len_ int
-	var val types.Zval
 	var idx zend.ZendUlong
 	p = strchr(env, '=')
 	if p == nil || p == env || ValidEnvironmentName(env, p) == 0 {
-
 		/* malformed entry? */
-
 		return
-
-		/* malformed entry? */
-
 	}
 	name_len = p - env
 	p++
-	len_ = strlen(p)
-	if len_ == 0 {
-		zend.ZVAL_EMPTY_STRING(&val)
-	} else if len_ == 1 {
-		val.SetInternedString(types.ZstrChar(zend_uchar * p))
-	} else {
-		val.SetString(types.NewString(b.CastStr(p, len_)))
-	}
+
+	val := types.NewZvalString(b.CastStrAuto(p))
 	if types.HandleNumericStr(b.CastStr(env, name_len), &idx) {
-		ht.IndexUpdate(idx, &val)
+		ht.IndexUpdate(idx, val)
 	} else {
-		PhpRegisterVariableQuick(env, name_len, &val, ht)
+		PhpRegisterVariableQuick(env, name_len, val, ht)
 	}
 }
 func _phpImportEnvironmentVariables(array_ptr *types.Zval) {

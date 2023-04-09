@@ -282,7 +282,7 @@ func ZendCompileTry(ast *ZendAst) {
 		var classes *ZendAstList = ZendAstGetList(catch_ast.GetChild()[0])
 		var var_ast *ZendAst = catch_ast.GetChild()[1]
 		var stmt_ast *ZendAst = catch_ast.GetChild()[2]
-		var var_name *types.String = ZvalMakeInternedString(ZendAstGetZval(var_ast))
+		var var_name *types.String = ZendAstGetZval(var_ast).GetStr()
 		var is_last_catch types.ZendBool = i+1 == catches.GetChildren()
 		var jmp_multicatch *uint32 = SafeEmalloc(b.SizeOf("uint32_t"), classes.GetChildren()-1, 0)
 		var opnum_catch uint32 = uint32 - 1
@@ -302,7 +302,7 @@ func ZendCompileTry(ast *ZendAst) {
 			opline.SetOp1Type(IS_CONST)
 			opline.GetOp1().SetConstant(ZendAddClassNameLiteral(ZendResolveClassNameAst(class_ast)))
 			opline.SetExtendedValue(ZendAllocCacheSlot())
-			if types.ZendStringEqualsLiteral(var_name, "this") {
+			if var_name.GetStr() == "this" {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 			}
 			opline.SetResultType(IS_CV)
@@ -519,7 +519,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var type_ast *ZendAst = param_ast.GetChild()[0]
 		var var_ast *ZendAst = param_ast.GetChild()[1]
 		var default_ast *ZendAst = param_ast.GetChild()[2]
-		var name *types.String = ZvalMakeInternedString(ZendAstGetZval(var_ast))
+		var name *types.String = ZendAstGetZval(var_ast).GetStr()
 		var is_ref types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_REF) != 0
 		var is_variadic types.ZendBool = (param_ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0
 		var var_node Znode
@@ -534,7 +534,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		var_node.GetOp().SetVar(LookupCv(name))
 		if EX_VAR_TO_NUM(var_node.GetOp().GetVar()) != i {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Redefinition of parameter $%s", name.GetVal())
-		} else if types.ZendStringEqualsLiteral(name, "this") {
+		} else if name.GetStr() == "this" {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as parameter")
 		}
 		if op_array.IsVariadic() {

@@ -280,15 +280,6 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 	}
 	return result
 }
-func ZvalMakeInternedString(zv *types.Zval) *types.String {
-	b.Assert(zv.IsString())
-	zv.SetStr(types.ZendNewInternedString(zv.GetStr()))
-
-	return zv.GetStr()
-}
-func IsPersistentClass(ce *types.ClassEntry) types.ZendBool {
-	return (ce.GetType()&ZEND_INTERNAL_CLASS) != 0 && ce.GetModule().GetType() == MODULE_PERSISTENT
-}
 func ZendDeclareTypedProperty(
 	ce *types.ClassEntry,
 	name *types.String,
@@ -310,9 +301,9 @@ func ZendDeclareTypedProperty(
 			ce.SetIsConstantsUpdated(false)
 		}
 	}
-	if property.IsString() {
-		ZvalMakeInternedString(property)
-	}
+	//if property.IsString() {
+	//	ZvalMakeInternedString(property)
+	//}
 	if (access_type & AccPppMask) == 0 {
 		access_type |= AccPublic
 	}
@@ -388,9 +379,9 @@ func ZendDeclareTypedProperty(
 
 		/* Must be interned to avoid ZTS data races */
 
-		if IsPersistentClass(ce) != 0 {
-			name = types.ZendNewInternedString(name.Copy())
-		}
+		//if IsPersistentClass(ce) != 0 {
+		//	name = types.ZendNewInternedString(name.Copy())
+		//}
 
 		/* Must be interned to avoid ZTS data races */
 
@@ -403,7 +394,7 @@ func ZendDeclareTypedProperty(
 		b.Assert((access_type & AccProtected) != 0)
 		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr()))
 	}
-	property_info.SetName(types.ZendNewInternedString(property_info.GetName()))
+	//property_info.SetName(types.ZendNewInternedString(property_info.GetName()))
 	property_info.SetFlags(access_type)
 	property_info.SetDocComment(doc_comment)
 	property_info.SetCe(ce)

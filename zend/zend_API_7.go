@@ -49,7 +49,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 	types.ZstrAlloc(lcname, name_len)
 	ZendStrTolowerCopy(lcname.GetVal(), name.GetVal(), name_len)
 	*strict_class = 0
-	if types.ZendStringEqualsLiteral(lcname, "self") {
+	if lcname.GetStr() == "self" {
 		if scope == nil {
 			if error != nil {
 				*error = Estrdup("cannot access self:: when no class scope is active")
@@ -65,7 +65,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			}
 			ret = 1
 		}
-	} else if types.ZendStringEqualsLiteral(lcname, "parent") {
+	} else if lcname.GetStr() == "parent" {
 		if scope == nil {
 			if error != nil {
 				*error = Estrdup("cannot access parent:: when no class scope is active")
@@ -86,7 +86,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 			*strict_class = 1
 			ret = 1
 		}
-	} else if types.ZendStringEqualsLiteral(lcname, "static") {
+	} else if lcname.GetStr() == "static" {
 		var called_scope *types.ClassEntry = ZendGetCalledScope(CurrEX())
 		if called_scope == nil {
 			if error != nil {
@@ -245,7 +245,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		return 0
 	}
 	lmname = ZendStringTolower(mname)
-	if strict_class != 0 && fcc.GetCallingScope() != nil && types.ZendStringEqualsLiteral(lmname, ZEND_CONSTRUCTOR_FUNC_NAME) {
+	if strict_class != 0 && fcc.GetCallingScope() != nil && lmname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 		fcc.SetFunctionHandler(fcc.GetCallingScope().GetConstructor())
 		if fcc.GetFunctionHandler() != nil {
 			retval = 1

@@ -54,59 +54,59 @@ func ZendTryCompileSpecialFunc(result *Znode, lcname *types.String, args *ZendAs
 	if ZendArgsContainUnpack(args) != 0 {
 		return types.FAILURE
 	}
-	if types.ZendStringEqualsLiteral(lcname, "strlen") {
+	if lcname.GetStr() == "strlen" {
 		return ZendCompileFuncStrlen(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_null") {
+	} else if lcname.GetStr() == "is_null" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_NULL)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_bool") {
+	} else if lcname.GetStr() == "is_bool" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_BOOL)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_long") || types.ZendStringEqualsLiteral(lcname, "is_int") || types.ZendStringEqualsLiteral(lcname, "is_integer") {
+	} else if lcname.GetStr() == "is_long" || lcname.GetStr() == "is_int" || lcname.GetStr() == "is_integer" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_LONG)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_float") || types.ZendStringEqualsLiteral(lcname, "is_double") {
+	} else if lcname.GetStr() == "is_float" || lcname.GetStr() == "is_double" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_DOUBLE)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_string") {
+	} else if lcname.GetStr() == "is_string" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_STRING)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_array") {
+	} else if lcname.GetStr() == "is_array" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_ARRAY)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_object") {
+	} else if lcname.GetStr() == "is_object" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_OBJECT)
-	} else if types.ZendStringEqualsLiteral(lcname, "is_resource") {
+	} else if lcname.GetStr() == "is_resource" {
 		return ZendCompileFuncTypecheck(result, args, types.IS_RESOURCE)
-	} else if types.ZendStringEqualsLiteral(lcname, "boolval") {
+	} else if lcname.GetStr() == "boolval" {
 		return ZendCompileFuncCast(result, args, types.IS_BOOL)
-	} else if types.ZendStringEqualsLiteral(lcname, "intval") {
+	} else if lcname.GetStr() == "intval" {
 		return ZendCompileFuncCast(result, args, types.IS_LONG)
-	} else if types.ZendStringEqualsLiteral(lcname, "floatval") || types.ZendStringEqualsLiteral(lcname, "doubleval") {
+	} else if lcname.GetStr() == "floatval" || lcname.GetStr() == "doubleval" {
 		return ZendCompileFuncCast(result, args, types.IS_DOUBLE)
-	} else if types.ZendStringEqualsLiteral(lcname, "strval") {
+	} else if lcname.GetStr() == "strval" {
 		return ZendCompileFuncCast(result, args, types.IS_STRING)
-	} else if types.ZendStringEqualsLiteral(lcname, "defined") {
+	} else if lcname.GetStr() == "defined" {
 		return ZendCompileFuncDefined(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "chr") && type_ == BP_VAR_R {
+	} else if lcname.GetStr() == "chr" && type_ == BP_VAR_R {
 		return ZendCompileFuncChr(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "ord") && type_ == BP_VAR_R {
+	} else if lcname.GetStr() == "ord" && type_ == BP_VAR_R {
 		return ZendCompileFuncOrd(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "call_user_func_array") {
+	} else if lcname.GetStr() == "call_user_func_array" {
 		return ZendCompileFuncCufa(result, args, lcname)
-	} else if types.ZendStringEqualsLiteral(lcname, "call_user_func") {
+	} else if lcname.GetStr() == "call_user_func" {
 		return ZendCompileFuncCuf(result, args, lcname)
-	} else if types.ZendStringEqualsLiteral(lcname, "in_array") {
+	} else if lcname.GetStr() == "in_array" {
 		return ZendCompileFuncInArray(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "count") || types.ZendStringEqualsLiteral(lcname, "sizeof") {
+	} else if lcname.GetStr() == "count" || lcname.GetStr() == "sizeof" {
 		return ZendCompileFuncCount(result, args, lcname)
-	} else if types.ZendStringEqualsLiteral(lcname, "get_class") {
+	} else if lcname.GetStr() == "get_class" {
 		return ZendCompileFuncGetClass(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "get_called_class") {
+	} else if lcname.GetStr() == "get_called_class" {
 		return ZendCompileFuncGetCalledClass(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "gettype") {
+	} else if lcname.GetStr() == "gettype" {
 		return ZendCompileFuncGettype(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "func_num_args") {
+	} else if lcname.GetStr() == "func_num_args" {
 		return ZendCompileFuncNumArgs(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "func_get_args") {
+	} else if lcname.GetStr() == "func_get_args" {
 		return ZendCompileFuncGetArgs(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "array_slice") {
+	} else if lcname.GetStr() == "array_slice" {
 		return ZendCompileFuncArraySlice(result, args)
-	} else if types.ZendStringEqualsLiteral(lcname, "array_key_exists") {
+	} else if lcname.GetStr() == "array_key_exists" {
 		return ZendCompileFuncArrayKeyExists(result, args)
 	} else {
 		return types.FAILURE
@@ -137,7 +137,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	lcname = ZendStringTolower(name.GetStr())
 
 	fbc = CG__().FunctionTable().Get(lcname.GetStr())
-	if fbc != nil && types.ZendStringEqualsLiteral(lcname, "assert") {
+	if fbc != nil && lcname.GetStr() == "assert" {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
 		// types.ZendStringRelease(lcname)
 		ZvalPtrDtor(name_node.GetConstant())
@@ -167,7 +167,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var method_node Znode
 	var opline *ZendOp
 	var fbc types.IFunction = nil
-	if IsThisFetch(obj_ast) != 0 {
+	if IsThisFetch(obj_ast) {
 		obj_node.SetOpType(IS_UNUSED)
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
 	} else {
@@ -326,7 +326,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 	if name_node.GetOpType() == IS_CONST {
 		ConvertToString(name_node.GetConstant())
 	}
-	if IsThisFetch(var_ast) != 0 {
+	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as global variable")
 	} else if ZendTryCompileCv(&result, var_ast) == types.SUCCESS {
 		var opline *ZendOp = ZendEmitOp(nil, ZEND_BIND_GLOBAL, &result, &name_node)
@@ -354,7 +354,7 @@ func ZendCompileStaticVarCommon(var_name *types.String, value *types.Zval, mode 
 		CG__().GetActiveOpArray().SetStaticVariables(types.NewArray(8))
 	}
 	value = CG__().GetActiveOpArray().GetStaticVariables().KeyUpdate(var_name.GetStr(), value)
-	if types.ZendStringEqualsLiteral(var_name, "this") {
+	if var_name.GetStr() == "this" {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as static variable")
 	}
 	opline = ZendEmitOp(nil, ZEND_BIND_STATIC, nil, nil)
@@ -380,7 +380,7 @@ func ZendCompileUnset(ast *ZendAst) {
 	ZendEnsureWritableVariable(var_ast)
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
-		if IsThisFetch(var_ast) != 0 {
+		if IsThisFetch(var_ast) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unset $this")
 		} else if ZendTryCompileCv(&var_node, var_ast) == types.SUCCESS {
 			opline = ZendEmitOp(nil, ZEND_UNSET_CV, &var_node, nil)
@@ -794,7 +794,7 @@ func ZendCompileForeach(ast *ZendAst) {
 	ZendBeginLoop(ZEND_FE_FREE, &reset_node, 0)
 	opnum_fetch = GetNextOpNumber()
 	opline = ZendEmitOp(nil, b.Cond(by_ref != 0, ZEND_FE_FETCH_RW, ZEND_FE_FETCH_R), &reset_node, nil)
-	if IsThisFetch(value_ast) != 0 {
+	if IsThisFetch(value_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	} else if value_ast.GetKind() == ZEND_AST_VAR && ZendTryCompileCv(&value_node, value_ast) == types.SUCCESS {
 		opline.SetOp2Type(value_node.GetOpType())

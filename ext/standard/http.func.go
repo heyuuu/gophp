@@ -260,7 +260,7 @@ func ZifHttpBuildQuery(executeData zpp.Ex, return_value zpp.Ret, formdata *types
 		return
 	}
 	if formstr.GetS() == nil {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 	formstr.ZeroTail()

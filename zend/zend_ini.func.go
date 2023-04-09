@@ -139,7 +139,7 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 
 		var defaultValue *types.Zval = ZendGetConfigurationDirective(p.GetName())
 		if defaultValue != nil && p.EmitOnModify(defaultValue.GetStr(), ZEND_INI_STAGE_STARTUP) {
-			p.SetValue(types.ZendNewInternedString(defaultValue.GetStr().Copy()))
+			p.SetValue(types.NewString(defaultValue.GetStrVal()))
 		} else {
 			p.SetValueStr(iniEntryDef.GetValueStr())
 			p.EmitOnModify(p.GetValue(), ZEND_INI_STAGE_STARTUP)
@@ -285,6 +285,19 @@ func ZendIniString(name string, name_length int, orig int) *byte {
 		return_value = ""
 	}
 	return return_value
+}
+func ZendIniGetValueEx(name string) (string, bool) {
+	var ini_entry *ZendIniEntry
+	ini_entry = types.ZendHashFindPtr(EG__().GetIniDirectives(), name)
+	if ini_entry != nil {
+		if ini_entry.GetValue() != nil {
+			return ini_entry.GetValue().GetStr(), true
+		} else {
+			return "", true
+		}
+	} else {
+		return "", false
+	}
 }
 func ZendIniGetValue(name *types.String) *types.String {
 	var ini_entry *ZendIniEntry

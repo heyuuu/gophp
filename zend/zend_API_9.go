@@ -23,9 +23,8 @@ func ZendTryAssignTypedRefDouble(ref *types.ZendReference, dval float64) int {
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefEmptyString(ref *types.ZendReference) int {
-	var tmp types.Zval
-	ZVAL_EMPTY_STRING(&tmp)
-	return ZendTryAssignTypedRef(ref, &tmp)
+	zv := types.NewZvalString("")
+	return ZendTryAssignTypedRef(ref, zv)
 }
 func ZendTryAssignTypedRefStr(ref *types.ZendReference, str *types.String) int {
 	var tmp types.Zval
@@ -86,9 +85,9 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 	if types.ZendStringEqualsLiteralCi(name, "class") {
 		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
-	if value.IsString() {
-		ZvalMakeInternedString(value)
-	}
+	//if value.IsString() {
+	//	ZvalMakeInternedString(value)
+	//}
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		c = Pemalloc(b.SizeOf("zend_class_constant"), 1)
 	} else {

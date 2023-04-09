@@ -1429,44 +1429,44 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 	}
 }
 func ZendAddMagicMethods(ce *types.ClassEntry, mname *types.String, fe types.IFunction) {
-	if types.ZendStringEqualsLiteral(mname, "serialize") {
+	if mname.GetStr() == "serialize" {
 		ce.SetSerializeFunc(fe)
-	} else if types.ZendStringEqualsLiteral(mname, "unserialize") {
+	} else if mname.GetStr() == "unserialize" {
 		ce.SetUnserializeFunc(fe)
 	} else if ce.GetName().GetLen() != mname.GetLen() && (mname.GetVal()[0] != '_' || mname.GetVal()[1] != '_') {
 
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_CLONE_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_CLONE_FUNC_NAME {
 		ce.SetClone(fe)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_CONSTRUCTOR_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 		if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.GetName().GetVal())
 		}
 		ce.SetConstructor(fe)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_DESTRUCTOR_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_DESTRUCTOR_FUNC_NAME {
 		ce.SetDestructor(fe)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_GET_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_GET_FUNC_NAME {
 		ce.SetGet(fe)
 		ce.SetIsUseGuards(true)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_SET_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_SET_FUNC_NAME {
 		ce.SetSet(fe)
 		ce.SetIsUseGuards(true)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_CALL_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_CALL_FUNC_NAME {
 		ce.SetCall(fe)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_UNSET_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_UNSET_FUNC_NAME {
 		ce.SetUnset(fe)
 		ce.SetIsUseGuards(true)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_ISSET_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_ISSET_FUNC_NAME {
 		ce.SetIsset(fe)
 		ce.SetIsUseGuards(true)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_CALLSTATIC_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
 		ce.SetCallstatic(fe)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_TOSTRING_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_TOSTRING_FUNC_NAME {
 		ce.SetTostring(fe)
-	} else if types.ZendStringEqualsLiteral(mname, ZEND_DEBUGINFO_FUNC_NAME) {
+	} else if mname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 		ce.SetDebugInfo(fe)
 	} else if ce.GetName().GetLen() == mname.GetLen() {
 		var lowercase_name *types.String = ZendStringTolower(ce.GetName())
-		lowercase_name = types.ZendNewInternedString(lowercase_name)
+		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		if !(memcmp(mname.GetVal(), lowercase_name.GetVal(), mname.GetLen())) {
 			if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.GetName().GetVal())

@@ -14,7 +14,7 @@ func ZendCompileAssignRef(result *Znode, ast *ZendAst) {
 	var opline *ZendOp
 	var offset uint32
 	var flags uint32
-	if IsThisFetch(target_ast) != 0 {
+	if IsThisFetch(target_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ZendEnsureWritableVariable(target_ast)
@@ -194,7 +194,7 @@ func ZendCompileArgs(ast *ZendAst, fbc types.IFunction) uint32 {
 				for {
 					if arg.GetKind() == ZEND_AST_VAR {
 						CG__().SetZendLineno(ZendAstGetLineno(ast))
-						if IsThisFetch(arg) != 0 {
+						if IsThisFetch(arg) {
 							ZendEmitOp(&arg_node, ZEND_FETCH_THIS, nil, nil)
 							opcode = ZEND_SEND_VAR_EX
 							CG__().GetActiveOpArray().SetIsUsesThis(true)
@@ -421,7 +421,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsLong() {
 		var c ZendLong = ZendAstGetZval(args.GetChild()[0]).GetLval() & 0xff
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetInternedString(types.ZstrChar(c))
+		result.GetConstant().SetStringVal(string(byte(c)))
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -652,7 +652,7 @@ func ZendCompileFuncCount(result *Znode, args *ZendAstList, lcname *types.String
 	}
 	ZendCompileExpr(&arg_node, args.GetChild()[0])
 	opline = ZendEmitOpTmp(result, ZEND_COUNT, &arg_node, nil)
-	opline.SetExtendedValue(types.ZendStringEqualsLiteral(lcname, "sizeof"))
+	opline.SetExtendedValue(uint32(types.IntBool(lcname.GetStr() == "sizeof")))
 	return types.SUCCESS
 }
 func ZendCompileFuncGetClass(result *Znode, args *ZendAstList) int {

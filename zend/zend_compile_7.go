@@ -80,7 +80,7 @@ func ZendCompileUse(ast *ZendAst) {
 			} else {
 				new_name = old_name.Copy()
 				if current_ns == nil {
-					if type_ == T_CLASS && types.ZendStringEqualsLiteral(new_name, "strict") {
+					if type_ == T_CLASS && new_name.GetStr() == "strict" {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "You seem to be trying to use a different language...")
 					}
 					faults.Error(faults.E_WARNING, "The use statement with non-compound name '%s' "+"has no effect", new_name.GetVal())
@@ -110,7 +110,7 @@ func ZendCompileUse(ast *ZendAst) {
 			}
 		}
 		//old_name.AddRefcount()
-		old_name = types.ZendNewInternedString(old_name)
+		//old_name = types.ZendNewInternedString(old_name)
 		if !(types.ZendHashAddPtr(current_import, lookup_name.GetStr(), old_name)) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
@@ -157,10 +157,10 @@ func ZendCompileConstDecl(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
 		}
 		name = ZendPrefixWithNs(unqualified_name)
-		name = types.ZendNewInternedString(name)
+		//name = types.ZendNewInternedString(name)
 		if FC__().GetImportsConst() != nil {
 			var import_name *types.String = types.ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name.GetStr())
-			if import_name != nil && types.ZendStringEquals(import_name, name) == 0 {
+			if import_name != nil && import_name.GetStr() != name.GetStr() {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 			}
 		}
@@ -273,7 +273,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			zv.SetStringCopy(op_array.GetFunctionName())
 		} else {
-			ZVAL_EMPTY_STRING(zv)
+			zv.SetStringVal("")
 		}
 	case T_METHOD_C:
 
@@ -290,7 +290,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 				zv.SetStringCopy(op_array.GetFunctionName())
 			}
 		} else {
-			ZVAL_EMPTY_STRING(zv)
+			zv.SetStringVal("")
 		}
 	case T_CLASS_C:
 		if ce != nil {
@@ -300,19 +300,19 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 				zv.SetStringCopy(ce.GetName())
 			}
 		} else {
-			ZVAL_EMPTY_STRING(zv)
+			zv.SetStringVal("")
 		}
 	case T_TRAIT_C:
 		if ce != nil && ce.IsTrait() {
 			zv.SetStringCopy(ce.GetName())
 		} else {
-			ZVAL_EMPTY_STRING(zv)
+			zv.SetStringVal("")
 		}
 	case T_NS_C:
 		if FC__().GetCurrentNamespace() != nil {
 			zv.SetStringCopy(FC__().GetCurrentNamespace())
 		} else {
-			ZVAL_EMPTY_STRING(zv)
+			zv.SetStringVal("")
 		}
 	default:
 

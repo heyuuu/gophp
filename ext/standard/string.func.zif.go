@@ -468,41 +468,45 @@ var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{Name: "str"}
 // generate by ZifOrd
 var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{Name: "character"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	character := fp.ParseZval()
+	character := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifOrd(executeData, returnValue, character)
+	ret := ZifOrd(character)
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifChr
 var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	codepoint := fp.ParseZval()
+	codepoint := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifChr(executeData, returnValue, codepoint)
+	ret := ZifChr(codepoint)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifUcfirst
 var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifUcfirst(executeData, returnValue, str)
+	ret := ZifUcfirst(str)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifLcfirst
 var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifLcfirst(executeData, returnValue, str)
+	ret := ZifLcfirst(str)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifUcwords

@@ -82,7 +82,7 @@ func ZendFetchDimensionAddressRead(
 		if container.GetStr().GetLen() < b.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
 				faults.Error(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
-				ZVAL_EMPTY_STRING(result)
+				result.SetStringVal("")
 			} else {
 				result.SetNull()
 			}
@@ -95,7 +95,7 @@ func ZendFetchDimensionAddressRead(
 				real_offset = offset
 			}
 			c = types.ZendUchar(container.GetStr().GetVal()[real_offset])
-			result.SetInternedString(types.ZstrChar(c))
+			result.SetStringVal(string(c))
 		}
 	} else if container.IsObject() {
 		if dim.IsUndef() {

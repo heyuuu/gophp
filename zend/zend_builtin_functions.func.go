@@ -504,7 +504,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 		return_value.SetFalse()
 		return
 	}
-	if only_subclass == 0 && types.ZendStringEquals(instance_ce.GetName(), class_name) != 0 {
+	if only_subclass == 0 && instance_ce.GetName().GetStr() == class_name.GetStr() {
 		retval = 1
 	} else {
 		ce = ZendLookupClassEx(class_name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
@@ -804,7 +804,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 
 				/* Returns true to the fake Closure's __invoke */
 
-				types.ZVAL_BOOL(return_value, func_.GetScope() == ZendCeClosure && types.ZendStringEqualsLiteral(method_name, ZEND_INVOKE_FUNC_NAME))
+				types.ZVAL_BOOL(return_value, func_.GetScope() == ZendCeClosure && method_name.GetStr() == ZEND_INVOKE_FUNC_NAME)
 				// types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
 				ZendFreeTrampoline(func_)
 				return
@@ -1266,7 +1266,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 				return_value.GetArr().IndexAddNew(index, val)
 			}
 		}
-	} else if types.ZendStringEqualsLiteral(type_, "Unknown") {
+	} else if type_.GetStr() == "Unknown" {
 		ArrayInit(return_value)
 		var __ht *types.Array = EG__().GetRegularList()
 		for _, _p := range __ht.ForeachData() {

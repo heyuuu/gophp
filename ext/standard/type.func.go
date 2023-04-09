@@ -11,30 +11,7 @@ import (
 )
 
 func ZifGettype(var_ *types.Zval) string {
-	switch var_.GetType() {
-	case types.IS_NULL:
-		return "NULL"
-	case types.IS_FALSE, types.IS_TRUE:
-		return "boolean"
-	case types.IS_LONG:
-		return "integer"
-	case types.IS_DOUBLE:
-		return "double"
-	case types.IS_STRING:
-		return "string"
-	case types.IS_ARRAY:
-		return "array"
-	case types.IS_OBJECT:
-		return "object"
-	case types.IS_RESOURCE:
-		if zend.ZendRsrcListGetRsrcType(var_.GetRes()) != nil {
-			return "resource"
-		} else {
-			return "resource (closed)"
-		}
-	default:
-		return "unknown type"
-	}
+	return types.ZendZvalGetType(var_)
 }
 func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	var tmp types.Zval

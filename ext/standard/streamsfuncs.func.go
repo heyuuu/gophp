@@ -422,7 +422,7 @@ func ZifStreamGetContents(executeData zpp.Ex, return_value zpp.Ret, source *type
 		return_value.SetString(contents)
 		return
 	} else {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 }

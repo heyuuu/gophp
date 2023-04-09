@@ -39,11 +39,11 @@ type Znode struct {
 	}
 }
 
-func (this *Znode) GetOpType() uint8        { return this.op_type }
-func (this *Znode) SetOpType(value uint8)   { this.op_type = value }
-func (this *Znode) GetOp() ZnodeOp          { return this.u.op }
-func (this *Znode) SetOp(value ZnodeOp)     { this.u.op = value }
-func (this *Znode) GetConstant() types.Zval { return this.u.constant }
+func (this *Znode) GetOpType() uint8         { return this.op_type }
+func (this *Znode) SetOpType(value uint8)    { this.op_type = value }
+func (this *Znode) GetOp() ZnodeOp           { return this.u.op }
+func (this *Znode) SetOp(value ZnodeOp)      { this.u.op = value }
+func (this *Znode) GetConstant() *types.Zval { return &this.u.constant }
 
 /**
  * ZendAstZnode

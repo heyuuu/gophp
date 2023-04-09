@@ -988,7 +988,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				if temp_filename != nil {
 					zfilename.SetStringCopy(temp_filename)
 				} else {
-					zend.ZVAL_EMPTY_STRING(&zfilename)
+					zfilename.SetStringVal("")
 				}
 				SafePhpRegisterVariableEx(param, &zfilename, nil, 1)
 			}
@@ -1004,7 +1004,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			if temp_filename != nil {
 				zfilename.SetStringCopy(temp_filename)
 			} else {
-				zend.ZVAL_EMPTY_STRING(&zfilename)
+				zfilename.SetStringVal("")
 			}
 			RegisterHttpPostFilesVariableEx(lbuf, &zfilename, &PG__().http_globals[TRACK_VARS_FILES], 1)
 			var file_size types.Zval

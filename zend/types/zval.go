@@ -135,14 +135,13 @@ func (zv *Zval) SetTypeInfo(value uint32) {
 }
 
 // 所有对类型的设置操作都集中到这里
-func (zv *Zval) SetTypeUndef()          { zv.typ, zv.typeFlags = IS_UNDEF, 0 }
-func (zv *Zval) SetTypeNull()           { zv.typ, zv.typeFlags = IS_NULL, 0 }
-func (zv *Zval) SetTypeFalse()          { zv.typ, zv.typeFlags = IS_FALSE, 0 }
-func (zv *Zval) SetTypeTrue()           { zv.typ, zv.typeFlags = IS_TRUE, 0 }
-func (zv *Zval) SetTypeLong()           { zv.typ, zv.typeFlags = IS_LONG, 0 }
-func (zv *Zval) SetTypeDouble()         { zv.typ, zv.typeFlags = IS_DOUBLE, 0 }
-func (zv *Zval) SetTypeString()         { zv.typ, zv.typeFlags = IS_STRING, IS_TYPE_REFCOUNTED }
-func (zv *Zval) SetTypeInternedString() { zv.typ, zv.typeFlags = IS_STRING, 0 }
+func (zv *Zval) SetTypeUndef()  { zv.typ, zv.typeFlags = IS_UNDEF, 0 }
+func (zv *Zval) SetTypeNull()   { zv.typ, zv.typeFlags = IS_NULL, 0 }
+func (zv *Zval) SetTypeFalse()  { zv.typ, zv.typeFlags = IS_FALSE, 0 }
+func (zv *Zval) SetTypeTrue()   { zv.typ, zv.typeFlags = IS_TRUE, 0 }
+func (zv *Zval) SetTypeLong()   { zv.typ, zv.typeFlags = IS_LONG, 0 }
+func (zv *Zval) SetTypeDouble() { zv.typ, zv.typeFlags = IS_DOUBLE, 0 }
+func (zv *Zval) SetTypeString() { zv.typ, zv.typeFlags = IS_STRING, 0 }
 func (zv *Zval) SetTypeArray() {
 	zv.typ, zv.typeFlags = IS_ARRAY, IS_TYPE_REFCOUNTED|IS_TYPE_COLLECTABLE
 }
@@ -254,11 +253,10 @@ func (zv *Zval) SetBool(b bool) {
 		zv.SetTypeFalse()
 	}
 }
-func (zv *Zval) SetLong(l int)               { zv.SetTypeLong(); zv.SetLval(l) }
-func (zv *Zval) SetDouble(d float64)         { zv.SetTypeDouble(); zv.SetDval(d) }
-func (zv *Zval) SetStringVal(s string)       { zv.SetString(NewString(s)) }
-func (zv *Zval) SetString(s *String)         { zv.SetTypeString(); zv.SetStr(s) }
-func (zv *Zval) SetInternedString(s *String) { zv.SetTypeInternedString(); zv.SetStr(s) }
+func (zv *Zval) SetLong(l int)         { zv.SetTypeLong(); zv.SetLval(l) }
+func (zv *Zval) SetDouble(d float64)   { zv.SetTypeDouble(); zv.SetDval(d) }
+func (zv *Zval) SetStringVal(s string) { zv.SetString(NewString(s)) }
+func (zv *Zval) SetString(s *String)   { zv.SetTypeString(); zv.SetStr(s) }
 func (zv *Zval) SetStringCopy(s *String) {
 	//s.AddRefcount()
 	zv.SetString(s)

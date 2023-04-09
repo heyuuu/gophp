@@ -1500,7 +1500,7 @@ func ZifPhpStripWhitespace(executeData zpp.Ex, return_value zpp.Ret, fileName *t
 	if zend.OpenFileForScanning(&file_handle) == types.FAILURE {
 		zend.ZendRestoreLexicalState(&original_lex_state)
 		core.PhpOutputEnd()
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 	zend.ZendStrip()
@@ -1557,32 +1557,8 @@ func ZifHighlightString(executeData zpp.Ex, return_value zpp.Ret, string *types.
 		return
 	}
 }
-func ZifIniGet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval) {
-	var varname *types.String
-	var val *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			varname = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	val = zend.ZendIniGetValue(varname)
-	if val == nil {
-		return_value.SetFalse()
-		return
-	}
-	if val.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-	} else if val.GetLen() == 1 {
-		return_value.SetInternedString(types.ZstrChar(types.ZendUchar(val.GetVal()[0])))
-	} else {
-		return_value.SetString(val.Copy())
-	}
+func ZifIniGet(varname string) (string, bool) {
+	return zend.ZendIniGetValueEx(varname)
 }
 func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension *types.Zval, details *types.Zval) {
 	var extname *byte = nil
@@ -1683,13 +1659,7 @@ func ZifIniSet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval, ne
 	/* copy to return here, because alter might free it! */
 
 	if val != nil {
-		if val.GetLen() == 0 {
-			zend.ZVAL_EMPTY_STRING(return_value)
-		} else if val.GetLen() == 1 {
-			return_value.SetInternedString(types.ZstrChar(types.ZendUchar(val.GetVal()[0])))
-		} else {
-			return_value.SetString(val.Copy())
-		}
+		return_value.SetStringVal(val.GetStr())
 	} else {
 		return_value.SetFalse()
 	}

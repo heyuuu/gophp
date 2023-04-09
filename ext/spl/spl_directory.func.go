@@ -523,7 +523,7 @@ func SplFilesystemObjectGetDebugInfo(object *types.Zval) *types.Array {
 		if intern.GetSubPath() != nil {
 			tmp.SetStringVal(b.CastStr(intern.GetSubPath(), intern.GetSubPathLen()))
 		} else {
-			zend.ZVAL_EMPTY_STRING(&tmp)
+			tmp.SetStringVal("")
 		}
 		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		// types.ZendStringReleaseEx(pnstr, 0)
@@ -712,7 +712,7 @@ func zim_spl_SplFileInfo_getPath(executeData *zend.ZendExecuteData, return_value
 		return_value.SetStringVal(b.CastStr(path, path_len))
 		return
 	} else {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 }
@@ -767,7 +767,7 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 		return
 	} else {
 		// types.ZendStringReleaseEx(ret, 0)
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 }
@@ -787,7 +787,7 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 		// types.ZendStringReleaseEx(fname, 0)
 	} else {
 		// types.ZendStringReleaseEx(fname, 0)
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 }
@@ -1271,7 +1271,7 @@ func zim_spl_RecursiveDirectoryIterator_getSubPath(executeData *zend.ZendExecute
 		return_value.SetStringVal(b.CastStr(intern.GetSubPath(), intern.GetSubPathLen()))
 		return
 	} else {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 }

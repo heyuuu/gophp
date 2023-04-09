@@ -394,14 +394,14 @@ func ZendRegisterConstant(c *ZendConstant) int {
 	var ret int = types.SUCCESS
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) == 0 {
 		lowercase_name = ZendStringTolowerEx(c.GetName())
-		lowercase_name = types.ZendNewInternedString(lowercase_name)
+		// lowercase_name = types.ZendNewInternedString(lowercase_name)
 		name = lowercase_name
 	} else {
 		var slash *byte = strrchr(c.GetName().GetVal(), '\\')
 		if slash != nil {
 			lowercase_name = types.NewString(c.GetName().GetStr())
 			ZendStrTolower(lowercase_name.GetVal(), slash-c.GetName().GetVal())
-			lowercase_name = types.ZendNewInternedString(lowercase_name)
+			// lowercase_name = types.ZendNewInternedString(lowercase_name)
 			name = lowercase_name
 		} else {
 			name = c.GetName()
@@ -410,7 +410,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 
 	/* Check if the user is trying to define the __special__  internal pseudo constant name __COMPILER_HALT_OFFSET__ */
 
-	if types.ZendStringEqualsLiteral(name, "__COMPILER_HALT_OFFSET__") || ZendHashAddConstant(EG__().GetZendConstants(), name, c) == nil {
+	if name.GetStr() == "__COMPILER_HALT_OFFSET__" || ZendHashAddConstant(EG__().GetZendConstants(), name, c) == nil {
 
 		/* The internal __COMPILER_HALT_OFFSET__ is prefixed by NULL byte */
 

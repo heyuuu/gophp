@@ -404,7 +404,7 @@ func FastIsIdenticalFunction(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	} else if op1.GetType() <= types.IS_TRUE {
 		return 1
 	}
-	return ZendIsIdentical(op1, op2)
+	return types.IntBool(ZendIsIdentical(op1, op2))
 }
 func FastIsNotIdenticalFunction(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	if op1.GetType() != op2.GetType() {
@@ -412,28 +412,7 @@ func FastIsNotIdenticalFunction(op1 *types.Zval, op2 *types.Zval) types.ZendBool
 	} else if op1.GetType() <= types.IS_TRUE {
 		return 0
 	}
-	return !(ZendIsIdentical(op1, op2))
-}
-func ZendPrintUlongToBuf(buf *byte, num ZendUlong) *byte {
-	*buf = '\000'
-	for {
-		buf--
-		*buf = byte(num%10 + '0')
-		num /= 10
-		if num <= 0 {
-			break
-		}
-	}
-	return buf
-}
-func ZendPrintLongToBuf(buf *byte, num ZendLong) *byte {
-	if num < 0 {
-		var result *byte = ZendPrintUlongToBuf(buf, ^ZendUlong(num)+1)
-		*(b.PreDec(&result)) = '-'
-		return result
-	} else {
-		return ZendPrintUlongToBuf(buf, num)
-	}
+	return types.IntBool(!(ZendIsIdentical(op1, op2)))
 }
 func ZendUnwrapReference(op *types.Zval) {
 	if op.GetRefcount() == 1 {
@@ -724,6 +703,7 @@ try_again:
 
 	}
 }
+
 func _convertToString(op *types.Zval) {
 try_again:
 	switch op.GetType() {
@@ -732,9 +712,9 @@ try_again:
 	case types.IS_NULL:
 		fallthrough
 	case types.IS_FALSE:
-		ZVAL_EMPTY_STRING(op)
+		op.SetStringVal("")
 	case types.IS_TRUE:
-		op.SetInternedString(types.ZstrChar('1'))
+		op.SetStringVal(string('1'))
 	case types.IS_STRING:
 
 	case types.IS_RESOURCE:
@@ -778,7 +758,7 @@ try_again:
 			faults.ThrowError(nil, "Object of class %s could not be converted to string", types.Z_OBJCE_P(op).GetName().GetVal())
 		}
 		ZvalPtrDtor(op)
-		ZVAL_EMPTY_STRING(op)
+		op.SetStringVal("")
 	case types.IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
@@ -989,7 +969,7 @@ try_again:
 	case types.IS_FALSE:
 		return types.NewString("")
 	case types.IS_TRUE:
-		return types.ZstrChar('1')
+		return types.NewString("1")
 	case types.IS_RESOURCE:
 		return ZendStrpprintf(0, "Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
 	case types.IS_LONG:
@@ -1687,7 +1667,7 @@ try_again:
 		var i int
 		if op1.GetStr().GetLen() == 1 {
 			var not types.ZendUchar = types.ZendUchar(^((*types.Z_STRVAL_P)(op1)))
-			result.SetInternedString(types.ZstrChar(not))
+			result.SetStringVal(string(not))
 		} else {
 			result.SetString(types.ZendStringAlloc(op1.GetStr().GetLen(), 0))
 			for i = 0; i < op1.GetStr().GetLen(); i++ {
@@ -1730,7 +1710,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 				if result == op1 {
 
 				}
-				result.SetInternedString(types.ZstrChar(or))
+				result.SetStringVal(string(or))
 				return types.SUCCESS
 			}
 			longer = op1
@@ -1811,11 +1791,11 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		var i int
 		if op1.GetStr().GetLen() >= op2.GetStr().GetLen() {
 			if op1.GetStr().GetLen() == op2.GetStr().GetLen() && op1.GetStr().GetLen() == 1 {
-				var and types.ZendUchar = zend_uchar((*types.Z_STRVAL_P)(op1) & (*types.Z_STRVAL_P)(op2))
+				var and types.ZendUchar = byte((*types.Z_STRVAL_P)(op1) & (*types.Z_STRVAL_P)(op2))
 				if result == op1 {
 
 				}
-				result.SetInternedString(types.ZstrChar(and))
+				result.SetStringVal(string(and))
 				return types.SUCCESS
 			}
 			longer = op1
@@ -1900,7 +1880,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				if result == op1 {
 
 				}
-				result.SetInternedString(types.ZstrChar(xor))
+				result.SetStringVal(string(xor))
 				return types.SUCCESS
 			}
 			longer = op1
@@ -2536,17 +2516,13 @@ func HashZvalIdenticalFunction(z1 *types.Zval, z2 *types.Zval) int {
 	z2 = types.ZVAL_DEREF(z2)
 	return FastIsNotIdenticalFunction(z1, z2)
 }
-func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
+func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) bool {
 	if op1.GetType() != op2.GetType() {
-		return 0
+		return false
 	}
 	switch op1.GetType() {
-	case types.IS_NULL:
-		fallthrough
-	case types.IS_FALSE:
-		fallthrough
-	case types.IS_TRUE:
-		return 1
+	case types.IS_NULL, types.IS_FALSE, types.IS_TRUE:
+		return true
 	case types.IS_LONG:
 		return op1.GetLval() == op2.GetLval()
 	case types.IS_RESOURCE:
@@ -2554,13 +2530,13 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) types.ZendBool {
 	case types.IS_DOUBLE:
 		return op1.GetDval() == op2.GetDval()
 	case types.IS_STRING:
-		return types.ZendStringEquals(op1.GetStr(), op2.GetStr())
+		return op1.GetStrVal() == op2.GetStrVal()
 	case types.IS_ARRAY:
 		return op1.GetArr() == op2.GetArr() || types.ZendHashCompare(op1.GetArr(), op2.GetArr(), types.CompareFuncT(HashZvalIdenticalFunction), 1) == 0
 	case types.IS_OBJECT:
 		return op1.GetObj() == op2.GetObj()
 	default:
-		return 0
+		return false
 	}
 }
 func IsIdenticalFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
@@ -2640,83 +2616,56 @@ func InstanceofFunction(instance_ce *types.ClassEntry, ce *types.ClassEntry) typ
 	}
 }
 func IncrementString(str *types.Zval) {
-	var carry int = 0
-	var pos int = str.GetStr().GetLen() - 1
-	var s *byte
-	var t *types.String
-	var last int = 0
-	var ch int
-	if str.GetStr().GetLen() == 0 {
+	// notice: 前置要求 str 必须是 IS_STRING 类型，且其值不为数字字符串
+	str.SetStringVal(IncrementStringEx(str.GetStrVal()))
+}
 
-		str.SetInternedString(types.ZstrChar('1'))
-		return
+func IncrementStringEx(str string) string {
+	// notice: 前置要求 str 其值不为数字字符串
+	if str == "" {
+		return "1"
 	}
-	if !(str.IsRefcounted()) {
-		str.SetStr(types.NewString(str.GetStr().GetStr()))
-		str.SetTypeString()
-	} else if str.GetRefcount() > 1 {
-		str.DelRefcount()
-		str.SetStr(types.NewString(str.GetStr().GetStr()))
-	} else {
-		//types.ZendStringForgetHashVal(str.GetStr())
-	}
-	s = str.GetStr().GetVal()
-	for {
-		ch = s[pos]
-		if ch >= 'a' && ch <= 'z' {
-			if ch == 'z' {
-				s[pos] = 'a'
-				carry = 1
-			} else {
-				s[pos]++
-				carry = 0
-			}
+
+	s := []byte(str)
+	last := 0
+	carry := false
+	for i := len(s) - 1; i >= 0; i-- {
+		c := s[i]
+		if ascii.IsLower(c) {
 			last = LOWER_CASE
-		} else if ch >= 'A' && ch <= 'Z' {
-			if ch == 'Z' {
-				s[pos] = 'A'
-				carry = 1
-			} else {
-				s[pos]++
-				carry = 0
-			}
+			carry = c == 'z'
+			s[i] = b.Cond(carry, 'a', c+1)
+		} else if ascii.IsUpper(c) {
 			last = UPPER_CASE
-		} else if ch >= '0' && ch <= '9' {
-			if ch == '9' {
-				s[pos] = '0'
-				carry = 1
-			} else {
-				s[pos]++
-				carry = 0
-			}
+			carry = c == 'Z'
+			s[i] = b.Cond(carry, 'A', c+1)
+		} else if ascii.IsDigit(c) {
 			last = NUMERIC
+			carry = c == '9'
+			s[i] = b.Cond(carry, '0', c+1)
 		} else {
-			carry = 0
+			carry = false
 			break
 		}
-		if carry == 0 {
-			break
-		}
-		if b.PostDec(&pos) <= 0 {
+		if !carry {
 			break
 		}
 	}
-	if carry != 0 {
-		t = types.ZendStringAlloc(str.GetStr().GetLen()+1, 0)
-		memcpy(t.GetVal()+1, str.GetStr().GetVal(), str.GetStr().GetLen())
-		t.GetVal()[str.GetStr().GetLen()+1] = '0'
+
+	if carry {
 		switch last {
 		case NUMERIC:
-			t.GetVal()[0] = '1'
+			return "1" + string(s)
 		case UPPER_CASE:
-			t.GetVal()[0] = 'A'
+			return "A" + string(s)
 		case LOWER_CASE:
-			t.GetVal()[0] = 'a'
+			return "a" + string(s)
 		}
-		//types.ZendStringFree(str.GetStr())
-		str.SetString(t)
 	}
+
+	return string(s)
 }
+
 func IncrementFunction(op1 *types.Zval) int {
 try_again:
 	switch op1.GetType() {
@@ -2745,9 +2694,7 @@ try_again:
 
 			op1.SetDouble(dval + 1)
 		default:
-
 			/* Perl style string increment */
-
 			IncrementString(op1)
 		}
 	case types.IS_OBJECT:

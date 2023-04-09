@@ -377,7 +377,7 @@ func ZifFileGetContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 	if b.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) != nil {
 		return_value.SetString(contents)
 	} else {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 	}
 	core.PhpStreamClose(stream)
 }

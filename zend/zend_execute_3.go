@@ -210,13 +210,8 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	}
 	str.GetStr().GetVal()[offset] = c
 	if RETURN_VALUE_USED(opline) {
-
 		/* Return the new character */
-
-		opline.Result().SetInternedString(types.ZstrChar(c))
-
-		/* Return the new character */
-
+		opline.Result().SetStringVal(string(c))
 	}
 }
 func ZendGetPropNotAcceptingDouble(ref *types.ZendReference) *ZendPropertyInfo {

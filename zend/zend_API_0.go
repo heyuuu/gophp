@@ -110,7 +110,7 @@ func ZendForbidDynamicCall(func_name string) int {
 	return types.SUCCESS
 }
 func CHECK_NULL_PATH(p []byte, l int) bool { return len(p) != l }
-func ZVAL_EMPTY_STRING(z *types.Zval)      { z.SetInternedString(types.NewString("")) }
+func ZVAL_EMPTY_STRING(z *types.Zval)      { z.SetStringVal("") }
 func ZVAL_ZVAL(z *types.Zval, zv *types.Zval, copy int, dtor int) {
 	var __z *types.Zval = z
 	var __zv *types.Zval = zv
@@ -210,7 +210,7 @@ func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *types.Zval, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_EMPTY_STRING(_zv)
+		_zv.SetStringVal("")
 		break
 	}
 }

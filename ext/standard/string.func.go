@@ -180,7 +180,7 @@ func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zp
 		break
 	}
 	if text.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 	if breakchar_len == 0 {
@@ -595,7 +595,7 @@ func ZifPathinfo(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval, _ z
 		if b.Assign(&element, types.ZendHashGetCurrentData(tmp.GetArr())) != nil {
 			types.ZVAL_COPY_DEREF(return_value, element)
 		} else {
-			zend.ZVAL_EMPTY_STRING(return_value)
+			return_value.SetStringVal("")
 		}
 		zend.ZvalPtrDtor(&tmp)
 	}
@@ -1198,98 +1198,27 @@ func ZifQuotemeta(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 	return_value.SetString(types.ZendStringTruncate(str, q-str.GetVal(), 0))
 	return
 }
-func ZifOrd(executeData zpp.Ex, return_value zpp.Ret, character *types.Zval) {
-	var str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifOrd(character string) int {
+	if character == "" {
+		return 0
 	}
-	return_value.SetLong(uint8(str.GetVal()[0]))
-	return
+	return int(character[0])
 }
-func ZifChr(executeData zpp.Ex, return_value zpp.Ret, codepoint *types.Zval) {
-	var c zend.ZendLong
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			c = fp.ParseLong()
-			break
-		}
-		if _error_code != zpp.ZPP_ERROR_OK {
-			c = 0
-		}
-		break
-	}
-	c &= 0xff
-	return_value.SetInternedString(types.ZstrChar(c))
+func ZifChr(codepoint int) string {
+	c := byte(codepoint & 0xff)
+	return string(c)
 }
-func PhpUcfirst(str *types.String) *types.String {
-	var ch uint8 = str.GetVal()[0]
-	var r uint8 = toupper(ch)
-	if r == ch {
-		return str.Copy()
-	} else {
-		var s *types.String = types.NewString(str.GetStr())
-		s.GetVal()[0] = r
-		return s
+func ZifUcfirst(str string) string {
+	if str != "" && ascii.IsLower(str[0]) {
+		return string(ascii.ToUpper(str[0])) + str[1:]
 	}
+	return str
 }
-func ZifUcfirst(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+func ZifLcfirst(str string) string {
+	if str != "" && ascii.IsUpper(str[0]) {
+		return string(ascii.ToLower(str[0])) + str[1:]
 	}
-	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
-	}
-	return_value.SetString(PhpUcfirst(str))
-	return
-}
-func PhpLcfirst(str *types.String) *types.String {
-	var r uint8 = tolower(str.GetVal()[0])
-	if r == str.GetVal()[0] {
-		return str.Copy()
-	} else {
-		var s *types.String = types.NewString(str.GetStr())
-		s.GetVal()[0] = r
-		return s
-	}
-}
-func ZifLcfirst(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			str = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
-		return
-	}
-	return_value.SetString(PhpLcfirst(str))
-	return
+	return str
 }
 func ZifUcwords(str string, _ zpp.Opt, delimiters *string) string {
 	var mask = " \t\r\n\f\v"
@@ -1712,7 +1641,7 @@ func PhpStrToStrEx(
 		if str_len == 0 {
 			new_str = types.NewString("")
 		} else if str_len == 1 {
-			new_str = types.ZstrChar(zend_uchar(*str))
+			new_str = types.NewString(string(*str))
 		} else {
 			new_str = types.NewString(b.CastStr(str, str_len))
 		}
@@ -1907,7 +1836,7 @@ func ZifStrtr(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, from *t
 	/* shortcut for empty string */
 
 	if str.GetLen() == 0 {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 		return
 	}
 	if ac == 2 {
@@ -2266,7 +2195,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 	subject_str = zend.ZvalGetTmpString(subject, &tmp_subject_str)
 	if subject_str.GetLen() == 0 {
 		zend.ZendTmpStringRelease(tmp_subject_str)
-		zend.ZVAL_EMPTY_STRING(result)
+		result.SetStringVal("")
 		return 0
 	}
 
@@ -2371,7 +2300,7 @@ func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *ty
 				subject_str = tmp_result
 				if subject_str.GetLen() == 0 {
 					// types.ZendStringReleaseEx(subject_str, 0)
-					zend.ZVAL_EMPTY_STRING(result)
+					result.SetStringVal("")
 					if lc_subject_str != nil {
 						// types.ZendStringReleaseEx(lc_subject_str, 0)
 					}

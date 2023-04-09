@@ -275,3 +275,29 @@ func ZendZvalTypeName(arg *Zval) string {
 	arg = ZVAL_DEREF(arg)
 	return ZendGetTypeByConst(arg.GetType())
 }
+func ZendZvalGetType(v *Zval) string {
+	switch v.GetType() {
+	case IS_NULL:
+		return "NULL"
+	case IS_FALSE, IS_TRUE:
+		return "boolean"
+	case IS_LONG:
+		return "integer"
+	case IS_DOUBLE:
+		return "double"
+	case IS_STRING:
+		return "string"
+	case IS_ARRAY:
+		return "array"
+	case IS_OBJECT:
+		return "object"
+	case IS_RESOURCE:
+		if zend.ZendRsrcListGetRsrcType(v.GetRes()) != nil {
+			return "resource"
+		} else {
+			return "resource (closed)"
+		}
+	default:
+		return "unknown type"
+	}
+}

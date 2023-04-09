@@ -160,7 +160,7 @@ func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
 func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
 	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
 	var result *types.String = ZendStrpprintf(0, "%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
-	return types.ZendNewInternedString(result)
+	return result
 }
 func ZendGetUnqualifiedName(name *types.String, result **byte, result_len *int) types.ZendBool {
 	var ns_separator *byte = ZendMemrchr(name.GetVal(), '\\', name.GetLen())
@@ -332,9 +332,9 @@ func LookupCv(name *types.String) int {
 }
 func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_position int) {
 	var lit *types.Zval = CT_CONSTANT_EX(op_array, literal_position)
-	if zv.IsString() {
-		ZvalMakeInternedString(zv)
-	}
+	//if zv.IsString() {
+	//	ZvalMakeInternedString(zv)
+	//}
 	types.ZVAL_COPY_VALUE(lit, zv)
 	lit.SetU2Extra(0)
 }

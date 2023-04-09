@@ -195,7 +195,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 			/* Set proper value for true/false settings */
 
 			if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
-				new_value = types.ZstrChar('1')
+				new_value = types.NewString("1")
 			} else if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.GetStr().GetLen() == 5 && !(strncasecmp(arg2.GetStr().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = types.NewString("")
 			} else {
@@ -228,10 +228,10 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
 			break
 		}
-		if persistent != 0 {
-			pattern = types.ZendNewInternedString(pattern.Copy())
-			// types.ZendStringRelease(pattern)
-		}
+		//if persistent != 0 {
+		//	pattern = types.ZendNewInternedString(pattern.Copy())
+		//	// types.ZendStringRelease(pattern)
+		//}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
 		entry = ctx.GetCurrentEntry()
 		types.ZendHashUpdatePtr(bdata.GetHtab(), pattern.GetStr(), entry)
@@ -392,7 +392,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 
 	/* See if we have an exact match, if so, we're done... */
 
-	if types.ZendStringEquals(agent_name, pattern_lc) != 0 {
+	if agent_name.GetStr() == pattern_lc.GetStr() {
 		*found_entry_ptr = entry
 		//pattern_lc.Free()
 		return 1

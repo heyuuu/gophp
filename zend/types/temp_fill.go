@@ -52,7 +52,7 @@ func (s *PackedFillScope) FillSetDouble(d float64) {
 
 func (s *PackedFillScope) FillSetInternedStr(str *String) {
 	//s.bucket.GetVal().SetInternedString(str)
-	s.zv.SetInternedString(str)
+	s.zv.SetString(str)
 }
 
 func (s *PackedFillScope) FillSetStringCopy(str *String) {

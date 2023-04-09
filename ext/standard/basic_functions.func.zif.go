@@ -310,11 +310,16 @@ var DefZifHighlightString = def.DefFunc("highlight_string", 1, 2, []def.ArgInfo{
 // generate by ZifIniGet
 var DefZifIniGet = def.DefFunc("ini_get", 1, 1, []def.ArgInfo{{Name: "varname"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	varname := fp.ParseZval()
+	varname := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifIniGet(executeData, returnValue, varname)
+	ret, ok := ZifIniGet(varname)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifIniGetAll

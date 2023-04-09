@@ -597,7 +597,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 	}
 	// types.ZendStringReleaseEx(func_name, 0)
 	if SPL_G(autoload_functions) {
-		if types.ZendStringEquals(lc_name, SplAutoloadCallFn.GetFunctionName()) != 0 {
+		if lc_name.GetStr() == SplAutoloadCallFn.GetFunctionName().GetStr() {
 
 			/* remove all */
 
@@ -622,7 +622,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 				success = types.ZendHashDel(SPL_G(autoload_functions), lc_name.GetStr())
 			}
 		}
-	} else if types.ZendStringEquals(lc_name, SplAutoloadFn.GetFunctionName()) != 0 {
+	} else if lc_name.GetStr() == SplAutoloadFn.GetFunctionName().GetStr() {
 
 		/* register single spl_autoload() */
 

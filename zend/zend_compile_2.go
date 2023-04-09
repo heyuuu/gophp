@@ -431,9 +431,10 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 		var zv *types.Zval = ZendAstGetZval(name_ast)
 		var name *types.String
 		if zv.IsString() {
-			name = ZvalMakeInternedString(zv)
+			//name = ZvalMakeInternedString(zv)
+			name = zv.GetStr()
 		} else {
-			name = types.ZendNewInternedString(ZvalGetStringFunc(zv))
+			name = ZvalGetStringFunc(zv)
 		}
 		if ZendIsAutoGlobal(name) != 0 {
 			return types.FAILURE
@@ -468,15 +469,15 @@ func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed
 	ZendAdjustForFetchType(opline, result, type_)
 	return opline
 }
-func IsThisFetch(ast *ZendAst) types.ZendBool {
+func IsThisFetch(ast *ZendAst) bool {
 	if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL {
 		var name *types.Zval = ZendAstGetZval(ast.GetChild()[0])
-		return name.IsString() && types.ZendStringEqualsLiteral(name.GetStr(), "this")
+		return name.IsString() && name.GetStrVal() == "this"
 	}
-	return 0
+	return false
 }
 func ZendCompileSimpleVar(result *Znode, ast *ZendAst, type_ uint32, delayed int) *ZendOp {
-	if IsThisFetch(ast) != 0 {
+	if IsThisFetch(ast) {
 		var opline *ZendOp = ZendEmitOp(result, ZEND_FETCH_THIS, nil, nil)
 		if type_ == BP_VAR_R || type_ == BP_VAR_IS {
 			opline.SetResultType(IS_TMP_VAR)
@@ -549,7 +550,7 @@ func ZendDelayedCompileProp(result *Znode, ast *ZendAst, type_ uint32) *ZendOp {
 	var obj_node Znode
 	var prop_node Znode
 	var opline *ZendOp
-	if IsThisFetch(obj_ast) != 0 {
+	if IsThisFetch(obj_ast) {
 		obj_node.SetOpType(IS_UNUSED)
 		CG__().GetActiveOpArray().SetIsUsesThis(true)
 	} else {
@@ -646,9 +647,9 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 	var i uint32
 	var has_elems types.ZendBool = 0
 	var is_keyed types.ZendBool = list.GetChildren() > 0 && list.GetChild()[0] != nil && list.GetChild()[0].GetChild()[1] != nil
-	if list.GetChildren() != 0 && expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsString() {
-		ZvalMakeInternedString(expr_node.GetConstant())
-	}
+	//if list.GetChildren() != 0 && expr_node.GetOpType() == IS_CONST && expr_node.GetConstant().IsString() {
+	//	ZvalMakeInternedString(expr_node.GetConstant())
+	//}
 	for i = 0; i < list.GetChildren(); i++ {
 		var elem_ast *ZendAst = list.GetChild()[i]
 		var var_ast *ZendAst
@@ -735,10 +736,8 @@ func ZendIsAssignToSelf(var_ast *ZendAst, expr_ast *ZendAst) types.ZendBool {
 	}
 	var name1 *types.String = ZvalGetString(ZendAstGetZval(var_ast.GetChild()[0]))
 	var name2 *types.String = ZvalGetString(ZendAstGetZval(expr_ast.GetChild()[0]))
-	var result types.ZendBool = types.ZendStringEquals(name1, name2)
-	// types.ZendStringReleaseEx(name1, 0)
-	// types.ZendStringReleaseEx(name2, 0)
-	return result
+	var result = name1.GetStr() == name2.GetStr()
+	return types.IntBool(result)
 }
 func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
@@ -747,7 +746,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	var expr_node Znode
 	var opline *ZendOp
 	var offset uint32
-	if IsThisFetch(var_ast) != 0 {
+	if IsThisFetch(var_ast) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ZendEnsureWritableVariable(var_ast)
@@ -770,7 +769,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 	case ZEND_AST_DIM:
 		offset = ZendDelayedCompileBegin()
 		ZendDelayedCompileDim(result, var_ast, BP_VAR_W)
-		if ZendIsAssignToSelf(var_ast, expr_ast) != 0 && IsThisFetch(expr_ast) == 0 {
+		if ZendIsAssignToSelf(var_ast, expr_ast) != 0 && !IsThisFetch(expr_ast) {
 
 			/* $a[0] = $a should evaluate the right $a first */
 

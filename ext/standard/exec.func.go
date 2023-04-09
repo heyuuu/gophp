@@ -108,7 +108,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 			return_value.SetStringVal(builtin.CastStr(buf, bufl))
 
 		} else {
-			zend.ZVAL_EMPTY_STRING(return_value)
+			return_value.SetStringVal("")
 		}
 	} else {
 		var read ssize_t
@@ -380,7 +380,7 @@ func ZifEscapeshellcmd(executeData zpp.Ex, return_value zpp.Ret, command *types.
 		}
 		return_value.SetString(PhpEscapeShellCmd(command))
 	} else {
-		zend.ZVAL_EMPTY_STRING(return_value)
+		return_value.SetStringVal("")
 	}
 }
 func ZifEscapeshellarg(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) {

@@ -17,11 +17,11 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.GetChild()[i]
-		var var_name *types.String = ZvalMakeInternedString(ZendAstGetZval(var_name_ast))
+		var var_name *types.String = ZendAstGetZval(var_name_ast).GetStr()
 		var mode uint32 = var_name_ast.GetAttr()
 		var opline *ZendOp
 		var value *types.Zval
-		if types.ZendStringEqualsLiteral(var_name, "this") {
+		if var_name.GetStr() == "this" {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use $this as lexical variable")
 		}
 		if ZendIsAutoGlobal(var_name) != 0 {
@@ -55,7 +55,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 				/* These is no need to explicitly import auto-globals. */
 
 			}
-			if types.ZendStringEqualsLiteral(name, "this") {
+			if name.GetStr() == "this" {
 
 				/* $this does not need to be explicitly imported. */
 
@@ -151,7 +151,7 @@ func ZendCompileClosureUses(ast *ZendAst) {
 		zv.SetNull()
 		var i int
 		for i = 0; i < op_array.GetLastVar(); i++ {
-			if types.ZendStringEquals(op_array.GetVars()[i], var_name) != 0 {
+			if op_array.GetVars()[i].GetStr() == var_name.GetStr() {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use lexical variable $%s as a parameter name", var_name.GetVal())
 			}
 		}
@@ -198,46 +198,46 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 	op_array.SetScope(ce)
 	op_array.SetFunctionName(name.Copy())
 	lcname = ZendStringTolower(name)
-	lcname = types.ZendNewInternedString(lcname)
+	//lcname = types.ZendNewInternedString(lcname)
 	if !ce.FunctionTable().Add(name.GetStr(), op_array) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::%s()", ce.GetName().GetVal(), name.GetVal())
 	}
 	if in_interface != 0 {
 		if lcname.GetVal()[0] != '_' || lcname.GetVal()[1] != '_' {
 
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CALL_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_CALL_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __call() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CALLSTATIC_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
 			if is_public == 0 || is_static == 0 {
 				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have "+"public visibility and be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_GET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_GET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __get() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_SET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_SET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __set() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_UNSET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_UNSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __unset() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_ISSET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_ISSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __isset() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_TOSTRING_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_TOSTRING_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __toString() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_INVOKE_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_INVOKE_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __invoke() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_DEBUGINFO_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have "+"public visibility and cannot be static")
 			}
@@ -247,12 +247,12 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			if ce.GetConstructor() == nil {
 				ce.SetConstructor((types.IFunction)(op_array))
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, "serialize") {
+		} else if lcname.GetStr() == "serialize" {
 			ce.SetSerializeFunc((types.IFunction)(op_array))
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, "unserialize") {
+		} else if lcname.GetStr() == "unserialize" {
 			ce.SetUnserializeFunc((types.IFunction)(op_array))
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
@@ -261,56 +261,56 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			if is_static == 0 {
 				op_array.SetIsAllowStatic(true)
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CONSTRUCTOR_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_CONSTRUCTOR_FUNC_NAME {
 			ce.SetConstructor((types.IFunction)(op_array))
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_DESTRUCTOR_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_DESTRUCTOR_FUNC_NAME {
 			ce.SetDestructor((types.IFunction)(op_array))
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CLONE_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_CLONE_FUNC_NAME {
 			ce.SetClone((types.IFunction)(op_array))
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CALL_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_CALL_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __call() must have "+"public visibility and cannot be static")
 			}
 			ce.SetCall((types.IFunction)(op_array))
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_CALLSTATIC_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_CALLSTATIC_FUNC_NAME {
 			if is_public == 0 || is_static == 0 {
 				faults.Error(faults.E_WARNING, "The magic method __callStatic() must have "+"public visibility and be static")
 			}
 			ce.SetCallstatic((types.IFunction)(op_array))
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_GET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_GET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __get() must have "+"public visibility and cannot be static")
 			}
 			ce.SetGet((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_SET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_SET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __set() must have "+"public visibility and cannot be static")
 			}
 			ce.SetSet((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_UNSET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_UNSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __unset() must have "+"public visibility and cannot be static")
 			}
 			ce.SetUnset((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_ISSET_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_ISSET_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __isset() must have "+"public visibility and cannot be static")
 			}
 			ce.SetIsset((types.IFunction)(op_array))
 			ce.SetIsUseGuards(true)
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_TOSTRING_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_TOSTRING_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __toString() must have "+"public visibility and cannot be static")
 			}
 			ce.SetTostring((types.IFunction)(op_array))
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_INVOKE_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_INVOKE_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __invoke() must have "+"public visibility and cannot be static")
 			}
-		} else if types.ZendStringEqualsLiteral(lcname, ZEND_DEBUGINFO_FUNC_NAME) {
+		} else if lcname.GetStr() == ZEND_DEBUGINFO_FUNC_NAME {
 			if is_public == 0 || is_static != 0 {
 				faults.Error(faults.E_WARNING, "The magic method __debugInfo() must have "+"public visibility and cannot be static")
 			}
@@ -338,7 +338,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare function %s "+"because the name is already in use", name.GetVal())
 		}
 	}
-	if types.ZendStringEqualsLiteral(lcname, ZEND_AUTOLOAD_FUNC_NAME) {
+	if lcname.GetStr() == ZEND_AUTOLOAD_FUNC_NAME {
 		if ZendAstGetList(params_ast).GetChildren() != 1 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "%s() must take exactly 1 argument", ZEND_AUTOLOAD_FUNC_NAME)
 		}
@@ -499,7 +499,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		var name_ast *ZendAst = prop_ast.GetChild()[0]
 		var value_ast *ZendAst = prop_ast.GetChild()[1]
 		var doc_comment_ast *ZendAst = prop_ast.GetChild()[2]
-		var name *types.String = ZvalMakeInternedString(ZendAstGetZval(name_ast))
+		var name *types.String = ZendAstGetZval(name_ast).GetStr()
 		var doc_comment *types.String = nil
 		var value_zv types.Zval
 		var type_ types.ZendType = 0
@@ -570,7 +570,7 @@ func ZendCompileClassConstDecl(ast *ZendAst) {
 		var name_ast *ZendAst = const_ast.GetChild()[0]
 		var value_ast *ZendAst = const_ast.GetChild()[1]
 		var doc_comment_ast *ZendAst = const_ast.GetChild()[2]
-		var name *types.String = ZvalMakeInternedString(ZendAstGetZval(name_ast))
+		var name *types.String = ZendAstGetZval(name_ast).GetStr()
 		var doc_comment *types.String = b.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
 		if (ast.GetAttr() & (AccStatic | AccAbstract | AccFinal)) != 0 {
@@ -695,7 +695,7 @@ func ZendCompileImplements(ast *ZendAst) {
 func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
 	var result *types.String = ZendStrpprintf(0, "class@anonymous%c%s:%"+"u"+"$%"+PRIx32, '0', filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
-	return types.ZendNewInternedString(result)
+	return result
 }
 func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)
@@ -714,7 +714,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		}
 		ZendAssertValidClassName(unqualified_name.GetStr())
 		name = ZendPrefixWithNs(unqualified_name)
-		name = types.ZendNewInternedString(name)
+		//name = types.ZendNewInternedString(name)
 		lcname = ZendStringTolower(name)
 		if FC__().GetImports() != nil {
 			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
@@ -737,7 +737,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 			}
 		}
 	}
-	lcname = types.ZendNewInternedString(lcname)
+	//lcname = types.ZendNewInternedString(lcname)
 	ce.SetType(ZEND_USER_CLASS)
 	ce.SetName(name)
 	ZendInitializeClassData(ce, 1)

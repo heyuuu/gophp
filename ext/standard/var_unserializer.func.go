@@ -1092,15 +1092,7 @@ yy36:
 	}
 	YYCURSOR += 2
 	*p = YYCURSOR
-	if len_ == 0 {
-		zend.ZVAL_EMPTY_STRING(rval)
-	} else if len_ == 1 {
-		rval.SetInternedString(types.ZstrChar(zend_uchar * str))
-	} else if as_key != 0 {
-		rval.SetString(types.ZendStringInitInterned(str, len_, 0))
-	} else {
-		rval.SetStringVal(b.CastStr(str, len_))
-	}
+	rval.SetStringVal(b.CastStr(str, len_))
 	return 1
 yy41:
 	yych = *(b.PreInc(&YYCURSOR))
