@@ -37,14 +37,7 @@ func ZendStringTruncate(s *String, len_ int) *String {
 }
 func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *String {
 	var ret *String
-	//if s.GetRefcount() == 1 {
-	//	ret = (*String)(SafePerealloc(s, n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
-	//	ret.SetLen(n*m + l)
-	//	ZendStringForgetHashVal(ret)
-	//	return ret
-	//}
 	ret = ZendStringSafeAlloc(n, m, l, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), b.Min(n*m+l, s.GetLen())+1)
-	//s.DelRefcount()
 	return ret
 }

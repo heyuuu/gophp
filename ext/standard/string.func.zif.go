@@ -891,5 +891,5 @@ var DefZifUtf8Decode = def.DefFunc("utf8_decode", 1, 1, []def.ArgInfo{{Name: "da
 	if fp.HasError() {
 		return
 	}
-	ZifUtf8Decode(executeData, returnValue, data)
+	ZifUtf8Decode(data)
 })

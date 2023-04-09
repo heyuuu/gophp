@@ -376,7 +376,7 @@ func PhpImplode(glue string, pieces *types.Array) string {
 	return strings.Join(parts, glue)
 }
 
-func STRTOK_TABLE(p *byte) __auto__ { return BG__().strtok_table[uint8(*p)] }
+func STRTOK_TABLE(p *byte) byte { return BG__().strtok_table[uint8(*p)] }
 func ZifStrtok(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, token *types.Zval) {
 	var str *types.String
 	var tok *types.String = nil
@@ -3817,20 +3817,6 @@ func PhpUtf8Decode(s *byte, len_ int) *types.String {
 func ZifUtf8Encode(data string) string {
 	return PhpUtf8EncodeEx(data)
 }
-func ZifUtf8Decode(executeData zpp.Ex, return_value zpp.Ret, data *types.Zval) {
-	var arg *byte
-	var arg_len int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg, arg_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetString(PhpUtf8Decode(arg, arg_len))
-	return
+func ZifUtf8Decode(data string) string {
+	return PhpUtf8Decode(data)
 }
