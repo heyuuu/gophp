@@ -2,7 +2,6 @@ package types
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/builtin/ascii"
 )
 
 func ZstrAlloc(str *String, _len int) {
@@ -48,10 +47,4 @@ func ZendStringSafeRealloc(s *String, n int, m int, l int, persistent int) *Stri
 	memcpy(ret.GetVal(), s.GetVal(), b.Min(n*m+l, s.GetLen())+1)
 	//s.DelRefcount()
 	return ret
-}
-func ZendStringEqualsCi(s1 *String, s2 *String) bool {
-	return ascii.StrCaseEquals(s1.GetStr(), s2.GetStr())
-}
-func ZendStringEqualsLiteralCi(str *String, c string) bool {
-	return ascii.StrCaseEquals(str.GetStr(), c)
 }

@@ -162,7 +162,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	/* Check protocol. Only http/https is allowed. */
 
-	if url_parts.GetScheme() != nil && !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
+	if url_parts.GetScheme() != nil && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "https")) {
 		dest.AppendSmartStr(url)
 		PhpUrlFree(url_parts)
 		return
@@ -296,7 +296,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		/* Only http/https should be handled.
 		   A bit hacky check this here, but saves a URL parse. */
 
-		if !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(types.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
+		if !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(url_parts.GetScheme().GetStr(), "https")) {
 			PhpUrlFree(url_parts)
 			return types.FAILURE
 		}

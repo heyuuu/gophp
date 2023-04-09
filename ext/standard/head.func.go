@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -183,22 +184,22 @@ func PhpHeadParseCookieOptionsArray(
 		key = _p.GetKey()
 		value = _z
 		if key != nil {
-			if types.ZendStringEqualsLiteralCi(key, "expires") {
+			if ascii.StrCaseEquals(key.GetStr(), "expires") {
 				*expires = zend.ZvalGetLong(value)
 				found++
-			} else if types.ZendStringEqualsLiteralCi(key, "path") {
+			} else if ascii.StrCaseEquals(key.GetStr(), "path") {
 				*path = zend.ZvalGetString(value)
 				found++
-			} else if types.ZendStringEqualsLiteralCi(key, "domain") {
+			} else if ascii.StrCaseEquals(key.GetStr(), "domain") {
 				*domain = zend.ZvalGetString(value)
 				found++
-			} else if types.ZendStringEqualsLiteralCi(key, "secure") {
+			} else if ascii.StrCaseEquals(key.GetStr(), "secure") {
 				*secure = zend.ZvalIsTrue(value)
 				found++
-			} else if types.ZendStringEqualsLiteralCi(key, "httponly") {
+			} else if ascii.StrCaseEquals(key.GetStr(), "httponly") {
 				*httponly = zend.ZvalIsTrue(value)
 				found++
-			} else if types.ZendStringEqualsLiteralCi(key, "samesite") {
+			} else if ascii.StrCaseEquals(key.GetStr(), "samesite") {
 				*samesite = zend.ZvalGetString(value)
 				found++
 			} else {

@@ -485,7 +485,7 @@ func ZendCompileFuncCufa(result *Znode, args *ZendAstList, lcname *types.String)
 		var list *ZendAstList = ZendAstGetList(args.GetChild()[1].GetChild()[1])
 		var is_fully_qualified types.ZendBool
 		var name *types.String = ZendResolveFunctionName(orig_name, args.GetChild()[1].GetChild()[0].GetAttr(), &is_fully_qualified)
-		if types.ZendStringEqualsLiteralCi(name, "array_slice") && list.GetChildren() == 3 && list.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
+		if ascii.StrCaseEquals(name.GetStr(), "array_slice") && list.GetChildren() == 3 && list.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
 			var zv *types.Zval = ZendAstGetZval(list.GetChild()[1])
 			if zv.IsLong() && zv.GetLval() >= 0 && zv.GetLval() <= 0x7fffffff {
 				var opline *ZendOp

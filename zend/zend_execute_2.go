@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
@@ -70,7 +71,7 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *types.Zval) {
 func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) types.ZendBool {
 	var ce *types.ClassEntry
 	var name *types.String = type_.Name()
-	if types.ZendStringEqualsLiteralCi(name, "self") {
+	if ascii.StrCaseEquals(name.GetStr(), "self") {
 
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
 		 * later using the wrong "self" when the trait is used in a class. */
@@ -80,7 +81,7 @@ func ZendResolveClassType(type_ *types.ZendType, self_ce *types.ClassEntry) type
 			return 0
 		}
 		ce = self_ce
-	} else if types.ZendStringEqualsLiteralCi(name, "parent") {
+	} else if ascii.StrCaseEquals(name.GetStr(), "parent") {
 		if !(self_ce.GetParent()) {
 			faults.ThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 			return 0

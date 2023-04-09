@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -243,7 +244,7 @@ func ZendBeginMethodDecl(op_array *types.ZendOpArray, name *types.String, has_bo
 			}
 		}
 	} else {
-		if in_trait == 0 && types.ZendStringEqualsCi(lcname, ce.GetName()) {
+		if in_trait == 0 && ascii.StrCaseEquals(lcname.GetStr(), ce.GetName().GetStr()) {
 			if ce.GetConstructor() == nil {
 				ce.SetConstructor((types.IFunction)(op_array))
 			}
@@ -334,7 +335,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 	lcname = ZendStringTolower(name)
 	if FC__().GetImportsFunction() != nil {
 		var import_name *types.String = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
-		if import_name != nil && !(types.ZendStringEqualsCi(lcname, import_name)) {
+		if import_name != nil && !(ascii.StrCaseEquals(lcname.GetStr(), import_name.GetStr())) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare function %s "+"because the name is already in use", name.GetVal())
 		}
 	}
@@ -344,7 +345,7 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 		}
 		faults.Error(faults.E_DEPRECATED, "__autoload() is deprecated, use spl_autoload_register() instead")
 	}
-	if types.ZendStringEqualsLiteralCi(unqualified_name, "assert") {
+	if ascii.StrCaseEquals(unqualified_name.GetStr(), "assert") {
 		faults.Error(faults.E_DEPRECATED, "Defining a custom assert() function is deprecated, "+"as the function has special semantics")
 	}
 	ZendRegisterSeenSymbol(lcname, ZEND_SYMBOL_FUNCTION)
@@ -718,7 +719,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		lcname = ZendStringTolower(name)
 		if FC__().GetImports() != nil {
 			var import_name *types.String = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
-			if import_name != nil && !(types.ZendStringEqualsCi(lcname, import_name)) {
+			if import_name != nil && !(ascii.StrCaseEquals(lcname.GetStr(), import_name.GetStr())) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare class %s "+"because the name is already in use", name.GetVal())
 			}
 		}

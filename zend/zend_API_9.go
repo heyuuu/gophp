@@ -82,7 +82,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
 		}
 	}
-	if types.ZendStringEqualsLiteralCi(name, "class") {
+	if ascii.StrCaseEquals(name.GetStr(), "class") {
 		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
 	//if value.IsString() {

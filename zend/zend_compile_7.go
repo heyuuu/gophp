@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -45,7 +46,7 @@ func ZendGetUseTypeStr(type_ uint32) *byte {
 	return " unknown"
 }
 func ZendCheckAlreadyInUse(type_ uint32, old_name *types.String, new_name *types.String, check_name *types.String) {
-	if types.ZendStringEqualsCi(old_name, check_name) {
+	if ascii.StrCaseEquals(old_name.GetStr(), check_name.GetStr()) {
 		return
 	}
 	faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())

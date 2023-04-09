@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/zend"
@@ -135,7 +136,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *types.ZendBool) *PhpUrl {
 			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
-				if types.ZendStringEqualsLiteralCi(ret.GetScheme(), "file") {
+				if ascii.StrCaseEquals(ret.GetScheme().GetStr(), "file") {
 					if e+3 < ue && (*(e + 3)) == '/' {
 
 						/* support windows drive letters as in:

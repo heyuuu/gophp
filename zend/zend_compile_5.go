@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -416,16 +417,16 @@ func ZendCompileDeclare(ast *ZendAst) {
 		if value_ast.GetKind() != ZEND_AST_ZVAL {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
 		}
-		if types.ZendStringEqualsLiteralCi(name, "ticks") {
+		if ascii.StrCaseEquals(name.GetStr(), "ticks") {
 			var value_zv types.Zval
 			ZendConstExprToZval(&value_zv, value_ast)
 			FC__().GetDeclarables().SetTicks(ZvalGetLong(&value_zv))
 			ZvalPtrDtorNogc(&value_zv)
-		} else if types.ZendStringEqualsLiteralCi(name, "encoding") {
+		} else if ascii.StrCaseEquals(name.GetStr(), "encoding") {
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")
 			}
-		} else if types.ZendStringEqualsLiteralCi(name, "strict_types") {
+		} else if ascii.StrCaseEquals(name.GetStr(), "strict_types") {
 			var value_zv types.Zval
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "strict_types declaration must be "+"the very first statement in the script")

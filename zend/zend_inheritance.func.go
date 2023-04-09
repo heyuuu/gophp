@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -163,13 +164,13 @@ func ZendVisibilityString(fn_flags uint32) *byte {
 }
 func ResolveClassName(scope *types.ClassEntry, name *types.String) *types.String {
 	b.Assert(scope != nil)
-	if types.ZendStringEqualsLiteralCi(name, "parent") && scope.GetParent() {
+	if ascii.StrCaseEquals(name.GetStr(), "parent") && scope.GetParent() {
 		if scope.IsResolvedParent() {
 			return scope.GetParent().name
 		} else {
 			return scope.GetParentName()
 		}
-	} else if types.ZendStringEqualsLiteralCi(name, "self") {
+	} else if ascii.StrCaseEquals(name.GetStr(), "self") {
 		return scope.GetName()
 	} else {
 		return name
@@ -207,7 +208,7 @@ func LookupClass(scope *types.ClassEntry, name *types.String) *types.ClassEntry 
 
 		/* The current class may not be registered yet, so check for it explicitly. */
 
-		if types.ZendStringEqualsCi(scope.GetName(), name) {
+		if ascii.StrCaseEquals(scope.GetName().GetStr(), name.GetStr()) {
 			return scope
 		}
 
@@ -286,7 +287,7 @@ func ZendPerformCovariantTypeCheck(unresolved_class **types.String, fe types.IFu
 		}
 		fe_class_name = ResolveClassName(fe.GetScope(), fe_type.Name())
 		proto_class_name = ResolveClassName(proto.GetScope(), proto_type.Name())
-		if types.ZendStringEqualsCi(fe_class_name, proto_class_name) {
+		if ascii.StrCaseEquals(fe_class_name.GetStr(), proto_class_name.GetStr()) {
 			return INHERITANCE_SUCCESS
 		}
 
@@ -820,7 +821,7 @@ func PropertyTypesCompatible(parent_info *ZendPropertyInfo, child_info *ZendProp
 	} else {
 		child_name = ResolveClassName(child_info.GetCe(), child_info.GetType().Name())
 	}
-	if types.ZendStringEqualsCi(parent_name, child_name) {
+	if ascii.StrCaseEquals(parent_name.GetStr(), child_name.GetStr()) {
 		return INHERITANCE_SUCCESS
 	}
 

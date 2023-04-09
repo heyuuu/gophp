@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/zend"
@@ -86,7 +87,7 @@ func PhpStreamUrlWrapHttpEx(
 	if resource == nil {
 		return nil
 	}
-	if !(types.ZendStringEqualsLiteralCi(resource.GetScheme(), "http")) && !(types.ZendStringEqualsLiteralCi(resource.GetScheme(), "https")) {
+	if !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "http")) && !(ascii.StrCaseEquals(resource.GetScheme().GetStr(), "https")) {
 		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || tmpzval.GetType() != types.IS_STRING || tmpzval.GetStr().GetLen() == 0 {
 			PhpUrlFree(resource)
 			return core.PhpStreamOpenWrapperEx(path, mode, core.REPORT_ERRORS, nil, context)
@@ -100,7 +101,7 @@ func PhpStreamUrlWrapHttpEx(
 		transport_len = tmpzval.GetStr().GetLen()
 		transport_string = zend.Estrndup(tmpzval.GetStr().GetVal(), tmpzval.GetStr().GetLen(
 
-		/* Normal http request (possibly with proxy) */ ))
+			/* Normal http request (possibly with proxy) */))
 	} else {
 
 		if strpbrk(mode, "awx+") {
@@ -301,8 +302,8 @@ func PhpStreamUrlWrapHttpEx(
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
 		if tmpzval.IsType(types.IS_STRING) && tmpzval.GetStr().GetLen(
 
-		/* As per the RFC, automatically redirected requests MUST NOT use other methods than
-		 * GET and HEAD unless it can be confirmed by the user */) > 0 {
+			/* As per the RFC, automatically redirected requests MUST NOT use other methods than
+			 * GET and HEAD unless it can be confirmed by the user */) > 0 {
 
 			if redirected == 0 || tmpzval.GetStr().GetLen() == 3 && memcmp("GET", tmpzval.GetStr().GetVal(), 3) == 0 || tmpzval.GetStr().GetLen() == 4 && memcmp("HEAD", tmpzval.GetStr().GetVal(), 4) == 0 {
 				custom_request_method = 1

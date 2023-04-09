@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -323,7 +324,7 @@ func check_type_stdClass_assignable(type_ types.ZendType) types.ZendBool {
 		if type_.IsCe() {
 			return type_.Ce() == ZendStandardClassDef
 		} else {
-			return types.ZendStringEqualsLiteralCi(type_.Name(), "stdclass")
+			return ascii.StrCaseEquals(type_.Name().GetStr(), "stdclass")
 		}
 	} else {
 		return type_.Code() == types.IS_OBJECT

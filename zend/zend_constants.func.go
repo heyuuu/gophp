@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -255,13 +256,13 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 		var class_name *types.String = types.NewString(b.CastStr(name, class_name_len))
 		var c *ZendClassConstant = nil
 		var ret_constant *types.Zval = nil
-		if types.ZendStringEqualsLiteralCi(class_name, "self") {
+		if ascii.StrCaseEquals(class_name.GetStr(), "self") {
 			if scope == nil {
 				faults.ThrowError(nil, "Cannot access self:: when no class scope is active")
 				goto failure
 			}
 			ce = scope
-		} else if types.ZendStringEqualsLiteralCi(class_name, "parent") {
+		} else if ascii.StrCaseEquals(class_name.GetStr(), "parent") {
 			if scope == nil {
 				faults.ThrowError(nil, "Cannot access parent:: when no class scope is active")
 				goto failure
@@ -271,7 +272,7 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 			} else {
 				ce = scope.GetParent()
 			}
-		} else if types.ZendStringEqualsLiteralCi(class_name, "static") {
+		} else if ascii.StrCaseEquals(class_name.GetStr(), "static") {
 			ce = ZendGetCalledScope(CurrEX())
 			if ce == nil {
 				faults.ThrowError(nil, "Cannot access static:: when no class scope is active")

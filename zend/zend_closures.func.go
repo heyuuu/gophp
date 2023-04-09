@@ -325,7 +325,7 @@ func ZendGetClosureThisPtr(obj *types.Zval) *types.Zval {
 	return closure.GetThisPtr()
 }
 func ZendClosureGetMethod(object **types.ZendObject, method *types.String, key *types.Zval) types.IFunction {
-	if types.ZendStringEqualsLiteralCi(method, ZEND_INVOKE_FUNC_NAME) {
+	if ascii.StrCaseEquals(method.GetStr(), ZEND_INVOKE_FUNC_NAME) {
 		return ZendGetClosureInvokeMethod(*object)
 	}
 	return ZendStdGetMethod(object, method, key)

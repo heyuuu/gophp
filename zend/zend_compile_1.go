@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"strings"
@@ -202,7 +203,7 @@ func ZendMarkFunctionAsGenerator() {
 			if !(return_info.GetType().IsClass()) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZendGetTypeByConst(return_info.GetType().Code()))
 			}
-			if !(types.ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Traversable")) && !(types.ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Iterator")) && !(types.ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Generator")) {
+			if !(ascii.StrCaseEquals(return_info.GetType().Name().GetStr(), "Traversable")) && !(ascii.StrCaseEquals(return_info.GetType().Name().GetStr(), "Iterator")) && !(ascii.StrCaseEquals(return_info.GetType().Name().GetStr(), "Generator")) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, msg, types.ZEND_TYPE_NAME(return_info.GetType()).GetVal())
 			}
 		}
@@ -319,21 +320,21 @@ func ZendIsScopeKnown() types.ZendBool {
 
 	/* For traits self etc refers to the using class, not the trait itself */
 }
-func ClassNameRefersToActiveCe(class_name *types.String, fetch_type uint32) types.ZendBool {
+func ClassNameRefersToActiveCe(class_name *types.String, fetch_type uint32) bool {
 	if CG__().GetActiveClassEntry() == nil {
-		return 0
+		return false
 	}
 	if fetch_type == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() != 0 {
-		return 1
+		return true
 	}
-	return fetch_type == ZEND_FETCH_CLASS_DEFAULT && types.ZendStringEqualsCi(class_name, CG__().GetActiveClassEntry().GetName())
+	return fetch_type == ZEND_FETCH_CLASS_DEFAULT && ascii.StrCaseEquals(class_name.GetStr(), CG__().GetActiveClassEntry().Name())
 }
 func ZendGetClassFetchType(name *types.String) uint32 {
-	if types.ZendStringEqualsLiteralCi(name, "self") {
+	if ascii.StrCaseEquals(name.GetStr(), "self") {
 		return ZEND_FETCH_CLASS_SELF
-	} else if types.ZendStringEqualsLiteralCi(name, "parent") {
+	} else if ascii.StrCaseEquals(name.GetStr(), "parent") {
 		return ZEND_FETCH_CLASS_PARENT
-	} else if types.ZendStringEqualsLiteralCi(name, "static") {
+	} else if ascii.StrCaseEquals(name.GetStr(), "static") {
 		return ZEND_FETCH_CLASS_STATIC
 	} else {
 		return ZEND_FETCH_CLASS_DEFAULT
@@ -427,7 +428,7 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *typ
 	var fetch_type = ZendGetClassFetchType(class_name)
 	var cc *ZendClassConstant
 	var c *types.Zval
-	if ClassNameRefersToActiveCe(class_name, fetch_type) != 0 {
+	if ClassNameRefersToActiveCe(class_name, fetch_type) {
 		cc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name.GetStr())
 	} else if fetch_type == ZEND_FETCH_CLASS_DEFAULT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0 {
 		ce := CG__().ClassTable().Get(class_name.GetStr())

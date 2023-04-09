@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -33,7 +34,7 @@ func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 		var list *ZendAstList = ZendAstGetList(args.GetChild()[0].GetChild()[1])
 		var zv *types.Zval = ZendAstGetZval(args.GetChild()[1])
 		var first Znode
-		if types.ZendStringEqualsLiteralCi(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.GetLval() >= 0 {
+		if ascii.StrCaseEquals(name.GetStr(), "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.GetLval() >= 0 {
 			first.SetOpType(IS_CONST)
 			first.GetConstant().SetLong(zv.GetLval())
 			ZendEmitOpTmp(result, ZEND_FUNC_GET_ARGS, &first, nil)
@@ -123,7 +124,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	}
 	var runtime_resolution types.ZendBool = ZendCompileFunctionName(&name_node, name_ast)
 	if runtime_resolution != 0 {
-		if types.ZendStringEqualsLiteralCi(ZendAstGetStr(name_ast), "assert") {
+		if ascii.StrCaseEquals(ZendAstGetStr(name_ast).GetStr(), "assert") {
 			ZendCompileAssert(result, ZendAstGetList(args_ast), name_node.GetConstant().GetStr(), nil)
 		} else {
 			ZendCompileNsCall(result, &name_node, args_ast)
@@ -207,7 +208,7 @@ func ZendCompileMethodCall(result *Znode, ast *ZendAst, type_ uint32) {
 	ZendCompileCallCommon(result, args_ast, fbc)
 }
 func ZendIsConstructor(name *types.String) types.ZendBool {
-	return types.ZendStringEqualsLiteralCi(name, ZEND_CONSTRUCTOR_FUNC_NAME)
+	return ascii.StrCaseEquals(name.GetStr(), ZEND_CONSTRUCTOR_FUNC_NAME)
 }
 func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 	var class_ast *ZendAst = ast.GetChild()[0]
@@ -255,7 +256,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 		if opline.GetOp1Type() == IS_CONST {
 			var lcname *types.String = (CT_CONSTANT(opline.GetOp1()) + 1).GetStr()
 			ce = CG__().ClassTable().Get(lcname.GetStr())
-			if ce == nil && CG__().GetActiveClassEntry() != nil && types.ZendStringEqualsCi(CG__().GetActiveClassEntry().GetName(), lcname) {
+			if ce == nil && CG__().GetActiveClassEntry() != nil && ascii.StrCaseEquals(CG__().GetActiveClassEntry().GetName().GetStr(), lcname.GetStr()) {
 				ce = CG__().GetActiveClassEntry()
 			}
 		} else if opline.GetOp1Type() == IS_UNUSED && (opline.GetOp1().GetNum()&ZEND_FETCH_CLASS_MASK) == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() != 0 {

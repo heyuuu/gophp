@@ -167,7 +167,7 @@ func ZendAstCreateConstant(name *types.String, attr ZendAstAttr) *ZendAst {
 }
 func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {
 	var name_str *types.String = ZendAstGetStr(name)
-	if types.ZendStringEqualsLiteralCi(name_str, "class") {
+	if ascii.StrCaseEquals(name_str.GetStr(), "class") {
 		// types.ZendStringRelease(name_str)
 		return ZendAstCreate(ZEND_AST_CLASS_NAME, class_name)
 	} else {
