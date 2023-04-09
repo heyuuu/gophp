@@ -891,9 +891,9 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_SplObjectStorage, 1, spl_ce_ArrayAccess)
 	SplRegisterStdClass(&spl_ce_MultipleIterator, "MultipleIterator", spl_SplObjectStorage_new, spl_funcs_MultipleIterator)
 	zend.ZendClassImplements(spl_ce_MultipleIterator, 1, zend.ZendCeIterator)
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ANY", b.SizeOf("\"MIT_NEED_ANY\"")-1, zend.ZendLong(MIT_NEED_ANY))
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ALL", b.SizeOf("\"MIT_NEED_ALL\"")-1, zend.ZendLong(MIT_NEED_ALL))
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_NUMERIC", b.SizeOf("\"MIT_KEYS_NUMERIC\"")-1, zend.ZendLong(MIT_KEYS_NUMERIC))
-	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_ASSOC", b.SizeOf("\"MIT_KEYS_ASSOC\"")-1, zend.ZendLong(MIT_KEYS_ASSOC))
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ANY", zend.ZendLong(MIT_NEED_ANY))
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_NEED_ALL", zend.ZendLong(MIT_NEED_ALL))
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_NUMERIC", zend.ZendLong(MIT_KEYS_NUMERIC))
+	zend.ZendDeclareClassConstantLong(spl_ce_MultipleIterator, "MIT_KEYS_ASSOC", zend.ZendLong(MIT_KEYS_ASSOC))
 	return types.SUCCESS
 }

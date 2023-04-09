@@ -105,22 +105,15 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 	}
 	return types.SUCCESS
 }
-func ZendDeclareClassConstant(ce *types.ClassEntry, name *byte, name_length int, value *types.Zval) int {
-	var ret int
-	var key *types.String
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		key = types.ZendStringInitInterned(name, name_length, 1)
-	} else {
-		key = types.NewString(b.CastStr(name, name_length))
-	}
-	ret = ZendDeclareClassConstantEx(ce, key, value, AccPublic, nil)
-	// types.ZendStringRelease(key)
+func ZendDeclareClassConstant(ce *types.ClassEntry, name string, value *types.Zval) int {
+	key := types.NewString(name)
+	ret := ZendDeclareClassConstantEx(ce, key, value, AccPublic, nil)
 	return ret
 }
-func ZendDeclareClassConstantLong(ce *types.ClassEntry, name string, name_length int, value ZendLong) int {
+func ZendDeclareClassConstantLong(ce *types.ClassEntry, name string, value ZendLong) int {
 	var constant types.Zval
 	constant.SetLong(value)
-	return ZendDeclareClassConstant(ce, name, name_length, &constant)
+	return ZendDeclareClassConstant(ce, name, &constant)
 }
 func ZendUpdatePropertyEx(scope *types.ClassEntry, object *types.Zval, name string, value *types.Zval) {
 	var oldScope *types.ClassEntry = EG__().GetFakeScope()

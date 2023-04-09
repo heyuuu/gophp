@@ -3,7 +3,6 @@ package types
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	"github.com/heyuuu/gophp/zend"
 )
 
 func ZstrAlloc(str *String, _len int) {
@@ -51,55 +50,4 @@ func ZendStringEqualsCi(s1 *String, s2 *String) bool {
 }
 func ZendStringEqualsLiteralCi(str *String, c string) bool {
 	return ascii.StrCaseEquals(str.GetStr(), c)
-}
-
-/**
- * Interned String 相关
- */
-var IsInRequestForInternedString bool = false
-
-func ZendInternedStringsInit() {
-	InternedStringsPermanent.Clean()
-	IsInRequestForInternedString = false
-}
-func ZendInternedStringsDtor() {
-	InternedStringsPermanent.Clean()
-}
-
-func InitInternedString(str string) string {
-	if IsInRequestForInternedString {
-		/* Check for permanent strings, the table is readonly at this point. */
-		if ret, ok := InternedStringsPermanent.Get(str); ok {
-			return ret
-		}
-
-		ret, _ := zend.CG__().InternedStrings.Get(str)
-		return ret
-	} else {
-		ret, _ := InternedStringsPermanent.GetOrInsert(str)
-		return ret
-	}
-}
-
-func InitInternedZendString(str string) *String {
-	var interned = InitInternedString(str)
-	return NewString(interned)
-}
-
-func ZendNewInternedString(str *String) *String {
-	return InitInternedZendString(str.GetStr())
-}
-
-func ZendStringInitInterned(str *byte, size int, permanent int) *String {
-	return InitInternedZendString(b.CastStr(str, size))
-}
-
-func ZendInternedStringsActivate() {
-	zend.CG__().InternedStrings = NewInternedStrings()
-}
-func ZendInternedStringsDeactivate() {
-	zend.CG__().InternedStrings.Destroy()
-}
-func ZendInternedStringsSwitchStorage(inRequest bool) {
-	IsInRequestForInternedString = inRequest
 }

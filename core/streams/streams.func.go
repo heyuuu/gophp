@@ -295,12 +295,10 @@ func PhpStreamWrapperSchemeValidate(protocol *byte, protocol_len uint) int {
 func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper) int {
 	var protocol_len uint = uint(strlen(protocol))
 	var ret int
-	var str *types.String
 	if PhpStreamWrapperSchemeValidate(protocol, protocol_len) == types.FAILURE {
 		return types.FAILURE
 	}
-	str = types.ZendStringInitInterned(protocol, protocol_len, 1)
-	if types.ZendHashAddPtr(&UrlStreamWrappersHash, str.GetStr(), any(wrapper)) {
+	if types.ZendHashAddPtr(&UrlStreamWrappersHash, protocol, any(wrapper)) {
 		ret = types.SUCCESS
 	} else {
 		ret = types.FAILURE

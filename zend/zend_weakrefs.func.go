@@ -131,7 +131,7 @@ func zim_WeakReference_get(executeData *ZendExecuteData, return_value *types.Zva
 func ZendRegisterWeakrefCe() {
 	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types.ZendStringInitInterned("WeakReference", b.SizeOf("\"WeakReference\"")-1, 1))
+	ce.SetName(types.NewString("WeakReference"))
 	ce.SetBuiltinFunctions(ZendWeakrefMethods)
 	ZendCeWeakref = ZendRegisterInternalClass(&ce)
 	ZendCeWeakref.SetIsFinal(true)

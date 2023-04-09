@@ -144,13 +144,11 @@ func BrowscapConvertPattern(pattern *types.String, persistent int) *types.String
 	return res
 }
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *types.String) *types.String {
-	zs, _ := ctx.StrInterned().GetOrInsertZendString(str.GetStr())
-	return zs
+	return ctx.GetInternedStr(str.GetStr())
 }
 func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String) *types.String {
 	lcName := ascii.StrToLower(str.GetStr())
-	zs, _ := ctx.StrInterned().GetOrInsertZendString(lcName)
-	return zs
+	return ctx.GetInternedStr(lcName)
 }
 func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, persistent types.ZendBool) {
 	if bdata.GetKvUsed() == bdata.GetKvSize() {
@@ -267,11 +265,9 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv")*browdata.GetKvSize(), persistent))
 
 	/* Create parser context */
-	var ctx BrowscapParserCtx = MakeBrowscapParserCtx(browdata)
-	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
+	var ctx = NewBrowscapParserCtx(browdata)
+	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), ctx)
 
-	/* Destroy parser context */
-	ctx.StrInterned().Destroy()
 	return types.SUCCESS
 }
 func BrowscapBdataDtor(bdata *BrowserData, persistent int) {

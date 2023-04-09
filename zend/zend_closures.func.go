@@ -470,7 +470,7 @@ func zim_Closure___construct(executeData *ZendExecuteData, return_value *types.Z
 func ZendRegisterClosureCe() {
 	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types.ZendStringInitInterned("Closure", b.SizeOf("\"Closure\"")-1, 1))
+	ce.SetName(types.NewString("Closure"))
 	ce.SetBuiltinFunctions(ClosureFunctions)
 	ZendCeClosure = ZendRegisterInternalClass(&ce)
 	ZendCeClosure.SetIsFinal(true)

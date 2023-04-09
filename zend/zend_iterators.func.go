@@ -7,7 +7,7 @@ import (
 
 func ZendRegisterIteratorWrapper() {
 	memset(&ZendIteratorClassEntry, 0, b.SizeOf("zend_class_entry"))
-	ZendIteratorClassEntry.SetName(types.ZendStringInitInterned("__iterator_wrapper", b.SizeOf("\"__iterator_wrapper\"")-1, 1))
+	ZendIteratorClassEntry.SetName(types.NewString("__iterator_wrapper"))
 	ZendIteratorClassEntry.SetBuiltinFunctions(nil)
 }
 func IterWrapperFree(object *types.ZendObject) {

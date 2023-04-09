@@ -39,8 +39,6 @@ type ZendCompilerGlobals struct {
 	file_context                 ZendFileContext
 	arena                        *ZendArena
 
-	InternedStrings *types.InternedStrings /* request 专用内部字符串 */
-
 	ast                          *ZendAst
 	ast_arena                    *ZendArena
 	delayed_oplines_stack        ZendStack

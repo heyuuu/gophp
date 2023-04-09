@@ -62,7 +62,7 @@ func ZmStartupAssert(type_ int, module_number int) int {
 	zend.RegisterLongConstant("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	zend.RegisterLongConstant("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types.ZendStringInitInterned("AssertionError", b.SizeOf("\"AssertionError\"")-1, 1))
+	ce.SetName(types.NewString("AssertionError"))
 	ce.SetBuiltinFunctions(nil)
 	AssertionErrorCe = zend.ZendRegisterInternalClassEx(&ce, faults.ZendCeError)
 	return types.SUCCESS

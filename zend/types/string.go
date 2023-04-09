@@ -1,14 +1,13 @@
 package types
 
+import "math"
+
 /**
  * String
  */
 type String struct{ str string }
 
 func NewString(str string) *String { return &String{str: str} }
-
-// 内部使用
-func initString(str string) *String { return NewString(str) }
 
 func (zs String) Copy() *String   { return &zs }
 func (zs *String) GetStr() string { return zs.str }
@@ -19,60 +18,50 @@ func (zs *String) GetValPtr() *byte { tmp := zs.str[0]; return &tmp } // todo re
 func (zs *String) SetLen(value int) { zs.str = zs.str[:value] }       // todo remove
 
 /**
- * InternedStrings
- * 内部字符串缓存，通过将相等字符串替换为内部字符串的方式减少字符串内存占用
+ * String Constants
  */
-type InternedStrings struct {
-	cache map[string]string
-}
+const STR_MAX_LEN = math.MaxInt
 
-const MIN_INTERNED_STRINGS_SIZE = 1024
-
-func NewInternedStrings() *InternedStrings {
-	return &InternedStrings{
-		cache: make(map[string]string, MIN_INTERNED_STRINGS_SIZE),
-	}
-}
-
-func (this *InternedStrings) GetOrInsert(str string) (string, bool) {
-	if interned, ok := this.cache[str]; ok {
-		return interned, true
-	} else {
-		this.cache[str] = str
-		return str, false
-	}
-}
-
-func (this *InternedStrings) Get(str string) (string, bool) {
-	if interned, ok := this.cache[str]; ok {
-		return interned, true
-	}
-	return "", false
-}
-
-func (this *InternedStrings) GetOrInsertZendString(str string) (*String, bool) {
-	s, exists := this.GetOrInsert(str)
-	return NewString(s), exists
-}
-
-func (this *InternedStrings) GetZendString(str string) (*String, bool) {
-	if s, exists := this.Get(str); exists {
-		return NewString(s), true
-	}
-	return nil, false
-}
-
-func (this *InternedStrings) LookupZendString(str string) *String {
-	if interned, ok := this.Get(str); ok {
-		return NewString(interned)
-	}
-	return nil
-}
-
-func (this *InternedStrings) Clean() {
-	this.cache = make(map[string]string, MIN_INTERNED_STRINGS_SIZE)
-}
-
-func (this *InternedStrings) Destroy() {
-	this.Clean()
-}
+// ZendKnownString
+var (
+	STR_FILE                 = "file"
+	STR_LINE                 = "line"
+	STR_FUNCTION             = "function"
+	STR_CLASS                = "class"
+	STR_OBJECT               = "object"
+	STR_TYPE                 = "type"
+	STR_OBJECT_OPERATOR      = "->"
+	STR_PAAMAYIM_NEKUDOTAYIM = "::"
+	STR_ARGS                 = "args"
+	STR_UNKNOWN              = "unknown"
+	STR_EVAL                 = "eval"
+	STR_INCLUDE              = "include"
+	STR_REQUIRE              = "require"
+	STR_INCLUDE_ONCE         = "include_once"
+	STR_REQUIRE_ONCE         = "require_once"
+	STR_SCALAR               = "scalar"
+	STR_ERROR_REPORTING      = "error_reporting"
+	STR_STATIC               = "static"
+	STR_THIS                 = "this"
+	STR_VALUE                = "value"
+	STR_KEY                  = "key"
+	STR_MAGIC_AUTOLOAD       = "__autoload"
+	STR_MAGIC_INVOKE         = "__invoke"
+	STR_PREVIOUS             = "previous"
+	STR_CODE                 = "code"
+	STR_MESSAGE              = "message"
+	STR_SEVERITY             = "severity"
+	STR_STRING               = "string"
+	STR_TRACE                = "trace"
+	STR_SCHEME               = "scheme"
+	STR_HOST                 = "host"
+	STR_PORT                 = "port"
+	STR_USER                 = "user"
+	STR_PASS                 = "pass"
+	STR_PATH                 = "path"
+	STR_QUERY                = "query"
+	STR_FRAGMENT             = "fragment"
+	STR_ARGV                 = "argv"
+	STR_ARGC                 = "argc"
+	STR_ARRAY_CAPITALIZED    = "Array"
+)

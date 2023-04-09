@@ -92,12 +92,12 @@ func IsProtectedVariable(varname *byte) types.ZendBool {
 }
 func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *types.Zval, override_protection types.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
-		PhpRegisterVariableSafe(var_, strval, val_len, track_vars_array)
+		PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(strval, val_len), track_vars_array)
 	}
 }
 func SafePhpRegisterVariableEx(var_ *byte, val *types.Zval, track_vars_array *types.Zval, override_protection types.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
-		PhpRegisterVariableEx(var_, val, track_vars_array)
+		PhpRegisterVariableEx(b.CastStrAuto(var_), val, track_vars_array)
 	}
 }
 func RegisterHttpPostFilesVariable(strvar *byte, val *byte, http_post_files *types.Zval, override_protection types.ZendBool) {

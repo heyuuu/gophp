@@ -125,8 +125,9 @@ func (this *ClassEntry) FunctionTable() FunctionTable { return this.functionTabl
 /**
  * Getter / Setter
  */
-func (this *ClassEntry) GetName() *String      { return NewString(this.name) }
-func (this *ClassEntry) SetName(value *String) { this.name = value.GetStr() }
+func (this *ClassEntry) GetName() *String        { return NewString(this.name) }
+func (this *ClassEntry) SetName(value *String)   { this.name = value.GetStr() }
+func (this *ClassEntry) SetNameVal(value string) { this.name = value }
 
 func (this *ClassEntry) GetType() byte                  { return this.type_ }
 func (this *ClassEntry) SetType(value byte)             { this.type_ = value }

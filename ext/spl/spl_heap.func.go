@@ -774,8 +774,8 @@ func ZmStartupSplHeap(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_SplPriorityQueue, 1, spl_ce_Iterator)
 	zend.ZendClassImplements(spl_ce_SplPriorityQueue, 1, spl_ce_Countable)
 	spl_ce_SplPriorityQueue.SetGetIterator(SplPqueueGetIterator)
-	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_BOTH", b.SizeOf("\"EXTR_BOTH\"")-1, zend.ZendLong(SPL_PQUEUE_EXTR_BOTH))
-	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_PRIORITY", b.SizeOf("\"EXTR_PRIORITY\"")-1, zend.ZendLong(SPL_PQUEUE_EXTR_PRIORITY))
-	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_DATA", b.SizeOf("\"EXTR_DATA\"")-1, zend.ZendLong(SPL_PQUEUE_EXTR_DATA))
+	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_BOTH", zend.ZendLong(SPL_PQUEUE_EXTR_BOTH))
+	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_PRIORITY", zend.ZendLong(SPL_PQUEUE_EXTR_PRIORITY))
+	zend.ZendDeclareClassConstantLong(spl_ce_SplPriorityQueue, "EXTR_DATA", zend.ZendLong(SPL_PQUEUE_EXTR_DATA))
 	return types.SUCCESS
 }

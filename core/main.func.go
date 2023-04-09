@@ -1164,8 +1164,6 @@ func PhpOnTimeout(seconds int) {
 	PG__().connection_status |= PHP_CONNECTION_TIMEOUT
 }
 func PhpRequestStartup() int {
-	types.ZendInternedStringsActivate()
-
 	retVal := faults.Try(func() {
 		PG__().in_error_log = 0
 		PG__().during_request_startup = 1
@@ -1309,7 +1307,6 @@ func PhpRequestShutdown(dummy any) {
 	})
 
 	/* 15. Free Willy (here be crashes) */
-	types.ZendInternedStringsDeactivate()
 	faults.Try(func() {
 		zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown() != 0 || report_memleaks == 0, 0)
 	})
@@ -1558,7 +1555,6 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	ModuleStartup = 0
 	zend.ShutdownMemoryManager(1, 0)
 	zend.VirtualCwdActivate()
-	types.ZendInternedStringsSwitchStorage(true)
 
 	/* we're done */
 	return types.IntBool(retval)
@@ -1569,7 +1565,6 @@ func PhpModuleShutdown() {
 	if ModuleInitialized == 0 {
 		return
 	}
-	types.ZendInternedStringsSwitchStorage(false)
 	SapiFlush()
 	zend.ZendShutdown()
 
@@ -1584,7 +1579,6 @@ func PhpModuleShutdown() {
 	zend.ZendIniShutdown()
 	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), 1)
 	PhpOutputShutdown()
-	types.ZendInternedStringsDtor()
 	if zend.ZendPostShutdownCb != nil {
 		var cb func() = zend.ZendPostShutdownCb
 		zend.ZendPostShutdownCb = nil

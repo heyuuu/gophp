@@ -24,7 +24,7 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	/* init the filter class ancestor */
 
 	memset(&UserFilterClassEntry, 0, b.SizeOf("zend_class_entry"))
-	UserFilterClassEntry.SetName(types.ZendStringInitInterned("php_user_filter", b.SizeOf("\"php_user_filter\"")-1, 1))
+	UserFilterClassEntry.SetName(types.NewString("php_user_filter"))
 	UserFilterClassEntry.SetBuiltinFunctions(UserFilterClassFuncs)
 	if b.Assign(&php_user_filter, zend.ZendRegisterInternalClass(&UserFilterClassEntry)) == nil {
 		return types.FAILURE

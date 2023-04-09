@@ -251,7 +251,7 @@ func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any
 	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
-		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
+		core.PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(val, new_val_len), array_ptr)
 	}
 }
 func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
@@ -320,7 +320,7 @@ func SapiCgiRegisterVariables(track_vars_array *types.Zval) {
 		/* Build the special-case PHP_SELF variable for the CGI version */
 
 		if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
-			core.PhpRegisterVariableSafe("PHP_SELF", php_self, php_self_len, track_vars_array)
+			core.PhpRegisterVariableSafe("PHP_SELF", b.CastStr(php_self, php_self_len), track_vars_array)
 		}
 		if free_php_self != 0 {
 			zend.FreeAlloca(php_self, use_heap)
@@ -333,7 +333,7 @@ func SapiCgiRegisterVariables(track_vars_array *types.Zval) {
 		}
 		php_self_len = strlen(php_self)
 		if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
-			core.PhpRegisterVariableSafe("PHP_SELF", php_self, php_self_len, track_vars_array)
+			core.PhpRegisterVariableSafe("PHP_SELF", b.CastStr(php_self, php_self_len), track_vars_array)
 		}
 	}
 }

@@ -9,14 +9,14 @@ import (
 func SplRegisterInterface(ppce **types.ClassEntry, class_name string, functions *types.FunctionEntry) {
 	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
+	ce.SetNameVal(class_name)
 	ce.SetBuiltinFunctions(functions)
 	*ppce = zend.ZendRegisterInternalInterface(&ce)
 }
 func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor any, function_list *types.FunctionEntry) {
 	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
+	ce.SetNameVal(class_name)
 	ce.SetBuiltinFunctions(function_list)
 	*ppce = zend.ZendRegisterInternalClass(&ce)
 
@@ -31,7 +31,7 @@ func SplRegisterStdClass(ppce **types.ClassEntry, class_name string, obj_ctor an
 func SplRegisterSubClass(ppce **types.ClassEntry, parent_ce *types.ClassEntry, class_name string, obj_ctor any, function_list *types.FunctionEntry) {
 	var ce types.ClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.SetName(types.ZendStringInitInterned(class_name, strlen(class_name), 1))
+	ce.SetNameVal(class_name)
 	ce.SetBuiltinFunctions(function_list)
 	*ppce = zend.ZendRegisterInternalClassEx(&ce, parent_ce)
 

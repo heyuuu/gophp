@@ -94,27 +94,27 @@ func SapiCliRegisterVariables(track_vars_array *types.Zval) {
 
 	len_ = strlen(PhpSelf)
 	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &PhpSelf, len_, &len_) != 0 {
-		core.PhpRegisterVariable("PHP_SELF", PhpSelf, track_vars_array)
+		core.PhpRegisterVariable("PHP_SELF", b.CastStrAuto(PhpSelf), track_vars_array)
 	}
 	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "SCRIPT_NAME", &PhpSelf, len_, &len_) != 0 {
-		core.PhpRegisterVariable("SCRIPT_NAME", PhpSelf, track_vars_array)
+		core.PhpRegisterVariable("SCRIPT_NAME", b.CastStrAuto(PhpSelf), track_vars_array)
 	}
 
 	/* filenames are empty for stdin */
 
 	len_ = strlen(ScriptFilename)
 	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "SCRIPT_FILENAME", &ScriptFilename, len_, &len_) != 0 {
-		core.PhpRegisterVariable("SCRIPT_FILENAME", ScriptFilename, track_vars_array)
+		core.PhpRegisterVariable("SCRIPT_FILENAME", b.CastStrAuto(ScriptFilename), track_vars_array)
 	}
 	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PATH_TRANSLATED", &ScriptFilename, len_, &len_) != 0 {
-		core.PhpRegisterVariable("PATH_TRANSLATED", ScriptFilename, track_vars_array)
+		core.PhpRegisterVariable("PATH_TRANSLATED", b.CastStrAuto(ScriptFilename), track_vars_array)
 	}
 
 	/* just make it available */
 
 	len_ = 0
 	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "DOCUMENT_ROOT", &docroot, len_, &len_) != 0 {
-		core.PhpRegisterVariable("DOCUMENT_ROOT", docroot, track_vars_array)
+		core.PhpRegisterVariable("DOCUMENT_ROOT", b.CastStrAuto(docroot), track_vars_array)
 	}
 }
 func SapiCliIniDefaults(configuration_hash *types.Array) {
@@ -160,13 +160,13 @@ func CliRegisterFileHandles() {
 	core.PhpStreamToZval(s_err, ec.Value())
 
 	zend.ZEND_CONSTANT_SET_FLAGS(&ic, zend.CONST_CS, 0)
-	ic.SetName(types.ZendStringInitInterned("STDIN", b.SizeOf("\"STDIN\"")-1, 0))
+	ic.SetName(types.NewString("STDIN"))
 	zend.ZendRegisterConstant(&ic)
 	zend.ZEND_CONSTANT_SET_FLAGS(&oc, zend.CONST_CS, 0)
-	oc.SetName(types.ZendStringInitInterned("STDOUT", b.SizeOf("\"STDOUT\"")-1, 0))
+	oc.SetName(types.NewString("STDOUT"))
 	zend.ZendRegisterConstant(&oc)
 	zend.ZEND_CONSTANT_SET_FLAGS(&ec, zend.CONST_CS, 0)
-	ec.SetName(types.ZendStringInitInterned("STDERR", b.SizeOf("\"STDERR\"")-1, 0))
+	ec.SetName(types.NewString("STDERR"))
 	zend.ZendRegisterConstant(&ec)
 }
 func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {

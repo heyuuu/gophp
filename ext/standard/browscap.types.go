@@ -116,19 +116,18 @@ type BrowscapParserCtx struct {
 	bdata                *BrowserData
 	current_entry        *BrowscapEntry
 	current_section_name *types.String
-	strInterned          *types.InternedStrings
+	strInterned          map[string]*types.String
 }
 
-func MakeBrowscapParserCtx(bdata *BrowserData) BrowscapParserCtx {
-	return BrowscapParserCtx{
+func NewBrowscapParserCtx(bdata *BrowserData) *BrowscapParserCtx {
+	return &BrowscapParserCtx{
 		bdata:                bdata,
 		current_entry:        nil,
 		current_section_name: nil,
-		strInterned:          types.NewInternedStrings(),
+		strInterned:          make(map[string]*types.String),
 	}
 }
 func (this *BrowscapParserCtx) GetBdata() *BrowserData               { return this.bdata }
-func (this *BrowscapParserCtx) SetBdata(value *BrowserData)          { this.bdata = value }
 func (this *BrowscapParserCtx) GetCurrentEntry() *BrowscapEntry      { return this.current_entry }
 func (this *BrowscapParserCtx) SetCurrentEntry(value *BrowscapEntry) { this.current_entry = value }
 func (this *BrowscapParserCtx) GetCurrentSectionName() *types.String {
@@ -137,5 +136,11 @@ func (this *BrowscapParserCtx) GetCurrentSectionName() *types.String {
 func (this *BrowscapParserCtx) SetCurrentSectionName(value *types.String) {
 	this.current_section_name = value
 }
-func (this *BrowscapParserCtx) StrInterned() *types.InternedStrings { return this.strInterned }
-func (this *BrowscapParserCtx) InitStrInterned()                    { this.strInterned = types.NewInternedStrings() }
+func (this *BrowscapParserCtx) GetInternedStr(str string) *types.String {
+	if interned, ok := this.strInterned[str]; ok {
+		return interned
+	}
+	interned := types.NewString(str)
+	this.strInterned[str] = interned
+	return interned
+}

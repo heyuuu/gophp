@@ -307,7 +307,7 @@ func ZendRegisterFunctions(scope *types.ClassEntry, functions *types.FunctionEnt
 						class_name++
 						allow_null = 1
 					}
-					str = types.ZendStringInitInterned(class_name, strlen(class_name), 1)
+					str = types.NewString(b.CastStrAuto(class_name))
 					new_arg_info[i].SetType(types.ZEND_TYPE_ENCODE_CLASS(str, allow_null))
 				}
 			}

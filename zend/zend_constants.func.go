@@ -108,28 +108,28 @@ func ZendRegisterNullConstant(name string, flags int, module_number int) {
 	var c ZendConstant
 	c.Value().SetNull()
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
-	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
+	c.SetNameVal(name)
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterBoolConstant(name string, bval types.ZendBool, flags int, module_number int) {
 	var c ZendConstant
 	types.ZVAL_BOOL(c.Value(), bval != 0)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
-	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
+	c.SetNameVal(name)
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterLongConstant(name string, lval ZendLong, flags int, module_number int) {
 	var c ZendConstant
 	c.Value().SetLong(lval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
-	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
+	c.SetNameVal(name)
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterDoubleConstant(name string, dval float64, flags int, module_number int) {
 	var c ZendConstant
 	c.Value().SetDouble(dval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
-	c.SetName(types.ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
+	c.SetNameVal(name)
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterStringlConstant(name string, str string, flags int, module_number int) {

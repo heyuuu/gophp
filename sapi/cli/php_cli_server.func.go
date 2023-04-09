@@ -209,7 +209,7 @@ func SapiCliServerRegisterVariable(track_vars_array *types.Zval, key *byte, val 
 		return
 	}
 	if core.SM__().GetInputFilter()(core.PARSE_SERVER, (*byte)(key), &new_val, strlen(val), &new_val_len) != 0 {
-		core.PhpRegisterVariableSafe((*byte)(key), new_val, new_val_len, track_vars_array)
+		core.PhpRegisterVariableSafe(b.CastStrAuto((*byte)(key)), b.CastStr(new_val, new_val_len), track_vars_array)
 	}
 }
 func SapiCliServerRegisterEntryCb(entry **byte, num_args int, va []any, hash_key *types.ArrayKey) int {
