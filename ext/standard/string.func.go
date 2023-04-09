@@ -1228,7 +1228,7 @@ func ZifChr(executeData zpp.Ex, return_value zpp.Ret, codepoint *types.Zval) {
 		break
 	}
 	c &= 0xff
-	return_value.SetInternedString(types.ZSTR_CHAR(c))
+	return_value.SetInternedString(types.ZstrChar(c))
 }
 func PhpUcfirst(str *types.String) *types.String {
 	var ch uint8 = str.GetVal()[0]
@@ -1712,7 +1712,7 @@ func PhpStrToStrEx(
 		if str_len == 0 {
 			new_str = types.NewString("")
 		} else if str_len == 1 {
-			new_str = types.ZSTR_CHAR(zend_uchar(*str))
+			new_str = types.ZstrChar(zend_uchar(*str))
 		} else {
 			new_str = types.NewString(b.CastStr(str, str_len))
 		}
@@ -2836,7 +2836,7 @@ func ZifParseStr(executeData zpp.Ex, return_value zpp.Ret, encodedString *types.
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
 		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
-		if types.ZendHashDel(symbol_table, types.ZSTR_THIS.GetStr()) == types.SUCCESS {
+		if types.ZendHashDel(symbol_table, types.STR_THIS) == types.SUCCESS {
 			faults.ThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {

@@ -560,7 +560,7 @@ func ZendPrefixWithNs(name *types.String) *types.String {
 func ZendHashFindPtrLc(ht *types.Array, str *byte, len_ int) any {
 	var result any
 	var lcname *types.String
-	types.ZSTR_ALLOCA_ALLOC(lcname, len_)
+	types.ZstrAlloc(lcname, len_)
 	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
 	result = types.ZendHashFindPtr(ht, lcname.GetStr())
 	//lcname.Free()

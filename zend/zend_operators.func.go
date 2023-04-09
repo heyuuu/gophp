@@ -734,7 +734,7 @@ try_again:
 	case types.IS_FALSE:
 		ZVAL_EMPTY_STRING(op)
 	case types.IS_TRUE:
-		op.SetInternedString(types.ZSTR_CHAR('1'))
+		op.SetInternedString(types.ZstrChar('1'))
 	case types.IS_STRING:
 
 	case types.IS_RESOURCE:
@@ -754,7 +754,7 @@ try_again:
 	case types.IS_ARRAY:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
 		ZvalPtrDtor(op)
-		op.SetInternedString(types.ZSTR_ARRAY_CAPITALIZED)
+		op.SetStringVal(types.STR_ARRAY_CAPITALIZED)
 	case types.IS_OBJECT:
 		var tmp types.Zval
 		if types.Z_OBJ_HT_P(op).GetCastObject() != nil {
@@ -873,7 +873,7 @@ try_again:
 		var tmp types.Zval
 		types.ZVAL_COPY_VALUE(&tmp, op)
 		ObjectInit(op)
-		types.Z_OBJPROP_P(op).KeyAddNew(types.ZSTR_SCALAR.GetStr(), &tmp)
+		types.Z_OBJPROP_P(op).KeyAddNew(types.STR_SCALAR, &tmp)
 	}
 }
 func _zvalGetLongFuncEx(op *types.Zval, silent types.ZendBool) ZendLong {
@@ -989,7 +989,7 @@ try_again:
 	case types.IS_FALSE:
 		return types.NewString("")
 	case types.IS_TRUE:
-		return types.ZSTR_CHAR('1')
+		return types.ZstrChar('1')
 	case types.IS_RESOURCE:
 		return ZendStrpprintf(0, "Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
 	case types.IS_LONG:
@@ -1001,7 +1001,7 @@ try_again:
 		if try != 0 && EG__().GetException() != nil {
 			return nil
 		} else {
-			return types.ZSTR_ARRAY_CAPITALIZED
+			return types.NewString(types.STR_ARRAY_CAPITALIZED)
 		}
 		fallthrough
 	case types.IS_OBJECT:
@@ -1687,7 +1687,7 @@ try_again:
 		var i int
 		if op1.GetStr().GetLen() == 1 {
 			var not types.ZendUchar = types.ZendUchar(^((*types.Z_STRVAL_P)(op1)))
-			result.SetInternedString(types.ZSTR_CHAR(not))
+			result.SetInternedString(types.ZstrChar(not))
 		} else {
 			result.SetString(types.ZendStringAlloc(op1.GetStr().GetLen(), 0))
 			for i = 0; i < op1.GetStr().GetLen(); i++ {
@@ -1730,7 +1730,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 				if result == op1 {
 
 				}
-				result.SetInternedString(types.ZSTR_CHAR(or))
+				result.SetInternedString(types.ZstrChar(or))
 				return types.SUCCESS
 			}
 			longer = op1
@@ -1815,7 +1815,7 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				if result == op1 {
 
 				}
-				result.SetInternedString(types.ZSTR_CHAR(and))
+				result.SetInternedString(types.ZstrChar(and))
 				return types.SUCCESS
 			}
 			longer = op1
@@ -1900,7 +1900,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				if result == op1 {
 
 				}
-				result.SetInternedString(types.ZSTR_CHAR(xor))
+				result.SetInternedString(types.ZstrChar(xor))
 				return types.SUCCESS
 			}
 			longer = op1
@@ -2648,7 +2648,7 @@ func IncrementString(str *types.Zval) {
 	var ch int
 	if str.GetStr().GetLen() == 0 {
 
-		str.SetInternedString(types.ZSTR_CHAR('1'))
+		str.SetInternedString(types.ZstrChar('1'))
 		return
 	}
 	if !(str.IsRefcounted()) {

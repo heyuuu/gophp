@@ -421,7 +421,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsLong() {
 		var c ZendLong = ZendAstGetZval(args.GetChild()[0]).GetLval() & 0xff
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetInternedString(types.ZSTR_CHAR(c))
+		result.GetConstant().SetInternedString(types.ZstrChar(c))
 		return types.SUCCESS
 	} else {
 		return types.FAILURE

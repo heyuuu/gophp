@@ -2519,7 +2519,7 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 			for {
 				fillScope := types.PackedFillStart(return_value.GetArr())
 				for ; low >= high; low -= uint(lstep) {
-					fillScope.FillSetInternedStr(types.ZSTR_CHAR(low))
+					fillScope.FillSetInternedStr(types.ZstrChar(low))
 					fillScope.FillNext()
 					if signed__int(low-lstep) < 0 {
 						break
@@ -2538,7 +2538,7 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 			for {
 				fillScope := types.PackedFillStart(return_value.GetArr())
 				for ; low <= high; low += uint(lstep) {
-					fillScope.FillSetInternedStr(types.ZSTR_CHAR(low))
+					fillScope.FillSetInternedStr(types.ZstrChar(low))
 					fillScope.FillNext()
 					if signed__int(low+lstep) > 255 {
 						break
@@ -2549,7 +2549,7 @@ func ZifRange(executeData zpp.Ex, return_value zpp.Ret, low *types.Zval, high *t
 			}
 		} else {
 			zend.ArrayInit(return_value)
-			tmp.SetInternedString(types.ZSTR_CHAR(low))
+			tmp.SetInternedString(types.ZstrChar(low))
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 		}
 	} else if zlow.IsType(types.IS_DOUBLE) || zhigh.IsType(types.IS_DOUBLE) || is_step_double != 0 {

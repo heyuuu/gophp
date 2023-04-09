@@ -95,7 +95,7 @@ func ZendFetchDimensionAddressRead(
 				real_offset = offset
 			}
 			c = types.ZendUchar(container.GetStr().GetVal()[real_offset])
-			result.SetInternedString(types.ZSTR_CHAR(c))
+			result.SetInternedString(types.ZstrChar(c))
 		}
 	} else if container.IsObject() {
 		if dim.IsUndef() {

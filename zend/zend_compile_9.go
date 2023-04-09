@@ -613,7 +613,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 				return
 			}
 			c = types.ZendUchar(container.GetStr().GetVal()[offset])
-			result.SetInternedString(types.ZSTR_CHAR(c))
+			result.SetInternedString(types.ZstrChar(c))
 		} else if container.GetType() <= types.IS_FALSE {
 			result.SetNull()
 		} else {

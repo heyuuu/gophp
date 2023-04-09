@@ -1177,7 +1177,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 	if key != nil {
 		lc_method_name = key.GetStr()
 	} else {
-		types.ZSTR_ALLOCA_ALLOC(lc_method_name, method_name.GetLen())
+		types.ZstrAlloc(lc_method_name, method_name.GetLen())
 		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
 	}
 	fbc = zobj.GetCe().FunctionTable().Get(lc_method_name.GetStr())
@@ -1596,7 +1596,7 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 }
 func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *types.IFunction, obj_ptr **types.ZendObject) int {
 	var ce *types.ClassEntry = types.Z_OBJCE_P(obj)
-	fptr := ce.FunctionTable().Get(types.ZSTR_MAGIC_INVOKE.GetStr())
+	fptr := ce.FunctionTable().Get(types.STR_MAGIC_INVOKE)
 	if fptr == nil {
 		return types.FAILURE
 	}

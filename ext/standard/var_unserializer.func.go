@@ -245,7 +245,7 @@ func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserialize
 	if !(classes.Len()) {
 		return 0
 	}
-	types.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen())
+	types.ZstrAlloc(lcname, class_name.GetLen())
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
 	res = types.IntBool(classes.KeyExists(lcname.GetStr()))
 	//lcname.Free()
@@ -1095,7 +1095,7 @@ yy36:
 	if len_ == 0 {
 		zend.ZVAL_EMPTY_STRING(rval)
 	} else if len_ == 1 {
-		rval.SetInternedString(types.ZSTR_CHAR(zend_uchar * str))
+		rval.SetInternedString(types.ZstrChar(zend_uchar * str))
 	} else if as_key != 0 {
 		rval.SetString(types.ZendStringInitInterned(str, len_, 0))
 	} else {

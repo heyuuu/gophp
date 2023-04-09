@@ -2,6 +2,7 @@ package standard
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -9,46 +10,35 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func ZifGettype(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
-	var arg *types.Zval
-	var type_ *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
+func ZifGettype(var_ *types.Zval) string {
+	switch var_.GetType() {
+	case types.IS_NULL:
+		return "NULL"
+	case types.IS_FALSE, types.IS_TRUE:
+		return "boolean"
+	case types.IS_LONG:
+		return "integer"
+	case types.IS_DOUBLE:
+		return "double"
+	case types.IS_STRING:
+		return "string"
+	case types.IS_ARRAY:
+		return "array"
+	case types.IS_OBJECT:
+		return "object"
+	case types.IS_RESOURCE:
+		if zend.ZendRsrcListGetRsrcType(var_.GetRes()) != nil {
+			return "resource"
+		} else {
+			return "resource (closed)"
 		}
-		break
-	}
-	type_ = types.ZendZvalGetType(arg)
-	if type_ != nil {
-		return_value.SetInternedString(type_)
-		return
-	} else {
-		return_value.SetStringVal("unknown type")
-		return
+	default:
+		return "unknown type"
 	}
 }
-func ZifSettype(executeData zpp.Ex, return_value zpp.Ret, var_ zpp.RefZval, type_ *types.Zval) {
-	var var_ *types.Zval
-	var type_ *types.String
+func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	var tmp types.Zval
 	var ptr *types.Zval
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			var_ = fp.ParseZval()
-			type_ = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 	b.Assert(var_.IsReference())
 	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.GetRef()) {
 		types.ZVAL_COPY(&tmp, types.Z_REFVAL_P(var_))
@@ -56,42 +46,39 @@ func ZifSettype(executeData zpp.Ex, return_value zpp.Ret, var_ zpp.RefZval, type
 	} else {
 		ptr = types.Z_REFVAL_P(var_)
 	}
-	if types.ZendStringEqualsLiteralCi(type_, "integer") {
+
+	typ = ascii.StrToLower(typ)
+	switch typ {
+	case "integer", "int":
 		zend.ConvertToLong(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "int") {
-		zend.ConvertToLong(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "float") {
+	case "float", "double":
 		zend.ConvertToDouble(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "double") {
-		zend.ConvertToDouble(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "string") {
+	case "string":
 		zend.ConvertToString(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "array") {
+	case "array":
 		zend.ConvertToArray(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "object") {
+	case "object":
 		zend.ConvertToObject(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "bool") {
+	case "bool", "boolean":
 		zend.ConvertToBoolean(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "boolean") {
-		zend.ConvertToBoolean(ptr)
-	} else if types.ZendStringEqualsLiteralCi(type_, "null") {
+	case "null":
 		zend.ConvertToNull(ptr)
-	} else {
+	default:
 		if ptr == &tmp {
 			zend.ZvalPtrDtor(&tmp)
 		}
-		if types.ZendStringEqualsLiteralCi(type_, "resource") {
+		if typ == "resource" {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot convert to resource type")
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid type")
 		}
-		return_value.SetFalse()
-		return
+		return false
 	}
+
 	if ptr == &tmp {
 		zend.ZendTryAssignTypedRef(var_.GetRef(), &tmp)
 	}
-	return_value.SetTrue()
+	return true
 }
 func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, base *types.Zval) {
 	var num *types.Zval

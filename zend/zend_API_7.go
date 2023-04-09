@@ -46,7 +46,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 	var ce *types.ClassEntry
 	var name_len int = name.GetLen()
 	var lcname *types.String
-	types.ZSTR_ALLOCA_ALLOC(lcname, name_len)
+	types.ZstrAlloc(lcname, name_len)
 	ZendStrTolowerCopy(lcname.GetVal(), name.GetVal(), name_len)
 	*strict_class = 0
 	if types.ZendStringEqualsLiteral(lcname, "self") {
@@ -171,7 +171,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 
 			/* Skip leading \ */
 
-			types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen()-1)
+			types.ZstrAlloc(lmname, callable.GetStr().GetLen()-1)
 			ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal()+1, callable.GetStr().GetLen()-1)
 			func_ = ZendFetchFunction(lmname)
 			//lmname.Free()
@@ -179,7 +179,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			lmname = callable.GetStr()
 			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
-				types.ZSTR_ALLOCA_ALLOC(lmname, callable.GetStr().GetLen())
+				types.ZstrAlloc(lmname, callable.GetStr().GetLen())
 				ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal(), callable.GetStr().GetLen())
 				func_ = ZendFetchFunction(lmname)
 				//lmname.Free()
@@ -407,14 +407,14 @@ try_again:
 			method = types.ZendHashIndexFindDeref(callable.GetArr(), 1)
 		}
 		if obj == nil || method == nil || method.GetType() != types.IS_STRING {
-			return types.ZSTR_ARRAY_CAPITALIZED
+			return types.NewString(types.STR_ARRAY_CAPITALIZED)
 		}
 		if obj.IsString() {
 			return ZendCreateMethodString(obj.GetStr(), method.GetStr())
 		} else if obj.IsObject() {
 			return ZendCreateMethodString(types.Z_OBJCE_P(obj).GetName(), method.GetStr())
 		} else {
-			return types.ZSTR_ARRAY_CAPITALIZED
+			return types.NewString(types.STR_ARRAY_CAPITALIZED)
 		}
 	case types.IS_OBJECT:
 		var calling_scope *types.ClassEntry

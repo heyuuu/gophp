@@ -12,7 +12,7 @@ var DefZifGettype = def.DefFunc("gettype", 1, 1, []def.ArgInfo{{Name: "var_"}}, 
 	if fp.HasError() {
 		return
 	}
-	ZifGettype(executeData, returnValue, var_)
+	ZifGettype(var_)
 })
 
 // generate by ZifSettype
@@ -23,7 +23,7 @@ var DefZifSettype = def.DefFunc("settype", 2, 2, []def.ArgInfo{{Name: "var_"}, {
 	if fp.HasError() {
 		return
 	}
-	ZifSettype(executeData, returnValue, var_, type_)
+	ZifSettype(var_, type_)
 })
 
 // generate by ZifIntval

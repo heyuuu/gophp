@@ -22,7 +22,7 @@ func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_a
 	if str_len == 0 {
 		zend.ZVAL_EMPTY_STRING(&new_entry)
 	} else if str_len == 1 {
-		new_entry.SetInternedString(types.ZSTR_CHAR(zend_uchar * strval))
+		new_entry.SetInternedString(types.ZstrChar(zend_uchar * strval))
 	} else {
 		new_entry.SetString(types.NewString(b.CastStr(strval, str_len)))
 	}
@@ -500,7 +500,7 @@ func ImportEnvironmentVariable(ht *types.Array, env *byte) {
 	if len_ == 0 {
 		zend.ZVAL_EMPTY_STRING(&val)
 	} else if len_ == 1 {
-		val.SetInternedString(types.ZSTR_CHAR(zend_uchar * p))
+		val.SetInternedString(types.ZstrChar(zend_uchar * p))
 	} else {
 		val.SetString(types.NewString(b.CastStr(p, len_)))
 	}
@@ -573,13 +573,13 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 	}
 	if SG__().request_info.argc {
 		arr.AddRefcount()
-		zend.EG__().GetSymbolTable().KeyUpdate(types.ZSTR_ARGV.GetStr(), &arr)
-		zend.EG__().GetSymbolTable().KeyUpdate(types.ZSTR_ARGC.GetStr(), &argc)
+		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGV, &arr)
+		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGC, &argc)
 	}
 	if track_vars_array != nil && track_vars_array.IsType(types.IS_ARRAY) {
 		arr.AddRefcount()
-		track_vars_array.GetArr().KeyUpdate(types.ZSTR_ARGV.GetStr(), &arr)
-		track_vars_array.GetArr().KeyUpdate(types.ZSTR_ARGC.GetStr(), &argc)
+		track_vars_array.GetArr().KeyUpdate(types.STR_ARGV, &arr)
+		track_vars_array.GetArr().KeyUpdate(types.STR_ARGC, &argc)
 	}
 	zend.ZvalPtrDtorNogc(&arr)
 }
@@ -717,10 +717,10 @@ func PhpAutoGlobalsCreateServer(name *types.String) types.ZendBool {
 			if SG__().request_info.argc {
 				var argc *types.Zval
 				var argv *types.Zval
-				if b.Assign(&argc, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGC.GetStr())) != nil && b.Assign(&argv, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr())) != nil {
+				if b.Assign(&argc, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGC)) != nil && b.Assign(&argv, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil {
 					argv.AddRefcount()
-					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_ARGV.GetStr(), argv)
-					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.ZSTR_ARGC.GetStr(), argc)
+					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.STR_ARGV, argv)
+					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.STR_ARGC, argc)
 				}
 			} else {
 				PhpBuildArgv(SG__().request_info.query_string, &PG__().http_globals[TRACK_VARS_SERVER])

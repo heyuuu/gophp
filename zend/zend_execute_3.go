@@ -213,7 +213,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 
 		/* Return the new character */
 
-		opline.Result().SetInternedString(types.ZSTR_CHAR(c))
+		opline.Result().SetInternedString(types.ZstrChar(c))
 
 		/* Return the new character */
 

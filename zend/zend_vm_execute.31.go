@@ -31,7 +31,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
-		if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
+		if name.GetStr() == types.STR_THIS {
 		fetch_this:
 			ZendFetchThisVar(type_, opline, executeData)
 			{
@@ -54,7 +54,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 	} else if retval.IsIndirect() {
 		retval = retval.GetZv()
 		if retval.IsUndef() {
-			if types.ZendStringEquals(name, types.ZSTR_THIS) != 0 {
+			if name.GetStr() == types.STR_THIS {
 				goto fetch_this
 			}
 			if type_ == BP_VAR_W {

@@ -641,7 +641,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.ZSTR_ARGV.GetStr())) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.ZSTR_ARGV.GetStr())) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -1579,7 +1579,7 @@ func ZifIniGet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval) {
 	if val.GetLen() == 0 {
 		zend.ZVAL_EMPTY_STRING(return_value)
 	} else if val.GetLen() == 1 {
-		return_value.SetInternedString(types.ZSTR_CHAR(types.ZendUchar(val.GetVal()[0])))
+		return_value.SetInternedString(types.ZstrChar(types.ZendUchar(val.GetVal()[0])))
 	} else {
 		return_value.SetString(val.Copy())
 	}
@@ -1686,7 +1686,7 @@ func ZifIniSet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval, ne
 		if val.GetLen() == 0 {
 			zend.ZVAL_EMPTY_STRING(return_value)
 		} else if val.GetLen() == 1 {
-			return_value.SetInternedString(types.ZSTR_CHAR(types.ZendUchar(val.GetVal()[0])))
+			return_value.SetInternedString(types.ZstrChar(types.ZendUchar(val.GetVal()[0])))
 		} else {
 			return_value.SetString(val.Copy())
 		}

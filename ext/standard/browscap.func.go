@@ -195,7 +195,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 			/* Set proper value for true/false settings */
 
 			if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
-				new_value = types.ZSTR_CHAR('1')
+				new_value = types.ZstrChar('1')
 			} else if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.GetStr().GetLen() == 5 && !(strncasecmp(arg2.GetStr().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = types.NewString("")
 			} else {
@@ -373,7 +373,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *types.String, found_ent
 
 	/* Lowercase the pattern, the agent name is already lowercase */
 
-	types.ZSTR_ALLOCA_ALLOC(pattern_lc, entry.GetPattern().GetLen())
+	types.ZstrAlloc(pattern_lc, entry.GetPattern().GetLen())
 	zend.ZendStrTolowerCopy(pattern_lc.GetVal(), entry.GetPattern().GetVal(), entry.GetPattern().GetLen())
 
 	/* Check if the agent contains the "contains" portions */

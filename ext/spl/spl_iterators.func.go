@@ -726,14 +726,11 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 		/* TODO: Remove this special case? */
 
 		if data.IsType(types.IS_ARRAY) {
-			return_value.SetInternedString(types.ZSTR_ARRAY_CAPITALIZED)
+			return_value.SetStringVal(types.STR_ARRAY_CAPITALIZED)
 		} else {
 			types.ZVAL_COPY(return_value, data)
 			zend.ConvertToString(return_value)
 		}
-
-		/* TODO: Remove this special case? */
-
 	}
 }
 func SplRecursiveTreeIteratorGetPostfix(object *SplRecursiveItObject, return_value *types.Zval) {
@@ -1490,7 +1487,7 @@ func zim_spl_RegexIterator_accept(executeData *zend.ZendExecuteData, return_valu
 		count = types.Z_ARRVAL(intern.GetData()).Len()
 		types.ZVAL_BOOL(return_value, count > 1)
 	case REGIT_MODE_REPLACE:
-		var replacement *types.Zval = zend.ZendReadProperty(intern.GetStd().GetCe(), zend.ZEND_THIS(executeData), "replacement", b.SizeOf("\"replacement\"")-1, 1, &rv)
+		var replacement *types.Zval = zend.ZendReadProperty(intern.GetStd().GetCe(), zend.ZEND_THIS(executeData), "replacement", 1, &rv)
 		var replacement_str *types.String = zend.ZvalTryGetString(replacement)
 		if replacement_str == nil {
 			return

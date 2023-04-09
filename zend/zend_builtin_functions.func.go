@@ -197,7 +197,7 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) {
 		entry.GetCounted().AddRefcountEx(2)
 	}
 	return_value.GetArr().IndexAddNew(1, entry)
-	return_value.GetArr().KeyAddNew(types.ZSTR_VALUE.GetStr(), entry)
+	return_value.GetArr().KeyAddNew(types.STR_VALUE, entry)
 
 	/* add the key elements */
 
@@ -208,7 +208,7 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) {
 		tmp.SetLong(num_key)
 	}
 	return_value.GetArr().IndexAddNew(0, &tmp)
-	return_value.GetArr().KeyAddNew(types.ZSTR_KEY.GetStr(), &tmp)
+	return_value.GetArr().KeyAddNew(types.STR_KEY, &tmp)
 	types.ZendHashMoveForward(target_hash)
 }
 func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
@@ -222,7 +222,7 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 		for {
 			var p = EG__().GetErrorReportingIniEntry()
 			if p == nil {
-				var zv = EG__().GetIniDirectives().KeyFind(types.ZSTR_ERROR_REPORTING.GetStr())
+				var zv = EG__().GetIniDirectives().KeyFind(types.STR_ERROR_REPORTING)
 				if zv != nil {
 					EG__().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
 					p = EG__().GetErrorReportingIniEntry()
@@ -235,7 +235,7 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
 					EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
 				}
-				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.ZSTR_ERROR_REPORTING.GetStr(), p) != nil {
+				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.STR_ERROR_REPORTING, p) != nil {
 					p.SetOrigValue(p.GetValue())
 					p.SetOrigModifiable(p.GetModifiable())
 					p.SetModified(1)
@@ -1735,9 +1735,9 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				lineno = skip.GetOpline().GetLineno()
 			}
 			tmp.SetStringCopy(filename)
-			stack_frame.GetArr().KeyAddNew(types.ZSTR_FILE.GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(types.STR_FILE, &tmp)
 			tmp.SetLong(lineno)
-			stack_frame.GetArr().KeyAddNew(types.ZSTR_LINE.GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(types.STR_LINE, &tmp)
 		} else {
 			var prev_call = skip
 			var prev = skip.GetPrevExecuteData()
@@ -1747,9 +1747,9 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetType()) {
 					tmp.SetStringCopy(prev.GetFunc().GetOpArray().GetFilename())
-					stack_frame.GetArr().KeyAddNew(types.ZSTR_FILE.GetStr(), &tmp)
+					stack_frame.GetArr().KeyAddNew(types.STR_FILE, &tmp)
 					tmp.SetLong(prev.GetOpline().GetLineno())
-					stack_frame.GetArr().KeyAddNew(types.ZSTR_LINE.GetStr(), &tmp)
+					stack_frame.GetArr().KeyAddNew(types.STR_LINE, &tmp)
 					break
 				}
 				prev_call = prev
@@ -1778,7 +1778,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 		}
 		if function_name != nil {
 			tmp.SetStringCopy(function_name)
-			stack_frame.GetArr().KeyAddNew(types.ZSTR_FUNCTION.GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(types.STR_FUNCTION, &tmp)
 			if object != nil {
 				if func_.GetScope() != nil {
 					tmp.SetStringCopy(func_.GetScope().GetName())
@@ -1787,55 +1787,55 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				} else {
 					tmp.SetString(object.GetHandlers().GetGetClassName()(object))
 				}
-				stack_frame.GetArr().KeyAddNew(types.ZSTR_CLASS.GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(types.STR_CLASS, &tmp)
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {
 					tmp.SetObject(object)
-					stack_frame.GetArr().KeyAddNew(types.ZSTR_OBJECT.GetStr(), &tmp)
+					stack_frame.GetArr().KeyAddNew(types.STR_OBJECT, &tmp)
 					tmp.AddRefcount()
 				}
-				tmp.SetInternedString(types.ZSTR_OBJECT_OPERATOR)
-				stack_frame.GetArr().KeyAddNew(types.ZSTR_TYPE.GetStr(), &tmp)
+				tmp.SetStringVal(types.STR_OBJECT_OPERATOR)
+				stack_frame.GetArr().KeyAddNew(types.STR_TYPE, &tmp)
 			} else if func_.GetScope() != nil {
 				tmp.SetStringCopy(func_.GetScope().GetName())
-				stack_frame.GetArr().KeyAddNew(types.ZSTR_CLASS.GetStr(), &tmp)
-				tmp.SetInternedString(types.ZSTR_PAAMAYIM_NEKUDOTAYIM)
-				stack_frame.GetArr().KeyAddNew(types.ZSTR_TYPE.GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(types.STR_CLASS, &tmp)
+				tmp.SetStringVal(types.STR_PAAMAYIM_NEKUDOTAYIM)
+				stack_frame.GetArr().KeyAddNew(types.STR_TYPE, &tmp)
 			}
 			if (options&DEBUG_BACKTRACE_IGNORE_ARGS) == 0 && func_.GetType() != ZEND_EVAL_CODE {
 				DebugBacktraceGetArgs(call, &tmp)
-				stack_frame.GetArr().KeyAddNew(types.ZSTR_ARGS.GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(types.STR_ARGS, &tmp)
 			}
 		} else {
 
 			/* i know this is kinda ugly, but i'm trying to avoid extra cycles in the main execution loop */
 
 			var build_filename_arg = 1
-			var pseudo_function_name *types.String
+			var pseudo_function_name string
 			if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetType())) || ptr.GetOpline().GetOpcode() != ZEND_INCLUDE_OR_EVAL {
 
 				/* can happen when calling eval from a custom sapi */
 
-				pseudo_function_name = types.ZSTR_UNKNOWN
+				pseudo_function_name = types.STR_UNKNOWN
 				build_filename_arg = 0
 			} else {
 				switch ptr.GetOpline().GetExtendedValue() {
 				case ZEND_EVAL:
-					pseudo_function_name = types.ZSTR_EVAL
+					pseudo_function_name = types.STR_EVAL
 					build_filename_arg = 0
 				case ZEND_INCLUDE:
-					pseudo_function_name = types.ZSTR_INCLUDE
+					pseudo_function_name = types.STR_INCLUDE
 				case ZEND_REQUIRE:
-					pseudo_function_name = types.ZSTR_REQUIRE
+					pseudo_function_name = types.STR_REQUIRE
 				case ZEND_INCLUDE_ONCE:
-					pseudo_function_name = types.ZSTR_INCLUDE_ONCE
+					pseudo_function_name = types.STR_INCLUDE_ONCE
 				case ZEND_REQUIRE_ONCE:
-					pseudo_function_name = types.ZSTR_REQUIRE_ONCE
+					pseudo_function_name = types.STR_REQUIRE_ONCE
 				default:
 
 					/* this can actually happen if you use debug_backtrace() in your error_handler and
 					 * you're in the top-scope */
 
-					pseudo_function_name = types.ZSTR_UNKNOWN
+					pseudo_function_name = types.STR_UNKNOWN
 					build_filename_arg = 0
 				}
 			}
@@ -1849,10 +1849,10 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 
 				tmp.SetStringCopy(include_filename)
 				arg_array.GetArr().NextIndexInsertNew(&tmp)
-				stack_frame.GetArr().KeyAddNew(types.ZSTR_ARGS.GetStr(), &arg_array)
+				stack_frame.GetArr().KeyAddNew(types.STR_ARGS, &arg_array)
 			}
-			tmp.SetInternedString(pseudo_function_name)
-			stack_frame.GetArr().KeyAddNew(types.ZSTR_FUNCTION.GetStr(), &tmp)
+			tmp.SetStringVal(pseudo_function_name)
+			stack_frame.GetArr().KeyAddNew(types.STR_FUNCTION, &tmp)
 		}
 		return_value.GetArr().NextIndexInsertNew(&stack_frame)
 		include_filename = filename

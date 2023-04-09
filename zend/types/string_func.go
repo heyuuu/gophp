@@ -6,9 +6,9 @@ import (
 	"github.com/heyuuu/gophp/zend"
 )
 
-func ZSTR_CHAR(c int) *String { return oneCharStrings[c] }
+func ZstrChar(c int) *String { return oneCharStrings[c] }
 
-func ZSTR_ALLOCA_ALLOC(str *String, _len int) {
+func ZstrAlloc(str *String, _len int) {
 	*str = *ZendStringAlloc(_len, 0)
 }
 

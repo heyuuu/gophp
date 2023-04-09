@@ -372,35 +372,35 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 
 	if resource.GetScheme() != nil {
 		tmp.SetStringCopy(resource.GetScheme())
-		return_value.GetArr().KeyAddNew(types.ZSTR_SCHEME.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_SCHEME, &tmp)
 	}
 	if resource.GetHost() != nil {
 		tmp.SetStringCopy(resource.GetHost())
-		return_value.GetArr().KeyAddNew(types.ZSTR_HOST.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_HOST, &tmp)
 	}
 	if has_port != 0 {
 		tmp.SetLong(resource.GetPort())
-		return_value.GetArr().KeyAddNew(types.ZSTR_PORT.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_PORT, &tmp)
 	}
 	if resource.GetUser() != nil {
 		tmp.SetStringCopy(resource.GetUser())
-		return_value.GetArr().KeyAddNew(types.ZSTR_USER.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_USER, &tmp)
 	}
 	if resource.GetPass() != nil {
 		tmp.SetStringCopy(resource.GetPass())
-		return_value.GetArr().KeyAddNew(types.ZSTR_PASS.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_PASS, &tmp)
 	}
 	if resource.GetPath() != nil {
 		tmp.SetStringCopy(resource.GetPath())
-		return_value.GetArr().KeyAddNew(types.ZSTR_PATH.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_PATH, &tmp)
 	}
 	if resource.GetQuery() != nil {
 		tmp.SetStringCopy(resource.GetQuery())
-		return_value.GetArr().KeyAddNew(types.ZSTR_QUERY.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_QUERY, &tmp)
 	}
 	if resource.GetFragment() != nil {
 		tmp.SetStringCopy(resource.GetFragment())
-		return_value.GetArr().KeyAddNew(types.ZSTR_FRAGMENT.GetStr(), &tmp)
+		return_value.GetArr().KeyAddNew(types.STR_FRAGMENT, &tmp)
 	}
 done:
 	PhpUrlFree(resource)

@@ -65,7 +65,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
+				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 				{
 
 					expr.TryAddRefcount()
@@ -149,7 +149,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
+				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 
 				{
 
@@ -235,7 +235,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
+				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 
 				{
 
@@ -319,7 +319,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			} else if expr.GetType() != types.IS_NULL {
 				ht = types.NewArray(1)
 				types.Z_OBJ_P(result).SetProperties(ht)
-				expr = ht.KeyAddNew(types.ZSTR_SCALAR.GetStr(), expr)
+				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 
 				{
 

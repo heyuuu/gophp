@@ -313,7 +313,7 @@ func ZendGetClosureInvokeMethod(object *types.ZendObject) types.IFunction {
 	invoke.GetInternalFunction().SetHandler(zim_Closure___invoke)
 	invoke.GetInternalFunction().SetModule(0)
 	invoke.GetInternalFunction().SetScope(ZendCeClosure)
-	invoke.GetInternalFunction().SetFunctionName(types.ZSTR_MAGIC_INVOKE)
+	invoke.GetInternalFunction().SetFunctionName(types.NewString(types.STR_MAGIC_INVOKE))
 	return invoke
 }
 func ZendGetClosureMethodDef(obj *types.Zval) types.IFunction {
@@ -400,7 +400,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 		var var_ *types.Zval
 		var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 		val.SetArray(types.ZendArrayDup(static_variables))
-		debug_info.KeyUpdate(types.ZSTR_STATIC.GetStr(), &val)
+		debug_info.KeyUpdate(types.STR_STATIC, &val)
 		var __ht *types.Array = val.GetArr()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
@@ -414,7 +414,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	}
 	if closure.GetThisPtr().IsNotUndef() {
 		closure.GetThisPtr().AddRefcount()
-		debug_info.KeyUpdate(types.ZSTR_THIS.GetStr(), closure.GetThisPtr())
+		debug_info.KeyUpdate(types.STR_THIS, closure.GetThisPtr())
 	}
 	if arg_info != nil && (closure.GetFunc().GetNumArgs() != 0 || closure.GetFunc().IsVariadic()) {
 		var i uint32
