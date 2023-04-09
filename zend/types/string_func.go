@@ -9,8 +9,12 @@ func ZstrAlloc(str *String, _len int) {
 	*str = *ZendStringAlloc(_len, 0)
 }
 
+func emptyString(len_ int) string {
+	return string(make([]byte, len_))
+}
+
 func ZendStringAlloc(len_ int, persistent int) *String {
-	var str_ = b.EmptyString(len_)
+	var str_ = emptyString(len_)
 	return NewString(str_)
 }
 func ZendStringSafeAlloc(n int, m int, l int, persistent int) *String {
@@ -18,14 +22,14 @@ func ZendStringSafeAlloc(n int, m int, l int, persistent int) *String {
 	var len_ = n*m + l
 	return ZendStringAlloc(len_, persistent)
 }
-func ZendStringExtend(s *String, len_ int, persistent int) *String {
+func ZendStringExtend(s *String, len_ int) *String {
 	b.Assert(len_ >= s.GetLen())
 	var oldStr = s.GetStr()
-	var newStr = oldStr + b.EmptyString(len_-len(oldStr))
+	var newStr = oldStr + emptyString(len_-len(oldStr))
 	//s.DelRefcount()
 	return NewString(newStr)
 }
-func ZendStringTruncate(s *String, len_ int, persistent int) *String {
+func ZendStringTruncate(s *String, len_ int) *String {
 	b.Assert(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]

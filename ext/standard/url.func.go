@@ -449,7 +449,7 @@ func PhpUrlEncode(s *byte, len_ int) *types.String {
 		}
 	}
 	*to = '0'
-	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
+	start = types.ZendStringTruncate(start, to-(*uint8)(start.GetVal()))
 	return start
 }
 func ZifUrlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
@@ -527,7 +527,7 @@ func PhpRawUrlEncode(s *byte, len_ int) *types.String {
 		y++
 	}
 	ret[y] = '0'
-	str = types.ZendStringTruncate(str, y, 0)
+	str = types.ZendStringTruncate(str, y)
 	return str
 }
 func ZifRawurlencode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {

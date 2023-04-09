@@ -186,7 +186,7 @@ func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = str.GetStr().GetLen()
-	str.SetString(types.ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD, 0))
+	str.SetString(types.ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD))
 	memset(str.GetStr().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
 	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil

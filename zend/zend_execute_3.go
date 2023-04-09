@@ -197,7 +197,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 	if int(offset >= str.GetStr().GetLen()) != 0 {
 
 		var old_len ZendLong = str.GetStr().GetLen()
-		str.SetString(types.ZendStringExtend(str.GetStr(), offset+1, 0))
+		str.SetString(types.ZendStringExtend(str.GetStr(), offset+1))
 		memset(str.GetStr().GetVal()+old_len, ' ', offset-old_len)
 		str.GetStr().GetVal()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {

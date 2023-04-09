@@ -264,7 +264,7 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 		var dirname *types.String = types.NewString(filename.GetStr())
 		dirname.SetLen(ZendDirname(dirname.GetVal(), dirname.GetLen()))
 		if strcmp(dirname.GetVal(), ".") == 0 {
-			dirname = types.ZendStringExtend(dirname, MAXPATHLEN, 0)
+			dirname = types.ZendStringExtend(dirname, MAXPATHLEN)
 			ZEND_IGNORE_VALUE(VCWD_GETCWD(dirname.GetVal(), MAXPATHLEN))
 			dirname.SetLen(strlen(dirname.GetVal()))
 		}

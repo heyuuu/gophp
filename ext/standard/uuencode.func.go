@@ -83,7 +83,7 @@ func PhpUuencode(src *byte, src_len int) *types.String {
 	b.PostInc(&(*p)) = PHP_UU_ENC('0')
 	b.PostInc(&(*p)) = '\n'
 	*p = '0'
-	dest = types.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()), 0)
+	dest = types.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()))
 	return dest
 }
 func PhpUudecode(src *byte, src_len int) *types.String {

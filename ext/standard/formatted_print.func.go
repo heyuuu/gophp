@@ -12,7 +12,7 @@ import (
 
 func PhpSprintfAppendchar(buffer **types.String, pos *int, add byte) {
 	if (*pos)+1 >= buffer.GetLen() {
-		*buffer = types.ZendStringExtend(*buffer, buffer.GetLen()<<1, 0)
+		*buffer = types.ZendStringExtend(*buffer, buffer.GetLen()<<1)
 	}
 	buffer.GetVal()[b.PostInc(&(*pos))] = add
 }
@@ -25,7 +25,7 @@ func PhpSprintfAppendchars(buffer **types.String, pos *int, add *byte, len_ int)
 				break
 			}
 		}
-		*buffer = types.ZendStringExtend(*buffer, nlen, 0)
+		*buffer = types.ZendStringExtend(*buffer, nlen)
 	}
 	memcpy(buffer.GetVal()+(*pos), add, len_)
 	*pos += len_
@@ -70,7 +70,7 @@ func PhpSprintfAppendstring(
 			}
 			size <<= 1
 		}
-		*buffer = types.ZendStringExtend(*buffer, size, 0)
+		*buffer = types.ZendStringExtend(*buffer, size)
 	}
 	if alignment == ALIGN_RIGHT {
 		if (neg != 0 || always_sign != 0) && padding == '0' {

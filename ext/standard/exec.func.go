@@ -291,7 +291,7 @@ func PhpEscapeShellCmd(str *byte) *types.String {
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
 
-		cmd = types.ZendStringTruncate(cmd, y, 0)
+		cmd = types.ZendStringTruncate(cmd, y)
 
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
@@ -350,7 +350,7 @@ func PhpEscapeShellArg(str *byte) *types.String {
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */
 
-		cmd = types.ZendStringTruncate(cmd, y, 0)
+		cmd = types.ZendStringTruncate(cmd, y)
 
 		/* realloc if the estimate was way overill
 		 * Arbitrary cutoff point of 4096 */

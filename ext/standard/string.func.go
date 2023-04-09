@@ -240,7 +240,7 @@ func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zp
 		for current = 0; current < zend.ZendLong(text.GetLen()); current++ {
 			if chk == 0 {
 				alloced += size_t(((text.GetLen()-current+1)/linelength+1)*breakchar_len) + 1
-				newtext = types.ZendStringExtend(newtext, alloced, 0)
+				newtext = types.ZendStringExtend(newtext, alloced)
 				chk = size_t((text.GetLen()-current)/linelength) + 1
 			}
 
@@ -297,7 +297,7 @@ func ZifWordwrap(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zp
 
 		/* free unused memory */
 
-		newtext = types.ZendStringTruncate(newtext, newtextlen, 0)
+		newtext = types.ZendStringTruncate(newtext, newtextlen)
 		return_value.SetString(newtext)
 		return
 	}
@@ -1195,7 +1195,7 @@ func ZifQuotemeta(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
 		}
 	}
 	*q = '0'
-	return_value.SetString(types.ZendStringTruncate(str, q-str.GetVal(), 0))
+	return_value.SetString(types.ZendStringTruncate(str, q-str.GetVal()))
 	return
 }
 func ZifOrd(character string) int {
@@ -1796,7 +1796,7 @@ func PhpStrToStr(
 				e += end - p
 			}
 			*e = '0'
-			new_str = types.ZendStringTruncate(new_str, e-s, 0)
+			new_str = types.ZendStringTruncate(new_str, e-s)
 			return new_str
 		}
 	} else if needle_len > length || memcmp(haystack, needle, length) {
@@ -3640,7 +3640,7 @@ func ZifMoneyFormat(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval
 	}
 	str.SetLen(int(res_len))
 	str.GetVal()[str.GetLen()] = '0'
-	return_value.SetString(types.ZendStringTruncate(str, str.GetLen(), 0))
+	return_value.SetString(types.ZendStringTruncate(str, str.GetLen()))
 	return
 }
 func ZifStrSplit(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, splitLength *types.Zval) {
@@ -3810,7 +3810,7 @@ func PhpUtf8Decode(s *byte, len_ int) *types.String {
 	}
 	str.GetVal()[str.GetLen()] = '0'
 	if str.GetLen() < len_ {
-		str = types.ZendStringTruncate(str, str.GetLen(), 0)
+		str = types.ZendStringTruncate(str, str.GetLen())
 	}
 	return str
 }

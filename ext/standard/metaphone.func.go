@@ -70,7 +70,7 @@ func Lookahead(word *byte, how_far int) byte {
 }
 func Phonize(c byte) {
 	if p_idx >= max_buffer_len {
-		*phoned_word = types.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len, 0)
+		*phoned_word = types.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len)
 		max_buffer_len += 2
 	}
 	phoned_word.GetVal()[b.PostInc(&p_idx)] = c
@@ -112,7 +112,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 		if Curr_Letter == '0' {
 			if p_idx == max_buffer_len {
-				*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len, 0)
+				*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
 				max_buffer_len += 1
 			}
 			phoned_word.GetVal()[p_idx] = '0'
@@ -315,7 +315,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		w_idx += skip_letter
 	}
 	if p_idx == max_buffer_len {
-		*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len, 0)
+		*phoned_word = types.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len)
 		max_buffer_len += 1
 	}
 	phoned_word.GetVal()[p_idx] = '0'

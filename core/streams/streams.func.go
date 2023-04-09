@@ -124,7 +124,7 @@ func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *types.String {
 	str.SetLen(read)
 	str.GetVal()[read] = 0
 	if int(read < len_/2) != 0 {
-		return types.ZendStringTruncate(str, read, 0)
+		return types.ZendStringTruncate(str, read)
 	}
 	return str
 }

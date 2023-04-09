@@ -183,7 +183,7 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 		ConvertToString(op2)
 	}
 	length = op1_len + int(op2.GetStr().GetLen())
-	result.SetString(types.ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
+	result.SetString(types.ZendStringExtend(op1.GetStr(), length))
 	memcpy(result.GetStr().GetVal()+op1_len, op2.GetStr().GetVal(), op2.GetStr().GetLen()+1)
 }
 

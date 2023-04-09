@@ -2229,7 +2229,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 
 			/* special case, perform operations on result */
 
-			result_str = types.ZendStringExtend(result.GetStr(), result_len, 0)
+			result_str = types.ZendStringExtend(result.GetStr(), result_len)
 
 			/* special case, perform operations on result */
 

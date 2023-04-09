@@ -212,7 +212,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	}
 	r.Fclose(fp)
 	if spool < 2 {
-		spoolbuf = types.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()), 0)
+		spoolbuf = types.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()))
 		return_value.SetString(spoolbuf)
 		return
 	} else {

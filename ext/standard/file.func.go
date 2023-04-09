@@ -874,7 +874,7 @@ func ZifFgets(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.Op
 		 * Only needed if the user requested a buffer size. */
 
 		if line_len < int(len_/2) {
-			str = types.ZendStringTruncate(str, line_len, 0)
+			str = types.ZendStringTruncate(str, line_len)
 		} else {
 			str.SetLen(line_len)
 		}

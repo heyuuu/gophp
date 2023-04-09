@@ -481,7 +481,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 
 			/* add object id to the hash to ensure uniqueness, for more reference look at bug #40091 */
 
-			lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
+			lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"))
 			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 			lc_name.GetVal()[lc_name.GetLen()] = '0'
 			alfi.GetObj().SetObject(obj_ptr)
@@ -616,7 +616,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 
 			success = types.ZendHashDel(SPL_G(autoload_functions), lc_name.GetStr())
 			if success != types.SUCCESS && obj_ptr != nil {
-				lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
+				lc_name = types.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"))
 				memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 				lc_name.GetVal()[lc_name.GetLen()] = '0'
 				success = types.ZendHashDel(SPL_G(autoload_functions), lc_name.GetStr())

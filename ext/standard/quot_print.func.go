@@ -141,7 +141,7 @@ func PhpQuotPrintEncode(str *uint8, length int) *types.String {
 		}
 	}
 	*d = '0'
-	ret = types.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()), 0)
+	ret = types.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()))
 	return ret
 }
 func ZifQuotedPrintableDecode(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {

@@ -236,7 +236,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *types.String {
 	return str
 }
 func UnserializeAllowedClass(class_name *types.String, var_hashx *PhpUnserializeDataT) int {
-	var classes *types.Array = var_hashx.GetAllowedClasses()
+	var classes *types.Array = (**var_hashx).GetAllowedClasses()
 	var lcname *types.String
 	var res int
 	if classes == nil {
