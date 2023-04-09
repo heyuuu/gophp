@@ -207,13 +207,9 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmActivateBasic(type_ int, module_number int) int {
-	memset(BG__().strtok_table, 0, 256)
 	BG__().serialize_lock = 0
 	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
 	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))
-	BG__().strtok_string = nil
-	BG__().strtok_zval.SetUndef()
-	BG__().strtok_last = nil
 	BG__().locale_string = nil
 	BG__().locale_changed = 0
 	BG__().array_walk_fci = zend.EmptyFcallInfo
@@ -243,9 +239,6 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
-	zend.ZvalPtrDtor(&(BG__().strtok_zval))
-	BG__().strtok_zval.SetUndef()
-	BG__().strtok_string = nil
 	tsrm_env_lock()
 	BG__().putenv_ht.Destroy()
 	tsrm_env_unlock()

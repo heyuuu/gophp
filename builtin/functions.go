@@ -64,7 +64,7 @@ func HashBytes(bytes []byte) uint {
 		hash = hash<<5 + hash + uint(c)
 	}
 	/* Hash value can't be zero, so we always set the high bit */
-	return hash | -0x8000000000000000
+	return hash | 0xffffffffffffffff
 }
 
 func Option[T any](ptr *T, defaultValue T) T {

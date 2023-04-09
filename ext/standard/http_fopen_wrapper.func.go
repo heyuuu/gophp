@@ -99,9 +99,9 @@ func PhpStreamUrlWrapHttpEx(
 		use_ssl = 0
 		use_proxy = 1
 		transport_len = tmpzval.GetStr().GetLen()
-		transport_string = zend.Estrndup(tmpzval.GetStr().GetVal(), tmpzval.GetStr().GetLen(
+		transport_string = zend.Estrndup(tmpzval.GetStr().GetVal(), tmpzval.GetStr().GetLen())
 
-			/* Normal http request (possibly with proxy) */))
+		/* Normal http request (possibly with proxy) */
 	} else {
 
 		if strpbrk(mode, "awx+") {
@@ -300,10 +300,7 @@ func PhpStreamUrlWrapHttpEx(
 	}
 	custom_request_method = 0
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
-		if tmpzval.IsType(types.IS_STRING) && tmpzval.GetStr().GetLen(
-
-			/* As per the RFC, automatically redirected requests MUST NOT use other methods than
-			 * GET and HEAD unless it can be confirmed by the user */) > 0 {
+		if tmpzval.IsType(types.IS_STRING) && tmpzval.GetStr().GetLen() > 0 {
 
 			if redirected == 0 || tmpzval.GetStr().GetLen() == 3 && memcmp("GET", tmpzval.GetStr().GetVal(), 3) == 0 || tmpzval.GetStr().GetLen() == 4 && memcmp("HEAD", tmpzval.GetStr().GetVal(), 4) == 0 {
 				custom_request_method = 1

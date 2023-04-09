@@ -10,15 +10,12 @@ import (
  * PhpBasicGlobals
  */
 type PhpBasicGlobals struct {
+	strTokState strTokState
+
 	user_shutdown_function_names *types.Array
 	putenv_ht                    types.Array
-	strtok_zval                  types.Zval
-	strtok_string                *byte
 	locale_string                *types.String
 	locale_changed               types.ZendBool
-	strtok_last                  *byte
-	strtok_table                 []byte
-	strtok_len                   zend.ZendUlong
 	str_ebuf                     []byte
 	array_walk_fci               types.ZendFcallInfo
 	array_walk_fci_cache         types.ZendFcallInfoCache
