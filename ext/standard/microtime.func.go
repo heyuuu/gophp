@@ -39,7 +39,7 @@ func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *types.Zva
 		zend.AddAssocLong(return_value, "dsttime", offset.is_dst)
 		timelib_time_offset_dtor(offset)
 	} else {
-		return_value.SetString(zend.ZendStrpprintf(0, "%.8F %ld", tp.tv_usec/MICRO_IN_SEC, long(tp.tv_sec)))
+		return_value.SetStringVal(zend.ZendSprintf("%.8F %ld", tp.tv_usec/MICRO_IN_SEC, long(tp.tv_sec)))
 		return
 	}
 }

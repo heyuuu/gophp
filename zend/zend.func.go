@@ -46,43 +46,6 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	return true
 }
 
-// 替代各种 sprintf 方法(限制长度)
-func ZendSprintfEx(maxLen int, format string, args ...any) string {
-	result := ZendSprintf(format, args...)
-	if maxLen != 0 && len(result) > maxLen {
-		return result[:maxLen]
-	}
-	return result
-}
-
-// 替代各种 sprintf 方法
-func ZendSprintf(format string, args ...any) string {
-	var buf = SmartStr{}
-	ZendPrintfToSmartStr(&buf, format, args...)
-	return buf.GetStr()
-}
-
-func ZendVspprintf(pbuf *string, max_len int, format string, args ...any) int {
-	/* since there are places where (v)spprintf called without checking for null,
-	   a bit of defensive coding here */
-	if pbuf == nil {
-		return 0
-	}
-	result := ZendSprintfEx(max_len, format, args...)
-	*pbuf = result
-	return len(result)
-}
-
-func ZendSpprintf(message *string, max_len int, format string, args ...any) int {
-	result := ZendSprintfEx(max_len, format, args...)
-	*message = result
-	return len(result)
-}
-
-func ZendStrpprintf(max_len int, format string, args ...any) *types.String {
-	result := ZendSprintfEx(max_len, format, args...)
-	return types.NewString(result)
-}
 
 func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendBool) {
 	for i := 0; i < indent; i++ {
@@ -573,10 +536,9 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 	va_end(files)
 	return types.SUCCESS
 }
-func ZendMakeCompiledStringDescription(name string) *byte {
+func ZendMakeCompiledStringDescription(name string) string {
 	var cur_filename *byte
 	var cur_lineno int
-	var compiled_string_description *byte
 	if ZendIsCompiling() != 0 {
 		cur_filename = ZendGetCompiledFilename().GetVal()
 		cur_lineno = ZendGetCompiledLineno()
@@ -587,8 +549,7 @@ func ZendMakeCompiledStringDescription(name string) *byte {
 		cur_filename = "Unknown"
 		cur_lineno = 0
 	}
-	ZendSpprintf(&compiled_string_description, 0, COMPILED_STRING_DESCRIPTION_FORMAT, cur_filename, cur_lineno, name)
-	return compiled_string_description
+	return ZendSprintf( COMPILED_STRING_DESCRIPTION_FORMAT, cur_filename, cur_lineno, name)
 }
 func FreeEstring(str_p **byte) { Efree(*str_p) }
 func ZendMapPtrNew() any {

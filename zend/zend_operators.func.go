@@ -682,19 +682,18 @@ try_again:
 	case types.IS_STRING:
 
 	case types.IS_RESOURCE:
-		var str *types.String = ZendStrpprintf(0, "Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
+		var str = ZendSprintf("Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
 		ZvalPtrDtor(op)
-		op.SetString(str)
+		op.SetStringVal(str)
 	case types.IS_LONG:
 		op.SetString(ZendLongToStr(op.GetLval()))
 	case types.IS_DOUBLE:
-		var str *types.String
 		var dval = op.GetDval()
-		str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), dval)
+		str := ZendSprintf(0, "%.*G", int(EG__().GetPrecision()), dval)
 
 		/* %G already handles removing trailing zeros from the fractional part, yay */
 
-		op.SetString(str)
+		op.SetStringVal(str)
 	case types.IS_ARRAY:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
 		ZvalPtrDtor(op)
@@ -935,11 +934,13 @@ try_again:
 	case types.IS_TRUE:
 		return types.NewString("1")
 	case types.IS_RESOURCE:
-		return ZendStrpprintf(0, "Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
+		str := ZendSprintf("Resource id #"+ZEND_LONG_FMT, ZendLong(types.Z_RES_HANDLE_P(op)))
+		return types.NewString(str)
 	case types.IS_LONG:
 		return ZendLongToStr(op.GetLval())
 	case types.IS_DOUBLE:
-		return ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), op.GetDval())
+		str := ZendSprintf("%.*G", int(EG__().GetPrecision()), op.GetDval())
+		return types.NewString(str)
 	case types.IS_ARRAY:
 		faults.Error(faults.E_NOTICE, "Array to string conversion")
 		if try != 0 && EG__().GetException() != nil {

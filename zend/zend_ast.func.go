@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -793,10 +794,8 @@ func ZendAstApply(ast *ZendAst, fn ZendAstApplyFunc) {
 		}
 	}
 }
-func ZendAstExportStr(str *SmartStr, s *types.String) {
-	var i int
-	for i = 0; i < s.GetLen(); i++ {
-		var c uint8 = s.GetVal()[i]
+func ZendAstExportStr(str *SmartStr, s string) {
+	for _, c := range []byte(s) {
 		if c == '\'' || c == '\\' {
 			str.AppendByte('\\')
 			str.AppendByte(c)
@@ -1052,10 +1051,6 @@ tail_call:
 	str.AppendByte('}')
 }
 func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) {
-	var idx ZendLong
-	var key *types.String
-	var val *types.Zval
-	var first int
 	zv = types.ZVAL_DEREF(zv)
 	switch zv.GetType() {
 	case types.IS_NULL:
@@ -1067,38 +1062,31 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 	case types.IS_LONG:
 		str.AppendLong(zv.GetLval())
 	case types.IS_DOUBLE:
-		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
-		str.AppendString(key.GetStr())
-		// types.ZendStringReleaseEx(key, 0)
+		key := ZendSprintf("%.*G", int(EG__().GetPrecision()), zv.GetDval())
+		str.AppendString(key)
 	case types.IS_STRING:
 		str.AppendByte('\'')
-		ZendAstExportStr(str, zv.GetStr())
+		ZendAstExportStr(str, zv.GetStrVal())
 		str.AppendByte('\'')
 	case types.IS_ARRAY:
 		str.AppendByte('[')
-		first = 1
-		var __ht *types.Array = types.Z_ARRVAL_P(zv)
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			idx = _p.GetH()
-			key = _p.GetKey()
-			val = _z
+		first := 1
+		zv.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
 			if first != 0 {
 				first = 0
 			} else {
 				str.AppendString(", ")
 			}
-			if key != nil {
+			if key.IsStrKey() {
 				str.AppendByte('\'')
-				ZendAstExportStr(str, key)
+				ZendAstExportStr(str, key.StrKey())
 				str.AppendString("' => ")
 			} else {
-				str.AppendLong(idx)
+				str.AppendLong(key.IndexKey())
 				str.AppendString(" => ")
 			}
-			ZendAstExportZval(str, val, 0, indent)
-		}
+			ZendAstExportZval(str, value, 0, indent)
+		})
 		str.AppendByte(']')
 	case types.IS_CONSTANT_AST:
 		ZendAstExportEx(str, types.Z_ASTVAL_P(zv), priority, indent)

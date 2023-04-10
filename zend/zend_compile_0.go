@@ -159,8 +159,8 @@ func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
 }
 func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *types.String {
 	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
-	var result *types.String = ZendStrpprintf(0, "%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
-	return result
+	var result = ZendSprintf("%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+	return types.NewString(result)
 }
 func ZendGetUnqualifiedName(name *types.String, result **byte, result_len *int) types.ZendBool {
 	var ns_separator *byte = ZendMemrchr(name.GetVal(), '\\', name.GetLen())

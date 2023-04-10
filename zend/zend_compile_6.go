@@ -695,8 +695,8 @@ func ZendCompileImplements(ast *ZendAst) {
 }
 func ZendGenerateAnonClassName(start_lineno uint32) *types.String {
 	var filename *types.String = CG__().GetActiveOpArray().GetFilename()
-	var result *types.String = ZendStrpprintf(0, "class@anonymous%c%s:%"+"u"+"$%"+PRIx32, '0', filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
-	return result
+	var result = ZendSprintf("class@anonymous%c%s:%"+"u"+"$%"+PRIx32, '0', filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
+	return types.NewString(result)
 }
 func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 	var decl *ZendAstDecl = (*ZendAstDecl)(ast)

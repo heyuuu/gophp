@@ -12,7 +12,7 @@ import (
 func PhpStreamXportGetHash() *types.Array { return &XportHash }
 func ERR_REPORT(out_err **types.String, fmt string, arg []byte) {
 	if out_err != nil {
-		*out_err = core.Strpprintf(0, fmt, arg)
+		*out_err = zend.ZendSprintfZStr(fmt, arg)
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, fmt, arg)
 	}

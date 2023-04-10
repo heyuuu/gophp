@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -426,19 +427,19 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 			num_args++
 		}
 		for i = 0; i < num_args; i++ {
-			var name *types.String
+			var name string
 			var info types.Zval
 			if arg_info.GetName() != nil {
 				if zstr_args != 0 {
-					name = ZendStrpprintf(0, "%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), arg_info.GetName().GetVal())
+					name = ZendSprintf("%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), arg_info.GetName().GetVal())
 				} else {
-					name = ZendStrpprintf(0, "%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), (*ArgInfo)(arg_info).Name())
+					name = ZendSprintf("%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), (*ArgInfo)(arg_info).Name())
 				}
 			} else {
-				name = ZendStrpprintf(0, "%s$param%d", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), i+1)
+				name = ZendSprintf("%s$param%d", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), i+1)
 			}
-			info.SetString(ZendStrpprintf(0, "%s", b.Cond(i >= required, "<optional>", "<required>")))
-			val.GetArr().KeyUpdate(name.GetStr(), &info)
+			info.SetStringVal(ZendSprintf("%s", b.Cond(i >= required, "<optional>", "<required>")))
+			val.GetArr().KeyUpdate(name, &info)
 			// types.ZendStringReleaseEx(name, 0)
 			arg_info++
 		}

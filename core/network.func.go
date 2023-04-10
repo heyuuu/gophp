@@ -64,7 +64,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 			if (*error_string) != nil {
 				// types.ZendStringReleaseEx(*error_string, 0)
 			}
-			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
+			*error_string = zend.ZendSprintfZStr("php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
 			PhpErrorDocref(nil, faults.E_WARNING, "%s", error_string.GetVal())
 		} else {
 			PhpErrorDocref(nil, faults.E_WARNING, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
@@ -78,7 +78,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 			if (*error_string) != nil {
 				// types.ZendStringReleaseEx(*error_string, 0)
 			}
-			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
+			*error_string = zend.ZendSprintfZStr("php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
 			PhpErrorDocref(nil, faults.E_WARNING, "%s", error_string.GetVal())
 		} else {
 			PhpErrorDocref(nil, faults.E_WARNING, "php_network_getaddresses: getaddrinfo failed (null result pointer)")
@@ -377,12 +377,12 @@ func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, te
 
 			buf = inet_ntoa((*__struct__sockaddr_in)(sa).sin_addr)
 			if buf != nil {
-				*textaddr = Strpprintf(0, "%s:%d", buf, ntohs((*__struct__sockaddr_in)(sa).sin_port))
+				*textaddr = zend.ZendSprintfZStr("%s:%d", buf, ntohs((*__struct__sockaddr_in)(sa).sin_port))
 			}
 		case AF_INET6:
 			buf = (*byte)(inet_ntop(sa.sa_family, (*__struct__sockaddr_in6)(sa).sin6_addr, (*byte)(&abuf), b.SizeOf("abuf")))
 			if buf != nil {
-				*textaddr = Strpprintf(0, "[%s]:%d", buf, ntohs((*__struct__sockaddr_in6)(sa).sin6_port))
+				*textaddr = zend.ZendSprintfZStr("[%s]:%d", buf, ntohs((*__struct__sockaddr_in6)(sa).sin6_port))
 			}
 		}
 	}

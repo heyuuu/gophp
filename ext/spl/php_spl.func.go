@@ -695,7 +695,7 @@ func ZifSplObjectHash(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval)
 	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
 		return
 	}
-	return_value.SetString(PhpSplObjectHash(obj))
+	return_value.SetStringVal(PhpSplObjectHash(obj))
 	return
 }
 func ZifSplObjectId(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
@@ -714,7 +714,7 @@ func ZifSplObjectId(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
 	return_value.SetLong(zend.ZendLong(zend.Z_OBJ_HANDLE_P(obj)))
 	return
 }
-func PhpSplObjectHash(obj *types.Zval) *types.String {
+func PhpSplObjectHash(obj *types.Zval) string {
 	var hash_handle intPtr
 	var hash_handlers intPtr
 	if !(SPL_G(hash_mask_init)) {
@@ -724,7 +724,7 @@ func PhpSplObjectHash(obj *types.Zval) *types.String {
 	}
 	hash_handle = SPL_G(hash_mask_handle) ^ intPtr(zend.Z_OBJ_HANDLE_P(obj))
 	hash_handlers = SPL_G(hash_mask_handlers)
-	return core.Strpprintf(32, "%016zx%016zx", hash_handle, hash_handlers)
+	return zend.ZendSprintfEx(32, "%016zx%016zx", hash_handle, hash_handlers)
 }
 func SplBuildClassListString(entry *types.Zval, list **byte) {
 	var res *byte

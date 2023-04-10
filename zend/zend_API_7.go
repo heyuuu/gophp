@@ -41,7 +41,7 @@ func ZendDisableClass(className string) int {
 	disabled_class.FunctionTable().Destroy()
 	return types.SUCCESS
 }
-func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error **byte) int {
+func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *types.ZendFcallInfoCache, strict_class *int, error *string) int {
 	var ret int = 0
 	var ce *types.ClassEntry
 	var name_len int = name.GetLen()
@@ -132,7 +132,7 @@ func ZendIsCallableCheckClass(name *types.String, scope *types.ClassEntry, fcc *
 		ret = 1
 	} else {
 		if error != nil {
-			ZendSpprintf(error, 0, "class '%.*s' not found", int(name_len), name.GetVal())
+			*error = ZendSprintf("class '%.*s' not found", name_len, name.GetVal())
 		}
 	}
 	//lcname.Free()
@@ -147,7 +147,7 @@ func ZendReleaseFcallInfoCache(fcc *types.ZendFcallInfoCache) {
 	}
 	fcc.SetFunctionHandler(nil)
 }
-func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.ZendFcallInfoCache, strict_class int, error **byte) int {
+func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.ZendFcallInfoCache, strict_class int, error *string) int {
 	var ce_org *types.ClassEntry = fcc.GetCallingScope()
 	var retval int = 0
 	var mname *types.String
@@ -222,7 +222,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		ftable = fcc.GetCallingScope().FunctionTable()
 		if ce_org != nil && InstanceofFunction(ce_org, fcc.GetCallingScope()) == 0 {
 			if error != nil {
-				ZendSpprintf(error, 0, "class '%s' is not a subclass of '%s'", ce_org.GetName().GetVal(), fcc.GetCallingScope().GetName().GetVal())
+				*error = ZendSprintf("class '%s' is not a subclass of '%s'", ce_org.GetName().GetVal(), fcc.GetCallingScope().GetName().GetVal())
 			}
 			return 0
 		}
@@ -240,7 +240,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* We already checked for plain function before. */
 
 		if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
-			ZendSpprintf(error, 0, "function '%s' not found or invalid function name", callable.GetStr().GetVal())
+			*error = ZendSprintf("function '%s' not found or invalid function name", callable.GetStr().GetVal())
 		}
 		return 0
 	}
@@ -314,7 +314,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			if fcc.GetFunctionHandler().IsAbstract() {
 				retval = 0
 				if error != nil {
-					ZendSpprintf(error, 0, "cannot call abstract method %s::%s()", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
+					*error = ZendSprintf("cannot call abstract method %s::%s()", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
 				}
 			} else if fcc.GetObject() == nil && !fcc.GetFunctionHandler().IsStatic() {
 				var severity int
@@ -333,7 +333,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 					retval = 0
 				}
 				if error != nil {
-					ZendSpprintf(error, 0, "non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+					*error = ZendSprintf("non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
 					if severity != faults.E_DEPRECATED {
 						retval = 0
 					}
@@ -353,7 +353,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 							if (*error) != nil {
 								Efree(*error)
 							}
-							ZendSpprintf(error, 0, "cannot access %s method %s::%s()", ZendVisibilityString(fcc.GetFunctionHandler().GetFnFlags()), fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
+							*error = ZendSprintf("cannot access %s method %s::%s()", ZendVisibilityString(fcc.GetFunctionHandler().GetFnFlags()), fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
 						}
 						retval = 0
 					}
@@ -363,11 +363,11 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 	} else if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
 		if fcc.GetCallingScope() != nil {
 			if error != nil {
-				ZendSpprintf(error, 0, "class '%s' does not have a method '%s'", fcc.GetCallingScope().GetName().GetVal(), mname.GetVal())
+				*error = ZendSprintf("class '%s' does not have a method '%s'", fcc.GetCallingScope().GetName().GetVal(), mname.GetVal())
 			}
 		} else {
 			if error != nil {
-				ZendSpprintf(error, 0, "function '%s' does not exist", mname.GetVal())
+				*error = ZendSprintf("function '%s' does not exist", mname.GetVal())
 			}
 		}
 	}

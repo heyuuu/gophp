@@ -157,7 +157,6 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	var props *types.Array
 	var tmp types.Zval
 	var storage types.Zval
-	var md5str *types.String
 	var zname *types.String
 	var debug_info *types.Array
 	props = types.Z_OBJPROP_P(obj)
@@ -169,7 +168,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 		var _z *types.Zval = _p.GetVal()
 
 		element = _z.GetPtr()
-		md5str = PhpSplObjectHash(element.GetObj())
+		md5str := PhpSplObjectHash(element.GetObj())
 		zend.ArrayInit(&tmp)
 
 		/* Incrementing the refcount of obj and inf would confuse the garbage collector.
@@ -178,7 +177,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 		types.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
 		zend.AddAssocZvalEx(&tmp, "obj", element.GetObj())
 		zend.AddAssocZvalEx(&tmp, "inf", element.GetInf())
-		storage.GetArr().KeyUpdate(md5str.GetStr(), &tmp)
+		storage.GetArr().KeyUpdate(md5str, &tmp)
 		// types.ZendStringReleaseEx(md5str, 0)
 	}
 	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage")
@@ -263,7 +262,7 @@ func zim_spl_SplObjectStorage_getHash(executeData *zend.ZendExecuteData, return_
 	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
 		return
 	}
-	return_value.SetString(PhpSplObjectHash(obj))
+	return_value.SetStringVal(PhpSplObjectHash(obj))
 	return
 }
 func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {

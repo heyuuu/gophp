@@ -113,7 +113,7 @@ func ErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format st
 			/* Handle the error in user space */
 
 			zend.VaCopy(usr_copy, args)
-			params[1].SetString(zend.ZendStrpprintf(0, format, usr_copy))
+			params[1].SetStringVal(zend.ZendSprintf(format, usr_copy))
 			va_end(usr_copy)
 			params[0].SetLong(type_)
 			if error_filename != nil {
@@ -363,4 +363,3 @@ func InternalArgumentCountError(throw_exception bool, format string, args ...any
 		Error(E_WARNING, "%s", message)
 	}
 }
-func OutputDebugString(trigger_break types.ZendBool, format string, _ ...any) {}
