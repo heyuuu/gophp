@@ -50,6 +50,15 @@ func (ht *Array) recalcElements() int {
 	return num
 }
 
+func (ht *Array) First() *Zval {
+	for _, p := range ht.data {
+		if p.IsValid() {
+			p.GetVal()
+		}
+	}
+	return nil
+}
+
 /**
  * Sort
  */

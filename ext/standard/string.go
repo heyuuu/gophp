@@ -834,3 +834,178 @@ func ZifChunkSplit(str string, _ zpp.Opt, chunklen_ *int, ending_ *string) (stri
 func ZifSubstr(str string, offset int, _ zpp.Opt, length *int) (string, bool) {
 	return substr(str, offset, length)
 }
+
+func substrReplaceSingle(str string, replace string, start int, l int) string {
+	/* if "start" position is negative, count start position start the end
+	 * of the string
+	 */
+	f := start
+	if f < 0 {
+		f = f + len(str)
+		if f < 0 {
+			f = 0
+		}
+	} else if f > len(str) {
+		f = len(str)
+	}
+
+	if l < 0 {
+		l = len(str) - f + l
+		if l < 0 {
+			l = 0
+		}
+	} else if l > len(str) {
+		l = len(str)
+	}
+	b.Assert(0 <= f && f <= zend.ZEND_LONG_MAX)
+	b.Assert(0 <= l && l <= zend.ZEND_LONG_MAX)
+	if f+l > len(str) {
+		l = len(str) - f
+	}
+
+	return str[:f] + replace + str[f+l:]
+}
+
+func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length *types.Zval) string {
+	// str 为字符串时，允许的参数类型:
+	// - substr_replace(string, array|string, int, int|null)
+	// 其他情况都会触发 warning 并返回原字符串
+	if start.IsArray() {
+		if length == nil || !length.IsArray() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
+		} else if length.IsArray() && start.GetArr().Len() != length.GetArr().Len() {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should have the same number of elements")
+		} else {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Functionality of 'start' and 'length' as arrays is not implemented")
+		}
+		return str
+	}
+	if length != nil && length.IsArray() {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
+		return str
+	}
+
+	// 正常处理 substr_replace(string, array|string, int, int|null)
+	l := len(str)
+	if length != nil && !length.IsArray() {
+		l = length.GetLval()
+	}
+
+	//
+	var replStr string
+	if replace.IsArray() {
+		replZval := replace.GetArr().First()
+		if replZval != nil {
+			replStr = zend.ZvalGetStrVal(replZval)
+		} else {
+			replStr = ""
+		}
+	} else {
+		replStr = replace.GetStrVal()
+	}
+
+	res := substrReplaceSingle(str, replStr, start.GetLval(), l)
+	return res
+}
+
+func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval, length *types.Zval) *types.Array {
+	arr := types.NewArray(str.Len())
+
+	var replaceStr []string
+	if replace.IsArray() {
+		replace.GetArr().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+			replaceStr = append(replaceStr, zend.ZvalGetStrVal(value))
+		})
+	}
+
+	var startPoints []int
+	if start.IsArray() {
+		start.GetArr().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+			startPoints = append(startPoints, zend.ZvalGetLong(value))
+		})
+	}
+
+	var lengthPoints []int
+	if length != nil && length.IsArray() {
+		length.GetArr().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+			lengthPoints = append(lengthPoints, zend.ZvalGetLong(value))
+		})
+	}
+
+	idx := -1
+	str.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		idx++
+
+		origStr := zend.ZvalGetStrVal(value)
+
+		// f
+		var f int = 0
+		if start.IsArray() {
+			if idx < len(startPoints) {
+				f = startPoints[idx]
+			}
+		} else {
+			f = start.GetLval()
+		}
+
+		// l
+		var l int = len(origStr)
+		if length != nil {
+			if length.IsArray() {
+				if idx < len(lengthPoints) {
+					l = lengthPoints[idx]
+				}
+			} else {
+				l = length.GetLval()
+			}
+		}
+
+		// repl
+		var replStr string = ""
+		if replace.IsArray() {
+			if idx <= len(replaceStr) {
+				replStr = replaceStr[idx]
+			}
+		} else {
+			replStr = replace.GetStrVal()
+		}
+
+		ret := substrReplaceSingle(origStr, replStr, f, l)
+		if key.IsStrKey() {
+			arr.SymtableUpdate(key.StrKey(), types.NewZvalString(ret))
+		} else {
+			arr.IndexUpdate(key.IndexKey(), types.NewZvalString(ret))
+		}
+	})
+	return arr
+}
+
+func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval, start *types.Zval, _ zpp.Opt, length *types.Zval) {
+	// 限定参数类型
+	// - substr_replace(array|string $str, array|string $replace, array|int $start, array|int|null $length = null)
+	if !str.IsArray() {
+		zend.ConvertToStringEx(str)
+	}
+	if !replace.IsArray() {
+		zend.ConvertToStringEx(replace)
+	}
+	if !start.IsArray() {
+		zend.ConvertToLong(start)
+	}
+	if length != nil && !length.IsArray() {
+		zend.ConvertToLong(length)
+	}
+	if zend.EG__().GetException() != nil {
+		return
+	}
+
+	if str.IsString() {
+		res := substrReplaceStr(str.GetStrVal(), replace, start, length)
+		returnValue.SetStringVal(res)
+		return
+	} else {
+		res := substrReplaceArray(str.GetArr(), replace, str, length)
+		returnValue.SetArray(res)
+		return
+	}
+}

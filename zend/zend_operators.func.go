@@ -512,7 +512,7 @@ func ZendiConvertScalarToNumber(op *types.Zval, holder *types.Zval, result *type
 	}
 }
 func ConvertToLong(op *types.Zval) {
-	if op.GetType() != types.IS_LONG {
+	if !op.IsLong() {
 		ConvertToLongBase(op, 10)
 	}
 }
