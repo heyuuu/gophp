@@ -492,7 +492,6 @@ func PhpBasename(s string, suffix string) string {
 func ZifBasename(path string, _ zpp.Opt, suffix string) string {
 	return PhpBasename(path, suffix)
 }
-func PhpDirname(path *byte, len_ int) int { return zend.ZendDirname(path, len_) }
 func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 	var levels = 1
 	if levels_ != nil {
@@ -501,7 +500,7 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 
 	if levels == 1 {
 		/* Default case */
-		return zend.ZendDirnameEx(path)
+		return zend.ZendDirname(path)
 	} else if levels < 1 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid argument, levels must be >= 1")
 		return ""
@@ -509,7 +508,7 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 		/* Some levels up */
 		dir := path
 		for i := 0; i < levels; i++ {
-			newDir := zend.ZendDirnameEx(dir)
+			newDir := zend.ZendDirname(dir)
 			if newDir == dir {
 				break
 			}

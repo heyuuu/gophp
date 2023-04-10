@@ -11,15 +11,13 @@ func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
 	opt := b.Option(options, PHP_PATHINFO_ALL)
 
 	var tmp types.Zval
-	var dirname *byte
 	var ret *types.String = nil
 
 	zend.ArrayInit(&tmp)
 	if (opt & PHP_PATHINFO_DIRNAME) == PHP_PATHINFO_DIRNAME {
-		dirname = zend.Estrndup(path, path_len)
-		PhpDirname(dirname, path_len)
-		if *dirname {
-			zend.AddAssocString(&tmp, "dirname", dirname)
+		dirname := zend.ZendDirname(path)
+		if dirname != "" {
+			zend.AddAssocStr(&tmp, "dirname", dirname)
 		}
 		zend.Efree(dirname)
 	}

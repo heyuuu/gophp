@@ -30,10 +30,10 @@ type (
 	// FAST_ZPP: Z_PARAM_DOUBLE, Type: 'd'，直接使用 double
 	//Double = float64
 
-	// FAST_ZPP: Z_PARAM_PATH, Type: 'p', 直接使用 string (略有差异，使用 string 类型而非 *byte+len 类型爽字段)
+	// FAST_ZPP: Z_PARAM_STRING, Type: 's', 直接使用 string (略有差异，使用 string 类型而非 *byte+len 类型爽字段)
 	//String = string
 
-	// FAST_ZPP: Z_PARAM_STRING, Type: 's' (略有差异，使用 string 类型而非 *byte+len 类型爽字段)
+	// FAST_ZPP: Z_PARAM_PATH, Type: 'p' (略有差异，使用 string 类型而非 *byte+len 类型爽字段)
 	Path = string
 
 	// FAST_ZPP: Z_PARAM_ARRAY_HT, Type: 'h'，直接使用	 *types.Array

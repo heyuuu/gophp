@@ -1025,8 +1025,8 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 }
 func PhpGetCurrentUser() *byte {
 	var pstat *zend.ZendStatT
-	if SG__().request_info.current_user {
-		return SG__().request_info.current_user
+	if SG__().RequestInfo.current_user {
+		return SG__().RequestInfo.current_user
 	}
 
 	/* FIXME: I need to have this somehow handled if
@@ -1041,9 +1041,9 @@ func PhpGetCurrentUser() *byte {
 		if b.Assign(&pwd, getpwuid(pstat.st_uid)) == nil {
 			return ""
 		}
-		SG__().request_info.current_user_length = strlen(pwd.pw_name)
-		SG__().request_info.current_user = zend.Estrndup(pwd.pw_name, SG__().request_info.current_user_length)
-		return SG__().request_info.current_user
+		SG__().RequestInfo.current_user_length = strlen(pwd.pw_name)
+		SG__().RequestInfo.current_user = zend.Estrndup(pwd.pw_name, SG__().RequestInfo.current_user_length)
+		return SG__().RequestInfo.current_user
 	}
 }
 
@@ -1153,9 +1153,9 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 		datetime_str = PhpAsctimeR(ta, asctimebuf)
 		if datetime_str != nil {
 			datetime_str[strlen(datetime_str)-1] = 0
-			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[%s]  Script:  '%s'\n", datetime_str, SAFE_FILENAME(SG__().request_info.path_translated))
+			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[%s]  Script:  '%s'\n", datetime_str, SAFE_FILENAME(SG__().RequestInfo.path_translated))
 		} else {
-			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", SAFE_FILENAME(SG__().request_info.path_translated))
+			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", SAFE_FILENAME(SG__().RequestInfo.path_translated))
 		}
 		log.Printf("%s", memory_leak_buf)
 	}
@@ -1239,7 +1239,7 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 3. Flush all output buffers */
 	faults.Try(func() {
-		var send_buffer types.ZendBool = b.Cond(SG__().request_info.headers_only, 0, 1)
+		var send_buffer types.ZendBool = b.Cond(SG__().RequestInfo.headers_only, 0, 1)
 		if zend.CG__().GetUncleanShutdown() != 0 && PG__().last_error_type == faults.E_ERROR && int(PG__().memory_limit < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
 		}
@@ -1680,25 +1680,25 @@ func PhpHandleAuthData(auth *byte) int {
 			pass = strchr(user.GetVal(), ':')
 			if pass != nil {
 				b.PostInc(&(*pass)) = '0'
-				SG__().request_info.auth_user = zend.Estrndup(user.GetVal(), user.GetLen())
-				SG__().request_info.auth_password = zend.Estrdup(pass)
+				SG__().RequestInfo.auth_user = zend.Estrndup(user.GetVal(), user.GetLen())
+				SG__().RequestInfo.auth_password = zend.Estrdup(pass)
 				ret = 0
 			}
 			//types.ZendStringFree(user)
 		}
 	}
 	if ret == -1 {
-		SG__().request_info.auth_password = nil
-		SG__().request_info.auth_user = SG__().request_info.auth_password
+		SG__().RequestInfo.auth_password = nil
+		SG__().RequestInfo.auth_user = SG__().RequestInfo.auth_password
 	} else {
-		SG__().request_info.auth_digest = nil
+		SG__().RequestInfo.auth_digest = nil
 	}
 	if ret == -1 && auth != nil && auth_len > 0 && zend.ZendBinaryStrncasecmp(b.CastStr(auth, auth_len), "Digest ", b.SizeOf("\"Digest \"")-1) == 0 {
-		SG__().request_info.auth_digest = zend.Estrdup(auth + 7)
+		SG__().RequestInfo.auth_digest = zend.Estrdup(auth + 7)
 		ret = 0
 	}
 	if ret == -1 {
-		SG__().request_info.auth_digest = nil
+		SG__().RequestInfo.auth_digest = nil
 	}
 	return ret
 }

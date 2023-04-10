@@ -23,6 +23,8 @@ type PhpStreamDirent struct {
 	d_name []byte
 }
 
+func (this *PhpStreamDirent) DName() string { return string(this.d_name) }
+
 func (this *PhpStreamDirent) GetDName() []byte { return this.d_name }
 
 /**

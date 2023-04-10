@@ -611,7 +611,7 @@ func ZendVerifyNamespace() {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "No code may exist outside of namespace {}")
 	}
 }
-func ZendDirnameEx(path string) string {
+func ZendDirname(path string) string {
 	if path == "" {
 		return ""
 	}
@@ -637,55 +637,6 @@ func ZendDirnameEx(path string) string {
 		return "."
 	}
 	return path
-}
-func ZendDirname(path *byte, len_ int) int {
-	var end *byte = path + len_ - 1
-	var len_adjust uint = 0
-	if len_ == 0 {
-		/* Illegal use of this function */
-		return 0
-	}
-
-	/* Strip trailing slashes */
-
-	for end >= path && IS_SLASH_P(end) {
-		end--
-	}
-	if end < path {
-
-		/* The path only contained slashes */
-
-		path[0] = DEFAULT_SLASH
-		path[1] = '0'
-		return 1 + len_adjust
-	}
-
-	/* Strip filename */
-
-	for end >= path && !(IS_SLASH_P(end)) {
-		end--
-	}
-	if end < path {
-
-		/* No slash found, therefore return '.' */
-
-		path[0] = '.'
-		path[1] = '0'
-		return 1 + len_adjust
-	}
-
-	/* Strip slashes which came before the file name */
-
-	for end >= path && IS_SLASH_P(end) {
-		end--
-	}
-	if end < path {
-		path[0] = DEFAULT_SLASH
-		path[1] = '0'
-		return 1 + len_adjust
-	}
-	*(end + 1) = '0'
-	return size_t(end+1-path) + len_adjust
 }
 func ZendAdjustForFetchType(opline *ZendOp, result *Znode, type_ uint32) {
 	var factor types.ZendUchar = b.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)

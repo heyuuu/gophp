@@ -1,6 +1,7 @@
 package core
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -59,6 +60,10 @@ type SapiRequestInfo struct {
 	proto_num           int
 }
 
+func (this *SapiRequestInfo) GetPathTranslated() string {
+	return b.CastStrAuto(this.path_translated)
+}
+
 func (this *SapiRequestInfo) SetRequestMethod(value *byte)         { this.request_method = value }
 func (this *SapiRequestInfo) SetQueryString(value *byte)           { this.query_string = value }
 func (this *SapiRequestInfo) SetContentLength(value zend.ZendLong) { this.content_length = value }
@@ -77,7 +82,7 @@ func (this *SapiRequestInfo) SetProtoNum(value int)                { this.proto_
  */
 type SapiGlobals struct {
 	server_context           any
-	request_info             SapiRequestInfo
+	RequestInfo              SapiRequestInfo
 	sapi_headers             SapiHeaders
 	read_post_bytes          int64
 	post_read                uint8

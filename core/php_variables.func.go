@@ -312,7 +312,7 @@ func AddPostVars(arr *types.Zval, vars *PostVarDataT, eof types.ZendBool) int {
 }
 func PhpStdPostHandler(content_type_dup *byte, arg any) {
 	var arr *types.Zval = (*types.Zval)(arg)
-	var s *PhpStream = SG__().request_info.request_body
+	var s *PhpStream = SG__().RequestInfo.request_body
 	var post_data PostVarDataT
 	if s != nil && types.SUCCESS == PhpStreamRewind(s) {
 		memset(&post_data, 0, b.SizeOf("post_data"))
@@ -381,7 +381,7 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *types.Zval) {
 		return
 	}
 	if arg == PARSE_GET {
-		c_var = SG__().request_info.query_string
+		c_var = SG__().RequestInfo.query_string
 		if c_var != nil && (*c_var) {
 			res = (*byte)(zend.Estrdup(c_var))
 			free_buffer = 1
@@ -389,7 +389,7 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *types.Zval) {
 			free_buffer = 0
 		}
 	} else if arg == PARSE_COOKIE {
-		c_var = SG__().request_info.cookie_data
+		c_var = SG__().RequestInfo.cookie_data
 		if c_var != nil && (*c_var) {
 			res = (*byte)(zend.Estrdup(c_var))
 			free_buffer = 1
@@ -500,17 +500,17 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 	var count int = 0
 	var ss *byte
 	var space *byte
-	if !(SG__().request_info.argc || track_vars_array != nil) {
+	if !(SG__().RequestInfo.argc || track_vars_array != nil) {
 		return
 	}
 	zend.ArrayInit(&arr)
 
 	/* Prepare argv */
 
-	if SG__().request_info.argc {
+	if SG__().RequestInfo.argc {
 		var i int
-		for i = 0; i < SG__().request_info.argc; i++ {
-			tmp.SetStringVal(b.CastStrAuto(SG__().request_info.argv[i]))
+		for i = 0; i < SG__().RequestInfo.argc; i++ {
+			tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.argv[i]))
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				// types.ZendStringEfree(tmp.GetStr())
 			}
@@ -541,12 +541,12 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 
 	/* prepare argc */
 
-	if SG__().request_info.argc {
-		argc.SetLong(SG__().request_info.argc)
+	if SG__().RequestInfo.argc {
+		argc.SetLong(SG__().RequestInfo.argc)
 	} else {
 		argc.SetLong(count)
 	}
-	if SG__().request_info.argc {
+	if SG__().RequestInfo.argc {
 		arr.AddRefcount()
 		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGV, &arr)
 		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGC, &argc)
@@ -574,16 +574,16 @@ func PhpRegisterServerVariables() {
 
 	/* PHP Authentication support */
 
-	if SG__().request_info.auth_user {
-		tmp.SetStringVal(b.CastStrAuto(SG__().request_info.auth_user))
+	if SG__().RequestInfo.auth_user {
+		tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.auth_user))
 		PhpRegisterVariableQuick("PHP_AUTH_USER", &tmp, ht)
 	}
-	if SG__().request_info.auth_password {
-		tmp.SetStringVal(b.CastStrAuto(SG__().request_info.auth_password))
+	if SG__().RequestInfo.auth_password {
+		tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.auth_password))
 		PhpRegisterVariableQuick("PHP_AUTH_PW", &tmp, ht)
 	}
-	if SG__().request_info.auth_digest {
-		tmp.SetStringVal(b.CastStrAuto(SG__().request_info.auth_digest))
+	if SG__().RequestInfo.auth_digest {
+		tmp.SetStringVal(b.CastStrAuto(SG__().RequestInfo.auth_digest))
 		PhpRegisterVariableQuick("PHP_AUTH_DIGEST", &tmp, ht)
 	}
 
@@ -628,7 +628,7 @@ func PhpHashEnvironment() int {
 	memset(PG__().http_globals, 0, b.SizeOf("PG ( http_globals )"))
 	zend.ZendActivateAutoGlobals()
 	if PG__().register_argc_argv {
-		PhpBuildArgv(SG__().request_info.query_string, &PG__().http_globals[TRACK_VARS_SERVER])
+		PhpBuildArgv(SG__().RequestInfo.query_string, &PG__().http_globals[TRACK_VARS_SERVER])
 	}
 	return types.SUCCESS
 }
@@ -644,7 +644,7 @@ func PhpAutoGlobalsCreateGet(name *types.String) types.ZendBool {
 	return 0
 }
 func PhpAutoGlobalsCreatePost(name *types.String) types.ZendBool {
-	if PG__().variables_order && (strchr(PG__().variables_order, 'P') || strchr(PG__().variables_order, 'p')) && !(SG__().headers_sent) && SG__().request_info.request_method && !(strcasecmp(SG__().request_info.request_method, "POST")) {
+	if PG__().variables_order && (strchr(PG__().variables_order, 'P') || strchr(PG__().variables_order, 'p')) && !(SG__().headers_sent) && SG__().RequestInfo.request_method && !(strcasecmp(SG__().RequestInfo.request_method, "POST")) {
 		SM__().GetTreatData()(PARSE_POST, nil, nil)
 	} else {
 		zend.ZvalPtrDtorNogc(&PG__().http_globals[TRACK_VARS_POST])
@@ -689,7 +689,7 @@ func PhpAutoGlobalsCreateServer(name *types.String) types.ZendBool {
 	if PG__().variables_order && (strchr(PG__().variables_order, 'S') || strchr(PG__().variables_order, 's')) {
 		PhpRegisterServerVariables()
 		if PG__().register_argc_argv {
-			if SG__().request_info.argc {
+			if SG__().RequestInfo.argc {
 				var argc *types.Zval
 				var argv *types.Zval
 				if b.Assign(&argc, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGC)) != nil && b.Assign(&argv, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil {
@@ -698,7 +698,7 @@ func PhpAutoGlobalsCreateServer(name *types.String) types.ZendBool {
 					PG__().http_globals[TRACK_VARS_SERVER].GetArr().KeyUpdate(types.STR_ARGC, argc)
 				}
 			} else {
-				PhpBuildArgv(SG__().request_info.query_string, &PG__().http_globals[TRACK_VARS_SERVER])
+				PhpBuildArgv(SG__().RequestInfo.query_string, &PG__().http_globals[TRACK_VARS_SERVER])
 			}
 		}
 	} else {

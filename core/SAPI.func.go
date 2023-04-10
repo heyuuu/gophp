@@ -55,16 +55,16 @@ func SapiRunHeaderCallback(callback *types.Zval) {
 	}
 }
 func SapiHandlePost(arg any) {
-	if SG__().request_info.post_entry && SG__().request_info.content_type_dup {
-		SG__().request_info.post_entry.post_handler(SG__().request_info.content_type_dup, arg)
-		zend.Efree(SG__().request_info.content_type_dup)
-		SG__().request_info.content_type_dup = nil
+	if SG__().RequestInfo.post_entry && SG__().RequestInfo.content_type_dup {
+		SG__().RequestInfo.post_entry.post_handler(SG__().RequestInfo.content_type_dup, arg)
+		zend.Efree(SG__().RequestInfo.content_type_dup)
+		SG__().RequestInfo.content_type_dup = nil
 	}
 }
 func SapiReadPostData() {
 	var post_entry *SapiPostEntry
-	var content_type_length uint32 = uint32(strlen(SG__().request_info.content_type))
-	var content_type *byte = zend.Estrndup(SG__().request_info.content_type, content_type_length)
+	var content_type_length uint32 = uint32(strlen(SG__().RequestInfo.content_type))
+	var content_type *byte = zend.Estrndup(SG__().RequestInfo.content_type, content_type_length)
 	var p *byte
 	var oldchar byte = 0
 	var post_reader_func func() = nil
@@ -95,18 +95,18 @@ func SapiReadPostData() {
 
 		/* found one, register it for use */
 
-		SG__().request_info.post_entry = post_entry
+		SG__().RequestInfo.post_entry = post_entry
 		post_reader_func = post_entry.GetPostReader()
 	} else {
 
 		/* fallback */
 
-		SG__().request_info.post_entry = nil
+		SG__().RequestInfo.post_entry = nil
 		if SM__().GetDefaultPostReader() == nil {
 
 			/* no default reader ? */
 
-			SG__().request_info.content_type_dup = nil
+			SG__().RequestInfo.content_type_dup = nil
 			SM__().SapiError(faults.E_WARNING, "Unsupported content type:  '%s'", content_type)
 			return
 		}
@@ -114,7 +114,7 @@ func SapiReadPostData() {
 	if oldchar {
 		*(p - 1) = oldchar
 	}
-	SG__().request_info.content_type_dup = content_type
+	SG__().RequestInfo.content_type_dup = content_type
 	if post_reader_func != nil {
 		post_reader_func()
 	}
@@ -149,22 +149,22 @@ func SapiReadPostBlock(buffer *byte, buflen int) int {
 	return read_bytes
 }
 func SapiReadStandardFormData() {
-	if SG__().post_max_size > 0 && SG__().request_info.content_length > SG__().post_max_size {
-		PhpErrorDocref(nil, faults.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
+	if SG__().post_max_size > 0 && SG__().RequestInfo.content_length > SG__().post_max_size {
+		PhpErrorDocref(nil, faults.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().RequestInfo.content_length, SG__().post_max_size)
 		return
 	}
-	SG__().request_info.request_body = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG__().upload_tmp_dir)
+	SG__().RequestInfo.request_body = PhpStreamTempCreateEx(TEMP_STREAM_DEFAULT, SAPI_POST_BLOCK_SIZE, PG__().upload_tmp_dir)
 	if SM__().GetReadPost() != nil {
 		var read_bytes int
 		for {
 			var buffer []byte
 			read_bytes = SapiReadPostBlock(buffer, SAPI_POST_BLOCK_SIZE)
 			if read_bytes > 0 {
-				if PhpStreamWrite(SG__().request_info.request_body, buffer, read_bytes) != read_bytes {
+				if PhpStreamWrite(SG__().RequestInfo.request_body, buffer, read_bytes) != read_bytes {
 
 					/* if parts of the stream can't be written, purge it completely */
 
-					PhpStreamTruncateSetSize(SG__().request_info.request_body, 0)
+					PhpStreamTruncateSetSize(SG__().RequestInfo.request_body, 0)
 					PhpErrorDocref(nil, faults.E_WARNING, "POST data can't be buffered; all data discarded")
 					break
 				}
@@ -183,7 +183,7 @@ func SapiReadStandardFormData() {
 
 			}
 		}
-		PhpStreamRewind(SG__().request_info.request_body)
+		PhpStreamRewind(SG__().RequestInfo.request_body)
 	}
 }
 func GetDefaultContentType(prefix_len uint32, len_ *uint32) *byte {
@@ -265,28 +265,28 @@ func SapiActivate() {
 	SG__().headers_sent = 0
 	SG__().callback_func.SetUndef()
 	SG__().read_post_bytes = 0
-	SG__().request_info.request_body = nil
-	SG__().request_info.current_user = nil
-	SG__().request_info.current_user_length = 0
-	SG__().request_info.no_headers = 0
-	SG__().request_info.post_entry = nil
-	SG__().request_info.proto_num = 1000
+	SG__().RequestInfo.request_body = nil
+	SG__().RequestInfo.current_user = nil
+	SG__().RequestInfo.current_user_length = 0
+	SG__().RequestInfo.no_headers = 0
+	SG__().RequestInfo.post_entry = nil
+	SG__().RequestInfo.proto_num = 1000
 	SG__().global_request_time = 0
 	SG__().post_read = 0
 
 	/* It's possible to override this general case in the activate() callback, if necessary. */
 
-	if SG__().request_info.request_method && !(strcmp(SG__().request_info.request_method, "HEAD")) {
-		SG__().request_info.headers_only = 1
+	if SG__().RequestInfo.request_method && !(strcmp(SG__().RequestInfo.request_method, "HEAD")) {
+		SG__().RequestInfo.headers_only = 1
 	} else {
-		SG__().request_info.headers_only = 0
+		SG__().RequestInfo.headers_only = 0
 	}
 	SG__().rfc1867_uploaded_files = nil
 
 	/* Handle request method */
 
 	if SG__().server_context {
-		if PG__().enable_post_data_reading && SG__().request_info.content_type && SG__().request_info.request_method && !(strcmp(SG__().request_info.request_method, "POST")) {
+		if PG__().enable_post_data_reading && SG__().RequestInfo.content_type && SG__().RequestInfo.request_method && !(strcmp(SG__().RequestInfo.request_method, "POST")) {
 
 			/* HTTP POST may contain form data to be processed into variables
 			 * depending on given content type */
@@ -297,12 +297,12 @@ func SapiActivate() {
 			 * depending on given content type */
 
 		} else {
-			SG__().request_info.content_type_dup = nil
+			SG__().RequestInfo.content_type_dup = nil
 		}
 
 		/* Cookies */
 
-		SG__().request_info.cookie_data = SM__().GetReadCookies()()
+		SG__().RequestInfo.cookie_data = SM__().GetReadCookies()()
 
 		/* Cookies */
 
@@ -318,8 +318,8 @@ func SapiSendHeadersFree() {
 }
 func SapiDeactivate() {
 	SG__().sapi_headers.headers.Destroy()
-	if SG__().request_info.request_body {
-		SG__().request_info.request_body = nil
+	if SG__().RequestInfo.request_body {
+		SG__().RequestInfo.request_body = nil
 	} else if SG__().server_context {
 		if !(SG__().post_read) {
 
@@ -335,20 +335,20 @@ func SapiDeactivate() {
 			}
 		}
 	}
-	if SG__().request_info.auth_user {
-		zend.Efree(SG__().request_info.auth_user)
+	if SG__().RequestInfo.auth_user {
+		zend.Efree(SG__().RequestInfo.auth_user)
 	}
-	if SG__().request_info.auth_password {
-		zend.Efree(SG__().request_info.auth_password)
+	if SG__().RequestInfo.auth_password {
+		zend.Efree(SG__().RequestInfo.auth_password)
 	}
-	if SG__().request_info.auth_digest {
-		zend.Efree(SG__().request_info.auth_digest)
+	if SG__().RequestInfo.auth_digest {
+		zend.Efree(SG__().RequestInfo.auth_digest)
 	}
-	if SG__().request_info.content_type_dup {
-		zend.Efree(SG__().request_info.content_type_dup)
+	if SG__().RequestInfo.content_type_dup {
+		zend.Efree(SG__().RequestInfo.content_type_dup)
 	}
-	if SG__().request_info.current_user {
-		zend.Efree(SG__().request_info.current_user)
+	if SG__().RequestInfo.current_user {
+		zend.Efree(SG__().RequestInfo.current_user)
 	}
 	SM__().Deactivate()
 	if SG__().rfc1867_uploaded_files != nil {
@@ -361,16 +361,16 @@ func SapiDeactivate() {
 	SapiSendHeadersFree()
 	SG__().sapi_started = 0
 	SG__().headers_sent = 0
-	SG__().request_info.headers_read = 0
+	SG__().RequestInfo.headers_read = 0
 	SG__().global_request_time = 0
 }
 func SapiInitializeEmptyRequest() {
 	SG__().server_context = nil
-	SG__().request_info.request_method = nil
-	SG__().request_info.auth_password = nil
-	SG__().request_info.auth_user = SG__().request_info.auth_password
-	SG__().request_info.auth_digest = SG__().request_info.auth_user
-	SG__().request_info.content_type_dup = nil
+	SG__().RequestInfo.request_method = nil
+	SG__().RequestInfo.auth_password = nil
+	SG__().RequestInfo.auth_user = SG__().RequestInfo.auth_password
+	SG__().RequestInfo.auth_digest = SG__().RequestInfo.auth_user
+	SG__().RequestInfo.content_type_dup = nil
 }
 func SapiExtractResponseCode(header_line *byte) int {
 	var code int = 200
@@ -444,7 +444,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	var header_line *byte
 	var header_line_len int
 	var http_response_code int
-	if SG__().headers_sent && !(SG__().request_info.no_headers) {
+	if SG__().headers_sent && !(SG__().RequestInfo.no_headers) {
 		var output_start_filename *byte = PhpOutputGetStartFilename()
 		var output_start_lineno int = PhpOutputGetStartLineno()
 		if output_start_filename != nil {
@@ -598,7 +598,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 
 					if http_response_code != 0 {
 						SapiUpdateResponseCode(http_response_code)
-					} else if SG__().request_info.proto_num > 1000 && SG__().request_info.request_method && strcmp(SG__().request_info.request_method, "HEAD") && strcmp(SG__().request_info.request_method, "GET") {
+					} else if SG__().RequestInfo.proto_num > 1000 && SG__().RequestInfo.request_method && strcmp(SG__().RequestInfo.request_method, "HEAD") && strcmp(SG__().RequestInfo.request_method, "GET") {
 						SapiUpdateResponseCode(303)
 					} else {
 						SapiUpdateResponseCode(302)
@@ -624,7 +624,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 func SapiSendHeaders() int {
 	var retval int
 	var ret int = types.FAILURE
-	if SG__().headers_sent || SG__().request_info.no_headers {
+	if SG__().headers_sent || SG__().RequestInfo.no_headers {
 		return types.SUCCESS
 	}
 
@@ -741,7 +741,7 @@ func SapiGetStat() *zend.ZendStatT {
 	if SM__().GetStat() {
 		return
 	} else {
-		if !(SG__().request_info.path_translated) || zend.VCWD_STAT(SG__().request_info.path_translated, &(SG__().global_stat)) == -1 {
+		if !(SG__().RequestInfo.path_translated) || zend.VCWD_STAT(SG__().RequestInfo.path_translated, &(SG__().global_stat)) == -1 {
 			return nil
 		}
 		return &(SG__().global_stat)

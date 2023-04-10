@@ -105,7 +105,7 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var pos zend.ZendLlistPosition
 	var ignore_status types.ZendBool = 0
 	var response_status int = core.SG__().sapi_headers.http_response_code
-	if core.SG__().request_info.no_headers == 1 {
+	if core.SG__().RequestInfo.no_headers == 1 {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if CGIG(nph) || core.SG__().sapi_headers.http_response_code != 200 {
@@ -180,8 +180,8 @@ func SapiCgiReadPost(buffer *byte, count_bytes int) int {
 	var read_bytes int = 0
 	var tmp_read_bytes int
 	var remaining_bytes int
-	b.Assert(core.SG__().request_info.content_length >= core.SG__().read_post_bytes)
-	remaining_bytes = size_t(core.SG__().request_info.content_length - core.SG__().read_post_bytes)
+	b.Assert(core.SG__().RequestInfo.content_length >= core.SG__().read_post_bytes)
+	remaining_bytes = size_t(core.SG__().RequestInfo.content_length - core.SG__().read_post_bytes)
 	count_bytes = cli.MIN(count_bytes, remaining_bytes)
 	for read_bytes < count_bytes {
 		tmp_read_bytes = read(STDIN_FILENO, buffer+read_bytes, count_bytes-read_bytes)
@@ -196,7 +196,7 @@ func SapiFcgiReadPost(buffer *byte, count_bytes int) int {
 	var read_bytes int = 0
 	var tmp_read_bytes int
 	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
-	var remaining int = core.SG__().request_info.content_length - core.SG__().read_post_bytes
+	var remaining int = core.SG__().RequestInfo.content_length - core.SG__().read_post_bytes
 	if remaining < count_bytes {
 		count_bytes = remaining
 	}
@@ -284,7 +284,7 @@ func SapiCgiRegisterVariables(track_vars_array *types.Zval) {
 
 	core.PhpImportEnvironmentVariables(track_vars_array)
 	if CGIG(fix_pathinfo) {
-		var script_name *byte = core.SG__().request_info.request_uri
+		var script_name *byte = core.SG__().RequestInfo.request_uri
 		var path_info *byte
 		var free_php_self int
 		if core.FcgiIsFastcgi() != 0 {
@@ -326,8 +326,8 @@ func SapiCgiRegisterVariables(track_vars_array *types.Zval) {
 			zend.FreeAlloca(php_self, use_heap)
 		}
 	} else {
-		if core.SG__().request_info.request_uri {
-			php_self = core.SG__().request_info.request_uri
+		if core.SG__().RequestInfo.request_uri {
+			php_self = core.SG__().RequestInfo.request_uri
 		} else {
 			php_self = ""
 		}
@@ -436,7 +436,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 func SapiCgiActivate() int {
 	/* PATH_TRANSLATED should be defined at this stage but better safe than sorry :) */
 
-	if !(core.SG__().request_info.path_translated) {
+	if !(core.SG__().RequestInfo.path_translated) {
 		return types.FAILURE
 	}
 	if core.PhpIniHasPerHostConfig() != 0 {
@@ -465,29 +465,19 @@ func SapiCgiActivate() int {
 
 	}
 	if core.PhpIniHasPerDirConfig() != 0 || core.PG__().user_ini_filename && *core.PG__().user_ini_filename {
-		var path *byte
-		var path_len int
-
-		/* Prepare search path */
-
-		path_len = strlen(core.SG__().request_info.path_translated)
+		var path string
 
 		/* Make sure we have trailing slash! */
-
-		if !(zend.IS_SLASH(core.SG__().request_info.path_translated[path_len])) {
-			path = zend.Emalloc(path_len + 2)
-			memcpy(path, core.SG__().request_info.path_translated, path_len+1)
-			path_len = zend.ZendDirname(path, path_len)
-			path[b.PostInc(&path_len)] = zend.DEFAULT_SLASH
+		pathTranslated := core.SG__().RequestInfo.GetPathTranslated()
+		if pathTranslated[len(pathTranslated)-1] != '/' {
+			path = zend.ZendDirname(pathTranslated) + "/"
 		} else {
-			path = zend.Estrndup(core.SG__().request_info.path_translated, path_len)
-			path_len = zend.ZendDirname(path, path_len)
+			path = zend.ZendDirname(pathTranslated)
 		}
-		path[path_len] = 0
 
 		/* Activate per-dir-system-configuration defined in php.ini and stored into configuration_hash during startup */
 
-		core.PhpIniActivatePerDirConfig(path, path_len)
+		core.PhpIniActivatePerDirConfig(path)
 
 		/* Load and activate user ini files in path starting from DOCUMENT_ROOT */
 
@@ -605,13 +595,13 @@ func InitRequestInfo(request *core.FcgiRequest) {
 
 	/* initialize the defaults */
 
-	core.SG__().request_info.path_translated = nil
-	core.SG__().request_info.request_method = nil
-	core.SG__().request_info.proto_num = 1000
-	core.SG__().request_info.query_string = nil
-	core.SG__().request_info.request_uri = nil
-	core.SG__().request_info.content_type = nil
-	core.SG__().request_info.content_length = 0
+	core.SG__().RequestInfo.path_translated = nil
+	core.SG__().RequestInfo.request_method = nil
+	core.SG__().RequestInfo.proto_num = 1000
+	core.SG__().RequestInfo.query_string = nil
+	core.SG__().RequestInfo.request_uri = nil
+	core.SG__().RequestInfo.content_type = nil
+	core.SG__().RequestInfo.content_length = 0
 	core.SG__().sapi_headers.http_response_code = 200
 
 	/* script_path_translated being set is a good indication that
@@ -704,9 +694,9 @@ func InitRequestInfo(request *core.FcgiRequest) {
 									if orig_script_name != nil {
 										CGI_PUTENV("ORIG_SCRIPT_NAME", orig_script_name)
 									}
-									core.SG__().request_info.request_uri = CGI_PUTENV("SCRIPT_NAME", env_path_info)
+									core.SG__().RequestInfo.request_uri = CGI_PUTENV("SCRIPT_NAME", env_path_info)
 								} else {
-									core.SG__().request_info.request_uri = orig_script_name
+									core.SG__().RequestInfo.request_uri = orig_script_name
 								}
 								path_info[0] = old
 							}
@@ -783,14 +773,14 @@ func InitRequestInfo(request *core.FcgiRequest) {
 					script_path_translated = CGI_PUTENV("SCRIPT_FILENAME", nil)
 					core.SG__().sapi_headers.http_response_code = 404
 				}
-				if !(core.SG__().request_info.request_uri) {
+				if !(core.SG__().RequestInfo.request_uri) {
 					if orig_script_name == nil || strcmp(orig_script_name, env_script_name) != 0 {
 						if orig_script_name != nil {
 							CGI_PUTENV("ORIG_SCRIPT_NAME", orig_script_name)
 						}
-						core.SG__().request_info.request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
+						core.SG__().RequestInfo.request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
 					} else {
-						core.SG__().request_info.request_uri = orig_script_name
+						core.SG__().RequestInfo.request_uri = orig_script_name
 					}
 				}
 				if pt != nil {
@@ -820,9 +810,9 @@ func InitRequestInfo(request *core.FcgiRequest) {
 					if orig_script_name != nil {
 						CGI_PUTENV("ORIG_SCRIPT_NAME", orig_script_name)
 					}
-					core.SG__().request_info.request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
+					core.SG__().RequestInfo.request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
 				} else {
-					core.SG__().request_info.request_uri = env_script_name
+					core.SG__().RequestInfo.request_uri = env_script_name
 				}
 				zend.Efree(real_path)
 			}
@@ -838,31 +828,31 @@ func InitRequestInfo(request *core.FcgiRequest) {
 			/* pre 4.3 behaviour, shouldn't be used but provides BC */
 
 			if env_path_info != nil {
-				core.SG__().request_info.request_uri = env_path_info
+				core.SG__().RequestInfo.request_uri = env_path_info
 			} else {
-				core.SG__().request_info.request_uri = env_script_name
+				core.SG__().RequestInfo.request_uri = env_script_name
 			}
 			if !(CGIG(discard_path)) && env_path_translated != nil {
 				script_path_translated = env_path_translated
 			}
 		}
 		if IsValidPath(script_path_translated) != 0 {
-			core.SG__().request_info.path_translated = zend.Estrdup(script_path_translated)
+			core.SG__().RequestInfo.path_translated = zend.Estrdup(script_path_translated)
 		}
-		core.SG__().request_info.request_method = CGI_GETENV("REQUEST_METHOD")
+		core.SG__().RequestInfo.request_method = CGI_GETENV("REQUEST_METHOD")
 
 		/* FIXME - Work out proto_num here */
 
-		core.SG__().request_info.query_string = CGI_GETENV("QUERY_STRING")
+		core.SG__().RequestInfo.query_string = CGI_GETENV("QUERY_STRING")
 		if content_type != nil {
-			core.SG__().request_info.content_type = content_type
+			core.SG__().RequestInfo.content_type = content_type
 		} else {
-			core.SG__().request_info.content_type = ""
+			core.SG__().RequestInfo.content_type = ""
 		}
 		if content_length != nil {
-			core.SG__().request_info.content_length = atol(content_length)
+			core.SG__().RequestInfo.content_length = atol(content_length)
 		} else {
-			core.SG__().request_info.content_length = 0
+			core.SG__().RequestInfo.content_length = 0
 		}
 
 		/* The CGI RFC allows servers to pass on unvalidated Authorization data */

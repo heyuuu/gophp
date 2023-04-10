@@ -336,8 +336,7 @@ func SplFilesystemInfoSetFilename(intern *SplFilesystemObject, path *byte, len_ 
 }
 func SplFilesystemObjectCreateInfo(
 	source *SplFilesystemObject,
-	file_path *byte,
-	file_path_len int,
+	file_path string,
 	use_copy int,
 	ce *types.ClassEntry,
 	return_value *types.Zval,
@@ -345,11 +344,7 @@ func SplFilesystemObjectCreateInfo(
 	var intern *SplFilesystemObject
 	var arg1 types.Zval
 	var error_handling zend.ZendErrorHandling
-	if file_path == nil || file_path_len == 0 {
-		if file_path != nil && use_copy == 0 {
-			zend.Efree(file_path)
-		}
-		file_path_len = 1
+	if file_path == "" {
 		file_path = "/"
 		return nil
 	}
@@ -363,7 +358,7 @@ func SplFilesystemObjectCreateInfo(
 	intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
 	return_value.SetObject(intern.GetStd())
 	if ce.GetConstructor().GetScope() != spl_ce_SplFileInfo {
-		arg1.SetStringVal(b.CastStr(file_path, file_path_len))
+		arg1.SetStringVal(file_path)
 		zend.ZendCallMethodWith1Params(return_value, ce, ce.GetConstructor(), "__construct", nil, &arg1)
 		zend.ZvalPtrDtor(&arg1)
 	} else {
@@ -464,6 +459,18 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 }
 func SplFilesystemIsInvalidOrDot(d_name *byte) int {
 	return d_name[0] == '0' || SplFilesystemIsDot(d_name) != 0
+}
+func SplFilesystemObjectGetPathnameEx(intern *SplFilesystemObject) string {
+	switch intern.GetType() {
+	case SPL_FS_INFO, SPL_FS_FILE:
+		return intern.FileName()
+	case SPL_FS_DIR:
+		if intern.GetEntry().DName() != "" {
+			SplFilesystemObjectGetFileName(intern)
+			return intern.FileName()
+		}
+	}
+	return ""
 }
 func SplFilesystemObjectGetPathname(intern *SplFilesystemObject, len_ *int) *byte {
 	switch intern.GetType() {
@@ -1156,12 +1163,10 @@ func zim_spl_SplFileInfo_getPathInfo(executeData *zend.ZendExecuteData, return_v
 	var error_handling zend.ZendErrorHandling
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_UnexpectedValueException, &error_handling)
 	if zend.ZendParseParameters(executeData.NumArgs(), "|C", &ce) == types.SUCCESS {
-		var path_len int
-		var path *byte = SplFilesystemObjectGetPathname(intern, &path_len)
-		if path != nil {
-			var dpath *byte = zend.Estrndup(path, path_len)
-			path_len = standard.PhpDirname(dpath, path_len)
-			SplFilesystemObjectCreateInfo(intern, dpath, path_len, 1, ce, return_value)
+		var path = SplFilesystemObjectGetPathnameEx(intern)
+		if path != "" {
+			dpath := zend.ZendDirname(path)
+			SplFilesystemObjectCreateInfo(intern, dpath, 1, ce, return_value)
 			zend.Efree(dpath)
 		}
 	}

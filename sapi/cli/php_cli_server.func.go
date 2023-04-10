@@ -160,7 +160,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var buffer zend.SmartStr = zend.MakeSmartStr(0)
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
-	if client == nil || core.SG__().request_info.no_headers {
+	if client == nil || core.SG__().RequestInfo.no_headers {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if core.SG__().sapi_headers.http_status_line {
@@ -273,10 +273,10 @@ func SapiCliServerRegisterVariables(track_vars_array *types.Zval) {
 	SapiCliServerRegisterVariable(track_vars_array, "SERVER_PORT", tmp)
 	zend.Efree(tmp)
 	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_URI", client.GetRequest().GetRequestUri())
-	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_METHOD", core.SG__().request_info.request_method)
+	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_METHOD", core.SG__().RequestInfo.request_method)
 	SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_NAME", client.GetRequest().GetVpath())
-	if core.SG__().request_info.path_translated {
-		SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_FILENAME", core.SG__().request_info.path_translated)
+	if core.SG__().RequestInfo.path_translated {
+		SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_FILENAME", core.SG__().RequestInfo.path_translated)
 	} else if client.GetServer().GetRouter() != nil {
 		SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_FILENAME", client.GetServer().GetRouter())
 	}
@@ -524,7 +524,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 
 	/* basic */
 
-	core.Spprintf(&basic_buf, 0, "%s [%d]: %s %s", client.GetAddrStr(), status, core.SG__().request_info.request_method, client.GetRequest().GetRequestUri())
+	core.Spprintf(&basic_buf, 0, "%s [%d]: %s %s", client.GetAddrStr(), status, core.SG__().RequestInfo.request_method, client.GetRequest().GetRequestUri())
 	if basic_buf == nil {
 		return
 	}
@@ -879,7 +879,7 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 
 	}
 	var zfd zend.ZendFileHandle
-	zend.ZendStreamInitFilename(&zfd, core.SG__().request_info.path_translated)
+	zend.ZendStreamInitFilename(&zfd, core.SG__().RequestInfo.path_translated)
 	faults.Try(func() {
 		core.PhpExecuteScript(&zfd)
 	})
@@ -946,7 +946,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 }
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
-	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().request_info))
+	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().RequestInfo))
 	if nil != b.Assign(&auth, types.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization")) {
 		core.PhpHandleAuthData(auth)
 	}
@@ -955,7 +955,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 
 		/* should never be happen */
 
-		DestroyRequestInfo(&(core.SG__().request_info))
+		DestroyRequestInfo(&(core.SG__().RequestInfo))
 		return types.FAILURE
 	}
 	core.PG__().during_request_startup = 0
@@ -964,7 +964,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClient) int {
 	core.PhpRequestShutdown(0)
 	PhpCliServerCloseConnection(server, client)
-	DestroyRequestInfo(&(core.SG__().request_info))
+	DestroyRequestInfo(&(core.SG__().RequestInfo))
 	core.SG__().server_context = nil
 	core.SG__().rfc1867_uploaded_files = nil
 	return types.SUCCESS
@@ -1008,7 +1008,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 		if types.FAILURE == PhpCliServerRequestStartup(server, client) {
 			core.SG__().server_context = nil
 			PhpCliServerCloseConnection(server, client)
-			DestroyRequestInfo(&(core.SG__().request_info))
+			DestroyRequestInfo(&(core.SG__().RequestInfo))
 			return types.SUCCESS
 		}
 	}
@@ -1050,7 +1050,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 		return types.SUCCESS
 	}
 	core.SG__().server_context = nil
-	DestroyRequestInfo(&(core.SG__().request_info))
+	DestroyRequestInfo(&(core.SG__().RequestInfo))
 	return types.SUCCESS
 }
 func PhpCliServerDtor(server *PhpCliServer) {

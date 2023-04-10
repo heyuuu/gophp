@@ -143,11 +143,11 @@ func PhpStreamUrlWrapPhp(
 			return nil
 		}
 		input = zend.Ecalloc(1, b.SizeOf("* input"))
-		if b.Assign(&(input.GetBody()), core.SG__().request_info.request_body) {
+		if b.Assign(&(input.GetBody()), core.SG__().RequestInfo.request_body) {
 			core.PhpStreamRewind(input.GetBody())
 		} else {
 			input.SetBody(core.PhpStreamTempCreateEx(core.TEMP_STREAM_DEFAULT, core.SAPI_POST_BLOCK_SIZE, core.PG__().upload_tmp_dir))
-			core.SG__().request_info.request_body = input.GetBody()
+			core.SG__().RequestInfo.request_body = input.GetBody()
 		}
 		return core.PhpStreamAlloc(&PhpStreamInputOps, input, 0, "rb")
 	}

@@ -539,8 +539,8 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		getword_conf = PhpApGetwordConf
 		_basename = PhpApBasename
 	}
-	if SG__().post_max_size > 0 && SG__().request_info.content_length > SG__().post_max_size {
-		SM__().SapiError(faults.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
+	if SG__().post_max_size > 0 && SG__().RequestInfo.content_length > SG__().post_max_size {
+		SM__().SapiError(faults.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().RequestInfo.content_length, SG__().post_max_size)
 		return
 	}
 
@@ -607,7 +607,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	header.Init(b.SizeOf("mime_header_entry"), zend.LlistDtorFuncT(PhpFreeHdrEntry), 0)
 	if PhpRfc1867Callback != nil {
 		var event_start MultipartEventStart
-		event_start.SetContentLength(SG__().request_info.content_length)
+		event_start.SetContentLength(SG__().RequestInfo.content_length)
 		if PhpRfc1867Callback(MULTIPART_EVENT_START, &event_start, &event_extra_data) == types.FAILURE {
 			goto fileupload_done
 		}

@@ -30,9 +30,9 @@ func (c *CliModuleType) Shutdown() bool {
 func (c *CliModuleType) Activate() {}
 func (c *CliModuleType) Deactivate() {
 	r.Fflush(stdout)
-	if core.SG__().request_info.argv0 {
-		zend.Free(core.SG__().request_info.argv0)
-		core.SG__().request_info.argv0 = nil
+	if core.SG__().RequestInfo.argv0 {
+		zend.Free(core.SG__().RequestInfo.argv0)
+		core.SG__().RequestInfo.argv0 = nil
 	}
 }
 func (c *CliModuleType) UbWrite(str string) (int, error) {

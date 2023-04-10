@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"os"
 )
 
 func ZendGetImportHt(type_ uint32) *types.Array {
@@ -261,15 +262,12 @@ func ZendTryCtEvalMagicConst(zv *types.Zval, ast *ZendAst) types.ZendBool {
 	case T_FILE:
 		zv.SetStringCopy(CG__().GetCompiledFilename())
 	case T_DIR:
-		var filename *types.String = CG__().GetCompiledFilename()
-		var dirname *types.String = types.NewString(filename.GetStr())
-		dirname.SetLen(ZendDirname(dirname.GetVal(), dirname.GetLen()))
-		if strcmp(dirname.GetVal(), ".") == 0 {
-			dirname = types.ZendStringExtend(dirname, MAXPATHLEN)
-			ZEND_IGNORE_VALUE(VCWD_GETCWD(dirname.GetVal(), MAXPATHLEN))
-			dirname.SetLen(strlen(dirname.GetVal()))
+		var filename = CG__().GetCompiledFilename().GetStr()
+		var dirname = ZendDirname(filename)
+		if dirname == "." {
+			dirname, _ = os.Getwd()
 		}
-		zv.SetString(dirname)
+		zv.SetStringVal(dirname)
 	case T_FUNC_C:
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			zv.SetStringCopy(op_array.GetFunctionName())

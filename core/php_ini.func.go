@@ -629,16 +629,16 @@ func PhpIniActivateConfig(source_hash *types.Array, modify_type int, stage int) 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 }
 func PhpIniHasPerDirConfig() int { return HasPerDirConfig }
-func PhpIniActivatePerDirConfig(path *byte, path_len int) {
+func PhpIniActivatePerDirConfig(path string) {
 	var tmp2 *types.Zval
 	var ptr *byte
-	if path_len > MAXPATHLEN {
+	if len(path) > MAXPATHLEN {
 		return
 	}
 
 	/* Walk through each directory in path and apply any found per-dir-system-configuration from configuration_hash */
 
-	if HasPerDirConfig != 0 && path != nil && path_len != 0 {
+	if HasPerDirConfig != 0 && path != "" {
 		ptr = path + 1
 		for b.Assign(&ptr, strchr(ptr, '/')) != nil {
 			*ptr = 0

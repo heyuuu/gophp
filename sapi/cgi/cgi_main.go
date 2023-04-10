@@ -381,7 +381,7 @@ func main(argc int, argv []*byte) int {
 						}
 						if no_headers != 0 {
 							core.SG__().headers_sent = 1
-							core.SG__().request_info.no_headers = 1
+							core.SG__().RequestInfo.no_headers = 1
 						}
 						standard.PhpPrintInfo(0xffffffff)
 						core.PhpRequestShutdown(any(0))
@@ -421,7 +421,7 @@ func main(argc int, argv []*byte) int {
 							return types.FAILURE
 						}
 						core.SG__().headers_sent = 1
-						core.SG__().request_info.no_headers = 1
+						core.SG__().RequestInfo.no_headers = 1
 						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.SM__().Name(), __DATE__, __TIME__, zend.GetZendVersion())
 						core.PhpRequestShutdown(any(0))
 						core.FcgiShutdown()
@@ -441,33 +441,33 @@ func main(argc int, argv []*byte) int {
 
 					/* override path_translated if -f on command line */
 
-					if core.SG__().request_info.path_translated {
-						zend.Efree(core.SG__().request_info.path_translated)
+					if core.SG__().RequestInfo.path_translated {
+						zend.Efree(core.SG__().RequestInfo.path_translated)
 					}
-					core.SG__().request_info.path_translated = script_file
+					core.SG__().RequestInfo.path_translated = script_file
 
 					/* before registering argv to module exchange the *new* argv[0] */
 
-					core.SG__().request_info.argc = argc - (PhpOptind - 1)
-					core.SG__().request_info.argv = &argv[PhpOptind-1]
-					core.SG__().request_info.argv[0] = script_file
+					core.SG__().RequestInfo.argc = argc - (PhpOptind - 1)
+					core.SG__().RequestInfo.argv = &argv[PhpOptind-1]
+					core.SG__().RequestInfo.argv[0] = script_file
 				} else if argc > PhpOptind {
 
 					/* file is on command line, but not in -f opt */
 
-					if core.SG__().request_info.path_translated {
-						zend.Efree(core.SG__().request_info.path_translated)
+					if core.SG__().RequestInfo.path_translated {
+						zend.Efree(core.SG__().RequestInfo.path_translated)
 					}
-					core.SG__().request_info.path_translated = zend.Estrdup(argv[PhpOptind])
+					core.SG__().RequestInfo.path_translated = zend.Estrdup(argv[PhpOptind])
 
 					/* arguments after the file are considered script args */
 
-					core.SG__().request_info.argc = argc - PhpOptind
-					core.SG__().request_info.argv = &argv[PhpOptind]
+					core.SG__().RequestInfo.argc = argc - PhpOptind
+					core.SG__().RequestInfo.argv = &argv[PhpOptind]
 				}
 				if no_headers != 0 {
 					core.SG__().headers_sent = 1
-					core.SG__().request_info.no_headers = 1
+					core.SG__().RequestInfo.no_headers = 1
 				}
 
 				/* all remaining arguments are part of the query string
@@ -480,7 +480,7 @@ func main(argc int, argv []*byte) int {
 				 *  test.php v1=test "v2=hello world!"
 				 */
 
-				if !(core.SG__().request_info.query_string) && argc > PhpOptind {
+				if !(core.SG__().RequestInfo.query_string) && argc > PhpOptind {
 					var slen int = strlen(core.PG__().arg_separator.input)
 					len_ = 0
 					for i = PhpOptind; i < argc; i++ {
@@ -499,7 +499,7 @@ func main(argc int, argv []*byte) int {
 							strlcat(s, core.PG__().arg_separator.input, len_)
 						}
 					}
-					core.SG__().request_info.query_string = s
+					core.SG__().RequestInfo.query_string = s
 					free_query_string = 1
 				}
 
@@ -521,8 +521,8 @@ func main(argc int, argv []*byte) int {
 			   we need in the environment.
 			*/
 
-			if core.SG__().request_info.path_translated || cgi != 0 || fastcgi != 0 {
-				zend.ZendStreamInitFilename(&file_handle, core.SG__().request_info.path_translated)
+			if core.SG__().RequestInfo.path_translated || cgi != 0 || fastcgi != 0 {
+				zend.ZendStreamInitFilename(&file_handle, core.SG__().RequestInfo.path_translated)
 			} else {
 				zend.ZendStreamInitFp(&file_handle, stdin, "Standard input code")
 			}
@@ -540,7 +540,7 @@ func main(argc int, argv []*byte) int {
 			}
 			if no_headers != 0 {
 				core.SG__().headers_sent = 1
-				core.SG__().request_info.no_headers = 1
+				core.SG__().RequestInfo.no_headers = 1
 			}
 
 			/*
@@ -549,7 +549,7 @@ func main(argc int, argv []*byte) int {
 			   2. we are running as cgi or fastcgi
 			*/
 
-			if cgi != 0 || fastcgi != 0 || core.SG__().request_info.path_translated {
+			if cgi != 0 || fastcgi != 0 || core.SG__().RequestInfo.path_translated {
 				if core.PhpFopenPrimaryScript(&file_handle) == types.FAILURE {
 					faults.Try(func() {
 						if errno == EACCES {
@@ -568,13 +568,13 @@ func main(argc int, argv []*byte) int {
 					if fastcgi != 0 {
 						goto fastcgi_request_done
 					}
-					if core.SG__().request_info.path_translated {
-						zend.Efree(core.SG__().request_info.path_translated)
-						core.SG__().request_info.path_translated = nil
+					if core.SG__().RequestInfo.path_translated {
+						zend.Efree(core.SG__().RequestInfo.path_translated)
+						core.SG__().RequestInfo.path_translated = nil
 					}
-					if free_query_string != 0 && core.SG__().request_info.query_string {
-						zend.Free(core.SG__().request_info.query_string)
-						core.SG__().request_info.query_string = nil
+					if free_query_string != 0 && core.SG__().RequestInfo.query_string {
+						zend.Free(core.SG__().RequestInfo.query_string)
+						core.SG__().RequestInfo.query_string = nil
 					}
 					core.PhpRequestShutdown(any(0))
 					core.SG__().server_context = nil
@@ -623,17 +623,17 @@ func main(argc int, argv []*byte) int {
 				break
 			}
 		fastcgi_request_done:
-			if core.SG__().request_info.path_translated {
-				zend.Efree(core.SG__().request_info.path_translated)
-				core.SG__().request_info.path_translated = nil
+			if core.SG__().RequestInfo.path_translated {
+				zend.Efree(core.SG__().RequestInfo.path_translated)
+				core.SG__().RequestInfo.path_translated = nil
 			}
 			core.PhpRequestShutdown(any(0))
 			if exit_status == 0 {
 				exit_status = zend.EG__().GetExitStatus()
 			}
-			if free_query_string != 0 && core.SG__().request_info.query_string {
-				zend.Free(core.SG__().request_info.query_string)
-				core.SG__().request_info.query_string = nil
+			if free_query_string != 0 && core.SG__().RequestInfo.query_string {
+				zend.Free(core.SG__().RequestInfo.query_string)
+				core.SG__().RequestInfo.query_string = nil
 			}
 			if fastcgi == 0 {
 				if benchmark != 0 {

@@ -50,7 +50,7 @@ func ZifHeaderRemove(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, name *
 	core.SapiHeaderOp(b.Cond(executeData.NumArgs() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
 }
 func PhpHeader() int {
-	if core.SapiSendHeaders() == types.FAILURE || core.SG__().request_info.headers_only {
+	if core.SapiSendHeaders() == types.FAILURE || core.SG__().RequestInfo.headers_only {
 		return 0
 	} else {
 		return 1

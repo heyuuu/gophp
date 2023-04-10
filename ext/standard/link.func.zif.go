@@ -22,7 +22,7 @@ var DefZifLinkinfo = def.DefFunc("linkinfo", 1, 1, []def.ArgInfo{{Name: "filenam
 	if fp.HasError() {
 		return
 	}
-	ZifLinkinfo(executeData, returnValue, filename)
+	ZifLinkinfo(returnValue, filename)
 })
 
 // generate by ZifSymlink
@@ -33,7 +33,7 @@ var DefZifSymlink = def.DefFunc("symlink", 2, 2, []def.ArgInfo{{Name: "target"},
 	if fp.HasError() {
 		return
 	}
-	ZifSymlink(executeData, returnValue, target, link)
+	ZifSymlink(target, link)
 })
 
 // generate by ZifLink

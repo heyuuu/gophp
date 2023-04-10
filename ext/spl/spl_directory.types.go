@@ -1,6 +1,7 @@
 package spl
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
@@ -99,6 +100,10 @@ type SplFilesystemObject struct {
 	std types.ZendObject
 }
 
+func (this *SplFilesystemObject) FileName() string {
+	return b.CastStr(this.file_name, this.file_name_len)
+}
+
 func (this *SplFilesystemObject) GetOth() any                          { return this.oth }
 func (this *SplFilesystemObject) SetOth(value any)                     { this.oth = value }
 func (this *SplFilesystemObject) GetOthHandler() *SplOtherHandler      { return this.oth_handler }
@@ -123,7 +128,7 @@ func (this *SplFilesystemObject) GetInfoClass() *types.ClassEntry      { return 
 func (this *SplFilesystemObject) SetInfoClass(value *types.ClassEntry) { this.info_class = value }
 func (this *SplFilesystemObject) GetDirp() *core.PhpStream             { return this.u.dir.dirp }
 func (this *SplFilesystemObject) SetDirp(value *core.PhpStream)        { this.u.dir.dirp = value }
-func (this *SplFilesystemObject) GetEntry() core.PhpStreamDirent       { return this.u.dir.entry }
+func (this *SplFilesystemObject) GetEntry() *core.PhpStreamDirent      { return &this.u.dir.entry }
 
 // func (this *SplFilesystemObject) SetEntry(value core.PhpStreamDirent) { this.u.dir.entry = value }
 func (this *SplFilesystemObject) GetSubPath() *byte       { return this.u.dir.sub_path }
