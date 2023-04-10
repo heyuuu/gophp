@@ -1009,3 +1009,66 @@ func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval,
 		return
 	}
 }
+
+func ZifQuotemeta(str string) (string, bool) {
+	if str == "" {
+		return "", false
+	}
+
+	replacer := strings.NewReplacer(
+		`.`, `\.`,
+		`\`, `\\`,
+		`+`, `\+`,
+		`*`, `\*`,
+		`?`, `\?`,
+		`[`, `\[`,
+		`^`, `\^`,
+		`]`, `\]`,
+		`$`, `\$`,
+		`(`, `\(`,
+		`)`, `\)`,
+	)
+	return replacer.Replace(str), true
+}
+
+func ZifOrd(character string) int {
+	if character == "" {
+		return 0
+	}
+	return int(character[0])
+}
+func ZifChr(codepoint int) string {
+	c := byte(codepoint & 0xff)
+	return string(c)
+}
+func ZifUcfirst(str string) string {
+	if str != "" && ascii.IsLower(str[0]) {
+		return string(ascii.ToUpper(str[0])) + str[1:]
+	}
+	return str
+}
+func ZifLcfirst(str string) string {
+	if str != "" && ascii.IsUpper(str[0]) {
+		return string(ascii.ToLower(str[0])) + str[1:]
+	}
+	return str
+}
+func ZifUcwords(str string, _ zpp.Opt, delimiters *string) string {
+	var mask = " \t\r\n\f\v"
+	if delimiters != nil {
+		mask, _ = PhpCharmaskEx(*delimiters)
+	}
+
+	if str == "" {
+		return ""
+	}
+
+	chars := []byte(str)
+	chars[0] = ascii.ToUpper(chars[0])
+	for i := 1; i < len(str)-1; i++ {
+		if strings.ContainsRune(mask, rune(chars[i-1])) {
+			chars[i] = ascii.ToUpper(chars[i])
+		}
+	}
+	return string(chars)
+}

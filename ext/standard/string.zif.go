@@ -465,3 +465,75 @@ var DefZifSubstrReplace = def.DefFunc("substr_replace", 3, 4, []def.ArgInfo{{Nam
 	}
 	ZifSubstrReplace(returnValue, str, replace, start, nil, length)
 })
+
+// generate by ZifQuotemeta
+var DefZifQuotemeta = def.DefFunc("quotemeta", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret, ok := ZifQuotemeta(str)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
+})
+
+// generate by ZifOrd
+var DefZifOrd = def.DefFunc("ord", 1, 1, []def.ArgInfo{{Name: "character"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	character := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifOrd(character)
+	returnValue.SetLong(ret)
+})
+
+// generate by ZifChr
+var DefZifChr = def.DefFunc("chr", 1, 1, []def.ArgInfo{{Name: "codepoint"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	codepoint := fp.ParseLong()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifChr(codepoint)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifUcfirst
+var DefZifUcfirst = def.DefFunc("ucfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifUcfirst(str)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifLcfirst
+var DefZifLcfirst = def.DefFunc("lcfirst", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifLcfirst(str)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifUcwords
+var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "delimiters"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	str := fp.ParseStringVal()
+	fp.StartOptional()
+	delimiters := fp.ParseStringValNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifUcwords(str, nil, delimiters)
+	returnValue.SetStringVal(ret)
+})

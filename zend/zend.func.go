@@ -46,7 +46,6 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	return true
 }
 
-
 func PrintHash(buf *SmartStr, ht *types.Array, indent int, is_object types.ZendBool) {
 	for i := 0; i < indent; i++ {
 		buf.AppendByte(' ')
@@ -549,7 +548,7 @@ func ZendMakeCompiledStringDescription(name string) string {
 		cur_filename = "Unknown"
 		cur_lineno = 0
 	}
-	return ZendSprintf( COMPILED_STRING_DESCRIPTION_FORMAT, cur_filename, cur_lineno, name)
+	return ZendSprintf(COMPILED_STRING_DESCRIPTION_FORMAT, cur_filename, cur_lineno, name)
 }
 func FreeEstring(str_p **byte) { Efree(*str_p) }
 func ZendMapPtrNew() any {
