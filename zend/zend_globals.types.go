@@ -380,7 +380,7 @@ func (this *ZendExecutorGlobals) GetUserErrorHandlerErrorReporting() int {
 func (this *ZendExecutorGlobals) SetUserErrorHandlerErrorReporting(value int) {
 	this.user_error_handler_error_reporting = value
 }
-func (this *ZendExecutorGlobals) GetUserErrorHandler() types.Zval { return this.user_error_handler }
+func (this *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &this.user_error_handler }
 func (this *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
 	this.user_error_handler = value
 }

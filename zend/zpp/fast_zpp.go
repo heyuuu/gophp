@@ -104,7 +104,7 @@ func (p *FastParser) triggerDeprecated(errorCode int, err string) {
 	switch errorCode {
 	case ZPP_ERROR_WRONG_CALLBACK:
 		message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", p.executeData.CalleeName(), p.idx, err)
-		faults.ErrorEx(faults.E_DEPRECATED, message)
+		faults.Error(faults.E_DEPRECATED, message)
 	}
 }
 

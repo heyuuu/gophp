@@ -1,6 +1,7 @@
 package faults
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
@@ -755,18 +756,6 @@ func ThrowErrorException(exception_ce *types.ClassEntry, message string, code ze
 	zend.ZendUpdatePropertyEx(ZendCeErrorException, &ex, types.STR_SEVERITY, &tmp)
 	return obj
 }
-func ErrorVa(type_ int, file *byte, lineno uint32, format string, _ ...any) {
-	var args va_list
-	va_start(args, format)
-	zend.ZendErrorCb(type_, file, lineno, format, args)
-	va_end(args)
-}
-func ErrorHelper(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
-	var va va_list
-	va_start(va, format)
-	zend.ZendErrorCb(type_, filename, lineno, format, va)
-	va_end(va)
-}
 func ExceptionError(ex *types.ZendObject, severity int) {
 	var exception types.Zval
 	var rv types.Zval
@@ -778,7 +767,11 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 		var message *types.String = zend.ZvalGetString(GET_PROPERTY(&exception, types.STR_MESSAGE, &rv))
 		var file *types.String = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_FILE, &rv))
 		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.STR_LINE, &rv))
-		ErrorHelper(b.Cond(ce_exception == ZendCeParseError, E_PARSE, E_COMPILE_ERROR), file.GetVal(), line, "%s", message.GetVal())
+		if ce_exception == ZendCeParseError {
+			errorCb(E_PARSE, file.GetStr(), uint32(line), message.GetStr())
+		} else {
+			errorCb(E_COMPILE_ERROR, file.GetStr(), uint32(line), message.GetStr())
+		}
 		// types.ZendStringReleaseEx(file, 0)
 		// types.ZendStringReleaseEx(message, 0)
 	} else if zend.InstanceofFunction(ce_exception, ZendCeThrowable) != 0 {
@@ -805,7 +798,12 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 				file = zend.ZvalGetString(GET_PROPERTY_SILENT(&zv, types.STR_FILE, &rv))
 				line = zend.ZvalGetLong(GET_PROPERTY_SILENT(&zv, types.STR_LINE, &rv))
 			}
-			ErrorVa(E_WARNING, b.CondF1(file != nil && file.GetLen() > 0, func() []byte { return file.GetVal() }, nil), line, "Uncaught %s in exception handling during call to %s::__tostring()", types.Z_OBJCE(zv).GetName().GetVal(), ce_exception.GetName().GetVal())
+			errMsg := fmt.Sprintf("Uncaught %s in exception handling during call to %s::__tostring()", types.Z_OBJCE(zv).Name(), ce_exception.Name())
+			if file == nil {
+				errorCb(E_WARNING, "", uint32(line), errMsg)
+			} else {
+				errorCb(E_WARNING, file.GetStr(), uint32(line), errMsg)
+			}
 			if file != nil {
 				// types.ZendStringReleaseEx(file, 0)
 			}
@@ -813,7 +811,11 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 		str = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_STRING, &rv))
 		file = zend.ZvalGetString(GET_PROPERTY_SILENT(&exception, types.STR_FILE, &rv))
 		line = zend.ZvalGetLong(GET_PROPERTY_SILENT(&exception, types.STR_LINE, &rv))
-		ErrorVa(severity, b.CondF1(file != nil && file.GetLen() > 0, func() []byte { return file.GetVal() }, nil), line, "Uncaught %s\n  thrown", str.GetVal())
+		if file == nil {
+			errorCb(severity, "", uint32(line), fmt.Sprintf("Uncaught %s\n  thrown", str.GetStr()))
+		} else {
+			errorCb(severity, file.GetStr(), uint32(line), fmt.Sprintf("Uncaught %s\n  thrown", str.GetStr()))
+		}
 		// types.ZendStringReleaseEx(str, 0)
 		// types.ZendStringReleaseEx(file, 0)
 	} else {
