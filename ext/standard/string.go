@@ -517,3 +517,320 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 		return dir
 	}
 }
+
+func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
+	opt := b.Option(options, PHP_PATHINFO_ALL)
+
+	var tmp *types.Zval = types.NewZvalEmptyArray()
+	if (opt & PHP_PATHINFO_DIRNAME) == PHP_PATHINFO_DIRNAME {
+		dirname := zend.ZendDirname(path)
+		if dirname != "" {
+			zend.AddAssocStr(tmp, "dirname", dirname)
+		}
+	}
+
+	basename := PhpBasename(path, "")
+	if (opt & PHP_PATHINFO_BASENAME) == PHP_PATHINFO_BASENAME {
+		zend.AddAssocStr(tmp, "basename", basename)
+	}
+	if (opt & PHP_PATHINFO_EXTENSION) == PHP_PATHINFO_EXTENSION {
+		if pos := strings.LastIndexByte(basename, '.'); pos >= 0 {
+			zend.AddAssocStr(tmp, "extension", basename[pos+1:])
+		}
+	}
+	if (opt & PHP_PATHINFO_FILENAME) == PHP_PATHINFO_FILENAME {
+		if pos := strings.LastIndexByte(basename, '.'); pos >= 0 {
+			zend.AddAssocStr(tmp, "filename", basename[:pos])
+		} else {
+			zend.AddAssocStr(tmp, "filename", basename)
+		}
+	}
+
+	if opt == PHP_PATHINFO_ALL {
+		return tmp
+	} else {
+		var element *types.Zval = types.ZendHashGetCurrentData(tmp.GetArr())
+		if element != nil {
+			return element
+		} else {
+			return types.NewZvalString("")
+		}
+	}
+}
+
+func PhpStrspnEx(s1 string, s2 string) int {
+	if s1 == "" {
+		return 0
+	}
+	for i, c := range []byte(s1) {
+		if !strings.ContainsRune(s2, rune(c)) {
+			return i
+		}
+	}
+	return len(s1)
+}
+func PhpStrcspnEx(s1 string, s2 string) int {
+	if s1 == "" {
+		return 0
+	}
+	for i, c := range []byte(s1) {
+		if strings.ContainsRune(s2, rune(c)) {
+			return i
+		}
+	}
+	return len(s1)
+}
+func PhpNeedleChar(needle *types.Zval) (byte, bool) {
+	switch needle.GetType() {
+	case types.IS_LONG:
+		return byte(needle.GetLval()), true
+	case types.IS_NULL, types.IS_FALSE:
+		return 0, true
+	case types.IS_TRUE:
+		return 1, true
+	case types.IS_DOUBLE, types.IS_OBJECT:
+		return byte(zend.ZvalGetLong(needle)), true
+	default:
+		core.PhpErrorDocref(nil, faults.E_WARNING, "needle is not a string or an integer")
+		return 0, false
+	}
+}
+func ZifStristr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return "", false
+	}
+	if needleStr == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
+		return "", false
+	}
+
+	haystackLc := ascii.StrToLower(haystack)
+	needleStrLc := ascii.StrToLower(needleStr)
+	if pos := strings.Index(haystackLc, needleStrLc); pos >= 0 {
+		if part {
+			return haystack[:pos], true
+		} else {
+			return haystack[pos:], true
+		}
+	} else {
+		return "", false
+	}
+}
+
+//@zif -alias strchr
+func ZifStrstr(haystack string, needle *types.Zval, _ zpp.Opt, part bool) (string, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return "", false
+	}
+	if needleStr == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty needle")
+		return "", false
+	}
+
+	if pos := strings.Index(haystack, needleStr); pos >= 0 {
+		if part {
+			return haystack[:pos], true
+		} else {
+			return haystack[pos:], true
+		}
+	} else {
+		return "", false
+	}
+}
+
+func posSubstr(str string, offset int) (string, bool) {
+	if offset < 0 {
+		offset += len(str)
+	}
+	if offset < 0 || offset > len(str) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
+		return "", false
+	}
+	if offset == 0 {
+		str = str[offset:]
+	}
+	return str, true
+}
+func parseNeedle(needle *types.Zval) (string, bool) {
+	if needle.IsString() {
+		return needle.GetStrVal(), true
+	} else {
+		/*
+		 * 在 PHP 8.0.0 之前，如果 needle 不是字符串，它将被转换为整数并作为字符的序数值应用。
+		 * 从 PHP 7.3.0 开始，这种行为已被废弃，不鼓励依赖它。根据预期的行为，应该明确地将 needle 转换成字符串，或者明确地调用 chr()。
+		 */
+		needleChar, ok := PhpNeedleChar(needle)
+		if !ok {
+			return "", false
+		}
+
+		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Non-string needles will be interpreted as strings in the future. "+"Use an explicit chr() call to preserve the current behavior")
+
+		return string([]byte{needleChar}), true
+	}
+}
+
+func ZifStrpos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+	haystack, ok := posSubstr(haystack, offset)
+	if !ok {
+		return 0, false
+	}
+	if len(haystack) == 0 {
+		return 0, false
+	}
+
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return 0, false
+	}
+
+	if pos := strings.Index(haystack, needleStr); pos < 0 {
+		return pos, true
+	} else {
+		return 0, false
+	}
+}
+func ZifStripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+	haystack, ok := posSubstr(haystack, offset)
+	if !ok {
+		return 0, false
+	}
+	if len(haystack) == 0 {
+		return 0, false
+	}
+
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return 0, false
+	}
+
+	haystack = ascii.StrToLower(haystack)
+	needleStr = ascii.StrToLower(needleStr)
+	if pos := strings.Index(haystack, needleStr); pos < 0 {
+		return pos, true
+	} else {
+		return 0, false
+	}
+}
+func ZifStrrpos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return 0, false
+	}
+
+	if len(haystack) == 0 {
+		return 0, false
+	}
+
+	if offset >= 0 {
+		haystack, ok = posSubstr(haystack, offset)
+		if !ok {
+			return 0, false
+		}
+		if pos := strings.Index(haystack, needleStr); pos >= 0 {
+			return pos, true
+		} else {
+			return 0, false
+		}
+	} else { // offset < 0
+		offset += len(haystack)
+		if offset < 0 {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
+			return 0, false
+		}
+
+		if offset+len(needleStr) < len(haystack) {
+			haystack = haystack[:offset+len(needleStr)]
+		}
+		if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
+			return pos, true
+		} else {
+			return 0, false
+		}
+	}
+}
+func ZifStrripos(haystack string, needle *types.Zval, _ zpp.Opt, offset int) (int, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok {
+		return 0, false
+	}
+
+	if len(haystack) == 0 {
+		return 0, false
+	}
+
+	haystack = ascii.StrToLower(haystack)
+	needleStr = ascii.StrToLower(needleStr)
+	if offset >= 0 {
+		haystack, ok = posSubstr(haystack, offset)
+		if !ok {
+			return 0, false
+		}
+		if pos := strings.Index(haystack, needleStr); pos >= 0 {
+			return pos, true
+		} else {
+			return 0, false
+		}
+	} else { // offset < 0
+		offset += len(haystack)
+		if offset < 0 {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Offset is greater than the length of haystack string")
+			return 0, false
+		}
+
+		if offset+len(needleStr) < len(haystack) {
+			haystack = haystack[:offset+len(needleStr)]
+		}
+		if pos := strings.LastIndex(haystack, needleStr); pos >= 0 {
+			return pos, true
+		} else {
+			return 0, false
+		}
+	}
+}
+func ZifStrrchr(haystack string, needle *types.Zval) (string, bool) {
+	needleStr, ok := parseNeedle(needle)
+	if !ok || needleStr == "" {
+		return "", false
+	}
+
+	if pos := strings.LastIndexByte(haystack, needleStr[0]); pos >= 0 {
+		return haystack[pos:], true
+	} else {
+		return "", false
+	}
+}
+func ZifChunkSplit(str string, _ zpp.Opt, chunklen_ *int, ending_ *string) (string, bool) {
+	chunklen := b.Option(chunklen_, 76)
+	ending := b.Option(ending_, "\r\n")
+
+	if chunklen <= 0 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Chunk length should be greater than zero")
+		return "", false
+	}
+
+	// fast
+	if ending == "" {
+		return str, true
+	}
+	if chunklen >= len(str) {
+		return str + ending, true
+	}
+
+	// common
+	var buf strings.Builder
+	for i := 0; i < len(str); i += chunklen {
+		if i+chunklen <= len(str) {
+			buf.WriteString(str[i : i+chunklen])
+		} else {
+			buf.WriteString(str[i:])
+		}
+		buf.WriteString(ending)
+	}
+	return buf.String(), true
+}
+func ZifSubstr(str string, offset int, _ zpp.Opt, length *int) (string, bool) {
+	return substr(str, offset, length)
+}

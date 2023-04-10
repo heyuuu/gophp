@@ -260,3 +260,16 @@ var DefZifDirname = def.DefFunc("dirname", 1, 2, []def.ArgInfo{{Name: "path"}, {
 	ret := ZifDirname(path, nil, levels_)
 	returnValue.SetStringVal(ret)
 })
+
+// generate by ZifPathinfo
+var DefZifPathinfo = def.DefFunc("pathinfo", 1, 2, []def.ArgInfo{{Name: "path"}, {Name: "options"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 2, 0)
+	path := fp.ParseStringVal()
+	fp.StartOptional()
+	options := fp.ParseLongNullable()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifPathinfo(path, nil, options)
+	returnValue.SetBy(ret)
+})

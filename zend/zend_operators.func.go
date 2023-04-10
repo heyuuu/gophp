@@ -86,42 +86,6 @@ func ZendMemrchr(s *byte, c byte, n int) *byte {
 	}
 }
 
-func ZendMemnrstr(haystack *byte, needle *byte, needle_len int, end *byte) *byte {
-	var p *byte = end
-	var ne byte = needle[needle_len-1]
-	var off_p ptrdiff_t
-	var off_s int
-	if needle_len == 1 {
-		return (*byte)(ZendMemrchr(haystack, *needle, p-haystack))
-	}
-	off_p = end - haystack
-	if off_p > 0 {
-		off_s = int(off_p)
-	} else {
-		off_s = 0
-	}
-	if needle_len > off_s {
-		return nil
-	}
-	if off_s < 1024 || needle_len < 3 {
-		p -= needle_len
-		for {
-			p = (*byte)(ZendMemrchr(haystack, *needle, p-haystack+1))
-			if p == nil {
-				return nil
-			}
-			if ne == p[needle_len-1] && !(memcmp(needle+1, p+1, needle_len-2)) {
-				return p
-			}
-			if b.PostDec(&p) < haystack {
-				break
-			}
-		}
-		return nil
-	} else {
-		return ZendMemnrstrEx(haystack, needle, needle_len, end)
-	}
-}
 func ZvalGetLong(op *types.Zval) ZendLong {
 	if op.IsLong() {
 		return op.GetLval()
