@@ -1279,15 +1279,7 @@ func PhpCharToStr(str string, from byte, to string, caseSensitivity bool) (strin
 	return result, count
 }
 
-func PhpCharToStrEx(str *types.String, from byte, to *byte, toLen int, caseSensitivity int, replaceCount *zend.ZendLong) *types.String {
-	result, count := PhpCharToStr(str.GetStr(), from, b.CastStr(to, toLen), caseSensitivity != 0)
-	if replaceCount != nil {
-		*replaceCount = count
-	}
-	return types.NewString(result)
-}
-
-func PhpStrToStrEx_Ex(haystack string, needle string, str string) (string, int) {
+func PhpStrToStr(haystack string, needle string, str string) (string, int) {
 	if len(needle) > len(haystack) {
 		return haystack, 0
 	} else if needle == haystack {
@@ -1299,21 +1291,7 @@ func PhpStrToStrEx_Ex(haystack string, needle string, str string) (string, int) 
 	return result, count
 }
 
-func PhpStrToStrEx(
-	haystack *types.String,
-	needle *byte,
-	needle_len int,
-	str *byte,
-	str_len int,
-	replace_count *zend.ZendLong,
-) *types.String {
-	result, count := PhpStrToStrEx_Ex(haystack.GetStr(), b.CastStr(needle, needle_len), b.CastStr(str, str_len))
-	if replace_count != nil {
-		*replace_count += count
-	}
-	return types.NewString(result)
-}
-func PhpStrToStrIEx_Ex(haystack string, lcHaystack string, needle string, str string) (string, int) {
+func PhpStrToStrI(haystack string, lcHaystack string, needle string, str string) (string, int) {
 	b.Assert(len(needle) != 0)
 
 	if len(needle) > len(haystack) {
@@ -1345,21 +1323,6 @@ func PhpStrToStrIEx_Ex(haystack string, lcHaystack string, needle string, str st
 		buf.WriteString(haystack[lastPos:])
 		return buf.String(), count
 	}
-}
-
-func PhpStrToStrIEx(
-	haystack *types.String,
-	lc_haystack *byte,
-	needle *types.String,
-	str *byte,
-	str_len int,
-	replace_count *zend.ZendLong,
-) *types.String {
-	result, count := PhpStrToStrIEx_Ex(haystack.GetStr(), b.CastStrAuto(lc_haystack), needle.GetStr(), b.CastStr(str, str_len))
-	if replace_count != nil {
-		*replace_count += count
-	}
-	return types.NewString(result)
 }
 
 func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, bool) {
@@ -1518,10 +1481,10 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 				tmpResult, count = PhpCharToStr(result, searchStr[0], replaceStr, caseSensitivity)
 			} else {
 				if caseSensitivity {
-					tmpResult, count = PhpStrToStrEx_Ex(result, searchStr, replaceStr)
+					tmpResult, count = PhpStrToStr(result, searchStr, replaceStr)
 				} else {
 					lcSubjectStr := ascii.StrToLower(result)
-					tmpResult, count = PhpStrToStrIEx_Ex(result, lcSubjectStr, searchStr, replaceStr)
+					tmpResult, count = PhpStrToStrI(result, lcSubjectStr, searchStr, replaceStr)
 				}
 			}
 
@@ -1541,10 +1504,10 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 			return PhpCharToStr(subject, searchStr[0], replaceStr, caseSensitivity)
 		} else {
 			if caseSensitivity {
-				return PhpStrToStrEx_Ex(subject, searchStr, replaceStr)
+				return PhpStrToStr(subject, searchStr, replaceStr)
 			} else {
 				lcSubject := ascii.StrToLower(subject)
-				return PhpStrToStrIEx_Ex(subject, lcSubject, searchStr, replaceStr)
+				return PhpStrToStrI(subject, lcSubject, searchStr, replaceStr)
 			}
 		}
 	}
