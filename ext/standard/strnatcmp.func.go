@@ -1,155 +1,124 @@
 package standard
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	"github.com/heyuuu/gophp/builtin/ascii"
+)
 
-func CompareRight(a **byte, aend *byte, b **byte, bend *byte) int {
-	var bias int = 0
-
+func compareRight(a string, ap int, b string, bp int) (result int, newAp int, newBp int) {
 	/* The longest run of digits wins.  That aside, the greatest
 	   value wins, but we can't know that it will until we've scanned
 	   both numbers to know that they have the same magnitude, so we
 	   remember it in BIAS. */
 
-	for {
-		if ((*a) == aend || !(isdigit(int(uint8(*(*a)))))) && ((*b) == bend || !(isdigit(int(uint8(*(*b)))))) {
-			return bias
-		} else if (*a) == aend || !(isdigit(int(uint8(*(*a))))) {
-			return -1
-		} else if (*b) == bend || !(isdigit(int(uint8(*(*b))))) {
-			return +1
-		} else if (*(*a)) < (*(*b)) {
+	bias := 0
+	for ; ; ap, bp = ap+1, bp+1 {
+		if (ap == len(a) || !ascii.IsDigit(a[ap])) && (bp == len(b) || !ascii.IsDigit(b[bp])) {
+			return bias, ap, bp
+		} else if ap == len(a) || !ascii.IsDigit(a[ap]) {
+			return -1, ap, bp
+		} else if bp == len(b) || !ascii.IsDigit(b[bp]) {
+			return 1, ap, bp
+		} else if a[ap] < b[bp] {
 			if bias == 0 {
 				bias = -1
 			}
-		} else if (*(*a)) > (*(*b)) {
+		} else if a[ap] > b[bp] {
 			if bias == 0 {
-				bias = +1
+				bias = 1
 			}
 		}
-		*a++
-		*b++
 	}
-	return 0
 }
-func CompareLeft(a **byte, aend *byte, b **byte, bend *byte) int {
-	/* Compare two left-aligned numbers: the first to have a
-	   different value wins. */
+func compareLeft(a string, ap int, b string, bp int) (result int, newAp int, newBp int) {
+	/* Compare two left-aligned numbers: the first to have a different value wins. */
 
-	for {
-		if ((*a) == aend || !(isdigit(int(uint8(*(*a)))))) && ((*b) == bend || !(isdigit(int(uint8(*(*b)))))) {
-			return 0
-		} else if (*a) == aend || !(isdigit(int(uint8(*(*a))))) {
-			return -1
-		} else if (*b) == bend || !(isdigit(int(uint8(*(*b))))) {
-			return +1
-		} else if (*(*a)) < (*(*b)) {
-			return -1
-		} else if (*(*a)) > (*(*b)) {
-			return +1
+	for ; ; ap, bp = ap+1, bp+1 {
+		if (ap == len(a) || !ascii.IsDigit(a[ap])) && (bp == len(b) || !ascii.IsDigit(b[bp])) {
+			return 0, ap, bp
+		} else if ap == len(a) || !ascii.IsDigit(a[ap]) {
+			return -1, ap, bp
+		} else if bp == len(b) || !ascii.IsDigit(b[bp]) {
+			return 1, ap, bp
+		} else if a[ap] < b[bp] {
+			return -1, ap, bp
+		} else if a[ap] > b[bp] {
+			return 1, ap, bp
 		}
-		*a++
-		*b++
 	}
-	return 0
 }
 
-func Strnatcmp(s1 string, s2 string, fold_case bool) int {
-	return StrnatcmpEx(s1, s1, s2, s2, types.IntBool(fold_case))
-}
-func StrnatcmpEx(a *byte, a_len int, b *byte, b_len int, fold_case int) int {
-	var ca uint8
-	var cb uint8
-	var ap *byte
-	var bp byte
-	var aend *byte = a + a_len
-	var bend byte = b + b_len
-	var fractional int
-	var result int
-	var leading short = 1
-	if a_len == 0 || b_len == 0 {
-		if a_len == b_len {
+func Strnatcmp(a string, b string, foldCase bool) int {
+	if a == "" || b == "" {
+		if a == b {
 			return 0
 		} else {
-			if a_len > b_len {
+			if len(a) > len(b) {
 				return 1
 			} else {
 				return -1
 			}
 		}
 	}
-	ap = a
-	bp = b
-	for true {
-		ca = *ap
-		cb = *bp
 
-		/* skip over leading zeros */
+	ap := 0 // for a
+	bp := 0 // for b
 
-		for leading && ca == '0' && ap+1 < aend && isdigit(int(uint8(*(ap + 1)))) {
-			ca = *(b.PreInc(&ap))
-		}
-		for leading && cb == '0' && bp+1 < bend && isdigit(int(uint8(*(bp + 1)))) {
-			cb = *(b.PreInc(&bp))
-		}
-		leading = 0
+	/* skip over leading zeros */
+	for a[ap] == '0' && ap+1 < len(a) && ascii.IsDigit(a[ap+1]) {
+		ap++
+	}
+	for b[bp] == '0' && bp+1 < len(b) && ascii.IsDigit(b[bp+1]) {
+		bp++
+	}
 
+	for {
 		/* Skip consecutive whitespace */
-
-		for isspace(int(uint8(ca))) {
-			ca = *(b.PreInc(&ap))
+		for ascii.IsSpace(a[ap]) {
+			ap++
 		}
-		for isspace(int(uint8(cb))) {
-			cb = *(b.PreInc(&bp))
+		for ascii.IsSpace(b[bp]) {
+			bp++
 		}
 
 		/* process run of digits */
-
-		if isdigit(int(uint8(ca))) && isdigit(int(uint8(cb))) {
-			fractional = ca == '0' || cb == '0'
-			if fractional != 0 {
-				result = CompareLeft(&ap, aend, &bp, bend)
+		if ascii.IsDigit(a[ap]) && ascii.IsDigit(b[bp]) {
+			var result int
+			if a[ap] == '0' || b[bp] == '0' {
+				result, ap, bp = compareLeft(a, ap, b, bp)
 			} else {
-				result = CompareRight(&ap, aend, &bp, bend)
+				result, ap, bp = compareRight(a, ap, b, bp)
 			}
 			if result != 0 {
 				return result
-			} else if ap == aend && bp == bend {
-
+			} else if ap == len(a) && bp == len(b) {
 				/* End of the strings. Let caller sort them out. */
-
 				return 0
-			} else if ap == aend {
+			} else if ap == len(a) {
 				return -1
-			} else if bp == bend {
+			} else if bp == len(b) {
 				return 1
-			} else {
-
-				/* Keep on comparing from the current point. */
-
-				ca = *ap
-				cb = *bp
 			}
 		}
-		if fold_case != 0 {
-			ca = toupper(int(uint8(ca)))
-			cb = toupper(int(uint8(cb)))
+
+		//
+		ac := a[ap]
+		bc := b[bp]
+		if foldCase {
+			ac = ascii.ToLower(ac)
+			bc = ascii.ToLower(bc)
 		}
-		if ca < cb {
+		if ac < bc {
 			return -1
-		} else if ca > cb {
-			return +1
+		} else if ac > bc {
+			return 1
 		}
 		ap++
 		bp++
-		if ap >= aend && bp >= bend {
-
-			/* The strings compare the same.  Perhaps the caller
-			   will want to call strcmp to break the tie. */
-
+		if ap == len(a) && bp == len(b) {
 			return 0
-		} else if ap >= aend {
+		} else if ap == len(a) {
 			return -1
-		} else if bp >= bend {
+		} else if bp == len(b) {
 			return 1
 		}
 	}
