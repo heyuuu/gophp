@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -383,13 +384,13 @@ func PhpStreamUrlWrapHttpEx(
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
 
 			if tmpstr.GetS() != nil {
-				tmp = types.NewString(PhpTrimAll(tmpstr.GetStr(), nil))
+				tmp = types.NewString(str.PhpTrimAll(tmpstr.GetStr(), nil))
 				tmpstr.Free()
 			}
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
 		} else if tmpzval.IsType(types.IS_STRING) && tmpzval.GetStr().GetLen() != 0 {
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
-			tmp = types.NewString(PhpTrimAll(tmpzval.GetStrVal(), nil))
+			tmp = types.NewString(str.PhpTrimAll(tmpzval.GetStrVal(), nil))
 		}
 		if tmp != nil && tmp.GetLen() != 0 {
 			var s *byte
@@ -402,7 +403,7 @@ func PhpStreamUrlWrapHttpEx(
 
 			/* Make lowercase for easy comparison against 'standard' headers */
 
-			PhpStrtolower(tmp.GetVal(), tmp.GetLen())
+			str.PhpStrtolower(tmp.GetVal(), tmp.GetLen())
 			t = tmp.GetVal()
 			if header_init == 0 {
 

@@ -2,6 +2,7 @@ package standard
 
 import (
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -10,7 +11,7 @@ import (
  * PhpBasicGlobals
  */
 type PhpBasicGlobals struct {
-	strTokState strTokState
+	strTokState str.StrTokState
 
 	user_shutdown_function_names *types.Array
 	putenv_ht                    types.Array
@@ -69,6 +70,10 @@ func (this *PhpBasicGlobals) GetUrlAdaptSessionHostsHt() types.Array {
 func (this *PhpBasicGlobals) GetUrlAdaptOutputEx() UrlAdaptStateExT { return this.url_adapt_output_ex }
 func (this *PhpBasicGlobals) GetUrlAdaptOutputHostsHt() types.Array {
 	return this.url_adapt_output_hosts_ht
+}
+
+func (this *PhpBasicGlobals) GetStrTokState() *str.StrTokState {
+	return &this.strTokState
 }
 
 /**

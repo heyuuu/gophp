@@ -2,7 +2,7 @@ package core
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -550,7 +550,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	if boundary == nil {
 		var content_type_len int = int(strlen(content_type_dup))
 		var content_type_lcase *byte = zend.Estrndup(content_type_dup, content_type_len)
-		standard.PhpStrtolower(content_type_lcase, content_type_len)
+		str.PhpStrtolower(content_type_lcase, content_type_len)
 		boundary = strstr(content_type_lcase, "boundary")
 		if boundary != nil {
 			boundary = content_type_dup + (boundary - content_type_lcase)

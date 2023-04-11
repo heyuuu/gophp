@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -110,7 +111,7 @@ func ZifStreamSocketClient(executeData zpp.Ex, return_value zpp.Ret, remoteaddre
 
 		/* host might contain binary characters */
 
-		var quoted_host *types.String = types.NewString(PhpAddslashes(host.GetStr()))
+		var quoted_host *types.String = types.NewString(str.PhpAddslashes(host.GetStr()))
 		core.PhpErrorDocref(nil, faults.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 		// types.ZendStringReleaseEx(quoted_host, 0)
 	}

@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/globals"
@@ -88,7 +89,7 @@ func PhpInfoPrintModule(zend_module *zend.ModuleEntry) {
 	if zend_module.GetInfoFunc() != nil {
 		if core.SM__().GetPhpinfoAsText() == 0 {
 			var url_name *types.String = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
-			PhpStrtolower(url_name.GetVal(), url_name.GetLen())
+			str.PhpStrtolower(url_name.GetVal(), url_name.GetLen())
 			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", url_name.GetVal(), zend_module.GetName())
 			zend.Efree(url_name)
 		} else {

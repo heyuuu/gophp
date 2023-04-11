@@ -1,8 +1,9 @@
-package standard
+package str
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -87,19 +88,19 @@ func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter *st
 		if *escape != "" {
 			esc = (*escape)[0]
 		} else {
-			esc = PHP_CSV_NO_ESCAPE
+			esc = standard.PHP_CSV_NO_ESCAPE
 		}
 	}
 
-	PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
+	standard.PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
 
 func ZifSscanf(str string, format string, vars []zpp.RefZval) *types.Zval {
 	var args *types.Zval = nil
 	var result int
 	var num_args int = 0
-	result = PhpSscanfInternal(str, format, num_args, args, 0, return_value)
-	if SCAN_ERROR_WRONG_PARAM_COUNT == result {
+	result = standard.PhpSscanfInternal(str, format, num_args, args, 0, return_value)
+	if standard.SCAN_ERROR_WRONG_PARAM_COUNT == result {
 		zend.ZendWrongParamCount()
 		return
 	}
@@ -122,7 +123,7 @@ func ZifUtf8Decode(data string) string {
 	var buf strings.Builder
 	for pos < len(data) {
 		var status int = types.FAILURE
-		c := PhpNextUtf8Char((*uint8)(data), len(data), &pos, &status)
+		c := standard.PhpNextUtf8Char((*uint8)(data), len(data), &pos, &status)
 
 		/* The lower 256 codepoints of Unicode are identical to Latin-1,
 		 * so we don't need to do any mapping here beyond replacing non-Latin-1

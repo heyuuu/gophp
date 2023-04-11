@@ -1,4 +1,4 @@
-package standard
+package str
 
 import (
 	"encoding/hex"
@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -510,20 +511,20 @@ func PhpImplode(glue string, pieces *types.Array) string {
 	return strings.Join(parts, glue)
 }
 
-type strTokState struct {
+type StrTokState struct {
 	str string
 }
 
 func ZifStrtok(str string, _ zpp.Opt, token_ *string) (string, bool) {
 	// todo 改为 state 参数传入
-	var state *strTokState = &BG__().strTokState
+	var state *StrTokState = standard.BG__().GetStrTokState()
 
 	// 两种参数形式
 	// - strtok(string $string, string $token): string|false
 	// - strtok(string $token): string|false
 	var token string
 	if token_ != nil {
-		*state = strTokState{
+		*state = StrTokState{
 			str: str,
 		}
 		token = *token_

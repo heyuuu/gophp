@@ -1,4 +1,4 @@
-package standard
+package str
 
 import (
 	"github.com/heyuuu/gophp/zend/def"

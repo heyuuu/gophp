@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -625,7 +626,7 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if core.PhpStreamGetLine(innerstream, ent.GetDName(), b.SizeOf("ent -> d_name"), &tmp_len) == nil {
 		return -1
 	}
-	basename = PhpBasenameZStr(b.CastStr(ent.GetDName(), tmp_len), "")
+	basename = str.PhpBasenameZStr(b.CastStr(ent.GetDName(), tmp_len), "")
 	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), basename.GetLen()-1)
 	memcpy(ent.GetDName(), basename.GetVal(), tmp_len)
 	ent.GetDName()[tmp_len-1] = '0'

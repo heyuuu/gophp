@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -22,7 +23,7 @@ func StrfilterRot13Filter(
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
-		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Rot13From, Rot13To)
+		str.PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Rot13From, Rot13To)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
@@ -46,7 +47,7 @@ func StrfilterToupperFilter(
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
-		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Lowercase, Uppercase)
+		str.PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Lowercase, Uppercase)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
@@ -67,7 +68,7 @@ func StrfilterTolowerFilter(
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
-		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Uppercase, Lowercase)
+		str.PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Uppercase, Lowercase)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
@@ -116,7 +117,7 @@ func StrfilterStripTagsFilter(
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
 		consumed = bucket.GetBuflen()
 
-		result, state := PhpStripTags(b.CastStr(bucket.GetBuf(), bucket.GetBuflen()), inst.GetState(), b.CastStr(inst.GetAllowedTags(), inst.GetAllowedTagsLen()))
+		result, state := str.PhpStripTags(b.CastStr(bucket.GetBuf(), bucket.GetBuflen()), inst.GetState(), b.CastStr(inst.GetAllowedTags(), inst.GetAllowedTagsLen()))
 		inst.SetState(state)
 		bucket.SetBuf_([]byte(result))
 

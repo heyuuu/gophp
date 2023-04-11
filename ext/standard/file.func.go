@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -288,7 +289,7 @@ func ZifGetMetaTags(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zv
 
 				/* For BC */
 
-				PhpStrtolower(name, strlen(name))
+				str.PhpStrtolower(name, strlen(name))
 				if have_content != 0 {
 					zend.AddAssocString(return_value, name, value)
 				} else {
@@ -651,7 +652,7 @@ func ZifTempnam(executeData zpp.Ex, return_value zpp.Ret, dir *types.Zval, prefi
 		}
 		break
 	}
-	p = PhpBasenameZStr(b.CastStr(prefix, prefix_len), "")
+	p = str.PhpBasenameZStr(b.CastStr(prefix, prefix_len), "")
 	if p.GetLen() > 64 {
 		p.GetVal()[63] = '0'
 	}
@@ -933,7 +934,7 @@ func ZifFgetss(fp *types.Zval, _ zpp.Opt, length *int, allowableTags string) (st
 		return "", false
 	}
 
-	result, state := PhpStripTags(b.CastStr(retval, actual_len), stream.GetFgetssState(), allowableTags)
+	result, state := str.PhpStripTags(b.CastStr(retval, actual_len), stream.GetFgetssState(), allowableTags)
 	stream.SetFgetssState(state)
 	return result, true
 }

@@ -5,6 +5,7 @@ import (
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
@@ -666,7 +667,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		for b.Assign(&p, strchr(docref_buf, '_')) != nil {
 			*p = '-'
 		}
-		docref = standard.PhpStrtolower(docref_buf, doclen)
+		docref = str.PhpStrtolower(docref_buf, doclen)
 	}
 
 	/* we have a docref for a function AND

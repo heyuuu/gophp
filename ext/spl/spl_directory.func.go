@@ -6,6 +6,7 @@ import (
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -765,7 +766,7 @@ func zim_spl_SplFileInfo_getExtension(executeData *zend.ZendExecuteData, return_
 		fname = intern.GetFileName()
 		flen = intern.GetFileNameLen()
 	}
-	ret = standard.PhpBasenameZStr(b.CastStr(fname, flen), "")
+	ret = str.PhpBasenameZStr(b.CastStr(fname, flen), "")
 	p = zend.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
 	if p != nil {
 		idx = p - ret.GetVal()
@@ -786,7 +787,7 @@ func zim_spl_DirectoryIterator_getExtension(executeData *zend.ZendExecuteData, r
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	fname = standard.PhpBasenameZStr(intern.GetEntry().GetDName(), "")
+	fname = str.PhpBasenameZStr(intern.GetEntry().GetDName(), "")
 	p = zend.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
 	if p != nil {
 		idx = p - fname.GetVal()
@@ -816,7 +817,7 @@ func zim_spl_SplFileInfo_getBasename(executeData *zend.ZendExecuteData, return_v
 		fname = intern.GetFileName()
 		flen = intern.GetFileNameLen()
 	}
-	return_value.SetString(standard.PhpBasenameZStr(b.CastStr(fname, flen), b.CastStr(suffix, slen)))
+	return_value.SetString(str.PhpBasenameZStr(b.CastStr(fname, flen), b.CastStr(suffix, slen)))
 	return
 }
 func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -827,7 +828,7 @@ func zim_spl_DirectoryIterator_getBasename(executeData *zend.ZendExecuteData, re
 	if zend.ZendParseParameters(executeData.NumArgs(), "|s", &suffix, &slen) == types.FAILURE {
 		return
 	}
-	fname = standard.PhpBasenameZStr(intern.GetEntry().GetDName(), b.CastStr(suffix, slen))
+	fname = str.PhpBasenameZStr(intern.GetEntry().GetDName(), b.CastStr(suffix, slen))
 	return_value.SetString(fname)
 }
 func zim_spl_SplFileInfo_getPathname(executeData *zend.ZendExecuteData, return_value *types.Zval) {

@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -326,7 +327,7 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Stri
 		buf.AppendLong(zend.ZendLong(index))
 		buf.AppendString(" => ")
 	} else {
-		var ckey *types.String = types.NewString(PhpAddcslashes(key.GetStr(), "'\\"))
+		var ckey *types.String = types.NewString(str.PhpAddcslashes(key.GetStr(), "'\\"))
 		tmp_str := strings.ReplaceAll(ckey.GetStr(), "0", "' . \"\\0\" . '")
 		BufferAppendSpaces(buf, level+1)
 		buf.AppendByte('\'')
@@ -344,7 +345,7 @@ func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Str
 	if key != nil {
 		_, propName, _ := zend.ZendUnmanglePropertyName_Ex(key.GetStr())
 
-		propNameEscaped := PhpAddcslashes(propName, "'\\")
+		propNameEscaped := str.PhpAddcslashes(propName, "'\\")
 		buf.AppendByte('\'')
 		buf.AppendString(propNameEscaped)
 		buf.AppendByte('\'')
@@ -396,7 +397,7 @@ again:
 			buf.AppendString(".0")
 		}
 	case types.IS_STRING:
-		ztmp := PhpAddcslashes(struc.GetStrVal(), "'\\")
+		ztmp := str.PhpAddcslashes(struc.GetStrVal(), "'\\")
 		ztmp2 := strings.ReplaceAll(ztmp, "0", "' . \"\\0\" . '")
 		buf.AppendByte('\'')
 		buf.AppendString(ztmp2)

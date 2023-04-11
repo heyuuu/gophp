@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -117,7 +118,7 @@ func ZmStartupBasic(type_ int, module_number int) int {
 	zend.RegisterLongConstant("PHP_ROUND_HALF_ODD", PHP_ROUND_HALF_ODD, zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	RegisterPhpinfoConstants(type_, module_number)
 	RegisterHtmlConstants(type_, module_number)
-	RegisterStringConstants(type_, module_number)
+	str.RegisterStringConstants(type_, module_number)
 	if ZmStartupVar(type_, module_number) != types.SUCCESS {
 		return types.FAILURE
 	}

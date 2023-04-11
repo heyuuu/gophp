@@ -3,6 +3,7 @@ package standard
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -174,7 +175,7 @@ func PhpArrayReverseKeyCompareString(a *types.Bucket, b *types.Bucket) int {
 func PhpArrayKeyCompareStringNaturalGeneral(p1 *types.Bucket, p2 *types.Bucket, fold_case int) int {
 	str1 := _bucketKeyToString(p1)
 	str2 := _bucketKeyToString(p2)
-	return Strnatcmp(str1, str2, fold_case != 0)
+	return str.Strnatcmp(str1, str2, fold_case != 0)
 }
 func PhpArrayKeyCompareStringNaturalCase(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringNaturalGeneral(a, b, 1)
@@ -274,7 +275,7 @@ func PhpArrayNaturalGeneralCompare(p1 *types.Bucket, p2 *types.Bucket, fold_case
 	var tmp_str2 *types.String
 	var str1 = zend.ZvalGetTmpString(p1.GetVal(), &tmp_str1)
 	var str2 = zend.ZvalGetTmpString(p2.GetVal(), &tmp_str2)
-	var result = Strnatcmp(str1.GetStr(), str2.GetStr(), fold_case)
+	var result = str.Strnatcmp(str1.GetStr(), str2.GetStr(), fold_case)
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
 	return result
@@ -4386,9 +4387,9 @@ func ZifArrayChangeKeyCase(executeData zpp.Ex, return_value zpp.Ret, input *type
 			entry = return_value.GetArr().IndexUpdate(num_key, entry)
 		} else {
 			if change_to_upper != 0 {
-				new_key = PhpStringToupper(string_key)
+				new_key = str.PhpStringToupper(string_key)
 			} else {
-				new_key = PhpStringTolower(string_key)
+				new_key = str.PhpStringTolower(string_key)
 			}
 			entry = return_value.GetArr().KeyUpdate(new_key.GetStr(), entry)
 			// types.ZendStringReleaseEx(new_key, 0)

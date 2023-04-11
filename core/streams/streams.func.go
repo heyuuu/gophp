@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
@@ -354,7 +355,7 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 	if protocol != nil {
 		if nil == b.Assign(&wrapper, types.ZendHashStrFindPtr(wrapper_hash, b.CastStr(protocol, n))) {
 			var tmp *byte = zend.Estrndup(protocol, n)
-			standard.PhpStrtolower(tmp, n)
+			str.PhpStrtolower(tmp, n)
 			if nil == b.Assign(&wrapper, types.ZendHashStrFindPtr(wrapper_hash, b.CastStr(tmp, n))) {
 				var wrapper_name []byte
 				if n >= b.SizeOf("wrapper_name") {

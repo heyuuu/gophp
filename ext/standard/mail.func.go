@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
+	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
@@ -265,7 +266,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 		case types.IS_STRING:
 			tmp_headers = types.NewString(headers.GetStr().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
-			str_headers = types.NewString(PhpTrimRight(tmp_headers.GetStr(), nil))
+			str_headers = types.NewString(str.PhpTrimRight(tmp_headers.GetStr(), nil))
 			// types.ZendStringReleaseEx(tmp_headers, 0)
 		case types.IS_ARRAY:
 			str_headers = PhpMailBuildHeaders(headers)
@@ -450,7 +451,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 	if core.PG__().mail_x_header {
 		var tmp *byte = zend.ZendGetExecutedFilename()
 		var f *types.String
-		f = PhpBasenameZStr(tmp, "")
+		f = str.PhpBasenameZStr(tmp, "")
 		if headers != nil && (*headers) {
 			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s\n%s", PhpGetuid(), f.GetVal(), headers)
 		} else {
