@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func PhpArrayElementDump(zv *types.Zval, key types.ArrayKey, level int) {
@@ -325,12 +326,11 @@ func PhpArrayElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Stri
 		buf.AppendLong(zend.ZendLong(index))
 		buf.AppendString(" => ")
 	} else {
-		var tmp_str *types.String
 		var ckey *types.String = types.NewString(PhpAddcslashes(key.GetStr(), "'\\"))
-		tmp_str = PhpStrToStr(ckey.GetVal(), ckey.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
+		tmp_str := strings.ReplaceAll(ckey.GetStr(), "0", "' . \"\\0\" . '")
 		BufferAppendSpaces(buf, level+1)
 		buf.AppendByte('\'')
-		buf.AppendString(tmp_str.GetStr())
+		buf.AppendString(tmp_str)
 		buf.AppendString("' => ")
 		//types.ZendStringFree(ckey)
 		//types.ZendStringFree(tmp_str)
@@ -359,8 +359,6 @@ func PhpObjectElementExport(zv *types.Zval, index zend.ZendUlong, key *types.Str
 func PhpVarExportEx(struc *types.Zval, level int, buf *zend.SmartStr) {
 	var myht *types.Array
 	var tmp_str []byte
-	var ztmp *types.String
-	var ztmp2 *types.String
 	var index zend.ZendUlong
 	var key *types.String
 	var val *types.Zval
@@ -398,10 +396,10 @@ again:
 			buf.AppendString(".0")
 		}
 	case types.IS_STRING:
-		ztmp = types.NewString(PhpAddcslashes(struc.GetStrVal(), "'\\"))
-		ztmp2 = PhpStrToStr(ztmp.GetVal(), ztmp.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
+		ztmp := PhpAddcslashes(struc.GetStrVal(), "'\\")
+		ztmp2 := strings.ReplaceAll(ztmp, "0", "' . \"\\0\" . '")
 		buf.AppendByte('\'')
-		buf.AppendString(ztmp2.GetStr())
+		buf.AppendString(ztmp2)
 		buf.AppendByte('\'')
 		//types.ZendStringFree(ztmp)
 		//types.ZendStringFree(ztmp2)

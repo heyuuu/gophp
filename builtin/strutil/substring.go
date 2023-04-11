@@ -29,3 +29,31 @@ func LastBeforeByte(str string, c byte) (string, bool) {
 	}
 	return "", false
 }
+
+func MapByte(mapping func(b byte) byte, s string) string {
+	if s == "" {
+		return s
+	}
+
+	var b strings.Builder
+	var changed = false
+	for i, c := range []byte(s) {
+		r := mapping(c)
+		if !changed {
+			if r == c {
+				continue
+			}
+			changed = true
+			b.WriteString(s[:i])
+			b.WriteByte(c)
+		} else {
+			b.WriteByte(c)
+		}
+	}
+
+	if changed {
+		return b.String()
+	} else {
+		return s
+	}
+}

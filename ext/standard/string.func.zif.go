@@ -5,19 +5,6 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-// generate by ZifStrtr
-var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 2, 3, 0)
-	str := fp.ParseZval()
-	from := fp.ParseZval()
-	fp.StartOptional()
-	to := fp.ParseZval()
-	if fp.HasError() {
-		return
-	}
-	ZifStrtr(executeData, returnValue, str, from, nil, to)
-})
-
 // generate by ZifStrrev
 var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)

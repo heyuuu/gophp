@@ -50,13 +50,13 @@ func (ht *Array) recalcElements() int {
 	return num
 }
 
-func (ht *Array) First() *Zval {
+func (ht *Array) First() (key ArrayKey, val *Zval) {
 	for _, p := range ht.data {
 		if p.IsValid() {
-			p.GetVal()
+			return p.GetArrayKey(), p.GetVal()
 		}
 	}
-	return nil
+	return
 }
 
 /**
@@ -471,6 +471,10 @@ func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval))
 		}
 		handler(p.GetArrayKey(), data)
 	}
+}
+
+func (ht *Array) Iterator() *ArrayIterator {
+	return &ArrayIterator{arr: ht, pos: 0}
 }
 
 // todo 逐渐替换为 Foreach 或其他更高效代码

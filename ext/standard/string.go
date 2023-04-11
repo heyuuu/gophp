@@ -5,11 +5,13 @@ import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strconv"
 	"strings"
 )
 
@@ -894,7 +896,7 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 	//
 	var replStr string
 	if replace.IsArray() {
-		replZval := replace.GetArr().First()
+		_, replZval := replace.GetArr().First()
 		if replZval != nil {
 			replStr = zend.ZvalGetStrVal(replZval)
 		} else {
@@ -1071,4 +1073,252 @@ func ZifUcwords(str string, _ zpp.Opt, delimiters *string) string {
 		}
 	}
 	return string(chars)
+}
+
+func phpStrtrEx(str string, from string, to string) string {
+	l := b.Min(len(from), len(to))
+	if len(from) == 0 {
+		return str
+	}
+
+	runeMap := make(map[byte]byte)
+	for i := 0; i < l; i++ {
+		runeMap[from[i]] = to[i]
+	}
+	return strutil.MapByte(func(b byte) byte {
+		if r, ok := runeMap[b]; ok {
+			return r
+		}
+		return b
+	}, str)
+}
+func phpStrtrArray(str string, pats *types.Array) (string, bool) {
+	// 扫描替换数组
+	var minLen int = 128 * 1024        // 最长扫描字符串长度
+	var maxLen int = 0                 // 最短扫描字符串长度
+	numBitset := b.NewBitset(len(str)) // 标记是否有对应长度的扫描字符串
+	bitset := ascii.NewAsciiSet()      // 标记是否有对应字符开头的扫描字符串
+
+	var strMap = make(map[string]*types.Zval, pats.Len())
+	pats.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		var strKey string
+		if !key.IsStrKey() {
+			strKey = strconv.Itoa(key.IndexKey())
+		} else {
+			strKey = key.StrKey()
+		}
+
+		/* skip long patterns */
+		if len(strKey) > len(str) {
+			return
+		}
+
+		maxLen = b.Max(maxLen, len(strKey))
+		minLen = b.Min(minLen, len(strKey))
+
+		/* remember possible key length */
+		numBitset.Mark(len(strKey))
+		bitset.Mark(strKey[0])
+
+		strMap[strKey] = value
+	})
+
+	// 特殊case, key 为空字符串时，直接返回false (此行为在PHP8中有所不同)
+	if _, ok := strMap[""]; ok {
+		return "", false
+	}
+
+	if len(strMap) == 0 {
+		/* return the original string */
+		return str, true
+	}
+
+	oldPos := 0
+	var result strings.Builder
+	for pos := 0; pos <= len(str)-minLen; pos++ {
+		if !bitset.Contains(str[pos]) {
+			continue
+		}
+
+		for len_ := b.Min(maxLen, len(str)-pos); len_ >= minLen; len_-- {
+			if numBitset.Marked(len_) {
+				continue
+			}
+
+			search := str[pos : pos+len_]
+			replaceZval, ok := strMap[search]
+			if !ok {
+				continue
+			}
+
+			replaceStr := zend.ZvalGetStrVal(replaceZval)
+			result.WriteString(str[oldPos:pos])
+			result.WriteString(replaceStr)
+			oldPos = pos + len_
+			pos = oldPos - 1
+			break
+		}
+	}
+	if oldPos != 0 {
+		result.WriteString(str[oldPos:])
+		return result.String(), true
+	} else {
+		return str, true
+	}
+}
+
+func PhpCharToStr(str string, from byte, to string, caseSensitivity bool) (string, int) {
+	// 预计算替换个数
+	var count int
+	if caseSensitivity || !ascii.IsAscii(from) {
+		count = strings.Count(str, string(from))
+	} else {
+		count = strings.Count(str, string(ascii.ToUpper(from))) + strings.Count(str, string(ascii.ToLower(from)))
+	}
+	if count == 0 {
+		return str, 0
+	}
+
+	// 替换
+	var result string
+	if caseSensitivity || !ascii.IsAscii(from) {
+		result = strings.ReplaceAll(str, string(from), to)
+	} else {
+		replacer := strings.NewReplacer(
+			string(ascii.ToUpper(from)), to,
+			string(ascii.ToLower(from)), to,
+		)
+		result = replacer.Replace(str)
+	}
+
+	return result, count
+}
+
+func PhpCharToStrEx(str *types.String, from byte, to *byte, toLen int, caseSensitivity int, replaceCount *zend.ZendLong) *types.String {
+	result, count := PhpCharToStr(str.GetStr(), from, b.CastStr(to, toLen), caseSensitivity != 0)
+	if replaceCount != nil {
+		*replaceCount = count
+	}
+	return types.NewString(result)
+}
+
+func PhpStrToStrEx_Ex(haystack string, needle string, str string) (string, int) {
+	if len(needle) > len(haystack) {
+		return haystack, 0
+	} else if needle == haystack {
+		return str, 1
+	}
+
+	count := strings.Count(haystack, needle)
+	result := strings.ReplaceAll(haystack, needle, str)
+	return result, count
+}
+
+func PhpStrToStrEx(
+	haystack *types.String,
+	needle *byte,
+	needle_len int,
+	str *byte,
+	str_len int,
+	replace_count *zend.ZendLong,
+) *types.String {
+	result, count := PhpStrToStrEx_Ex(haystack.GetStr(), b.CastStr(needle, needle_len), b.CastStr(str, str_len))
+	if replace_count != nil {
+		*replace_count += count
+	}
+	return types.NewString(result)
+}
+func PhpStrToStrIEx_Ex(haystack string, lcHaystack string, needle string, str string) (string, int) {
+	b.Assert(len(needle) != 0)
+
+	if len(needle) > len(haystack) {
+		return haystack, 0
+	}
+
+	lcNeedle := ascii.StrToLower(needle)
+	if lcHaystack == lcNeedle {
+		return str, 1
+	}
+
+	var buf strings.Builder
+	lastPos := 0
+	count := 0
+	for {
+		pos := strings.Index(lcHaystack[lastPos:], needle)
+		if pos < 0 {
+			break
+		}
+
+		buf.WriteString(haystack[lastPos : lastPos+pos])
+		buf.WriteString(str)
+		lastPos = lastPos + pos + len(needle)
+		count++
+	}
+	if count == 0 {
+		return haystack, 0
+	} else {
+		buf.WriteString(haystack[lastPos:])
+		return buf.String(), count
+	}
+}
+
+func PhpStrToStrIEx(
+	haystack *types.String,
+	lc_haystack *byte,
+	needle *types.String,
+	str *byte,
+	str_len int,
+	replace_count *zend.ZendLong,
+) *types.String {
+	result, count := PhpStrToStrIEx_Ex(haystack.GetStr(), b.CastStrAuto(lc_haystack), needle.GetStr(), b.CastStr(str, str_len))
+	if replace_count != nil {
+		*replace_count += count
+	}
+	return types.NewString(result)
+}
+
+func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, bool) {
+	// 支持两种参数形式:
+	// - strtr(string, array)
+	// - strtr(string, string, string)
+	if to_ != nil && !from.IsArray() {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The second argument is not an array")
+		return "", false
+	}
+
+	/* shortcut for empty string */
+	if str == "" {
+		return "", true
+	}
+	if to_ == nil {
+		var pats *types.Array = from.GetArr()
+		switch pats.Len() {
+		case 0:
+			return str, true
+		case 1:
+			key, val := pats.First()
+
+			var strKey string
+			if !key.IsStrKey() {
+				strKey = strconv.Itoa(key.IndexKey())
+			} else {
+				strKey = key.StrKey()
+			}
+
+			if strKey == "" {
+				return str, true
+			}
+
+			replace := zend.ZvalGetStrVal(val)
+			return strings.ReplaceAll(str, strKey, replace), true
+		default:
+			return phpStrtrArray(str, pats)
+		}
+	} else {
+		if zend.TryConvertToString(from) == 0 {
+			// unreachable, 触发 fatal error
+			return "", false
+		}
+		return phpStrtrEx(str, from.GetStrVal(), *to_), true
+	}
 }

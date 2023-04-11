@@ -537,3 +537,21 @@ var DefZifUcwords = def.DefFunc("ucwords", 1, 2, []def.ArgInfo{{Name: "str"}, {N
 	ret := ZifUcwords(str, nil, delimiters)
 	returnValue.SetStringVal(ret)
 })
+
+// generate by ZifStrtr
+var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name: "from"}, {Name: "to_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 2, 3, 0)
+	str := fp.ParseStringVal()
+	from := fp.ParseZval()
+	fp.StartOptional()
+	to_ := fp.ParseStringValNullable()
+	if fp.HasError() {
+		return
+	}
+	ret, ok := ZifStrtr(str, from, nil, to_)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
+})

@@ -22,7 +22,7 @@ func StrfilterRot13Filter(
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
-		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Rot13From, Rot13To, 52)
+		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Rot13From, Rot13To)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
@@ -46,7 +46,7 @@ func StrfilterToupperFilter(
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
-		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Lowercase, Uppercase, 26)
+		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Lowercase, Uppercase)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
@@ -67,7 +67,7 @@ func StrfilterTolowerFilter(
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
-		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Uppercase, Lowercase, 26)
+		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Uppercase, Lowercase)
 		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
