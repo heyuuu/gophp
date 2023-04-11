@@ -12,6 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -441,7 +442,7 @@ func ZifWordwrap(str string, _ zpp.Opt, width *int, break_ *string, cut bool) (s
 	}
 }
 func ZifExplode(separator string, str string, _ zpp.Opt, limit_ *int) ([]string, bool) {
-	var limit = zend.ZEND_LONG_MAX
+	var limit = math.MaxInt32
 	if limit_ != nil {
 		limit = *limit_
 	}
@@ -609,35 +610,35 @@ func ZifDirname(path string, _ zpp.Opt, levels_ *int) string {
 func ZifPathinfo(path string, _ zpp.Opt, options *int) *types.Zval {
 	opt := b.Option(options, PHP_PATHINFO_ALL)
 
-	var tmp *types.Zval = types.NewZvalEmptyArray()
+	arr := types.NewArray(0)
 	if (opt & PHP_PATHINFO_DIRNAME) == PHP_PATHINFO_DIRNAME {
 		dirname := zend.ZendDirname(path)
 		if dirname != "" {
-			zend.AddAssocStr(tmp, "dirname", dirname)
+			arr.KeyUpdate("dirname", types.NewZvalString(dirname))
 		}
 	}
 
 	basename := PhpBasename(path, "")
 	if (opt & PHP_PATHINFO_BASENAME) == PHP_PATHINFO_BASENAME {
-		zend.AddAssocStr(tmp, "basename", basename)
+		arr.KeyUpdate("basename", types.NewZvalString(basename))
 	}
 	if (opt & PHP_PATHINFO_EXTENSION) == PHP_PATHINFO_EXTENSION {
 		if pos := strings.LastIndexByte(basename, '.'); pos >= 0 {
-			zend.AddAssocStr(tmp, "extension", basename[pos+1:])
+			arr.KeyUpdate("extension", types.NewZvalString(basename[pos+1:]))
 		}
 	}
 	if (opt & PHP_PATHINFO_FILENAME) == PHP_PATHINFO_FILENAME {
 		if pos := strings.LastIndexByte(basename, '.'); pos >= 0 {
-			zend.AddAssocStr(tmp, "filename", basename[:pos])
+			arr.KeyUpdate("filename", types.NewZvalString(basename[:pos]))
 		} else {
-			zend.AddAssocStr(tmp, "filename", basename)
+			arr.KeyUpdate("filename", types.NewZvalString(basename))
 		}
 	}
 
 	if opt == PHP_PATHINFO_ALL {
-		return tmp
+		return types.NewZvalArray(arr)
 	} else {
-		var element *types.Zval = types.ZendHashGetCurrentData(tmp.GetArr())
+		_, element := arr.First()
 		if element != nil {
 			return element
 		} else {
