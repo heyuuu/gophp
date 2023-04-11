@@ -26,6 +26,10 @@ func IsDigit(c byte) bool {
 	return '0' <= c && c <= '9'
 }
 
+func IsXDigit(c byte) bool {
+	return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F')
+}
+
 func ToUpper(c byte) byte {
 	if 'a' <= c && c <= 'z' {
 		return c - 'a' + 'A'

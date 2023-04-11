@@ -93,9 +93,6 @@ func PhpAddslashes(str string) string {
 	if str == "" {
 		return ""
 	}
-	if pos := strings.IndexByte(str, '\\'); pos < 0 {
-		return str
-	}
 	replacer := strings.NewReplacer(
 		"\\000", "\\0",
 		`'`, `\'`,
@@ -106,6 +103,13 @@ func PhpAddslashes(str string) string {
 }
 
 func PhpAddcslashes(str string, what string) string {
+	if str == "" {
+		return ""
+	}
+	if what == "" {
+		return str
+	}
+
 	mask, _ := PhpCharmaskEx(what)
 
 	strings.NewReplacer()
@@ -140,6 +144,86 @@ func PhpAddcslashes(str string, what string) string {
 		buf.WriteByte(c)
 	}
 
+	return buf.String()
+}
+
+func PhpStripslashes(str string) string {
+	if str == "" {
+		return ""
+	}
+	replacer := strings.NewReplacer(
+		"\\0", "\\000",
+		`\'`, `'`,
+		`\"`, `"`,
+		`\\`, `\`,
+	)
+	return replacer.Replace(str)
+}
+
+func PhpStripcslashes(str string) string {
+	if pos := strings.IndexByte(str, '\\'); pos < 0 {
+		return str
+	}
+
+	var buf strings.Builder
+	for i := 0; i < len(str); i++ {
+		if str[i] != '\\' || i+1 > len(str) {
+			buf.WriteByte(str[i])
+			continue
+		}
+
+		// 处理转义字符
+		i++
+		switch str[i] {
+		case 'n':
+			buf.WriteByte('\n')
+		case 'r':
+			buf.WriteByte('\r')
+		case 'a':
+			buf.WriteByte('\a')
+		case 't':
+			buf.WriteByte('\t')
+		case 'v':
+			buf.WriteByte('\v')
+		case 'b':
+			buf.WriteByte('\b')
+		case 'f':
+			buf.WriteByte('\f')
+		case '\\':
+			buf.WriteByte('\\')
+		case 'x':
+			// try \x[0-9a-fA-F]{1,2}
+			hexSize := 0
+			for hexSize < 2 && i+hexSize+1 < len(str) && ascii.IsXDigit(str[i+hexSize+1]) {
+				hexSize++
+			}
+			if hexSize > 0 {
+				hexNum, _ := strconv.ParseInt(str[i+1:i+hexSize+1], 16, 0)
+				buf.WriteByte(byte(hexNum))
+				i += hexSize
+				break
+			}
+
+			// fallback
+			buf.WriteString("\\x")
+		default:
+			// try \[0-7]{1,3}
+			octSize := 0
+			for octSize < 3 && i+octSize+1 < len(str) && '0' <= str[i+octSize+1] && str[i+octSize+1] <= '7' {
+				octSize++
+			}
+			if octSize > 0 {
+				hexNum, _ := strconv.ParseInt(str[i+1:i+octSize+1], 8, 0)
+				buf.WriteByte(byte(hexNum))
+				i += octSize
+				break
+			}
+
+			// fallback
+			buf.WriteByte('\\')
+			buf.WriteByte(str[i])
+		}
+	}
 	return buf.String()
 }
 
@@ -1322,3 +1406,68 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 		return phpStrtrEx(str, from.GetStrVal(), *to_), true
 	}
 }
+
+func ZifStrrev(str string) string {
+	l := len(str)
+	result := make([]byte, l)
+	for i := 0; i < l; i++ {
+		result[i] = str[l-i-1]
+	}
+	return string(result)
+}
+
+func phpSimilarStr(txt1 string, txt2 string) (max int, count int, pos1 int, pos2 int) {
+	for i := range []byte(txt1) {
+		for j := range []byte(txt2) {
+			l := 0
+			for l < len(txt1) && l < len(txt2) && txt1[l] == txt2[l] {
+				l++
+			}
+			if l > max {
+				max = l
+				count++
+				pos1 = i
+				pos2 = j
+			}
+		}
+	}
+	return
+}
+
+func phpSimilarChar(txt1 string, txt2 string) int {
+	max, count, pos1, pos2 := phpSimilarStr(txt1, txt2)
+	sum := max
+	if max != 0 {
+		if pos1 != 0 && pos2 != 0 && count > 1 {
+			sum += phpSimilarChar(txt1[:pos1], txt2[:pos2])
+		}
+		if pos1+max < len(txt1) && pos2+max < len(txt2) {
+			sum += phpSimilarChar(txt1[pos1+max:], txt2[pos2+max:])
+		}
+	}
+	return sum
+}
+
+// 计算两个字符串的相似度, O(n^3) 算法为: <Programming Classics: Implementing the World's Best Algorithms by Oliver> (ISBN 0-131-00413-1)
+func ZifSimilarText(str1 string, str2 string, _ zpp.Opt, percent zpp.RefZval) int {
+	// 特例
+	if str1 == "" && str2 == "" {
+		if percent != nil {
+			zend.ZEND_TRY_ASSIGN_REF_DOUBLE(percent, 0)
+		}
+		return 0
+	}
+
+	// 常规情况
+	sim := phpSimilarChar(str1, str2)
+	if percent != nil {
+		simFloat := float64(sim) * 200 / float64(len(str1)+len(str2))
+		zend.ZEND_TRY_ASSIGN_REF_DOUBLE(percent, simFloat)
+	}
+	return sim
+}
+
+func ZifAddslashes(str string) string                   { return PhpAddslashes(str) }
+func ZifAddcslashes(str string, charlist string) string { return PhpAddcslashes(str, charlist) }
+func ZifStripslashes(str string) string                 { return PhpStripslashes(str) }
+func ZifStripcslashes(str string) string                { return PhpStripcslashes(str) }

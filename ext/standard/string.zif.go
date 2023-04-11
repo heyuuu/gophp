@@ -555,3 +555,73 @@ var DefZifStrtr = def.DefFunc("strtr", 2, 3, []def.ArgInfo{{Name: "str"}, {Name:
 		returnValue.SetFalse()
 	}
 })
+
+// generate by ZifStrrev
+var DefZifStrrev = def.DefFunc("strrev", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifStrrev(str)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifSimilarText
+var DefZifSimilarText = def.DefFunc("similar_text", 2, 3, []def.ArgInfo{{Name: "str1"}, {Name: "str2"}, {Name: "percent"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 2, 3, 0)
+	str1 := fp.ParseStringVal()
+	str2 := fp.ParseStringVal()
+	fp.StartOptional()
+	percent := fp.ParseZvalEx(false, true)
+	if fp.HasError() {
+		return
+	}
+	ret := ZifSimilarText(str1, str2, nil, percent)
+	returnValue.SetLong(ret)
+})
+
+// generate by ZifAddslashes
+var DefZifAddslashes = def.DefFunc("addslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifAddslashes(str)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifAddcslashes
+var DefZifAddcslashes = def.DefFunc("addcslashes", 2, 2, []def.ArgInfo{{Name: "str"}, {Name: "charlist"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 2, 2, 0)
+	str := fp.ParseStringVal()
+	charlist := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifAddcslashes(str, charlist)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifStripslashes
+var DefZifStripslashes = def.DefFunc("stripslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifStripslashes(str)
+	returnValue.SetStringVal(ret)
+})
+
+// generate by ZifStripcslashes
+var DefZifStripcslashes = def.DefFunc("stripcslashes", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifStripcslashes(str)
+	returnValue.SetStringVal(ret)
+})
