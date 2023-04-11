@@ -61,18 +61,24 @@ func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf u
 	return bucket
 }
 func PhpStreamBucketMakeWriteable(bucket *PhpStreamBucket) *PhpStreamBucket {
-	var retval *PhpStreamBucket
 	PhpStreamBucketUnlink(bucket)
 	if bucket.GetRefcount() == 1 && bucket.GetOwnBuf() != 0 {
 		return bucket
 	}
-	retval = (*PhpStreamBucket)(zend.Pemalloc(b.SizeOf("php_stream_bucket"), bucket.GetIsPersistent()))
-	memcpy(retval, bucket, b.SizeOf("* retval"))
-	retval.SetBuf(zend.Pemalloc(retval.GetBuflen(), retval.GetIsPersistent()))
-	memcpy(retval.GetBuf(), bucket.GetBuf(), retval.GetBuflen())
-	retval.SetRefcount(1)
-	retval.SetOwnBuf(1)
+
+	var retval *PhpStreamBucket = &PhpStreamBucket{
+		next:          bucket.next,
+		prev:          bucket.prev,
+		brigade:       bucket.brigade,
+		buf_:          b.CopySlice(bucket.buf_),
+		buflen:        bucket.buflen,
+		own_buf:       1,
+		is_persistent: bucket.is_persistent,
+		refcount:      1,
+	}
+
 	PhpStreamBucketDelref(bucket)
+
 	return retval
 }
 func PhpStreamBucketDelref(bucket *PhpStreamBucket) {

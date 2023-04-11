@@ -115,7 +115,11 @@ func StrfilterStripTagsFilter(
 	for buckets_in.GetHead() != nil {
 		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
 		consumed = bucket.GetBuflen()
-		bucket.SetBuflen(PhpStripTags(bucket.GetBuf(), bucket.GetBuflen(), &(inst.GetState()), inst.GetAllowedTags(), inst.GetAllowedTagsLen()))
+
+		result, state := PhpStripTags(b.CastStr(bucket.GetBuf(), bucket.GetBuflen()), inst.GetState(), b.CastStr(inst.GetAllowedTags(), inst.GetAllowedTagsLen()))
+		inst.SetState(state)
+		bucket.SetBuf_([]byte(result))
+
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {

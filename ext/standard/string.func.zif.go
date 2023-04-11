@@ -16,7 +16,7 @@ var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "se
 	if fp.HasError() {
 		return
 	}
-	ZifStrReplace(executeData, returnValue, search, replace, subject, nil, replace_count)
+	ZifStrReplace(returnValue, search, replace, subject, nil)
 })
 
 // generate by ZifStrIreplace
@@ -30,7 +30,7 @@ var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifStrIreplace(executeData, returnValue, search, replace, subject, nil, replace_count)
+	ZifStrIreplace(returnValue, search, replace, subject, nil, replace_count)
 })
 
 // generate by ZifHebrev
@@ -42,7 +42,7 @@ var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{Name: "str"}, {Nam
 	if fp.HasError() {
 		return
 	}
-	ZifHebrev(executeData, returnValue, str, nil, max_chars_per_line)
+	ZifHebrev(str, nil, max_chars_per_line)
 })
 
 // generate by ZifHebrevc
@@ -66,7 +66,7 @@ var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name:
 	if fp.HasError() {
 		return
 	}
-	ZifNl2br(executeData, returnValue, str, nil, is_xhtml)
+	ZifNl2br(str, nil, is_xhtml)
 })
 
 // generate by ZifStripTags
@@ -78,7 +78,7 @@ var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"
 	if fp.HasError() {
 		return
 	}
-	ZifStripTags(executeData, returnValue, str, nil, allowable_tags)
+	ZifStripTags(str, nil, allowable_tags)
 })
 
 // generate by ZifParseStr
@@ -104,7 +104,7 @@ var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{Name: "stri
 	if fp.HasError() {
 		return
 	}
-	ZifStrGetcsv(executeData, returnValue, string, nil, delimiter, enclosure, escape)
+	ZifStrGetcsv(returnValue, string, nil, delimiter, enclosure, escape)
 })
 
 // generate by ZifStrRepeat
@@ -132,7 +132,7 @@ var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{Name: "in
 	if fp.HasError() {
 		return
 	}
-	ZifCountChars(executeData, returnValue, input, nil, mode)
+	ZifCountChars(input, nil, mode)
 })
 
 // generate by ZifStrnatcmp
@@ -154,7 +154,7 @@ var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{Name
 	if fp.HasError() {
 		return
 	}
-	ZifStrnatcasecmp(executeData, returnValue, s1, s2)
+	ZifStrnatcasecmp(s1, s2)
 })
 
 // generate by ZifSubstrCount
@@ -168,7 +168,7 @@ var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "
 	if fp.HasError() {
 		return
 	}
-	ZifSubstrCount(executeData, returnValue, haystack, needle, nil, offset, length)
+	ZifSubstrCount(haystack, needle, nil, offset, length)
 })
 
 // generate by ZifStrPad

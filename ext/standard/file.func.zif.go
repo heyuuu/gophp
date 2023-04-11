@@ -178,7 +178,7 @@ var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{Name: "fp"}, {Name
 	if fp.HasError() {
 		return
 	}
-	ZifFgetss(executeData, returnValue, fp, nil, length, allowable_tags)
+	ZifFgetss(fp, nil, length, allowable_tags)
 })
 
 // generate by ZifFwrite

@@ -1,5 +1,7 @@
 package standard
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func CompareRight(a **byte, aend *byte, b **byte, bend *byte) int {
 	var bias int = 0
 
@@ -51,8 +53,8 @@ func CompareLeft(a **byte, aend *byte, b **byte, bend *byte) int {
 	return 0
 }
 
-func StrnatcmpExEx(s1 string, s2 string, fold_case int) int {
-	return StrnatcmpEx()
+func Strnatcmp(s1 string, s2 string, fold_case bool) int {
+	return StrnatcmpEx(s1, s1, s2, s2, types.IntBool(fold_case))
 }
 func StrnatcmpEx(a *byte, a_len int, b *byte, b_len int, fold_case int) int {
 	var ca uint8

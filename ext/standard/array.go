@@ -174,7 +174,7 @@ func PhpArrayReverseKeyCompareString(a *types.Bucket, b *types.Bucket) int {
 func PhpArrayKeyCompareStringNaturalGeneral(p1 *types.Bucket, p2 *types.Bucket, fold_case int) int {
 	str1 := _bucketKeyToString(p1)
 	str2 := _bucketKeyToString(p2)
-	return StrnatcmpExEx(str1, str2, fold_case)
+	return Strnatcmp(str1, str2, fold_case != 0)
 }
 func PhpArrayKeyCompareStringNaturalCase(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayKeyCompareStringNaturalGeneral(a, b, 1)
@@ -274,7 +274,7 @@ func PhpArrayNaturalGeneralCompare(p1 *types.Bucket, p2 *types.Bucket, fold_case
 	var tmp_str2 *types.String
 	var str1 = zend.ZvalGetTmpString(p1.GetVal(), &tmp_str1)
 	var str2 = zend.ZvalGetTmpString(p2.GetVal(), &tmp_str2)
-	var result = StrnatcmpExEx(str1.GetStr(), str2.GetStr(), fold_case)
+	var result = Strnatcmp(str1.GetStr(), str2.GetStr(), fold_case)
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
 	return result

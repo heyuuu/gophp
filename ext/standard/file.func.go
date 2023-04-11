@@ -910,62 +910,32 @@ func ZifFgetc(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 		return
 	}
 }
-func ZifFgetss(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.Opt, length *types.Zval, allowableTags *types.Zval) {
-	var fd *types.Zval
-	var bytes zend.ZendLong = 0
+func ZifFgetss(fp *types.Zval, _ zpp.Opt, length *int, allowableTags string) (string, bool) {
 	var len_ int = 0
 	var actual_len int
-	var retval_len int
 	var buf *byte = nil
 	var retval *byte
 	var stream *core.PhpStream
-	var allowed_tags *byte = nil
-	var allowed_tags_len int = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			fd = fp.ParseResource()
-			fp.StartOptional()
-			bytes = fp.ParseLong()
-			allowed_tags, allowed_tags_len = fp.ParseString()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	PHP_STREAM_TO_ZVAL(stream, fd)
-	if executeData.NumArgs() >= 2 {
-		if bytes <= 0 {
+
+	PHP_STREAM_TO_ZVAL(stream, fp)
+	if length != nil {
+		if *length <= 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Length parameter must be greater than 0")
-			return_value.SetFalse()
-			return
+			return "", false
 		}
-		len_ = int(bytes)
+		len_ = *length
 		buf = zend.SafeEmalloc(b.SizeOf("char"), len_+1, 0)
 
-		/*needed because recv doesn't set null char at end*/
-
-		memset(buf, 0, len_+1)
-
-		/*needed because recv doesn't set null char at end*/
-
+		buf = make([]byte, len_+1)
 	}
-	if b.Assign(&retval, core.PhpStreamGetLine(stream, buf, len_, &actual_len)) == nil {
-		if buf != nil {
-			zend.Efree(buf)
-		}
-		return_value.SetFalse()
-		return
+	retval := core.PhpStreamGetLine(stream, buf, len_, &actual_len)
+	if retval == nil {
+		return "", false
 	}
-	retval_len = PhpStripTags(retval, actual_len, stream.GetFgetssState(), allowed_tags, allowed_tags_len)
 
-	// TODO: avoid reallocation ???
-
-	return_value.SetStringVal(b.CastStr(retval, retval_len))
-	zend.Efree(retval)
+	result, state := PhpStripTags(b.CastStr(retval, actual_len), stream.GetFgetssState(), allowableTags)
+	stream.SetFgetssState(state)
+	return result, true
 }
 func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var result int
@@ -1932,6 +1902,7 @@ func ZifFgetcsv(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, _ zpp.
 	}
 	PhpFgetcsv(stream, delimiter, enclosure, escape, buf_len, buf, return_value)
 }
+
 func PhpFgetcsv(
 	stream *core.PhpStream,
 	delimiter byte,

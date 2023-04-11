@@ -13,10 +13,16 @@ type PhpStreamBucket struct {
 	prev          **PhpStreamBucket
 	brigade       *PhpStreamBucketBrigade
 	buf           *byte
+	buf_          []byte
 	buflen        int
 	own_buf       uint8
 	is_persistent uint8
 	refcount      int
+}
+
+func (this *PhpStreamBucket) SetBuf_(value []byte) {
+	this.buf_ = value
+	this.buflen = len(value)
 }
 
 func (this *PhpStreamBucket) GetNext() *PhpStreamBucket                { return this.next }

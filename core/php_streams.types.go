@@ -301,6 +301,7 @@ func (this *PhpStream) SetExposed(value uint8)                        { this.__e
 func (this *PhpStream) GetFcloseStdiocast() uint8                     { return this.fclose_stdiocast }
 func (this *PhpStream) SetFcloseStdiocast(value uint8)                { this.fclose_stdiocast = value }
 func (this *PhpStream) GetFgetssState() uint8                         { return this.fgetss_state }
+func (this *PhpStream) SetFgetssState(state uint8)                    { this.fgetss_state = state }
 func (this *PhpStream) GetMode() []byte                               { return this.mode }
 func (this *PhpStream) GetFlags() uint32                              { return this.flags }
 func (this *PhpStream) SetFlags(value uint32)                         { this.flags = value }

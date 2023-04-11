@@ -30,6 +30,10 @@ func IsXDigit(c byte) bool {
 	return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F')
 }
 
+func IsSpace(c byte) bool {
+	return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r'
+}
+
 func ToUpper(c byte) byte {
 	if 'a' <= c && c <= 'z' {
 		return c - 'a' + 'A'

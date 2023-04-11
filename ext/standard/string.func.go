@@ -49,1061 +49,645 @@ func PhpStrtr(str *byte, len_ int, from string, to string) {
 	str *= newStr
 }
 
-func Isheb(c byte) int {
-	if uint8(c) >= 224 && uint8(c) <= 250 {
-		return 1
-	} else {
-		return 0
-	}
-}
-func _isblank(c byte) int {
-	if uint8(c) == ' ' || uint8(c) == '\t' {
-		return 1
-	} else {
-		return 0
-	}
-}
-func _isnewline(c byte) int {
-	if uint8(c) == '\n' || uint8(c) == '\r' {
-		return 1
-	} else {
-		return 0
-	}
-}
-func PhpStrReplaceInSubject(search *types.Zval, replace *types.Zval, subject *types.Zval, result *types.Zval, case_sensitivity int) zend.ZendLong {
-	var search_entry *types.Zval
-	var tmp_result *types.String
-	var tmp_subject_str *types.String
-	var replace_value *byte = nil
-	var replace_len int = 0
-	var replace_count zend.ZendLong = 0
-	var subject_str *types.String
-	var lc_subject_str *types.String = nil
-	var replace_idx uint32
-
-	/* Make sure we're dealing with strings. */
-
-	subject_str = zend.ZvalGetTmpString(subject, &tmp_subject_str)
-	if subject_str.GetLen() == 0 {
-		zend.ZendTmpStringRelease(tmp_subject_str)
-		result.SetStringVal("")
-		return 0
+func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, caseSensitivity bool) (string, int) {
+	if subject == "" {
+		return "", 0
 	}
 
-	/* If search is an array */
-
-	if search.IsType(types.IS_ARRAY) {
-
-		/* Duplicate subject string for repeated replacement */
-
-		//subject_str.AddRefcount()
-		if replace.IsType(types.IS_ARRAY) {
-			replace_idx = 0
+	if search.IsArray() {
+		var replaceStrings []string
+		var replaceStr string
+		if replace.IsArray() {
+			replaceStrings = make([]string, replace.GetArr().Len())
+			replace.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+				replaceStrings = append(replaceStrings, zend.ZvalGetStrVal(value))
+			})
 		} else {
-			/* Set replacement value to the passed one */
-			replace_value = replace.GetStr().GetVal()
-			replace_len = replace.GetStr().GetLen()
+			replaceStr = zend.ZvalGetStrVal(replace)
 		}
 
-		var __ht *types.Array = search.GetArr()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.GetZv()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			search_entry = _z
-
-			/* Make sure we're dealing with strings. */
-
-			var tmp_search_str *types.String
-			var search_str *types.String = zend.ZvalGetTmpString(search_entry, &tmp_search_str)
-			var replace_entry_str *types.String
-			var tmp_replace_entry_str *types.String = nil
-
-			/* If replace is an array. */
-
-			if replace.IsType(types.IS_ARRAY) {
-
-				/* Get current entry */
-
-				var replace_entry *types.Zval = nil
-				for replace_idx < types.Z_ARRVAL_P(replace).GetNNumUsed() {
-					replace_entry = types.Z_ARRVAL_P(replace).GetArData()[replace_idx].GetVal()
-					if replace_entry.IsNotUndef() {
-						break
-					}
-					replace_idx++
-				}
-				if replace_idx < types.Z_ARRVAL_P(replace).GetNNumUsed() {
-
-					/* Make sure we're dealing with strings. */
-
-					replace_entry_str = zend.ZvalGetTmpString(replace_entry, &tmp_replace_entry_str)
-
-					/* Set replacement value to the one we got from array */
-
-					replace_value = replace_entry_str.GetVal()
-					replace_len = replace_entry_str.GetLen()
-					replace_idx++
-				} else {
-
-					/* We've run out of replacement strings, so use an empty one. */
-
-					replace_value = ""
-					replace_len = 0
-				}
-			}
-			if search_str.GetLen() == 1 {
-				var old_replace_count zend.ZendLong = replace_count
-				tmp_result = PhpCharToStrEx(subject_str, search_str.GetVal()[0], replace_value, replace_len, case_sensitivity, &replace_count)
-				if lc_subject_str != nil && replace_count != old_replace_count {
-					// types.ZendStringReleaseEx(lc_subject_str, 0)
-					lc_subject_str = nil
-				}
-			} else if search_str.GetLen() > 1 {
-				if case_sensitivity != 0 {
-					tmp_result = PhpStrToStrEx(subject_str, search_str.GetVal(), search_str.GetLen(), replace_value, replace_len, &replace_count)
-				} else {
-					var old_replace_count zend.ZendLong = replace_count
-					if lc_subject_str == nil {
-						lc_subject_str = PhpStringTolower(subject_str)
-					}
-					tmp_result = PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search_str, replace_value, replace_len, &replace_count)
-					if replace_count != old_replace_count {
-						// types.ZendStringReleaseEx(lc_subject_str, 0)
-						lc_subject_str = nil
-					}
-				}
-			} else {
-				zend.ZendTmpStringRelease(tmp_search_str)
-				zend.ZendTmpStringRelease(tmp_replace_entry_str)
-				continue
-			}
-			zend.ZendTmpStringRelease(tmp_search_str)
-			zend.ZendTmpStringRelease(tmp_replace_entry_str)
-			if subject_str == tmp_result {
-				//subject_str.DelRefcount()
-			} else {
-				// types.ZendStringReleaseEx(subject_str, 0)
-				subject_str = tmp_result
-				if subject_str.GetLen() == 0 {
-					// types.ZendStringReleaseEx(subject_str, 0)
-					result.SetStringVal("")
-					if lc_subject_str != nil {
-						// types.ZendStringReleaseEx(lc_subject_str, 0)
-					}
-					zend.ZendTmpStringRelease(tmp_subject_str)
-					return replace_count
-				}
-			}
-		}
-		result.SetString(subject_str)
-		if lc_subject_str != nil {
-			// types.ZendStringReleaseEx(lc_subject_str, 0)
-		}
-	} else {
-		b.Assert(search.IsType(types.IS_STRING))
-		if search.GetStr().GetLen() == 1 {
-			result.SetString(PhpCharToStrEx(subject_str, search.GetStr().GetVal()[0], replace.GetStr().GetVal(), replace.GetStr().GetLen(), case_sensitivity, &replace_count))
-		} else if search.GetStr().GetLen() > 1 {
-			if case_sensitivity != 0 {
-				result.SetString(PhpStrToStrEx(subject_str, search.GetStr().GetVal(), search.GetStr().GetLen(), replace.GetStr().GetVal(), replace.GetStr().GetLen(), &replace_count))
-			} else {
-				lc_subject_str = PhpStringTolower(subject_str)
-				result.SetString(PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search.GetStr(), replace.GetStr().GetVal(), replace.GetStr().GetLen(), &replace_count))
-				// types.ZendStringReleaseEx(lc_subject_str, 0)
-			}
-		} else {
-			result.SetStringCopy(subject_str)
-		}
-	}
-	zend.ZendTmpStringRelease(tmp_subject_str)
-	return replace_count
-}
-func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *types.Zval, case_sensitivity int) {
-	var subject *types.Zval
-	var search *types.Zval
-	var replace *types.Zval
-	var subject_entry *types.Zval
-	var zcount *types.Zval = nil
-	var result types.Zval
-	var string_key *types.String
-	var num_key zend.ZendUlong
-	var count zend.ZendLong = 0
-	var argc int = executeData.NumArgs()
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 3, 4, 0)
-			search = fp.ParseZval()
-			replace = fp.ParseZval()
-			subject = fp.ParseZval()
-			fp.StartOptional()
-			zcount = fp.ParseZval()
-			if fp.HasError() {
+		var result = subject
+		var replaceCount = 0
+		i := -1
+		search.GetArr().ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
+			if subject == "" {
 				return
 			}
-			break
+
+			searchStr := zend.ZvalGetStrVal(val)
+			if searchStr == "" {
+				return
+			}
+
+			i++
+			if replace.IsArray() {
+				if i < len(replaceStrings) {
+					replaceStr = replaceStrings[i]
+				} else {
+					replaceStr = ""
+				}
+			}
+
+			var tmpResult string
+			var count int
+			if len(searchStr) == 1 {
+				tmpResult, count = PhpCharToStr(result, searchStr[0], replaceStr, caseSensitivity)
+			} else {
+				if caseSensitivity {
+					tmpResult, count = PhpStrToStrEx_Ex(result, searchStr, replaceStr)
+				} else {
+					lcSubjectStr := ascii.StrToLower(result)
+					tmpResult, count = PhpStrToStrIEx_Ex(result, lcSubjectStr, searchStr, replaceStr)
+				}
+			}
+
+			result = tmpResult
+			replaceCount += count
+		})
+		return result, replaceCount
+	} else {
+		b.Assert(search.IsString())
+		searchStr := search.GetStrVal()
+		if searchStr == "" {
+			return subject, 0
 		}
-		break
+		replaceStr := replace.GetStrVal()
+
+		if len(searchStr) == 1 {
+			return PhpCharToStr(subject, searchStr[0], replaceStr, caseSensitivity)
+		} else {
+			if caseSensitivity {
+				return PhpStrToStrEx_Ex(subject, searchStr, replaceStr)
+			} else {
+				lcSubject := ascii.StrToLower(subject)
+				return PhpStrToStrIEx_Ex(subject, lcSubject, searchStr, replaceStr)
+			}
+		}
 	}
+}
+func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zval, caseSensitivity bool) (*types.Array, int) {
+	arr := types.NewArray(subject.Len())
+	replaceCount := 0
+	subject.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		value = types.ZVAL_DEREF(value)
 
-	/* Make sure we're dealing with strings and do the replacement. */
-
-	if search.GetType() != types.IS_ARRAY {
-		zend.ConvertToStringEx(search)
-		if replace.GetType() != types.IS_STRING {
-			zend.ConvertToStringEx(replace)
+		var result types.Zval
+		if !value.IsArray() && !value.IsObject() {
+			tmpResult, count := strReplaceStr(zend.ZvalGetStrVal(value), search, replace, caseSensitivity)
+			result.SetStringVal(tmpResult)
+			replaceCount += count
+		} else {
+			types.ZVAL_COPY(&result, value)
 		}
-	} else if replace.GetType() != types.IS_ARRAY {
+
+		if key.IsStrKey() {
+			arr.KeyAddNew(key.StrKey(), &result)
+		} else {
+			arr.IndexAddNew(key.IndexKey(), &result)
+		}
+	})
+	return arr, replaceCount
+}
+func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval, subject *types.Zval, replaceCount zpp.RefZval, caseSensitivity bool) {
+	// 限定参数类型
+	// - str_replace(array|string $search, array|string $replace, array|string $subject, int|null &$count == null): string|array
+	if !search.IsArray() {
+		zend.ConvertToStringEx(search)
+		zend.ConvertToStringEx(replace)
+	} else if !replace.IsArray() {
 		zend.ConvertToStringEx(replace)
 	}
 	if zend.EG__().GetException() != nil {
 		return
 	}
 
-	/* if subject is an array */
-
+	// 主逻辑
+	var count int
 	if subject.IsType(types.IS_ARRAY) {
-		zend.ArrayInit(return_value)
-
-		/* For each subject entry, convert it to string, then perform replacement
-		   and add the result to the return_value array. */
-
-		var __ht *types.Array = subject.GetArr()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-			if _z.IsIndirect() {
-				_z = _z.GetZv()
-				if _z.IsUndef() {
-					continue
-				}
-			}
-			num_key = _p.GetH()
-			string_key = _p.GetKey()
-			subject_entry = _z
-			subject_entry = types.ZVAL_DEREF(subject_entry)
-			if subject_entry.GetType() != types.IS_ARRAY && subject_entry.GetType() != types.IS_OBJECT {
-				count += PhpStrReplaceInSubject(search, replace, subject_entry, &result, case_sensitivity)
-			} else {
-				types.ZVAL_COPY(&result, subject_entry)
-			}
-
-			/* Add to return array */
-
-			if string_key != nil {
-				return_value.GetArr().KeyAddNew(string_key.GetStr(), &result)
-			} else {
-				return_value.GetArr().IndexAddNew(num_key, &result)
-			}
-
-			/* Add to return array */
-
-		}
-
-		/* For each subject entry, convert it to string, then perform replacement
-		   and add the result to the return_value array. */
-
+		var arr *types.Array
+		arr, count = strReplaceArray(subject.GetArr(), search, replace, caseSensitivity)
+		returnValue.SetArray(arr)
 	} else {
-		count = PhpStrReplaceInSubject(search, replace, subject, return_value, case_sensitivity)
+		var str string
+		str, count = strReplaceStr(zend.ZvalGetStrVal(subject), search, replace, caseSensitivity)
+		returnValue.SetStringVal(str)
 	}
-	if argc > 3 {
-		zend.ZEND_TRY_ASSIGN_REF_LONG(zcount, count)
+
+	if replaceCount != nil {
+		zend.ZEND_TRY_ASSIGN_REF_LONG(replaceCount, count)
 	}
 }
-func ZifStrReplace(executeData zpp.Ex, return_value zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
-	PhpStrReplaceCommon(executeData, return_value, 1)
+
+func ZifStrReplace(returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+	strReplace(returnValue, search, replace, subject, replaceCount, true)
 }
-func ZifStrIreplace(executeData zpp.Ex, return_value zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
-	PhpStrReplaceCommon(executeData, return_value, 0)
+func ZifStrIreplace(returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+	strReplace(returnValue, search, replace, subject, replaceCount, false)
 }
-func PhpHebrev(executeData *zend.ZendExecuteData, return_value *types.Zval, convert_newlines int) {
-	var str *byte
-	var heb_str *byte
-	var target *byte
-	var tmp *byte
-	var block_start int
-	var block_end int
-	var block_type int
-	var block_length int
-	var i int
-	var max_chars zend.ZendLong = 0
-	var char_count zend.ZendLong
-	var begin int
-	var end int
-	var orig_begin int
-	var str_len int
-	var broken_str *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str, str_len = fp.ParseString()
-			fp.StartOptional()
-			max_chars = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+
+// 判断是否为希伯来文字符的首字节
+func _isHeb(c byte) bool     { return 224 <= c && c <= 250 }
+func _isBlank(c byte) bool   { return c == ' ' || c == '\t' }
+func _isNewline(c byte) bool { return c == '\r' || c == '\n' }
+func _isPunct(c byte) bool   { panic("todo") } // todo
+func PhpHebrev(str string, maxChars int, convertNewlines bool) (string, bool) {
+	if str == "" {
+		return "", false
 	}
-	if str_len == 0 {
-		return_value.SetFalse()
-		return
-	}
-	tmp = str
-	block_end = 0
-	block_start = block_end
-	heb_str = (*byte)(zend.Emalloc(str_len + 1))
-	target = heb_str + str_len
-	*target = 0
-	target--
-	block_length = 0
-	if Isheb(*tmp) != 0 {
-		block_type = _HEB_BLOCK_TYPE_HEB
+
+	hebStr := make([]byte, len(str))
+	target := len(str) - 1
+
+	blockStart, blockEnd, blockLength := 0, 0, 0
+	var blockType int
+	if _isHeb(str[0]) {
+		blockType = _HEB_BLOCK_TYPE_HEB
 	} else {
-		block_type = _HEB_BLOCK_TYPE_ENG
+		blockType = _HEB_BLOCK_TYPE_ENG
 	}
+
+	idx := 0
+	tmp := str[idx]
 	for {
-		if block_type == _HEB_BLOCK_TYPE_HEB {
-			for (Isheb(int(*(tmp + 1))) != 0 || _isblank(int(*(tmp + 1))) != 0 || ispunct(int(*(tmp + 1))) || int((*(tmp + 1)) == '\n') != 0) && block_end < str_len-1 {
-				tmp++
-				block_end++
-				block_length++
+		if blockType == _HEB_BLOCK_TYPE_HEB {
+			c := str[idx+1]
+			for (_isHeb(c) || _isBlank(c) || _isPunct(c) || c == '\n') && blockEnd < len(str)-1 {
+				idx++
+				tmp = str[idx]
+				blockEnd++
+				blockLength++
 			}
-			for i = block_start + 1; i <= block_end+1; i++ {
-				*target = str[i-1]
-				switch *target {
+			for i := blockStart + 1; i <= blockEnd+1; i++ {
+				switch str[i-1] {
 				case '(':
-					*target = ')'
+					hebStr[target] = ')'
 				case ')':
-					*target = '('
+					hebStr[target] = '('
 				case '[':
-					*target = ']'
+					hebStr[target] = ']'
 				case ']':
-					*target = '['
+					hebStr[target] = '['
 				case '{':
-					*target = '}'
+					hebStr[target] = '}'
 				case '}':
-					*target = '{'
+					hebStr[target] = '{'
 				case '<':
-					*target = '>'
+					hebStr[target] = '>'
 				case '>':
-					*target = '<'
+					hebStr[target] = '<'
 				case '\\':
-					*target = '/'
+					hebStr[target] = '/'
 				case '/':
-					*target = '\\'
+					hebStr[target] = '\\'
 				default:
-
+					hebStr[target] = str[i-1]
 				}
 				target--
 			}
-			block_type = _HEB_BLOCK_TYPE_ENG
+			blockType = _HEB_BLOCK_TYPE_ENG
 		} else {
-			for Isheb(*(tmp + 1)) == 0 && int((*(tmp + 1)) != '\n' && block_end < str_len-1) != 0 {
-				tmp++
-				block_end++
-				block_length++
+			c := str[idx+1]
+			for !_isHeb(c) && c != '\n' && blockEnd < len(str)-1 {
+				idx++
+				tmp = str[idx]
+				blockEnd++
+				blockLength++
 			}
-			for (_isblank(int(*tmp)) != 0 || ispunct(int(*tmp))) && (*tmp) != '/' && (*tmp) != '-' && block_end > block_start {
+
+			for (_isBlank(tmp) || _isPunct(tmp)) && tmp != '/' && tmp != '-' && blockEnd > blockStart {
 				tmp--
-				block_end--
+				blockEnd--
 			}
-			for i = block_end + 1; i >= block_start+1; i-- {
-				*target = str[i-1]
+
+			for i := blockEnd + 1; i >= blockStart+1; i-- {
+				hebStr[target] = str[i-1]
 				target--
 			}
-			block_type = _HEB_BLOCK_TYPE_HEB
+			blockType = _HEB_BLOCK_TYPE_HEB
 		}
-		block_start = block_end + 1
-		if block_end >= str_len-1 {
+		blockStart = blockEnd + 1
+		if blockEnd >= len(str)-1 {
 			break
 		}
 	}
-	broken_str = types.ZendStringAlloc(str_len, 0)
-	end = str_len - 1
-	begin = end
-	target = broken_str.GetVal()
+
+	begin := len(str) - 1
+	end := len(str) - 1
+	var brokenStr strings.Builder
 	for true {
-		char_count = 0
-		for (max_chars == 0 || max_chars > 0 && char_count < max_chars) && begin > 0 {
+		char_count := 0
+		for (maxChars == 0 || maxChars > 0 && char_count < maxChars) && begin > 0 {
 			char_count++
 			begin--
-			if _isnewline(heb_str[begin]) != 0 {
-				for begin > 0 && _isnewline(heb_str[begin-1]) != 0 {
+			if _isNewline(hebStr[begin]) {
+				for begin > 0 && _isNewline(hebStr[begin-1]) {
 					begin--
 					char_count++
 				}
 				break
 			}
 		}
-		if max_chars >= 0 && char_count == max_chars {
-			var new_char_count int = char_count
-			var new_begin int = begin
-			for new_char_count > 0 {
-				if _isblank(heb_str[new_begin]) != 0 || _isnewline(heb_str[new_begin]) != 0 {
+		if maxChars >= 0 && char_count == maxChars {
+			var newCharCount int = char_count
+			var newBegin int = begin
+			for newCharCount > 0 {
+				if _isBlank(hebStr[newBegin]) || _isNewline(hebStr[newBegin]) {
 					break
 				}
-				new_begin++
-				new_char_count--
+				newBegin++
+				newCharCount--
 			}
-			if new_char_count > 0 {
-				begin = new_begin
+			if newCharCount > 0 {
+				begin = newBegin
 			}
 		}
-		orig_begin = begin
-		if _isblank(heb_str[begin]) != 0 {
-			heb_str[begin] = '\n'
+		origBegin := begin
+		if _isBlank(hebStr[begin]) {
+			hebStr[begin] = '\n'
 		}
-		for begin <= end && _isnewline(heb_str[begin]) != 0 {
+		for begin <= end && _isNewline(hebStr[begin]) {
 			begin++
 		}
-		for i = begin; i <= end; i++ {
-			*target = heb_str[i]
-			target++
+		for i := begin; i <= end; i++ {
+			brokenStr.WriteByte(hebStr[i])
 		}
-		for i = orig_begin; i <= end && _isnewline(heb_str[i]) != 0; i++ {
-			*target = heb_str[i]
-			target++
+		for i := origBegin; i <= end && _isNewline(hebStr[i]); i++ {
+			brokenStr.WriteByte(hebStr[i])
 		}
-		begin = orig_begin
+		begin = origBegin
 		if begin == 0 {
-			*target = 0
 			break
 		}
 		begin--
 		end = begin
 	}
-	zend.Efree(heb_str)
-	if convert_newlines != 0 {
-		return_value.SetStringVal(strings.ReplaceAll(broken_str.GetStr(), "\n", "<br />\n"))
+
+	if convertNewlines {
+		return strings.ReplaceAll(brokenStr.String(), "\n", "<br />\n"), true
 	} else {
-		return_value.SetStringVal(broken_str.GetStr())
+		return brokenStr.String(), true
 	}
 }
-func ZifHebrev(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, maxCharsPerLine *types.Zval) {
-	PhpHebrev(executeData, return_value, 0)
+func ZifHebrev(str string, _ zpp.Opt, maxCharsPerLine int) (string, bool) {
+	return PhpHebrev(str, maxCharsPerLine, false)
 }
-func ZifHebrevc(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, maxCharsPerLine *types.Zval) {
-	PhpHebrev(executeData, return_value, 1)
+func ZifHebrevc(str string, _ zpp.Opt, maxCharsPerLine int) (string, bool) {
+	return PhpHebrev(str, maxCharsPerLine, true)
 }
 
 /* in brief this inserts <br /> or <br> before matched regexp \n\r?|\r\n? */
-func ZifNl2br(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, isXhtml *types.Zval) {
+func ZifNl2br(str string, _ zpp.Opt, isXhtml_ *bool) string {
+	var isXhtml bool = b.Option(isXhtml_, true)
 
-	var tmp *byte
-	var end *byte
-	var str *types.String
-	var target *byte
-	var repl_cnt int = 0
-	var is_xhtml types.ZendBool = 1
-	var result *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			is_xhtml = fp.ParseBool()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+	// 无换行符直接返回原字符串
+	// notice: 这里不是查找 "\r\n" 而是查找 '\r' 或 '\n'
+	if pos := strings.IndexAny(str, "\r\n"); pos < 0 {
+		return str
 	}
-	tmp = str.GetVal()
-	end = str.GetVal() + str.GetLen()
 
-	/* it is really faster to scan twice and allocate mem once instead of scanning once
-	   and constantly reallocing */
+	var br string
+	if isXhtml {
+		br = `<br />`
+	} else {
+		br = `<br>`
+	}
 
-	for tmp < end {
-		if (*tmp) == '\r' {
-			if (*(tmp + 1)) == '\n' {
-				tmp++
-			}
-			repl_cnt++
-		} else if (*tmp) == '\n' {
-			if (*(tmp + 1)) == '\r' {
-				tmp++
-			}
-			repl_cnt++
+	var buf strings.Builder
+	for i := 0; i < len(str); i++ {
+		c := str[i]
+		if c != '\r' && c != '\n' {
+			buf.WriteByte(c)
+			continue
 		}
-		tmp++
-	}
-	if repl_cnt == 0 {
-		return_value.SetStringCopy(str)
-		return
-	}
-	var repl_len int = b.CondF(is_xhtml != 0, func() int { return b.SizeOf("\"<br />\"") - 1 }, func() int { return b.SizeOf("\"<br>\"") - 1 })
-	result = types.ZendStringSafeAlloc(repl_cnt, repl_len, str.GetLen(), 0)
-	target = result.GetVal()
-	tmp = str.GetVal()
-	for tmp < end {
-		switch *tmp {
-		case '\r':
-			fallthrough
-		case '\n':
-			b.PostInc(&(*target)) = '<'
-			b.PostInc(&(*target)) = 'b'
-			b.PostInc(&(*target)) = 'r'
-			if is_xhtml != 0 {
-				b.PostInc(&(*target)) = ' '
-				b.PostInc(&(*target)) = '/'
-			}
-			b.PostInc(&(*target)) = '>'
-			if (*tmp) == '\r' && (*(tmp + 1)) == '\n' || (*tmp) == '\n' && (*(tmp + 1)) == '\r' {
-				*tmp++
-				b.PostInc(&(*target)) = (*tmp) - 1
-			}
-			fallthrough
-		default:
-			b.PostInc(&(*target)) = *tmp
+
+		buf.WriteString(br)
+		buf.WriteByte(c)
+		if i+1 < len(str) && (c == '\r' && str[i+1] == '\n') || (c == '\n' && str[i+1] == '\r') {
+			i++
+			buf.WriteByte(str[i])
 		}
-		tmp++
 	}
-	*target = '0'
-	return_value.SetString(result)
-	return
+	return buf.String()
 }
-func ZifStripTags(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval, _ zpp.Opt, allowableTags *types.Zval) {
-	var buf *types.String
-	var str *types.String
-	var allow *types.Zval = nil
-	var allowed_tags *byte = nil
-	var allowed_tags_len int = 0
-	var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			allow = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+
+func phpTagFind(tag string, set string) bool {
+	if tag == "" {
+		return false
 	}
+	var norm_ strings.Builder
+
+	t := 0 // for tag
+	c := ascii.ToLower(tag[t])
+	done := false
+	state := 0
+	for !done {
+		switch c {
+		case '<':
+			norm_.WriteByte(c)
+		case '>':
+			done = true
+		default:
+			if !ascii.IsSpace(c) {
+				if state == 0 {
+					state = 1
+				}
+				if c != '/' || (tag[t-1] != '<' && tag[t+1] != '>') {
+					norm_.WriteByte(c)
+				}
+			} else {
+				if state == 1 {
+					done = true
+				}
+			}
+		}
+		t++
+		c = ascii.ToLower(tag[t])
+	}
+	norm_.WriteByte('>')
+
+	if pos := strings.Index(set, norm_.String()); pos >= 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
+	var buf strings.Builder
+	var tagBuf strings.Builder
+	var br = 0
+	var quote byte = 0 // 标识是否在字符串内，可能值有: 0, '"', '\''
+	var lc byte = 0
+	var depth = 0
+	var isXml = false
+
+	// 约束 state 范围
+	if state < 1 || state > 4 {
+		state = 0
+	}
+
+	allowTags = ascii.StrToLower(allowTags)
+	for p, c := range []byte(str) {
+		if state == 0 {
+			switch c {
+			case 0:
+				break
+			case '<':
+				if quote != 0 {
+					break
+				}
+				if ascii.IsSpace(str[p+1]) {
+					buf.WriteByte(c)
+					break
+				}
+				lc = '<'
+				state = 1
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+				}
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				buf.WriteByte(c)
+			default:
+				buf.WriteByte(c)
+			}
+		} else if state == 1 {
+			switch c {
+			case 0:
+				break
+			case '<':
+				if quote != 0 {
+					break
+				}
+				if ascii.IsSpace(str[p+1]) {
+					if allowTags != "" {
+						tagBuf.WriteByte(c)
+					}
+				} else {
+					depth++
+				}
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				lc = '>'
+				if isXml && p >= 1 && str[p-1] == '-' {
+					break
+				}
+				isXml = false
+				state = 0
+				quote = 0
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+					if phpTagFind(tagBuf.String(), allowTags) {
+						buf.WriteString(tagBuf.String())
+					}
+					tagBuf.Reset()
+				}
+			case '"', '\'':
+				if p != 0 && (quote == 0 || str[p] == quote) {
+					if quote != 0 {
+						quote = 0
+					} else {
+						quote = str[p]
+					}
+				}
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+				}
+			case '!':
+				/* JavaScript & Other HTML scripting languages */
+				if p >= 1 && str[p-1] == '<' {
+					state = 3
+					lc = c
+				} else {
+					if allowTags != "" {
+						tagBuf.WriteByte(c)
+					}
+				}
+			case '?':
+				if p >= 1 && str[p-1] == '<' {
+					br = 0
+					state = 2
+				} else {
+					if allowTags != "" {
+						tagBuf.WriteByte(c)
+					}
+				}
+			default:
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+				}
+			}
+		} else if state == 2 {
+			switch c {
+			case '(':
+				if lc != '"' && lc != '\'' {
+					lc = '('
+					br++
+				}
+			case ')':
+				if lc != '"' && lc != '\'' {
+					lc = ')'
+					br--
+				}
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				if br == 0 && p >= 1 && lc != '"' && str[p-1] == '?' {
+					state = 0
+					quote = 0
+					tagBuf.Reset()
+				}
+			case '"', '\'':
+				if p >= 1 && str[p-1] != '\\' {
+					if lc == c {
+						lc = 0
+					} else if lc != '\\' {
+						lc = c
+					}
+					if p != 0 && (quote == 0 || str[p] == quote) {
+						if quote != 0 {
+							quote = 0
+						} else {
+							quote = str[p]
+						}
+					}
+				}
+			case 'l', 'L':
+				/* swm: If we encounter '<?xml' then we shouldn't be in
+				 * state == 2 (PHP). Switch back to HTML.
+				 */
+				if state == 2 && p > 4 && ascii.StrToLower(str[p-4:p]) == "<?xm" {
+					state = 1
+					isXml = true
+				}
+			}
+		} else if state == 3 {
+			switch c {
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				state = 0
+				quote = 0
+				tagBuf.Reset()
+			case '"', '\'':
+				if p != 0 && str[p-1] != '\\' && (quote == 0 || str[p] == quote) {
+					if quote != 0 {
+						quote = 0
+					} else {
+						quote = str[p]
+					}
+				}
+			case '-':
+				if p >= 2 && str[p-2:p] == "!-" {
+					state = 4
+				}
+			case 'E', 'e':
+				/* !DOCTYPE exception */
+				if p > 6 && ascii.StrToLower(str[p-6:p+1]) == "doctype" {
+					state = 1
+				}
+			}
+		} else { // stage == 4
+			if c == '>' && quote == 0 {
+				if p >= 2 && str[p-2:p] == "--" {
+					state = 0
+					quote = 0
+					tagBuf.Reset()
+				}
+			}
+		}
+	}
+
+	return buf.String(), state
+}
+func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
+	var allow *types.Zval = allowableTags
+	var allowTagsStr string
 	if allow != nil {
 		if allow.IsType(types.IS_ARRAY) {
-			var tmp *types.Zval
-			var tag *types.String
-			var __ht *types.Array = allow.GetArr()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				tmp = _z
-				tag = zend.ZvalGetString(tmp)
-				tags_ss.AppendByte('<')
-				tags_ss.AppendString(tag.GetStr())
-				tags_ss.AppendByte('>')
-				// types.ZendStringRelease(tag)
-			}
-			if tags_ss.GetS() != nil {
-				tags_ss.ZeroTail()
-				allowed_tags = tags_ss.GetS().GetVal()
-				allowed_tags_len = tags_ss.GetS().GetLen()
-			}
+			var buf strings.Builder
+			allow.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+				tag := zend.ZvalGetStrVal(value)
+				buf.WriteByte('<')
+				buf.WriteString(tag)
+				buf.WriteByte('>')
+			})
+			allowTagsStr = buf.String()
 		} else {
-
 			/* To maintain a certain BC, we allow anything for the second parameter and return original string */
-
 			zend.ConvertToString(allow)
-			allowed_tags = allow.GetStr().GetVal()
-			allowed_tags_len = allow.GetStr().GetLen()
+			allowTagsStr = allowableTags.GetStrVal()
 		}
 	}
-	buf = types.NewString(str.GetStr())
-	buf.SetLen(PhpStripTagsEx(buf.GetVal(), str.GetLen(), nil, allowed_tags, allowed_tags_len, 0))
-	tags_ss.Free()
-	return_value.SetString(buf)
-	return
+
+	result, _ := PhpStripTags(str, 0, allowTagsStr)
+	return result
 }
-func ZifParseStr(executeData zpp.Ex, return_value zpp.Ret, encodedString *types.Zval, _ zpp.Opt, result zpp.RefZval) {
-	var arg *byte
-	var arrayArg *types.Zval = nil
-	var res *byte = nil
-	var arglen int
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			arg, arglen = fp.ParseString()
-			fp.StartOptional()
-			arrayArg = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	res = zend.Estrndup(arg, arglen)
-	if arrayArg == nil {
-		var tmp types.Zval
-		var symbol_table *types.Array
+func ZifParseStr(encodedString string, _ zpp.Opt, result zpp.RefZval) {
+	if result == nil {
 		if zend.ZendForbidDynamicCall("parse_str() with a single argument") == types.FAILURE {
-			zend.Efree(res)
 			return
 		}
 		core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
+		var tmp types.Zval
+		var symbol_table *types.Array
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
-		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
+		core.SM__().GetTreatData()(core.PARSE_STRING, encodedString, &tmp)
 		if types.ZendHashDel(symbol_table, types.STR_THIS) == types.SUCCESS {
 			faults.ThrowError(nil, "Cannot re-assign $this")
 		}
 	} else {
-		arrayArg = zend.ZendTryArrayInit(arrayArg)
-		if arrayArg == nil {
-			zend.Efree(res)
+		result = zend.ZendTryArrayInit(result)
+		if result == nil {
 			return
 		}
-		core.SM__().GetTreatData()(core.PARSE_STRING, res, arrayArg)
+		core.SM__().GetTreatData()(core.PARSE_STRING, encodedString, result)
 	}
 }
-func PhpTagFind(tag *byte, len_ int, set *byte) int {
-	var c byte
-	var n *byte
-	var t *byte
-	var state int = 0
-	var done int = 0
-	var norm *byte
-	if len_ == 0 {
-		return 0
-	}
-	norm = zend.Emalloc(len_ + 1)
-	n = norm
-	t = tag
-	c = tolower(*t)
 
-	/*
-	   normalize the tag removing leading and trailing whitespace
-	   and turn any <a whatever...> into just <a> and any </tag>
-	   into <tag>
-	*/
-
-	for done == 0 {
-		switch c {
-		case '<':
-			*(b.PostInc(&n)) = c
-		case '>':
-			done = 1
-		default:
-			if !(isspace(int(c))) {
-				if state == 0 {
-					state = 1
-				}
-				if c != '/' || (*(t - 1)) != '<' && (*(t + 1)) != '>' {
-					*(b.PostInc(&n)) = c
-				}
-			} else {
-				if state == 1 {
-					done = 1
-				}
-			}
-		}
-		c = tolower(*(b.PreInc(&t)))
-	}
-	*(b.PostInc(&n)) = '>'
-	*n = '0'
-	if strstr(set, norm) {
-		done = 1
-	} else {
-		done = 0
-	}
-	zend.Efree(norm)
-	return done
-}
-func PhpStripTags(rbuf *byte, len_ int, stateptr *uint8, allow *byte, allow_len int) int {
-	return PhpStripTagsEx(rbuf, len_, stateptr, allow, allow_len, 0)
-}
-func PhpStripTagsEx(
-	rbuf *byte,
-	len_ int,
-	stateptr *uint8,
-	allow *byte,
-	allow_len int,
-	allow_tag_spaces types.ZendBool,
-) int {
-	var tbuf *byte
-	var tp *byte
-	var rp *byte
-	var c byte
-	var lc byte
-	var buf *byte
-	var p *byte
-	var end *byte
-	var br int
-	var depth int = 0
-	var in_q int = 0
-	var state uint8 = 0
-	var pos int
-	var allow_free *byte = nil
-	var is_xml byte = 0
-	buf = zend.Estrndup(rbuf, len_)
-	end = buf + len_
-	lc = '0'
-	p = buf
-	rp = rbuf
-	br = 0
-	if allow != nil {
-		allow_free = zend.ZendStrTolowerDupEx(allow, allow_len)
-		if allow_free != nil {
-			allow = allow_free
-		} else {
-			allow = allow
-		}
-		tbuf = zend.Emalloc(PHP_TAG_BUF_SIZE + 1)
-		tp = tbuf
-	} else {
-		tp = nil
-		tbuf = tp
-	}
-	if stateptr != nil {
-		state = *stateptr
-		switch state {
-		case 1:
-			goto state_1
-		case 2:
-			goto state_2
-		case 3:
-			goto state_3
-		case 4:
-			goto state_4
-		default:
-
-		}
-	}
-state_0:
-	if p >= end {
-		goto finish
-	}
-	c = *p
-	switch c {
-	case '0':
-
-	case '<':
-		if in_q != 0 {
-			break
-		}
-		if isspace(*(p + 1)) && allow_tag_spaces == 0 {
-			*(b.PostInc(&rp)) = c
-			break
-		}
-		lc = '<'
-		state = 1
-		if allow != nil {
-			if tp-tbuf >= PHP_TAG_BUF_SIZE {
-				pos = tp - tbuf
-				tbuf = zend.Erealloc(tbuf, tp-tbuf+PHP_TAG_BUF_SIZE+1)
-				tp = tbuf + pos
-			}
-			*(b.PostInc(&tp)) = '<'
-		}
-		p++
-		goto state_1
-	case '>':
-		if depth != 0 {
-			depth--
-			break
-		}
-		if in_q != 0 {
-			break
-		}
-		*(b.PostInc(&rp)) = c
-	default:
-		*(b.PostInc(&rp)) = c
-	}
-	p++
-	goto state_0
-state_1:
-	if p >= end {
-		goto finish
-	}
-	c = *p
-	switch c {
-	case '0':
-
-	case '<':
-		if in_q != 0 {
-			break
-		}
-		if isspace(*(p + 1)) && allow_tag_spaces == 0 {
-			goto reg_char_1
-		}
-		depth++
-	case '>':
-		if depth != 0 {
-			depth--
-			break
-		}
-		if in_q != 0 {
-			break
-		}
-		lc = '>'
-		if is_xml && p >= buf+1 && (*(p - 1)) == '-' {
-			break
-		}
-		is_xml = 0
-		state = is_xml
-		in_q = state
-		if allow != nil {
-			if tp-tbuf >= PHP_TAG_BUF_SIZE {
-				pos = tp - tbuf
-				tbuf = zend.Erealloc(tbuf, tp-tbuf+PHP_TAG_BUF_SIZE+1)
-				tp = tbuf + pos
-			}
-			*(b.PostInc(&tp)) = '>'
-			*tp = '0'
-			if PhpTagFind(tbuf, tp-tbuf, allow) != 0 {
-				memcpy(rp, tbuf, tp-tbuf)
-				rp += tp - tbuf
-			}
-			tp = tbuf
-		}
-		p++
-		goto state_0
-	case '"':
-		fallthrough
-	case '\'':
-		if p != buf && (in_q == 0 || (*p) == in_q) {
-			if in_q != 0 {
-				in_q = 0
-			} else {
-				in_q = *p
-			}
-		}
-		goto reg_char_1
-	case '!':
-
-		/* JavaScript & Other HTML scripting languages */
-
-		if p >= buf+1 && (*(p - 1)) == '<' {
-			state = 3
-			lc = c
-			p++
-			goto state_3
-		} else {
-			goto reg_char_1
-		}
-	case '?':
-		if p >= buf+1 && (*(p - 1)) == '<' {
-			br = 0
-			state = 2
-			p++
-			goto state_2
-		} else {
-			goto reg_char_1
-		}
-	default:
-	reg_char_1:
-		if allow != nil {
-			if tp-tbuf >= PHP_TAG_BUF_SIZE {
-				pos = tp - tbuf
-				tbuf = zend.Erealloc(tbuf, tp-tbuf+PHP_TAG_BUF_SIZE+1)
-				tp = tbuf + pos
-			}
-			*(b.PostInc(&tp)) = c
-		}
-	}
-	p++
-	goto state_1
-state_2:
-	if p >= end {
-		goto finish
-	}
-	c = *p
-	switch c {
-	case '(':
-		if lc != '"' && lc != '\'' {
-			lc = '('
-			br++
-		}
-	case ')':
-		if lc != '"' && lc != '\'' {
-			lc = ')'
-			br--
-		}
-	case '>':
-		if depth != 0 {
-			depth--
-			break
-		}
-		if in_q != 0 {
-			break
-		}
-		if br == 0 && p >= buf+1 && lc != '"' && (*(p - 1)) == '?' {
-			state = 0
-			in_q = state
-			tp = tbuf
-			p++
-			goto state_0
-		}
-	case '"':
-		fallthrough
-	case '\'':
-		if p >= buf+1 && (*(p - 1)) != '\\' {
-			if lc == c {
-				lc = '0'
-			} else if lc != '\\' {
-				lc = c
-			}
-			if p != buf && (in_q == 0 || (*p) == in_q) {
-				if in_q != 0 {
-					in_q = 0
-				} else {
-					in_q = *p
-				}
-			}
-		}
-	case 'l':
-		fallthrough
-	case 'L':
-
-		/* swm: If we encounter '<?xml' then we shouldn't be in
-		 * state == 2 (PHP). Switch back to HTML.
-		 */
-
-		if state == 2 && p > buf+4 && ((*(p - 1)) == 'm' || (*(p - 1)) == 'M') && ((*(p - 2)) == 'x' || (*(p - 2)) == 'X') && (*(p - 3)) == '?' && (*(p - 4)) == '<' {
-			state = 1
-			is_xml = 1
-			p++
-			goto state_1
-		}
-	default:
-
-	}
-	p++
-	goto state_2
-state_3:
-	if p >= end {
-		goto finish
-	}
-	c = *p
-	switch c {
-	case '>':
-		if depth != 0 {
-			depth--
-			break
-		}
-		if in_q != 0 {
-			break
-		}
-		state = 0
-		in_q = state
-		tp = tbuf
-		p++
-		goto state_0
-	case '"':
-		fallthrough
-	case '\'':
-		if p != buf && (*(p - 1)) != '\\' && (in_q == 0 || (*p) == in_q) {
-			if in_q != 0 {
-				in_q = 0
-			} else {
-				in_q = *p
-			}
-		}
-	case '-':
-		if p >= buf+2 && (*(p - 1)) == '-' && (*(p - 2)) == '!' {
-			state = 4
-			p++
-			goto state_4
-		}
-	case 'E':
-		fallthrough
-	case 'e':
-
-		/* !DOCTYPE exception */
-
-		if p > buf+6 && ((*(p - 1)) == 'p' || (*(p - 1)) == 'P') && ((*(p - 2)) == 'y' || (*(p - 2)) == 'Y') && ((*(p - 3)) == 't' || (*(p - 3)) == 'T') && ((*(p - 4)) == 'c' || (*(p - 4)) == 'C') && ((*(p - 5)) == 'o' || (*(p - 5)) == 'O') && ((*(p - 6)) == 'd' || (*(p - 6)) == 'D') {
-			state = 1
-			p++
-			goto state_1
-		}
-	default:
-
-	}
-	p++
-	goto state_3
-state_4:
-	for p < end {
-		c = *p
-		if c == '>' && in_q == 0 {
-			if p >= buf+2 && (*(p - 1)) == '-' && (*(p - 2)) == '-' {
-				state = 0
-				in_q = state
-				tp = tbuf
-				p++
-				goto state_0
-			}
-		}
-		p++
-	}
-finish:
-	if rp < rbuf+len_ {
-		*rp = '0'
-	}
-	zend.Efree(any(buf))
-	if tbuf != nil {
-		zend.Efree(tbuf)
-	}
-	if allow_free != nil {
-		zend.Efree(allow_free)
-	}
-	if stateptr != nil {
-		*stateptr = state
-	}
-	return size_t(rp - rbuf)
-}
-func ZifStrGetcsv(executeData zpp.Ex, return_value zpp.Ret, string *types.Zval, _ zpp.Opt, delimiter *types.Zval, enclosure *types.Zval, escape *types.Zval) {
-	var str *types.String
+func ZifStrGetcsv(return_value zpp.Ret, string_ string, _ zpp.Opt, delimiter *string, enclosure *string, escape *string) *types.Array {
+	var str *types.String = string_
 	var delim byte = ','
 	var enc byte = '"'
-	var esc int = uint8('\\')
-	var delim_str *byte = nil
-	var enc_str *byte = nil
-	var esc_str *byte = nil
-	var delim_len int = 0
-	var enc_len int = 0
-	var esc_len int = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 4, 0)
-			str = fp.ParseStr()
-			fp.StartOptional()
-			delim_str, delim_len = fp.ParseString()
-			enc_str, enc_len = fp.ParseString()
-			esc_str, esc_len = fp.ParseString()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
+	var esc byte = '\\'
+
+	if delimiter != nil && *delimiter != "" {
+		delim = (*delimiter)[0]
 	}
-	if delim_len != 0 {
-		delim = delim_str[0]
-	} else {
-		delim = delim
+	if enclosure != nil && *enclosure != "" {
+		enc = (*enclosure)[0]
 	}
-	if enc_len != 0 {
-		enc = enc_str[0]
-	} else {
-		enc = enc
-	}
-	if esc_str != nil {
-		if esc_len != 0 {
-			esc = uint8(esc_str[0])
+	if escape != nil {
+		if *escape != "" {
+			esc = (*escape)[0]
 		} else {
 			esc = PHP_CSV_NO_ESCAPE
 		}
 	}
+
 	PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
 func ZifStrRepeat(input string, mult int) (string, bool) {
@@ -1118,162 +702,77 @@ func ZifStrRepeat(input string, mult int) (string, bool) {
 
 	return strings.Repeat(input, mult), true
 }
-func ZifCountChars(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval, _ zpp.Opt, mode *types.Zval) {
-	var input *types.String
-	var chars []int
-	var mymode zend.ZendLong = 0
-	var buf *uint8
-	var inx int
-	var retstr []byte
-	var retlen int = 0
-	var tmp int = 0
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 2, 0)
-			input = fp.ParseStr()
-			fp.StartOptional()
-			mymode = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if mymode < 0 || mymode > 4 {
+func ZifCountChars(input string, _ zpp.Opt, mode int) (*types.Zval, bool) {
+	if mode < 0 || mode > 4 {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown mode")
-		return_value.SetFalse()
-		return
+		return nil, false
 	}
-	buf = (*uint8)(input.GetVal())
-	memset(any(chars), 0, b.SizeOf("chars"))
-	for tmp < input.GetLen() {
-		chars[*buf]++
-		buf++
-		tmp++
+
+	var charCount [256]int
+
+	for _, c := range []byte(input) {
+		charCount[c]++
 	}
-	if mymode < 3 {
-		zend.ArrayInit(return_value)
-	}
-	for inx = 0; inx < 256; inx++ {
-		switch mymode {
-		case 0:
-			zend.AddIndexLong(return_value, inx, chars[inx])
-		case 1:
-			if chars[inx] != 0 {
-				zend.AddIndexLong(return_value, inx, chars[inx])
-			}
-		case 2:
-			if chars[inx] == 0 {
-				zend.AddIndexLong(return_value, inx, chars[inx])
-			}
-		case 3:
-			if chars[inx] != 0 {
-				retstr[b.PostInc(&retlen)] = inx
-			}
-		case 4:
-			if chars[inx] == 0 {
-				retstr[b.PostInc(&retlen)] = inx
+
+	if mode < 3 { // mode=0,1,2 以数组返回
+		arr := types.NewArray(0)
+		for i := 0; i < 256; i++ {
+			count := charCount[i]
+			if mode == 0 || (mode == 1 && count != 0) || (mode == 2 && count == 0) {
+				arr.IndexUpdate(i, types.NewZvalLong(charCount[i]))
 			}
 		}
-	}
-	if mymode >= 3 && mymode <= 4 {
-		return_value.SetStringVal(b.CastStr(retstr, retlen))
-		return
-	}
-}
-func PhpStrnatcmp(executeData *zend.ZendExecuteData, return_value *types.Zval, fold_case int) {
-	var s1 *types.String
-	var s2 *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			s1 = fp.ParseStr()
-			s2 = fp.ParseStr()
-			if fp.HasError() {
-				return
+		return types.NewZvalArray(arr), true
+	} else { // mode=3,4 以字符串返回
+		var str []byte
+		for i := 0; i < 256; i++ {
+			count := charCount[i]
+			if (mode == 3 && count != 0) || (mode == 4 && count == 0) {
+				str = append(str, byte(i))
 			}
-			break
 		}
-		break
+		return types.NewZvalString(string(str)), true
 	}
-	return_value.SetLong(StrnatcmpEx(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), fold_case))
-	return
 }
-func ZifStrnatcmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
-	PhpStrnatcmp(executeData, return_value, 0)
+func ZifStrnatcmp(s1 string, s2 string) int {
+	return Strnatcmp(s1, s2, false)
 }
-func ZifStrnatcasecmp(executeData zpp.Ex, return_value zpp.Ret, s1 *types.Zval, s2 *types.Zval) {
-	PhpStrnatcmp(executeData, return_value, 1)
+func ZifStrnatcasecmp(s1 string, s2 string) int {
+	return Strnatcmp(s1, s2, true)
 }
-func ZifSubstrCount(executeData zpp.Ex, return_value zpp.Ret, haystack *types.Zval, needle *types.Zval, _ zpp.Opt, offset *types.Zval, length *types.Zval) {
-	var haystack *byte
-	var needle *byte
-	var offset zend.ZendLong = 0
-	var length zend.ZendLong = 0
-	var ac int = executeData.NumArgs()
-	var count zend.ZendLong = 0
-	var haystack_len int
-	var needle_len int
-	var p *byte
-	var endp *byte
-	var cmp byte
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 4, 0)
-			haystack, haystack_len = fp.ParseString()
-			needle, needle_len = fp.ParseString()
-			fp.StartOptional()
-			offset = fp.ParseLong()
-			length = fp.ParseLong()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if needle_len == 0 {
+func ZifSubstrCount(haystack string, needle string, _ zpp.Opt, offset int, length_ *int) (int, bool) {
+	// check needle
+	if needle == "" {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty substring")
-		return_value.SetFalse()
-		return
+		return 0, false
 	}
-	p = haystack
-	endp = p + haystack_len
+
+	// check offset
 	if offset < 0 {
-		offset += zend.ZendLong(haystack_len)
+		offset += len(haystack)
 	}
-	if offset < 0 || int(offset > haystack_len) != 0 {
+	if offset < 0 || offset > len(haystack) {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
-		return_value.SetFalse()
-		return
+		return 0, false
 	}
-	p += offset
-	if ac == 4 {
+
+	// check length
+	var length = len(haystack) - offset
+	if length_ != nil {
+		length = *length_
 		if length < 0 {
-			length += haystack_len - offset
+			length += len(haystack) - offset
 		}
-		if length < 0 || int(length > haystack_len-offset) != 0 {
+		if length < 0 || length > len(haystack)-offset {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid length value")
-			return_value.SetFalse()
-			return
-		}
-		endp = p + length
-	}
-	if needle_len == 1 {
-		cmp = needle[0]
-		for b.Assign(&p, memchr(p, cmp, endp-p)) {
-			count++
-			p++
-		}
-	} else {
-		for b.Assign(&p, (*byte)(core.PhpMemnstr(p, needle, needle_len, endp))) {
-			p += needle_len
-			count++
+			return 0, false
 		}
 	}
-	return_value.SetLong(count)
-	return
+
+	// 截取目标字符串范围
+	searchStr := haystack[offset : offset+length]
+
+	return strings.Count(searchStr, needle), true
 }
 
 func ZifStrPad(input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) (string, bool) {
@@ -1324,77 +823,32 @@ func ZifStrPad(input string, padLength int, _ zpp.Opt, padString_ *string, padTy
 
 	return buf.String(), true
 }
-func ZifSscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
+func ZifSscanf(str string, format string, vars []zpp.RefZval) *types.Zval {
 	var args *types.Zval = nil
-	var str *byte
-	var format *byte
-	var str_len int
-	var format_len int
 	var result int
 	var num_args int = 0
-	for {
-		var _flags int = 0
-		var _min_num_args int = 2
-		var _max_num_args int = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			str, str_len = fp.ParseString()
-			format, format_len = fp.ParseString()
-			args, num_args = fp.ParseVariadic0()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
 	result = PhpSscanfInternal(str, format, num_args, args, 0, return_value)
 	if SCAN_ERROR_WRONG_PARAM_COUNT == result {
 		zend.ZendWrongParamCount()
 		return
 	}
 }
-func PhpStrRot13(str *types.String) *types.String {
-	var ret *types.String
-	var p *byte
-	var e *byte
-	var target *byte
-	if str.GetLen() == 0 {
-		return types.NewString("")
+
+// 参数执行 ROT13 编码并将结果字符串返回。
+func ZifStrRot13(str string) string {
+	if str == "" {
+		return ""
 	}
-	ret = types.ZendStringAlloc(str.GetLen(), 0)
-	p = str.GetVal()
-	e = p + str.GetLen()
-	target = ret.GetVal()
-	for p < e {
-		if (*p) >= 'a' && (*p) <= 'z' {
-			b.PostInc(&(*target)) = 'a' + (b.PostInc(&(*p))-'a'+13)%26
-		} else if (*p) >= 'A' && (*p) <= 'Z' {
-			b.PostInc(&(*target)) = 'A' + (b.PostInc(&(*p))-'A'+13)%26
-		} else {
-			*p++
-			b.PostInc(&(*target)) = (*p) - 1
+
+	bin := []byte(str)
+	for i, c := range bin {
+		if 'a' <= c && c <= 'z' {
+			bin[i] = 'a' + (c-'a'+13)%26
+		} else if 'A' <= c && c <= 'Z' {
+			bin[i] = 'A' + (c-'A'+13)%26
 		}
 	}
-	*target = '0'
-	return ret
-}
-func ZifStrRot13(executeData zpp.Ex, return_value zpp.Ret, str *types.Zval) {
-	var arg *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			arg = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetString(PhpStrRot13(arg))
-	return
+	return string(bin)
 }
 func PhpStringShuffle(str *byte, len_ zend.ZendLong) {
 	var n_elems zend.ZendLong
