@@ -77,6 +77,7 @@ const (
 	// ref
 	ZppTypeRefZval
 	ZppTypeRefArray
+	ZppTypeRefVariadic
 )
 
 var zppInfos = []struct {
@@ -115,6 +116,7 @@ var zppInfos = []struct {
 	// ref type
 	{ZppTypeRefZval, "zpp.RefZval", "ParseZvalEx", []ast.Expr{f.False(), f.True()}},
 	{ZppTypeRefArray, "zpp.RefArray", "ParseArrayEx", []ast.Expr{f.False(), f.True()}},
+	{ZppTypeRefVariadic, "[]zpp.RefZval", "ParseVariadic", nil},
 }
 
 var toZppTypeMap map[string]ZppType

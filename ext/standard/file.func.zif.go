@@ -173,12 +173,17 @@ var DefZifFgetss = def.DefFunc("fgetss", 1, 3, []def.ArgInfo{{Name: "fp"}, {Name
 	fp := zpp.FastParseStart(executeData, 1, 3, 0)
 	fp := fp.ParseZval()
 	fp.StartOptional()
-	length := fp.ParseZval()
-	allowable_tags := fp.ParseZval()
+	length := fp.ParseLongNullable()
+	allowable_tags := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifFgetss(fp, nil, length, allowable_tags)
+	ret, ok := ZifFgetss(fp, nil, length, allowable_tags)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifFwrite

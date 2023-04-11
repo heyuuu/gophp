@@ -84,7 +84,6 @@ var BasicFunctions []types.FunctionEntry = []types.FunctionEntry{
 	DefZifUtf8Encode,
 	DefZifUtf8Decode,
 	DefZifStrcoll,
-	DefZifMoneyFormat,
 	DefZifSubstr,
 	DefZifSubstrReplace,
 	DefZifQuotemeta,

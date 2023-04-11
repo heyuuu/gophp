@@ -11,6 +11,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"math/rand"
 	"strconv"
 	"strings"
 )
@@ -1471,3 +1472,891 @@ func ZifAddslashes(str string) string                   { return PhpAddslashes(s
 func ZifAddcslashes(str string, charlist string) string { return PhpAddcslashes(str, charlist) }
 func ZifStripslashes(str string) string                 { return PhpStripslashes(str) }
 func ZifStripcslashes(str string) string                { return PhpStripcslashes(str) }
+
+func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, caseSensitivity bool) (string, int) {
+	if subject == "" {
+		return "", 0
+	}
+
+	if search.IsArray() {
+		var replaceStrings []string
+		var replaceStr string
+		if replace.IsArray() {
+			replaceStrings = make([]string, replace.GetArr().Len())
+			replace.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+				replaceStrings = append(replaceStrings, zend.ZvalGetStrVal(value))
+			})
+		} else {
+			replaceStr = zend.ZvalGetStrVal(replace)
+		}
+
+		var result = subject
+		var replaceCount = 0
+		i := -1
+		search.GetArr().ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
+			if subject == "" {
+				return
+			}
+
+			searchStr := zend.ZvalGetStrVal(val)
+			if searchStr == "" {
+				return
+			}
+
+			i++
+			if replace.IsArray() {
+				if i < len(replaceStrings) {
+					replaceStr = replaceStrings[i]
+				} else {
+					replaceStr = ""
+				}
+			}
+
+			var tmpResult string
+			var count int
+			if len(searchStr) == 1 {
+				tmpResult, count = PhpCharToStr(result, searchStr[0], replaceStr, caseSensitivity)
+			} else {
+				if caseSensitivity {
+					tmpResult, count = PhpStrToStrEx_Ex(result, searchStr, replaceStr)
+				} else {
+					lcSubjectStr := ascii.StrToLower(result)
+					tmpResult, count = PhpStrToStrIEx_Ex(result, lcSubjectStr, searchStr, replaceStr)
+				}
+			}
+
+			result = tmpResult
+			replaceCount += count
+		})
+		return result, replaceCount
+	} else {
+		b.Assert(search.IsString())
+		searchStr := search.GetStrVal()
+		if searchStr == "" {
+			return subject, 0
+		}
+		replaceStr := replace.GetStrVal()
+
+		if len(searchStr) == 1 {
+			return PhpCharToStr(subject, searchStr[0], replaceStr, caseSensitivity)
+		} else {
+			if caseSensitivity {
+				return PhpStrToStrEx_Ex(subject, searchStr, replaceStr)
+			} else {
+				lcSubject := ascii.StrToLower(subject)
+				return PhpStrToStrIEx_Ex(subject, lcSubject, searchStr, replaceStr)
+			}
+		}
+	}
+}
+func strReplaceArray(subject *types.Array, search *types.Zval, replace *types.Zval, caseSensitivity bool) (*types.Array, int) {
+	arr := types.NewArray(subject.Len())
+	replaceCount := 0
+	subject.ForeachIndirect(func(key types.ArrayKey, value *types.Zval) {
+		value = types.ZVAL_DEREF(value)
+
+		var result types.Zval
+		if !value.IsArray() && !value.IsObject() {
+			tmpResult, count := strReplaceStr(zend.ZvalGetStrVal(value), search, replace, caseSensitivity)
+			result.SetStringVal(tmpResult)
+			replaceCount += count
+		} else {
+			types.ZVAL_COPY(&result, value)
+		}
+
+		if key.IsStrKey() {
+			arr.KeyAddNew(key.StrKey(), &result)
+		} else {
+			arr.IndexAddNew(key.IndexKey(), &result)
+		}
+	})
+	return arr, replaceCount
+}
+func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval, subject *types.Zval, replaceCount zpp.RefZval, caseSensitivity bool) {
+	// 限定参数类型
+	// - str_replace(array|string $search, array|string $replace, array|string $subject, int|null &$count == null): string|array
+	if !search.IsArray() {
+		zend.ConvertToStringEx(search)
+		zend.ConvertToStringEx(replace)
+	} else if !replace.IsArray() {
+		zend.ConvertToStringEx(replace)
+	}
+	if zend.EG__().GetException() != nil {
+		return
+	}
+
+	// 主逻辑
+	var count int
+	if subject.IsType(types.IS_ARRAY) {
+		var arr *types.Array
+		arr, count = strReplaceArray(subject.GetArr(), search, replace, caseSensitivity)
+		returnValue.SetArray(arr)
+	} else {
+		var str string
+		str, count = strReplaceStr(zend.ZvalGetStrVal(subject), search, replace, caseSensitivity)
+		returnValue.SetStringVal(str)
+	}
+
+	if replaceCount != nil {
+		zend.ZEND_TRY_ASSIGN_REF_LONG(replaceCount, count)
+	}
+}
+
+func ZifStrReplace(returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+	strReplace(returnValue, search, replace, subject, replaceCount, true)
+}
+func ZifStrIreplace(returnValue zpp.Ret, search *types.Zval, replace *types.Zval, subject *types.Zval, _ zpp.Opt, replaceCount zpp.RefZval) {
+	strReplace(returnValue, search, replace, subject, replaceCount, false)
+}
+
+// 判断是否为希伯来文字符的首字节
+func _isHeb(c byte) bool     { return 224 <= c && c <= 250 }
+func _isBlank(c byte) bool   { return c == ' ' || c == '\t' }
+func _isNewline(c byte) bool { return c == '\r' || c == '\n' }
+func _isPunct(c byte) bool   { panic("todo") } // todo
+func PhpHebrev(str string, maxChars int, convertNewlines bool) (string, bool) {
+	if str == "" {
+		return "", false
+	}
+
+	hebStr := make([]byte, len(str))
+	target := len(str) - 1
+
+	blockStart, blockEnd, blockLength := 0, 0, 0
+	var blockType int
+	if _isHeb(str[0]) {
+		blockType = _HEB_BLOCK_TYPE_HEB
+	} else {
+		blockType = _HEB_BLOCK_TYPE_ENG
+	}
+
+	idx := 0
+	tmp := str[idx]
+	for {
+		if blockType == _HEB_BLOCK_TYPE_HEB {
+			c := str[idx+1]
+			for (_isHeb(c) || _isBlank(c) || _isPunct(c) || c == '\n') && blockEnd < len(str)-1 {
+				idx++
+				tmp = str[idx]
+				blockEnd++
+				blockLength++
+			}
+			for i := blockStart + 1; i <= blockEnd+1; i++ {
+				switch str[i-1] {
+				case '(':
+					hebStr[target] = ')'
+				case ')':
+					hebStr[target] = '('
+				case '[':
+					hebStr[target] = ']'
+				case ']':
+					hebStr[target] = '['
+				case '{':
+					hebStr[target] = '}'
+				case '}':
+					hebStr[target] = '{'
+				case '<':
+					hebStr[target] = '>'
+				case '>':
+					hebStr[target] = '<'
+				case '\\':
+					hebStr[target] = '/'
+				case '/':
+					hebStr[target] = '\\'
+				default:
+					hebStr[target] = str[i-1]
+				}
+				target--
+			}
+			blockType = _HEB_BLOCK_TYPE_ENG
+		} else {
+			c := str[idx+1]
+			for !_isHeb(c) && c != '\n' && blockEnd < len(str)-1 {
+				idx++
+				tmp = str[idx]
+				blockEnd++
+				blockLength++
+			}
+
+			for (_isBlank(tmp) || _isPunct(tmp)) && tmp != '/' && tmp != '-' && blockEnd > blockStart {
+				tmp--
+				blockEnd--
+			}
+
+			for i := blockEnd + 1; i >= blockStart+1; i-- {
+				hebStr[target] = str[i-1]
+				target--
+			}
+			blockType = _HEB_BLOCK_TYPE_HEB
+		}
+		blockStart = blockEnd + 1
+		if blockEnd >= len(str)-1 {
+			break
+		}
+	}
+
+	begin := len(str) - 1
+	end := len(str) - 1
+	var brokenStr strings.Builder
+	for true {
+		char_count := 0
+		for (maxChars == 0 || maxChars > 0 && char_count < maxChars) && begin > 0 {
+			char_count++
+			begin--
+			if _isNewline(hebStr[begin]) {
+				for begin > 0 && _isNewline(hebStr[begin-1]) {
+					begin--
+					char_count++
+				}
+				break
+			}
+		}
+		if maxChars >= 0 && char_count == maxChars {
+			var newCharCount int = char_count
+			var newBegin int = begin
+			for newCharCount > 0 {
+				if _isBlank(hebStr[newBegin]) || _isNewline(hebStr[newBegin]) {
+					break
+				}
+				newBegin++
+				newCharCount--
+			}
+			if newCharCount > 0 {
+				begin = newBegin
+			}
+		}
+		origBegin := begin
+		if _isBlank(hebStr[begin]) {
+			hebStr[begin] = '\n'
+		}
+		for begin <= end && _isNewline(hebStr[begin]) {
+			begin++
+		}
+		for i := begin; i <= end; i++ {
+			brokenStr.WriteByte(hebStr[i])
+		}
+		for i := origBegin; i <= end && _isNewline(hebStr[i]); i++ {
+			brokenStr.WriteByte(hebStr[i])
+		}
+		begin = origBegin
+		if begin == 0 {
+			break
+		}
+		begin--
+		end = begin
+	}
+
+	if convertNewlines {
+		return strings.ReplaceAll(brokenStr.String(), "\n", "<br />\n"), true
+	} else {
+		return brokenStr.String(), true
+	}
+}
+func ZifHebrev(str string, _ zpp.Opt, maxCharsPerLine int) (string, bool) {
+	return PhpHebrev(str, maxCharsPerLine, false)
+}
+func ZifHebrevc(str string, _ zpp.Opt, maxCharsPerLine int) (string, bool) {
+	return PhpHebrev(str, maxCharsPerLine, true)
+}
+
+/* in brief this inserts <br /> or <br> before matched regexp \n\r?|\r\n? */
+func ZifNl2br(str string, _ zpp.Opt, isXhtml_ *bool) string {
+	var isXhtml bool = b.Option(isXhtml_, true)
+
+	// 无换行符直接返回原字符串
+	// notice: 这里不是查找 "\r\n" 而是查找 '\r' 或 '\n'
+	if pos := strings.IndexAny(str, "\r\n"); pos < 0 {
+		return str
+	}
+
+	var br string
+	if isXhtml {
+		br = `<br />`
+	} else {
+		br = `<br>`
+	}
+
+	var buf strings.Builder
+	for i := 0; i < len(str); i++ {
+		c := str[i]
+		if c != '\r' && c != '\n' {
+			buf.WriteByte(c)
+			continue
+		}
+
+		buf.WriteString(br)
+		buf.WriteByte(c)
+		if i+1 < len(str) && (c == '\r' && str[i+1] == '\n') || (c == '\n' && str[i+1] == '\r') {
+			i++
+			buf.WriteByte(str[i])
+		}
+	}
+	return buf.String()
+}
+
+func phpTagFind(tag string, set string) bool {
+	if tag == "" {
+		return false
+	}
+	var norm_ strings.Builder
+
+	t := 0 // for tag
+	c := ascii.ToLower(tag[t])
+	done := false
+	state := 0
+	for !done {
+		switch c {
+		case '<':
+			norm_.WriteByte(c)
+		case '>':
+			done = true
+		default:
+			if !ascii.IsSpace(c) {
+				if state == 0 {
+					state = 1
+				}
+				if c != '/' || (tag[t-1] != '<' && tag[t+1] != '>') {
+					norm_.WriteByte(c)
+				}
+			} else {
+				if state == 1 {
+					done = true
+				}
+			}
+		}
+		t++
+		c = ascii.ToLower(tag[t])
+	}
+	norm_.WriteByte('>')
+
+	if pos := strings.Index(set, norm_.String()); pos >= 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func PhpStripTags(str string, state uint8, allowTags string) (string, uint8) {
+	var buf strings.Builder
+	var tagBuf strings.Builder
+	var br = 0
+	var quote byte = 0 // 标识是否在字符串内，可能值有: 0, '"', '\''
+	var lc byte = 0
+	var depth = 0
+	var isXml = false
+
+	// 约束 state 范围
+	if state < 1 || state > 4 {
+		state = 0
+	}
+
+	allowTags = ascii.StrToLower(allowTags)
+	for p, c := range []byte(str) {
+		if state == 0 {
+			switch c {
+			case 0:
+				break
+			case '<':
+				if quote != 0 {
+					break
+				}
+				if ascii.IsSpace(str[p+1]) {
+					buf.WriteByte(c)
+					break
+				}
+				lc = '<'
+				state = 1
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+				}
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				buf.WriteByte(c)
+			default:
+				buf.WriteByte(c)
+			}
+		} else if state == 1 {
+			switch c {
+			case 0:
+				break
+			case '<':
+				if quote != 0 {
+					break
+				}
+				if ascii.IsSpace(str[p+1]) {
+					if allowTags != "" {
+						tagBuf.WriteByte(c)
+					}
+				} else {
+					depth++
+				}
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				lc = '>'
+				if isXml && p >= 1 && str[p-1] == '-' {
+					break
+				}
+				isXml = false
+				state = 0
+				quote = 0
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+					if phpTagFind(tagBuf.String(), allowTags) {
+						buf.WriteString(tagBuf.String())
+					}
+					tagBuf.Reset()
+				}
+			case '"', '\'':
+				if p != 0 && (quote == 0 || str[p] == quote) {
+					if quote != 0 {
+						quote = 0
+					} else {
+						quote = str[p]
+					}
+				}
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+				}
+			case '!':
+				/* JavaScript & Other HTML scripting languages */
+				if p >= 1 && str[p-1] == '<' {
+					state = 3
+					lc = c
+				} else {
+					if allowTags != "" {
+						tagBuf.WriteByte(c)
+					}
+				}
+			case '?':
+				if p >= 1 && str[p-1] == '<' {
+					br = 0
+					state = 2
+				} else {
+					if allowTags != "" {
+						tagBuf.WriteByte(c)
+					}
+				}
+			default:
+				if allowTags != "" {
+					tagBuf.WriteByte(c)
+				}
+			}
+		} else if state == 2 {
+			switch c {
+			case '(':
+				if lc != '"' && lc != '\'' {
+					lc = '('
+					br++
+				}
+			case ')':
+				if lc != '"' && lc != '\'' {
+					lc = ')'
+					br--
+				}
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				if br == 0 && p >= 1 && lc != '"' && str[p-1] == '?' {
+					state = 0
+					quote = 0
+					tagBuf.Reset()
+				}
+			case '"', '\'':
+				if p >= 1 && str[p-1] != '\\' {
+					if lc == c {
+						lc = 0
+					} else if lc != '\\' {
+						lc = c
+					}
+					if p != 0 && (quote == 0 || str[p] == quote) {
+						if quote != 0 {
+							quote = 0
+						} else {
+							quote = str[p]
+						}
+					}
+				}
+			case 'l', 'L':
+				/* swm: If we encounter '<?xml' then we shouldn't be in
+				 * state == 2 (PHP). Switch back to HTML.
+				 */
+				if state == 2 && p > 4 && ascii.StrToLower(str[p-4:p]) == "<?xm" {
+					state = 1
+					isXml = true
+				}
+			}
+		} else if state == 3 {
+			switch c {
+			case '>':
+				if depth != 0 {
+					depth--
+					break
+				}
+				if quote != 0 {
+					break
+				}
+				state = 0
+				quote = 0
+				tagBuf.Reset()
+			case '"', '\'':
+				if p != 0 && str[p-1] != '\\' && (quote == 0 || str[p] == quote) {
+					if quote != 0 {
+						quote = 0
+					} else {
+						quote = str[p]
+					}
+				}
+			case '-':
+				if p >= 2 && str[p-2:p] == "!-" {
+					state = 4
+				}
+			case 'E', 'e':
+				/* !DOCTYPE exception */
+				if p > 6 && ascii.StrToLower(str[p-6:p+1]) == "doctype" {
+					state = 1
+				}
+			}
+		} else { // stage == 4
+			if c == '>' && quote == 0 {
+				if p >= 2 && str[p-2:p] == "--" {
+					state = 0
+					quote = 0
+					tagBuf.Reset()
+				}
+			}
+		}
+	}
+
+	return buf.String(), state
+}
+func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
+	var allow *types.Zval = allowableTags
+	var allowTagsStr string
+	if allow != nil {
+		if allow.IsType(types.IS_ARRAY) {
+			var buf strings.Builder
+			allow.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+				tag := zend.ZvalGetStrVal(value)
+				buf.WriteByte('<')
+				buf.WriteString(tag)
+				buf.WriteByte('>')
+			})
+			allowTagsStr = buf.String()
+		} else {
+			/* To maintain a certain BC, we allow anything for the second parameter and return original string */
+			zend.ConvertToString(allow)
+			allowTagsStr = allowableTags.GetStrVal()
+		}
+	}
+
+	result, _ := PhpStripTags(str, 0, allowTagsStr)
+	return result
+}
+
+func ZifStrRepeat(input string, mult int) (string, bool) {
+	if mult < 0 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Second argument has to be greater than or equal to 0")
+		return "", false
+	}
+	/* Don't waste our time if it's empty */
+	if input == "" || mult == 0 {
+		return "", true
+	}
+
+	return strings.Repeat(input, mult), true
+}
+func ZifCountChars(input string, _ zpp.Opt, mode int) (*types.Zval, bool) {
+	if mode < 0 || mode > 4 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unknown mode")
+		return nil, false
+	}
+
+	var charCount [256]int
+
+	for _, c := range []byte(input) {
+		charCount[c]++
+	}
+
+	if mode < 3 { // mode=0,1,2 以数组返回
+		arr := types.NewArray(0)
+		for i := 0; i < 256; i++ {
+			count := charCount[i]
+			if mode == 0 || (mode == 1 && count != 0) || (mode == 2 && count == 0) {
+				arr.IndexUpdate(i, types.NewZvalLong(charCount[i]))
+			}
+		}
+		return types.NewZvalArray(arr), true
+	} else { // mode=3,4 以字符串返回
+		var str []byte
+		for i := 0; i < 256; i++ {
+			count := charCount[i]
+			if (mode == 3 && count != 0) || (mode == 4 && count == 0) {
+				str = append(str, byte(i))
+			}
+		}
+		return types.NewZvalString(string(str)), true
+	}
+}
+func ZifStrnatcmp(s1 string, s2 string) int {
+	return Strnatcmp(s1, s2, false)
+}
+func ZifStrnatcasecmp(s1 string, s2 string) int {
+	return Strnatcmp(s1, s2, true)
+}
+func ZifSubstrCount(haystack string, needle string, _ zpp.Opt, offset int, length_ *int) (int, bool) {
+	// check needle
+	if needle == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Empty substring")
+		return 0, false
+	}
+
+	// check offset
+	if offset < 0 {
+		offset += len(haystack)
+	}
+	if offset < 0 || offset > len(haystack) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Offset not contained in string")
+		return 0, false
+	}
+
+	// check length
+	var length = len(haystack) - offset
+	if length_ != nil {
+		length = *length_
+		if length < 0 {
+			length += len(haystack) - offset
+		}
+		if length < 0 || length > len(haystack)-offset {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid length value")
+			return 0, false
+		}
+	}
+
+	// 截取目标字符串范围
+	searchStr := haystack[offset : offset+length]
+
+	return strings.Count(searchStr, needle), true
+}
+
+func ZifStrPad(input string, padLength int, _ zpp.Opt, padString_ *string, padType_ *int) (string, bool) {
+	padString := b.Option(padString_, " ")
+	padType := b.Option(padType_, STR_PAD_RIGHT)
+
+	/* If resulting string turns out to be shorter than input string,
+	   we simply copy the input and return. */
+	if padLength < 0 || padLength < len(input) {
+		return input, true
+	}
+	if padString == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding string cannot be empty")
+		return "", false
+	}
+	if padType < STR_PAD_LEFT || padType > STR_PAD_BOTH {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH")
+		return "", false
+	}
+	numPadChars := padLength - len(input)
+	if numPadChars >= core.INT_MAX {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Padding length is too long")
+		return "", false
+	}
+
+	/* We need to figure out the left/right padding lengths. */
+	var leftPad, rightPad int
+	switch padType {
+	case STR_PAD_RIGHT:
+		leftPad = 0
+		rightPad = numPadChars
+	case STR_PAD_LEFT:
+		leftPad = numPadChars
+		rightPad = 0
+	case STR_PAD_BOTH:
+		leftPad = numPadChars / 2
+		rightPad = numPadChars - leftPad
+	}
+
+	var buf strings.Builder
+	for i := 0; i < leftPad; i++ {
+		buf.WriteByte(padString[i%len(padString)])
+	}
+	buf.WriteString(input)
+	for i := 0; i < rightPad; i++ {
+		buf.WriteByte(padString[i%len(padString)])
+	}
+
+	return buf.String(), true
+}
+
+// 参数执行 ROT13 编码并将结果字符串返回。
+func ZifStrRot13(str string) string {
+	if str == "" {
+		return ""
+	}
+
+	bin := []byte(str)
+	for i, c := range bin {
+		if 'a' <= c && c <= 'z' {
+			bin[i] = 'a' + (c-'a'+13)%26
+		} else if 'A' <= c && c <= 'Z' {
+			bin[i] = 'A' + (c-'A'+13)%26
+		}
+	}
+	return string(bin)
+}
+func ZifStrShuffle(str string) string {
+	if len(str) <= 1 {
+		return str
+	}
+
+	bin := []byte(str)
+	for i := len(str) - 1; i >= 0; i-- {
+		rndIdx := rand.Intn(i)
+		if rndIdx != i {
+			bin[i], bin[rndIdx] = bin[rndIdx], bin[i]
+		}
+	}
+	return string(bin)
+}
+func ZifStrWordCount(str string, _ zpp.Opt, format int, charlist *string) (*types.Zval, bool) {
+	var mask = ""
+	if charlist != nil {
+		mask, _ = PhpCharmaskEx(*charlist)
+	}
+
+	// find spans
+	type span struct {
+		start int
+		end   int
+	}
+	spans := make([]span, 0, 32)
+
+	start := -1
+	for end, c := range []byte(str) {
+		if ascii.IsAscii(c) || (mask != "" && strings.ContainsRune(mask, rune(c))) {
+			if start < 0 {
+				start = end
+			}
+		} else {
+			spans = append(spans, span{start, end})
+			start = -1
+		}
+	}
+	if start > 0 {
+		spans = append(spans, span{start, len(str)})
+	}
+
+	// 区分三种输出格式返回
+	switch format {
+	case 0:
+		count := len(spans)
+		return types.NewZvalLong(count), true
+	case 1:
+		arr := types.NewArray(len(spans))
+		for _, span := range spans {
+			arr.NextIndexInsert(types.NewZvalString(str[span.start:span.end]))
+		}
+		return types.NewZvalArray(arr), true
+	case 2:
+		arr := types.NewArray(len(spans))
+		for _, span := range spans {
+			arr.IndexUpdate(span.start, types.NewZvalString(str[span.start:span.end]))
+		}
+		return types.NewZvalArray(arr), true
+	default:
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, format)
+		return nil, false
+	}
+}
+func ZifStrSplit(str string, _ zpp.Opt, splitLength_ *int) ([]string, bool) {
+	var splitLength zend.ZendLong = b.Option(splitLength_, 1)
+
+	if splitLength <= 0 {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The length of each segment must be greater than zero")
+		return nil, false
+	}
+
+	if str == "" || splitLength >= len(str) {
+		return []string{str}, true
+	}
+
+	size := (len(str) + splitLength - 1) / splitLength
+	result := make([]string, size)
+	for i := 0; i < len(str); i += splitLength {
+		if i+splitLength <= len(str) {
+			result = append(result, str[i:])
+		} else {
+			result = append(result, str[i:i+splitLength])
+		}
+	}
+	return result, true
+}
+func ZifStrpbrk(haystack string, charList string) (string, bool) {
+	if charList == "" {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The character list cannot be empty")
+		return "", false
+	}
+	if pos := strings.IndexAny(haystack, charList); pos >= 0 {
+		return haystack[pos:], true
+	}
+	return "", false
+}
+func ZifSubstrCompare(return_value zpp.Ret, haystack string, needle string, offset int, _ zpp.Opt, length *int, caseInsensitivity bool) (int, bool) {
+	// check length
+	if length != nil && *length <= 0 {
+		if *length == 0 {
+			return_value.SetLong(0)
+			return 0, true
+		} else {
+			core.PhpErrorDocref(nil, faults.E_WARNING, "The length must be greater than or equal to zero")
+			return 0, false
+		}
+	}
+
+	// check offset
+	if offset < 0 {
+		offset = len(haystack) + offset
+		if offset < 0 {
+			offset = 0
+		}
+	}
+	if offset > len(haystack) {
+		core.PhpErrorDocref(nil, faults.E_WARNING, "The start position cannot exceed initial string length")
+		return_value.SetFalse()
+		return 0, false
+	}
+
+	// cut
+	s1 := haystack[offset:]
+	s2 := needle
+	if length != nil {
+		if len(s1) > *length {
+			s1 = s1[:*length]
+		}
+		if len(s2) > *length {
+			s2 = s2[:*length]
+		}
+	}
+
+	if caseInsensitivity {
+		return strings.Compare(s1, s2), true
+	} else {
+		return ascii.StrCaseCompare(s1, s2), true
+	}
+}

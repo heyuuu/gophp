@@ -23,6 +23,7 @@
 字符串函数
 - `localeconv`
 - `setlocale`
+- `money_format`
 
 
 # 实现细节不同的方法

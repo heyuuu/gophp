@@ -16,7 +16,7 @@ var DefZifStrReplace = def.DefFunc("str_replace", 3, 4, []def.ArgInfo{{Name: "se
 	if fp.HasError() {
 		return
 	}
-	ZifStrReplace(returnValue, search, replace, subject, nil)
+	ZifStrReplace(returnValue, search, replace, subject, nil, replace_count)
 })
 
 // generate by ZifStrIreplace
@@ -36,75 +36,88 @@ var DefZifStrIreplace = def.DefFunc("str_ireplace", 3, 4, []def.ArgInfo{{Name: "
 // generate by ZifHebrev
 var DefZifHebrev = def.DefFunc("hebrev", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "max_chars_per_line"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	max_chars_per_line := fp.ParseZval()
+	max_chars_per_line := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifHebrev(str, nil, max_chars_per_line)
+	ret, ok := ZifHebrev(str, nil, max_chars_per_line)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifHebrevc
 var DefZifHebrevc = def.DefFunc("hebrevc", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "max_chars_per_line"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	max_chars_per_line := fp.ParseZval()
+	max_chars_per_line := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifHebrevc(executeData, returnValue, str, nil, max_chars_per_line)
+	ret, ok := ZifHebrevc(str, nil, max_chars_per_line)
+	if ok {
+		returnValue.SetStringVal(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifNl2br
-var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "is_xhtml"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifNl2br = def.DefFunc("nl2br", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "is_xhtml_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
-	is_xhtml := fp.ParseZval()
+	is_xhtml_ := fp.ParseBoolValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifNl2br(str, nil, is_xhtml)
+	ret := ZifNl2br(str, nil, is_xhtml_)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifStripTags
 var DefZifStripTags = def.DefFunc("strip_tags", 1, 2, []def.ArgInfo{{Name: "str"}, {Name: "allowable_tags"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	fp.StartOptional()
 	allowable_tags := fp.ParseZval()
 	if fp.HasError() {
 		return
 	}
-	ZifStripTags(str, nil, allowable_tags)
+	ret := ZifStripTags(str, nil, allowable_tags)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifParseStr
 var DefZifParseStr = def.DefFunc("parse_str", 1, 2, []def.ArgInfo{{Name: "encoded_string"}, {Name: "result"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	encoded_string := fp.ParseZval()
+	encoded_string := fp.ParseStringVal()
 	fp.StartOptional()
 	result := fp.ParseZvalEx(false, true)
 	if fp.HasError() {
 		return
 	}
-	ZifParseStr(executeData, returnValue, encoded_string, nil, result)
+	ZifParseStr(encoded_string, nil, result)
 })
 
 // generate by ZifStrGetcsv
-var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{Name: "string"}, {Name: "delimiter"}, {Name: "enclosure"}, {Name: "escape"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifStrGetcsv = def.DefFunc("str_getcsv", 1, 4, []def.ArgInfo{{Name: "string_"}, {Name: "delimiter"}, {Name: "enclosure"}, {Name: "escape"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 4, 0)
-	string := fp.ParseZval()
+	string_ := fp.ParseStringVal()
 	fp.StartOptional()
-	delimiter := fp.ParseZval()
-	enclosure := fp.ParseZval()
-	escape := fp.ParseZval()
+	delimiter := fp.ParseStringValNullable()
+	enclosure := fp.ParseStringValNullable()
+	escape := fp.ParseStringValNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifStrGetcsv(returnValue, string, nil, delimiter, enclosure, escape)
+	ret := ZifStrGetcsv(returnValue, string_, nil, delimiter, enclosure, escape)
+	returnValue.SetArray(ret)
 })
 
 // generate by ZifStrRepeat
@@ -126,49 +139,61 @@ var DefZifStrRepeat = def.DefFunc("str_repeat", 2, 2, []def.ArgInfo{{Name: "inpu
 // generate by ZifCountChars
 var DefZifCountChars = def.DefFunc("count_chars", 1, 2, []def.ArgInfo{{Name: "input"}, {Name: "mode"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 2, 0)
-	input := fp.ParseZval()
+	input := fp.ParseStringVal()
 	fp.StartOptional()
-	mode := fp.ParseZval()
+	mode := fp.ParseLong()
 	if fp.HasError() {
 		return
 	}
-	ZifCountChars(input, nil, mode)
+	ret, ok := ZifCountChars(input, nil, mode)
+	if ok {
+		returnValue.SetBy(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrnatcmp
 var DefZifStrnatcmp = def.DefFunc("strnatcmp", 2, 2, []def.ArgInfo{{Name: "s1"}, {Name: "s2"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	s1 := fp.ParseZval()
-	s2 := fp.ParseZval()
+	s1 := fp.ParseStringVal()
+	s2 := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrnatcmp(executeData, returnValue, s1, s2)
+	ret := ZifStrnatcmp(s1, s2)
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifStrnatcasecmp
 var DefZifStrnatcasecmp = def.DefFunc("strnatcasecmp", 2, 2, []def.ArgInfo{{Name: "s1"}, {Name: "s2"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	s1 := fp.ParseZval()
-	s2 := fp.ParseZval()
+	s1 := fp.ParseStringVal()
+	s2 := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrnatcasecmp(s1, s2)
+	ret := ZifStrnatcasecmp(s1, s2)
+	returnValue.SetLong(ret)
 })
 
 // generate by ZifSubstrCount
-var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}, {Name: "length"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifSubstrCount = def.DefFunc("substr_count", 2, 4, []def.ArgInfo{{Name: "haystack"}, {Name: "needle"}, {Name: "offset"}, {Name: "length_"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 4, 0)
-	haystack := fp.ParseZval()
-	needle := fp.ParseZval()
+	haystack := fp.ParseStringVal()
+	needle := fp.ParseStringVal()
 	fp.StartOptional()
-	offset := fp.ParseZval()
-	length := fp.ParseZval()
+	offset := fp.ParseLong()
+	length_ := fp.ParseLongNullable()
 	if fp.HasError() {
 		return
 	}
-	ZifSubstrCount(haystack, needle, nil, offset, length)
+	ret, ok := ZifSubstrCount(haystack, needle, nil, offset, length_)
+	if ok {
+		returnValue.SetLong(ret)
+	} else {
+		returnValue.SetFalse()
+	}
 })
 
 // generate by ZifStrPad
@@ -190,24 +215,39 @@ var DefZifStrPad = def.DefFunc("str_pad", 2, 4, []def.ArgInfo{{Name: "input"}, {
 	}
 })
 
-// generate by ZifStrRot13
-var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	str := fp.ParseZval()
+// generate by ZifSscanf
+var DefZifSscanf = def.DefFunc("sscanf", 3, 3, []def.ArgInfo{{Name: "str"}, {Name: "format"}, {Name: "vars"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 3, 3, 0)
+	str := fp.ParseStringVal()
+	format := fp.ParseStringVal()
+	vars := fp.ParseVariadic()
 	if fp.HasError() {
 		return
 	}
-	ZifStrRot13(executeData, returnValue, str)
+	ret := ZifSscanf(str, format, vars)
+	returnValue.SetBy(ret)
+})
+
+// generate by ZifStrRot13
+var DefZifStrRot13 = def.DefFunc("str_rot13", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+	fp := zpp.FastParseStart(executeData, 1, 1, 0)
+	str := fp.ParseStringVal()
+	if fp.HasError() {
+		return
+	}
+	ret := ZifStrRot13(str)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifStrShuffle
 var DefZifStrShuffle = def.DefFunc("str_shuffle", 1, 1, []def.ArgInfo{{Name: "str"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	str := fp.ParseZval()
+	str := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStrShuffle(executeData, returnValue, str)
+	ret := ZifStrShuffle(str)
+	returnValue.SetStringVal(ret)
 })
 
 // generate by ZifStrWordCount
@@ -226,17 +266,6 @@ var DefZifStrWordCount = def.DefFunc("str_word_count", 1, 3, []def.ArgInfo{{Name
 	} else {
 		returnValue.SetFalse()
 	}
-})
-
-// generate by ZifMoneyFormat
-var DefZifMoneyFormat = def.DefFunc("money_format", 2, 2, []def.ArgInfo{{Name: "format"}, {Name: "value"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
-	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	format := fp.ParseZval()
-	value := fp.ParseZval()
-	if fp.HasError() {
-		return
-	}
-	ZifMoneyFormat(executeData, returnValue, format, value)
 })
 
 // generate by ZifStrSplit
@@ -259,11 +288,11 @@ var DefZifStrpbrk = def.DefFunc("strpbrk", 2, 2, []def.ArgInfo{{Name: "haystack"
 	if fp.HasError() {
 		return
 	}
-	ZifStrpbrk(executeData, returnValue, haystack, char_list)
+	ZifStrpbrk(haystack, char_list)
 })
 
 // generate by ZifSubstrCompare
-var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Name: "main_str"}, {Name: "str"}, {Name: "offset"}, {Name: "length"}, {Name: "case_sensitivity"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
+var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Name: "main_str"}, {Name: "str"}, {Name: "offset"}, {Name: "length"}, {Name: "case_insensitivity"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 3, 5, 0)
 	main_str := fp.ParseZval()
 	str := fp.ParseZval()
@@ -274,7 +303,7 @@ var DefZifSubstrCompare = def.DefFunc("substr_compare", 3, 5, []def.ArgInfo{{Nam
 	if fp.HasError() {
 		return
 	}
-	ZifSubstrCompare(executeData, returnValue, main_str, str, offset, nil, length, case_sensitivity)
+	ZifSubstrCompare(returnValue, offset, nil, length)
 })
 
 // generate by ZifUtf8Encode
