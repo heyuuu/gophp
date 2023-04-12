@@ -315,25 +315,17 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 				}
 			}
 		}
-		ce.GetPropertiesInfo().Destroy()
+		ce.PropertyTable().Destroy()
 		// types.ZendStringReleaseEx(ce.GetName(), 0)
 		ce.FunctionTable().Destroy()
-		if ce.GetConstantsTable().Len() {
-			var c *ZendClassConstant
-			var __ht *types.Array = ce.GetConstantsTable()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				c = _z.GetPtr()
+		if ce.ConstantsTable().Len() != 0 {
+			ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 				if c.GetCe() == ce {
 					ZvalPtrDtorNogc(c.GetValue())
-					if c.GetDocComment() != nil {
-						// types.ZendStringReleaseEx(c.GetDocComment(), 0)
-					}
 				}
-			}
+			})
 		}
-		ce.GetConstantsTable().Destroy()
+		ce.ConstantsTable().Destroy()
 		if ce.GetNumInterfaces() > 0 {
 			if !ce.IsResolvedInterfaces() {
 				var i uint32
@@ -343,9 +335,6 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 				}
 			}
 			Efree(ce.GetInterfaces())
-		}
-		if ce.GetDocComment() != nil {
-			// types.ZendStringReleaseEx(ce.GetDocComment(), 0)
 		}
 		if ce.GetNumTraits() > 0 {
 			_destroyZendClassTraitsInfo(ce)
@@ -383,22 +372,14 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 		})
 		ce.FunctionTable().Destroy()
 
-		if ce.GetConstantsTable().Len() {
-			var c *ZendClassConstant
-			var __ht *types.Array = ce.GetConstantsTable()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				c = _z.GetPtr()
+		if ce.ConstantsTable().Len() != 0 {
+			ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 				if c.GetCe() == ce {
 					ZvalInternalPtrDtor(c.GetValue())
-					if c.GetDocComment() != nil {
-						// types.ZendStringReleaseEx(c.GetDocComment(), 1)
-					}
 				}
-				Free(c)
-			}
-			ce.GetConstantsTable().Destroy()
+			})
+
+			ce.ConstantsTable().Destroy()
 		}
 		if ce.GetIteratorFuncsPtr() != nil {
 			Free(ce.GetIteratorFuncsPtr())

@@ -133,7 +133,6 @@ func (this *ClassEntry) PropertyTable() PropertyTable       { return this.proper
 func (this *ClassEntry) ConstantsTable() ClassConstantTable { return this.constantTable }
 
 func (this *ClassEntry) GetPropertiesInfo() Array { return this.properties_info }
-func (this *ClassEntry) GetConstantsTable() Array { return this.constants_table }
 
 /**
  * Getter / Setter

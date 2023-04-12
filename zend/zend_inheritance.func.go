@@ -945,11 +945,11 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 
 	/* and now call the implementing handlers */
 }
-func DoInheritClassConstant(name *types.String, parentConst *ZendClassConstant, ce *types.ClassEntry) {
-	var c = ce.ConstantsTable().Get(name.GetStr())
+func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *types.ClassEntry) {
+	var c = ce.ConstantsTable().Get(name)
 	if c != nil {
 		if (c.GetValue().GetAccessFlags() & AccPppMask) > (parentConst.GetValue().GetAccessFlags() & AccPppMask) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name.GetStr(), ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&AccPublic) != 0, "", " or weaker"))
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&AccPublic) != 0, "", " or weaker"))
 		}
 	} else if (parentConst.GetValue().GetAccessFlags() & AccPrivate) == 0 {
 		if parentConst.GetValue().IsConstant() {
@@ -958,7 +958,7 @@ func DoInheritClassConstant(name *types.String, parentConst *ZendClassConstant, 
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
 			parentConst = CopyClassConstant(parentConst)
 		}
-		ce.ConstantsTable().Add(name.GetStr(), parentConst)
+		ce.ConstantsTable().Add(name, parentConst)
 	}
 }
 func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
@@ -1243,17 +1243,11 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			DoInheritProperty(property_info, key, ce)
 		}
 	}
-	if parent_ce.GetConstantsTable().Len() {
-		var c *ZendClassConstant
-		ce.GetConstantsTable().Extend(ce.GetConstantsTable().Len() + parent_ce.GetConstantsTable().Len())
-		var __ht *types.Array = parent_ce.GetConstantsTable()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			key = _p.GetKey()
-			c = _z.GetPtr()
+	if parent_ce.ConstantsTable().Len() != 0 {
+		parent_ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 			DoInheritClassConstant(key, c, ce)
-		}
+		})
+
 	}
 	if parent_ce.FunctionTable().Len() != 0 {
 		if checked {
@@ -1274,20 +1268,18 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 	}
 	ce.AddCeFlags(parent_ce.GetCeFlags() & (AccHasStaticInMethods | AccHasTypeHints | AccUseGuards))
 }
-func DoInheritConstantCheck(child_constants_table *types.Array, parent_constant *ZendClassConstant, name *types.String, iface *types.ClassEntry) types.ZendBool {
-	var zv *types.Zval = child_constants_table.KeyFind(name.GetStr())
-	var old_constant *ZendClassConstant
-	if zv != nil {
-		old_constant = (*ZendClassConstant)(zv.GetPtr())
-		if old_constant.GetCe() != parent_constant.GetCe() {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot inherit previously-inherited or override constant %s from interface %s", name.GetVal(), iface.GetName().GetVal())
+func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parentConstant *ZendClassConstant, name string, iface *types.ClassEntry) types.ZendBool {
+	var oldConstant *ZendClassConstant = childConstantsTable.Get(name)
+	if oldConstant != nil {
+		if oldConstant.GetCe() != parentConstant.GetCe() {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot inherit previously-inherited or override constant %s from interface %s", name, iface.Name())
 		}
 		return 0
 	}
 	return 1
 }
-func DoInheritIfaceConstant(name *types.String, c *ZendClassConstant, ce *types.ClassEntry, iface *types.ClassEntry) {
-	if DoInheritConstantCheck(ce.GetConstantsTable(), c, name, iface) != 0 {
+func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEntry, iface *types.ClassEntry) {
+	if DoInheritConstantCheck(ce.ConstantsTable(), c, name, iface) != 0 {
 		var ct *ZendClassConstant
 		if c.GetValue().IsConstant() {
 			ce.SetIsConstantsUpdated(false)
@@ -1297,21 +1289,13 @@ func DoInheritIfaceConstant(name *types.String, c *ZendClassConstant, ce *types.
 			memcpy(ct, c, b.SizeOf("zend_class_constant"))
 			c = ct
 		}
-		types.ZendHashUpdatePtr(ce.GetConstantsTable(), name.GetStr(), c)
+		ce.ConstantsTable().Update(name, c)
 	}
 }
 func DoInterfaceImplementation(ce *types.ClassEntry, iface *types.ClassEntry) {
-	var func_ types.IFunction
-	var key *types.String
-	var c *ZendClassConstant
-	var __ht *types.Array = iface.GetConstantsTable()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		key = _p.GetKey()
-		c = _z.GetPtr()
+	iface.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 		DoInheritIfaceConstant(key, c, ce, iface)
-	}
+	})
 	iface.FunctionTable().Foreach(func(key string, func_ types.IFunction) {
 		DoInheritMethod(key, func_, ce, 1, 0)
 	})
@@ -1341,20 +1325,10 @@ func ZendDoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
 		}
 	}
 	if ignore != 0 {
-
 		/* Check for attempt to redeclare interface constants */
-
-		var __ht *types.Array = ce.GetConstantsTable()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			key = _p.GetKey()
-			c = _z.GetPtr()
-			DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
-		}
-
-		/* Check for attempt to redeclare interface constants */
-
+		ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+			DoInheritConstantCheck(iface.ConstantsTable(), c, key, iface)
+		})
 	} else {
 		if ce.GetNumInterfaces() >= current_iface_num {
 			if ce.GetType() == ZEND_INTERNAL_CLASS {
@@ -1394,15 +1368,10 @@ func ZendDoImplementInterfaces(ce *types.ClassEntry, interfaces **types.ClassEnt
 				}
 
 				/* skip duplications */
+				ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
+					DoInheritConstantCheck(iface.ConstantsTable(), c, key, iface)
+				})
 
-				var __ht *types.Array = ce.GetConstantsTable()
-				for _, _p := range __ht.ForeachData() {
-					var _z *types.Zval = _p.GetVal()
-
-					key = _p.GetKey()
-					c = _z.GetPtr()
-					DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
-				}
 				iface = nil
 				break
 			}
