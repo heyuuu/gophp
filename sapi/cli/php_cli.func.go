@@ -446,7 +446,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		}
 		request_started = 1
 		zend.CG__().SetSkipShebang(1)
-		zend.ZendRegisterBoolConstant("PHP_CLI_PROCESS_TITLE", 0, zend.CONST_CS, 0)
+		zend.RegisterBoolConstant("PHP_CLI_PROCESS_TITLE", false, zend.CONST_CS, 0)
 		*arg_excp = arg_free
 		if hide_argv != 0 {
 			var i int

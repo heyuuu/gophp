@@ -388,11 +388,7 @@ register_constant:
 
 	c.SetFlags(caseSensitive, PHP_USER_CONSTANT)
 	c.SetName(constantName)
-	if ZendRegisterConstant(&c) == types.SUCCESS {
-		return true
-	} else {
-		return false
-	}
+	return ZendRegisterConstant(&c)
 }
 func ZifDefined(constantName string) bool {
 	if ZendGetConstantEx(types.NewString(constantName), ZendGetExecutedScope(), ZEND_FETCH_CLASS_SILENT|ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) != nil {

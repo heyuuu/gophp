@@ -20,29 +20,46 @@ func RESET_CONSTANT_VISITED(zv *types.Zval) uint32 {
 	return zv.GetAccessFlags()
 }
 
-func RegisterLongConstant(name string, lval ZendLong, flags int, moduleNumber int) {
-	ZendRegisterLongConstant(name, lval, flags, moduleNumber)
+func RegisterNullConstant(name string, flags int, moduleNumber int) {
+	c := NewConstant(name, flags, moduleNumber)
+	c.Value().SetNull()
+	ZendRegisterConstant(c)
+}
+func RegisterBoolConstant(name string, bval bool, flags int, moduleNumber int) {
+	c := NewConstant(name, flags, moduleNumber)
+	c.Value().SetBool(bval)
+	ZendRegisterConstant(c)
+}
+func RegisterLongConstant(name string, lval int, flags int, moduleNumber int) {
+	c := NewConstant(name, flags, moduleNumber)
+	c.Value().SetLong(lval)
+	ZendRegisterConstant(c)
 }
 func RegisterDoubleConstant(name string, dval float64, flags int, moduleNumber int) {
-	ZendRegisterDoubleConstant(name, dval, flags, moduleNumber)
+	c := NewConstant(name, flags, moduleNumber)
+	c.Value().SetDouble(dval)
+	ZendRegisterConstant(c)
 }
-func RegisterStringConstant(name string, str *byte, flags int, moduleNumber int) {
-	ZendRegisterStringConstant(name, str, flags, moduleNumber)
+func RegisterStringConstant(name string, str string, flags int, moduleNumber int) {
+	c := NewConstant(name, flags, moduleNumber)
+	c.Value().SetStringVal(str)
+	ZendRegisterConstant(c)
 }
+
 func RegisterMainNullConstant(name string, flags int) {
-	ZendRegisterNullConstant(name, flags, 0)
+	RegisterNullConstant(name, flags, 0)
 }
-func RegisterMainBoolConstant(name string, bval types.ZendBool, flags int) {
-	ZendRegisterBoolConstant(name, bval, flags, 0)
+func RegisterMainBoolConstant(name string, bval bool, flags int) {
+	RegisterBoolConstant(name, bval, flags, 0)
 }
 func RegisterMainLongConstant(name string, lval ZendLong, flags int) {
-	ZendRegisterLongConstant(name, lval, flags, 0)
+	RegisterLongConstant(name, lval, flags, 0)
 }
 func RegisterMainDoubleConstant(name string, dval float64, flags int) {
-	ZendRegisterDoubleConstant(name, dval, flags, 0)
+	RegisterDoubleConstant(name, dval, flags, 0)
 }
 func RegisterMainStringConstant(name string, str string, flags int) {
-	ZendRegisterStringlConstant(name, str, flags, 0)
+	RegisterStringConstant(name, str, flags, 0)
 }
 
 func FreeZendConstantEx(c *ZendConstant) {
@@ -80,45 +97,11 @@ func ZendRegisterStandardConstants() {
 
 	/* true/false constants */
 
-	RegisterMainBoolConstant("TRUE", 1, CONST_PERSISTENT|CONST_CT_SUBST)
-	RegisterMainBoolConstant("FALSE", 0, CONST_PERSISTENT|CONST_CT_SUBST)
-	RegisterMainBoolConstant("ZEND_THREAD_SAFE", 0, CONST_PERSISTENT|CONST_CS)
-	RegisterMainBoolConstant("ZEND_DEBUG_BUILD", 0, CONST_PERSISTENT|CONST_CS)
+	RegisterMainBoolConstant("TRUE", true, CONST_PERSISTENT|CONST_CT_SUBST)
+	RegisterMainBoolConstant("FALSE", false, CONST_PERSISTENT|CONST_CT_SUBST)
+	RegisterMainBoolConstant("ZEND_THREAD_SAFE", false, CONST_PERSISTENT|CONST_CS)
+	RegisterMainBoolConstant("ZEND_DEBUG_BUILD", false, CONST_PERSISTENT|CONST_CS)
 	RegisterMainNullConstant("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
-}
-func ZendRegisterNullConstant(name string, flags int, moduleNumber int) {
-	var c ZendConstant
-	c.Value().SetNull()
-	c.SetFlags(flags, moduleNumber)
-	c.SetName(name)
-	ZendRegisterConstant(&c)
-}
-func ZendRegisterBoolConstant(name string, bval types.ZendBool, flags int, moduleNumber int) {
-	var c ZendConstant
-	types.ZVAL_BOOL(c.Value(), bval != 0)
-	c.SetFlags(flags, moduleNumber)
-	c.SetName(name)
-	ZendRegisterConstant(&c)
-}
-func ZendRegisterLongConstant(name string, lval ZendLong, flags int, moduleNumber int) {
-	var c ZendConstant
-	c.Value().SetLong(lval)
-	c.SetFlags(flags, moduleNumber)
-	c.SetName(name)
-	ZendRegisterConstant(&c)
-}
-func ZendRegisterDoubleConstant(name string, dval float64, flags int, moduleNumber int) {
-	c := NewConstant(name, flags, moduleNumber)
-	c.Value().SetDouble(dval)
-	ZendRegisterConstant(c)
-}
-func ZendRegisterStringlConstant(name string, str string, flags int, moduleNumber int) {
-	c := NewConstant(name, flags, moduleNumber)
-	c.Value().SetStringVal(str)
-	ZendRegisterConstant(c)
-}
-func ZendRegisterStringConstant(name string, strval *byte, flags int, moduleNumber int) {
-	ZendRegisterStringlConstant(name, strval, flags, moduleNumber)
 }
 func ZendGetSpecialConstant(name string) *ZendConstant {
 	var haltoff = "__COMPILER_HALT_OFFSET__"
@@ -167,23 +150,13 @@ func ZendGetConstant(name string) *types.Zval {
 		return nil
 	}
 }
-func IsAccessDeprecated(c *ZendConstant, access_name *byte) types.ZendBool {
-	var ns_sep *byte = ZendMemrchr(c.GetName().GetStr(), '\\', c.GetName().GetLen())
-	if ns_sep != nil {
-
+func IsAccessDeprecated(c *ZendConstant, accessName string) bool {
+	if pos := strings.LastIndexByte(c.Name(), '\\'); pos >= 0 {
 		/* Namespaces are always case-insensitive. Only compare shortname. */
-
-		var shortname_offset int = ns_sep - c.GetName().GetVal() + 1
-		var shortname_len int = c.GetName().GetLen() - shortname_offset
-		return memcmp(access_name+shortname_offset, c.GetName().GetVal()+shortname_offset, shortname_len) != 0
+		return accessName[pos+1:] != c.Name()[pos+1:]
 	} else {
-
 		/* No namespace, compare whole name */
-
-		return memcmp(access_name, c.GetName().GetVal(), c.GetName().GetLen()) != 0
-
-		/* No namespace, compare whole name */
-
+		return accessName != c.Name()
 	}
 }
 func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint32) *types.Zval {
@@ -305,40 +278,32 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 		return nil
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
-		if !c.IsCaseSensitive() && !c.IsCtSubst() && IsAccessDeprecated(c, name_) != 0 {
+		if !c.IsCaseSensitive() && !c.IsCtSubst() && IsAccessDeprecated(c, name_) {
 			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 		}
 	}
 	return c.Value()
 }
 
-func ZendRegisterConstant(c *ZendConstant) int {
-	var lowercase_name *types.String = nil
-	var name *types.String
-	var ret int = types.SUCCESS
+func ZendRegisterConstant(c *ZendConstant) bool {
+	name := c.Name()
 	if !c.IsCaseSensitive() {
-		lowercase_name = ZendStringTolowerEx(c.GetName())
-		name = lowercase_name
+		name = ascii.StrToLower(name)
 	} else {
-		var slash *byte = strrchr(c.GetName().GetVal(), '\\')
-		if slash != nil {
-			lowercase_name = types.NewString(c.GetName().GetStr())
-			ZendStrTolower(lowercase_name.GetVal(), slash-c.GetName().GetVal())
-			// lowercase_name = types.ZendNewInternedString(lowercase_name)
-			name = lowercase_name
-		} else {
-			name = c.GetName()
+		// 带命名空间的常量名，命名空间部分大小写无关
+		if pos := strings.LastIndexByte(name, '\\'); pos >= 0 {
+			name = ascii.StrToLower(name[:pos]) + name[pos:]
 		}
 	}
 
 	/* Check if the user is trying to define the __special__  internal pseudo constant name __COMPILER_HALT_OFFSET__ */
-
-	if name.GetStr() == "__COMPILER_HALT_OFFSET__" || !EG__().ConstantTable().Add(name.GetStr(), CopyConstant(c)) {
-		faults.Error(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
+	if name == "__COMPILER_HALT_OFFSET__" || !EG__().ConstantTable().Add(name, CopyConstant(c)) {
+		faults.Error(faults.E_NOTICE, "Constant %s already defined", name)
 		if !c.IsPersistent() {
 			ZvalPtrDtorNogc(c.Value())
 		}
-		ret = types.FAILURE
+		return false
 	}
-	return ret
+
+	return true
 }
