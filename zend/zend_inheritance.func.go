@@ -960,62 +960,39 @@ func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *typ
 	}
 }
 func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
-	var table []*ZendPropertyInfo
-	var size int
 	if ce.GetDefaultPropertiesCount() == 0 {
 		return
 	}
 	b.Assert(ce.GetPropertiesInfoTable() == nil)
-	size = b.SizeOf("zend_property_info *") * ce.GetDefaultPropertiesCount()
-	if ce.GetType() == ZEND_USER_CLASS {
-		table = ZendArenaAlloc(CG__().GetArena(), size)
-		ce.SetPropertiesInfoTable(table)
-	} else {
-		table = Pemalloc(size, 1)
-		ce.SetPropertiesInfoTable(table)
-	}
+
+	var table []*ZendPropertyInfo = make([]*ZendPropertyInfo, ce.GetDefaultPropertiesCount())
+	ce.SetPropertiesInfoTable(table)
 
 	/* Dead slots may be left behind during inheritance. Make sure these are NULLed out. */
-
-	memset(table, 0, size)
-	if ce.GetParent() && ce.GetParent().default_properties_count != 0 {
-		var parent_table **ZendPropertyInfo = ce.GetParent().properties_info_table
-		memcpy(table, parent_table, b.SizeOf("zend_property_info *")*ce.GetParent().default_properties_count)
+	if ce.GetParent() != nil && ce.GetParent().GetDefaultPropertiesCount() != 0 {
+		var parentTable []*ZendPropertyInfo = ce.GetParent().GetPropertiesInfoTable()
+		copy(table, parentTable[:ce.GetParent().GetDefaultPropertiesCount()])
 
 		/* Child did not add any new properties, we are done */
-
-		if ce.GetDefaultPropertiesCount() == ce.GetParent().default_properties_count {
+		if ce.GetDefaultPropertiesCount() == ce.GetParent().GetDefaultPropertiesCount() {
 			return
 		}
-
-		/* Child did not add any new properties, we are done */
-
 	}
 
-	ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
-		if prop_info.GetCe() == ce && !prop_info.IsStatic() {
-			table[OBJ_PROP_TO_NUM(prop_info.GetOffset())] = prop_info
+	ce.PropertyTable().Foreach(func(key string, propInfo *ZendPropertyInfo) {
+		if propInfo.GetCe() == ce && !propInfo.IsStatic() {
+			table[OBJ_PROP_TO_NUM(propInfo.GetOffset())] = propInfo
 		}
 	})
 }
 func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, checked bool) {
-	var property_info *ZendPropertyInfo
-	var func_ types.IFunction
-	var key *types.String
 	if ce.IsInterface() {
-
 		/* Interface can only inherit other interfaces */
-
 		if !parent_ce.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Interface %s may not inherit from class (%s)", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
 		}
-
-		/* Interface can only inherit other interfaces */
-
 	} else if parent_ce.HasCeFlags(AccInterface | AccTrait | AccFinal) {
-
 		/* Class declaration must not extend traits or interfaces */
-
 		if parent_ce.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s cannot extend from interface %s", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
 		} else if parent_ce.IsTrait() {
@@ -1023,16 +1000,9 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		}
 
 		/* Class must not extend a final class */
-
 		if parent_ce.IsFinal() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Class %s may not inherit from final class (%s)", ce.GetName().GetVal(), parent_ce.GetName().GetVal())
 		}
-
-		/* Class must not extend a final class */
-
-	}
-	if ce.GetParentName() {
-		// types.ZendStringReleaseEx(ce.GetParentName(), 0)
 	}
 	ce.SetParent(parent_ce)
 	ce.SetIsResolvedParent(true)
@@ -1079,9 +1049,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		}
 		src = parent_ce.GetDefaultPropertiesTable() + parent_ce.GetDefaultPropertiesCount()
 		if parent_ce.GetType() != ce.GetType() {
-
 			/* User class extends internal */
-
 			for {
 				dst--
 				src--
@@ -1094,9 +1062,6 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 					break
 				}
 			}
-
-			/* User class extends internal */
-
 		} else {
 			for {
 				dst--

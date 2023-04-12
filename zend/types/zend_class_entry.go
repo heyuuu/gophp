@@ -31,7 +31,7 @@ type ClassEntry struct {
 	propertyTable PropertyTable
 	constantTable ClassConstantTable
 
-	properties_info_table **zend.ZendPropertyInfo
+	properties_info_table []*zend.ZendPropertyInfo
 
 	constructor      IFunction
 	destructor       IFunction
@@ -171,10 +171,10 @@ func (this *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 func (this *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return this.static_members_table__ptr
 }
-func (this *ClassEntry) GetPropertiesInfoTable() **zend.ZendPropertyInfo {
+func (this *ClassEntry) GetPropertiesInfoTable() []*zend.ZendPropertyInfo {
 	return this.properties_info_table
 }
-func (this *ClassEntry) SetPropertiesInfoTable(value **zend.ZendPropertyInfo) {
+func (this *ClassEntry) SetPropertiesInfoTable(value []*zend.ZendPropertyInfo) {
 	this.properties_info_table = value
 }
 func (this *ClassEntry) GetConstructor() IFunction        { return this.constructor }

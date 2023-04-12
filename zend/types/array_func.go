@@ -493,9 +493,6 @@ func ZendHashStrAddEmptyElement(ht *Array, str string) *Zval {
 	(&dummy).SetUndef()
 	return ht.KeyAdd(str, &dummy)
 }
-func ZendHashSetBucketKey(ht *Array, b *Bucket, key string) *Zval {
-	return ht.SetBucketKey(b, key)
-}
 func ZendHashDelBucket(ht *Array, p *Bucket) {
 	ht.assertRc1()
 	// todo 调整为传入 pos 更合适
