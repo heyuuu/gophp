@@ -8,33 +8,48 @@ import (
 /**
  * 内部频繁使用的 map, 有如下特征
  * - 有序
- * - key 为字符串且无视大小写
+ * - key 为字符串且可无视大小写(可选)
  * - value 为引用且不为空。get(key) 方法返回 nil 表示 key 不存在
  * - 支持元素析构函数
  */
-type LcTable[T any] struct {
+type Table[T any] struct {
 	keys       []string
 	m          map[string]T
 	destructor func(T)
+	caseIgnore bool
 }
 
-func NewLcTable[T any](destructor func(T)) *LcTable[T] {
-	return &LcTable[T]{
+func NewLcTable[T any](destructor func(T)) *Table[T] {
+	return &Table[T]{
 		keys:       nil,
 		m:          make(map[string]T),
 		destructor: destructor,
+		caseIgnore: true,
+	}
+}
+func NewTable[T any](destructor func(T)) *Table[T] {
+	return &Table[T]{
+		keys:       nil,
+		m:          make(map[string]T),
+		destructor: destructor,
+		caseIgnore: false,
 	}
 }
 
-func (t *LcTable[T]) realKey(key string) string { return ascii.StrToLower(key) }
+func (t *Table[T]) realKey(key string) string {
+	if t.caseIgnore {
+		return ascii.StrToLower(key)
+	}
+	return key
+}
 
-func (t *LcTable[T]) Clean()                 { t.keys, t.m = nil, make(map[string]T) }
-func (t *LcTable[T]) Len() int               { return len(t.m) }
-func (t *LcTable[T]) Get(key string) T       { return t.m[t.realKey(key)] }
-func (t *LcTable[T]) Exists(key string) bool { return t.m[t.realKey(key)] != nil }
-func (t *LcTable[T]) Add(key string, val T) bool {
+func (t *Table[T]) Clean()                 { t.keys, t.m = nil, make(map[string]T) }
+func (t *Table[T]) Len() int               { return len(t.m) }
+func (t *Table[T]) Get(key string) T       { return t.m[t.realKey(key)] }
+func (t *Table[T]) Exists(key string) bool { return t.m[t.realKey(key)] != nil }
+func (t *Table[T]) Add(key string, val T) bool {
 	if val == nil {
-		panic("LcTable.Add(key, val) 方法参数 val 不可为 nil")
+		panic("Table.Add(key, val) 方法参数 val 不可为 nil")
 	}
 
 	key = t.realKey(key)
@@ -46,9 +61,9 @@ func (t *LcTable[T]) Add(key string, val T) bool {
 		return true
 	}
 }
-func (t *LcTable[T]) Update(key string, val T) {
+func (t *Table[T]) Update(key string, val T) {
 	if val == nil {
-		panic("LcTable.Update(key, val) 方法参数 val 不可为 nil")
+		panic("Table.Update(key, val) 方法参数 val 不可为 nil")
 	}
 
 	key = t.realKey(key)
@@ -62,9 +77,9 @@ func (t *LcTable[T]) Update(key string, val T) {
 		t.m[key] = val
 	}
 }
-func (t *LcTable[T]) UpdateDirect(key string, val T) {
+func (t *Table[T]) UpdateDirect(key string, val T) {
 	if val == nil {
-		panic("LcTable.UpdateDirect(key, val) 方法参数 val 不可为 nil")
+		panic("Table.UpdateDirect(key, val) 方法参数 val 不可为 nil")
 	}
 
 	key = t.realKey(key)
@@ -75,7 +90,7 @@ func (t *LcTable[T]) UpdateDirect(key string, val T) {
 		t.m[key] = val
 	}
 }
-func (t *LcTable[T]) Del(key string) {
+func (t *Table[T]) Del(key string) {
 	val := t.m[key]
 	if val == nil {
 		return
@@ -90,32 +105,32 @@ func (t *LcTable[T]) Del(key string) {
 		break
 	}
 }
-func (t *LcTable[T]) Values() []T {
+func (t *Table[T]) Values() []T {
 	var values []T
 	for _, key := range t.keys {
 		values = append(values, t.m[key])
 	}
 	return values
 }
-func (t *LcTable[T]) Sort(less func(i, j T) bool) {
+func (t *Table[T]) Sort(less func(i, j T) bool) {
 	sort.SliceStable(t.keys, func(i, j int) bool {
 		return less(t.m[t.keys[i]], t.m[t.keys[j]])
 	})
 }
-func (t *LcTable[T]) Foreach(handler func(string, T)) {
+func (t *Table[T]) Foreach(handler func(string, T)) {
 	for _, k := range t.keys {
 		v := t.m[k]
 		handler(k, v)
 	}
 }
-func (t *LcTable[T]) ForeachReserve(handler func(string, T)) {
+func (t *Table[T]) ForeachReserve(handler func(string, T)) {
 	for i := len(t.keys) - 1; i >= 0; i-- {
 		k := t.keys[i]
 		v := t.m[k]
 		handler(k, v)
 	}
 }
-func (t *LcTable[T]) ForeachEx(handler func(string, T) bool) {
+func (t *Table[T]) ForeachEx(handler func(string, T) bool) {
 	for _, k := range t.keys {
 		v := t.m[k]
 		if !handler(k, v) {
@@ -125,7 +140,7 @@ func (t *LcTable[T]) ForeachEx(handler func(string, T) bool) {
 }
 
 // todo 此方法不是并发安全的，待优化
-func (t *LcTable[T]) Filter(handler func(string, T) bool) {
+func (t *Table[T]) Filter(handler func(string, T) bool) {
 	var newKeys = make([]string, 0, cap(t.keys))
 	for _, k := range t.keys {
 		v := t.m[k]
@@ -139,7 +154,7 @@ func (t *LcTable[T]) Filter(handler func(string, T) bool) {
 }
 
 // todo 此方法不是并发安全的，待优化
-func (t *LcTable[T]) FilterReserve(handler func(string, T) bool) {
+func (t *Table[T]) FilterReserve(handler func(string, T) bool) {
 	var newKeys = make([]string, 0, cap(t.keys))
 	for i := len(t.keys) - 1; i >= 0; i-- {
 		k := t.keys[i]
@@ -153,7 +168,7 @@ func (t *LcTable[T]) FilterReserve(handler func(string, T) bool) {
 	t.keys = newKeys
 }
 
-func (t *LcTable[T]) Destroy() {
+func (t *Table[T]) Destroy() {
 	if t.destructor != nil {
 		t.Foreach(func(_ string, v T) { t.destructor(v) })
 	}

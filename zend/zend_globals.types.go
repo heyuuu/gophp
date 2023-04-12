@@ -6,9 +6,9 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-type ClassTable = *internal.LcTable[*types.ClassEntry]
-type FunctionTable = *internal.LcTable[types.IFunction]
-type ConstantTable = *internal.LcTable[*ZendConstant]
+type ClassTable = *internal.Table[*types.ClassEntry]
+type FunctionTable = *internal.Table[types.IFunction]
+type ConstantTable = *internal.Table[*ZendConstant]
 
 /**
  * ZendCompilerGlobals
@@ -260,7 +260,7 @@ type ZendExecutorGlobals struct {
 
 func (this *ZendExecutorGlobals) InitTables() {
 	this.zend_constants = types.NewArrayEx(128, ZEND_CONSTANT_DTOR, true)
-	this.constantTable = internal.NewLcTable[*ZendConstant](FreeZendConstantEx)
+	this.constantTable = internal.NewTable[*ZendConstant](FreeZendConstantEx)
 }
 func (this *ZendExecutorGlobals) DestroyTables() {
 	this.zend_constants.Destroy()

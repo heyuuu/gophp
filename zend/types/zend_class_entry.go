@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/internal"
 )
 
-type FunctionTable = *internal.LcTable[IFunction]
+type FunctionTable = *internal.Table[IFunction]
 
 /**
  * ClassEntry
