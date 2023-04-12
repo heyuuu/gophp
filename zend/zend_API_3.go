@@ -43,7 +43,6 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 	if !class_type.IsConstantsUpdated() {
 		var ce *types.ClassEntry
 		var val *types.Zval
-		var prop_info *ZendPropertyInfo
 		if class_type.GetParent() != nil {
 			if ZendUpdateClassConstants(class_type.GetParent()) != types.SUCCESS {
 				return types.FAILURE
@@ -69,11 +68,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 		}
 		ce = class_type
 		for ce != nil {
-			var __ht *types.Array = ce.GetPropertiesInfo()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				prop_info = _z.GetPtr()
+			foreachRet := ce.PropertyTable().ForeachEx(func(key string, prop_info *ZendPropertyInfo) bool {
 				if prop_info.GetCe() == ce {
 					if prop_info.IsStatic() {
 						val = CE_STATIC_MEMBERS(class_type) + prop_info.GetOffset()
@@ -99,7 +94,12 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 						}
 					}
 				}
+				return true
+			})
+			if !foreachRet {
+				return types.FAILURE
 			}
+
 			ce = ce.GetParent()
 		}
 		class_type.SetIsConstantsUpdated(true)

@@ -42,11 +42,8 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 		zobj.SetProperties(types.NewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			types.ZendHashRealInitMixed(zobj.GetProperties())
-			var __ht *types.Array = ce.GetPropertiesInfo()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
 
-				prop_info = _z.GetPtr()
+			ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
 				if !prop_info.IsStatic() {
 					flags |= prop_info.GetFlags()
 					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
@@ -54,15 +51,12 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 					}
 					types._zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 				}
-			}
+			})
+
 			if (flags & AccChanged) != 0 {
 				for ce.GetParent() && ce.GetParent().default_properties_count {
 					ce = ce.GetParent()
-					var __ht *types.Array = ce.GetPropertiesInfo()
-					for _, _p := range __ht.ForeachData() {
-						var _z *types.Zval = _p.GetVal()
-
-						prop_info = _z.GetPtr()
+					ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
 						if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 							var zv types.Zval
 							if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
@@ -71,7 +65,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 							zv.SetIndirect(OBJ_PROP(zobj, prop_info.GetOffset()))
 							zobj.GetProperties().KeyAdd(prop_info.GetName().GetStr(), &zv)
 						}
-					}
+					})
 				}
 			}
 		}
@@ -267,12 +261,10 @@ func IsProtectedCompatibleScope(ce *types.ClassEntry, scope *types.ClassEntry) i
 	return scope != nil && (IsDerivedClass(ce, scope) != 0 || IsDerivedClass(scope, ce) != 0)
 }
 func ZendGetParentPrivateProperty(scope *types.ClassEntry, ce *types.ClassEntry, member *types.String) *ZendPropertyInfo {
-	var zv *types.Zval
 	var prop_info *ZendPropertyInfo
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
-		zv = scope.GetPropertiesInfo().KeyFind(member.GetStr())
-		if zv != nil {
-			prop_info = (*ZendPropertyInfo)(zv.GetPtr())
+		prop_info = scope.PropertyTable().Get(member.GetStr())
+		if prop_info != nil {
 			if prop_info.IsPrivate() && prop_info.GetCe() == scope {
 				return prop_info
 			}
@@ -287,7 +279,6 @@ func ZendBadPropertyName() {
 	faults.ThrowError(nil, "Cannot access property started with '\\0'")
 }
 func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent int, cache_slot *any, info_ptr **ZendPropertyInfo) uintPtr {
-	var zv *types.Zval
 	var property_info *ZendPropertyInfo
 	var flags uint32
 	var scope *types.ClassEntry
@@ -296,7 +287,7 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		*info_ptr = CACHED_PTR_EX(cache_slot + 2)
 		return uintPtr(CACHED_PTR_EX(cache_slot + 1))
 	}
-	if ce.GetPropertiesInfo().Len() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
+	if ce.PropertyTable().Len() == 0 || b.Assign(&property_info, ce.PropertyTable().Get(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
@@ -310,7 +301,6 @@ func ZendGetPropertyOffset(ce *types.ClassEntry, member *types.String, silent in
 		}
 		return ZEND_DYNAMIC_PROPERTY_OFFSET
 	}
-	property_info = (*ZendPropertyInfo)(zv.GetPtr())
 	flags = property_info.GetFlags()
 	if (flags & (AccChanged | AccPrivate | AccProtected)) != 0 {
 		if EG__().GetFakeScope() != nil {
@@ -391,11 +381,10 @@ func ZendWrongOffset(ce *types.ClassEntry, member *types.String) {
 	/* Trigger the correct error */
 }
 func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int) *ZendPropertyInfo {
-	var zv *types.Zval
 	var property_info *ZendPropertyInfo
 	var flags uint32
 	var scope *types.ClassEntry
-	if ce.GetPropertiesInfo().Len() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
+	if ce.PropertyTable().Len() == 0 || b.Assign(&property_info, ce.PropertyTable().Get(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
@@ -405,7 +394,6 @@ func ZendGetPropertyInfo(ce *types.ClassEntry, member *types.String, silent int)
 	dynamic:
 		return nil
 	}
-	property_info = (*ZendPropertyInfo)(zv.GetPtr())
 	flags = property_info.GetFlags()
 	if (flags & (AccChanged | AccPrivate | AccProtected)) != 0 {
 		if EG__().GetFakeScope() != nil {
@@ -1294,7 +1282,7 @@ func ZendClassInitStatics(class_type *types.ClassEntry) {
 func ZendStdGetStaticPropertyWithInfo(ce *types.ClassEntry, property_name *types.String, type_ int, property_info_ptr **ZendPropertyInfo) *types.Zval {
 	var ret *types.Zval
 	var scope *types.ClassEntry
-	var property_info *ZendPropertyInfo = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property_name.GetStr())
+	var property_info *ZendPropertyInfo = ce.PropertyTable().Get(property_name.GetStr())
 	*property_info_ptr = property_info
 	if property_info == nil {
 		goto undeclared_property
@@ -1405,38 +1393,44 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 			faults.ErrorNoreturn(faults.E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
 		o1.ProtectRecursive()
-		var __ht *types.Array = zobj1.GetCe().GetPropertiesInfo()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
 
-			info = _z.GetPtr()
+		var ret int
+		zobj1.GetCe().PropertyTable().ForeachEx(func(key string, info *ZendPropertyInfo) bool {
 			var p1 *types.Zval = OBJ_PROP(zobj1, info.GetOffset())
 			var p2 *types.Zval = OBJ_PROP(zobj2, info.GetOffset())
 			if info.IsStatic() {
-				continue
+				return true
 			}
 			if p1.IsNotUndef() {
 				if p2.IsNotUndef() {
 					var result types.Zval
 					if CompareFunction(&result, p1, p2) == types.FAILURE {
 						o1.UnprotectRecursive()
-						return 1
+						return false
 					}
 					if result.GetLval() != 0 {
 						o1.UnprotectRecursive()
-						return result.GetLval()
+						ret = result.GetLval()
+						return false
 					}
 				} else {
 					o1.UnprotectRecursive()
-					return 1
+					ret = 1
+					return false
 				}
 			} else {
 				if p2.IsNotUndef() {
 					o1.UnprotectRecursive()
-					return 1
+					ret = 1
+					return false
 				}
 			}
+			return true
+		})
+		if ret != 0 {
+			return ret
 		}
+
 		o1.UnprotectRecursive()
 		return 0
 	} else {

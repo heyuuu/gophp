@@ -519,7 +519,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		if (flags & AccFinal) != 0 {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare property %s::$%s final, "+"the final modifier is allowed only for methods and classes", ce.GetName().GetVal(), name.GetVal())
 		}
-		if ce.GetPropertiesInfo().KeyExists(name.GetStr()) {
+		if ce.PropertyTable().Exists(name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s::$%s", ce.GetName().GetVal(), name.GetVal())
 		}
 		if value_ast != nil {

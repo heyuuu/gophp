@@ -524,20 +524,12 @@ func ZifIsA(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, classN
 	IsAImpl(executeData, return_value, 0)
 }
 func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, return_value *types.Zval) {
-	var prop_info *ZendPropertyInfo
-	var prop *types.Zval
-	var prop_copy types.Zval
-	var key *types.String
-	var __ht *types.Array = ce.GetPropertiesInfo()
-	for _, _p := range __ht.ForeachData() {
-		var _z = _p.GetVal()
 
-		key = _p.GetKey()
-		prop_info = _z.GetPtr()
+	ce.PropertyTable().ForeachEx(func(key string, prop_info *ZendPropertyInfo) bool {
 		if prop_info.IsProtected() && ZendCheckProtected(prop_info.GetCe(), scope) == 0 || prop_info.IsPrivate() && prop_info.GetCe() != scope {
-			continue
+			return true
 		}
-		prop = nil
+		var prop *types.Zval = nil
 		if statics != 0 && prop_info.IsStatic() {
 			prop = ce.GetDefaultStaticMembersTable()[prop_info.GetOffset()]
 			prop = types.ZVAL_DEINDIRECT(prop)
@@ -545,23 +537,16 @@ func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, re
 			prop = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(prop_info.GetOffset())]
 		}
 		if prop == nil {
-			continue
+			return true
 		}
+
+		var prop_copy types.Zval
 		if prop.IsUndef() {
-
 			/* Return uninitialized typed properties as a null value */
-
 			prop_copy.SetNull()
-
-			/* Return uninitialized typed properties as a null value */
-
 		} else {
-
 			/* copy: enforce read only access */
-
 			types.ZVAL_COPY_OR_DUP(&prop_copy, prop)
-
-			/* copy: enforce read only access */
 
 		}
 		prop = &prop_copy
@@ -571,11 +556,12 @@ func AddClassVars(scope *types.ClassEntry, ce *types.ClassEntry, statics int, re
 
 		if prop.IsConstant() {
 			if ZvalUpdateConstantEx(prop, nil) != types.SUCCESS {
-				return
+				return false
 			}
 		}
-		return_value.GetArr().KeyAddNew(key.GetStr(), prop)
-	}
+		return_value.GetArr().KeyAddNew(key, prop)
+		return true
+	})
 }
 func ZifGetClassVars(executeData zpp.Ex, return_value zpp.Ret, className *types.Zval) {
 	var class_name *types.String
@@ -838,7 +824,7 @@ func ZifPropertyExists(executeData zpp.Ex, return_value zpp.Ret, objectOrClass *
 		return_value.SetNull()
 		return
 	}
-	property_info = types.ZendHashFindPtr(ce.GetPropertiesInfo(), property.GetStr())
+	property_info = ce.PropertyTable().Get(property.GetStr())
 	if property_info != nil && (!property_info.IsPrivate() || property_info.GetCe() == ce) {
 		return_value.SetTrue()
 		return

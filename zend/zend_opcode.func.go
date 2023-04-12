@@ -233,8 +233,6 @@ func DestroyZendClass(zv *types.Zval) {
 	DestroyZendClassEntry(zv.GetPtr().(*types.ClassEntry))
 }
 func DestroyZendClassEntry(ce *types.ClassEntry) {
-	var prop_info *ZendPropertyInfo
-	var fn types.IFunction
 	if ce.HasCeFlags(AccImmutable | AccPreloaded) {
 		if ce.GetDefaultStaticMembersCount() != 0 {
 			ZendCleanupInternalClassData(ce)
@@ -300,23 +298,8 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			}
 			Efree(ce.GetDefaultStaticMembersTable())
 		}
-		var __ht *types.Array = ce.GetPropertiesInfo()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
 
-			prop_info = _z.GetPtr()
-			if prop_info.GetCe() == ce {
-				// types.ZendStringReleaseEx(prop_info.GetName(), 0)
-				if prop_info.GetDocComment() != nil {
-					// types.ZendStringReleaseEx(prop_info.GetDocComment(), 0)
-				}
-				if prop_info.GetType().IsName() {
-					// types.ZendStringRelease(prop_info.GetType().Name())
-				}
-			}
-		}
 		ce.PropertyTable().Destroy()
-		// types.ZendStringReleaseEx(ce.GetName(), 0)
 		ce.FunctionTable().Destroy()
 		if ce.ConstantsTable().Len() != 0 {
 			ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
@@ -361,7 +344,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 				ZendCleanupInternalClassData(ce)
 			}
 		}
-		ce.GetPropertiesInfo().Destroy()
+		ce.PropertyTable().Destroy()
 		// types.ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */

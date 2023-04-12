@@ -351,24 +351,19 @@ func ZendRegisterStandardIniEntries() {
 	REGISTER_INI_ENTRIES(0)
 }
 func ZendResolvePropertyTypes() {
-	var prop_info *ZendPropertyInfo
 	CG__().ClassTable().Foreach(func(_ string, ce *types.ClassEntry) {
 		if ce.GetType() != ZEND_INTERNAL_CLASS {
 			return
 		}
 		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
-			var __ht *types.Array = ce.GetPropertiesInfo()
-			for _, _p := range __ht.ForeachData() {
-				var _z *types.Zval = _p.GetVal()
-
-				prop_info = _z.GetPtr()
+			ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
 				if prop_info.GetType().IsName() {
 					var type_name = prop_info.GetType().Name().GetStr()
 					var prop_ce *types.ClassEntry = CG__().ClassTable().Get(type_name)
 					b.Assert(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(types.ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 				}
-			}
+			})
 		}
 		ce.SetIsPropertyTypesResolved(true)
 	})

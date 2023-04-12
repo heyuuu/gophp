@@ -308,10 +308,11 @@ func ZendDeclareTypedProperty(
 		access_type |= AccPublic
 	}
 	if (access_type & AccStatic) != 0 {
-		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && property_info_ptr.IsStatic() {
+		property_info_ptr = ce.PropertyTable().Get(name.GetStr())
+		if property_info_ptr != nil && property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
-			types.ZendHashDel(ce.GetPropertiesInfo(), name.GetStr())
+			ce.PropertyTable().Del(name.GetStr())
 		} else {
 			ce.GetDefaultStaticMembersCount()++
 			property_info.SetOffset(ce.GetDefaultStaticMembersCount() - 1)
@@ -334,10 +335,11 @@ func ZendDeclareTypedProperty(
 		}
 	} else {
 		var property_default_ptr *types.Zval
-		if b.Assign(&property_info_ptr, types.ZendHashFindPtr(ce.GetPropertiesInfo(), name.GetStr())) != nil && !property_info_ptr.IsStatic() {
+		property_info_ptr = ce.PropertyTable().Get(name.GetStr())
+		if property_info_ptr != nil && !property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
-			types.ZendHashDel(ce.GetPropertiesInfo(), name.GetStr())
+			ce.PropertyTable().Del(name.GetStr())
 			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
 			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info
@@ -399,7 +401,7 @@ func ZendDeclareTypedProperty(
 	property_info.SetDocComment(doc_comment)
 	property_info.SetCe(ce)
 	property_info.SetType(type_)
-	types.ZendHashUpdatePtr(ce.GetPropertiesInfo(), name.GetStr(), property_info)
+	ce.PropertyTable().Update(name.GetStr(), property_info)
 	return types.SUCCESS
 }
 func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict types.ZendBool) int {

@@ -851,20 +851,18 @@ func EmitIncompatiblePropertyError(child *ZendPropertyInfo, parent *ZendProperty
 		return b.CondF(parent.GetType().IsCe(), func() *types.String { return types.ZEND_TYPE_CE(parent.GetType()).GetName() }, func() *types.String { return ResolveClassName(parent.GetCe(), parent.GetType().Name()) }).GetVal()
 	}, func() *byte { return types.ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
 }
-func DoInheritProperty(parent_info *ZendPropertyInfo, key *types.String, ce *types.ClassEntry) {
-	var child *types.Zval = ce.GetPropertiesInfo().KeyFind(key.GetStr())
-	var child_info *ZendPropertyInfo
-	if child != nil {
-		child_info = child.GetPtr()
+func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types.ClassEntry) {
+	var child_info *ZendPropertyInfo = ce.PropertyTable().Get(key)
+	if child_info != nil {
 		if parent_info.HasFlags(AccPrivate | AccChanged) {
 			child_info.SetIsChanged(true)
 		}
 		if !parent_info.IsPrivate() {
 			if (parent_info.GetFlags() & AccStatic) != (child_info.GetFlags() & AccStatic) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().name.GetVal(), key.GetVal(), b.Cond(child_info.IsStatic(), "static ", "non static "), ce.GetName().GetVal(), key.GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().Name(), key, b.Cond(child_info.IsStatic(), "static ", "non static "), ce.GetName().GetVal(), key)
 			}
 			if (child_info.GetFlags() & AccPppMask) > (parent_info.GetFlags() & AccPppMask) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.GetName().GetVal(), key.GetVal(), ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().name.GetVal(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.GetName().GetVal(), key, ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().Name(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
 			} else if !child_info.IsStatic() {
 				var parent_num int = OBJ_PROP_TO_NUM(parent_info.GetOffset())
 				var child_num int = OBJ_PROP_TO_NUM(child_info.GetOffset())
@@ -885,7 +883,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *types.String, ce *typ
 					AddPropertyCompatibilityObligation(ce, child_info, parent_info)
 				}
 			} else if child_info.GetType().IsSet() && !(parent_info.GetType().IsSet()) {
-				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must not be defined (as in class %s)", ce.GetName().GetVal(), key.GetVal(), ce.GetParent().name.GetVal())
+				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Type of %s::$%s must not be defined (as in class %s)", ce.GetName().GetVal(), key, ce.GetParent().Name())
 			}
 		}
 	} else {
@@ -894,7 +892,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *types.String, ce *typ
 		} else {
 			child_info = parent_info
 		}
-		types._zendHashAppendPtr(ce.GetPropertiesInfo(), key, child_info)
+		ce.PropertyTable().Add(key, child_info)
 	}
 }
 func DoImplementInterface(ce *types.ClassEntry, iface *types.ClassEntry) {
@@ -962,8 +960,7 @@ func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *typ
 	}
 }
 func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
-	var table **ZendPropertyInfo
-	var prop **ZendPropertyInfo
+	var table []*ZendPropertyInfo
 	var size int
 	if ce.GetDefaultPropertiesCount() == 0 {
 		return
@@ -994,15 +991,12 @@ func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {
 		/* Child did not add any new properties, we are done */
 
 	}
-	var __ht *types.Array = ce.GetPropertiesInfo()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		prop = _z.GetPtr()
-		if prop.GetCe() == ce && !prop.IsStatic() {
-			table[OBJ_PROP_TO_NUM(prop.GetOffset())] = prop
+	ce.PropertyTable().Foreach(func(key string, prop_info *ZendPropertyInfo) {
+		if prop_info.GetCe() == ce && !prop_info.IsStatic() {
+			table[OBJ_PROP_TO_NUM(prop_info.GetOffset())] = prop_info
 		}
-	}
+	})
 }
 func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, checked bool) {
 	var property_info *ZendPropertyInfo
@@ -1219,29 +1213,21 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			}
 		}
 	}
-	var __ht *types.Array = ce.GetPropertiesInfo()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		property_info = _z.GetPtr()
+	ce.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
 		if property_info.GetCe() == ce {
 			if property_info.IsStatic() {
-				property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultStaticMembersCount())
+				property_info.SetOffset(property_info.GetOffset() + uint32(parent_ce.GetDefaultStaticMembersCount()))
 			} else {
-				property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultPropertiesCount()*b.SizeOf("zval"))
+				property_info.SetOffset(property_info.GetOffset() + uint32(parent_ce.GetDefaultPropertiesCount()*b.SizeOf("zval")))
 			}
 		}
-	}
-	if parent_ce.GetPropertiesInfo().Len() {
-		ce.GetPropertiesInfo().Extend(ce.GetPropertiesInfo().Len() + parent_ce.GetPropertiesInfo().Len())
-		var __ht *types.Array = parent_ce.GetPropertiesInfo()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
+	})
 
-			key = _p.GetKey()
-			property_info = _z.GetPtr()
+	if parent_ce.PropertyTable().Len() != 0 {
+		parent_ce.PropertyTable().Foreach(func(key string, property_info *ZendPropertyInfo) {
 			DoInheritProperty(property_info, key, ce)
-		}
+		})
 	}
 	if parent_ce.ConstantsTable().Len() != 0 {
 		parent_ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
@@ -1843,9 +1829,10 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 			/* next: check for conflicts with current class */
 
-			if b.Assign(&coliding_prop, types.ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name.GetStr())) != nil {
+			coliding_prop = ce.PropertyTable().Get(prop_name.GetStr())
+			if coliding_prop != nil {
 				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
-					types.ZendHashDel(ce.GetPropertiesInfo(), prop_name.GetStr())
+					ce.PropertyTable().Del(prop_name.GetStr())
 					flags |= AccChanged
 				} else {
 					not_compatible = 1
@@ -2346,7 +2333,9 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 			if status != INHERITANCE_SUCCESS {
 				b.Assert(status == INHERITANCE_UNRESOLVED || status == INHERITANCE_ERROR)
 				ret = status
-				return false
+				if status == INHERITANCE_UNRESOLVED {
+					return false
+				}
 			}
 		}
 		return true
@@ -2355,31 +2344,26 @@ func ZendCanEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry) Inherit
 		return ret
 	}
 
-	var __ht__1 *types.Array = parent_ce.GetPropertiesInfo()
-	for _, _p := range __ht__1.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		key = _p.GetKey()
-		parent_info = _z.GetPtr()
-		var zv *types.Zval
+	parent_ce.PropertyTable().ForeachEx(func(key string, parent_info *ZendPropertyInfo) bool {
 		if parent_info.IsPrivate() || !(parent_info.GetType().IsSet()) {
-			continue
+			return true
 		}
-		zv = ce.GetPropertiesInfo().KeyFind(key.GetStr())
-		if zv != nil {
-			var child_info *ZendPropertyInfo = zv.GetPtr()
-			if child_info.GetType().IsSet() {
-				var status InheritanceStatus = PropertyTypesCompatible(parent_info, child_info)
+		var childInfo *ZendPropertyInfo = ce.PropertyTable().Get(key)
+		if childInfo != nil {
+			if childInfo.GetType().IsSet() {
+				var status InheritanceStatus = PropertyTypesCompatible(parent_info, childInfo)
 				if status != INHERITANCE_SUCCESS {
+					b.Assert(status == INHERITANCE_UNRESOLVED || status == INHERITANCE_ERROR)
+					ret = status
 					if status == INHERITANCE_UNRESOLVED {
-						return INHERITANCE_UNRESOLVED
+						return false
 					}
-					b.Assert(status == INHERITANCE_ERROR)
-					ret = INHERITANCE_ERROR
 				}
 			}
 		}
-	}
+		return true
+	})
+
 	return ret
 }
 func ZendTryEarlyBind(ce *types.ClassEntry, parent_ce *types.ClassEntry, lcname *types.String) bool {

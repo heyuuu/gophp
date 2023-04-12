@@ -1,7 +1,6 @@
 package types
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/internal"
 )
@@ -32,8 +31,6 @@ type ClassEntry struct {
 	propertyTable PropertyTable
 	constantTable ClassConstantTable
 
-	properties_info       Array
-	constants_table       Array
 	properties_info_table **zend.ZendPropertyInfo
 
 	constructor      IFunction
@@ -121,9 +118,9 @@ func NewClassEntry(name string, functions []FunctionEntry) *ClassEntry {
 	return class
 }
 func (this *ClassEntry) InitTables(persistentHashes bool) {
-	this.properties_info = MakeArrayEx(8, b.Cond(persistentHashes, zend.ZendDestroyPropertyInfoInternal, nil), IntBool(persistentHashes))
-	this.constants_table = MakeArrayEx(8, nil, IntBool(persistentHashes))
 	this.functionTable = internal.NewLcTable[IFunction](zend.ZendFunctionDtorEx)
+	this.propertyTable = internal.NewTable[*zend.ZendPropertyInfo](nil)
+	this.constantTable = internal.NewTable[*zend.ZendClassConstant](nil)
 }
 
 func (this *ClassEntry) Name() string { return this.name }
@@ -131,8 +128,6 @@ func (this *ClassEntry) Name() string { return this.name }
 func (this *ClassEntry) FunctionTable() FunctionTable       { return this.functionTable }
 func (this *ClassEntry) PropertyTable() PropertyTable       { return this.propertyTable }
 func (this *ClassEntry) ConstantsTable() ClassConstantTable { return this.constantTable }
-
-func (this *ClassEntry) GetPropertiesInfo() Array { return this.properties_info }
 
 /**
  * Getter / Setter
