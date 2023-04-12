@@ -446,25 +446,31 @@ func (this *ZendPropertyInfo) SetIsChanged(cond bool)   { this.SwitchFlags(AccCh
  * ZendClassConstant
  */
 type ZendClassConstant struct {
-	value       types.Zval
-	doc_comment *types.String
-	ce          *types.ClassEntry
+	value      types.Zval
+	docComment *types.String
+	ce         *types.ClassEntry
 }
 
-// func MakeZendClassConstant(value Zval, doc_comment *String, ce *ClassEntry) ZendClassConstant {
-//     return ZendClassConstant{
-//         value:value,
-//         doc_comment:doc_comment,
-//         ce:ce,
-//     }
-// }
-func (this *ZendClassConstant) GetValue() types.Zval { return this.value }
+func NewClassConstant(ce *types.ClassEntry, value *types.Zval, docComment *types.String) *ZendClassConstant {
+	c := &ZendClassConstant{
+		ce:         ce,
+		docComment: docComment,
+	}
+	types.ZVAL_COPY_VALUE(&c.value, value)
+	return c
+}
 
-// func (this *ZendClassConstant) SetValue(value Zval) { this.value = value }
-func (this *ZendClassConstant) GetDocComment() *types.String      { return this.doc_comment }
-func (this *ZendClassConstant) SetDocComment(value *types.String) { this.doc_comment = value }
-func (this *ZendClassConstant) GetCe() *types.ClassEntry          { return this.ce }
-func (this *ZendClassConstant) SetCe(value *types.ClassEntry)     { this.ce = value }
+func CopyClassConstant(c *ZendClassConstant) *ZendClassConstant {
+	return &ZendClassConstant{
+		ce:         c.ce,
+		value:      c.value,
+		docComment: c.docComment,
+	}
+}
+
+func (c *ZendClassConstant) GetCe() *types.ClassEntry     { return c.ce }
+func (c *ZendClassConstant) GetValue() *types.Zval        { return &c.value }
+func (c *ZendClassConstant) GetDocComment() *types.String { return c.docComment }
 
 /**
  * ZendArgInfo

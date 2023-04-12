@@ -200,7 +200,7 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 			ce = ZendFetchClass(className, flags)
 		}
 		if ce != nil {
-			c = types.ZendHashFindPtr(ce.GetConstantsTable(), constantName)
+			c = ce.ConstantsTable().Get(constantName)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
 					faults.ThrowError(nil, "Undefined class constant '%s::%s'", className, constantName)

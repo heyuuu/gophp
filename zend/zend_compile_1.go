@@ -424,11 +424,11 @@ func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *typ
 	var cc *ZendClassConstant
 	var c *types.Zval
 	if ClassNameRefersToActiveCe(class_name, fetch_type) {
-		cc = types.ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name.GetStr())
+		cc = CG__().GetActiveClassEntry().ConstantsTable().Get(name.GetStr())
 	} else if fetch_type == ZEND_FETCH_CLASS_DEFAULT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0 {
 		ce := CG__().ClassTable().Get(class_name.GetStr())
 		if ce != nil {
-			cc = types.ZendHashFindPtr(ce.GetConstantsTable(), name.GetStr())
+			cc = ce.ConstantsTable().Get(name.GetStr())
 		} else {
 			return 0
 		}

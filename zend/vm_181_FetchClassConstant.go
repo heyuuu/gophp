@@ -1,11 +1,16 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
 	var c *ZendClassConstant
 	var value *types.Zval
-	var zv *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {
 		{
@@ -24,10 +29,9 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 		}
 
-		zv = ce.GetConstantsTable().KeyFind(opline.Const2().GetStr().GetStr())
-		if zv != nil {
-			c = zv.GetPtr()
-			scope = executeData.GetFunc().op_array.scope
+		c = ce.ConstantsTable().Get(opline.Const2().GetStrVal())
+		if c != nil {
+			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if ZendVerifyConstAccess(c, scope) == 0 {
 				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), opline.Const2().GetStr().GetVal())
 				opline.Result().SetUndef()
@@ -71,10 +75,9 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteDa
 				break
 			}
 		}
-		zv = ce.GetConstantsTable().KeyFind(opline.Const2().GetStr().GetStr())
-		if zv != nil {
-			c = zv.GetPtr()
-			scope = executeData.GetFunc().op_array.scope
+		c = ce.ConstantsTable().Get(opline.Const2().GetStr().GetStr())
+		if c != nil {
+			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if ZendVerifyConstAccess(c, scope) == 0 {
 				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), opline.Const2().GetStr().GetVal())
 				opline.Result().SetUndef()
@@ -104,7 +107,6 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 	var scope *types.ClassEntry
 	var c *ZendClassConstant
 	var value *types.Zval
-	var zv *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
 	for {
 
@@ -123,10 +125,9 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecut
 				break
 			}
 		}
-		zv = ce.GetConstantsTable().KeyFind(opline.Const2().GetStr().GetStr())
-		if zv != nil {
-			c = zv.GetPtr()
-			scope = executeData.GetFunc().op_array.scope
+		c = ce.ConstantsTable().Get(opline.Const2().GetStr().GetStr())
+		if c != nil {
+			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if ZendVerifyConstAccess(c, scope) == 0 {
 				faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), ce.GetName().GetVal(), opline.Const2().GetStr().GetVal())
 				opline.Result().SetUndef()

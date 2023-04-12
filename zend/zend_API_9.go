@@ -76,7 +76,6 @@ func ZendDeclarePropertyString(ce *types.ClassEntry, name string, name_length in
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value *types.Zval, access_type int, doc_comment *types.String) int {
-	var c *ZendClassConstant
 	if ce.IsInterface() {
 		if access_type != AccPublic {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
@@ -85,22 +84,13 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 	if ascii.StrCaseEquals(name.GetStr(), "class") {
 		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
-	//if value.IsString() {
-	//	ZvalMakeInternedString(value)
-	//}
-	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		c = Pemalloc(b.SizeOf("zend_class_constant"), 1)
-	} else {
-		c = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_constant"))
-	}
-	types.ZVAL_COPY_VALUE(c.GetValue(), value)
-	c.GetValue().GetAccessFlags() = access_type
-	c.SetDocComment(doc_comment)
-	c.SetCe(ce)
+
+	var c *ZendClassConstant = NewClassConstant(ce, value, doc_comment)
+	c.GetValue().SetAccessFlags(uint32(access_type))
 	if value.IsConstant() {
 		ce.SetIsConstantsUpdated(false)
 	}
-	if !(types.ZendHashAddPtr(ce.GetConstantsTable(), name.GetStr(), c)) {
+	if !ce.ConstantsTable().Add(name.GetStr(), c) {
 		faults.ErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, faults.E_CORE_ERROR, faults.E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
 	}
 	return types.SUCCESS

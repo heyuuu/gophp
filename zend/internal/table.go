@@ -130,13 +130,14 @@ func (t *Table[T]) ForeachReserve(handler func(string, T)) {
 		handler(k, v)
 	}
 }
-func (t *Table[T]) ForeachEx(handler func(string, T) bool) {
+func (t *Table[T]) ForeachEx(handler func(string, T) bool) bool {
 	for _, k := range t.keys {
 		v := t.m[k]
 		if !handler(k, v) {
-			break
+			return false
 		}
 	}
+	return true
 }
 
 // todo 此方法不是并发安全的，待优化

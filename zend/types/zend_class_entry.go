@@ -7,6 +7,8 @@ import (
 )
 
 type FunctionTable = *internal.Table[IFunction]
+type PropertyTable = *internal.Table[*zend.ZendPropertyInfo]
+type ClassConstantTable = *internal.Table[*zend.ZendClassConstant]
 
 /**
  * ClassEntry
@@ -25,25 +27,31 @@ type ClassEntry struct {
 	default_properties_table     *Zval
 	default_static_members_table *Zval
 	static_members_table__ptr    **Zval
-	functionTable                FunctionTable
-	properties_info              Array
-	constants_table              Array
-	properties_info_table        **zend.ZendPropertyInfo
-	constructor                  IFunction
-	destructor                   IFunction
-	clone                        IFunction
-	__get                        IFunction
-	__set                        IFunction
-	__unset                      IFunction
-	__isset                      IFunction
-	__call                       IFunction
-	__callstatic                 IFunction
-	__tostring                   IFunction
-	__debugInfo                  IFunction
-	serialize_func               IFunction
-	unserialize_func             IFunction
-	iterator_funcs_ptr           *zend.ZendClassIteratorFuncs
-	__1                          struct /* union */ {
+
+	functionTable FunctionTable
+	propertyTable PropertyTable
+	constantTable ClassConstantTable
+
+	properties_info       Array
+	constants_table       Array
+	properties_info_table **zend.ZendPropertyInfo
+
+	constructor      IFunction
+	destructor       IFunction
+	clone            IFunction
+	__get            IFunction
+	__set            IFunction
+	__unset          IFunction
+	__isset          IFunction
+	__call           IFunction
+	__callstatic     IFunction
+	__tostring       IFunction
+	__debugInfo      IFunction
+	serialize_func   IFunction
+	unserialize_func IFunction
+
+	iterator_funcs_ptr *zend.ZendClassIteratorFuncs
+	__1                struct /* union */ {
 		create_object              func(class_type *ClassEntry) *ZendObject
 		interface_gets_implemented func(iface *ClassEntry, class_type *ClassEntry) int
 	}
@@ -120,7 +128,12 @@ func (this *ClassEntry) InitTables(persistentHashes bool) {
 
 func (this *ClassEntry) Name() string { return this.name }
 
-func (this *ClassEntry) FunctionTable() FunctionTable { return this.functionTable }
+func (this *ClassEntry) FunctionTable() FunctionTable       { return this.functionTable }
+func (this *ClassEntry) PropertyTable() PropertyTable       { return this.propertyTable }
+func (this *ClassEntry) ConstantsTable() ClassConstantTable { return this.constantTable }
+
+func (this *ClassEntry) GetPropertiesInfo() Array { return this.properties_info }
+func (this *ClassEntry) GetConstantsTable() Array { return this.constants_table }
 
 /**
  * Getter / Setter
@@ -164,8 +177,6 @@ func (this *ClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 func (this *ClassEntry) GetStaticMembersTablePtr() **Zval {
 	return this.static_members_table__ptr
 }
-func (this *ClassEntry) GetPropertiesInfo() Array { return this.properties_info }
-func (this *ClassEntry) GetConstantsTable() Array { return this.constants_table }
 func (this *ClassEntry) GetPropertiesInfoTable() **zend.ZendPropertyInfo {
 	return this.properties_info_table
 }

@@ -945,24 +945,20 @@ func ZendDoInheritInterfaces(ce *types.ClassEntry, iface *types.ClassEntry) {
 
 	/* and now call the implementing handlers */
 }
-func DoInheritClassConstant(name *types.String, parent_const *ZendClassConstant, ce *types.ClassEntry) {
-	var zv *types.Zval = ce.GetConstantsTable().KeyFind(name.GetStr())
-	var c *ZendClassConstant
-	if zv != nil {
-		c = (*ZendClassConstant)(zv.GetPtr())
-		if (c.GetValue().GetAccessFlags() & AccPppMask) > (parent_const.GetValue().GetAccessFlags() & AccPppMask) {
-			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.GetName().GetVal(), name.GetVal(), ZendVisibilityString(parent_const.GetValue().GetAccessFlags()), ce.GetParent().name.GetVal(), b.Cond((parent_const.GetValue().GetAccessFlags()&AccPublic) != 0, "", " or weaker"))
+func DoInheritClassConstant(name *types.String, parentConst *ZendClassConstant, ce *types.ClassEntry) {
+	var c = ce.ConstantsTable().Get(name.GetStr())
+	if c != nil {
+		if (c.GetValue().GetAccessFlags() & AccPppMask) > (parentConst.GetValue().GetAccessFlags() & AccPppMask) {
+			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name.GetStr(), ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&AccPublic) != 0, "", " or weaker"))
 		}
-	} else if (parent_const.GetValue().GetAccessFlags() & AccPrivate) == 0 {
-		if parent_const.GetValue().IsConstant() {
+	} else if (parentConst.GetValue().GetAccessFlags() & AccPrivate) == 0 {
+		if parentConst.GetValue().IsConstant() {
 			ce.SetIsConstantsUpdated(false)
 		}
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
-			c = Pemalloc(b.SizeOf("zend_class_constant"), 1)
-			memcpy(c, parent_const, b.SizeOf("zend_class_constant"))
-			parent_const = c
+			parentConst = CopyClassConstant(parentConst)
 		}
-		types._zendHashAppendPtr(ce.GetConstantsTable(), name, parent_const)
+		ce.ConstantsTable().Add(name.GetStr(), parentConst)
 	}
 }
 func ZendBuildPropertiesInfoTable(ce *types.ClassEntry) {

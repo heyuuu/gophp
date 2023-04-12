@@ -42,26 +42,26 @@ func ZendParseMethodParameters(num_args int, this_ptr *types.Zval, type_spec str
 func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 	if !class_type.IsConstantsUpdated() {
 		var ce *types.ClassEntry
-		var c *ZendClassConstant
 		var val *types.Zval
 		var prop_info *ZendPropertyInfo
-		if class_type.GetParent() {
+		if class_type.GetParent() != nil {
 			if ZendUpdateClassConstants(class_type.GetParent()) != types.SUCCESS {
 				return types.FAILURE
 			}
 		}
-		var __ht *types.Array = class_type.GetConstantsTable()
-		for _, _p := range __ht.ForeachData() {
-			var _z *types.Zval = _p.GetVal()
-
-			c = _z.GetPtr()
-			val = c.GetValue()
+		ret := class_type.ConstantsTable().ForeachEx(func(_ string, c *ZendClassConstant) bool {
+			val := c.GetValue()
 			if val.IsConstant() {
 				if ZvalUpdateConstantEx(val, c.GetCe()) != types.SUCCESS {
-					return types.FAILURE
+					return false
 				}
 			}
+			return true
+		})
+		if !ret {
+			return types.FAILURE
 		}
+
 		if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
 			if class_type.GetType() == ZEND_INTERNAL_CLASS || class_type.HasCeFlags(AccImmutable|AccPreloaded) {
 				ZendClassInitStatics(class_type)
