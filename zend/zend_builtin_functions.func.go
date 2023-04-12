@@ -386,8 +386,8 @@ register_constant:
 
 	/* non persistent */
 
-	ZEND_CONSTANT_SET_FLAGS(&c, caseSensitive, PHP_USER_CONSTANT)
-	c.SetNameVal(constantName)
+	c.SetFlags(caseSensitive, PHP_USER_CONSTANT)
+	c.SetName(constantName)
 	if ZendRegisterConstant(&c) == types.SUCCESS {
 		return true
 	} else {
@@ -1347,14 +1347,14 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 				/* skip special constants */
 				return
 			}
-			if ZEND_CONSTANT_MODULE_NUMBER(val) == PHP_USER_CONSTANT {
+			if val.ModuleNumber() == PHP_USER_CONSTANT {
 				module_number = i
-			} else if ZEND_CONSTANT_MODULE_NUMBER(val) > i {
+			} else if val.ModuleNumber() > i {
 				/* should not happen */
 				return
 
 			} else {
-				module_number = ZEND_CONSTANT_MODULE_NUMBER(val)
+				module_number = val.ModuleNumber()
 			}
 			if modules[module_number].IsUndef() {
 				ArrayInit(&modules[module_number])

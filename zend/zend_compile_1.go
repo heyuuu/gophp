@@ -262,7 +262,7 @@ func ZendUnmanglePropertyNameEx(name *types.String, class_name **byte, prop_name
 }
 func ZendLookupReservedConst(name string) *ZendConstant {
 	var c *ZendConstant = EG__().ConstantTable().Get(name)
-	if c != nil && (ZEND_CONSTANT_FLAGS(c)&CONST_CS) == 0 && (ZEND_CONSTANT_FLAGS(c)&CONST_CT_SUBST) != 0 {
+	if c != nil && !c.IsCaseSensitive() && c.IsCtSubst() {
 		return c
 	}
 	return nil
@@ -271,7 +271,7 @@ func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified types.Ze
 	var c *ZendConstant = EG__().ConstantTable().Get(name)
 
 	/* Substitute case-sensitive (or lowercase) constants */
-	if c != nil && ((ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT) != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && ((ZEND_CONSTANT_FLAGS(c)&CONST_NO_FILE_CACHE) == 0 || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
+	if c != nil && (c.IsPersistent() && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && !c.IsNoFileCache() || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
 		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
 	}

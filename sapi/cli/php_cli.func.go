@@ -159,14 +159,14 @@ func CliRegisterFileHandles() {
 	core.PhpStreamToZval(s_out, oc.Value())
 	core.PhpStreamToZval(s_err, ec.Value())
 
-	zend.ZEND_CONSTANT_SET_FLAGS(&ic, zend.CONST_CS, 0)
-	ic.SetName(types.NewString("STDIN"))
+	ic.SetFlags(zend.CONST_CS, 0)
+	ic.SetName("STDIN")
 	zend.ZendRegisterConstant(&ic)
-	zend.ZEND_CONSTANT_SET_FLAGS(&oc, zend.CONST_CS, 0)
-	oc.SetName(types.NewString("STDOUT"))
+	oc.SetFlags(zend.CONST_CS, 0)
+	oc.SetName("STDOUT")
 	zend.ZendRegisterConstant(&oc)
-	zend.ZEND_CONSTANT_SET_FLAGS(&ec, zend.CONST_CS, 0)
-	ec.SetName(types.NewString("STDERR"))
+	ec.SetFlags(zend.CONST_CS, 0)
+	ec.SetName("STDERR")
 	zend.ZendRegisterConstant(&ec)
 }
 func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {

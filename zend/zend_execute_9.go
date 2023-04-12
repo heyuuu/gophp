@@ -139,21 +139,20 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 	return is_empty
 }
 func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
-	var zv *types.Zval
 	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
 	c = EG__().ConstantTable().Get(key.GetStr().GetStr())
 	if c == nil {
 		key++
 		c = EG__().ConstantTable().Get(key.GetStr().GetStr())
-		if zv == nil || (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) != 0 {
+		if c == nil || c.IsCaseSensitive() {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
 				c = EG__().ConstantTable().Get(key.GetStr().GetStr())
 				if c == nil {
 					key++
 					c = EG__().ConstantTable().Get(key.GetStr().GetStr())
-					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) != 0 {
+					if c != nil && c.IsCaseSensitive() {
 						c = nil
 					}
 				}
@@ -182,7 +181,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	}
 	if check_defined_only == 0 {
 		types.ZVAL_COPY_OR_DUP(opline.Result(), c.Value())
-		if (ZEND_CONSTANT_FLAGS(c) & (CONST_CS | CONST_CT_SUBST)) == 0 {
+		if !c.IsCaseSensitive() && !c.IsCtSubst() {
 			var ns_sep *byte
 			var shortname_offset int
 			var shortname_len int

@@ -178,7 +178,6 @@ func (zv *Zval) IsIndirect() bool            { return zv.typ == IS_INDIRECT }
 func (zv *Zval) IsError() bool               { return zv.typ == IS_ERROR }
 
 /** Zval.u2 */
-func (zv *Zval) GetNext() uint32               { return zv.u2 }
 func (zv *Zval) GetCacheSlot() uint32          { return zv.u2 }
 func (zv *Zval) SetCacheSlot(value uint32)     { zv.u2 = value }
 func (zv *Zval) GetOplineNum() uint32          { return zv.u2 }
@@ -195,8 +194,6 @@ func (zv *Zval) GetAccessFlags() uint32        { return zv.u2 }
 func (zv *Zval) SetAccessFlags(value uint32)   { zv.u2 = value }
 func (zv *Zval) GetPropertyGuard() uint32      { return zv.u2 }
 func (zv *Zval) SetPropertyGuard(value uint32) { zv.u2 = value }
-func (zv *Zval) GetConstantFlags() uint32      { return zv.u2 }
-func (zv *Zval) SetConstantFlags(value uint32) { zv.u2 = value }
 func (zv *Zval) GetU2Extra() uint32            { return zv.u2 }
 func (zv *Zval) SetU2Extra(value uint32)       { zv.u2 = value }
 
