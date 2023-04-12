@@ -142,25 +142,19 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	var zv *types.Zval
 	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
-	zv = EG__().GetZendConstants().KeyFind(key.GetStr().GetStr())
-	if zv != nil {
-		c = (*ZendConstant)(zv.GetPtr())
-	} else {
+	c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+	if c == nil {
 		key++
-		zv = EG__().GetZendConstants().KeyFind(key.GetStr().GetStr())
-		if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
-			c = (*ZendConstant)(zv.GetPtr())
-		} else {
+		c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+		if zv == nil || (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) != 0 {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				zv = EG__().GetZendConstants().KeyFind(key.GetStr().GetStr())
-				if zv != nil {
-					c = (*ZendConstant)(zv.GetPtr())
-				} else {
+				c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+				if c == nil {
 					key++
-					zv = EG__().GetZendConstants().KeyFind(key.GetStr().GetStr())
-					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
-						c = (*ZendConstant)(zv.GetPtr())
+					c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) != 0 {
+						c = nil
 					}
 				}
 			}

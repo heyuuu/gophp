@@ -203,7 +203,6 @@ type ZendExecutorGlobals struct {
 	functionTable                       FunctionTable
 	classTable                          ClassTable
 	constantTable                       ConstantTable
-	zend_constants                      *types.Array
 	vm_stack_top                        *types.Zval
 	vm_stack_end                        *types.Zval
 	vm_stack                            ZendVmStack
@@ -259,11 +258,9 @@ type ZendExecutorGlobals struct {
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
-	this.zend_constants = types.NewArrayEx(128, ZEND_CONSTANT_DTOR, true)
 	this.constantTable = internal.NewTable[*ZendConstant](FreeZendConstantEx)
 }
 func (this *ZendExecutorGlobals) DestroyTables() {
-	this.zend_constants.Destroy()
 	this.constantTable.Destroy()
 }
 
@@ -281,8 +278,7 @@ func (this *ZendExecutorGlobals) SetClassTable(t ClassTable) { this.classTable =
 func (this *ZendExecutorGlobals) FunctionTable() FunctionTable     { return this.functionTable }
 func (this *ZendExecutorGlobals) SetFunctionTable(t FunctionTable) { this.functionTable = t }
 
-func (this *ZendExecutorGlobals) ConstantTable() ConstantTable   { return this.constantTable }
-func (this *ZendExecutorGlobals) GetZendConstants() *types.Array { return this.zend_constants }
+func (this *ZendExecutorGlobals) ConstantTable() ConstantTable { return this.constantTable }
 
 /**
  * 以下是自动生成的方法

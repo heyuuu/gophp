@@ -193,7 +193,7 @@ func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 
-	if !(memchr(name.GetStr().GetVal(), ':', name.GetStr().GetLen())) && b.Assign(&c, ZendGetConstant(name.GetStr())) != 0 {
+	if !(memchr(name.GetStr().GetVal(), ':', name.GetStr().GetLen())) && b.Assign(&c, ZendGetConstant(name.GetStrVal())) != 0 {
 		if c.GetType() != types.IS_STRING {
 			types.ZVAL_COPY_OR_DUP(&tmp, c)
 			if tmp.IsConstant() {

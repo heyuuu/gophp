@@ -144,7 +144,7 @@ func ZendRegisterDoubleConstant(name string, dval float64, flags int, module_num
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterStringlConstant(name string, str string, flags int, module_number int) {
-	c := NewZendConstant(name)
+	c := NewConstant(name)
 	c.Value().SetStringVal(str)
 
 	ZEND_CONSTANT_SET_FLAGS(c, flags, module_number)
@@ -154,18 +154,15 @@ func ZendRegisterStringConstant(name string, strval *byte, flags int, module_num
 	ZendRegisterStringlConstant(name, strval, flags, module_number)
 }
 func ZendGetSpecialConstant(name string) *ZendConstant {
-	var c *ZendConstant
 	var haltoff = "__COMPILER_HALT_OFFSET__"
 	if CurrEX() == nil {
 		return nil
-	} else if name_len == b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1 && !(memcmp(name, "__COMPILER_HALT_OFFSET__", b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1)) {
+	} else if name == haltoff {
 		cfilename := ZendGetExecutedFilename()
 
 		/* check for __COMPILER_HALT_OFFSET__ */
-
 		haltname := ZendManglePropertyName_Ex(haltoff, cfilename)
-		c = types.ZendHashFindPtr(EG__().GetZendConstants(), haltname.GetStr())
-		return c
+		return EG__().ConstantTable().Get(haltname)
 	} else {
 		return nil
 	}
@@ -180,45 +177,22 @@ func ZendVerifyConstAccess(c *ZendClassConstant, scope *types.ClassEntry) int {
 		return ZendCheckProtected(c.GetCe(), scope)
 	}
 }
-func ZendGetConstantStrImpl(name string) *ZendConstant {
+func ZendGetConstantImpl(name string) *ZendConstant {
 	var c *ZendConstant
-	if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), b.CastStr(name, name_len))) == nil {
-		var lcname *byte = DoAlloca(name_len+1, use_heap)
-		ZendStrTolowerCopy(lcname, name, name_len)
-		if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), b.CastStr(lcname, name_len))) != nil {
+	c = EG__().ConstantTable().Get(name)
+	if c == nil {
+		c = EG__().ConstantTable().Get(ascii.StrToLower(name))
+		if c != nil {
 			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 				c = nil
 			}
 		} else {
-			c = ZendGetSpecialConstant(name, name_len)
+			c = ZendGetSpecialConstant(name)
 		}
-		FreeAlloca(lcname, use_heap)
 	}
 	return c
 }
-func ZendGetConstantImpl(name *types.String) *ZendConstant {
-	var zv *types.Zval
-	var c *ZendConstant
-	zv = EG__().GetZendConstants().KeyFind(name.GetStr())
-	if zv == nil {
-		var lcname *byte = DoAlloca(name.GetLen()+1, use_heap)
-		ZendStrTolowerCopy(lcname, name.GetVal(), name.GetLen())
-		zv = EG__().GetZendConstants().KeyFind(b.CastStr(lcname, name.GetLen()))
-		if zv != nil {
-			c = zv.GetPtr()
-			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
-				c = nil
-			}
-		} else {
-			c = ZendGetSpecialConstant(name.GetVal(), name.GetLen())
-		}
-		FreeAlloca(lcname, use_heap)
-		return c
-	} else {
-		return (*ZendConstant)(zv.GetPtr())
-	}
-}
-func ZendGetConstant(name *types.String) *types.Zval {
+func ZendGetConstant(name string) *types.Zval {
 	var c *ZendConstant = ZendGetConstantImpl(name)
 	if c != nil {
 		return c.Value()
@@ -227,7 +201,7 @@ func ZendGetConstant(name *types.String) *types.Zval {
 	}
 }
 func IsAccessDeprecated(c *ZendConstant, access_name *byte) types.ZendBool {
-	var ns_sep *byte = ZendMemrchr(c.GetName().GetVal(), '\\', c.GetName().GetLen())
+	var ns_sep *byte = ZendMemrchr(c.GetName().GetStr(), '\\', c.GetName().GetLen())
 	if ns_sep != nil {
 
 		/* Namespaces are always case-insensitive. Only compare shortname. */
@@ -330,26 +304,18 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 	/* non-class constant */
 	if pos := strings.LastIndexByte(name_, '\\'); pos >= 0 {
 		/* compound constant name */
-		var prefix_len int = colon - name
-		var const_name_len int = name_len - pos - 1
-		var constant_name *byte = colon + 1
-
-		var constantName = name_[pos+1:]
-
-		var lcname *byte
-		var lcname_len int
-		lcname_len = prefix_len + 1 + const_name_len
-		lcname = DoAlloca(lcname_len+1, use_heap)
-
-		lcname_ := ascii.StrToLower(name[:pos]) + '\\' + constantName
+		lcPrefix := ascii.StrToLower(name_[:pos]) + "\\"
+		constName := name_[pos+1:]
 
 		/* Check for namespace constant */
-		if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname_)) == nil {
-
+		// 查找常量顺序
+		// - 不忽略大小写查找 (searchName=命名空间名小写+原常量名)
+		// - 忽略大小写查找且判断常量属性非大小写敏感 (searchName=命名空间名小写+常量名小写)
+		searchName := lcPrefix + constName
+		if c = EG__().ConstantTable().Get(searchName); c == nil {
 			/* try lowercase */
-
-			ZendStrTolower(lcname+prefix_len+1, const_name_len)
-			if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname_)) != nil {
+			searchName = lcPrefix + ascii.StrToLower(constName)
+			if c = EG__().ConstantTable().Get(searchName); c != nil {
 				if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 					c = nil
 				}
@@ -361,36 +327,25 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 			}
 
 			/* name requires runtime resolution, need to check non-namespaced name */
-
-			c = ZendGetConstantStrImpl(constantName)
-			name = constant_name
+			c = ZendGetConstantImpl(constName)
+			name_ = constName
 		}
 	} else {
 		if cname != nil {
-			c = ZendGetConstantImpl(cname)
+			c = ZendGetConstantImpl(cname.GetStr())
 		} else {
-			c = ZendGetConstantStrImpl(name_)
+			c = ZendGetConstantImpl(name_)
 		}
 	}
 	if c == nil {
 		return nil
 	}
 	if (flags & ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) == 0 {
-		if (ZEND_CONSTANT_FLAGS(c)&(CONST_CS|CONST_CT_SUBST)) == 0 && IsAccessDeprecated(c, name) != 0 {
+		if (ZEND_CONSTANT_FLAGS(c)&(CONST_CS|CONST_CT_SUBST)) == 0 && IsAccessDeprecated(c, name_) != 0 {
 			faults.Error(faults.E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", c.GetName().GetVal())
 		}
 	}
 	return c.Value()
-}
-func ZendHashAddConstant(ht *types.Array, key *types.String, c *ZendConstant) any {
-	var ret any
-	var copy *ZendConstant = Pemalloc(b.SizeOf("zend_constant"), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
-	memcpy(copy, c, b.SizeOf("zend_constant"))
-	ret = types.ZendHashAddPtr(ht, key.GetStr(), copy)
-	if !ret {
-		Pefree(copy, ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
-	}
-	return ret
 }
 
 func ZendRegisterConstant(c *ZendConstant) int {
@@ -415,22 +370,12 @@ func ZendRegisterConstant(c *ZendConstant) int {
 
 	/* Check if the user is trying to define the __special__  internal pseudo constant name __COMPILER_HALT_OFFSET__ */
 
-	if name.GetStr() == "__COMPILER_HALT_OFFSET__" || ZendHashAddConstant(EG__().GetZendConstants(), name, c) == nil {
-
-		/* The internal __COMPILER_HALT_OFFSET__ is prefixed by NULL byte */
-
-		if c.GetName().GetVal()[0] == '0' && c.GetName().GetLen() > b.SizeOf("\"\\0__COMPILER_HALT_OFFSET__\"")-1 && memcmp(name.GetVal(), "0__COMPILER_HALT_OFFSET__", b.SizeOf("\"\\0__COMPILER_HALT_OFFSET__\"")) == 0 {
-
-		}
+	if name.GetStr() == "__COMPILER_HALT_OFFSET__" || !EG__().ConstantTable().Add(name.GetStr(), CopyConstant(c)) {
 		faults.Error(faults.E_NOTICE, "Constant %s already defined", name.GetVal())
-		// types.ZendStringRelease(c.GetName())
 		if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
 			ZvalPtrDtorNogc(c.Value())
 		}
 		ret = types.FAILURE
-	}
-	if lowercase_name != nil {
-		// types.ZendStringRelease(lowercase_name)
 	}
 	return ret
 }

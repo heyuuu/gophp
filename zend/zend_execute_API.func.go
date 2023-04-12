@@ -17,14 +17,6 @@ func ZendExtensionDeactivator(extension *ZendExtension) {
 		extension.GetDeactivate()()
 	}
 }
-func CleanNonPersistentConstantFull(zv *types.Zval) int {
-	var c *ZendConstant = zv.GetPtr()
-	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) != 0 {
-		return types.ArrayApplyKeep
-	} else {
-		return types.ArrayApplyRemove
-	}
-}
 func InitExecutor() {
 	ZendInitFpu()
 	EG__().GetUninitializedZval().SetNull()
@@ -64,7 +56,7 @@ func InitExecutor() {
 	EG__().SetHtIterators(EG__().GetHtIteratorsSlots())
 	memset(EG__().GetHtIterators(), 0, b.SizeOf("EG ( ht_iterators_slots )"))
 	EG__().SetEachDeprecationThrown(0)
-	EG__().SetPersistentConstantsCount(EG__().GetZendConstants().GetNNumUsed())
+	EG__().SetPersistentConstantsCount(uint32(EG__().ConstantTable().Len()))
 	EG__().SetPersistentFunctionsCount(uint32(EG__().FunctionTable().Len()))
 	EG__().SetPersistentClassesCount(uint32(EG__().ClassTable().Len()))
 	ZendWeakrefsInit()
@@ -204,7 +196,9 @@ func ShutdownExecutor() {
 		 * each allocated block separately.
 		 */
 
-		EG__().GetZendConstants().Discard(EG__().GetPersistentConstantsCount())
+		EG__().ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+			return c.IsPersistent()
+		})
 		EG__().FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
 			return f.GetType() == ZEND_INTERNAL_FUNCTION
 		})
@@ -215,47 +209,24 @@ func ShutdownExecutor() {
 	} else {
 		ZendVmStackDestroy()
 		if EG__().GetFullTablesCleanup() != 0 {
-			types.ZendHashReverseApply(EG__().GetZendConstants(), CleanNonPersistentConstantFull)
+			EG__().ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+				return c.IsPersistent()
+			})
 			EG__().FunctionTable().FilterReserve(func(_ string, f types.IFunction) bool {
 				return f.GetType() == ZEND_INTERNAL_FUNCTION
 			})
 			EG__().ClassTable().FilterReserve(func(_ string, ce *types.ClassEntry) bool {
 				return ce.GetType() == ZEND_INTERNAL_CLASS
 			})
-
 		} else {
-			var __ht *types.Array = EG__().GetZendConstants()
-			for _, _p := range __ht.ForeachDataReserve() {
-				var _z types.Zval = _p.GetVal()
+			EG__().ConstantTable().FilterReserve(func(_ string, c *ZendConstant) bool {
+				if c.IsPersistent() {
+					return true
+				}
 
-				key = _p.GetKey()
-				zv = _z
-				var c *ZendConstant = zv.GetPtr()
-				if _idx == EG__().GetPersistentConstantsCount() {
-					break
-				}
 				ZvalPtrDtorNogc(c.Value())
-				if c.GetName() != nil {
-					// types.ZendStringReleaseEx(c.GetName(), 0)
-				}
-				Efree(c)
-				// types.ZendStringReleaseEx(key, 0)
-				__ht.Len()--
-				var j uint32 = types.HT_IDX_TO_HASH(_idx - 1)
-				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-				var i uint32 = types.HT_HASH(__ht, nIndex)
-				if j != i {
-					var prev *types.Bucket = __ht.Bucket(i)
-					for prev.GetVal().GetNext() != j {
-						i = prev.GetVal().GetNext()
-						prev = __ht.Bucket(i)
-					}
-					prev.GetVal().GetNext() = _p.GetVal().GetNext()
-				} else {
-					types.HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
-				}
-			}
-			__ht.SetNNumUsed(_idx)
+				return false
+			})
 
 			EG__().FunctionTable().FilterReserve(func(key string, f types.IFunction) bool {
 				if f.GetType() == ZEND_INTERNAL_FUNCTION {

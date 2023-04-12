@@ -25,7 +25,7 @@ type ZendConstant struct {
 	name  string
 }
 
-func NewZendConstant(name string, flags int, moduleNumber int) *ZendConstant {
+func NewConstant(name string, flags int, moduleNumber int) *ZendConstant {
 	c := &ZendConstant{name: name}
 
 	realFlags := uint32(flags&0xff | moduleNumber<<8)
@@ -34,14 +34,25 @@ func NewZendConstant(name string, flags int, moduleNumber int) *ZendConstant {
 	return c
 }
 
-func (this *ZendConstant) Name() string       { return this.name }
-func (this *ZendConstant) Value() *types.Zval { return &this.value }
-func (this *ZendConstant) Flags() uint8       { return uint8(this.value.GetConstantFlags() & 0xff) }
-func (this *ZendConstant) ModuleNumber() int  { return int(this.value.GetConstantFlags() << 8) }
+func CopyConstant(c *ZendConstant) *ZendConstant {
+	return &ZendConstant{
+		value: c.value,
+		name:  c.name,
+	}
+}
 
-func (this *ZendConstant) GetName() *types.String     { return types.NewString(this.name) }
-func (this *ZendConstant) SetName(name *types.String) { this.name = name.GetStr() }
-func (this *ZendConstant) SetNameVal(name string)     { this.name = name }
+func (c *ZendConstant) Name() string       { return c.name }
+func (c *ZendConstant) Value() *types.Zval { return &c.value }
+func (c *ZendConstant) Flags() uint8       { return uint8(c.value.GetConstantFlags() & 0xff) }
+func (c *ZendConstant) ModuleNumber() int  { return int(c.value.GetConstantFlags() << 8) }
+
+func (c *ZendConstant) GetName() *types.String     { return types.NewString(c.name) }
+func (c *ZendConstant) SetName(name *types.String) { c.name = name.GetStr() }
+func (c *ZendConstant) SetNameVal(name string)     { c.name = name }
+
+func (c *ZendConstant) IsPersistent() bool {
+	return (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) != 0
+}
 
 /**
  * functions
