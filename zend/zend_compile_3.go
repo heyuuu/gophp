@@ -397,7 +397,7 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 		// types.ZendStringReleaseEx(name, 0)
 		return types.FAILURE
 	}
-	if ZendTryCtEvalConst(result.GetConstant(), name, 0) != 0 {
+	if ZendTryCtEvalConst(result.GetConstant(), name.GetStr(), 0) != 0 {
 		// types.ZendStringReleaseEx(name, 0)
 		ZvalPtrDtor(result.GetConstant())
 		result.GetConstant().SetTrue()
@@ -579,7 +579,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 			var name_ast *ZendAst = args.GetChild()[2].GetChild()[0]
 			var is_fully_qualified types.ZendBool
 			var resolved_name *types.String = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
-			if ZendTryCtEvalConst(&value, resolved_name, is_fully_qualified) == 0 {
+			if ZendTryCtEvalConst(&value, resolved_name.GetStr(), is_fully_qualified) == 0 {
 				// types.ZendStringReleaseEx(resolved_name, 0)
 				return types.FAILURE
 			}

@@ -1,5 +1,10 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_FETCH_CLASS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var class_name *types.Zval
 	var opline *ZendOp = executeData.GetOpline()
@@ -27,7 +32,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		if class_name.IsObject() {
 			opline.Result().SetCe(types.Z_OBJCE_P(class_name))
 		} else if class_name.IsString() {
-			opline.Result().SetCe(ZendFetchClass(class_name.GetStr(), opline.GetOp1().GetNum()))
+			opline.Result().SetCe(ZendFetchClass(class_name.GetStr().GetStr(), opline.GetOp1().GetNum()))
 		} else if class_name.IsReference() {
 			class_name = types.Z_REFVAL_P(class_name)
 			goto try_class_name
@@ -64,7 +69,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
 		if class_name.IsObject() {
 			opline.Result().SetCe(types.Z_OBJCE_P(class_name))
 		} else if class_name.IsString() {
-			opline.Result().SetCe(ZendFetchClass(class_name.GetStr(), opline.GetOp1().GetNum()))
+			opline.Result().SetCe(ZendFetchClass(class_name.GetStr().GetStr(), opline.GetOp1().GetNum()))
 		} else if class_name.IsReference() {
 			class_name = types.Z_REFVAL_P(class_name)
 			goto try_class_name

@@ -45,7 +45,7 @@ func PhpStrtolower(s *byte, len_ int) *byte {
 
 func PhpStrtr(str *byte, len_ int, from string, to string) {
 	s := b.CastStr(str, len_)
-	newStr := phpStrtrEx(s, from, to)
+	newStr := Strtr(s, from, to)
 	str *= newStr
 }
 

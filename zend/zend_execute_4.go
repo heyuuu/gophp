@@ -194,10 +194,8 @@ func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *Z
 func SlowIndexConvert(ht *types.Array, dim *types.Zval, value *types.ZendValue, executeData *ZendExecuteData) types.ZendUchar {
 	switch dim.GetType() {
 	case types.IS_UNDEF:
-
 		/* The array may be destroyed while throwing the notice.
 		 * Temporarily increase the refcount to detect this situation. */
-
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 			ht.AddRefcount()
 		}

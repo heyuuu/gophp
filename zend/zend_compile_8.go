@@ -606,7 +606,7 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 			return
 		}
 	}
-	if ZendTryCtEvalConst(result.GetConstant(), resolved_name, is_fully_qualified) != 0 {
+	if ZendTryCtEvalConst(result.GetConstant(), resolved_name.GetStr(), is_fully_qualified) != 0 {
 		result.SetOpType(IS_CONST)
 		// types.ZendStringReleaseEx(resolved_name, 0)
 		return
@@ -660,7 +660,7 @@ func ZendCompileClassName(result *Znode, ast *ZendAst) {
 		return
 	}
 	opline = ZendEmitOpTmp(result, ZEND_FETCH_CLASS_NAME, nil, nil)
-	opline.GetOp1().SetNum(ZendGetClassFetchType(ZendAstGetStr(class_ast)))
+	opline.GetOp1().SetNum(ZendGetClassFetchType(ZendAstGetStr(class_ast).GetStr()))
 }
 func ZendCompileRopeAddEx(opline *ZendOp, result *Znode, num uint32, elem_node *Znode) *ZendOp {
 	if num == 0 {

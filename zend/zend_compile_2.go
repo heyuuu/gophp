@@ -391,7 +391,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
 			name = name_node.GetConstant().GetStr()
-			fetch_type = ZendGetClassFetchType(name)
+			fetch_type = ZendGetClassFetchType(name.GetStr())
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
 				result.GetConstant().SetString(ZendResolveClassName(name, ZEND_NAME_FQ))
@@ -415,7 +415,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
 		return
 	}
-	fetch_type = ZendGetClassFetchType(ZendAstGetStr(name_ast))
+	fetch_type = ZendGetClassFetchType(ZendAstGetStr(name_ast).GetStr())
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		result.SetOpType(IS_CONST)
 		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))

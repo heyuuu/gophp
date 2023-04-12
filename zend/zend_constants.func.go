@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"strings"
 )
 
 func ZEND_CONSTANT_FLAGS(c *ZendConstant) uint8       { return c.Flags() }
@@ -49,6 +50,22 @@ func RegisterMainStringConstant(name string, str string, flags int) {
 	ZendRegisterStringlConstant(name, str, flags, 0)
 }
 
+func FreeZendConstantEx(c *ZendConstant) {
+	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
+		ZvalPtrDtorNogc(c.Value())
+		if c.GetName() != nil {
+			// types.ZendStringReleaseEx(c.GetName(), 0)
+		}
+		Efree(c)
+	} else {
+		ZvalInternalPtrDtor(c.Value())
+		if c.GetName() != nil {
+			// types.ZendStringReleaseEx(c.GetName(), 1)
+		}
+		Free(c)
+	}
+}
+
 func FreeZendConstant(zv *types.Zval) {
 	var c *ZendConstant = zv.GetPtr()
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
@@ -65,17 +82,10 @@ func FreeZendConstant(zv *types.Zval) {
 		Free(c)
 	}
 }
-func CleanModuleConstant(el *types.Zval, arg any) int {
-	var c *ZendConstant = (*ZendConstant)(el.GetPtr())
-	var module_number int = *((*int)(arg))
-	if ZEND_CONSTANT_MODULE_NUMBER(c) == module_number {
-		return types.ArrayApplyRemove
-	} else {
-		return types.ArrayApplyKeep
-	}
-}
-func CleanModuleConstants(module_number int) {
-	types.ZendHashApplyWithArgument(EG__().GetZendConstants(), CleanModuleConstant, any(&module_number))
+func CleanModuleConstants(moduleNumber int) {
+	EG__().ConstantTable().Filter(func(_ string, c *ZendConstant) bool {
+		return ZEND_CONSTANT_MODULE_NUMBER(c) != moduleNumber
+	})
 }
 func ZendRegisterStandardConstants() {
 	RegisterMainLongConstant("E_ERROR", faults.E_ERROR, CONST_PERSISTENT|CONST_CS)
@@ -238,31 +248,28 @@ func IsAccessDeprecated(c *ZendConstant, access_name *byte) types.ZendBool {
 func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint32) *types.Zval {
 	var c *ZendConstant
 	var colon *byte
-	var ce *types.ClassEntry = nil
+	var name_ string = cname.GetStr()
 	var name *byte = cname.GetVal()
 	var name_len int = cname.GetLen()
 
 	/* Skip leading \\ */
-
-	if name[0] == '\\' {
-		name += 1
-		name_len -= 1
+	if name_ != "" && name_[0] == '\\' {
+		name_ = name_[1:]
 		cname = nil
 	}
-	if b.Assign(&colon, ZendMemrchr(name, ':', name_len)) && colon > name && (*(colon - 1)) == ':' {
-		var class_name_len int = colon - name - 1
-		var const_name_len int = name_len - class_name_len - 2
-		var constant_name *types.String = types.NewString(b.CastStr(colon+1, const_name_len))
-		var class_name *types.String = types.NewString(b.CastStr(name, class_name_len))
+	if pos := strings.LastIndexByte(name_, ':'); pos > 0 && name_[pos-1] == ':' {
+		var constantName = name_[pos+1:]
+		var className = name_[:pos-1]
 		var c *ZendClassConstant = nil
 		var ret_constant *types.Zval = nil
-		if ascii.StrCaseEquals(class_name.GetStr(), "self") {
+		var ce *types.ClassEntry
+		if ascii.StrCaseEquals(className, "self") {
 			if scope == nil {
 				faults.ThrowError(nil, "Cannot access self:: when no class scope is active")
 				goto failure
 			}
 			ce = scope
-		} else if ascii.StrCaseEquals(class_name.GetStr(), "parent") {
+		} else if ascii.StrCaseEquals(className, "parent") {
 			if scope == nil {
 				faults.ThrowError(nil, "Cannot access parent:: when no class scope is active")
 				goto failure
@@ -272,27 +279,27 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 			} else {
 				ce = scope.GetParent()
 			}
-		} else if ascii.StrCaseEquals(class_name.GetStr(), "static") {
+		} else if ascii.StrCaseEquals(className, "static") {
 			ce = ZendGetCalledScope(CurrEX())
 			if ce == nil {
 				faults.ThrowError(nil, "Cannot access static:: when no class scope is active")
 				goto failure
 			}
 		} else {
-			ce = ZendFetchClass(class_name, flags)
+			ce = ZendFetchClass(className, flags)
 		}
 		if ce != nil {
-			c = types.ZendHashFindPtr(ce.GetConstantsTable(), constant_name.GetStr())
+			c = types.ZendHashFindPtr(ce.GetConstantsTable(), constantName)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-					faults.ThrowError(nil, "Undefined class constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
+					faults.ThrowError(nil, "Undefined class constant '%s::%s'", className, constantName)
 					goto failure
 				}
 				ret_constant = nil
 			} else {
 				if ZendVerifyConstAccess(c, scope) == 0 {
 					if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
-						faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), class_name.GetVal(), constant_name.GetVal())
+						faults.ThrowError(nil, "Cannot access %s const %s::%s", ZendVisibilityString(c.GetValue().GetAccessFlags()), className, constantName)
 					}
 					goto failure
 				}
@@ -302,7 +309,7 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 		if ret_constant != nil && ret_constant.IsConstant() {
 			var ret int
 			if IS_CONSTANT_VISITED(ret_constant) {
-				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", class_name.GetVal(), constant_name.GetVal())
+				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", className, constantName)
 				ret_constant = nil
 				goto failure
 			}
@@ -321,36 +328,33 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 	}
 
 	/* non-class constant */
-
-	if b.Assign(&colon, ZendMemrchr(name, '\\', name_len)) != nil {
-
+	if pos := strings.LastIndexByte(name_, '\\'); pos >= 0 {
 		/* compound constant name */
-
 		var prefix_len int = colon - name
-		var const_name_len int = name_len - prefix_len - 1
+		var const_name_len int = name_len - pos - 1
 		var constant_name *byte = colon + 1
+
+		var constantName = name_[pos+1:]
+
 		var lcname *byte
 		var lcname_len int
 		lcname_len = prefix_len + 1 + const_name_len
 		lcname = DoAlloca(lcname_len+1, use_heap)
-		ZendStrTolowerCopy(lcname, name, prefix_len)
+
+		lcname_ := ascii.StrToLower(name[:pos]) + '\\' + constantName
 
 		/* Check for namespace constant */
-
-		lcname[prefix_len] = '\\'
-		memcpy(lcname+prefix_len+1, constant_name, const_name_len+1)
-		if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), b.CastStr(lcname, lcname_len))) == nil {
+		if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname_)) == nil {
 
 			/* try lowercase */
 
 			ZendStrTolower(lcname+prefix_len+1, const_name_len)
-			if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), b.CastStr(lcname, lcname_len))) != nil {
+			if b.Assign(&c, types.ZendHashStrFindPtr(EG__().GetZendConstants(), lcname_)) != nil {
 				if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 					c = nil
 				}
 			}
 		}
-		FreeAlloca(lcname, use_heap)
 		if c == nil {
 			if (flags & IS_CONSTANT_UNQUALIFIED) == 0 {
 				return nil
@@ -358,14 +362,14 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 
 			/* name requires runtime resolution, need to check non-namespaced name */
 
-			c = ZendGetConstantStrImpl(constant_name, const_name_len)
+			c = ZendGetConstantStrImpl(constantName)
 			name = constant_name
 		}
 	} else {
 		if cname != nil {
 			c = ZendGetConstantImpl(cname)
 		} else {
-			c = ZendGetConstantStrImpl(name, name_len)
+			c = ZendGetConstantStrImpl(name_)
 		}
 	}
 	if c == nil {

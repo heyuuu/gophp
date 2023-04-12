@@ -929,7 +929,7 @@ func ZendUnsetTimeout() {
 	}
 	EG__().SetTimedOut(0)
 }
-func ZendFetchClass(class_name *types.String, fetch_type int) *types.ClassEntry {
+func ZendFetchClass(className string, fetch_type int) *types.ClassEntry {
 	var ce *types.ClassEntry
 	var scope *types.ClassEntry
 	var fetch_sub_type int = fetch_type & ZEND_FETCH_CLASS_MASK
@@ -959,21 +959,21 @@ check_fetch_type:
 		}
 		return ce
 	case ZEND_FETCH_CLASS_AUTO:
-		fetch_sub_type = ZendGetClassFetchType(class_name)
+		fetch_sub_type = ZendGetClassFetchType(className)
 		if fetch_sub_type != ZEND_FETCH_CLASS_DEFAULT {
 			goto check_fetch_type
 		}
 	}
 	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
-		return ZendLookupClassEx(class_name, nil, fetch_type)
-	} else if b.Assign(&ce, ZendLookupClassEx(class_name, nil, fetch_type)) == nil {
+		return ZendLookupClassEx(className, nil, fetch_type)
+	} else if b.Assign(&ce, ZendLookupClassEx(className, nil, fetch_type)) == nil {
 		if (fetch_type&ZEND_FETCH_CLASS_SILENT) == 0 && EG__().GetException() == nil {
 			if fetch_sub_type == ZEND_FETCH_CLASS_INTERFACE {
-				ZendThrowOrError(fetch_type, nil, "Interface '%s' not found", class_name.GetVal())
+				ZendThrowOrError(fetch_type, nil, "Interface '%s' not found", className)
 			} else if fetch_sub_type == ZEND_FETCH_CLASS_TRAIT {
-				ZendThrowOrError(fetch_type, nil, "Trait '%s' not found", class_name.GetVal())
+				ZendThrowOrError(fetch_type, nil, "Trait '%s' not found", className)
 			} else {
-				ZendThrowOrError(fetch_type, nil, "Class '%s' not found", class_name.GetVal())
+				ZendThrowOrError(fetch_type, nil, "Class '%s' not found", className)
 			}
 		}
 		return nil

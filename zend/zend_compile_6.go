@@ -646,7 +646,7 @@ func ZendCompileUseTrait(ast *ZendAst) {
 		if ce.IsInterface() {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use traits inside of interfaces. "+"%s is used in %s", name.GetVal(), ce.GetName().GetVal())
 		}
-		switch ZendGetClassFetchType(name) {
+		switch ZendGetClassFetchType(name.GetStr()) {
 		case ZEND_FETCH_CLASS_SELF:
 			fallthrough
 		case ZEND_FETCH_CLASS_PARENT:

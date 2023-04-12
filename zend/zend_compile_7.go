@@ -69,16 +69,9 @@ func ZendCompileUse(ast *ZendAst) {
 		if new_name_ast != nil {
 			new_name = ZendAstGetStr(new_name_ast).Copy()
 		} else {
-			var unqualified_name *byte
-			var unqualified_name_len int
-			if ZendGetUnqualifiedName(old_name, &unqualified_name, &unqualified_name_len) != 0 {
-
+			if unqualifiedName, ok := ZendGetUnqualifiedNameEx(old_name.GetStr()); ok {
 				/* The form "use A\B" is equivalent to "use A\B as B" */
-
-				new_name = types.NewString(b.CastStr(unqualified_name, unqualified_name_len))
-
-				/* The form "use A\B" is equivalent to "use A\B as B" */
-
+				new_name = types.NewString(unqualifiedName)
 			} else {
 				new_name = old_name.Copy()
 				if current_ns == nil {
@@ -155,7 +148,7 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		var value_zv *types.Zval = value_node.GetConstant()
 		value_node.SetOpType(IS_CONST)
 		ZendConstExprToZval(value_zv, value_ast)
-		if ZendLookupReservedConst(unqualified_name.GetVal(), unqualified_name.GetLen()) != nil {
+		if ZendLookupReservedConst(b.CastStr(unqualified_name.GetVal(), unqualified_name.GetLen())) != nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
 		}
 		name = ZendPrefixWithNs(unqualified_name)
@@ -222,7 +215,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 	}
 	if name_ast != nil {
 		name = ZendAstGetStr(name_ast)
-		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
+		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name.GetVal())
 		}
 		FC__().SetCurrentNamespace(name.Copy())

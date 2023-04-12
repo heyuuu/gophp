@@ -31,7 +31,7 @@ func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 
 		/* Ensure that \self, \parent and \static are not used */
 
-		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
+		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name.GetStr()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "'\\%s' is an invalid class name", name.GetVal())
 		}
 		return name
@@ -260,32 +260,27 @@ func ZendUnmanglePropertyNameEx(name *types.String, class_name **byte, prop_name
 		return types.FAILURE
 	}
 }
-func ZendLookupReservedConst(name *byte, len_ int) *ZendConstant {
-	var c *ZendConstant = ZendHashFindPtrLc(EG__().GetZendConstants(), name, len_)
+func ZendLookupReservedConst(name string) *ZendConstant {
+	var c *ZendConstant = EG__().ConstantTable().Get(name)
 	if c != nil && (ZEND_CONSTANT_FLAGS(c)&CONST_CS) == 0 && (ZEND_CONSTANT_FLAGS(c)&CONST_CT_SUBST) != 0 {
 		return c
 	}
 	return nil
 }
-func ZendTryCtEvalConst(zv *types.Zval, name *types.String, is_fully_qualified types.ZendBool) types.ZendBool {
-	var c *ZendConstant
+func ZendTryCtEvalConst(zv *types.Zval, name string, is_fully_qualified types.ZendBool) types.ZendBool {
+	var c *ZendConstant = EG__().ConstantTable().Get(name)
 
 	/* Substitute case-sensitive (or lowercase) constants */
-
-	c = types.ZendHashFindPtr(EG__().GetZendConstants(), name.GetStr())
 	if c != nil && ((ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT) != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && ((ZEND_CONSTANT_FLAGS(c)&CONST_NO_FILE_CACHE) == 0 || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.Value().GetType() < types.IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
 		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
 	}
 
 	/* Substitute true, false and null (including unqualified usage in namespaces) */
-
-	var lookup_name *byte = name.GetVal()
-	var lookup_len = name.GetLen()
 	if is_fully_qualified == 0 {
-		ZendGetUnqualifiedName(name, &lookup_name, &lookup_len)
+		name, _ = ZendGetUnqualifiedNameEx(name)
 	}
-	c = ZendLookupReservedConst(lookup_name, lookup_len)
+	c = ZendLookupReservedConst(name)
 	if c != nil {
 		types.ZVAL_COPY_OR_DUP(zv, c.Value())
 		return 1
@@ -329,12 +324,12 @@ func ClassNameRefersToActiveCe(class_name *types.String, fetch_type uint32) bool
 	}
 	return fetch_type == ZEND_FETCH_CLASS_DEFAULT && ascii.StrCaseEquals(class_name.GetStr(), CG__().GetActiveClassEntry().Name())
 }
-func ZendGetClassFetchType(name *types.String) uint32 {
-	if ascii.StrCaseEquals(name.GetStr(), "self") {
+func ZendGetClassFetchType(name string) uint32 {
+	if ascii.StrCaseEquals(name, "self") {
 		return ZEND_FETCH_CLASS_SELF
-	} else if ascii.StrCaseEquals(name.GetStr(), "parent") {
+	} else if ascii.StrCaseEquals(name, "parent") {
 		return ZEND_FETCH_CLASS_PARENT
-	} else if ascii.StrCaseEquals(name.GetStr(), "static") {
+	} else if ascii.StrCaseEquals(name, "static") {
 		return ZEND_FETCH_CLASS_STATIC
 	} else {
 		return ZEND_FETCH_CLASS_DEFAULT
@@ -346,7 +341,7 @@ func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
 	if name_ast.GetAttr() == ZEND_NAME_FQ {
 		return ZEND_FETCH_CLASS_DEFAULT
 	}
-	return ZendGetClassFetchType(ZendAstGetStr(name_ast))
+	return ZendGetClassFetchType(ZendAstGetStr(name_ast).GetStr())
 }
 func ZendEnsureValidClassFetchType(fetch_type uint32) {
 	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() != 0 {
@@ -368,7 +363,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	if class_name.GetType() != types.IS_STRING {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	fetch_type = ZendGetClassFetchType(class_name.GetStr())
+	fetch_type = ZendGetClassFetchType(class_name.GetStr().GetStr())
 	ZendEnsureValidClassFetchType(fetch_type)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
@@ -425,7 +420,7 @@ func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *types.ClassEntry) type
 	}
 }
 func ZendTryCtEvalClassConst(zv *types.Zval, class_name *types.String, name *types.String) types.ZendBool {
-	var fetch_type = ZendGetClassFetchType(class_name)
+	var fetch_type = ZendGetClassFetchType(class_name.GetStr())
 	var cc *ZendClassConstant
 	var c *types.Zval
 	if ClassNameRefersToActiveCe(class_name, fetch_type) {

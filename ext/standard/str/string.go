@@ -34,7 +34,15 @@ const PHP_PATHINFO_ALL = PHP_PATHINFO_DIRNAME | PHP_PATHINFO_BASENAME | PHP_PATH
 const _HEB_BLOCK_TYPE_ENG = 1
 const _HEB_BLOCK_TYPE_HEB = 2
 
-const PHP_TAG_BUF_SIZE = 1023
+const (
+	CHAR_MAX    = 127
+	LC_CTYPE    = 2
+	LC_NUMERIC  = 4
+	LC_TIME     = 5
+	LC_COLLATE  = 1
+	LC_MONETARY = 3
+	LC_ALL      = 0
+)
 
 /**
  * helpers
@@ -1162,7 +1170,7 @@ func ZifUcwords(str string, _ zpp.Opt, delimiters *string) string {
 	return string(chars)
 }
 
-func phpStrtrEx(str string, from string, to string) string {
+func Strtr(str string, from string, to string) string {
 	l := b.Min(len(from), len(to))
 	if len(from) == 0 {
 		return str
@@ -1369,7 +1377,7 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 			// unreachable, 触发 fatal error
 			return "", false
 		}
-		return phpStrtrEx(str, from.GetStrVal(), *to_), true
+		return Strtr(str, from.GetStrVal(), *to_), true
 	}
 }
 

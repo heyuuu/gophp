@@ -1330,11 +1330,11 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 	if categorize != 0 {
 		var val *ZendConstant
 		var module_number int
-		var modules *types.Zval
+		var modules []types.Zval
 		var const_val types.Zval
 		var module_names []string
 		var i = 1
-		modules = Ecalloc(globals.G().CountModules()+2, b.SizeOf("zval"))
+		modules = make([]types.Zval, globals.G().CountModules()+2)
 		module_names = make([]string, globals.G().CountModules()+2)
 		module_names[0] = "internal"
 		globals.G().EachModule(func(module *ModuleEntry) {
@@ -1342,29 +1342,16 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			i++
 		})
 		module_names[i] = "user"
-		var __ht__1 = EG__().GetZendConstants()
-		for _, _p := range __ht__1.ForeachData() {
-			var _z = _p.GetVal()
-
-			val = _z.GetPtr()
+		EG__().ConstantTable().Foreach(func(_ string, val *ZendConstant) {
 			if val.GetName() == nil {
-
 				/* skip special constants */
-
-				continue
-
-				/* skip special constants */
-
+				return
 			}
 			if ZEND_CONSTANT_MODULE_NUMBER(val) == PHP_USER_CONSTANT {
 				module_number = i
 			} else if ZEND_CONSTANT_MODULE_NUMBER(val) > i {
-
 				/* should not happen */
-
-				continue
-
-				/* should not happen */
+				return
 
 			} else {
 				module_number = ZEND_CONSTANT_MODULE_NUMBER(val)
@@ -1375,28 +1362,20 @@ func ZifGetDefinedConstants(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			}
 			types.ZVAL_COPY_OR_DUP(&const_val, val.Value())
 			modules[module_number].GetArr().KeyAddNew(val.GetName().GetStr(), &const_val)
-		}
+		})
+
 		Efree(modules)
 	} else {
-		var constant *ZendConstant
-		var const_val types.Zval
-		var __ht = EG__().GetZendConstants()
-		for _, _p := range __ht.ForeachData() {
-			var _z = _p.GetVal()
-
-			constant = _z.GetPtr()
+		EG__().ConstantTable().Foreach(func(_ string, constant *ZendConstant) {
 			if constant.GetName() == nil {
-
 				/* skip special constants */
-
-				continue
-
-				/* skip special constants */
-
+				return
 			}
-			types.ZVAL_COPY_OR_DUP(&const_val, constant.Value())
-			return_value.GetArr().KeyAddNew(constant.GetName().GetStr(), &const_val)
-		}
+
+			var constVal types.Zval
+			types.ZVAL_COPY_OR_DUP(&constVal, constant.Value())
+			return_value.GetArr().KeyAddNew(constant.GetName().GetStr(), &constVal)
+		})
 	}
 }
 func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {

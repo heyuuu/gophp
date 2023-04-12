@@ -31,7 +31,7 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Dynamic class names are not allowed in compile-time class constant references")
 	}
 	class_name = ZendAstGetStr(class_ast)
-	fetch_type = ZendGetClassFetchType(class_name)
+	fetch_type = ZendGetClassFetchType(class_name.GetStr())
 	if ZEND_FETCH_CLASS_STATIC == fetch_type {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "\"static::\" is not allowed in compile-time constants")
 	}
@@ -49,7 +49,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 	var ast *ZendAst = *ast_ptr
 	var class_ast *ZendAst = ast.GetChild()[0]
 	var class_name *types.String = ZendAstGetStr(class_ast)
-	var fetch_type uint32 = ZendGetClassFetchType(class_name)
+	var fetch_type uint32 = ZendGetClassFetchType(class_name.GetStr())
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
 		fallthrough
@@ -76,7 +76,7 @@ func ZendCompileConstExprConst(ast_ptr **ZendAst) {
 	var result types.Zval
 	var resolved_name *types.String
 	resolved_name = ZendResolveConstName(orig_name, name_ast.GetAttr(), &is_fully_qualified)
-	if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) != 0 {
+	if ZendTryCtEvalConst(&result, resolved_name.GetStr(), is_fully_qualified) != 0 {
 		// types.ZendStringReleaseEx(resolved_name, 0)
 		ZendAstDestroy(ast)
 		*ast_ptr = ZendAstCreateZval(&result)
@@ -631,7 +631,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		var name_ast *ZendAst = ast.GetChild()[0]
 		var is_fully_qualified types.ZendBool
 		var resolved_name *types.String = ZendResolveConstName(ZendAstGetStr(name_ast), name_ast.GetAttr(), &is_fully_qualified)
-		if ZendTryCtEvalConst(&result, resolved_name, is_fully_qualified) == 0 {
+		if ZendTryCtEvalConst(&result, resolved_name.GetStr(), is_fully_qualified) == 0 {
 			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}

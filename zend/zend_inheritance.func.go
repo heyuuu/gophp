@@ -1700,7 +1700,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 			/** Resolve classes for all precedence operations. */
 
 			cur_method_ref = cur_precedence.GetTraitMethod()
-			trait = ZendFetchClass(cur_method_ref.GetClassName(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			trait = ZendFetchClass(cur_method_ref.GetClassName().GetStr(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if trait == nil {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", cur_method_ref.GetClassName().GetVal())
 			}
@@ -1722,7 +1722,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 
 			for j = 0; j < cur_precedence.GetNumExcludes(); j++ {
 				var class_name *types.String = cur_precedence.GetExcludeClassNames()[j]
-				var exclude_ce *types.ClassEntry = ZendFetchClass(class_name, ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var exclude_ce *types.ClassEntry = ZendFetchClass(class_name.GetStr(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				var trait_num uint32
 				if exclude_ce == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", class_name.GetVal())
@@ -1765,7 +1765,7 @@ func ZendTraitsInitTraitStructures(ce *types.ClassEntry, traits **types.ClassEnt
 
 			if ce.GetTraitAliases()[i].GetTraitMethod().GetClassName() != nil {
 				cur_method_ref = ce.GetTraitAliases()[i].GetTraitMethod()
-				trait = ZendFetchClass(cur_method_ref.GetClassName(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				trait = ZendFetchClass(cur_method_ref.GetClassName().GetStr(), ZEND_FETCH_CLASS_TRAIT|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if trait == nil {
 					faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Could not find trait %s", cur_method_ref.GetClassName().GetVal())
 				}

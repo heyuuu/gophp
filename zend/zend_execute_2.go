@@ -162,7 +162,7 @@ func ZendCheckType(
 		if *cache_slot {
 			*ce = (*types.ClassEntry)(*cache_slot)
 		} else {
-			*ce = ZendFetchClass(type_.Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			*ce = ZendFetchClass(type_.Name().GetStr(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
 				return arg.IsNull() && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
 			}
@@ -289,7 +289,7 @@ func ZendVerifyMissingReturnType(zf types.IFunction, cache_slot *any) int {
 			if *cache_slot {
 				ce = (*types.ClassEntry)(*cache_slot)
 			} else {
-				ce = ZendFetchClass(ret_info.GetType().Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClass(ret_info.GetType().Name().GetStr(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					*cache_slot = any(ce)
 				}

@@ -3,9 +3,9 @@ package zend
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/builtin/ascii"
-	"github.com/heyuuu/gophp/builtin/strutil"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"strings"
 )
 
 func MAKE_NOP(opline *ZendOp) {
@@ -162,18 +162,12 @@ func ZendBuildRuntimeDefinitionKey(name *types.String, start_lineno uint32) *typ
 	var result = ZendSprintf("%c%s%s:%"+"u"+"$%"+PRIx32, '0', name.GetVal(), filename.GetVal(), start_lineno, b.PostInc(&(CG__().GetRtdKeyCounter())))
 	return types.NewString(result)
 }
-func ZendGetUnqualifiedName(name *types.String, result **byte, result_len *int) types.ZendBool {
-	var ns_separator *byte = ZendMemrchr(name.GetVal(), '\\', name.GetLen())
-	if ns_separator != nil {
-		*result = ns_separator + 1
-		*result_len = name.GetVal() + name.GetLen() - (*result)
-		return 1
-	}
-	return 0
-}
 
 func ZendGetUnqualifiedNameEx(name string) (string, bool) {
-	return strutil.LastAfterByte(name, '\\')
+	if pos := strings.LastIndexByte(name, '\\'); pos >= 0 {
+		return name[pos+1:], true
+	}
+	return name, false
 }
 func ZendIsReservedClassName(name string) bool {
 	name, _ = ZendGetUnqualifiedNameEx(name)
