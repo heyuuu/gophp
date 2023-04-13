@@ -288,7 +288,7 @@ func ZifStreamWrapperUnregister(executeData zpp.Ex, return_value zpp.Ret, protoc
 	return_value.SetTrue()
 	return
 }
-func ZifStreamWrapperRestore(executeData zpp.Ex, return_value zpp.Ret, protocol string) bool {
+func ZifStreamWrapperRestore(protocol string) bool {
 	var wrapper_hash map[string]*core.PhpStreamWrapper
 	global_wrapper_hash := UrlStreamWrappersHash
 	wrapper := global_wrapper_hash[protocol]

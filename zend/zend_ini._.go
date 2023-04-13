@@ -31,7 +31,7 @@ const ZEND_INI_PARSER_ENTRY = 1
 const ZEND_INI_PARSER_SECTION = 2
 const ZEND_INI_PARSER_POP_ENTRY = 3
 
-var RegisteredZendIniDirectives *types.Array
+var RegisteredZendIniDirectives IniDirectives
 
 const NO_VALUE_PLAINTEXT = "no value"
 const NO_VALUE_HTML = "<i>no value</i>"

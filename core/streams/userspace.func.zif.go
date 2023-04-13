@@ -48,6 +48,6 @@ var DefZifStreamWrapperRestore = def.DefFunc("stream_wrapper_restore", 1, 1, []d
 	if fp.HasError() {
 		return
 	}
-	ret := ZifStreamWrapperRestore(executeData, returnValue, protocol)
+	ret := ZifStreamWrapperRestore(protocol)
 	returnValue.SetBool(ret)
 })

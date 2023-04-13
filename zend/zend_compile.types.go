@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/internal"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -74,16 +75,51 @@ func (this *ZendDeclarables) SetTicks(value ZendLong) { this.ticks = value }
 /**
  * ZendFileContext
  */
+type ImportNames = *internal.Table[string]
 type ZendFileContext struct {
 	declarables              ZendDeclarables
 	current_namespace        *types.String
 	in_namespace             types.ZendBool
 	has_bracketed_namespaces types.ZendBool
-	imports                  *types.Array
-	imports_function         *types.Array
-	imports_const            *types.Array
+	imports                  ImportNames
+	imports_function         ImportNames
+	imports_const            ImportNames
 	seen_symbols             types.Array
 }
+
+func (this *ZendFileContext) ResetImportTables() {
+	this.imports = nil
+	this.imports_function = nil
+	this.imports_const = nil
+}
+
+func (this *ZendFileContext) Imports() ImportNames {
+	if this.imports == nil {
+		this.imports = internal.NewLcTable[string](nil)
+	}
+	return this.imports
+}
+func (this *ZendFileContext) ImportsFunction() ImportNames {
+	if this.imports_function == nil {
+		this.imports_function = internal.NewLcTable[string](nil)
+	}
+	return this.imports_function
+}
+func (this *ZendFileContext) ImportsConst() ImportNames {
+	if this.imports_const == nil {
+		this.imports_const = internal.NewLcTable[string](nil)
+	}
+	return this.imports_const
+}
+
+func (this *ZendFileContext) GetImports() ImportNames       { return this.imports }
+func (this *ZendFileContext) SetImports(value *types.Array)    { this.imports = value }
+func (this *ZendFileContext) GetImportsFunction() *types.Array { return this.imports_function }
+func (this *ZendFileContext) SetImportsFunction(value *types.Array) {
+	this.imports_function = value
+}
+func (this *ZendFileContext) GetImportsConst() *types.Array      { return this.imports_const }
+func (this *ZendFileContext) SetImportsConst(value *types.Array) { this.imports_const = value }
 
 func (this *ZendFileContext) GetDeclarables() ZendDeclarables      { return this.declarables }
 func (this *ZendFileContext) SetDeclarables(value ZendDeclarables) { this.declarables = value }
@@ -99,15 +135,7 @@ func (this *ZendFileContext) GetHasBracketedNamespaces() types.ZendBool {
 func (this *ZendFileContext) SetHasBracketedNamespaces(value types.ZendBool) {
 	this.has_bracketed_namespaces = value
 }
-func (this *ZendFileContext) GetImports() *types.Array         { return this.imports }
-func (this *ZendFileContext) SetImports(value *types.Array)    { this.imports = value }
-func (this *ZendFileContext) GetImportsFunction() *types.Array { return this.imports_function }
-func (this *ZendFileContext) SetImportsFunction(value *types.Array) {
-	this.imports_function = value
-}
-func (this *ZendFileContext) GetImportsConst() *types.Array      { return this.imports_const }
-func (this *ZendFileContext) SetImportsConst(value *types.Array) { this.imports_const = value }
-func (this *ZendFileContext) GetSeenSymbols() types.Array        { return this.seen_symbols }
+func (this *ZendFileContext) GetSeenSymbols() types.Array { return this.seen_symbols }
 
 // func (this *ZendFileContext) SetSeenSymbols(value HashTable) { this.seen_symbols = value }
 

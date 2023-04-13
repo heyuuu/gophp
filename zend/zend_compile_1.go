@@ -36,7 +36,7 @@ func ZendResolveClassName(name *types.String, type_ uint32) *types.String {
 		}
 		return name
 	}
-	if FC__().GetImports() != nil {
+	if FC__().GetImports().Len() != 0 {
 		compound = memchr(name.GetVal(), '\\', name.GetLen())
 		if compound != nil {
 

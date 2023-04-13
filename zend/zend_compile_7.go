@@ -8,32 +8,19 @@ import (
 	"os"
 )
 
-func ZendGetImportHt(type_ uint32) *types.Array {
+func ZendGetImportHt(type_ uint32) ImportNames {
 	switch type_ {
 	case ZEND_SYMBOL_CLASS:
-		if FC__().GetImports() == nil {
-			FC__().SetImports(Emalloc(b.SizeOf("HashTable")))
-			FC__().GetImports() = types.MakeArrayEx(8, StrDtor, 0)
-		}
-		return FC__().GetImports()
+		return FC__().Imports()
 	case ZEND_SYMBOL_FUNCTION:
-		if FC__().GetImportsFunction() == nil {
-			FC__().SetImportsFunction(Emalloc(b.SizeOf("HashTable")))
-			FC__().GetImportsFunction() = types.MakeArrayEx(8, StrDtor, 0)
-		}
-		return FC__().GetImportsFunction()
+		return FC__().ImportsFunction()
 	case ZEND_SYMBOL_CONST:
-		if FC__().GetImportsConst() == nil {
-			FC__().SetImportsConst(Emalloc(b.SizeOf("HashTable")))
-			FC__().GetImportsConst() = types.MakeArrayEx(8, StrDtor, 0)
-		}
-		return FC__().GetImportsConst()
+		return FC__().ImportsConst()
 	default:
-
 	}
 	return nil
 }
-func ZendGetUseTypeStr(type_ uint32) *byte {
+func ZendGetUseTypeStr(type_ uint32) string {
 	switch type_ {
 	case ZEND_SYMBOL_CLASS:
 		return ""
@@ -42,7 +29,6 @@ func ZendGetUseTypeStr(type_ uint32) *byte {
 	case ZEND_SYMBOL_CONST:
 		return " const"
 	default:
-
 	}
 	return " unknown"
 }
@@ -57,8 +43,8 @@ func ZendCompileUse(ast *ZendAst) {
 	var i uint32
 	var current_ns *types.String = FC__().GetCurrentNamespace()
 	var type_ uint32 = ast.GetAttr()
-	var current_import *types.Array = ZendGetImportHt(type_)
-	var case_sensitive types.ZendBool = type_ == ZEND_SYMBOL_CONST
+	var current_import ImportNames = ZendGetImportHt(type_)
+	var case_sensitive bool = type_ == ZEND_SYMBOL_CONST
 	for i = 0; i < list.GetChildren(); i++ {
 		var use_ast *ZendAst = list.GetChild()[i]
 		var old_name_ast *ZendAst = use_ast.GetChild()[0]
@@ -82,7 +68,7 @@ func ZendCompileUse(ast *ZendAst) {
 				}
 			}
 		}
-		if case_sensitive != 0 {
+		if case_sensitive {
 			lookup_name = new_name.Copy()
 		} else {
 			lookup_name = ZendStringTolower(new_name)
@@ -98,21 +84,17 @@ func ZendCompileUse(ast *ZendAst) {
 			if ZendHaveSeenSymbol(ns_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, ns_name)
 			}
-			// types.ZendStringEfree(ns_name)
 		} else {
 			if ZendHaveSeenSymbol(lookup_name, type_) != 0 {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
 			}
 		}
-		//old_name.AddRefcount()
-		//old_name = types.ZendNewInternedString(old_name)
-		if !(types.ZendHashAddPtr(current_import, lookup_name.GetStr(), old_name)) {
+		if !current_import.Add(lookup_name.GetStr(), old_name) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
 		}
-		// types.ZendStringReleaseEx(lookup_name, 0)
-		// types.ZendStringReleaseEx(new_name, 0)
 	}
 }
+
 func ZendCompileGroupUse(ast *ZendAst) {
 	var i uint32
 	var ns *types.String = ZendAstGetStr(ast.GetChild()[0])

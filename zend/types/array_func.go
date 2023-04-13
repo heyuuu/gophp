@@ -197,14 +197,6 @@ func ZendHashFindInd(ht *Array, key string) *Zval {
 	}
 }
 
-func ZendHashAddPtr(ht *Array, key string, pData any) any {
-	zv := ht.KeyAdd(key, NewZvalPtr(pData))
-	if zv != nil {
-		return zv.GetPtr()
-	} else {
-		return nil
-	}
-}
 func ZendHashAddNewPtr(ht *Array, key string, pData any) any {
 	zv := ht.KeyAddNew(key, NewZvalPtr(pData))
 	if zv != nil {

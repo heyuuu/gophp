@@ -218,21 +218,7 @@ func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 	CG__().SetContext(*prev_context)
 }
 func ZendResetImportTables() {
-	if FC__().GetImports() != nil {
-		FC__().GetImports().Destroy()
-		Efree(FC__().GetImports())
-		FC__().SetImports(nil)
-	}
-	if FC__().GetImportsFunction() != nil {
-		FC__().GetImportsFunction().Destroy()
-		Efree(FC__().GetImportsFunction())
-		FC__().SetImportsFunction(nil)
-	}
-	if FC__().GetImportsConst() != nil {
-		FC__().GetImportsConst().Destroy()
-		Efree(FC__().GetImportsConst())
-		FC__().SetImportsConst(nil)
-	}
+	FC__().ResetImportTables()
 }
 func ZendEndNamespace() {
 	FC__().SetInNamespace(0)

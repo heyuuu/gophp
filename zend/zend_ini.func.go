@@ -89,14 +89,11 @@ func ZendIniSortEntries() {
 	})
 }
 func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) int {
-	var directives *types.Array = RegisteredZendIniDirectives
+	var directives = RegisteredZendIniDirectives
 	for i := range iniEntryDefs {
 		iniEntryDef := &iniEntryDefs[i]
 		p := NewZendIniEntry(iniEntryDef, moduleNumber)
-		if types.ZendHashAddPtr(directives, p.GetName().GetStr(), any(p)) == nil {
-			if p.GetName() != nil {
-				// types.ZendStringReleaseEx(p.GetName(), 1)
-			}
+		if !directives.Add(p.GetName().GetStr(), p) {
 			ZendUnregisterIniEntries(moduleNumber)
 			return types.FAILURE
 		}
@@ -112,7 +109,9 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 	return types.SUCCESS
 }
 func ZendUnregisterIniEntries(module_number int) {
-	types.ZendHashApplyWithArgument(RegisteredZendIniDirectives, ZendRemoveIniEntries, any(&module_number))
+	RegisteredZendIniDirectives.Filter(func(_ string, ini_entry *ZendIniEntry) bool {
+		return ini_entry.GetModuleNumber() == module_number
+	})
 }
 func ZendAlterIniEntryChars(name string, value string, modify_type int, stage int) bool {
 	return ZendAlterIniEntryEx(types.NewString(name), types.NewString(value), modify_type, stage, 0)
@@ -172,8 +171,7 @@ func ZendRestoreIniEntry(name *types.String, stage int) int {
 	return types.SUCCESS
 }
 func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
-	var ini_entry *ZendIniEntry
-	ini_entry = types.ZendHashStrFindPtr(RegisteredZendIniDirectives, b.CastStr(name, name_length))
+	var ini_entry *ZendIniEntry = RegisteredZendIniDirectives.Get(b.CastStr(name, name_length))
 	if ini_entry == nil {
 		return types.FAILURE
 	}
