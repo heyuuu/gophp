@@ -58,4 +58,3 @@ func ZendMemoryPeakUsage(real_usage int) int {
 }
 func ShutdownMemoryManager(silent int, full_shutdown int) {}
 func StartMemoryManager()                                 {}
-func ZendMmGetHeap() any/* *ZendMmHeap   */ { return nil }

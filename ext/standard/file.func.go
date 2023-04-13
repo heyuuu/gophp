@@ -489,12 +489,12 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 					bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
 					if bytes_written != str.GetLen() {
 						core.PhpErrorDocref(nil, faults.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
-						zend.ZendTmpStringRelease(t)
+						// zend.ZendTmpStringRelease(t)
 						numbytes = -1
 						break
 					}
 				}
-				zend.ZendTmpStringRelease(t)
+				// zend.ZendTmpStringRelease(t)
 			}
 		}
 	case types.IS_OBJECT:
@@ -1787,7 +1787,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 		if b.PreInc(&i) != count {
 			csvline.AppendString(b.CastStr(&delimiter, 1))
 		}
-		zend.ZendTmpStringRelease(tmp_field_str)
+		// zend.ZendTmpStringRelease(tmp_field_str)
 	}
 	csvline.AppendByte('\n')
 	csvline.ZeroTail()

@@ -124,15 +124,10 @@ func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 		return 1
 	}
 }
-func ZendPrintZval(expr *types.Zval, indent int) int {
-	var tmp_str *types.String
-	var str *types.String = ZvalGetTmpString(expr, &tmp_str)
-	var len_ int = str.GetLen()
-	if len_ != 0 {
-		ZendWrite(str.GetStr())
-	}
-	ZendTmpStringRelease(tmp_str)
-	return len_
+func ZendPrintZval(expr *types.Zval) int {
+	var str = ZvalGetStrVal(expr)
+	ZendWrite(str)
+	return len(str)
 }
 func ZendPrintFlatZvalR(expr *types.Zval) {
 	switch expr.GetType() {
@@ -172,7 +167,7 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 		ZendPrintFlatZvalR(types.Z_REFVAL_P(expr))
 		break
 	default:
-		ZendPrintZval(expr, 0)
+		ZendPrintZval(expr)
 		break
 	}
 }

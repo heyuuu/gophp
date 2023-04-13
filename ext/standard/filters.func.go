@@ -968,7 +968,7 @@ func PhpConvGetStringPropEx(
 		*pretval = zend.Pemalloc(str.GetLen() + 1)
 		*pretval_len = str.GetLen()
 		memcpy(*pretval, str.GetVal(), str.GetLen()+1)
-		zend.ZendTmpStringRelease(tmp)
+		// zend.ZendTmpStringRelease(tmp)
 	} else {
 		return PHP_CONV_ERR_NOT_FOUND
 	}

@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var value *types.Zval
@@ -50,9 +52,6 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
-	{
-		ZendTmpStringRelease(tmp_name)
-	}
 	ZvalPtrDtorNogc(free_op1)
 	if value == nil {
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
@@ -82,15 +81,8 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
 	varname = opline.Op1()
-
-	{
-		name = ZvalGetTmpString(varname, &tmp_name)
-	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
-	{
-		ZendTmpStringRelease(tmp_name)
-	}
 	if value == nil {
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
 	} else {

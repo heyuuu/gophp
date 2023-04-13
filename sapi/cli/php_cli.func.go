@@ -579,7 +579,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				zend.EG__().SetException(nil)
 				exit_status = 1
 			} else {
-				zend.ZendPrintZval(&ref, 0)
+				zend.ZendPrintZval(&ref)
 				zend.ZendWrite("\n")
 			}
 			zend.ZvalPtrDtor(&ref)

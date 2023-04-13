@@ -361,7 +361,6 @@ func ZendBeginFuncDecl(result *Znode, op_array *types.ZendOpArray, decl *ZendAst
 
 	key = nil
 	for {
-		ZendTmpStringRelease(key)
 		key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
 		if CG__().FunctionTable().Add(key.GetStr(), op_array) {
 			break
@@ -729,8 +728,6 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		name = nil
 		lcname = nil
 		for {
-			ZendTmpStringRelease(name)
-			ZendTmpStringRelease(lcname)
 			name = ZendGenerateAnonClassName(decl.GetStartLineno())
 			lcname = ZendStringTolower(name)
 			if !CG__().ClassTable().Exists(name.GetStr()) {
@@ -872,7 +869,6 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 
 		var key *types.String = nil
 		for {
-			ZendTmpStringRelease(key)
 			key = ZendBuildRuntimeDefinitionKey(lcname, decl.GetStartLineno())
 			if CG__().ClassTable().Add(key.GetStr(), ce) {
 				break

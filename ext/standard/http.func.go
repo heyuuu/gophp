@@ -221,7 +221,7 @@ func PhpUrlEncodeHashEx(
 					ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
 				}
 				formstr.AppendString(ekey.GetStr())
-				zend.ZendTmpStringRelease(tmp)
+				// zend.ZendTmpStringRelease(tmp)
 				//types.ZendStringFree(ekey)
 			}
 		}

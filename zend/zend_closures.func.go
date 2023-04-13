@@ -171,11 +171,9 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *types.Zval) {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
 				faults.Error(faults.E_WARNING, "Class '%s' not found", class_name.GetVal())
-				ZendTmpStringRelease(tmp_class_name)
 				return_value.SetNull()
 				return
 			}
-			ZendTmpStringRelease(tmp_class_name)
 		}
 	} else {
 		ce = closure.GetFunc().GetScope()

@@ -270,27 +270,23 @@ func PhpArrayDataCompareString(a *types.Bucket, b *types.Bucket) int {
 func PhpArrayReverseDataCompareString(a *types.Bucket, b *types.Bucket) int {
 	return PhpArrayDataCompareString(b, a)
 }
-func PhpArrayNaturalGeneralCompare(p1 *types.Bucket, p2 *types.Bucket, fold_case int) int {
-	var tmp_str1 *types.String
-	var tmp_str2 *types.String
-	var str1 = zend.ZvalGetTmpString(p1.GetVal(), &tmp_str1)
-	var str2 = zend.ZvalGetTmpString(p2.GetVal(), &tmp_str2)
-	var result = str.Strnatcmp(str1.GetStr(), str2.GetStr(), fold_case)
-	zend.ZendTmpStringRelease(tmp_str1)
-	zend.ZendTmpStringRelease(tmp_str2)
+func PhpArrayNaturalGeneralCompare(p1 *types.Bucket, p2 *types.Bucket, fold_case bool) int {
+	var str1 = zend.ZvalGetStrVal(p1.GetVal())
+	var str2 = zend.ZvalGetStrVal(p2.GetVal())
+	var result = str.Strnatcmp(str1, str2, fold_case)
 	return result
 }
 func PhpArrayNaturalCompare(a *types.Bucket, b *types.Bucket) int {
-	return PhpArrayNaturalGeneralCompare(a, b, 0)
+	return PhpArrayNaturalGeneralCompare(a, b, false)
 }
 func PhpArrayReverseNaturalCompare(a *types.Bucket, b *types.Bucket) int {
-	return PhpArrayNaturalGeneralCompare(b, a, 0)
+	return PhpArrayNaturalGeneralCompare(b, a, false)
 }
 func PhpArrayNaturalCaseCompare(a *types.Bucket, b *types.Bucket) int {
-	return PhpArrayNaturalGeneralCompare(a, b, 1)
+	return PhpArrayNaturalGeneralCompare(a, b, true)
 }
 func PhpArrayReverseNaturalCaseCompare(a *types.Bucket, b *types.Bucket) int {
-	return PhpArrayNaturalGeneralCompare(b, a, 1)
+	return PhpArrayNaturalGeneralCompare(b, a, true)
 }
 func PhpArrayDataCompareStringLocale(a *types.Bucket, b *types.Bucket) int {
 	var f *types.Bucket
@@ -2434,7 +2430,6 @@ func ZifArrayFillKeys(executeData zpp.Ex, return_value zpp.Ret, keys *types.Zval
 			var tmp_key *types.String
 			var key = zend.ZvalGetTmpString(entry, &tmp_key)
 			return_value.GetArr().SymtableUpdate(key.GetStr(), val)
-			zend.ZendTmpStringRelease(tmp_key)
 		}
 	}
 }
@@ -4116,7 +4111,7 @@ func ZifArrayColumn(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, c
 						var tmp_key *types.String
 						var key = zend.ZvalGetTmpString(keyval, &tmp_key)
 						return_value.GetArr().SymtableUpdate(key.GetStr(), colval)
-						zend.ZendTmpStringRelease(tmp_key)
+						// zend.ZendTmpStringRelease(tmp_key)
 					case types.IS_NULL:
 						return_value.GetArr().KeyUpdate(types.NewString("").GetStr(), colval)
 					case types.IS_DOUBLE:
@@ -4458,7 +4453,7 @@ func ZifArrayUnique(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _
 				var tmp_str_val *types.String
 				var str_val = zend.ZvalGetTmpString(val, &tmp_str_val)
 				retval = types.ZendHashAddEmptyElement(&seen, str_val.GetStr())
-				zend.ZendTmpStringRelease(tmp_str_val)
+				// zend.ZendTmpStringRelease(tmp_str_val)
 			}
 			if retval != nil {
 
@@ -5428,15 +5423,15 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 					value = _z
 					str = zend.ZvalGetTmpString(value, &tmp_str)
 					if search_str.GetStr() == str.GetStr() {
-						zend.ZendTmpStringRelease(tmp_str)
+						// zend.ZendTmpStringRelease(tmp_str)
 						found = 1
 						break
 					}
-					zend.ZendTmpStringRelease(tmp_str)
+					// zend.ZendTmpStringRelease(tmp_str)
 				}
 			}
 		}
-		zend.ZendTmpStringRelease(tmp_search_str)
+		// zend.ZendTmpStringRelease(tmp_search_str)
 		if found != 0 {
 			return_value.SetEmptyArray()
 		} else {
@@ -5478,7 +5473,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 			value = _z
 			str = zend.ZvalGetTmpString(value, &tmp_str)
 			exclude.KeyAdd(str.GetStr(), &dummy)
-			zend.ZendTmpStringRelease(tmp_str)
+			// zend.ZendTmpStringRelease(tmp_str)
 		}
 	}
 
@@ -5506,7 +5501,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 			}
 			zend.ZvalAddRef(value)
 		}
-		zend.ZendTmpStringRelease(tmp_str)
+		// zend.ZendTmpStringRelease(tmp_str)
 	}
 	exclude.Destroy()
 }
@@ -6511,7 +6506,7 @@ func ZifArrayCombine(executeData zpp.Ex, return_value zpp.Ret, keys *types.Zval,
 					var tmp_key *types.String
 					var key = zend.ZvalGetTmpString(entry_keys, &tmp_key)
 					entry_values = return_value.GetArr().SymtableUpdate(key.GetStr(), entry_values)
-					zend.ZendTmpStringRelease(tmp_key)
+					// zend.ZendTmpStringRelease(tmp_key)
 				}
 				zend.ZvalAddRef(entry_values)
 				pos_values++

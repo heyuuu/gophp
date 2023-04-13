@@ -16,7 +16,7 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 						break
 					}
 				}
-				ZendPrintZval(ptr, 0)
+				ZendPrintZval(ptr)
 			}
 			break
 		}

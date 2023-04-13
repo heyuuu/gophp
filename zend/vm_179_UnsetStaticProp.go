@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var varname *types.Zval
@@ -39,7 +44,6 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		name = ZvalGetTmpString(varname, &tmp_name)
 	}
 	ZendStdUnsetStaticProperty(ce, name)
-	ZendTmpStringRelease(tmp_name)
 	FREE_OP(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

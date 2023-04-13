@@ -414,7 +414,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 			memset(&output.GetVal()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
 			memcpy(&output.GetVal()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
-			zend.ZendTmpStringRelease(tmp_str)
+			// zend.ZendTmpStringRelease(tmp_str)
 		case 'h':
 			fallthrough
 		case 'H':
@@ -449,7 +449,7 @@ func ZifPack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp
 				nibbleshift = nibbleshift + 4&7
 			}
 			outputpos++
-			zend.ZendTmpStringRelease(tmp_str)
+			// zend.ZendTmpStringRelease(tmp_str)
 		case 'c':
 			fallthrough
 		case 'C':

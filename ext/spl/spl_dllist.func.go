@@ -326,7 +326,6 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.Array {
 	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyAdd(pnstr.GetStr(), &tmp)
-	// types.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&dllist_array)
 	for current != nil {
 		next = current.GetNext()
@@ -339,7 +338,6 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.Array {
 	}
 	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "dllist")
 	debug_info.KeyAdd(pnstr.GetStr(), &dllist_array)
-	// types.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
 }
 func SplDllistObjectGetGc(obj *types.Zval, gc_data **types.Zval, gc_data_count *int) *types.Array {

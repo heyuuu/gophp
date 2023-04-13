@@ -607,21 +607,10 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.A
 	return types.FAILURE
 }
 func PhpIniActivateConfig(source_hash *types.Array, modify_type int, stage int) {
-	var str *types.String
-	var data *types.Zval
-
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
-
-	var __ht *types.Array = source_hash
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		str = _p.GetKey()
-		data = _z
-		zend.ZendAlterIniEntryEx(str, data.GetStr(), modify_type, stage, 0)
-	}
-
-	/* Walk through config hash and alter matching ini entries using the values found in the hash */
+	source_hash.Foreach(func(key types.ArrayKey, data *types.Zval) {
+		zend.ZendAlterIniEntryEx(key.StrKey(), data.GetStr(), modify_type, stage, 0)
+	})
 }
 func PhpIniHasPerDirConfig() int { return HasPerDirConfig }
 func PhpIniActivatePerDirConfig(path string) {

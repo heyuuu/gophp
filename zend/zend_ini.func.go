@@ -114,14 +114,14 @@ func ZendUnregisterIniEntries(module_number int) {
 	})
 }
 func ZendAlterIniEntryChars(name string, value string, modify_type int, stage int) bool {
-	return ZendAlterIniEntryEx(types.NewString(name), types.NewString(value), modify_type, stage, 0)
+	return ZendAlterIniEntryEx(types.NewString(name).GetStr(), types.NewString(value), modify_type, stage, 0)
 }
-func ZendAlterIniEntryEx(name *types.String, new_value *types.String, modify_type int, stage int, force_change int) bool {
+func ZendAlterIniEntryEx(name string, new_value *types.String, modify_type int, stage int, force_change int) bool {
 	var duplicate *types.String
 	var modifiable uint8
 	var modified types.ZendBool
 
-	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name.GetStr())
+	var ini_entry *ZendIniEntry = EG__().IniDirectives().Get(name)
 	if ini_entry == nil {
 		return false
 	}

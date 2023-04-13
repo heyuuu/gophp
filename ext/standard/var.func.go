@@ -691,41 +691,41 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 		}
 		name = zend.ZvalGetTmpString(name_val, &tmp_name)
 		if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == types.SUCCESS {
-			zend.ZendTmpStringRelease(tmp_name)
+			// zend.ZendTmpStringRelease(tmp_name)
 			continue
 		}
 		if zend.EG__().GetException() != nil {
-			zend.ZendTmpStringRelease(tmp_name)
+			// zend.ZendTmpStringRelease(tmp_name)
 			retval = types.FAILURE
 			break
 		}
 		priv_name = zend.ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == types.SUCCESS {
-			zend.ZendTmpStringRelease(tmp_name)
+			// zend.ZendTmpStringRelease(tmp_name)
 			// types.ZendStringRelease(priv_name)
 			continue
 		}
 		// types.ZendStringRelease(priv_name)
 		if zend.EG__().GetException() != nil {
-			zend.ZendTmpStringRelease(tmp_name)
+			// zend.ZendTmpStringRelease(tmp_name)
 			retval = types.FAILURE
 			break
 		}
 		prot_name = zend.ZendManglePropertyName_ZStr("*", name.GetStr())
 		if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == types.SUCCESS {
-			zend.ZendTmpStringRelease(tmp_name)
+			// zend.ZendTmpStringRelease(tmp_name)
 			// types.ZendStringRelease(prot_name)
 			continue
 		}
 		// types.ZendStringRelease(prot_name)
 		if zend.EG__().GetException() != nil {
-			zend.ZendTmpStringRelease(tmp_name)
+			// zend.ZendTmpStringRelease(tmp_name)
 			retval = types.FAILURE
 			break
 		}
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
 		ht.KeyAdd(name.GetStr(), zend.EG__().GetUninitializedZval())
-		zend.ZendTmpStringRelease(tmp_name)
+		// zend.ZendTmpStringRelease(tmp_name)
 	}
 	zend.ZendReleaseProperties(props)
 	return retval

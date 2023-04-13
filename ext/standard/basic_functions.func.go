@@ -659,7 +659,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 			var tmp_arg_str *types.String
 			var arg_str *types.String = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
-			zend.ZendTmpStringRelease(tmp_arg_str)
+			// zend.ZendTmpStringRelease(tmp_arg_str)
 		}
 
 		/* The C Standard requires argv[argc] to be NULL - this might
@@ -713,7 +713,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 			}
 			opts.SetOptChar(0)
 			opts++
-			zend.ZendTmpStringRelease(tmp_arg_str)
+			// zend.ZendTmpStringRelease(tmp_arg_str)
 		}
 
 		/* Iterate over the hash to construct the argv array. */
@@ -1650,7 +1650,7 @@ func ZifIniSet(return_value zpp.Ret, varname string, newvalue string) {
 			}
 		}
 	}
-	if !zend.ZendAlterIniEntryEx(varname, newvalue, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
+	if !zend.ZendAlterIniEntryEx(varname.GetStr(), newvalue, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 		return_value.SetFalse()
 		return
 	}
@@ -1695,7 +1695,7 @@ func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath 
 		return_value.SetFalse()
 	}
 	key = types.NewString("include_path")
-	if !zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
+	if !zend.ZendAlterIniEntryEx(key.GetStr(), new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 		// types.ZendStringReleaseEx(key, 0)
 
 		return_value.SetFalse()

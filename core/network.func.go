@@ -60,10 +60,6 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 		if error_string != nil {
 
 			/* free error string received during previous iteration (if any) */
-
-			if (*error_string) != nil {
-				// types.ZendStringReleaseEx(*error_string, 0)
-			}
 			*error_string = zend.ZendSprintfZStr("php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
 			PhpErrorDocref(nil, faults.E_WARNING, "%s", error_string.GetVal())
 		} else {

@@ -172,7 +172,7 @@ func PhpPrintGpcseArray(name string) {
 				} else {
 					PhpInfoPrint(str.GetVal())
 				}
-				zend.ZendTmpStringRelease(tmp2)
+				// zend.ZendTmpStringRelease(tmp2)
 			}
 			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td></tr>\n")

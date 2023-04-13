@@ -130,9 +130,6 @@ func ZvalGetTmpString(op *types.Zval, tmp **types.String) *types.String {
 	}
 }
 func ZendTmpStringRelease(tmp *types.String) {
-	if tmp != nil {
-		// types.ZendStringReleaseEx(tmp, 0)
-	}
 }
 func ZvalTryGetString(op *types.Zval) *types.String {
 	if op.IsString() {
