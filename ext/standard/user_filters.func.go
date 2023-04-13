@@ -59,11 +59,7 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmDeactivateUserFilters(type_ int, module_number int) int {
-	if BG__().user_filter_map {
-		BG__().user_filter_map.Destroy()
-		zend.Efree(BG__().user_filter_map)
-		BG__().user_filter_map = nil
-	}
+	BG__().UserFilterMap = nil
 	return types.SUCCESS
 }
 func UserfilterDtor(thisfilter *core.PhpStreamFilter) {
@@ -208,8 +204,8 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	len_ = strlen(filtername)
 
 	/* determine the classname/class entry */
-
-	if nil == b.Assign(&fdat, types.ZendHashStrFindPtr(BG__().user_filter_map, b.CastStr((*byte)(filtername), len_))) {
+	fdat = BG__().UserFilterMap[b.CastStrAuto(filtername)]
+	if nil == fdat {
 		var period *byte
 
 		/* Userspace Filters using ambiguous wildcards could cause problems.
@@ -229,7 +225,8 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 				b.Assert(period[0] == '.')
 				period[1] = '*'
 				period[2] = '0'
-				if nil != b.Assign(&fdat, types.ZendHashStrFindPtr(BG__().user_filter_map, wildcard)) {
+				fdat = BG__().UserFilterMap[wildcard]
+				if nil != fdat {
 					period = nil
 				} else {
 					*period = '0'
@@ -248,7 +245,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	if fdat.GetCe() == nil {
 		if nil == b.Assign(&(fdat.GetCe()), zend.ZendLookupClass(fdat.GetClassname())) {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "user-filter \"%s\" requires class \"%s\", but that class is not defined", filtername, fdat.GetClassname().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "user-filter \"%s\" requires class \"%s\", but that class is not defined", filtername, fdat.GetClassname())
 			return nil
 		}
 	}
@@ -483,42 +480,29 @@ func ZifStreamGetFilters(executeData zpp.Ex, return_value zpp.Ret) {
 		}
 	}
 }
-func ZifStreamFilterRegister(executeData zpp.Ex, return_value zpp.Ret, filtername *types.Zval, classname *types.Zval) {
-	var filtername *types.String
-	var classname *types.String
+func ZifStreamFilterRegister(filtername string, classname string) bool {
 	var fdat *PhpUserFilterData
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			filtername = fp.ParseStr()
-			classname = fp.ParseStr()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
-	return_value.SetFalse()
-	if filtername.GetLen() == 0 {
+	if filtername == "" {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Filter name cannot be empty")
-		return
+		return false
 	}
-	if classname.GetLen() == 0 {
+	if classname == "" {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Class name cannot be empty")
-		return
+		return false
 	}
-	if !(BG__().user_filter_map) {
-		BG__().user_filter_map = (*types.Array)(zend.Emalloc(b.SizeOf("HashTable")))
-		BG__().user_filter_map = types.MakeArrayEx(8, types.DtorFuncT(FilterItemDtor), 0)
+	if BG__().UserFilterMap == nil {
+		BG__().UserFilterMap = make(map[string]*PhpUserFilterData)
 	}
-	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
-	fdat.SetClassname(classname.Copy())
-	if types.ZendHashAddPtr(BG__().user_filter_map, filtername.GetStr(), fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == types.SUCCESS {
-		return_value.SetTrue()
-	} else {
-		// types.ZendStringReleaseEx(classname, 0)
-		zend.Efree(fdat)
+	fdat = NewPhpUserFilterData(nil, classname)
+
+	if _, exist := BG__().UserFilterMap[filtername]; exist {
+		return false
 	}
+	BG__().UserFilterMap[filtername] = fdat
+
+	if streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) != types.SUCCESS {
+		return false
+	}
+
+	return true
 }

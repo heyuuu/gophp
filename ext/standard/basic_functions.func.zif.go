@@ -337,8 +337,8 @@ var DefZifIniGetAll = def.DefFunc("ini_get_all", 0, 2, []def.ArgInfo{{Name: "ext
 // generate by ZifIniSet
 var DefZifIniSet = def.DefFunc("ini_set", 2, 2, []def.ArgInfo{{Name: "varname"}, {Name: "newvalue"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	varname := fp.ParseZval()
-	newvalue := fp.ParseZval()
+	varname := fp.ParseStringVal()
+	newvalue := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
@@ -348,8 +348,8 @@ var DefZifIniSet = def.DefFunc("ini_set", 2, 2, []def.ArgInfo{{Name: "varname"},
 // generate by ZifIniSet
 var DefZifIniAlter = def.DefFunc("ini_alter", 2, 2, []def.ArgInfo{{Name: "varname"}, {Name: "newvalue"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	varname := fp.ParseZval()
-	newvalue := fp.ParseZval()
+	varname := fp.ParseStringVal()
+	newvalue := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}

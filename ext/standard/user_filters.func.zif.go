@@ -67,10 +67,11 @@ var DefZifStreamGetFilters = def.DefFunc("stream_get_filters", 0, 0, []def.ArgIn
 // generate by ZifStreamFilterRegister
 var DefZifStreamFilterRegister = def.DefFunc("stream_filter_register", 2, 2, []def.ArgInfo{{Name: "filtername"}, {Name: "classname"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 2, 2, 0)
-	filtername := fp.ParseZval()
-	classname := fp.ParseZval()
+	filtername := fp.ParseStringVal()
+	classname := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStreamFilterRegister(executeData, returnValue, filtername, classname)
+	ret := ZifStreamFilterRegister(filtername, classname)
+	returnValue.SetBool(ret)
 })

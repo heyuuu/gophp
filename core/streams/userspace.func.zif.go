@@ -44,9 +44,10 @@ var DefZifStreamWrapperUnregister = def.DefFunc("stream_wrapper_unregister", 1, 
 // generate by ZifStreamWrapperRestore
 var DefZifStreamWrapperRestore = def.DefFunc("stream_wrapper_restore", 1, 1, []def.ArgInfo{{Name: "protocol"}}, func(executeData zpp.Ex, returnValue zpp.Ret) {
 	fp := zpp.FastParseStart(executeData, 1, 1, 0)
-	protocol := fp.ParseZval()
+	protocol := fp.ParseStringVal()
 	if fp.HasError() {
 		return
 	}
-	ZifStreamWrapperRestore(executeData, returnValue, protocol)
+	ret := ZifStreamWrapperRestore(executeData, returnValue, protocol)
+	returnValue.SetBool(ret)
 })

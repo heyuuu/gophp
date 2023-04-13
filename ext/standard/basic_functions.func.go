@@ -40,7 +40,7 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	BG__().next = nil
 	BG__().left = -1
 	BG__().user_tick_functions = nil
-	BG__().user_filter_map = nil
+	BG__().UserFilterMap = nil
 	BG__().serialize_lock = 0
 	memset(&(BG__().serialize), 0, b.SizeOf("BG ( serialize )"))
 	memset(&(BG__().unserialize), 0, b.SizeOf("BG ( unserialize )"))

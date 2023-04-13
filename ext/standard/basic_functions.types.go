@@ -54,7 +54,7 @@ type PhpBasicGlobals struct {
 	url_adapt_output_hosts_ht  types.Array
 	mmap_file                  any
 	mmap_len                   int
-	user_filter_map            *types.Array
+	UserFilterMap              map[string]*PhpUserFilterData
 	umask                      int
 	unserialize_max_depth      zend.ZendLong
 }

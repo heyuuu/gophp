@@ -288,36 +288,29 @@ func ZifStreamWrapperUnregister(executeData zpp.Ex, return_value zpp.Ret, protoc
 	return_value.SetTrue()
 	return
 }
-func ZifStreamWrapperRestore(executeData zpp.Ex, return_value zpp.Ret, protocol *types.String) {
-	var wrapper_hash *types.Array
-	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == types.FAILURE {
-		return_value.SetFalse()
-		return
-	}
+func ZifStreamWrapperRestore(executeData zpp.Ex, return_value zpp.Ret, protocol string) bool {
+	var wrapper_hash map[string]*core.PhpStreamWrapper
 	global_wrapper_hash := UrlStreamWrappersHash
-	wrapper := global_wrapper_hash[protocol.GetStr()]
+	wrapper := global_wrapper_hash[protocol]
 	if wrapper == nil {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
-		return_value.SetFalse()
-		return
+		core.PhpErrorDocref(nil, faults.E_WARNING, "%s:// never existed, nothing to restore", protocol)
+		return false
 	}
+
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
-	if wrapper_hash == global_wrapper_hash || types.ZendHashFindPtr(wrapper_hash, protocol.GetStr()) == wrapper {
-		core.PhpErrorDocref(nil, faults.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
-		return_value.SetTrue()
-		return
+	if wrapper_hash == global_wrapper_hash || wrapper_hash[protocol] == wrapper {
+		core.PhpErrorDocref(nil, faults.E_NOTICE, "%s:// was never changed, nothing to restore", protocol)
+		return false
 	}
 
 	/* A failure here could be okay given that the protocol might have been merely unregistered */
 
 	PhpUnregisterUrlStreamWrapperVolatile(protocol)
 	if PhpRegisterUrlStreamWrapperVolatile(protocol, wrapper) == types.FAILURE {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to restore original %s:// wrapper", protocol.GetVal())
-		return_value.SetFalse()
-		return
+		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to restore original %s:// wrapper", protocol)
+		return false
 	}
-	return_value.SetTrue()
-	return
+	return true
 }
 func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var func_name types.Zval
