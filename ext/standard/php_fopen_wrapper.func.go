@@ -13,7 +13,7 @@ import (
 )
 
 func PhpStreamOutputWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	core.PHPWRITE(buf, count)
+	core.PUTS(b.CastStr(buf, count))
 	return count
 }
 func PhpStreamOutputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {

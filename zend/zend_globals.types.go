@@ -9,6 +9,7 @@ import (
 type ClassTable = *internal.Table[*types.ClassEntry]
 type FunctionTable = *internal.Table[types.IFunction]
 type ConstantTable = *internal.Table[*ZendConstant]
+type IniDirectives = *internal.Table[*ZendIniEntry]
 
 /**
  * ZendCompilerGlobals
@@ -232,29 +233,34 @@ type ZendExecutorGlobals struct {
 	exception_class                     *types.ClassEntry
 	timeout_seconds                     ZendLong
 	lambda_count                        int
-	ini_directives                      *types.Array
-	modified_ini_directives             *types.Array
-	error_reporting_ini_entry           *ZendIniEntry
-	objects_store                       ZendObjectsStore
-	exception                           *types.ZendObject
-	prev_exception                      **types.ZendObject
-	opline_before_exception             *ZendOp
-	exception_op                        [3]ZendOp
-	current_module                      *ModuleEntry
-	active                              types.ZendBool
-	flags                               types.ZendUchar
-	assertions                          ZendLong
-	ht_iterators_count                  uint32
-	ht_iterators_used                   uint32
-	ht_iterators                        *types.HashTableIterator
-	ht_iterators_slots                  []types.HashTableIterator
-	saved_fpu_cw_ptr                    any
-	trampoline                          types.IFunction
-	call_trampoline_op                  ZendOp
-	each_deprecation_thrown             types.ZendBool
-	weakrefs                            types.Array
-	exception_ignore_args               types.ZendBool
-	reserved                            []any
+
+	iniDirectives         IniDirectives
+	modifiedIniDirectives IniDirectives
+
+	ini_directives          *types.Array
+	modified_ini_directives *types.Array
+
+	error_reporting_ini_entry *ZendIniEntry
+	objects_store             ZendObjectsStore
+	exception                 *types.ZendObject
+	prev_exception            **types.ZendObject
+	opline_before_exception   *ZendOp
+	exception_op              [3]ZendOp
+	current_module            *ModuleEntry
+	active                    types.ZendBool
+	flags                     types.ZendUchar
+	assertions                ZendLong
+	ht_iterators_count        uint32
+	ht_iterators_used         uint32
+	ht_iterators              *types.HashTableIterator
+	ht_iterators_slots        []types.HashTableIterator
+	saved_fpu_cw_ptr          any
+	trampoline                types.IFunction
+	call_trampoline_op        ZendOp
+	each_deprecation_thrown   types.ZendBool
+	weakrefs                  types.Array
+	exception_ignore_args     types.ZendBool
+	reserved                  []any
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
@@ -279,6 +285,24 @@ func (this *ZendExecutorGlobals) FunctionTable() FunctionTable     { return this
 func (this *ZendExecutorGlobals) SetFunctionTable(t FunctionTable) { this.functionTable = t }
 
 func (this *ZendExecutorGlobals) ConstantTable() ConstantTable { return this.constantTable }
+
+func (this *ZendExecutorGlobals) IniDirectives() IniDirectives {
+	return this.iniDirectives
+}
+func (this *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
+	return this.modifiedIniDirectives
+}
+
+func (this *ZendExecutorGlobals) GetIniDirectives() *types.Array { return this.ini_directives }
+func (this *ZendExecutorGlobals) SetIniDirectives(value *types.Array) {
+	this.ini_directives = value
+}
+func (this *ZendExecutorGlobals) GetModifiedIniDirectives() *types.Array {
+	return this.modified_ini_directives
+}
+func (this *ZendExecutorGlobals) SetModifiedIniDirectives(value *types.Array) {
+	this.modified_ini_directives = value
+}
 
 /**
  * 以下是自动生成的方法
@@ -417,16 +441,7 @@ func (this *ZendExecutorGlobals) GetTimeoutSeconds() ZendLong      { return this
 func (this *ZendExecutorGlobals) SetTimeoutSeconds(value ZendLong) { this.timeout_seconds = value }
 func (this *ZendExecutorGlobals) GetLambdaCount() int              { return this.lambda_count }
 func (this *ZendExecutorGlobals) SetLambdaCount(value int)         { this.lambda_count = value }
-func (this *ZendExecutorGlobals) GetIniDirectives() *types.Array   { return this.ini_directives }
-func (this *ZendExecutorGlobals) SetIniDirectives(value *types.Array) {
-	this.ini_directives = value
-}
-func (this *ZendExecutorGlobals) GetModifiedIniDirectives() *types.Array {
-	return this.modified_ini_directives
-}
-func (this *ZendExecutorGlobals) SetModifiedIniDirectives(value *types.Array) {
-	this.modified_ini_directives = value
-}
+
 func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 	return this.error_reporting_ini_entry
 }

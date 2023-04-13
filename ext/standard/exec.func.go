@@ -56,7 +56,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 				bufl += b - buf
 			}
 			if type_ == 1 {
-				core.PHPWRITE(buf, bufl)
+				core.PUTS(builtin.CastStr(buf, bufl))
 				if core.PhpOutputGetLevel() < 1 {
 					core.SapiFlush()
 				}
@@ -81,7 +81,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 			/* output remaining data in buffer */
 
 			if type_ == 1 && buf != b {
-				core.PHPWRITE(buf, bufl)
+				core.PUTS(b.CastStr(buf, bufl))
 				if core.PhpOutputGetLevel() < 1 {
 					core.SapiFlush()
 				}
@@ -113,7 +113,7 @@ func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) 
 	} else {
 		var read ssize_t
 		for builtin.Assign(&read, core.PhpStreamRead(stream, buf, core.EXEC_INPUT_BUF)) > 0 {
-			core.PHPWRITE(buf, read)
+			core.PUTS(b.CastStr(buf, read))
 		}
 	}
 	pclose_return = core.PhpStreamClose(stream)

@@ -2240,14 +2240,14 @@ func StringCaseCompareFunction(op1 *types.Zval, op2 *types.Zval) int {
 		if op1.GetStr() == op2.GetStr() {
 			return 0
 		} else {
-			return ZendBinaryStrcasecmpL(b.CastStr(op1.GetStr().GetVal(), op1.GetStr().GetLen()), b.CastStr(op2.GetStr().GetVal(), op2.GetStr().GetLen()))
+			return ZendBinaryStrcasecmpL(op1.GetStr().GetStr(), op2.GetStr().GetStr())
 		}
 	} else {
 		var tmp_str1 *types.String
 		var tmp_str2 *types.String
 		var str1 *types.String = ZvalGetTmpString(op1, &tmp_str1)
 		var str2 *types.String = ZvalGetTmpString(op2, &tmp_str2)
-		var ret int = ZendBinaryStrcasecmpL(b.CastStr(str1.GetVal(), str1.GetLen()), b.CastStr(str2.GetVal(), str1.GetLen()))
+		var ret int = ZendBinaryStrcasecmpL(str1.GetStr(), b.CastStr(str2.GetVal(), str1.GetLen()))
 		ZendTmpStringRelease(tmp_str1)
 		ZendTmpStringRelease(tmp_str2)
 		return ret

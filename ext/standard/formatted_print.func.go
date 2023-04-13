@@ -591,7 +591,7 @@ func ZifUserPrintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval,
 		return_value.SetFalse()
 		return
 	}
-	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
+	rlen = core.PUTS(result.GetStr())
 	// types.ZendStringEfree(result)
 	return_value.SetLong(rlen)
 	return
@@ -623,7 +623,7 @@ func ZifVprintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, ar
 		return_value.SetFalse()
 		return
 	}
-	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
+	rlen = core.PUTS(result.GetStr())
 	// types.ZendStringEfree(result)
 	return_value.SetLong(rlen)
 	return

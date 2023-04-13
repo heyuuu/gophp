@@ -221,7 +221,7 @@ again:
 		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
 	case types.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, struc.GetStr().GetLen())
-		core.PHPWRITE(struc.GetStr().GetVal(), struc.GetStr().GetLen())
+		core.PUTS(struc.GetStr().GetStr())
 		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
 	case types.IS_ARRAY:
 		myht = struc.GetArr()
@@ -504,7 +504,7 @@ func PhpVarExport(struc *types.Zval, level int) {
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	PhpVarExportEx(struc, level, &buf)
 	buf.ZeroTail()
-	core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
+	core.PUTS(buf.GetS().GetStr())
 	buf.Free()
 }
 func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, return_ *types.Zval) {
@@ -530,7 +530,7 @@ func ZifVarExport(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ 
 		return_value.SetString(buf.GetS())
 		return
 	} else {
-		core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
+		core.PUTS(buf.GetS().GetStr())
 		buf.Free()
 	}
 }

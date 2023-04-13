@@ -148,7 +148,7 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		var value_zv *types.Zval = value_node.GetConstant()
 		value_node.SetOpType(IS_CONST)
 		ZendConstExprToZval(value_zv, value_ast)
-		if ZendLookupReservedConst(b.CastStr(unqualified_name.GetVal(), unqualified_name.GetLen())) != nil {
+		if ZendLookupReservedConst(unqualified_name.GetStr()) != nil {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot redeclare constant '%s'", unqualified_name.GetVal())
 		}
 		name = ZendPrefixWithNs(unqualified_name)

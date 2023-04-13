@@ -549,7 +549,7 @@ func PhpPrintf(format string, _ ...any) int {
 	var size int
 	va_start(args, format)
 	size = Vspprintf(&buffer, 0, format, args)
-	ret = PHPWRITE(buffer, size)
+	ret = PUTS(b.CastStr(buffer, size))
 	zend.Efree(buffer)
 	va_end(args)
 	return ret

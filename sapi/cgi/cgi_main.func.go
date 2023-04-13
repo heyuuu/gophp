@@ -146,8 +146,8 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			}
 		}
 		if has_status == 0 {
-			core.PHPWRITE_H(buf, len_)
-			core.PHPWRITE_H("\r\n", 2)
+			core.PUTS_H(b.CastStr(buf, len_))
+			core.PUTS_H("\r\n")
 			ignore_status = 1
 		}
 	}
@@ -160,20 +160,20 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			if h.GetHeaderLen() > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.GetHeader(), "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
 				if ignore_status == 0 {
 					ignore_status = 1
-					core.PHPWRITE_H(h.GetHeader(), h.GetHeaderLen())
-					core.PHPWRITE_H("\r\n", 2)
+					core.PUTS_H(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+					core.PUTS_H("\r\n")
 				}
 			} else if response_status == 304 && h.GetHeaderLen() > b.SizeOf("\"Content-Type:\"")-1 && strncasecmp(h.GetHeader(), "Content-Type:", b.SizeOf("\"Content-Type:\"")-1) == 0 {
 				h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 				continue
 			} else {
-				core.PHPWRITE_H(h.GetHeader(), h.GetHeaderLen())
-				core.PHPWRITE_H("\r\n", 2)
+				core.PUTS_H(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+				core.PUTS_H("\r\n")
 			}
 		}
 		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 	}
-	core.PHPWRITE_H("\r\n", 2)
+	core.PUTS_H("\r\n")
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
 func SapiCgiReadPost(buffer *byte, count_bytes int) int {

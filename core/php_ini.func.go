@@ -46,7 +46,7 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		if esc_html != 0 {
 			PhpHtmlPuts(display_string, display_string_length)
 		} else {
-			PHPWRITE(display_string, display_string_length)
+			PUTS(b.CastStr(display_string, display_string_length))
 		}
 	}
 }
@@ -60,6 +60,33 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 		module_number = 0
 	}
 	var __ht *types.Array = zend.EG__().GetIniDirectives()
+	zend.EG__().IniDirectives().Foreach(func(_ string, ini_entry *zend.ZendIniEntry) {
+		if ini_entry.GetModuleNumber() != module_number {
+			return
+		}
+		if first != 0 {
+			standard.PhpInfoPrintTableStart()
+			standard.PhpInfoPrintTableHeader(3, "Directive", "Local Value", "Master Value")
+			first = 0
+		}
+		if SM__().GetPhpinfoAsText() == 0 {
+			PUTS("<tr>")
+			PUTS("<td class=\"e\">")
+			PUTS(ini_entry.GetName().GetStr())
+			PUTS("</td><td class=\"v\">")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
+			PUTS("</td><td class=\"v\">")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
+			PUTS("</td></tr>\n")
+		} else {
+			PUTS(ini_entry.GetName().GetStr())
+			PUTS(" => ")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
+			PUTS(" => ")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
+			PUTS("\n")
+		}
+	})
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -75,14 +102,14 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 		if SM__().GetPhpinfoAsText() == 0 {
 			PUTS("<tr>")
 			PUTS("<td class=\"e\">")
-			PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
+			PUTS(ini_entry.GetName().GetStr())
 			PUTS("</td><td class=\"v\">")
 			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
 			PUTS("</td><td class=\"v\">")
 			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
 			PUTS("</td></tr>\n")
 		} else {
-			PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
+			PUTS(ini_entry.GetName().GetStr())
 			PUTS(" => ")
 			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
 			PUTS(" => ")
