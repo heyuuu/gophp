@@ -9,19 +9,18 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		for {
 			EG__().SetErrorReporting(0)
 			if EG__().GetErrorReportingIniEntry() == nil {
-				var zv *types.Zval = EG__().GetIniDirectives().KeyFind(types.STR_ERROR_REPORTING)
-				if zv != nil {
-					EG__().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
+				var iniEntry = EG__().IniDirectives().Get(types.STR_ERROR_REPORTING)
+				if iniEntry != nil {
+					EG__().SetErrorReportingIniEntry(iniEntry)
 				} else {
 					break
 				}
 			}
 			if EG__().GetErrorReportingIniEntry().GetModified() == 0 {
-				if EG__().GetModifiedIniDirectives() == nil {
-					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
-					EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
+				if EG__().ModifiedIniDirectives() == nil {
+					EG__().ModifiedIniDirectives()
 				}
-				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.STR_ERROR_REPORTING, EG__().GetErrorReportingIniEntry()) != nil {
+				if EG__().ModifiedIniDirectives().Add(types.STR_ERROR_REPORTING, EG__().GetErrorReportingIniEntry()) {
 					EG__().GetErrorReportingIniEntry().SetOrigValue(EG__().GetErrorReportingIniEntry().GetValue())
 					EG__().GetErrorReportingIniEntry().SetOrigModifiable(EG__().GetErrorReportingIniEntry().GetModifiable())
 					EG__().GetErrorReportingIniEntry().SetModified(1)

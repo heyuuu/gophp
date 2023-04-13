@@ -52,14 +52,12 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 }
 func DisplayIniEntries(module *zend.ModuleEntry) {
 	var module_number int
-	var ini_entry *zend.ZendIniEntry
 	var first types.ZendBool = 1
 	if module != nil {
 		module_number = module.GetModuleNumber()
 	} else {
 		module_number = 0
 	}
-	var __ht *types.Array = zend.EG__().GetIniDirectives()
 	zend.EG__().IniDirectives().Foreach(func(_ string, ini_entry *zend.ZendIniEntry) {
 		if ini_entry.GetModuleNumber() != module_number {
 			return
@@ -87,36 +85,6 @@ func DisplayIniEntries(module *zend.ModuleEntry) {
 			PUTS("\n")
 		}
 	})
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
-
-		ini_entry = _z.GetPtr()
-		if ini_entry.GetModuleNumber() != module_number {
-			continue
-		}
-		if first != 0 {
-			standard.PhpInfoPrintTableStart()
-			standard.PhpInfoPrintTableHeader(3, "Directive", "Local Value", "Master Value")
-			first = 0
-		}
-		if SM__().GetPhpinfoAsText() == 0 {
-			PUTS("<tr>")
-			PUTS("<td class=\"e\">")
-			PUTS(ini_entry.GetName().GetStr())
-			PUTS("</td><td class=\"v\">")
-			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
-			PUTS("</td><td class=\"v\">")
-			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
-			PUTS("</td></tr>\n")
-		} else {
-			PUTS(ini_entry.GetName().GetStr())
-			PUTS(" => ")
-			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
-			PUTS(" => ")
-			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
-			PUTS("\n")
-		}
-	}
 	if first == 0 {
 		standard.PhpInfoPrintTableEnd()
 	}

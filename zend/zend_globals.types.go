@@ -237,9 +237,6 @@ type ZendExecutorGlobals struct {
 	iniDirectives         IniDirectives
 	modifiedIniDirectives IniDirectives
 
-	ini_directives          *types.Array
-	modified_ini_directives *types.Array
-
 	error_reporting_ini_entry *ZendIniEntry
 	objects_store             ZendObjectsStore
 	exception                 *types.ZendObject
@@ -289,19 +286,14 @@ func (this *ZendExecutorGlobals) ConstantTable() ConstantTable { return this.con
 func (this *ZendExecutorGlobals) IniDirectives() IniDirectives {
 	return this.iniDirectives
 }
+func (this *ZendExecutorGlobals) InitIniDirectives() {
+	this.iniDirectives = internal.NewTable[*ZendIniEntry](nil)
+}
 func (this *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
 	return this.modifiedIniDirectives
 }
-
-func (this *ZendExecutorGlobals) GetIniDirectives() *types.Array { return this.ini_directives }
-func (this *ZendExecutorGlobals) SetIniDirectives(value *types.Array) {
-	this.ini_directives = value
-}
-func (this *ZendExecutorGlobals) GetModifiedIniDirectives() *types.Array {
-	return this.modified_ini_directives
-}
-func (this *ZendExecutorGlobals) SetModifiedIniDirectives(value *types.Array) {
-	this.modified_ini_directives = value
+func (this *ZendExecutorGlobals) InitModifiedIniDirectives() {
+	this.modifiedIniDirectives = internal.NewTable[*ZendIniEntry](nil)
 }
 
 /**

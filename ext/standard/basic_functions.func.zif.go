@@ -342,7 +342,7 @@ var DefZifIniSet = def.DefFunc("ini_set", 2, 2, []def.ArgInfo{{Name: "varname"},
 	if fp.HasError() {
 		return
 	}
-	ZifIniSet(executeData, returnValue, varname, newvalue)
+	ZifIniSet(returnValue, varname, newvalue)
 })
 
 // generate by ZifIniSet
@@ -353,7 +353,7 @@ var DefZifIniAlter = def.DefFunc("ini_alter", 2, 2, []def.ArgInfo{{Name: "varnam
 	if fp.HasError() {
 		return
 	}
-	ZifIniSet(executeData, returnValue, varname, newvalue)
+	ZifIniSet(returnValue, varname, newvalue)
 })
 
 // generate by ZifIniRestore

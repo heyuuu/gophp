@@ -222,20 +222,19 @@ func ZifErrorReporting(ret zpp.Ret, _ zpp.Opt, newErrorLevel *types.Zval) {
 		for {
 			var p = EG__().GetErrorReportingIniEntry()
 			if p == nil {
-				var zv = EG__().GetIniDirectives().KeyFind(types.STR_ERROR_REPORTING)
-				if zv != nil {
-					EG__().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
-					p = EG__().GetErrorReportingIniEntry()
+				var iniEntry = EG__().IniDirectives().Get(types.STR_ERROR_REPORTING)
+				if iniEntry != nil {
+					EG__().SetErrorReportingIniEntry(iniEntry)
+					p = iniEntry
 				} else {
 					break
 				}
 			}
 			if p.GetModified() == 0 {
-				if EG__().GetModifiedIniDirectives() == nil {
-					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
-					EG__().GetModifiedIniDirectives() = types.MakeArrayEx(8, nil, 0)
+				if EG__().ModifiedIniDirectives() == nil {
+					EG__().InitModifiedIniDirectives()
 				}
-				if types.ZendHashAddPtr(EG__().GetModifiedIniDirectives(), types.STR_ERROR_REPORTING, p) != nil {
+				if EG__().ModifiedIniDirectives().Add(types.STR_ERROR_REPORTING, p) {
 					p.SetOrigValue(p.GetValue())
 					p.SetOrigModifiable(p.GetModifiable())
 					p.SetModified(1)

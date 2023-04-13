@@ -1585,17 +1585,13 @@ func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension
 		module_number = module.GetModuleNumber()
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types.Array = zend.EG__().GetIniDirectives()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		key = _p.GetKey()
-		ini_entry = _z.GetPtr()
+	zend.EG__().IniDirectives().Foreach(func(key string, ini_entry *zend.ZendIniEntry) {
 		var option types.Zval
 		if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
-			continue
+			return
 		}
-		if key == nil || key.GetVal()[0] != 0 {
+		if key == nil || key != "" {
 			if details != 0 {
 				zend.ArrayInit(&option)
 				if ini_entry.GetOrigValue() != nil {
@@ -1622,7 +1618,7 @@ func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension
 				}
 			}
 		}
-	}
+	})
 }
 func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, new_option_len int) int {
 	if option_len+1 != new_option_len {
@@ -1632,26 +1628,10 @@ func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, 
 }
 
 //@zif -alias ini_alter
-func ZifIniSet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval, newvalue *types.Zval) {
-	var varname *types.String
-	var new_value *types.String
-	var val *types.String
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 2, 2, 0)
-			varname = fp.ParseStr()
-			new_value = fp.ParseStr()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	val = zend.ZendIniGetValue(varname)
+func ZifIniSet(return_value zpp.Ret, varname string, newvalue string) {
+	val := zend.ZendIniGetValue(varname)
 
 	/* copy to return here, because alter might free it! */
-
 	if val != nil {
 		return_value.SetStringVal(val.GetStr())
 	} else {
@@ -1664,15 +1644,13 @@ func ZifIniSet(executeData zpp.Ex, return_value zpp.Ret, varname *types.Zval, ne
 
 	if core.PG__().open_basedir {
 		if PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
-			if core.PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
-
+			if core.PhpCheckOpenBasedir(newvalue) != 0 {
 				return_value.SetFalse()
 				return
 			}
 		}
 	}
-	if !zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
-
+	if !zend.ZendAlterIniEntryEx(varname, newvalue, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) {
 		return_value.SetFalse()
 		return
 	}
@@ -1707,7 +1685,7 @@ func ZifSetIncludePath(executeData zpp.Ex, return_value zpp.Ret, newIncludePath 
 		}
 		break
 	}
-	old_value = zend.ZendIniString("include_path", b.SizeOf("\"include_path\"")-1, 0)
+	old_value = zend.ZendIniString("include_path", 0)
 
 	/* copy to return here, because alter might free it! */
 
@@ -1730,7 +1708,7 @@ func ZifGetIncludePath(executeData zpp.Ex, return_value zpp.Ret) {
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	str = zend.ZendIniString("include_path", b.SizeOf("\"include_path\"")-1, 0)
+	str = zend.ZendIniString("include_path", 0)
 	if str == nil {
 		return_value.SetFalse()
 		return

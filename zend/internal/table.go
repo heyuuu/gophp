@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/heyuuu/gophp/builtin/ascii"
+	"github.com/heyuuu/gophp/zend/types"
 	"sort"
 )
 
@@ -112,11 +113,36 @@ func (t *Table[T]) Values() []T {
 	}
 	return values
 }
-func (t *Table[T]) Sort(less func(i, j T) bool) {
-	sort.SliceStable(t.keys, func(i, j int) bool {
-		return less(t.m[t.keys[i]], t.m[t.keys[j]])
+
+func (t *Table[T]) SortByKey(less func(k1 string, k2 string) bool) {
+	t.Sort(func(k1 string, v1 T, k2 string, v2 T) bool {
+		return less(k1, k2)
 	})
 }
+
+// todo 兼容用函数，后续会迁移
+func (t *Table[T]) SortByArrayKey(less func(k1 types.ArrayKey, k2 types.ArrayKey) bool) {
+	t.Sort(func(k1 string, v1 T, k2 string, v2 T) bool {
+		return less(types.MakeStrKey(k1), types.MakeStrKey(k2))
+	})
+}
+
+func (t *Table[T]) SortByValue(less func(i, j T) bool) {
+	t.Sort(func(k1 string, v1 T, k2 string, v2 T) bool {
+		return less(v1, v2)
+	})
+}
+
+func (t *Table[T]) Sort(less func(k1 string, v1 T, k2 string, v2 T) bool) {
+	sort.SliceStable(t.keys, func(i, j int) bool {
+		k1 := t.keys[i]
+		k2 := t.keys[j]
+		v1 := t.m[k1]
+		v2 := t.m[k2]
+		return less(k1, v1, k2, v2)
+	})
+}
+
 func (t *Table[T]) Foreach(handler func(string, T)) {
 	for _, k := range t.keys {
 		v := t.m[k]
