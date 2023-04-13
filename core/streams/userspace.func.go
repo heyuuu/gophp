@@ -288,17 +288,15 @@ func ZifStreamWrapperUnregister(executeData zpp.Ex, return_value zpp.Ret, protoc
 	return_value.SetTrue()
 	return
 }
-func ZifStreamWrapperRestore(executeData zpp.Ex, return_value zpp.Ret, protocol *types.Zval) {
-	var protocol *types.String
-	var wrapper *core.PhpStreamWrapper
-	var global_wrapper_hash *types.Array
+func ZifStreamWrapperRestore(executeData zpp.Ex, return_value zpp.Ret, protocol *types.String) {
 	var wrapper_hash *types.Array
 	if zend.ZendParseParameters(executeData.NumArgs(), "S", &protocol) == types.FAILURE {
 		return_value.SetFalse()
 		return
 	}
-	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
-	if b.Assign(&wrapper, types.ZendHashFindPtr(global_wrapper_hash, protocol.GetStr())) == nil {
+	global_wrapper_hash := UrlStreamWrappersHash
+	wrapper := global_wrapper_hash[protocol.GetStr()]
+	if wrapper == nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
 		return_value.SetFalse()
 		return

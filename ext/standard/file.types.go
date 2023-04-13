@@ -45,12 +45,23 @@ type PhpFileGlobals struct {
 	from_address                 *byte
 	user_stream_current_filename *byte
 	default_context              *core.PhpStreamContext
-	stream_wrappers              *types.Array
+	stream_wrappers              map[string]*core.PhpStreamWrapper
 	stream_filters               map[string]*streams.PhpStreamFilterFactory
 	wrapper_errors               *types.Array
 	pclose_wait                  int
 }
 
+func (this *PhpFileGlobals) StreamWrappers() map[string]*core.PhpStreamWrapper {
+	return this.stream_wrappers
+}
+func (this *PhpFileGlobals) GetStreamWrappers() map[string]*core.PhpStreamWrapper {
+	return this.stream_wrappers
+}
+func (this *PhpFileGlobals) SetStreamWrappers(value map[string]*core.PhpStreamWrapper) {
+	this.stream_wrappers = value
+}
+
+//
 func (this *PhpFileGlobals) SetDefChunkSize(value int) { this.def_chunk_size = value }
 
 func (this *PhpFileGlobals) GetAutoDetectLineEndings() types.ZendBool {
@@ -79,8 +90,6 @@ func (this *PhpFileGlobals) GetDefaultContext() *core.PhpStreamContext { return 
 func (this *PhpFileGlobals) SetDefaultContext(value *core.PhpStreamContext) {
 	this.default_context = value
 }
-func (this *PhpFileGlobals) GetStreamWrappers() *types.Array      { return this.stream_wrappers }
-func (this *PhpFileGlobals) SetStreamWrappers(value *types.Array) { this.stream_wrappers = value }
 
 func (this *PhpFileGlobals) GetStreamFilters() map[string]*streams.PhpStreamFilterFactory {
 	return this.stream_filters

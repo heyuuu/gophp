@@ -26,6 +26,14 @@ func CopySlice[T any](src []T) []T {
 	return dst
 }
 
+func CopyMap[K comparable, V any](src map[K]V) map[K]V {
+	dst := make(map[K]V, len(src))
+	for k, v := range src {
+		dst[k] = v
+	}
+	return dst
+}
+
 /*
  * DJBX33A (Daniel J. Bernstein, Times 33 with Addition)
  *

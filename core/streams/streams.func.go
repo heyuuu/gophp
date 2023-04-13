@@ -2,6 +2,7 @@ package streams
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
@@ -11,10 +12,9 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func PhpFileLeStream() int                                  { return LeStream }
-func PhpFileLePstream() int                                 { return LePstream }
-func PhpFileLeStreamFilter() int                            { return LeStreamFilter }
-func PhpStreamGetUrlStreamWrappersHashGlobal() *types.Array { return &UrlStreamWrappersHash }
+func PhpFileLeStream() int       { return LeStream }
+func PhpFileLePstream() int      { return LePstream }
+func PhpFileLeStreamFilter() int { return LeStreamFilter }
 func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 	var stream *core.PhpStream
 	var rsrc *types.ZendResource = el.GetRes()
@@ -284,58 +284,57 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 	ret_buf.GetVal()[ret_buf.GetLen()] = '0'
 	return ret_buf
 }
-func PhpStreamWrapperSchemeValidate(protocol *byte, protocol_len uint) int {
-	var i uint
-	for i = 0; i < protocol_len; i++ {
-		if !(isalnum(int(protocol[i]))) && protocol[i] != '+' && protocol[i] != '-' && protocol[i] != '.' {
-			return types.FAILURE
+func PhpStreamWrapperSchemeValidate(protocol string) bool {
+	for _, c := range []byte(protocol) {
+		if !ascii.IsAlphaNum(c) && c != '+' && c != '-' && c != '.' {
+			return false
 		}
 	}
-	return types.SUCCESS
+	return true
 }
-func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper) int {
-	var protocol_len uint = uint(strlen(protocol))
-	var ret int
-	if PhpStreamWrapperSchemeValidate(protocol, protocol_len) == types.FAILURE {
-		return types.FAILURE
+func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper) {
+	if !PhpStreamWrapperSchemeValidate(protocol) {
+		return
 	}
-	if types.ZendHashAddPtr(&UrlStreamWrappersHash, protocol, any(wrapper)) {
-		ret = types.SUCCESS
-	} else {
-		ret = types.FAILURE
-	}
-	// types.ZendStringReleaseEx(str, 1)
-	return ret
+	UrlStreamWrappersHash[protocol] = wrapper
 }
-func PhpUnregisterUrlStreamWrapper(protocol string) int {
-	return types.ZendHashStrDel(&UrlStreamWrappersHash, protocol)
+func PhpUnregisterUrlStreamWrapper(protocol string) {
+	delete(UrlStreamWrappersHash, protocol)
 }
 func CloneWrapperHash() {
-	zend.ALLOC_HASHTABLE(standard.FG__().GetStreamWrappers())
-	standard.FG__().GetStreamWrappers() = types.MakeArrayEx(UrlStreamWrappersHash.Len(), nil, 0)
-	types.ZendHashCopy(standard.FG__().GetStreamWrappers(), &UrlStreamWrappersHash, nil)
+	standard.FG__().SetStreamWrappers(b.CopyMap(UrlStreamWrappersHash))
 }
 func PhpRegisterUrlStreamWrapperVolatile(protocol *types.String, wrapper *core.PhpStreamWrapper) int {
-	if PhpStreamWrapperSchemeValidate(protocol.GetVal(), protocol.GetLen()) == types.FAILURE {
+	if !PhpStreamWrapperSchemeValidate(protocol.GetStr()) {
 		return types.FAILURE
 	}
-	if standard.FG__().GetStreamWrappers() == nil {
+	if standard.FG__().StreamWrappers() == nil {
 		CloneWrapperHash()
 	}
-	if types.ZendHashAddPtr(standard.FG__().GetStreamWrappers(), protocol.GetStr(), wrapper) {
-		return types.SUCCESS
-	} else {
+	if _, exists := standard.FG__().StreamWrappers()[protocol.GetStr()]; exists {
 		return types.FAILURE
+	} else {
+		standard.FG__().StreamWrappers()[protocol.GetStr()] = wrapper
+		return types.SUCCESS
 	}
 }
 func PhpUnregisterUrlStreamWrapperVolatile(protocol *types.String) int {
-	if standard.FG__().GetStreamWrappers() != nil {
+	if standard.FG__().StreamWrappers() != nil {
 		CloneWrapperHash()
 	}
-	return types.ZendHashDel(standard.FG__().GetStreamWrappers(), protocol.GetStr())
+	if standard.FG__().StreamWrappers()[protocol.GetStr()] != nil {
+		return types.FAILURE
+	}
+	delete(standard.FG__().StreamWrappers(), protocol.GetStr())
+	return types.SUCCESS
 }
 func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *core.PhpStreamWrapper {
-	var wrapper_hash *types.Array = b.CondF1(standard.FG__().GetStreamWrappers(), func() __auto__ { return standard.FG__().GetStreamWrappers() }, &UrlStreamWrappersHash)
+	var wrapper_hash map[string]*core.PhpStreamWrapper
+	if standard.FG__().StreamWrappers() != nil {
+		wrapper_hash = standard.FG__().StreamWrappers()
+	} else {
+		wrapper_hash = UrlStreamWrappersHash
+	}
 	var wrapper *core.PhpStreamWrapper = nil
 	var p *byte
 	var protocol *byte = nil
@@ -353,10 +352,11 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 		protocol = path
 	}
 	if protocol != nil {
-		if nil == b.Assign(&wrapper, types.ZendHashStrFindPtr(wrapper_hash, b.CastStr(protocol, n))) {
+		if nil == wrapper_hash[b.CastStr(protocol, n)] {
 			var tmp *byte = zend.Estrndup(protocol, n)
 			str.PhpStrtolower(tmp, n)
-			if nil == b.Assign(&wrapper, types.ZendHashStrFindPtr(wrapper_hash, b.CastStr(tmp, n))) {
+			wrapper = wrapper_hash[b.CastStr(tmp, n)]
+			if nil == wrapper {
 				var wrapper_name []byte
 				if n >= b.SizeOf("wrapper_name") {
 					n = b.SizeOf("wrapper_name") - 1
@@ -405,23 +405,16 @@ func PhpStreamLocateUrlWrapper(path *byte, path_for_open **byte, options int) *c
 		if (options & core.STREAM_LOCATE_WRAPPERS_ONLY) != 0 {
 			return nil
 		}
-		if standard.FG__().GetStreamWrappers() {
-
+		if standard.FG__().StreamWrappers() != nil {
 			/* The file:// wrapper may have been disabled/overridden */
-
 			if wrapper != nil {
-
 				/* It was found so go ahead and provide it */
-
 				return wrapper
-
-				/* It was found so go ahead and provide it */
-
 			}
 
 			/* Check again, the original check might have not known the protocol name */
-
-			if b.Assign(&wrapper, types.ZendHashFindPtr(wrapper_hash, types.STR_FILE)) != nil {
+			wrapper = wrapper_hash[types.STR_FILE]
+			if wrapper != nil {
 				return wrapper
 			}
 			if (options & core.REPORT_ERRORS) != 0 {
