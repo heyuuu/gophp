@@ -197,14 +197,6 @@ func ZendHashFindInd(ht *Array, key string) *Zval {
 	}
 }
 
-func ZendHashAddNewPtr(ht *Array, key string, pData any) any {
-	zv := ht.KeyAddNew(key, NewZvalPtr(pData))
-	if zv != nil {
-		return zv.GetPtr()
-	} else {
-		return nil
-	}
-}
 func ZendHashUpdatePtr(ht *Array, key string, pData any) any {
 	zv := ht.KeyUpdate(key, NewZvalPtr(pData))
 	return zv.GetPtr()
@@ -213,7 +205,7 @@ func ZendHashUpdatePtr(ht *Array, key string, pData any) any {
 func ZendHashAddMem(ht *Array, key string, pData any, size int) any {
 	zv := ht.KeyAdd(key, NewZvalPtr(nil))
 	if zv != nil {
-		zv.SetPtr(zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(zend.Pemalloc(size))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -221,13 +213,13 @@ func ZendHashAddMem(ht *Array, key string, pData any, size int) any {
 }
 func ZendHashUpdateMem(ht *Array, key string, pData any, size int) any {
 	var p any
-	p = zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+	p = zend.Pemalloc(size)
 	memcpy(p, pData, size)
 	return ZendHashUpdatePtr(ht, key, p)
 }
 func ZendHashStrUpdateMem(ht *Array, str string, pData any, size int) any {
 	var p any
-	p = zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+	p = zend.Pemalloc(size)
 	memcpy(p, pData, size)
 	return ZendHashUpdatePtr(ht, str, p)
 }
@@ -273,7 +265,7 @@ func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
 }
 func ZendHashIndexUpdateMem(ht *Array, index int, pData any, size int) any {
 	var p any
-	p = zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+	p = zend.Pemalloc(size)
 	memcpy(p, pData, size)
 	return ZendHashIndexUpdatePtr(ht, index, p)
 }
@@ -282,7 +274,7 @@ func ZendHashNextIndexInsertMem(ht *Array, pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ht.NextIndexInsert(&tmp)) {
-		zv.SetPtr(zend.Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(zend.Pemalloc(size))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}

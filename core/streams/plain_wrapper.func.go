@@ -67,7 +67,7 @@ func DoFstat(d *PhpStdioStreamData, force int) int {
 }
 func _phpStreamFopenFromFdInt(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
 	var self *PhpStdioStreamData
-	self = PemallocRelOrig(b.SizeOf("* self"), persistent_id)
+	self = PemallocRelOrig(b.SizeOf("* self"))
 	memset(self, 0, b.SizeOf("* self"))
 	self.SetFile(nil)
 	self.SetIsSeekable(1)

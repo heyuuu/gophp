@@ -23,26 +23,18 @@ func Erealloc(ptr any, size int) any                  { return b.Realloc(ptr, si
 func SafeErealloc(ptr any, nmemb int, size int, offset int) any {
 	return b.Realloc(ptr, nmemb, size, offset)
 }
-func Estrdup(s string) *byte                             { return b.Strdup(s) }
-func Estrndup(s *byte, length int) *byte                 { return b.Strndup(s, length) }
-func Pemalloc(size int, persistent int) any              { return b.Malloc(size) }
-func Pefree(ptr any, persistent int)                     { b.Free(ptr) }
-func Pecalloc(nmemb int, size int, persistent uint8) any { return b.Calloc(nmemb, size) }
-func Perealloc(ptr any, size int, persistent uint8) any {
-	return b.Realloc(ptr, size)
-}
-func SafePerealloc(ptr any, nmemb int, size int, offset int, persistent int) any {
-	return b.Realloc(ptr, size)
-}
-func Pestrdup(s *byte, persistent int) *byte {
-	return b.Strdup(s)
-}
-func Pestrndup(s *byte, length int, persistent int) *byte {
-	return b.Strndup(s, length)
-}
+func Estrdup(s string) *byte                       { return b.Strdup(s) }
+func Estrndup(s *byte, length int) *byte           { return b.Strndup(s, length) }
+func Pemalloc(size int) any                        { return b.Malloc(size) }
+func Pefree(ptr any, persistent int)               { b.Free(ptr) }
+func Pecalloc(nmemb int, size int) any             { return b.Calloc(nmemb, size) }
+func Perealloc(ptr any, size int) any              { return b.Realloc(ptr, size) }
+func SafePerealloc(ptr any, size int) any          { return b.Realloc(ptr, size) }
+func Pestrdup(s *byte) *byte                       { return b.Strdup(s) }
+func Pestrndup(s *byte, length int) *byte          { return b.Strndup(s, length) }
 func ALLOC_HASHTABLE(ht *types.Array) *types.Array { return types.NewArray(0) }
 func FREE_HASHTABLE(ht *types.Array)               { b.Free(ht) }
-func ZendMmGc(__ZendMmHeap any) int                { return 0 }
+func ZendMmGc() int                                { return 0 }
 func IsZendMm() int                                { return 0 }
 func ZendStrndup(s *byte, length int) *byte {
 	var p *byte

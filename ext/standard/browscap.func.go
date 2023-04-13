@@ -153,7 +153,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *types.String) *types.Strin
 func BrowscapAddKv(bdata *BrowserData, key *types.String, value *types.String, persistent types.ZendBool) {
 	if bdata.GetKvUsed() == bdata.GetKvSize() {
 		bdata.SetKvSize(bdata.GetKvSize() * 2)
-		bdata.SetKv(zend.SafePerealloc(bdata.GetKv(), b.SizeOf("browscap_kv"), bdata.GetKvSize(), 0, persistent))
+		bdata.SetKv(zend.SafePerealloc(bdata.GetKv(), bdata.GetKvSize()))
 	}
 	bdata.GetKv()[bdata.GetKvUsed()].SetKey(key)
 	bdata.GetKv()[bdata.GetKvUsed()].SetValue(value)
@@ -230,7 +230,7 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		//	pattern = types.ZendNewInternedString(pattern.Copy())
 		//	// types.ZendStringRelease(pattern)
 		//}
-		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
+		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry")))
 		entry = ctx.GetCurrentEntry()
 		types.ZendHashUpdatePtr(bdata.GetHtab(), pattern.GetStr(), entry)
 		if ctx.GetCurrentSectionName() != nil {
@@ -258,11 +258,11 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return types.FAILURE
 	}
-	browdata.SetHtab(zend.Pemalloc(sizeof*browdata.GetHtab(), persistent))
+	browdata.SetHtab(zend.Pemalloc(sizeof * browdata.GetHtab()))
 	browdata.GetHtab() = types.MakeArrayEx(0, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent)
 	browdata.SetKvSize(16 * 1024)
 	browdata.SetKvUsed(0)
-	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv")*browdata.GetKvSize(), persistent))
+	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv") * browdata.GetKvSize()))
 
 	/* Create parser context */
 	var ctx = NewBrowscapParserCtx(browdata)

@@ -392,7 +392,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}
 		if bucket.GetBuflen() != pzdata.GetStr().GetLen() {
-			bucket.SetBuf(zend.Perealloc(bucket.GetBuf(), pzdata.GetStr().GetLen(), bucket.GetIsPersistent()))
+			bucket.SetBuf(zend.Perealloc(bucket.GetBuf(), pzdata.GetStr().GetLen()))
 			bucket.SetBuflen(pzdata.GetStr().GetLen())
 		}
 		memcpy(bucket.GetBuf(), pzdata.GetStr().GetVal(), bucket.GetBuflen())

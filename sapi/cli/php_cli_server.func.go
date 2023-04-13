@@ -27,7 +27,7 @@ func PhpCliServerGetSystemTime(buf *byte) int {
 	core.PhpAsctimeR(&tm, buf)
 	return 0
 }
-func GetLastError() *byte { return zend.Pestrdup(strerror(errno), 1) }
+func GetLastError() *byte { return zend.Pestrdup(strerror(errno)) }
 func GetStatusString(code int) string {
 	if result, ok := core.HttpStatusMap[code]; ok {
 		return result
@@ -399,7 +399,7 @@ func PhpCliServerBufferSize(buffer *PhpCliServerBuffer) int {
 	return retval
 }
 func PhpCliServerChunkHeapNew(block any, buf *byte, len_ int) *PhpCliServerChunk {
-	var chunk *PhpCliServerChunk = zend.Pemalloc(b.SizeOf("php_cli_server_chunk"), 1)
+	var chunk *PhpCliServerChunk = zend.Pemalloc(b.SizeOf("php_cli_server_chunk"))
 	chunk.SetType(PHP_CLI_SERVER_CHUNK_HEAP)
 	chunk.SetNext(nil)
 	chunk.SetBlock(block)
@@ -408,7 +408,7 @@ func PhpCliServerChunkHeapNew(block any, buf *byte, len_ int) *PhpCliServerChunk
 	return chunk
 }
 func PhpCliServerChunkHeapNewSelfContained(len_ int) *PhpCliServerChunk {
-	var chunk *PhpCliServerChunk = zend.Pemalloc(b.SizeOf("php_cli_server_chunk")+len_, 1)
+	var chunk *PhpCliServerChunk = zend.Pemalloc(b.SizeOf("php_cli_server_chunk") + len_)
 	chunk.SetType(PHP_CLI_SERVER_CHUNK_HEAP)
 	chunk.SetNext(nil)
 	chunk.SetBlock(chunk)
@@ -600,13 +600,13 @@ func PhpNetworkListenSocket(host *byte, port *int, socktype int, af *int, sockle
 		}
 		switch p.sa_family {
 		case AF_INET6:
-			sa = zend.Pemalloc(b.SizeOf("struct sockaddr_in6"), 1)
+			sa = zend.Pemalloc(b.SizeOf("struct sockaddr_in6"))
 			*((*__struct__sockaddr_in6)(sa)) = *((*__struct__sockaddr_in6)(*p))
 			(*__struct__sockaddr_in6)(sa).sin6_port = htons(*port)
 			*socklen = b.SizeOf("struct sockaddr_in6")
 			break
 		case AF_INET:
-			sa = zend.Pemalloc(b.SizeOf("struct sockaddr_in"), 1)
+			sa = zend.Pemalloc(b.SizeOf("struct sockaddr_in"))
 			*((*__struct__sockaddr_in)(sa)) = *((*__struct__sockaddr_in)(*p))
 			(*__struct__sockaddr_in)(sa).sin_port = htons(*port)
 			*socklen = b.SizeOf("struct sockaddr_in")
@@ -757,7 +757,7 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetAddrLen(addr_len)
 	var addr_str *types.String = 0
 	core.PhpNetworkPopulateNameFromSockaddr(addr, addr_len, &addr_str, nil, 0)
-	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen(), 1))
+	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen()))
 	client.SetAddrStrLen(addr_str.GetLen())
 	// types.ZendStringReleaseEx(addr_str, 0)
 	PhpHttpParserInit(client.GetParser(), PHP_HTTP_REQUEST)

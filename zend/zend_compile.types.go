@@ -112,7 +112,7 @@ func (this *ZendFileContext) ImportsConst() ImportNames {
 	return this.imports_const
 }
 
-func (this *ZendFileContext) GetImports() ImportNames       { return this.imports }
+func (this *ZendFileContext) GetImports() ImportNames          { return this.imports }
 func (this *ZendFileContext) SetImports(value *types.Array)    { this.imports = value }
 func (this *ZendFileContext) GetImportsFunction() *types.Array { return this.imports_function }
 func (this *ZendFileContext) SetImportsFunction(value *types.Array) {

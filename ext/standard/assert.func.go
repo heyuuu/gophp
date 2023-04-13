@@ -38,7 +38,7 @@ func OnChangeCallback(
 			zend.Pefree(ASSERTG(cb), 1)
 		}
 		if new_value != nil && new_value.GetLen() != 0 {
-			ASSERTG(cb) = zend.Pemalloc(new_value.GetLen()+1, 1)
+			ASSERTG(cb) = zend.Pemalloc(new_value.GetLen() + 1)
 			memcpy(ASSERTG(cb), new_value.GetVal(), new_value.GetLen())
 			ASSERTG(cb)[new_value.GetLen()] = '0'
 		} else {

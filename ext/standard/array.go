@@ -4483,7 +4483,7 @@ func ZifArrayUnique(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _
 
 	/* create and sort array with pointers to the target_hash buckets */
 
-	arTmp = (*Bucketindex)(zend.Pemalloc((types.Z_ARRVAL_P(array).Len()+1)*b.SizeOf("struct bucketindex"), array.GetArr().GetGcFlags()&types.IS_ARRAY_PERSISTENT))
+	arTmp = (*Bucketindex)(zend.Pemalloc((types.Z_ARRVAL_P(array).Len() + 1) * b.SizeOf("struct bucketindex")))
 	i = 0
 	idx = 0
 	for ; idx < types.Z_ARRVAL_P(array).GetNNumUsed(); idx++ {
@@ -4772,7 +4772,7 @@ func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *types.Zv
 			goto out
 		}
 		hash = args[i].GetArr()
-		list = (*types.Bucket)(zend.Pemalloc((hash.Len()+1)*b.SizeOf("Bucket"), hash.GetGcFlags()&types.IS_ARRAY_PERSISTENT))
+		list = (*types.Bucket)(zend.Pemalloc((hash.Len() + 1) * b.SizeOf("Bucket")))
 		lists[i] = list
 		ptrs[i] = list
 		for idx = 0; idx < hash.GetNNumUsed(); idx++ {
@@ -5167,7 +5167,7 @@ func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *types.Zval, b
 			goto out
 		}
 		hash = args[i].GetArr()
-		list = (*types.Bucket)(zend.Pemalloc((hash.Len()+1)*b.SizeOf("Bucket"), hash.GetGcFlags()&types.IS_ARRAY_PERSISTENT))
+		list = (*types.Bucket)(zend.Pemalloc((hash.Len() + 1) * b.SizeOf("Bucket")))
 		lists[i] = list
 		ptrs[i] = list
 		for idx = 0; idx < hash.GetNNumUsed(); idx++ {

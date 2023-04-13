@@ -64,7 +64,7 @@ const (
 	// class is abstarct, since it is set by any
 	// abstract method
 	AccImplicitAbstractClass = 1 << 4 /*                   X  |     |     |     */
-	/* Class has magic methods __get/__set/__unset/
+	// Class has magic methods __get/__set/__unset/
 	// __isset that use guards
 	AccUseGuards = 1 << 11 /*                              X  |     |     |     */
 	// Class constants updated

@@ -553,7 +553,7 @@ func ZendMapPtrNew() any {
 		/* Grow map_ptr table */
 
 		CG__().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(CG__().GetMapPtrLast()+1, 4096))
-		CG__().SetMapPtrBase(Perealloc(CG__().GetMapPtrBase(), CG__().GetMapPtrSize()*b.SizeOf("void *"), 1))
+		CG__().SetMapPtrBase(Perealloc(CG__().GetMapPtrBase(), CG__().GetMapPtrSize()*b.SizeOf("void *")))
 	}
 	ptr = (*any)(CG__().GetMapPtrBase() + CG__().GetMapPtrLast())
 	*ptr = nil

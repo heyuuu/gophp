@@ -14,7 +14,7 @@ func OverriddenPtrDtor(zv *types.Zval) {
 	EfreeSize(zv.GetPtr(), b.SizeOf("zend_function"))
 }
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
-	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"), 1)
+	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
 	//new_property_info.GetName().AddRefcount()
 	if new_property_info.GetType().IsName() {
@@ -25,7 +25,7 @@ func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPro
 func ZendDuplicateInternalFunction(func_ types.IFunction, ce *types.ClassEntry) types.IFunction {
 	var new_function types.IFunction
 	if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
-		new_function = Pemalloc(b.SizeOf("zend_internal_function"), 1)
+		new_function = Pemalloc(b.SizeOf("zend_internal_function"))
 		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
 	} else {
 		new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_internal_function"))
@@ -1027,7 +1027,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		var dst *types.Zval
 		var end *types.Zval
 		if ce.GetDefaultPropertiesCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval")*(ce.GetDefaultPropertiesCount()+parent_ce.GetDefaultPropertiesCount()), ce.GetType() == ZEND_INTERNAL_CLASS)
+			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() + parent_ce.GetDefaultPropertiesCount()))
 			src = ce.GetDefaultPropertiesTable() + ce.GetDefaultPropertiesCount()
 			end = table + parent_ce.GetDefaultPropertiesCount()
 			dst = end + ce.GetDefaultPropertiesCount()
@@ -1043,7 +1043,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			Pefree(src, ce.GetType() == ZEND_INTERNAL_CLASS)
 			end = ce.GetDefaultPropertiesTable()
 		} else {
-			end = Pemalloc(b.SizeOf("zval")*parent_ce.GetDefaultPropertiesCount(), ce.GetType() == ZEND_INTERNAL_CLASS)
+			end = Pemalloc(b.SizeOf("zval") * parent_ce.GetDefaultPropertiesCount())
 			dst = end + parent_ce.GetDefaultPropertiesCount()
 			ce.SetDefaultPropertiesTable(end)
 		}
@@ -1083,7 +1083,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 		var dst *types.Zval
 		var end *types.Zval
 		if ce.GetDefaultStaticMembersCount() != 0 {
-			var table *types.Zval = Pemalloc(b.SizeOf("zval")*(ce.GetDefaultStaticMembersCount()+parent_ce.GetDefaultStaticMembersCount()), ce.GetType() == ZEND_INTERNAL_CLASS)
+			var table *types.Zval = Pemalloc(b.SizeOf("zval") * (ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount()))
 			src = ce.GetDefaultStaticMembersTable() + ce.GetDefaultStaticMembersCount()
 			end = table + parent_ce.GetDefaultStaticMembersCount()
 			dst = end + ce.GetDefaultStaticMembersCount()
@@ -1099,7 +1099,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			Pefree(src, ce.GetType() == ZEND_INTERNAL_CLASS)
 			end = ce.GetDefaultStaticMembersTable()
 		} else {
-			end = Pemalloc(b.SizeOf("zval")*parent_ce.GetDefaultStaticMembersCount(), ce.GetType() == ZEND_INTERNAL_CLASS)
+			end = Pemalloc(b.SizeOf("zval") * parent_ce.GetDefaultStaticMembersCount())
 			dst = end + parent_ce.GetDefaultStaticMembersCount()
 			ce.SetDefaultStaticMembersTable(end)
 		}
@@ -1236,7 +1236,7 @@ func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEn
 			ce.SetIsConstantsUpdated(false)
 		}
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
-			ct = Pemalloc(b.SizeOf("zend_class_constant"), 1)
+			ct = Pemalloc(b.SizeOf("zend_class_constant"))
 			memcpy(ct, c, b.SizeOf("zend_class_constant"))
 			c = ct
 		}

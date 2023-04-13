@@ -520,8 +520,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			guards = types.MakeArrayEx(8, ZendPropertyGuardDtor, 0)
 
 			/* mark pointer as "special" using low bit */
-
-			types.ZendHashAddNewPtr(guards, str.GetStr(), any(zend_uintptr_t&zv.GetPropertyGuard()|1))
+			guards.KeyAddNew(str.GetStr(), types.NewZvalPtr(any(zend_uintptr_t&zv.GetPropertyGuard()|1)))
 
 			zv.SetArray(guards)
 		}
@@ -543,7 +542,12 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 
 	ptr = (*uint32)(Emalloc(b.SizeOf("uint32_t")))
 	*ptr = 0
-	return (*uint32)(types.ZendHashAddNewPtr(guards, member.GetStr(), ptr))
+
+	if guards.KeyExists(member.GetStr()) {
+		return nil
+	}
+	guards.KeyAddNew(member.GetStr(), types.NewZvalPtr(ptr))
+	return ptr
 }
 func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cache_slot *any, rv *types.Zval) *types.Zval {
 	var zobj *types.ZendObject

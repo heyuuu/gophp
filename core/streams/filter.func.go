@@ -39,7 +39,7 @@ func PhpStreamFilterRegisterFactoryVolatile(filterpattern *types.String, factory
 func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf uint8, buf_persistent uint8) *PhpStreamBucket {
 	var is_persistent int = stream.GetIsPersistent()
 	var bucket *PhpStreamBucket
-	bucket = (*PhpStreamBucket)(zend.Pemalloc(b.SizeOf("php_stream_bucket"), is_persistent))
+	bucket = (*PhpStreamBucket)(zend.Pemalloc(b.SizeOf("php_stream_bucket")))
 	bucket.SetPrev(nil)
 	bucket.SetNext(bucket.GetPrev())
 	if is_persistent != 0 && buf_persistent == 0 {
@@ -178,7 +178,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *types.Zval, persisten
 }
 func _phpStreamFilterAlloc(fops *PhpStreamFilterOps, abstract any, persistent uint8) *core.PhpStreamFilter {
 	var filter *core.PhpStreamFilter
-	filter = (*core.PhpStreamFilter)(PemallocRelOrig(b.SizeOf("php_stream_filter"), persistent))
+	filter = (*core.PhpStreamFilter)(PemallocRelOrig(b.SizeOf("php_stream_filter")))
 	memset(filter, 0, b.SizeOf("php_stream_filter"))
 	filter.SetFops(fops)
 	filter.GetAbstract().GetPtr() = abstract
@@ -277,7 +277,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 
 				if stream.GetReadbuflen()-stream.GetWritepos() < bucket.GetBuflen() {
 					stream.SetReadbuflen(stream.GetReadbuflen() + bucket.GetBuflen())
-					stream.SetReadbuf(zend.Perealloc(stream.GetReadbuf(), stream.GetReadbuflen(), stream.GetIsPersistent()))
+					stream.SetReadbuf(zend.Perealloc(stream.GetReadbuf(), stream.GetReadbuflen()))
 				}
 				memcpy(stream.GetReadbuf()+stream.GetWritepos(), bucket.GetBuf(), bucket.GetBuflen())
 				stream.SetWritepos(stream.GetWritepos() + bucket.GetBuflen())
@@ -380,7 +380,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 			/* Grow the buffer */
 
-			stream.SetReadbuf(zend.Perealloc(stream.GetReadbuf(), stream.GetWritepos()+flushed_size+stream.GetChunkSize(), stream.GetIsPersistent()))
+			stream.SetReadbuf(zend.Perealloc(stream.GetReadbuf(), stream.GetWritepos()+flushed_size+stream.GetChunkSize()))
 
 			/* Grow the buffer */
 

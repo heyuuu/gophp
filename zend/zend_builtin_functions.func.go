@@ -23,7 +23,7 @@ func ZendStartupBuiltinFunctions() {
 }
 
 func ZifZendVersion() string  { return ZEND_VERSION }
-func ZifGcMemCaches() int     { return ZendMmGc(ZendMmGetHeap()) }
+func ZifGcMemCaches() int     { return ZendMmGc() }
 func ZifGcCollectCycles() int { return 0 }
 func ZifGcEnabled() bool      { return true }
 func ZifGcEnable() {

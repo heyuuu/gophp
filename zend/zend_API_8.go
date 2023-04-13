@@ -294,7 +294,7 @@ func ZendDeclareTypedProperty(
 		ce.SetIsHasTypeHints(true)
 	}
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		property_info = Pemalloc(b.SizeOf("zend_property_info"), 1)
+		property_info = Pemalloc(b.SizeOf("zend_property_info"))
 	} else {
 		property_info = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_property_info"))
 		if property.IsConstant() {
@@ -316,7 +316,7 @@ func ZendDeclareTypedProperty(
 		} else {
 			ce.GetDefaultStaticMembersCount()++
 			property_info.SetOffset(ce.GetDefaultStaticMembersCount() - 1)
-			ce.SetDefaultStaticMembersTable(Perealloc(ce.GetDefaultStaticMembersTable(), b.SizeOf("zval")*ce.GetDefaultStaticMembersCount(), ce.GetType() == ZEND_INTERNAL_CLASS))
+			ce.SetDefaultStaticMembersTable(Perealloc(ce.GetDefaultStaticMembersTable(), b.SizeOf("zval")*ce.GetDefaultStaticMembersCount()))
 		}
 		types.ZVAL_COPY_VALUE(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()], property)
 		if ce.GetStaticMembersTablePtr() == nil {
@@ -346,12 +346,12 @@ func ZendDeclareTypedProperty(
 		} else {
 			property_info.SetOffset(OBJ_PROP_TO_OFFSET(ce.GetDefaultPropertiesCount()))
 			ce.GetDefaultPropertiesCount()++
-			ce.SetDefaultPropertiesTable(Perealloc(ce.GetDefaultPropertiesTable(), b.SizeOf("zval")*ce.GetDefaultPropertiesCount(), ce.GetType() == ZEND_INTERNAL_CLASS))
+			ce.SetDefaultPropertiesTable(Perealloc(ce.GetDefaultPropertiesTable(), b.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
 
 			/* For user classes this is handled during linking */
 
 			if ce.GetType() == ZEND_INTERNAL_CLASS {
-				ce.SetPropertiesInfoTable(Perealloc(ce.GetPropertiesInfoTable(), b.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount(), 1))
+				ce.SetPropertiesInfoTable(Perealloc(ce.GetPropertiesInfoTable(), b.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount()))
 				ce.GetPropertiesInfoTable()[ce.GetDefaultPropertiesCount()-1] = property_info
 			}
 
