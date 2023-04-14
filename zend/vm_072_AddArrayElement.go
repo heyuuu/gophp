@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr_ptr *types.Zval
@@ -17,14 +19,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -73,7 +75,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -83,7 +85,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -158,7 +160,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -168,7 +170,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -217,14 +219,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -275,7 +277,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -285,7 +287,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -364,7 +366,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -374,7 +376,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -426,14 +428,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -487,7 +489,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -497,7 +499,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -582,7 +584,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -592,7 +594,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -640,14 +642,14 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsNull() {
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -697,7 +699,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -707,7 +709,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0
@@ -784,7 +786,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 		str_index:
 			opline.Result().Array().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index:
 			opline.Result().Array().IndexUpdate(hval, expr_ptr)
 		} else if offset.IsReference() {
@@ -794,7 +796,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			str = types.NewString("")
 			goto str_index
 		} else if offset.IsDouble() {
-			hval = DvalToLval(offset.GetDval())
+			hval = DvalToLval(offset.Double())
 			goto num_index
 		} else if offset.IsFalse() {
 			hval = 0

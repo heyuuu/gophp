@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var container *types.Zval
@@ -19,7 +21,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			str = offset.GetStr()
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else {
@@ -87,7 +89,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 			}
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
@@ -155,7 +157,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteDa
 			}
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
@@ -217,7 +219,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 			str = offset.GetStr()
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else {
@@ -290,7 +292,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 			}
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
@@ -364,7 +366,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 			}
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
@@ -430,7 +432,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteDa
 			str = offset.GetStr()
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else {
@@ -501,7 +503,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 			}
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {
@@ -573,7 +575,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData)
 			}
 			value = types.ZendHashFindInd(ht, str.GetStr())
 		} else if offset.IsLong() {
-			hval = offset.GetLval()
+			hval = offset.Long()()
 		num_index_prop:
 			value = ht.IndexFind(hval)
 		} else if offset.IsReference() {

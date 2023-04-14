@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var array *types.Zval
@@ -78,7 +84,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 								var prop_info *ZendPropertyInfo = ZendGetTypedPropertyInfoForSlot(array.GetObj(), value)
 								if prop_info != nil {
 									value.SetNewRef(value)
-									ZEND_REF_ADD_TYPE_SOURCE(value.GetRef(), prop_info)
+									ZEND_REF_ADD_TYPE_SOURCE(value.Reference(), prop_info)
 									value_type = types.IS_REFERENCE_EX
 								}
 							}
@@ -175,14 +181,14 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		var variable_ptr *types.Zval = opline.Op2()
 		if variable_ptr != value {
 			var ref *types.ZendReference
-			ref = value.GetRef()
+			ref = value.Reference()
 			ref.AddRefcount()
 			IZvalPtrDtor(variable_ptr)
 			variable_ptr.SetReference(ref)
 		}
 	} else {
 		value.AddRefcount()
-		opline.Op2().SetReference(value.GetRef())
+		opline.Op2().SetReference(value.Reference())
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

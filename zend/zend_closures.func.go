@@ -397,7 +397,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	debug_info = types.NewArray(8)
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 		var var_ *types.Zval
-		var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
+		var static_variables *types.Array = closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
 		val.SetArray(types.ZendArrayDup(static_variables))
 		debug_info.KeyUpdate(types.STR_STATIC, &val)
 		var __ht *types.Array = val.Array()
@@ -458,7 +458,7 @@ func ZendClosureGetGc(obj *types.Zval, table **types.Zval, n *int) *types.Array 
 		*n = 0
 	}
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
-		return ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
+		return closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	} else {
 		return nil
 	}
@@ -598,7 +598,7 @@ func ZendCreateFakeClosure(res *types.Zval, func_ types.IFunction, scope *types.
 }
 func ZendClosureBindVarEx(closure_zv *types.Zval, offset uint32, val *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.Object())
-	var static_variables *types.Array = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
+	var static_variables *types.Array = closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	var var_ *types.Zval = (*types.Zval)((*byte)(static_variables.Bucket(offset)))
 	ZvalPtrDtor(var_)
 	types.ZVAL_COPY_VALUE(var_, val)

@@ -385,7 +385,7 @@ func ZendClassAddRef(zv *types.Zval) {
 func DestroyOpArray(op_array *types.ZendOpArray) {
 	var i uint32
 	if op_array.GetStaticVariables() != nil {
-		var ht *types.Array = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+		var ht *types.Array = op_array.GetStaticVariablesPtr()
 		if ht != nil && (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 {
 			if ht.DelRefcount() == 0 {
 				ht.DestroyEx()

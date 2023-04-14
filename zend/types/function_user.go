@@ -45,6 +45,25 @@ func (f *ZendOpArray) init() {
 	f.typ = zend.ZEND_USER_FUNCTION
 }
 
+//  ZEND_MAP_PTR_GET(f.static_variables_ptr)
+func (f *ZendOpArray) GetStaticVariablesPtr() *Array {
+	if uintptr(f.static_variables_ptr__ptr)&1 != 0 {
+		// todo
+		return nil
+	} else {
+		return *f.static_variables_ptr__ptr
+	}
+}
+
+//  ZEND_MAP_PTR_SET(f.static_variables_ptr, ht)
+func (f *ZendOpArray) SetStaticVariablesPtr(ht *Array) {
+	if uintptr(f.static_variables_ptr__ptr)&1 != 0 {
+		// todo
+	} else {
+		*f.static_variables_ptr__ptr = ht
+	}
+}
+
 func (f *ZendOpArray) GetOpArray() *ZendOpArray { return f }
 func (f *ZendOpArray) GetInternalFunction() *InternalFunction {
 	panic("*ZendOpArray is not *InternalFunction")

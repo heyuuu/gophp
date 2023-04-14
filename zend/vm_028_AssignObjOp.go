@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
@@ -45,7 +50,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -133,7 +138,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -221,7 +226,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -298,7 +303,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -372,7 +377,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -446,7 +451,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -530,7 +535,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -614,7 +619,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -698,7 +703,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				var ref *types.ZendReference
 				for {
 					if zptr.IsReference() {
-						ref = zptr.GetRef()
+						ref = zptr.Reference()
 						zptr = types.Z_REFVAL_P(zptr)
 						if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 							ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)

@@ -41,11 +41,11 @@ func ZendDuplicateUserFunction(func_ types.IFunction) types.IFunction {
 	var new_function types.IFunction
 	new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 	memcpy(new_function, func_, b.SizeOf("zend_op_array"))
-	if ZEND_MAP_PTR_GET(func_.GetOpArray().static_variables_ptr) {
+	if func_.GetOpArray().GetStaticVariablesPtr() {
 
 		/* See: Zend/tests/method_static_var.phpt */
 
-		new_function.GetOpArray().SetStaticVariables(ZEND_MAP_PTR_GET(func_.GetOpArray().static_variables_ptr))
+		new_function.GetOpArray().SetStaticVariables(func_.GetOpArray().GetStaticVariablesPtr())
 
 		/* See: Zend/tests/method_static_var.phpt */
 

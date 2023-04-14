@@ -46,6 +46,7 @@ func (zv *Zval) IsResource() bool            { return zv.typ == IS_RESOURCE }
 func (zv *Zval) IsReference() bool           { return zv.typ == IS_REFERENCE }
 func (zv *Zval) IsConstantAst() bool         { return zv.typ == IS_CONSTANT_AST }
 func (zv *Zval) IsIndirect() bool            { return zv.typ == IS_INDIRECT }
+func (zv *Zval) IsError() bool               { return zv.typ == IS_ERROR }
 
 func (zv *Zval) Long() int                   { return zv.value.(int) }
 func (zv *Zval) Double() float64             { return zv.value.(float64) }

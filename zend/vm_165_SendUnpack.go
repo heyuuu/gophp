@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_SEND_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
@@ -46,13 +52,13 @@ send_again:
 			if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 				if arg.IsReference() {
 					arg.AddRefcount()
-					top.SetReference(arg.GetRef())
+					top.SetReference(arg.Reference())
 				} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
 
 					/* array is already separated above */
 
 					types.ZVAL_MAKE_REF_EX(arg, 2)
-					top.SetReference(arg.GetRef())
+					top.SetReference(arg.Reference())
 				} else {
 					arg.TryAddRefcount()
 					top.SetNewRef(arg)

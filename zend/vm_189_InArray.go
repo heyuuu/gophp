@@ -9,7 +9,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	op1 = opline.Const1()
 	if op1.IsString() {
-		result = ht.KeyFind(op1.GetStr().GetStr())
+		result = ht.KeyFind(op1.GetStrVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
 			result = ht.IndexFind(op1.Long())
@@ -50,10 +50,10 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	op1 = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if op1.IsString() {
-		result = ht.KeyFind(op1.GetStr().GetStr())
+		result = ht.KeyFind(op1.GetStrVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFind(op1.GetLval())
+			result = ht.IndexFind(op1.Long()())
 		} else {
 			result = nil
 		}
@@ -73,7 +73,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 			val = _z
 			key_tmp.SetString(key)
 			CompareFunction(&result_tmp, op1, &key_tmp)
-			if result_tmp.GetLval() == 0 {
+			if result_tmp.Long()() == 0 {
 				result = val
 				break
 			}
@@ -92,10 +92,10 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	op1 = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if op1.IsString() {
-		result = ht.KeyFind(op1.GetStr().GetStr())
+		result = ht.KeyFind(op1.GetStrVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFind(op1.GetLval())
+			result = ht.IndexFind(op1.Long()())
 		} else {
 			result = nil
 		}
@@ -115,7 +115,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			val = _z
 			key_tmp.SetString(key)
 			CompareFunction(&result_tmp, op1, &key_tmp)
-			if result_tmp.GetLval() == 0 {
+			if result_tmp.Long()() == 0 {
 				result = val
 				break
 			}
@@ -133,10 +133,10 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval
 	op1 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if op1.IsString() {
-		result = ht.KeyFind(op1.GetStr().GetStr())
+		result = ht.KeyFind(op1.GetStrVal())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsLong() {
-			result = ht.IndexFind(op1.GetLval())
+			result = ht.IndexFind(op1.Long()())
 		} else {
 			result = nil
 		}
@@ -156,7 +156,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			val = _z
 			key_tmp.SetString(key)
 			CompareFunction(&result_tmp, op1, &key_tmp)
-			if result_tmp.GetLval() == 0 {
+			if result_tmp.Long()() == 0 {
 				result = val
 				break
 			}

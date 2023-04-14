@@ -13,7 +13,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		for {
 			fillScope := types.PackedFillStart(params.GetArr())
 			param = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T)
-			if (executeData.GetFunc().GetOpArray().fn_flags & AccHasTypeHints) != 0 {
+			if (executeData.GetFunc().GetOpArray().GetFnFlags() & AccHasTypeHints) != 0 {
 				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 				for {
 					ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))

@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var retval_ptr *types.Zval
@@ -28,7 +34,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
-				SetReference(retval_ptr.GetRef())
+				SetReference(retval_ptr.Reference())
 		}
 		break
 	}
@@ -76,7 +82,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
-				SetReference(retval_ptr.GetRef())
+				SetReference(retval_ptr.Reference())
 		}
 		break
 	}
@@ -128,7 +134,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
-				SetReference(retval_ptr.GetRef())
+				SetReference(retval_ptr.Reference())
 		}
 		if free_op1 != nil {
 			ZvalPtrDtorNogc(free_op1)
@@ -177,7 +183,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
 			executeData.GetReturnValue().
-				SetReference(retval_ptr.GetRef())
+				SetReference(retval_ptr.Reference())
 		}
 		break
 	}

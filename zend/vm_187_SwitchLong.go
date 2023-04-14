@@ -21,9 +21,9 @@ func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int
 
 		}
 	}
-	jump_zv = jumptable.IndexFind(op.GetLval())
+	jump_zv = jumptable.IndexFind(op.Long()())
 	if jump_zv != nil {
-		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, jump_zv.GetLval())
+		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, jump_zv.Long()())
 		return 0
 	} else {
 
@@ -52,9 +52,9 @@ func ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) 
 
 		}
 	}
-	jump_zv = jumptable.IndexFind(op.GetLval())
+	jump_zv = jumptable.IndexFind(op.Long()())
 	if jump_zv != nil {
-		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, jump_zv.GetLval())
+		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, jump_zv.Long()())
 		return 0
 	} else {
 

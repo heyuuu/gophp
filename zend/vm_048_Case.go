@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
@@ -11,7 +13,7 @@ func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	op2 = opline.Const2()
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() == op2.GetLval() {
+			if op1.Long()() == op2.Long()() {
 			case_true:
 				ZEND_VM_SMART_BRANCH_TRUE()
 				opline.Result().SetTrue()
@@ -23,14 +25,14 @@ func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long()())
+			d2 = op2.Double()
 			goto case_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		case_double:
 			if d1 == d2 {
 				goto case_true
@@ -38,8 +40,8 @@ func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				goto case_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long()())
 			goto case_double
 		}
 	} else if op1.IsString() {
@@ -66,7 +68,7 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	op2 = opline.Op2Ptr(&free_op2)
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() == op2.GetLval() {
+			if op1.Long()() == op2.Long()() {
 			case_true:
 				ZEND_VM_SMART_BRANCH_TRUE()
 				opline.Result().SetTrue()
@@ -78,14 +80,14 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long()())
+			d2 = op2.Double()
 			goto case_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		case_double:
 			if d1 == d2 {
 				goto case_true
@@ -93,8 +95,8 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				goto case_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long()())
 			goto case_double
 		}
 	} else if op1.IsString() {
@@ -121,7 +123,7 @@ func ZEND_CASE_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	op2 = opline.Op2()
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() == op2.GetLval() {
+			if op1.Long()() == op2.Long()() {
 			case_true:
 				ZEND_VM_SMART_BRANCH_TRUE()
 				opline.Result().SetTrue()
@@ -133,14 +135,14 @@ func ZEND_CASE_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long()())
+			d2 = op2.Double()
 			goto case_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		case_double:
 			if d1 == d2 {
 				goto case_true
@@ -148,8 +150,8 @@ func ZEND_CASE_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				goto case_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long()())
 			goto case_double
 		}
 	} else if op1.IsString() {

@@ -135,12 +135,12 @@ func ShutdownExecutor() {
 
 			opArray := f.GetOpArray()
 			if opArray.GetStaticVariables() != nil {
-				var ht *types.Array = ZEND_MAP_PTR_GET(opArray.static_variables_ptr)
+				var ht *types.Array = opArray.GetStaticVariablesPtr()
 				if ht != nil {
 					if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 						ht.DestroyEx()
 					}
-					ZEND_MAP_PTR_SET(opArray.static_variables_ptr, nil)
+					opArray.SetStaticVariablesPtr(nil)
 				}
 			}
 		})
@@ -154,12 +154,12 @@ func ShutdownExecutor() {
 					if f.GetType() == ZEND_USER_FUNCTION {
 						opArray := f.GetOpArray()
 						if opArray.GetStaticVariables() != nil {
-							var ht *types.Array = ZEND_MAP_PTR_GET(opArray.static_variables_ptr)
+							var ht *types.Array = opArray.GetStaticVariablesPtr()
 							if ht != nil {
 								if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 									ht.DestroyEx()
 								}
-								ZEND_MAP_PTR_SET(opArray.static_variables_ptr, nil)
+								opArray.SetStaticVariablesPtr(nil)
 							}
 						}
 					}
