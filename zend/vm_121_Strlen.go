@@ -11,7 +11,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	value = opline.Const1()
 	if value.IsString() {
-		opline.Result().SetLong(value.GetStr().GetLen())
+		opline.Result().SetLong(value.String().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict types.ZendBool
@@ -43,7 +43,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	value = opline.Op1Ptr(&free_op1)
 	if value.IsString() {
-		opline.Result().SetLong(value.GetStr().GetLen())
+		opline.Result().SetLong(value.String().GetLen())
 		ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
@@ -51,7 +51,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if value.IsReference() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
-				opline.Result().SetLong(value.GetStr().GetLen())
+				opline.Result().SetLong(value.String().GetLen())
 				ZvalPtrDtorNogc(free_op1)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
@@ -87,14 +87,14 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	value = opline.Op1()
 	if value.IsString() {
-		opline.Result().SetLong(value.GetStr().GetLen())
+		opline.Result().SetLong(value.String().GetLen())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict types.ZendBool
 		if value.IsReference() {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
-				opline.Result().SetLong(value.GetStr().GetLen())
+				opline.Result().SetLong(value.String().GetLen())
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		}

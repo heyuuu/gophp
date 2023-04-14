@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func TagDtor(zv *types.Zval) { zend.Free(zv.GetPtr()) }
+func TagDtor(zv *types.Zval) { zend.Free(zv.Ptr()) }
 func PhpIniOnUpdateTags(
 	entry *zend.ZendIniEntry,
 	new_value *types.String,
@@ -263,7 +263,7 @@ func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 func CheckHttpHost(target string) int {
 	tmp := zend.EG__().GetSymbolTable().KeyFind("_SERVER")
 	if tmp != nil && tmp.IsArray() {
-		host := tmp.GetArr().KeyFind("HTTP_HOST")
+		host := tmp.Array().KeyFind("HTTP_HOST")
 		if host != nil && host.IsString() {
 			hostStr := host.GetStrVal()
 

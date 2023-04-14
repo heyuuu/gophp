@@ -25,7 +25,7 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
-		scope = executeData.GetFunc().op_array.scope
+		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
@@ -77,7 +77,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
-		scope = executeData.GetFunc().op_array.scope
+		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
@@ -114,7 +114,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
-		scope = executeData.GetFunc().op_array.scope
+		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
@@ -163,7 +163,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		return 0
 	}
 	if clone != nil && !clone.IsPublic() {
-		scope = executeData.GetFunc().op_array.scope
+		scope = executeData.GetFunc().GetOpArray().scope
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)

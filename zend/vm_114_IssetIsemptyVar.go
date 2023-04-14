@@ -12,7 +12,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 	var target_symbol_table *types.Array
 	varname = opline.Const1()
 	{
-		name = varname.GetStr()
+		name = varname.String()
 	}
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
@@ -21,7 +21,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
 	} else {
 		if value.IsIndirect() {
-			value = value.GetZv()
+			value = value.Indirect()
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 			if value.IsReference() {
@@ -57,7 +57,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
 	} else {
 		if value.IsIndirect() {
-			value = value.GetZv()
+			value = value.Indirect()
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 			if value.IsReference() {
@@ -87,7 +87,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
 	} else {
 		if value.IsIndirect() {
-			value = value.GetZv()
+			value = value.Indirect()
 		}
 		if (opline.GetExtendedValue() & ZEND_ISEMPTY) == 0 {
 			if value.IsReference() {

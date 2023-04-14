@@ -89,22 +89,22 @@ func ZifNetGetInterfaces(executeData zpp.Ex, return_value zpp.Ret) {
 	}
 	zend.ArrayInit(return_value)
 	for p = addrs; p != nil; p = p.ifa_next {
-		var iface *types.Zval = return_value.GetArr().KeyFind(b.CastStrAuto(p.ifa_name))
+		var iface *types.Zval = return_value.Array().KeyFind(b.CastStrAuto(p.ifa_name))
 		var unicast *types.Zval
 		var status *types.Zval
 		if iface == nil {
 			var newif types.Zval
 			zend.ArrayInit(&newif)
-			iface = return_value.GetArr().KeyAdd(b.CastStrAuto(p.ifa_name), &newif)
+			iface = return_value.Array().KeyAdd(b.CastStrAuto(p.ifa_name), &newif)
 		}
-		unicast = iface.GetArr().KeyFind("unicast")
+		unicast = iface.Array().KeyFind("unicast")
 		if unicast == nil {
 			var newuni types.Zval
 			zend.ArrayInit(&newuni)
-			unicast = iface.GetArr().KeyAdd("unicast", &newuni)
+			unicast = iface.Array().KeyAdd("unicast", &newuni)
 		}
 		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, b.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), b.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
-		status = iface.GetArr().KeyFind("up")
+		status = iface.Array().KeyFind("up")
 		if status == nil {
 			zend.AddAssocBool(iface, "up", (p.ifa_flags&IFF_UP) != 0)
 		}

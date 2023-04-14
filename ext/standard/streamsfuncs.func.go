@@ -166,7 +166,7 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
 	if context != nil {
-		context.GetRes().AddRefcount()
+		context.Resource().AddRefcount()
 	}
 	if zerrno != nil {
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, 0)
@@ -554,7 +554,7 @@ func StreamArrayToFdSet(stream_array *types.Zval, fds *fd_set, max_fd *core.PhpS
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	var __ht *types.Array = stream_array.GetArr()
+	var __ht *types.Array = stream_array.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -610,7 +610,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 		return 0
 	}
 	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
-	var __ht *types.Array = stream_array.GetArr()
+	var __ht *types.Array = stream_array.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -669,7 +669,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 		return 0
 	}
 	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
-	var __ht *types.Array = stream_array.GetArr()
+	var __ht *types.Array = stream_array.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -876,7 +876,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 	var wkey *types.String
 	var okey *types.String
 	var ret int = types.SUCCESS
-	var __ht *types.Array = options.GetArr()
+	var __ht *types.Array = options.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -884,7 +884,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 		wval = _z
 		wval = types.ZVAL_DEREF(wval)
 		if wkey != nil && wval.IsType(types.IS_ARRAY) {
-			var __ht *types.Array = wval.GetArr()
+			var __ht *types.Array = wval.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -903,7 +903,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *types.Zval) in
 func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int {
 	var ret int = types.SUCCESS
 	var tmp *types.Zval
-	if nil != b.Assign(&tmp, params.GetArr().KeyFind("notification")) {
+	if nil != b.Assign(&tmp, params.Array().KeyFind("notification")) {
 		if context.GetNotifier() != nil {
 			streams.PhpStreamNotificationFree(context.GetNotifier())
 			context.SetNotifier(nil)
@@ -913,7 +913,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *types.Zval) int 
 		types.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
-	if nil != b.Assign(&tmp, params.GetArr().KeyFind("options")) {
+	if nil != b.Assign(&tmp, params.Array().KeyFind("options")) {
 		if tmp.IsType(types.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {
@@ -1267,7 +1267,7 @@ func ZifStreamFilterRemove(executeData zpp.Ex, return_value zpp.Ret, streamFilte
 		}
 		break
 	}
-	filter = zend.ZendFetchResource(zfilter.GetRes(), nil, streams.PhpFileLeStreamFilter())
+	filter = zend.ZendFetchResource(zfilter.Resource(), nil, streams.PhpFileLeStreamFilter())
 	if filter == nil {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid resource given, not a stream filter")
 		return_value.SetFalse()
@@ -1278,7 +1278,7 @@ func ZifStreamFilterRemove(executeData zpp.Ex, return_value zpp.Ret, streamFilte
 		return_value.SetFalse()
 		return
 	}
-	if zend.ZendListClose(zfilter.GetRes()) == types.FAILURE {
+	if zend.ZendListClose(zfilter.Resource()) == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Could not invalidate filter, not removing")
 		return_value.SetFalse()
 		return
@@ -1530,7 +1530,7 @@ func ZifStreamSocketEnableCrypto(executeData zpp.Ex, return_value zpp.Ret, strea
 				return_value.SetFalse()
 				return
 			}
-			cryptokind = val.GetLval()
+			cryptokind = val.Long()
 		}
 		if zsessstream != nil {
 			core.PhpStreamFromZval(sessstream, zsessstream)
@@ -1603,7 +1603,7 @@ func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		if zend.TryConvertToString(zstream) == 0 {
 			return
 		}
-		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.GetStr().GetVal(), nil, 0)
+		wrapper = streams.PhpStreamLocateUrlWrapper(zstream.String().GetVal(), nil, 0)
 	}
 	if wrapper == nil {
 		return_value.SetFalse()

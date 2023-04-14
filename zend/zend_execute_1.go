@@ -127,7 +127,7 @@ func _getZvalPtrPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendEx
 	var ret *types.Zval = EX_VAR(var_)
 	if ret.IsIndirect() {
 		*should_free = nil
-		ret = ret.GetZv()
+		ret = ret.Indirect()
 	} else {
 		*should_free = ret
 	}
@@ -184,10 +184,10 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 	} else if variable_ptr == value_ptr {
 		return
 	}
-	ref = value_ptr.GetRef()
+	ref = value_ptr.Reference()
 	ref.AddRefcount()
 	if variable_ptr.IsRefcounted() {
-		var garbage *types.ZendRefcounted = variable_ptr.GetCounted()
+		var garbage *types.ZendRefcounted = variable_ptr.RefCounted()
 		if garbage.DelRefcount() == 0 {
 			variable_ptr.SetReference(ref)
 			RcDtorFunc(garbage)
@@ -203,10 +203,10 @@ func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *types
 		return EG__().GetUninitializedZval()
 	}
 	if prop.IsReference() {
-		ZEND_REF_DEL_TYPE_SOURCE(prop.GetRef(), prop_info)
+		ZEND_REF_DEL_TYPE_SOURCE(prop.Reference(), prop_info)
 	}
 	ZendAssignToVariableReference(prop, value_ptr)
-	ZEND_REF_ADD_TYPE_SOURCE(prop.GetRef(), prop_info)
+	ZEND_REF_ADD_TYPE_SOURCE(prop.Reference(), prop_info)
 	return prop
 }
 func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zval, opline *ZendOp, executeData *ZendExecuteData) *types.Zval {
@@ -258,7 +258,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 		ref = object
 		object = types.Z_REFVAL_P(object)
 	}
-	if object.GetType() > types.IS_FALSE && (object.GetType() != types.IS_STRING || object.GetStr().GetLen() != 0) {
+	if object.GetType() > types.IS_FALSE && (object.GetType() != types.IS_STRING || object.String().GetLen() != 0) {
 		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var tmp_property_name *types.String
 			var property_name *types.String = ZvalGetTmpString(property, &tmp_property_name)
@@ -276,8 +276,8 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 		}
 		return nil
 	}
-	if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref.GetRef()) {
-		if zend_verify_ref_stdClass_assignable(ref.GetRef()) == 0 {
+	if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref.Reference()) {
+		if zend_verify_ref_stdClass_assignable(ref.Reference()) == 0 {
 			if RETURN_VALUE_USED(opline) {
 				opline.Result().SetUndef()
 			}
@@ -287,7 +287,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 	ZvalPtrDtorNogc(object)
 	ObjectInit(object)
 	object.AddRefcount()
-	obj = object.GetObj()
+	obj = object.Object()
 	faults.Error(faults.E_WARNING, "Creating default object from empty value")
 	if obj.GetRefcount() == 1 {
 
@@ -416,7 +416,7 @@ func ZendVerifyArgError(zf types.IFunction, arg_info *ZendArgInfo, arg_num int, 
 	}
 }
 func IsNullConstant(scope *types.ClassEntry, default_value *types.Zval) int {
-	if default_value.IsConstant() {
+	if default_value.IsConstantAst() {
 		var constant types.Zval
 		types.ZVAL_COPY(&constant, default_value)
 		if ZvalUpdateConstantEx(&constant, scope) != types.SUCCESS {

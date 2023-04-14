@@ -188,7 +188,7 @@ func ZendHashFindInd(ht *Array, key string) *Zval {
 	zv = ht.KeyFind(key)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
-			return zv.GetZv()
+			return zv.Indirect()
 		} else {
 			return nil
 		}
@@ -199,15 +199,15 @@ func ZendHashFindInd(ht *Array, key string) *Zval {
 
 func ZendHashUpdatePtr(ht *Array, key string, pData any) any {
 	zv := ht.KeyUpdate(key, NewZvalPtr(pData))
-	return zv.GetPtr()
+	return zv.Ptr()
 }
 
 func ZendHashAddMem(ht *Array, key string, pData any, size int) any {
 	zv := ht.KeyAdd(key, NewZvalPtr(nil))
 	if zv != nil {
 		zv.SetPtr(zend.Pemalloc(size))
-		memcpy(zv.GetPtr(), pData, size)
-		return zv.GetPtr()
+		memcpy(zv.Ptr(), pData, size)
+		return zv.Ptr()
 	}
 	return nil
 }
@@ -229,7 +229,7 @@ func ZendHashIndexAddPtr(ht *Array, index int, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = ht.IndexAdd(index, &tmp)
 	if zv != nil {
-		return zv.GetPtr()
+		return zv.Ptr()
 	} else {
 		return nil
 	}
@@ -240,7 +240,7 @@ func ZendHashIndexAddNewPtr(ht *Array, index int, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = ht.IndexAddNew(index, &tmp)
 	if zv != nil {
-		return zv.GetPtr()
+		return zv.Ptr()
 	} else {
 		return nil
 	}
@@ -250,7 +250,7 @@ func ZendHashIndexUpdatePtr(ht *Array, index int, pData any) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
 	zv = ht.IndexUpdate(index, &tmp)
-	return zv.GetPtr()
+	return zv.Ptr()
 }
 func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
 	var tmp Zval
@@ -258,7 +258,7 @@ func ZendHashNextIndexInsertPtr(ht *Array, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = ht.NextIndexInsert(&tmp)
 	if zv != nil {
-		return zv.GetPtr()
+		return zv.Ptr()
 	} else {
 		return nil
 	}
@@ -275,8 +275,8 @@ func ZendHashNextIndexInsertMem(ht *Array, pData any, size int) any {
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ht.NextIndexInsert(&tmp)) {
 		zv.SetPtr(zend.Pemalloc(size))
-		memcpy(zv.GetPtr(), pData, size)
-		return zv.GetPtr()
+		memcpy(zv.Ptr(), pData, size)
+		return zv.Ptr()
 	}
 	return nil
 }
@@ -290,7 +290,7 @@ func ZendHashIndexFindPtr(ht *Array, h int) any {
 	var zv *Zval
 	zv = ht.IndexFind(h)
 	if zv != nil {
-		return zv.GetPtr()
+		return zv.Ptr()
 	} else {
 		return nil
 	}
@@ -320,7 +320,7 @@ func ZendHashGetCurrentDataPtrEx(ht *Array, pos *ArrayPosition) any {
 	var zv *Zval
 	zv = ZendHashGetCurrentDataEx(ht, pos)
 	if zv != nil {
-		return zv.GetPtr()
+		return zv.Ptr()
 	} else {
 		return nil
 	}
@@ -385,7 +385,7 @@ func ZendHashIteratorPos(idx uint32, ht *Array) ArrayPosition {
 	return iter.GetPos()
 }
 func ZendHashIteratorPosEx(idx uint32, array *Zval) ArrayPosition {
-	var ht *Array = array.GetArr()
+	var ht *Array = array.Array()
 	var iter *HashTableIterator = zend.EG__().GetHtIterators() + idx
 	b.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
@@ -393,7 +393,7 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) ArrayPosition {
 			iter.GetHt().DecIteratorsCount()
 		}
 		SEPARATE_ARRAY(array)
-		ht = array.GetArr()
+		ht = array.Array()
 		if !(ht.IsIteratorsOverflow()) {
 			ht.IncIteratorsCount()
 		}
@@ -545,8 +545,8 @@ func ZendArrayDupElements(source *Array, target *Array) {
 		// 增加引用计数
 		for {
 			if data.IsRefcounted() {
-				if data.IsReference() && data.GetRefcount() == 1 && (!data.GetRef().GetVal().IsArray() || data.GetRef().GetVal().GetArr() != source) {
-					data = data.GetRef().GetVal()
+				if data.IsReference() && data.GetRefcount() == 1 && (!data.Reference().GetVal().IsArray() || data.Reference().GetVal().Array() != source) {
+					data = data.Reference().GetVal()
 					if !(data.IsRefcounted()) {
 						break
 					}
@@ -707,10 +707,10 @@ func ZendHashCompareImpl(ht1 *Array, ht2 *Array, compar CompareFuncT, ordered Ze
 		}
 		pData1 = p1.GetVal()
 		if pData1.IsType(IS_INDIRECT) {
-			pData1 = pData1.GetZv()
+			pData1 = pData1.Indirect()
 		}
 		if pData2.IsType(IS_INDIRECT) {
-			pData2 = pData2.GetZv()
+			pData2 = pData2.Indirect()
 		}
 		if pData1.IsType(IS_UNDEF) {
 			if pData2.GetType() != IS_UNDEF {
@@ -891,7 +891,7 @@ convert:
 	for _, _p := range __ht__1.ForeachData() {
 		var _z *Zval = _p.GetVal()
 		if _z.IsIndirect() {
-			_z = _z.GetZv()
+			_z = _z.Indirect()
 			if _z.IsUndef() {
 				continue
 			}

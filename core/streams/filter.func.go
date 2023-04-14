@@ -181,7 +181,7 @@ func _phpStreamFilterAlloc(fops *PhpStreamFilterOps, abstract any, persistent ui
 	filter = (*core.PhpStreamFilter)(PemallocRelOrig(b.SizeOf("php_stream_filter")))
 	memset(filter, 0, b.SizeOf("php_stream_filter"))
 	filter.SetFops(fops)
-	filter.GetAbstract().GetPtr() = abstract
+	filter.GetAbstract().Ptr() = abstract
 	filter.SetIsPersistent(persistent)
 	return filter
 }

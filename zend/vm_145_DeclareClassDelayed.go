@@ -26,7 +26,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 			}
 
 			//
-			if ZendDoLinkClass(ce, opline.Const2().GetStr()) == types.FAILURE {
+			if ZendDoLinkClass(ce, opline.Const2().String()) == types.FAILURE {
 				return 0
 			}
 

@@ -10,7 +10,7 @@ func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) i
 	name = opline.Const1()
 	val = opline.Const2()
 	types.ZVAL_COPY(c.Value(), val)
-	if c.Value().IsConstant() {
+	if c.Value().IsConstantAst() {
 		if ZvalUpdateConstantEx(c.Value(), executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
 			ZvalPtrDtorNogc(c.Value())
 			return 0

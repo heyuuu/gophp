@@ -95,7 +95,7 @@ func PrintFlatHash(ht *types.Array) {
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 		if _z.IsIndirect() {
-			_z = _z.GetZv()
+			_z = _z.Indirect()
 			if _z.IsUndef() {
 				continue
 			}
@@ -133,33 +133,33 @@ func ZendPrintFlatZvalR(expr *types.Zval) {
 	switch expr.GetType() {
 	case types.IS_ARRAY:
 		ZEND_PUTS("Array (")
-		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			if expr.GetArr().IsRecursive() {
+		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+			if expr.Array().IsRecursive() {
 				ZEND_PUTS(" *RECURSION*")
 				return
 			}
-			expr.GetArr().ProtectRecursive()
+			expr.Array().ProtectRecursive()
 		}
-		PrintFlatHash(expr.GetArr())
+		PrintFlatHash(expr.Array())
 		ZEND_PUTS(")")
-		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			expr.GetArr().UnprotectRecursive()
+		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+			expr.Array().UnprotectRecursive()
 		}
 		break
 	case types.IS_OBJECT:
 		var properties *types.Array
-		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
+		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.Object())
 		ZendPrintf("%s Object (", class_name.GetVal())
 		// types.ZendStringReleaseEx(class_name, 0)
-		if expr.GetCounted().IsRecursive() {
+		if expr.RefCounted().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
 			return
 		}
 		properties = types.Z_OBJPROP_P(expr)
 		if properties != nil {
-			expr.GetObj().ProtectRecursive()
+			expr.Object().ProtectRecursive()
 			PrintFlatHash(properties)
-			expr.GetObj().UnprotectRecursive()
+			expr.Object().UnprotectRecursive()
 		}
 		ZEND_PUTS(")")
 		break
@@ -175,44 +175,44 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *types.Zval, indent int) {
 	switch expr.GetType() {
 	case types.IS_ARRAY:
 		buf.AppendString("Array\n")
-		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			if expr.GetArr().IsRecursive() {
+		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+			if expr.Array().IsRecursive() {
 				buf.AppendString(" *RECURSION*")
 				return
 			}
-			expr.GetArr().ProtectRecursive()
+			expr.Array().ProtectRecursive()
 		}
-		PrintHash(buf, expr.GetArr(), indent, 0)
-		if (expr.GetArr().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
-			expr.GetArr().UnprotectRecursive()
+		PrintHash(buf, expr.Array(), indent, 0)
+		if (expr.Array().GetGcFlags() & types.GC_IMMUTABLE) == 0 {
+			expr.Array().UnprotectRecursive()
 		}
 		break
 	case types.IS_OBJECT:
 		var properties *types.Array
-		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
+		var class_name *types.String = types.Z_OBJ_HT(*expr).GetGetClassName()(expr.Object())
 		buf.AppendString(class_name.GetStr())
 		// types.ZendStringReleaseEx(class_name, 0)
 		buf.AppendString(" Object\n")
-		if expr.GetObj().IsRecursive() {
+		if expr.Object().IsRecursive() {
 			buf.AppendString(" *RECURSION*")
 			return
 		}
 		if b.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
 			break
 		}
-		expr.GetObj().ProtectRecursive()
+		expr.Object().ProtectRecursive()
 		PrintHash(buf, properties, indent, 1)
-		expr.GetObj().UnprotectRecursive()
+		expr.Object().UnprotectRecursive()
 		ZendReleaseProperties(properties)
 		break
 	case types.IS_LONG:
-		buf.AppendLong(expr.GetLval())
+		buf.AppendLong(expr.Long())
 		break
 	case types.IS_REFERENCE:
 		ZendPrintZvalRToBuf(buf, types.Z_REFVAL_P(expr), indent)
 		break
 	case types.IS_STRING:
-		buf.AppendString(expr.GetStr().GetStr())
+		buf.AppendString(expr.String().GetStr())
 		break
 	default:
 		var str *types.String = ZvalGetStringFunc(expr)
@@ -260,7 +260,7 @@ func ZendInitCallTrampolineOp() {
 	EG__().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
 	ZendVmSetOpcodeHandler(EG__().GetCallTrampolineOp())
 }
-func AutoGlobalDtor(zv *types.Zval) { Free(zv.GetPtr()) }
+func AutoGlobalDtor(zv *types.Zval) { Free(zv.Ptr()) }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }

@@ -17,7 +17,7 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	var tmp types.Zval
 	var ptr *types.Zval
 	b.Assert(var_.IsReference())
-	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.GetRef()) {
+	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.Reference()) {
 		types.ZVAL_COPY(&tmp, types.Z_REFVAL_P(var_))
 		ptr = &tmp
 	} else {
@@ -53,7 +53,7 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	}
 
 	if ptr == &tmp {
-		zend.ZendTryAssignTypedRef(var_.GetRef(), &tmp)
+		zend.ZendTryAssignTypedRef(var_.Reference(), &tmp)
 	}
 	return true
 }
@@ -78,8 +78,8 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		return
 	}
 	if base == 0 || base == 2 {
-		var strval *byte = num.GetStr().GetVal()
-		var strlen int = num.GetStr().GetLen()
+		var strval *byte = num.String().GetVal()
+		var strlen int = num.String().GetLen()
 		for isspace(*strval) && strlen != 0 {
 			strval++
 			strlen--
@@ -116,7 +116,7 @@ func ZifIntval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _ zpp
 		/* Length of 3+ covers "0b#" and "-0b" (which results in 0) */
 
 	}
-	return_value.SetLong(zend.ZEND_STRTOL(num.GetStr().GetVal(), nil, base))
+	return_value.SetLong(zend.ZEND_STRTOL(num.String().GetVal(), nil, base))
 }
 
 //@zif -alias doubleval
@@ -183,7 +183,7 @@ func PhpIsType(executeData *zend.ZendExecuteData, return_value *types.Zval, type
 	}
 	if arg.IsType(type_) {
 		if type_ == types.IS_RESOURCE {
-			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.GetRes())
+			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.Resource())
 			if type_name == nil {
 				return_value.SetFalse()
 				return
@@ -258,7 +258,7 @@ func ZifIsNumeric(executeData zpp.Ex, return_value zpp.Ret, value *types.Zval) {
 		return_value.SetTrue()
 		return
 	case types.IS_STRING:
-		if zend.IsNumericString(arg.GetStr().GetStr(), nil, nil, 0) != 0 {
+		if zend.IsNumericString(arg.String().GetStr(), nil, nil, 0) != 0 {
 			return_value.SetTrue()
 			return
 		} else {

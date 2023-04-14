@@ -103,7 +103,7 @@ func ZendCompileGroupUse(ast *ZendAst) {
 		var inline_use *ZendAst
 		var use *ZendAst = list.GetChild()[i]
 		var name_zval *types.Zval = ZendAstGetZval(use.GetChild()[0])
-		var name *types.String = name_zval.GetStr()
+		var name *types.String = name_zval.String()
 		var compound_ns *types.String = ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
 		// types.ZendStringReleaseEx(name, 0)
 		name_zval.SetString(compound_ns)
@@ -216,7 +216,7 @@ func ZendCompileNamespace(ast *ZendAst) {
 }
 func ZendCompileHaltCompiler(ast *ZendAst) {
 	var offset_ast *ZendAst = ast.GetChild()[0]
-	var offset ZendLong = ZendAstGetZval(offset_ast).GetLval()
+	var offset ZendLong = ZendAstGetZval(offset_ast).Long()
 	var filename *types.String
 	var name *types.String
 	var const_name = "__COMPILER_HALT_OFFSET__"
@@ -304,10 +304,10 @@ func ZendBinaryOpProducesNumericStringError(opcode uint32, op1 *types.Zval, op2 
 	if (opcode == ZEND_BW_OR || opcode == ZEND_BW_AND || opcode == ZEND_BW_XOR) && op1.IsString() && op2.IsString() {
 		return 0
 	}
-	if op1.IsString() && IsNumericString(op1.GetStr().GetStr(), nil, nil, 0) == 0 {
+	if op1.IsString() && IsNumericString(op1.String().GetStr(), nil, nil, 0) == 0 {
 		return 1
 	}
-	if op2.IsString() && IsNumericString(op2.GetStr().GetStr(), nil, nil, 0) == 0 {
+	if op2.IsString() && IsNumericString(op2.String().GetStr(), nil, nil, 0) == 0 {
 		return 1
 	}
 	return 0
@@ -407,7 +407,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 		var value *types.Zval = ZendAstGetZval(value_ast)
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {
 			if value.IsArray() {
-				var ht *types.Array = value.GetArr()
+				var ht *types.Array = value.Array()
 				var val *types.Zval
 				var key *types.String
 				var __ht *types.Array = ht
@@ -419,7 +419,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 					if key != nil {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
-					if result.GetArr().NextIndexInsert(val) == nil {
+					if result.Array().NextIndexInsert(val) == nil {
 						ZvalPtrDtor(result)
 						return 0
 					}
@@ -436,22 +436,22 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			var key *types.Zval = ZendAstGetZval(key_ast)
 			switch key.GetType() {
 			case types.IS_LONG:
-				result.GetArr().IndexUpdate(key.GetLval(), value)
+				result.Array().IndexUpdate(key.Long(), value)
 			case types.IS_STRING:
-				result.GetArr().SymtableUpdate(key.GetStr().GetStr(), value)
+				result.Array().SymtableUpdate(key.String().GetStr(), value)
 			case types.IS_DOUBLE:
-				result.GetArr().IndexUpdate(DvalToLval(key.GetDval()), value)
+				result.Array().IndexUpdate(DvalToLval(key.Double()), value)
 			case types.IS_FALSE:
-				result.GetArr().IndexUpdate(0, value)
+				result.Array().IndexUpdate(0, value)
 			case types.IS_TRUE:
-				result.GetArr().IndexUpdate(1, value)
+				result.Array().IndexUpdate(1, value)
 			case types.IS_NULL:
-				result.GetArr().KeyUpdate(types.NewString("").GetStr(), value)
+				result.Array().KeyUpdate(types.NewString("").GetStr(), value)
 			default:
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal offset type")
 			}
 		} else {
-			if result.GetArr().NextIndexInsert(value) == nil {
+			if result.Array().NextIndexInsert(value) == nil {
 				ZvalPtrDtorNogc(value)
 				ZvalPtrDtor(result)
 				return 0

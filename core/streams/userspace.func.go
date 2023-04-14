@@ -41,14 +41,14 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		var retval types.Zval
 		fci.SetSize(b.SizeOf("fci"))
 		fci.GetFunctionName().SetUndef()
-		fci.SetObject(object.GetObj())
+		fci.SetObject(object.Object())
 		fci.SetRetval(&retval)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
 		fcc.SetFunctionHandler(uwrap.GetCe().GetConstructor())
 		fcc.SetCalledScope(types.Z_OBJCE_P(object))
-		fcc.SetObject(object.GetObj())
+		fcc.SetObject(object.Object())
 		if zend.ZendCallFunction(&fci, &fcc) == types.FAILURE {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().GetName().GetVal(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
 			zend.ZvalPtrDtor(object)
@@ -124,7 +124,7 @@ func UserWrapperOpener(
 		/* if the opened path is set, copy it out */
 
 		if args[3].IsReference() && types.Z_REFVAL(args[3]).IsType(types.IS_STRING) && opened_path != nil {
-			*opened_path = types.Z_REFVAL(args[3]).GetStr().Copy()
+			*opened_path = types.Z_REFVAL(args[3]).String().Copy()
 		}
 
 		/* set wrapper data to be a reference to our object */
@@ -249,7 +249,7 @@ func ZifStreamWrapperRegister(executeData zpp.Ex, return_value zpp.Ret, protocol
 
 			/* We failed.  But why? */
 
-			if core.PhpStreamGetUrlStreamWrappersHash().KeyExists(protocol.GetStr()) {
+			if core.PhpStreamGetUrlStreamWrappersHash().KeyExists(protocol.String()) {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 
@@ -333,7 +333,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 			didwrite = -1
 		} else {
 			zend.ConvertToLong(&retval)
-			didwrite = retval.GetLval()
+			didwrite = retval.Long()
 		}
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_WRITE+" is not implemented!", us.GetWrapper().GetClassname())
@@ -375,13 +375,13 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if zend.TryConvertToString(&retval) == 0 {
 		return -1
 	}
-	didread = retval.GetStr().GetLen()
+	didread = retval.String().GetLen()
 	if didread > 0 {
 		if didread > count {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_READ+" - read "+zend.ZEND_LONG_FMT+" bytes more data than requested ("+zend.ZEND_LONG_FMT+" read, "+zend.ZEND_LONG_FMT+" max) - excess data will be lost", us.GetWrapper().GetClassname(), zend_long(didread-count), zend.ZendLong(didread), zend.ZendLong(count))
 			didread = count
 		}
-		memcpy(buf, retval.GetStr().GetVal(), didread)
+		memcpy(buf, retval.String().GetVal(), didread)
 	}
 	zend.ZvalPtrDtor(&retval)
 	retval.SetUndef()
@@ -476,7 +476,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	func_name.SetStringVal(USERSTREAM_TELL)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == types.SUCCESS && retval.IsType(types.IS_LONG) {
-		*newoffs = retval.GetLval()
+		*newoffs = retval.Long()
 		ret = 0
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_TELL+" is not implemented!", us.GetWrapper().GetClassname())
@@ -496,43 +496,43 @@ func StatbufFromArray(array *types.Zval, ssb *core.PhpStreamStatbuf) int {
 	// #define STAT_PROP_ENTRY(name) STAT_PROP_ENTRY_EX ( name , name )
 
 	memset(ssb, 0, b.SizeOf("php_stream_statbuf"))
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("dev")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("dev")) {
 		ssb.GetSb().st_dev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("ino")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("ino")) {
 		ssb.GetSb().st_ino = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("mode")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("mode")) {
 		ssb.GetSb().st_mode = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("nlink")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("nlink")) {
 		ssb.GetSb().st_nlink = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("uid")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("uid")) {
 		ssb.GetSb().st_uid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("gid")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("gid")) {
 		ssb.GetSb().st_gid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("rdev")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("rdev")) {
 		ssb.GetSb().st_rdev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("size")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("size")) {
 		ssb.GetSb().st_size = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("atime")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("atime")) {
 		ssb.GetSb().st_atime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("mtime")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("mtime")) {
 		ssb.GetSb().st_mtime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("ctime")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("ctime")) {
 		ssb.GetSb().st_ctime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("blksize")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("blksize")) {
 		ssb.GetSb().st_blksize = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().KeyFind("blocks")) {
+	if nil != b.Assign(&elem, array.Array().KeyFind("blocks")) {
 		ssb.GetSb().st_blocks = zend.ZvalGetLong(elem)
 	}
 	return types.SUCCESS
@@ -584,15 +584,15 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 	case core.PHP_STREAM_OPTION_LOCKING:
 		args[0].SetLong(0)
 		if (value & LOCK_NB) != 0 {
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_NB)
+			args[0].SetLong(args[0].Long() | standard.PHP_LOCK_NB)
 		}
 		switch value & ^LOCK_NB {
 		case LOCK_SH:
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_SH)
+			args[0].SetLong(args[0].Long() | standard.PHP_LOCK_SH)
 		case LOCK_EX:
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_EX)
+			args[0].SetLong(args[0].Long() | standard.PHP_LOCK_EX)
 		case LOCK_UN:
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_UN)
+			args[0].SetLong(args[0].Long() | standard.PHP_LOCK_UN)
 		}
 
 		/* TODO wouldblock */
@@ -622,7 +622,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		func_name.SetStringVal(USERSTREAM_TRUNCATE)
 		switch value {
 		case core.PHP_STREAM_TRUNCATE_SUPPORTED:
-			if zend.ZendIsCallableEx(&func_name, b.CondF2(us.GetObject().IsUndef(), nil, func() *types.ZendObject { return us.GetObject().GetObj() }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
+			if zend.ZendIsCallableEx(&func_name, b.CondF2(us.GetObject().IsUndef(), nil, func() *types.ZendObject { return us.GetObject().Object() }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
 				ret = core.PHP_STREAM_OPTION_RETURN_OK
 			} else {
 				ret = core.PHP_STREAM_OPTION_RETURN_ERR
@@ -973,7 +973,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() types.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == types.SUCCESS && retval.GetType() != types.IS_FALSE && retval.GetType() != types.IS_TRUE {
 		zend.ConvertToString(&retval)
-		core.PHP_STRLCPY(ent.GetDName(), retval.GetStr().GetVal(), b.SizeOf("ent -> d_name"), retval.GetStr().GetLen())
+		core.PHP_STRLCPY(ent.GetDName(), retval.String().GetVal(), b.SizeOf("ent -> d_name"), retval.String().GetLen())
 		didread = b.SizeOf("php_stream_dirent")
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "%s::"+USERSTREAM_DIR_READ+" is not implemented!", us.GetWrapper().GetClassname())

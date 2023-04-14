@@ -112,7 +112,7 @@ func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendO
 	for {
 		ancestor = zend.ZendReadProperty(GetExceptionBase(&pv), &pv, types.STR_PREVIOUS, 1, &rv)
 		for ancestor.IsObject() {
-			if ancestor.GetObj() == ex.GetObj() {
+			if ancestor.Object() == ex.Object() {
 				zend.OBJ_RELEASE(add_previous)
 				return
 			}
@@ -126,7 +126,7 @@ func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendO
 			return
 		}
 		ex = previous
-		if ex.GetObj() == add_previous {
+		if ex.Object() == add_previous {
 			break
 		}
 	}
@@ -153,8 +153,8 @@ func ExceptionRestore() {
 func ThrowExceptionInternal(exception *types.Zval) {
 	if exception != nil {
 		var previous *types.ZendObject = zend.EG__().GetException()
-		ExceptionSetPrevious(exception.GetObj(), zend.EG__().GetException())
-		zend.EG__().SetException(exception.GetObj())
+		ExceptionSetPrevious(exception.Object(), zend.EG__().GetException())
+		zend.EG__().SetException(exception.Object())
 		if previous != nil {
 			return
 		}
@@ -259,8 +259,8 @@ func ZimExceptionConstruct(executeData *zend.ZendExecuteData, return_value *type
 		var ce *types.ClassEntry
 		if executeData.GetThis().IsObject() {
 			ce = types.Z_OBJCE(executeData.GetThis())
-		} else if executeData.GetThis().GetCe() != nil {
-			ce = executeData.GetThis().GetCe()
+		} else if executeData.GetThis().Class() != nil {
+			ce = executeData.GetThis().Class()
 		} else {
 			ce = base_ce
 		}
@@ -314,8 +314,8 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 		var ce *types.ClassEntry
 		if executeData.GetThis().IsObject() {
 			ce = types.Z_OBJCE(executeData.GetThis())
-		} else if executeData.GetThis().GetCe() != nil {
-			ce = executeData.GetThis().GetCe()
+		} else if executeData.GetThis().Class() != nil {
+			ce = executeData.GetThis().Class()
 		} else {
 			ce = ZendCeErrorException
 		}
@@ -438,8 +438,8 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		str.AppendString("NULL, ")
 	case types.IS_STRING:
 		str.AppendByte('\'')
-		zend.SmartStrAppendEscaped(str, arg.GetStr().GetVal(), b.Min(arg.GetStr().GetLen(), 15))
-		if arg.GetStr().GetLen() > 15 {
+		zend.SmartStrAppendEscaped(str, arg.String().GetVal(), b.Min(arg.String().GetLen(), 15))
+		if arg.String().GetLen() > 15 {
 			str.AppendString("...', ")
 		} else {
 			str.AppendString("', ")
@@ -453,10 +453,10 @@ func _buildTraceArgs(arg *types.Zval, str *zend.SmartStr) {
 		str.AppendLong(types.Z_RES_HANDLE_P(arg))
 		str.AppendString(", ")
 	case types.IS_LONG:
-		str.AppendLong(arg.GetLval())
+		str.AppendLong(arg.Long())
 		str.AppendString(", ")
 	case types.IS_DOUBLE:
-		zend.SmartStrAppendPrintf(str, "%.*G", int(zend.EG__().GetPrecision()), arg.GetDval())
+		zend.SmartStrAppendPrintf(str, "%.*G", int(zend.EG__().GetPrecision()), arg.Double())
 		str.AppendString(", ")
 	case types.IS_ARRAY:
 		str.AppendString("Array, ")
@@ -484,7 +484,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			tmp = ht.KeyFind(types.STR_LINE)
 			if tmp != nil {
 				if tmp.IsLong() {
-					line = tmp.GetLval()
+					line = tmp.Long()
 				} else {
 					Error(E_WARNING, "Line is no long")
 					line = 0
@@ -492,7 +492,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 			} else {
 				line = 0
 			}
-			str.AppendString(file.GetStr().GetStr())
+			str.AppendString(file.String().GetStr())
 			str.AppendByte('(')
 			str.AppendLong(line)
 			str.AppendString("): ")
@@ -509,7 +509,7 @@ func _buildTraceString(str *zend.SmartStr, ht *types.Array, num uint32) {
 		if tmp.IsArray() {
 			var last_len int = str.GetS().GetLen()
 			var arg *types.Zval
-			var __ht *types.Array = tmp.GetArr()
+			var __ht *types.Array = tmp.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -544,7 +544,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 		return_value.SetFalse()
 		return
 	}
-	var __ht *types.Array = trace.GetArr()
+	var __ht *types.Array = trace.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -554,7 +554,7 @@ func zim_exception_getTraceAsString(executeData *zend.ZendExecuteData, return_va
 			Error(E_WARNING, "Expected array for frame "+zend.ZEND_ULONG_FMT, index)
 			continue
 		}
-		_buildTraceString(&str, frame.GetArr(), b.PostInc(&num))
+		_buildTraceString(&str, frame.Array(), b.PostInc(&num))
 	}
 	str.AppendByte('#')
 	str.AppendLong(num)
@@ -592,7 +592,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		var line zend.ZendLong = zend.ZvalGetLong(GET_PROPERTY(exception, types.STR_LINE, &rv))
 		fci.SetSize(b.SizeOf("fci"))
 		fci.GetFunctionName().SetString(fname)
-		fci.SetObject(exception.GetObj())
+		fci.SetObject(exception.Object())
 		fci.SetRetval(&trace)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
@@ -608,9 +608,9 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 			message = real_message
 		}
 		if message.GetLen() > 0 {
-			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.GetStr().GetLen() != 0, func() []byte { return trace.GetStr().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s: %s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), message.GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.String().GetLen() != 0, func() []byte { return trace.String().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		} else {
-			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.GetStr().GetLen() != 0, func() []byte { return trace.GetStr().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
+			str = zend.ZendSprintfZStr("%s in %s:"+zend.ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", types.Z_OBJCE_P(exception).GetName().GetVal(), file.GetVal(), line, b.CondF1(trace.IsString() && trace.String().GetLen() != 0, func() []byte { return trace.String().GetVal() }, "#0 {main}\n"), b.Cond(prev_str.GetLen() != 0, "\n\nNext ", ""), prev_str.GetVal())
 		}
 		// types.ZendStringReleaseEx(prev_str, 0)
 		// types.ZendStringReleaseEx(message, 0)
@@ -740,7 +740,7 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 		zend.ZendUpdatePropertyEx(exception_ce, &ex, types.STR_CODE, &tmp)
 	}
 	ThrowExceptionInternal(&ex)
-	return ex.GetObj()
+	return ex.Object()
 }
 func ThrowExceptionEx(exception_ce *types.ClassEntry, code zend.ZendLong, format string, args ...any) *types.ZendObject {
 	message := zend.ZendSprintf(format, args)

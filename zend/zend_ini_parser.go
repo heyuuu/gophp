@@ -106,12 +106,12 @@ var ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
 func GetIntVal(op *types.Zval) int {
 	switch op.GetType() {
 	case types.IS_LONG:
-		return op.GetLval()
+		return op.Long()
 	case types.IS_DOUBLE:
-		return int(op.GetDval())
+		return int(op.Double())
 	case types.IS_STRING:
-		var val int = atoi(op.GetStr().GetVal())
-		//types.ZendStringFree(op.GetStr())
+		var val int = atoi(op.String().GetVal())
+		//types.ZendStringFree(op.String())
 		return val
 	default:
 
@@ -178,13 +178,13 @@ func ZendIniAddString(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 	}
-	op1_len = int(op1.GetStr().GetLen())
+	op1_len = int(op1.String().GetLen())
 	if op2.GetType() != types.IS_STRING {
 		ConvertToString(op2)
 	}
-	length = op1_len + int(op2.GetStr().GetLen())
-	result.SetString(types.ZendStringExtend(op1.GetStr(), length))
-	memcpy(result.GetStr().GetVal()+op1_len, op2.GetStr().GetVal(), op2.GetStr().GetLen()+1)
+	length = op1_len + int(op2.String().GetLen())
+	result.SetString(types.ZendStringExtend(op1.String(), length))
+	memcpy(result.String().GetVal()+op1_len, op2.String().GetVal(), op2.String().GetLen()+1)
 }
 
 func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
@@ -193,20 +193,20 @@ func ZendIniGetConstant(result *types.Zval, name *types.Zval) {
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 
-	if !(memchr(name.GetStr().GetVal(), ':', name.GetStr().GetLen())) && b.Assign(&c, ZendGetConstant(name.GetStrVal())) != 0 {
+	if !(memchr(name.String().GetVal(), ':', name.String().GetLen())) && b.Assign(&c, ZendGetConstant(name.GetStrVal())) != 0 {
 		if c.GetType() != types.IS_STRING {
 			types.ZVAL_COPY_OR_DUP(&tmp, c)
-			if tmp.IsConstant() {
+			if tmp.IsConstantAst() {
 				ZvalUpdateConstantEx(&tmp, nil)
 			}
 			ConvertToString(&tmp)
 			c = &tmp
 		}
-		result.SetString(types.NewString(c.GetStr().GetStr()))
+		result.SetString(types.NewString(c.String().GetStr()))
 		if c == &tmp {
-			// types.ZendStringRelease(tmp.GetStr())
+			// types.ZendStringRelease(tmp.String())
 		}
-		//types.ZendStringFree(name.GetStr())
+		//types.ZendStringFree(name.String())
 	} else {
 		*result = *name
 	}
@@ -281,7 +281,7 @@ func ZendParseIniString(str *byte, unbuffered_errors types.ZendBool, scanner_mod
 
 func ZvalIniDtor(zv *types.Zval) {
 	if zv.IsString() {
-		// types.ZendStringRelease(zv.GetStr())
+		// types.ZendStringRelease(zv.String())
 	}
 }
 

@@ -484,7 +484,7 @@ func PhpStreamUrlWrapFtp(
 		/* when writing file (but not appending), it must NOT exist, unless a context option exists which allows it */
 
 		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "overwrite")) != nil {
-			if tmpzval.GetLval() != 0 {
+			if tmpzval.Long() != 0 {
 				allow_overwrite = 1
 			} else {
 				allow_overwrite = 0
@@ -522,11 +522,11 @@ func PhpStreamUrlWrapFtp(
 
 		/* set resume position if applicable */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.GetLval() > 0 {
-			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.GetLval())
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(types.IS_LONG) && tmpzval.Long() > 0 {
+			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.Long())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset "+zend.ZEND_LONG_FMT, tmpzval.GetLval())
+				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset "+zend.ZEND_LONG_FMT, tmpzval.Long())
 				goto errexit
 			}
 		}

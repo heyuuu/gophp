@@ -52,9 +52,9 @@ func AddToken(return_value *types.Zval, token_type int, text *uint8, leng int, l
 		arr.NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
 		arr.NextIndexInsert(types.NewZvalLong(lineno))
 
-		return_value.GetArr().NextIndexInsert(types.NewZvalArray(arr))
+		return_value.Array().NextIndexInsert(types.NewZvalArray(arr))
 	} else {
-		return_value.GetArr().NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
+		return_value.Array().NextIndexInsert(types.NewZvalString(b.CastStr(text, leng)))
 	}
 }
 func Tokenize(return_value *types.Zval, source string) types.ZendBool {
@@ -127,10 +127,10 @@ func OnEvent(event zend.ZendPhpScannerEvent, token int, line int, context any) {
 		}
 		AddToken(token_stream, token, zend.INI_SCNG__().GetYyText(), zend.INI_SCNG__().GetYyLeng(), line)
 	case zend.ON_FEEDBACK:
-		tokens_ht = token_stream.GetArr()
+		tokens_ht = token_stream.Array()
 		token_zv = tokens_ht.IndexFindH(tokens_ht.GetNNumOfElements() - 1)
 		if token_zv != nil && token_zv.IsType(zend.IS_ARRAY) {
-			token_zv.GetArr().IndexFindH(0).SetLong(token)
+			token_zv.Array().IndexFindH(0).SetLong(token)
 		}
 	case zend.ON_STOP:
 		if zend.INI_SCNG__().GetYyCursor() != zend.INI_SCNG__().GetYyLimit() {

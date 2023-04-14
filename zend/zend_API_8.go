@@ -41,8 +41,8 @@ again:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
 		if types.Z_ARRVAL_P(callable).Len() == 2 {
-			obj = callable.GetArr().IndexFind(0)
-			method = callable.GetArr().IndexFind(1)
+			obj = callable.Array().IndexFind(0)
+			method = callable.Array().IndexFind(1)
 		}
 		for {
 			if obj == nil || method == nil {
@@ -57,12 +57,12 @@ again:
 				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					return 1
 				}
-				if ZendIsCallableCheckClass(obj.GetStr(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
+				if ZendIsCallableCheckClass(obj.String(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
 					return 0
 				}
 			} else if obj.IsObject() {
 				fcc.SetCallingScope(types.Z_OBJCE_P(obj))
-				fcc.SetObject(obj.GetObj())
+				fcc.SetObject(obj.Object())
 				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					fcc.SetCalledScope(fcc.GetCallingScope())
 					return 1
@@ -198,7 +198,7 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ types.IFunction, args *
 	fci.SetParamCount(types.Z_ARRVAL_P(args).Len())
 	params = (*types.Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval")))
 	fci.SetParams(params)
-	var __ht *types.Array = args.GetArr()
+	var __ht *types.Array = args.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -297,7 +297,7 @@ func ZendDeclareTypedProperty(
 		property_info = Pemalloc(b.SizeOf("zend_property_info"))
 	} else {
 		property_info = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_property_info"))
-		if property.IsConstant() {
+		if property.IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
 	}

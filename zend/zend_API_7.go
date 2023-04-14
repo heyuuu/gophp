@@ -167,20 +167,20 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
 
-		if callable.GetStr().GetVal()[0] == '\\' {
+		if callable.String().GetVal()[0] == '\\' {
 
 			/* Skip leading \ */
 
-			types.ZstrAlloc(lmname, callable.GetStr().GetLen()-1)
-			ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal()+1, callable.GetStr().GetLen()-1)
+			types.ZstrAlloc(lmname, callable.String().GetLen()-1)
+			ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal()+1, callable.String().GetLen()-1)
 			func_ = ZendFetchFunction(lmname)
 			//lmname.Free()
 		} else {
-			lmname = callable.GetStr()
+			lmname = callable.String()
 			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
-				types.ZstrAlloc(lmname, callable.GetStr().GetLen())
-				ZendStrTolowerCopy(lmname.GetVal(), callable.GetStr().GetVal(), callable.GetStr().GetLen())
+				types.ZstrAlloc(lmname, callable.String().GetLen())
+				ZendStrTolowerCopy(lmname.GetVal(), callable.String().GetVal(), callable.String().GetLen())
 				func_ = ZendFetchFunction(lmname)
 				//lmname.Free()
 			}
@@ -193,12 +193,12 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 
 	/* Split name into class/namespace and method/function names */
 
-	if b.Assign(&colon, ZendMemrchr(callable.GetStr().GetVal(), ':', callable.GetStr().GetLen())) != nil && colon > callable.GetStr().GetVal() && (*(colon - 1)) == ':' {
+	if b.Assign(&colon, ZendMemrchr(callable.String().GetVal(), ':', callable.String().GetLen())) != nil && colon > callable.String().GetVal() && (*(colon - 1)) == ':' {
 		var mlen int
 		colon--
-		clen = colon - callable.GetStr().GetVal()
-		mlen = callable.GetStr().GetLen() - clen - 2
-		if colon == callable.GetStr().GetVal() {
+		clen = colon - callable.String().GetVal()
+		mlen = callable.String().GetLen() - clen - 2
+		if colon == callable.String().GetVal() {
 			if error != nil {
 				*error = Estrdup("invalid function name")
 			}
@@ -213,7 +213,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		cname = types.NewString(b.CastStr(callable.GetStr().GetVal(), clen))
+		cname = types.NewString(b.CastStr(callable.String().GetVal(), clen))
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
 			// types.ZendStringReleaseEx(cname, 0)
 			return 0
@@ -226,12 +226,12 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 			}
 			return 0
 		}
-		mname = types.NewString(b.CastStr(callable.GetStr().GetVal()+clen+2, mlen))
+		mname = types.NewString(b.CastStr(callable.String().GetVal()+clen+2, mlen))
 	} else if ce_org != nil {
 
 		/* Try to fetch find static method of given class. */
 
-		mname = callable.GetStr()
+		mname = callable.String()
 		//mname.AddRefcount()
 		ftable = ce_org.FunctionTable()
 		fcc.SetCallingScope(ce_org)
@@ -240,7 +240,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *types.Zval, fcc *types.Z
 		/* We already checked for plain function before. */
 
 		if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
-			*error = ZendSprintf("function '%s' not found or invalid function name", callable.GetStr().GetVal())
+			*error = ZendSprintf("function '%s' not found or invalid function name", callable.String().GetVal())
 		}
 		return 0
 	}
@@ -396,23 +396,23 @@ try_again:
 	switch callable.GetType() {
 	case types.IS_STRING:
 		if object != nil {
-			return ZendCreateMethodString(object.GetCe().GetName(), callable.GetStr())
+			return ZendCreateMethodString(object.GetCe().GetName(), callable.String())
 		}
-		return callable.GetStr().Copy()
+		return callable.String().Copy()
 	case types.IS_ARRAY:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
 		if types.Z_ARRVAL_P(callable).Len() == 2 {
-			obj = types.ZendHashIndexFindDeref(callable.GetArr(), 0)
-			method = types.ZendHashIndexFindDeref(callable.GetArr(), 1)
+			obj = types.ZendHashIndexFindDeref(callable.Array(), 0)
+			method = types.ZendHashIndexFindDeref(callable.Array(), 1)
 		}
 		if obj == nil || method == nil || method.GetType() != types.IS_STRING {
 			return types.NewString(types.STR_ARRAY_CAPITALIZED)
 		}
 		if obj.IsString() {
-			return ZendCreateMethodString(obj.GetStr(), method.GetStr())
+			return ZendCreateMethodString(obj.String(), method.String())
 		} else if obj.IsObject() {
-			return ZendCreateMethodString(types.Z_OBJCE_P(obj).GetName(), method.GetStr())
+			return ZendCreateMethodString(types.Z_OBJCE_P(obj).GetName(), method.String())
 		} else {
 			return types.NewString(types.STR_ARRAY_CAPITALIZED)
 		}

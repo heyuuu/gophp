@@ -25,7 +25,7 @@ func REGISTER_INI_BOOLEAN(name *byte) int {
 	return REGISTER_INI_DISPLAYER(name, ZendIniBooleanDisplayerCb)
 }
 func ZendRemoveIniEntries(el *types.Zval, arg any) int {
-	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.GetPtr())
+	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.Ptr())
 	var module_number int = *((*int)(arg))
 	return ini_entry.GetModuleNumber() == module_number
 }
@@ -99,7 +99,7 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 		}
 
 		var defaultValue *types.Zval = ZendGetConfigurationDirective(p.GetName())
-		if defaultValue != nil && p.EmitOnModify(defaultValue.GetStr(), ZEND_INI_STAGE_STARTUP) {
+		if defaultValue != nil && p.EmitOnModify(defaultValue.String(), ZEND_INI_STAGE_STARTUP) {
 			p.SetValue(types.NewString(defaultValue.GetStrVal()))
 		} else {
 			p.SetValueStr(iniEntryDef.GetValueStr())

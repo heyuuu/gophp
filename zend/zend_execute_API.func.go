@@ -64,7 +64,7 @@ func InitExecutor() {
 }
 func ZvalCallDestructor(zv *types.Zval) int {
 	if zv.IsIndirect() {
-		zv = zv.GetZv()
+		zv = zv.Indirect()
 	}
 	if zv.IsObject() && zv.GetRefcount() == 1 {
 		return types.ArrayApplyRemove
@@ -74,7 +74,7 @@ func ZvalCallDestructor(zv *types.Zval) int {
 }
 func ZendUncleanZvalPtrDtor(zv *types.Zval) {
 	if zv.IsIndirect() {
-		zv = zv.GetZv()
+		zv = zv.Indirect()
 	}
 	IZvalPtrDtor(zv)
 }
@@ -350,7 +350,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 	return types.SUCCESS
 }
 func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
-	if p.IsConstant() {
+	if p.IsConstantAst() {
 		var ast *ZendAst = types.Z_ASTVAL_P(p)
 		if ast.GetKind() == ZEND_AST_CONSTANT {
 			var name *types.String = ZendAstGetConstantName(ast)
@@ -716,8 +716,8 @@ func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 	for ex != nil {
 		if ex.GetThis().IsObject() {
 			return types.Z_OBJCE(ex.GetThis())
-		} else if ex.GetThis().GetCe() != nil {
-			return ex.GetThis().GetCe()
+		} else if ex.GetThis().Class() != nil {
+			return ex.GetThis().Class()
 		} else if ex.GetFunc() != nil {
 			if ex.GetFunc().GetType() != ZEND_INTERNAL_FUNCTION || ex.GetFunc().GetScope() != nil {
 				return nil
@@ -730,7 +730,7 @@ func ZendGetCalledScope(ex *ZendExecuteData) *types.ClassEntry {
 func ZendGetThisObject(ex *ZendExecuteData) *types.ZendObject {
 	for ex != nil {
 		if ex.GetThis().IsObject() {
-			return ex.GetThis().GetObj()
+			return ex.GetThis().Object()
 		} else if ex.GetFunc() != nil {
 			if ex.GetFunc().GetType() != ZEND_INTERNAL_FUNCTION || ex.GetFunc().GetScope() != nil {
 				return nil
@@ -747,10 +747,10 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 	var retval int
 	if retval_ptr != nil {
 		pv.SetString(types.ZendStringAlloc(str_len+b.SizeOf("\"return ;\"")-1, 0))
-		memcpy(pv.GetStr().GetVal(), "return ", b.SizeOf("\"return \"")-1)
-		memcpy(pv.GetStr().GetVal()+b.SizeOf("\"return \"")-1, str, str_len)
-		pv.GetStr().GetVal()[pv.GetStr().GetLen()-1] = ';'
-		pv.GetStr().GetVal()[pv.GetStr().GetLen()] = '0'
+		memcpy(pv.String().GetVal(), "return ", b.SizeOf("\"return \"")-1)
+		memcpy(pv.String().GetVal()+b.SizeOf("\"return \"")-1, str, str_len)
+		pv.String().GetVal()[pv.String().GetLen()-1] = ';'
+		pv.String().GetVal()[pv.String().GetLen()] = '0'
 	} else {
 		/*printf("Evaluating '%s'\n", pv.value.str.val);*/
 		pv.SetStringVal(b.CastStr(str, str_len))
@@ -1047,7 +1047,7 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 			var zv *types.Zval = ht.KeyFind(str.GetStr())
 			if zv != nil {
 				if zv.IsIndirect() {
-					var val *types.Zval = zv.GetZv()
+					var val *types.Zval = zv.Indirect()
 					types.ZVAL_COPY_VALUE(var_, val)
 				} else {
 					types.ZVAL_COPY_VALUE(var_, zv)

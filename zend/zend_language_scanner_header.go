@@ -159,11 +159,11 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 		types.ZVAL_STR(&tmp, zval_get_string(filename))
 		filename = &tmp
 	}
-	zend_stream_init_filename(&file_handle, filename.GetStr().GetVal())
+	zend_stream_init_filename(&file_handle, filename.String().GetVal())
 	retval = zend_compile_file(&file_handle, type_)
 	if retval != nil && file_handle.handle.stream.handle {
 		if !(file_handle.opened_path) {
-			opened_path = filename.GetStr().Copy()
+			opened_path = filename.String().Copy()
 			file_handle.opened_path = opened_path
 		}
 		zend_hash_add_empty_element(EG__().included_files, file_handle.opened_path)
@@ -185,12 +185,12 @@ func ZendPrepareStringForScanning(str *types.Zval, filename string) int {
 
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
-	old_len = str.GetStr().GetLen()
-	str.SetString(types.ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD))
-	memset(str.GetStr().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
+	old_len = str.String().GetLen()
+	str.SetString(types.ZendStringExtend(str.String(), old_len+ZEND_MMAP_AHEAD))
+	memset(str.String().GetVal()+old_len, 0, ZEND_MMAP_AHEAD+1)
 	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
-	buf = str.GetStr().GetVal()
+	buf = str.String().GetVal()
 	size = old_len
 	YyScanBuffer(buf, size)
 	new_compiled_filename = zend_string_init(filename, strlen(filename), 0)
@@ -210,7 +210,7 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 	} else {
 		types.ZVAL_COPY(&tmp, source_string)
 	}
-	if tmp.GetStr().GetLen() == 0 {
+	if tmp.String().GetLen() == 0 {
 		zval_ptr_dtor(&tmp)
 		return nil
 	}
@@ -426,9 +426,9 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 }
 
 func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
-	var str *byte = zendlval.GetStr().GetVal()
-	var end *byte = str + zendlval.GetStr().GetLen()
-	var copy *byte = zendlval.GetStr().GetVal()
+	var str *byte = zendlval.String().GetVal()
+	var end *byte = str + zendlval.String().GetLen()
+	var copy *byte = zendlval.String().GetVal()
 	var newline_count int = 0
 	var newline_len int
 	var nl *byte
@@ -482,7 +482,7 @@ func StripMultilineStringIndentation(zendlval *types.Zval, indentation int, usin
 		newline_count++
 	}
 	*copy = '0'
-	zendlval.GetStr().GetLen() = copy - zendlval.GetStr().GetVal()
+	zendlval.String().GetLen() = copy - zendlval.String().GetVal()
 	return 1
 error:
 	zval_ptr_dtor_str(zendlval)

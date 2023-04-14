@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var ht *types.Array
@@ -8,7 +10,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	var skip uint32
 	arg_count = executeData.NumArgs()
 	{
-		skip = opline.Const1().GetLval()
+		skip = opline.Const1().Long()
 		if arg_count < skip {
 			result_size = 0
 		} else {
@@ -17,7 +19,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 	}
 
 	if result_size != 0 {
-		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
+		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
 		ht = types.NewArray(result_size)
 		opline.Result().SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
@@ -47,7 +49,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 			} else {
 				skip -= first_extra_arg
 			}
-			p = executeData.VarNum(executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T + skip)
+			p = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T + skip)
 		}
 		for i < arg_count {
 			q = p
@@ -84,7 +86,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 		result_size = arg_count
 	}
 	if result_size != 0 {
-		var first_extra_arg uint32 = executeData.GetFunc().op_array.num_args
+		var first_extra_arg uint32 = executeData.GetFunc().GetOpArray().num_args
 		ht = types.NewArray(result_size)
 		opline.Result().SetArray(ht)
 		types.ZendHashRealInitPacked(ht)
@@ -114,7 +116,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 			} else {
 				skip -= first_extra_arg
 			}
-			p = executeData.VarNum(executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T + skip)
+			p = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T + skip)
 		}
 		for i < arg_count {
 			q = p

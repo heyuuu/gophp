@@ -11,7 +11,7 @@ func ZendDoInheritance(ce *types.ClassEntry, parent_ce *types.ClassEntry) {
 	ZendDoInheritanceEx(ce, parent_ce, false)
 }
 func OverriddenPtrDtor(zv *types.Zval) {
-	EfreeSize(zv.GetPtr(), b.SizeOf("zend_function"))
+	EfreeSize(zv.Ptr(), b.SizeOf("zend_function"))
 }
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"))
@@ -66,7 +66,7 @@ func ZendDuplicateFunction(func_ types.IFunction, ce *types.ClassEntry, is_inter
 		return ZendDuplicateInternalFunction(func_, ce)
 	} else {
 		if func_.GetOpArray().GetRefcount() != nil {
-			func_.op_array.refcount++
+			func_.GetOpArray().refcount++
 		}
 		if is_interface != 0 || func_.GetOpArray().GetStaticVariables() == nil {
 
@@ -583,14 +583,14 @@ func ZendGetFunctionDeclaration(fptr types.IFunction) *types.String {
 							str.AppendString("NULL")
 						} else if zv.IsString() {
 							str.AppendByte('\'')
-							str.AppendString(b.CastStr(zv.GetStr().GetVal(), b.Min(zv.GetStr().GetLen(), 10)))
-							if zv.GetStr().GetLen() > 10 {
+							str.AppendString(b.CastStr(zv.String().GetVal(), b.Min(zv.String().GetLen(), 10)))
+							if zv.String().GetLen() > 10 {
 								str.AppendString("...")
 							}
 							str.AppendByte('\'')
 						} else if zv.IsArray() {
 							str.AppendString("Array")
-						} else if zv.IsConstant() {
+						} else if zv.IsConstantAst() {
 							var ast *ZendAst = types.Z_ASTVAL_P(zv)
 							if ast.GetKind() == ZEND_AST_CONSTANT {
 								str.AppendString(ZendAstGetConstantName(ast).GetStr())
@@ -796,7 +796,7 @@ func DoInheritMethod(key string, parent types.IFunction, ce *types.ClassEntry, i
 		//if is_interface == 0 {
 		//	types._zendHashAppendPtr(ce.GetFunctionTable(), key, parent)
 		//} else {
-		//	types.ZendHashAddNewPtr(ce.GetFunctionTable(), key.GetStr(), parent)
+		//	types.ZendHashAddNewPtr(ce.GetFunctionTable(), key.String(), parent)
 		//}
 	}
 }
@@ -950,7 +950,7 @@ func DoInheritClassConstant(name string, parentConst *ZendClassConstant, ce *typ
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.Name(), name, ZendVisibilityString(parentConst.GetValue().GetAccessFlags()), ce.GetParent().Name(), b.Cond((parentConst.GetValue().GetAccessFlags()&AccPublic) != 0, "", " or weaker"))
 		}
 	} else if (parentConst.GetValue().GetAccessFlags() & AccPrivate) == 0 {
-		if parentConst.GetValue().IsConstant() {
+		if parentConst.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
@@ -1054,7 +1054,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				dst--
 				src--
 				types.ZVAL_COPY_OR_DUP_PROP(dst, src)
-				if dst.IsConstant() {
+				if dst.IsConstantAst() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				continue
@@ -1067,7 +1067,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				dst--
 				src--
 				types.ZVAL_COPY_PROP(dst, src)
-				if dst.IsConstant() {
+				if dst.IsConstantAst() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				continue
@@ -1118,7 +1118,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				dst--
 				src--
 				if src.IsIndirect() {
-					dst.SetIndirect(src.GetZv())
+					dst.SetIndirect(src.Indirect())
 				} else {
 					dst.SetIndirect(src)
 				}
@@ -1136,11 +1136,11 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				dst--
 				src--
 				if src.IsIndirect() {
-					dst.SetIndirect(src.GetZv())
+					dst.SetIndirect(src.Indirect())
 				} else {
 					dst.SetIndirect(src)
 				}
-				if types.Z_INDIRECT_P(dst).IsConstant() {
+				if types.Z_INDIRECT_P(dst).IsConstantAst() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				if dst == end {
@@ -1153,7 +1153,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 				dst--
 				src--
 				if src.IsIndirect() {
-					dst.SetIndirect(src.GetZv())
+					dst.SetIndirect(src.Indirect())
 				} else {
 					dst.SetIndirect(src)
 				}
@@ -1232,7 +1232,7 @@ func DoInheritConstantCheck(childConstantsTable types.ClassConstantTable, parent
 func DoInheritIfaceConstant(name string, c *ZendClassConstant, ce *types.ClassEntry, iface *types.ClassEntry) {
 	if DoInheritConstantCheck(ce.ConstantsTable(), c, name, iface) != 0 {
 		var ct *ZendClassConstant
-		if c.GetValue().IsConstant() {
+		if c.GetValue().IsConstantAst() {
 			ce.SetIsConstantsUpdated(false)
 		}
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
@@ -1773,7 +1773,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
-			property_info = _z.GetPtr()
+			property_info = _z.Ptr()
 
 			/* first get the unmangeld name if necessary,
 			 * then check whether the property is already there
@@ -1821,12 +1821,12 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 
 						/* if any of the values is a constant, we try to resolve it */
 
-						if op1.IsConstant() {
+						if op1.IsConstantAst() {
 							types.ZVAL_COPY_OR_DUP(&op1_tmp, op1)
 							ZvalUpdateConstantEx(&op1_tmp, ce)
 							op1 = &op1_tmp
 						}
-						if op2.IsConstant() {
+						if op2.IsConstantAst() {
 							types.ZVAL_COPY_OR_DUP(&op2_tmp, op2)
 							ZvalUpdateConstantEx(&op2_tmp, ce)
 							op2 = &op2_tmp
@@ -2039,10 +2039,10 @@ func ZendVerifyAbstractClass(ce *types.ClassEntry) {
 
 	}
 }
-func VarianceObligationDtor(zv *types.Zval) { Efree(zv.GetPtr()) }
+func VarianceObligationDtor(zv *types.Zval) { Efree(zv.Ptr()) }
 func VarianceObligationHtDtor(zv *types.Zval) {
-	zv.GetPtr().Destroy()
-	FREE_HASHTABLE(zv.GetPtr())
+	zv.Ptr().Destroy()
+	FREE_HASHTABLE(zv.Ptr())
 }
 func GetOrInitObligationsForClass(ce *types.ClassEntry) *types.Array {
 	var ht *types.Array
@@ -2098,7 +2098,7 @@ func AddPropertyCompatibilityObligation(ce *types.ClassEntry, child_prop *ZendPr
 	types.ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func CheckVarianceObligation(zv *types.Zval) int {
-	var obligation *VarianceObligation = zv.GetPtr()
+	var obligation *VarianceObligation = zv.Ptr()
 	if obligation.GetType() == OBLIGATION_DEPENDENCY {
 		var dependency_ce *types.ClassEntry = obligation.GetDependencyCe()
 		if dependency_ce.IsUnresolvedVariance() {
@@ -2176,7 +2176,7 @@ func ReportVarianceErrors(ce *types.ClassEntry) {
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		obligation = _z.GetPtr()
+		obligation = _z.Ptr()
 		var status InheritanceStatus
 		var unresolved_class *types.String
 		if obligation.GetType() == OBLIGATION_COMPATIBILITY {

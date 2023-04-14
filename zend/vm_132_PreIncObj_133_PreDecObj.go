@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_PRE_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp

@@ -8,12 +8,12 @@ import (
 
 func ZvalPtrDtorNogc(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() && zval_ptr.DelRefcount() == 0 {
-		RcDtorFunc(zval_ptr.GetCounted())
+		RcDtorFunc(zval_ptr.RefCounted())
 	}
 }
 func IZvalPtrDtor(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() {
-		var ref = zval_ptr.GetCounted()
+		var ref = zval_ptr.RefCounted()
 		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
 		}
@@ -49,7 +49,7 @@ func ZendReferenceDestroy(ref *types.ZendReference) {
 func ZvalPtrDtor(zval_ptr *types.Zval) { IZvalPtrDtor(zval_ptr) }
 func ZvalInternalPtrDtor(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() {
-		var ref *types.ZendRefcounted = zval_ptr.GetCounted()
+		var ref *types.ZendRefcounted = zval_ptr.RefCounted()
 		if ref.DelRefcount() == 0 {
 			if zval_ptr.IsString() {
 				// todo remove
@@ -74,9 +74,9 @@ func ZvalAddRef(p *types.Zval) {
 }
 func ZvalCopyCtorFunc(zvalue *types.Zval) {
 	if zvalue.IsArray() {
-		zvalue.SetArray(types.ZendArrayDup(zvalue.GetArr()))
+		zvalue.SetArray(types.ZendArrayDup(zvalue.Array()))
 	} else if zvalue.IsString() {
 		b.Assert(true)
-		zvalue.SetString(zvalue.GetStr().Copy())
+		zvalue.SetString(zvalue.String().Copy())
 	}
 }

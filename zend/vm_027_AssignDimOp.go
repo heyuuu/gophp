@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
@@ -17,7 +19,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 
 		{
 			{
-				var_ptr = zend_fetch_dimension_address_inner_RW_CONST(container.GetArr(), dim, executeData)
+				var_ptr = zend_fetch_dimension_address_inner_RW_CONST(container.Array(), dim, executeData)
 			}
 
 			if var_ptr == nil {
@@ -27,7 +29,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.GetRef()
+				var ref *types.ZendReference = var_ptr.Reference()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -94,7 +96,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		{
 
 			{
-				var_ptr = zend_fetch_dimension_address_inner_RW(container.GetArr(), dim, executeData)
+				var_ptr = zend_fetch_dimension_address_inner_RW(container.Array(), dim, executeData)
 			}
 			if var_ptr == nil {
 				goto assign_dim_op_ret_null
@@ -103,7 +105,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
 		for {
 			if var_ptr.IsReference() {
-				var ref *types.ZendReference = var_ptr.GetRef()
+				var ref *types.ZendReference = var_ptr.Reference()
 				var_ptr = types.Z_REFVAL_P(var_ptr)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendBinaryAssignOpTypedRef(ref, value, opline, executeData)
@@ -164,7 +166,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	assign_dim_op_new_array:
 		dim = nil
 		{
-			var_ptr = container.GetArr().NextIndexInsert(EG__().GetUninitializedZval())
+			var_ptr = container.Array().NextIndexInsert(EG__().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -229,7 +231,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		{
 
 			{
-				var_ptr = zend_fetch_dimension_address_inner_RW(container.GetArr(), dim, executeData)
+				var_ptr = zend_fetch_dimension_address_inner_RW(container.Array(), dim, executeData)
 			}
 			if var_ptr == nil {
 				goto assign_dim_op_ret_null
@@ -299,7 +301,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 
 		{
 			{
-				var_ptr = zend_fetch_dimension_address_inner_RW_CONST(container.GetArr(), dim, executeData)
+				var_ptr = zend_fetch_dimension_address_inner_RW_CONST(container.Array(), dim, executeData)
 			}
 
 			if var_ptr == nil {
@@ -372,7 +374,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		{
 
 			{
-				var_ptr = zend_fetch_dimension_address_inner_RW(container.GetArr(), dim, executeData)
+				var_ptr = zend_fetch_dimension_address_inner_RW(container.Array(), dim, executeData)
 			}
 			if var_ptr == nil {
 				goto assign_dim_op_ret_null
@@ -438,7 +440,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	assign_dim_op_new_array:
 		dim = nil
 		{
-			var_ptr = container.GetArr().NextIndexInsert(EG__().GetUninitializedZval())
+			var_ptr = container.Array().NextIndexInsert(EG__().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -499,7 +501,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		{
 
 			{
-				var_ptr = zend_fetch_dimension_address_inner_RW(container.GetArr(), dim, executeData)
+				var_ptr = zend_fetch_dimension_address_inner_RW(container.Array(), dim, executeData)
 			}
 			if var_ptr == nil {
 				goto assign_dim_op_ret_null

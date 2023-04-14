@@ -15,7 +15,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 	var target_symbol_table *types.Array
 	varname = opline.Const1()
 	{
-		name = varname.GetStr()
+		name = varname.String()
 	}
 
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
@@ -39,7 +39,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, executeData *Zen
 			}
 		}
 	} else if retval.IsIndirect() {
-		retval = retval.GetZv()
+		retval = retval.Indirect()
 		if retval.IsUndef() {
 			if name.GetStr() == types.STR_THIS {
 				goto fetch_this

@@ -95,7 +95,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		return -1
 	}
 	if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-		var object *types.ZendObject = call.GetThis().GetObj()
+		var object *types.ZendObject = call.GetThis().Object()
 		OBJ_RELEASE(object)
 	}
 	ZendVmStackFreeCallFrame(call)

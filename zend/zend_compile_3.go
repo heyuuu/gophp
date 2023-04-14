@@ -303,14 +303,14 @@ func ZendCompileNsCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
 	var opline *ZendOp = GetNextOp()
 	opline.SetOpcode(ZEND_INIT_NS_FCALL_BY_NAME)
 	opline.SetOp2Type(IS_CONST)
-	opline.GetOp2().SetConstant(ZendAddNsFuncNameLiteral(name_node.GetConstant().GetStr()))
+	opline.GetOp2().SetConstant(ZendAddNsFuncNameLiteral(name_node.GetConstant().String()))
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
 	ZendCompileCallCommon(result, args_ast, nil)
 }
 func ZendCompileDynamicCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
 	if name_node.GetOpType() == IS_CONST && name_node.GetConstant().IsString() {
 		var colon *byte
-		var str *types.String = name_node.GetConstant().GetStr()
+		var str *types.String = name_node.GetConstant().String()
 		if b.Assign(&colon, ZendMemrchr(str.GetVal(), ':', str.GetLen())) != nil && colon > str.GetVal() && (*(colon - 1)) == ':' {
 			var class *types.String = types.NewString(b.CastStr(str.GetVal(), colon-str.GetVal()-1))
 			var method *types.String = types.NewString(b.CastStr(colon+1, str.GetLen()-(colon-str.GetVal())-1))
@@ -354,7 +354,7 @@ func ZendCompileFuncStrlen(result *Znode, args *ZendAstList) int {
 	ZendCompileExpr(&arg_node, args.GetChild()[0])
 	if arg_node.GetOpType() == IS_CONST && arg_node.GetConstant().IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(arg_node.GetConstant().GetStr().GetLen())
+		result.GetConstant().SetLong(arg_node.GetConstant().String().GetLen())
 	} else {
 		ZendEmitOpTmp(result, ZEND_STRLEN, &arg_node, nil)
 	}
@@ -419,7 +419,7 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 }
 func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsLong() {
-		var c ZendLong = ZendAstGetZval(args.GetChild()[0]).GetLval() & 0xff
+		var c ZendLong = ZendAstGetZval(args.GetChild()[0]).Long() & 0xff
 		result.SetOpType(IS_CONST)
 		result.GetConstant().SetStringVal(string(byte(c)))
 		return types.SUCCESS
@@ -430,7 +430,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 func ZendCompileFuncOrd(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsString() {
 		result.SetOpType(IS_CONST)
-		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.GetChild()[0]).GetStr().GetVal()[0]))
+		result.GetConstant().SetLong(uint8(ZendAstGetZval(args.GetChild()[0]).String().GetVal()[0]))
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -487,13 +487,13 @@ func ZendCompileFuncCufa(result *Znode, args *ZendAstList, lcname *types.String)
 		var name *types.String = ZendResolveFunctionName(orig_name, args.GetChild()[1].GetChild()[0].GetAttr(), &is_fully_qualified)
 		if ascii.StrCaseEquals(name.GetStr(), "array_slice") && list.GetChildren() == 3 && list.GetChild()[1].GetKind() == ZEND_AST_ZVAL {
 			var zv *types.Zval = ZendAstGetZval(list.GetChild()[1])
-			if zv.IsLong() && zv.GetLval() >= 0 && zv.GetLval() <= 0x7fffffff {
+			if zv.IsLong() && zv.Long() >= 0 && zv.Long() <= 0x7fffffff {
 				var opline *ZendOp
 				var len_node Znode
 				ZendCompileExpr(&arg_node, list.GetChild()[0])
 				ZendCompileExpr(&len_node, list.GetChild()[2])
 				opline = ZendEmitOp(nil, ZEND_SEND_ARRAY, &arg_node, &len_node)
-				opline.SetExtendedValue(zv.GetLval())
+				opline.SetExtendedValue(zv.Long())
 				ZendEmitOp(result, ZEND_DO_FCALL, nil, nil)
 				// types.ZendStringReleaseEx(name, 0)
 				return types.SUCCESS
@@ -599,7 +599,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var ok types.ZendBool = 1
 		var val *types.Zval
 		var tmp types.Zval
-		var src *types.Array = array.GetConstant().GetArr()
+		var src *types.Array = array.GetConstant().Array()
 		var dst *types.Array = types.NewArray(src.Len())
 		tmp.SetTrue()
 		if strict != 0 {
@@ -609,9 +609,9 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 
 				val = _z
 				if val.IsString() {
-					dst.KeyAdd(val.GetStr().GetStr(), &tmp)
+					dst.KeyAdd(val.String().GetStr(), &tmp)
 				} else if val.IsLong() {
-					dst.IndexAdd(val.GetLval(), &tmp)
+					dst.IndexAdd(val.Long(), &tmp)
 				} else {
 					dst.DestroyEx()
 					ok = 0
@@ -624,19 +624,19 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				var _z *types.Zval = _p.GetVal()
 
 				val = _z
-				if val.GetType() != types.IS_STRING || IsNumericString(val.GetStr().GetStr(), nil, nil, 0) != 0 {
+				if val.GetType() != types.IS_STRING || IsNumericString(val.String().GetStr(), nil, nil, 0) != 0 {
 					dst.DestroyEx()
 					ok = 0
 					break
 				}
-				dst.KeyAdd(val.GetStr().GetStr(), &tmp)
+				dst.KeyAdd(val.String().GetStr(), &tmp)
 			}
 		}
 		src.DestroyEx()
 		if ok == 0 {
 			return types.FAILURE
 		}
-		array.GetConstant().GetArr() = dst
+		array.GetConstant().Array() = dst
 	}
 	array.SetOpType(IS_CONST)
 	ZendCompileExpr(&needly, args.GetChild()[0])

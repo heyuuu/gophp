@@ -21,7 +21,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -54,7 +54,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
@@ -100,7 +100,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -135,7 +135,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -183,7 +183,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -218,7 +218,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -266,7 +266,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -299,7 +299,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
@@ -347,7 +347,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -376,7 +376,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				UNDEF_RESULT()
 			} else {
@@ -427,7 +427,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -458,7 +458,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -511,7 +511,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -542,7 +542,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -595,7 +595,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -624,7 +624,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				UNDEF_RESULT()
 			} else {
@@ -670,7 +670,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 		types.SEPARATE_ARRAY(object_ptr)
 		{
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -702,7 +702,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				UNDEF_RESULT()
 			} else {
@@ -748,7 +748,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -783,7 +783,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -831,7 +831,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -866,7 +866,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -914,7 +914,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -947,7 +947,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				UNDEF_RESULT()
 			} else {
@@ -994,7 +994,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1023,7 +1023,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
@@ -1070,7 +1070,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1101,7 +1101,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -1150,7 +1150,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1181,7 +1181,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -1230,7 +1230,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1259,7 +1259,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
@@ -1304,7 +1304,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -1337,7 +1337,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
@@ -1378,7 +1378,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -1413,7 +1413,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -1456,7 +1456,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -1491,7 +1491,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -1534,7 +1534,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 		{
 			dim = opline.Const2()
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W_CONST(object_ptr.Array(), dim, executeData)
 			}
 
 			if variable_ptr == nil {
@@ -1567,7 +1567,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Const2()
 				UNDEF_RESULT()
 			} else {
@@ -1610,7 +1610,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1639,7 +1639,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				UNDEF_RESULT()
 			} else {
@@ -1686,7 +1686,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1717,7 +1717,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -1766,7 +1766,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1797,7 +1797,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -1846,7 +1846,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 			dim = opline.Op2Ptr(&free_op2)
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -1875,7 +1875,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Op2Ptr(&free_op2)
 				UNDEF_RESULT()
 			} else {
@@ -1917,7 +1917,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
 		types.SEPARATE_ARRAY(object_ptr)
 		{
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -1949,7 +1949,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				UNDEF_RESULT()
 			} else {
@@ -1990,7 +1990,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -2025,7 +2025,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -2068,7 +2068,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -2103,7 +2103,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -2146,7 +2146,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 			{
 				value = types.ZVAL_DEREF(value)
 			}
-			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
+			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -2179,7 +2179,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 			}
 
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = nil
 				UNDEF_RESULT()
 			} else {
@@ -2221,7 +2221,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -2250,7 +2250,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {
@@ -2292,7 +2292,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -2323,7 +2323,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -2367,7 +2367,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -2398,7 +2398,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 				ZvalPtrDtorNogc(free_op_data)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				ZvalPtrDtorNogc(EX_VAR((opline + 1).GetOp1().GetVar()))
 				UNDEF_RESULT()
@@ -2442,7 +2442,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 			dim = opline.Op2()
 
 			{
-				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.GetArr(), dim, executeData)
+				variable_ptr = zend_fetch_dimension_address_inner_W(object_ptr.Array(), dim, executeData)
 			}
 			if variable_ptr == nil {
 				goto assign_dim_error
@@ -2471,7 +2471,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 				ZendAssignToStringOffset(object_ptr, dim, value, opline, executeData)
 			}
 		} else if object_ptr.GetType() <= types.IS_FALSE {
-			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.GetRef()) && ZendVerifyRefArrayAssignable(orig_object_ptr.GetRef()) == 0 {
+			if orig_object_ptr.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(orig_object_ptr.Reference()) && ZendVerifyRefArrayAssignable(orig_object_ptr.Reference()) == 0 {
 				dim = opline.Cv2OrUndef()
 				UNDEF_RESULT()
 			} else {

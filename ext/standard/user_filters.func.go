@@ -144,7 +144,7 @@ func UserfilterFilter(
 	zend.ZvalPtrDtor(&func_name)
 	if call_result == types.SUCCESS && retval.IsNotUndef() {
 		zend.ConvertToLong(&retval)
-		ret = int(retval.GetLval())
+		ret = int(retval.Long())
 	} else if call_result == types.FAILURE {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "failed to call filter function")
 	}
@@ -307,7 +307,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	/* set the filter property, this will be used during cleanup */
 
 	zfilter.SetResource(zend.ZendRegisterResource(filter, LeUserfilters))
-	filter.GetAbstract().SetObject(obj.GetObj())
+	filter.GetAbstract().SetObject(obj.Object())
 	zend.AddPropertyZval(&obj, "filter", &zfilter)
 
 	/* add_property_zval increments the refcount which is unwanted here */
@@ -316,7 +316,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	return filter
 }
 func FilterItemDtor(zv *types.Zval) {
-	var fdat *PhpUserFilterData = zv.GetPtr()
+	var fdat *PhpUserFilterData = zv.Ptr()
 	// types.ZendStringReleaseEx(fdat.GetClassname(), 0)
 	zend.Efree(fdat)
 }
@@ -337,7 +337,7 @@ func ZifStreamBucketMakeWriteable(executeData zpp.Ex, return_value zpp.Ret, brig
 		}
 		break
 	}
-	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.GetRes(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
+	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.Resource(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
 		return_value.SetFalse()
 		return
 	}
@@ -379,7 +379,7 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		return_value.SetFalse()
 		return
 	}
-	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.GetRes(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
+	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.Resource(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
 		return_value.SetFalse()
 		return
 	}
@@ -391,11 +391,11 @@ func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}
-		if bucket.GetBuflen() != pzdata.GetStr().GetLen() {
-			bucket.SetBuf(zend.Perealloc(bucket.GetBuf(), pzdata.GetStr().GetLen()))
-			bucket.SetBuflen(pzdata.GetStr().GetLen())
+		if bucket.GetBuflen() != pzdata.String().GetLen() {
+			bucket.SetBuf(zend.Perealloc(bucket.GetBuf(), pzdata.String().GetLen()))
+			bucket.SetBuflen(pzdata.String().GetLen())
 		}
-		memcpy(bucket.GetBuf(), pzdata.GetStr().GetVal(), bucket.GetBuflen())
+		memcpy(bucket.GetBuf(), pzdata.String().GetVal(), bucket.GetBuflen())
 	}
 	if append != 0 {
 		streams.PhpStreamBucketAppend(brigade, bucket)

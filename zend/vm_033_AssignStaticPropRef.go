@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_ASSIGN_STATIC_PROP_REF_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op_data ZendFreeOp

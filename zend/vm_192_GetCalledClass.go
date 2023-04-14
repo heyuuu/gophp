@@ -1,10 +1,15 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_GET_CALLED_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if executeData.GetThis().IsObject() {
 		opline.Result().SetStringCopy(types.Z_OBJCE(executeData.GetThis()).GetName())
-	} else if executeData.GetThis().GetCe() != nil {
+	} else if executeData.GetThis().Class() != nil {
 		opline.Result().SetStringCopy(types.Z_CE(executeData.GetThis()).GetName())
 	} else {
 		opline.Result().SetFalse()

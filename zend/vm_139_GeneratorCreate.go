@@ -21,19 +21,19 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		 */
 
 		num_args = executeData.NumArgs()
-		if num_args <= executeData.GetFunc().op_array.num_args {
-			used_stack = (ZEND_CALL_FRAME_SLOT + executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T) * b.SizeOf("zval")
+		if num_args <= executeData.GetFunc().GetOpArray().num_args {
+			used_stack = (ZEND_CALL_FRAME_SLOT + executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T) * b.SizeOf("zval")
 			gen_execute_data = (*ZendExecuteData)(Emalloc(used_stack))
-			used_stack = (ZEND_CALL_FRAME_SLOT + executeData.GetFunc().op_array.last_var) * b.SizeOf("zval")
+			used_stack = (ZEND_CALL_FRAME_SLOT + executeData.GetFunc().GetOpArray().last_var) * b.SizeOf("zval")
 		} else {
-			used_stack = (ZEND_CALL_FRAME_SLOT + num_args + executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T - executeData.GetFunc().op_array.num_args) * b.SizeOf("zval")
+			used_stack = (ZEND_CALL_FRAME_SLOT + num_args + executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T - executeData.GetFunc().GetOpArray().num_args) * b.SizeOf("zval")
 			gen_execute_data = (*ZendExecuteData)(Emalloc(used_stack))
 		}
 		memcpy(gen_execute_data, executeData, used_stack)
 
 		/* Save execution context in generator object. */
 
-		generator = (*ZendGenerator)(executeData.GetReturnValue().GetObj())
+		generator = (*ZendGenerator)(executeData.GetReturnValue().Object())
 		generator.SetExecuteData(gen_execute_data)
 		generator.SetFrozenCallStack(nil)
 		generator.GetExecuteFake().SetOpline(nil)

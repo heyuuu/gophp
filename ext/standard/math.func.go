@@ -198,14 +198,14 @@ func ZifAbs(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.IsType(types.IS_DOUBLE) {
-		return_value.SetDouble(fabs(value.GetDval()))
+		return_value.SetDouble(fabs(value.Double()))
 		return
 	} else if value.IsType(types.IS_LONG) {
-		if value.GetLval() == zend.ZEND_LONG_MIN {
+		if value.Long() == zend.ZEND_LONG_MIN {
 			return_value.SetDouble(-float64(zend.ZEND_LONG_MIN))
 			return
 		} else {
-			return_value.SetLong(b.CondF(value.GetLval() < 0, func() int { return -(value.GetLval()) }, func() zend.ZendLong { return value.GetLval() }))
+			return_value.SetLong(b.CondF(value.Long() < 0, func() int { return -(value.Long()) }, func() zend.ZendLong { return value.Long() }))
 			return
 		}
 	}
@@ -227,7 +227,7 @@ func ZifCeil(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.IsType(types.IS_DOUBLE) {
-		return_value.SetDouble(ceil(value.GetDval()))
+		return_value.SetDouble(ceil(value.Double()))
 		return
 	} else if value.IsType(types.IS_LONG) {
 		return_value.SetDouble(zend.ZvalGetDouble(value))
@@ -251,7 +251,7 @@ func ZifFloor(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.IsType(types.IS_DOUBLE) {
-		return_value.SetDouble(floor(value.GetDval()))
+		return_value.SetDouble(floor(value.Double()))
 		return
 	} else if value.IsType(types.IS_LONG) {
 		return_value.SetDouble(zend.ZvalGetDouble(value))
@@ -302,15 +302,15 @@ func ZifRound(executeData zpp.Ex, return_value zpp.Ret, number *types.Zval, _ zp
 		/* Simple case - long that doesn't need to be rounded. */
 
 		if places >= 0 {
-			return_value.SetDouble(float64(value.GetLval()))
+			return_value.SetDouble(float64(value.Long()))
 			return
 		}
 		fallthrough
 	case types.IS_DOUBLE:
 		if value.IsType(types.IS_LONG) {
-			return_val = float64(value.GetLval())
+			return_val = float64(value.Long())
 		} else {
-			return_val = value.GetDval()
+			return_val = value.Double()
 		}
 		return_val = _phpMathRound(return_val, int(places), int(mode))
 		return_value.SetDouble(return_val)
@@ -775,8 +775,8 @@ func _phpMathBasetolong(arg *types.Zval, base int) zend.ZendLong {
 	if arg.GetType() != types.IS_STRING || base < 2 || base > 36 {
 		return 0
 	}
-	s = arg.GetStr().GetVal()
-	for i = arg.GetStr().GetLen(); i > 0; i-- {
+	s = arg.String().GetVal()
+	for i = arg.String().GetLen(); i > 0; i-- {
 		*s++
 		c = (*s) - 1
 		if b.Cond(b.Cond(c >= '0' && c <= '9', c-'0', c >= 'A' && c <= 'Z'), c-'A'+10, c >= 'a' && c <= 'z') {
@@ -810,8 +810,8 @@ func _phpMathBasetozval(arg *types.Zval, base int, ret *types.Zval) int {
 	if arg.GetType() != types.IS_STRING || base < 2 || base > 36 {
 		return types.FAILURE
 	}
-	s = arg.GetStr().GetVal()
-	e = s + arg.GetStr().GetLen()
+	s = arg.String().GetVal()
+	e = s + arg.String().GetLen()
 
 	for s < e && isspace(*s) {
 		s++
@@ -888,7 +888,7 @@ func _phpMathLongtobase(arg *types.Zval, base int) *types.String {
 	if arg.GetType() != types.IS_LONG || base < 2 || base > 36 {
 		return types.NewString("")
 	}
-	value = arg.GetLval()
+	value = arg.Long()
 	ptr = buf + b.SizeOf("buf") - 1
 	end = ptr
 	*ptr = '0'
@@ -908,7 +908,7 @@ func _phpMathZvaltobase(arg *types.Zval, base int) *types.String {
 		return types.NewString("")
 	}
 	if arg.IsType(types.IS_DOUBLE) {
-		var fvalue float64 = floor(arg.GetDval())
+		var fvalue float64 = floor(arg.Double())
 		var ptr *byte
 		var end *byte
 		var buf []byte

@@ -66,7 +66,7 @@ func ZendFreeInternalArgInfo(function *types.InternalFunction) {
 	}
 }
 func ZendFunctionDtor(zv *types.Zval) {
-	var function types.IFunction = zv.GetPtr()
+	var function types.IFunction = zv.Ptr()
 	if function.GetType() == ZEND_USER_FUNCTION {
 		b.Assert(function.GetFunctionName() != nil)
 		DestroyOpArray(function.GetOpArray())
@@ -135,7 +135,7 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 							for ; _prop < _end; _prop++ {
 								prop_info = *_prop
 								if prop_info.GetCe() == ce && p-static_members == prop_info.GetOffset() {
-									ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
+									ZEND_REF_DEL_TYPE_SOURCE(p.Reference(), prop_info)
 									break
 								}
 							}
@@ -175,7 +175,7 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 							for ; _prop < _end; _prop++ {
 								prop_info = *_prop
 								if prop_info.GetCe() == ce && p-static_members == prop_info.GetOffset() {
-									ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
+									ZEND_REF_DEL_TYPE_SOURCE(p.Reference(), prop_info)
 									break
 								}
 							}
@@ -230,7 +230,7 @@ func _destroyZendClassTraitsInfo(ce *types.ClassEntry) {
 	}
 }
 func DestroyZendClass(zv *types.Zval) {
-	DestroyZendClassEntry(zv.GetPtr().(*types.ClassEntry))
+	DestroyZendClassEntry(zv.Ptr().(*types.ClassEntry))
 }
 func DestroyZendClassEntry(ce *types.ClassEntry) {
 	if ce.HasCeFlags(AccImmutable | AccPreloaded) {
@@ -285,7 +285,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 							for ; _prop < _end; _prop++ {
 								prop_info = *_prop
 								if prop_info.GetCe() == ce && p-ce.GetDefaultStaticMembersTable() == prop_info.GetOffset() {
-									ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
+									ZEND_REF_DEL_TYPE_SOURCE(p.Reference(), prop_info)
 									break
 								}
 							}
@@ -377,7 +377,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 	}
 }
 func ZendClassAddRef(zv *types.Zval) {
-	var ce *types.ClassEntry = zv.GetPtr()
+	var ce *types.ClassEntry = zv.Ptr()
 	if !ce.IsImmutable() {
 		ce.GetRefcount()++
 	}
@@ -831,7 +831,7 @@ func PassTwo(op_array *types.ZendOpArray) int {
 		switch opline.GetOpcode() {
 		case ZEND_RECV_INIT:
 			var val *types.Zval = CT_CONSTANT(opline.GetOp2())
-			if val.IsConstant() {
+			if val.IsConstantAst() {
 				var slot uint32 = ZEND_MM_ALIGNED_SIZE_EX(op_array.GetCacheSize(), 8)
 				val.SetCacheSlot(slot)
 				op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("zval"))
@@ -922,7 +922,7 @@ func PassTwo(op_array *types.ZendOpArray) int {
 				var _z *types.Zval = _p.GetVal()
 
 				zv = _z
-				zv.SetLval(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.GetLval()))
+				zv.SetLong(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.Long()))
 			}
 			opline.SetExtendedValue(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline.GetExtendedValue()))
 		}

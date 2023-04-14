@@ -120,7 +120,7 @@ func PhpPrintGpcseArray(name string) {
 	var num_key zend.ZendUlong
 	zend.ZendIsAutoGlobalStr(name)
 	if b.Assign(&data, types.ZendHashFindDeref(zend.EG__().GetSymbolTable(), name)) != nil && data.IsType(types.IS_ARRAY) {
-		var __ht *types.Array = data.GetArr()
+		var __ht *types.Array = data.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -359,16 +359,16 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(2, "Variable", "Value")
 		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_SELF")) != nil && data.IsType(types.IS_STRING) {
-			PhpInfoPrintTableRow(2, "PHP_SELF", data.GetStr().GetVal())
+			PhpInfoPrintTableRow(2, "PHP_SELF", data.String().GetVal())
 		}
 		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_TYPE")) != nil && data.IsType(types.IS_STRING) {
-			PhpInfoPrintTableRow(2, "PHP_AUTH_TYPE", data.GetStr().GetVal())
+			PhpInfoPrintTableRow(2, "PHP_AUTH_TYPE", data.String().GetVal())
 		}
 		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_USER")) != nil && data.IsType(types.IS_STRING) {
-			PhpInfoPrintTableRow(2, "PHP_AUTH_USER", data.GetStr().GetVal())
+			PhpInfoPrintTableRow(2, "PHP_AUTH_USER", data.String().GetVal())
 		}
 		if b.Assign(&data, zend.EG__().GetSymbolTable().KeyFind("PHP_AUTH_PW")) != nil && data.IsType(types.IS_STRING) {
-			PhpInfoPrintTableRow(2, "PHP_AUTH_PW", data.GetStr().GetVal())
+			PhpInfoPrintTableRow(2, "PHP_AUTH_PW", data.String().GetVal())
 		}
 		PhpPrintGpcseArray("_REQUEST")
 		PhpPrintGpcseArray("_GET")

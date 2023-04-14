@@ -51,10 +51,10 @@ func SplRegisterProperty(class_entry *types.ClassEntry, prop_name string, prop_n
 func SplAddClassName(list *types.Zval, pce *types.ClassEntry, allow int, ce_flags int) {
 	if allow == 0 || allow > 0 && pce.HasCeFlags(ce_flags) || allow < 0 && !pce.HasCeFlags(ce_flags) {
 		var tmp *types.Zval
-		if b.Assign(&tmp, list.GetArr().KeyFind(pce.GetName().GetStr())) == nil {
+		if b.Assign(&tmp, list.Array().KeyFind(pce.GetName().GetStr())) == nil {
 			var t types.Zval
 			t.SetStringCopy(pce.GetName())
-			list.GetArr().KeyAdd(pce.GetName().GetStr(), &t)
+			list.Array().KeyAdd(pce.GetName().GetStr(), &t)
 		}
 	}
 }

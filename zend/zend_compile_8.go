@@ -226,7 +226,7 @@ func ZendCompileCoalesce(result *Znode, ast *ZendAst) {
 	opline.GetOp2().SetOplineNum(GetNextOpNumber())
 }
 func ZnodeDtor(zv *types.Zval) {
-	var node *Znode = zv.GetPtr()
+	var node *Znode = zv.Ptr()
 	if node.GetOpType() == IS_CONST {
 		ZvalPtrDtorNogc(node.GetConstant())
 	}
@@ -296,7 +296,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		node = _z.GetPtr()
+		node = _z.Ptr()
 		if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
 			need_frees = 1
 			break
@@ -312,7 +312,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
-			node = _z.GetPtr()
+			node = _z.Ptr()
 			if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
 				ZendEmitOp(nil, ZEND_FREE, node, nil)
 			}
@@ -402,7 +402,7 @@ func ZendCompileInstanceof(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOpTmp(result, ZEND_INSTANCEOF, &obj_node, nil)
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().GetStr()))
+		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 		opline.SetExtendedValue(ZendAllocCacheSlot())
 	} else {
 		opline.SetOp2Type(class_node.GetOpType())
@@ -601,7 +601,7 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 		}
 		if last != nil && last.GetKind() == ZEND_AST_HALT_COMPILER {
 			result.SetOpType(IS_CONST)
-			result.GetConstant().SetLong(ZendAstGetZval(last.GetChild()[0]).GetLval())
+			result.GetConstant().SetLong(ZendAstGetZval(last.GetChild()[0]).Long())
 			// types.ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
@@ -738,7 +738,7 @@ func ZendCompileEncapsList(result *Znode, ast *ZendAst) {
 		ZendCompileExpr(&elem_node, list.GetChild()[i])
 		if elem_node.GetOpType() == IS_CONST {
 			ConvertToString(elem_node.GetConstant())
-			if elem_node.GetConstant().GetStr().GetLen() == 0 {
+			if elem_node.GetConstant().String().GetLen() == 0 {
 				ZvalPtrDtor(elem_node.GetConstant())
 			} else if last_const_node.GetOpType() == IS_CONST {
 				ConcatFunction(last_const_node.GetConstant(), last_const_node.GetConstant(), elem_node.GetConstant())

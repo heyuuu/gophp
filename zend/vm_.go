@@ -9,7 +9,7 @@ func getBwOrHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = opline.Op2Ex()
 
 	if op1.IsLong() && op2.IsLong() {
-		opline.Result().SetLong(op1.GetLval() | op2.GetLval())
+		opline.Result().SetLong(op1.Long() | op2.Long())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 
@@ -23,7 +23,7 @@ func getBwAndHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = opline.Op2Ex()
 
 	if op1.IsLong() && op2.IsLong() {
-		opline.Result().SetLong(op1.GetLval() & op2.GetLval())
+		opline.Result().SetLong(op1.Long() & op2.Long())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	return zend_bw_and_helper_SPEC(op1, op2, executeData)
@@ -36,7 +36,7 @@ func getBwXorHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = opline.Op2Ex()
 
 	if op1.IsLong() && op2.IsLong() {
-		opline.Result().SetLong(op1.GetLval() ^ op2.GetLval())
+		opline.Result().SetLong(op1.Long() ^ op2.Long())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	return zend_bw_xor_helper_SPEC(op1, op2, executeData)
@@ -66,7 +66,7 @@ func getBwNotHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = opline.ConcatOp1(&freeOp1)
 
 	if op1.IsLong() {
-		opline.Result().SetLong(^(op1.GetLval()))
+		opline.Result().SetLong(^(op1.Long()))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	if op1.IsUndef() {

@@ -153,7 +153,7 @@ func GetNextBrkContElement() *ZendBrkContElement {
 	return CG__().GetContext().GetBrkContArray()[CG__().GetContext().GetLastBrkCont()-1]
 }
 func ZendDestroyPropertyInfoInternal(zv *types.Zval) {
-	var property_info *ZendPropertyInfo = zv.GetPtr()
+	var property_info *ZendPropertyInfo = zv.Ptr()
 	// types.ZendStringRelease(property_info.GetName())
 	Free(property_info)
 }
@@ -240,7 +240,7 @@ func ZendInitCompilerDataStructures() {
 func ZendRegisterSeenSymbol(name *types.String, kind uint32) {
 	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	if zv != nil {
-		zv.SetLval(zv.GetLval() | kind)
+		zv.SetLong(zv.Long() | kind)
 	} else {
 		var tmp types.Zval
 		tmp.SetLong(kind)
@@ -249,7 +249,7 @@ func ZendRegisterSeenSymbol(name *types.String, kind uint32) {
 }
 func ZendHaveSeenSymbol(name *types.String, kind uint32) types.ZendBool {
 	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
-	return zv != nil && (zv.GetLval()&kind) != 0
+	return zv != nil && (zv.Long()&kind) != 0
 }
 func FileHandleDtor(fh *ZendFileHandle) { fh.Destroy() }
 func InitCompiler() {
@@ -336,7 +336,7 @@ func ZendAddLiteralString(str **types.String) int {
 	var zv types.Zval
 	zv.SetString(*str)
 	ret = ZendAddLiteral(&zv)
-	*str = zv.GetStr()
+	*str = zv.String()
 	return ret
 }
 func ZendAddFuncNameLiteral(name *types.String) int {

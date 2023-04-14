@@ -155,7 +155,7 @@ func ZendCheckType(
 		return 1
 	}
 	if arg.IsReference() {
-		ref = arg.GetRef()
+		ref = arg.Reference()
 		arg = types.Z_REFVAL_P(arg)
 	}
 	if type_.IsClass() {
@@ -396,11 +396,11 @@ try_again:
 	if dim.GetType() != types.IS_LONG {
 		switch dim.GetType() {
 		case types.IS_STRING:
-			if types.IS_LONG == IsNumericString(dim.GetStr().GetStr(), nil, nil, -1) {
+			if types.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 				break
 			}
 			if type_ != BP_VAR_UNSET {
-				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
+				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
 			}
 		case types.IS_UNDEF:
 			ZVAL_UNDEFINED_OP2(executeData)
@@ -421,7 +421,7 @@ try_again:
 		}
 		offset = ZvalGetLongFunc(dim)
 	} else {
-		offset = dim.GetLval()
+		offset = dim.Long()
 	}
 	return offset
 }

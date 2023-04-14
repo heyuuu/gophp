@@ -373,35 +373,35 @@ func ZifParseUrl(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ zp
 
 	if resource.GetScheme() != nil {
 		tmp.SetStringCopy(resource.GetScheme())
-		return_value.GetArr().KeyAddNew(types.STR_SCHEME, &tmp)
+		return_value.Array().KeyAddNew(types.STR_SCHEME, &tmp)
 	}
 	if resource.GetHost() != nil {
 		tmp.SetStringCopy(resource.GetHost())
-		return_value.GetArr().KeyAddNew(types.STR_HOST, &tmp)
+		return_value.Array().KeyAddNew(types.STR_HOST, &tmp)
 	}
 	if has_port != 0 {
 		tmp.SetLong(resource.GetPort())
-		return_value.GetArr().KeyAddNew(types.STR_PORT, &tmp)
+		return_value.Array().KeyAddNew(types.STR_PORT, &tmp)
 	}
 	if resource.GetUser() != nil {
 		tmp.SetStringCopy(resource.GetUser())
-		return_value.GetArr().KeyAddNew(types.STR_USER, &tmp)
+		return_value.Array().KeyAddNew(types.STR_USER, &tmp)
 	}
 	if resource.GetPass() != nil {
 		tmp.SetStringCopy(resource.GetPass())
-		return_value.GetArr().KeyAddNew(types.STR_PASS, &tmp)
+		return_value.Array().KeyAddNew(types.STR_PASS, &tmp)
 	}
 	if resource.GetPath() != nil {
 		tmp.SetStringCopy(resource.GetPath())
-		return_value.GetArr().KeyAddNew(types.STR_PATH, &tmp)
+		return_value.Array().KeyAddNew(types.STR_PATH, &tmp)
 	}
 	if resource.GetQuery() != nil {
 		tmp.SetStringCopy(resource.GetQuery())
-		return_value.GetArr().KeyAddNew(types.STR_QUERY, &tmp)
+		return_value.Array().KeyAddNew(types.STR_QUERY, &tmp)
 	}
 	if resource.GetFragment() != nil {
 		tmp.SetStringCopy(resource.GetFragment())
-		return_value.GetArr().KeyAddNew(types.STR_FRAGMENT, &tmp)
+		return_value.Array().KeyAddNew(types.STR_FRAGMENT, &tmp)
 	}
 done:
 	PhpUrlFree(resource)
@@ -617,7 +617,7 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		return
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types.Array = stream.GetWrapperdata().GetArr()
+	var __ht *types.Array = stream.GetWrapperdata().Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -627,23 +627,23 @@ func ZifGetHeaders(executeData zpp.Ex, return_value zpp.Ret, url *types.Zval, _ 
 		}
 		if format == 0 {
 		no_name_header:
-			zend.AddNextIndexStr(return_value, hdr.GetStr().Copy())
+			zend.AddNextIndexStr(return_value, hdr.String().Copy())
 		} else {
 			var c byte
 			var s *byte
 			var p *byte
-			if b.Assign(&p, strchr(hdr.GetStr().GetVal(), ':')) {
+			if b.Assign(&p, strchr(hdr.String().GetVal(), ':')) {
 				c = *p
 				*p = '0'
 				s = p + 1
 				for isspace(int(*((*uint8)(s)))) {
 					s++
 				}
-				if b.Assign(&prev_val, return_value.GetArr().KeyFind(b.CastStr(hdr.GetStr().GetVal(), p-hdr.GetStr().GetVal()))) == nil {
-					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.GetStr().GetVal(), p-hdr.GetStr().GetVal()), b.CastStr(s, hdr.GetStr().GetLen()-(s-hdr.GetStr().GetVal())))
+				if b.Assign(&prev_val, return_value.Array().KeyFind(b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()))) == nil {
+					zend.AddAssocStringlEx(return_value, b.CastStr(hdr.String().GetVal(), p-hdr.String().GetVal()), b.CastStr(s, hdr.String().GetLen()-(s-hdr.String().GetVal())))
 				} else {
 					zend.ConvertToArray(prev_val)
-					zend.AddNextIndexStringl(prev_val, s, hdr.GetStr().GetLen()-(s-hdr.GetStr().GetVal()))
+					zend.AddNextIndexStringl(prev_val, s, hdr.String().GetLen()-(s-hdr.String().GetVal()))
 				}
 				*p = c
 			} else {

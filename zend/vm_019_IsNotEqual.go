@@ -24,7 +24,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -34,14 +34,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -49,13 +49,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -80,7 +80,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
 				opline.Result().SetTrue()
@@ -92,14 +92,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -107,13 +107,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -138,7 +138,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
 				opline.Result().SetTrue()
@@ -150,14 +150,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -165,13 +165,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -197,7 +197,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -207,14 +207,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -222,13 +222,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -257,7 +257,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteD
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
 				opline.Result().SetTrue()
@@ -269,14 +269,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteD
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -284,13 +284,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteD
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -319,7 +319,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecute
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
 				opline.Result().SetTrue()
@@ -331,14 +331,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecute
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -346,13 +346,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecute
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -379,7 +379,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -389,14 +389,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -404,13 +404,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -434,7 +434,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) 
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
 				opline.Result().SetTrue()
@@ -446,14 +446,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) 
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -461,13 +461,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER(executeData *ZendExecuteData) 
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -491,7 +491,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData)
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
 				opline.Result().SetTrue()
@@ -503,14 +503,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -518,13 +518,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteData)
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -549,7 +549,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -559,14 +559,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -574,13 +574,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -608,7 +608,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteData)
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
 				opline.Result().SetTrue()
@@ -620,14 +620,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteData)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -635,13 +635,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER(executeData *ZendExecuteData)
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -669,7 +669,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecuteData
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
 				opline.Result().SetTrue()
@@ -681,14 +681,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecuteData
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -696,13 +696,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER(executeData *ZendExecuteData
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -729,7 +729,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				opline.Result().SetTrue()
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -739,14 +739,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -754,13 +754,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -787,7 +787,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPZ_HANDLER(executeData *ZendExecuteData) int
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
 				opline.Result().SetTrue()
@@ -799,14 +799,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPZ_HANDLER(executeData *ZendExecuteData) int
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -814,13 +814,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPZ_HANDLER(executeData *ZendExecuteData) int
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}
@@ -847,7 +847,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPNZ_HANDLER(executeData *ZendExecuteData) in
 
 	if op1.IsLong() {
 		if op2.IsLong() {
-			if op1.GetLval() != op2.GetLval() {
+			if op1.Long() != op2.Long() {
 			is_not_equal_true:
 				ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
 				opline.Result().SetTrue()
@@ -859,14 +859,14 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPNZ_HANDLER(executeData *ZendExecuteData) in
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		} else if op2.IsDouble() {
-			d1 = float64(op1.GetLval())
-			d2 = op2.GetDval()
+			d1 = float64(op1.Long())
+			d2 = op2.Double()
 			goto is_not_equal_double
 		}
 	} else if op1.IsDouble() {
 		if op2.IsDouble() {
-			d1 = op1.GetDval()
-			d2 = op2.GetDval()
+			d1 = op1.Double()
+			d2 = op2.Double()
 		is_not_equal_double:
 			if d1 != d2 {
 				goto is_not_equal_true
@@ -874,13 +874,13 @@ func ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPNZ_HANDLER(executeData *ZendExecuteData) in
 				goto is_not_equal_false
 			}
 		} else if op2.IsLong() {
-			d1 = op1.GetDval()
-			d2 = float64(op2.GetLval())
+			d1 = op1.Double()
+			d2 = float64(op2.Long())
 			goto is_not_equal_double
 		}
 	} else if op1.IsString() {
 		if op2.IsString() {
-			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
+			var result int = ZendFastEqualStrings(op1.String(), op2.String())
 			{
 
 			}

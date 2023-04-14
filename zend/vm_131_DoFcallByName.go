@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var call *ZendExecuteData = executeData.GetCall()

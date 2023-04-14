@@ -75,6 +75,8 @@ const (
 	IS_ITERABLE ZvalType = 18
 	IS_VOID     ZvalType = 19
 	IS_NUMBER   ZvalType = 20 // _IS_NUMBER
+
+	_IS_IMMUTABLE_ARRAY ZvalType = 30
 )
 
 /* we should never set just Z_TYPE, we should set Z_TYPE_INFO */

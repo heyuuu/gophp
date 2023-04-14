@@ -5,74 +5,13 @@ import (
 )
 
 /**
- * ZendValue
- */
-type ZendValue struct {
-	val any
-}
-type RawZendValue struct /* union */ {
-	lval    int
-	dval    float64
-	counted *ZendRefcounted
-	str     *String
-	arr     *Array
-	obj     *ZendObject
-	res     *ZendResource
-	ref     *ZendReference
-	ast     *ZendAstRef
-	zv      *Zval
-	ptr     any
-	ce      *ClassEntry
-	func_   IFunction
-}
-
-func (this *ZendValue) GetLval() int                { return this.val.(int) }
-func (this *ZendValue) GetDval() float64            { return this.val.(float64) }
-func (this *ZendValue) GetCounted() *ZendRefcounted { return this.val.(*ZendRefcounted) }
-func (this *ZendValue) GetStr() *String             { return this.val.(*String) }
-func (this *ZendValue) GetArr() *Array              { return this.val.(*Array) }
-func (this *ZendValue) GetObj() *ZendObject         { return this.val.(*ZendObject) }
-func (this *ZendValue) GetRes() *ZendResource       { return this.val.(*ZendResource) }
-func (this *ZendValue) GetRef() *ZendReference      { return this.val.(*ZendReference) }
-func (this *ZendValue) GetAst() *ZendAstRef         { return this.val.(*ZendAstRef) }
-func (this *ZendValue) GetZv() *Zval                { return this.val.(*Zval) }
-func (this *ZendValue) GetPtr() any                 { return this.val }
-func (this *ZendValue) GetCe() *ClassEntry          { return this.val.(*ClassEntry) }
-func (this *ZendValue) GetFunc() IFunction          { return this.val.(IFunction) }
-
-func (this *ZendValue) SetLval(value int)                { this.val = value }
-func (this *ZendValue) SetDval(value float64)            { this.val = value }
-func (this *ZendValue) SetCounted(value *ZendRefcounted) { this.val = value }
-func (this *ZendValue) SetStr(value *String)             { this.val = value }
-func (this *ZendValue) SetArr(value *Array)              { this.val = value }
-func (this *ZendValue) SetObj(value *ZendObject)         { this.val = value }
-func (this *ZendValue) SetRes(value *ZendResource)       { this.val = value }
-func (this *ZendValue) SetRef(value *ZendReference)      { this.val = value }
-func (this *ZendValue) SetAst(value *ZendAstRef)         { this.val = value }
-func (this *ZendValue) SetZv(value *Zval)                { this.val = value }
-func (this *ZendValue) SetPtr(value any)                 { this.val = value }
-func (this *ZendValue) SetCe(value *ClassEntry)          { this.val = value }
-func (this *ZendValue) SetFunc(value IFunction)          { this.val = value }
-
-/**
  * Zval
  */
 type Zval struct {
-	value     ZendValue
+	value     any
 	typ       ZendUchar
 	typeFlags ZendUchar
 	u2        uint32
-
-	//u1 struct /* union */ {
-	//	v struct {
-	//		type_      ZendUchar
-	//		type_flags ZendUchar
-	//		u          struct /* union */ {
-	//			extra uint16
-	//		}
-	//	}
-	//	type_info uint32
-	//}
 	//u2 struct /* union */ {
 	//	next           uint32 /* hash collision chain  用来解决哈希冲突问题，记录冲突的下一个元素位置*/
 	//	cache_slot     uint32 /* literal cache slot  运行时缓存。在执行函数时会优先去缓存中查找，若缓存中没有，会在全局的function表中查找*/
@@ -89,41 +28,60 @@ type Zval struct {
 }
 
 /** Zval.value */
-func (zv *Zval) GetValue() ZendValue      { return zv.value }
-func (zv *Zval) SetValue(value ZendValue) { zv.value = value }
-func (zv *Zval) GetStrVal() string        { return zv.value.GetStr().GetStr() }
+func (zv *Zval) GetStrVal() string { return zv.String().GetStr() }
 
-// Zval 从 ZendValue 继承的方法。暂时不写成组合模式，方便开发中查找对应调用调用代码。
-func (zv *Zval) GetLval() int                { return zv.value.GetLval() }
-func (zv *Zval) GetDval() float64            { return zv.value.GetDval() }
-func (zv *Zval) GetCounted() *ZendRefcounted { return zv.value.GetCounted() }
-func (zv *Zval) GetStr() *String             { return zv.value.GetStr() }
-func (zv *Zval) GetArr() *Array              { return zv.value.GetArr() }
-func (zv *Zval) GetObj() *ZendObject         { return zv.value.GetObj() }
-func (zv *Zval) GetRes() *ZendResource       { return zv.value.GetRes() }
-func (zv *Zval) GetRef() *ZendReference      { return zv.value.GetRef() }
-func (zv *Zval) GetAst() *ZendAstRef         { return zv.value.GetAst() }
-func (zv *Zval) GetZv() *Zval                { return zv.value.GetZv() }
-func (zv *Zval) GetPtr() any                 { return zv.value.GetPtr() }
-func (zv *Zval) GetCe() *ClassEntry          { return zv.value.GetCe() }
-func (zv *Zval) GetFunc() IFunction          { return zv.value.GetFunc() }
+/** value 的 isType/ getter / setter 判断 */
+func (zv *Zval) IsType(value ZendUchar) bool { return zv.typ == value }
+func (zv *Zval) IsUndef() bool               { return zv.typ == IS_UNDEF }
+func (zv *Zval) IsNotUndef() bool            { return zv.typ != IS_UNDEF }
+func (zv *Zval) IsNull() bool                { return zv.typ == IS_NULL }
+func (zv *Zval) IsFalse() bool               { return zv.typ == IS_FALSE }
+func (zv *Zval) IsTrue() bool                { return zv.typ == IS_TRUE }
+func (zv *Zval) IsLong() bool                { return zv.typ == IS_LONG }
+func (zv *Zval) IsDouble() bool              { return zv.typ == IS_DOUBLE }
+func (zv *Zval) IsString() bool              { return zv.typ == IS_STRING }
+func (zv *Zval) IsArray() bool               { return zv.typ == IS_ARRAY }
+func (zv *Zval) IsObject() bool              { return zv.typ == IS_OBJECT }
+func (zv *Zval) IsResource() bool            { return zv.typ == IS_RESOURCE }
+func (zv *Zval) IsReference() bool           { return zv.typ == IS_REFERENCE }
+func (zv *Zval) IsConstantAst() bool         { return zv.typ == IS_CONSTANT_AST }
+func (zv *Zval) IsIndirect() bool            { return zv.typ == IS_INDIRECT }
 
-func (zv *Zval) SetLval(value int)                { zv.value.SetLval(value) }
-func (zv *Zval) SetDval(value float64)            { zv.value.SetDval(value) }
-func (zv *Zval) SetCounted(value *ZendRefcounted) { zv.value.SetCounted(value) }
-func (zv *Zval) SetStr(value *String)             { zv.value.SetStr(value) }
-func (zv *Zval) SetArr(value *Array)              { zv.value.SetArr(value) }
-func (zv *Zval) SetObj(value *ZendObject)         { zv.value.SetObj(value) }
-func (zv *Zval) SetRes(value *ZendResource)       { zv.value.SetRes(value) }
-func (zv *Zval) SetRef(value *ZendReference)      { zv.value.SetRef(value) }
-func (zv *Zval) SetAst(value *ZendAstRef)         { zv.value.SetAst(value) }
-func (zv *Zval) SetZv(value *Zval)                { zv.value.SetZv(value) }
-func (zv *Zval) SetPtr(value any)                 { zv.value.SetPtr(value) }
-func (zv *Zval) SetCe(value *ClassEntry)          { zv.value.SetCe(value) }
-func (zv *Zval) SetFunc(value IFunction)          { zv.value.SetFunc(value) }
+func (zv *Zval) Long() int                   { return zv.value.(int) }
+func (zv *Zval) Double() float64             { return zv.value.(float64) }
+func (zv *Zval) String() *String             { return zv.value.(*String) }
+func (zv *Zval) Array() *Array               { return zv.value.(*Array) }
+func (zv *Zval) Object() *ZendObject         { return zv.value.(*ZendObject) }
+func (zv *Zval) Resource() *ZendResource     { return zv.value.(*ZendResource) }
+func (zv *Zval) Reference() *ZendReference   { return zv.value.(*ZendReference) }
+func (zv *Zval) RefCounted() *ZendRefcounted { return zv.value.(*ZendRefcounted) }
+func (zv *Zval) ConstantAst() *ZendAstRef    { return zv.value.(*ZendAstRef) }
+func (zv *Zval) Indirect() *Zval             { return zv.value.(*Zval) }
+func (zv *Zval) Ptr() any                    { return zv.value }
+func (zv *Zval) Class() *ClassEntry          { return zv.value.(*ClassEntry) }
+func (zv *Zval) Func() IFunction             { return zv.value.(IFunction) }
+
+func (zv *Zval) SetLval(value int)                { zv.value = value }
+func (zv *Zval) SetDval(value float64)            { zv.value = value }
+func (zv *Zval) SetCounted(value *ZendRefcounted) { zv.value = value }
+func (zv *Zval) SetStr(value *String)             { zv.value = value }
+func (zv *Zval) SetArr(value *Array)              { zv.value = value }
+func (zv *Zval) SetObj(value *ZendObject)         { zv.value = value }
+func (zv *Zval) SetRes(value *ZendResource)       { zv.value = value }
+func (zv *Zval) SetRef(value *ZendReference)      { zv.value = value }
+func (zv *Zval) SetAst(value *ZendAstRef)         { zv.value = value }
+func (zv *Zval) SetZv(value *Zval)                { zv.value = value }
+func (zv *Zval) SetPtr(value any)                 { zv.value = value }
+func (zv *Zval) SetCe(value *ClassEntry)          { zv.value = value }
+func (zv *Zval) SetFunc(value IFunction)          { zv.value = value }
 
 /** Zval.u1 -> type & typeFlags */
-func (zv *Zval) GetType() ZvalType            { return zv.typ }
+func (zv *Zval) GetType() ZvalType {
+	if zv.typ == _IS_IMMUTABLE_ARRAY {
+		return IS_ARRAY
+	}
+	return zv.typ
+}
 func (zv *Zval) GetTypeFlags() ZendUchar      { return zv.typeFlags }
 func (zv *Zval) SetTypeFlags(value ZendUchar) { zv.typeFlags = value } /* todo remove */
 func (zv *Zval) GetTypeInfo() uint32 {
@@ -155,27 +113,6 @@ func (zv *Zval) SetTypeObject() {
 func (zv *Zval) SetTypeResource()  { zv.typ, zv.typeFlags = IS_RESOURCE, IS_TYPE_REFCOUNTED }
 func (zv *Zval) SetTypeReference() { zv.typ, zv.typeFlags = IS_REFERENCE, IS_TYPE_REFCOUNTED }
 func (zv *Zval) SetTypeConstant()  { zv.typ, zv.typeFlags = IS_CONSTANT_AST, IS_TYPE_REFCOUNTED }
-func (zv *Zval) SetTypeIndirect()  { zv.typ, zv.typeFlags = IS_INDIRECT, 0 }
-func (zv *Zval) SetTypePtr()       { zv.typ, zv.typeFlags = IS_PTR, 0 }
-func (zv *Zval) SetTypeAliasPtr()  { zv.typ, zv.typeFlags = IS_ALIAS_PTR, 0 }
-func (zv *Zval) SetTypeError()     { zv.typ, zv.typeFlags = IS_ERROR, 0 }
-
-func (zv *Zval) IsType(value ZendUchar) bool { return zv.typ == value }
-func (zv *Zval) IsUndef() bool               { return zv.typ == IS_UNDEF }
-func (zv *Zval) IsNotUndef() bool            { return zv.typ != IS_UNDEF }
-func (zv *Zval) IsNull() bool                { return zv.typ == IS_NULL }
-func (zv *Zval) IsFalse() bool               { return zv.typ == IS_FALSE }
-func (zv *Zval) IsTrue() bool                { return zv.typ == IS_TRUE }
-func (zv *Zval) IsLong() bool                { return zv.typ == IS_LONG }
-func (zv *Zval) IsDouble() bool              { return zv.typ == IS_DOUBLE }
-func (zv *Zval) IsString() bool              { return zv.typ == IS_STRING }
-func (zv *Zval) IsArray() bool               { return zv.typ == IS_ARRAY }
-func (zv *Zval) IsObject() bool              { return zv.typ == IS_OBJECT }
-func (zv *Zval) IsResource() bool            { return zv.typ == IS_RESOURCE }
-func (zv *Zval) IsReference() bool           { return zv.typ == IS_REFERENCE }
-func (zv *Zval) IsConstant() bool            { return zv.typ == IS_CONSTANT_AST }
-func (zv *Zval) IsIndirect() bool            { return zv.typ == IS_INDIRECT }
-func (zv *Zval) IsError() bool               { return zv.typ == IS_ERROR }
 
 /** Zval.u2 */
 func (zv *Zval) GetCacheSlot() uint32          { return zv.u2 }
@@ -240,55 +177,30 @@ func NewZvalPtr(ptr any) *Zval                { var tmp Zval; tmp.SetAsPtr(ptr);
 /**
  * init
  */
-func (zv *Zval) SetUndef() { zv.SetTypeUndef() }
-func (zv *Zval) SetNull()  { zv.SetTypeNull() }
-func (zv *Zval) SetFalse() { zv.SetTypeFalse() }
-func (zv *Zval) SetTrue()  { zv.SetTypeTrue() }
-func (zv *Zval) SetBool(b bool) {
-	if b {
-		zv.SetTypeTrue()
-	} else {
-		zv.SetTypeFalse()
-	}
-}
-func (zv *Zval) SetLong(l int)         { zv.SetTypeLong(); zv.SetLval(l) }
-func (zv *Zval) SetDouble(d float64)   { zv.SetTypeDouble(); zv.SetDval(d) }
-func (zv *Zval) SetStringVal(s string) { zv.SetString(NewString(s)) }
-func (zv *Zval) SetString(s *String)   { zv.SetTypeString(); zv.SetStr(s) }
-func (zv *Zval) SetStringCopy(s *String) {
-	//s.AddRefcount()
-	zv.SetString(s)
-}
-func (zv *Zval) SetArray(arr *Array) { zv.SetTypeArray(); zv.SetArr(arr) }
-func (zv *Zval) SetImmutableArray(arr *Array) {
-	b.Assert(arr.IsImmutable())
-	zv.SetTypeArray()
-	zv.SetArr(arr)
-}
-func (zv *Zval) SetEmptyArray() {
-	zv.SetImmutableArray(emptyArray)
-}
-func (zv *Zval) SetArrayOfInt(arr []int)       { zv.SetArray(NewArrayOfInt(arr)) }
-func (zv *Zval) SetArrayOfString(arr []string) { zv.SetArray(NewArrayOfString(arr)) }
-func (zv *Zval) SetArrayOfZval(arr []*Zval)    { zv.SetArray(NewArrayOfZval(arr)) }
-
-func (zv *Zval) SetObject(obj *ZendObject)     { zv.SetTypeObject(); zv.SetObj(obj) }
-func (zv *Zval) SetResource(res *ZendResource) { zv.SetTypeResource(); zv.SetRes(res) }
-func (zv *Zval) SetNewResource(handle int, ptr any, type_ int) {
-	var res = NewZendResource(handle, ptr, type_)
-	zv.SetResource(res)
-}
-func (zv *Zval) SetNewResourcePersistent(handle int, ptr any, type_ int) {
-	var res = NewZendResourcePersistent(handle, ptr, type_, true)
-	zv.SetResource(res)
-}
-func (zv *Zval) SetReference(ref *ZendReference) { zv.SetTypeReference(); zv.SetRef(ref) }
+func (zv *Zval) SetUndef()                       { zv.typ, zv.value = IS_UNDEF, nil }
+func (zv *Zval) SetNull()                        { zv.typ, zv.value = IS_NULL, nil }
+func (zv *Zval) SetFalse()                       { zv.typ, zv.value = IS_FALSE, nil }
+func (zv *Zval) SetTrue()                        { zv.typ, zv.value = IS_TRUE, nil }
+func (zv *Zval) SetBool(v bool)                  { zv.typ, zv.value = b.Cond(v, IS_TRUE, IS_FALSE), nil }
+func (zv *Zval) SetLong(l int)                   { zv.typ, zv.value = IS_LONG, l }
+func (zv *Zval) SetDouble(d float64)             { zv.typ, zv.value = IS_DOUBLE, d }
+func (zv *Zval) SetStringVal(s string)           { zv.typ, zv.value = IS_STRING, NewString(s) }
+func (zv *Zval) SetString(s *String)             { zv.typ, zv.value = IS_STRING, s }
+func (zv *Zval) SetStringCopy(s *String)         { zv.typ, zv.value = IS_STRING, s }
+func (zv *Zval) SetArray(arr *Array)             { zv.typ, zv.value = IS_ARRAY, arr }
+func (zv *Zval) SetEmptyArray()                  { zv.typ, zv.value = IS_ARRAY, NewArray(0) }
+func (zv *Zval) SetArrayOfInt(arr []int)         { zv.SetArray(NewArrayOfInt(arr)) }
+func (zv *Zval) SetArrayOfString(arr []string)   { zv.SetArray(NewArrayOfString(arr)) }
+func (zv *Zval) SetArrayOfZval(arr []*Zval)      { zv.SetArray(NewArrayOfZval(arr)) }
+func (zv *Zval) SetObject(obj *ZendObject)       { zv.typ, zv.value = IS_OBJECT, obj }
+func (zv *Zval) SetResource(res *ZendResource)   { zv.typ, zv.value = IS_RESOURCE, res }
+func (zv *Zval) SetReference(ref *ZendReference) { zv.typ, zv.value = IS_REFERENCE, ref }
 func (zv *Zval) SetNewEmptyRef()                 { zv.SetReference(NewZendReference(nil)) }
 func (zv *Zval) SetNewRef(val *Zval)             { zv.SetReference(NewZendReference(val)) }
-func (zv *Zval) SetConstantAst(ast *ZendAstRef)  { zv.SetTypeConstant(); zv.SetAst(ast) }
-func (zv *Zval) SetIndirect(v *Zval)             { zv.SetTypeIndirect(); zv.SetZv(v) }
-func (zv *Zval) SetAsPtr(ptr any)                { zv.SetTypePtr(); zv.SetPtr(ptr) }
-func (zv *Zval) SetAliasPtr(ptr any)             { zv.SetTypeAliasPtr(); zv.SetPtr(ptr) }
+func (zv *Zval) SetConstantAst(ast *ZendAstRef)  { zv.typ, zv.value = IS_CONSTANT_AST, ast }
+func (zv *Zval) SetIndirect(v *Zval)             { zv.typ, zv.value = IS_INDIRECT, v }
+func (zv *Zval) SetAsPtr(ptr any)                { zv.typ, zv.value = IS_PTR, ptr }
+func (zv *Zval) SetAliasPtr(ptr any)             { zv.typ, zv.value = IS_ALIAS_PTR, ptr }
 
 func (zv *Zval) SetBy(val *Zval) {
 	ZVAL_COPY_VALUE(zv, val)

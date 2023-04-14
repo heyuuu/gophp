@@ -303,8 +303,8 @@ func PhpFormattedPrint(z_format *types.Zval, args *types.Zval, argc int) *types.
 	if zend.TryConvertToString(z_format) == 0 {
 		return nil
 	}
-	format = z_format.GetStr().GetVal()
-	format_len = z_format.GetStr().GetLen()
+	format = z_format.String().GetVal()
+	format_len = z_format.String().GetLen()
 	result = types.ZendStringAlloc(size, 0)
 	currarg = 0
 	for format_len != 0 {
@@ -491,7 +491,7 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 	n = types.Z_ARRVAL_P(array).Len()
 	args = (*types.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
-	var __ht *types.Array = array.GetArr()
+	var __ht *types.Array = array.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 

@@ -2,7 +2,7 @@ package zend
 
 func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var throw_op *ZendOp = EG__().GetOplineBeforeException()
-	var throw_op_num uint32 = throw_op - executeData.GetFunc().op_array.opcodes
+	var throw_op_num uint32 = throw_op - executeData.GetFunc().GetOpArray().opcodes
 	var i int
 	var current_try_catch_offset int = -1
 	if (throw_op.GetOpcode() == ZEND_FREE || throw_op.GetOpcode() == ZEND_FE_FREE) && (throw_op.GetExtendedValue()&ZEND_FREE_ON_RETURN) != 0 {
@@ -12,14 +12,14 @@ func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		 * throw_op_num.
 		 */
 
-		var range_ *ZendLiveRange = FindLiveRange(executeData.GetFunc().op_array, throw_op_num, throw_op.GetOp1().GetVar())
+		var range_ *ZendLiveRange = FindLiveRange(executeData.GetFunc().GetOpArray(), throw_op_num, throw_op.GetOp1().GetVar())
 		throw_op_num = range_.GetEnd()
 	}
 
 	/* Find the innermost try/catch/finally the exception was thrown in */
 
-	for i = 0; i < executeData.GetFunc().op_array.last_try_catch; i++ {
-		var try_catch *ZendTryCatchElement = executeData.GetFunc().op_array.try_catch_array[i]
+	for i = 0; i < executeData.GetFunc().GetOpArray().last_try_catch; i++ {
+		var try_catch *ZendTryCatchElement = executeData.GetFunc().GetOpArray().try_catch_array[i]
 		if try_catch.GetTryOp() > throw_op_num {
 
 			/* further blocks will not be relevant... */

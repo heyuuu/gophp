@@ -585,14 +585,14 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if container.IsArray() {
 			var el *types.Zval
 			if dim.IsLong() {
-				el = container.GetArr().IndexFind(dim.GetLval())
+				el = container.Array().IndexFind(dim.Long())
 				if el != nil {
 					types.ZVAL_COPY(&result, el)
 				} else {
 					return
 				}
 			} else if dim.IsString() {
-				el = container.GetArr().SymtableFind(dim.GetStr().GetStr())
+				el = container.Array().SymtableFind(dim.String().GetStr())
 				if el != nil {
 					types.ZVAL_COPY(&result, el)
 				} else {
@@ -605,14 +605,14 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			var offset ZendLong
 			var c types.ZendUchar
 			if dim.IsLong() {
-				offset = dim.GetLval()
-			} else if dim.GetType() != types.IS_STRING || IsNumericString(dim.GetStr().GetStr(), &offset, nil, 1) != types.IS_LONG {
+				offset = dim.Long()
+			} else if dim.GetType() != types.IS_STRING || IsNumericString(dim.String().GetStr(), &offset, nil, 1) != types.IS_LONG {
 				return
 			}
-			if offset < 0 || int(offset >= container.GetStr().GetLen()) != 0 {
+			if offset < 0 || int(offset >= container.String().GetLen()) != 0 {
 				return
 			}
-			c = types.ZendUchar(container.GetStr().GetVal()[offset])
+			c = types.ZendUchar(container.String().GetVal()[offset])
 			result.SetStringVal(string(c))
 		} else if container.GetType() <= types.IS_FALSE {
 			result.SetNull()

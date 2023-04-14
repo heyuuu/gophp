@@ -52,7 +52,7 @@ func ZifEzmlmHash(executeData zpp.Ex, return_value zpp.Ret, addr *types.Zval) {
 }
 func PhpMailBuildHeadersCheckFieldValue(val *types.Zval) types.ZendBool {
 	var len_ int = 0
-	var value *types.String = val.GetStr()
+	var value *types.String = val.String()
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
 
@@ -92,12 +92,12 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zva
 			return
 		}
 		if PhpMailBuildHeadersCheckFieldValue(val) != types.SUCCESS {
-			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.GetStr().GetVal())
+			core.PhpErrorDocref(nil, faults.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), val.String().GetVal())
 			return
 		}
 		s.AppendString(key.GetStr())
 		s.AppendString(": ")
-		s.AppendString(b.CastStrAuto(val.GetStr().GetVal()))
+		s.AppendString(b.CastStrAuto(val.String().GetVal()))
 		s.AppendString("\r\n")
 	case types.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)
@@ -108,7 +108,7 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *types.String, val *types.Zva
 func PhpMailBuildHeadersElems(s *zend.SmartStr, key *types.String, val *types.Zval) {
 	var tmp_key *types.String
 	var tmp_val *types.Zval
-	var __ht *types.Array = val.GetArr()
+	var __ht *types.Array = val.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -131,7 +131,7 @@ func PhpMailBuildHeaders(headers *types.Zval) *types.String {
 	var val *types.Zval
 	var s zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(headers.IsType(types.IS_ARRAY))
-	var __ht *types.Array = headers.GetArr()
+	var __ht *types.Array = headers.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -264,7 +264,7 @@ func ZifMail(executeData zpp.Ex, return_value zpp.Ret, to *types.Zval, subject *
 	if headers != nil {
 		switch headers.GetType() {
 		case types.IS_STRING:
-			tmp_headers = types.NewString(headers.GetStr().GetStr())
+			tmp_headers = types.NewString(headers.String().GetStr())
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = types.NewString(str.PhpTrimRight(tmp_headers.GetStr(), nil))
 			// types.ZendStringReleaseEx(tmp_headers, 0)

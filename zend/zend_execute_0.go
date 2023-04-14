@@ -35,14 +35,14 @@ func ZendCopyToVariable(variable_ptr *types.Zval, value *types.Zval, value_type 
 func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_type types.ZendUchar, strict types.ZendBool) *types.Zval {
 	var ref *types.ZendRefcounted = nil
 	if value.IsReference() {
-		ref = value.GetCounted()
+		ref = value.RefCounted()
 		value = types.Z_REFVAL_P(value)
 	}
 	for {
 		if variable_ptr.IsRefcounted() {
 			var garbage *types.ZendRefcounted
 			if variable_ptr.IsReference() {
-				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.GetRef()) {
+				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.Reference()) {
 					return ZendAssignToTypedRef(variable_ptr, value, value_type, strict, ref)
 				}
 				variable_ptr = types.Z_REFVAL_P(variable_ptr)
@@ -54,7 +54,7 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_typ
 				types.Z_OBJ_HT(*variable_ptr).GetSet()(variable_ptr, value)
 				return variable_ptr
 			}
-			garbage = variable_ptr.GetCounted()
+			garbage = variable_ptr.RefCounted()
 			ZendCopyToVariable(variable_ptr, value, value_type, ref)
 			if garbage.DelRefcount() == 0 {
 				RcDtorFunc(garbage)
@@ -76,7 +76,7 @@ func ZEND_VM_STACK_ELEMENTS(stack ZendVmStack) __auto__ {
 }
 func ZendVmInitCallFrame(call *ZendExecuteData, call_info uint32, func_ types.IFunction, num_args uint32, object_or_called_scope any) {
 	call.SetFunc(func_)
-	call.GetThis().GetPtr() = object_or_called_scope
+	call.GetThis().Ptr() = object_or_called_scope
 	ZEND_CALL_INFO(call) = call_info
 	call.NumArgs() = num_args
 }
@@ -109,7 +109,7 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 		var p *types.Zval = call.VarNum(call.GetFunc().GetOpArray().GetLastVar() + call.GetFunc().GetOpArray().GetT())
 		for {
 			if p.IsRefcounted() {
-				var r *types.ZendRefcounted = p.GetCounted()
+				var r *types.ZendRefcounted = p.RefCounted()
 				if r.DelRefcount() == 0 {
 					p.SetNull()
 					RcDtorFunc(r)
@@ -130,7 +130,7 @@ func ZendVmStackFreeExtraArgs(call *ZendExecuteData) {
 func ZendVmStackFreeArgs(call *ZendExecuteData) {
 	for _, p := range call.AllArgs() {
 		if p.IsRefcounted() {
-			r := p.GetCounted()
+			r := p.RefCounted()
 			if r.DelRefcount() == 0 {
 				p.SetNull()
 				RcDtorFunc(r)
@@ -244,11 +244,11 @@ func ZifPass(executeData *ZendExecuteData, return_value *types.Zval) {}
 func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *types.Zval, result *types.Zval) {
 	var __container_to_free *types.Zval = free_op
 	if __container_to_free != nil && __container_to_free.IsRefcounted() {
-		var __ref *types.ZendRefcounted = __container_to_free.GetCounted()
+		var __ref *types.ZendRefcounted = __container_to_free.RefCounted()
 		if __ref.DelRefcount() == 0 {
 			var __zv *types.Zval = result
 			if __zv.IsIndirect() {
-				types.ZVAL_COPY(__zv, __zv.GetZv())
+				types.ZVAL_COPY(__zv, __zv.Indirect())
 			}
 			RcDtorFunc(__ref)
 		}
@@ -269,7 +269,7 @@ func FREE_OP_VAR_PTR(should_free *types.Zval) {
 		ZvalPtrDtorNogc(should_free)
 	}
 }
-func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().op_array.vars[i] }
+func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().GetOpArray().vars[i] }
 func ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size int, page_size int) int {
 	return size + ZEND_VM_STACK_HEADER_SLOTS*b.SizeOf("zval") + (page_size-1) & ^(page_size-1)
 }

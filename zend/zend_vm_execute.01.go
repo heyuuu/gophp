@@ -84,7 +84,7 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if opline.Result().GetLval() == 0 {
+	if opline.Result().Long() == 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -112,7 +112,7 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if opline.Result().GetLval() != 0 {
+	if opline.Result().Long() != 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -140,7 +140,7 @@ func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if opline.Result().GetLval() < 0 {
+	if opline.Result().Long() < 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -168,7 +168,7 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if opline.Result().GetLval() <= 0 {
+	if opline.Result().Long() <= 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -243,7 +243,7 @@ func zend_undefined_function_helper_SPEC(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
 	function_name = opline.Const2()
-	faults.ThrowError(nil, "Call to undefined function %s()", function_name.GetStr().GetVal())
+	faults.ThrowError(nil, "Call to undefined function %s()", function_name.String().GetVal())
 	return 0
 }
 func zend_fetch_static_prop_helper_SPEC(type_ int, executeData *ZendExecuteData) int {
@@ -283,7 +283,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		IFreeCompiledVariables(executeData)
 		if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(executeData.GetThis().GetObj())
+			OBJ_RELEASE(executeData.GetThis().Object())
 		} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
 			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 		}
@@ -301,13 +301,13 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
 
-				/* Free extra args before releasing the closure,
-				 * as that may free the op_array. */))
+			/* Free extra args before releasing the closure,
+			 * as that may free the op_array. */))
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
 		if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(executeData.GetThis().GetObj())
+			OBJ_RELEASE(executeData.GetThis().Object())
 		} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
 			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 		}
@@ -322,7 +322,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		return 2
 	} else if (call_info & ZEND_CALL_TOP) == 0 {
 		ZendDetachSymbolTable(executeData)
-		DestroyOpArray(executeData.GetFunc().op_array)
+		DestroyOpArray(executeData.GetFunc().GetOpArray())
 		EfreeSize(executeData.GetFunc(), b.SizeOf("zend_op_array"))
 		old_execute_data = executeData
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())

@@ -7,39 +7,51 @@ import (
 /**
  * GC - Refcount
  */
-func (zv *Zval) IsRefcounted() bool  { return zv.GetTypeFlags() != 0 }
-func (zv *Zval) IsCollectable() bool { return b.FlagMatch(zv.GetTypeFlags(), IS_TYPE_COLLECTABLE) }
+func (zv *Zval) IsRefcounted() bool {
+	switch zv.typ {
+	case IS_ARRAY, // 不包含 _IS_IMMUTABLE_ARRAY
+		IS_OBJECT,
+		IS_RESOURCE,
+		IS_REFERENCE:
+		return true
+	default:
+		return false
+	}
+}
+func (zv *Zval) IsCollectable() bool {
+	return zv.typ == IS_ARRAY || zv.typ == IS_OBJECT
+}
 
 func (zv *Zval) GetRefcount() uint32 {
 	b.Assert(zv.IsRefcounted())
-	return zv.GetCounted().GetRefcount()
+	return zv.RefCounted().GetRefcount()
 }
 func (zv *Zval) SetRefcount(rc uint32) uint32 {
 	b.Assert(zv.IsRefcounted())
-	return zv.GetCounted().SetRefcount(rc)
+	return zv.RefCounted().SetRefcount(rc)
 }
 func (zv *Zval) AddRefcount() uint32 {
 	b.Assert(zv.IsRefcounted())
-	return zv.GetCounted().AddRefcount()
+	return zv.RefCounted().AddRefcount()
 }
 func (zv *Zval) DelRefcount() uint32 {
 	b.Assert(zv.IsRefcounted())
-	return zv.GetCounted().DelRefcount()
+	return zv.RefCounted().DelRefcount()
 }
 func (zv *Zval) TryAddRefcount() {
 	if zv.IsRefcounted() {
-		zv.GetCounted().AddRefcount()
+		zv.RefCounted().AddRefcount()
 	}
 }
 func (zv *Zval) TryDelRefcount() {
 	if zv.IsRefcounted() {
-		zv.GetCounted().DelRefcount()
+		zv.RefCounted().DelRefcount()
 	}
 }
 
 /**
  * GC - GC_PROTECTED
  */
-func (zv *Zval) IsRecursive() bool   { return zv.GetCounted().IsRecursive() }
-func (zv *Zval) ProtectRecursive()   { zv.GetCounted().ProtectRecursive() }
-func (zv *Zval) UnprotectRecursive() { zv.GetCounted().UnprotectRecursive() }
+func (zv *Zval) IsRecursive() bool   { return zv.RefCounted().IsRecursive() }
+func (zv *Zval) ProtectRecursive()   { zv.RefCounted().ProtectRecursive() }
+func (zv *Zval) UnprotectRecursive() { zv.RefCounted().UnprotectRecursive() }

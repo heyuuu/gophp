@@ -71,12 +71,12 @@ func ZendAstGetZval(ast *ZendAst) *types.Zval {
 func ZendAstGetStr(ast *ZendAst) *types.String {
 	var zv *types.Zval = ZendAstGetZval(ast)
 	b.Assert(zv.IsString())
-	return zv.GetStr()
+	return zv.String()
 }
 func ZendAstGetConstantName(ast *ZendAst) *types.String {
 	b.Assert(ast.GetKind() == ZEND_AST_CONSTANT)
 	b.Assert((*ZendAstZval)(ast).GetVal().IsString())
-	return (*ZendAstZval)(ast).GetVal().GetStr()
+	return (*ZendAstZval)(ast).GetVal().String()
 }
 func ZendAstGetNumChildren(ast *ZendAst) uint32 {
 	b.Assert(ZendAstIsList(ast) == 0)
@@ -366,26 +366,26 @@ func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.Zval) int {
 	switch offset.GetType() {
 	case types.IS_UNDEF:
-		if result.GetArr().NextIndexInsert(expr) == nil {
+		if result.Array().NextIndexInsert(expr) == nil {
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
 	case types.IS_STRING:
-		result.GetArr().SymtableUpdate(offset.GetStr().GetStr(), expr)
+		result.Array().SymtableUpdate(offset.String().GetStr(), expr)
 
 	case types.IS_NULL:
-		result.GetArr().SymtableUpdate(types.NewString("").GetStr(), expr)
+		result.Array().SymtableUpdate(types.NewString("").GetStr(), expr)
 	case types.IS_LONG:
-		result.GetArr().IndexUpdate(offset.GetLval(), expr)
+		result.Array().IndexUpdate(offset.Long(), expr)
 	case types.IS_FALSE:
-		result.GetArr().IndexUpdate(0, expr)
+		result.Array().IndexUpdate(0, expr)
 	case types.IS_TRUE:
-		result.GetArr().IndexUpdate(1, expr)
+		result.Array().IndexUpdate(1, expr)
 	case types.IS_DOUBLE:
-		result.GetArr().IndexUpdate(DvalToLval(offset.GetDval()), expr)
+		result.Array().IndexUpdate(DvalToLval(offset.Double()), expr)
 	case types.IS_RESOURCE:
 		faults.Error(faults.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", types.Z_RES_HANDLE_P(offset), types.Z_RES_HANDLE_P(offset))
-		result.GetArr().IndexUpdate(types.Z_RES_HANDLE_P(offset), expr)
+		result.Array().IndexUpdate(types.Z_RES_HANDLE_P(offset), expr)
 	default:
 		faults.ThrowError(nil, "Illegal offset type")
 		return types.FAILURE
@@ -394,7 +394,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 }
 func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 	if expr.IsArray() {
-		var ht *types.Array = expr.GetArr()
+		var ht *types.Array = expr.Array()
 		var val *types.Zval
 		var key *types.String
 		var __ht *types.Array = ht
@@ -407,7 +407,7 @@ func ZendAstAddUnpackedElement(result *types.Zval, expr *types.Zval) int {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
 				return types.FAILURE
 			} else {
-				if result.GetArr().NextIndexInsert(val) == nil {
+				if result.Array().NextIndexInsert(val) == nil {
 					faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 					break
 				}
@@ -845,7 +845,7 @@ func ZendAstExportName(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *types.Zval = ZendAstGetZval(ast)
 		if zv.IsString() {
-			str.AppendString(zv.GetStr().GetStr())
+			str.AppendString(zv.String().GetStr())
 			return
 		}
 	}
@@ -860,7 +860,7 @@ func ZendAstExportNsName(str *SmartStr, ast *ZendAst, priority int, indent int) 
 			} else if ast.GetAttr() == ZEND_NAME_RELATIVE {
 				str.AppendString("namespace\\")
 			}
-			str.AppendString(zv.GetStr().GetStr())
+			str.AppendString(zv.String().GetStr())
 			return
 		}
 	}
@@ -897,8 +897,8 @@ func ZendAstVarNeedsBraces(ch byte) int {
 func ZendAstExportVar(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *types.Zval = ZendAstGetZval(ast)
-		if zv.IsString() && ZendAstValidVarName(zv.GetStr().GetVal(), zv.GetStr().GetLen()) != 0 {
-			str.AppendString(zv.GetStr().GetStr())
+		if zv.IsString() && ZendAstValidVarName(zv.String().GetVal(), zv.String().GetLen()) != 0 {
+			str.AppendString(zv.String().GetStr())
 			return
 		}
 	} else if ast.GetKind() == ZEND_AST_VAR {
@@ -927,7 +927,7 @@ func ZendAstExportEncapsList(str *SmartStr, quote byte, list *ZendAstList, inden
 		if ast.GetKind() == ZEND_AST_ZVAL {
 			var zv *types.Zval = ZendAstGetZval(ast)
 			b.Assert(zv.IsString())
-			ZendAstExportQstr(str, quote, zv.GetStr())
+			ZendAstExportQstr(str, quote, zv.String())
 		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces((*types.Z_STRVAL_P)(ZendAstGetZval(list.GetChild()[i+1]))) == 0) {
 			ZendAstExportEx(str, ast, 0, indent)
 		} else {
@@ -1060,9 +1060,9 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 	case types.IS_TRUE:
 		str.AppendString("true")
 	case types.IS_LONG:
-		str.AppendLong(zv.GetLval())
+		str.AppendLong(zv.Long())
 	case types.IS_DOUBLE:
-		key := ZendSprintf("%.*G", int(EG__().GetPrecision()), zv.GetDval())
+		key := ZendSprintf("%.*G", int(EG__().GetPrecision()), zv.Double())
 		str.AppendString(key)
 	case types.IS_STRING:
 		str.AppendByte('\'')
@@ -1071,7 +1071,7 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 	case types.IS_ARRAY:
 		str.AppendByte('[')
 		first := 1
-		zv.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+		zv.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 			if first != 0 {
 				first = 0
 			} else {
@@ -1412,7 +1412,7 @@ tail_call:
 			b.Assert(ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL)
 			zv = ZendAstGetZval(ast.GetChild()[0])
 			b.Assert(zv.IsString())
-			ZendAstExportQstr(str, '`', zv.GetStr())
+			ZendAstExportQstr(str, '`', zv.String())
 		}
 		str.AppendByte('`')
 	case ZEND_AST_CLONE:

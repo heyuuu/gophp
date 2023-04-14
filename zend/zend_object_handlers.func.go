@@ -73,7 +73,7 @@ func RebuildObjectProperties(zobj *types.ZendObject) {
 }
 func ZendStdGetProperties(object *types.Zval) *types.Array {
 	var zobj *types.ZendObject
-	zobj = object.GetObj()
+	zobj = object.Object()
 	if zobj.GetProperties() == nil {
 		RebuildObjectProperties(zobj)
 	}
@@ -85,7 +85,7 @@ func ZendStdGetGc(object *types.Zval, table **types.Zval, n *int) *types.Array {
 		*n = 0
 		return types.Z_OBJ_HT(*object).GetGetProperties()(object)
 	} else {
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		if zobj.GetProperties() != nil {
 			*table = nil
 			*n = 0
@@ -113,15 +113,15 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 	if retval.IsArray() {
 		if !(retval.IsRefcounted()) {
 			*is_temp = 1
-			return types.ZendArrayDup(retval.GetArr())
+			return types.ZendArrayDup(retval.Array())
 		} else if retval.GetRefcount() <= 1 {
 			*is_temp = 1
-			ht = retval.GetArr()
+			ht = retval.Array()
 			return ht
 		} else {
 			*is_temp = 0
 			ZvalPtrDtor(&retval)
-			return retval.GetArr()
+			return retval.Array()
 		}
 	} else if retval.IsNull() {
 		*is_temp = 1
@@ -496,7 +496,7 @@ func ZendCheckPropertyAccess(zobj *types.ZendObject, prop_info_name *types.Strin
 	}
 }
 func ZendPropertyGuardDtor(el *types.Zval) {
-	var ptr *uint32 = (*uint32)(el.GetPtr())
+	var ptr *uint32 = (*uint32)(el.Ptr())
 	if (types.ZendUintptrT(ptr) & 1) == 0 {
 		EfreeSize(ptr, b.SizeOf("uint32_t"))
 	}
@@ -508,7 +508,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 	b.Assert(zobj.GetCe().IsUseGuards())
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
 	if zv.IsString() {
-		var str *types.String = zv.GetStr()
+		var str *types.String = zv.String()
 		if str.GetStr() == member.GetStr() {
 			return &(zv.GetPropertyGuard())
 		} else if zv.GetPropertyGuard() == 0 {
@@ -525,11 +525,11 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			zv.SetArray(guards)
 		}
 	} else if zv.IsArray() {
-		guards = zv.GetArr()
+		guards = zv.Array()
 		b.Assert(guards != nil)
 		zv = guards.KeyFind(member.GetStr())
 		if zv != nil {
-			return (*uint32)(types.ZendUintptrT(zv.GetPtr()) & ^1)
+			return (*uint32)(types.ZendUintptrT(zv.Ptr()) & ^1)
 		}
 	} else {
 		b.Assert(zv.IsUndef())
@@ -557,7 +557,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	var guard *uint32 = nil
-	zobj = object.GetObj()
+	zobj = object.Object()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
 		return EG__().GetUninitializedZval()
@@ -701,7 +701,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	b.Assert(!(value.IsReference()))
-	zobj = object.GetObj()
+	zobj = object.Object()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
 		return value
@@ -818,7 +818,7 @@ func ZendStdReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv 
 			types.ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
 		object.AddRefcount()
-		tmp_object.SetObject(object.GetObj())
+		tmp_object.SetObject(object.Object())
 		if type_ == BP_VAR_IS {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", rv, &tmp_offset)
 			if rv.IsUndef() {
@@ -860,7 +860,7 @@ func ZendStdWriteDimension(object *types.Zval, offset *types.Zval, value *types.
 			types.ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
 		object.AddRefcount()
-		tmp_object.SetObject(object.GetObj())
+		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith2Params(&tmp_object, ce, nil, "offsetset", nil, &tmp_offset, value)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
@@ -877,7 +877,7 @@ func ZendStdHasDimension(object *types.Zval, offset *types.Zval, check_empty int
 	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		types.ZVAL_COPY_DEREF(&tmp_offset, offset)
 		object.AddRefcount()
-		tmp_object.SetObject(object.GetObj())
+		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", &retval, &tmp_offset)
 		result = IZendIsTrue(&retval)
 		ZvalPtrDtor(&retval)
@@ -901,7 +901,7 @@ func ZendStdGetPropertyPtrPtr(object *types.Zval, member *types.Zval, type_ int,
 	var retval *types.Zval = nil
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	zobj = object.GetObj()
+	zobj = object.Object()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
 		return EG__().GetErrorZval()
@@ -972,7 +972,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 	var tmp_name *types.String
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	zobj = object.GetObj()
+	zobj = object.Object()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
 		return
@@ -981,9 +981,9 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		var slot *types.Zval = OBJ_PROP(zobj, property_offset)
 		if slot.IsNotUndef() {
-			if slot.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(slot.GetRef()) {
+			if slot.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(slot.Reference()) {
 				if prop_info != nil {
-					ZEND_REF_DEL_TYPE_SOURCE(slot.GetRef(), prop_info)
+					ZEND_REF_DEL_TYPE_SOURCE(slot.Reference(), prop_info)
 				}
 			}
 			var tmp types.Zval
@@ -1046,7 +1046,7 @@ func ZendStdUnsetDimension(object *types.Zval, offset *types.Zval) {
 	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		types.ZVAL_COPY_DEREF(&tmp_offset, offset)
 		object.AddRefcount()
-		tmp_object.SetObject(object.GetObj())
+		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetunset", nil, &tmp_offset)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
@@ -1167,7 +1167,7 @@ func ZendStdGetMethod(obj_ptr **types.ZendObject, method_name *types.String, key
 	var lc_method_name *types.String
 	var scope *types.ClassEntry
 	if key != nil {
-		lc_method_name = key.GetStr()
+		lc_method_name = key.String()
 	} else {
 		types.ZstrAlloc(lc_method_name, method_name.GetLen())
 		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
@@ -1219,7 +1219,7 @@ func ZendStdGetStaticMethod(ce *types.ClassEntry, function_name *types.String, k
 	var object *types.ZendObject
 	var scope *types.ClassEntry
 	if key != nil {
-		lc_function_name = key.GetStr()
+		lc_function_name = key.String()
 	} else {
 		lc_function_name = ZendStringTolower(function_name)
 	}
@@ -1374,8 +1374,8 @@ func ZendStdGetConstructor(zobj *types.ZendObject) types.IFunction {
 func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 	var zobj1 *types.ZendObject
 	var zobj2 *types.ZendObject
-	zobj1 = o1.GetObj()
-	zobj2 = o2.GetObj()
+	zobj1 = o1.Object()
+	zobj2 = o2.Object()
 	if zobj1 == zobj2 {
 		return 0
 	}
@@ -1412,9 +1412,9 @@ func ZendStdCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
 						o1.UnprotectRecursive()
 						return false
 					}
-					if result.GetLval() != 0 {
+					if result.Long() != 0 {
 						o1.UnprotectRecursive()
-						ret = result.GetLval()
+						ret = result.Long()
 						return false
 					}
 				} else {
@@ -1455,7 +1455,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 	var tmp_name *types.String
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	zobj = object.GetObj()
+	zobj = object.Object()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
 		return 0
@@ -1606,7 +1606,7 @@ func ZendStdGetClosure(obj *types.Zval, ce_ptr **types.ClassEntry, fptr_ptr *typ
 		}
 	} else {
 		if obj_ptr != nil {
-			*obj_ptr = obj.GetObj()
+			*obj_ptr = obj.Object()
 		}
 	}
 	return types.SUCCESS

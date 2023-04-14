@@ -104,9 +104,9 @@ func ZifApacheRequestHeaders(executeData zpp.Ex, return_value zpp.Ret) {
 		var _z *types.Zval = _p.GetVal()
 
 		key = _p.GetKey()
-		value = _z.GetPtr()
+		value = _z.Ptr()
 		tmp.SetStringVal(b.CastStrAuto(value))
-		return_value.GetArr().SymtableUpdate(key.GetStr(), &tmp)
+		return_value.Array().SymtableUpdate(key.GetStr(), &tmp)
 	}
 }
 func AddResponseHeader(h *core.SapiHeader, return_value *types.Zval) {
@@ -1090,7 +1090,7 @@ func PhpCliServerDtor(server *PhpCliServer) {
 	}
 }
 func PhpCliServerClientDtorWrapper(zv *types.Zval) {
-	var p *PhpCliServerClient = zv.GetPtr()
+	var p *PhpCliServerClient = zv.Ptr()
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
 	PhpCliServerClientDtor(p)

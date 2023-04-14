@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_PRE_INC_SPEC_VAR_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp

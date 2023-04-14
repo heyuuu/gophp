@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
@@ -7,7 +13,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	op1 = opline.Const1()
 	for true {
 		if op1.IsArray() {
-			count = op1.GetArr().Count()
+			count = op1.Array().Count()
 			break
 		} else if op1.IsObject() {
 
@@ -58,7 +64,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	op1 = opline.Op1Ptr(&free_op1)
 	for true {
 		if op1.IsArray() {
-			count = op1.GetArr().Count()
+			count = op1.Array().Count()
 			break
 		} else if op1.IsObject() {
 
@@ -115,7 +121,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	op1 = opline.Op1()
 	for true {
 		if op1.IsArray() {
-			count = op1.GetArr().Count()
+			count = op1.Array().Count()
 			break
 		} else if op1.IsObject() {
 

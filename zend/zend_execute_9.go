@@ -24,18 +24,18 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	case ZEND_REQUIRE_ONCE:
 		var file_handle ZendFileHandle
 		var resolved_path *string
-		resolved_path = ZendResolvePath(inc_filename.GetStr().GetStr())
+		resolved_path = ZendResolvePath(inc_filename.String().GetStr())
 		if resolved_path != nil {
 			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
 				goto already_compiled
 			}
 		} else if EG__().GetException() != nil {
 			break
-		} else if strlen(inc_filename.GetStr().GetVal()) != inc_filename.GetStr().GetLen() {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.GetStr().GetVal())
+		} else if strlen(inc_filename.String().GetVal()) != inc_filename.String().GetLen() {
+			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
 			break
 		} else {
-			*resolved_path = inc_filename.GetStr().GetStr()
+			*resolved_path = inc_filename.String().GetStr()
 		}
 		if types.SUCCESS == ZendStreamOpen(*resolved_path, &file_handle) {
 			if file_handle.GetOpenedPath() == nil {
@@ -54,13 +54,13 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}
 		} else {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.GetStr().GetVal())
+			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
 		}
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
-		if strlen(inc_filename.GetStr().GetVal()) != inc_filename.GetStr().GetLen() {
-			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.GetStr().GetVal())
+		if strlen(inc_filename.String().GetVal()) != inc_filename.String().GetLen() {
+			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), inc_filename.String().GetVal())
 			break
 		}
 		new_op_array = CompileFilename(type_, inc_filename)
@@ -92,7 +92,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *types.Zval) int {
 		faults.ThrowError(nil, "Cannot call overloaded function for non-object")
 		return 0
 	}
-	object = call.GetThis().GetObj()
+	object = call.GetThis().Object()
 	ret.SetNull()
 	EG__().SetCurrentExecuteData(call)
 	object.GetHandlers().GetCallMethod()(fbc.GetFunctionName(), object, call, ret)
@@ -141,17 +141,17 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
 	var orig_key *types.Zval = key
 	var c *ZendConstant = nil
-	c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+	c = EG__().ConstantTable().Get(key.String().GetStr())
 	if c == nil {
 		key++
-		c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+		c = EG__().ConstantTable().Get(key.String().GetStr())
 		if c == nil || c.IsCaseSensitive() {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+				c = EG__().ConstantTable().Get(key.String().GetStr())
 				if c == nil {
 					key++
-					c = EG__().ConstantTable().Get(key.GetStr().GetStr())
+					c = EG__().ConstantTable().Get(key.String().GetStr())
 					if c != nil && c.IsCaseSensitive() {
 						c = nil
 					}
@@ -162,18 +162,18 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 	if c == nil {
 		if check_defined_only == 0 {
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
-				var actual *byte = (*byte)(ZendMemrchr(opline.Const2().GetStr().GetVal(), '\\', opline.Const2().GetStr().GetLen()))
+				var actual *byte = (*byte)(ZendMemrchr(opline.Const2().String().GetVal(), '\\', opline.Const2().String().GetLen()))
 				if actual == nil {
-					opline.Result().SetStringCopy(opline.Const2().GetStr())
+					opline.Result().SetStringCopy(opline.Const2().String())
 				} else {
 					actual++
-					opline.Result().SetStringVal(b.CastStr(actual, opline.Const2().GetStr().GetLen()-(actual-opline.Const2().GetStr().GetVal())))
+					opline.Result().SetStringVal(b.CastStr(actual, opline.Const2().String().GetLen()-(actual-opline.Const2().String().GetVal())))
 				}
 
-				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().GetStr().GetVal(), opline.Result().GetStr().GetVal())
+				faults.Error(faults.E_WARNING, "Use of undefined constant %s - assumed '%s' (this will throw an Error in a future version of PHP)", opline.Result().String().GetVal(), opline.Result().String().GetVal())
 
 			} else {
-				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().GetStr().GetVal())
+				faults.ThrowError(nil, "Undefined constant '%s'", opline.Const2().String().GetVal())
 				opline.Result().SetUndef()
 			}
 		}

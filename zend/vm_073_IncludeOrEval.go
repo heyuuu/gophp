@@ -23,8 +23,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if RETURN_VALUE_USED(opline) {
 			return_value = opline.Result()
 		}
-		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
-		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
+		new_op_array.SetScope(executeData.GetFunc().GetOpArray().scope)
+		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().Ptr())
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			call.SetSymbolTable(executeData.GetSymbolTable())
 		} else {
@@ -76,8 +76,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 		if RETURN_VALUE_USED(opline) {
 			return_value = opline.Result()
 		}
-		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
-		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
+		new_op_array.SetScope(executeData.GetFunc().GetOpArray().scope)
+		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().Ptr())
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			call.SetSymbolTable(executeData.GetSymbolTable())
 		} else {
@@ -127,8 +127,8 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		if RETURN_VALUE_USED(opline) {
 			return_value = opline.Result()
 		}
-		new_op_array.SetScope(executeData.GetFunc().op_array.scope)
-		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().GetPtr())
+		new_op_array.SetScope(executeData.GetFunc().GetOpArray().scope)
+		call = ZendVmStackPushCallFrame(executeData.GetThis().GetTypeInfo()&ZEND_CALL_HAS_THIS|ZEND_CALL_NESTED_CODE|ZEND_CALL_HAS_SYMBOL_TABLE, (types.IFunction)(new_op_array), 0, executeData.GetThis().Ptr())
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 			call.SetSymbolTable(executeData.GetSymbolTable())
 		} else {

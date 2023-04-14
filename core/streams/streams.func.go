@@ -17,7 +17,7 @@ func PhpFileLePstream() int      { return LePstream }
 func PhpFileLeStreamFilter() int { return LeStreamFilter }
 func ForgetPersistentResourceIdNumbers(el *types.Zval) int {
 	var stream *core.PhpStream
-	var rsrc *types.ZendResource = el.GetRes()
+	var rsrc *types.ZendResource = el.Resource()
 	if rsrc.GetType() != LePstream {
 		return 0
 	}
@@ -62,7 +62,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 				for _, _p := range __ht.ForeachData() {
 					var _z *types.Zval = _p.GetVal()
 
-					regentry = _z.GetPtr()
+					regentry = _z.Ptr()
 					if regentry.GetPtr() == le.GetPtr() {
 						regentry.AddRefcount()
 						stream.SetRes(regentry)
@@ -80,7 +80,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 }
 func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
 func WrapperListDtor(item *types.Zval) {
-	var list *zend.ZendLlist = (*zend.ZendLlist)(item.GetPtr())
+	var list *zend.ZendLlist = (*zend.ZendLlist)(item.Ptr())
 	list.Destroy()
 	zend.Efree(list)
 }
@@ -499,24 +499,24 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 }
 func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *types.Zval {
 	var wrapperhash *types.Zval
-	if nil == b.Assign(&wrapperhash, context.GetOptions().GetArr().KeyFind(b.CastStrAuto(wrappername))) {
+	if nil == b.Assign(&wrapperhash, context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))) {
 		return nil
 	}
-	return wrapperhash.GetArr().KeyFind(b.CastStrAuto(optionname))
+	return wrapperhash.Array().KeyFind(b.CastStrAuto(optionname))
 }
 func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *types.Zval) int {
 	var wrapperhash *types.Zval
 	var category types.Zval
 	types.SEPARATE_ARRAY(context.GetOptions())
-	wrapperhash = context.GetOptions().GetArr().KeyFind(b.CastStrAuto(wrappername))
+	wrapperhash = context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
-		wrapperhash = context.GetOptions().GetArr().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
+		wrapperhash = context.GetOptions().Array().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
 	}
 	optionvalue = types.ZVAL_DEREF(optionvalue)
 	optionvalue.TryAddRefcount()
 	types.SEPARATE_ARRAY(wrapperhash)
-	wrapperhash.GetArr().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
+	wrapperhash.Array().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
 	return types.SUCCESS
 }
 func PhpStreamDirentAlphasort(a **types.String, b **types.String) int {

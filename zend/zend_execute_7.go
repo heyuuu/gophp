@@ -8,7 +8,7 @@ import (
 
 func IZvalPtrDtorNoref(zval_ptr *types.Zval) {
 	if zval_ptr.IsRefcounted() {
-		var ref *types.ZendRefcounted = zval_ptr.GetCounted()
+		var ref *types.ZendRefcounted = zval_ptr.RefCounted()
 		b.Assert(zval_ptr.GetType() != types.IS_REFERENCE)
 		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
@@ -21,7 +21,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 	var ret types.ZendBool
 	var value types.Zval
 	types.ZVAL_COPY(&value, orig_value)
-	ret = ZendVerifyRefAssignableZval(variable_ptr.GetRef(), &value, strict)
+	ret = ZendVerifyRefAssignableZval(variable_ptr.Reference(), &value, strict)
 	variable_ptr = types.Z_REFVAL_P(variable_ptr)
 	if ret != 0 {
 		IZvalPtrDtorNoref(variable_ptr)
@@ -43,7 +43,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 }
 func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.Zval, strict types.ZendBool) types.ZendBool {
 	var val *types.Zval = orig_val
-	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.GetRef()) {
+	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.Reference()) {
 		var result int
 		val = types.Z_REFVAL_P(val)
 		result = IZendVerifyTypeAssignableZval(prop_info.GetType(), prop_info.GetCe(), val, strict)
@@ -51,7 +51,7 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *types.
 			return 1
 		}
 		if result < 0 {
-			var ref_prop *ZendPropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.GetRef())
+			var ref_prop *ZendPropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.Reference())
 			if prop_info.GetType().Code() != ref_prop.GetType().Code() {
 
 				/* Invalid due to conflicting coercion */
@@ -130,7 +130,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 	switch type_ {
 	case BP_VAR_R:
 		if executeData.GetThis().IsObject() {
-			result.SetObject(executeData.GetThis().GetObj())
+			result.SetObject(executeData.GetThis().Object())
 			result.AddRefcount()
 		} else {
 			result.SetNull()
@@ -138,7 +138,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 		}
 	case BP_VAR_IS:
 		if executeData.GetThis().IsObject() {
-			result.SetObject(executeData.GetThis().GetObj())
+			result.SetObject(executeData.GetThis().Object())
 			result.AddRefcount()
 		} else {
 			result.SetNull()
@@ -175,10 +175,10 @@ func ZendCleanAndCacheSymbolTable(symbol_table *types.Array) {
 }
 func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	var cv *types.Zval = executeData.VarNum(0)
-	var count int = executeData.GetFunc().op_array.last_var
+	var count int = executeData.GetFunc().GetOpArray().last_var
 	for count != 0 {
 		if cv.IsRefcounted() {
-			var r *types.ZendRefcounted = cv.GetCounted()
+			var r *types.ZendRefcounted = cv.RefCounted()
 			if r.DelRefcount() == 0 {
 				cv.SetNull()
 				RcDtorFunc(r)
@@ -202,7 +202,7 @@ func ZEND_VM_LOOP_INTERRUPT_CHECK(executeData *ZendExecuteData) {
 	}
 }
 func ZendCopyExtraArgs(executeData *ZendExecuteData) {
-	var op_array *types.ZendOpArray = executeData.GetFunc().op_array
+	var op_array *types.ZendOpArray = executeData.GetFunc().GetOpArray()
 	var first_extra_arg uint32 = op_array.GetNumArgs()
 	var num_args uint32 = executeData.NumArgs()
 	var src *types.Zval

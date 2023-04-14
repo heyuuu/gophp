@@ -15,7 +15,7 @@ func ZEND_CATCH_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	catch_ce = CACHED_PTR(opline.GetExtendedValue() & ^ZEND_LAST_CATCH)
 	if catch_ce == nil {
-		catch_ce = ZendFetchClassByName(opline.Const1().GetStr(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
+		catch_ce = ZendFetchClassByName(opline.Const1().String(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		CACHE_PTR(opline.GetExtendedValue() & ^ZEND_LAST_CATCH, catch_ce)
 	}
 	ce = EG__().GetException().GetCe()

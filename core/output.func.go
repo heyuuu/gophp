@@ -451,9 +451,9 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				status = PHP_OUTPUT_HANDLER_NO_DATA
 				if retval.GetType() != types.IS_FALSE && retval.GetType() != types.IS_TRUE {
 					zend.ConvertToStringEx(&retval)
-					if retval.GetStr().GetLen() != 0 {
-						context.GetOut().SetData(zend.Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
-						context.GetOut().SetUsed(retval.GetStr().GetLen())
+					if retval.String().GetLen() != 0 {
+						context.GetOut().SetData(zend.Estrndup(retval.String().GetVal(), retval.String().GetLen()))
+						context.GetOut().SetUsed(retval.String().GetLen())
 						context.GetOut().SetFree(1)
 						status = PHP_OUTPUT_HANDLER_SUCCESS
 					}

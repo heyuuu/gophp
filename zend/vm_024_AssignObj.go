@@ -30,7 +30,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -56,7 +56,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -71,7 +71,7 @@ assign_object:
 
 				}
 
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -120,7 +120,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -146,7 +146,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -155,7 +155,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -208,7 +208,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -234,7 +234,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -243,7 +243,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -295,7 +295,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -321,7 +321,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -330,7 +330,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -702,7 +702,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -728,7 +728,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -743,7 +743,7 @@ assign_object:
 
 				}
 
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -780,7 +780,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -806,7 +806,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -815,7 +815,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -856,7 +856,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -882,7 +882,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -891,7 +891,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -931,7 +931,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -957,7 +957,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -966,7 +966,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -1247,7 +1247,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -1273,7 +1273,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -1288,7 +1288,7 @@ assign_object:
 
 				}
 
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -1333,7 +1333,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -1359,7 +1359,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -1368,7 +1368,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -1417,7 +1417,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -1443,7 +1443,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -1452,7 +1452,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}
@@ -1500,7 +1500,7 @@ assign_object:
 	if types.Z_OBJCE_P(object) == CACHED_PTR(opline.GetExtendedValue()) {
 		var cache_slot *any = CACHE_ADDR(opline.GetExtendedValue())
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = object.GetObj()
+		var zobj *types.ZendObject = object.Object()
 		var property_val *types.Zval
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			property_val = OBJ_PROP(zobj, prop_offset)
@@ -1526,7 +1526,7 @@ assign_object:
 					}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -1535,7 +1535,7 @@ assign_object:
 				if zobj.GetProperties() == nil {
 					RebuildObjectProperties(zobj)
 				}
-				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.String().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					types.ZVAL_COPY(opline.Result(), value)
 				}

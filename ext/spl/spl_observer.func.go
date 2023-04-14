@@ -12,7 +12,7 @@ func SplObjectStorageFromObj(obj *types.ZendObject) *spl_SplObjectStorage {
 	return (*spl_SplObjectStorage)((*byte)(obj - zend_long((*byte)(&((*spl_SplObjectStorage)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLOBJSTORAGE_P(zv *types.Zval) *spl_SplObjectStorage {
-	return SplObjectStorageFromObj(zv.GetObj())
+	return SplObjectStorageFromObj(zv.Object())
 }
 func spl_SplObjectStorage_free_storage(object *types.ZendObject) {
 	var intern *spl_SplObjectStorage = SplObjectStorageFromObj(object)
@@ -44,7 +44,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 	}
 }
 func SplObjectStorageDtor(element *types.Zval) {
-	var el *spl_SplObjectStorageElement = element.GetPtr()
+	var el *spl_SplObjectStorageElement = element.Ptr()
 	zend.ZvalPtrDtor(el.GetObj())
 	zend.ZvalPtrDtor(el.GetInf())
 	zend.Efree(el)
@@ -110,7 +110,7 @@ func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *types.Zval, othe
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		element = _z.GetPtr()
+		element = _z.Ptr()
 		SplObjectStorageAttach(intern, this, element.GetObj(), element.GetInf())
 	}
 	intern.SetIndex(0)
@@ -146,7 +146,7 @@ func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *type
 func SplObjectStorageClone(zobject *types.Zval) *types.ZendObject {
 	var old_object *types.ZendObject
 	var new_object *types.ZendObject
-	old_object = zobject.GetObj()
+	old_object = zobject.Object()
 	new_object = SplObjectStorageNewEx(old_object.GetCe(), zobject)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -167,7 +167,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		element = _z.GetPtr()
+		element = _z.Ptr()
 		md5str := PhpSplObjectHash(element.GetObj())
 		zend.ArrayInit(&tmp)
 
@@ -177,7 +177,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 		types.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
 		zend.AddAssocZvalEx(&tmp, "obj", element.GetObj())
 		zend.AddAssocZvalEx(&tmp, "inf", element.GetInf())
-		storage.GetArr().KeyUpdate(md5str, &tmp)
+		storage.Array().KeyUpdate(md5str, &tmp)
 		// types.ZendStringReleaseEx(md5str, 0)
 	}
 	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage")
@@ -197,7 +197,7 @@ func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.A
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		element = _z.GetPtr()
+		element = _z.Ptr()
 		types.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetObj())
 		types.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetInf())
 	}
@@ -206,17 +206,17 @@ func SplObjectStorageGetGc(obj *types.Zval, table **types.Zval, n *int) *types.A
 	return zend.ZendStdGetProperties(obj)
 }
 func SplObjectStorageCompareInfo(e1 *types.Zval, e2 *types.Zval) int {
-	var s1 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e1.GetPtr())
-	var s2 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e2.GetPtr())
+	var s1 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e1.Ptr())
+	var s2 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e2.Ptr())
 	var result types.Zval
 	if zend.CompareFunction(&result, s1.GetInf(), s2.GetInf()) == types.FAILURE {
 		return 1
 	}
-	return zend.ZEND_NORMALIZE_BOOL(result.GetLval())
+	return zend.ZEND_NORMALIZE_BOOL(result.Long())
 }
 func SplObjectStorageCompareObjects(o1 *types.Zval, o2 *types.Zval) int {
-	var zo1 *types.ZendObject = (*types.ZendObject)(o1.GetObj())
-	var zo2 *types.ZendObject = (*types.ZendObject)(o2.GetObj())
+	var zo1 *types.ZendObject = (*types.ZendObject)(o1.Object())
+	var zo2 *types.ZendObject = (*types.ZendObject)(o2.Object())
 	if zo1.GetCe() != spl_ce_SplObjectStorage || zo2.GetCe() != spl_ce_SplObjectStorage {
 		return 1
 	}
@@ -329,7 +329,7 @@ func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData,
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		element = _z.GetPtr()
+		element = _z.Ptr()
 		if SplObjectStorageContains(other, zend.ZEND_THIS(executeData), element.GetObj()) == 0 {
 			SplObjectStorageDetach(intern, zend.ZEND_THIS(executeData), element.GetObj())
 		}
@@ -520,7 +520,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 		goto outexcept
 	}
 	p--
-	count = pcount.GetLval()
+	count = pcount.Long()
 	if count < 0 {
 		goto outexcept
 	}
@@ -596,7 +596,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 
 	/* copy members */
 
-	zend.ObjectPropertiesLoad(intern.GetStd(), pmembers.GetArr())
+	zend.ObjectPropertiesLoad(intern.GetStd(), pmembers.Array())
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
 	return
 outexcept:
@@ -620,19 +620,19 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		elem = _z.GetPtr()
+		elem = _z.Ptr()
 		elem.GetObj().TryAddRefcount()
-		tmp.GetArr().NextIndexInsert(elem.GetObj())
+		tmp.Array().NextIndexInsert(elem.GetObj())
 		elem.GetInf().TryAddRefcount()
-		tmp.GetArr().NextIndexInsert(elem.GetInf())
+		tmp.Array().NextIndexInsert(elem.GetInf())
 	}
-	return_value.GetArr().NextIndexInsert(&tmp)
+	return_value.Array().NextIndexInsert(&tmp)
 
 	/* members */
 
 	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
 	tmp.TryAddRefcount()
-	return_value.GetArr().NextIndexInsert(&tmp)
+	return_value.Array().NextIndexInsert(&tmp)
 }
 func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
@@ -655,7 +655,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 		return
 	}
 	key = nil
-	var __ht *types.Array = storage_zv.GetArr()
+	var __ht *types.Array = storage_zv.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -671,7 +671,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 			key = val
 		}
 	}
-	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
+	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.Array())
 }
 func zim_spl_SplObjectStorage___debugInfo(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	if !executeData.CheckNumArgsNone(false) {
@@ -843,9 +843,9 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 		if intern.IsKeysAssoc() {
 			switch element.GetInf().GetType() {
 			case types.IS_LONG:
-				zend.AddIndexZval(return_value, element.GetInf().GetLval(), &retval)
+				zend.AddIndexZval(return_value, element.GetInf().Long(), &retval)
 			case types.IS_STRING:
-				return_value.GetArr().SymtableUpdate(element.GetInf().GetStr().GetStr(), &retval)
+				return_value.Array().SymtableUpdate(element.GetInf().String().GetStr(), &retval)
 			default:
 				zend.ZvalPtrDtor(&retval)
 				faults.ThrowException(spl_ce_InvalidArgumentException, "Sub-Iterator is associated with NULL", 0)

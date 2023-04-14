@@ -1,5 +1,10 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var array_ptr *types.Zval

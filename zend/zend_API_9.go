@@ -87,7 +87,7 @@ func ZendDeclareClassConstantEx(ce *types.ClassEntry, name *types.String, value 
 
 	var c *ZendClassConstant = NewClassConstant(ce, value, doc_comment)
 	c.GetValue().SetAccessFlags(uint32(access_type))
-	if value.IsConstant() {
+	if value.IsConstantAst() {
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !ce.ConstantsTable().Add(name.GetStr(), c) {

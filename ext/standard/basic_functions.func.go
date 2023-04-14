@@ -16,7 +16,7 @@ import (
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
 func PhpPutenvDestructor(zv *types.Zval) {
-	var pe *PutenvEntry = zv.GetPtr()
+	var pe *PutenvEntry = zv.Ptr()
 	if pe.GetPreviousValue() != nil {
 		putenv(pe.GetPreviousValue())
 	} else {
@@ -635,7 +635,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
+	if (core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0) && (b.Assign(&args, types.ZendHashFindInd(core.PG__().http_globals[core.TRACK_VARS_SERVER].Array(), types.STR_ARGV)) != nil || b.Assign(&args, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil) {
 		var pos int = 0
 		var entry *types.Zval
 		if args.GetType() != types.IS_ARRAY {
@@ -651,7 +651,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *types.Array = args.GetArr()
+		var __ht *types.Array = args.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -693,7 +693,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 
 		/* Iterate over the hash to construct the argv array. */
 
-		var __ht *types.Array = p_longopts.GetArr()
+		var __ht *types.Array = p_longopts.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -774,25 +774,25 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
-			if b.Assign(&args, return_value.GetArr().IndexFind(optname_int)) != nil {
+			if b.Assign(&args, return_value.Array().IndexFind(optname_int)) != nil {
 				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				args.GetArr().NextIndexInsert(&val)
+				args.Array().NextIndexInsert(&val)
 			} else {
-				return_value.GetArr().IndexUpdate(optname_int, &val)
+				return_value.Array().IndexUpdate(optname_int, &val)
 			}
 		} else {
 
 			/* other strings */
 
-			if b.Assign(&args, return_value.GetArr().KeyFind(b.CastStrAuto(optname))) != nil {
+			if b.Assign(&args, return_value.Array().KeyFind(b.CastStrAuto(optname))) != nil {
 				if args.GetType() != types.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				args.GetArr().NextIndexInsert(&val)
+				args.Array().NextIndexInsert(&val)
 			} else {
-				return_value.GetArr().KeyAdd(b.CastStrAuto(optname), &val)
+				return_value.Array().KeyAdd(b.CastStrAuto(optname), &val)
 			}
 
 			/* other strings */
@@ -956,7 +956,7 @@ func ZifGetCurrentUser(executeData zpp.Ex, return_value zpp.Ret) {
 }
 func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retval *types.Zval) {
 	if entry.IsType(types.IS_STRING) {
-		var str = entry.GetStr().Copy()
+		var str = entry.String().Copy()
 		if key != nil {
 			zend.AddAssocStrEx(retval, key.GetStr(), str.GetStr())
 		} else {
@@ -965,8 +965,8 @@ func AddConfigEntry(h zend.ZendUlong, key *types.String, entry *types.Zval, retv
 	} else if entry.IsType(types.IS_ARRAY) {
 		var tmp types.Zval
 		zend.ArrayInit(&tmp)
-		AddConfigEntries(entry.GetArr(), &tmp)
-		retval.GetArr().KeyUpdate(key.GetStr(), &tmp)
+		AddConfigEntries(entry.Array(), &tmp)
+		retval.Array().KeyUpdate(key.GetStr(), &tmp)
 	}
 }
 func AddConfigEntries(hash *types.Array, return_value *types.Zval) {
@@ -1002,10 +1002,10 @@ func ZifGetCfgVar(executeData zpp.Ex, return_value zpp.Ret, optionName *types.Zv
 	if retval != nil {
 		if retval.IsType(types.IS_ARRAY) {
 			zend.ArrayInit(return_value)
-			AddConfigEntries(retval.GetArr(), return_value)
+			AddConfigEntries(retval.Array(), return_value)
 			return
 		} else {
-			return_value.SetStringVal(b.CastStrAuto(retval.GetStr().GetVal()))
+			return_value.SetStringVal(b.CastStrAuto(retval.String().GetVal()))
 			return
 		}
 	} else {
@@ -1265,7 +1265,7 @@ func ZifForwardStaticCallArray(executeData zpp.Ex, return_value zpp.Ret, functio
 }
 func UserShutdownFunctionDtor(zv *types.Zval) {
 	var i int
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
+	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
 	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 		zend.ZvalPtrDtor(shutdown_function_entry.GetArguments()[i])
 	}
@@ -1280,7 +1280,7 @@ func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
 	zend.Efree(tick_function_entry.GetArguments())
 }
 func UserShutdownFunctionCall(zv *types.Zval) int {
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
+	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
 	var retval types.Zval
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
 		var function_name *types.String = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
@@ -1307,9 +1307,9 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 			var obj *types.Zval
 			var method *types.Zval
 			if function.IsType(types.IS_STRING) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s() - function does not exist", function.GetStr().GetVal())
-			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFind(0)) != nil && b.Assign(&method, function.GetArr().IndexFind(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.GetStr().GetVal())
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s() - function does not exist", function.String().GetVal())
+			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.Array().IndexFind(0)) != nil && b.Assign(&method, function.Array().IndexFind(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.String().GetVal())
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call tick function")
 			}
@@ -1607,14 +1607,14 @@ func ZifIniGetAll(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, extension
 					zend.AddAssocNull(&option, "local_value")
 				}
 				zend.AddAssocLong(&option, "access", ini_entry.GetModifiable())
-				return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), &option)
+				return_value.Array().SymtableUpdate(ini_entry.GetName().GetStr(), &option)
 			} else {
 				if ini_entry.GetValue() != nil {
 					var zv types.Zval
 					zv.SetStringCopy(ini_entry.GetValue())
-					return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), &zv)
+					return_value.Array().SymtableUpdate(ini_entry.GetName().GetStr(), &zv)
 				} else {
-					return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
+					return_value.Array().SymtableUpdate(ini_entry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
 				}
 			}
 		}
@@ -2040,7 +2040,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 
 		}
 		arg2.TryAddRefcount()
-		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), arg2)
+		arr.Array().SymtableUpdate(arg1.String().GetStr(), arg2)
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash types.Zval
 		var find_hash *types.Zval
@@ -2053,27 +2053,27 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		if !(arg1.GetStr().GetLen() > 1 && arg1.GetStr().GetVal()[0] == '0') && zend.IsNumericString(arg1.GetStr().GetStr(), nil, nil, 0) == types.IS_LONG {
+		if !(arg1.String().GetLen() > 1 && arg1.String().GetVal()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
 			var key = zend.StrToLongWithUnit(arg1.GetStrVal())
-			if b.Assign(&find_hash, arr.GetArr().IndexFind(key)) == nil {
+			if b.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = arr.GetArr().IndexAddNew(key, &hash)
+				find_hash = arr.Array().IndexAddNew(key, &hash)
 			}
 		} else {
-			if b.Assign(&find_hash, arr.GetArr().KeyFind(arg1.GetStr().GetStr())) == nil {
+			if b.Assign(&find_hash, arr.Array().KeyFind(arg1.String().GetStr())) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = arr.GetArr().KeyAddNew(arg1.GetStr().GetStr(), &hash)
+				find_hash = arr.Array().KeyAddNew(arg1.String().GetStr(), &hash)
 			}
 		}
 		if find_hash.GetType() != types.IS_ARRAY {
 			zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.GetStr().GetLen() == 0 {
+		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.String().GetLen() == 0 {
 			arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {
-			zend.ArraySetZvalKey(find_hash.GetArr(), arg3, arg2)
+			zend.ArraySetZvalKey(find_hash.Array(), arg3, arg2)
 		}
 	case zend.ZEND_INI_PARSER_SECTION:
 
@@ -2082,7 +2082,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&(BG__().active_ini_file_section))
-		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), &(BG__().active_ini_file_section))
+		arr.Array().SymtableUpdate(arg1.String().GetStr(), &(BG__().active_ini_file_section))
 	} else if arg2 != nil {
 		var active_arr *types.Zval
 		if BG__().active_ini_file_section.IsNotUndef() {
@@ -2135,7 +2135,7 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Z
 	fh.InitFilename(filename)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
-		return_value.GetArr().DestroyEx()
+		return_value.Array().DestroyEx()
 		return_value.SetFalse()
 		return
 	}
@@ -2182,7 +2182,7 @@ func ZifParseIniString(executeData zpp.Ex, return_value zpp.Ret, iniString *type
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
-		return_value.GetArr().DestroyEx()
+		return_value.Array().DestroyEx()
 		return_value.SetFalse()
 	}
 	zend.Efree(string)

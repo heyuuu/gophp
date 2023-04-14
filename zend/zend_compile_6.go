@@ -18,7 +18,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *types.ZendOpArray, uses
 	}
 	for i = 0; i < list.GetChildren(); i++ {
 		var var_name_ast *ZendAst = list.GetChild()[i]
-		var var_name *types.String = ZendAstGetZval(var_name_ast).GetStr()
+		var var_name *types.String = ZendAstGetZval(var_name_ast).String()
 		var mode uint32 = var_name_ast.GetAttr()
 		var opline *ZendOp
 		var value *types.Zval
@@ -499,7 +499,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		var name_ast *ZendAst = prop_ast.GetChild()[0]
 		var value_ast *ZendAst = prop_ast.GetChild()[1]
 		var doc_comment_ast *ZendAst = prop_ast.GetChild()[2]
-		var name *types.String = ZendAstGetZval(name_ast).GetStr()
+		var name *types.String = ZendAstGetZval(name_ast).String()
 		var doc_comment *types.String = nil
 		var value_zv types.Zval
 		var type_ types.ZendType = 0
@@ -523,7 +523,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		}
 		if value_ast != nil {
 			ZendConstExprToZval(&value_zv, value_ast)
-			if type_.IsSet() && !(value_zv.IsConstant()) {
+			if type_.IsSet() && !(value_zv.IsConstantAst()) {
 				if value_zv.IsNull() {
 					if !(type_.AllowNull()) {
 						var name *byte = b.CondF(type_.IsClass(), func() []byte { return types.ZEND_TYPE_NAME(type_).GetVal() }, func() *byte { return types.ZendGetTypeByConst(type_.Code()) })
@@ -570,7 +570,7 @@ func ZendCompileClassConstDecl(ast *ZendAst) {
 		var name_ast *ZendAst = const_ast.GetChild()[0]
 		var value_ast *ZendAst = const_ast.GetChild()[1]
 		var doc_comment_ast *ZendAst = const_ast.GetChild()[2]
-		var name *types.String = ZendAstGetZval(name_ast).GetStr()
+		var name *types.String = ZendAstGetZval(name_ast).String()
 		var doc_comment *types.String = b.CondF1(doc_comment_ast != nil, func() *types.String { return ZendAstGetStr(doc_comment_ast).Copy() }, nil)
 		var value_zv types.Zval
 		if (ast.GetAttr() & (AccStatic | AccAbstract | AccFinal)) != 0 {
@@ -768,7 +768,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel types.ZendBool) *ZendOp {
 		if extends_node.GetOpType() != IS_CONST || extends_node.GetConstant().GetType() != types.IS_STRING {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 		}
-		extends_name = extends_node.GetConstant().GetStr()
+		extends_name = extends_node.GetConstant().String()
 		ce.SetParentName(ZendResolveClassName(extends_name, b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
 		// types.ZendStringReleaseEx(extends_name, 0)
 		ce.SetIsInherited(true)

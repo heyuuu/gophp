@@ -12,7 +12,7 @@ try_instanceof:
 		{
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
-				ce = ZendFetchClassByName(opline.Const2().GetStr(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClassByName(opline.Const2().String(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					CACHE_PTR(opline.GetExtendedValue(), ce)
 				}
@@ -45,7 +45,7 @@ try_instanceof:
 		var ce *types.ClassEntry
 
 		{
-			ce = opline.Op2().GetCe()
+			ce = opline.Op2().Class()
 		}
 		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {
@@ -108,7 +108,7 @@ try_instanceof:
 		{
 			ce = CACHED_PTR(opline.GetExtendedValue())
 			if ce == nil {
-				ce = ZendFetchClassByName(opline.Const2().GetStr(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClassByName(opline.Const2().String(), (opline.Const2() + 1).GetStr(), ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					CACHE_PTR(opline.GetExtendedValue(), ce)
 				}
@@ -139,7 +139,7 @@ try_instanceof:
 		var ce *types.ClassEntry
 
 		{
-			ce = opline.Op2().GetCe()
+			ce = opline.Op2().Class()
 		}
 		result = ce != nil && InstanceofFunction(types.Z_OBJCE_P(expr), ce) != 0
 	} else if expr.IsReference() {

@@ -12,8 +12,8 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		types.ZendHashRealInitPacked(params.GetArr())
 		for {
 			fillScope := types.PackedFillStart(params.GetArr())
-			param = executeData.VarNum(executeData.GetFunc().op_array.last_var + executeData.GetFunc().op_array.T)
-			if (executeData.GetFunc().op_array.fn_flags & AccHasTypeHints) != 0 {
+			param = executeData.VarNum(executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T)
+			if (executeData.GetFunc().GetOpArray().fn_flags & AccHasTypeHints) != 0 {
 				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 				for {
 					ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))

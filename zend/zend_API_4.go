@@ -146,87 +146,87 @@ func ObjectInit(arg *types.Zval) int {
 func AddAssocLongEx(arg *types.Zval, key string, n ZendLong) int {
 	var tmp types.Zval
 	tmp.SetLong(n)
-	arg.GetArr().SymtableUpdate(key, &tmp)
+	arg.Array().SymtableUpdate(key, &tmp)
 	return types.SUCCESS
 }
 func AddAssocNullEx(arg *types.Zval, key string) int {
 	var tmp types.Zval
 	tmp.SetNull()
-	arg.GetArr().SymtableUpdate(key, &tmp)
+	arg.Array().SymtableUpdate(key, &tmp)
 	return types.SUCCESS
 }
 func AddAssocBoolEx(arg *types.Zval, key string, b int) int {
 	var tmp types.Zval
 	tmp.SetBool(b != 0)
-	arg.GetArr().SymtableUpdate(key, &tmp)
+	arg.Array().SymtableUpdate(key, &tmp)
 	return types.SUCCESS
 }
 func AddAssocDoubleEx(arg *types.Zval, key string, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
-	arg.GetArr().SymtableUpdate(key, &tmp)
+	arg.Array().SymtableUpdate(key, &tmp)
 	return types.SUCCESS
 }
 func AddAssocStrEx(arg *types.Zval, key string, str string) int {
-	arg.GetArr().SymtableUpdate(key, types.NewZvalString(str))
+	arg.Array().SymtableUpdate(key, types.NewZvalString(str))
 	return types.SUCCESS
 }
 func AddAssocStringlEx(arg *types.Zval, key string, str string) int {
-	arg.GetArr().SymtableUpdate(key, types.NewZvalString(str))
+	arg.Array().SymtableUpdate(key, types.NewZvalString(str))
 	return types.SUCCESS
 }
 func AddAssocZvalEx(arg *types.Zval, key string, value *types.Zval) int {
-	arg.GetArr().SymtableUpdate(key, value)
+	arg.Array().SymtableUpdate(key, value)
 	return types.SUCCESS
 }
 func AddIndexLong(arg *types.Zval, index ZendUlong, n ZendLong) int {
 	var tmp types.Zval
 	tmp.SetLong(n)
-	arg.GetArr().IndexUpdate(index, &tmp)
+	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexBool(arg *types.Zval, index ZendUlong, b int) int {
 	var tmp types.Zval
 	tmp.SetBool(b != 0)
-	arg.GetArr().IndexUpdate(index, &tmp)
+	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexResource(arg *types.Zval, index ZendUlong, r *types.ZendResource) int {
 	var tmp types.Zval
 	tmp.SetResource(r)
-	arg.GetArr().IndexUpdate(index, &tmp)
+	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexDouble(arg *types.Zval, index ZendUlong, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
-	arg.GetArr().IndexUpdate(index, &tmp)
+	arg.Array().IndexUpdate(index, &tmp)
 	return types.SUCCESS
 }
 func AddIndexStr(arg *types.Zval, index ZendUlong, str *types.String) int {
 	zv := types.NewZvalString(str.GetStr())
-	arg.GetArr().IndexUpdate(index, zv)
+	arg.Array().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddIndexString(arg *types.Zval, index ZendUlong, str *byte) int {
 	zv := types.NewZvalString(b.CastStrAuto(str))
-	arg.GetArr().IndexUpdate(index, zv)
+	arg.Array().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddIndexStringl(arg *types.Zval, index ZendUlong, str *byte, length int) int {
 	zv := types.NewZvalString(b.CastStr(str, length))
-	arg.GetArr().IndexUpdate(index, zv)
+	arg.Array().IndexUpdate(index, zv)
 	return types.SUCCESS
 }
 func AddNextIndexLong(arg *types.Zval, n ZendLong) int {
-	if arg.GetArr().NextIndexInsert(types.NewZvalLong(n)) != nil {
+	if arg.Array().NextIndexInsert(types.NewZvalLong(n)) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
 	}
 }
 func AddNextIndexNull(arg *types.Zval) int {
-	if arg.GetArr().NextIndexInsert(types.NewZvalNull()) != nil {
+	if arg.Array().NextIndexInsert(types.NewZvalNull()) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -235,7 +235,7 @@ func AddNextIndexNull(arg *types.Zval) int {
 func AddNextIndexBool(arg *types.Zval, b int) int {
 	var tmp types.Zval
 	tmp.SetBool(b != 0)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -244,7 +244,7 @@ func AddNextIndexBool(arg *types.Zval, b int) int {
 func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
 	var tmp types.Zval
 	tmp.SetResource(r)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -253,7 +253,7 @@ func AddNextIndexResource(arg *types.Zval, r *types.ZendResource) int {
 func AddNextIndexDouble(arg *types.Zval, d float64) int {
 	var tmp types.Zval
 	tmp.SetDouble(d)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -262,7 +262,7 @@ func AddNextIndexDouble(arg *types.Zval, d float64) int {
 func AddNextIndexStrEx(arg *types.Zval, str string) int {
 	var tmp types.Zval
 	tmp.SetStringVal(str)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -271,7 +271,7 @@ func AddNextIndexStrEx(arg *types.Zval, str string) int {
 func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 	var tmp types.Zval
 	tmp.SetString(str)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -280,7 +280,7 @@ func AddNextIndexStr(arg *types.Zval, str *types.String) int {
 func AddNextIndexString(arg *types.Zval, str string) int {
 	var tmp types.Zval
 	tmp.SetStringVal(str)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -289,7 +289,7 @@ func AddNextIndexString(arg *types.Zval, str string) int {
 func AddNextIndexStringl(arg *types.Zval, str *byte, length int) int {
 	var tmp types.Zval
 	tmp.SetStringVal(b.CastStr(str, length))
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.Array().NextIndexInsert(&tmp) != nil {
 		return types.SUCCESS
 	} else {
 		return types.FAILURE
@@ -299,7 +299,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 	var result *types.Zval
 	switch key.GetType() {
 	case types.IS_STRING:
-		result = ht.SymtableUpdate(key.GetStr().GetStr(), value)
+		result = ht.SymtableUpdate(key.String().GetStr(), value)
 		break
 	case types.IS_NULL:
 		result = ht.SymtableUpdate(types.NewString("").GetStr(), value)
@@ -315,10 +315,10 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = ht.IndexUpdate(1, value)
 		break
 	case types.IS_LONG:
-		result = ht.IndexUpdate(key.GetLval(), value)
+		result = ht.IndexUpdate(key.Long(), value)
 		break
 	case types.IS_DOUBLE:
-		result = ht.IndexUpdate(DvalToLval(key.GetDval()), value)
+		result = ht.IndexUpdate(DvalToLval(key.Double()), value)
 		break
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")

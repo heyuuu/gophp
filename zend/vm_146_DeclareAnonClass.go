@@ -31,7 +31,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	afterGetCe:
 		b.Assert(ce != nil)
 		if !ce.IsLinked() {
-			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().GetStr() }, nil)) == types.FAILURE {
+			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *types.String { return opline.Const2().String() }, nil)) == types.FAILURE {
 				return 0
 			}
 		}

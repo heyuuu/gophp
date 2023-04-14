@@ -1,12 +1,14 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op *types.Zval
 	var jump_zv *types.Zval
 	var jumptable *types.Array
 	op = opline.Const1()
-	jumptable = opline.Const2().GetArr()
+	jumptable = opline.Const2().Array()
 	if op.GetType() != types.IS_STRING {
 		{
 
@@ -41,7 +43,7 @@ func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData
 	var jump_zv *types.Zval
 	var jumptable *types.Array
 	op = opline.Op1()
-	jumptable = opline.Const2().GetArr()
+	jumptable = opline.Const2().Array()
 	if op.GetType() != types.IS_STRING {
 
 		/* Wrong type, fall back to ZEND_CASE chain */

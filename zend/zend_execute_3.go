@@ -155,7 +155,7 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		}
 		return
 	}
-	if offset < -ZendLong(str.GetStr().GetLen()) {
+	if offset < -ZendLong(str.String().GetLen()) {
 
 		faults.Error(faults.E_WARNING, "Illegal string offset:  "+ZEND_LONG_FMT, offset)
 		if RETURN_VALUE_USED(opline) {
@@ -178,8 +178,8 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		c = types.ZendUchar(tmp.GetVal()[0])
 		// types.ZendStringReleaseEx(tmp, 0)
 	} else {
-		string_len = value.GetStr().GetLen()
-		c = types.ZendUchar(value.GetStr().GetVal()[0])
+		string_len = value.String().GetLen()
+		c = types.ZendUchar(value.String().GetVal()[0])
 	}
 	if string_len == 0 {
 
@@ -192,23 +192,23 @@ func ZendAssignToStringOffset(str *types.Zval, dim *types.Zval, value *types.Zva
 		return
 	}
 	if offset < 0 {
-		offset += ZendLong(str.GetStr().GetLen())
+		offset += ZendLong(str.String().GetLen())
 	}
-	if int(offset >= str.GetStr().GetLen()) != 0 {
+	if int(offset >= str.String().GetLen()) != 0 {
 
-		var old_len ZendLong = str.GetStr().GetLen()
-		str.SetString(types.ZendStringExtend(str.GetStr(), offset+1))
-		memset(str.GetStr().GetVal()+old_len, ' ', offset-old_len)
-		str.GetStr().GetVal()[offset+1] = 0
+		var old_len ZendLong = str.String().GetLen()
+		str.SetString(types.ZendStringExtend(str.String(), offset+1))
+		memset(str.String().GetVal()+old_len, ' ', offset-old_len)
+		str.String().GetVal()[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
-		str.SetString(types.NewString(str.GetStr().GetStr()))
+		str.SetString(types.NewString(str.String().GetStr()))
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		str.SetString(types.NewString(str.GetStr().GetStr()))
+		str.SetString(types.NewString(str.String().GetStr()))
 	} else {
-		//types.ZendStringForgetHashVal(str.GetStr())
+		//types.ZendStringForgetHashVal(str.String())
 	}
-	str.GetStr().GetVal()[offset] = c
+	str.String().GetVal()[offset] = c
 	if RETURN_VALUE_USED(opline) {
 		/* Return the new character */
 		opline.Result().SetStringVal(string(c))
@@ -324,7 +324,7 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, op
 	} else {
 		for {
 			if prop.IsReference() {
-				var ref *types.ZendReference = prop.GetRef()
+				var ref *types.ZendReference = prop.Reference()
 				prop = types.Z_REFVAL_P(prop)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					ZendIncdecTypedRef(ref, nil, opline, executeData)
@@ -347,7 +347,7 @@ func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, op
 }
 func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
 	if prop.IsLong() {
-		opline.Result().SetLong(prop.GetLval())
+		opline.Result().SetLong(prop.Long())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			FastLongIncrementFunction(prop)
 		} else {
@@ -359,7 +359,7 @@ func ZendPostIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, o
 		}
 	} else {
 		if prop.IsReference() {
-			var ref *types.ZendReference = prop.GetRef()
+			var ref *types.ZendReference = prop.Reference()
 			prop = types.Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendIncdecTypedRef(ref, opline.Result(), opline, executeData)
@@ -383,11 +383,11 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	var obj types.Zval
 	var z *types.Zval
 	var z_copy types.Zval
-	obj.SetObject(object.GetObj())
+	obj.SetObject(object.Object())
 	obj.AddRefcount()
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
-		OBJ_RELEASE(obj.GetObj())
+		OBJ_RELEASE(obj.Object())
 		opline.Result().SetUndef()
 		return
 	}
@@ -407,7 +407,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 		DecrementFunction(&z_copy)
 	}
 	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
-	OBJ_RELEASE(obj.GetObj())
+	OBJ_RELEASE(obj.Object())
 	ZvalPtrDtor(&z_copy)
 	ZvalPtrDtor(z)
 }

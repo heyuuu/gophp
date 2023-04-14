@@ -16,7 +16,7 @@ import (
 func FG__() *PhpFileGlobals { return &FileGlobals }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *types.Zval) {
 	b.Assert(arg.IsType(types.IS_RESOURCE))
-	core.PhpStreamFromRes(stream, arg.GetRes())
+	core.PhpStreamFromRes(stream, arg.Resource())
 }
 func PhpLeStreamContext() int { return LeStreamContext }
 func FileContextDtor(res *types.ZendResource) {
@@ -466,10 +466,10 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		zend.ConvertToStringEx(data)
 		fallthrough
 	case types.IS_STRING:
-		if data.GetStr().GetLen() != 0 {
-			numbytes = core.PhpStreamWrite(stream, data.GetStr().GetVal(), data.GetStr().GetLen())
-			if numbytes != data.GetStr().GetLen() {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.GetStr().GetLen())
+		if data.String().GetLen() != 0 {
+			numbytes = core.PhpStreamWrite(stream, data.String().GetVal(), data.String().GetLen())
+			if numbytes != data.String().GetLen() {
+				core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, data.String().GetLen())
 				numbytes = -1
 			}
 		}
@@ -477,7 +477,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		if types.Z_ARRVAL_P(data).Len() {
 			var bytes_written ssize_t
 			var tmp *types.Zval
-			var __ht *types.Array = data.GetArr()
+			var __ht *types.Array = data.Array()
 			for _, _p := range __ht.ForeachData() {
 				var _z *types.Zval = _p.GetVal()
 
@@ -501,9 +501,9 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 		if types.Z_OBJ_HT_P(data) != nil {
 			var out types.Zval
 			if zend.ZendStdCastObjectTostring(data, &out, types.IS_STRING) == types.SUCCESS {
-				numbytes = core.PhpStreamWrite(stream, out.GetStr().GetVal(), out.GetStr().GetLen())
-				if numbytes != out.GetStr().GetLen() {
-					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.GetStr().GetLen())
+				numbytes = core.PhpStreamWrite(stream, out.String().GetVal(), out.String().GetLen())
+				if numbytes != out.String().GetLen() {
+					core.PhpErrorDocref(nil, faults.E_WARNING, "Only %zd of %zd bytes written, possibly out of free disk space", numbytes, out.String().GetLen())
 					numbytes = -1
 				}
 
@@ -965,7 +965,7 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		}
 		break
 	}
-	what = zend.ZendFetchResource2(file_handle.GetRes(), "File-Handle", streams.PhpFileLeStream(), streams.PhpFileLePstream())
+	what = zend.ZendFetchResource2(file_handle.Resource(), "File-Handle", streams.PhpFileLeStream(), streams.PhpFileLePstream())
 
 	/* we can't do a ZEND_VERIFY_RESOURCE(what), otherwise we end up
 	 * with a leak if we have an invalid filehandle. This needs changing
@@ -1436,35 +1436,35 @@ func ZifFstat(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
 
 	/* Store numeric indexes in proper order */
 
-	return_value.GetArr().NextIndexInsert(&stat_dev)
-	return_value.GetArr().NextIndexInsert(&stat_ino)
-	return_value.GetArr().NextIndexInsert(&stat_mode)
-	return_value.GetArr().NextIndexInsert(&stat_nlink)
-	return_value.GetArr().NextIndexInsert(&stat_uid)
-	return_value.GetArr().NextIndexInsert(&stat_gid)
-	return_value.GetArr().NextIndexInsert(&stat_rdev)
-	return_value.GetArr().NextIndexInsert(&stat_size)
-	return_value.GetArr().NextIndexInsert(&stat_atime)
-	return_value.GetArr().NextIndexInsert(&stat_mtime)
-	return_value.GetArr().NextIndexInsert(&stat_ctime)
-	return_value.GetArr().NextIndexInsert(&stat_blksize)
-	return_value.GetArr().NextIndexInsert(&stat_blocks)
+	return_value.Array().NextIndexInsert(&stat_dev)
+	return_value.Array().NextIndexInsert(&stat_ino)
+	return_value.Array().NextIndexInsert(&stat_mode)
+	return_value.Array().NextIndexInsert(&stat_nlink)
+	return_value.Array().NextIndexInsert(&stat_uid)
+	return_value.Array().NextIndexInsert(&stat_gid)
+	return_value.Array().NextIndexInsert(&stat_rdev)
+	return_value.Array().NextIndexInsert(&stat_size)
+	return_value.Array().NextIndexInsert(&stat_atime)
+	return_value.Array().NextIndexInsert(&stat_mtime)
+	return_value.Array().NextIndexInsert(&stat_ctime)
+	return_value.Array().NextIndexInsert(&stat_blksize)
+	return_value.Array().NextIndexInsert(&stat_blocks)
 
 	/* Store string indexes referencing the same zval*/
 
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[0]), &stat_dev)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[1]), &stat_ino)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[2]), &stat_mode)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[3]), &stat_nlink)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[4]), &stat_uid)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[5]), &stat_gid)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[6]), &stat_rdev)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[7]), &stat_size)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[8]), &stat_atime)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[9]), &stat_mtime)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[10]), &stat_ctime)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[11]), &stat_blksize)
-	return_value.GetArr().KeyAddNew(b.CastStrAuto(stat_sb_names[12]), &stat_blocks)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[0]), &stat_dev)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[1]), &stat_ino)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[2]), &stat_mode)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[3]), &stat_nlink)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[4]), &stat_uid)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[5]), &stat_gid)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[6]), &stat_rdev)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[7]), &stat_size)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[8]), &stat_atime)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[9]), &stat_mtime)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[10]), &stat_ctime)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[11]), &stat_blksize)
+	return_value.Array().KeyAddNew(b.CastStrAuto(stat_sb_names[12]), &stat_blocks)
 }
 func ZifCopy(executeData zpp.Ex, return_value zpp.Ret, sourceFile *types.Zval, destinationFile *types.Zval, _ zpp.Opt, context *types.Zval) {
 	var source *byte
@@ -1754,7 +1754,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	var csvline zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = types.Z_ARRVAL_P(fields).Len()
-	var __ht *types.Array = fields.GetArr()
+	var __ht *types.Array = fields.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
@@ -2024,7 +2024,7 @@ func PhpFgetcsv(
 							if int(temp_len > size_t(limit-buf)) != 0 {
 								goto quit_loop_2
 							}
-							return_value.GetArr().DestroyEx()
+							return_value.Array().DestroyEx()
 							return_value.SetFalse()
 							goto out
 						}

@@ -212,8 +212,8 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 				if free_zcopy != 0 {
 					zvp = &zcopy
 				}
-				s_len = zvp.GetStr().GetLen()
-				s = zvp.GetStr().GetVal()
+				s_len = zvp.String().GetLen()
+				s = zvp.String().GetVal()
 				if adjust_precision != 0 && int(precision < s_len) != 0 {
 					s_len = precision
 				}

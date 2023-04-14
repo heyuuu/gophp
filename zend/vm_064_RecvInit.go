@@ -18,7 +18,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					types.ZVAL_COPY_VALUE(param, cache_val)
 				} else {
 					types.ZVAL_COPY(param, default_value)
-					if ZvalUpdateConstantEx(param, executeData.GetFunc().op_array.scope) != types.SUCCESS {
+					if ZvalUpdateConstantEx(param, executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
 						ZvalPtrDtorNogc(param)
 						param.SetUndef()
 						return 0
@@ -33,7 +33,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		} else {
 		recv_init_check_type:
-			if (executeData.GetFunc().op_array.fn_flags & AccHasTypeHints) != 0 {
+			if (executeData.GetFunc().GetOpArray().fn_flags & AccHasTypeHints) != 0 {
 				var default_value *types.Zval = opline.Const2()
 				if ZendVerifyRecvArgType(executeData.GetFunc(), arg_num, param, default_value, CACHE_ADDR(opline.GetExtendedValue())) == 0 {
 					return 0

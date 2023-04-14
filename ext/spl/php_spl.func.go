@@ -44,7 +44,7 @@ func ZifClassParents(executeData zpp.Ex, return_value zpp.Ret, instance *types.Z
 		return
 	}
 	if obj.IsType(types.IS_STRING) {
-		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
+		if nil == b.Assign(&ce, SplFindCeByName(obj.String(), autoload)) {
 			return_value.SetFalse()
 			return
 		}
@@ -72,7 +72,7 @@ func ZifClassImplements(executeData zpp.Ex, return_value zpp.Ret, what *types.Zv
 		return
 	}
 	if obj.IsType(types.IS_STRING) {
-		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
+		if nil == b.Assign(&ce, SplFindCeByName(obj.String(), autoload)) {
 			return_value.SetFalse()
 			return
 		}
@@ -96,7 +96,7 @@ func ZifClassUses(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval, _ 
 		return
 	}
 	if obj.IsType(types.IS_STRING) {
-		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
+		if nil == b.Assign(&ce, SplFindCeByName(obj.String(), autoload)) {
 			return_value.SetFalse()
 			return
 		}
@@ -271,7 +271,7 @@ func ZifSplAutoloadExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Op
 	}
 }
 func AutoloadFuncInfoDtor(element *types.Zval) {
-	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.GetPtr())
+	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.Ptr())
 	if !(alfi.GetObj().IsUndef()) {
 		zend.ZvalPtrDtor(alfi.GetObj())
 	}
@@ -302,7 +302,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
 		var l_autoload_running int = SPL_G(autoload_running)
 		SPL_G(autoload_running) = 1
-		lc_name = zend.ZendStringTolower(class_name.GetStr())
+		lc_name = zend.ZendStringTolower(class_name.String())
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetRetval(&retval)
 		fci.SetParamCount(1)
@@ -329,8 +329,8 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 					fcic.SetCalledScope(called_scope)
 				}
 			} else {
-				fci.SetObject(alfi.GetObj().GetObj())
-				fcic.SetObject(alfi.GetObj().GetObj())
+				fci.SetObject(alfi.GetObj().Object())
+				fcic.SetObject(alfi.GetObj().Object())
 				fcic.SetCalledScope(types.Z_OBJCE(alfi.GetObj()))
 			}
 			zend.ZendCallFunction(&fci, &fcic)
@@ -647,7 +647,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 			var tmp types.Zval
 			zend.ArrayInit(return_value)
 			tmp.SetStringVal(types.STR_MAGIC_AUTOLOAD)
-			return_value.GetArr().NextIndexInsertNew(&tmp)
+			return_value.Array().NextIndexInsertNew(&tmp)
 			return
 		}
 		return_value.SetFalse()
@@ -662,7 +662,7 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 			var _z *types.Zval = _p.GetVal()
 
 			key = _p.GetKey()
-			alfi = _z.GetPtr()
+			alfi = _z.Ptr()
 			if !(alfi.GetClosure().IsUndef()) {
 				alfi.GetClosure().AddRefcount()
 				zend.AddNextIndexZval(return_value, alfi.GetClosure())
@@ -728,7 +728,7 @@ func PhpSplObjectHash(obj *types.Zval) string {
 }
 func SplBuildClassListString(entry *types.Zval, list **byte) {
 	var res *byte
-	core.Spprintf(&res, 0, "%s, %s", *list, entry.GetStr().GetVal())
+	core.Spprintf(&res, 0, "%s, %s", *list, entry.String().GetVal())
 	zend.Efree(*list)
 	*list = res
 }
@@ -795,14 +795,14 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, 1, zend.AccInterface)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.AccInterface)
 	strg = zend.Estrdup("")
-	var __ht *types.Array = list.GetArr()
+	var __ht *types.Array = list.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		zv = _z
 		SplBuildClassListString(zv, &strg)
 	}
-	list.GetArr().DestroyEx()
+	list.Array().DestroyEx()
 	standard.PhpInfoPrintTableRow(2, "Interfaces", strg+2)
 	zend.Efree(strg)
 	zend.ArrayInit(&list)
@@ -862,14 +862,14 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, -1, zend.AccInterface)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.AccInterface)
 	strg = zend.Estrdup("")
-	var __ht__1 *types.Array = list.GetArr()
+	var __ht__1 *types.Array = list.Array()
 	for _, _p := range __ht__1.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		zv = _z
 		SplBuildClassListString(zv, &strg)
 	}
-	list.GetArr().DestroyEx()
+	list.Array().DestroyEx()
 	standard.PhpInfoPrintTableRow(2, "Classes", strg+2)
 	zend.Efree(strg)
 	standard.PhpInfoPrintTableEnd()

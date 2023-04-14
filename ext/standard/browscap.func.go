@@ -13,7 +13,7 @@ import (
 
 func BROWSCAP_G(v __auto__) __auto__ { return BrowscapGlobals.v }
 func BrowscapEntryDtor(zvalue *types.Zval) {
-	var entry *BrowscapEntry = zvalue.GetPtr()
+	var entry *BrowscapEntry = zvalue.Ptr()
 	// types.ZendStringReleaseEx(entry.GetPattern(), 0)
 	if entry.GetParent() != nil {
 		// types.ZendStringReleaseEx(entry.GetParent(), 0)
@@ -21,7 +21,7 @@ func BrowscapEntryDtor(zvalue *types.Zval) {
 	zend.Efree(entry)
 }
 func BrowscapEntryDtorPersistent(zvalue *types.Zval) {
-	var entry *BrowscapEntry = zvalue.GetPtr()
+	var entry *BrowscapEntry = zvalue.Ptr()
 	// types.ZendStringReleaseEx(entry.GetPattern(), 1)
 	if entry.GetParent() != nil {
 		// types.ZendStringReleaseEx(entry.GetParent(), 1)
@@ -192,18 +192,18 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 
 			/* Set proper value for true/false settings */
 
-			if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
+			if arg2.String().GetLen() == 2 && !(strncasecmp(arg2.String().GetVal(), "on", b.SizeOf("\"on\"")-1)) || arg2.String().GetLen() == 3 && !(strncasecmp(arg2.String().GetVal(), "yes", b.SizeOf("\"yes\"")-1)) || arg2.String().GetLen() == 4 && !(strncasecmp(arg2.String().GetVal(), "true", b.SizeOf("\"true\"")-1)) {
 				new_value = types.NewString("1")
-			} else if arg2.GetStr().GetLen() == 2 && !(strncasecmp(arg2.GetStr().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.GetStr().GetLen() == 3 && !(strncasecmp(arg2.GetStr().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.GetStr().GetLen() == 4 && !(strncasecmp(arg2.GetStr().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.GetStr().GetLen() == 5 && !(strncasecmp(arg2.GetStr().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
+			} else if arg2.String().GetLen() == 2 && !(strncasecmp(arg2.String().GetVal(), "no", b.SizeOf("\"no\"")-1)) || arg2.String().GetLen() == 3 && !(strncasecmp(arg2.String().GetVal(), "off", b.SizeOf("\"off\"")-1)) || arg2.String().GetLen() == 4 && !(strncasecmp(arg2.String().GetVal(), "none", b.SizeOf("\"none\"")-1)) || arg2.String().GetLen() == 5 && !(strncasecmp(arg2.String().GetVal(), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = types.NewString("")
 			} else {
-				new_value = BrowscapInternStr(ctx, arg2.GetStr())
+				new_value = BrowscapInternStr(ctx, arg2.String())
 			}
-			if !(strcasecmp(arg1.GetStr().GetVal(), "parent")) {
+			if !(strcasecmp(arg1.String().GetVal(), "parent")) {
 
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
-				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.GetStr().GetVal())) {
+				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), arg2.String().GetVal())) {
 					faults.Error(faults.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
 					return
 				}
@@ -212,14 +212,14 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
-				new_key = BrowscapInternStrCi(ctx, arg1.GetStr())
+				new_key = BrowscapInternStrCi(ctx, arg1.String())
 				BrowscapAddKv(bdata, new_key, new_value, persistent)
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
 		}
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *types.String = arg1.GetStr()
+		var pattern *types.String = arg1.String()
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
@@ -471,7 +471,7 @@ func BrowscapZvalCopyCtor(p *types.Zval) {
 	if p.IsRefcounted() {
 		var str *types.String
 		b.Assert(p.IsType(types.IS_STRING))
-		str = p.GetStr().Copy()
+		str = p.String().Copy()
 		p.SetString(str)
 	}
 }
@@ -514,14 +514,14 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 	if agent_name == nil {
 		var http_user_agent *types.Zval = nil
 		if core.PG__().http_globals[core.TRACK_VARS_SERVER].GetType() == types.IS_ARRAY || zend.ZendIsAutoGlobalStr("_SERVER") != 0 {
-			http_user_agent = core.PG__().http_globals[core.TRACK_VARS_SERVER].GetArr().KeyFind("HTTP_USER_AGENT")
+			http_user_agent = core.PG__().http_globals[core.TRACK_VARS_SERVER].Array().KeyFind("HTTP_USER_AGENT")
 		}
 		if http_user_agent == nil {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
 			return_value.SetFalse()
 			return
 		}
-		agent_name = http_user_agent.GetStr()
+		agent_name = http_user_agent.String()
 	}
 	lookup_browser_name = zend.ZendStringTolower(agent_name)
 	found_entry = types.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name.GetStr())
@@ -531,7 +531,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
-			entry = _z.GetPtr()
+			entry = _z.Ptr()
 			if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
 				break
 			}
@@ -558,7 +558,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 		}
 		agent_ht = BrowscapEntryToArray(bdata, found_entry)
 		if return_array != 0 {
-			types.ZendHashMerge(return_value.GetArr(), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			types.ZendHashMerge(return_value.Array(), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		} else {
 			types.ZendHashMerge(types.Z_OBJPROP_P(return_value), agent_ht, types.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		}

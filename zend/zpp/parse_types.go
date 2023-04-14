@@ -46,7 +46,7 @@ func ParseLong(arg *types.Zval, checkNull bool, cap bool, weak bool) (dest int, 
 
 	// base parse
 	if arg.IsLong() {
-		return parseArgSucc(arg.GetLval())
+		return parseArgSucc(arg.Long())
 	}
 
 	// weak parse
@@ -60,7 +60,7 @@ func ParseLong(arg *types.Zval, checkNull bool, cap bool, weak bool) (dest int, 
 func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg = zend.ConvertNumericStrAsZval(arg.GetStr().GetStr(), zend.ConvertNoticeOnErrors)
+		arg = zend.ConvertNumericStrAsZval(arg.String().GetStr(), zend.ConvertNoticeOnErrors)
 		if arg == nil {
 			return // fail
 		}
@@ -75,9 +75,9 @@ func ParseLongWeak(arg *types.Zval, cap bool) (dest int, ok bool) {
 	case types.IS_TRUE:
 		dest = 1
 	case types.IS_LONG:
-		dest = arg.GetLval()
+		dest = arg.Long()
 	case types.IS_DOUBLE:
-		return parseArgWeak_DvalToLval(arg.GetDval(), cap)
+		return parseArgWeak_DvalToLval(arg.Double(), cap)
 	default:
 		return // fail
 	}
@@ -107,9 +107,9 @@ func ParseDouble(arg *types.Zval, checkNull bool, weak bool) (dest float64, isNu
 
 	// base parse
 	if arg.IsLong() {
-		return parseArgSucc(arg.GetDval())
+		return parseArgSucc(arg.Double())
 	} else if arg.IsLong() {
-		return parseArgSucc(float64(arg.GetLval()))
+		return parseArgSucc(float64(arg.Long()))
 	}
 
 	// weak parse
@@ -123,7 +123,7 @@ func ParseDouble(arg *types.Zval, checkNull bool, weak bool) (dest float64, isNu
 func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	// 字符串类型尝试转数字
 	if arg.IsString() {
-		arg = zend.ConvertNumericStrAsZval(arg.GetStr().GetStr(), zend.ConvertNoticeOnErrors)
+		arg = zend.ConvertNumericStrAsZval(arg.String().GetStr(), zend.ConvertNoticeOnErrors)
 		if arg == nil {
 			return // fail
 		}
@@ -138,9 +138,9 @@ func ParseDoubleWeak(arg *types.Zval) (dest float64, ok bool) {
 	case types.IS_TRUE:
 		dest = 1
 	case types.IS_LONG:
-		dest = float64(arg.GetLval())
+		dest = float64(arg.Long())
 	case types.IS_DOUBLE:
-		dest = arg.GetDval()
+		dest = arg.Double()
 	default:
 		return // fail
 	}
@@ -159,7 +159,7 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, 
 
 	// base parse
 	if arg.IsString() {
-		return arg.GetStr(), true
+		return arg.String(), true
 	}
 
 	// weak parse
@@ -174,17 +174,17 @@ func ParseZStr(arg *types.Zval, checkNull bool, weak bool) (dest *types.String, 
 func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 	if arg.GetType() < types.IS_STRING {
 		zend.ConvertToString(arg)
-		return arg.GetStr(), true
+		return arg.String(), true
 	} else if arg.IsString() {
-		return arg.GetStr(), true
+		return arg.String(), true
 	} else if arg.IsObject() {
-		handlers := arg.GetObj().GetHandlers()
+		handlers := arg.Object().GetHandlers()
 		if castFunc := handlers.GetCastObject(); castFunc != nil {
 			var obj types.Zval
 			if castFunc(arg, &obj, types.IS_STRING) == types.SUCCESS {
 				zend.ZvalPtrDtor(arg)
 				types.ZVAL_COPY_VALUE(arg, &obj)
-				return arg.GetStr(), true
+				return arg.String(), true
 			}
 		} else if getFunc := handlers.GetGet(); getFunc != nil {
 			var rv types.Zval
@@ -197,7 +197,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 					arg.SetString(zend.ZvalGetStringFunc(z))
 					zend.ZvalPtrDtor(z)
 				}
-				return arg.GetStr(), true
+				return arg.String(), true
 			}
 			zend.ZvalPtrDtor(z)
 		}
@@ -265,7 +265,7 @@ func ParseArray(arg *types.Zval, checkNull bool, orObject bool) (dest *types.Zva
 
 func ParseArrayHt(arg *types.Zval, checkNull bool, orObject bool, separate bool) (dest *types.Array, ok bool) {
 	if arg.IsArray() {
-		return arg.GetArr(), true
+		return arg.Array(), true
 	} else if orObject && arg.IsObject() {
 		if separate && types.Z_OBJ_P(arg).GetProperties() != nil && types.Z_OBJ_P(arg).GetProperties().GetRefcount() > 1 {
 			if (types.Z_OBJ_P(arg).GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
@@ -329,7 +329,7 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 	if zend.TryConvertToString(arg) == 0 {
 		return nil, false
 	}
-	ce = zend.ZendLookupClass(arg.GetStr())
+	ce = zend.ZendLookupClass(arg.String())
 	if baseCe != nil {
 		if ce == nil || zend.InstanceofFunction(ce, baseCe) == 0 {
 			faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", zend.GetActiveCalleeName(), num, baseCe.Name(), arg.GetStrVal())
@@ -337,7 +337,7 @@ func ParseClass(arg *types.Zval, baseCe *types.ClassEntry, num int, checkNull bo
 		}
 	}
 	if ce == nil {
-		faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.GetStr().GetVal())
+		faults.InternalTypeError(zend.CurrEX().IsArgUseStrictTypes(), "%s() expects parameter %d to be a valid class name, '%s' given", zend.GetActiveCalleeName(), num, arg.String().GetVal())
 		return nil, false
 	}
 	return ce, true

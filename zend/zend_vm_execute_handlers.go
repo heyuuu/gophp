@@ -25,14 +25,14 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
-			d1 = float64(op1.GetLval())
+			d1 = float64(op1.Long())
 		} else {
-			d1 = op1.GetDval()
+			d1 = op1.Double()
 		}
 		if op2.IsLong() {
-			d2 = float64(op2.GetLval())
+			d2 = float64(op2.Long())
 		} else {
-			d2 = op2.GetDval()
+			d2 = op2.Double()
 		}
 		result := opline.Result()
 		result.SetDouble(d1 + d2)
@@ -73,14 +73,14 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
-			d1 = float64(op1.GetLval())
+			d1 = float64(op1.Long())
 		} else {
-			d1 = op1.GetDval()
+			d1 = op1.Double()
 		}
 		if op2.IsLong() {
-			d2 = float64(op2.GetLval())
+			d2 = float64(op2.Long())
 		} else {
-			d2 = op2.GetDval()
+			d2 = op2.Double()
 		}
 		result := opline.Result()
 		result.SetDouble(d1 - d2)
@@ -115,7 +115,7 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
 		var overflow ZendLong
 		result := opline.Result()
-		ZEND_SIGNED_MULTIPLY_LONG(op1.GetLval(), op2.GetLval(), result.GetLval(), result.GetDval(), overflow)
+		ZEND_SIGNED_MULTIPLY_LONG(op1.Long(), op2.Long(), result.Long(), result.Double(), overflow)
 		if overflow != 0 {
 			result.SetTypeInfo(types.IS_DOUBLE)
 		} else {
@@ -127,14 +127,14 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
 		var d1, d2 float64
 		if op1.IsLong() {
-			d1 = float64(op1.GetLval())
+			d1 = float64(op1.Long())
 		} else {
-			d1 = op1.GetDval()
+			d1 = op1.Double()
 		}
 		if op2.IsLong() {
-			d2 = float64(op2.GetLval())
+			d2 = float64(op2.Long())
 		} else {
-			d2 = op2.GetDval()
+			d2 = op2.Double()
 		}
 		result := opline.Result()
 		result.SetDouble(d1 * d2)
@@ -183,13 +183,13 @@ func vmModHandler(executeData *ZendExecuteData) int {
 	// fast
 	if op1.IsLong() && op2.IsLong() {
 		result := opline.Result()
-		if op2.GetLval() == 0 {
+		if op2.Long() == 0 {
 			return zend_mod_by_zero_helper_SPEC(executeData)
-		} else if op2.GetLval() == -1 {
+		} else if op2.Long() == -1 {
 			/* Prevent overflow error/crash if op1==ZEND_LONG_MIN */
 			result.SetLong(0)
 		} else {
-			result.SetLong(op1.GetLval() % op2.GetLval())
+			result.SetLong(op1.Long() % op2.Long())
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
@@ -203,9 +203,9 @@ func vmSlHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = opline.Op1Ex()
 	var op2 *types.Zval = opline.Op2Ex()
 
-	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.GetLval() < SIZEOF_ZEND_LONG*8) != 0 {
+	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.Long() < SIZEOF_ZEND_LONG*8) != 0 {
 		/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
-		opline.Result().SetLong(ZendLong(ZendUlong(op1.GetLval() << op2.GetLval())))
+		opline.Result().SetLong(ZendLong(ZendUlong(op1.Long() << op2.Long())))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	return zend_shift_left_helper_SPEC(op1, op2, executeData)
@@ -217,8 +217,8 @@ func getSrHandler(executeData *ZendExecuteData) int {
 	var op1 *types.Zval = opline.Op1Ex()
 	var op2 *types.Zval = opline.Op2Ex()
 
-	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.GetLval() < SIZEOF_ZEND_LONG*8) != 0 {
-		opline.Result().SetLong(op1.GetLval() >> op2.GetLval())
+	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.Long() < SIZEOF_ZEND_LONG*8) != 0 {
+		opline.Result().SetLong(op1.Long() >> op2.Long())
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 

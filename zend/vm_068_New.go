@@ -14,7 +14,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	{
 		ce = CACHED_PTR(opline.GetOp2().GetNum())
 		if ce == nil {
-			ce = ZendFetchClassByName(opline.Const1().GetStr(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			ce = ZendFetchClassByName(opline.Const1().String(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
 				opline.Result().SetUndef()
@@ -29,7 +29,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		result.SetUndef()
 		return 0
 	}
-	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.GetObj())
+	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -56,7 +56,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* We are not handling overloaded classes right now */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.GetObj())
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.Object())
 		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(executeData.GetCall())
@@ -71,14 +71,14 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var call *ZendExecuteData
 
 	{
-		ce = opline.Op1().GetCe()
+		ce = opline.Op1().Class()
 	}
 	result = opline.Result()
 	if ObjectInitEx(result, ce) != types.SUCCESS {
 		result.SetUndef()
 		return 0
 	}
-	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.GetObj())
+	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -105,7 +105,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* We are not handling overloaded classes right now */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.GetObj())
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.Object())
 		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(executeData.GetCall())
@@ -133,7 +133,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		result.SetUndef()
 		return 0
 	}
-	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.GetObj())
+	constructor = types.Z_OBJ_HT_P(result).GetGetConstructor()(result.Object())
 	if constructor == nil {
 		if EG__().GetException() != nil {
 			return 0
@@ -160,7 +160,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 
 		/* We are not handling overloaded classes right now */
 
-		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.GetObj())
+		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.Object())
 		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(executeData.GetCall())

@@ -28,7 +28,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -58,7 +58,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -94,7 +94,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	{
 		cache_slot = CACHE_ADDR(opline.GetExtendedValue())
@@ -113,7 +113,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
 							retval = p.GetVal()
 							{
 								goto fetch_obj_is_copy
@@ -123,7 +123,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -171,7 +171,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -209,7 +209,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int 
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -234,7 +234,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 	offset = opline.Const2()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	{
 		cache_slot = CACHE_ADDR(opline.GetExtendedValue())
@@ -255,7 +255,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
 							retval = p.GetVal()
 
 							{
@@ -265,7 +265,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -300,7 +300,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	offset = opline.Op2Ptr(&free_op2)
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -325,7 +325,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int 
 	offset = opline.Cv2OrUndef()
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -360,7 +360,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	{
 		cache_slot = CACHE_ADDR(opline.GetExtendedValue())
@@ -379,7 +379,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.GetStr() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
 							retval = p.GetVal()
 							{
 								goto fetch_obj_is_copy
@@ -389,7 +389,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.String().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -435,7 +435,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {
@@ -471,7 +471,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 
 	/* here we are sure we are dealing with an object */
 
-	var zobj *types.ZendObject = container.GetObj()
+	var zobj *types.ZendObject = container.Object()
 	var retval *types.Zval
 	retval = zobj.GetHandlers().GetReadProperty()(container, offset, BP_VAR_IS, cache_slot, opline.Result())
 	if retval != opline.Result() {

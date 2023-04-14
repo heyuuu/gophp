@@ -15,7 +15,7 @@ func PhpPack(val *types.Zval, size int, map_ *int, output *byte) {
 	if val.GetType() != types.IS_LONG {
 		zend.ConvertToLong(val)
 	}
-	v = (*byte)(&(val.GetLval()))
+	v = (*byte)(&(val.Long()))
 	for i = 0; i < size; i++ {
 		b.PostInc(&(*output)) = v[map_[i]]
 	}
@@ -748,13 +748,13 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 			size = b.SizeOf("double")
 		default:
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid format type %c", type_)
-			return_value.GetArr().DestroyEx()
+			return_value.Array().DestroyEx()
 			return_value.SetFalse()
 			return
 		}
 		if size != 0 && size != -1 && size < 0 {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow", type_)
-			return_value.GetArr().DestroyEx()
+			return_value.Array().DestroyEx()
 			return_value.SetFalse()
 			return
 		}
@@ -785,7 +785,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 			}
 			if size != 0 && size != -1 && core.INT_MAX-size+1 < inputpos {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: integer overflow", type_)
-				return_value.GetArr().DestroyEx()
+				return_value.Array().DestroyEx()
 				return_value.SetFalse()
 				return
 			}
@@ -1048,7 +1048,7 @@ func ZifUnpack(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, inp
 
 			} else {
 				core.PhpErrorDocref(nil, faults.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
-				return_value.GetArr().DestroyEx()
+				return_value.Array().DestroyEx()
 				return_value.SetFalse()
 				return
 			}
@@ -1114,9 +1114,7 @@ func ZmStartupPack(type_ int, module_number int) int {
 		LittleEndianLonglongMap[6] = 6
 		LittleEndianLonglongMap[7] = 7
 	} else {
-		var val types.Zval
 		var size int = b.SizeOf("Z_LVAL ( val )")
-		val.SetLval(0)
 
 		/* Where to get hi to lo bytes from */
 

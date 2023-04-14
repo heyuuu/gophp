@@ -6,7 +6,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	var scope *types.ClassEntry
 	var opline *ZendOp = executeData.GetOpline()
 	fetch_type = opline.GetOp1().GetNum()
-	scope = executeData.GetFunc().op_array.scope
+	scope = executeData.GetFunc().GetOpArray().scope
 	if scope == nil {
 		faults.ThrowError(nil, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
 		opline.Result().SetUndef()
@@ -26,7 +26,7 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		if executeData.GetThis().IsObject() {
 			called_scope = types.Z_OBJCE(executeData.GetThis())
 		} else {
-			called_scope = executeData.GetThis().GetCe()
+			called_scope = executeData.GetThis().Class()
 		}
 		opline.Result().SetStringCopy(called_scope.GetName())
 	default:

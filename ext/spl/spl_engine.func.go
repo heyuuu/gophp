@@ -26,14 +26,14 @@ func SplInstantiateArgN(pce *types.ClassEntry, retval *types.Zval, argc int, arg
 	SplInstantiate(pce, retval)
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
 	fci.GetFunctionName().SetString(func_.GetFunctionName())
-	fci.SetObject(retval.GetObj())
+	fci.SetObject(retval.Object())
 	fci.SetRetval(&dummy)
 	fci.SetParamCount(argc)
 	fci.SetParams(argv)
 	fci.SetNoSeparation(1)
 	fcc.SetFunctionHandler(func_)
 	fcc.SetCalledScope(pce)
-	fcc.SetObject(retval.GetObj())
+	fcc.SetObject(retval.Object())
 	zend.ZendCallFunction(&fci, &fcc)
 }
 func SplInstantiate(pce *types.ClassEntry, object *types.Zval) { zend.ObjectInitEx(object, pce) }
@@ -42,13 +42,13 @@ func SplOffsetConvertToLong(offset *types.Zval) zend.ZendLong {
 try_again:
 	switch offset.GetType() {
 	case types.IS_STRING:
-		if types.HandleNumericStr(offset.GetStr().GetStr(), &idx) {
+		if types.HandleNumericStr(offset.String().GetStr(), &idx) {
 			return idx
 		}
 	case types.IS_DOUBLE:
-		return zend.ZendLong(offset.GetDval())
+		return zend.ZendLong(offset.Double())
 	case types.IS_LONG:
-		return offset.GetLval()
+		return offset.Long()
 	case types.IS_FALSE:
 		return 0
 	case types.IS_TRUE:

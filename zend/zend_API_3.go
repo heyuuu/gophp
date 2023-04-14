@@ -50,7 +50,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 		}
 		ret := class_type.ConstantsTable().ForeachEx(func(_ string, c *ZendClassConstant) bool {
 			val := c.GetValue()
-			if val.IsConstant() {
+			if val.IsConstantAst() {
 				if ZvalUpdateConstantEx(val, c.GetCe()) != types.SUCCESS {
 					return false
 				}
@@ -75,7 +75,7 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 					} else {
 						val = (*types.Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
 					}
-					if val.IsConstant() {
+					if val.IsConstantAst() {
 						if prop_info.GetType() != 0 {
 							var tmp types.Zval
 							types.ZVAL_COPY(&tmp, val)

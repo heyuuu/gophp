@@ -344,7 +344,7 @@ func ZendIsConstDefaultClassRef(name_ast *ZendAst) types.ZendBool {
 func ZendHandleNumericOp(node *Znode) {
 	if node.GetOpType() == IS_CONST && node.GetConstant().IsString() {
 		var index ZendUlong
-		if types.HandleNumericStr(node.GetConstant().GetStr().GetStr(), &index) {
+		if types.HandleNumericStr(node.GetConstant().String().GetStr(), &index) {
 			ZvalPtrDtor(node.GetConstant())
 			node.GetConstant().SetLong(index)
 		}
@@ -353,7 +353,7 @@ func ZendHandleNumericOp(node *Znode) {
 func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 	if dim_node.GetConstant().IsString() {
 		var index ZendUlong
-		if types.HandleNumericStr(dim_node.GetConstant().GetStr().GetStr(), &index) {
+		if types.HandleNumericStr(dim_node.GetConstant().String().GetStr(), &index) {
 
 			/* For numeric indexes we also keep the original value to use by ArrayAccess
 			 * See bug #63217
@@ -370,7 +370,7 @@ func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 func ZendSetClassNameOp1(opline *ZendOp, class_node *Znode) {
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp1Type(IS_CONST)
-		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().GetStr()))
+		opline.GetOp1().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 	} else {
 		opline.SetOp1Type(class_node.GetOpType())
 		if class_node.GetOpType() == IS_CONST {
@@ -390,7 +390,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 			if name_node.GetConstant().GetType() != types.IS_STRING {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 			}
-			name = name_node.GetConstant().GetStr()
+			name = name_node.GetConstant().String()
 			fetch_type = ZendGetClassFetchType(name.GetStr())
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
@@ -432,7 +432,7 @@ func ZendTryCompileCv(result *Znode, ast *ZendAst) int {
 		var name *types.String
 		if zv.IsString() {
 			//name = ZvalMakeInternedString(zv)
-			name = zv.GetStr()
+			name = zv.String()
 		} else {
 			name = ZvalGetStringFunc(zv)
 		}
@@ -461,7 +461,7 @@ func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed
 	} else {
 		opline = ZendEmitOp(result, ZEND_FETCH_R, &name_node, nil)
 	}
-	if name_node.GetOpType() == IS_CONST && ZendIsAutoGlobal(name_node.GetConstant().GetStr()) != 0 {
+	if name_node.GetOpType() == IS_CONST && ZendIsAutoGlobal(name_node.GetConstant().String()) != 0 {
 		opline.SetExtendedValue(ZEND_FETCH_GLOBAL)
 	} else {
 		opline.SetExtendedValue(ZEND_FETCH_LOCAL)
@@ -596,7 +596,7 @@ func ZendCompileStaticProp(result *Znode, ast *ZendAst, type_ uint32, by_ref int
 	}
 	if class_node.GetOpType() == IS_CONST {
 		opline.SetOp2Type(IS_CONST)
-		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().GetStr()))
+		opline.GetOp2().SetConstant(ZendAddClassNameLiteral(class_node.GetConstant().String()))
 		if opline.GetOp1Type() != IS_CONST {
 			opline.SetExtendedValue(ZendAllocCacheSlot())
 		}

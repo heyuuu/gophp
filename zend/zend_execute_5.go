@@ -33,7 +33,7 @@ func ZendFetchDimensionAddressRead(
 	if slow == 0 {
 		if container.IsArray() {
 		try_array:
-			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, executeData)
+			retval = ZendFetchDimensionAddressInner(container.Array(), dim, dim_type, type_, executeData)
 			types.ZVAL_COPY_DEREF(result, retval)
 			return
 		} else if container.IsReference() {
@@ -49,14 +49,14 @@ func ZendFetchDimensionAddressRead(
 		if dim.GetType() != types.IS_LONG {
 			switch dim.GetType() {
 			case types.IS_STRING:
-				if types.IS_LONG == IsNumericString(dim.GetStr().GetStr(), nil, nil, -1) {
+				if types.IS_LONG == IsNumericString(dim.String().GetStr(), nil, nil, -1) {
 					break
 				}
 				if type_ == BP_VAR_IS {
 					result.SetNull()
 					return
 				}
-				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
+				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.String().GetVal())
 			case types.IS_UNDEF:
 				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough
@@ -78,9 +78,9 @@ func ZendFetchDimensionAddressRead(
 			}
 			offset = ZvalGetLongFunc(dim)
 		} else {
-			offset = dim.GetLval()
+			offset = dim.Long()
 		}
-		if container.GetStr().GetLen() < b.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
+		if container.String().GetLen() < b.CondF(offset < 0, func() int { return -int(offset) }, func() int { return int(offset + 1) }) {
 			if type_ != BP_VAR_IS {
 				faults.Error(faults.E_NOTICE, "Uninitialized string offset: "+ZEND_LONG_FMT, offset)
 				result.SetStringVal("")
@@ -91,11 +91,11 @@ func ZendFetchDimensionAddressRead(
 			var c types.ZendUchar
 			var real_offset ZendLong
 			if offset < 0 {
-				real_offset = ZendLong(container.GetStr().GetLen() + offset)
+				real_offset = ZendLong(container.String().GetLen() + offset)
 			} else {
 				real_offset = offset
 			}
-			c = types.ZendUchar(container.GetStr().GetVal()[real_offset])
+			c = types.ZendUchar(container.String().GetVal()[real_offset])
 			result.SetStringVal(string(c))
 		}
 	} else if container.IsObject() {
@@ -151,7 +151,7 @@ func ZendFetchDimensionConst(result *types.Zval, container *types.Zval, dim *typ
 func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *ZendExecuteData) *types.Zval {
 	var hval ZendUlong
 	if offset.IsDouble() {
-		hval = DvalToLval(offset.GetDval())
+		hval = DvalToLval(offset.Double())
 	num_idx:
 		return ht.IndexFind(hval)
 	} else if offset.IsNull() {
@@ -183,12 +183,12 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 	} else if container.IsString() {
 		var lval ZendLong
 		if offset.IsLong() {
-			lval = offset.GetLval()
+			lval = offset.Long()
 		str_offset:
 			if lval < 0 {
-				lval += ZendLong(container.GetStr().GetLen())
+				lval += ZendLong(container.String().GetLen())
 			}
-			if lval >= 0 && int(lval < container.GetStr().GetLen()) != 0 {
+			if lval >= 0 && int(lval < container.String().GetLen()) != 0 {
 				return 1
 			} else {
 				return 0
@@ -201,7 +201,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 
 			/*}*/
 
-			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.GetStr().GetStr(), nil, nil, 0) {
+			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -220,13 +220,13 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 	} else if container.IsString() {
 		var lval ZendLong
 		if offset.IsLong() {
-			lval = offset.GetLval()
+			lval = offset.Long()
 		str_offset:
 			if lval < 0 {
-				lval += ZendLong(container.GetStr().GetLen())
+				lval += ZendLong(container.String().GetLen())
 			}
-			if lval >= 0 && int(lval < container.GetStr().GetLen()) != 0 {
-				return container.GetStr().GetVal()[lval] == '0'
+			if lval >= 0 && int(lval < container.String().GetLen()) != 0 {
+				return container.String().GetVal()[lval] == '0'
 			} else {
 				return 1
 			}
@@ -238,7 +238,7 @@ func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *
 
 			/*}*/
 
-			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.GetStr().GetStr(), nil, nil, 0) {
+			if offset.GetType() < types.IS_STRING || offset.IsString() && types.IS_LONG == IsNumericString(offset.String().GetStr(), nil, nil, 0) {
 				lval = ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -253,7 +253,7 @@ func ZendArrayKeyExistsFast(ht *types.Array, key *types.Zval, opline *ZendOp, ex
 	var hval ZendUlong
 try_again:
 	if key.IsString() {
-		str = key.GetStr()
+		str = key.String()
 		if types.HandleNumericStr(str.GetStr(), &hval) {
 			goto num_key
 		}
@@ -264,7 +264,7 @@ try_again:
 			return types.IS_FALSE
 		}
 	} else if key.IsLong() {
-		hval = key.GetLval()
+		hval = key.Long()
 	num_key:
 		if ht.IndexFind(hval) != nil {
 			return types.IS_TRUE
@@ -308,7 +308,7 @@ func PromotesToArray(val *types.Zval) types.ZendBool {
 }
 func PromotesToObject(val *types.Zval) types.ZendBool {
 	val = types.ZVAL_DEREF(val)
-	return val.GetType() <= types.IS_FALSE || val.IsString() && val.GetStr().GetLen() == 0
+	return val.GetType() <= types.IS_FALSE || val.IsString() && val.String().GetLen() == 0
 }
 func CheckTypeArrayAssignable(type_ types.ZendType) types.ZendBool {
 	if type_ == 0 {

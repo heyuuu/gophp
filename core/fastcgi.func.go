@@ -574,7 +574,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 				q = q.GetListNext()
 				continue
 			}
-			zlen = uint(value.GetStr().GetLen())
+			zlen = uint(value.String().GetLen())
 			if p+4+4+q.GetVarLen()+zlen >= buf+b.SizeOf("buf") {
 				break
 			}
@@ -596,7 +596,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 			}
 			memcpy(p, q.GetVar(), q.GetVarLen())
 			p += q.GetVarLen()
-			memcpy(p, value.GetStr().GetVal(), zlen)
+			memcpy(p, value.String().GetVal(), zlen)
 			p += zlen
 			q = q.GetListNext()
 		}
@@ -924,11 +924,11 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var key *types.String = types.NewString(b.CastStr(name, name_len))
 	zvalue.SetString(types.NewString(b.CastStr(value, value_len)))
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
-	types.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
+	types.GC_MAKE_PERSISTENT_LOCAL(zvalue.String())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
 	// types.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *types.Zval) { zend.Pefree(zv.GetStr(), 1) }
+func FcgiFreeMgmtVarCb(zv *types.Zval) { zend.Pefree(zv.String(), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 

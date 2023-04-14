@@ -496,15 +496,15 @@ func ZifImplode(glue_ *types.Zval, _ zpp.Opt, pieces_ *types.Zval) string {
 			return ""
 		}
 		glue = ""
-		pieces = arg1.GetArr()
+		pieces = arg1.Array()
 	} else {
 		if arg1.IsType(types.IS_ARRAY) {
 			glue = zend.ZvalGetStrVal(arg2)
-			pieces = arg1.GetArr()
+			pieces = arg1.Array()
 			core.PhpErrorDocref(nil, faults.E_DEPRECATED, "Passing glue string after array is deprecated. Swap the parameters")
 		} else if arg2.IsType(types.IS_ARRAY) {
 			glue = zend.ZvalGetStrVal(arg1)
-			pieces = arg2.GetArr()
+			pieces = arg2.Array()
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid arguments passed")
 			return ""
@@ -680,7 +680,7 @@ func PhpStrcspnEx(s1 string, s2 string) int {
 func PhpNeedleChar(needle *types.Zval) (byte, bool) {
 	switch needle.GetType() {
 	case types.IS_LONG:
-		return byte(needle.GetLval()), true
+		return byte(needle.Long()), true
 	case types.IS_NULL, types.IS_FALSE:
 		return 0, true
 	case types.IS_TRUE:
@@ -970,7 +970,7 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 	if start.IsArray() {
 		if length == nil || !length.IsArray() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should be of same type - numerical or array ")
-		} else if length.IsArray() && start.GetArr().Len() != length.GetArr().Len() {
+		} else if length.IsArray() && start.Array().Len() != length.Array().Len() {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "'start' and 'length' should have the same number of elements")
 		} else {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Functionality of 'start' and 'length' as arrays is not implemented")
@@ -985,13 +985,13 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 	// 正常处理 substr_replace(string, array|string, int, int|null)
 	l := len(str)
 	if length != nil && !length.IsArray() {
-		l = length.GetLval()
+		l = length.Long()
 	}
 
 	//
 	var replStr string
 	if replace.IsArray() {
-		_, replZval := replace.GetArr().First()
+		_, replZval := replace.Array().First()
 		if replZval != nil {
 			replStr = zend.ZvalGetStrVal(replZval)
 		} else {
@@ -1001,7 +1001,7 @@ func substrReplaceStr(str string, replace *types.Zval, start *types.Zval, length
 		replStr = replace.GetStrVal()
 	}
 
-	res := substrReplaceSingle(str, replStr, start.GetLval(), l)
+	res := substrReplaceSingle(str, replStr, start.Long(), l)
 	return res
 }
 
@@ -1010,21 +1010,21 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 
 	var replaceStr []string
 	if replace.IsArray() {
-		replace.GetArr().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+		replace.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 			replaceStr = append(replaceStr, zend.ZvalGetStrVal(value))
 		})
 	}
 
 	var startPoints []int
 	if start.IsArray() {
-		start.GetArr().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+		start.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 			startPoints = append(startPoints, zend.ZvalGetLong(value))
 		})
 	}
 
 	var lengthPoints []int
 	if length != nil && length.IsArray() {
-		length.GetArr().Foreach(func(_ types.ArrayKey, value *types.Zval) {
+		length.Array().Foreach(func(_ types.ArrayKey, value *types.Zval) {
 			lengthPoints = append(lengthPoints, zend.ZvalGetLong(value))
 		})
 	}
@@ -1042,7 +1042,7 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 				f = startPoints[idx]
 			}
 		} else {
-			f = start.GetLval()
+			f = start.Long()
 		}
 
 		// l
@@ -1053,7 +1053,7 @@ func substrReplaceArray(str *types.Array, replace *types.Zval, start *types.Zval
 					l = lengthPoints[idx]
 				}
 			} else {
-				l = length.GetLval()
+				l = length.Long()
 			}
 		}
 
@@ -1101,7 +1101,7 @@ func ZifSubstrReplace(returnValue zpp.Ret, str *types.Zval, replace *types.Zval,
 		returnValue.SetStringVal(res)
 		return
 	} else {
-		res := substrReplaceArray(str.GetArr(), replace, str, length)
+		res := substrReplaceArray(str.Array(), replace, str, length)
 		returnValue.SetArray(res)
 		return
 	}
@@ -1349,7 +1349,7 @@ func ZifStrtr(str string, from *types.Zval, _ zpp.Opt, to_ *string) (string, boo
 		return "", true
 	}
 	if to_ == nil {
-		var pats *types.Array = from.GetArr()
+		var pats *types.Array = from.Array()
 		switch pats.Len() {
 		case 0:
 			return str, true
@@ -1455,8 +1455,8 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 		var replaceStrings []string
 		var replaceStr string
 		if replace.IsArray() {
-			replaceStrings = make([]string, replace.GetArr().Len())
-			replace.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			replaceStrings = make([]string, replace.Array().Len())
+			replace.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 				replaceStrings = append(replaceStrings, zend.ZvalGetStrVal(value))
 			})
 		} else {
@@ -1466,7 +1466,7 @@ func strReplaceStr(subject string, search *types.Zval, replace *types.Zval, case
 		var result = subject
 		var replaceCount = 0
 		i := -1
-		search.GetArr().ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
+		search.Array().ForeachIndirect(func(key types.ArrayKey, val *types.Zval) {
 			if subject == "" {
 				return
 			}
@@ -1562,7 +1562,7 @@ func strReplace(returnValue *types.Zval, search *types.Zval, replace *types.Zval
 	var count int
 	if subject.IsType(types.IS_ARRAY) {
 		var arr *types.Array
-		arr, count = strReplaceArray(subject.GetArr(), search, replace, caseSensitivity)
+		arr, count = strReplaceArray(subject.Array(), search, replace, caseSensitivity)
 		returnValue.SetArray(arr)
 	} else {
 		var str string
@@ -2025,7 +2025,7 @@ func ZifStripTags(str string, _ zpp.Opt, allowableTags *types.Zval) string {
 	if allow != nil {
 		if allow.IsType(types.IS_ARRAY) {
 			var buf strings.Builder
-			allow.GetArr().Foreach(func(key types.ArrayKey, value *types.Zval) {
+			allow.Array().Foreach(func(key types.ArrayKey, value *types.Zval) {
 				tag := zend.ZvalGetStrVal(value)
 				buf.WriteByte('<')
 				buf.WriteString(tag)

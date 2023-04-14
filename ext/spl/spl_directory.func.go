@@ -16,7 +16,7 @@ import (
 func SplFilesystemFromObj(obj *types.ZendObject) *SplFilesystemObject {
 	return (*SplFilesystemObject)((*byte)(obj - zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLFILESYSTEM_P(zv *types.Zval) *SplFilesystemObject { return SplFilesystemFromObj(zv.GetObj()) }
+func Z_SPLFILESYSTEM_P(zv *types.Zval) *SplFilesystemObject { return SplFilesystemFromObj(zv.Object()) }
 func SplFilesystemObjectToIterator(obj *SplFilesystemObject) *SplFilesystemIterator {
 	var it *SplFilesystemIterator
 	it = zend.Ecalloc(1, b.SizeOf("spl_filesystem_iterator"))
@@ -268,7 +268,7 @@ func SplFilesystemObjectClone(zobject *types.Zval) *types.ZendObject {
 	var source *SplFilesystemObject
 	var index int
 	var skip_dots int
-	old_object = zobject.GetObj()
+	old_object = zobject.Object()
 	source = SplFilesystemFromObj(old_object)
 	new_object = SplFilesystemObjectNewEx(old_object.GetCe())
 	intern = SplFilesystemFromObj(new_object)
@@ -651,7 +651,7 @@ func zim_spl_DirectoryIterator_current(executeData *zend.ZendExecuteData, return
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	return_value.SetObject(zend.ZEND_THIS(executeData).GetObj())
+	return_value.SetObject(zend.ZEND_THIS(executeData).Object())
 	return_value.AddRefcount()
 }
 func zim_spl_DirectoryIterator_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -874,7 +874,7 @@ func zim_spl_FilesystemIterator_current(executeData *zend.ZendExecuteData, retur
 		SplFilesystemObjectGetFileName(intern)
 		SplFilesystemObjectCreateType(0, intern, SPL_FS_INFO, nil, return_value)
 	} else {
-		return_value.SetObject(zend.ZEND_THIS(executeData).GetObj())
+		return_value.SetObject(zend.ZEND_THIS(executeData).Object())
 		return_value.AddRefcount()
 	}
 }
@@ -1329,7 +1329,7 @@ func SplFilesystemDirGetIterator(ce *types.ClassEntry, object *types.Zval, by_re
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	object.AddRefcount()
-	iterator.GetIntern().GetData().SetObject(object.GetObj())
+	iterator.GetIntern().GetData().SetObject(object.Object())
 	iterator.GetIntern().SetFuncs(&SplFilesystemDirItFuncs)
 
 	/* ->current must be initialized; rewind doesn't set it and valid
@@ -1455,7 +1455,7 @@ func SplFilesystemTreeGetIterator(ce *types.ClassEntry, object *types.Zval, by_r
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	object.AddRefcount()
-	iterator.GetIntern().GetData().SetObject(object.GetObj())
+	iterator.GetIntern().GetData().SetObject(object.Object())
 	iterator.GetIntern().SetFuncs(&SplFilesystemTreeItFuncs)
 	return iterator.GetIntern()
 }
@@ -1613,8 +1613,8 @@ func SplFilesystemFileReadLineEx(this_ptr *types.Zval, intern *SplFilesystemObje
 			}
 			SplFilesystemFileFreeLine(intern)
 			if retval.IsType(types.IS_STRING) {
-				intern.SetCurrentLine(zend.Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
-				intern.SetCurrentLineLen(retval.GetStr().GetLen())
+				intern.SetCurrentLine(zend.Estrndup(retval.String().GetVal(), retval.String().GetLen()))
+				intern.SetCurrentLineLen(retval.String().GetLen())
 			} else {
 				var value *types.Zval = &retval
 				types.ZVAL_COPY_DEREF(intern.GetCurrentZval(), value)
@@ -1636,7 +1636,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 	} else if !(intern.GetCurrentZval().IsUndef()) {
 		switch intern.GetCurrentZval().GetType() {
 		case types.IS_STRING:
-			return intern.GetCurrentZval().GetStr().GetLen() == 0
+			return intern.GetCurrentZval().String().GetLen() == 0
 		case types.IS_ARRAY:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && types.Z_ARRVAL(intern.GetCurrentZval()).Len() == 1 {
 				var idx uint32 = 0
@@ -1645,7 +1645,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 					idx++
 				}
 				first = types.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
-				return first.IsType(types.IS_STRING) && first.GetStr().GetLen() == 0
+				return first.IsType(types.IS_STRING) && first.String().GetLen() == 0
 			}
 			return types.Z_ARRVAL(intern.GetCurrentZval()).Len() == 0
 		case types.IS_NULL:

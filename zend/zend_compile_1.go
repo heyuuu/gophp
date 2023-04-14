@@ -69,13 +69,13 @@ func ZendResolveClassNameAst(ast *ZendAst) *types.String {
 	if class_name.GetType() != types.IS_STRING {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	return ZendResolveClassName(class_name.GetStr(), ast.GetAttr())
+	return ZendResolveClassName(class_name.String(), ast.GetAttr())
 }
 func LabelPtrDtor(zv *types.Zval) {
-	EfreeSize(zv.GetPtr(), b.SizeOf("zend_label"))
+	EfreeSize(zv.Ptr(), b.SizeOf("zend_label"))
 }
 func StrDtor(zv *types.Zval) {
-	// types.ZendStringReleaseEx(zv.GetStr(), 0)
+	// types.ZendStringReleaseEx(zv.String(), 0)
 }
 func ZendAddTryElement(try_op uint32) uint32 {
 	var op_array = CG__().GetActiveOpArray()
@@ -137,14 +137,14 @@ func DoBindFunction(lcname *types.Zval) int {
 	var function types.IFunction
 	var rtd_key *types.Zval
 	rtd_key = lcname + 1
-	function = EG__().FunctionTable().Get(rtd_key.GetStr().GetStr())
+	function = EG__().FunctionTable().Get(rtd_key.String().GetStr())
 	if function == nil {
-		DoBindFunctionError(lcname.GetStr(), nil, 0)
+		DoBindFunctionError(lcname.String(), nil, 0)
 		return types.FAILURE
 	}
 
 	if EG__().FunctionTable().Exists(lcname.GetStrVal()) {
-		DoBindFunctionError(lcname.GetStr(), function.GetOpArray(), 0)
+		DoBindFunctionError(lcname.String(), function.GetOpArray(), 0)
 		return types.FAILURE
 	}
 
@@ -172,7 +172,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 					goto afterGetCe
 				}
 			}
-			faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.GetStr().GetVal())
+			faults.ErrorNoreturn(faults.E_ERROR, "Class %s wasn't preloaded", lcname.String().GetVal())
 			return types.FAILURE
 		}
 	}
@@ -363,7 +363,7 @@ func ZendTryCompileConstExprResolveClassName(zv *types.Zval, class_ast *ZendAst)
 	if class_name.GetType() != types.IS_STRING {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Illegal class name")
 	}
-	fetch_type = ZendGetClassFetchType(class_name.GetStr().GetStr())
+	fetch_type = ZendGetClassFetchType(class_name.String().GetStr())
 	ZendEnsureValidClassFetchType(fetch_type)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
@@ -527,7 +527,7 @@ func ZendActivateAutoGlobals() {
 	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
 
-		auto_global = _z.GetPtr()
+		auto_global = _z.Ptr()
 		if auto_global.GetJit() != 0 {
 			auto_global.SetArmed(1)
 		} else if auto_global.GetAutoGlobalCallback() != nil {

@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var array *types.Zval
 	var size uint32
@@ -12,7 +14,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData)
 	}
@@ -30,7 +32,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData)
 	}
@@ -48,7 +50,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData)
 	}
@@ -66,7 +68,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData)
 	}
@@ -84,7 +86,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData)
 	}
@@ -102,7 +104,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData)
 	}
@@ -120,7 +122,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData)
 	}
@@ -138,7 +140,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData)
 	}
@@ -156,7 +158,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData)
 	}
@@ -174,7 +176,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData)
 	}
@@ -192,7 +194,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData)
 	}
@@ -210,7 +212,7 @@ func ZEND_INIT_ARRAY_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData)
 	}
@@ -280,7 +282,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData)
 	}
@@ -298,7 +300,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData)
 	}
@@ -316,7 +318,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData)
 	}
@@ -334,7 +336,7 @@ func ZEND_INIT_ARRAY_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* Explicitly initialize array as not-packed if flag is set */
 
 		if (opline.GetExtendedValue() & ZEND_ARRAY_NOT_PACKED) != 0 {
-			types.ZendHashRealInitMixed(array.GetArr())
+			types.ZendHashRealInitMixed(array.Array())
 		}
 		return ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData)
 	}

@@ -16,7 +16,7 @@ func ZendListInsert(ptr any, type_ int) *types.Zval {
 	} else if index == core.INT_MAX {
 		faults.ErrorNoreturn(faults.E_ERROR, "Resource ID space overflow")
 	}
-	zv.SetNewResource(index, ptr, type_)
+	zv.SetResource(types.NewZendResource(index, ptr, type_))
 	return EG__().GetRegularList().IndexAddNew(index, &zv)
 }
 func ZendListDelete(res *types.ZendResource) int {
@@ -58,7 +58,7 @@ func ZendListClose(res *types.ZendResource) int {
 func ZendRegisterResource(rsrc_pointer any, rsrc_type int) *types.ZendResource {
 	var zv *types.Zval
 	zv = ZendListInsert(rsrc_pointer, rsrc_type)
-	return zv.GetRes()
+	return zv.Resource()
 }
 func ZendFetchResource2(res *types.ZendResource, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res != nil {
@@ -96,7 +96,7 @@ func ZendFetchResourceEx(res *types.Zval, resource_type_name string, resource_ty
 		}
 		return nil
 	}
-	return ZendFetchResource(res.GetRes(), resource_type_name, resource_type)
+	return ZendFetchResource(res.Resource(), resource_type_name, resource_type)
 }
 func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res == nil {
@@ -111,10 +111,10 @@ func ZendFetchResource2Ex(res *types.Zval, resource_type_name string, resource_t
 		}
 		return nil
 	}
-	return ZendFetchResource2(res.GetRes(), resource_type_name, resource_type1, resource_type2)
+	return ZendFetchResource2(res.Resource(), resource_type_name, resource_type1, resource_type2)
 }
 func ListEntryDestructor(zv *types.Zval) {
-	var res *types.ZendResource = zv.GetRes()
+	var res *types.ZendResource = zv.Resource()
 	zv.SetUndef()
 	if res.GetType() >= 0 {
 		ZendResourceDtor(res)
@@ -122,7 +122,7 @@ func ListEntryDestructor(zv *types.Zval) {
 	EfreeSize(res, b.SizeOf("zend_resource"))
 }
 func PlistEntryDestructor(zv *types.Zval) {
-	var res *types.ZendResource = zv.GetRes()
+	var res *types.ZendResource = zv.Resource()
 	if res.GetType() >= 0 {
 		var ld *ZendRsrcListDtorsEntry
 		ld = types.ZendHashIndexFindPtr(&ListDestructors, res.GetType())
@@ -150,7 +150,7 @@ func ZendCloseRsrcList(ht *types.Array) {
 	for _, _p := range __ht.ForeachDataReserve() {
 		var _z types.Zval = _p.GetVal()
 
-		res = _z.GetPtr()
+		res = _z.Ptr()
 		if res.GetType() >= 0 {
 			ZendResourceDtor(res)
 		}
@@ -161,7 +161,7 @@ func CleanModuleResource(zv *types.Zval, arg any) int {
 	return types.Z_RES_TYPE_P(zv) == resource_id
 }
 func ZendCleanModuleRsrcDtorsCb(zv *types.Zval, arg any) int {
-	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.GetPtr())
+	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.Ptr())
 	var module_number int = *((*int)(arg))
 	if ld.GetModuleNumber() == module_number {
 		types.ZendHashApplyWithArgument(EG__().GetPersistentList(), CleanModuleResource, any(&(ld.GetResourceId())))
@@ -194,14 +194,14 @@ func ZendFetchListDtorId(type_name *byte) int {
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
-		lde = _z.GetPtr()
+		lde = _z.Ptr()
 		if lde.GetTypeName() != nil && strcmp(type_name, lde.GetTypeName()) == 0 {
 			return lde.GetResourceId()
 		}
 	}
 	return 0
 }
-func ListDestructorsDtor(zv *types.Zval) { Free(zv.GetPtr()) }
+func ListDestructorsDtor(zv *types.Zval) { Free(zv.Ptr()) }
 func ZendInitRsrcListDtors() int {
 	&ListDestructors = types.MakeArrayEx(64, ListDestructorsDtor, 1)
 	ListDestructors.SetNNextFreeElement(1)
@@ -229,11 +229,11 @@ func ZendRsrcListGetRsrcTypeEx(res *types.ZendResource) *string {
 func ZendRegisterPersistentResourceEx(key *types.String, rsrc_pointer any, rsrc_type int) *types.ZendResource {
 	var zv *types.Zval
 	var tmp types.Zval
-	tmp.SetNewResourcePersistent(-1, rsrc_pointer, rsrc_type)
-	types.GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
+	tmp.SetResource(types.NewZendResourcePersistent(-1, rsrc_pointer, rsrc_type, true))
+	types.GC_MAKE_PERSISTENT_LOCAL(tmp.RefCounted())
 	types.GC_MAKE_PERSISTENT_LOCAL(key)
 	zv = EG__().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)
-	return zv.GetRes()
+	return zv.Resource()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *types.ZendResource {
 	var str *types.String = types.NewString(b.CastStr(key, key_len))

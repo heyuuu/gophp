@@ -1174,7 +1174,7 @@ func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
 		ZendAstDestroy(yyvaluep.GetAst())
 	case 273:
 		if yyvaluep.GetStr() != nil {
-			// types.ZendStringReleaseEx(yyvaluep.GetStr(), 0)
+			// types.ZendStringReleaseEx(yyvaluep.String(), 0)
 		}
 	case 277:
 		ZendAstDestroy(yyvaluep.GetAst())

@@ -58,7 +58,7 @@ func PhpUrlEncodeHashEx(
 		zdata = _z
 		var is_dynamic types.ZendBool = 1
 		if zdata.IsIndirect() {
-			zdata = zdata.GetZv()
+			zdata = zdata.Indirect()
 			if zdata.IsUndef() {
 				continue
 			}
@@ -70,7 +70,7 @@ func PhpUrlEncodeHashEx(
 		if key != nil {
 			prop_name = key.GetVal()
 			prop_len = key.GetLen()
-			if type_ != nil && zend.ZendCheckPropertyAccess(type_.GetObj(), key, is_dynamic) != types.SUCCESS {
+			if type_ != nil && zend.ZendCheckPropertyAccess(type_.Object(), key, is_dynamic) != types.SUCCESS {
 
 				/* property not visible in this scope */
 
@@ -199,14 +199,14 @@ func PhpUrlEncodeHashEx(
 			case types.IS_STRING:
 				var ekey *types.String
 				if enc_type == PHP_QUERY_RFC3986 {
-					ekey = PhpRawUrlEncode(zdata.GetStr().GetVal(), zdata.GetStr().GetLen())
+					ekey = PhpRawUrlEncode(zdata.String().GetVal(), zdata.String().GetLen())
 				} else {
-					ekey = PhpUrlEncode(zdata.GetStr().GetVal(), zdata.GetStr().GetLen())
+					ekey = PhpUrlEncode(zdata.String().GetVal(), zdata.String().GetLen())
 				}
 				formstr.AppendString(ekey.GetStr())
 				//types.ZendStringFree(ekey)
 			case types.IS_LONG:
-				formstr.AppendLong(zdata.GetLval())
+				formstr.AppendLong(zdata.Long())
 			case types.IS_FALSE:
 				formstr.AppendString("0")
 			case types.IS_TRUE:

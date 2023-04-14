@@ -52,7 +52,7 @@ func ZendCallMethod(
 	}
 	fci.SetSize(b.SizeOf("fci"))
 	if object != nil {
-		fci.SetObject(object.GetObj())
+		fci.SetObject(object.Object())
 	} else {
 		fci.SetObject(nil)
 	}
@@ -123,7 +123,7 @@ func ZendCallMethod(
 			}
 		}
 		if object != nil {
-			fcic.SetObject(object.GetObj())
+			fcic.SetObject(object.Object())
 		} else {
 			fcic.SetObject(nil)
 		}
@@ -226,7 +226,7 @@ func ZendUserItGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int)
 	iterator = Emalloc(b.SizeOf("zend_user_iterator"))
 	ZendIteratorInit((*ZendObjectIterator)(iterator))
 	object.AddRefcount()
-	iterator.GetIt().GetData().SetObject(object.GetObj())
+	iterator.GetIt().GetData().SetObject(object.Object())
 	iterator.GetIt().SetFuncs(&ZendInterfaceIteratorFuncsIterator)
 	iterator.SetCe(types.Z_OBJCE_P(object))
 	iterator.GetValue().SetUndef()
@@ -242,7 +242,7 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	} else {
 		ce_it = nil
 	}
-	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.GetObj() == object.GetObj() {
+	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.Object() == object.Object() {
 		if EG__().GetException() == nil {
 			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return types.Z_OBJCE_P(object).GetName().GetVal() }))
 		}
@@ -402,8 +402,8 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 			ZvalPtrDtor(&retval)
 			return types.FAILURE
 		case types.IS_STRING:
-			*buffer = (*uint8)(Estrndup(retval.GetStr().GetVal(), retval.GetStr().GetLen()))
-			*buf_len = retval.GetStr().GetLen()
+			*buffer = (*uint8)(Estrndup(retval.String().GetVal(), retval.String().GetLen()))
+			*buf_len = retval.String().GetLen()
 			result = types.SUCCESS
 		default:
 			result = types.FAILURE

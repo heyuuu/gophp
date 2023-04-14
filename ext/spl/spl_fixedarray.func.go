@@ -11,7 +11,7 @@ import (
 func SplFixedArrayFromObj(obj *types.ZendObject) *SplFixedarrayObject {
 	return (*SplFixedarrayObject)((*byte)(obj - zend_long((*byte)(&((*SplFixedarrayObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLFIXEDARRAY_P(zv *types.Zval) *SplFixedarrayObject { return SplFixedArrayFromObj(zv.GetObj()) }
+func Z_SPLFIXEDARRAY_P(zv *types.Zval) *SplFixedarrayObject { return SplFixedArrayFromObj(zv.Object()) }
 func SplFixedarrayInit(array *SplFixedarray, size zend.ZendLong) {
 	if size > 0 {
 		array.SetSize(0)
@@ -195,7 +195,7 @@ func SplFixedarrayNew(class_type *types.ClassEntry) *types.ZendObject {
 func SplFixedarrayObjectClone(zobject *types.Zval) *types.ZendObject {
 	var old_object *types.ZendObject
 	var new_object *types.ZendObject
-	old_object = zobject.GetObj()
+	old_object = zobject.Object()
 	new_object = SplFixedarrayObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -213,7 +213,7 @@ func SplFixedarrayObjectReadDimensionHelper(intern *SplFixedarrayObject, offset 
 	if offset.GetType() != types.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
-		index = offset.GetLval()
+		index = offset.Long()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
 		faults.ThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
@@ -259,7 +259,7 @@ func SplFixedarrayObjectWriteDimensionHelper(intern *SplFixedarrayObject, offset
 	if offset.GetType() != types.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
-		index = offset.GetLval()
+		index = offset.Long()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
 		faults.ThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
@@ -299,7 +299,7 @@ func SplFixedarrayObjectUnsetDimensionHelper(intern *SplFixedarrayObject, offset
 	if offset.GetType() != types.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
-		index = offset.GetLval()
+		index = offset.Long()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
 		faults.ThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
@@ -326,7 +326,7 @@ func SplFixedarrayObjectHasDimensionHelper(intern *SplFixedarrayObject, offset *
 	if offset.GetType() != types.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
-		index = offset.GetLval()
+		index = offset.Long()
 	}
 	if index < 0 || index >= intern.GetArray().GetSize() {
 		retval = 0
@@ -451,10 +451,10 @@ func zim_spl_SplFixedArray_toArray(executeData *zend.ZendExecuteData, return_val
 		zend.ArrayInit(return_value)
 		for ; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
-				return_value.GetArr().IndexUpdate(i, intern.GetArray().GetElements()[i])
+				return_value.Array().IndexUpdate(i, intern.GetArray().GetElements()[i])
 				intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
-				return_value.GetArr().IndexUpdate(i, zend.EG__().GetUninitializedZval())
+				return_value.Array().IndexUpdate(i, zend.EG__().GetUninitializedZval())
 			}
 		}
 	} else {
@@ -478,7 +478,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var num_index zend.ZendUlong
 		var max_index zend.ZendUlong = 0
 		var tmp zend.ZendLong
-		var __ht *types.Array = data.GetArr()
+		var __ht *types.Array = data.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -498,7 +498,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 			return
 		}
 		SplFixedarrayInit(&array, tmp)
-		var __ht__1 *types.Array = data.GetArr()
+		var __ht__1 *types.Array = data.Array()
 		for _, _p := range __ht__1.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -511,7 +511,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 		var element *types.Zval
 		var i zend.ZendLong = 0
 		SplFixedarrayInit(&array, num)
-		var __ht *types.Array = data.GetArr()
+		var __ht *types.Array = data.Array()
 		for _, _p := range __ht.ForeachData() {
 			var _z *types.Zval = _p.GetVal()
 
@@ -707,7 +707,7 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	iterator = zend.Emalloc(b.SizeOf("spl_fixedarray_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	object.AddRefcount()
-	iterator.GetIntern().GetIt().GetData().SetObject(object.GetObj())
+	iterator.GetIntern().GetIt().GetData().SetObject(object.Object())
 	iterator.GetIntern().GetIt().SetFuncs(&SplFixedarrayItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.GetIntern().GetValue().SetUndef()

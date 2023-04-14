@@ -13,7 +13,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var idx uintPtr
 	var ref *types.ZendReference
 	for {
-		varname = opline.Const2().GetStr()
+		varname = opline.Const2().String()
 
 		/* We store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
 
@@ -47,7 +47,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			/* GLOBAL variable may be an INDIRECT pointer to CV */
 
 			if value.IsIndirect() {
-				value = value.GetZv()
+				value = value.Indirect()
 				if value.IsUndef() {
 					value.SetNull()
 				}
@@ -58,14 +58,14 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if !(value.IsReference()) {
 			types.ZVAL_MAKE_REF_EX(value, 2)
-			ref = value.GetRef()
+			ref = value.Reference()
 		} else {
-			ref = value.GetRef()
+			ref = value.Reference()
 			ref.AddRefcount()
 		}
 		variable_ptr = opline.Op1()
 		if variable_ptr.IsRefcounted() {
-			var ref *types.ZendRefcounted = variable_ptr.GetCounted()
+			var ref *types.ZendRefcounted = variable_ptr.RefCounted()
 			var refcnt uint32 = ref.DelRefcount()
 			if variable_ptr != value {
 				if refcnt == 0 {

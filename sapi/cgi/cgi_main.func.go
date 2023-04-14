@@ -14,7 +14,7 @@ import (
 )
 
 func UserConfigCacheEntryDtor(el *types.Zval) {
-	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.GetPtr())
+	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.Ptr())
 	entry.GetUserConfig().Destroy()
 	zend.Free(entry.GetUserConfig())
 	zend.Free(entry)
@@ -248,7 +248,7 @@ func SapiFcgiReadCookies() *byte {
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
 	var array_ptr *types.Zval = (*types.Zval)(arg)
-	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
+	var filter_arg int = b.Cond(array_ptr.Array() == core.PG__().http_globals[core.TRACK_VARS_ENV].Array(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(b.CastStrAuto(var_), b.CastStr(val, new_val_len), array_ptr)
@@ -259,9 +259,9 @@ func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() != types.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types.IS_ARRAY && array_ptr.GetArr() != core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr() {
-			array_ptr.GetArr().DestroyEx()
-			array_ptr.SetArr(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].GetArr()))
+		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types.IS_ARRAY && array_ptr.Array() != core.PG__().http_globals[core.TRACK_VARS_ENV].Array() {
+			array_ptr.Array().DestroyEx()
+			array_ptr.SetArr(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].Array()))
 			return
 		}
 	}

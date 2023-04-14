@@ -17,7 +17,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	varname = opline.Op1Ptr(&free_op1)
 
 	if varname.IsString() {
-		name = varname.GetStr()
+		name = varname.String()
 		tmp_name = nil
 	} else {
 		if varname.IsUndef() {
@@ -54,7 +54,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 			}
 		}
 	} else if retval.IsIndirect() {
-		retval = retval.GetZv()
+		retval = retval.Indirect()
 		if retval.IsUndef() {
 			if name.GetStr() == types.STR_THIS {
 				goto fetch_this

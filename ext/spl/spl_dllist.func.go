@@ -31,7 +31,7 @@ func SPL_LLIST_CHECK_ADDREF(elem *SplPtrLlistElement) {
 func SplDllistFromObj(obj *types.ZendObject) *SplDllistObject {
 	return (*SplDllistObject)((*byte)(obj - zend_long((*byte)(&((*SplDllistObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLDLLIST_P(zv *types.Zval) *SplDllistObject { return SplDllistFromObj(zv.GetObj()) }
+func Z_SPLDLLIST_P(zv *types.Zval) *SplDllistObject { return SplDllistFromObj(zv.Object()) }
 func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 	if !(elem.GetData().IsUndef()) {
 		zend.ZvalPtrDtor(elem.GetData())
@@ -288,7 +288,7 @@ func SplDllistObjectNew(class_type *types.ClassEntry) *types.ZendObject {
 func SplDllistObjectClone(zobject *types.Zval) *types.ZendObject {
 	var old_object *types.ZendObject
 	var new_object *types.ZendObject
-	old_object = zobject.GetObj()
+	old_object = zobject.Object()
 	new_object = SplDllistObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -815,7 +815,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, 
 	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || flags.GetType() != types.IS_LONG {
 		goto error
 	}
-	intern.SetFlags(int(flags.GetLval()))
+	intern.SetFlags(int(flags.Long()))
 
 	/* elements */
 
@@ -850,23 +850,23 @@ func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, 
 	/* flags */
 
 	tmp.SetLong(intern.GetFlags())
-	return_value.GetArr().NextIndexInsert(&tmp)
+	return_value.Array().NextIndexInsert(&tmp)
 
 	/* elements */
 
 	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
-		tmp.GetArr().NextIndexInsert(current.GetData())
+		tmp.Array().NextIndexInsert(current.GetData())
 		current.GetData().TryAddRefcount()
 		current = current.GetNext()
 	}
-	return_value.GetArr().NextIndexInsert(&tmp)
+	return_value.Array().NextIndexInsert(&tmp)
 
 	/* members */
 
 	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
 	tmp.TryAddRefcount()
-	return_value.GetArr().NextIndexInsert(&tmp)
+	return_value.Array().NextIndexInsert(&tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
@@ -885,15 +885,15 @@ func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	intern.SetFlags(int(flags_zv.GetLval()))
-	var __ht *types.Array = storage_zv.GetArr()
+	intern.SetFlags(int(flags_zv.Long()))
+	var __ht *types.Array = storage_zv.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 
 		elem = _z
 		SplPtrLlistPush(intern.GetLlist(), elem)
 	}
-	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
+	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.Array())
 }
 func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	var zindex *types.Zval
@@ -967,7 +967,7 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	object.AddRefcount()
-	iterator.GetIntern().GetIt().GetData().SetObject(object.GetObj())
+	iterator.GetIntern().GetIt().GetData().SetObject(object.Object())
 	iterator.GetIntern().GetIt().SetFuncs(&SplDllistItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetTraversePosition(dllist_object.GetTraversePosition())

@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var expr *types.Zval
@@ -34,7 +36,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				if expr.GetType() != types.IS_NULL {
 					result.SetArray(types.NewArray(1))
-					expr = result.GetArr().IndexAddNew(0, expr)
+					expr = result.Array().IndexAddNew(0, expr)
 					{
 
 						expr.TryAddRefcount()
@@ -51,7 +53,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = types.ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.Array())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
@@ -110,7 +112,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
 					result.SetArray(types.NewArray(1))
-					expr = result.GetArr().IndexAddNew(0, expr)
+					expr = result.Array().IndexAddNew(0, expr)
 
 					{
 
@@ -135,7 +137,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = types.ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.Array())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
@@ -196,7 +198,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
 					result.SetArray(types.NewArray(1))
-					expr = result.GetArr().IndexAddNew(0, expr)
+					expr = result.Array().IndexAddNew(0, expr)
 
 					{
 
@@ -221,7 +223,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = types.ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.Array())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
@@ -280,7 +282,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if expr.GetType() != types.IS_OBJECT || types.Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != types.IS_NULL {
 					result.SetArray(types.NewArray(1))
-					expr = result.GetArr().IndexAddNew(0, expr)
+					expr = result.Array().IndexAddNew(0, expr)
 
 					{
 
@@ -305,7 +307,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		} else {
 			result.SetObject(ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsArray() {
-				ht = types.ZendSymtableToProptable(expr.GetArr())
+				ht = types.ZendSymtableToProptable(expr.Array())
 				if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */

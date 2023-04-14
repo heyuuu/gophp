@@ -30,7 +30,7 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 	if EG__().GetException() != nil {
 		return 0
 	}
-	if opline.Result().GetLval() == 0 {
+	if opline.Result().Long() == 0 {
 		ZEND_VM_SMART_BRANCH_TRUE()
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -48,42 +48,42 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 	/* Walk try/catch/finally structures upwards, performing the necessary actions */
 
 	for try_catch_offset != uint32-1 {
-		var try_catch *ZendTryCatchElement = executeData.GetFunc().op_array.try_catch_array[try_catch_offset]
+		var try_catch *ZendTryCatchElement = executeData.GetFunc().GetOpArray().try_catch_array[try_catch_offset]
 		if op_num < try_catch.GetCatchOp() && ex != nil {
 
 			/* Go to catch block */
 
 			CleanupLiveVars(executeData, op_num, try_catch.GetCatchOp())
-			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().op_array.opcodes[try_catch.GetCatchOp()], 0)
+			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().GetOpArray().opcodes[try_catch.GetCatchOp()], 0)
 		} else if op_num < try_catch.GetFinallyOp() {
 
 			/* Go to finally block */
 
-			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().op_array.opcodes[try_catch.GetFinallyEnd()].op1.var_)
+			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
 			CleanupLiveVars(executeData, op_num, try_catch.GetFinallyOp())
 			fast_call.SetObj(EG__().GetException())
 			EG__().SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
-			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().op_array.opcodes[try_catch.GetFinallyOp()], 0)
+			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyOp()], 0)
 		} else if op_num < try_catch.GetFinallyEnd() {
-			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().op_array.opcodes[try_catch.GetFinallyEnd()].op1.var_)
+			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
 
 			/* cleanup incomplete RETURN statement */
 
-			if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().op_array.opcodes[fast_call.GetOplineNum()].op2_type&(IS_TMP_VAR|IS_VAR)) != 0 {
-				var return_value *types.Zval = EX_VAR(executeData.GetFunc().op_array.opcodes[fast_call.GetOplineNum()].op2.var_)
+			if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2_type&(IS_TMP_VAR|IS_VAR)) != 0 {
+				var return_value *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
 				ZvalPtrDtor(return_value)
 			}
 
 			/* Chain potential exception from wrapping finally block */
 
-			if fast_call.GetObj() != nil {
+			if fast_call.Object() != nil {
 				if ex != nil {
-					faults.ExceptionSetPrevious(ex, fast_call.GetObj())
+					faults.ExceptionSetPrevious(ex, fast_call.Object())
 				} else {
-					EG__().SetException(fast_call.GetObj())
+					EG__().SetException(fast_call.Object())
 				}
-				ex = fast_call.GetObj()
+				ex = fast_call.Object()
 			}
 
 			/* Chain potential exception from wrapping finally block */

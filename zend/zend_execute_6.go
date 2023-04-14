@@ -71,7 +71,7 @@ func ZendHandleFetchObjFlags(result *types.Zval, ptr *types.Zval, obj *types.Zen
 				ptr.SetNull()
 			}
 			ptr.SetNewRef(ptr)
-			ZEND_REF_ADD_TYPE_SOURCE(ptr.GetRef(), prop_info)
+			ZEND_REF_ADD_TYPE_SOURCE(ptr.Reference(), prop_info)
 		}
 	default:
 
@@ -118,7 +118,7 @@ func ZendFetchPropertyAddress(
 	}
 	if prop_op_type == IS_CONST && types.Z_OBJCE_P(container) == CACHED_PTR_EX(cache_slot) {
 		var prop_offset uintPtr = uintPtr(CACHED_PTR_EX(cache_slot + 1))
-		var zobj *types.ZendObject = container.GetObj()
+		var zobj *types.ZendObject = container.Object()
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			ptr = OBJ_PROP(zobj, prop_offset)
 			if ptr.IsNotUndef() {
@@ -138,7 +138,7 @@ func ZendFetchPropertyAddress(
 				}
 				zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 			}
-			ptr = zobj.GetProperties().KeyFind(prop_ptr.GetStr().GetStr())
+			ptr = zobj.GetProperties().KeyFind(prop_ptr.String().GetStr())
 			if ptr != nil {
 				result.SetIndirect(ptr)
 				return
@@ -173,7 +173,7 @@ func ZendFetchPropertyAddress(
 				}
 			}
 		} else {
-			if ZendHandleFetchObjFlags(result, ptr, container.GetObj(), nil, flags) == 0 {
+			if ZendHandleFetchObjFlags(result, ptr, container.Object(), nil, flags) == 0 {
 				return
 			}
 		}
@@ -196,7 +196,7 @@ func ZendAssignToPropertyReference(
 	var cache_addr *any = b.CondF1(prop_op_type == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_RETURNS_FUNCTION) }, nil)
 	ZendFetchPropertyAddress(variable_ptr, container, container_op_type, prop_ptr, prop_op_type, cache_addr, BP_VAR_W, 0, 0, opline, executeData)
 	if variable_ptr.IsIndirect() {
-		variable_ptr = variable_ptr.GetZv()
+		variable_ptr = variable_ptr.Indirect()
 	}
 	if variable_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
@@ -214,7 +214,7 @@ func ZendAssignToPropertyReference(
 			prop_info = (*ZendPropertyInfo)(CACHED_PTR_EX(cache_addr + 2))
 		} else {
 			container = types.ZVAL_DEREF(container)
-			prop_info = ZendObjectFetchPropertyTypeInfo(container.GetObj(), variable_ptr)
+			prop_info = ZendObjectFetchPropertyTypeInfo(container.Object(), variable_ptr)
 		}
 		if prop_info != nil {
 			variable_ptr = ZendAssignToTypedPropertyReference(prop_info, variable_ptr, value_ptr, executeData)
@@ -257,7 +257,7 @@ func ZendFetchStaticPropertyAddressEx(
 		var class_name *types.Zval = opline.Const2()
 		b.Assert(op1_type != IS_CONST || CACHED_PTR(cache_slot) == nil)
 		if b.Assign(&ce, CACHED_PTR(cache_slot)) == nil {
-			ce = ZendFetchClassByName(class_name.GetStr(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
+			ce = ZendFetchClassByName(class_name.String(), (class_name + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				FREE_UNFETCHED_OP(op1_type, opline.GetOp1().GetVar())
 				return types.FAILURE
@@ -274,7 +274,7 @@ func ZendFetchStaticPropertyAddressEx(
 				return types.FAILURE
 			}
 		} else {
-			ce = opline.Op2().GetCe()
+			ce = opline.Op2().Class()
 		}
 		if op1_type == IS_CONST && CACHED_PTR(cache_slot) == ce {
 			*retval = CACHED_PTR(cache_slot + b.SizeOf("void *"))
@@ -283,11 +283,11 @@ func ZendFetchStaticPropertyAddressEx(
 		}
 	}
 	if op1_type == IS_CONST {
-		name = opline.Const1().GetStr()
+		name = opline.Const1().String()
 	} else {
 		var varname *types.Zval = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
 		if varname.IsString() {
-			name = varname.GetStr()
+			name = varname.String()
 			tmp_name = nil
 		} else {
 			if op1_type == IS_CV && varname.IsUndef() {

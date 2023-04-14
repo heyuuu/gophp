@@ -266,7 +266,7 @@ func (ht *Array) KeyFind(key string) *Zval {
 func (ht *Array) KeyFindPtr(key string) any {
 	var zv = ht.KeyFind(key)
 	if zv != nil {
-		return zv.GetPtr()
+		return zv.Ptr()
 	}
 	return nil
 }
@@ -280,7 +280,7 @@ func (ht *Array) KeyExistsIndirect(key string) bool {
 		return false
 	}
 
-	if zv.IsUndef() && zv.GetZv().IsUndef() {
+	if zv.IsUndef() && zv.Indirect().IsUndef() {
 		return false
 	}
 
@@ -307,7 +307,7 @@ func (ht *Array) KeyAddIndirect(key string, pData *Zval) *Zval {
 	if data := ht.KeyFind(key); data != nil {
 		b.Assert(data != pData)
 		if data.IsIndirect() {
-			data = data.GetZv()
+			data = data.Indirect()
 			if !data.IsUndef() {
 				return nil
 			}
@@ -343,7 +343,7 @@ func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	if data := ht.KeyFind(key); data != nil {
 		b.Assert(data != pData)
 		if data.IsType(IS_INDIRECT) {
-			data = data.GetZv()
+			data = data.Indirect()
 		}
 		if ht.GetPDestructor() != nil {
 			ht.GetPDestructor()(data)
@@ -367,7 +367,7 @@ func (ht *Array) KeyDeleteIndirect(key string) bool {
 	if pos, ok := ht.keyMap[key]; ok {
 		var p = &ht.data[pos]
 		if p.GetVal().IsType(IS_INDIRECT) {
-			var data *Zval = p.GetVal().GetZv()
+			var data *Zval = p.GetVal().Indirect()
 			if data.IsType(IS_UNDEF) {
 				return false
 			} else {
@@ -451,7 +451,7 @@ func (ht *Array) ForeachIndirect(handler func(key ArrayKey, value *Zval)) {
 		p := &ht.data[i]
 		data := p.GetVal()
 		if data.IsIndirect() {
-			data = data.GetZv()
+			data = data.Indirect()
 		}
 		if data.IsUndef() {
 			return
@@ -464,7 +464,7 @@ func (ht *Array) ForeachIndirectReserve(handler func(key ArrayKey, value *Zval))
 		p := &ht.data[i]
 		data := p.GetVal()
 		if data.IsIndirect() {
-			data = data.GetZv()
+			data = data.Indirect()
 		}
 		if data.IsUndef() {
 			return
@@ -521,7 +521,7 @@ func (ht *Array) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, dat
 		p := &ht.data[i]
 		data := p.GetVal()
 		if data.IsIndirect() {
-			data = data.GetZv()
+			data = data.Indirect()
 		}
 		if data.IsUndef() {
 			return

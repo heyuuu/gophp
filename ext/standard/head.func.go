@@ -177,7 +177,7 @@ func PhpHeadParseCookieOptionsArray(
 	var found int = 0
 	var key *types.String
 	var value *types.Zval
-	var __ht *types.Array = options.GetArr()
+	var __ht *types.Array = options.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 

@@ -217,7 +217,7 @@ func ZendGetConstantEx(cname *types.String, scope *types.ClassEntry, flags uint3
 				ret_constant = c.GetValue()
 			}
 		}
-		if ret_constant != nil && ret_constant.IsConstant() {
+		if ret_constant != nil && ret_constant.IsConstantAst() {
 			var ret int
 			if IS_CONSTANT_VISITED(ret_constant) {
 				faults.ThrowError(nil, "Cannot declare self-referencing constant '%s::%s'", className, constantName)
