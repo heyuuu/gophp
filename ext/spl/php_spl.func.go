@@ -633,7 +633,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 		}
 	}
 	// types.ZendStringReleaseEx(lc_name, 0)
-	types.ZVAL_BOOL(return_value, success == types.SUCCESS)
+	return_value.SetBool(success == types.SUCCESS)
 	return
 }
 func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {

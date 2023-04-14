@@ -69,10 +69,10 @@ func OP_JMP_ADDR(opline *ZendOp, node ZnodeOp) *ZendOp {
 func ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array *types.ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetJmpOffset(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, node.GetOplineNum()))
 }
-func CT_CONSTANT_EX(op_array *types.ZendOpArray, num *types.Zval) __auto__ {
+func CT_CONSTANT_EX(op_array *types.ZendOpArray, num *types.Zval) *types.Zval {
 	return op_array.GetLiterals() + num
 }
-func CT_CONSTANT(node ZnodeOp) __auto__ {
+func CT_CONSTANT(node ZnodeOp) *types.Zval {
 	return CT_CONSTANT_EX(CG__().GetActiveOpArray(), node.GetConstant())
 }
 func RT_CONSTANT(opline *ZendOp, node ZnodeOp) *types.Zval {

@@ -31,7 +31,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_TMPVAR_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -59,7 +59,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -94,7 +94,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -126,7 +126,7 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -152,7 +152,7 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_INSTANCEOF_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -184,6 +184,6 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

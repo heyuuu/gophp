@@ -227,7 +227,7 @@ func ZifDnsCheckRecord(executeData zpp.Ex, return_value zpp.Ret, host *types.Zva
 		return
 	}
 	hp = (*HEADER)(&answer)
-	types.ZVAL_BOOL(return_value, ntohs(hp.ancount) != 0)
+	return_value.SetBool(ntohs(hp.ancount) != 0)
 	return
 }
 func PhpParserr(
@@ -1007,7 +1007,7 @@ func ZifDnsGetMx(executeData zpp.Ex, return_value zpp.Ret, hostname *types.Zval,
 		}
 	}
 	PhpDnsFreeHandle(handle)
-	types.ZVAL_BOOL(return_value, types.Z_ARRVAL_P(mx_list).Len() != 0)
+	return_value.SetBool(mx_list.Array().Len() != 0)
 	return
 }
 func ZmStartupDns(type_ int, module_number int) int {

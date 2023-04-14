@@ -448,7 +448,7 @@ func zim_spl_SplDoublyLinkedList_isEmpty(executeData *zend.ZendExecuteData, retu
 		return
 	}
 	SplDllistObjectCountElements(zend.ZEND_THIS(executeData), &count)
-	types.ZVAL_BOOL(return_value, count == 0)
+	return_value.SetBool(count == 0)
 	return
 }
 func zim_spl_SplDoublyLinkedList_setIteratorMode(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -484,7 +484,7 @@ func zim_spl_SplDoublyLinkedList_offsetExists(executeData *zend.ZendExecuteData,
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
-	types.ZVAL_BOOL(return_value, index >= 0 && index < intern.GetLlist().GetCount())
+	return_value.SetBool(index >= 0 && index < intern.GetLlist().GetCount())
 	return
 }
 func zim_spl_SplDoublyLinkedList_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -723,7 +723,7 @@ func zim_spl_SplDoublyLinkedList_valid(executeData *zend.ZendExecuteData, return
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, intern.GetTraversePointer() != nil)
+	return_value.SetBool(intern.GetTraversePointer() != nil)
 	return
 }
 func zim_spl_SplDoublyLinkedList_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {

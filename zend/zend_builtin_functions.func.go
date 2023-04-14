@@ -295,7 +295,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 	var idx ZendUlong
 	var new_val *types.Zval
 	var val *types.Zval
-	ArrayInitSize(dst, types.Z_ARRVAL_P(src).Len())
+	ArrayInitSize(dst, src.Array().Len())
 	var __ht = src.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z = _p.GetVal()
@@ -513,7 +513,7 @@ func IsAImpl(executeData *ZendExecuteData, return_value *types.Zval, only_subcla
 			}
 		}
 	}
-	types.ZVAL_BOOL(return_value, retval != 0)
+	return_value.SetBool(retval != 0)
 	return
 }
 func ZifIsSubclassOf(executeData zpp.Ex, return_value zpp.Ret, object *types.Zval, className *types.Zval, _ zpp.Opt, allowString *types.Zval) {
@@ -774,7 +774,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */
 
-		types.ZVAL_BOOL(return_value, klass.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce)
+		return_value.SetBool(klass.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce)
 		return
 	}
 	if klass.IsObject() {
@@ -785,7 +785,7 @@ func ZifMethodExists(executeData zpp.Ex, return_value zpp.Ret, object *types.Zva
 
 				/* Returns true to the fake Closure's __invoke */
 
-				types.ZVAL_BOOL(return_value, func_.GetScope() == ZendCeClosure && method_name.GetStr() == ZEND_INVOKE_FUNC_NAME)
+				return_value.SetBool(func_.GetScope() == ZendCeClosure && method_name.GetStr() == ZEND_INVOKE_FUNC_NAME)
 				// types.ZendStringReleaseEx(func_.GetFunctionName(), 0)
 				ZendFreeTrampoline(func_)
 				return
@@ -869,7 +869,7 @@ func ClassExistsImpl(executeData *ZendExecuteData, return_value *types.Zval, fla
 		ce = ZendLookupClass(name)
 	}
 	if ce != nil {
-		types.ZVAL_BOOL(return_value, (ce.GetCeFlags()&flags) == flags && !ce.HasCeFlags(skip_flags))
+		return_value.SetBool((ce.GetCeFlags()&flags) == flags && !ce.HasCeFlags(skip_flags))
 		return
 	} else {
 		return_value.SetFalse()
@@ -916,7 +916,7 @@ func ZifFunctionExists(executeData zpp.Ex, return_value zpp.Ret, functionName *t
 	 * is actually one that displays "function is disabled" message.
 	 */
 
-	types.ZVAL_BOOL(return_value, func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction))
+	return_value.SetBool(func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction))
 	return
 }
 func ZifClassAlias(executeData zpp.Ex, return_value zpp.Ret, userClassName *types.Zval, aliasName *types.Zval, _ zpp.Opt, autoload *types.Zval) {
@@ -1424,7 +1424,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 			i++
 		}
 		fillScope.FillEnd()
-		types.Z_ARRVAL_P(arg_array).SetNNumOfElements(num_args)
+		arg_array.Array().SetNNumOfElements(num_args)
 	} else {
 		arg_array.SetEmptyArray()
 	}

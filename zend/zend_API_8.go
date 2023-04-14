@@ -40,7 +40,7 @@ again:
 	case types.IS_ARRAY:
 		var method *types.Zval = nil
 		var obj *types.Zval = nil
-		if types.Z_ARRVAL_P(callable).Len() == 2 {
+		if callable.Array().Len() == 2 {
 			obj = callable.Array().IndexFind(0)
 			method = callable.Array().IndexFind(1)
 		}
@@ -74,7 +74,7 @@ again:
 			goto check_func
 			break
 		}
-		if types.Z_ARRVAL_P(callable).Len() == 2 {
+		if callable.Array().Len() == 2 {
 			if obj == nil || b.CondF(!(obj.IsReference()), func() bool { return obj.GetType() != types.IS_STRING && obj.GetType() != types.IS_OBJECT }, func() bool {
 				return types.Z_REFVAL_P(obj).GetType() != types.IS_STRING && types.Z_REFVAL_P(obj).GetType() != types.IS_OBJECT
 			}) {
@@ -195,7 +195,7 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ types.IFunction, args *
 	if args.GetType() != types.IS_ARRAY {
 		return types.FAILURE
 	}
-	fci.SetParamCount(types.Z_ARRVAL_P(args).Len())
+	fci.SetParamCount(args.Array().Len())
 	params = (*types.Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval")))
 	fci.SetParams(params)
 	var __ht *types.Array = args.Array()

@@ -141,7 +141,7 @@ func ZendIniCopyTypedValue(retval *types.Zval, type_ int, str *byte, len_ int) {
 	case BOOL_FALSE:
 		fallthrough
 	case BOOL_TRUE:
-		types.ZVAL_BOOL(retval, type_ == BOOL_TRUE)
+		retval.SetBool(type_ == BOOL_TRUE)
 	case NULL_NULL:
 		retval.SetNull()
 	case TC_NUMBER:

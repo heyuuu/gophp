@@ -642,7 +642,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 			return_value.SetFalse()
 			return
 		}
-		argc = types.Z_ARRVAL_P(args).Len()
+		argc = args.Array().Len()
 
 		/* Attempt to allocate enough memory to hold all of the arguments
 		 * and a trailing NULL */
@@ -681,7 +681,7 @@ func ZifGetopt(executeData zpp.Ex, return_value zpp.Ret, options *types.Zval, _ 
 	if p_longopts != nil {
 		var count int
 		var entry *types.Zval
-		count = types.Z_ARRVAL_P(p_longopts).Len()
+		count = p_longopts.Array().Len()
 
 		/* the first <len> slots are filled by the one short ops
 		 * we now extend our array and jump to the new added structs */
@@ -2024,7 +2024,7 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Z
 	} else {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
-	types.ZVAL_BOOL(return_value, successful != 0)
+	return_value.SetBool(successful != 0)
 	return
 }
 func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callback_type int, arr *types.Zval) {

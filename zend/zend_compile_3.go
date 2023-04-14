@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/builtin/ascii"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -595,7 +596,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 	if args.GetChild()[1].GetKind() != ZEND_AST_ARRAY || ZendTryCtEvalArray(array.GetConstant(), args.GetChild()[1]) == 0 {
 		return types.FAILURE
 	}
-	if types.Z_ARRVAL(array.GetConstant()).Len() > 0 {
+	if array.GetConstant().Array().Len() > 0 {
 		var ok types.ZendBool = 1
 		var val *types.Zval
 		var tmp types.Zval

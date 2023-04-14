@@ -15,7 +15,7 @@ func ZEND_TYPE_CHECK_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		ZEND_VM_SMART_BRANCH(result, 0)
-		types.ZVAL_BOOL(opline.Result(), result != 0)
+		opline.Result().SetBool(result != 0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 }
@@ -46,7 +46,7 @@ func ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	{
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_SMART_BRANCH(result, 1)
-		types.ZVAL_BOOL(opline.Result(), result != 0)
+		opline.Result().SetBool(result != 0)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 
@@ -76,7 +76,7 @@ func ZEND_TYPE_CHECK_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	{
 		ZEND_VM_SMART_BRANCH(result, 1)
-		types.ZVAL_BOOL(opline.Result(), result != 0)
+		opline.Result().SetBool(result != 0)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 

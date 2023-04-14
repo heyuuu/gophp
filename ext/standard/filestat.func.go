@@ -676,22 +676,22 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *types
 		return_value.SetStringVal("unknown")
 		return
 	case FS_IS_W:
-		types.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&wmask) != 0)
+		return_value.SetBool((ssb.GetSb().st_mode & wmask) != 0)
 		return
 	case FS_IS_R:
-		types.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&rmask) != 0)
+		return_value.SetBool((ssb.GetSb().st_mode & rmask) != 0)
 		return
 	case FS_IS_X:
-		types.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&xmask) != 0)
+		return_value.SetBool((ssb.GetSb().st_mode & xmask) != 0)
 		return
 	case FS_IS_FILE:
-		types.ZVAL_BOOL(return_value, zend.S_ISREG(ssb.GetSb().st_mode))
+		return_value.SetBool(zend.S_ISREG(ssb.GetSb().st_mode))
 		return
 	case FS_IS_DIR:
-		types.ZVAL_BOOL(return_value, zend.S_ISDIR(ssb.GetSb().st_mode))
+		return_value.SetBool(zend.S_ISDIR(ssb.GetSb().st_mode))
 		return
 	case FS_IS_LINK:
-		types.ZVAL_BOOL(return_value, zend.S_ISLNK(ssb.GetSb().st_mode))
+		return_value.SetBool(zend.S_ISLNK(ssb.GetSb().st_mode))
 		return
 	case FS_EXISTS:
 		return_value.SetTrue()

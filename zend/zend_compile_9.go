@@ -478,7 +478,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 		child0_is_true = ZendIsTrue(ZendAstGetZval(ast.GetChild()[0]))
 		if child0_is_true == (ast.GetKind() == ZEND_AST_OR) {
-			types.ZVAL_BOOL(&result, ast.GetKind() == ZEND_AST_OR)
+			result.SetBool(ast.GetKind() == ZEND_AST_OR)
 			break
 		}
 		if ast.GetChild()[1].GetKind() != ZEND_AST_ZVAL {
@@ -486,9 +486,9 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		}
 		child1_is_true = ZendIsTrue(ZendAstGetZval(ast.GetChild()[1]))
 		if ast.GetKind() == ZEND_AST_OR {
-			types.ZVAL_BOOL(&result, child0_is_true != 0 || child1_is_true != 0)
+			result.SetBool(child0_is_true != 0 || child1_is_true != 0)
 		} else {
-			types.ZVAL_BOOL(&result, child0_is_true != 0 && child1_is_true != 0)
+			result.SetBool(child0_is_true != 0 && child1_is_true != 0)
 		}
 	case ZEND_AST_UNARY_OP:
 		ZendEvalConstExpr(ast.GetChild()[0])

@@ -471,7 +471,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParameters(executeData.NumArgs(), "a|b", &data, &save_indexes) == types.FAILURE {
 		return
 	}
-	num = types.Z_ARRVAL_P(data).Len()
+	num = data.Array().Len()
 	if num > 0 && save_indexes != 0 {
 		var element *types.Zval
 		var str_index *types.String
@@ -559,7 +559,7 @@ func zim_spl_SplFixedArray_offsetExists(executeData *zend.ZendExecuteData, retur
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
-	types.ZVAL_BOOL(return_value, SplFixedarrayObjectHasDimensionHelper(intern, zindex, 0) != 0)
+	return_value.SetBool(SplFixedarrayObjectHasDimensionHelper(intern, zindex, 0) != 0)
 	return
 }
 func zim_spl_SplFixedArray_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -672,7 +672,7 @@ func zim_spl_SplFixedArray_valid(executeData *zend.ZendExecuteData, return_value
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, intern.GetCurrent() >= 0 && intern.GetCurrent() < intern.GetArray().GetSize())
+	return_value.SetBool(intern.GetCurrent() >= 0 && intern.GetCurrent() < intern.GetArray().GetSize())
 	return
 }
 func zim_spl_SplFixedArray_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {

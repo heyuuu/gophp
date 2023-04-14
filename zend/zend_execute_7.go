@@ -208,12 +208,9 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 	var src *types.Zval
 	var delta int
 	var count uint32
-	var type_flags uint32 = 0
 	if !op_array.IsHasTypeHints() {
 		executeData.GetOpline() += first_extra_arg
-
 		/* Skip useless ZEND_RECV and ZEND_RECV_INIT opcodes */
-
 	}
 
 	/* move extra args into separate array after all CV and TMP vars */
@@ -223,8 +220,9 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 	count = num_args - first_extra_arg
 	if delta != 0 {
 		delta *= b.SizeOf("zval")
+		isAnyRefcounted := true
 		for {
-			type_flags |= src.GetTypeInfo()
+			isAnyRefcounted = isAnyRefcounted || src.IsRefcounted()
 			types.ZVAL_COPY_VALUE((*types.Zval)((*byte)(src)+delta), src)
 			src.SetUndef()
 			src--
@@ -232,7 +230,7 @@ func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 				break
 			}
 		}
-		if types.Z_TYPE_INFO_REFCOUNTED(type_flags) {
+		if isAnyRefcounted {
 			ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 		}
 	} else {

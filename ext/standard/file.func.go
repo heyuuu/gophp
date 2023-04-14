@@ -474,7 +474,7 @@ func ZifFilePutContents(executeData zpp.Ex, return_value zpp.Ret, filename *type
 			}
 		}
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(data).Len() {
+		if data.Array().Len() {
 			var bytes_written ssize_t
 			var tmp *types.Zval
 			var __ht *types.Array = data.Array()
@@ -1166,7 +1166,7 @@ func ZifMkdir(executeData zpp.Ex, return_value zpp.Ret, pathname *types.Zval, _ 
 		break
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	types.ZVAL_BOOL(return_value, core.PhpStreamMkdir(dir, int(mode), b.Cond(recursive != 0, core.PHP_STREAM_MKDIR_RECURSIVE, 0)|core.REPORT_ERRORS, context) != 0)
+	return_value.SetBool(core.PhpStreamMkdir(dir, int(mode), b.Cond(recursive != 0, core.PHP_STREAM_MKDIR_RECURSIVE, 0)|core.REPORT_ERRORS, context) != 0)
 	return
 }
 func ZifRmdir(executeData zpp.Ex, return_value zpp.Ret, dirname *types.Zval, _ zpp.Opt, context *types.Zval) {
@@ -1189,7 +1189,7 @@ func ZifRmdir(executeData zpp.Ex, return_value zpp.Ret, dirname *types.Zval, _ z
 		break
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	types.ZVAL_BOOL(return_value, core.PhpStreamRmdir(dir, core.REPORT_ERRORS, context) != 0)
+	return_value.SetBool(core.PhpStreamRmdir(dir, core.REPORT_ERRORS, context) != 0)
 	return
 }
 func ZifReadfile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, flags *types.Zval, context *types.Zval) {
@@ -1315,7 +1315,7 @@ func ZifRename(executeData zpp.Ex, return_value zpp.Ret, oldName *types.Zval, ne
 		return
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
-	types.ZVAL_BOOL(return_value, wrapper.GetWops().GetRename()(wrapper, old_name, new_name, 0, context) != 0)
+	return_value.SetBool(wrapper.GetWops().GetRename()(wrapper, old_name, new_name, 0, context) != 0)
 	return
 }
 func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, context *types.Zval) {
@@ -1350,7 +1350,7 @@ func ZifUnlink(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, wrapper.GetWops().GetUnlink()(wrapper, filename, core.REPORT_ERRORS, context) != 0)
+	return_value.SetBool(wrapper.GetWops().GetUnlink()(wrapper, filename, core.REPORT_ERRORS, context) != 0)
 	return
 }
 func ZifFtruncate(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, size *types.Zval) {
@@ -1381,7 +1381,7 @@ func ZifFtruncate(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval, size
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, 0 == core.PhpStreamTruncateSetSize(stream, size))
+	return_value.SetBool(0 == core.PhpStreamTruncateSetSize(stream, size))
 	return
 }
 func ZifFstat(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zval) {
@@ -1753,7 +1753,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *types.Zval, delimiter byte, encl
 	var field_tmp *types.Zval
 	var csvline zend.SmartStr = zend.MakeSmartStr(0)
 	b.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
-	count = types.Z_ARRVAL_P(fields).Len()
+	count = fields.Array().Len()
 	var __ht *types.Array = fields.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -2342,7 +2342,7 @@ func ZifFnmatch(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, f
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, !(fnmatch(pattern, filename, int(flags))))
+	return_value.SetBool(!(fnmatch(pattern, filename, int(flags))))
 	return
 }
 func ZifSysGetTempDir(executeData zpp.Ex, return_value zpp.Ret) {

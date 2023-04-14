@@ -39,7 +39,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != nil)
+	opline.Result().SetBool(result != nil)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -81,7 +81,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != nil)
+	opline.Result().SetBool(result != nil)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -123,7 +123,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != nil)
+	opline.Result().SetBool(result != nil)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -163,6 +163,6 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != nil)
+	opline.Result().SetBool(result != nil)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

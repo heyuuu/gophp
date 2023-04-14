@@ -11,7 +11,7 @@ import (
 )
 
 func ZifGettype(var_ *types.Zval) string {
-	return types.ZendZvalGetType(var_)
+	return types.ZvalGetType(var_)
 }
 func ZifSettype(var_ zpp.RefZval, typ string) bool {
 	var tmp types.Zval
@@ -149,7 +149,7 @@ func ZifBoolval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, zend.ZendIsTrue(val) != 0)
+	return_value.SetBool(zend.ZendIsTrue(val) != 0)
 	return
 }
 func ZifStrval(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
@@ -216,7 +216,7 @@ func ZifIsBool(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, arg.IsType(types.IS_FALSE) || arg.IsType(types.IS_TRUE))
+	return_value.SetBool(arg.IsType(types.IS_FALSE) || arg.IsType(types.IS_TRUE))
 	return
 }
 
@@ -340,7 +340,7 @@ func ZifIsCallable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval, _
 		/* ignore errors */
 
 	}
-	types.ZVAL_BOOL(return_value, retval != 0)
+	return_value.SetBool(retval != 0)
 	return
 }
 func ZifIsIterable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
@@ -356,7 +356,7 @@ func ZifIsIterable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, zend.ZendIsIterable(var_) != 0)
+	return_value.SetBool(zend.ZendIsIterable(var_) != 0)
 	return
 }
 func ZifIsCountable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) {
@@ -372,6 +372,6 @@ func ZifIsCountable(executeData zpp.Ex, return_value zpp.Ret, var_ *types.Zval) 
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, zend.ZendIsCountable(var_) != 0)
+	return_value.SetBool(zend.ZendIsCountable(var_) != 0)
 	return
 }

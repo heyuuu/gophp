@@ -705,7 +705,7 @@ func zim_spl_DirectoryIterator_valid(executeData *zend.ZendExecuteData, return_v
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, intern.GetEntry().GetDName()[0] != '0')
+	return_value.SetBool(intern.GetEntry().GetDName()[0] != '0')
 	return
 }
 func zim_spl_SplFileInfo_getPath(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -883,7 +883,7 @@ func zim_spl_DirectoryIterator_isDot(executeData *zend.ZendExecuteData, return_v
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0)
+	return_value.SetBool(SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0)
 	return
 }
 func zim_spl_SplFileInfo___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1638,16 +1638,16 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 		case types.IS_STRING:
 			return intern.GetCurrentZval().String().GetLen() == 0
 		case types.IS_ARRAY:
-			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && types.Z_ARRVAL(intern.GetCurrentZval()).Len() == 1 {
+			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().Array().Len() == 1 {
 				var idx uint32 = 0
 				var first *types.Zval
-				for types.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal().IsUndef() {
+				for intern.GetCurrentZval().Array().GetArData()[idx].GetVal().IsUndef() {
 					idx++
 				}
-				first = types.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
+				first = intern.GetCurrentZval().Array().GetArData()[idx].GetVal()
 				return first.IsType(types.IS_STRING) && first.String().GetLen() == 0
 			}
-			return types.Z_ARRVAL(intern.GetCurrentZval()).Len() == 0
+			return intern.GetCurrentZval().Array().Len() == 0
 		case types.IS_NULL:
 			return 1
 		default:
@@ -1761,7 +1761,7 @@ func zim_spl_SplFileObject_eof(executeData *zend.ZendExecuteData, return_value *
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	types.ZVAL_BOOL(return_value, core.PhpStreamEof(intern.GetStream()) != 0)
+	return_value.SetBool(core.PhpStreamEof(intern.GetStream()) != 0)
 	return
 }
 func zim_spl_SplFileObject_valid(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1770,14 +1770,14 @@ func zim_spl_SplFileObject_valid(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 	if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_AHEAD) != 0 {
-		types.ZVAL_BOOL(return_value, intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()))
+		return_value.SetBool(intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()))
 		return
 	} else {
 		if intern.GetStream() == nil {
 			return_value.SetFalse()
 			return
 		}
-		types.ZVAL_BOOL(return_value, core.PhpStreamEof(intern.GetStream()) == 0)
+		return_value.SetBool(core.PhpStreamEof(intern.GetStream()) == 0)
 	}
 }
 func zim_spl_SplFileObject_fgets(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2083,7 +2083,7 @@ func zim_spl_SplFileObject_fflush(executeData *zend.ZendExecuteData, return_valu
 		faults.ThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	types.ZVAL_BOOL(return_value, core.PhpStreamFlush(intern.GetStream()) == 0)
+	return_value.SetBool(core.PhpStreamFlush(intern.GetStream()) == 0)
 	return
 }
 func zim_spl_SplFileObject_ftell(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2273,7 +2273,7 @@ func zim_spl_SplFileObject_ftruncate(executeData *zend.ZendExecuteData, return_v
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, 0 == core.PhpStreamTruncateSetSize(intern.GetStream(), size))
+	return_value.SetBool(0 == core.PhpStreamTruncateSetSize(intern.GetStream(), size))
 	return
 }
 func zim_spl_SplFileObject_seek(executeData *zend.ZendExecuteData, return_value *types.Zval) {

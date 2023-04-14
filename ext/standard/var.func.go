@@ -1091,7 +1091,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 		}
 		if classes != nil && (classes.IsType(types.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
 			zend.ALLOC_HASHTABLE(class_hash)
-			class_hash = types.MakeArrayEx(b.CondF1(classes.IsType(types.IS_ARRAY), func() __auto__ { return types.Z_ARRVAL_P(classes).Len() }, 0), nil, 0)
+			class_hash = types.MakeArrayEx(b.CondF1(classes.IsType(types.IS_ARRAY), func() __auto__ { return classes.Array().Len() }, 0), nil, 0)
 		}
 		if class_hash != nil && classes.IsType(types.IS_ARRAY) {
 			var entry *types.Zval

@@ -915,7 +915,7 @@ func PassTwo(op_array *types.ZendOpArray) int {
 
 			/* absolute indexes to relative offsets */
 
-			var jumptable *types.Array = types.Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
+			var jumptable *types.Array = CT_CONSTANT(opline.GetOp2()).Array()
 			var zv *types.Zval
 			var __ht *types.Array = jumptable
 			for _, _p := range __ht.ForeachData() {

@@ -174,7 +174,7 @@ func SplObjectStorageDebugInfo(obj *types.Zval) *types.Array {
 		/* Incrementing the refcount of obj and inf would confuse the garbage collector.
 		 * Prefer to null the destructor */
 
-		types.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
+		&tmp.Array().SetPDestructor(nil)
 		zend.AddAssocZvalEx(&tmp, "obj", element.GetObj())
 		zend.AddAssocZvalEx(&tmp, "inf", element.GetInf())
 		storage.Array().KeyUpdate(md5str, &tmp)
@@ -345,7 +345,7 @@ func zim_spl_SplObjectStorage_contains(executeData *zend.ZendExecuteData, return
 	if zend.ZendParseParameters(executeData.NumArgs(), "o", &obj) == types.FAILURE {
 		return
 	}
-	types.ZVAL_BOOL(return_value, SplObjectStorageContains(intern, zend.ZEND_THIS(executeData), obj) != 0)
+	return_value.SetBool(SplObjectStorageContains(intern, zend.ZEND_THIS(executeData), obj) != 0)
 	return
 }
 func zim_spl_SplObjectStorage_count(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -381,7 +381,7 @@ func zim_spl_SplObjectStorage_valid(executeData *zend.ZendExecuteData, return_va
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(intern.GetStorage(), intern.GetPos()))
+	return_value.SetBool(types.ZendHashHasMoreElementsEx(intern.GetStorage(), intern.GetPos()))
 	return
 }
 func zim_spl_SplObjectStorage_key(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -650,7 +650,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	if types.Z_ARRVAL_P(storage_zv).Len()%2 != 0 {
+	if storage_zv.Array().Len()%2 != 0 {
 		faults.ThrowException(spl_ce_UnexpectedValueException, "Odd number of elements", 0)
 		return
 	}
@@ -790,12 +790,12 @@ func zim_spl_MultipleIterator_valid(executeData *zend.ZendExecuteData, return_va
 			valid = 0
 		}
 		if expect != valid {
-			types.ZVAL_BOOL(return_value, expect == 0)
+			return_value.SetBool(expect == 0)
 			return
 		}
 		types.ZendHashMoveForwardEx(intern.GetStorage(), intern.GetPos())
 	}
-	types.ZVAL_BOOL(return_value, expect != 0)
+	return_value.SetBool(expect != 0)
 	return
 }
 func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, return_value *types.Zval) {

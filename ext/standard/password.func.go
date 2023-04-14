@@ -416,7 +416,7 @@ func ZifPasswordNeedsRehash(executeData zpp.Ex, return_value zpp.Ret, hash *type
 		return_value.SetTrue()
 		return
 	}
-	types.ZVAL_BOOL(return_value, old_algo.GetNeedsRehash()(hash, options) != 0)
+	return_value.SetBool(old_algo.GetNeedsRehash()(hash, options) != 0)
 	return
 }
 func ZifPasswordVerify(executeData zpp.Ex, return_value zpp.Ret, password *types.Zval, hash *types.Zval) {
@@ -437,7 +437,7 @@ func ZifPasswordVerify(executeData zpp.Ex, return_value zpp.Ret, password *types
 		break
 	}
 	algo = PhpPasswordAlgoIdentify(hash)
-	types.ZVAL_BOOL(return_value, algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
+	return_value.SetBool(algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
 	return
 }
 func ZifPasswordHash(executeData zpp.Ex, return_value zpp.Ret, password *types.Zval, algo *types.Zval, _ zpp.Opt, options *types.Zval) {

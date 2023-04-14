@@ -547,7 +547,7 @@ func ZifIsFinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, core.ZendFinite(dval))
+	return_value.SetBool(core.ZendFinite(dval))
 	return
 }
 func ZifIsInfinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
@@ -563,7 +563,7 @@ func ZifIsInfinite(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, core.ZendIsInf(dval))
+	return_value.SetBool(core.ZendIsInf(dval))
 	return
 }
 func ZifIsNan(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
@@ -579,7 +579,7 @@ func ZifIsNan(executeData zpp.Ex, return_value zpp.Ret, val *types.Zval) {
 		}
 		break
 	}
-	types.ZVAL_BOOL(return_value, core.ZendIsNaN(dval))
+	return_value.SetBool(core.ZendIsNaN(dval))
 	return
 }
 func ZifPow(executeData zpp.Ex, return_value zpp.Ret, base *types.Zval, exponent *types.Zval) {

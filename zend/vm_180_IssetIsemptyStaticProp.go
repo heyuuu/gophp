@@ -11,6 +11,6 @@ func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) i
 		result = result != types.SUCCESS || IZendIsTrue(value) == 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

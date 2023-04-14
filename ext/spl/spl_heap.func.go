@@ -362,7 +362,7 @@ func SplHeapObjectGetDebugInfo(ce *types.ClassEntry, obj *types.Zval) *types.Arr
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	// types.ZendStringReleaseEx(pnstr, 0)
 	pnstr = SplGenPrivatePropName(ce, "isCorrupted")
-	types.ZVAL_BOOL(&tmp, intern.GetHeap().IsHeapCorrupted())
+	tmp.SetBool(intern.GetHeap().IsHeapCorrupted())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	// types.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&heap_array)
@@ -413,7 +413,7 @@ func zim_spl_SplHeap_isEmpty(executeData *zend.ZendExecuteData, return_value *ty
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, intern.GetHeap().GetCount() == 0)
+	return_value.SetBool(intern.GetHeap().GetCount() == 0)
 	return
 }
 func zim_spl_SplHeap_insert(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -543,7 +543,7 @@ func zim_spl_SplHeap_isCorrupted(executeData *zend.ZendExecuteData, return_value
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS(executeData))
-	types.ZVAL_BOOL(return_value, intern.GetHeap().IsHeapCorrupted())
+	return_value.SetBool(intern.GetHeap().IsHeapCorrupted())
 	return
 }
 func zim_spl_SplPriorityQueue_compare(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -665,7 +665,7 @@ func zim_spl_SplHeap_valid(executeData *zend.ZendExecuteData, return_value *type
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, intern.GetHeap().GetCount() != 0)
+	return_value.SetBool(intern.GetHeap().GetCount() != 0)
 	return
 }
 func zim_spl_SplHeap_rewind(executeData *zend.ZendExecuteData, return_value *types.Zval) {

@@ -125,7 +125,7 @@ func ZendHashGetCurrentKeyZvalEx(ht *Array, key *Zval, pos *ArrayPosition) {
 	} else {
 		p = ht.Bucket(idx)
 		if p.GetKey() != nil {
-			ZVAL_STR_COPY(key, p.GetKey())
+			key.SetStringVal(p.StrKey())
 		} else {
 			key.SetLong(p.IndexKey())
 		}

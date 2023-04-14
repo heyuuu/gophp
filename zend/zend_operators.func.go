@@ -180,7 +180,7 @@ again:
 			result = 1
 		}
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
+		if op.Array().Len() {
 			result = 1
 		}
 	case types.IS_OBJECT:
@@ -540,7 +540,7 @@ try_again:
 		}
 		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
+		if op.Array().Len() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -587,7 +587,7 @@ try_again:
 		op.SetDouble(ZendStrtod(str.GetVal(), nil))
 		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
+		if op.Array().Len() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -627,11 +627,11 @@ try_again:
 	case types.IS_RESOURCE:
 		var l ZendLong = b.Cond(types.Z_RES_HANDLE_P(op) != 0, 1, 0)
 		ZvalPtrDtor(op)
-		types.ZVAL_BOOL(op, l != 0)
+		op.SetBool(l != 0)
 	case types.IS_LONG:
-		types.ZVAL_BOOL(op, op.Long() != 0)
+		op.SetBool(op.Long() != 0)
 	case types.IS_DOUBLE:
-		types.ZVAL_BOOL(op, op.Double() != 0)
+		op.SetBool(op.Double() != 0)
 	case types.IS_STRING:
 		var str *types.String = op.String()
 		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetVal()[0] == '0' {
@@ -641,13 +641,13 @@ try_again:
 		}
 		// types.ZendStringReleaseEx(str, 0)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() != 0 {
+		if op.Array().Len() != 0 {
 			tmp = 1
 		} else {
 			tmp = 0
 		}
 		ZvalPtrDtor(op)
-		types.ZVAL_BOOL(op, tmp != 0)
+		op.SetBool(tmp != 0)
 	case types.IS_OBJECT:
 		var dst types.Zval
 		ConvertObjectToType(op, &dst, types.IS_BOOL, ConvertToBoolean)
@@ -855,7 +855,7 @@ try_again:
 			return DvalToLvalCap(dval)
 		}
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() != 0 {
+		if op.Array().Len() != 0 {
 			return 1
 		} else {
 			return 0
@@ -896,7 +896,7 @@ try_again:
 	case types.IS_STRING:
 		return ZendStrtod(op.String().GetVal(), nil)
 	case types.IS_ARRAY:
-		if types.Z_ARRVAL_P(op).Len() {
+		if op.Array().Len() {
 			return 1.0
 		} else {
 			return 0.0
@@ -1590,7 +1590,7 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 		}
 		break
 	}
-	types.ZVAL_BOOL(result, (op1_val^op2_val) != 0)
+	result.SetBool((op1_val ^ op2_val) != 0)
 	return types.SUCCESS
 }
 func BooleanNotFunction(result *types.Zval, op1 *types.Zval) int {
@@ -1612,7 +1612,7 @@ func BooleanNotFunction(result *types.Zval, op1 *types.Zval) int {
 		if op1.IsObject() && types.Z_OBJ_HT(*op1).GetDoOperation() != nil && types.SUCCESS == types.Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_NOT, result, op1, nil) {
 			return types.SUCCESS
 		}
-		types.ZVAL_BOOL(result, ZvalIsTrue(op1) == 0)
+		result.SetBool(ZvalIsTrue(op1) == 0)
 	}
 	return types.SUCCESS
 }
@@ -1626,17 +1626,11 @@ try_again:
 		result.SetLong(^(DvalToLval(op1.Double())))
 		return types.SUCCESS
 	case types.IS_STRING:
-		var i int
-		if op1.String().GetLen() == 1 {
-			var not types.ZendUchar = types.ZendUchar(^((*types.Z_STRVAL_P)(op1)))
-			result.SetStringVal(string(not))
-		} else {
-			result.SetString(types.ZendStringAlloc(op1.String().GetLen(), 0))
-			for i = 0; i < op1.String().GetLen(); i++ {
-				result.String().GetVal()[i] = ^(op1.String().GetVal()[i])
-			}
-			result.String().GetVal()[i] = 0
+		str := []byte(op1.StringVal())
+		for i, c := range str {
+			str[i] = ^c
 		}
+		result.SetStringVal(string(str))
 		return types.SUCCESS
 	case types.IS_REFERENCE:
 		op1 = types.Z_REFVAL_P(op1)
@@ -1662,34 +1656,12 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 	op1 = types.ZVAL_DEREF(op1)
 	op2 = types.ZVAL_DEREF(op2)
 	if op1.IsString() && op2.IsString() {
-		var longer *types.Zval
-		var shorter *types.Zval
-		var str *types.String
-		var i int
-		if op1.String().GetLen() >= op2.String().GetLen() {
-			if op1.String().GetLen() == op2.String().GetLen() && op1.String().GetLen() == 1 {
-				var or types.ZendUchar = zend_uchar((*types.Z_STRVAL_P)(op1) | (*types.Z_STRVAL_P)(op2))
-				if result == op1 {
-
-				}
-				result.SetStringVal(string(or))
-				return types.SUCCESS
-			}
-			longer = op1
-			shorter = op2
-		} else {
-			longer = op2
-			shorter = op1
+		s1, s2 := op1.StringVal(), op2.StringVal()
+		str := make([]byte, b.Min(len(s1), len(s2)))
+		for i := range str {
+			str[i] = s1[i] | s2[i]
 		}
-		str = types.ZendStringAlloc(longer.String().GetLen(), 0)
-		for i = 0; i < shorter.String().GetLen(); i++ {
-			str.GetVal()[i] = longer.String().GetVal()[i] | shorter.String().GetVal()[i]
-		}
-		memcpy(str.GetVal()+i, longer.String().GetVal()+i, longer.String().GetLen()-i+1)
-		if result == op1 {
-
-		}
-		result.SetString(str)
+		result.SetStringVal(string(str))
 		return types.SUCCESS
 	}
 	if op1.GetType() != types.IS_LONG {
@@ -1747,34 +1719,12 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 	op1 = types.ZVAL_DEREF(op1)
 	op2 = types.ZVAL_DEREF(op2)
 	if op1.IsString() && op2.IsString() {
-		var longer *types.Zval
-		var shorter *types.Zval
-		var str *types.String
-		var i int
-		if op1.String().GetLen() >= op2.String().GetLen() {
-			if op1.String().GetLen() == op2.String().GetLen() && op1.String().GetLen() == 1 {
-				var and types.ZendUchar = byte((*types.Z_STRVAL_P)(op1) & (*types.Z_STRVAL_P)(op2))
-				if result == op1 {
-
-				}
-				result.SetStringVal(string(and))
-				return types.SUCCESS
-			}
-			longer = op1
-			shorter = op2
-		} else {
-			longer = op2
-			shorter = op1
+		s1, s2 := op1.StringVal(), op2.StringVal()
+		str := make([]byte, b.Min(len(s1), len(s2)))
+		for i := range str {
+			str[i] = s1[i] & s2[i]
 		}
-		str = types.ZendStringAlloc(shorter.String().GetLen(), 0)
-		for i = 0; i < shorter.String().GetLen(); i++ {
-			str.GetVal()[i] = shorter.String().GetVal()[i] & longer.String().GetVal()[i]
-		}
-		str.GetVal()[i] = 0
-		if result == op1 {
-
-		}
-		result.SetString(str)
+		result.SetStringVal(string(str))
 		return types.SUCCESS
 	}
 	if op1.GetType() != types.IS_LONG {
@@ -1832,34 +1782,12 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 	op1 = types.ZVAL_DEREF(op1)
 	op2 = types.ZVAL_DEREF(op2)
 	if op1.IsString() && op2.IsString() {
-		var longer *types.Zval
-		var shorter *types.Zval
-		var str *types.String
-		var i int
-		if op1.String().GetLen() >= op2.String().GetLen() {
-			if op1.String().GetLen() == op2.String().GetLen() && op1.String().GetLen() == 1 {
-				var xor types.ZendUchar = zend_uchar((*types.Z_STRVAL_P)(op1) ^ (*types.Z_STRVAL_P)(op2))
-				if result == op1 {
-
-				}
-				result.SetStringVal(string(xor))
-				return types.SUCCESS
-			}
-			longer = op1
-			shorter = op2
-		} else {
-			longer = op2
-			shorter = op1
+		s1, s2 := op1.StringVal(), op2.StringVal()
+		str := make([]byte, b.Min(len(s1), len(s2)))
+		for i := range str {
+			str[i] = s1[i] ^ s2[i]
 		}
-		str = types.ZendStringAlloc(shorter.String().GetLen(), 0)
-		for i = 0; i < shorter.String().GetLen(); i++ {
-			str.GetVal()[i] = shorter.String().GetVal()[i] ^ longer.String().GetVal()[i]
-		}
-		str.GetVal()[i] = 0
-		if result == op1 {
-
-		}
-		result.SetString(str)
+		result.SetStringVal(string(str))
 		return types.SUCCESS
 	}
 	if op1.GetType() != types.IS_LONG {
@@ -2502,39 +2430,39 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) bool {
 	}
 }
 func IsIdenticalFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	types.ZVAL_BOOL(result, ZendIsIdentical(op1, op2) != 0)
+	result.SetBool(ZendIsIdentical(op1, op2) != 0)
 	return types.SUCCESS
 }
 func IsNotIdenticalFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
-	types.ZVAL_BOOL(result, ZendIsIdentical(op1, op2) == 0)
+	result.SetBool(ZendIsIdentical(op1, op2) == 0)
 	return types.SUCCESS
 }
 func IsEqualFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	if CompareFunction(result, op1, op2) == types.FAILURE {
 		return types.FAILURE
 	}
-	types.ZVAL_BOOL(result, result.Long() == 0)
+	result.SetBool(result.Long() == 0)
 	return types.SUCCESS
 }
 func IsNotEqualFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	if CompareFunction(result, op1, op2) == types.FAILURE {
 		return types.FAILURE
 	}
-	types.ZVAL_BOOL(result, result.Long() != 0)
+	result.SetBool(result.Long() != 0)
 	return types.SUCCESS
 }
 func IsSmallerFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	if CompareFunction(result, op1, op2) == types.FAILURE {
 		return types.FAILURE
 	}
-	types.ZVAL_BOOL(result, result.Long() < 0)
+	result.SetBool(result.Long() < 0)
 	return types.SUCCESS
 }
 func IsSmallerOrEqualFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	if CompareFunction(result, op1, op2) == types.FAILURE {
 		return types.FAILURE
 	}
-	types.ZVAL_BOOL(result, result.Long() <= 0)
+	result.SetBool(result.Long() <= 0)
 	return types.SUCCESS
 }
 func InstanceofClass(instance_ce *types.ClassEntry, ce *types.ClassEntry) types.ZendBool {

@@ -25,6 +25,6 @@ func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_EMPTY_HANDLER(executeData *ZendExecute
 		return 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 0)
-	types.ZVAL_BOOL(opline.Result(), result != 0)
+	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

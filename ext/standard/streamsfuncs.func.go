@@ -609,7 +609,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
+	ht = types.NewArray(stream_array.Array().Len())
 	var __ht *types.Array = stream_array.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -668,7 +668,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 	if stream_array.GetType() != types.IS_ARRAY {
 		return 0
 	}
-	ht = types.NewArray(types.Z_ARRVAL_P(stream_array).Len())
+	ht = types.NewArray(stream_array.Array().Len())
 	var __ht *types.Array = stream_array.Array()
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
@@ -995,7 +995,7 @@ func ZifStreamContextSetOption(executeData zpp.Ex, return_value zpp.Ret, streamO
 			return_value.SetFalse()
 			return
 		}
-		types.ZVAL_BOOL(return_value, ParseContextOptions(context, options) == types.SUCCESS)
+		return_value.SetBool(ParseContextOptions(context, options) == types.SUCCESS)
 		return
 	} else {
 		var zvalue *types.Zval
@@ -1029,7 +1029,7 @@ func ZifStreamContextSetOption(executeData zpp.Ex, return_value zpp.Ret, streamO
 			return_value.SetFalse()
 			return
 		}
-		types.ZVAL_BOOL(return_value, streams.PhpStreamContextSetOption(context, wrappername, optionname, zvalue) == types.SUCCESS)
+		return_value.SetBool(streams.PhpStreamContextSetOption(context, wrappername, optionname, zvalue) == types.SUCCESS)
 		return
 	}
 }
@@ -1056,7 +1056,7 @@ func ZifStreamContextSetParams(executeData zpp.Ex, return_value zpp.Ret, streamO
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, ParseContextParams(context, params) == types.SUCCESS)
+	return_value.SetBool(ParseContextParams(context, params) == types.SUCCESS)
 }
 func ZifStreamContextGetParams(executeData zpp.Ex, return_value zpp.Ret, streamOrContext *types.Zval) {
 	var zcontext *types.Zval
@@ -1609,7 +1609,7 @@ func ZifStreamIsLocal(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zv
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, wrapper.GetIsUrl() == 0)
+	return_value.SetBool(wrapper.GetIsUrl() == 0)
 	return
 }
 func ZifStreamSupportsLock(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zval) {
@@ -1663,7 +1663,7 @@ func ZifStreamIsatty(executeData zpp.Ex, return_value zpp.Ret, stream *types.Zva
 
 	/* Check if the file descriptor identifier is a terminal */
 
-	types.ZVAL_BOOL(return_value, zend.Isatty(fileno) != 0)
+	return_value.SetBool(zend.Isatty(fileno) != 0)
 
 	/* Check if the file descriptor identifier is a terminal */
 }
@@ -1690,6 +1690,6 @@ func ZifStreamSocketShutdown(executeData zpp.Ex, return_value zpp.Ret, stream *t
 		return
 	}
 	core.PhpStreamFromZval(stream, zstream)
-	types.ZVAL_BOOL(return_value, streams.PhpStreamXportShutdown(stream, streams.StreamShutdownT(how)) == 0)
+	return_value.SetBool(streams.PhpStreamXportShutdown(stream, streams.StreamShutdownT(how)) == 0)
 	return
 }

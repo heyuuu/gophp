@@ -557,7 +557,7 @@ func zim_spl_Array_offsetExists(executeData *zend.ZendExecuteData, return_value 
 	if zend.ZendParseParameters(executeData.NumArgs(), "z", &index) == types.FAILURE {
 		return
 	}
-	types.ZVAL_BOOL(return_value, SplArrayHasDimensionEx(0, zend.ZEND_THIS(executeData), index, 2) != 0)
+	return_value.SetBool(SplArrayHasDimensionEx(0, zend.ZEND_THIS(executeData), index, 2) != 0)
 	return
 }
 func zim_spl_Array_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1191,7 +1191,7 @@ func zim_spl_Array_valid(executeData *zend.ZendExecuteData, return_value *types.
 	if !executeData.CheckNumArgsNone(false) {
 		return
 	}
-	types.ZVAL_BOOL(return_value, types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)))
+	return_value.SetBool(types.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)))
 	return
 }
 func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1210,7 +1210,7 @@ func zim_spl_Array_hasChildren(executeData *zend.ZendExecuteData, return_value *
 		entry = entry.Indirect()
 	}
 	entry = types.ZVAL_DEREF(entry)
-	types.ZVAL_BOOL(return_value, entry.IsType(types.IS_ARRAY) || entry.IsType(types.IS_OBJECT) && !intern.IsChildArraysOnly())
+	return_value.SetBool(entry.IsType(types.IS_ARRAY) || entry.IsType(types.IS_OBJECT) && !intern.IsChildArraysOnly())
 	return
 }
 func zim_spl_Array_getChildren(executeData *zend.ZendExecuteData, return_value *types.Zval) {

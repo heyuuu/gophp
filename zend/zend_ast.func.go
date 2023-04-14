@@ -509,7 +509,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 				ret = types.FAILURE
 				break
 			}
-			types.ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
+			result.SetBool(ZendIsTrue(&op2) != 0)
 			ZvalPtrDtorNogc(&op2)
 		} else {
 			result.SetFalse()
@@ -528,7 +528,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 				ret = types.FAILURE
 				break
 			}
-			types.ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
+			result.SetBool(ZendIsTrue(&op2) != 0)
 			ZvalPtrDtorNogc(&op2)
 		}
 		ZvalPtrDtorNogc(&op1)
@@ -928,7 +928,7 @@ func ZendAstExportEncapsList(str *SmartStr, quote byte, list *ZendAstList, inden
 			var zv *types.Zval = ZendAstGetZval(ast)
 			b.Assert(zv.IsString())
 			ZendAstExportQstr(str, quote, zv.String())
-		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces((*types.Z_STRVAL_P)(ZendAstGetZval(list.GetChild()[i+1]))) == 0) {
+		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces(ZendAstGetZval(list.GetChild()[i+1]).StringVal()[0]) == 0) {
 			ZendAstExportEx(str, ast, 0, indent)
 		} else {
 			str.AppendByte('{')

@@ -41,11 +41,6 @@ func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
 	var ptr = b.CastUintptr(&fullClassName)
 	return ZendType(ptr)
 }
-func HT_IDX_TO_HASH(idx uint32) uint32 { return idx }
-func HT_HASH(ht *Array, idx ArrayPosition) uint32 {
-	// todo 待移除 - 在旧 arData 上返回通过 idx 获取对应的 pos 位置
-	return 0
-}
 func ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list *ZendPropertyInfoList) int { return 0x1 | uintPtr(list) }
 func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
 	return (*ZendPropertyInfoList)(list & ^0x1)
@@ -54,11 +49,7 @@ func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
 func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 	return faketype == realtype || faketype == IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
-func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
 
-func Z_STRVAL_P(zval *Zval) []byte                   { return zval.String().GetVal() }
-func Z_ARRVAL(zval Zval) *Array                      { return zval.Array() }
-func Z_ARRVAL_P(zval *Zval) *Array                   { return zval.Array() }
 func Z_OBJ_P(zval *Zval) *ZendObject                 { return zval.Object() }
 func Z_OBJ_HT(zval Zval) *zend.ZendObjectHandlers    { return zval.Object().GetHandlers() }
 func Z_OBJ_HT_P(zval *Zval) *zend.ZendObjectHandlers { return zval.Object().GetHandlers() }
@@ -84,10 +75,7 @@ func Z_INDIRECT(zval Zval) *Zval            { return zval.Indirect() }
 func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.Indirect() }
 func Z_PTR(zval Zval) any                   { return zval.Ptr() }
 
-func ZVAL_BOOL(z *Zval, b bool)        { z.SetBool(b) }
-func ZVAL_STR(z *Zval, s *String)      { z.SetString(s) }
-func ZVAL_STR_COPY(z *Zval, s *String) { z.SetStringCopy(s) }
-func ZVAL_ARR(z *Zval, a *Array)       { z.SetArray(a) }
+func ZVAL_ARR(z *Zval, a *Array) { z.SetArray(a) }
 func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
 	var arr = NewArray(0)
 	z.SetArray(arr)
@@ -175,7 +163,7 @@ func SEPARATE_ARRAY(zv *Zval) {
 		if _zv.IsRefcounted() {
 			_arr.DelRefcount()
 		}
-		ZVAL_ARR(_zv, ZendArrayDup(_arr))
+		_zv.SetArray(ZendArrayDup(_arr))
 	}
 }
 func SEPARATE_ZVAL_IF_NOT_REF(zv *Zval) {
@@ -230,63 +218,3 @@ func ZVAL_COPY_OR_DUP_PROP(z *Zval, v *Zval) {
 	z.SetU2Extra(v.GetU2Extra())
 }
 
-func ZendGetTypeByConst(type_ ZendUchar) string {
-	switch type_ {
-	case IS_FALSE, IS_TRUE, IS_BOOL:
-		return "bool"
-	case IS_LONG:
-		return "int"
-	case IS_DOUBLE:
-		return "float"
-	case IS_STRING:
-		return "string"
-	case IS_OBJECT:
-		return "object"
-	case IS_RESOURCE:
-		return "resource"
-	case IS_NULL:
-		return "null"
-	case IS_CALLABLE:
-		return "callable"
-	case IS_ITERABLE:
-		return "iterable"
-	case IS_ARRAY:
-		return "array"
-	case IS_VOID:
-		return "void"
-	case IS_NUMBER:
-		return "number"
-	default:
-		return "unknown"
-	}
-}
-func ZendZvalTypeName(arg *Zval) string {
-	arg = ZVAL_DEREF(arg)
-	return ZendGetTypeByConst(arg.GetType())
-}
-func ZendZvalGetType(v *Zval) string {
-	switch v.GetType() {
-	case IS_NULL:
-		return "NULL"
-	case IS_FALSE, IS_TRUE:
-		return "boolean"
-	case IS_LONG:
-		return "integer"
-	case IS_DOUBLE:
-		return "double"
-	case IS_STRING:
-		return "string"
-	case IS_ARRAY:
-		return "array"
-	case IS_OBJECT:
-		return "object"
-	case IS_RESOURCE:
-		if zend.ZendRsrcListGetRsrcType(v.Resource()) != nil {
-			return "resource"
-		} else {
-			return "resource (closed)"
-		}
-	default:
-		return "unknown type"
-	}
-}

@@ -787,7 +787,7 @@ func ZifObEndFlush(executeData zpp.Ex, return_value zpp.Ret) {
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputEnd())
+	return_value.SetBool(types.SUCCESS == PhpOutputEnd())
 	return
 }
 func ZifObEndClean(executeData zpp.Ex, return_value zpp.Ret) {
@@ -799,7 +799,7 @@ func ZifObEndClean(executeData zpp.Ex, return_value zpp.Ret) {
 		return_value.SetFalse()
 		return
 	}
-	types.ZVAL_BOOL(return_value, types.SUCCESS == PhpOutputDiscard())
+	return_value.SetBool(types.SUCCESS == PhpOutputDiscard())
 	return
 }
 func ZifObGetFlush(executeData zpp.Ex, return_value zpp.Ret) {

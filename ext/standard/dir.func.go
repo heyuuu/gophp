@@ -429,7 +429,7 @@ func ZifGlob(executeData zpp.Ex, return_value zpp.Ret, pattern *types.Zval, _ zp
 		zend.AddNextIndexString(return_value, globbuf.gl_pathv[n]+cwd_skip)
 	}
 	globfree(&globbuf)
-	if basedir_limit != 0 && !(types.Z_ARRVAL_P(return_value).Len()) {
+	if basedir_limit != 0 && !(return_value.Array().Len()) {
 		return_value.Array().DestroyEx()
 		return_value.SetFalse()
 		return

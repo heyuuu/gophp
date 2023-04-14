@@ -12,7 +12,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
+		result.SetBool(ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
 	case types.IS_DOUBLE:
@@ -90,7 +90,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
+		result.SetBool(ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
 	case types.IS_DOUBLE:
@@ -175,7 +175,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
+		result.SetBool(ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
 	case types.IS_DOUBLE:
@@ -260,7 +260,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	case types.IS_NULL:
 		result.SetNull()
 	case types.IS_BOOL:
-		types.ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
+		result.SetBool(ZendIsTrue(expr) != 0)
 	case types.IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
 	case types.IS_DOUBLE:

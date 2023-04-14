@@ -156,7 +156,7 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 	var retval int
 	var opened_path *types.String = nil
 	if filename.IsString() {
-		types.ZVAL_STR(&tmp, zval_get_string(filename))
+		tmp.SetStringVal(ZvalGetStrVal(filename))
 		filename = &tmp
 	}
 	zend_stream_init_filename(&file_handle, filename.String().GetVal())
@@ -205,13 +205,8 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 	var original_lex_state ZendLexState
 	var op_array int = nil
 	var tmp types.Zval
-	if Z_TYPE_P(source_string) != types.IS_STRING {
-		types.ZVAL_STR(&tmp, zval_get_string_func(source_string))
-	} else {
-		types.ZVAL_COPY(&tmp, source_string)
-	}
+	tmp.SetStringVal(ZvalGetStrVal(source_string))
 	if tmp.String().GetLen() == 0 {
-		zval_ptr_dtor(&tmp)
 		return nil
 	}
 	ZendSaveLexicalState(&original_lex_state)
@@ -246,8 +241,7 @@ func HighlightString(str *types.Zval, syntax_highlighter_ini *zend_syntax_highli
 	var original_lex_state ZendLexState
 	var tmp types.Zval
 	if Z_TYPE_P(str) != types.IS_STRING {
-		types.ZVAL_STR(&tmp, zval_get_string_func(str))
-		str = &tmp
+		str = types.NewZvalString(ZvalGetStrVal(str))
 	}
 	ZendSaveLexicalState(&original_lex_state)
 	if ZendPrepareStringForScanning(str, str_name) == types.FAILURE {
