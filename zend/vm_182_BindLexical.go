@@ -19,7 +19,7 @@ func ZEND_BIND_LEXICAL_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		var_ = opline.Op2()
 		if var_.IsUndef() && (opline.GetExtendedValue()&ZEND_BIND_IMPLICIT) == 0 {
-			var_ = ZVAL_UNDEFINED_OP2()
+			var_ = ZVAL_UNDEFINED_OP2(executeData)
 			if EG__().GetException() != nil {
 				return 0
 			}

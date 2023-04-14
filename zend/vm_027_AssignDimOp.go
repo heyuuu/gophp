@@ -56,7 +56,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -129,7 +129,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -192,7 +192,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -264,7 +264,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -338,7 +338,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -407,7 +407,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -466,7 +466,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array
@@ -534,7 +534,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			ZendBinaryAssignOpObjDim(container, dim, opline, executeData)
 		} else if container.GetType() <= types.IS_FALSE {
 			if container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			container.SetArray(types.NewArray(8))
 			goto assign_dim_op_new_array

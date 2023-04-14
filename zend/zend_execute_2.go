@@ -403,7 +403,7 @@ try_again:
 				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
 			}
 		case types.IS_UNDEF:
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 			fallthrough
 		case types.IS_DOUBLE:
 			fallthrough

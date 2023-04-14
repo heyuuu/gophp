@@ -102,7 +102,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 							break
 						}
 					} else if function_name.IsUndef() {
-						ZVAL_UNDEFINED_OP2()
+						ZVAL_UNDEFINED_OP2(executeData)
 						if EG__().GetException() != nil {
 							return 0
 						}
@@ -251,7 +251,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecute
 							break
 						}
 					} else if function_name.IsUndef() {
-						ZVAL_UNDEFINED_OP2()
+						ZVAL_UNDEFINED_OP2(executeData)
 						if EG__().GetException() != nil {
 							return 0
 						}
@@ -385,7 +385,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 							break
 						}
 					} else if function_name.IsUndef() {
-						ZVAL_UNDEFINED_OP2()
+						ZVAL_UNDEFINED_OP2(executeData)
 						if EG__().GetException() != nil {
 							return 0
 						}
@@ -514,7 +514,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteDa
 							break
 						}
 					} else if function_name.IsUndef() {
-						ZVAL_UNDEFINED_OP2()
+						ZVAL_UNDEFINED_OP2(executeData)
 						if EG__().GetException() != nil {
 							return 0
 						}
@@ -665,7 +665,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 							break
 						}
 					} else if function_name.IsUndef() {
-						ZVAL_UNDEFINED_OP2()
+						ZVAL_UNDEFINED_OP2(executeData)
 						if EG__().GetException() != nil {
 							return 0
 						}
@@ -818,7 +818,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecut
 							break
 						}
 					} else if function_name.IsUndef() {
-						ZVAL_UNDEFINED_OP2()
+						ZVAL_UNDEFINED_OP2(executeData)
 						if EG__().GetException() != nil {
 							return 0
 						}

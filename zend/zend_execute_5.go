@@ -58,7 +58,7 @@ func ZendFetchDimensionAddressRead(
 				}
 				faults.Error(faults.E_WARNING, "Illegal string offset '%s'", dim.GetStr().GetVal())
 			case types.IS_UNDEF:
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				fallthrough
 			case types.IS_DOUBLE:
 				fallthrough
@@ -100,7 +100,7 @@ func ZendFetchDimensionAddressRead(
 		}
 	} else if container.IsObject() {
 		if dim.IsUndef() {
-			dim = ZVAL_UNDEFINED_OP2()
+			dim = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
@@ -118,10 +118,10 @@ func ZendFetchDimensionAddressRead(
 		}
 	} else {
 		if type_ != BP_VAR_IS && container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if dim.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {
 			faults.Error(faults.E_NOTICE, "Trying to access array offset on value of type %s", types.ZendZvalTypeName(container))
@@ -167,7 +167,7 @@ func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *Zend
 		hval = types.Z_RES_HANDLE_P(offset)
 		goto num_idx
 	} else if offset.IsUndef() {
-		ZVAL_UNDEFINED_OP2()
+		ZVAL_UNDEFINED_OP2(executeData)
 		goto str_idx
 	} else {
 		faults.Error(faults.E_WARNING, "Illegal offset type in isset or empty")
@@ -176,7 +176,7 @@ func ZendFindArrayDimSlow(ht *types.Array, offset *types.Zval, executeData *Zend
 }
 func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
-		offset = ZVAL_UNDEFINED_OP2()
+		offset = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	if container.IsObject() {
 		return types.Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 0)
@@ -213,7 +213,7 @@ func ZendIssetDimSlow(container *types.Zval, offset *types.Zval, executeData *Ze
 }
 func ZendIsemptyDimSlow(container *types.Zval, offset *types.Zval, executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
-		offset = ZVAL_UNDEFINED_OP2()
+		offset = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	if container.IsObject() {
 		return !(types.Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 1))
@@ -276,7 +276,7 @@ try_again:
 		goto try_again
 	} else if key.GetType() <= types.IS_NULL {
 		if key.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		str = types.NewString("")
 		goto str_key
@@ -294,10 +294,10 @@ func ZendArrayKeyExistsSlow(subject *types.Zval, key *types.Zval, opline *ZendOp
 		return result
 	} else {
 		if key.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if subject.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "array_key_exists() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(subject.GetType()))
 		return types.IS_NULL

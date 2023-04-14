@@ -20,7 +20,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 				goto assign_op_object
 			}
 			if object.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			object = MakeRealObject(object, property, opline, executeData)
 			if object == nil {
@@ -109,7 +109,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 				goto assign_op_object
 			}
 			if object.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			object = MakeRealObject(object, property, opline, executeData)
 			if object == nil {
@@ -197,7 +197,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				goto assign_op_object
 			}
 			if object.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			object = MakeRealObject(object, property, opline, executeData)
 			if object == nil {
@@ -505,7 +505,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 				goto assign_op_object
 			}
 			if object.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			object = MakeRealObject(object, property, opline, executeData)
 			if object == nil {
@@ -590,7 +590,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 				goto assign_op_object
 			}
 			if object.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			object = MakeRealObject(object, property, opline, executeData)
 			if object == nil {
@@ -674,7 +674,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				goto assign_op_object
 			}
 			if object.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			object = MakeRealObject(object, property, opline, executeData)
 			if object == nil {

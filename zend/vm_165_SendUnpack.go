@@ -122,7 +122,7 @@ send_again:
 		goto send_again
 	} else {
 		if opline.GetOp1Type() == IS_CV && args.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		faults.Error(faults.E_WARNING, "Only arrays and Traversables can be unpacked")
 	}

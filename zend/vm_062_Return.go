@@ -30,7 +30,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	retval_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	return_value = executeData.GetReturnValue()
 	if retval_ptr.IsUndef() {
-		retval_ptr = ZVAL_UNDEFINED_OP1()
+		retval_ptr = ZVAL_UNDEFINED_OP1(executeData)
 		if return_value != nil {
 			return_value.SetNull()
 		}
@@ -56,7 +56,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	retval_ptr = opline.Op1Ptr(&free_op1)
 	return_value = executeData.GetReturnValue()
 	if retval_ptr.IsUndef() {
-		retval_ptr = ZVAL_UNDEFINED_OP1()
+		retval_ptr = ZVAL_UNDEFINED_OP1(executeData)
 		if return_value != nil {
 			return_value.SetNull()
 		}
@@ -82,7 +82,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	retval_ptr = opline.Op1()
 	return_value = executeData.GetReturnValue()
 	if retval_ptr.IsUndef() {
-		retval_ptr = ZVAL_UNDEFINED_OP1()
+		retval_ptr = ZVAL_UNDEFINED_OP1(executeData)
 		if return_value != nil {
 			return_value.SetNull()
 		}

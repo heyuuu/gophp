@@ -32,7 +32,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		var orig_val_type uint32 = val.GetTypeInfo()
 		opline.Result().SetFalse()
 		if orig_val_type == types.IS_UNDEF {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {
@@ -55,7 +55,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		var orig_val_type uint32 = val.GetTypeInfo()
 		opline.Result().SetFalse()
 		if orig_val_type == types.IS_UNDEF {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {

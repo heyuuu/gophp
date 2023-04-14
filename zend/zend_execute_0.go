@@ -345,8 +345,12 @@ func _zvalUndefinedOp1(executeData *ZendExecuteData) *types.Zval {
 func _zvalUndefinedOp2(executeData *ZendExecuteData) *types.Zval {
 	return ZvalUndefinedCv(executeData.GetOpline().op2.var_, executeData)
 }
-func ZVAL_UNDEFINED_OP1() *types.Zval { return _zvalUndefinedOp1(executeData) }
-func ZVAL_UNDEFINED_OP2() *types.Zval { return _zvalUndefinedOp2(executeData) }
+func ZVAL_UNDEFINED_OP1(executeData *ZendExecuteData) *types.Zval {
+	return _zvalUndefinedOp1(executeData)
+}
+func ZVAL_UNDEFINED_OP2(executeData *ZendExecuteData) *types.Zval {
+	return _zvalUndefinedOp2(executeData)
+}
 func _getZvalCvLookup(ptr *types.Zval, var_ uint32, type_ int, executeData *ZendExecuteData) *types.Zval {
 	switch type_ {
 	case BP_VAR_R:

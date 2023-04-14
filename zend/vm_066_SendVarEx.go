@@ -12,7 +12,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varptr = opline.Op1Ptr(&free_op1)
 	if varptr.IsUndef() {
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -35,7 +35,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_QUICK_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varptr = opline.Op1Ptr(&free_op1)
 	if varptr.IsUndef() {
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -58,7 +58,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varptr = opline.Op1()
 	if varptr.IsUndef() {
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -80,7 +80,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_QUICK_HANDLER(executeData *ZendExecuteData) int {
 	}
 	varptr = opline.Op1()
 	if varptr.IsUndef() {
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

@@ -95,7 +95,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			continue
 		} else if op1.GetType() <= types.IS_NULL {
 			if op1.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			count = 0
 		} else {
@@ -152,7 +152,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			continue
 		} else if op1.GetType() <= types.IS_NULL {
 			if op1.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			count = 0
 		} else {

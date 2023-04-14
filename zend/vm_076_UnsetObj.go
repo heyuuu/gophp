@@ -13,7 +13,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 				container = types.Z_REFVAL_P(container)
 				if container.GetType() != types.IS_OBJECT {
 					if container.IsUndef() {
-						ZVAL_UNDEFINED_OP1()
+						ZVAL_UNDEFINED_OP1(executeData)
 					}
 					break
 				}
@@ -43,7 +43,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				container = types.Z_REFVAL_P(container)
 				if container.GetType() != types.IS_OBJECT {
 					if container.IsUndef() {
-						ZVAL_UNDEFINED_OP1()
+						ZVAL_UNDEFINED_OP1(executeData)
 					}
 					break
 				}
@@ -73,7 +73,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				container = types.Z_REFVAL_P(container)
 				if container.GetType() != types.IS_OBJECT {
 					if container.IsUndef() {
-						ZVAL_UNDEFINED_OP1()
+						ZVAL_UNDEFINED_OP1(executeData)
 					}
 					break
 				}
@@ -148,7 +148,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 				container = types.Z_REFVAL_P(container)
 				if container.GetType() != types.IS_OBJECT {
 					if container.IsUndef() {
-						ZVAL_UNDEFINED_OP1()
+						ZVAL_UNDEFINED_OP1(executeData)
 					}
 					break
 				}
@@ -174,7 +174,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				container = types.Z_REFVAL_P(container)
 				if container.GetType() != types.IS_OBJECT {
 					if container.IsUndef() {
-						ZVAL_UNDEFINED_OP1()
+						ZVAL_UNDEFINED_OP1(executeData)
 					}
 					break
 				}
@@ -200,7 +200,7 @@ func ZEND_UNSET_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				container = types.Z_REFVAL_P(container)
 				if container.GetType() != types.IS_OBJECT {
 					if container.IsUndef() {
-						ZVAL_UNDEFINED_OP1()
+						ZVAL_UNDEFINED_OP1(executeData)
 					}
 					break
 				}

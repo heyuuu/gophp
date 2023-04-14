@@ -35,7 +35,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else if z.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		// types.ZendStringReleaseEx(str, 0)
 	}
@@ -56,7 +56,7 @@ func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		if str.GetLen() != 0 {
 			ZendWrite(str.GetStr())
 		} else if z.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		// types.ZendStringReleaseEx(str, 0)
 	}

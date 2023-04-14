@@ -70,7 +70,7 @@ func getBwNotHandler(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	}
 	if op1.IsUndef() {
-		op1 = ZVAL_UNDEFINED_OP1()
+		op1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
 	BitwiseNotFunction(opline.Result(), op1)
 	if freeOp1 != nil {
@@ -90,7 +90,7 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 	} else if op1.GetType() <= types.IS_TRUE {
 		opline.Result().SetTrue()
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 	} else {

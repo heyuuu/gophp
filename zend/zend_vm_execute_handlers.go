@@ -41,10 +41,10 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 
 	// zend_add_helper_SPEC
 	if op1.IsUndef() {
-		op1 = ZVAL_UNDEFINED_OP1()
+		op1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
 	if op2.IsUndef() {
-		op2 = ZVAL_UNDEFINED_OP2()
+		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	AddFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
@@ -89,10 +89,10 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 
 	//  zend_sub_helper_SPEC
 	if op1.IsUndef() {
-		op1 = ZVAL_UNDEFINED_OP1()
+		op1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
 	if op2.IsUndef() {
-		op2 = ZVAL_UNDEFINED_OP2()
+		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	SubFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
@@ -143,10 +143,10 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 
 	// common
 	if op1.IsUndef() {
-		op1 = ZVAL_UNDEFINED_OP1()
+		op1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
 	if op2.IsUndef() {
-		op2 = ZVAL_UNDEFINED_OP2()
+		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	MulFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
@@ -240,10 +240,10 @@ func getConcatHandler(executeData *ZendExecuteData) int {
 
 	// common
 	if op1.IsUndef() {
-		op1 = ZVAL_UNDEFINED_OP1()
+		op1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
 	if op2.IsUndef() {
-		op2 = ZVAL_UNDEFINED_OP2()
+		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	ConcatFunction(opline.Result(), op1, op2)
 	if freeOp1 != nil {

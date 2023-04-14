@@ -54,7 +54,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if container.IsObject() {
 			if offset.GetU2Extra() == ZEND_EXTRA_VALUE {
@@ -124,7 +124,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				hval = types.Z_RES_HANDLE_P(offset)
 				goto num_index_dim
 			} else if offset.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				key = types.NewString("")
 				goto str_index_dim
 			} else {
@@ -138,10 +138,10 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if offset.IsUndef() {
-			offset = ZVAL_UNDEFINED_OP2()
+			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
@@ -208,7 +208,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 				hval = types.Z_RES_HANDLE_P(offset)
 				goto num_index_dim
 			} else if offset.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				key = types.NewString("")
 				goto str_index_dim
 			} else {
@@ -222,10 +222,10 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if offset.IsUndef() {
-			offset = ZVAL_UNDEFINED_OP2()
+			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
@@ -292,7 +292,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if container.IsObject() {
 			if offset.GetU2Extra() == ZEND_EXTRA_VALUE {
@@ -358,7 +358,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				hval = types.Z_RES_HANDLE_P(offset)
 				goto num_index_dim
 			} else if offset.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				key = types.NewString("")
 				goto str_index_dim
 			} else {
@@ -372,10 +372,10 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if offset.IsUndef() {
-			offset = ZVAL_UNDEFINED_OP2()
+			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)
@@ -438,7 +438,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 				hval = types.Z_RES_HANDLE_P(offset)
 				goto num_index_dim
 			} else if offset.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				key = types.NewString("")
 				goto str_index_dim
 			} else {
@@ -452,10 +452,10 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if container.IsUndef() {
-			container = ZVAL_UNDEFINED_OP1()
+			container = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		if offset.IsUndef() {
-			offset = ZVAL_UNDEFINED_OP2()
+			offset = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if container.IsObject() {
 			types.Z_OBJ_HT_P(container).GetUnsetDimension()(container, offset)

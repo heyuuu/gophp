@@ -33,7 +33,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 				continue
 			} else {
 				if op1.IsUndef() {
-					ZVAL_UNDEFINED_OP1()
+					ZVAL_UNDEFINED_OP1(executeData)
 				}
 				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				opline.Result().SetFalse()
@@ -72,7 +72,7 @@ func ZEND_GET_CLASS_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				continue
 			} else {
 				if op1.IsUndef() {
-					ZVAL_UNDEFINED_OP1()
+					ZVAL_UNDEFINED_OP1(executeData)
 				}
 				faults.Error(faults.E_WARNING, "get_class() expects parameter 1 to be object, %s given", types.ZendGetTypeByConst(op1.GetType()))
 				opline.Result().SetFalse()

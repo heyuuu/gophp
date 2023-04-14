@@ -31,7 +31,7 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		tmp_name = nil
 	} else {
 		if varname.IsUndef() {
-			varname = ZVAL_UNDEFINED_OP1()
+			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		name = ZvalTryGetTmpString(varname, &tmp_name)
 		if name == nil {
@@ -57,7 +57,7 @@ func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		tmp_name = nil
 	} else {
 		if varname.IsUndef() {
-			varname = ZVAL_UNDEFINED_OP1()
+			varname = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		name = ZvalTryGetTmpString(varname, &tmp_name)
 		if name == nil {

@@ -25,7 +25,7 @@ func ZEND_JMPZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		if val.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 			if EG__().GetException() != nil {
 				return 0
 			}
@@ -48,7 +48,7 @@ func ZEND_JMPZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if val.GetTypeInfo() <= types.IS_TRUE {
 		if val.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 			if EG__().GetException() != nil {
 				return 0
 			}

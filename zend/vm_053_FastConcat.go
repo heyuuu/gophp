@@ -68,7 +68,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		op2_str = op2.GetStr().Copy()
 	} else {
 		if op2.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		op2_str = ZvalGetStringFunc(op2)
 	}
@@ -138,7 +138,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 		op2_str = op2.GetStr().Copy()
 	} else {
 		if op2.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		op2_str = ZvalGetStringFunc(op2)
 	}
@@ -204,7 +204,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		op1_str = op1.GetStr().Copy()
 	} else {
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		op1_str = ZvalGetStringFunc(op1)
 	}
@@ -287,7 +287,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		op1_str = op1.GetStr().Copy()
 	} else {
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		op1_str = ZvalGetStringFunc(op1)
 	}
@@ -296,7 +296,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		op2_str = op2.GetStr().Copy()
 	} else {
 		if op2.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		op2_str = ZvalGetStringFunc(op2)
 	}
@@ -380,7 +380,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		op1_str = op1.GetStr().Copy()
 	} else {
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		op1_str = ZvalGetStringFunc(op1)
 	}
@@ -389,7 +389,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		op2_str = op2.GetStr().Copy()
 	} else {
 		if op2.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		op2_str = ZvalGetStringFunc(op2)
 	}
@@ -460,7 +460,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		op1_str = op1.GetStr().Copy()
 	} else {
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		op1_str = ZvalGetStringFunc(op1)
 	}
@@ -541,7 +541,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		op1_str = op1.GetStr().Copy()
 	} else {
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		op1_str = ZvalGetStringFunc(op1)
 	}
@@ -550,7 +550,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		op2_str = op2.GetStr().Copy()
 	} else {
 		if op2.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		op2_str = ZvalGetStringFunc(op2)
 	}
@@ -632,7 +632,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		op1_str = op1.GetStr().Copy()
 	} else {
 		if op1.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		op1_str = ZvalGetStringFunc(op1)
 	}
@@ -641,7 +641,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		op2_str = op2.GetStr().Copy()
 	} else {
 		if op2.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 		}
 		op2_str = ZvalGetStringFunc(op2)
 	}

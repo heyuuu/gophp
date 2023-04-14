@@ -38,7 +38,7 @@ try_function_name:
 		goto try_function_name
 	} else {
 		if function_name.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 			if EG__().GetException() != nil {
 				return 0
 			}
@@ -83,7 +83,7 @@ try_function_name:
 		goto try_function_name
 	} else {
 		if function_name.IsUndef() {
-			ZVAL_UNDEFINED_OP2()
+			ZVAL_UNDEFINED_OP2(executeData)
 			if EG__().GetException() != nil {
 				return 0
 			}

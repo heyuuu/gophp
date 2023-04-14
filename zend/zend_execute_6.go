@@ -99,7 +99,7 @@ func ZendFetchPropertyAddress(
 				break
 			}
 			if container_op_type == IS_CV && type_ != BP_VAR_W && container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 
 			/* this should modify object only if it's empty */

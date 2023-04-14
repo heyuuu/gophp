@@ -17,7 +17,7 @@ func zend_pre_inc_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 	}
 	if var_ptr.IsUndef() {
 		var_ptr.SetNull()
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
 		if var_ptr.IsReference() {
@@ -52,7 +52,7 @@ func zend_pre_dec_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 	}
 	if var_ptr.IsUndef() {
 		var_ptr.SetNull()
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
 		if var_ptr.IsReference() {
@@ -85,7 +85,7 @@ func zend_post_inc_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 	}
 	if var_ptr.IsUndef() {
 		var_ptr.SetNull()
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
 		if var_ptr.IsReference() {
@@ -116,7 +116,7 @@ func zend_post_dec_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 	}
 	if var_ptr.IsUndef() {
 		var_ptr.SetNull()
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 	}
 	for {
 		if var_ptr.IsReference() {
@@ -143,7 +143,7 @@ func ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	varptr = opline.Op1Ptr(&free_op1)
 	if varptr.IsUndef() {
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 		arg.SetNull()
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

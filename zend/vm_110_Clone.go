@@ -56,7 +56,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			opline.Result().SetUndef()
 			if obj.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -144,7 +144,7 @@ func ZEND_CLONE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 			opline.Result().SetUndef()
 			if obj.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}

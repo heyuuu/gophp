@@ -37,7 +37,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 
 		} else {
 			if var_.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 			}
 			rope[opline.GetExtendedValue()] = ZvalGetStringFunc(var_)
 			ZvalPtrDtorNogc(free_op2)
@@ -64,7 +64,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 
 		} else {
 			if var_.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 			}
 			rope[opline.GetExtendedValue()] = ZvalGetStringFunc(var_)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

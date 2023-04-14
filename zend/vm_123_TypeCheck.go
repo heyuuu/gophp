@@ -37,7 +37,7 @@ func ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else if value.IsUndef() {
 		result = (1 << types.IS_NULL & opline.GetExtendedValue()) != 0
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		if EG__().GetException() != nil {
 			opline.Result().SetUndef()
 			return 0
@@ -68,7 +68,7 @@ func ZEND_TYPE_CHECK_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else if value.IsUndef() {
 		result = (1 << types.IS_NULL & opline.GetExtendedValue()) != 0
-		ZVAL_UNDEFINED_OP1()
+		ZVAL_UNDEFINED_OP1(executeData)
 		if EG__().GetException() != nil {
 			opline.Result().SetUndef()
 			return 0

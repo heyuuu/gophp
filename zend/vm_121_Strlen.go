@@ -57,7 +57,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if value.IsUndef() {
-			value = ZVAL_UNDEFINED_OP1()
+			value = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		strict = executeData.IsCallUseStrictTypes()
 		for {
@@ -99,7 +99,7 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		if value.IsUndef() {
-			value = ZVAL_UNDEFINED_OP1()
+			value = ZVAL_UNDEFINED_OP1(executeData)
 		}
 		strict = executeData.IsCallUseStrictTypes()
 		for {

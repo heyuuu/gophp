@@ -25,7 +25,7 @@ try_instanceof:
 		goto try_instanceof
 	} else {
 		if expr.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		result = 0
 	}
@@ -53,7 +53,7 @@ try_instanceof:
 		goto try_instanceof
 	} else {
 		if expr.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		result = 0
 	}
@@ -88,7 +88,7 @@ try_instanceof:
 		goto try_instanceof
 	} else {
 		if expr.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		result = 0
 	}
@@ -121,7 +121,7 @@ try_instanceof:
 		goto try_instanceof
 	} else {
 		if expr.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		result = 0
 	}
@@ -147,7 +147,7 @@ try_instanceof:
 		goto try_instanceof
 	} else {
 		if expr.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		result = 0
 	}
@@ -179,7 +179,7 @@ try_instanceof:
 		goto try_instanceof
 	} else {
 		if expr.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		result = 0
 	}

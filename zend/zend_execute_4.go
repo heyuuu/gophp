@@ -191,6 +191,39 @@ func ZendBinaryAssignOpDimSlow(container *types.Zval, dim *types.Zval, opline *Z
 		ZendUseScalarAsArray()
 	}
 }
+func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecuteData) *types.Zval {
+	switch dim.GetType() {
+	case types.IS_UNDEF:
+		/* The array may be destroyed while throwing the notice.
+		 * Temporarily increase the refcount to detect this situation. */
+		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+			ht.AddRefcount()
+		}
+		ZVAL_UNDEFINED_OP2(executeData)
+		if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+			ht.DestroyEx()
+			return types.NewZvalNull()
+		}
+		if EG__().GetException() != nil {
+			return types.NewZvalNull()
+		}
+		fallthrough
+	case types.IS_NULL:
+		return types.NewZvalString("")
+	case types.IS_DOUBLE:
+		return types.NewZvalLong(DvalToLval(dim.GetDval()))
+	case types.IS_RESOURCE:
+		ZendUseResourceAsOffset(dim)
+		return types.NewZvalLong(types.Z_RES_HANDLE_P(dim))
+	case types.IS_FALSE:
+		return types.NewZvalLong(0)
+	case types.IS_TRUE:
+		return types.NewZvalLong(1)
+	default:
+		ZendIllegalOffset()
+		return types.NewZvalNull()
+	}
+}
 func SlowIndexConvert(ht *types.Array, dim *types.Zval, value *types.ZendValue, executeData *ZendExecuteData) types.ZendUchar {
 	switch dim.GetType() {
 	case types.IS_UNDEF:
@@ -199,7 +232,7 @@ func SlowIndexConvert(ht *types.Array, dim *types.Zval, value *types.ZendValue, 
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 			ht.AddRefcount()
 		}
-		ZVAL_UNDEFINED_OP2()
+		ZVAL_UNDEFINED_OP2(executeData)
 		if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 			ht.DestroyEx()
 			return types.IS_NULL
@@ -324,13 +357,12 @@ try_again:
 		dim = types.Z_REFVAL_P(dim)
 		goto try_again
 	} else {
-		var val types.ZendValue
-		var t types.ZendUchar = SlowIndexConvert(ht, dim, &val, executeData)
-		if t == types.IS_STRING {
-			offset_key = val.GetStr()
+		var zv = SlowIndexConvertEx(ht, dim, executeData)
+		if zv.IsString() {
+			offset_key = zv.GetStr()
 			goto str_index
-		} else if t == types.IS_LONG {
-			hval = val.GetLval()
+		} else if zv.IsLong() {
+			hval = zv.GetLval()
 			goto num_index
 		} else {
 			if type_ == BP_VAR_W || type_ == BP_VAR_RW {
@@ -413,7 +445,7 @@ func ZendFetchDimensionAddress(
 		result.IsError()
 	} else if container.IsObject() {
 		if dim != nil && dim.IsUndef() {
-			dim = ZVAL_UNDEFINED_OP2()
+			dim = ZVAL_UNDEFINED_OP2(executeData)
 		}
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
 			dim++
@@ -445,7 +477,7 @@ func ZendFetchDimensionAddress(
 	} else {
 		if container.GetType() <= types.IS_FALSE {
 			if type_ != BP_VAR_W && container.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 			}
 			if type_ != BP_VAR_UNSET {
 				ArrayInit(container)
@@ -456,7 +488,7 @@ func ZendFetchDimensionAddress(
 				/* for read-mode only */
 
 				if dim != nil && dim.IsUndef() {
-					ZVAL_UNDEFINED_OP2()
+					ZVAL_UNDEFINED_OP2(executeData)
 				}
 				result.SetNull()
 			}

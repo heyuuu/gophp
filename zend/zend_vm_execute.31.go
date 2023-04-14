@@ -20,7 +20,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, executeData *ZendEx
 		tmp_name = nil
 	} else {
 		if varname.IsUndef() {
-			ZVAL_UNDEFINED_OP1()
+			ZVAL_UNDEFINED_OP1(executeData)
 		}
 		name = ZvalTryGetTmpString(varname, &tmp_name)
 		if name == nil {

@@ -18,10 +18,10 @@ func zend_cannot_pass_by_ref_helper_SPEC(executeData *ZendExecuteData) int {
 func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	if op_1.IsUndef() {
-		op_1 = ZVAL_UNDEFINED_OP1()
+		op_1 = ZVAL_UNDEFINED_OP1(executeData)
 	}
 	if op_2.IsUndef() {
-		op_2 = ZVAL_UNDEFINED_OP2()
+		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {

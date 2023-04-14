@@ -33,7 +33,7 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			if value.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -63,7 +63,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			if value.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -93,7 +93,7 @@ func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			if value.IsUndef() {
-				ZVAL_UNDEFINED_OP1()
+				ZVAL_UNDEFINED_OP1(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}

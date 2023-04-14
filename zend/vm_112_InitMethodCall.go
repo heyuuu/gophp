@@ -84,7 +84,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -171,7 +171,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) i
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -251,7 +251,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 					}
 				}
 				if object.IsUndef() {
-					object = ZVAL_UNDEFINED_OP1()
+					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						return 0
 					}
@@ -353,7 +353,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					ZvalPtrDtorNogc(free_op1)
 					return 0
@@ -376,7 +376,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 					}
 				}
 				if object.IsUndef() {
-					object = ZVAL_UNDEFINED_OP1()
+					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						{
 							ZvalPtrDtorNogc(free_op2)
@@ -474,7 +474,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					ZvalPtrDtorNogc(free_op1)
 					return 0
@@ -496,7 +496,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 					}
 				}
 				if object.IsUndef() {
-					object = ZVAL_UNDEFINED_OP1()
+					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						return 0
 					}
@@ -652,7 +652,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -732,7 +732,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) 
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -803,7 +803,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 					}
 				}
 				if object.IsUndef() {
-					object = ZVAL_UNDEFINED_OP1()
+					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						return 0
 					}
@@ -902,7 +902,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -923,7 +923,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 					}
 				}
 				if object.IsUndef() {
-					object = ZVAL_UNDEFINED_OP1()
+					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						{
 							ZvalPtrDtorNogc(free_op2)
@@ -1018,7 +1018,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 					break
 				}
 			} else if function_name.IsUndef() {
-				ZVAL_UNDEFINED_OP2()
+				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
 					return 0
 				}
@@ -1038,7 +1038,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 					}
 				}
 				if object.IsUndef() {
-					object = ZVAL_UNDEFINED_OP1()
+					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						return 0
 					}
