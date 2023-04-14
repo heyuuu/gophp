@@ -621,9 +621,9 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 		var _z *types.Zval = _p.GetVal()
 
 		elem = _z.Ptr()
-		elem.GetObj().TryAddRefcount()
+		//elem.GetObj().TryAddRefcount()
 		tmp.Array().NextIndexInsert(elem.GetObj())
-		elem.GetInf().TryAddRefcount()
+		//elem.GetInf().TryAddRefcount()
 		tmp.Array().NextIndexInsert(elem.GetInf())
 	}
 	return_value.Array().NextIndexInsert(&tmp)
@@ -631,7 +631,7 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 	/* members */
 
 	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
-	tmp.TryAddRefcount()
+	//tmp.TryAddRefcount()
 	return_value.Array().NextIndexInsert(&tmp)
 }
 func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {

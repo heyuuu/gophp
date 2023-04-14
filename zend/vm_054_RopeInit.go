@@ -12,7 +12,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int 
 		var_ = opline.Const2()
 		rope[0] = var_.GetStr()
 
-		var_.TryAddRefcount()
+		// var_.TryAddRefcount()
 
 	}
 

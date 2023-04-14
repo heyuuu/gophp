@@ -130,7 +130,7 @@ func ZifFuncGetArgs(executeData zpp.Ex) (*types.Array, bool) {
 		} else {
 			zv = types.ZVAL_DEREF(zv)
 
-			zv.TryAddRefcount()
+			// zv.TryAddRefcount()
 
 			arr.NextIndexInsertNew(zv)
 		}
@@ -193,9 +193,9 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) {
 	/* add value elements */
 
 	entry = types.ZVAL_DEREF(entry)
-	if entry.IsRefcounted() {
-		entry.RefCounted().AddRefcountEx(2)
-	}
+	//if entry.IsRefcounted() {
+	//	entry.RefCounted().AddRefcountEx(2)
+	//}
 	return_value.Array().IndexAddNew(1, entry)
 	return_value.Array().KeyAddNew(types.STR_VALUE, entry)
 
@@ -203,7 +203,7 @@ func ZifEach(executeData zpp.Ex, return_value zpp.Ret, arr zpp.RefZval) {
 
 	if types.ZendHashGetCurrentKey(target_hash, &key, &num_key) == types.HASH_KEY_IS_STRING {
 		tmp.SetStringCopy(key)
-		tmp.TryAddRefcount()
+		// tmp.TryAddRefcount()
 	} else {
 		tmp.SetLong(num_key)
 	}
@@ -322,7 +322,7 @@ func CopyConstantArray(dst *types.Zval, src *types.Zval) {
 				CopyConstantArray(new_val, val)
 			}
 		} else {
-			val.TryAddRefcount()
+			// val.TryAddRefcount()
 		}
 	}
 }
@@ -642,7 +642,7 @@ func ZifGetObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval)
 			if value.IsReference() && value.GetRefcount() == 1 {
 				value = types.Z_REFVAL_P(value)
 			}
-			value.TryAddRefcount()
+			// value.TryAddRefcount()
 			if key == nil {
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
@@ -1243,7 +1243,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 			key = _p.GetKey()
 			val = _z
 			if key == nil {
-				val.AddRefcount()
+				// 				val.AddRefcount()
 				return_value.Array().IndexAddNew(index, val)
 			}
 		}
@@ -1257,7 +1257,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 			key = _p.GetKey()
 			val = _z
 			if key == nil && types.Z_RES_TYPE_P(val) <= 0 {
-				val.AddRefcount()
+				// 				val.AddRefcount()
 				return_value.Array().IndexAddNew(index, val)
 			}
 		}
@@ -1277,7 +1277,7 @@ func ZifGetResources(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, type_ 
 			key = _p.GetKey()
 			val = _z
 			if key == nil && types.Z_RES_TYPE_P(val) == id {
-				val.AddRefcount()
+				// 				val.AddRefcount()
 				return_value.Array().IndexAddNew(index, val)
 			}
 		}
@@ -1384,7 +1384,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 					arg = types.ZendHashFindInd(call.GetSymbolTable(), arg_name.GetStr())
 					if arg != nil {
 
-						arg.TryAddRefcount()
+						// arg.TryAddRefcount()
 
 						fillScope.FillSet(arg)
 					} else {
@@ -1397,7 +1397,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 				for i < first_extra_arg {
 					if !p.IsUndef() {
 
-						p.TryAddRefcount()
+						// p.TryAddRefcount()
 
 						fillScope.FillSet(p)
 					} else {
@@ -1413,7 +1413,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *types.Zval) {
 		for i < num_args {
 			if !p.IsUndef() {
 
-				p.TryAddRefcount()
+				// p.TryAddRefcount()
 
 				fillScope.FillSet(p)
 			} else {
@@ -1751,7 +1751,7 @@ func ZendFetchDebugBacktrace(return_value *types.Zval, skip_last int, options in
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {
 					tmp.SetObject(object)
 					stack_frame.Array().KeyAddNew(types.STR_OBJECT, &tmp)
-					tmp.AddRefcount()
+					// 					tmp.AddRefcount()
 				}
 				tmp.SetStringVal(types.STR_OBJECT_OPERATOR)
 				stack_frame.Array().KeyAddNew(types.STR_TYPE, &tmp)

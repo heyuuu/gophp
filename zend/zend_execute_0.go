@@ -17,17 +17,17 @@ func ZEND_REF_FIRST_SOURCE(ref *types.ZendReference) *ZendPropertyInfo {
 	}
 }
 func ZendCopyToVariable(variable_ptr *types.Zval, value *types.Zval, value_type types.ZendUchar, ref *types.ZendRefcounted) {
-	types.ZVAL_COPY_VALUE(variable_ptr, value)
+	variable_ptr.CopyValueFrom(value)
 
 	if (value_type & (IS_CONST | IS_CV)) != 0 {
 
-		variable_ptr.TryAddRefcount()
+		// variable_ptr.TryAddRefcount()
 
 	} else if ref != nil {
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else {
-			variable_ptr.TryAddRefcount()
+			// variable_ptr.TryAddRefcount()
 		}
 
 	}

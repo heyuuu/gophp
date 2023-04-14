@@ -23,10 +23,10 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		/* If value is already of correct type, return it directly */
 
 		if expr.IsType(opline.GetExtendedValue()) {
-			types.ZVAL_COPY_VALUE(result, expr)
+			result.CopyValueFrom(expr)
 			{
 
-				result.TryAddRefcount()
+				// result.TryAddRefcount()
 
 			}
 
@@ -39,7 +39,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 					expr = result.Array().IndexAddNew(0, expr)
 					{
 
-						expr.TryAddRefcount()
+						// expr.TryAddRefcount()
 
 					}
 
@@ -70,7 +70,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				expr = ht.KeyAddNew(types.STR_SCALAR, expr)
 				{
 
-					expr.TryAddRefcount()
+					// expr.TryAddRefcount()
 
 				}
 
@@ -105,7 +105,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		/* If value is already of correct type, return it directly */
 
 		if expr.IsType(opline.GetExtendedValue()) {
-			types.ZVAL_COPY_VALUE(result, expr)
+			result.CopyValueFrom(expr)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
@@ -116,7 +116,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 					{
 
-						expr.TryAddRefcount()
+						// expr.TryAddRefcount()
 
 					}
 				} else {
@@ -155,7 +155,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 				{
 
-					expr.TryAddRefcount()
+					// expr.TryAddRefcount()
 
 				}
 			}
@@ -190,7 +190,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		/* If value is already of correct type, return it directly */
 
 		if expr.IsType(opline.GetExtendedValue()) {
-			types.ZVAL_COPY_VALUE(result, expr)
+			result.CopyValueFrom(expr)
 			ZvalPtrDtorNogc(free_op1)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
@@ -202,7 +202,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 					{
 
-						expr.TryAddRefcount()
+						// expr.TryAddRefcount()
 
 					}
 				} else {
@@ -241,7 +241,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 				{
 
-					expr.TryAddRefcount()
+					// expr.TryAddRefcount()
 
 				}
 			}
@@ -275,7 +275,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		/* If value is already of correct type, return it directly */
 
 		if expr.IsType(opline.GetExtendedValue()) {
-			types.ZVAL_COPY_VALUE(result, expr)
+			result.CopyValueFrom(expr)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
@@ -286,7 +286,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 
 					{
 
-						expr.TryAddRefcount()
+						// expr.TryAddRefcount()
 
 					}
 				} else {
@@ -325,7 +325,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 
 				{
 
-					expr.TryAddRefcount()
+					// expr.TryAddRefcount()
 
 				}
 			}

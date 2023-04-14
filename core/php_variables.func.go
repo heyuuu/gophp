@@ -192,7 +192,7 @@ func PhpRegisterVariableEx(var_name string, val *types.Zval, track_vars_array *t
 						zend.ZvalPtrDtorNogc(gpc_element_p)
 						zend.ArrayInit(gpc_element_p)
 					} else {
-						types.SEPARATE_ARRAY(gpc_element_p)
+						types.SeparateArray(gpc_element_p)
 					}
 				}
 			}
@@ -547,12 +547,12 @@ func PhpBuildArgv(s *byte, track_vars_array *types.Zval) {
 		argc.SetLong(count)
 	}
 	if SG__().RequestInfo.argc {
-		arr.AddRefcount()
+		// 		arr.AddRefcount()
 		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGV, &arr)
 		zend.EG__().GetSymbolTable().KeyUpdate(types.STR_ARGC, &argc)
 	}
 	if track_vars_array != nil && track_vars_array.IsType(types.IS_ARRAY) {
-		arr.AddRefcount()
+		// 		arr.AddRefcount()
 		track_vars_array.Array().KeyUpdate(types.STR_ARGV, &arr)
 		track_vars_array.Array().KeyUpdate(types.STR_ARGC, &argc)
 	}
@@ -608,18 +608,18 @@ func PhpAutoglobalMerge(dest *types.Array, src *types.Array) {
 		string_key = _p.GetKey()
 		src_entry = _z
 		if src_entry.GetType() != types.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || string_key == nil && b.Assign(&dest_entry, dest.IndexFind(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY {
-			src_entry.TryAddRefcount()
+			//src_entry.TryAddRefcount()
 			if string_key != nil {
 				if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
 					dest.KeyUpdate(string_key.GetStr(), src_entry)
 				} else {
-					src_entry.TryDelRefcount()
+					//src_entry.TryDelRefcount()
 				}
 			} else {
 				dest.IndexUpdate(num_key, src_entry)
 			}
 		} else {
-			types.SEPARATE_ARRAY(dest_entry)
+			types.SeparateArray(dest_entry)
 			PhpAutoglobalMerge(dest_entry.Array(), src_entry.Array())
 		}
 	}
@@ -640,7 +640,7 @@ func PhpAutoGlobalsCreateGet(name *types.String) types.ZendBool {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_GET])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_GET])
-	PG__().http_globals[TRACK_VARS_GET].AddRefcount()
+	//PG__().http_globals[TRACK_VARS_GET].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreatePost(name *types.String) types.ZendBool {
@@ -651,7 +651,7 @@ func PhpAutoGlobalsCreatePost(name *types.String) types.ZendBool {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_POST])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_POST])
-	PG__().http_globals[TRACK_VARS_POST].AddRefcount()
+	//PG__().http_globals[TRACK_VARS_POST].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateCookie(name *types.String) types.ZendBool {
@@ -662,7 +662,7 @@ func PhpAutoGlobalsCreateCookie(name *types.String) types.ZendBool {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_COOKIE])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_COOKIE])
-	PG__().http_globals[TRACK_VARS_COOKIE].AddRefcount()
+	//PG__().http_globals[TRACK_VARS_COOKIE].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
@@ -670,7 +670,7 @@ func PhpAutoGlobalsCreateFiles(name *types.String) types.ZendBool {
 		zend.ArrayInit(&PG__().http_globals[TRACK_VARS_FILES])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_FILES])
-	PG__().http_globals[TRACK_VARS_FILES].AddRefcount()
+	//PG__().http_globals[TRACK_VARS_FILES].AddRefcount()
 	return 0
 }
 func CheckHttpProxy(var_table *types.Array) {
@@ -693,7 +693,7 @@ func PhpAutoGlobalsCreateServer(name *types.String) types.ZendBool {
 				var argc *types.Zval
 				var argv *types.Zval
 				if b.Assign(&argc, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGC)) != nil && b.Assign(&argv, types.ZendHashFindInd(zend.EG__().GetSymbolTable(), types.STR_ARGV)) != nil {
-					argv.AddRefcount()
+					// 					argv.AddRefcount()
 					PG__().http_globals[TRACK_VARS_SERVER].Array().KeyUpdate(types.STR_ARGV, argv)
 					PG__().http_globals[TRACK_VARS_SERVER].Array().KeyUpdate(types.STR_ARGC, argc)
 				}
@@ -707,7 +707,7 @@ func PhpAutoGlobalsCreateServer(name *types.String) types.ZendBool {
 	}
 	CheckHttpProxy(PG__().http_globals[TRACK_VARS_SERVER].Array())
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_SERVER])
-	PG__().http_globals[TRACK_VARS_SERVER].AddRefcount()
+	//PG__().http_globals[TRACK_VARS_SERVER].AddRefcount()
 
 	/* TODO: TRACK_VARS_SERVER is modified in a number of places (e.g. phar) past this point,
 	 * where rc>1 due to the $_SERVER global. Ideally this shouldn't happen, but for now we
@@ -723,7 +723,7 @@ func PhpAutoGlobalsCreateEnv(name *types.String) types.ZendBool {
 	}
 	CheckHttpProxy(PG__().http_globals[TRACK_VARS_ENV].Array())
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG__().http_globals[TRACK_VARS_ENV])
-	PG__().http_globals[TRACK_VARS_ENV].AddRefcount()
+	//PG__().http_globals[TRACK_VARS_ENV].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateRequest(name *types.String) types.ZendBool {

@@ -74,7 +74,7 @@ func ZendObjectsStoreCallDestructors(objects *ZendObjectsStore) {
 				if (obj.GetGcFlags() & types.IS_OBJ_DESTRUCTOR_CALLED) == 0 {
 					obj.AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					if obj.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || obj.GetCe().GetDestructor() != nil {
-						obj.AddRefcount()
+						// 						obj.AddRefcount()
 						obj.GetHandlers().GetDtorObj()(obj)
 						obj.DelRefcount()
 					}
@@ -120,7 +120,7 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 				if (obj.GetGcFlags() & types.IS_OBJ_FREE_CALLED) == 0 {
 					obj.AddGcFlags(types.IS_OBJ_FREE_CALLED)
 					if obj.GetHandlers().GetFreeObj() != ZendObjectStdDtor {
-						obj.AddRefcount()
+						// 						obj.AddRefcount()
 						obj.GetHandlers().GetFreeObj()(obj)
 					}
 				}
@@ -136,7 +136,7 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 			if IS_OBJ_VALID(obj) {
 				if (obj.GetGcFlags() & types.IS_OBJ_FREE_CALLED) == 0 {
 					obj.AddGcFlags(types.IS_OBJ_FREE_CALLED)
-					obj.AddRefcount()
+					// 					obj.AddRefcount()
 					obj.GetHandlers().GetFreeObj()(obj)
 				}
 			}

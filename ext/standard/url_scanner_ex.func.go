@@ -52,7 +52,7 @@ func PhpIniOnUpdateTags(
 			}
 			keylen = q - key
 			str = types.NewString(b.CastStr(key, keylen))
-			types.GC_MAKE_PERSISTENT_LOCAL(str)
+			//types.GC_MAKE_PERSISTENT_LOCAL(str)
 			types.ZendHashAddMem(ctx.GetTags(), str.GetStr(), val, strlen(val)+1)
 			// types.ZendStringReleaseEx(str, 1)
 		}

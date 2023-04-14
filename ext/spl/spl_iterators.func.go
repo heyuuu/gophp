@@ -298,7 +298,7 @@ func SplRecursiveItGetIterator(ce *types.ClassEntry, zobject *types.Zval, by_ref
 		faults.Error(faults.E_ERROR, "The object to be iterated is in an invalid state: "+"the parent constructor has not been called")
 	}
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	zobject.AddRefcount()
+	// 	zobject.AddRefcount()
 	iterator.GetIntern().GetData().SetObject(zobject.Object())
 	iterator.GetIntern().SetFuncs(&SplRecursiveItIteratorFuncs)
 	return (*zend.ZendObjectIterator)(iterator)
@@ -325,7 +325,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 				zend.ZendCallMethodWith0Params(iterator, types.Z_OBJCE_P(iterator), types.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
-				iterator.AddRefcount()
+				// 				iterator.AddRefcount()
 			}
 			if user_caching_it_flags != nil {
 				types.ZVAL_COPY(&caching_it_flags, user_caching_it_flags)
@@ -349,7 +349,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 				zend.ZendCallMethodWith0Params(iterator, types.Z_OBJCE_P(iterator), types.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
-				iterator.AddRefcount()
+				// 				iterator.AddRefcount()
 			}
 		} else {
 			iterator = nil
@@ -735,7 +735,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 }
 func SplRecursiveTreeIteratorGetPostfix(object *SplRecursiveItObject, return_value *types.Zval) {
 	return_value.SetString(object.GetPostfix()[0].GetS())
-	return_value.AddRefcount()
+	// 	return_value.AddRefcount()
 }
 func zim_spl_RecursiveTreeIterator___construct(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 	SplRecursiveItItConstruct(executeData, return_value, spl_ce_RecursiveTreeIterator, zend.ZendCeIterator, RIT_RecursiveTreeIterator)
@@ -1063,10 +1063,10 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 			zend.Efree(cfi)
 			return nil
 		}
-		cfi.GetFci().GetFunctionName().TryAddRefcount()
+		//cfi.GetFci().GetFunctionName().TryAddRefcount()
 		cfi.SetObject(cfi.GetFcc().GetObject())
 		if cfi.GetObject() != nil {
-			cfi.GetObject().AddRefcount()
+			//cfi.GetObject().AddRefcount()
 		}
 		intern.SetCbfilter(cfi)
 	default:
@@ -1075,7 +1075,7 @@ func SplDualItConstruct(executeData *zend.ZendExecuteData, return_value *types.Z
 		}
 	}
 	if inc_refcount != 0 {
-		zobject.AddRefcount()
+		// 		zobject.AddRefcount()
 	}
 	intern.GetZobject().SetObject(zobject.Object())
 	if dit_type == DIT_IteratorIterator {
@@ -1853,7 +1853,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 			var key *types.Zval = intern.GetKey()
 			var data *types.Zval = intern.GetData()
 			data = types.ZVAL_DEREF(data)
-			data.TryAddRefcount()
+			//data.TryAddRefcount()
 			zend.ArraySetZvalKey(intern.GetZcache().Array(), key, data)
 			zend.ZvalPtrDtor(data)
 		}
@@ -1911,7 +1911,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 			if use_copy != 0 {
 				types.ZVAL_COPY_VALUE(intern.GetZstr(), &expr_copy)
 			} else {
-				intern.GetZstr().TryAddRefcount()
+				//intern.GetZstr().TryAddRefcount()
 			}
 		}
 		SplDualItNext(intern, 0)
@@ -2027,7 +2027,7 @@ func zim_spl_CachingIterator_offsetSet(executeData *zend.ZendExecuteData, return
 	if zend.ZendParseParameters(executeData.NumArgs(), "Sz", &key, &value) == types.FAILURE {
 		return
 	}
-	value.TryAddRefcount()
+	//value.TryAddRefcount()
 	intern.GetZcache().Array().SymtableUpdate(key.GetStr(), value)
 }
 func zim_spl_CachingIterator_offsetGet(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -2556,7 +2556,7 @@ func SplIteratorToArrayApply(iter *zend.ZendObjectIterator, puser any) int {
 		zend.ArraySetZvalKey(return_value.Array(), &key, data)
 		zend.ZvalPtrDtor(&key)
 	} else {
-		data.TryAddRefcount()
+		//data.TryAddRefcount()
 		zend.AddNextIndexZval(return_value, data)
 	}
 	return types.ArrayApplyKeep
@@ -2571,7 +2571,7 @@ func SplIteratorToValuesApply(iter *zend.ZendObjectIterator, puser any) int {
 	if data == nil {
 		return types.ArrayApplyStop
 	}
-	data.TryAddRefcount()
+	//data.TryAddRefcount()
 	zend.AddNextIndexZval(return_value, data)
 	return types.ArrayApplyKeep
 }

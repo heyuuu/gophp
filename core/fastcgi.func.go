@@ -923,8 +923,8 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var zvalue types.Zval
 	var key *types.String = types.NewString(b.CastStr(name, name_len))
 	zvalue.SetString(types.NewString(b.CastStr(value, value_len)))
-	types.GC_MAKE_PERSISTENT_LOCAL(key)
-	types.GC_MAKE_PERSISTENT_LOCAL(zvalue.String())
+	//types.GC_MAKE_PERSISTENT_LOCAL(key)
+	//types.GC_MAKE_PERSISTENT_LOCAL(zvalue.String())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)
 	// types.ZendStringReleaseEx(key, 1)
 }

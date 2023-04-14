@@ -51,9 +51,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	//zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -67,7 +67,7 @@ assign_object:
 				}
 				{
 
-					value.TryAddRefcount()
+					// value.TryAddRefcount()
 
 				}
 
@@ -141,9 +141,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -229,9 +229,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -316,9 +316,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -723,9 +723,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -739,7 +739,7 @@ assign_object:
 				}
 				{
 
-					value.TryAddRefcount()
+					// value.TryAddRefcount()
 
 				}
 
@@ -801,9 +801,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -877,9 +877,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -952,9 +952,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -1268,9 +1268,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -1284,7 +1284,7 @@ assign_object:
 				}
 				{
 
-					value.TryAddRefcount()
+					// value.TryAddRefcount()
 
 				}
 
@@ -1354,9 +1354,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -1438,9 +1438,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())
@@ -1521,9 +1521,9 @@ assign_object:
 		} else {
 			if zobj.GetProperties() != nil {
 				if zobj.GetProperties().GetRefcount() > 1 {
-					if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-						zobj.GetProperties().DelRefcount()
-					}
+					//if (zobj.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
+					//	zobj.GetProperties().DelRefcount()
+					//}
 					zobj.SetProperties(types.ZendArrayDup(zobj.GetProperties()))
 				}
 				property_val = zobj.GetProperties().KeyFind(property.String().GetStr())

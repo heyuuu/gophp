@@ -2039,7 +2039,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			/* bare string - nothing to do */
 
 		}
-		arg2.TryAddRefcount()
+		// arg2.TryAddRefcount()
 		arr.Array().SymtableUpdate(arg1.String().GetStr(), arg2)
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash types.Zval
@@ -2070,7 +2070,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			zend.ArrayInit(find_hash)
 		}
 		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.String().GetLen() == 0 {
-			arg2.TryAddRefcount()
+			// arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {
 			zend.ArraySetZvalKey(find_hash.Array(), arg3, arg2)

@@ -53,12 +53,12 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				array_ref.SetNewRef(array_ref)
 				array_ptr = types.Z_REFVAL_P(array_ref)
 			}
-			array_ref.AddRefcount()
+			// 			array_ref.AddRefcount()
 			types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 		}
 
 		{
-			types.SEPARATE_ARRAY(array_ptr)
+			types.SeparateArray(array_ptr)
 		}
 		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -70,7 +70,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 					array_ref.SetNewRef(array_ref)
 					array_ptr = types.Z_REFVAL_P(array_ref)
 				}
-				array_ref.AddRefcount()
+				// 				array_ref.AddRefcount()
 				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
@@ -123,12 +123,12 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				array_ref.SetNewRef(array_ref)
 				array_ptr = types.Z_REFVAL_P(array_ref)
 			}
-			array_ref.AddRefcount()
+			// 			array_ref.AddRefcount()
 			types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 		}
 
 		{
-			types.SEPARATE_ARRAY(array_ptr)
+			types.SeparateArray(array_ptr)
 		}
 		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		{
@@ -145,7 +145,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					array_ref.SetNewRef(array_ref)
 					array_ptr = types.Z_REFVAL_P(array_ref)
 				}
-				array_ref.AddRefcount()
+				// 				array_ref.AddRefcount()
 				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 
@@ -215,12 +215,12 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				array_ref.SetNewRef(array_ref)
 				array_ptr = types.Z_REFVAL_P(array_ref)
 			}
-			array_ref.AddRefcount()
+			// 			array_ref.AddRefcount()
 			types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 		}
 
 		{
-			types.SEPARATE_ARRAY(array_ptr)
+			types.SeparateArray(array_ptr)
 		}
 		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -232,7 +232,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 					array_ref.SetNewRef(array_ref)
 					array_ptr = types.Z_REFVAL_P(array_ref)
 				}
-				array_ref.AddRefcount()
+				// 				array_ref.AddRefcount()
 				types.ZVAL_COPY_VALUE(opline.Result(), array_ref)
 			}
 

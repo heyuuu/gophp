@@ -18,7 +18,7 @@ func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict type
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		types.ZVAL_COPY_VALUE(_zv, other_zv)
+		_zv.CopyValueFrom(other_zv)
 		break
 	}
 }
@@ -26,7 +26,7 @@ func ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict types
 	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 0)
 }
 func ZEND_TRY_ASSIGN_COPY_EX(zv *types.Zval, other_zv *types.Zval, strict types.ZendBool) {
-	other_zv.TryAddRefcount()
+	// other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
 }
 func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
@@ -55,7 +55,7 @@ func _zendGetParametersArrayEx(param_count int, argument_array *types.Zval) int 
 		return types.FAILURE
 	}
 	for b.PostDec(&param_count) > 0 {
-		types.ZVAL_COPY_VALUE(argument_array, param_ptr)
+		argument_array.CopyValueFrom(param_ptr)
 		argument_array++
 		param_ptr++
 	}
@@ -70,7 +70,7 @@ func ZendCopyParametersArray(param_count int, argument_array *types.Zval) int {
 		return types.FAILURE
 	}
 	for b.PostDec(&param_count) > 0 {
-		param_ptr.TryAddRefcount()
+		// param_ptr.TryAddRefcount()
 		argument_array.Array().NextIndexInsertNew(param_ptr)
 		param_ptr++
 	}

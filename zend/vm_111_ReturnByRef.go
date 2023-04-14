@@ -21,7 +21,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				executeData.GetReturnValue().
 					SetNewRef(retval_ptr)
 				{
-					retval_ptr.TryAddRefcount()
+					// retval_ptr.TryAddRefcount()
 				}
 			}
 			break
@@ -29,7 +29,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 		retval_ptr = nil
 		if executeData.GetReturnValue() {
 			if retval_ptr.IsReference() {
-				retval_ptr.AddRefcount()
+				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -77,7 +77,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if executeData.GetReturnValue() {
 			if retval_ptr.IsReference() {
-				retval_ptr.AddRefcount()
+				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -129,7 +129,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if executeData.GetReturnValue() {
 			if retval_ptr.IsReference() {
-				retval_ptr.AddRefcount()
+				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -178,7 +178,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		if executeData.GetReturnValue() {
 			if retval_ptr.IsReference() {
-				retval_ptr.AddRefcount()
+				// 				retval_ptr.AddRefcount()
 			} else {
 				types.ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}

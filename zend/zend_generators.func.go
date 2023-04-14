@@ -991,7 +991,7 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *types.Zval)
 		}
 		break
 	}
-	exception.TryAddRefcount()
+	// exception.TryAddRefcount()
 	generator = (*ZendGenerator)(ZEND_THIS(executeData).Object())
 	ZendGeneratorEnsureInitialized(generator)
 	if generator.GetExecuteData() != nil {
@@ -1092,7 +1092,7 @@ func ZendGeneratorGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	iterator = generator.GetIterator()
 	ZendIteratorInit(iterator)
 	iterator.SetFuncs(&ZendGeneratorIteratorFunctions)
-	object.AddRefcount()
+	// 	object.AddRefcount()
 	iterator.GetData().SetObject(object.Object())
 	return iterator
 }

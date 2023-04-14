@@ -15,7 +15,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				/* we keep in cache only not refcounted values */
 
 				if cache_val.IsNotUndef() {
-					types.ZVAL_COPY_VALUE(param, cache_val)
+					param.CopyValueFrom(cache_val)
 				} else {
 					types.ZVAL_COPY(param, default_value)
 					if ZvalUpdateConstantEx(param, executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
@@ -24,7 +24,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 						return 0
 					}
 					if !(param.IsRefcounted()) {
-						types.ZVAL_COPY_VALUE(cache_val, param)
+						cache_val.CopyValueFrom(param)
 					}
 				}
 				goto recv_init_check_type

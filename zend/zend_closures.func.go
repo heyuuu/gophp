@@ -412,7 +412,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 		}
 	}
 	if closure.GetThisPtr().IsNotUndef() {
-		closure.GetThisPtr().AddRefcount()
+		//closure.GetThisPtr().AddRefcount()
 		debug_info.KeyUpdate(types.STR_THIS, closure.GetThisPtr())
 	}
 	if arg_info != nil && (closure.GetFunc().GetNumArgs() != 0 || closure.GetFunc().IsVariadic()) {
@@ -585,7 +585,7 @@ func ZendCreateClosure(res *types.Zval, func_ types.IFunction, scope *types.Clas
 	if scope != nil {
 		closure.GetFunc().SetIsPublic(true)
 		if this_ptr != nil && this_ptr.IsObject() && !closure.GetFunc().IsStatic() {
-			this_ptr.AddRefcount()
+			// 			this_ptr.AddRefcount()
 			closure.GetThisPtr().SetObject(this_ptr.Object())
 		}
 	}
@@ -601,5 +601,5 @@ func ZendClosureBindVarEx(closure_zv *types.Zval, offset uint32, val *types.Zval
 	var static_variables *types.Array = closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	var var_ *types.Zval = (*types.Zval)((*byte)(static_variables.Bucket(offset)))
 	ZvalPtrDtor(var_)
-	types.ZVAL_COPY_VALUE(var_, val)
+	var_.CopyValueFrom(val)
 }

@@ -512,7 +512,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		if must_wrap == 0 {
 			types.ZVAL_COPY(param, arg)
 		} else {
-			arg.TryAddRefcount()
+			// arg.TryAddRefcount()
 			param.SetNewRef(arg)
 		}
 	}
@@ -964,7 +964,7 @@ func ZendFetchClassByName(class_name *types.String, key *types.String, fetch_typ
 				var exception_str *types.String
 				var exception_zv types.Zval
 				exception_zv.SetObject(EG__().GetException())
-				exception_zv.AddRefcount()
+				// 				exception_zv.AddRefcount()
 				faults.ClearException()
 				exception_str = ZvalGetString(&exception_zv)
 				faults.ErrorNoreturn(faults.E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())
@@ -1048,9 +1048,9 @@ func ZendAttachSymbolTable(executeData *ZendExecuteData) {
 			if zv != nil {
 				if zv.IsIndirect() {
 					var val *types.Zval = zv.Indirect()
-					types.ZVAL_COPY_VALUE(var_, val)
+					var_.CopyValueFrom(val)
 				} else {
-					types.ZVAL_COPY_VALUE(var_, zv)
+					var_.CopyValueFrom(zv)
 				}
 			} else {
 				var_.SetUndef()
@@ -1111,7 +1111,7 @@ func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 					if (*str).GetStr() == name {
 						var var_ *types.Zval = executeData.VarNum(str - op_array.GetVars())
 						ZvalPtrDtor(var_)
-						types.ZVAL_COPY_VALUE(var_, value)
+						var_.CopyValueFrom(value)
 						return types.SUCCESS
 					}
 					str++

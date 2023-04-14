@@ -11,10 +11,10 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if return_value == nil {
 	} else {
 		{
-			types.ZVAL_COPY_VALUE(return_value, retval_ptr)
+			return_value.CopyValueFrom(retval_ptr)
 			{
 
-				return_value.TryAddRefcount()
+				// return_value.TryAddRefcount()
 
 			}
 		}
@@ -42,7 +42,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		{
-			types.ZVAL_COPY_VALUE(return_value, retval_ptr)
+			return_value.CopyValueFrom(retval_ptr)
 		}
 
 	}
@@ -68,7 +68,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		{
-			types.ZVAL_COPY_VALUE(return_value, retval_ptr)
+			return_value.CopyValueFrom(retval_ptr)
 		}
 
 	}
@@ -94,7 +94,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		{
-			types.ZVAL_COPY_VALUE(return_value, retval_ptr)
+			return_value.CopyValueFrom(retval_ptr)
 		}
 
 	}

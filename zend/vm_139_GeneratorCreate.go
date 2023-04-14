@@ -1,5 +1,10 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var return_value *types.Zval = executeData.GetReturnValue()
 	if return_value != nil {
@@ -48,7 +53,7 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		call_info = executeData.GetThis().GetTypeInfo()
 		if (call_info&types.Z_TYPE_MASK) == types.IS_OBJECT && ((call_info&(ZEND_CALL_CLOSURE|ZEND_CALL_RELEASE_THIS)) == 0 || ZendExecuteEx != ExecuteEx) {
 			ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_RELEASE_THIS)
-			gen_execute_data.GetThis().AddRefcount()
+			//gen_execute_data.GetThis().AddRefcount()
 		}
 		ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_TOP_FUNCTION|ZEND_CALL_ALLOCATED|ZEND_CALL_GENERATOR)
 		gen_execute_data.GetThis().GetTypeInfo() = call_info

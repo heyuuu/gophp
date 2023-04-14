@@ -7,10 +7,10 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	value = opline.Const1()
 	if value.GetType() > types.IS_NULL {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 
@@ -32,11 +32,11 @@ func ZEND_COALESCE_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if value.GetType() > types.IS_NULL {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 
@@ -59,11 +59,11 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if value.GetType() > types.IS_NULL {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 
@@ -85,11 +85,11 @@ func ZEND_COALESCE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if value.GetType() > types.IS_NULL {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 

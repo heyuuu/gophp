@@ -18,7 +18,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsArray() {
 			var ht *types.Array
 		unset_dim_array:
-			types.SEPARATE_ARRAY(container)
+			types.SeparateArray(container)
 			ht = container.GetArr()
 		offset_again:
 			if offset.IsString() {
@@ -90,7 +90,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsArray() {
 			var ht *types.Array
 		unset_dim_array:
-			types.SEPARATE_ARRAY(container)
+			types.SeparateArray(container)
 			ht = container.GetArr()
 		offset_again:
 			if offset.IsString() {
@@ -174,7 +174,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsArray() {
 			var ht *types.Array
 		unset_dim_array:
-			types.SEPARATE_ARRAY(container)
+			types.SeparateArray(container)
 			ht = container.GetArr()
 		offset_again:
 			if offset.IsString() {
@@ -256,7 +256,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsArray() {
 			var ht *types.Array
 		unset_dim_array:
-			types.SEPARATE_ARRAY(container)
+			types.SeparateArray(container)
 			ht = container.GetArr()
 		offset_again:
 			if offset.IsString() {
@@ -324,7 +324,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsArray() {
 			var ht *types.Array
 		unset_dim_array:
-			types.SEPARATE_ARRAY(container)
+			types.SeparateArray(container)
 			ht = container.GetArr()
 		offset_again:
 			if offset.IsString() {
@@ -404,7 +404,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		if container.IsArray() {
 			var ht *types.Array
 		unset_dim_array:
-			types.SEPARATE_ARRAY(container)
+			types.SeparateArray(container)
 			ht = container.GetArr()
 		offset_again:
 			if offset.IsString() {

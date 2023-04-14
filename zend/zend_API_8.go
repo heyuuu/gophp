@@ -205,7 +205,7 @@ func ZendFcallInfoArgsEx(fci *types.ZendFcallInfo, func_ types.IFunction, args *
 		arg = _z
 		if func_ != nil && !(arg.IsReference()) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
 			params.SetNewRef(arg)
-			arg.TryAddRefcount()
+			// arg.TryAddRefcount()
 		} else {
 			types.ZVAL_COPY(params, arg)
 		}
@@ -359,7 +359,7 @@ func ZendDeclareTypedProperty(
 
 		}
 		property_default_ptr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
-		types.ZVAL_COPY_VALUE(property_default_ptr, property)
+		property_default_ptr.CopyValueFrom(property)
 		if property.IsUndef() {
 			property_default_ptr.SetU2Extra(types.IS_PROP_UNINIT)
 		} else {

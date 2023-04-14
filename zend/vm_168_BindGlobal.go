@@ -61,7 +61,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			ref = value.Reference()
 		} else {
 			ref = value.Reference()
-			ref.AddRefcount()
+			// 			ref.AddRefcount()
 		}
 		variable_ptr = opline.Op1()
 		if variable_ptr.IsRefcounted() {

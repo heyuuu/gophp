@@ -8,10 +8,10 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var result *types.Zval = opline.Result()
 	value = opline.Const1()
 	{
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 	}

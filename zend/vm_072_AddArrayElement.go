@@ -8,7 +8,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 	var new_expr types.Zval
 
 	expr_ptr = opline.Const1()
-	expr_ptr.TryAddRefcount()
+	// expr_ptr.TryAddRefcount()
 	{
 		var offset *types.Zval = opline.Const2()
 		var str *types.String
@@ -55,7 +55,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		expr_ptr = opline.Const1()
 
 		{
-			expr_ptr.TryAddRefcount()
+			// expr_ptr.TryAddRefcount()
 		}
 
 	}
@@ -119,7 +119,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 		expr_ptr = opline.Const1()
 
 		{
-			expr_ptr.TryAddRefcount()
+			// expr_ptr.TryAddRefcount()
 		}
 
 	}
@@ -141,7 +141,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 		expr_ptr = opline.Const1()
 
 		{
-			expr_ptr.TryAddRefcount()
+			// expr_ptr.TryAddRefcount()
 		}
 
 	}
@@ -202,7 +202,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -254,7 +254,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -320,7 +320,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -344,7 +344,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -408,7 +408,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -463,7 +463,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -532,7 +532,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -559,7 +559,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -625,7 +625,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -676,7 +676,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -741,7 +741,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -764,7 +764,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 	if (opline.GetExtendedValue() & ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), executeData)
 		if expr_ptr.IsReference() {
-			expr_ptr.AddRefcount()
+			// 			expr_ptr.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}

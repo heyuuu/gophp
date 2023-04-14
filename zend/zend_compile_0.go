@@ -315,7 +315,7 @@ func ZendInsertLiteral(op_array *types.ZendOpArray, zv *types.Zval, literal_posi
 	//if zv.IsString() {
 	//	ZvalMakeInternedString(zv)
 	//}
-	types.ZVAL_COPY_VALUE(lit, zv)
+	lit.CopyValueFrom(zv)
 	lit.SetU2Extra(0)
 }
 func ZendAddLiteral(zv *types.Zval) int {

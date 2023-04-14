@@ -185,7 +185,7 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 		return
 	}
 	ref = value_ptr.Reference()
-	ref.AddRefcount()
+	// 	ref.AddRefcount()
 	if variable_ptr.IsRefcounted() {
 		var garbage *types.ZendRefcounted = variable_ptr.RefCounted()
 		if garbage.DelRefcount() == 0 {
@@ -217,7 +217,7 @@ func ZendWrongAssignToVariableReference(variable_ptr *types.Zval, value_ptr *typ
 
 	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */
 
-	value_ptr.TryAddRefcount()
+	// value_ptr.TryAddRefcount()
 	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
 }
 func ZendFormatType(type_ types.ZendType, part1 **byte, part2 **byte) {
@@ -286,7 +286,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 	}
 	ZvalPtrDtorNogc(object)
 	ObjectInit(object)
-	object.AddRefcount()
+	// 	object.AddRefcount()
 	obj = object.Object()
 	faults.Error(faults.E_WARNING, "Creating default object from empty value")
 	if obj.GetRefcount() == 1 {

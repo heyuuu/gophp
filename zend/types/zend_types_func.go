@@ -75,7 +75,6 @@ func Z_INDIRECT(zval Zval) *Zval            { return zval.Indirect() }
 func Z_INDIRECT_P(zval_p *Zval) *Zval       { return zval_p.Indirect() }
 func Z_PTR(zval Zval) any                   { return zval.Ptr() }
 
-func ZVAL_ARR(z *Zval, a *Array) { z.SetArray(a) }
 func ZVAL_NEW_PERSISTENT_ARR(z *Zval) {
 	var arr = NewArray(0)
 	z.SetArray(arr)
@@ -86,48 +85,15 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	ref.SetRefcount(refcount)
 	z.SetReference(ref)
 }
-func ZVAL_PTR(z *Zval, p any)            { z.SetPtr(p) }
-func Z_REFCOUNT_P(pz *Zval) uint32       { return pz.GetRefcount() }
-func Z_ADDREF_P(pz *Zval) uint32         { return pz.AddRefcount() }
-func Z_DELREF_P(pz *Zval) uint32         { return pz.DelRefcount() }
-func GC_MAKE_PERSISTENT_LOCAL(p *String) {}
+func ZVAL_PTR(z *Zval, p any)      { z.SetPtr(p) }
+func Z_REFCOUNT_P(pz *Zval) uint32 { return pz.GetRefcount() }
 
-func ZVAL_COPY_VALUE(z *Zval, v *Zval) {
-	// 复制除 u2 外所有数据
-	var temp = z.u2
-	*z = *v
-	z.u2 = temp
-}
-func ZVAL_COPY(z *Zval, v *Zval) {
-	ZVAL_COPY_VALUE(z, v)
-	// 若支持引用计数，则增加计数；此时 z、v 指向同一个 value，增加哪个都一样
-	if v.IsRefcounted() {
-		z.RefCounted().AddRefcount()
-	}
-}
-func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
-	ZVAL_COPY_VALUE(z, v)
-	if v.IsRefcounted() {
-		if v.RefCounted().HasGcFlags(GC_PERSISTENT) {
-			v.RefCounted().AddRefcount()
-		} else {
-			zend.ZvalCopyCtorFunc(z)
-		}
-	}
-}
+func ZVAL_COPY_VALUE(z *Zval, v *Zval)  { z.CopyValueFrom(v) }
+func ZVAL_COPY(z *Zval, v *Zval)        { z.CopyFrom(v) }
+func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) { z.CopyOrDupFrom(v) }
+func ZVAL_DEREF(z *Zval) *Zval          { return z.DeRef() }
+func ZVAL_DEINDIRECT(z *Zval) *Zval     { return z.DeIndirect() }
 
-func ZVAL_DEREF(z *Zval) *Zval {
-	if z.IsReference() {
-		return Z_REFVAL_P(z)
-	}
-	return z
-}
-func ZVAL_DEINDIRECT(z *Zval) *Zval {
-	if z.IsIndirect() {
-		return z.Indirect()
-	}
-	return z
-}
 func ZVAL_MAKE_REF(zv *Zval) {
 	var __zv *Zval = zv
 	if !(__zv.IsReference()) {
@@ -143,70 +109,24 @@ func ZVAL_UNREF(z *Zval) {
 	zend.EfreeSize(ref, b.SizeOf("zend_reference"))
 }
 func ZVAL_COPY_DEREF(z *Zval, v *Zval) {
-	var _z3 *Zval = v
-	if _z3.IsRefcounted() {
-		if _z3.IsReference() {
-			_z3 = Z_REFVAL_P(_z3)
-			if _z3.IsRefcounted() {
-				Z_ADDREF_P(_z3)
-			}
-		} else {
-			Z_ADDREF_P(_z3)
-		}
-	}
-	ZVAL_COPY_VALUE(z, _z3)
+	z.CopyFrom(v.DeRef())
 }
-func SEPARATE_ARRAY(zv *Zval) {
-	var _zv *Zval = zv
-	var _arr *Array = _zv.Array()
-	if _arr.GetRefcount() > 1 {
-		if _zv.IsRefcounted() {
-			_arr.DelRefcount()
-		}
-		_zv.SetArray(ZendArrayDup(_arr))
+func SeparateArray(zv *Zval) {
+	b.Assert(zv.IsArray())
+	zv.SetArray(ArrayRealDup(zv.Array()))
+}
+func SeparateZval(zv *Zval) {
+	// 解 Ref
+	if zv.IsReference() {
+		zv.CopyValueFrom(zv.DeRef())
+	}
+	// 仅数组需要分离
+	if zv.IsArray() {
+		zv.SetArray(ArrayRealDup(zv.Array()))
 	}
 }
-func SEPARATE_ZVAL_IF_NOT_REF(zv *Zval) {
-	var __zv *Zval = zv
-	if __zv.IsArray() {
-		if Z_REFCOUNT_P(__zv) > 1 {
-			if __zv.IsRefcounted() {
-				Z_DELREF_P(__zv)
-			}
-			ZVAL_ARR(__zv, ZendArrayDup(__zv.Array()))
-		}
-	}
-}
-func SEPARATE_ZVAL_NOREF(zv *Zval) {
-	var _zv *Zval = zv
-	b.Assert(_zv.GetType() != IS_REFERENCE)
-	SEPARATE_ZVAL_IF_NOT_REF(_zv)
-}
-func SEPARATE_ZVAL(zv *Zval) {
-	for {
-		var _zv *Zval = zv
-		if _zv.IsReference() {
-			var _r *ZendReference = _zv.Reference()
-			ZVAL_COPY_VALUE(_zv, _r.GetVal())
-			if _r.DelRefcount() == 0 {
-				zend.EfreeSize(_r, b.SizeOf("zend_reference"))
-			} else if _zv.IsArray() {
-				ZVAL_ARR(_zv, ZendArrayDup(_zv.Array()))
-				break
-			} else if _zv.IsRefcounted() {
-				Z_ADDREF_P(_zv)
-				break
-			}
-		}
-		SEPARATE_ZVAL_IF_NOT_REF(_zv)
-		break
-	}
-}
-func SEPARATE_ARG_IF_REF(varptr *Zval) {
-	varptr = ZVAL_DEREF(varptr)
-	if varptr.IsRefcounted() {
-		Z_ADDREF_P(varptr)
-	}
+func SEPARATE_ARG_IF_REF(varptr *Zval) *Zval {
+	return varptr.DeRef()
 }
 func ZVAL_COPY_VALUE_PROP(z *Zval, v *Zval) { *z = *v }
 func ZVAL_COPY_PROP(z *Zval, v *Zval) {
@@ -217,4 +137,3 @@ func ZVAL_COPY_OR_DUP_PROP(z *Zval, v *Zval) {
 	ZVAL_COPY_OR_DUP(z, v)
 	z.SetU2Extra(v.GetU2Extra())
 }
-

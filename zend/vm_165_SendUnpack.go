@@ -33,7 +33,7 @@ send_again:
 				}
 			}
 			if separate != 0 {
-				types.SEPARATE_ARRAY(args)
+				types.SeparateArray(args)
 				ht = args.GetArr()
 			}
 		}
@@ -51,7 +51,7 @@ send_again:
 			top = executeData.GetCall().Arg(arg_num)
 			if ARG_SHOULD_BE_SENT_BY_REF(executeData.GetCall().func_, arg_num) != 0 {
 				if arg.IsReference() {
-					arg.AddRefcount()
+					// 					arg.AddRefcount()
 					top.SetReference(arg.Reference())
 				} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
 
@@ -60,7 +60,7 @@ send_again:
 					types.ZVAL_MAKE_REF_EX(arg, 2)
 					top.SetReference(arg.Reference())
 				} else {
-					arg.TryAddRefcount()
+					// arg.TryAddRefcount()
 					top.SetNewRef(arg)
 				}
 			} else {
@@ -113,10 +113,10 @@ send_again:
 					faults.Error(faults.E_WARNING, "Cannot pass by-reference argument %d of %s%s%s()"+" by unpacking a Traversable, passing by-value instead", arg_num, b.CondF1(executeData.GetCall().func_.common.scope, func() []byte { return executeData.GetCall().func_.common.scope.name.GetVal() }, ""), b.Cond(executeData.GetCall().func_.common.scope, "::", ""), executeData.GetCall().func_.common.function_name.GetVal())
 				}
 				arg = types.ZVAL_DEREF(arg)
-				arg.TryAddRefcount()
+				// arg.TryAddRefcount()
 				ZendVmStackExtendCallFrame(&(executeData.GetCall()), arg_num-1, 1)
 				top = executeData.GetCall().Arg(arg_num)
-				types.ZVAL_COPY_VALUE(top, arg)
+				top.CopyValueFrom(arg)
 				executeData.GetCall().
 					NumArgs()++
 				iter.GetFuncs().GetMoveForward()(iter)

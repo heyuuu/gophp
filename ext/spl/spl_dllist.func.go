@@ -40,7 +40,7 @@ func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 }
 func SplPtrLlistZvalCtor(elem *SplPtrLlistElement) {
 
-	elem.GetData().TryAddRefcount()
+	//elem.GetData().TryAddRefcount()
 
 }
 func SplPtrLlistInit(ctor SplPtrLlistCtorFunc, dtor SplPtrLlistDtorFunc) *SplPtrLlist {
@@ -331,7 +331,7 @@ func SplDllistObjectGetDebugInfo(obj *types.Zval) *types.Array {
 		next = current.GetNext()
 		zend.AddIndexZval(&dllist_array, i, current.GetData())
 
-		current.GetData().TryAddRefcount()
+		//current.GetData().TryAddRefcount()
 
 		i++
 		current = next
@@ -857,7 +857,7 @@ func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, 
 	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
 		tmp.Array().NextIndexInsert(current.GetData())
-		current.GetData().TryAddRefcount()
+		//current.GetData().TryAddRefcount()
 		current = current.GetNext()
 	}
 	return_value.Array().NextIndexInsert(&tmp)
@@ -865,7 +865,7 @@ func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, 
 	/* members */
 
 	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
-	tmp.TryAddRefcount()
+	//tmp.TryAddRefcount()
 	return_value.Array().NextIndexInsert(&tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -910,7 +910,7 @@ func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_v
 		faults.ThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 		return
 	}
-	value.TryAddRefcount()
+	//value.TryAddRefcount()
 	if index == intern.GetLlist().GetCount() {
 
 		/* If index is the last entry+1 then we do a push because we're not inserting before any entry */
@@ -966,7 +966,7 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	object.AddRefcount()
+	// 	object.AddRefcount()
 	iterator.GetIntern().GetIt().GetData().SetObject(object.Object())
 	iterator.GetIntern().GetIt().SetFuncs(&SplDllistItFuncs)
 	iterator.GetIntern().SetCe(ce)

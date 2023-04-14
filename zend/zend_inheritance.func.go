@@ -1091,7 +1091,7 @@ func ZendDoInheritanceEx(ce *types.ClassEntry, parent_ce *types.ClassEntry, chec
 			for {
 				dst--
 				src--
-				types.ZVAL_COPY_VALUE(dst, src)
+				dst.CopyValueFrom(src)
 				if dst == end {
 					break
 				}
@@ -1855,7 +1855,7 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 			} else {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}
-			prop_value.TryAddRefcount()
+			// prop_value.TryAddRefcount()
 			if property_info.GetDocComment() != nil {
 				doc_comment = property_info.GetDocComment().Copy()
 			} else {
@@ -2211,7 +2211,7 @@ func CheckUnrecoverableLoadFailure(ce *types.ClassEntry) {
 		var exception_zv types.Zval
 		b.Assert(EG__().GetException() != nil && "Exception must have been thrown")
 		exception_zv.SetObject(EG__().GetException())
-		exception_zv.AddRefcount()
+		// 		exception_zv.AddRefcount()
 		faults.ClearException()
 		exception_str = ZvalGetString(&exception_zv)
 		faults.ErrorNoreturn(faults.E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.GetName().GetVal(), exception_str.GetVal())

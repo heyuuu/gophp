@@ -132,14 +132,7 @@ func (p *FastParser) parsePrologueFastZpp(deref bool, separate bool) {
 		}
 	}
 
-	p.arg = p.currArg()
-	if deref {
-		p.arg = types.ZVAL_DEREF(p.arg)
-	}
-	if separate {
-		types.SEPARATE_ZVAL_NOREF(p.arg)
-	}
-
+	p.readArg(deref, separate)
 }
 
 func (p *FastParser) parsePrologueOldZpp(deref bool, separate bool) {
@@ -150,12 +143,16 @@ func (p *FastParser) parsePrologueOldZpp(deref bool, separate bool) {
 	}
 
 	p.idx++
+	p.readArg(deref, separate)
+}
+
+func (p *FastParser) readArg(deref bool, separate bool) {
 	p.arg = p.currArg()
-	if deref {
-		p.arg = types.ZVAL_DEREF(p.arg)
-	}
 	if separate {
-		types.SEPARATE_ZVAL_NOREF(p.arg)
+		// separate 为 true 时，必然需要会执行 DeRef，所以无需再判断 deref
+		types.SeparateZval(p.arg)
+	} else if deref {
+		p.arg = p.arg.DeRef()
 	}
 }
 

@@ -13,7 +13,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = opline.Const2()
 
@@ -89,7 +89,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = opline.Op2Ptr(&free_op2)
 
@@ -162,7 +162,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = nil
 		{
@@ -224,7 +224,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = opline.Op2()
 
@@ -295,7 +295,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 	container = opline.Op1()
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = opline.Const2()
 
@@ -367,7 +367,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	container = opline.Op1()
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = opline.Op2Ptr(&free_op2)
 
@@ -436,7 +436,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	container = opline.Op1()
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = nil
 		{
@@ -494,7 +494,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 	container = opline.Op1()
 	if container.IsArray() {
 	assign_dim_op_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	assign_dim_op_new_array:
 		dim = opline.Op2()
 

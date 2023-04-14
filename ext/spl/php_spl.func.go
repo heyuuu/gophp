@@ -265,7 +265,7 @@ func ZifSplAutoloadExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Op
 		return_value.SetStringVal(SPL_DEFAULT_FILE_EXTENSIONS)
 		return
 	} else {
-		SPL_G(autoload_extensions).AddRefcount()
+		//SPL_G(autoload_extensions).AddRefcount()
 		return_value.SetString(SPL_G(autoload_extensions))
 		return
 	}
@@ -473,7 +473,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		// types.ZendStringReleaseEx(func_name, 0)
 		if SPL_G(autoload_functions) && SPL_G(autoload_functions).KeyExists(lc_name.GetStr()) {
 			if !(alfi.GetClosure().IsUndef()) {
-				alfi.GetClosure().DelRefcount()
+				//alfi.GetClosure().DelRefcount()
 			}
 			goto skip
 		}
@@ -485,7 +485,7 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 			lc_name.GetVal()[lc_name.GetLen()] = '0'
 			alfi.GetObj().SetObject(obj_ptr)
-			alfi.GetObj().AddRefcount()
+			//alfi.GetObj().AddRefcount()
 		} else {
 			alfi.GetObj().SetUndef()
 		}
@@ -518,12 +518,12 @@ func ZifSplAutoloadRegister(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 			alfi.SetFuncPtr(copy)
 		}
 		if types.ZendHashAddMem(SPL_G(autoload_functions), lc_name.GetStr(), &alfi, b.SizeOf("autoload_func_info")) == nil {
-			if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.AccStatic) {
-				alfi.GetObj().DelRefcount()
-			}
-			if !(alfi.GetClosure().IsUndef()) {
-				alfi.GetClosure().DelRefcount()
-			}
+			//if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.AccStatic) {
+			//	alfi.GetObj().DelRefcount()
+			//}
+			//if !(alfi.GetClosure().IsUndef()) {
+			//	alfi.GetClosure().DelRefcount()
+			//}
 			if alfi.GetFuncPtr().HasFnFlags(zend.AccCallViaTrampoline) {
 				// types.ZendStringReleaseEx(alfi.GetFuncPtr().GetFunctionName(), 0)
 				zend.ZendFreeTrampoline(alfi.GetFuncPtr())
@@ -664,13 +664,13 @@ func ZifSplAutoloadFunctions(executeData zpp.Ex, return_value zpp.Ret) {
 			key = _p.GetKey()
 			alfi = _z.Ptr()
 			if !(alfi.GetClosure().IsUndef()) {
-				alfi.GetClosure().AddRefcount()
+				//alfi.GetClosure().AddRefcount()
 				zend.AddNextIndexZval(return_value, alfi.GetClosure())
 			} else if alfi.GetFuncPtr().GetScope() != nil {
 				var tmp types.Zval
 				zend.ArrayInit(&tmp)
 				if !(alfi.GetObj().IsUndef()) {
-					alfi.GetObj().AddRefcount()
+					//alfi.GetObj().AddRefcount()
 					zend.AddNextIndexZval(&tmp, alfi.GetObj())
 				} else {
 					zend.AddNextIndexStr(&tmp, alfi.GetCe().GetName().Copy())

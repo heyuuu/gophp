@@ -131,7 +131,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 	case BP_VAR_R:
 		if executeData.GetThis().IsObject() {
 			result.SetObject(executeData.GetThis().Object())
-			result.AddRefcount()
+			// 			result.AddRefcount()
 		} else {
 			result.SetNull()
 			faults.Error(faults.E_NOTICE, "Undefined variable: this")
@@ -139,7 +139,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 	case BP_VAR_IS:
 		if executeData.GetThis().IsObject() {
 			result.SetObject(executeData.GetThis().Object())
-			result.AddRefcount()
+			// 			result.AddRefcount()
 		} else {
 			result.SetNull()
 		}
@@ -359,7 +359,7 @@ func ZendVmStackCopyCallFrame(call *ZendExecuteData, passed_args uint32, additio
 		var src *types.Zval = call.Arg(1)
 		var dst *types.Zval = new_call.Arg(1)
 		for {
-			types.ZVAL_COPY_VALUE(dst, src)
+			dst.CopyValueFrom(src)
 			passed_args--
 			src++
 			dst++

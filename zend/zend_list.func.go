@@ -230,8 +230,8 @@ func ZendRegisterPersistentResourceEx(key *types.String, rsrc_pointer any, rsrc_
 	var zv *types.Zval
 	var tmp types.Zval
 	tmp.SetResource(types.NewZendResourcePersistent(-1, rsrc_pointer, rsrc_type, true))
-	types.GC_MAKE_PERSISTENT_LOCAL(tmp.RefCounted())
-	types.GC_MAKE_PERSISTENT_LOCAL(key)
+	//types.GC_MAKE_PERSISTENT_LOCAL(tmp.RefCounted())
+	//types.GC_MAKE_PERSISTENT_LOCAL(key)
 	zv = EG__().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)
 	return zv.Resource()
 }

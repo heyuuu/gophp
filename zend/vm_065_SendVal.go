@@ -6,10 +6,10 @@ func ZEND_SEND_VAL_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var arg *types.Zval
 	value = opline.Const1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
+	arg.CopyValueFrom(value)
 	{
 
-		arg.TryAddRefcount()
+		// arg.TryAddRefcount()
 
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -21,6 +21,6 @@ func ZEND_SEND_VAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	value = opline.Op1Ptr(&free_op1)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
+	arg.CopyValueFrom(value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

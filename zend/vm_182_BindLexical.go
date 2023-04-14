@@ -12,7 +12,7 @@ func ZEND_BIND_LEXICAL_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 
 		var_ = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp2().GetVar(), executeData)
 		if var_.IsReference() {
-			var_.AddRefcount()
+			// 			var_.AddRefcount()
 		} else {
 			types.ZVAL_MAKE_REF_EX(var_, 2)
 		}
@@ -25,7 +25,7 @@ func ZEND_BIND_LEXICAL_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 		var_ = types.ZVAL_DEREF(var_)
-		var_.TryAddRefcount()
+		// var_.TryAddRefcount()
 	}
 	ZendClosureBindVarEx(closure, opline.GetExtendedValue() & ^(ZEND_BIND_REF|ZEND_BIND_IMPLICIT), var_)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

@@ -334,7 +334,7 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 			if z == &rv {
 				ZvalPtrDtor(&rv)
 			}
-			types.ZVAL_COPY_VALUE(z, value)
+			z.CopyValueFrom(value)
 		}
 		if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
 			types.Z_OBJ_HT_P(object).GetWriteDimension()(object, property, &res)

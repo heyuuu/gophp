@@ -315,7 +315,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
-			obj.AddRefcount()
+			// 			obj.AddRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -437,7 +437,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
-			obj.AddRefcount()
+			// 			obj.AddRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -549,7 +549,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
-			obj.AddRefcount()
+			// 			obj.AddRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -864,7 +864,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) i
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
-			obj.AddRefcount()
+			// 			obj.AddRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -981,7 +981,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
-			obj.AddRefcount()
+			// 			obj.AddRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -1088,7 +1088,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int 
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else {
 		{
-			obj.AddRefcount()
+			// 			obj.AddRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */

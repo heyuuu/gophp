@@ -7,6 +7,30 @@ import (
 	"strconv"
 )
 
+func ArrayLazyDup(arr *Array) *Array {
+	// todo 涉及数组的写时复制机制，待完成
+	/*
+	 *	此处功能要求为:
+	 *  - 若原数组数据非只读，标记原数组数组为只读，设置原数组指向数组的一个只读 reader
+	 *  - 此方法返回底层数组数据的只读 reader
+	 *  只读 reader 要求
+	 *  - 读操作时直接读取数据
+	 *  - 写操作时，复制底层数组数据后指向新数据，在新数据上操作
+	 */
+	return arr
+}
+
+func ArrayRealDup(arr *Array) *Array {
+	// todo 涉及数组的写时复制机制，待完成
+	/**
+	 * 此处功能要求为:
+	 * - 确认当前是一个只读 reader
+	 * - 若指向的数组上只有唯一一个 reader, 直接使用此数组，并标记为非只读
+	 * - 否则，复制此数组作为真实数组使用
+	 */
+	return ZendArrayDup(arr)
+}
+
 var emptyArray *Array
 
 func NewArrayOfInt(items []int) *Array {
@@ -392,7 +416,7 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) ArrayPosition {
 		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(ht.IsIteratorsOverflow()) {
 			iter.GetHt().DecIteratorsCount()
 		}
-		SEPARATE_ARRAY(array)
+		SeparateArray(array)
 		ht = array.Array()
 		if !(ht.IsIteratorsOverflow()) {
 			ht.IncIteratorsCount()
@@ -551,7 +575,7 @@ func ZendArrayDupElements(source *Array, target *Array) {
 						break
 					}
 				}
-				data.AddRefcount()
+				// 				data.AddRefcount()
 			}
 			break
 		}
@@ -830,7 +854,7 @@ func ZendSymtableToProptable(ht *Array) *Array {
 		}
 	}
 	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
-		ht.AddRefcount()
+		// 		ht.AddRefcount()
 	}
 	return ht
 convert:
@@ -850,7 +874,7 @@ convert:
 						break
 					}
 				}
-				Z_ADDREF_P(zv)
+				//Z_ADDREF_P(zv)
 			}
 			break
 		}
@@ -882,7 +906,7 @@ func ZendProptableToSymtable(ht *Array, always_duplicate ZendBool) *Array {
 		return ZendArrayDup(ht)
 	}
 	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
-		ht.AddRefcount()
+		// 		ht.AddRefcount()
 	}
 	return ht
 convert:
@@ -907,7 +931,7 @@ convert:
 						break
 					}
 				}
-				Z_ADDREF_P(zv)
+				//Z_ADDREF_P(zv)
 			}
 			break
 		}

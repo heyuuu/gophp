@@ -77,7 +77,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 			if op2_str.GetLen() == 0 {
 				{
 					if op1.IsRefcounted() {
-						op1_str.AddRefcount()
+						// 						op1_str.AddRefcount()
 					}
 				}
 				opline.Result().SetString(op1_str)
@@ -147,7 +147,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
 			if op2_str.GetLen() == 0 {
 				{
 					if op1.IsRefcounted() {
-						op1_str.AddRefcount()
+						// 						op1_str.AddRefcount()
 					}
 				}
 				opline.Result().SetString(op1_str)
@@ -217,7 +217,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 			if op1_str.GetLen() == 0 {
 				{
 					if op2.IsRefcounted() {
-						op2_str.AddRefcount()
+						// 						op2_str.AddRefcount()
 					}
 				}
 				opline.Result().SetString(op2_str)
@@ -473,7 +473,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			if op1_str.GetLen() == 0 {
 				{
 					if op2.IsRefcounted() {
-						op2_str.AddRefcount()
+						// 						op2_str.AddRefcount()
 					}
 				}
 				opline.Result().SetString(op2_str)

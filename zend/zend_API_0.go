@@ -117,7 +117,7 @@ func ZVAL_ZVAL(z *types.Zval, zv *types.Zval, copy int, dtor int) {
 		if copy != 0 && dtor == 0 {
 			types.ZVAL_COPY(__z, __zv)
 		} else {
-			types.ZVAL_COPY_VALUE(__z, __zv)
+			__z.CopyValueFrom(__zv)
 		}
 	} else {
 		types.ZVAL_COPY(__z, types.Z_REFVAL_P(__zv))

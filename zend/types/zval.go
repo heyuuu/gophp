@@ -105,8 +105,8 @@ func (zv *Zval) GetType() ZvalType {
 	}
 	return zv.typ
 }
-func (zv *Zval) GetTypeFlags() ZendUchar      { return zv.typeFlags }
-func (zv *Zval) SetTypeFlags(value ZendUchar) { zv.typeFlags = value } /* todo remove */
+
+// todo delete，暂时还有些其他语义的用法(如 ExecuteData.This.callInfo)，待处理后移除
 func (zv *Zval) GetTypeInfo() uint32 {
 	return uint32(zv.typ) | uint32(zv.typeFlags)<<Z_TYPE_FLAGS_SHIFT
 }
@@ -185,5 +185,5 @@ func (zv *Zval) SwitchConstantFlags(value uint32, cond bool) {
  * init
  */
 func (zv *Zval) SetBy(val *Zval) {
-	ZVAL_COPY_VALUE(zv, val)
+	zv.CopyValueFrom(val)
 }

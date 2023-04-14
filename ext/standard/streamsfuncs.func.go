@@ -166,7 +166,7 @@ func ZifStreamSocketServer(executeData zpp.Ex, return_value zpp.Ret, localaddres
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
 	if context != nil {
-		context.Resource().AddRefcount()
+		//context.Resource().AddRefcount()
 	}
 	if zerrno != nil {
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, 0)
@@ -491,7 +491,7 @@ func ZifStreamGetMetaData(executeData zpp.Ex, return_value zpp.Ret, fp *types.Zv
 		zend.AddAssocBool(return_value, "eof", core.PhpStreamEof(stream))
 	}
 	if !(stream.GetWrapperdata().IsUndef()) {
-		stream.GetWrapperdata().AddRefcount()
+		//stream.GetWrapperdata().AddRefcount()
 		zend.AddAssocZval(return_value, "wrapper_data", stream.GetWrapperdata())
 	}
 	if stream.GetWrapper() != nil {

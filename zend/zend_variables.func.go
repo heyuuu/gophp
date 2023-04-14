@@ -68,15 +68,12 @@ func ZvalAddRef(p *types.Zval) {
 		if p.IsReference() && p.GetRefcount() == 1 {
 			types.ZVAL_COPY(p, types.Z_REFVAL_P(p))
 		} else {
-			p.AddRefcount()
+			// 			p.AddRefcount()
 		}
 	}
 }
 func ZvalCopyCtorFunc(zvalue *types.Zval) {
 	if zvalue.IsArray() {
 		zvalue.SetArray(types.ZendArrayDup(zvalue.Array()))
-	} else if zvalue.IsString() {
-		b.Assert(true)
-		zvalue.SetString(zvalue.String().Copy())
 	}
 }

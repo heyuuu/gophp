@@ -11,10 +11,10 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	value = opline.Const1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
+	arg.CopyValueFrom(value)
 	{
 
-		arg.TryAddRefcount()
+		// arg.TryAddRefcount()
 
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -29,10 +29,10 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_QUICK_HANDLER(executeData *ZendExecuteData) int
 	}
 	value = opline.Const1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
+	arg.CopyValueFrom(value)
 	{
 
-		arg.TryAddRefcount()
+		// arg.TryAddRefcount()
 
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -49,7 +49,7 @@ func ZEND_SEND_VAL_EX_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	}
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
+	arg.CopyValueFrom(value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_SEND_VAL_EX_SPEC_TMP_QUICK_HANDLER(executeData *ZendExecuteData) int {
@@ -63,6 +63,6 @@ func ZEND_SEND_VAL_EX_SPEC_TMP_QUICK_HANDLER(executeData *ZendExecuteData) int {
 	}
 	value = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
-	types.ZVAL_COPY_VALUE(arg, value)
+	arg.CopyValueFrom(value)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

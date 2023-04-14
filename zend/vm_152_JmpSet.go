@@ -13,10 +13,10 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if ret != 0 {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 
@@ -45,11 +45,11 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if ret != 0 {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 
@@ -79,11 +79,11 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if ret != 0 {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 
@@ -111,11 +111,11 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	}
 	if ret != 0 {
 		var result *types.Zval = opline.Result()
-		types.ZVAL_COPY_VALUE(result, value)
+		result.CopyValueFrom(value)
 
 		{
 
-			result.TryAddRefcount()
+			// result.TryAddRefcount()
 
 		}
 

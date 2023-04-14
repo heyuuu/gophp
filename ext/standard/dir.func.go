@@ -16,7 +16,7 @@ func PhpSetDefaultDir(res *types.ZendResource) {
 		zend.ZendListDelete(DIRG(default_dir))
 	}
 	if res != nil {
-		res.AddRefcount()
+		// 		res.AddRefcount()
 	}
 	DIRG(default_dir) = res
 }

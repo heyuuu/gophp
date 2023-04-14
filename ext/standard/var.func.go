@@ -96,7 +96,7 @@ again:
 				}
 				myht.ProtectRecursive()
 			}
-			myht.AddRefcount()
+			// 			myht.AddRefcount()
 		}
 		count := myht.Count()
 		core.PhpPrintf("%sarray(%d) {\n", common, count)
@@ -107,7 +107,7 @@ again:
 			if level > 1 {
 				myht.UnprotectRecursive()
 			}
-			myht.DelRefcount()
+			//myht.DelRefcount()
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
@@ -233,7 +233,7 @@ again:
 				}
 				myht.ProtectRecursive()
 			}
-			myht.AddRefcount()
+			// 			myht.AddRefcount()
 		}
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return struc.GetRefcount() - 1 }, 1))
@@ -255,7 +255,7 @@ again:
 			if level > 1 {
 				myht.UnprotectRecursive()
 			}
-			myht.DelRefcount()
+			//myht.DelRefcount()
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
@@ -412,7 +412,7 @@ again:
 				faults.Error(faults.E_WARNING, "var_export does not handle circular references")
 				return
 			}
-			myht.AddRefcount()
+			// 			myht.AddRefcount()
 			myht.ProtectRecursive()
 		}
 		if level > 1 {
@@ -436,7 +436,7 @@ again:
 		}
 		if (myht.GetGcFlags() & types.GC_IMMUTABLE) == 0 {
 			myht.UnprotectRecursive()
-			myht.DelRefcount()
+			//myht.DelRefcount()
 		}
 		if level > 1 {
 			BufferAppendSpaces(buf, level-1)
@@ -573,7 +573,7 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *types.Zval) zend.ZendLong {
 		 * of another zend_refcounted structure. */
 
 		data.GetHt().IndexAddNewH(key+1, var_)
-		var_.AddRefcount()
+		// 		var_.AddRefcount()
 		return 0
 	}
 }
@@ -658,7 +658,7 @@ func PhpVarSerializeTryAddSleepProp(ht *types.Array, props *types.Array, name *t
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
 		return types.SUCCESS
 	}
-	val.TryAddRefcount()
+	// val.TryAddRefcount()
 	return types.SUCCESS
 }
 func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retval *types.Array) int {
@@ -862,7 +862,7 @@ again:
 			var key *types.String
 			var data *types.Zval
 			var index zend.ZendUlong
-			struc.AddRefcount()
+			// 			struc.AddRefcount()
 			obj.SetObject(struc.Object())
 			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == types.FAILURE {
 				if zend.EG__().GetException() == nil {
@@ -933,7 +933,7 @@ again:
 		if ce != PHP_IC_ENTRY && ce.FunctionTable().Exists("__sleep") {
 			var retval types.Zval
 			var tmp types.Zval
-			struc.AddRefcount()
+			// 			struc.AddRefcount()
 			tmp.SetObject(struc.Object())
 			if PhpVarSerializeCallSleep(&retval, &tmp) == types.FAILURE {
 				if zend.EG__().GetException() == nil {

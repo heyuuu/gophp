@@ -340,7 +340,7 @@ func ZendInitDynamicCallObject(function *types.Zval, num_args uint32) *ZendExecu
 			}
 		} else if object != nil {
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
-			object.AddRefcount()
+			// 			object.AddRefcount()
 			object_or_called_scope = object
 		}
 	} else {
@@ -411,7 +411,7 @@ func ZendInitDynamicCallArray(function *types.Array, num_args uint32) *ZendExecu
 				object_or_called_scope = object.GetCe()
 			} else {
 				call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
-				object.AddRefcount()
+				// 				object.AddRefcount()
 				object_or_called_scope = object
 			}
 		}

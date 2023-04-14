@@ -83,7 +83,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 					if must_wrap == 0 {
 						types.ZVAL_COPY(param, arg)
 					} else {
-						arg.TryAddRefcount()
+						// arg.TryAddRefcount()
 						param.SetNewRef(arg)
 					}
 					executeData.GetCall().
@@ -128,7 +128,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 				if must_wrap == 0 {
 					types.ZVAL_COPY(param, arg)
 				} else {
-					arg.TryAddRefcount()
+					// arg.TryAddRefcount()
 					param.SetNewRef(arg)
 				}
 				executeData.GetCall().

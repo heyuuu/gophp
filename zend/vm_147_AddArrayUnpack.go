@@ -24,7 +24,7 @@ add_unpack_again:
 				if val.IsReference() && val.GetRefcount() == 1 {
 					val = types.Z_REFVAL_P(val)
 				}
-				val.TryAddRefcount()
+				// val.TryAddRefcount()
 				if opline.Result().Array().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
 					ZvalPtrDtorNogc(val)
@@ -71,7 +71,7 @@ add_unpack_again:
 					}
 				}
 				val = types.ZVAL_DEREF(val)
-				val.TryAddRefcount()
+				// val.TryAddRefcount()
 				if opline.Result().Array().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
 					ZvalPtrDtorNogc(val)

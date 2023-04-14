@@ -219,7 +219,7 @@ func (ht *Array) IndexUpdate(index int, pData *Zval) *Zval {
 		if ht.destructor != nil {
 			ht.destructor(zv)
 		}
-		ZVAL_COPY_VALUE(zv, pData)
+		zv.CopyValueFrom(pData)
 		return zv
 	}
 
@@ -317,7 +317,7 @@ func (ht *Array) KeyAddIndirect(key string, pData *Zval) *Zval {
 		if ht.GetPDestructor() != nil {
 			ht.GetPDestructor()(data)
 		}
-		ZVAL_COPY_VALUE(data, pData)
+		data.CopyValueFrom(pData)
 		return data
 	}
 
@@ -331,7 +331,7 @@ func (ht *Array) KeyUpdate(key string, pData *Zval) *Zval {
 		if ht.GetPDestructor() != nil {
 			ht.GetPDestructor()(data)
 		}
-		ZVAL_COPY_VALUE(data, pData)
+		data.CopyValueFrom(pData)
 		return data
 	}
 
@@ -348,7 +348,7 @@ func (ht *Array) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 		if ht.GetPDestructor() != nil {
 			ht.GetPDestructor()(data)
 		}
-		ZVAL_COPY_VALUE(data, pData)
+		data.CopyValueFrom(pData)
 		return data
 	}
 

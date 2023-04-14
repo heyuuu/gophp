@@ -18,7 +18,7 @@ func PhpStreamContextFromZval(zcontext *types.Zval, nocontext int) __auto__ {
 }
 func PhpStreamContextToZval(context *core.PhpStreamContext, zval *types.Zval) {
 	zval.SetResource(context.GetRes())
-	context.GetRes().AddRefcount()
+	//context.GetRes().AddRefcount()
 }
 func PhpStreamNotifyInfo(context *core.PhpStreamContext, code zend.ZendLong, xmsg *byte, xcode int) {
 	if context != nil && context.GetNotifier() != nil {

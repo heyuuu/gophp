@@ -423,14 +423,14 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 						ZvalPtrDtor(result)
 						return 0
 					}
-					val.TryAddRefcount()
+					// val.TryAddRefcount()
 				}
 				continue
 			} else {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Only arrays and Traversables can be unpacked")
 			}
 		}
-		value.TryAddRefcount()
+		// value.TryAddRefcount()
 		key_ast = elem_ast.GetChild()[1]
 		if key_ast != nil {
 			var key *types.Zval = ZendAstGetZval(key_ast)

@@ -12,7 +12,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	var obj types.Zval
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
-	obj.AddRefcount()
+	// 	obj.AddRefcount()
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.Object())
@@ -27,7 +27,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 		if z == &rv {
 			ZvalPtrDtor(&rv)
 		}
-		types.ZVAL_COPY_VALUE(z, value)
+		z.CopyValueFrom(value)
 	}
 	types.ZVAL_COPY_DEREF(&z_copy, z)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
@@ -56,7 +56,7 @@ func ZendAssignOpOverloadedProperty(
 	var obj types.Zval
 	var res types.Zval
 	obj.SetObject(object.Object())
-	obj.AddRefcount()
+	// 	obj.AddRefcount()
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.Object())
@@ -71,7 +71,7 @@ func ZendAssignOpOverloadedProperty(
 		if z == &rv {
 			ZvalPtrDtor(&rv)
 		}
-		types.ZVAL_COPY_VALUE(z, value)
+		z.CopyValueFrom(value)
 	}
 	if ZendBinaryOp(&res, z, value, opline) == types.SUCCESS {
 		types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &res, cache_slot)
@@ -122,7 +122,7 @@ func ZendUndefinedOffsetWrite(ht *types.Array, lval ZendLong) int {
 	 * Temporarily increase the refcount to detect this situation. */
 
 	if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-		ht.AddRefcount()
+		// 		ht.AddRefcount()
 	}
 	ZendUndefinedOffset(lval)
 	if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
@@ -139,7 +139,7 @@ func ZendUndefinedIndexWrite(ht *types.Array, offset *types.String) int {
 	 * Temporarily increase the refcount to detect this situation. */
 
 	if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-		ht.AddRefcount()
+		// 		ht.AddRefcount()
 	}
 	ZendUndefinedIndex(offset)
 	if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
@@ -197,7 +197,7 @@ func SlowIndexConvertEx(ht *types.Array, dim *types.Zval, executeData *ZendExecu
 		/* The array may be destroyed while throwing the notice.
 		 * Temporarily increase the refcount to detect this situation. */
 		if (ht.GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
-			ht.AddRefcount()
+			// 			ht.AddRefcount()
 		}
 		ZVAL_UNDEFINED_OP2(executeData)
 		if (ht.GetGcFlags()&types.IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
@@ -359,7 +359,7 @@ func ZendFetchDimensionAddress(
 	var retval *types.Zval
 	if container.IsArray() {
 	try_array:
-		types.SEPARATE_ARRAY(container)
+		types.SeparateArray(container)
 	fetch_from_array:
 		if dim == nil {
 			retval = container.Array().NextIndexInsert(EG__().GetUninitializedZval())

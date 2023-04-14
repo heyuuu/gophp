@@ -393,7 +393,7 @@ func ConvertObjectToType(op *types.Zval, dst *types.Zval, ctype int, conv_func f
 	} else if types.Z_OBJ_HT_P(op).GetGet() != nil {
 		var newop *types.Zval = types.Z_OBJ_HT_P(op).GetGet()(op, dst)
 		if newop.GetType() != types.IS_OBJECT {
-			types.ZVAL_COPY_VALUE(dst, newop)
+			dst.CopyValueFrom(newop)
 			conv_func(dst)
 		}
 	}
@@ -995,7 +995,7 @@ func AddFunctionArray(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 	if result != op1 {
 		result.SetArray(types.ZendArrayDup(op1.Array()))
 	} else {
-		types.SEPARATE_ARRAY(result)
+		types.SeparateArray(result)
 	}
 	types.ZendHashMerge(result.Array(), op2.Array(), ZvalAddRef, 0)
 }
@@ -1034,7 +1034,7 @@ func AddFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = AddFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -1111,7 +1111,7 @@ func SubFunctionSlow(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = SubFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -1190,7 +1190,7 @@ func MulFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					var ret int
 					var rv types.Zval
 					var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-					objval.TryAddRefcount()
+					// objval.TryAddRefcount()
 					ret = MulFunction(objval, objval, op2)
 					types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 					ZvalPtrDtor(objval)
@@ -1293,7 +1293,7 @@ func PowFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					var ret int
 					var rv types.Zval
 					var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-					objval.TryAddRefcount()
+					// objval.TryAddRefcount()
 					ret = PowFunction(objval, objval, op2)
 					types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 					ZvalPtrDtor(objval)
@@ -1405,7 +1405,7 @@ func DivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 					var ret int
 					var rv types.Zval
 					var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-					objval.TryAddRefcount()
+					// objval.TryAddRefcount()
 					ret = DivFunction(objval, objval, op2)
 					types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 					ZvalPtrDtor(objval)
@@ -1457,7 +1457,7 @@ func ModFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = ModFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -1553,7 +1553,7 @@ func BooleanXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = BooleanXorFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -1669,7 +1669,7 @@ func BitwiseOrFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 			var ret int
 			var rv types.Zval
 			var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-			objval.TryAddRefcount()
+			// objval.TryAddRefcount()
 			ret = BitwiseOrFunction(objval, objval, op2)
 			types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 			ZvalPtrDtor(objval)
@@ -1732,7 +1732,7 @@ func BitwiseAndFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			var ret int
 			var rv types.Zval
 			var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-			objval.TryAddRefcount()
+			// objval.TryAddRefcount()
 			ret = BitwiseAndFunction(objval, objval, op2)
 			types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 			ZvalPtrDtor(objval)
@@ -1795,7 +1795,7 @@ func BitwiseXorFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 			var ret int
 			var rv types.Zval
 			var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-			objval.TryAddRefcount()
+			// objval.TryAddRefcount()
 			ret = BitwiseXorFunction(objval, objval, op2)
 			types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 			ZvalPtrDtor(objval)
@@ -1851,7 +1851,7 @@ func ShiftLeftFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = ShiftLeftFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -1944,7 +1944,7 @@ func ShiftRightFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) in
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = ShiftRightFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -2036,7 +2036,7 @@ func ConcatFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				var ret int
 				var rv types.Zval
 				var objval *types.Zval = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-				objval.TryAddRefcount()
+				// objval.TryAddRefcount()
 				ret = ConcatFunction(objval, objval, op2)
 				types.Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
@@ -2595,7 +2595,7 @@ try_again:
 			var rv types.Zval
 			var val *types.Zval
 			val = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-			val.TryAddRefcount()
+			// val.TryAddRefcount()
 			IncrementFunction(val)
 			types.Z_OBJ_HT(*op1).GetSet()(op1, val)
 			ZvalPtrDtor(val)
@@ -2651,7 +2651,7 @@ try_again:
 			var rv types.Zval
 			var val *types.Zval
 			val = types.Z_OBJ_HT(*op1).GetGet()(op1, &rv)
-			val.TryAddRefcount()
+			// val.TryAddRefcount()
 			DecrementFunction(val)
 			types.Z_OBJ_HT(*op1).GetSet()(op1, val)
 			ZvalPtrDtor(val)

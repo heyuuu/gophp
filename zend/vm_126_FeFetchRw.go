@@ -182,12 +182,12 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		if variable_ptr != value {
 			var ref *types.ZendReference
 			ref = value.Reference()
-			ref.AddRefcount()
+			// 			ref.AddRefcount()
 			IZvalPtrDtor(variable_ptr)
 			variable_ptr.SetReference(ref)
 		}
 	} else {
-		value.AddRefcount()
+		// 		value.AddRefcount()
 		opline.Op2().SetReference(value.Reference())
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

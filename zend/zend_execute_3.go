@@ -282,7 +282,7 @@ func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *Zend
 		var_ptr.SetLong(val)
 	} else if ZendVerifyRefAssignableZval(ref, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(var_ptr)
-		types.ZVAL_COPY_VALUE(var_ptr, copy)
+		var_ptr.CopyValueFrom(copy)
 		copy.SetUndef()
 	} else if copy == &tmp {
 		ZvalPtrDtor(&tmp)
@@ -304,7 +304,7 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy 
 		var_ptr.SetLong(val)
 	} else if ZendVerifyPropertyType(prop_info, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
 		ZvalPtrDtor(var_ptr)
-		types.ZVAL_COPY_VALUE(var_ptr, copy)
+		var_ptr.CopyValueFrom(copy)
 		copy.SetUndef()
 	} else if copy == &tmp {
 		ZvalPtrDtor(&tmp)
@@ -384,7 +384,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	var z *types.Zval
 	var z_copy types.Zval
 	obj.SetObject(object.Object())
-	obj.AddRefcount()
+	// 	obj.AddRefcount()
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.Object())
@@ -397,7 +397,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 		if z == &rv {
 			ZvalPtrDtor(&rv)
 		}
-		types.ZVAL_COPY_VALUE(z, value)
+		z.CopyValueFrom(value)
 	}
 	types.ZVAL_COPY_DEREF(&z_copy, z)
 	types.ZVAL_COPY(opline.Result(), &z_copy)

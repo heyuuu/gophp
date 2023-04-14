@@ -16,7 +16,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -95,7 +95,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -178,7 +178,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -261,7 +261,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -341,7 +341,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExec
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -421,7 +421,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -505,7 +505,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -589,7 +589,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -668,7 +668,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
@@ -676,7 +676,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExec
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 		}
@@ -743,7 +743,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			{
 				value = types.ZVAL_DEREF(value)
@@ -754,7 +754,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecut
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 
@@ -826,7 +826,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			{
 				value = types.ZVAL_DEREF(value)
@@ -837,7 +837,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 
@@ -909,7 +909,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			{
 				value = types.ZVAL_DEREF(value)
@@ -920,7 +920,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecute
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 
@@ -988,7 +988,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteD
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -1064,7 +1064,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteDat
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -1144,7 +1144,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteDat
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -1224,7 +1224,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -1299,7 +1299,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(executeData *ZendExecut
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -1373,7 +1373,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(executeData *ZendExecuteD
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -1451,7 +1451,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExecuteD
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -1529,7 +1529,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(executeData *ZendExecuteDa
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Const2()
@@ -1604,7 +1604,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -1680,7 +1680,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -1760,7 +1760,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -1840,7 +1840,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2Ptr(&free_op2)
@@ -1915,7 +1915,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			variable_ptr = object_ptr.Array().NextIndexInsert(value)
 			if variable_ptr == nil {
@@ -1923,7 +1923,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(executeData *ZendExecu
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 		}
@@ -1985,7 +1985,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			{
 				value = types.ZVAL_DEREF(value)
@@ -1996,7 +1996,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(executeData *ZendExecute
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 
@@ -2063,7 +2063,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			{
 				value = types.ZVAL_DEREF(value)
@@ -2074,7 +2074,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 
@@ -2141,7 +2141,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 		{
 			{
 				value = types.ZVAL_DEREF(value)
@@ -2152,7 +2152,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(executeData *ZendExecuteD
 				goto assign_dim_error
 			} else {
 
-				value.TryAddRefcount()
+				// value.TryAddRefcount()
 
 			}
 
@@ -2215,7 +2215,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(executeData *ZendExecuteDa
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = RT_CONSTANT(opline+1, (opline + 1).GetOp1())
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -2286,7 +2286,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(executeData *ZendExecuteData
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrTmp((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -2361,7 +2361,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecuteData
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = _getZvalPtrVar((opline + 1).GetOp1().GetVar(), &free_op_data, executeData)
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()
@@ -2436,7 +2436,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(executeData *ZendExecuteData)
 	if object_ptr.IsArray() {
 	try_assign_dim_array:
 		value = opline.Offset(1).Cv1OrUndef()
-		types.SEPARATE_ARRAY(object_ptr)
+		types.SeparateArray(object_ptr)
 
 		{
 			dim = opline.Op2()

@@ -13,7 +13,7 @@ func ZEND_THROW_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	}
 	faults.ExceptionSave()
 	{
-		value.TryAddRefcount()
+		// value.TryAddRefcount()
 	}
 	faults.ThrowExceptionObject(value)
 	faults.ExceptionRestore()

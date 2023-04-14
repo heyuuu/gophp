@@ -64,12 +64,12 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 
 					regentry = _z.Ptr()
 					if regentry.GetPtr() == le.GetPtr() {
-						regentry.AddRefcount()
+						// 						regentry.AddRefcount()
 						stream.SetRes(regentry)
 						return core.PHP_STREAM_PERSISTENT_SUCCESS
 					}
 				}
-				le.AddRefcount()
+				// 				le.AddRefcount()
 				stream.SetRes(zend.ZendRegisterResource(*stream, LePstream))
 			}
 			return core.PHP_STREAM_PERSISTENT_SUCCESS
@@ -446,7 +446,7 @@ func PhpStreamContextSet(stream *core.PhpStream, context *core.PhpStreamContext)
 	var oldcontext *core.PhpStreamContext = core.PHP_STREAM_CONTEXT(stream)
 	if context != nil {
 		stream.SetCtx(context.GetRes())
-		context.GetRes().AddRefcount()
+		//context.GetRes().AddRefcount()
 	} else {
 		stream.SetCtx(nil)
 	}
@@ -507,15 +507,15 @@ func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername strin
 func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *types.Zval) int {
 	var wrapperhash *types.Zval
 	var category types.Zval
-	types.SEPARATE_ARRAY(context.GetOptions())
+	types.SeparateArray(context.GetOptions())
 	wrapperhash = context.GetOptions().Array().KeyFind(b.CastStrAuto(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
 		wrapperhash = context.GetOptions().Array().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
 	}
 	optionvalue = types.ZVAL_DEREF(optionvalue)
-	optionvalue.TryAddRefcount()
-	types.SEPARATE_ARRAY(wrapperhash)
+	//optionvalue.TryAddRefcount()
+	types.SeparateArray(wrapperhash)
 	wrapperhash.Array().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
 	return types.SUCCESS
 }

@@ -154,7 +154,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		var gc *types.ZendRefcounted = value.GetCounted()
 		types.ZVAL_COPY_VALUE_EX(res, value, gc, value_type)
 		if types.Z_TYPE_INFO_REFCOUNTED(value_type) {
-			gc.AddRefcount()
+			// 			gc.AddRefcount()
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

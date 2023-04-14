@@ -272,8 +272,7 @@ func PhpAutoGlobalsCreateGlobals(name *types.String) types.ZendBool {
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
-	globals.SetArray(EG__().GetSymbolTable())
-	globals.SetTypeFlags(0)
+	globals.SetImmutableArray(EG__().GetSymbolTable())
 	globals.SetNewRef(&globals)
 	EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
 	return 0

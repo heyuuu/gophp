@@ -33,7 +33,7 @@ func ObjectPropertiesInitEx(object *types.ZendObject, properties *types.Array) {
 					}
 					types.ZVAL_COPY_VALUE(slot, &tmp)
 				} else {
-					types.ZVAL_COPY_VALUE(slot, prop)
+					slot.CopyValueFrom(prop)
 				}
 				prop.SetIndirect(slot)
 			}
@@ -78,7 +78,7 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
 				var slot *types.Zval = OBJ_PROP(object, property_info.GetOffset())
 				ZvalPtrDtor(slot)
-				types.ZVAL_COPY_VALUE(slot, prop)
+				slot.CopyValueFrom(prop)
 				ZvalAddRef(slot)
 				if object.GetProperties() != nil {
 					tmp.SetIndirect(slot)
@@ -323,7 +323,7 @@ func ArraySetZvalKey(ht *types.Array, key *types.Zval, value *types.Zval) int {
 		result = nil
 	}
 	if result != nil {
-		result.TryAddRefcount()
+		// result.TryAddRefcount()
 		return types.SUCCESS
 	} else {
 		return types.FAILURE

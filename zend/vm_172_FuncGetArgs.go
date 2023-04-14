@@ -34,7 +34,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
 
-					q.TryAddRefcount()
+					// q.TryAddRefcount()
 
 					fillScope.FillSet(q)
 				} else {
@@ -56,7 +56,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) 
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
 
-				q.TryAddRefcount()
+				// q.TryAddRefcount()
 
 				fillScope.FillSet(q)
 			} else {
@@ -101,7 +101,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 				if !q.IsUndef() {
 					q = types.ZVAL_DEREF(q)
 
-					q.TryAddRefcount()
+					// q.TryAddRefcount()
 
 					fillScope.FillSet(q)
 				} else {
@@ -123,7 +123,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData)
 			if !q.IsUndef() {
 				q = types.ZVAL_DEREF(q)
 
-				q.TryAddRefcount()
+				// q.TryAddRefcount()
 
 				fillScope.FillSet(q)
 			} else {

@@ -474,7 +474,7 @@ func PhpTcpSockopAccept(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xp
 		if xparam.GetClient() != nil {
 			xparam.GetClient().SetCtx(stream.GetCtx())
 			if stream.GetCtx() != nil {
-				stream.GetCtx().AddRefcount()
+				//stream.GetCtx().AddRefcount()
 			}
 		}
 	}

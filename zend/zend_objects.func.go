@@ -112,7 +112,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 
 			}
 		}
-		object.AddRefcount()
+		// 		object.AddRefcount()
 
 		/* Make sure that destructors are protected from previously thrown exceptions.
 		 * For example, if an exception was thrown in a function and when the function's
@@ -234,7 +234,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		var fci types.ZendFcallInfo
 		var fcic types.ZendFcallInfoCache
 		var ret types.Zval
-		new_object.AddRefcount()
+		// 		new_object.AddRefcount()
 		ret.SetUndef()
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(new_object)

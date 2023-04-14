@@ -12,7 +12,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData) int {
 		var_ = opline.Const2()
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 
-		var_.TryAddRefcount()
+		// var_.TryAddRefcount()
 
 	}
 

@@ -12,9 +12,9 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	array_ptr = opline.Const1()
 	if array_ptr.IsArray() {
 		result = opline.Result()
-		types.ZVAL_COPY_VALUE(result, array_ptr)
+		result.CopyValueFrom(array_ptr)
 		if result.IsRefcounted() {
-			array_ptr.AddRefcount()
+			// 			array_ptr.AddRefcount()
 		}
 		result.SetFePos(0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -33,7 +33,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	array_ptr = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if array_ptr.IsArray() {
 		result = opline.Result()
-		types.ZVAL_COPY_VALUE(result, array_ptr)
+		result.CopyValueFrom(array_ptr)
 		result.SetFePos(0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if array_ptr.IsObject() {
@@ -47,7 +47,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = opline.Result()
-			types.ZVAL_COPY_VALUE(result, array_ptr)
+			result.CopyValueFrom(array_ptr)
 			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
@@ -81,7 +81,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	array_ptr = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if array_ptr.IsArray() {
 		result = opline.Result()
-		types.ZVAL_COPY_VALUE(result, array_ptr)
+		result.CopyValueFrom(array_ptr)
 		result.SetFePos(0)
 		ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -96,7 +96,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = opline.Result()
-			types.ZVAL_COPY_VALUE(result, array_ptr)
+			result.CopyValueFrom(array_ptr)
 			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				ZvalPtrDtorNogc(free_op1)
@@ -131,7 +131,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	array_ptr = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), executeData)
 	if array_ptr.IsArray() {
 		result = opline.Result()
-		types.ZVAL_COPY_VALUE(result, array_ptr)
+		result.CopyValueFrom(array_ptr)
 		result.SetFePos(0)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else if array_ptr.IsObject() {
@@ -145,7 +145,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			}
 			properties = types.Z_OBJPROP_P(array_ptr)
 			result = opline.Result()
-			types.ZVAL_COPY_VALUE(result, array_ptr)
+			result.CopyValueFrom(array_ptr)
 			if properties.Len() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))

@@ -18,7 +18,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				for {
 					ZendVerifyVariadicArgType(executeData.GetFunc(), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
 
-					param.TryAddRefcount()
+					// param.TryAddRefcount()
 
 					fillScope.FillSet(param)
 					fillScope.FillNext()
@@ -30,7 +30,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			} else {
 				for {
 
-					param.TryAddRefcount()
+					// param.TryAddRefcount()
 
 					fillScope.FillSet(param)
 					fillScope.FillNext()

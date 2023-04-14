@@ -18,15 +18,15 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if varptr.IsReference() {
 		var ref *types.ZendRefcounted = varptr.RefCounted()
 		varptr = types.Z_REFVAL_P(varptr)
-		types.ZVAL_COPY_VALUE(arg, varptr)
+		arg.CopyValueFrom(varptr)
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else {
-			arg.TryAddRefcount()
+			// arg.TryAddRefcount()
 		}
 
 	} else {
-		types.ZVAL_COPY_VALUE(arg, varptr)
+		arg.CopyValueFrom(varptr)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

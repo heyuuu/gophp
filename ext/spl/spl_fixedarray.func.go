@@ -89,7 +89,7 @@ func SplFixedarrayObjectGetProperties(obj *types.Zval) *types.Array {
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				ht.IndexUpdate(i, intern.GetArray().GetElements()[i])
-				intern.GetArray().GetElements()[i].TryAddRefcount()
+				//intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
 				ht.IndexUpdate(i, zend.EG__().GetUninitializedZval())
 			}
@@ -236,7 +236,7 @@ func SplFixedarrayObjectReadDimension(object *types.Zval, offset *types.Zval, ty
 			tmp.SetNull()
 			offset = &tmp
 		} else {
-			types.SEPARATE_ARG_IF_REF(offset)
+			offset = types.SEPARATE_ARG_IF_REF(offset)
 		}
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetGet(), "offsetGet", rv, offset)
 		zend.ZvalPtrDtor(offset)
@@ -284,9 +284,9 @@ func SplFixedarrayObjectWriteDimension(object *types.Zval, offset *types.Zval, v
 			tmp.SetNull()
 			offset = &tmp
 		} else {
-			types.SEPARATE_ARG_IF_REF(offset)
+			offset = types.SEPARATE_ARG_IF_REF(offset)
 		}
-		types.SEPARATE_ARG_IF_REF(value)
+		value = types.SEPARATE_ARG_IF_REF(value)
 		zend.ZendCallMethodWith2Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetSet(), "offsetSet", nil, offset, value)
 		zend.ZvalPtrDtor(value)
 		zend.ZvalPtrDtor(offset)
@@ -313,7 +313,7 @@ func SplFixedarrayObjectUnsetDimension(object *types.Zval, offset *types.Zval) {
 	var intern *SplFixedarrayObject
 	intern = Z_SPLFIXEDARRAY_P(object)
 	if intern.GetFptrOffsetDel() != nil {
-		types.SEPARATE_ARG_IF_REF(offset)
+		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetDel(), "offsetUnset", nil, offset)
 		zend.ZvalPtrDtor(offset)
 		return
@@ -351,7 +351,7 @@ func SplFixedarrayObjectHasDimension(object *types.Zval, offset *types.Zval, che
 	if intern.GetFptrOffsetHas() != nil {
 		var rv types.Zval
 		var result types.ZendBool
-		types.SEPARATE_ARG_IF_REF(offset)
+		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
 		zend.ZvalPtrDtor(offset)
 		result = zend.ZendIsTrue(&rv)
@@ -452,7 +452,7 @@ func zim_spl_SplFixedArray_toArray(executeData *zend.ZendExecuteData, return_val
 		for ; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				return_value.Array().IndexUpdate(i, intern.GetArray().GetElements()[i])
-				intern.GetArray().GetElements()[i].TryAddRefcount()
+				//intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
 				return_value.Array().IndexUpdate(i, zend.EG__().GetUninitializedZval())
 			}
@@ -706,7 +706,7 @@ func SplFixedarrayGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_fixedarray_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	object.AddRefcount()
+	// 	object.AddRefcount()
 	iterator.GetIntern().GetIt().GetData().SetObject(object.Object())
 	iterator.GetIntern().GetIt().SetFuncs(&SplFixedarrayItFuncs)
 	iterator.GetIntern().SetCe(ce)

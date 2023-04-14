@@ -179,7 +179,7 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 		if description == nil {
 			faults.ThrowException(AssertionErrorCe, nil, faults.E_ERROR)
 		} else if description.IsType(types.IS_OBJECT) && zend.InstanceofFunction(types.Z_OBJCE_P(description), faults.ZendCeThrowable) != 0 {
-			description.AddRefcount()
+			// 			description.AddRefcount()
 			faults.ThrowExceptionObject(description)
 		} else {
 			var str *types.String = zend.ZvalGetString(description)
