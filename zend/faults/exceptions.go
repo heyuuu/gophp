@@ -210,8 +210,8 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	var base_ce *types.ClassEntry
 	var filename *types.String
 	object = zend.ZendObjectsNew(class_type)
-	obj.SetObj(object)
-	types.Z_OBJ_HT(obj) = &DefaultExceptionHandlers
+	object.SetHandlers(&DefaultExceptionHandlers)
+	obj.SetObject(object)
 	zend.ObjectPropertiesInit(object, class_type)
 	if zend.CurrEX() != nil {
 		zend.ZendFetchDebugBacktrace(&trace, skip_top_traces, b.Cond(zend.EG__().GetExceptionIgnoreArgs() != 0, zend.DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
@@ -421,7 +421,7 @@ func traceAppendKey(ht *types.Array, key string) string {
 			Error(E_WARNING, "Value for %s is no string", key)
 			return "[unknown]"
 		} else {
-			return tmp.GetStrVal()
+			return tmp.StringVal()
 		}
 	}
 }

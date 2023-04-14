@@ -11,10 +11,10 @@ func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData)
 	if fbc == nil {
 		func_name = (*types.Zval)(opline.Const2())
 		var func_name_1 *types.Zval = func_name + 1
-		fbc = EG__().FunctionTable().Get(func_name_1.GetStrVal())
+		fbc = EG__().FunctionTable().Get(func_name_1.StringVal())
 		if fbc == nil {
 			var func_name_2 *types.Zval = func_name + 2
-			fbc = EG__().FunctionTable().Get(func_name_2.GetStrVal())
+			fbc = EG__().FunctionTable().Get(func_name_2.StringVal())
 			if fbc == nil {
 				return zend_undefined_function_helper_SPEC(executeData)
 			}

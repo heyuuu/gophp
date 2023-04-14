@@ -1327,7 +1327,7 @@ func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTick
 	var func2 *types.Zval = tick_fe2.GetArguments()[0]
 	var ret bool
 	if func1.IsType(types.IS_STRING) && func2.IsType(types.IS_STRING) {
-		ret = func1.GetStrVal() == func2.GetStrVal()
+		ret = func1.StringVal() == func2.StringVal()
 	} else if func1.IsType(types.IS_ARRAY) && func2.IsType(types.IS_ARRAY) {
 		ret = zend.ZendCompareArrays(func1, func2) == 0
 	} else if func1.IsType(types.IS_OBJECT) && func2.IsType(types.IS_OBJECT) {
@@ -2054,7 +2054,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 
 		}
 		if !(arg1.String().GetLen() > 1 && arg1.String().GetVal()[0] == '0') && zend.IsNumericString(arg1.String().GetStr(), nil, nil, 0) == types.IS_LONG {
-			var key = zend.StrToLongWithUnit(arg1.GetStrVal())
+			var key = zend.StrToLongWithUnit(arg1.StringVal())
 			if b.Assign(&find_hash, arr.Array().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.Array().IndexAddNew(key, &hash)

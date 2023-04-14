@@ -133,7 +133,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 			/* Store in active hash */
 
 			entry = active_hash.KeyUpdate(arg1.String().GetStr(), arg2)
-			entry.SetStr(entry.String().Copy())
+			entry.SetStringVal(entry.StringVal())
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -166,7 +166,7 @@ func PhpIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, callba
 		} else {
 			entry = find_arr.Array().NextIndexInsert(arg2)
 		}
-		entry.SetStr(entry.String().Copy())
+		entry.SetStringVal(entry.StringVal())
 	case zend.ZEND_INI_PARSER_SECTION:
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_SECTION: %s\n",Z_STRVAL_P(arg1)); */

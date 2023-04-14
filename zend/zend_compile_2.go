@@ -472,7 +472,7 @@ func ZendCompileSimpleVarNoCv(result *Znode, ast *ZendAst, type_ uint32, delayed
 func IsThisFetch(ast *ZendAst) bool {
 	if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL {
 		var name *types.Zval = ZendAstGetZval(ast.GetChild()[0])
-		return name.IsString() && name.GetStrVal() == "this"
+		return name.IsString() && name.StringVal() == "this"
 	}
 	return false
 }

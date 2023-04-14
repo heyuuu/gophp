@@ -11,7 +11,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
-		var rtd_key string = opline.Const1().GetStrVal()
+		var rtd_key string = opline.Const1().StringVal()
 
 		ce = EG__().ClassTable().Get(rtd_key)
 		if ce == nil {

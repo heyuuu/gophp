@@ -182,7 +182,7 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 	lde.SetModuleNumber(module_number)
 	lde.SetResourceId(ListDestructors.GetNNextFreeElement())
 	lde.SetTypeName(type_name)
-	zv.SetAsPtr(lde)
+	zv.SetPtr(lde)
 	if ListDestructors.NextIndexInsert(&zv) == nil {
 		return types.FAILURE
 	}

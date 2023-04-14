@@ -98,7 +98,7 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	ref.SetRefcount(refcount)
 	z.SetReference(ref)
 }
-func ZVAL_PTR(z *Zval, p any)            { z.SetAsPtr(p) }
+func ZVAL_PTR(z *Zval, p any)            { z.SetPtr(p) }
 func Z_REFCOUNT_P(pz *Zval) uint32       { return pz.GetRefcount() }
 func Z_ADDREF_P(pz *Zval) uint32         { return pz.AddRefcount() }
 func Z_DELREF_P(pz *Zval) uint32         { return pz.DelRefcount() }

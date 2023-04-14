@@ -84,7 +84,7 @@ again:
 		core.PhpPrintf("%sfloat(%.*G)\n", common, int(zend.EG__().GetPrecision()), struc.Double())
 	case types.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", common, struc.String().GetLen())
-		core.PhpOutputWrite(struc.GetStrVal())
+		core.PhpOutputWrite(struc.StringVal())
 		core.PUTS("\"\n")
 	case types.IS_ARRAY:
 		myht := struc.Array()
@@ -397,7 +397,7 @@ again:
 			buf.AppendString(".0")
 		}
 	case types.IS_STRING:
-		ztmp := str.PhpAddcslashes(struc.GetStrVal(), "'\\")
+		ztmp := str.PhpAddcslashes(struc.StringVal(), "'\\")
 		ztmp2 := strings.ReplaceAll(ztmp, "0", "' . \"\\0\" . '")
 		buf.AppendByte('\'')
 		buf.AppendString(ztmp2)

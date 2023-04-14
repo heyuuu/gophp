@@ -100,7 +100,7 @@ func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) in
 
 		var defaultValue *types.Zval = ZendGetConfigurationDirective(p.GetName())
 		if defaultValue != nil && p.EmitOnModify(defaultValue.String(), ZEND_INI_STAGE_STARTUP) {
-			p.SetValue(types.NewString(defaultValue.GetStrVal()))
+			p.SetValue(types.NewString(defaultValue.StringVal()))
 		} else {
 			p.SetValueStr(iniEntryDef.GetValueStr())
 			p.EmitOnModify(p.GetValue(), ZEND_INI_STAGE_STARTUP)

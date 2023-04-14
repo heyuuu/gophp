@@ -61,7 +61,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 
 			var fast_call *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyEnd()].op1.var_)
 			CleanupLiveVars(executeData, op_num, try_catch.GetFinallyOp())
-			fast_call.SetObj(EG__().GetException())
+			fast_call.SetObject(EG__().GetException())
 			EG__().SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
 			return ZEND_VM_JMP_EX(executeData, executeData.GetFunc().GetOpArray().opcodes[try_catch.GetFinallyOp()], 0)

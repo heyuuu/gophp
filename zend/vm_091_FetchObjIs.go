@@ -113,7 +113,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.StringVal())) {
 							retval = p.GetVal()
 							{
 								goto fetch_obj_is_copy
@@ -255,7 +255,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) i
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.StringVal())) {
 							retval = p.GetVal()
 
 							{
@@ -379,7 +379,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 					var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(prop_offset)
 					if idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket") {
 						var p *types.Bucket = (*types.Bucket)((*byte)(zobj.GetProperties().Bucket(idx)))
-						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.GetStrVal())) {
+						if p.GetVal().IsNotUndef() && (p.GetKey() == offset.String() || (p.IsStrKey() && p.StrKey() == offset.StringVal())) {
 							retval = p.GetVal()
 							{
 								goto fetch_obj_is_copy

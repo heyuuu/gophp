@@ -11,7 +11,7 @@ func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) in
 	if fbc == nil {
 		function_name = (*types.Zval)(opline.Const2())
 		var function_name_1 *types.Zval = function_name + 1
-		fbc = EG__().FunctionTable().Get(function_name_1.GetStrVal())
+		fbc = EG__().FunctionTable().Get(function_name_1.StringVal())
 		if fbc == nil {
 			return zend_undefined_function_helper_SPEC(executeData)
 		}

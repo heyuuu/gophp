@@ -143,31 +143,31 @@ func DoBindFunction(lcname *types.Zval) int {
 		return types.FAILURE
 	}
 
-	if EG__().FunctionTable().Exists(lcname.GetStrVal()) {
+	if EG__().FunctionTable().Exists(lcname.StringVal()) {
 		DoBindFunctionError(lcname.String(), function.GetOpArray(), 0)
 		return types.FAILURE
 	}
 
 	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
-		EG__().FunctionTable().Add(lcname.GetStrVal(), function)
+		EG__().FunctionTable().Add(lcname.StringVal(), function)
 	} else {
-		EG__().FunctionTable().Del(rtd_key.GetStrVal())
-		EG__().FunctionTable().Add(lcname.GetStrVal(), function)
+		EG__().FunctionTable().Del(rtd_key.StringVal())
+		EG__().FunctionTable().Add(lcname.StringVal(), function)
 	}
 	return types.SUCCESS
 }
 func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 	var rtd_key *types.Zval = lcname + 1
 
-	ce := EG__().ClassTable().Get(rtd_key.GetStrVal())
+	ce := EG__().ClassTable().Get(rtd_key.StringVal())
 	if ce == nil {
-		if EG__().ClassTable().Exists(lcname.GetStrVal()) {
+		if EG__().ClassTable().Exists(lcname.StringVal()) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 			return types.FAILURE
 		} else {
 			b.Assert(CurrEX().GetFunc().GetOpArray().IsPreloaded())
 			if ZendPreloadAutoload != nil && ZendPreloadAutoload(CurrEX().GetFunc().GetOpArray().GetFilename()) == types.SUCCESS {
-				ce = EG__().ClassTable().Get(rtd_key.GetStrVal())
+				ce = EG__().ClassTable().Get(rtd_key.StringVal())
 				if ce != nil {
 					goto afterGetCe
 				}
@@ -178,7 +178,7 @@ func DoBindClass(lcname *types.Zval, lc_parent_name *types.String) int {
 	}
 afterGetCe:
 
-	if EG__().ClassTable().Exists(lcname.GetStrVal()) {
+	if EG__().ClassTable().Exists(lcname.StringVal()) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 		return types.FAILURE
 	}
@@ -187,8 +187,8 @@ afterGetCe:
 		return types.FAILURE
 	}
 
-	EG__().ClassTable().Del(rtd_key.GetStrVal())
-	EG__().ClassTable().Add(lcname.GetStrVal(), ce)
+	EG__().ClassTable().Del(rtd_key.StringVal())
+	EG__().ClassTable().Add(lcname.StringVal(), ce)
 
 	return types.SUCCESS
 }

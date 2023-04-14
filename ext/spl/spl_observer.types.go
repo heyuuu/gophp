@@ -85,15 +85,5 @@ type spl_SplObjectStorageElement struct {
 	inf types.Zval
 }
 
-// func Makespl_SplObjectStorageElement(obj zend.Zval, inf zend.Zval) spl_SplObjectStorageElement {
-//     return spl_SplObjectStorageElement{
-//         obj:obj,
-//         inf:inf,
-//     }
-// }
 func (this *spl_SplObjectStorageElement) GetObj() types.Zval { return this.obj }
-
-// func (this *spl_SplObjectStorageElement) SetObj(value zend.Zval) { this.obj = value }
 func (this *spl_SplObjectStorageElement) GetInf() types.Zval { return this.inf }
-
-// func (this *spl_SplObjectStorageElement) SetInf(value zend.Zval) { this.inf = value }

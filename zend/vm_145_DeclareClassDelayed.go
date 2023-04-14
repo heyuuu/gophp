@@ -14,8 +14,8 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(executeData *ZendExecut
 		lcname = opline.Const1()
 		var lcname1 *types.Zval = lcname + 1
 
-		lcnameStr := lcname.GetStrVal()
-		lcname1Str := lcname1.GetStrVal()
+		lcnameStr := lcname.StringVal()
+		lcname1Str := lcname1.StringVal()
 
 		if EG__().ClassTable().Exists(lcname1Str) {
 			ce = EG__().ClassTable().Get(lcname1Str)

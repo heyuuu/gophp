@@ -103,7 +103,7 @@ func ZvalGetDouble(op *types.Zval) float64 {
 
 func ZvalGetStrVal(op *types.Zval) string {
 	if op.IsString() {
-		return op.GetStrVal()
+		return op.StringVal()
 	} else {
 		zstr := ZvalGetStringFunc(op)
 		if zstr == nil {
@@ -211,7 +211,7 @@ again:
 	case types.IS_DOUBLE:
 		return op.Double() != 0
 	case types.IS_STRING:
-		str := op.GetStrVal()
+		str := op.StringVal()
 		return str != "" && str != "0"
 	case types.IS_ARRAY:
 		return op.Array().Len() != 0
@@ -456,7 +456,7 @@ func _zendiConvertScalarToNumberEx(op *types.Zval, holder *types.Zval, silent ty
 		} else {
 			mode = ConvertNoticeOnErrors
 		}
-		r := ConvertNumericStr(op.GetStrVal(), mode)
+		r := ConvertNumericStr(op.StringVal(), mode)
 		switch r.Type {
 		case types.IS_LONG:
 			holder.SetLong(r.Lval)
@@ -2297,18 +2297,18 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 			}))
 			return types.SUCCESS
 		case TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
-			result.SetDval(op1.Double() - float64(op2.Long()))
+			result.SetDouble(op1.Double() - float64(op2.Long()))
 			result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
 		case TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE):
-			result.SetDval(float64(op1.Long() - op2.Double()))
+			result.SetDouble(float64(op1.Long() - op2.Double()))
 			result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
 			return types.SUCCESS
 		case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE):
 			if op1.Double() == op2.Double() {
 				result.SetLong(0)
 			} else {
-				result.SetDval(op1.Double() - op2.Double())
+				result.SetDouble(op1.Double() - op2.Double())
 				result.SetLong(ZEND_NORMALIZE_BOOL(result.Double()))
 			}
 			return types.SUCCESS
@@ -2337,7 +2337,7 @@ func CompareFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 				result.SetLong(0)
 				return types.SUCCESS
 			}
-			result.SetLong(ZendiSmartStrcmp(op1.GetStrVal(), op2.GetStrVal()))
+			result.SetLong(ZendiSmartStrcmp(op1.StringVal(), op2.StringVal()))
 			return types.SUCCESS
 		case TYPE_PAIR(types.IS_NULL, types.IS_STRING):
 			result.SetLong(b.Cond(op2.String().GetLen() == 0, 0, -1))
@@ -2492,7 +2492,7 @@ func ZendIsIdentical(op1 *types.Zval, op2 *types.Zval) bool {
 	case types.IS_DOUBLE:
 		return op1.Double() == op2.Double()
 	case types.IS_STRING:
-		return op1.GetStrVal() == op2.GetStrVal()
+		return op1.StringVal() == op2.StringVal()
 	case types.IS_ARRAY:
 		return op1.Array() == op2.Array() || types.ZendHashCompare(op1.Array(), op2.Array(), types.CompareFuncT(HashZvalIdenticalFunction), 1) == 0
 	case types.IS_OBJECT:
@@ -2579,7 +2579,7 @@ func InstanceofFunction(instance_ce *types.ClassEntry, ce *types.ClassEntry) typ
 }
 func IncrementString(str *types.Zval) {
 	// notice: 前置要求 str 必须是 IS_STRING 类型，且其值不为数字字符串
-	str.SetStringVal(IncrementStringEx(str.GetStrVal()))
+	str.SetStringVal(IncrementStringEx(str.StringVal()))
 }
 
 func IncrementStringEx(str string) string {
@@ -2634,7 +2634,7 @@ try_again:
 	case types.IS_LONG:
 		FastLongIncrementFunction(op1)
 	case types.IS_DOUBLE:
-		op1.SetDval(op1.Double() + 1)
+		op1.SetDouble(op1.Double() + 1)
 	case types.IS_NULL:
 		op1.SetLong(1)
 	case types.IS_STRING:
@@ -2695,7 +2695,7 @@ try_again:
 	case types.IS_LONG:
 		FastLongDecrementFunction(op1)
 	case types.IS_DOUBLE:
-		op1.SetDval(op1.Double() - 1)
+		op1.SetDouble(op1.Double() - 1)
 	case types.IS_STRING:
 		if op1.String().GetLen() == 0 {
 

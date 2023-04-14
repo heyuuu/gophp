@@ -404,14 +404,7 @@ type SplRecursiveItIterator struct {
 	intern zend.ZendObjectIterator
 }
 
-// func MakeSplRecursiveItIterator(intern zend.ZendObjectIterator) SplRecursiveItIterator {
-//     return SplRecursiveItIterator{
-//         intern:intern,
-//     }
-// }
 func (this *SplRecursiveItIterator) GetIntern() zend.ZendObjectIterator { return this.intern }
-
-// func (this *SplRecursiveItIterator) SetIntern(value zend.ZendObjectIterator) { this.intern = value }
 
 /**
  * SplIteratorApplyInfo
@@ -424,25 +417,10 @@ type SplIteratorApplyInfo struct {
 	fcc   types.ZendFcallInfoCache
 }
 
-// func MakeSplIteratorApplyInfo(obj *zend.Zval, args *zend.Zval, count zend.ZendLong, fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) SplIteratorApplyInfo {
-//     return SplIteratorApplyInfo{
-//         obj:obj,
-//         args:args,
-//         count:count,
-//         fci:fci,
-//         fcc:fcc,
-//     }
-// }
-func (this *SplIteratorApplyInfo) GetObj() *types.Zval { return this.obj }
-
-// func (this *SplIteratorApplyInfo) SetObj(value *zend.Zval) { this.obj = value }
-func (this *SplIteratorApplyInfo) GetArgs() *types.Zval         { return this.args }
-func (this *SplIteratorApplyInfo) SetArgs(value *types.Zval)    { this.args = value }
-func (this *SplIteratorApplyInfo) GetCount() zend.ZendLong      { return this.count }
-func (this *SplIteratorApplyInfo) SetCount(value zend.ZendLong) { this.count = value }
-func (this *SplIteratorApplyInfo) GetFci() types.ZendFcallInfo  { return this.fci }
-
-// func (this *SplIteratorApplyInfo) SetFci(value zend.ZendFcallInfo) { this.fci = value }
+func (this *SplIteratorApplyInfo) GetObj() *types.Zval              { return this.obj }
+func (this *SplIteratorApplyInfo) GetArgs() *types.Zval             { return this.args }
+func (this *SplIteratorApplyInfo) SetArgs(value *types.Zval)        { this.args = value }
+func (this *SplIteratorApplyInfo) GetCount() zend.ZendLong          { return this.count }
+func (this *SplIteratorApplyInfo) SetCount(value zend.ZendLong)     { this.count = value }
+func (this *SplIteratorApplyInfo) GetFci() types.ZendFcallInfo      { return this.fci }
 func (this *SplIteratorApplyInfo) GetFcc() types.ZendFcallInfoCache { return this.fcc }
-
-// func (this *SplIteratorApplyInfo) SetFcc(value zend.ZendFcallInfoCache) { this.fcc = value }

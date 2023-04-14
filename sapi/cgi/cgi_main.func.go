@@ -261,7 +261,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *types.Zval) {
 		}
 		if core.PG__().http_globals[core.TRACK_VARS_ENV].GetType() == types.IS_ARRAY && array_ptr.Array() != core.PG__().http_globals[core.TRACK_VARS_ENV].Array() {
 			array_ptr.Array().DestroyEx()
-			array_ptr.SetArr(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].Array()))
+			array_ptr.SetArray(types.ZendArrayDup(core.PG__().http_globals[core.TRACK_VARS_ENV].Array()))
 			return
 		}
 	}

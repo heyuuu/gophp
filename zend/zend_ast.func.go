@@ -1066,7 +1066,7 @@ func ZendAstExportZval(str *SmartStr, zv *types.Zval, priority int, indent int) 
 		str.AppendString(key)
 	case types.IS_STRING:
 		str.AppendByte('\'')
-		ZendAstExportStr(str, zv.GetStrVal())
+		ZendAstExportStr(str, zv.StringVal())
 		str.AppendByte('\'')
 	case types.IS_ARRAY:
 		str.AppendByte('[')

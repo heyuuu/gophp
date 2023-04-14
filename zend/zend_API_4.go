@@ -110,13 +110,11 @@ func _objectAndPropertiesInit(arg *types.Zval, class_type *types.ClassEntry, pro
 			faults.ThrowError(nil, "Cannot instantiate abstract class %s", class_type.GetName().GetVal())
 		}
 		arg.SetNull()
-		arg.SetObj(nil)
 		return types.FAILURE
 	}
 	if !class_type.IsConstantsUpdated() {
 		if ZendUpdateClassConstants(class_type) != types.SUCCESS {
 			arg.SetNull()
-			arg.SetObj(nil)
 			return types.FAILURE
 		}
 	}

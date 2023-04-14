@@ -29,7 +29,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecute
 			}
 		}
 
-		c = ce.ConstantsTable().Get(opline.Const2().GetStrVal())
+		c = ce.ConstantsTable().Get(opline.Const2().StringVal())
 		if c != nil {
 			scope = executeData.GetFunc().GetOpArray().GetScope()
 			if ZendVerifyConstAccess(c, scope) == 0 {

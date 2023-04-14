@@ -197,7 +197,7 @@ func _zendQuickGetConstant(key *types.Zval, flags uint32, check_defined_only int
 						access_key = orig_key + 2
 					}
 				}
-				is_deprecated = types.IntBool(c.GetName().GetStr() != access_key.GetStrVal())
+				is_deprecated = types.IntBool(c.GetName().GetStr() != access_key.StringVal())
 			} else {
 			check_short_name:
 

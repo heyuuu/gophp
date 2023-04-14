@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_FAST_RET_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var fast_call *types.Zval = opline.Op1()
@@ -12,8 +14,8 @@ func ZEND_FAST_RET_SPEC_HANDLER(executeData *ZendExecuteData) int {
 
 	/* special case for unhandled exceptions */
 
-	EG__().SetException(fast_call.GetObj())
-	fast_call.SetObj(nil)
+	EG__().SetException(fast_call.Object())
+	fast_call.SetObject(nil)
 	current_try_catch_offset = opline.GetOp2().GetNum()
 	current_op_num = opline - executeData.GetFunc().GetOpArray().opcodes
 	return zend_dispatch_try_catch_finally_helper_SPEC(current_try_catch_offset, current_op_num, executeData)

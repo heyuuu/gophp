@@ -1578,7 +1578,7 @@ func PhpExtractRefPrefixIfExists(arr *types.Array, symbol_table *types.Array, pr
 			}
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.String().GetVal(), final_name.String().GetLen()) != 0 {
-				if final_name.GetStrVal() == "this" {
+				if final_name.StringVal() == "this" {
 					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
@@ -1636,7 +1636,7 @@ func PhpExtractPrefixIfExists(arr *types.Array, symbol_table *types.Array, prefi
 			}
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.String().GetVal(), final_name.String().GetLen()) != 0 {
-				if final_name.GetStrVal() == "this" {
+				if final_name.StringVal() == "this" {
 					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
@@ -1701,9 +1701,9 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbol_table *types.Array, prefix
 				}
 			}
 		prefix:
-			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
-			if PhpValidVarName(final_name.String().GetVal(), final_name.String().GetLen()) != 0 {
-				if final_name.GetStrVal() == "this" {
+			PhpPrefixVarname(&final_name, prefix, var_name.GetStr(), var_name.GetLen(), 1)
+			if PhpValidVarName(final_name.StringVal(), final_name.String().GetLen()) != 0 {
+				if final_name.StringVal() == "this" {
 					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
@@ -1779,7 +1779,7 @@ func PhpExtractPrefixSame(arr *types.Array, symbol_table *types.Array, prefix *t
 		prefix:
 			PhpPrefixVarname(&final_name, prefix, var_name.GetVal(), var_name.GetLen(), 1)
 			if PhpValidVarName(final_name.String().GetVal(), final_name.String().GetLen()) != 0 {
-				if final_name.GetStrVal() == "this" {
+				if final_name.StringVal() == "this" {
 					faults.ThrowError(nil, "Cannot re-assign $this")
 					return -1
 				} else {
@@ -1846,7 +1846,7 @@ func PhpExtractRefPrefixAll(arr *types.Array, symbol_table *types.Array, prefix 
 			// types.ZendStringReleaseEx(str, 0)
 		}
 		if PhpValidVarName(final_name.String().GetVal(), final_name.String().GetLen()) != 0 {
-			if final_name.GetStrVal() == "this" {
+			if final_name.StringVal() == "this" {
 				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
@@ -1901,7 +1901,7 @@ func PhpExtractPrefixAll(arr *types.Array, symbol_table *types.Array, prefix *ty
 			// types.ZendStringReleaseEx(str, 0)
 		}
 		if PhpValidVarName(final_name.String().GetVal(), final_name.String().GetLen()) != 0 {
-			if final_name.GetStrVal() == "this" {
+			if final_name.StringVal() == "this" {
 				faults.ThrowError(nil, "Cannot re-assign $this")
 				return -1
 			} else {
@@ -1964,7 +1964,7 @@ func PhpExtractRefPrefixInvalid(arr *types.Array, symbol_table *types.Array, pre
 				continue
 			}
 		}
-		if final_name.GetStrVal() == "this" {
+		if final_name.StringVal() == "this" {
 			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
@@ -2026,7 +2026,7 @@ func PhpExtractPrefixInvalid(arr *types.Array, symbol_table *types.Array, prefix
 				continue
 			}
 		}
-		if final_name.GetStrVal() == "this" {
+		if final_name.StringVal() == "this" {
 			faults.ThrowError(nil, "Cannot re-assign $this")
 			return -1
 		} else {
@@ -2244,7 +2244,7 @@ func PhpCompactVar(eg_active_symbol_table *types.Array, return_value *types.Zval
 			value_ptr = types.ZVAL_DEREF(value_ptr)
 			value_ptr.TryAddRefcount()
 			return_value.Array().KeyUpdate(entry.String().GetStr(), value_ptr)
-		} else if entry.GetStrVal() == "this" {
+		} else if entry.StringVal() == "this" {
 			var object = zend.ZendGetThisObject(zend.CurrEX())
 			if object != nil {
 				object.AddRefcount()
@@ -5985,7 +5985,7 @@ func ZifArrayProduct(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval) 
 		}
 		zend.ConvertToDouble(return_value)
 		zend.ConvertToDouble(&entry_n)
-		return_value.SetDval(return_value.Double() * entry_n.Double())
+		return_value.SetDouble(return_value.Double() * entry_n.Double())
 	}
 }
 func ZifArrayReduce(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, callback *types.Zval, _ zpp.Opt, initial *types.Zval) {

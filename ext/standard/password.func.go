@@ -11,7 +11,7 @@ import (
 
 func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	var zalgo types.Zval
-	zalgo.SetAsPtr((*PhpPasswordAlgo)(algo))
+	zalgo.SetPtr((*PhpPasswordAlgo)(algo))
 	if PhpPasswordAlgos.KeyAdd(b.CastStrAuto(ident), &zalgo) != nil {
 		return types.SUCCESS
 	}
