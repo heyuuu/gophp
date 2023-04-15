@@ -517,7 +517,7 @@ func ZendGetPropertyGuard(zobj *types.ZendObject, member *types.String) *uint32 
 			return &(zv.GetPropertyGuard())
 		} else {
 			ALLOC_HASHTABLE(guards)
-			guards = types.MakeArrayEx(8, ZendPropertyGuardDtor, 0)
+			guards = types.NewArrayEx(8, ZendPropertyGuardDtor)
 
 			/* mark pointer as "special" using low bit */
 			guards.KeyAddNew(str.GetStr(), types.NewZvalPtr(any(zend_uintptr_t&zv.GetPropertyGuard()|1)))

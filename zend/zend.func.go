@@ -260,7 +260,6 @@ func ZendInitCallTrampolineOp() {
 	EG__().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
 	ZendVmSetOpcodeHandler(EG__().GetCallTrampolineOp())
 }
-func AutoGlobalDtor(zv *types.Zval) { Free(zv.Ptr()) }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }

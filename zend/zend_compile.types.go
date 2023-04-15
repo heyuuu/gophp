@@ -656,18 +656,10 @@ func (this *BuiltinTypeInfo) GetType() uint8  { return this.type_ }
  * ClosureInfo
  */
 type ClosureInfo struct {
-	uses         types.Array
+	uses         *types.Array
 	varvars_used types.ZendBool
 }
 
-// func MakeClosureInfo(uses HashTable, varvars_used ZendBool) ClosureInfo {
-//     return ClosureInfo{
-//         uses:uses,
-//         varvars_used:varvars_used,
-//     }
-// }
-func (this *ClosureInfo) GetUses() types.Array { return this.uses }
-
-// func (this *ClosureInfo) SetUses(value HashTable) { this.uses = value }
-// func (this *ClosureInfo)  GetVarvarsUsed() ZendBool      { return this.varvars_used }
+func (this *ClosureInfo) GetUses() *types.Array               { return this.uses }
+func (this *ClosureInfo) SetUses(value *types.Array)          { this.uses = value }
 func (this *ClosureInfo) SetVarvarsUsed(value types.ZendBool) { this.varvars_used = value }

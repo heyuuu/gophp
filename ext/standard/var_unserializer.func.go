@@ -408,11 +408,11 @@ func ProcessNestedData(
 							/* Remember to which property this slot belongs, so we can add a
 							 * type source if it is turned into a reference lateron. */
 
-							if var_hash.GetRefProps() == nil {
-								var_hash.SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
-								var_hash.GetRefProps() = types.MakeArrayEx(8, nil, 0)
+							if (**var_hash).GetRefProps() == nil {
+								(**var_hash).SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
+								(**var_hash).GetRefProps().Init(8, nil)
 							}
-							types.ZendHashIndexUpdatePtr(var_hash.GetRefProps(), types.ZendUintptrT(data), info)
+							types.ZendHashIndexUpdatePtr((**var_hash).GetRefProps(), types.ZendUintptrT(data), info)
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)

@@ -38,7 +38,7 @@ func PhpIniOnUpdateTags(
 			return types.FAILURE
 		}
 	}
-	ctx.GetTags() = types.MakeArrayEx(0, TagDtor, 1)
+	ctx.GetTags().Init(0, TagDtor)
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')

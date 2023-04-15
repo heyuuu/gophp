@@ -121,23 +121,20 @@ var _ IRefcounted = &Array{}
  * Constructor && Init
  */
 func NewArray(size int) *Array {
-	return NewArrayEx(size, nil, false)
+	return NewArrayEx(size, nil)
 }
-func MakeArray(nSize int) Array {
-	arr := *NewArray(nSize)
-	return arr
+func NewArrayEx(size int, pDestructor DtorFuncT) *Array {
+	var ht = new(Array)
+	ht.Init(size, pDestructor)
+	return ht
 }
-func MakeArrayEx(nSize int, pDestructor DtorFuncT, persistent ZendBool) Array {
-	arr := *NewArrayEx(nSize, pDestructor, persistent != 0)
-	return arr
-}
-func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
+func (ht *Array) Init(size int, pDestructor DtorFuncT) {
 	var data []Bucket
 	if size > 0 {
 		data = make([]Bucket, 0, size)
 	}
 
-	var ht = &Array{
+	*ht = Array{
 		destructor: pDestructor,
 
 		// 数据存储
@@ -149,18 +146,16 @@ func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
 	// GC 信息
 	ht.SetRefcount(1)
 	ht.SetGcTypeInfo(uint32(IS_ARRAY))
-	if persistent {
-		ht.AddGcFlags(GC_PERSISTENT)
-	} else {
-		ht.AddGcFlags(GC_COLLECTABLE)
-	}
+	//if persistent {
+	//	ht.AddGcFlags(GC_PERSISTENT)
+	//} else {
+	//	ht.AddGcFlags(GC_COLLECTABLE)
+	//}
 
 	// 析构函数
 	if pDestructor != nil {
 		runtime.SetFinalizer(ht, ht.DestroyEx)
 	}
-
-	return ht
 }
 
 /* init */

@@ -254,7 +254,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 		faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot re-assign $this")
 	}
 	ALLOC_HASHTABLE(CG__().GetMemoizedExprs())
-	CG__().GetMemoizedExprs() = types.MakeArrayEx(0, ZnodeDtor, 0)
+	CG__().GetMemoizedExprs().Init(0, ZnodeDtor)
 	CG__().SetMemoizeMode(ZEND_MEMOIZE_COMPILE)
 	ZendCompileVar(&var_node_is, var_ast, BP_VAR_IS, 0)
 	coalesce_opnum = GetNextOpNumber()

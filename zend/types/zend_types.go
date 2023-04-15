@@ -73,7 +73,7 @@ func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
 		o.propertiesTable[ce.GetDefaultPropertiesCount()].SetUndef()
 	}
 
-	runtime.SetFinalizer(o, zend.AutoGlobalDtor)
+	runtime.SetFinalizer(o, ObjectAutoFree)
 }
 
 func (o *ZendObject) GetHandle() uint32                          { return o.handle }

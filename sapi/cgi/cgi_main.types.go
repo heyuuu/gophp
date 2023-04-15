@@ -8,7 +8,7 @@ import (
  * php_cgi_globals_struct
  */
 type php_cgi_globals_struct struct {
-	user_config_cache   types.Array
+	user_config_cache   *types.Array
 	redirect_status_env *byte
 	rfc2616_headers     types.ZendBool
 	nph                 types.ZendBool
@@ -19,7 +19,7 @@ type php_cgi_globals_struct struct {
 	fcgi_logging        types.ZendBool
 }
 
-func (this *php_cgi_globals_struct) GetUserConfigCache() types.Array {
+func (this *php_cgi_globals_struct) GetUserConfigCache() *types.Array {
 	return this.user_config_cache
 }
 func (this *php_cgi_globals_struct) GetRedirectStatusEnv() *byte { return this.redirect_status_env }

@@ -123,7 +123,7 @@ func SplObjectStorageNewEx(class_type *types.ClassEntry, orig *types.Zval) *type
 	intern.SetPos(0)
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
 	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
-	intern.GetStorage() = types.MakeArrayEx(0, SplObjectStorageDtor, 0)
+	intern.GetStorage().Init(0, SplObjectStorageDtor)
 	intern.GetStd().SetHandlers(&spl_handler_SplObjectStorage)
 	for parent != nil {
 		if parent == spl_ce_SplObjectStorage {

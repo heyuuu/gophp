@@ -4428,11 +4428,11 @@ func ZifArrayUnique(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _
 		return
 	}
 	if sort_type == PHP_SORT_STRING {
-		var seen types.Array
+		var seen *types.Array
 		var num_key zend.ZendLong
 		var str_key *types.String
 		var val *types.Zval
-		&seen = types.MakeArrayEx(array.Array().Len(), nil, 0)
+		seen = types.NewArray(array.Array().Len())
 		zend.ArrayInit(return_value)
 		var __ht = array.Array()
 		for _, _p := range __ht.ForeachData() {
@@ -5333,7 +5333,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 	var argc int
 	var i int
 	var num uint32
-	var exclude types.Array
+	var exclude *types.Array
 	var value *types.Zval
 	var str *types.String
 	var tmp_str *types.String
@@ -5459,7 +5459,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 
 	/* create exclude map */
 
-	&exclude = types.MakeArrayEx(num, nil, 0)
+	exclude = types.NewArray(num)
 	for i = 1; i < argc; i++ {
 		var __ht *types.Array = args[i].Array()
 		for _, _p := range __ht.ForeachData() {
@@ -5493,7 +5493,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 		key = _p.GetKey()
 		value = _z
 		str = zend.ZvalGetTmpString(value, &tmp_str)
-		if !&exclude.KeyExists(str.GetStr()) {
+		if !exclude.KeyExists(str.GetStr()) {
 			if key != nil {
 				value = return_value.Array().KeyAddNew(key.GetStr(), value)
 			} else {

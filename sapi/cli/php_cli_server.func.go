@@ -1161,7 +1161,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, r
 	PhpCliServerPollerAdd(server.GetPoller(), POLLIN, server_sock)
 	server.SetHostStr(host)
 	server.SetPort(port)
-	server.clients = *types.NewArrayEx(0, PhpCliServerClientDtorWrapper, true)
+	server.clients = *types.NewArrayEx(0, PhpCliServerClientDtorWrapper)
 	server.SetDocumentRootStr(document_root)
 	server.SetRouterStr(router)
 	server.SetIsRunning(1)

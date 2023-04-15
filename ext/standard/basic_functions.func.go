@@ -48,8 +48,8 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	memset(&(BG__().url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
 	BG__().url_adapt_session_ex.type_ = 1
 	BG__().url_adapt_output_ex.type_ = 0
-	&(BG__().url_adapt_session_hosts_ht) = types.MakeArrayEx(0, nil, 1)
-	&(BG__().url_adapt_output_hosts_ht) = types.MakeArrayEx(0, nil, 1)
+	BG__().url_adapt_session_hosts_ht.Init(0, nil)
+	BG__().url_adapt_output_hosts_ht.Init(0, nil)
 	BG__().incomplete_class = IncompleteClassEntry
 	BG__().page_uid = -1
 	BG__().page_gid = -1
@@ -221,7 +221,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG__().page_gid = -1
 	BG__().page_inode = -1
 	BG__().page_mtime = -1
-	&(BG__().putenv_ht) = types.MakeArrayEx(1, PhpPutenvDestructor, 0)
+	BG__().putenv_ht.Init(1, PhpPutenvDestructor)
 	BG__().user_shutdown_function_names = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
@@ -1062,9 +1062,6 @@ func ZifErrorLog(executeData zpp.Ex, return_value zpp.Ret, message *types.Zval, 
 	return_value.SetTrue()
 	return
 }
-func _phpErrorLog(opt_err int, message *byte, opt *byte, headers *byte) int {
-	return _phpErrorLogEx(opt_err, message, b.CondF1(opt_err == 3, func() __auto__ { return strlen(message) }, 0), opt, headers)
-}
 func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, headers *byte) int {
 	var stream *core.PhpStream = nil
 	var nbytes int
@@ -1387,7 +1384,7 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 	} else {
 		if !(BG__().user_shutdown_function_names) {
 			zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-			BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
+			BG__().user_shutdown_function_names.Init(0, UserShutdownFunctionDtor)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
@@ -1396,27 +1393,6 @@ func ZifRegisterShutdownFunction(executeData zpp.Ex, return_value zpp.Ret, funct
 	}
 
 	/* Prevent entering of anything but valid callback (syntax check only!) */
-}
-func RegisterUserShutdownFunction(function_name *byte, function_len int, shutdown_function_entry *PhpShutdownFunctionEntry) types.ZendBool {
-	if !(BG__().user_shutdown_function_names) {
-		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-		BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
-	}
-	types.ZendHashStrUpdateMem(BG__().user_shutdown_function_names, b.CastStr(function_name, function_len), shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
-	return 1
-}
-func RemoveUserShutdownFunction(function_name *byte, function_len int) types.ZendBool {
-	if BG__().user_shutdown_function_names {
-		return types.ZendHashStrDel(BG__().user_shutdown_function_names, b.CastStr(function_name, function_len)) != types.FAILURE
-	}
-	return 0
-}
-func AppendUserShutdownFunction(shutdown_function_entry PhpShutdownFunctionEntry) types.ZendBool {
-	if !(BG__().user_shutdown_function_names) {
-		zend.ALLOC_HASHTABLE(BG__().user_shutdown_function_names)
-		BG__().user_shutdown_function_names = types.MakeArrayEx(0, UserShutdownFunctionDtor, 0)
-	}
-	return types.ZendHashNextIndexInsertMem(BG__().user_shutdown_function_names, &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry")) != nil
 }
 func PhpGetHighlight(syntax_highlighter_ini *zend.ZendSyntaxHighlighterIni) {
 	syntax_highlighter_ini.SetHighlightComment(zend.INI_STR("highlight.comment"))

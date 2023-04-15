@@ -97,7 +97,7 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 		var list *zend.ZendLlist = nil
 		if !(standard.FG__().wrapper_errors) {
 			zend.ALLOC_HASHTABLE(standard.FG__().wrapper_errors)
-			standard.FG__().wrapper_errors = types.MakeArrayEx(8, WrapperListDtor, 0)
+			standard.FG__().GetWrapperErrors().Init(8, WrapperListDtor)
 		} else {
 			list = types.ZendHashStrFindPtr(standard.FG__().wrapper_errors, b.CastStr((*byte)(&wrapper), b.SizeOf("wrapper")))
 		}

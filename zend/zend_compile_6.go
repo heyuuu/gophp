@@ -106,7 +106,7 @@ func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 func FindImplicitBinds(info *ClosureInfo, params_ast *ZendAst, stmt_ast *ZendAst) {
 	var param_list *ZendAstList = ZendAstGetList(params_ast)
 	var i uint32
-	info.GetUses() = types.MakeArrayEx(param_list.GetChildren(), nil, 0)
+	info.SetUses(types.NewArray(param_list.GetChildren()))
 	FindImplicitBindsRecursively(info, stmt_ast)
 
 	/* Remove variables that are parameters */

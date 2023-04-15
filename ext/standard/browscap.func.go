@@ -11,23 +11,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func BROWSCAP_G(v __auto__) __auto__ { return BrowscapGlobals.v }
-func BrowscapEntryDtor(zvalue *types.Zval) {
-	var entry *BrowscapEntry = zvalue.Ptr()
-	// types.ZendStringReleaseEx(entry.GetPattern(), 0)
-	if entry.GetParent() != nil {
-		// types.ZendStringReleaseEx(entry.GetParent(), 0)
-	}
-	zend.Efree(entry)
-}
-func BrowscapEntryDtorPersistent(zvalue *types.Zval) {
-	var entry *BrowscapEntry = zvalue.Ptr()
-	// types.ZendStringReleaseEx(entry.GetPattern(), 1)
-	if entry.GetParent() != nil {
-		// types.ZendStringReleaseEx(entry.GetParent(), 1)
-	}
-	zend.Pefree(entry, 1)
-}
+func BROWSCAP_G(v __auto__) __auto__      { return BrowscapGlobals.v }
 func IsPlaceholder(c byte) types.ZendBool { return c == '?' || c == '*' }
 func BrowscapComputePrefixLen(pattern *types.String) uint8 {
 	var i int
@@ -258,8 +242,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return types.FAILURE
 	}
-	browdata.SetHtab(zend.Pemalloc(sizeof * browdata.GetHtab()))
-	browdata.GetHtab() = types.MakeArrayEx(0, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent)
+	browdata.SetHtab(types.NewArray(0))
 	browdata.SetKvSize(16 * 1024)
 	browdata.SetKvUsed(0)
 	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv") * browdata.GetKvSize()))
@@ -272,46 +255,13 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 }
 func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 	if bdata.GetHtab() != nil {
-		var i uint32
 		bdata.GetHtab().Destroy()
 		zend.Pefree(bdata.GetHtab(), persistent)
 		bdata.SetHtab(nil)
-		for i = 0; i < bdata.GetKvUsed(); i++ {
-			// types.ZendStringRelease(bdata.GetKv()[i].GetKey())
-			// types.ZendStringRelease(bdata.GetKv()[i].GetValue())
-		}
 		zend.Pefree(bdata.GetKv(), persistent)
 		bdata.SetKv(nil)
 	}
 	bdata.GetFilename()[0] = '0'
-}
-func OnChangeBrowscap(
-	entry *zend.ZendIniEntry,
-	new_value *types.String,
-	mh_arg1 any,
-	mh_arg2 any,
-	mh_arg3 any,
-	stage int,
-) int {
-	if stage == core.PHP_INI_STAGE_STARTUP {
-
-		/* value handled in browscap.c's MINIT */
-
-		return types.SUCCESS
-
-		/* value handled in browscap.c's MINIT */
-
-	} else if stage == core.PHP_INI_STAGE_ACTIVATE {
-		var bdata *BrowserData = &(BROWSCAP_G(activation_bdata))
-		if bdata.GetFilename()[0] != '0' {
-			BrowscapBdataDtor(bdata, 0)
-		}
-		if zend.VCWD_REALPATH(new_value.GetVal(), bdata.GetFilename()) == nil {
-			return types.FAILURE
-		}
-		return types.SUCCESS
-	}
-	return types.FAILURE
 }
 func ZmStartupBrowscap(type_ int, module_number int) int {
 	var browscap *byte = zend.INI_STR("browscap")

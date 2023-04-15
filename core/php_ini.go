@@ -13,7 +13,7 @@ type Configuration struct {
 }
 
 func (this *Configuration) Init() {
-	&this.hash = types.MakeArrayEx(8, ConfigZvalDtor, 1)
+	this.hash.Init(8, ConfigZvalDtor)
 }
 
 func (this *Configuration) Set(key string, value string) *types.Zval {
