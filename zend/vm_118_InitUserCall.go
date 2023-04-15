@@ -1,5 +1,10 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var function_name *types.Zval
@@ -104,9 +109,9 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
 			if (call_info & ZEND_CALL_CLOSURE) != 0 {
-				ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
+				//ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
 			} else if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-				ZendObjectRelease(fcc.GetObject())
+				//ZendObjectRelease(fcc.GetObject())
 			}
 			return 0
 		}
@@ -171,9 +176,9 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int
 		}
 		if EG__().GetException() != nil {
 			if (call_info & ZEND_CALL_CLOSURE) != 0 {
-				ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
+				//ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
 			} else if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-				ZendObjectRelease(fcc.GetObject())
+				//ZendObjectRelease(fcc.GetObject())
 			}
 			return 0
 		}

@@ -152,10 +152,10 @@ func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 			}
 			ZendVmStackFreeArgs(executeData.GetCall())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
-				OBJ_RELEASE(call.GetThis().Object())
+				// OBJ_RELEASE(call.GetThis().Object())
 			}
 			if call.GetFunc().IsClosure() {
-				ZendObjectRelease(ZEND_CLOSURE_OBJECT(call.GetFunc()))
+				//ZendObjectRelease(ZEND_CLOSURE_OBJECT(call.GetFunc()))
 			} else if call.GetFunc().IsCallViaTrampoline() {
 				// types.ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 				ZendFreeTrampoline(call.GetFunc())
@@ -203,7 +203,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					b.Assert(var_.IsObject())
 					obj = var_.Object()
 					ZendObjectStoreCtorFailed(obj)
-					OBJ_RELEASE(obj)
+					// OBJ_RELEASE(obj)
 				} else if kind == ZEND_LIVE_LOOP {
 					if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
 						types.ZendHashIteratorDel(var_.GetFeIterIdx())

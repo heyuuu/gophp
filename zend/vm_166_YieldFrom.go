@@ -96,7 +96,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
 				if EG__().GetException() != nil {
-					OBJ_RELEASE(iter.GetStd())
+					// OBJ_RELEASE(iter.GetStd())
 					UNDEF_RESULT()
 					return 0
 				}
@@ -186,7 +186,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
 				if EG__().GetException() != nil {
-					OBJ_RELEASE(iter.GetStd())
+					// OBJ_RELEASE(iter.GetStd())
 					UNDEF_RESULT()
 					return 0
 				}
@@ -271,7 +271,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if iter.GetFuncs().GetRewind() != nil {
 				iter.GetFuncs().GetRewind()(iter)
 				if EG__().GetException() != nil {
-					OBJ_RELEASE(iter.GetStd())
+					// OBJ_RELEASE(iter.GetStd())
 					UNDEF_RESULT()
 					return 0
 				}

@@ -44,7 +44,7 @@ func InitExecutor() {
 	EG__().GetUserErrorHandlersErrorReporting().Init()
 	EG__().GetUserErrorHandlers().Init()
 	EG__().GetUserExceptionHandlers().Init()
-	ZendObjectsStoreInit(EG__().GetObjectsStore(), 1024)
+	//EG__().GetObjectsStore().Init(1024)
 	EG__().SetVmInterrupt(0)
 	EG__().SetTimedOut(0)
 	EG__().SetException(nil)
@@ -99,10 +99,12 @@ func ShutdownDestructors() {
 				break
 			}
 		}
-		ZendObjectsStoreCallDestructors(EG__().GetObjectsStore())
+		// notice: 无需主动调用析构函数，使用自动析构代替
+		//ZendObjectsStoreCallDestructors(EG__().GetObjectsStore())
 	}, func() {
 		/* if we couldn't destruct cleanly, mark all objects as destructed anyway */
-		ZendObjectsStoreMarkDestructed(EG__().GetObjectsStore())
+		// notice: 无需主动调用析构函数，使用自动析构代替
+		//ZendObjectsStoreMarkDestructed(EG__().GetObjectsStore())
 	})
 }
 func ShutdownExecutor() {
@@ -181,7 +183,8 @@ func ShutdownExecutor() {
 		ZendStackClean(EG__().GetUserErrorHandlers(), (func(any))(ZVAL_PTR_DTOR), 1)
 		ZendStackClean(EG__().GetUserExceptionHandlers(), (func(any))(ZVAL_PTR_DTOR), 1)
 	}
-	ZendObjectsStoreFreeObjectStorage(EG__().GetObjectsStore(), fast_shutdown)
+	// notice: 无需主动调用析构函数，使用自动析构代替
+	//ZendObjectsStoreFreeObjectStorage(EG__().GetObjectsStore(), fast_shutdown)
 	ZendWeakrefsShutdown()
 
 	faults.Try(func() {
@@ -255,7 +258,7 @@ func ShutdownExecutor() {
 		EG__().GetUserErrorHandlersErrorReporting().Destroy()
 		EG__().GetUserErrorHandlers().Destroy()
 		EG__().GetUserExceptionHandlers().Destroy()
-		ZendObjectsStoreDestroy(EG__().GetObjectsStore())
+		//EG__().GetObjectsStore().Destroy()
 		if EG__().GetInAutoload() != nil {
 			EG__().GetInAutoload().Destroy()
 			FREE_HASHTABLE(EG__().GetInAutoload())

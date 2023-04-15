@@ -11,7 +11,7 @@ func _zendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
 	object.GetGcTypeInfo() = types.IS_OBJECT | types.GC_COLLECTABLE<<types.GC_FLAGS_SHIFT
 	object.SetCe(ce)
 	object.SetProperties(nil)
-	ZendObjectsStorePut(object)
+	EG__().GetObjectsStore().PutObject(object)
 	if ce.IsUseGuards() {
 		(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount()).SetUndef()
 	}
@@ -150,7 +150,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 				EG__().SetException(old_exception)
 			}
 		}
-		OBJ_RELEASE(object)
+		// OBJ_RELEASE(object)
 		EG__().SetFakeScope(orig_fake_scope)
 	}
 }
@@ -248,7 +248,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		fcic.SetObject(new_object)
 		ZendCallFunction(&fci, &fcic)
 		ZvalPtrDtor(&ret)
-		OBJ_RELEASE(new_object)
+		// OBJ_RELEASE(new_object)
 	}
 }
 func ZendObjectsCloneObj(zobject *types.Zval) *types.ZendObject {

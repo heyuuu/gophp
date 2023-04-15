@@ -68,7 +68,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 		ZvalPtrDtor(ret)
 	}
 	if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
-		OBJ_RELEASE(call.GetThis().Object())
+		// OBJ_RELEASE(call.GetThis().Object())
 	}
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {
@@ -146,7 +146,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(executeData *ZendExecuteData) int {
 
 	}
 	if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
-		OBJ_RELEASE(call.GetThis().Object())
+		// OBJ_RELEASE(call.GetThis().Object())
 	}
 	ZendVmStackFreeCallFrame(call)
 	if EG__().GetException() != nil {

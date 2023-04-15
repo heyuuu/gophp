@@ -14,9 +14,9 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		}
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "call_user_func_array() expects parameter 2 to be array, %s given", types.ZendGetTypeByConst(args.GetType()))
 		if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_CLOSURE) != 0 {
-			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetCall().func_))
+			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetCall().func_))
 		} else if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(executeData.GetCall().This.Object())
+			// OBJ_RELEASE(executeData.GetCall().This.Object())
 		}
 		executeData.GetCall().
 			func_ = (types.IFunction)(&ZendPassFunction)

@@ -16,7 +16,7 @@ func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	/* cleanup delayed exception */
 	if fast_call.Object() != nil {
 		/* discard the previously thrown exception */
-		OBJ_RELEASE(fast_call.Object())
+		// OBJ_RELEASE(fast_call.Object())
 		fast_call.SetObject(nil)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

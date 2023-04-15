@@ -1,0 +1,37 @@
+package types
+
+import (
+	"github.com/heyuuu/gophp/zend"
+)
+
+// Object 对象自动析构方法
+func ObjectAutoFree(object *ZendObject) {
+	// todo 待重构
+
+	/* GC might have released this object already. */
+	if object.GetGcType() == IS_NULL {
+		return
+	}
+
+	/*    Make sure we hold a reference count during the destructor call
+	      otherwise, when the destructor ends the storage might be freed
+	      when the refcount reaches 0 a second time
+	*/
+
+	// 调用 Dtor 方法
+	if (object.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
+		object.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
+		if object.GetHandlers().GetDtorObj() != zend.ZendObjectsDestroyObject || object.GetCe().GetDestructor() != nil {
+			object.SetRefcount(1)
+			object.GetHandlers().GetDtorObj()(object)
+			object.DelRefcount()
+		}
+	}
+
+	// 调用 Free 方法
+	if (object.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
+		object.AddGcFlags(IS_OBJ_FREE_CALLED)
+		object.SetRefcount(1)
+		object.GetHandlers().GetFreeObj()(object)
+	}
+}

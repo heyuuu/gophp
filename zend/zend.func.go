@@ -479,10 +479,10 @@ func ZendUserExceptionHandler() {
 	if CallUserFunction(nil, &orig_user_exception_handler, &retval2, 1, params) == types.SUCCESS {
 		ZvalPtrDtor(&retval2)
 		if EG__().GetException() != nil {
-			OBJ_RELEASE(EG__().GetException())
+			// OBJ_RELEASE(EG__().GetException())
 			EG__().SetException(nil)
 		}
-		OBJ_RELEASE(old_exception)
+		// OBJ_RELEASE(old_exception)
 	} else {
 		EG__().SetException(old_exception)
 	}

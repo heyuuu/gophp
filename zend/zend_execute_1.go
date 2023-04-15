@@ -293,7 +293,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 
 		/* the enclosing container was deleted, obj is unreferenced */
 
-		OBJ_RELEASE(obj)
+		// OBJ_RELEASE(obj)
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetNull()
 		}

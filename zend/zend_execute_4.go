@@ -15,7 +15,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 	// 	obj.AddRefcount()
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
-		OBJ_RELEASE(obj.Object())
+		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetNull()
 		}
@@ -39,7 +39,7 @@ func ZendPreIncdecOverloadedProperty(object *types.Zval, property *types.Zval, c
 		types.ZVAL_COPY(opline.Result(), &z_copy)
 	}
 	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
-	OBJ_RELEASE(obj.Object())
+	// OBJ_RELEASE(obj.Object())
 	ZvalPtrDtor(&z_copy)
 	ZvalPtrDtor(z)
 }
@@ -59,7 +59,7 @@ func ZendAssignOpOverloadedProperty(
 	// 	obj.AddRefcount()
 	z = types.Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
-		OBJ_RELEASE(obj.Object())
+		// OBJ_RELEASE(obj.Object())
 		if RETURN_VALUE_USED(opline) {
 			opline.Result().SetUndef()
 		}
@@ -81,7 +81,7 @@ func ZendAssignOpOverloadedProperty(
 	}
 	ZvalPtrDtor(z)
 	ZvalPtrDtor(&res)
-	OBJ_RELEASE(obj.Object())
+	// OBJ_RELEASE(obj.Object())
 }
 func ZendExtensionStatementHandler(extension *ZendExtension, frame *ZendExecuteData) {
 	if extension.GetStatementHandler() != nil {

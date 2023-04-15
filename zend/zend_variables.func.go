@@ -27,8 +27,8 @@ func RcDtorFunc(p types.IRefcounted) {
 		arr := p.(*types.Array)
 		arr.DestroyEx()
 	case *types.ZendObject:
-		obj := p.(*types.ZendObject)
-		ZendObjectsStoreDel(obj)
+		//obj := p.(*types.ZendObject)
+		//ZendObjectsStoreDel(obj)
 	case *types.ZendResource:
 		res := p.(*types.ZendResource)
 		ZendListFree(res)

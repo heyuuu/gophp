@@ -494,7 +494,7 @@ func ZendRegisterClosureCe() {
 func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *types.Zval) {
 	var closure *ZendClosure = (*ZendClosure)(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 	closure.GetOrigInternalHandler()(executeData, return_value)
-	OBJ_RELEASE((*types.ZendObject)(closure))
+	// OBJ_RELEASE((*types.ZendObject)(closure))
 	executeData.GetFunc() = nil
 }
 func ZendCreateClosure(res *types.Zval, func_ types.IFunction, scope *types.ClassEntry, called_scope *types.ClassEntry, this_ptr *types.Zval) {

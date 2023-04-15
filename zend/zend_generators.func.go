@@ -131,7 +131,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution types.ZendB
 
 		ZendFreeCompiledVariables(executeData)
 		if (EX_CALL_INFO() & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(executeData.GetThis().Object())
+			// OBJ_RELEASE(executeData.GetThis().Object())
 		}
 
 		/* A fatal error / die occurred during the generator execution.
@@ -153,7 +153,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution types.ZendB
 		/* Free closure object */
 
 		if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
-			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc(
+			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc(
 
 			/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */ )))
 		}
@@ -185,7 +185,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 			next = ZendGeneratorGetChild(root.GetNode(), generator)
 			generator.GetNode().SetRoot(next)
 			next.GetNode().SetParent(nil)
-			OBJ_RELEASE(root.GetStd())
+			// OBJ_RELEASE(root.GetStd())
 			root = next
 		}
 	}
@@ -251,7 +251,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 			/* Clean up backed-up exception */
 
 			if fast_call.Object() != nil {
-				OBJ_RELEASE(fast_call.Object())
+				// OBJ_RELEASE(fast_call.Object())
 			}
 
 			/* Clean up backed-up exception */
@@ -618,7 +618,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 		old_root = nil
 	}
 	for root.GetExecuteData() == nil && root != generator {
-		OBJ_RELEASE(old_root.GetStd())
+		// OBJ_RELEASE(old_root.GetStd())
 		old_root = root
 		root = ZendGeneratorGetChild(root.GetNode(), leaf)
 	}
@@ -646,7 +646,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 							leaf.GetNode().SetRoot(root)
 							root.GetNode().SetParent(nil)
 							if old_root != nil {
-								OBJ_RELEASE(old_root.GetStd())
+								// OBJ_RELEASE(old_root.GetStd())
 							}
 							ZendGeneratorResume(leaf)
 							return leaf.GetNode().GetRoot()
@@ -671,7 +671,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 	}
 	leaf.GetNode().SetRoot(root)
 	if old_root != nil {
-		OBJ_RELEASE(old_root.GetStd())
+		// OBJ_RELEASE(old_root.GetStd())
 	}
 	return root
 }

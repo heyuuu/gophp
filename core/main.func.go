@@ -995,7 +995,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 
 				zend.ZendSetMemoryLimit(PG__().memory_limit)
 				zend.Efree(buffer)
-				zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
+				//zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
 				faults.Bailout()
 				return
 			}

@@ -110,7 +110,7 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 	var is_empty types.ZendBool
 	if iter == nil || EG__().GetException() != nil {
 		if iter != nil {
-			OBJ_RELEASE(iter.GetStd())
+			// OBJ_RELEASE(iter.GetStd())
 		}
 		if EG__().GetException() == nil {
 			faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
@@ -122,14 +122,14 @@ func ZendFeResetIterator(array_ptr *types.Zval, by_ref int, opline *ZendOp, exec
 	if iter.GetFuncs().GetRewind() != nil {
 		iter.GetFuncs().GetRewind()(iter)
 		if EG__().GetException() != nil {
-			OBJ_RELEASE(iter.GetStd())
+			// OBJ_RELEASE(iter.GetStd())
 			opline.Result().SetUndef()
 			return 1
 		}
 	}
 	is_empty = iter.GetFuncs().GetValid()(iter) != types.SUCCESS
 	if EG__().GetException() != nil {
-		OBJ_RELEASE(iter.GetStd())
+		// OBJ_RELEASE(iter.GetStd())
 		opline.Result().SetUndef()
 		return 1
 	}

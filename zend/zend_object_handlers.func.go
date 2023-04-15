@@ -623,7 +623,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			*guard &= ^IN_ISSET
 			if ZendIsTrue(&tmp_result) == 0 {
 				retval = EG__().GetUninitializedZval()
-				OBJ_RELEASE(zobj)
+				// OBJ_RELEASE(zobj)
 				ZvalPtrDtor(&tmp_result)
 				goto exit
 			}
@@ -631,7 +631,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 				goto call_getter
 			}
-			OBJ_RELEASE(zobj)
+			// OBJ_RELEASE(zobj)
 		} else if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 			goto call_getter_addref
 		}
@@ -663,7 +663,7 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			if prop_info != nil {
 				ZendVerifyPropAssignableByRef(prop_info, retval, zobj.GetCe().GetGet().IsStrictTypes())
 			}
-			OBJ_RELEASE(zobj)
+			// OBJ_RELEASE(zobj)
 			goto exit
 		} else if IS_WRONG_PROPERTY_OFFSET(property_offset) {
 
@@ -758,7 +758,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 			*guard |= IN_SET
 			ZendStdCallSetter(zobj, name, value)
 			*guard &= ^IN_SET
-			OBJ_RELEASE(zobj)
+			// OBJ_RELEASE(zobj)
 			variable_ptr = value
 		} else if !(IS_WRONG_PROPERTY_OFFSET(property_offset)) {
 			goto write_std_property
@@ -1538,7 +1538,7 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 				}
 			}
 			*guard &= ^IN_ISSET
-			OBJ_RELEASE(zobj)
+			// OBJ_RELEASE(zobj)
 		}
 	}
 exit:

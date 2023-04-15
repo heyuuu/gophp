@@ -4,9 +4,9 @@ package zend
  * ZendObjectHandlers
  */
 type ZendObjectHandlers struct {
-	offset               int
-	free_obj             ZendObjectFreeObjT
-	dtor_obj             ZendObjectDtorObjT
+	offset               int                // 指向 Object 的偏移量
+	free_obj             ZendObjectFreeObjT // todo free函数,在释放时若无free_obj则调用
+	dtor_obj             ZendObjectDtorObjT // todo 析构函数,在释放时调用，优先级高于 free_obj
 	clone_obj            ZendObjectCloneObjT
 	read_property        ZendObjectReadPropertyT
 	write_property       ZendObjectWritePropertyT

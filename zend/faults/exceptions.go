@@ -99,7 +99,7 @@ func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendO
 		return
 	}
 	if exception == add_previous {
-		zend.OBJ_RELEASE(add_previous)
+		// zend.OBJ_RELEASE(add_previous)
 		return
 	}
 	pv.SetObject(add_previous)
@@ -113,7 +113,7 @@ func ExceptionSetPrevious(exception *types.ZendObject, add_previous *types.ZendO
 		ancestor = zend.ZendReadProperty(GetExceptionBase(&pv), &pv, types.STR_PREVIOUS, 1, &rv)
 		for ancestor.IsObject() {
 			if ancestor.Object() == ex.Object() {
-				zend.OBJ_RELEASE(add_previous)
+				// zend.OBJ_RELEASE(add_previous)
 				return
 			}
 			ancestor = zend.ZendReadProperty(GetExceptionBase(ancestor), ancestor, types.STR_PREVIOUS, 1, &rv)
@@ -186,7 +186,7 @@ func ThrowExceptionInternal(exception *types.Zval) {
 func ClearException() {
 	var exception *types.ZendObject
 	if zend.EG__().GetPrevException() != nil {
-		zend.OBJ_RELEASE(zend.EG__().GetPrevException())
+		// zend.OBJ_RELEASE(zend.EG__().GetPrevException())
 		zend.EG__().SetPrevException(nil)
 	}
 	if zend.EG__().GetException() == nil {
@@ -197,7 +197,7 @@ func ClearException() {
 
 	exception = zend.EG__().GetException()
 	zend.EG__().SetException(nil)
-	zend.OBJ_RELEASE(exception)
+	// zend.OBJ_RELEASE(exception)
 	if zend.CurrEX() != nil {
 		zend.CurrEX().SetOpline(zend.EG__().GetOplineBeforeException())
 	}
@@ -821,7 +821,7 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 	} else {
 		Error(severity, "Uncaught exception '%s'", ce_exception.GetName().GetVal())
 	}
-	zend.OBJ_RELEASE(ex)
+	// zend.OBJ_RELEASE(ex)
 }
 func ThrowExceptionObject(exception *types.Zval) {
 	var exception_ce *types.ClassEntry

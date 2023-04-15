@@ -30,7 +30,7 @@ func ZendIteratorDtor(iter *ZendObjectIterator) {
 	if iter.GetStd().DelRefcount() > 0 {
 		return
 	}
-	ZendObjectsStoreDel(iter.GetStd())
+	//ZendObjectsStoreDel(iter.GetStd())
 }
 func ZendIteratorUnwrap(array_ptr *types.Zval) *ZendObjectIterator {
 	b.Assert(array_ptr.IsObject())

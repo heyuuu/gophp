@@ -283,9 +283,9 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		IFreeCompiledVariables(executeData)
 		if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(executeData.GetThis().Object())
+			// OBJ_RELEASE(executeData.GetThis().Object())
 		} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
-			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
+			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 		}
 		EG__().SetVmStackTop((*types.Zval)(executeData))
 		executeData = executeData.GetPrevExecuteData()
@@ -307,9 +307,9 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
 		if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(executeData.GetThis().Object())
+			// OBJ_RELEASE(executeData.GetThis().Object())
 		} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
-			OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
+			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 		}
 		old_execute_data = executeData
 		executeData = executeData.GetPrevExecuteData()
@@ -346,7 +346,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 				ZendVmStackFreeExtraArgsEx(call_info, executeData)
 			}
 			if (call_info & ZEND_CALL_CLOSURE) != 0 {
-				OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
+				// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 			}
 			return -1
 		} else {

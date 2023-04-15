@@ -3,28 +3,16 @@ package zend
 import "github.com/heyuuu/gophp/zend/types"
 
 /**
- * ZendObjectsStore
+ * ObjectsStore
+ * 简化为仅作为对象 ZendObject.handle 的发号器
  */
-type ZendObjectsStore struct {
-	object_buckets **types.ZendObject
-	top            uint32
-	size           uint32
-	free_list_head int
+type ObjectsStore struct {
+	lastHandle uint32 // 最后一个object的handle值，初始为0
 }
 
-// func MakeZendObjectsStore(object_buckets **ZendObject, top uint32, size uint32, free_list_head int) ZendObjectsStore {
-//     return ZendObjectsStore{
-//         object_buckets:object_buckets,
-//         top:top,
-//         size:size,
-//         free_list_head:free_list_head,
-//     }
-// }
-func (this *ZendObjectsStore) GetObjectBuckets() **types.ZendObject      { return this.object_buckets }
-func (this *ZendObjectsStore) SetObjectBuckets(value **types.ZendObject) { this.object_buckets = value }
-func (this *ZendObjectsStore) GetTop() uint32                            { return this.top }
-func (this *ZendObjectsStore) SetTop(value uint32)                       { this.top = value }
-func (this *ZendObjectsStore) GetSize() uint32                           { return this.size }
-func (this *ZendObjectsStore) SetSize(value uint32)                      { this.size = value }
-func (this *ZendObjectsStore) GetFreeListHead() int                      { return this.free_list_head }
-func (this *ZendObjectsStore) SetFreeListHead(value int)                 { this.free_list_head = value }
+func (s *ObjectsStore) PutObject(obj *types.ZendObject) {
+	// notice: 此处的 handle 是从 1 开始的，以保持索引 == ZendObject.handle 且 ZendObject.handle 始终大于 0
+	s.lastHandle++
+	handle := s.lastHandle
+	obj.SetHandle(handle)
+}

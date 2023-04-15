@@ -238,7 +238,7 @@ type ZendExecutorGlobals struct {
 	modifiedIniDirectives IniDirectives
 
 	error_reporting_ini_entry *ZendIniEntry
-	objects_store             ZendObjectsStore
+	objects_store             ObjectsStore
 	exception                 *types.ZendObject
 	prev_exception            **types.ZendObject
 	opline_before_exception   *ZendOp
@@ -440,11 +440,11 @@ func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 func (this *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 	this.error_reporting_ini_entry = value
 }
-func (this *ZendExecutorGlobals) GetObjectsStore() *ZendObjectsStore     { return &this.objects_store }
-func (this *ZendExecutorGlobals) SetObjectsStore(value ZendObjectsStore) { this.objects_store = value }
-func (this *ZendExecutorGlobals) GetException() *types.ZendObject        { return this.exception }
-func (this *ZendExecutorGlobals) SetException(value *types.ZendObject)   { this.exception = value }
-func (this *ZendExecutorGlobals) GetPrevException() **types.ZendObject   { return this.prev_exception }
+func (this *ZendExecutorGlobals) GetObjectsStore() *ObjectsStore       { return &this.objects_store }
+func (this *ZendExecutorGlobals) SetObjectsStore(value ObjectsStore)   { this.objects_store = value }
+func (this *ZendExecutorGlobals) GetException() *types.ZendObject      { return this.exception }
+func (this *ZendExecutorGlobals) SetException(value *types.ZendObject) { this.exception = value }
+func (this *ZendExecutorGlobals) GetPrevException() **types.ZendObject { return this.prev_exception }
 func (this *ZendExecutorGlobals) SetPrevException(value **types.ZendObject) {
 	this.prev_exception = value
 }

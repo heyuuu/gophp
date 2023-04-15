@@ -1704,7 +1704,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 			object.SetCbfilter(nil)
 			zend.ZvalPtrDtor(cbfilter.GetFci().GetFunctionName())
 			if cbfilter.GetFci().GetObject() != nil {
-				zend.OBJ_RELEASE(cbfilter.GetFci().GetObject())
+				// zend.OBJ_RELEASE(cbfilter.GetFci().GetObject())
 			}
 			zend.Efree(cbfilter)
 		}
