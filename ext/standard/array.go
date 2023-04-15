@@ -3369,7 +3369,7 @@ func ZifArraySlice(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, of
 				entry = return_value.Array().NextIndexInsertNew(entry)
 			}
 		}
-		//zend.ZvalAddRef(entry)
+		zend.ZvalAddRef(entry)
 	}
 }
 func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
@@ -3433,11 +3433,11 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 				// zend.ZvalPtrDtor(&tmp)
 			} else {
 				var zv = dest.KeyAddNew(string_key.GetStr(), src_entry)
-				//zend.ZvalAddRef(zv)
+				zend.ZvalAddRef(zv)
 			}
 		} else {
 			var zv = dest.NextIndexInsert(src_entry)
-			//zend.ZvalAddRef(zv)
+			zend.ZvalAddRef(zv)
 		}
 	}
 	return 1
@@ -3501,13 +3501,13 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) int {
 		if string_key != nil {
 			if src_zval.GetType() != types.IS_ARRAY || b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || dest_entry.GetType() != types.IS_ARRAY && (!(dest_entry.IsReference()) || types.Z_REFVAL_P(dest_entry).GetType() != types.IS_ARRAY) {
 				var zv = dest.KeyUpdate(string_key.GetStr(), src_entry)
-				//zend.ZvalAddRef(zv)
+				zend.ZvalAddRef(zv)
 				continue
 			}
 		} else {
 			if src_zval.GetType() != types.IS_ARRAY || b.Assign(&dest_entry, dest.IndexFind(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY && (!(dest_entry.IsReference()) || types.Z_REFVAL_P(dest_entry).GetType() != types.IS_ARRAY) {
 				var zv = dest.IndexUpdate(num_key, src_entry)
-				//zend.ZvalAddRef(zv)
+				zend.ZvalAddRef(zv)
 				continue
 			}
 		}
@@ -4196,7 +4196,7 @@ func ZifArrayReverse(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval
 					entry = return_value.Array().NextIndexInsertNew(entry)
 				}
 			}
-			//zend.ZvalAddRef(entry)
+			zend.ZvalAddRef(entry)
 		}
 	}
 }
@@ -4389,7 +4389,7 @@ func ZifArrayChangeKeyCase(executeData zpp.Ex, return_value zpp.Ret, input *type
 			entry = return_value.Array().KeyUpdate(new_key.GetStr(), entry)
 			// types.ZendStringReleaseEx(new_key, 0)
 		}
-		//zend.ZvalAddRef(entry)
+		zend.ZvalAddRef(entry)
 	}
 }
 func ArrayBucketindexSwap(p any, q any) {
@@ -5499,7 +5499,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 			} else {
 				value = return_value.Array().IndexAddNew(idx, value)
 			}
-			//zend.ZvalAddRef(value)
+			zend.ZvalAddRef(value)
 		}
 		// zend.ZendTmpStringRelease(tmp_str)
 	}
@@ -6151,7 +6151,7 @@ func ZifArrayFilter(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _
 		} else {
 			operand = return_value.Array().IndexUpdate(num_key, operand)
 		}
-		//zend.ZvalAddRef(operand)
+		zend.ZvalAddRef(operand)
 	}
 	zend.ZendReleaseFcallInfoCache(&fci_cache)
 }
@@ -6435,7 +6435,7 @@ func ZifArrayChunk(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, si
 		} else {
 			entry = chunk.Array().NextIndexInsert(entry)
 		}
-		//zend.ZvalAddRef(entry)
+		zend.ZvalAddRef(entry)
 
 		/* If reached the chunk size, add it to the result array, and reset the
 		 * pointer. */
@@ -6508,7 +6508,7 @@ func ZifArrayCombine(executeData zpp.Ex, return_value zpp.Ret, keys *types.Zval,
 					entry_values = return_value.Array().SymtableUpdate(key.GetStr(), entry_values)
 					// zend.ZendTmpStringRelease(tmp_key)
 				}
-				//zend.ZvalAddRef(entry_values)
+				zend.ZvalAddRef(entry_values)
 				pos_values++
 				break
 			}

@@ -637,7 +637,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 				} else {
 					dest_elem = ht.KeyUpdate(key.GetStr(), elem)
 				}
-				//zend.ZvalAddRef(dest_elem)
+				zend.ZvalAddRef(dest_elem)
 				ret++
 				continue
 			}
@@ -695,7 +695,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 			} else {
 				dest_elem = ht.KeyUpdate(key.GetStr(), elem)
 			}
-			//zend.ZvalAddRef(dest_elem)
+			zend.ZvalAddRef(dest_elem)
 			ret++
 			continue
 		}
