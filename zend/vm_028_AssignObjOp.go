@@ -105,7 +105,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = opline.Op2Ptr(&free_op2)
+	property = opline.Op2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if object.GetType() != types.IS_OBJECT {
@@ -357,7 +357,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	if object.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = opline.Op2Ptr(&free_op2)
+	property = opline.Op2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 	assign_op_object:
@@ -586,7 +586,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
 	object = opline.Op1()
-	property = opline.Op2Ptr(&free_op2)
+	property = opline.Op2()
 	for {
 		value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data)
 		if object.GetType() != types.IS_OBJECT {

@@ -13,7 +13,7 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	if (ZEND_CALL_INFO(executeData.GetCall()) & ZEND_CALL_SEND_ARG_BY_REF) != 0 {
 		return ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData)
 	}
-	varptr = opline.Op1Ptr(&free_op1)
+	varptr = opline.Op1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	if varptr.IsReference() {
 		var ref *types.ZendRefcounted = varptr.RefCounted()

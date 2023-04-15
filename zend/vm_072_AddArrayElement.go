@@ -61,7 +61,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2Ptr(&free_op2)
+		var offset *types.Zval = opline.Op2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -263,7 +263,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2Ptr(&free_op2)
+		var offset *types.Zval = opline.Op2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -416,7 +416,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
-		expr_ptr = opline.Op1Ptr(&free_op1)
+		expr_ptr = opline.Op1()
 	}
 	{
 		var offset *types.Zval = opline.Const2()
@@ -471,11 +471,11 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
-		expr_ptr = opline.Op1Ptr(&free_op1)
+		expr_ptr = opline.Op1()
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2Ptr(&free_op2)
+		var offset *types.Zval = opline.Op2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:
@@ -540,7 +540,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
-		expr_ptr = opline.Op1Ptr(&free_op1)
+		expr_ptr = opline.Op1()
 	}
 
 	{
@@ -567,7 +567,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
-		expr_ptr = opline.Op1Ptr(&free_op1)
+		expr_ptr = opline.Op1()
 	}
 	{
 		var offset *types.Zval = opline.Op2()
@@ -685,7 +685,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	}
 	{
 		var free_op2 ZendFreeOp
-		var offset *types.Zval = opline.Op2Ptr(&free_op2)
+		var offset *types.Zval = opline.Op2()
 		var str *types.String
 		var hval ZendUlong
 	add_again:

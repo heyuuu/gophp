@@ -11,8 +11,8 @@ func vmNopHandler(executeData *ZendExecuteData) int {
 // ZEND_ADD
 func vmAddHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
@@ -59,8 +59,8 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 // ZEND_SUB
 func vmSubHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
@@ -107,8 +107,8 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 // ZEND_MUL
 func vmMulHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
@@ -162,23 +162,18 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 func vmDivHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var freeOp1, freeOp2 ZendFreeOp
-	var op1 *types.Zval = opline.Op1ExEx(&freeOp1)
-	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
+	var op1 *types.Zval = executeData.Op1(opline, opMode2)
+	var op2 *types.Zval = executeData.Op2(opline, opMode2)
 	FastDivFunction(opline.Result(), op1, op2)
-	if freeOp1 != nil {
-		// ZvalPtrDtorNogc(freeOp1)
-	}
-	if freeOp2 != nil {
-		// ZvalPtrDtorNogc(freeOp2)
-	}
+
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
 // ZEND_MOD
 func vmModHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	if op1.IsLong() && op2.IsLong() {
@@ -200,8 +195,8 @@ func vmModHandler(executeData *ZendExecuteData) int {
 // ZEND_SL
 func vmSlHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.Long() < SIZEOF_ZEND_LONG*8) != 0 {
 		/* Perform shift on unsigned numbers to get well-defined wrap behavior. */
@@ -214,8 +209,8 @@ func vmSlHandler(executeData *ZendExecuteData) int {
 // ZEND_SR
 func getSrHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = opline.Op1Ex()
-	var op2 *types.Zval = opline.Op2Ex()
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	if op1.IsLong() && op2.IsLong() && ZendUlong(op2.Long() < SIZEOF_ZEND_LONG*8) != 0 {
 		opline.Result().SetLong(op1.Long() >> op2.Long())
@@ -229,8 +224,8 @@ func getSrHandler(executeData *ZendExecuteData) int {
 func getConcatHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var freeOp1, freeOp2 ZendFreeOp
-	var op1 *types.Zval = opline.ConcatOp1(&freeOp1)
-	var op2 *types.Zval = opline.ConcatOp2(&freeOp2)
+	var op1 *types.Zval = executeData.Op1(opline, opMode1)
+	var op2 *types.Zval = executeData.Op2(opline, opMode1)
 
 	// fast
 	if op1.IsString() && op2.IsString() {
@@ -246,11 +241,6 @@ func getConcatHandler(executeData *ZendExecuteData) int {
 		op2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	ConcatFunction(opline.Result(), op1, op2)
-	if freeOp1 != nil {
-		// ZvalPtrDtorNogc(freeOp1)
-	}
-	if freeOp2 != nil {
-		// ZvalPtrDtorNogc(freeOp2)
-	}
+
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

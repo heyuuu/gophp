@@ -56,7 +56,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var new_op_array *types.ZendOpArray
 	var free_op1 ZendFreeOp
 	var inc_filename *types.Zval
-	inc_filename = opline.Op1Ptr(&free_op1)
+	inc_filename = opline.Op1()
 	new_op_array = ZendIncludeOrEval(inc_filename, opline.GetExtendedValue())
 	// ZvalPtrDtorNogc(free_op1)
 	if EG__().GetException() != nil {

@@ -55,7 +55,7 @@ func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var retval *types.Zval
 	var free_op1 ZendFreeOp
 	var generator *ZendGenerator = ZendGetRunningGenerator(executeData)
-	retval = opline.Op1Ptr(&free_op1)
+	retval = opline.Op1()
 
 	/* Copy return value into generator->retval */
 

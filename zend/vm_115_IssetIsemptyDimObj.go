@@ -72,7 +72,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 	var hval ZendUlong
 	var offset *types.Zval
 	container = opline.Const1()
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	if container.IsArray() {
 		var ht *types.Array
 		var value *types.Zval
@@ -206,7 +206,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 	var result int
 	var hval ZendUlong
 	var offset *types.Zval
-	container = opline.Op1Ptr(&free_op1)
+	container = opline.Op1()
 	offset = opline.Const2()
 	if container.IsArray() {
 		var ht *types.Array
@@ -274,8 +274,8 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 	var result int
 	var hval ZendUlong
 	var offset *types.Zval
-	container = opline.Op1Ptr(&free_op1)
-	offset = opline.Op2Ptr(&free_op2)
+	container = opline.Op1()
+	offset = opline.Op2()
 	if container.IsArray() {
 		var ht *types.Array
 		var value *types.Zval
@@ -348,7 +348,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 	var result int
 	var hval ZendUlong
 	var offset *types.Zval
-	container = opline.Op1Ptr(&free_op1)
+	container = opline.Op1()
 	offset = opline.Op2()
 	if container.IsArray() {
 		var ht *types.Array
@@ -486,7 +486,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 	var hval ZendUlong
 	var offset *types.Zval
 	container = opline.Op1()
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	if container.IsArray() {
 		var ht *types.Array
 		var value *types.Zval

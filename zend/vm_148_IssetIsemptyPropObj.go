@@ -27,7 +27,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExec
 	var result int
 	var offset *types.Zval
 	container = opline.Const1()
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	{
 
 		{
@@ -68,7 +68,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExec
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = opline.Op1Ptr(&free_op1)
+	container = opline.Op1()
 	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -96,8 +96,8 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExe
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = opline.Op1Ptr(&free_op1)
-	offset = opline.Op2Ptr(&free_op2)
+	container = opline.Op1()
+	offset = opline.Op2()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -124,7 +124,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecute
 	var container *types.Zval
 	var result int
 	var offset *types.Zval
-	container = opline.Op1Ptr(&free_op1)
+	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
@@ -171,7 +171,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExe
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ types.Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	// ZvalPtrDtorNogc(free_op2)
@@ -227,7 +227,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecute
 	var result int
 	var offset *types.Zval
 	container = opline.Op1()
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	if container.GetType() != types.IS_OBJECT {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)

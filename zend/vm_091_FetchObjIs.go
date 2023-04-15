@@ -17,7 +17,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = opline.Const1()
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	{
 		for {
 			opline.Result().SetNull()
@@ -76,7 +76,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) i
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.Op1Ptr(&free_op1)
+	container = opline.Op1()
 	offset = opline.Const2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -153,8 +153,8 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	var free_op2 ZendFreeOp
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.Op1Ptr(&free_op1)
-	offset = opline.Op2Ptr(&free_op2)
+	container = opline.Op1()
+	offset = opline.Op2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {
@@ -191,7 +191,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int 
 	var container *types.Zval
 	var offset *types.Zval
 	var cache_slot *any = nil
-	container = opline.Op1Ptr(&free_op1)
+	container = opline.Op1()
 	offset = opline.Cv2OrUndef()
 	if container.GetType() != types.IS_OBJECT {
 		for {
@@ -297,7 +297,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	/* here we are sure we are dealing with an object */
 
 	var zobj *types.ZendObject = container.Object()
@@ -418,7 +418,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var offset *types.Zval
 	var cache_slot *any = nil
 	container = opline.Op1()
-	offset = opline.Op2Ptr(&free_op2)
+	offset = opline.Op2()
 	if container.GetType() != types.IS_OBJECT {
 		for {
 			if container.IsReference() {

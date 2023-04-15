@@ -27,7 +27,7 @@ func ZEND_JMPZ_EX_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var val *types.Zval
 	var ret int
-	val = opline.Op1Ptr(&free_op1)
+	val = opline.Op1()
 	if val.IsTrue() {
 		opline.Result().SetTrue()
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)

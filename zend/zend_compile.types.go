@@ -1,7 +1,6 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/internal"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -228,17 +227,6 @@ func (op *ZendOp) _complexOpEx(opType uint8, node ZnodeOp, shouldFree *ZendFreeO
 //
 func (op *ZendOp) _const(node ZnodeOp) *types.Zval { return RT_CONSTANT(op, node) }
 func (op *ZendOp) _op(node ZnodeOp) *types.Zval    { return EX_VAR(node.GetVar()) }
-func (op *ZendOp) _opPtr(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
-	var ret = op._op(node)
-	*shouldFree = ret
-	return ret
-}
-func (op *ZendOp) _opPtrTmp(node ZnodeOp, shouldFree *ZendFreeOp) *types.Zval {
-	var ret = op._op(node)
-	*shouldFree = ret
-	b.Assert(ret.GetType() != types.IS_REFERENCE)
-	return ret
-}
 func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
 	ret := op._op(node)
 	if ret.IsUndef() {
@@ -247,52 +235,13 @@ func (op *ZendOp) _cvOrUndef(node ZnodeOp) *types.Zval {
 	return ret
 }
 
-func (op *ZendOp) Const1() *types.Zval { return op._const(op.op1) }
-func (op *ZendOp) Const2() *types.Zval { return op._const(op.op2) }
-func (op *ZendOp) Op1() *types.Zval    { return op._op(op.op1) }
-func (op *ZendOp) Op2() *types.Zval    { return op._op(op.op2) }
-func (op *ZendOp) Result() *types.Zval { return op._op(op.result) }
-
-//
-func (op *ZendOp) Op1Ptr(shouldFree *ZendFreeOp) *types.Zval {
-	return op._opPtr(op.op1, shouldFree)
-}
-func (op *ZendOp) Op2Ptr(shouldFree *ZendFreeOp) *types.Zval {
-	return op._opPtr(op.op2, shouldFree)
-}
-func (op *ZendOp) Op1PtrTmp(shouldFree *ZendFreeOp) *types.Zval {
-	return op._opPtrTmp(op.op1, shouldFree)
-}
-func (op *ZendOp) Op2PtrTmp(shouldFree *ZendFreeOp) *types.Zval {
-	return op._opPtrTmp(op.op2, shouldFree)
-}
-
+func (op *ZendOp) Const1() *types.Zval     { return op._const(op.op1) }
+func (op *ZendOp) Const2() *types.Zval     { return op._const(op.op2) }
+func (op *ZendOp) Op1() *types.Zval        { return op._op(op.op1) }
+func (op *ZendOp) Op2() *types.Zval        { return op._op(op.op2) }
+func (op *ZendOp) Result() *types.Zval     { return op._op(op.result) }
 func (op *ZendOp) Cv1OrUndef() *types.Zval { return op._cvOrUndef(op.op1) }
 func (op *ZendOp) Cv2OrUndef() *types.Zval { return op._cvOrUndef(op.op2) }
-
-// VarEx
-func (op *ZendOp) Op1Ex() *types.Zval {
-	return op._complexOp(op.op1Type, op.op1, op._const, op._op, op._op)
-}
-func (op *ZendOp) Op2Ex() *types.Zval {
-	return op._complexOp(op.op2Type, op.op2, op._const, op._op, op._op)
-}
-
-// VarExEx
-func (op *ZendOp) Op1ExEx(shouldFree *ZendFreeOp) *types.Zval {
-	return op._complexOpEx(op.op1Type, op.op1, shouldFree, op._const, op._opPtr, op._cvOrUndef)
-}
-func (op *ZendOp) Op2ExEx(shouldFree *ZendFreeOp) *types.Zval {
-	return op._complexOpEx(op.op2Type, op.op2, shouldFree, op._const, op._opPtr, op._cvOrUndef)
-}
-
-//
-func (op *ZendOp) ConcatOp1(freeOp *ZendFreeOp) *types.Zval {
-	return op._complexOpEx(op.op1Type, op.op1, freeOp, op._const, op._opPtr, op._op)
-}
-func (op *ZendOp) ConcatOp2(freeOp *ZendFreeOp) *types.Zval {
-	return op._complexOpEx(op.op1Type, op.op1, freeOp, op._const, op._opPtr, op._op)
-}
 
 /**
  * ZendBrkContElement

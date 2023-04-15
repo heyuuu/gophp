@@ -45,7 +45,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var scope *types.ClassEntry
 	var clone types.IFunction
 	var clone_call ZendObjectCloneObjT
-	obj = opline.Op1Ptr(&free_op1)
+	obj = opline.Op1()
 	for {
 		if obj.GetType() != types.IS_OBJECT {
 			if obj.IsReference() {

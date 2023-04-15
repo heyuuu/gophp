@@ -22,7 +22,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	var container *types.Zval
 	var dim *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	dim = opline.Op2Ptr(&free_op2)
+	dim = opline.Op2()
 	if opline.Op1().GetType() != types.IS_INDIRECT && !(container.IsReference()) {
 		faults.Error(faults.E_NOTICE, "Attempting to set reference to non referenceable value")
 		zend_fetch_dimension_address_LIST_r(container, dim, IS_TMP_VAR|IS_VAR, opline, executeData)

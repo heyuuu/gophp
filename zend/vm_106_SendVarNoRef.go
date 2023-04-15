@@ -5,7 +5,7 @@ func ZEND_SEND_VAR_NO_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var varptr *types.Zval
 	var arg *types.Zval
-	varptr = opline.Op1Ptr(&free_op1)
+	varptr = opline.Op1()
 	arg = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	arg.CopyValueFrom(varptr)
 	if varptr.IsReference() {

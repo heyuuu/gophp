@@ -23,7 +23,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	var container *types.Zval
 	var result *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
-	property = opline.Op2Ptr(&free_op2)
+	property = opline.Op2()
 	result = opline.Result()
 	ZendFetchPropertyAddress(result, container, IS_VAR, property, IS_TMP_VAR|IS_VAR, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
 	// ZvalPtrDtorNogc(free_op2)
@@ -73,7 +73,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 	if container.IsUndef() {
 		return zend_this_not_in_object_context_helper_SPEC(executeData)
 	}
-	property = opline.Op2Ptr(&free_op2)
+	property = opline.Op2()
 	result = opline.Result()
 	ZendFetchPropertyAddress(result, container, IS_UNUSED, property, IS_TMP_VAR|IS_VAR, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
 	// ZvalPtrDtorNogc(free_op2)
@@ -117,7 +117,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var container *types.Zval
 	var result *types.Zval
 	container = opline.Op1()
-	property = opline.Op2Ptr(&free_op2)
+	property = opline.Op2()
 	result = opline.Result()
 	ZendFetchPropertyAddress(result, container, IS_CV, property, IS_TMP_VAR|IS_VAR, b.CondF1((IS_TMP_VAR|IS_VAR) == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue()) }, nil), BP_VAR_RW, 0, 1, opline, executeData)
 	// ZvalPtrDtorNogc(free_op2)

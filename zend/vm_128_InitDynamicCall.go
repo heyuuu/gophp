@@ -25,7 +25,7 @@ func ZEND_INIT_DYNAMIC_CALL_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	var free_op2 ZendFreeOp
 	var function_name *types.Zval
 	var call *ZendExecuteData
-	function_name = opline.Op2Ptr(&free_op2)
+	function_name = opline.Op2()
 try_function_name:
 	if function_name.IsString() {
 		call = ZendInitDynamicCallString(function_name.GetStr(), opline.GetExtendedValue())

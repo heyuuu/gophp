@@ -29,7 +29,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 	{
 		var free_op1 ZendFreeOp
 		var op1 *types.Zval
-		op1 = opline.Op1Ptr(&free_op1)
+		op1 = opline.Op1()
 		for true {
 			if op1.IsObject() {
 				opline.Result().SetStringCopy(types.Z_OBJCE_P(op1).GetName())

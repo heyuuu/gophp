@@ -39,7 +39,7 @@ func ZEND_QM_ASSIGN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var free_op1 ZendFreeOp
 	var value *types.Zval
 	var result *types.Zval = opline.Result()
-	value = opline.Op1Ptr(&free_op1)
+	value = opline.Op1()
 	if value.IsUndef() {
 		ZVAL_UNDEFINED_OP1(executeData)
 		result.SetNull()

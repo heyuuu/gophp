@@ -286,7 +286,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = opline.Op2Ptr(&free_op2)
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -783,7 +783,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = opline.Op2Ptr(&free_op2)
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1033,7 +1033,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = opline.Op1Ptr(&free_op1)
+				value = opline.Op1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -1044,7 +1044,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = opline.Op1Ptr(&free_op1)
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -1130,7 +1130,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = opline.Op1Ptr(&free_op1)
+				value = opline.Op1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -1141,7 +1141,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = opline.Op1Ptr(&free_op1)
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -1225,7 +1225,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = opline.Op1Ptr(&free_op1)
+				value = opline.Op1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -1236,7 +1236,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = opline.Op1Ptr(&free_op1)
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -1257,7 +1257,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = opline.Op2Ptr(&free_op2)
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -1320,7 +1320,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = opline.Op1Ptr(&free_op1)
+				value = opline.Op1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -1331,7 +1331,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = opline.Op1Ptr(&free_op1)
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -1407,7 +1407,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			{
 				var value *types.Zval
 				faults.Error(faults.E_NOTICE, "Only variable references should be yielded by reference")
-				value = opline.Op1Ptr(&free_op1)
+				value = opline.Op1()
 				types.ZVAL_COPY_VALUE(generator.GetValue(), value)
 			}
 
@@ -1418,7 +1418,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 			 * but we still allow them with a notice. */
 
 		} else {
-			var value *types.Zval = opline.Op1Ptr(&free_op1)
+			var value *types.Zval = opline.Op1()
 
 			/* Consts, temporary variables and references need copying */
 
@@ -1689,7 +1689,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = opline.Op2Ptr(&free_op2)
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 
@@ -2139,7 +2139,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 	{
 		var free_op2 ZendFreeOp
-		var key *types.Zval = opline.Op2Ptr(&free_op2)
+		var key *types.Zval = opline.Op2()
 
 		/* Consts, temporary variables and references need copying */
 

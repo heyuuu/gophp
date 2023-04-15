@@ -64,7 +64,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var ref *types.Zval = nil
 	var ret int
-	value = opline.Op1Ptr(&free_op1)
+	value = opline.Op1()
 	if value.IsReference() {
 		{
 			ref = value

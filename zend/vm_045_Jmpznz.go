@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var val *types.Zval
@@ -19,9 +21,8 @@ func ZEND_JMPZNZ_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 }
 func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var free_op1 ZendFreeOp
 	var val *types.Zval
-	val = opline.Op1Ptr(&free_op1)
+	val = opline.Op1()
 	if val.IsTrue() {
 		ZEND_VM_SET_RELATIVE_OPCODE(executeData, opline, opline.GetExtendedValue())
 		return 0
@@ -39,7 +40,6 @@ func ZEND_JMPZNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		opline = OP_JMP_ADDR(opline, opline.GetOp2())
 	}
-	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_JMP(executeData, opline)
 }
 func ZEND_JMPZNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

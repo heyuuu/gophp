@@ -14,7 +14,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 	var name *types.String
 	var tmp_name *types.String
 	var target_symbol_table *types.Array
-	varname = opline.Op1Ptr(&free_op1)
+	varname = opline.Op1()
 
 	if varname.IsString() {
 		name = varname.String()
