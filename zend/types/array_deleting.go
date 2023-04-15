@@ -36,7 +36,7 @@ func (this *Bucket) SetKey(value *String) {
  */
 func (ht *Array) SymtableClean() {
 	// todo 这里可能不会严格对等，需要处理一下
-	b.Assert(ht.destructor == zend.ZVAL_PTR_DTOR)
+	//b.Assert(ht.destructor == zend.ZVAL_PTR_DTOR)
 
 	ht.Clean()
 }

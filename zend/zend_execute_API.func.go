@@ -34,7 +34,7 @@ func InitExecutor() {
 	EG__().SetErrorHandling(EH_NORMAL)
 	EG__().SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
-	EG__().GetSymbolTable() = types.MakeArrayEx(64, ZVAL_PTR_DTOR, 0)
+	EG__().SetSymbolTable(types.NewArray(64))
 	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
 	EG__().GetIncludedFiles() = types.MakeArrayEx(8, nil, 0)
 	EG__().SetTicksCount(0)
@@ -180,8 +180,8 @@ func ShutdownExecutor() {
 			EG__().GetUserExceptionHandler().SetUndef()
 		}
 		ZendStackClean(EG__().GetUserErrorHandlersErrorReporting(), nil, 1)
-		ZendStackClean(EG__().GetUserErrorHandlers(), (func(any))(ZVAL_PTR_DTOR), 1)
-		ZendStackClean(EG__().GetUserExceptionHandlers(), (func(any))(ZVAL_PTR_DTOR), 1)
+		ZendStackClean(EG__().GetUserErrorHandlers(), nil, 1)
+		ZendStackClean(EG__().GetUserExceptionHandlers(), nil, 1)
 	}
 	// notice: 无需主动调用析构函数，使用自动析构代替
 	//ZendObjectsStoreFreeObjectStorage(EG__().GetObjectsStore(), fast_shutdown)

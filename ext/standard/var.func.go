@@ -666,7 +666,7 @@ func PhpVarSerializeGetSleepProps(ht *types.Array, struc *types.Zval, sleep_retv
 	var props *types.Array = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *types.Zval
 	var retval int = types.SUCCESS
-	ht = types.MakeArrayEx(sleep_retval.Len(), zend.ZVAL_PTR_DTOR, 0)
+	*ht = *types.NewArray(sleep_retval.Len())
 
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
@@ -992,7 +992,7 @@ func PhpVarSerializeInit() PhpSerializeDataT {
 
 	if BG__().serialize_lock || !(BG__().serialize.level) {
 		d = zend.Emalloc(b.SizeOf("struct php_serialize_data"))
-		d.GetHt() = types.MakeArrayEx(16, zend.ZVAL_PTR_DTOR, 0)
+		d.SetHt(types.NewArray(16))
 		d.SetN(0)
 		if !(BG__().serialize_lock) {
 			BG__().serialize.data = d

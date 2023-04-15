@@ -4,7 +4,6 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func ZvalPtrDtor(zval_ptr *types.Zval) {}
 func ZvalAddRef(p *types.Zval) {
 	if p.IsRefcounted() {
 		if p.IsReference() && p.GetRefcount() == 1 {
