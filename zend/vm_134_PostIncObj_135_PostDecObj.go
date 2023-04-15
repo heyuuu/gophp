@@ -48,7 +48,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int 
 		break
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -99,9 +99,9 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		}
 		break
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -152,7 +152,7 @@ func ZEND_POST_INC_OBJ_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		break
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -230,7 +230,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		}
 		break
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -364,7 +364,7 @@ func ZEND_POST_INC_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 		}
 		break
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_POST_INC_OBJ_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {

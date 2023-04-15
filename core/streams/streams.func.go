@@ -471,7 +471,7 @@ func PhpStreamNotificationNotify(
 }
 func PhpStreamContextFree(context *core.PhpStreamContext) {
 	if context.GetOptions().IsNotUndef() {
-		zend.ZvalPtrDtor(context.GetOptions())
+		// zend.ZvalPtrDtor(context.GetOptions())
 		context.GetOptions().SetUndef()
 	}
 	if context.GetNotifier() != nil {

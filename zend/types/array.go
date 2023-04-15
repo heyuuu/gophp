@@ -121,13 +121,14 @@ var _ IRefcounted = &Array{}
  * Constructor && Init
  */
 func NewArray(size int) *Array {
-	return NewArrayEx(size, zend.ZVAL_PTR_DTOR, false)
+	return NewArrayEx(size, nil, false)
+}
+func MakeArray(nSize int) Array {
+	arr := *NewArray(nSize)
+	return arr
 }
 func MakeArrayEx(nSize int, pDestructor DtorFuncT, persistent ZendBool) Array {
 	arr := *NewArrayEx(nSize, pDestructor, persistent != 0)
-	if pDestructor != nil {
-		runtime.SetFinalizer(arr, arr.DestroyEx)
-	}
 	return arr
 }
 func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
@@ -152,6 +153,11 @@ func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
 		ht.AddGcFlags(GC_PERSISTENT)
 	} else {
 		ht.AddGcFlags(GC_COLLECTABLE)
+	}
+
+	// 析构函数
+	if pDestructor != nil {
+		runtime.SetFinalizer(ht, ht.DestroyEx)
 	}
 
 	return ht

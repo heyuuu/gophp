@@ -1084,7 +1084,7 @@ done:
 		ScanSetErrorReturn(numVars, return_value)
 		result = SCAN_ERROR_EOF
 	} else if numVars != 0 {
-		zend.ZvalPtrDtor(return_value)
+		// zend.ZvalPtrDtor(return_value)
 		return_value.SetLong(nconversions)
 	} else if nconversions < totalVars {
 

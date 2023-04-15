@@ -420,7 +420,7 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 						faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
 					if result.Array().NextIndexInsert(val) == nil {
-						ZvalPtrDtor(result)
+						// ZvalPtrDtor(result)
 						return 0
 					}
 					// val.TryAddRefcount()
@@ -452,8 +452,8 @@ func ZendTryCtEvalArray(result *types.Zval, ast *ZendAst) types.ZendBool {
 			}
 		} else {
 			if result.Array().NextIndexInsert(value) == nil {
-				ZvalPtrDtorNogc(value)
-				ZvalPtrDtor(result)
+				// ZvalPtrDtorNogc(value)
+				// ZvalPtrDtor(result)
 				return 0
 			}
 		}
@@ -480,8 +480,8 @@ func ZendCompileBinaryOp(result *Znode, ast *ZendAst) {
 	if left_node.GetOpType() == IS_CONST && right_node.GetOpType() == IS_CONST {
 		if ZendTryCtEvalBinaryOp(result.GetConstant(), opcode, left_node.GetConstant(), right_node.GetConstant()) != 0 {
 			result.SetOpType(IS_CONST)
-			ZvalPtrDtor(left_node.GetConstant())
-			ZvalPtrDtor(right_node.GetConstant())
+			// ZvalPtrDtor(left_node.GetConstant())
+			// ZvalPtrDtor(right_node.GetConstant())
 			return
 		}
 	}
@@ -562,8 +562,8 @@ func ZendCompileGreater(result *Znode, ast *ZendAst) {
 	if left_node.GetOpType() == IS_CONST && right_node.GetOpType() == IS_CONST {
 		result.SetOpType(IS_CONST)
 		ZendCtEvalGreater(result.GetConstant(), ast.GetKind(), left_node.GetConstant(), right_node.GetConstant())
-		ZvalPtrDtor(left_node.GetConstant())
-		ZvalPtrDtor(right_node.GetConstant())
+		// ZvalPtrDtor(left_node.GetConstant())
+		// ZvalPtrDtor(right_node.GetConstant())
 		return
 	}
 	ZendEmitOpTmp(result, b.Cond(ast.GetKind() == ZEND_AST_GREATER, ZEND_IS_SMALLER, ZEND_IS_SMALLER_OR_EQUAL), &right_node, &left_node)
@@ -576,7 +576,7 @@ func ZendCompileUnaryOp(result *Znode, ast *ZendAst) {
 	if expr_node.GetOpType() == IS_CONST {
 		result.SetOpType(IS_CONST)
 		ZendCtEvalUnaryOp(result.GetConstant(), opcode, expr_node.GetConstant())
-		ZvalPtrDtor(expr_node.GetConstant())
+		// ZvalPtrDtor(expr_node.GetConstant())
 		return
 	}
 	ZendEmitOpTmp(result, opcode, &expr_node, nil)

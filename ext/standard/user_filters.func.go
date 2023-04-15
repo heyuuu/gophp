@@ -77,12 +77,12 @@ func UserfilterDtor(thisfilter *core.PhpStreamFilter) {
 	}
 	func_name.SetStringVal("onclose")
 	zend.CallUserFunction(obj, &func_name, &retval, 0, nil)
-	zend.ZvalPtrDtor(&retval)
-	zend.ZvalPtrDtor(&func_name)
+	// zend.ZvalPtrDtor(&retval)
+	// zend.ZvalPtrDtor(&func_name)
 
 	/* kill the object */
 
-	zend.ZvalPtrDtor(obj)
+	// zend.ZvalPtrDtor(obj)
 
 	/* kill the object */
 }
@@ -123,7 +123,7 @@ func UserfilterFilter(
 
 		/* add_property_zval increments the refcount which is unwanted here */
 
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 
 		/* add_property_zval increments the refcount which is unwanted here */
 
@@ -141,7 +141,7 @@ func UserfilterFilter(
 	}
 	args[3].SetBool((flags & streams.PSFS_FLAG_FLUSH_CLOSE) != 0)
 	call_result = zend.CallUserFunctionEx(obj, &func_name, &retval, 4, args, 0)
-	zend.ZvalPtrDtor(&func_name)
+	// zend.ZvalPtrDtor(&func_name)
 	if call_result == types.SUCCESS && retval.IsNotUndef() {
 		zend.ConvertToLong(&retval)
 		ret = int(retval.Long())
@@ -177,11 +177,11 @@ func UserfilterFilter(
 
 	zpropname.SetStringVal("stream")
 	types.Z_OBJ_HT(*obj).GetUnsetProperty()(obj, &zpropname, nil)
-	zend.ZvalPtrDtor(&zpropname)
-	zend.ZvalPtrDtor(&args[3])
-	zend.ZvalPtrDtor(&args[2])
-	zend.ZvalPtrDtor(&args[1])
-	zend.ZvalPtrDtor(&args[0])
+	// zend.ZvalPtrDtor(&zpropname)
+	// zend.ZvalPtrDtor(&args[3])
+	// zend.ZvalPtrDtor(&args[2])
+	// zend.ZvalPtrDtor(&args[1])
+	// zend.ZvalPtrDtor(&args[0])
 	stream.SubFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
 	stream.AddFlags(orig_no_fclose)
 	return ret
@@ -257,7 +257,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 	}
 	filter = streams.PhpStreamFilterAlloc(&UserfilterOps, nil, 0)
 	if filter == nil {
-		zend.ZvalPtrDtor(&obj)
+		// zend.ZvalPtrDtor(&obj)
 		return nil
 	}
 
@@ -282,7 +282,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 			/* User reported filter creation error "return false;" */
 
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 
 			/* Kill the filter (safely) */
 
@@ -291,7 +291,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 			/* Kill the object */
 
-			zend.ZvalPtrDtor(&obj)
+			// zend.ZvalPtrDtor(&obj)
 
 			/* Report failure to filter_alloc */
 
@@ -300,9 +300,9 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 			/* Report failure to filter_alloc */
 
 		}
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 	}
-	zend.ZvalPtrDtor(&func_name)
+	// zend.ZvalPtrDtor(&func_name)
 
 	/* set the filter property, this will be used during cleanup */
 
@@ -312,7 +312,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *types.Zval, persist
 
 	/* add_property_zval increments the refcount which is unwanted here */
 
-	zend.ZvalPtrDtor(&zfilter)
+	// zend.ZvalPtrDtor(&zfilter)
 	return filter
 }
 func FilterItemDtor(zv *types.Zval) {
@@ -349,7 +349,7 @@ func ZifStreamBucketMakeWriteable(executeData zpp.Ex, return_value zpp.Ret, brig
 
 		/* add_property_zval increments the refcount which is unwanted here */
 
-		zend.ZvalPtrDtor(&zbucket)
+		// zend.ZvalPtrDtor(&zbucket)
 		zend.AddPropertyStringl(return_value, "data", b.CastStr(bucket.GetBuf(), bucket.GetBuflen()))
 		zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 	}
@@ -456,7 +456,7 @@ func ZifStreamBucketNew(executeData zpp.Ex, return_value zpp.Ret, stream *types.
 
 	/* add_property_zval increments the refcount which is unwanted here */
 
-	zend.ZvalPtrDtor(&zbucket)
+	// zend.ZvalPtrDtor(&zbucket)
 	zend.AddPropertyStringl(return_value, "data", b.CastStr(bucket.GetBuf(), bucket.GetBuflen()))
 	zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 }

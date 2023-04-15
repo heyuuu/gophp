@@ -143,7 +143,7 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 						break
 					}
 				}
-				IZvalPtrDtor(p)
+				// IZvalPtrDtor(p)
 				p.SetUndef()
 				p++
 			}
@@ -183,7 +183,7 @@ func ZendCleanupInternalClassData(ce *types.ClassEntry) {
 						break
 					}
 				}
-				IZvalPtrDtor(p)
+				// IZvalPtrDtor(p)
 				p++
 			}
 			Efree(static_members)
@@ -257,7 +257,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			var p *types.Zval = ce.GetDefaultPropertiesTable()
 			var end *types.Zval = p + ce.GetDefaultPropertiesCount()
 			for p != end {
-				IZvalPtrDtor(p)
+				// IZvalPtrDtor(p)
 				p++
 			}
 			Efree(ce.GetDefaultPropertiesTable())
@@ -293,7 +293,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 						break
 					}
 				}
-				IZvalPtrDtor(p)
+				// IZvalPtrDtor(p)
 				p++
 			}
 			Efree(ce.GetDefaultStaticMembersTable())
@@ -304,7 +304,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 		if ce.ConstantsTable().Len() != 0 {
 			ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 				if c.GetCe() == ce {
-					ZvalPtrDtorNogc(c.GetValue())
+					// ZvalPtrDtorNogc(c.GetValue())
 				}
 			})
 		}
@@ -327,7 +327,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			var p *types.Zval = ce.GetDefaultPropertiesTable()
 			var end *types.Zval = p + ce.GetDefaultPropertiesCount()
 			for p != end {
-				ZvalInternalPtrDtor(p)
+				//ZvalInternalPtrDtor(p)
 				p++
 			}
 			Free(ce.GetDefaultPropertiesTable())
@@ -336,7 +336,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 			var p *types.Zval = ce.GetDefaultStaticMembersTable()
 			var end *types.Zval = p + ce.GetDefaultStaticMembersCount()
 			for p != end {
-				ZvalInternalPtrDtor(p)
+				//ZvalInternalPtrDtor(p)
 				p++
 			}
 			Free(ce.GetDefaultStaticMembersTable())
@@ -358,7 +358,7 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 		if ce.ConstantsTable().Len() != 0 {
 			ce.ConstantsTable().Foreach(func(key string, c *ZendClassConstant) {
 				if c.GetCe() == ce {
-					ZvalInternalPtrDtor(c.GetValue())
+					//ZvalInternalPtrDtor(c.GetValue())
 				}
 			})
 
@@ -411,7 +411,7 @@ func DestroyOpArray(op_array *types.ZendOpArray) {
 		var literal *types.Zval = op_array.GetLiterals()
 		var end *types.Zval = literal + op_array.GetLastLiteral()
 		for literal < end {
-			ZvalPtrDtorNogc(literal)
+			// ZvalPtrDtorNogc(literal)
 			literal++
 		}
 		if ZEND_USE_ABS_CONST_ADDR || !op_array.IsDonePassTwo() {

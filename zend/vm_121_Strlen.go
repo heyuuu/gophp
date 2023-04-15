@@ -23,10 +23,10 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					opline.Result().SetLong(str.GetLen())
-					ZvalPtrDtor(&tmp)
+					// ZvalPtrDtor(&tmp)
 					break
 				}
-				ZvalPtrDtor(&tmp)
+				// ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
@@ -44,7 +44,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	value = opline.Op1Ptr(&free_op1)
 	if value.IsString() {
 		opline.Result().SetLong(value.String().GetLen())
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
 	} else {
 		var strict types.ZendBool
@@ -52,7 +52,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			value = types.Z_REFVAL_P(value)
 			if value.IsString() {
 				opline.Result().SetLong(value.String().GetLen())
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
 			}
 		}
@@ -67,10 +67,10 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					opline.Result().SetLong(str.GetLen())
-					ZvalPtrDtor(&tmp)
+					// ZvalPtrDtor(&tmp)
 					break
 				}
-				ZvalPtrDtor(&tmp)
+				// ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))
@@ -79,7 +79,7 @@ func ZEND_STRLEN_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 			break
 		}
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -109,10 +109,10 @@ func ZEND_STRLEN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				types.ZVAL_COPY(&tmp, value)
 				if zpp.ZendParseArgStrWeak(&tmp, &str) != 0 {
 					opline.Result().SetLong(str.GetLen())
-					ZvalPtrDtor(&tmp)
+					// ZvalPtrDtor(&tmp)
 					break
 				}
-				ZvalPtrDtor(&tmp)
+				// ZvalPtrDtor(&tmp)
 			}
 			if EG__().GetException() == nil {
 				faults.InternalTypeError(strict, "strlen() expects parameter 1 to be string, %s given", types.ZendGetTypeByConst(value.GetType()))

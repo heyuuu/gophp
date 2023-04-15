@@ -46,7 +46,7 @@ try_function_name:
 		faults.ThrowError(nil, "Function name must be a string")
 		call = nil
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if call == nil {
 		return 0
 	}

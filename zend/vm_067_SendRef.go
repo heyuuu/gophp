@@ -21,7 +21,7 @@ func ZEND_SEND_REF_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	arg.SetReference(varptr.Reference())
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }

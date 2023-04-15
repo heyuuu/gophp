@@ -21,7 +21,7 @@ func ZEND_GET_TYPE_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	typ := types.ZvalGetType(op1)
 	opline.Result().SetStringVal(typ)
 
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_GET_TYPE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -33,7 +33,7 @@ func ZEND_GET_TYPE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	typ := types.ZvalGetType(op1)
 	opline.Result().SetStringVal(typ)
 
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_GET_TYPE_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {

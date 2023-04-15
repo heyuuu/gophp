@@ -26,7 +26,7 @@ const ZEND_USER_OPCODE_DISPATCH_TO = 0x100
 
 /* former zend_execute_locks.h */
 
-type ZendFreeOp *types.Zval
+type ZendFreeOp = *types.Zval
 
 const CACHE_SPECIAL = 1 << 0
 

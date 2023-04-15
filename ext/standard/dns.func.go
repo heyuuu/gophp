@@ -631,7 +631,7 @@ func PhpParserr(
 		cp += n
 		zend.AddAssocString(subarray, "replacement", name)
 	default:
-		zend.ZvalPtrDtor(subarray)
+		// zend.ZvalPtrDtor(subarray)
 		subarray.SetUndef()
 		cp += dlen
 	}

@@ -25,7 +25,7 @@ func zend_case_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zend
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
@@ -72,7 +72,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 
 			if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2_type&(IS_TMP_VAR|IS_VAR)) != 0 {
 				var return_value *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
-				ZvalPtrDtor(return_value)
+				// ZvalPtrDtor(return_value)
 			}
 
 			/* Chain potential exception from wrapping finally block */

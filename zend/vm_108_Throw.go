@@ -39,7 +39,7 @@ func ZEND_THROW_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			faults.ThrowError(nil, "Can only throw objects")
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 		break
@@ -69,7 +69,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			faults.ThrowError(nil, "Can only throw objects")
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 		break
@@ -77,7 +77,7 @@ func ZEND_THROW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	faults.ExceptionSave()
 	faults.ThrowExceptionObject(value)
 	faults.ExceptionRestore()
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return 0
 }
 func ZEND_THROW_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

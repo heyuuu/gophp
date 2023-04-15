@@ -80,14 +80,14 @@ func ZendUpdateClassConstants(class_type *types.ClassEntry) int {
 							var tmp types.Zval
 							types.ZVAL_COPY(&tmp, val)
 							if ZvalUpdateConstantEx(&tmp, ce) != types.SUCCESS {
-								ZvalPtrDtor(&tmp)
+								// ZvalPtrDtor(&tmp)
 								return types.FAILURE
 							}
 							if ZendVerifyPropertyType(prop_info, &tmp, 1) == 0 {
-								ZvalPtrDtor(&tmp)
+								// ZvalPtrDtor(&tmp)
 								return types.FAILURE
 							}
-							ZvalPtrDtor(val)
+							// ZvalPtrDtor(val)
 							types.ZVAL_COPY_VALUE(val, &tmp)
 						} else if ZvalUpdateConstantEx(val, ce) != types.SUCCESS {
 							return types.FAILURE

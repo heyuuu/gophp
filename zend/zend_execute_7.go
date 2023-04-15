@@ -11,7 +11,7 @@ func IZvalPtrDtorNoref(zval_ptr *types.Zval) {
 		var ref *types.ZendRefcounted = zval_ptr.RefCounted()
 		b.Assert(zval_ptr.GetType() != types.IS_REFERENCE)
 		if ref.DelRefcount() == 0 {
-			RcDtorFunc(ref)
+			//RcDtorFunc(ref)
 			//} else if GC_MAY_LEAK(ref) {
 			//	GcPossibleRoot(ref)
 		}
@@ -27,12 +27,12 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 		IZvalPtrDtorNoref(variable_ptr)
 		types.ZVAL_COPY_VALUE(variable_ptr, &value)
 	} else {
-		ZvalPtrDtorNogc(&value)
+		// ZvalPtrDtorNogc(&value)
 	}
 	if (value_type & (IS_VAR | IS_TMP_VAR)) != 0 {
 		if ref != nil {
 			if ref.DelRefcount() == 0 {
-				ZvalPtrDtor(orig_value)
+				// ZvalPtrDtor(orig_value)
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			}
 		} else {
@@ -181,7 +181,7 @@ func IFreeCompiledVariables(executeData *ZendExecuteData) {
 			var r *types.ZendRefcounted = cv.RefCounted()
 			if r.DelRefcount() == 0 {
 				cv.SetNull()
-				RcDtorFunc(r)
+				//RcDtorFunc(r)
 			} else {
 				//GcCheckPossibleRoot(r)
 			}

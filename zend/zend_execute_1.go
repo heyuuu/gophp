@@ -190,7 +190,7 @@ func ZendAssignToVariableReference(variable_ptr *types.Zval, value_ptr *types.Zv
 		var garbage *types.ZendRefcounted = variable_ptr.RefCounted()
 		if garbage.DelRefcount() == 0 {
 			variable_ptr.SetReference(ref)
-			RcDtorFunc(garbage)
+			//RcDtorFunc(garbage)
 			return
 		} else {
 			//GcCheckPossibleRoot(garbage)
@@ -284,7 +284,7 @@ func MakeRealObject(object *types.Zval, property *types.Zval, opline *ZendOp, ex
 			return nil
 		}
 	}
-	ZvalPtrDtorNogc(object)
+	// ZvalPtrDtorNogc(object)
 	ObjectInit(object)
 	// 	object.AddRefcount()
 	obj = object.Object()
@@ -425,7 +425,7 @@ func IsNullConstant(scope *types.ClassEntry, default_value *types.Zval) int {
 		if constant.IsNull() {
 			return 1
 		}
-		ZvalPtrDtorNogc(&constant)
+		// ZvalPtrDtorNogc(&constant)
 	}
 	return 0
 }

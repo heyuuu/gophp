@@ -27,7 +27,7 @@ func OnChangeCallback(
 ) int {
 	if zend.CurrEX() != nil {
 		if ASSERTG(callback).IsNotUndef() {
-			zend.ZvalPtrDtor(&(ASSERTG(callback)))
+			// zend.ZvalPtrDtor(&(ASSERTG(callback)))
 			ASSERTG(callback).SetUndef()
 		}
 		if new_value != nil && (ASSERTG(callback).IsNotUndef() || new_value.GetLen() != 0) {
@@ -76,7 +76,7 @@ func ZmShutdownAssert(type_ int, module_number int) int {
 }
 func ZmDeactivateAssert(type_ int, module_number int) int {
 	if ASSERTG(callback).IsNotUndef() {
-		zend.ZvalPtrDtor(&(ASSERTG(callback)))
+		// zend.ZvalPtrDtor(&(ASSERTG(callback)))
 		ASSERTG(callback).SetUndef()
 	}
 	return types.SUCCESS
@@ -164,16 +164,16 @@ func ZifAssert(executeData zpp.Ex, return_value zpp.Ret, assertion *types.Zval, 
 
 		if description == nil {
 			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 3, args)
-			zend.ZvalPtrDtor(&args[2])
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&args[2])
+			// zend.ZvalPtrDtor(&args[0])
 		} else {
 			args[3].SetString(zend.ZvalGetString(description))
 			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 4, args)
-			zend.ZvalPtrDtor(&args[3])
-			zend.ZvalPtrDtor(&args[2])
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&args[3])
+			// zend.ZvalPtrDtor(&args[2])
+			// zend.ZvalPtrDtor(&args[0])
 		}
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 	}
 	if ASSERTG(exception) {
 		if description == nil {
@@ -294,7 +294,7 @@ func ZifAssertOptions(executeData zpp.Ex, return_value zpp.Ret, what *types.Zval
 			return_value.SetNull()
 		}
 		if ac == 2 {
-			zend.ZvalPtrDtor(&(ASSERTG(callback)))
+			// zend.ZvalPtrDtor(&(ASSERTG(callback)))
 			types.ZVAL_COPY(&(ASSERTG(callback)), value)
 		}
 		return

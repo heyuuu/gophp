@@ -44,7 +44,7 @@ func ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	{
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_SMART_BRANCH(result, 1)
 		opline.Result().SetBool(result != 0)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

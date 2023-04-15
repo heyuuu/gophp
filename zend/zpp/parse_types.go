@@ -182,7 +182,7 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 		if castFunc := handlers.GetCastObject(); castFunc != nil {
 			var obj types.Zval
 			if castFunc(arg, &obj, types.IS_STRING) == types.SUCCESS {
-				zend.ZvalPtrDtor(arg)
+				// zend.ZvalPtrDtor(arg)
 				types.ZVAL_COPY_VALUE(arg, &obj)
 				return arg.String(), true
 			}
@@ -190,16 +190,16 @@ func ParseZStrWeak(arg *types.Zval) (*types.String, bool) {
 			var rv types.Zval
 			var z *types.Zval = getFunc(arg, &rv)
 			if z.GetType() != types.IS_OBJECT {
-				zend.ZvalPtrDtor(arg)
+				// zend.ZvalPtrDtor(arg)
 				if z.IsString() {
 					arg.CopyValueFrom(z)
 				} else {
 					arg.SetString(zend.ZvalGetStringFunc(z))
-					zend.ZvalPtrDtor(z)
+					// zend.ZvalPtrDtor(z)
 				}
 				return arg.String(), true
 			}
-			zend.ZvalPtrDtor(z)
+			// zend.ZvalPtrDtor(z)
 		}
 		return nil, false
 	} else {

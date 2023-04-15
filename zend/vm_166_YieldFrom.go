@@ -51,7 +51,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	val = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
 		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -65,7 +65,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
 					faults.ThrowError(nil, "Impossible to yield from the Generator being currently run")
-					ZvalPtrDtor(val)
+					// ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					return 0
 				} else {
@@ -73,7 +73,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 				}
 			} else if new_gen.GetExecuteData() == nil {
 				faults.ThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
-				ZvalPtrDtor(val)
+				// ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				return 0
 			} else {
@@ -84,7 +84,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 		} else {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
 					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
@@ -105,7 +105,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -139,23 +139,23 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	val = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	if generator.IsForcedClose() {
 		faults.ThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
 	}
 	if val.IsArray() {
 		types.ZVAL_COPY_VALUE(generator.GetValues(), val)
 		generator.GetValues().GetFePos() = 0
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	} else if val.IsObject() && types.Z_OBJCE_P(val).GetGetIterator() != nil {
 		var ce *types.ClassEntry = types.Z_OBJCE_P(val)
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
 					faults.ThrowError(nil, "Impossible to yield from the Generator being currently run")
-					ZvalPtrDtor(val)
+					// ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					return 0
 				} else {
@@ -163,7 +163,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			} else if new_gen.GetExecuteData() == nil {
 				faults.ThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
-				ZvalPtrDtor(val)
+				// ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				return 0
 			} else {
@@ -174,7 +174,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		} else {
 			var iter *ZendObjectIterator = ce.GetGetIterator()(ce, val, 0)
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			if iter == nil || EG__().GetException() != nil {
 				if EG__().GetException() == nil {
 					faults.ThrowError(nil, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
@@ -195,7 +195,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	} else {
 		faults.ThrowError(nil, "Can use \"yield from\" only with arrays and Traversables")
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
 		return 0
 	}
@@ -241,7 +241,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
 					faults.ThrowError(nil, "Impossible to yield from the Generator being currently run")
-					ZvalPtrDtor(val)
+					// ZvalPtrDtor(val)
 					UNDEF_RESULT()
 					return 0
 				} else {
@@ -249,7 +249,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 				}
 			} else if new_gen.GetExecuteData() == nil {
 				faults.ThrowError(nil, "Generator passed to yield from was aborted without proper return and is unable to continue")
-				ZvalPtrDtor(val)
+				// ZvalPtrDtor(val)
 				UNDEF_RESULT()
 				return 0
 			} else {

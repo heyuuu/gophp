@@ -198,7 +198,7 @@ func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext
 			zend.DestroyOpArray(new_op_array)
 			zend.Efree(new_op_array)
 			if zend.EG__().GetException() == nil {
-				zend.ZvalPtrDtor(&result)
+				// zend.ZvalPtrDtor(&result)
 			}
 			zend.Efree(class_file)
 			return types.IntBool(zend.EG__().ClassTable().Exists(lc_name.GetStr()))
@@ -273,14 +273,14 @@ func ZifSplAutoloadExtensions(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Op
 func AutoloadFuncInfoDtor(element *types.Zval) {
 	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.Ptr())
 	if !(alfi.GetObj().IsUndef()) {
-		zend.ZvalPtrDtor(alfi.GetObj())
+		// zend.ZvalPtrDtor(alfi.GetObj())
 	}
 	if alfi.GetFuncPtr() != nil && alfi.GetFuncPtr().HasFnFlags(zend.AccCallViaTrampoline) {
 		// types.ZendStringReleaseEx(alfi.GetFuncPtr().GetFunctionName(), 0)
 		zend.ZendFreeTrampoline(alfi.GetFuncPtr())
 	}
 	if !(alfi.GetClosure().IsUndef()) {
-		zend.ZvalPtrDtor(alfi.GetClosure())
+		// zend.ZvalPtrDtor(alfi.GetClosure())
 	}
 	zend.Efree(alfi)
 }
@@ -334,7 +334,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 				fcic.SetCalledScope(types.Z_OBJCE(alfi.GetObj()))
 			}
 			zend.ZendCallFunction(&fci, &fcic)
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 			if zend.EG__().GetException() != nil {
 				break
 			}
@@ -363,7 +363,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		fcall_cache.SetCalledScope(nil)
 		fcall_cache.SetObject(nil)
 		zend.ZendCallFunction(&fcall_info, &fcall_cache)
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 	}
 }
 func HT_MOVE_TAIL_TO_HEAD(ht *types.Array) {

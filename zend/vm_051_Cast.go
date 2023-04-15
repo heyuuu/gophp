@@ -161,7 +161,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -191,7 +191,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 		if expr.IsType(opline.GetExtendedValue()) {
 			result.CopyValueFrom(expr)
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		}
 		if opline.GetExtendedValue() == types.IS_ARRAY {
@@ -247,7 +247,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CAST_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

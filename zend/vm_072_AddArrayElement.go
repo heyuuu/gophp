@@ -40,7 +40,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteDat
 			goto num_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -103,9 +103,9 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -127,7 +127,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteDa
 	{
 		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -188,7 +188,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) 
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -240,7 +240,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(executeData *ZendExecuteData)
 			goto num_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -305,9 +305,9 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(executeData *ZendExecuteData
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -331,7 +331,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData
 	{
 		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -394,7 +394,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(executeData *ZendExecuteData) in
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -413,7 +413,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
 		expr_ptr = opline.Op1Ptr(&free_op1)
@@ -449,7 +449,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData)
 			goto num_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -468,7 +468,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
 		expr_ptr = opline.Op1Ptr(&free_op1)
@@ -517,9 +517,9 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -537,7 +537,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
 		expr_ptr = opline.Op1Ptr(&free_op1)
@@ -546,7 +546,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData
 	{
 		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -564,7 +564,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			types.ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
 		if free_op1 != nil {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 		}
 	} else {
 		expr_ptr = opline.Op1Ptr(&free_op1)
@@ -612,7 +612,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) in
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -663,7 +663,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) 
 			goto num_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 
@@ -727,9 +727,9 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -752,7 +752,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData)
 	{
 		if opline.Result().Array().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -814,7 +814,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int
 			goto str_index
 		} else {
 			ZendIllegalOffset()
-			ZvalPtrDtorNogc(expr_ptr)
+			// ZvalPtrDtorNogc(expr_ptr)
 		}
 	}
 

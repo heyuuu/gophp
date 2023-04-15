@@ -150,7 +150,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 						zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG__().serialize_lock--
-					zend.ZvalPtrDtor(&retval)
+					// zend.ZvalPtrDtor(&retval)
 				} else {
 					zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 				}
@@ -174,8 +174,8 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 						zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG__().serialize_lock--
-					zend.ZvalPtrDtor(&param)
-					zend.ZvalPtrDtor(&retval)
+					// zend.ZvalPtrDtor(&param)
+					// zend.ZvalPtrDtor(&retval)
 				} else {
 					zv.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
 				}
@@ -183,14 +183,14 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 				/* Perform delayed __unserialize calls */
 
 			}
-			zend.IZvalPtrDtor(zv)
+			// zend.IZvalPtrDtor(zv)
 		}
 		next = var_dtor_hash.GetNext()
 		zend.EfreeSize(var_dtor_hash, b.SizeOf("var_dtor_entries"))
 		var_dtor_hash = next
 	}
-	zend.ZvalPtrDtorNogc(&wakeup_name)
-	zend.ZvalPtrDtorNogc(&unserialize_name)
+	// zend.ZvalPtrDtorNogc(&wakeup_name)
+	// zend.ZvalPtrDtorNogc(&unserialize_name)
 	if var_hashx.GetRefProps() != nil {
 		var_hashx.GetRefProps().Destroy()
 		zend.FREE_HASHTABLE(var_hashx.GetRefProps())
@@ -325,7 +325,7 @@ func ProcessNestedData(
 		var info *zend.ZendPropertyInfo = nil
 		key.SetUndef()
 		if PhpVarUnserializeInternal(&key, p, max, nil, 1) == 0 {
-			zend.ZvalPtrDtor(&key)
+			// zend.ZvalPtrDtor(&key)
 			goto failure
 		}
 		data = nil
@@ -357,7 +357,7 @@ func ProcessNestedData(
 					data = ht.KeyAddNew(key.String().GetStr(), &d)
 				}
 			} else {
-				zend.ZvalPtrDtor(&key)
+				// zend.ZvalPtrDtor(&key)
 				goto failure
 			}
 		} else {
@@ -371,7 +371,7 @@ func ProcessNestedData(
 					var unmangled_prop_len int
 					var unmangled *types.String
 					if zend.ZendUnmanglePropertyNameEx(key.String(), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == types.FAILURE {
-						zend.ZvalPtrDtor(&key)
+						// zend.ZvalPtrDtor(&key)
 						goto failure
 					}
 					unmangled = types.NewString(b.CastStr(unmangled_prop, unmangled_prop_len))
@@ -428,19 +428,19 @@ func ProcessNestedData(
 				zend.ConvertToString(&key)
 				goto string_key
 			} else {
-				zend.ZvalPtrDtor(&key)
+				// zend.ZvalPtrDtor(&key)
 				goto failure
 			}
 		}
 		if PhpVarUnserializeInternal(data, p, max, var_hash, 0) == 0 {
-			zend.ZvalPtrDtor(&key)
+			// zend.ZvalPtrDtor(&key)
 			goto failure
 		}
 		if info != nil {
 			if zend.ZendVerifyPropAssignableByRef(info, data, 1) == 0 {
-				zend.ZvalPtrDtor(data)
+				// zend.ZvalPtrDtor(data)
 				data.SetUndef()
-				zend.ZvalDtor(&key)
+				//zend.ZvalDtor(&key)
 				goto failure
 			}
 			if data.IsReference() {
@@ -522,7 +522,7 @@ func ObjectCommon(
 		if ProcessNestedData(rval, p, max, var_hash, ary.Array(), elements, nil) == 0 {
 			rval = types.ZVAL_DEREF(rval)
 			rval.Object().AddGcFlags(types.IS_OBJ_DESTRUCTOR_CALLED)
-			zend.ZvalPtrDtor(&ary)
+			// zend.ZvalPtrDtor(&ary)
 			return 0
 		}
 
@@ -849,23 +849,23 @@ yy18:
 			BG__().serialize_lock--
 			if zend.EG__().GetException() != nil {
 				// types.ZendStringReleaseEx(class_name, 0)
-				zend.ZvalPtrDtor(&user_func)
-				zend.ZvalPtrDtor(&args[0])
+				// zend.ZvalPtrDtor(&user_func)
+				// zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
 			core.PhpErrorDocref(nil, faults.E_WARNING, "defined (%s) but not found", user_func.String().GetVal())
 			incomplete_class = 1
 			ce = PHP_IC_ENTRY
-			zend.ZvalPtrDtor(&user_func)
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&user_func)
+			// zend.ZvalPtrDtor(&args[0])
 			break
 		}
 		BG__().serialize_lock--
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 		if zend.EG__().GetException() != nil {
 			// types.ZendStringReleaseEx(class_name, 0)
-			zend.ZvalPtrDtor(&user_func)
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&user_func)
+			// zend.ZvalPtrDtor(&args[0])
 			return 0
 		}
 
@@ -878,8 +878,8 @@ yy18:
 			ce = PHP_IC_ENTRY
 		}
 		BG__().serialize_lock--
-		zend.ZvalPtrDtor(&user_func)
-		zend.ZvalPtrDtor(&args[0])
+		// zend.ZvalPtrDtor(&user_func)
+		// zend.ZvalPtrDtor(&args[0])
 		break
 
 	}

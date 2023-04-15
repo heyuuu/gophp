@@ -12,19 +12,19 @@ func ZendVerifyWeakScalarTypeHint(type_hint types.ZendUchar, arg *types.Zval) ty
 	switch type_hint {
 	case types.IS_BOOL:
 		if val, ok := zpp.ParseBoolWeak(arg); ok {
-			ZvalPtrDtor(arg)
+			// ZvalPtrDtor(arg)
 			arg.SetBool(val)
 			return 1
 		}
 	case types.IS_LONG:
 		if val, ok := zpp.ParseLongWeak(arg, false); ok {
-			ZvalPtrDtor(arg)
+			// ZvalPtrDtor(arg)
 			arg.SetLong(val)
 			return 1
 		}
 	case types.IS_DOUBLE:
 		if val, ok := zpp.ParseDoubleWeak(arg); ok {
-			ZvalPtrDtor(arg)
+			// ZvalPtrDtor(arg)
 			arg.SetDouble(val)
 			return 1
 		}
@@ -136,7 +136,7 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *types.Zval, val
 	value = types.ZVAL_DEREF(value)
 	types.ZVAL_COPY(&tmp, value)
 	if IZendVerifyPropertyType(info, &tmp, executeData.IsCallUseStrictTypes()) == 0 {
-		ZvalPtrDtor(&tmp)
+		// ZvalPtrDtor(&tmp)
 		return EG__().GetUninitializedZval()
 	}
 	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, executeData.IsCallUseStrictTypes())
@@ -332,7 +332,7 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 			var rv2 types.Zval
 			var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 			if z == &rv {
-				ZvalPtrDtor(&rv)
+				// ZvalPtrDtor(&rv)
 			}
 			z.CopyValueFrom(value)
 		}
@@ -340,12 +340,12 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 			types.Z_OBJ_HT_P(object).GetWriteDimension()(object, property, &res)
 		}
 		if z == &rv {
-			ZvalPtrDtor(&rv)
+			// ZvalPtrDtor(&rv)
 		}
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), &res)
 		}
-		ZvalPtrDtor(&res)
+		// ZvalPtrDtor(&res)
 	} else {
 		ZendUseObjectAsArray()
 		if RETURN_VALUE_USED(opline) {
@@ -366,10 +366,10 @@ func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opl
 	}
 	ZendBinaryOp(&z_copy, ref.GetVal(), value, opline)
 	if ZendVerifyRefAssignableZval(ref, &z_copy, executeData.IsCallUseStrictTypes()) != 0 {
-		ZvalPtrDtor(ref.GetVal())
+		// ZvalPtrDtor(ref.GetVal())
 		types.ZVAL_COPY_VALUE(ref.GetVal(), &z_copy)
 	} else {
-		ZvalPtrDtor(&z_copy)
+		// ZvalPtrDtor(&z_copy)
 	}
 }
 func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
@@ -384,10 +384,10 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *types.Zval, 
 	}
 	ZendBinaryOp(&z_copy, zptr, value, opline)
 	if ZendVerifyPropertyType(prop_info, &z_copy, executeData.IsCallUseStrictTypes()) != 0 {
-		ZvalPtrDtor(zptr)
+		// ZvalPtrDtor(zptr)
 		types.ZVAL_COPY_VALUE(zptr, &z_copy)
 	} else {
-		ZvalPtrDtor(&z_copy)
+		// ZvalPtrDtor(&z_copy)
 	}
 }
 func ZendCheckStringOffset(dim *types.Zval, type_ int, executeData *ZendExecuteData) ZendLong {

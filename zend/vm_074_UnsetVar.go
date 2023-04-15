@@ -35,13 +35,13 @@ func ZEND_UNSET_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		}
 		name = ZvalTryGetTmpString(varname, &tmp_name)
 		if name == nil {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	types.ZendHashDelInd(target_symbol_table, name.GetStr())
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_UNSET_VAR_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {

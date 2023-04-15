@@ -50,10 +50,10 @@ func getPowHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
 	PowFunction(opline.Result(), op1, op2)
 	if freeOp1 != nil {
-		ZvalPtrDtorNogc(freeOp1)
+		// ZvalPtrDtorNogc(freeOp1)
 	}
 	if freeOp2 != nil {
-		ZvalPtrDtorNogc(freeOp2)
+		// ZvalPtrDtorNogc(freeOp2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	//todo
@@ -74,7 +74,7 @@ func getBwNotHandler(executeData *ZendExecuteData) int {
 	}
 	BitwiseNotFunction(opline.Result(), op1)
 	if freeOp1 != nil {
-		ZvalPtrDtorNogc(freeOp1)
+		// ZvalPtrDtorNogc(freeOp1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -96,7 +96,7 @@ func getBoolNotHandler(executeData *ZendExecuteData) int {
 	} else {
 		opline.Result().SetBool(!IZendIsTrueEx(op1))
 		if freeOp1 != nil {
-			ZvalPtrDtorNogc(freeOp1)
+			// ZvalPtrDtorNogc(freeOp1)
 		}
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}

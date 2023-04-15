@@ -42,7 +42,7 @@ func ZEND_COALESCE_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_COALESCE_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -69,7 +69,7 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_COALESCE_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

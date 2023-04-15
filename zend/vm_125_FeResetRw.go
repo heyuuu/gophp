@@ -133,7 +133,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(array_ptr.GetArr(), 0))
 		{
 			if free_op1 != nil {
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 			}
 		}
 		return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -159,20 +159,20 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			if properties.Len() == 0 {
 				opline.Result().SetFeIterIdx(uint32 - 1)
 				if free_op1 != nil {
-					ZvalPtrDtorNogc(free_op1)
+					// ZvalPtrDtorNogc(free_op1)
 				}
 				return ZEND_VM_JMP(executeData, OP_JMP_ADDR(opline, opline.GetOp2()))
 			}
 			opline.Result().SetFeIterIdx(types.ZendHashIteratorAdd(properties, 0))
 			if free_op1 != nil {
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 			}
 			return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 		} else {
 			var is_empty types.ZendBool = ZendFeResetIterator(array_ptr, 1, opline, executeData)
 			{
 				if free_op1 != nil {
-					ZvalPtrDtorNogc(free_op1)
+					// ZvalPtrDtorNogc(free_op1)
 				}
 			}
 
@@ -190,7 +190,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 		opline.Result().SetFeIterIdx(uint32 - 1)
 		{
 			if free_op1 != nil {
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 			}
 		}
 

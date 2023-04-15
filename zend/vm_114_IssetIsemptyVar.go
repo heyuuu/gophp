@@ -52,7 +52,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteD
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), executeData)
 	value = target_symbol_table.KeyFind(name.GetStr())
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	if value == nil {
 		result = opline.GetExtendedValue() & ZEND_ISEMPTY
 	} else {

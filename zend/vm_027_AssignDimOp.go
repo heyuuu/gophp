@@ -72,7 +72,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -144,9 +144,9 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 			}
 		}
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -208,7 +208,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -280,7 +280,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -422,7 +422,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 			}
 		}
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	OPLINE = executeData.GetOpline() + 2
 	return 0
 }

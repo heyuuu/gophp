@@ -141,7 +141,7 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 					if retval.IsFalse() {
 						errorCb(typ, errorFilename, errorLineno, message)
 					}
-					zend.ZvalPtrDtor(&retval)
+					// zend.ZvalPtrDtor(&retval)
 				}
 			} else if zend.EG__().GetException() == nil {
 				/* The user error handler failed, use built-in error handler */
@@ -154,13 +154,13 @@ func errorVaList(typ int, errorFilename string, errorLineno uint32, message stri
 				zend.RESTORE_STACK(delayed_oplines_stack)
 				zend.CG__().SetInCompilation(1)
 			}
-			zend.ZvalPtrDtor(&params[4])
-			zend.ZvalPtrDtor(&params[2])
-			zend.ZvalPtrDtor(&params[1])
+			// zend.ZvalPtrDtor(&params[4])
+			// zend.ZvalPtrDtor(&params[2])
+			// zend.ZvalPtrDtor(&params[1])
 			if zend.EG__().GetUserErrorHandler().IsUndef() {
 				types.ZVAL_COPY_VALUE(zend.EG__().GetUserErrorHandler(), &orig_user_error_handler)
 			} else {
-				zend.ZvalPtrDtor(&orig_user_error_handler)
+				// zend.ZvalPtrDtor(&orig_user_error_handler)
 			}
 
 		}

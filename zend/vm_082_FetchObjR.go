@@ -49,7 +49,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -164,7 +164,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -213,8 +213,8 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZvalPtrDtorNogc(free_op2)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -262,7 +262,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -295,7 +295,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -374,7 +374,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		ZendUnwrapReference(retval)
 	}
 fetch_obj_r_finish:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {

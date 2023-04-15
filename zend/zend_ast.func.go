@@ -368,7 +368,7 @@ func ZendAstAddArrayElement(result *types.Zval, offset *types.Zval, expr *types.
 	case types.IS_UNDEF:
 		if result.Array().NextIndexInsert(expr) == nil {
 			faults.Error(faults.E_WARNING, "Cannot add element to the array as the next element is already occupied")
-			ZvalPtrDtorNogc(expr)
+			// ZvalPtrDtorNogc(expr)
 		}
 	case types.IS_STRING:
 		result.Array().SymtableUpdate(offset.String().GetStr(), expr)
@@ -431,13 +431,13 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
-			ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op1)
 			ret = types.FAILURE
 		} else {
 			var op BinaryOpType = GetBinaryOp(ast.GetAttr())
 			ret = op(result, &op1, &op2)
-			ZvalPtrDtorNogc(&op1)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_GREATER:
 		fallthrough
@@ -445,7 +445,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
-			ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op1)
 			ret = types.FAILURE
 		} else {
 
@@ -453,8 +453,8 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 
 			var op BinaryOpType = b.Cond(ast.GetKind() == ZEND_AST_GREATER, IsSmallerFunction, IsSmallerOrEqualFunction)
 			ret = op(result, &op2, &op1)
-			ZvalPtrDtorNogc(&op1)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_UNARY_OP:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
@@ -462,7 +462,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		} else {
 			var op UnaryOpType = GetUnaryOp(ast.GetAttr())
 			ret = op(result, &op1)
-			ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op1)
 		}
 	case ZEND_AST_ZVAL:
 		var zv *types.Zval = ZendAstGetZval(ast)
@@ -505,16 +505,16 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		}
 		if ZendIsTrue(&op1) != 0 {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
-				ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op1)
 				ret = types.FAILURE
 				break
 			}
 			result.SetBool(ZendIsTrue(&op2) != 0)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op2)
 		} else {
 			result.SetFalse()
 		}
-		ZvalPtrDtorNogc(&op1)
+		// ZvalPtrDtorNogc(&op1)
 	case ZEND_AST_OR:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
@@ -524,14 +524,14 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			result.SetTrue()
 		} else {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
-				ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op1)
 				ret = types.FAILURE
 				break
 			}
 			result.SetBool(ZendIsTrue(&op2) != 0)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op2)
 		}
-		ZvalPtrDtorNogc(&op1)
+		// ZvalPtrDtorNogc(&op1)
 	case ZEND_AST_CONDITIONAL:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
@@ -542,19 +542,19 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 				*result = op1
 			} else {
 				if ZendAstEvaluate(result, ast.GetChild()[1], scope) != types.SUCCESS {
-					ZvalPtrDtorNogc(&op1)
+					// ZvalPtrDtorNogc(&op1)
 					ret = types.FAILURE
 					break
 				}
-				ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op1)
 			}
 		} else {
 			if ZendAstEvaluate(result, ast.GetChild()[2], scope) != types.SUCCESS {
-				ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op1)
 				ret = types.FAILURE
 				break
 			}
-			ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op1)
 		}
 	case ZEND_AST_COALESCE:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
@@ -565,11 +565,11 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			*result = op1
 		} else {
 			if ZendAstEvaluate(result, ast.GetChild()[1], scope) != types.SUCCESS {
-				ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op1)
 				ret = types.FAILURE
 				break
 			}
-			ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op1)
 		}
 	case ZEND_AST_UNARY_PLUS:
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != types.SUCCESS {
@@ -577,7 +577,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		} else {
 			op1.SetLong(0)
 			ret = AddFunction(result, &op1, &op2)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_UNARY_MINUS:
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != types.SUCCESS {
@@ -585,7 +585,7 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		} else {
 			op1.SetLong(0)
 			ret = SubFunction(result, &op1, &op2)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op2)
 		}
 	case ZEND_AST_ARRAY:
 		var i uint32
@@ -599,34 +599,34 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 			var elem *ZendAst = list.GetChild()[i]
 			if elem.GetKind() == ZEND_AST_UNPACK {
 				if ZendAstEvaluate(&op1, elem.GetChild()[0], scope) != types.SUCCESS {
-					ZvalPtrDtorNogc(result)
+					// ZvalPtrDtorNogc(result)
 					return types.FAILURE
 				}
 				if ZendAstAddUnpackedElement(result, &op1) != types.SUCCESS {
-					ZvalPtrDtorNogc(&op1)
-					ZvalPtrDtorNogc(result)
+					// ZvalPtrDtorNogc(&op1)
+					// ZvalPtrDtorNogc(result)
 					return types.FAILURE
 				}
-				ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op1)
 				continue
 			}
 			if elem.GetChild()[1] != nil {
 				if ZendAstEvaluate(&op1, elem.GetChild()[1], scope) != types.SUCCESS {
-					ZvalPtrDtorNogc(result)
+					// ZvalPtrDtorNogc(result)
 					return types.FAILURE
 				}
 			} else {
 				op1.SetUndef()
 			}
 			if ZendAstEvaluate(&op2, elem.GetChild()[0], scope) != types.SUCCESS {
-				ZvalPtrDtorNogc(&op1)
-				ZvalPtrDtorNogc(result)
+				// ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(result)
 				return types.FAILURE
 			}
 			if ZendAstAddArrayElement(result, &op1, &op2) != types.SUCCESS {
-				ZvalPtrDtorNogc(&op1)
-				ZvalPtrDtorNogc(&op2)
-				ZvalPtrDtorNogc(result)
+				// ZvalPtrDtorNogc(&op1)
+				// ZvalPtrDtorNogc(&op2)
+				// ZvalPtrDtorNogc(result)
 				return types.FAILURE
 			}
 		}
@@ -637,12 +637,12 @@ func ZendAstEvaluate(result *types.Zval, ast *ZendAst, scope *types.ClassEntry) 
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != types.SUCCESS {
 			ret = types.FAILURE
 		} else if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != types.SUCCESS {
-			ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op1)
 			ret = types.FAILURE
 		} else {
 			ZendFetchDimensionConst(result, &op1, &op2, b.Cond((ast.GetAttr()&ZEND_DIM_IS) != 0, BP_VAR_IS, BP_VAR_R))
-			ZvalPtrDtorNogc(&op1)
-			ZvalPtrDtorNogc(&op2)
+			// ZvalPtrDtorNogc(&op1)
+			// ZvalPtrDtorNogc(&op2)
 		}
 	default:
 		faults.ThrowError(nil, "Unsupported constant expression")
@@ -736,7 +736,7 @@ tail_call:
 		ast = ast.GetChild()[0]
 		goto tail_call
 	} else if ast.GetKind() == ZEND_AST_ZVAL {
-		ZvalPtrDtorNogc(ZendAstGetZval(ast))
+		// ZvalPtrDtorNogc(ZendAstGetZval(ast))
 	} else if ZendAstIsList(ast) != 0 {
 		var list *ZendAstList = ZendAstGetList(ast)
 		if list.GetChildren() != 0 {

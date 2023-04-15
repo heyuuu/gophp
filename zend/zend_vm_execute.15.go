@@ -35,7 +35,7 @@ func zend_pre_inc_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY(opline.Result(), var_ptr)
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -70,7 +70,7 @@ func zend_pre_dec_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY(opline.Result(), var_ptr)
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -101,7 +101,7 @@ func zend_post_inc_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 		break
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -132,7 +132,7 @@ func zend_post_dec_helper_SPEC_VAR(executeData *ZendExecuteData) int {
 		break
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

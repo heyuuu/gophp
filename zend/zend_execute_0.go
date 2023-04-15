@@ -57,7 +57,7 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_typ
 			garbage = variable_ptr.RefCounted()
 			ZendCopyToVariable(variable_ptr, value, value_type, ref)
 			if garbage.DelRefcount() == 0 {
-				RcDtorFunc(garbage)
+				//RcDtorFunc(garbage)
 			} else {
 				/* optimized version of GC_ZVAL_CHECK_POSSIBLE_ROOT(variable_ptr) */
 				//if GC_MAY_LEAK(garbage) {
@@ -112,7 +112,7 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 				var r *types.ZendRefcounted = p.RefCounted()
 				if r.DelRefcount() == 0 {
 					p.SetNull()
-					RcDtorFunc(r)
+					//RcDtorFunc(r)
 				} else {
 					//GcCheckPossibleRoot(r)
 				}
@@ -133,7 +133,7 @@ func ZendVmStackFreeArgs(call *ZendExecuteData) {
 			r := p.RefCounted()
 			if r.DelRefcount() == 0 {
 				p.SetNull()
-				RcDtorFunc(r)
+				//RcDtorFunc(r)
 			}
 		}
 	}
@@ -250,23 +250,23 @@ func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *types.Zval, result *t
 			if __zv.IsIndirect() {
 				types.ZVAL_COPY(__zv, __zv.Indirect())
 			}
-			RcDtorFunc(__ref)
+			//RcDtorFunc(__ref)
 		}
 	}
 }
 func FREE_OP(should_free *types.Zval) {
 	if should_free != nil {
-		ZvalPtrDtorNogc(should_free)
+		// ZvalPtrDtorNogc(should_free)
 	}
 }
 func FREE_UNFETCHED_OP(type_ types.ZendUchar, var_ uint32) {
 	if (type_ & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(EX_VAR(var_))
+		// ZvalPtrDtorNogc(EX_VAR(var_))
 	}
 }
 func FREE_OP_VAR_PTR(should_free *types.Zval) {
 	if should_free != nil {
-		ZvalPtrDtorNogc(should_free)
+		// ZvalPtrDtorNogc(should_free)
 	}
 }
 func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().GetOpArray().vars[i] }

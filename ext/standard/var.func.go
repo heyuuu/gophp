@@ -610,11 +610,11 @@ func PhpVarSerializeCallSleep(retval *types.Zval, struc *types.Zval) int {
 	BG__().serialize_lock--
 
 	if res == types.FAILURE || retval.IsUndef() {
-		zend.ZvalPtrDtor(retval)
+		// zend.ZvalPtrDtor(retval)
 		return types.FAILURE
 	}
 	if !(zend.HASH_OF(retval)) {
-		zend.ZvalPtrDtor(retval)
+		// zend.ZvalPtrDtor(retval)
 		core.PhpErrorDocref(nil, faults.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize")
 		return types.FAILURE
 	}
@@ -629,11 +629,11 @@ func PhpVarSerializeCallMagicSerialize(retval *types.Zval, obj *types.Zval) int 
 	BG__().serialize_lock--
 
 	if res == types.FAILURE || retval.IsUndef() {
-		zend.ZvalPtrDtor(retval)
+		// zend.ZvalPtrDtor(retval)
 		return types.FAILURE
 	}
 	if retval.GetType() != types.IS_ARRAY {
-		zend.ZvalPtrDtor(retval)
+		// zend.ZvalPtrDtor(retval)
 		faults.TypeError("%s::__serialize() must return an array", types.Z_OBJCE_P(obj).GetName().GetVal())
 		return types.FAILURE
 	}
@@ -868,7 +868,7 @@ again:
 				if zend.EG__().GetException() == nil {
 					buf.AppendString("N;")
 				}
-				zend.ZvalPtrDtor(&obj)
+				// zend.ZvalPtrDtor(&obj)
 				return
 			}
 			PhpVarSerializeClassName(buf, &obj)
@@ -897,8 +897,8 @@ again:
 				PhpVarSerializeIntern(buf, data, var_hash)
 			}
 			buf.AppendByte('}')
-			zend.ZvalPtrDtor(&obj)
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&obj)
+			// zend.ZvalPtrDtor(&retval)
 			return
 		}
 		if ce.GetSerialize() != nil {
@@ -947,12 +947,12 @@ again:
 					 * since we already wrote the length of the array before */
 
 				}
-				zend.ZvalPtrDtor(&tmp)
+				// zend.ZvalPtrDtor(&tmp)
 				return
 			}
 			PhpVarSerializeClass(buf, &tmp, &retval, var_hash)
-			zend.ZvalPtrDtor(&retval)
-			zend.ZvalPtrDtor(&tmp)
+			// zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&tmp)
 			return
 		}
 		incomplete_class = PhpVarSerializeClassName(buf, struc)
@@ -1151,7 +1151,7 @@ func ZifUnserialize(executeData zpp.Ex, return_value zpp.Ret, variableRepresenta
 			core.PhpErrorDocref(nil, faults.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
 		if BG__().unserialize.level <= 1 {
-			zend.ZvalPtrDtor(return_value)
+			// zend.ZvalPtrDtor(return_value)
 		}
 		return_value.SetFalse()
 	} else if BG__().unserialize.level > 1 {

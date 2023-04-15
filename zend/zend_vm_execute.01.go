@@ -25,10 +25,10 @@ func zend_mod_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *ZendE
 	}
 	ModFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -42,10 +42,10 @@ func zend_shift_left_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 	}
 	ShiftLeftFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -59,10 +59,10 @@ func zend_shift_right_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDat
 	}
 	ShiftRightFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -76,10 +76,10 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
@@ -104,10 +104,10 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
@@ -132,10 +132,10 @@ func zend_is_smaller_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
@@ -160,10 +160,10 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, ex
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	if EG__().GetException() != nil {
 		return 0
@@ -188,10 +188,10 @@ func zend_bw_or_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Zen
 	}
 	BitwiseOrFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -205,10 +205,10 @@ func zend_bw_and_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 	}
 	BitwiseAndFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -222,10 +222,10 @@ func zend_bw_xor_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *Ze
 	}
 	BitwiseXorFunction(opline.Result(), op_1, op_2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_1)
+		// ZvalPtrDtorNogc(op_1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op_2)
+		// ZvalPtrDtorNogc(op_2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

@@ -214,7 +214,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *types.Zval
 	fcc.SetObject(fci.GetObject())
 	fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
 	ZendCallFunction(&fci, &fcc)
-	ZvalPtrDtor(fci.GetParams()[1])
+	// ZvalPtrDtor(fci.GetParams()[1])
 }
 func ZendCreateClosureFromCallable(return_value *types.Zval, callable *types.Zval, error **byte) int {
 	var fcc types.ZendFcallInfoCache
@@ -359,7 +359,7 @@ func ZendClosureFreeStorage(object *types.ZendObject) {
 		// types.ZendStringRelease(closure.GetFunc().GetFunctionName())
 	}
 	if closure.GetThisPtr().IsNotUndef() {
-		ZvalPtrDtor(closure.GetThisPtr())
+		// ZvalPtrDtor(closure.GetThisPtr())
 	}
 }
 func ZendClosureNew(class_type *types.ClassEntry) *types.ZendObject {
@@ -406,7 +406,7 @@ func ZendClosureGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 
 			var_ = _z
 			if var_.IsConstantAst() {
-				ZvalPtrDtor(var_)
+				// ZvalPtrDtor(var_)
 				var_.SetStringVal("<constant ast>")
 			}
 		}
@@ -600,6 +600,6 @@ func ZendClosureBindVarEx(closure_zv *types.Zval, offset uint32, val *types.Zval
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.Object())
 	var static_variables *types.Array = closure.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	var var_ *types.Zval = (*types.Zval)((*byte)(static_variables.Bucket(offset)))
-	ZvalPtrDtor(var_)
+	// ZvalPtrDtor(var_)
 	var_.CopyValueFrom(val)
 }

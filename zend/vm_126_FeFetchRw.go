@@ -183,7 +183,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 			var ref *types.ZendReference
 			ref = value.Reference()
 			// 			ref.AddRefcount()
-			IZvalPtrDtor(variable_ptr)
+			// IZvalPtrDtor(variable_ptr)
 			variable_ptr.SetReference(ref)
 		}
 	} else {

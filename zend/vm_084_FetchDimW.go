@@ -19,7 +19,7 @@ func ZEND_FETCH_DIM_W_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int 
 	var container *types.Zval
 	container = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, executeData)
 	zend_fetch_dimension_address_W(container, opline.Op2Ptr(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	{
 		var result *types.Zval = opline.Result()
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)
@@ -69,7 +69,7 @@ func ZEND_FETCH_DIM_W_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	var container *types.Zval
 	container = opline.Op1()
 	zend_fetch_dimension_address_W(container, opline.Op2Ptr(&free_op2), IS_TMP_VAR|IS_VAR, opline, executeData)
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	{
 		var result *types.Zval = opline.Result()
 		FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op1, result)

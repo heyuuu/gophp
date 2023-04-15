@@ -29,7 +29,7 @@ func ZEND_FETCH_LIST_W_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 	} else {
 		zend_fetch_dimension_address_W(container, dim, IS_TMP_VAR|IS_VAR, opline, executeData)
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_LIST_W_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {

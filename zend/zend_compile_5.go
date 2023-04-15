@@ -223,7 +223,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 		opline = ZendEmitOp(nil, ZEND_FREE, &expr_node, nil)
 		opline.SetExtendedValue(ZEND_FREE_SWITCH)
 	} else if expr_node.GetOpType() == IS_CONST {
-		ZvalPtrDtorNogc(expr_node.GetConstant())
+		// ZvalPtrDtorNogc(expr_node.GetConstant())
 	}
 	Efree(jmpnz_opnums)
 }
@@ -421,7 +421,7 @@ func ZendCompileDeclare(ast *ZendAst) {
 			var value_zv types.Zval
 			ZendConstExprToZval(&value_zv, value_ast)
 			FC__().GetDeclarables().SetTicks(ZvalGetLong(&value_zv))
-			ZvalPtrDtorNogc(&value_zv)
+			// ZvalPtrDtorNogc(&value_zv)
 		} else if ascii.StrCaseEquals(name.GetStr(), "encoding") {
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")

@@ -23,7 +23,7 @@ func ZEND_SEND_USER_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	arg = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, executeData)
 	param = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY(param, arg)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_SEND_USER_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -37,7 +37,7 @@ func ZEND_SEND_USER_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	arg = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, executeData)
 	param = ZEND_CALL_VAR(executeData.GetCall(), opline.GetResult().GetVar())
 	types.ZVAL_COPY(param, arg)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_SEND_USER_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

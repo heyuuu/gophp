@@ -271,7 +271,7 @@ func PhpOutputHandlerDtor(handler *PhpOutputHandler) {
 		zend.Efree(handler.GetBuffer().GetData())
 	}
 	if handler.IsUser() {
-		zend.ZvalPtrDtor(handler.GetUser().GetZoh())
+		// zend.ZvalPtrDtor(handler.GetUser().GetZoh())
 		zend.Efree(handler.GetUser())
 	}
 	if handler.GetDtor() != nil && handler.GetOpaq() {
@@ -440,7 +440,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			ob_data.SetStringVal(b.CastStr(handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed()))
 			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
-			zend.ZvalPtrDtor(&ob_data)
+			// zend.ZvalPtrDtor(&ob_data)
 			var PHP_OUTPUT_USER_SUCCESS func(retval types.Zval) bool = func(retval types.Zval) bool {
 				return retval.IsNotUndef() && retval.GetType() != types.IS_FALSE
 			}
@@ -468,7 +468,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 			}
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 0)
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 		} else {
 			PhpOutputContextFeed(context, handler.GetBuffer().GetData(), handler.GetBuffer().GetSize(), handler.GetBuffer().GetUsed(), 0)
 			if types.SUCCESS == handler.GetInternal()(handler.GetOpaq(), context) {

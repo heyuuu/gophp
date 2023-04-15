@@ -1,5 +1,7 @@
 package zend
 
+import "github.com/heyuuu/gophp/zend/types"
+
 func ZEND_RETURN_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var retval_ptr *types.Zval
@@ -37,7 +39,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	} else if return_value == nil {
 		{
 			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
-				RcDtorFunc(free_op1.GetCounted())
+				//RcDtorFunc(free_op1.GetCounted())
 			}
 		}
 	} else {
@@ -63,7 +65,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	} else if return_value == nil {
 		{
 			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
-				RcDtorFunc(free_op1.GetCounted())
+				//RcDtorFunc(free_op1.GetCounted())
 			}
 		}
 	} else {
@@ -89,7 +91,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	} else if return_value == nil {
 		{
 			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
-				RcDtorFunc(free_op1.GetCounted())
+				//RcDtorFunc(free_op1.GetCounted())
 			}
 		}
 	} else {

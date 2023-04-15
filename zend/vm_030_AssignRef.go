@@ -24,10 +24,10 @@ func ZEND_ASSIGN_REF_SPEC_VAR_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY(opline.Result(), variable_ptr)
 	}
 	if free_op2 != nil {
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -54,7 +54,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY(opline.Result(), variable_ptr)
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -81,7 +81,7 @@ func ZEND_ASSIGN_REF_SPEC_CV_VAR_HANDLER(executeData *ZendExecuteData) int {
 		types.ZVAL_COPY(opline.Result(), variable_ptr)
 	}
 	if free_op2 != nil {
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

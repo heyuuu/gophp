@@ -90,7 +90,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 				}
 			}
 			faults.ThrowError(nil, "Method name must be a string")
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 			break
 		}
@@ -99,7 +99,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 		for {
 			{
 				ZendInvalidMethodCall(object, function_name)
-				ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op2)
 				return 0
 			}
 			break
@@ -117,7 +117,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		/* Reset "object" to trigger reference counting */
@@ -129,7 +129,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteDat
 		}
 	}
 	{
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
@@ -260,7 +260,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 					function_name = opline.Const2()
 				}
 				ZendInvalidMethodCall(object, function_name)
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 				return 0
 			}
 			break
@@ -283,7 +283,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 		if fbc.GetType() <= ZEND_USER_FUNCTION && !fbc.HasFnFlags(AccCallViaTrampoline|AccNeverCache) && obj == orig_obj {
@@ -304,7 +304,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteDat
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		if EG__().GetException() != nil {
 			return 0
 		}
@@ -355,13 +355,13 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
-					ZvalPtrDtorNogc(free_op1)
+					// ZvalPtrDtorNogc(free_op1)
 					return 0
 				}
 			}
 			faults.ThrowError(nil, "Method name must be a string")
-			ZvalPtrDtorNogc(free_op2)
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 			break
 		}
@@ -379,14 +379,14 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						{
-							ZvalPtrDtorNogc(free_op2)
+							// ZvalPtrDtorNogc(free_op2)
 						}
 						return 0
 					}
 				}
 				ZendInvalidMethodCall(object, function_name)
-				ZvalPtrDtorNogc(free_op2)
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op1)
 				return 0
 			}
 			break
@@ -404,8 +404,8 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 		if obj != orig_obj {
@@ -422,11 +422,11 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		}
 	}
 	{
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		if EG__().GetException() != nil {
 			return 0
 		}
@@ -476,12 +476,12 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 			} else if function_name.IsUndef() {
 				ZVAL_UNDEFINED_OP2(executeData)
 				if EG__().GetException() != nil {
-					ZvalPtrDtorNogc(free_op1)
+					// ZvalPtrDtorNogc(free_op1)
 					return 0
 				}
 			}
 			faults.ThrowError(nil, "Method name must be a string")
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 			break
 		}
@@ -502,7 +502,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 					}
 				}
 				ZendInvalidMethodCall(object, function_name)
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 				return 0
 			}
 			break
@@ -520,7 +520,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 		if obj != orig_obj {
@@ -538,7 +538,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		if EG__().GetException() != nil {
 			return 0
 		}
@@ -658,7 +658,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 				}
 			}
 			faults.ThrowError(nil, "Method name must be a string")
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 			break
 		}
@@ -675,7 +675,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		/* Reset "object" to trigger reference counting */
@@ -687,7 +687,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteDa
 		}
 	}
 	{
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {
@@ -908,7 +908,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 				}
 			}
 			faults.ThrowError(nil, "Method name must be a string")
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 			break
 		}
@@ -926,13 +926,13 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 					object = ZVAL_UNDEFINED_OP1(executeData)
 					if EG__().GetException() != nil {
 						{
-							ZvalPtrDtorNogc(free_op2)
+							// ZvalPtrDtorNogc(free_op2)
 						}
 						return 0
 					}
 				}
 				ZendInvalidMethodCall(object, function_name)
-				ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op2)
 				return 0
 			}
 			break
@@ -950,7 +950,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(obj.GetCe(), function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		if obj != orig_obj {
@@ -967,7 +967,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) 
 		}
 	}
 	{
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
 	if fbc.IsStatic() {

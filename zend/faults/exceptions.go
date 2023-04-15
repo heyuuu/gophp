@@ -223,7 +223,7 @@ func DefaultExceptionNewEx(class_type *types.ClassEntry, skip_top_traces int) *t
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, zend.ZendGetCompiledFilename())) {
 		tmp.SetStringVal(b.CastStrAuto(zend.ZendGetExecutedFilename()))
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_FILE, &tmp)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 		tmp.SetLong(zend.ZendGetExecutedLineno())
 		zend.ZendUpdatePropertyEx(base_ce, &obj, types.STR_LINE, &tmp)
 	} else {
@@ -326,7 +326,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	if message != nil {
 		tmp.SetStringCopy(message)
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_MESSAGE, &tmp)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
 		tmp.SetLong(code)
@@ -340,7 +340,7 @@ func ZimErrorExceptionConstruct(executeData *zend.ZendExecuteData, return_value 
 	if argc >= 4 {
 		tmp.SetStringCopy(filename)
 		zend.ZendUpdatePropertyEx(ZendCeException, object, types.STR_FILE, &tmp)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 		if argc < 5 {
 			lineno = 0
 		}
@@ -599,7 +599,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		fci.SetNoSeparation(1)
 		zend.ZendCallFunction(&fci, nil)
 		if trace.GetType() != types.IS_STRING {
-			zend.ZvalPtrDtor(&trace)
+			// zend.ZvalPtrDtor(&trace)
 			trace.SetUndef()
 		}
 		if (types.Z_OBJCE_P(exception) == ZendCeTypeError || types.Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
@@ -615,7 +615,7 @@ func zim_exception___toString(executeData *zend.ZendExecuteData, return_value *t
 		// types.ZendStringReleaseEx(prev_str, 0)
 		// types.ZendStringReleaseEx(message, 0)
 		// types.ZendStringReleaseEx(file, 0)
-		zend.ZvalPtrDtor(&trace)
+		// zend.ZvalPtrDtor(&trace)
 		exception.ProtectRecursive()
 		exception = GET_PROPERTY(exception, types.STR_PREVIOUS, &rv)
 		if exception != nil && exception.IsObject() && exception.IsRecursive() {
@@ -733,7 +733,7 @@ func ThrowException(exception_ce *types.ClassEntry, message string, code zend.Ze
 	if message {
 		tmp.SetStringVal(b.CastStrAuto(message))
 		zend.ZendUpdatePropertyEx(exception_ce, &ex, types.STR_MESSAGE, &tmp)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
 		tmp.SetLong(code)
@@ -787,7 +787,7 @@ func ExceptionError(ex *types.ZendObject, severity int) {
 				zend.ZendUpdatePropertyEx(GetExceptionBase(&exception), &exception, types.STR_STRING, &tmp)
 			}
 		}
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 		if zend.EG__().GetException() != nil {
 			var zv types.Zval
 			zv.SetObject(zend.EG__().GetException())
@@ -831,7 +831,7 @@ func ThrowExceptionObject(exception *types.Zval) {
 	exception_ce = types.Z_OBJCE_P(exception)
 	if exception_ce == nil || zend.InstanceofFunction(exception_ce, ZendCeThrowable) == 0 {
 		ThrowError(nil, "Cannot throw objects that do not implement Throwable")
-		zend.ZvalPtrDtor(exception)
+		// zend.ZvalPtrDtor(exception)
 		return
 	}
 	ThrowExceptionInternal(exception)

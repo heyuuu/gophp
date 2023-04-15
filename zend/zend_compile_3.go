@@ -325,7 +325,7 @@ func ZendCompileDynamicCall(result *Znode, name_node *Znode, args_ast *ZendAst) 
 			/* 2 slots, for class and method */
 
 			opline.GetResult().SetNum(ZendAllocCacheSlots(2))
-			ZvalPtrDtor(name_node.GetConstant())
+			// ZvalPtrDtor(name_node.GetConstant())
 		} else {
 			var opline *ZendOp = GetNextOp()
 			opline.SetOpcode(ZEND_INIT_FCALL_BY_NAME)
@@ -400,7 +400,7 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 	}
 	if ZendTryCtEvalConst(result.GetConstant(), name.GetStr(), 0) != 0 {
 		// types.ZendStringReleaseEx(name, 0)
-		ZvalPtrDtor(result.GetConstant())
+		// ZvalPtrDtor(result.GetConstant())
 		result.GetConstant().SetTrue()
 		result.SetOpType(IS_CONST)
 		return types.SUCCESS
@@ -586,7 +586,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 			}
 			// types.ZendStringReleaseEx(resolved_name, 0)
 			strict = ZendIsTrue(&value)
-			ZvalPtrDtor(&value)
+			// ZvalPtrDtor(&value)
 		} else {
 			return types.FAILURE
 		}

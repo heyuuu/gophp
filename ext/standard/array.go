@@ -482,7 +482,7 @@ func ZifCount(return_value zpp.Ret, var_ *types.Zval, _ zpp.Opt, mode int) {
 			zend.ZendCallMethodWith0Params(array, nil, nil, "count", &retval)
 			if retval.IsNotUndef() {
 				return_value.SetLong(zend.ZvalGetLong(&retval))
-				zend.ZvalPtrDtor(&retval)
+				// zend.ZvalPtrDtor(&retval)
 			}
 			return
 		}
@@ -559,13 +559,13 @@ func PhpArrayUserCompare(a *types.Bucket, b *types.Bucket) int {
 	BG__().user_compare_fci.no_separation = 0
 	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
 		var ret = zend.ZvalGetLong(&retval)
-		zend.ZvalPtrDtor(&retval)
-		zend.ZvalPtrDtor(&args[1])
-		zend.ZvalPtrDtor(&args[0])
+		// zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&args[1])
+		// zend.ZvalPtrDtor(&args[0])
 		return zend.ZEND_NORMALIZE_BOOL(ret)
 	} else {
-		zend.ZvalPtrDtor(&args[1])
-		zend.ZvalPtrDtor(&args[0])
+		// zend.ZvalPtrDtor(&args[1])
+		// zend.ZvalPtrDtor(&args[0])
 		return 0
 	}
 }
@@ -613,7 +613,7 @@ func PhpUsort(executeData *zend.ZendExecuteData, return_value *types.Zval, compa
 	var garbage types.Zval
 	types.ZVAL_COPY_VALUE(&garbage, array)
 	array.SetArray(arr)
-	zend.ZvalPtrDtor(&garbage)
+	// zend.ZvalPtrDtor(&garbage)
 	PHP_ARRAY_CMP_FUNC_RESTORE()
 	return_value.SetBool(retval != 0)
 	return
@@ -648,12 +648,12 @@ func PhpArrayUserKeyCompare(a *types.Bucket, b *types.Bucket) int {
 	BG__().user_compare_fci.no_separation = 0
 	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
 		result = zend.ZvalGetLong(&retval)
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 	} else {
 		result = 0
 	}
-	zend.ZvalPtrDtor(&args[0])
-	zend.ZvalPtrDtor(&args[1])
+	// zend.ZvalPtrDtor(&args[0])
+	// zend.ZvalPtrDtor(&args[1])
 	return zend.ZEND_NORMALIZE_BOOL(result)
 }
 func ZifUksort(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval, cmpFunction *types.Zval) {
@@ -1018,7 +1018,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 				 * increment -- our reference to thash is no longer valid. */
 
 			}
-			zend.ZvalPtrDtor(&ref)
+			// zend.ZvalPtrDtor(&ref)
 
 			/* restore the fcall info and cache */
 
@@ -1031,12 +1031,12 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 
 			result = zend.ZendCallFunction(&(BG__().array_walk_fci), &(BG__().array_walk_fci_cache))
 			if result == types.SUCCESS {
-				zend.ZvalPtrDtor(&retval)
+				// zend.ZvalPtrDtor(&retval)
 			}
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&args[0])
 		}
 		if args[1].IsNotUndef() {
-			zend.ZvalPtrDtor(&args[1])
+			// zend.ZvalPtrDtor(&args[1])
 			args[1].SetUndef()
 		}
 		if result == types.FAILURE {
@@ -1064,7 +1064,7 @@ func PhpArrayWalk(array *types.Zval, userdata *types.Zval, recursive int) int {
 		}
 	}
 	if userdata != nil {
-		zend.ZvalPtrDtor(&args[2])
+		// zend.ZvalPtrDtor(&args[2])
 	}
 	types.ZendHashIteratorDel(ht_iter)
 	return result
@@ -1386,7 +1386,7 @@ func PhpExtractRefIfExists(arr *types.Array, symbol_table *types.Array) zend.Zen
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			zend.ZvalPtrDtor(orig_var)
+			// zend.ZvalPtrDtor(orig_var)
 			orig_var.SetReference(entry.Reference())
 			count++
 		}
@@ -1479,7 +1479,7 @@ func PhpExtractRefOverwrite(arr *types.Array, symbol_table *types.Array) zend.Ze
 			} else {
 				types.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			zend.ZvalPtrDtor(orig_var)
+			// zend.ZvalPtrDtor(orig_var)
 			orig_var.SetReference(entry.Reference())
 		} else {
 			if entry.IsReference() {
@@ -1591,7 +1591,7 @@ func PhpExtractRefPrefixIfExists(arr *types.Array, symbol_table *types.Array, pr
 						if orig_var.IsIndirect() {
 							orig_var = orig_var.Indirect()
 						}
-						zend.ZvalPtrDtor(orig_var)
+						// zend.ZvalPtrDtor(orig_var)
 						orig_var.SetReference(entry.Reference())
 					} else {
 						symbol_table.KeyAddNew(final_name.String().GetStr(), entry)
@@ -1716,7 +1716,7 @@ func PhpExtractRefPrefixSame(arr *types.Array, symbol_table *types.Array, prefix
 						if orig_var.IsIndirect() {
 							orig_var = orig_var.Indirect()
 						}
-						zend.ZvalPtrDtor(orig_var)
+						// zend.ZvalPtrDtor(orig_var)
 						orig_var.SetReference(entry.Reference())
 					} else {
 						symbol_table.KeyAddNew(final_name.String().GetStr(), entry)
@@ -1859,7 +1859,7 @@ func PhpExtractRefPrefixAll(arr *types.Array, symbol_table *types.Array, prefix 
 					if orig_var.IsIndirect() {
 						orig_var = orig_var.Indirect()
 					}
-					zend.ZvalPtrDtor(orig_var)
+					// zend.ZvalPtrDtor(orig_var)
 					orig_var.SetReference(entry.Reference())
 				} else {
 					symbol_table.KeyAddNew(final_name.String().GetStr(), entry)
@@ -1977,7 +1977,7 @@ func PhpExtractRefPrefixInvalid(arr *types.Array, symbol_table *types.Array, pre
 				if orig_var.IsIndirect() {
 					orig_var = orig_var.Indirect()
 				}
-				zend.ZvalPtrDtor(orig_var)
+				// zend.ZvalPtrDtor(orig_var)
 				orig_var.SetReference(entry.Reference())
 			} else {
 				symbol_table.KeyAddNew(final_name.String().GetStr(), entry)
@@ -2230,7 +2230,7 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *types.Zval) {
 		default:
 			count = PhpExtractSkip(array_copy.Array(), symbol_table)
 		}
-		zend.ZvalPtrDtor(&array_copy)
+		// zend.ZvalPtrDtor(&array_copy)
 	}
 	return_value.SetLong(count)
 	return
@@ -2791,7 +2791,7 @@ func ZifShuffle(executeData zpp.Ex, return_value zpp.Ret, arg zpp.RefZval) {
 	return
 }
 func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong, replace *types.Array, removed *types.Array) {
-	var out_hash types.Array
+	var out_hash *types.Array
 	var num_in zend.ZendLong
 	var pos zend.ZendLong
 	var idx uint32
@@ -2821,7 +2821,7 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 
 	/* Create and initialize output hash */
 
-	&out_hash = types.MakeArrayEx(b.Cond(length > 0, num_in-length, 0)+b.CondF1(replace != nil, func() __auto__ { return replace.Len() }, 0), zend.ZVAL_PTR_DTOR, 0)
+	out_hash = types.NewArray(b.Cond(length > 0, num_in-length, 0) + b.CondF1(replace != nil, func() int { return replace.Len() }, 0))
 
 	/* Start at the beginning of the input hash and copy entries to output hash until offset is reached */
 
@@ -2941,7 +2941,7 @@ func PhpSplice(in_hash *types.Array, offset zend.ZendLong, length zend.ZendLong,
 	in_hash.SetPDestructor(nil)
 	in_hash.Destroy()
 
-	in_hash.SetBy(&out_hash)
+	in_hash.SetBy(out_hash)
 }
 func ZifArrayPush(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval, _ zpp.Opt, vars []*types.Zval) {
 	var args *types.Zval
@@ -3152,7 +3152,7 @@ func ZifArrayShift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval) 
 func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval, _ zpp.Opt, vars []*types.Zval) {
 	var args *types.Zval
 	var stack *types.Zval
-	var new_hash types.Array
+	var new_hash *types.Array
 	var argc int
 	var i int
 	var key *types.String
@@ -3173,7 +3173,7 @@ func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval
 		}
 		break
 	}
-	&new_hash = types.MakeArrayEx(stack.Array().Len()+argc, zend.ZVAL_PTR_DTOR, 0)
+	new_hash = types.NewArray(stack.Array().Len() + argc)
 	for i = 0; i < argc; i++ {
 		args[i].TryAddRefcount()
 		new_hash.NextIndexInsertNew(&args[i])
@@ -3201,7 +3201,7 @@ func ZifArrayUnshift(executeData zpp.Ex, return_value zpp.Ret, stack zpp.RefZval
 	stack.Array().SetPDestructor(nil)
 	stack.Array().Destroy()
 
-	stack.Array().SetBy(&new_hash)
+	stack.Array().SetBy(new_hash)
 
 	/* Clean up and return the number of elements in the stack */
 
@@ -3369,7 +3369,7 @@ func ZifArraySlice(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, of
 				entry = return_value.Array().NextIndexInsertNew(entry)
 			}
 		}
-		zend.ZvalAddRef(entry)
+		//zend.ZvalAddRef(entry)
 	}
 }
 func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
@@ -3430,14 +3430,14 @@ func PhpArrayMergeRecursive(dest *types.Array, src *types.Array) int {
 					// src_zval.TryAddRefcount()
 					dest_zval.Array().NextIndexInsert(src_zval)
 				}
-				zend.ZvalPtrDtor(&tmp)
+				// zend.ZvalPtrDtor(&tmp)
 			} else {
 				var zv = dest.KeyAddNew(string_key.GetStr(), src_entry)
-				zend.ZvalAddRef(zv)
+				//zend.ZvalAddRef(zv)
 			}
 		} else {
 			var zv = dest.NextIndexInsert(src_entry)
-			zend.ZvalAddRef(zv)
+			//zend.ZvalAddRef(zv)
 		}
 	}
 	return 1
@@ -3501,13 +3501,13 @@ func PhpArrayReplaceRecursive(dest *types.Array, src *types.Array) int {
 		if string_key != nil {
 			if src_zval.GetType() != types.IS_ARRAY || b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || dest_entry.GetType() != types.IS_ARRAY && (!(dest_entry.IsReference()) || types.Z_REFVAL_P(dest_entry).GetType() != types.IS_ARRAY) {
 				var zv = dest.KeyUpdate(string_key.GetStr(), src_entry)
-				zend.ZvalAddRef(zv)
+				//zend.ZvalAddRef(zv)
 				continue
 			}
 		} else {
 			if src_zval.GetType() != types.IS_ARRAY || b.Assign(&dest_entry, dest.IndexFind(num_key)) == nil || dest_entry.GetType() != types.IS_ARRAY && (!(dest_entry.IsReference()) || types.Z_REFVAL_P(dest_entry).GetType() != types.IS_ARRAY) {
 				var zv = dest.IndexUpdate(num_key, src_entry)
-				zend.ZvalAddRef(zv)
+				//zend.ZvalAddRef(zv)
 				continue
 			}
 		}
@@ -4125,7 +4125,7 @@ func ZifArrayColumn(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, c
 					default:
 						return_value.Array().NextIndexInsert(colval)
 					}
-					zend.ZvalPtrDtor(keyval)
+					// zend.ZvalPtrDtor(keyval)
 				} else {
 					return_value.Array().NextIndexInsert(colval)
 				}
@@ -4196,7 +4196,7 @@ func ZifArrayReverse(executeData zpp.Ex, return_value zpp.Ret, input *types.Zval
 					entry = return_value.Array().NextIndexInsertNew(entry)
 				}
 			}
-			zend.ZvalAddRef(entry)
+			//zend.ZvalAddRef(entry)
 		}
 	}
 }
@@ -4389,7 +4389,7 @@ func ZifArrayChangeKeyCase(executeData zpp.Ex, return_value zpp.Ret, input *type
 			entry = return_value.Array().KeyUpdate(new_key.GetStr(), entry)
 			// types.ZendStringReleaseEx(new_key, 0)
 		}
-		zend.ZvalAddRef(entry)
+		//zend.ZvalAddRef(entry)
 	}
 }
 func ArrayBucketindexSwap(p any, q any) {
@@ -4536,7 +4536,7 @@ func ZvalUserCompare(a *types.Zval, b *types.Zval) int {
 	BG__().user_compare_fci.no_separation = 0
 	if zend.ZendCallFunction(&(BG__().user_compare_fci), &(BG__().user_compare_fci_cache)) == types.SUCCESS && retval.IsNotUndef() {
 		var ret = zend.ZvalGetLong(&retval)
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 		return zend.ZEND_NORMALIZE_BOOL(ret)
 	} else {
 		return 0
@@ -5499,7 +5499,7 @@ func ZifArrayDiff(executeData zpp.Ex, return_value zpp.Ret, arr1 *types.Zval, ar
 			} else {
 				value = return_value.Array().IndexAddNew(idx, value)
 			}
-			zend.ZvalAddRef(value)
+			//zend.ZvalAddRef(value)
 		}
 		// zend.ZendTmpStringRelease(tmp_str)
 	}
@@ -6040,12 +6040,12 @@ func ZifArrayReduce(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, c
 		types.ZVAL_COPY(&args[1], operand)
 		fci.SetParams(args)
 		if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS && retval.IsNotUndef() {
-			zend.ZvalPtrDtor(&args[1])
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&args[1])
+			// zend.ZvalPtrDtor(&args[0])
 			types.ZVAL_COPY_VALUE(&result, &retval)
 		} else {
-			zend.ZvalPtrDtor(&args[1])
-			zend.ZvalPtrDtor(&args[0])
+			// zend.ZvalPtrDtor(&args[1])
+			// zend.ZvalPtrDtor(&args[0])
 			return
 		}
 	}
@@ -6127,19 +6127,19 @@ func ZifArrayFilter(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _
 			fci.SetParams(args)
 			if zend.ZendCallFunction(&fci, &fci_cache) == types.SUCCESS {
 				var retval_true int
-				zend.ZvalPtrDtor(&args[0])
+				// zend.ZvalPtrDtor(&args[0])
 				if use_type == ARRAY_FILTER_USE_BOTH {
-					zend.ZvalPtrDtor(&args[1])
+					// zend.ZvalPtrDtor(&args[1])
 				}
 				retval_true = zend.ZendIsTrue(&retval)
-				zend.ZvalPtrDtor(&retval)
+				// zend.ZvalPtrDtor(&retval)
 				if retval_true == 0 {
 					continue
 				}
 			} else {
-				zend.ZvalPtrDtor(&args[0])
+				// zend.ZvalPtrDtor(&args[0])
 				if use_type == ARRAY_FILTER_USE_BOTH {
-					zend.ZvalPtrDtor(&args[1])
+					// zend.ZvalPtrDtor(&args[1])
 				}
 				return
 			}
@@ -6151,7 +6151,7 @@ func ZifArrayFilter(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, _
 		} else {
 			operand = return_value.Array().IndexUpdate(num_key, operand)
 		}
-		zend.ZvalAddRef(operand)
+		//zend.ZvalAddRef(operand)
 	}
 	zend.ZendReleaseFcallInfoCache(&fci_cache)
 }
@@ -6219,7 +6219,7 @@ func ZifArrayMap(executeData zpp.Ex, return_value zpp.Ret, callback *types.Zval,
 			fci.SetNoSeparation(0)
 			types.ZVAL_COPY(&arg, zv)
 			ret = zend.ZendCallFunction(&fci, &fci_cache)
-			zend.IZvalPtrDtor(&arg)
+			// zend.IZvalPtrDtor(&arg)
 			if ret != types.SUCCESS || result.IsUndef() {
 				return_value.Array().DestroyEx()
 				return_value.SetNull()
@@ -6312,14 +6312,14 @@ func ZifArrayMap(executeData zpp.Ex, return_value zpp.Ret, callback *types.Zval,
 					zend.Efree(array_pos)
 					return_value.Array().DestroyEx()
 					for i = 0; i < n_arrays; i++ {
-						zend.ZvalPtrDtor(&params[i])
+						// zend.ZvalPtrDtor(&params[i])
 					}
 					zend.Efree(params)
 					return_value.SetNull()
 					return
 				} else {
 					for i = 0; i < n_arrays; i++ {
-						zend.ZvalPtrDtor(&params[i])
+						// zend.ZvalPtrDtor(&params[i])
 					}
 				}
 				return_value.Array().NextIndexInsertNew(&result)
@@ -6435,7 +6435,7 @@ func ZifArrayChunk(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval, si
 		} else {
 			entry = chunk.Array().NextIndexInsert(entry)
 		}
-		zend.ZvalAddRef(entry)
+		//zend.ZvalAddRef(entry)
 
 		/* If reached the chunk size, add it to the result array, and reset the
 		 * pointer. */
@@ -6508,7 +6508,7 @@ func ZifArrayCombine(executeData zpp.Ex, return_value zpp.Ret, keys *types.Zval,
 					entry_values = return_value.Array().SymtableUpdate(key.GetStr(), entry_values)
 					// zend.ZendTmpStringRelease(tmp_key)
 				}
-				zend.ZvalAddRef(entry_values)
+				//zend.ZvalAddRef(entry_values)
 				pos_values++
 				break
 			}

@@ -86,7 +86,7 @@ free_and_exit_assign_obj:
 	}
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -171,10 +171,10 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -259,10 +259,10 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -348,7 +348,7 @@ free_and_exit_assign_obj:
 	}
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -385,9 +385,9 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -427,11 +427,11 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -471,11 +471,11 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -515,9 +515,9 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -554,7 +554,7 @@ free_and_exit_assign_obj:
 	}
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -593,10 +593,10 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -635,10 +635,10 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -678,7 +678,7 @@ free_and_exit_assign_obj:
 	}
 exit_assign_obj:
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 
 	/* assign_obj has two opcodes! */
@@ -831,7 +831,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -907,7 +907,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -1009,7 +1009,7 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1039,9 +1039,9 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1071,9 +1071,9 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1103,7 +1103,7 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1157,7 +1157,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -1187,7 +1187,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -1384,7 +1384,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -1468,7 +1468,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -1586,7 +1586,7 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1624,9 +1624,9 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1664,9 +1664,9 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1704,7 +1704,7 @@ free_and_exit_assign_obj:
 		types.ZVAL_COPY(opline.Result(), value)
 	}
 exit_assign_obj:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
 
@@ -1774,7 +1774,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */
@@ -1812,7 +1812,7 @@ free_and_exit_assign_obj:
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), value)
 	}
-	ZvalPtrDtorNogc(free_op_data)
+	// ZvalPtrDtorNogc(free_op_data)
 exit_assign_obj:
 
 	/* assign_obj has two opcodes! */

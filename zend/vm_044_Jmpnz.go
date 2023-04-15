@@ -37,7 +37,7 @@ func ZEND_JMPNZ_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		opline++
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_JMP(executeData, opline)
 }
 func ZEND_JMPNZ_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

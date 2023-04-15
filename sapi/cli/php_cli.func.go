@@ -575,15 +575,15 @@ func DoCli(argc int, argv **byte, args []string) int {
 				tmp.SetObject(zend.EG__().GetException())
 				msg = zend.ZendReadProperty(faults.ZendCeException, &tmp, "message", 0, &rv)
 				zend.ZendPrintf("Exception: %s\n", msg.String().GetVal())
-				zend.ZvalPtrDtor(&tmp)
+				// zend.ZvalPtrDtor(&tmp)
 				zend.EG__().SetException(nil)
 				exit_status = 1
 			} else {
 				zend.ZendPrintZval(&ref)
 				zend.ZendWrite("\n")
 			}
-			zend.ZvalPtrDtor(&ref)
-			zend.ZvalPtrDtor(&arg)
+			// zend.ZvalPtrDtor(&ref)
+			// zend.ZvalPtrDtor(&arg)
 			break
 		case PHP_MODE_REFLECTION_EXT_INFO:
 			if module := globals.G().GetModule(b.CastStrAuto(reflection_what)); module != nil {

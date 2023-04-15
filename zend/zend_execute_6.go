@@ -202,7 +202,7 @@ func ZendAssignToPropertyReference(
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if variable.GetType() != types.IS_INDIRECT {
 		faults.ThrowError(nil, "Cannot assign by reference to overloaded object")
-		ZvalPtrDtor(&variable)
+		// ZvalPtrDtor(&variable)
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
@@ -300,7 +300,7 @@ func ZendFetchStaticPropertyAddressEx(
 	if op1_type != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 		if op1_type != IS_CV {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 		}
 	}
 	if (*retval) == nil {

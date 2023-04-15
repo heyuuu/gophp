@@ -17,7 +17,7 @@ func _ZEND_TRY_ASSIGN_VALUE_EX(zv *types.Zval, other_zv *types.Zval, strict type
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.CopyValueFrom(other_zv)
 		break
 	}
@@ -41,7 +41,7 @@ func ZendTryArrayInitSize(zv *types.Zval, size uint32) *types.Zval {
 		}
 		zv = ref.GetVal()
 	}
-	ZvalPtrDtor(zv)
+	// ZvalPtrDtor(zv)
 	zv.SetArray(arr)
 	return zv
 }

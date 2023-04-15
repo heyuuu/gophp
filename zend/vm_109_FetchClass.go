@@ -46,7 +46,7 @@ func ZEND_FETCH_CLASS_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 			faults.ThrowError(nil, "Class name must be a valid object or a string")
 		}
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_CLASS_SPEC_UNUSED_UNUSED_HANDLER(executeData *ZendExecuteData) int {

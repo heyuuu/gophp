@@ -24,7 +24,7 @@ func ZifHeaderRegisterCallback(callback *types.Zval) bool {
 	}
 
 	if SG__().callback_func.IsNotUndef() {
-		zend.ZvalPtrDtor(&SG__().callback_func)
+		// zend.ZvalPtrDtor(&SG__().callback_func)
 		SG__().fci_cache = zend.EmptyFcallInfoCache
 	}
 
@@ -44,7 +44,7 @@ func SapiRunHeaderCallback(callback *types.Zval) {
 		if error == types.FAILURE {
 			goto callback_failed
 		} else {
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 		}
 	} else {
 	callback_failed:
@@ -653,7 +653,7 @@ func SapiSendHeaders() int {
 		types.ZVAL_COPY_VALUE(&cb, &(SG__().callback_func))
 		SG__().callback_func.SetUndef()
 		SapiRunHeaderCallback(&cb)
-		zend.ZvalPtrDtor(&cb)
+		// zend.ZvalPtrDtor(&cb)
 	}
 	SG__().headers_sent = 1
 	if SM__().GetSendHeaders() != nil {

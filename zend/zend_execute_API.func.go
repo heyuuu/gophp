@@ -76,7 +76,7 @@ func ZendUncleanZvalPtrDtor(zv *types.Zval) {
 	if zv.IsIndirect() {
 		zv = zv.Indirect()
 	}
-	IZvalPtrDtor(zv)
+	// IZvalPtrDtor(zv)
 }
 func ZendThrowOrError(fetch_type int, exception_ce *types.ClassEntry, format string, args ...any) {
 	message := ZendSprintf(format, args)
@@ -172,11 +172,11 @@ func ShutdownExecutor() {
 		/* Also release error and exception handlers, which may hold objects. */
 
 		if EG__().GetUserErrorHandler().IsNotUndef() {
-			ZvalPtrDtor(EG__().GetUserErrorHandler())
+			// ZvalPtrDtor(EG__().GetUserErrorHandler())
 			EG__().GetUserErrorHandler().SetUndef()
 		}
 		if EG__().GetUserExceptionHandler().IsNotUndef() {
-			ZvalPtrDtor(EG__().GetUserExceptionHandler())
+			// ZvalPtrDtor(EG__().GetUserExceptionHandler())
 			EG__().GetUserExceptionHandler().SetUndef()
 		}
 		ZendStackClean(EG__().GetUserErrorHandlersErrorReporting(), nil, 1)
@@ -227,7 +227,7 @@ func ShutdownExecutor() {
 					return true
 				}
 
-				ZvalPtrDtorNogc(c.Value())
+				// ZvalPtrDtorNogc(c.Value())
 				return false
 			})
 
@@ -346,7 +346,7 @@ func ZendUseUndefinedConstant(name *types.String, attr ZendAstAttr, result *type
 			return types.FAILURE
 		} else {
 			var result_str *types.String = types.NewString(b.CastStr(actual, actual_len))
-			ZvalPtrDtorNogc(result)
+			// ZvalPtrDtorNogc(result)
 			result.SetString(result_str)
 		}
 	}
@@ -361,14 +361,14 @@ func ZvalUpdateConstantEx(p *types.Zval, scope *types.ClassEntry) int {
 			if zv == nil {
 				return ZendUseUndefinedConstant(name, ast.GetAttr(), p)
 			}
-			ZvalPtrDtorNogc(p)
+			// ZvalPtrDtorNogc(p)
 			types.ZVAL_COPY_OR_DUP(p, zv)
 		} else {
 			var tmp types.Zval
 			if ZendAstEvaluate(&tmp, ast, scope) != types.SUCCESS {
 				return types.FAILURE
 			}
-			ZvalPtrDtorNogc(p)
+			// ZvalPtrDtorNogc(p)
 			types.ZVAL_COPY_VALUE(p, &tmp)
 		}
 	}
@@ -562,7 +562,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
 		ZendVmStackFreeArgs(call)
 		if EG__().GetException() != nil {
-			ZvalPtrDtor(fci.GetRetval())
+			// ZvalPtrDtor(fci.GetRetval())
 			fci.GetRetval().SetUndef()
 		}
 		if call_via_handler != 0 {
@@ -593,7 +593,7 @@ func ZendCallFunction(fci *types.ZendFcallInfo, fci_cache *types.ZendFcallInfoCa
 		}
 		Efree(func_)
 		if EG__().GetException() != nil {
-			ZvalPtrDtor(fci.GetRetval())
+			// ZvalPtrDtor(fci.GetRetval())
 			fci.GetRetval().SetUndef()
 		}
 	}
@@ -707,9 +707,9 @@ func ZendLookupClassEx(name *types.String, key *types.String, flags uint32) *typ
 
 	faults.ExceptionRestore()
 	EG__().SetFakeScope(orig_fake_scope)
-	ZvalPtrDtor(&args[0])
+	// ZvalPtrDtor(&args[0])
 	types.ZendHashDel(EG__().GetInAutoload(), lc_name.GetStr())
-	ZvalPtrDtor(&local_retval)
+	// ZvalPtrDtor(&local_retval)
 	return ce
 }
 func ZendLookupClass(name *types.String) *types.ClassEntry {
@@ -781,7 +781,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 			if retval_ptr != nil {
 				types.ZVAL_COPY_VALUE(retval_ptr, &local_retval)
 			} else {
-				ZvalPtrDtor(&local_retval)
+				// ZvalPtrDtor(&local_retval)
 			}
 		} else {
 			if retval_ptr != nil {
@@ -1113,7 +1113,7 @@ func ZendSetLocalVarStr(name string, value *types.Zval, force int) int {
 				for {
 					if (*str).GetStr() == name {
 						var var_ *types.Zval = executeData.VarNum(str - op_array.GetVars())
-						ZvalPtrDtor(var_)
+						// ZvalPtrDtor(var_)
 						var_.CopyValueFrom(value)
 						return types.SUCCESS
 					}

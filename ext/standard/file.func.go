@@ -22,7 +22,7 @@ func PhpLeStreamContext() int { return LeStreamContext }
 func FileContextDtor(res *types.ZendResource) {
 	var context *core.PhpStreamContext = (*core.PhpStreamContext)(res.GetPtr())
 	if context.GetOptions().IsNotUndef() {
-		zend.ZvalPtrDtor(context.GetOptions())
+		// zend.ZvalPtrDtor(context.GetOptions())
 		context.GetOptions().SetUndef()
 	}
 	streams.PhpStreamContextFree(context)

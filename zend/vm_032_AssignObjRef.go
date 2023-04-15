@@ -18,10 +18,10 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExe
 
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -43,7 +43,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(executeData *ZendExec
 
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -67,11 +67,11 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendEx
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -94,9 +94,9 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExe
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	OPLINE = executeData.GetOpline() + 2
 	return 0
 }
@@ -118,10 +118,10 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecut
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -143,7 +143,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_VAR_CV_OP_DATA_CV_HANDLER(executeData *ZendExecute
 		}
 	}
 	if free_op1 != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -168,7 +168,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CONST_OP_DATA_VAR_HANDLER(executeData *Zend
 	}
 
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -214,9 +214,9 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_TMPVAR_OP_DATA_VAR_HANDLER(executeData *Zen
 		}
 	}
 
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -240,7 +240,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_TMPVAR_OP_DATA_CV_HANDLER(executeData *Zend
 		}
 	}
 
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	OPLINE = executeData.GetOpline() + 2
 	return 0
 }
@@ -264,7 +264,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CV_OP_DATA_VAR_HANDLER(executeData *ZendExe
 	}
 
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -307,7 +307,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(executeData *ZendExec
 
 	}
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -347,9 +347,9 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(executeData *ZendExe
 			ZendAssignToPropertyReferenceVarVar(container, property, value_ptr, opline, executeData)
 		}
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0
@@ -370,7 +370,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(executeData *ZendExec
 			ZendAssignToPropertyReferenceVarVar(container, property, value_ptr, opline, executeData)
 		}
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	OPLINE = executeData.GetOpline() + 2
 	return 0
 }
@@ -391,7 +391,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_CV_CV_OP_DATA_VAR_HANDLER(executeData *ZendExecute
 		}
 	}
 	if free_op_data != nil {
-		ZvalPtrDtorNogc(free_op_data)
+		// ZvalPtrDtorNogc(free_op_data)
 	}
 	OPLINE = executeData.GetOpline() + 2
 	return 0

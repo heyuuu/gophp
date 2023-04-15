@@ -69,7 +69,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
 			var refcnt uint32 = ref.DelRefcount()
 			if variable_ptr != value {
 				if refcnt == 0 {
-					RcDtorFunc(ref)
+					//RcDtorFunc(ref)
 					if EG__().GetException() != nil {
 						variable_ptr.SetNull()
 						return 0

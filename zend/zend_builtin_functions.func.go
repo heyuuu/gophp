@@ -373,11 +373,11 @@ repeat:
 		fallthrough
 	default:
 		faults.Error(faults.E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
-		ZvalPtrDtor(&val_free)
+		// ZvalPtrDtor(&val_free)
 		return false
 	}
 	types.ZVAL_COPY(c.Value(), value)
-	ZvalPtrDtor(&val_free)
+	// ZvalPtrDtor(&val_free)
 register_constant:
 	if caseInsensitive {
 		faults.Error(faults.E_DEPRECATED, "define(): Declaration of case-insensitive constants is deprecated")
@@ -1029,7 +1029,7 @@ func ZifRestoreErrorHandler(executeData zpp.Ex, return_value zpp.Ret) {
 		var zeh types.Zval
 		types.ZVAL_COPY_VALUE(&zeh, EG__().GetUserErrorHandler())
 		EG__().GetUserErrorHandler().SetUndef()
-		ZvalPtrDtor(&zeh)
+		// ZvalPtrDtor(&zeh)
 	}
 	if ZendStackIsEmpty(EG__().GetUserErrorHandlers()) != 0 {
 		EG__().GetUserErrorHandler().SetUndef()
@@ -1072,7 +1072,7 @@ func ZifRestoreExceptionHandler(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	if EG__().GetUserExceptionHandler().IsNotUndef() {
-		ZvalPtrDtor(EG__().GetUserExceptionHandler())
+		// ZvalPtrDtor(EG__().GetUserExceptionHandler())
 	}
 	if ZendStackIsEmpty(EG__().GetUserExceptionHandlers()) != 0 {
 		EG__().GetUserExceptionHandler().SetUndef()
@@ -1598,7 +1598,7 @@ func ZifDebugPrintBacktrace(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt,
 		ZendPrintf("%s(", function_name)
 		if arg_array.IsNotUndef() {
 			DebugPrintBacktraceArgs(&arg_array)
-			ZvalPtrDtor(&arg_array)
+			// ZvalPtrDtor(&arg_array)
 		}
 		if filename != nil {
 			ZendPrintf(") called at [%s:%d]\n", filename, lineno)

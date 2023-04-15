@@ -197,7 +197,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 				var var_num uint32 = range_.GetVar() & ^ZEND_LIVE_MASK
 				var var_ *types.Zval = EX_VAR(var_num)
 				if kind == ZEND_LIVE_TMPVAR {
-					ZvalPtrDtorNogc(var_)
+					// ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_NEW {
 					var obj *types.ZendObject
 					b.Assert(var_.IsObject())
@@ -208,7 +208,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 					if var_.GetType() != types.IS_ARRAY && var_.GetFeIterIdx() != uint32-1 {
 						types.ZendHashIteratorDel(var_.GetFeIterIdx())
 					}
-					ZvalPtrDtorNogc(var_)
+					// ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_ROPE {
 					var rope **types.String = (**types.String)(var_)
 					var last *ZendOp = executeData.GetFunc().GetOpArray().opcodes + op_num

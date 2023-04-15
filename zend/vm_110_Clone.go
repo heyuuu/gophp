@@ -62,7 +62,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 				}
 			}
 			faults.ThrowError(nil, "__clone method called on non-object")
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			return 0
 		}
 		break
@@ -72,7 +72,7 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	clone_call = types.Z_OBJ_HT_P(obj).GetCloneObj()
 	if clone_call == nil {
 		faults.ThrowError(nil, "Trying to clone an uncloneable object of class %s", ce.GetName().GetVal())
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
 		return 0
 	}
@@ -81,14 +81,14 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		if clone.GetScope() != scope {
 			if clone.IsPrivate() || ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0 {
 				ZendWrongCloneCall(clone, scope)
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 				opline.Result().SetUndef()
 				return 0
 			}
 		}
 	}
 	opline.Result().SetObject(clone_call(obj))
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_CLONE_SPEC_UNUSED_HANDLER(executeData *ZendExecuteData) int {

@@ -73,7 +73,7 @@ func SplArrayObjectFreeStorage(object *types.ZendObject) {
 		types.ZendHashIteratorDel(intern.GetHtIter())
 	}
 	zend.ZendObjectStdDtor(intern.GetStd())
-	zend.ZvalPtrDtor(intern.GetArray())
+	// zend.ZvalPtrDtor(intern.GetArray())
 }
 func SplArrayObjectNewEx(class_type *types.ClassEntry, orig *types.Zval, clone_orig int) *types.ZendObject {
 	var intern *SplArrayObject
@@ -311,7 +311,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *types.Zval, offset *ty
 				offset = types.SEPARATE_ARG_IF_REF(offset)
 			}
 			zend.ZendCallMethodWith1Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetGet(), "offsetGet", rv, offset)
-			zend.ZvalPtrDtor(offset)
+			// zend.ZvalPtrDtor(offset)
 			if !(rv.IsUndef()) {
 				return rv
 			}
@@ -346,7 +346,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *types.Zval, offset *t
 			offset = types.SEPARATE_ARG_IF_REF(offset)
 		}
 		zend.ZendCallMethodWith2Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetSet(), "offsetSet", nil, offset, value)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(offset)
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
@@ -392,7 +392,7 @@ try_again:
 		goto try_again
 	default:
 		faults.Error(faults.E_WARNING, "Illegal offset type")
-		zend.ZvalPtrDtor(value)
+		// zend.ZvalPtrDtor(value)
 		return
 	}
 }
@@ -406,7 +406,7 @@ func SplArrayUnsetDimensionEx(check_inherited int, object *types.Zval, offset *t
 	if check_inherited != 0 && intern.GetFptrOffsetDel() != nil {
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetDel(), "offsetUnset", nil, offset)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(offset)
 		return
 	}
 	if intern.GetNApplyCount() > 0 {
@@ -429,7 +429,7 @@ try_again:
 					if data.IsUndef() {
 						faults.Error(faults.E_NOTICE, "Undefined index: %s", offset.String().GetVal())
 					} else {
-						zend.ZvalPtrDtor(data)
+						// zend.ZvalPtrDtor(data)
 						data.SetUndef()
 						ht.MarkHasEmptyIndex()
 						types.ZendHashMoveForwardEx(ht, SplArrayGetPosPtr(ht, intern))
@@ -483,16 +483,16 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 	if check_inherited != 0 && intern.GetFptrOffsetHas() != nil {
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, types.Z_OBJCE_P(object), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(offset)
 		if zend.ZendIsTrue(&rv) != 0 {
-			zend.ZvalPtrDtor(&rv)
+			// zend.ZvalPtrDtor(&rv)
 			if check_empty != 1 {
 				return 1
 			} else if intern.GetFptrOffsetGet() != nil {
 				value = SplArrayReadDimensionEx(1, object, offset, zend.BP_VAR_R, &rv)
 			}
 		} else {
-			zend.ZvalPtrDtor(&rv)
+			// zend.ZvalPtrDtor(&rv)
 			return 0
 		}
 	}
@@ -545,7 +545,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *types.Zval, offset *typ
 	}
 	var result types.ZendBool = b.CondF(check_empty != 0, func() int { return zend.ZendIsTrue(value) }, func() bool { return value.GetType() != types.IS_NULL })
 	if value == &rv {
-		zend.ZvalPtrDtor(&rv)
+		// zend.ZvalPtrDtor(&rv)
 	}
 	return result
 }
@@ -778,7 +778,7 @@ func SplArrayNext(intern *SplArrayObject) int {
 }
 func SplArrayItDtor(iter *zend.ZendObjectIterator) {
 	zend.ZendUserItInvalidateCurrent(iter)
-	zend.ZvalPtrDtor(iter.GetData())
+	// zend.ZvalPtrDtor(iter.GetData())
 }
 func SplArrayItValid(iter *zend.ZendObjectIterator) int {
 	var object *SplArrayObject = Z_SPLARRAY_P(iter.GetData())
@@ -845,7 +845,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 		return
 	}
 	if array.IsType(types.IS_ARRAY) {
-		zend.ZvalPtrDtor(intern.GetArray())
+		// zend.ZvalPtrDtor(intern.GetArray())
 		if array.GetRefcount() == 1 {
 			types.ZVAL_COPY(intern.GetArray(), array)
 		} else {
@@ -859,7 +859,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 		}
 	} else {
 		if types.Z_OBJ_HT_P(array) == &spl_handler_ArrayObject || types.Z_OBJ_HT_P(array) == &spl_handler_ArrayIterator {
-			zend.ZvalPtrDtor(intern.GetArray())
+			// zend.ZvalPtrDtor(intern.GetArray())
 			if just_array != 0 {
 				var other *SplArrayObject = Z_SPLARRAY_P(array)
 				ar_flags = other.GetArFlags() & ^SPL_ARRAY_INT_MASK
@@ -877,7 +877,7 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 				faults.ThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", types.Z_OBJCE_P(array).GetName().GetVal(), intern.GetStd().GetCe().GetName().GetVal())
 				return
 			}
-			zend.ZvalPtrDtor(intern.GetArray())
+			// zend.ZvalPtrDtor(intern.GetArray())
 			types.ZVAL_COPY(intern.GetArray(), array)
 		}
 	}
@@ -1064,7 +1064,7 @@ func SplArrayObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if rv.IsNotUndef() {
 			*count = zend.ZvalGetLong(&rv)
-			zend.ZvalPtrDtor(&rv)
+			// zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
 		}
 		*count = 0
@@ -1124,7 +1124,7 @@ exit:
 		//aht.DelRefcount()
 	}
 	types.Z_REFVAL(params[0]).SetNull()
-	zend.ZvalPtrDtor(&params[0])
+	// zend.ZvalPtrDtor(&params[0])
 	//types.ZendStringFree(function_name.String())
 }
 func zim_spl_Array_asort(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -1337,7 +1337,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 
 		intern.SetIsCloneMask(false)
 		intern.AddArFlags(flags & SPL_ARRAY_CLONE_MASK)
-		zend.ZvalPtrDtor(intern.GetArray())
+		// zend.ZvalPtrDtor(intern.GetArray())
 		intern.GetArray().SetUndef()
 	} else {
 		if (*p) != 'a' && (*p) != 'O' && (*p) != 'C' && (*p) != 'r' {
@@ -1350,7 +1350,7 @@ func zim_spl_Array_unserialize(executeData *zend.ZendExecuteData, return_value *
 		intern.SetIsCloneMask(false)
 		intern.AddArFlags(flags & SPL_ARRAY_CLONE_MASK)
 		if array.IsType(types.IS_ARRAY) {
-			zend.ZvalPtrDtor(intern.GetArray())
+			// zend.ZvalPtrDtor(intern.GetArray())
 			types.ZVAL_COPY_VALUE(intern.GetArray(), array)
 			array.SetNull()
 			types.SeparateArray(intern.GetArray())
@@ -1447,7 +1447,7 @@ func zim_spl_Array___unserialize(executeData *zend.ZendExecuteData, return_value
 	intern.SetIsCloneMask(false)
 	intern.AddArFlags(flags & SPL_ARRAY_CLONE_MASK)
 	if (flags & SPL_ARRAY_IS_SELF) != 0 {
-		zend.ZvalPtrDtor(intern.GetArray())
+		// zend.ZvalPtrDtor(intern.GetArray())
 		intern.GetArray().SetUndef()
 	} else {
 		SplArraySetArray(zend.ZEND_THIS(executeData), intern, storage_zv, 0, 1)

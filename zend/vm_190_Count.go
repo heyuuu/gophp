@@ -35,7 +35,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				var retval types.Zval
 				ZendCallMethodWith0Params(op1, nil, nil, "count", &retval)
 				count = ZvalGetLong(&retval)
-				ZvalPtrDtor(&retval)
+				// ZvalPtrDtor(&retval)
 				break
 			}
 
@@ -86,7 +86,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				var retval types.Zval
 				ZendCallMethodWith0Params(op1, nil, nil, "count", &retval)
 				count = ZvalGetLong(&retval)
-				ZvalPtrDtor(&retval)
+				// ZvalPtrDtor(&retval)
 				break
 			}
 
@@ -111,7 +111,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 		break
 	}
 	opline.Result().SetLong(count)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
@@ -143,7 +143,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 				var retval types.Zval
 				ZendCallMethodWith0Params(op1, nil, nil, "count", &retval)
 				count = ZvalGetLong(&retval)
-				ZvalPtrDtor(&retval)
+				// ZvalPtrDtor(&retval)
 				break
 			}
 

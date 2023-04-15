@@ -176,7 +176,11 @@ func NewZendReference(val *Zval) *ZendReference {
 	ref.SetRefcount(1)
 	ref.SetGcTypeInfo(uint32(IS_REFERENCE))
 
-	runtime.SetFinalizer(ref, zend.ZendReferenceDestroy)
+	runtime.SetFinalizer(ref, func(ref *ZendReference) {
+		b.Assert(ref.GetSources().GetPtr() != nil)
+		// IZvalPtrDtor(ref.GetVal())
+		zend.EfreeSize(ref, b.SizeOf("zend_reference"))
+	})
 
 	return ref
 }

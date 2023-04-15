@@ -77,9 +77,9 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 			}
 			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
 				var slot *types.Zval = OBJ_PROP(object, property_info.GetOffset())
-				ZvalPtrDtor(slot)
+				// ZvalPtrDtor(slot)
 				slot.CopyValueFrom(prop)
-				ZvalAddRef(slot)
+				//ZvalAddRef(slot)
 				if object.GetProperties() != nil {
 					tmp.SetIndirect(slot)
 					object.GetProperties().KeyUpdate(key.GetStr(), &tmp)
@@ -89,14 +89,14 @@ func ObjectPropertiesLoad(object *types.ZendObject, properties *types.Array) {
 					RebuildObjectProperties(object)
 				}
 				prop = object.GetProperties().KeyUpdate(key.GetStr(), prop)
-				ZvalAddRef(prop)
+				//ZvalAddRef(prop)
 			}
 		} else {
 			if object.GetProperties() == nil {
 				RebuildObjectProperties(object)
 			}
 			prop = object.GetProperties().IndexUpdate(h, prop)
-			ZvalAddRef(prop)
+			//ZvalAddRef(prop)
 		}
 	}
 }

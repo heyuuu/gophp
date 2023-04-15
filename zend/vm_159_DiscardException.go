@@ -10,7 +10,7 @@ func ZEND_DISCARD_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 
 	if fast_call.GetOplineNum() != uint32-1 && (executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].GetOp2Type()&(IS_TMP_VAR|IS_VAR)) != 0 {
 		var return_value *types.Zval = EX_VAR(executeData.GetFunc().GetOpArray().opcodes[fast_call.GetOplineNum()].op2.var_)
-		ZvalPtrDtor(return_value)
+		// ZvalPtrDtor(return_value)
 	}
 
 	/* cleanup delayed exception */

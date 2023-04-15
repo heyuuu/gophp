@@ -869,7 +869,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key string, ce *types.Clas
 
 				/* Don't keep default properties in GC (they may be freed by opcache) */
 
-				ZvalPtrDtorNogc(&ce.GetDefaultPropertiesTable()[parent_num])
+				// ZvalPtrDtorNogc(&ce.GetDefaultPropertiesTable()[parent_num])
 				ce.GetDefaultPropertiesTable()[parent_num] = ce.GetDefaultPropertiesTable()[child_num]
 				ce.GetDefaultPropertiesTable()[child_num].SetUndef()
 				child_info.SetOffset(parent_info.GetOffset())
@@ -1833,10 +1833,10 @@ func ZendDoTraitsPropertyBinding(ce *types.ClassEntry, traits **types.ClassEntry
 						}
 						not_compatible = FastIsNotIdenticalFunction(op1, op2)
 						if op1 == &op1_tmp {
-							ZvalPtrDtorNogc(&op1_tmp)
+							// ZvalPtrDtorNogc(&op1_tmp)
 						}
 						if op2 == &op2_tmp {
-							ZvalPtrDtorNogc(&op2_tmp)
+							// ZvalPtrDtorNogc(&op2_tmp)
 						}
 					}
 					if not_compatible != 0 {

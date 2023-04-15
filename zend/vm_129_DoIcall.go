@@ -15,7 +15,7 @@ func ZEND_DO_ICALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 	EG__().SetCurrentExecuteData(executeData)
 	ZendVmStackFreeArgs(call)
 	ZendVmStackFreeCallFrame(call)
-	IZvalPtrDtor(ret)
+	// IZvalPtrDtor(ret)
 	if EG__().GetException() != nil {
 		faults.RethrowException(executeData)
 		return 0

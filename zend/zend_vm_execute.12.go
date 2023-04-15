@@ -25,7 +25,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 		}
 		name = ZvalTryGetTmpString(varname, &tmp_name)
 		if name == nil {
-			ZvalPtrDtorNogc(free_op1)
+			// ZvalPtrDtorNogc(free_op1)
 			opline.Result().SetUndef()
 			return 0
 		}
@@ -74,7 +74,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, executeData *Ze
 		}
 	}
 	if (opline.GetExtendedValue() & ZEND_FETCH_GLOBAL_LOCK) == 0 {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 	}
 	{
 		ZendTmpStringRelease(tmp_name)

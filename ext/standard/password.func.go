@@ -17,9 +17,6 @@ func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	}
 	return types.FAILURE
 }
-func PhpPasswordAlgoUnregister(ident *byte) {
-	types.ZendHashStrDel(&PhpPasswordAlgos, ident)
-}
 func PhpPasswordSaltIsAlphabet(str *byte, len_ int) int {
 	var i int = 0
 	for i = 0; i < len_; i++ {
@@ -245,7 +242,7 @@ func PhpPasswordBcryptHash(password *types.String, options *types.Array) *types.
 	return result
 }
 func ZmStartupPassword(type_ int, module_number int) int {
-	&PhpPasswordAlgos = types.MakeArrayEx(4, zend.ZVAL_PTR_DTOR, 1)
+	PhpPasswordAlgos = types.NewArray(4)
 	zend.RegisterStringConstant("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT, module_number)
 	if types.FAILURE == PhpPasswordAlgoRegister("2y", &PhpPasswordAlgoBcrypt) {
 		return types.FAILURE
@@ -373,8 +370,8 @@ func ZifPasswordGetInfo(executeData zpp.Ex, return_value zpp.Ret, hash *types.Zv
 	// types.ZendStringRelease(ident)
 	zend.AddAssocString(return_value, "algoName", algo.GetName())
 	if algo.GetGetInfo() != nil && types.FAILURE == algo.GetGetInfo()(&options, hash) {
-		zend.ZvalDtor(&options)
-		zend.ZvalDtor(return_value)
+		//zend.ZvalDtor(&options)
+		//zend.ZvalDtor(return_value)
 		return_value.SetNull()
 		return
 	}
@@ -485,7 +482,7 @@ func ZifPasswordAlgos(executeData zpp.Ex, return_value zpp.Ret) {
 		return
 	}
 	zend.ArrayInit(return_value)
-	var __ht *types.Array = &PhpPasswordAlgos
+	var __ht *types.Array = PhpPasswordAlgos
 	for _, _p := range __ht.ForeachData() {
 		var _z *types.Zval = _p.GetVal()
 

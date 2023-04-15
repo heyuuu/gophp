@@ -35,7 +35,7 @@ func ZendObjectStdDtor(object *types.ZendObject) {
 						ZEND_REF_DEL_TYPE_SOURCE(p.Reference(), prop_info)
 					}
 				}
-				IZvalPtrDtor(p)
+				// IZvalPtrDtor(p)
 			}
 			p++
 			if p == end {
@@ -137,7 +137,7 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		fcic.SetCalledScope(object.GetCe())
 		fcic.SetObject(object)
 		ZendCallFunction(&fci, &fcic)
-		ZvalPtrDtor(&ret)
+		// ZvalPtrDtor(&ret)
 		if old_exception != nil {
 			if EG__().GetException() != nil {
 				faults.ExceptionSetPrevious(EG__().GetException(), old_exception)
@@ -155,9 +155,9 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		var dst *types.Zval = new_object.GetPropertiesTable()
 		var end *types.Zval = src + old_object.GetCe().GetDefaultPropertiesCount()
 		for {
-			IZvalPtrDtor(dst)
+			// IZvalPtrDtor(dst)
 			types.ZVAL_COPY_VALUE_PROP(dst, src)
-			ZvalAddRef(dst)
+			//ZvalAddRef(dst)
 			if dst.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(dst.Reference()) {
 				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
 				if prop_info.GetType() != 0 {
@@ -210,7 +210,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 				new_prop.SetIndirect(new_object.GetPropertiesTable() + (prop.Indirect() - old_object.GetPropertiesTable()))
 			} else {
 				types.ZVAL_COPY_VALUE(&new_prop, prop)
-				ZvalAddRef(&new_prop)
+				//ZvalAddRef(&new_prop)
 			}
 			if key != nil {
 				types._zendHashAppend(new_object.GetProperties(), key, &new_prop)
@@ -236,7 +236,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 		fcic.SetCalledScope(new_object.GetCe())
 		fcic.SetObject(new_object)
 		ZendCallFunction(&fci, &fcic)
-		ZvalPtrDtor(&ret)
+		// ZvalPtrDtor(&ret)
 		// OBJ_RELEASE(new_object)
 	}
 }

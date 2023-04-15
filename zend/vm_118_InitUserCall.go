@@ -83,7 +83,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 
 			ZendNonStaticMethodCall(func_)
 			if EG__().GetException() != nil {
-				ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op2)
 				return 0
 			}
 		}
@@ -106,7 +106,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
 			if (call_info & ZEND_CALL_CLOSURE) != 0 {
 				//ZendObjectRelease(ZEND_CLOSURE_OBJECT(func_))
@@ -121,7 +121,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData)
 	} else {
 		faults.InternalTypeError(executeData.IsCallUseStrictTypes(), "%s() expects parameter 1 to be a valid callback, %s", opline.Const1().String().GetVal(), error)
 		Efree(error)
-		ZvalPtrDtorNogc(free_op2)
+		// ZvalPtrDtorNogc(free_op2)
 		if EG__().GetException() != nil {
 			return 0
 		}

@@ -1267,7 +1267,7 @@ func UserShutdownFunctionDtor(zv *types.Zval) {
 	var i int
 	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.Ptr()
 	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
-		zend.ZvalPtrDtor(shutdown_function_entry.GetArguments()[i])
+		// zend.ZvalPtrDtor(shutdown_function_entry.GetArguments()[i])
 	}
 	zend.Efree(shutdown_function_entry.GetArguments())
 	zend.Efree(shutdown_function_entry)
@@ -1275,7 +1275,7 @@ func UserShutdownFunctionDtor(zv *types.Zval) {
 func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
 	var i int
 	for i = 0; i < tick_function_entry.GetArgCount(); i++ {
-		zend.ZvalPtrDtor(tick_function_entry.GetArguments()[i])
+		// zend.ZvalPtrDtor(tick_function_entry.GetArguments()[i])
 	}
 	zend.Efree(tick_function_entry.GetArguments())
 }
@@ -1289,7 +1289,7 @@ func UserShutdownFunctionCall(zv *types.Zval) int {
 		return 0
 	}
 	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == types.SUCCESS {
-		zend.ZvalPtrDtor(&retval)
+		// zend.ZvalPtrDtor(&retval)
 	}
 	return 0
 }
@@ -1302,7 +1302,7 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 	if tick_fe.GetCalling() == 0 {
 		tick_fe.SetCalling(1)
 		if zend.CallUserFunction(nil, function, &retval, tick_fe.GetArgCount()-1, tick_fe.GetArguments()+1) == types.SUCCESS {
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 		} else {
 			var obj *types.Zval
 			var method *types.Zval
@@ -2066,7 +2066,7 @@ func PhpSimpleIniParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, 
 			}
 		}
 		if find_hash.GetType() != types.IS_ARRAY {
-			zend.ZvalPtrDtorNogc(find_hash)
+			// zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
 		if arg3 == nil || arg3.IsType(types.IS_STRING) && arg3.String().GetLen() == 0 {

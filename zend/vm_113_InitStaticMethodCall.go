@@ -81,7 +81,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 			ce = ZendFetchClassByName(opline.Const1().String(), (opline.Const1() + 1).GetStr(), ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
-				ZvalPtrDtorNogc(opline.Op2())
+				// ZvalPtrDtorNogc(opline.Op2())
 				return 0
 			}
 			{
@@ -108,7 +108,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 						}
 					}
 					faults.ThrowError(nil, "Function name must be a string")
-					ZvalPtrDtorNogc(free_op2)
+					// ZvalPtrDtorNogc(free_op2)
 					return 0
 					break
 				}
@@ -123,14 +123,14 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExe
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 		{
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 		}
 	}
 
@@ -391,7 +391,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 						}
 					}
 					faults.ThrowError(nil, "Function name must be a string")
-					ZvalPtrDtorNogc(free_op2)
+					// ZvalPtrDtorNogc(free_op2)
 					return 0
 					break
 				}
@@ -406,14 +406,14 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecu
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 		{
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 		}
 	}
 
@@ -648,7 +648,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
 			b.Assert(EG__().GetException() != nil)
-			ZvalPtrDtorNogc(opline.Op2())
+			// ZvalPtrDtorNogc(opline.Op2())
 			return 0
 		}
 	}
@@ -671,7 +671,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 						}
 					}
 					faults.ThrowError(nil, "Function name must be a string")
-					ZvalPtrDtorNogc(free_op2)
+					// ZvalPtrDtorNogc(free_op2)
 					return 0
 					break
 				}
@@ -686,14 +686,14 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendEx
 			if EG__().GetException() == nil {
 				ZendUndefinedMethod(ce, function_name.GetStr())
 			}
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			return 0
 		}
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
 			InitFuncRunTimeCache(fbc.GetOpArray())
 		}
 		{
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 		}
 	}
 

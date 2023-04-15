@@ -19,14 +19,16 @@ func SplHeapElemCopy(heap *SplPtrHeap, to any, from any) {
 	b.Assert(to != from)
 	memcpy(to, from, heap.GetElemSize())
 }
-func SplPtrHeapZvalDtor(elem any) { zend.ZvalPtrDtor((*types.Zval)(elem)) }
+func SplPtrHeapZvalDtor(elem any) {
+	//zend.ZvalPtrDtor((*types.Zval)(elem))
+}
 func SplPtrHeapZvalCtor(elem any) {
 	//(*types.Zval)(elem).TryAddRefcount()
 }
 func SplPtrHeapPqueueElemDtor(elem any) {
 	var pq_elem *SplPqueueElem = elem
-	zend.ZvalPtrDtor(pq_elem.GetData())
-	zend.ZvalPtrDtor(pq_elem.GetPriority())
+	// zend.ZvalPtrDtor(pq_elem.GetData())
+	// zend.ZvalPtrDtor(pq_elem.GetPriority())
 }
 func SplPtrHeapPqueueElemCtor(elem any) {
 	var pq_elem *SplPqueueElem = elem
@@ -40,7 +42,7 @@ func SplPtrHeapCmpCbHelper(object *types.Zval, heap_object *SplHeapObject, a *ty
 		return types.FAILURE
 	}
 	*result = zend.ZvalGetLong(&zresult)
-	zend.ZvalPtrDtor(&zresult)
+	// zend.ZvalPtrDtor(&zresult)
 	return types.SUCCESS
 }
 func SplPqueueExtractHelper(result *types.Zval, elem *SplPqueueElem, flags int) {
@@ -338,7 +340,7 @@ func SplHeapObjectCountElements(object *types.Zval, count *zend.ZendLong) int {
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if !(rv.IsUndef()) {
 			*count = zend.ZvalGetLong(&rv)
-			zend.ZvalPtrDtor(&rv)
+			// zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
 		}
 		*count = 0
@@ -596,7 +598,7 @@ func zim_spl_SplMaxHeap_compare(executeData *zend.ZendExecuteData, return_value 
 func SplHeapItDtor(iter *zend.ZendObjectIterator) {
 	var iterator *SplHeapIt = (*SplHeapIt)(iter)
 	zend.ZendUserItInvalidateCurrent(iter)
-	zend.ZvalPtrDtor(iterator.GetIntern().GetIt().GetData())
+	// zend.ZvalPtrDtor(iterator.GetIntern().GetIt().GetData())
 }
 func SplHeapItRewind(iter *zend.ZendObjectIterator) {}
 func SplHeapItValid(iter *zend.ZendObjectIterator) int {

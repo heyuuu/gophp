@@ -163,7 +163,7 @@ func ZendFcallInfoArgsClear(fci *types.ZendFcallInfo, free_mem int) {
 		var p *types.Zval = fci.GetParams()
 		var end *types.Zval = p + fci.GetParamCount()
 		for p != end {
-			IZvalPtrDtor(p)
+			// IZvalPtrDtor(p)
 			p++
 		}
 		if free_mem != 0 {
@@ -273,7 +273,7 @@ func ZendFcallInfoCall(fci *types.ZendFcallInfo, fcc *types.ZendFcallInfoCache, 
 	}
 	result = ZendCallFunction(fci, fcc)
 	if retval_ptr == nil && retval.IsNotUndef() {
-		ZvalPtrDtor(&retval)
+		// ZvalPtrDtor(&retval)
 	}
 	if args != nil {
 		ZendFcallInfoArgsRestore(fci, org_count, org_params)
@@ -311,7 +311,7 @@ func ZendDeclareTypedProperty(
 		property_info_ptr = ce.PropertyTable().Get(name.GetStr())
 		if property_info_ptr != nil && property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
-			ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
+			// ZvalPtrDtor(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()])
 			ce.PropertyTable().Del(name.GetStr())
 		} else {
 			ce.GetDefaultStaticMembersCount()++
@@ -338,7 +338,7 @@ func ZendDeclareTypedProperty(
 		property_info_ptr = ce.PropertyTable().Get(name.GetStr())
 		if property_info_ptr != nil && !property_info_ptr.IsStatic() {
 			property_info.SetOffset(property_info_ptr.GetOffset())
-			ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
+			// ZvalPtrDtor(ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			ce.PropertyTable().Del(name.GetStr())
 			b.Assert(ce.GetType() == ZEND_INTERNAL_CLASS)
 			b.Assert(ce.GetPropertiesInfoTable() != nil)
@@ -406,10 +406,10 @@ func ZendDeclareTypedProperty(
 }
 func ZendTryAssignTypedRefEx(ref *types.ZendReference, val *types.Zval, strict types.ZendBool) int {
 	if ZendVerifyRefAssignableZval(ref, val, strict) == 0 {
-		ZvalPtrDtor(val)
+		// ZvalPtrDtor(val)
 		return types.FAILURE
 	} else {
-		ZvalPtrDtor(ref.GetVal())
+		// ZvalPtrDtor(ref.GetVal())
 		types.ZVAL_COPY_VALUE(ref.GetVal(), val)
 		return types.SUCCESS
 	}

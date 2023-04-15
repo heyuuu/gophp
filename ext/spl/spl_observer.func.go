@@ -32,7 +32,7 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 				return types.SUCCESS
 			} else {
 				faults.ThrowException(spl_ce_RuntimeException, "Hash needs to be a string", 0)
-				zend.ZvalPtrDtor(&rv)
+				// zend.ZvalPtrDtor(&rv)
 				return types.FAILURE
 			}
 		} else {
@@ -45,8 +45,8 @@ func SplObjectStorageGetHash(key *types.ArrayKey, intern *spl_SplObjectStorage, 
 }
 func SplObjectStorageDtor(element *types.Zval) {
 	var el *spl_SplObjectStorageElement = element.Ptr()
-	zend.ZvalPtrDtor(el.GetObj())
-	zend.ZvalPtrDtor(el.GetInf())
+	// zend.ZvalPtrDtor(el.GetObj())
+	// zend.ZvalPtrDtor(el.GetInf())
 	zend.Efree(el)
 }
 func SplObjectStorageGet(intern *spl_SplObjectStorage, key *types.ArrayKey) *spl_SplObjectStorageElement {
@@ -70,7 +70,7 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *types.Zval, obj 
 	}
 	pelement = SplObjectStorageGet(intern, &key)
 	if pelement != nil {
-		zend.ZvalPtrDtor(pelement.GetInf())
+		// zend.ZvalPtrDtor(pelement.GetInf())
 		if inf != nil {
 			types.ZVAL_COPY(pelement.GetInf(), inf)
 		} else {
@@ -424,7 +424,7 @@ func zim_spl_SplObjectStorage_setInfo(executeData *zend.ZendExecuteData, return_
 	if b.Assign(&element, types.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) == nil {
 		return
 	}
-	zend.ZvalPtrDtor(element.GetInf())
+	// zend.ZvalPtrDtor(element.GetInf())
 	types.ZVAL_COPY(element.GetInf(), inf)
 }
 func zim_spl_SplObjectStorage_next(executeData *zend.ZendExecuteData, return_value *types.Zval) {
@@ -473,7 +473,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	buf.AppendString("m:")
 	members.SetArray(types.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))))
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
-	zend.ZvalPtrDtor(&members)
+	// zend.ZvalPtrDtor(&members)
 
 	/* done */
 
@@ -540,25 +540,25 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 		/* store reference to allow cross-references between different elements */
 
 		if standard.PhpVarUnserialize(&entry, &p, s+buf_len, &var_hash) == 0 {
-			zend.ZvalPtrDtor(&entry)
+			// zend.ZvalPtrDtor(&entry)
 			goto outexcept
 		}
 		if (*p) == ',' {
 			p++
 			if standard.PhpVarUnserialize(&inf, &p, s+buf_len, &var_hash) == 0 {
-				zend.ZvalPtrDtor(&entry)
-				zend.ZvalPtrDtor(&inf)
+				// zend.ZvalPtrDtor(&entry)
+				// zend.ZvalPtrDtor(&inf)
 				goto outexcept
 			}
 		}
 		if entry.GetType() != types.IS_OBJECT {
-			zend.ZvalPtrDtor(&entry)
-			zend.ZvalPtrDtor(&inf)
+			// zend.ZvalPtrDtor(&entry)
+			// zend.ZvalPtrDtor(&inf)
 			goto outexcept
 		}
 		if SplObjectStorageGetHash(&key, intern, zend.ZEND_THIS(executeData), &entry) == types.FAILURE {
-			zend.ZvalPtrDtor(&entry)
-			zend.ZvalPtrDtor(&inf)
+			// zend.ZvalPtrDtor(&entry)
+			// zend.ZvalPtrDtor(&inf)
 			goto outexcept
 		}
 		pelement = SplObjectStorageGet(intern, &key)
@@ -573,9 +573,9 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 		element = SplObjectStorageAttach(intern, zend.ZEND_THIS(executeData), &entry, b.Cond(inf.IsUndef(), nil, &inf))
 		standard.VarReplace(&var_hash, &entry, element.GetObj())
 		standard.VarReplace(&var_hash, &inf, element.GetInf())
-		zend.ZvalPtrDtor(&entry)
+		// zend.ZvalPtrDtor(&entry)
 		entry.SetUndef()
-		zend.ZvalPtrDtor(&inf)
+		// zend.ZvalPtrDtor(&inf)
 		inf.SetUndef()
 	}
 	if (*p) != ';' {
@@ -785,7 +785,7 @@ func zim_spl_MultipleIterator_valid(executeData *zend.ZendExecuteData, return_va
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(retval.IsUndef()) {
 			valid = retval.IsType(types.IS_TRUE)
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 		} else {
 			valid = 0
 		}
@@ -816,7 +816,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 		zend.ZendCallMethodWith0Params(it, types.Z_OBJCE_P(it), types.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(retval.IsUndef()) {
 			valid = retval.IsType(types.IS_TRUE)
-			zend.ZvalPtrDtor(&retval)
+			// zend.ZvalPtrDtor(&retval)
 		} else {
 			valid = 0
 		}
@@ -847,7 +847,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 			case types.IS_STRING:
 				return_value.Array().SymtableUpdate(element.GetInf().String().GetStr(), &retval)
 			default:
-				zend.ZvalPtrDtor(&retval)
+				// zend.ZvalPtrDtor(&retval)
 				faults.ThrowException(spl_ce_InvalidArgumentException, "Sub-Iterator is associated with NULL", 0)
 				return
 			}

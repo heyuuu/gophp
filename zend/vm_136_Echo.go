@@ -39,7 +39,7 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 		// types.ZendStringReleaseEx(str, 0)
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

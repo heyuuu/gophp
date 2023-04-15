@@ -87,7 +87,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	call_trampoline_end:
 		ZendVmStackFreeArgs(call)
 		if ret == &retval {
-			ZvalPtrDtor(ret)
+			// ZvalPtrDtor(ret)
 		}
 	}
 	executeData = CurrEX()

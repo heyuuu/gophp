@@ -102,7 +102,7 @@ func ZEND_CASE_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	} else if op1.IsString() {
 		if op2.IsString() {
 			var result int = ZendFastEqualStrings(op1.GetStr(), op2.GetStr())
-			ZvalPtrDtorNogc(free_op2)
+			// ZvalPtrDtorNogc(free_op2)
 			if result != 0 {
 				goto case_true
 			} else {

@@ -34,7 +34,7 @@ func SplDllistFromObj(obj *types.ZendObject) *SplDllistObject {
 func Z_SPLDLLIST_P(zv *types.Zval) *SplDllistObject { return SplDllistFromObj(zv.Object()) }
 func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 	if !(elem.GetData().IsUndef()) {
-		zend.ZvalPtrDtor(elem.GetData())
+		// zend.ZvalPtrDtor(elem.GetData())
 		elem.GetData().SetUndef()
 	}
 }
@@ -204,7 +204,7 @@ func SplDllistObjectFreeStorage(object *types.ZendObject) {
 	zend.ZendObjectStdDtor(intern.GetStd())
 	for intern.GetLlist().GetCount() > 0 {
 		SplPtrLlistPop(intern.GetLlist(), &tmp)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 	}
 	if intern.GetGcData() != nil {
 		zend.Efree(intern.GetGcData())
@@ -300,7 +300,7 @@ func SplDllistObjectCountElements(object *types.Zval, count *zend.ZendLong) int 
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if !(rv.IsUndef()) {
 			*count = zend.ZvalGetLong(&rv)
-			zend.ZvalPtrDtor(&rv)
+			// zend.ZvalPtrDtor(&rv)
 			return types.SUCCESS
 		}
 		*count = 0
@@ -548,7 +548,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 			/* the element is replaced, delref the old one as in
 			 * SplDoublyLinkedList::pop() */
 
-			zend.ZvalPtrDtor(element.GetData())
+			// zend.ZvalPtrDtor(element.GetData())
 			types.ZVAL_COPY_VALUE(element.GetData(), value)
 
 			/* new element, call ctor as in spl_ptr_llist_push */
@@ -560,7 +560,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 			/* new element, call ctor as in spl_ptr_llist_push */
 
 		} else {
-			zend.ZvalPtrDtor(value)
+			// zend.ZvalPtrDtor(value)
 			faults.ThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
 			return
 		}
@@ -613,7 +613,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(executeData *zend.ZendExecuteData, 
 			SPL_LLIST_DELREF(element)
 			intern.SetTraversePointer(nil)
 		}
-		zend.ZvalPtrDtor(element.GetData())
+		// zend.ZvalPtrDtor(element.GetData())
 		element.GetData().SetUndef()
 		SPL_LLIST_DELREF(element)
 	} else {
@@ -625,7 +625,7 @@ func SplDllistItDtor(iter *zend.ZendObjectIterator) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
 	SPL_LLIST_CHECK_DELREF(iterator.GetTraversePointer())
 	zend.ZendUserItInvalidateCurrent(iter)
-	zend.ZvalPtrDtor(iterator.GetIntern().GetIt().GetData())
+	// zend.ZvalPtrDtor(iterator.GetIntern().GetIt().GetData())
 }
 func SplDllistItHelperRewind(traverse_pointer_ptr **SplPtrLlistElement, traverse_position_ptr *int, llist *SplPtrLlist, flags int) {
 	SPL_LLIST_CHECK_DELREF(*traverse_pointer_ptr)
@@ -647,14 +647,14 @@ func SplDllistItHelperMoveForward(traverse_pointer_ptr **SplPtrLlistElement, tra
 			if (flags & SPL_DLLIST_IT_DELETE) != 0 {
 				var prev types.Zval
 				SplPtrLlistPop(llist, &prev)
-				zend.ZvalPtrDtor(&prev)
+				// zend.ZvalPtrDtor(&prev)
 			}
 		} else {
 			*traverse_pointer_ptr = old.GetNext()
 			if (flags & SPL_DLLIST_IT_DELETE) != 0 {
 				var prev types.Zval
 				SplPtrLlistShift(llist, &prev)
-				zend.ZvalPtrDtor(&prev)
+				// zend.ZvalPtrDtor(&prev)
 			} else {
 				*traverse_position_ptr++
 			}
@@ -803,7 +803,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, 
 	for intern.GetLlist().GetCount() > 0 {
 		var tmp types.Zval
 		SplPtrLlistPop(intern.GetLlist(), &tmp)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 	}
 	p = (*uint8)(buf)
 	s = p

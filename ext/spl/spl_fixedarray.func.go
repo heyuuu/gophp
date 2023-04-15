@@ -50,7 +50,7 @@ func SplFixedarrayResize(array *SplFixedarray, size zend.ZendLong) {
 			array.SetElements(nil)
 			array.SetSize(0)
 			for i = 0; i < old_size; i++ {
-				zend.ZvalPtrDtor(&elements[i])
+				// zend.ZvalPtrDtor(&elements[i])
 			}
 			zend.Efree(elements)
 			return
@@ -61,7 +61,7 @@ func SplFixedarrayResize(array *SplFixedarray, size zend.ZendLong) {
 	} else {
 		var i zend.ZendLong
 		for i = size; i < array.GetSize(); i++ {
-			zend.ZvalPtrDtor(&array.GetElements()[i])
+			// zend.ZvalPtrDtor(&array.GetElements()[i])
 		}
 		array.SetElements(zend.Erealloc(array.GetElements(), b.SizeOf("zval")*size))
 	}
@@ -107,7 +107,7 @@ func SplFixedarrayObjectFreeStorage(object *types.ZendObject) {
 	var i zend.ZendLong
 	if intern.GetArray().GetSize() > 0 {
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
-			zend.ZvalPtrDtor(&intern.GetArray().GetElements()[i])
+			// zend.ZvalPtrDtor(&intern.GetArray().GetElements()[i])
 		}
 		if intern.GetArray().GetSize() > 0 && intern.GetArray().GetElements() != nil {
 			zend.Efree(intern.GetArray().GetElements())
@@ -239,7 +239,7 @@ func SplFixedarrayObjectReadDimension(object *types.Zval, offset *types.Zval, ty
 			offset = types.SEPARATE_ARG_IF_REF(offset)
 		}
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetGet(), "offsetGet", rv, offset)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(offset)
 		if !(rv.IsUndef()) {
 			return rv
 		}
@@ -272,7 +272,7 @@ func SplFixedarrayObjectWriteDimensionHelper(intern *SplFixedarrayObject, offset
 		var tmp types.Zval
 		types.ZVAL_COPY_VALUE(&tmp, ptr)
 		types.ZVAL_COPY_DEREF(ptr, value)
-		zend.ZvalPtrDtor(&tmp)
+		// zend.ZvalPtrDtor(&tmp)
 	}
 }
 func SplFixedarrayObjectWriteDimension(object *types.Zval, offset *types.Zval, value *types.Zval) {
@@ -288,8 +288,8 @@ func SplFixedarrayObjectWriteDimension(object *types.Zval, offset *types.Zval, v
 		}
 		value = types.SEPARATE_ARG_IF_REF(value)
 		zend.ZendCallMethodWith2Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetSet(), "offsetSet", nil, offset, value)
-		zend.ZvalPtrDtor(value)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(value)
+		// zend.ZvalPtrDtor(offset)
 		return
 	}
 	SplFixedarrayObjectWriteDimensionHelper(intern, offset, value)
@@ -305,7 +305,7 @@ func SplFixedarrayObjectUnsetDimensionHelper(intern *SplFixedarrayObject, offset
 		faults.ThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return
 	} else {
-		zend.ZvalPtrDtor(&intern.GetArray().GetElements()[index])
+		// zend.ZvalPtrDtor(&intern.GetArray().GetElements()[index])
 		intern.GetArray().GetElements()[index].SetUndef()
 	}
 }
@@ -315,7 +315,7 @@ func SplFixedarrayObjectUnsetDimension(object *types.Zval, offset *types.Zval) {
 	if intern.GetFptrOffsetDel() != nil {
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetDel(), "offsetUnset", nil, offset)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(offset)
 		return
 	}
 	SplFixedarrayObjectUnsetDimensionHelper(intern, offset)
@@ -353,9 +353,9 @@ func SplFixedarrayObjectHasDimension(object *types.Zval, offset *types.Zval, che
 		var result types.ZendBool
 		offset = types.SEPARATE_ARG_IF_REF(offset)
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetHas(), "offsetExists", &rv, offset)
-		zend.ZvalPtrDtor(offset)
+		// zend.ZvalPtrDtor(offset)
 		result = zend.ZendIsTrue(&rv)
-		zend.ZvalPtrDtor(&rv)
+		// zend.ZvalPtrDtor(&rv)
 		return result
 	}
 	return SplFixedarrayObjectHasDimensionHelper(intern, offset, check_empty)
@@ -368,7 +368,7 @@ func SplFixedarrayObjectCountElements(object *types.Zval, count *zend.ZendLong) 
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
 		if !(rv.IsUndef()) {
 			*count = zend.ZvalGetLong(&rv)
-			zend.ZvalPtrDtor(&rv)
+			// zend.ZvalPtrDtor(&rv)
 		} else {
 			*count = 0
 		}
@@ -600,7 +600,7 @@ func zim_spl_SplFixedArray_offsetUnset(executeData *zend.ZendExecuteData, return
 func SplFixedarrayItDtor(iter *zend.ZendObjectIterator) {
 	var iterator *SplFixedarrayIt = (*SplFixedarrayIt)(iter)
 	zend.ZendUserItInvalidateCurrent(iter)
-	zend.ZvalPtrDtor(iterator.GetIntern().GetIt().GetData())
+	// zend.ZvalPtrDtor(iterator.GetIntern().GetIt().GetData())
 }
 func SplFixedarrayItRewind(iter *zend.ZendObjectIterator) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(iter.GetData())

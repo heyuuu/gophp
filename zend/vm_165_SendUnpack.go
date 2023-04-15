@@ -105,7 +105,7 @@ send_again:
 					}
 					if key.GetType() != types.IS_LONG {
 						faults.ThrowError(nil, b.Cond(key.IsString(), "Cannot unpack Traversable with string keys", "Cannot unpack Traversable with non-integer keys"))
-						ZvalPtrDtor(&key)
+						// ZvalPtrDtor(&key)
 						break
 					}
 				}

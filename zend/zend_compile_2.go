@@ -345,7 +345,7 @@ func ZendHandleNumericOp(node *Znode) {
 	if node.GetOpType() == IS_CONST && node.GetConstant().IsString() {
 		var index ZendUlong
 		if types.HandleNumericStr(node.GetConstant().String().GetStr(), &index) {
-			ZvalPtrDtor(node.GetConstant())
+			// ZvalPtrDtor(node.GetConstant())
 			node.GetConstant().SetLong(index)
 		}
 	}

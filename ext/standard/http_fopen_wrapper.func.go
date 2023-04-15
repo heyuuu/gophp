@@ -153,7 +153,7 @@ func PhpStreamUrlWrapHttpEx(
 		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ssl", "peer_name")) == nil {
 			ssl_proxy_peer_name.SetStringCopy(resource.GetHost())
 			streams.PhpStreamContextSetOption(core.PHP_STREAM_CONTEXT(stream), "ssl", "peer_name", &ssl_proxy_peer_name)
-			zend.ZvalPtrDtor(&ssl_proxy_peer_name)
+			// zend.ZvalPtrDtor(&ssl_proxy_peer_name)
 		}
 		header.AppendString("CONNECT ")
 		header.AppendString(b.CastStrAuto(resource.GetHost().GetVal()))
@@ -922,7 +922,7 @@ func PhpStreamUrlWrapHttp(
 	stream = PhpStreamUrlWrapHttpEx(wrapper, path, mode, options, opened_path, context, PHP_URL_REDIRECT_MAX, HTTP_WRAPPER_HEADER_INIT, &headers)
 	if !(headers.IsUndef()) {
 		if types.FAILURE == zend.ZendSetLocalVarStr("http_response_header", &headers, 1) {
-			zend.ZvalPtrDtor(&headers)
+			// zend.ZvalPtrDtor(&headers)
 		}
 	}
 	return stream

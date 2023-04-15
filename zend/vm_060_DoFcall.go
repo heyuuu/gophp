@@ -57,7 +57,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 		EG__().SetCurrentExecuteData(executeData)
 	fcall_end:
 		ZendVmStackFreeArgs(call)
-		IZvalPtrDtor(ret)
+		// IZvalPtrDtor(ret)
 	} else {
 		ret = &retval
 		call.SetPrevExecuteData(executeData)
@@ -65,7 +65,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 			UNDEF_RESULT()
 			return 0
 		}
-		ZvalPtrDtor(ret)
+		// ZvalPtrDtor(ret)
 	}
 	if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
 		// OBJ_RELEASE(call.GetThis().Object())

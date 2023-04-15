@@ -175,7 +175,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 	/* leave yield from mode to properly allow finally execution */
 
 	if generator.GetValues().IsNotUndef() {
-		ZvalPtrDtor(generator.GetValues())
+		// ZvalPtrDtor(generator.GetValues())
 		generator.GetValues().SetUndef()
 	}
 	if generator.GetNode().GetChildren() == 0 {
@@ -244,7 +244,7 @@ func ZendGeneratorDtorStorage(object *types.ZendObject) {
 			if fast_call.GetOplineNum() != uint32-1 {
 				var retval_op *ZendOp = ex.GetFunc().GetOpArray().GetOpcodes()[fast_call.GetOplineNum()]
 				if (retval_op.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-					ZvalPtrDtor(ZEND_CALL_VAR(ex, retval_op.GetOp2().GetVar()))
+					// ZvalPtrDtor(ZEND_CALL_VAR(ex, retval_op.GetOp2().GetVar()))
 				}
 			}
 
@@ -268,10 +268,10 @@ func ZendGeneratorFreeStorage(object *types.ZendObject) {
 
 	/* we can't immediately free them in zend_generator_close() else yield from won't be able to fetch it */
 
-	ZvalPtrDtor(generator.GetValue())
-	ZvalPtrDtor(generator.GetKey())
+	// ZvalPtrDtor(generator.GetValue())
+	// ZvalPtrDtor(generator.GetKey())
 	if !(generator.GetRetval().IsUndef()) {
-		ZvalPtrDtor(generator.GetRetval())
+		// ZvalPtrDtor(generator.GetRetval())
 	}
 	if generator.GetNode().GetChildren() > 1 {
 		generator.GetNode().GetHt().Destroy()
@@ -485,7 +485,7 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *types.Zval
 	/* if we don't stop an array/iterator yield from, the exception will only reach the generator after the values were all iterated over */
 
 	if generator.GetValues().IsNotUndef() {
-		ZvalPtrDtor(generator.GetValues())
+		// ZvalPtrDtor(generator.GetValues())
 		generator.GetValues().SetUndef()
 	}
 
@@ -652,7 +652,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 							return leaf.GetNode().GetRoot()
 						}
 					} else {
-						ZvalPtrDtor(root.GetValue())
+						// ZvalPtrDtor(root.GetValue())
 						types.ZVAL_COPY(root.GetValue(), root.GetNode().GetParent().GetValue())
 						types.ZVAL_COPY(ZEND_CALL_VAR(root.GetExecuteData(), yield_from.GetResult().GetVar()), root.GetNode().GetParent().GetRetval())
 					}
@@ -701,9 +701,9 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 				break
 			}
 		}
-		ZvalPtrDtor(generator.GetValue())
+		// ZvalPtrDtor(generator.GetValue())
 		types.ZVAL_COPY(generator.GetValue(), value)
-		ZvalPtrDtor(generator.GetKey())
+		// ZvalPtrDtor(generator.GetKey())
 		if p.GetKey() != nil {
 			generator.GetKey().SetStringCopy(p.GetKey())
 		} else {
@@ -736,9 +736,9 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		} else if value == nil {
 			goto failure
 		}
-		ZvalPtrDtor(generator.GetValue())
+		// ZvalPtrDtor(generator.GetValue())
 		types.ZVAL_COPY(generator.GetValue(), value)
-		ZvalPtrDtor(generator.GetKey())
+		// ZvalPtrDtor(generator.GetKey())
 		if iter.GetFuncs().GetGetCurrentKey() != nil {
 			iter.GetFuncs().GetGetCurrentKey()(iter, generator.GetKey())
 			if EG__().GetException() != nil {
@@ -753,7 +753,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 exception:
 	ZendGeneratorThrowException(generator, nil)
 failure:
-	ZvalPtrDtor(generator.GetValues())
+	// ZvalPtrDtor(generator.GetValues())
 	generator.GetValues().SetUndef()
 	return types.FAILURE
 }
@@ -1037,7 +1037,7 @@ func zim_Generator_getReturn(executeData *ZendExecuteData, return_value *types.Z
 func ZendGeneratorIteratorDtor(iterator *ZendObjectIterator) {
 	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().Object())
 	generator.SetIterator(nil)
-	ZvalPtrDtor(iterator.GetData())
+	// ZvalPtrDtor(iterator.GetData())
 }
 func ZendGeneratorIteratorValid(iterator *ZendObjectIterator) int {
 	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().Object())

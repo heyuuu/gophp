@@ -122,7 +122,7 @@ func ZVAL_ZVAL(z *types.Zval, zv *types.Zval, copy int, dtor int) {
 	} else {
 		types.ZVAL_COPY(__z, types.Z_REFVAL_P(__zv))
 		if dtor != 0 || copy == 0 {
-			ZvalPtrDtor(__zv)
+			// ZvalPtrDtor(__zv)
 		}
 	}
 }
@@ -148,7 +148,7 @@ func _ZEND_TRY_ASSIGN_NULL(zv *types.Zval, is_ref int) {
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetNull()
 		break
 	}
@@ -168,7 +168,7 @@ func _ZEND_TRY_ASSIGN_LONG(zv *types.Zval, lval ZendLong, is_ref int) {
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetLong(lval)
 		break
 	}
@@ -188,7 +188,7 @@ func _ZEND_TRY_ASSIGN_DOUBLE(zv *types.Zval, dval float64, is_ref int) {
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetDouble(dval)
 		break
 	}
@@ -208,7 +208,7 @@ func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *types.Zval, is_ref int) {
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetStringVal("")
 		break
 	}
@@ -228,7 +228,7 @@ func _ZEND_TRY_ASSIGN_STR(zv *types.Zval, str *types.String, is_ref int) {
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetString(str)
 		break
 	}
@@ -248,7 +248,7 @@ func _ZEND_TRY_ASSIGN_STRING(zv *types.Zval, string *byte, is_ref int) {
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetStringVal(b.CastStrAuto(string))
 		break
 	}
@@ -268,7 +268,7 @@ func _ZEND_TRY_ASSIGN_STRINGL(zv *types.Zval, string *byte, len_ int, is_ref int
 			}
 			_zv = ref.GetVal()
 		}
-		ZvalPtrDtor(_zv)
+		// ZvalPtrDtor(_zv)
 		_zv.SetStringVal(b.CastStr(string, len_))
 		break
 	}

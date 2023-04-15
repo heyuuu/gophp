@@ -71,7 +71,7 @@ func ZendCallMethod(
 
 		fci.GetFunctionName().SetStringVal(function_name)
 		result = ZendCallFunction(&fci, nil)
-		ZvalPtrDtor(fci.GetFunctionName())
+		// ZvalPtrDtor(fci.GetFunctionName())
 	} else {
 		var fcic types.ZendFcallInfoCache
 		fci.GetFunctionName().SetUndef()
@@ -145,7 +145,7 @@ func ZendCallMethod(
 		}
 	}
 	if retval_ptr == nil {
-		ZvalPtrDtor(&retval)
+		// ZvalPtrDtor(&retval)
 		return nil
 	}
 	return retval_ptr
@@ -156,7 +156,7 @@ func ZendUserItNewIterator(ce *types.ClassEntry, object *types.Zval, retval *typ
 func ZendUserItInvalidateCurrent(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
 	if !(iter.GetValue().IsUndef()) {
-		ZvalPtrDtor(iter.GetValue())
+		// ZvalPtrDtor(iter.GetValue())
 		iter.GetValue().SetUndef()
 	}
 }
@@ -164,7 +164,7 @@ func ZendUserItDtor(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
 	var object *types.Zval = iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
-	ZvalPtrDtor(object)
+	// ZvalPtrDtor(object)
 }
 func ZendUserItValid(_iter *ZendObjectIterator) int {
 	if _iter != nil {
@@ -174,7 +174,7 @@ func ZendUserItValid(_iter *ZendObjectIterator) int {
 		var result int
 		ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfValid(), "valid", &more)
 		result = IZendIsTrue(&more)
-		ZvalPtrDtor(&more)
+		// ZvalPtrDtor(&more)
 		if result != 0 {
 			return types.SUCCESS
 		} else {
@@ -246,11 +246,11 @@ func ZendUserItGetNewIterator(ce *types.ClassEntry, object *types.Zval, by_ref i
 		if EG__().GetException() == nil {
 			faults.ThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return types.Z_OBJCE_P(object).GetName().GetVal() }))
 		}
-		ZvalPtrDtor(&iterator)
+		// ZvalPtrDtor(&iterator)
 		return nil
 	}
 	new_iterator = ce_it.GetGetIterator()(ce_it, &iterator, by_ref)
-	ZvalPtrDtor(&iterator)
+	// ZvalPtrDtor(&iterator)
 	return new_iterator
 }
 func ZendImplementTraversable(interface_ *types.ClassEntry, class_type *types.ClassEntry) int {
@@ -399,7 +399,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 
 			/* we could also make this '*buf_len = 0' but this allows to skip variables */
 
-			ZvalPtrDtor(&retval)
+			// ZvalPtrDtor(&retval)
 			return types.FAILURE
 		case types.IS_STRING:
 			*buffer = (*uint8)(Estrndup(retval.String().GetVal(), retval.String().GetLen()))
@@ -408,7 +408,7 @@ func ZendUserSerialize(object *types.Zval, buffer **uint8, buf_len *int, data *Z
 		default:
 			result = types.FAILURE
 		}
-		ZvalPtrDtor(&retval)
+		// ZvalPtrDtor(&retval)
 	}
 	if result == types.FAILURE && EG__().GetException() == nil {
 		faults.ThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.GetName().GetVal())
@@ -422,7 +422,7 @@ func ZendUserUnserialize(object *types.Zval, ce *types.ClassEntry, buf *uint8, b
 	}
 	zdata.SetStringVal(b.CastStr((*byte)(buf), buf_len))
 	ZendCallMethodWith1Params(object, ce, ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
-	ZvalPtrDtor(&zdata)
+	// ZvalPtrDtor(&zdata)
 	if EG__().GetException() != nil {
 		return types.FAILURE
 	} else {

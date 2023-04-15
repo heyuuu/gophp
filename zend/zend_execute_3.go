@@ -281,11 +281,11 @@ func ZendIncdecTypedRef(ref *types.ZendReference, copy *types.Zval, opline *Zend
 		var val ZendLong = ZendThrowIncdecRefError(ref, opline)
 		var_ptr.SetLong(val)
 	} else if ZendVerifyRefAssignableZval(ref, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
-		ZvalPtrDtor(var_ptr)
+		// ZvalPtrDtor(var_ptr)
 		var_ptr.CopyValueFrom(copy)
 		copy.SetUndef()
 	} else if copy == &tmp {
-		ZvalPtrDtor(&tmp)
+		// ZvalPtrDtor(&tmp)
 	}
 }
 func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
@@ -303,11 +303,11 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *types.Zval, copy 
 		var val ZendLong = ZendThrowIncdecPropError(prop_info, opline)
 		var_ptr.SetLong(val)
 	} else if ZendVerifyPropertyType(prop_info, var_ptr, executeData.IsCallUseStrictTypes()) == 0 {
-		ZvalPtrDtor(var_ptr)
+		// ZvalPtrDtor(var_ptr)
 		var_ptr.CopyValueFrom(copy)
 		copy.SetUndef()
 	} else if copy == &tmp {
-		ZvalPtrDtor(&tmp)
+		// ZvalPtrDtor(&tmp)
 	}
 }
 func ZendPreIncdecPropertyZval(prop *types.Zval, prop_info *ZendPropertyInfo, opline *ZendOp, executeData *ZendExecuteData) {
@@ -395,7 +395,7 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 		var rv2 types.Zval
 		var value *types.Zval = types.Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
-			ZvalPtrDtor(&rv)
+			// ZvalPtrDtor(&rv)
 		}
 		z.CopyValueFrom(value)
 	}
@@ -408,6 +408,6 @@ func ZendPostIncdecOverloadedProperty(object *types.Zval, property *types.Zval, 
 	}
 	types.Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &z_copy, cache_slot)
 	// OBJ_RELEASE(obj.Object())
-	ZvalPtrDtor(&z_copy)
-	ZvalPtrDtor(z)
+	// ZvalPtrDtor(&z_copy)
+	// ZvalPtrDtor(z)
 }

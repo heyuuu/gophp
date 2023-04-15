@@ -49,7 +49,7 @@ func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		case ZEND_DECLARE_ANON_CLASS:
 
 		default:
-			ZvalPtrDtorNogc(EX_VAR(throw_op.GetResult().GetVar()))
+			// ZvalPtrDtorNogc(EX_VAR(throw_op.GetResult().GetVar()))
 		}
 	}
 	return zend_dispatch_try_catch_finally_helper_SPEC(current_try_catch_offset, throw_op_num, executeData)

@@ -48,10 +48,10 @@ func vmAddHandler(executeData *ZendExecuteData) int {
 	}
 	AddFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op1)
+		// ZvalPtrDtorNogc(op1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op2)
+		// ZvalPtrDtorNogc(op2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -96,10 +96,10 @@ func vmSubHandler(executeData *ZendExecuteData) int {
 	}
 	SubFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op1)
+		// ZvalPtrDtorNogc(op1)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op2)
+		// ZvalPtrDtorNogc(op2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -150,10 +150,10 @@ func vmMulHandler(executeData *ZendExecuteData) int {
 	}
 	MulFunction(opline.Result(), op1, op2)
 	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op2)
+		// ZvalPtrDtorNogc(op2)
 	}
 	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		ZvalPtrDtorNogc(op2)
+		// ZvalPtrDtorNogc(op2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -166,10 +166,10 @@ func vmDivHandler(executeData *ZendExecuteData) int {
 	var op2 *types.Zval = opline.Op2ExEx(&freeOp2)
 	FastDivFunction(opline.Result(), op1, op2)
 	if freeOp1 != nil {
-		ZvalPtrDtorNogc(freeOp1)
+		// ZvalPtrDtorNogc(freeOp1)
 	}
 	if freeOp2 != nil {
-		ZvalPtrDtorNogc(freeOp2)
+		// ZvalPtrDtorNogc(freeOp2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
@@ -247,10 +247,10 @@ func getConcatHandler(executeData *ZendExecuteData) int {
 	}
 	ConcatFunction(opline.Result(), op1, op2)
 	if freeOp1 != nil {
-		ZvalPtrDtorNogc(freeOp1)
+		// ZvalPtrDtorNogc(freeOp1)
 	}
 	if freeOp2 != nil {
-		ZvalPtrDtorNogc(freeOp2)
+		// ZvalPtrDtorNogc(freeOp2)
 	}
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

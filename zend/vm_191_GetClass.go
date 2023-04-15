@@ -45,7 +45,7 @@ func ZEND_GET_CLASS_SPEC_TMPVAR_UNUSED_HANDLER(executeData *ZendExecuteData) int
 			}
 			break
 		}
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 	}
 }

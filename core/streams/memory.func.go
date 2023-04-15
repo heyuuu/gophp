@@ -249,7 +249,7 @@ func PhpStreamTempClose(stream *core.PhpStream, close_handle int) int {
 	} else {
 		ret = 0
 	}
-	zend.ZvalPtrDtor(ts.GetMeta())
+	// zend.ZvalPtrDtor(ts.GetMeta())
 	if ts.GetTmpdir() != nil {
 		zend.Efree(ts.GetTmpdir())
 	}
@@ -403,7 +403,7 @@ func PhpStreamUrlWrapRfc2397(
 			mlen -= plen
 			path += plen
 		} else if semi != path || mlen != b.SizeOf("\";base64\"")-1 || memcmp(path, ";base64", b.SizeOf("\";base64\"")-1) {
-			zend.ZvalPtrDtor(&meta)
+			// zend.ZvalPtrDtor(&meta)
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: illegal media type")
 			return nil
 		}
@@ -420,7 +420,7 @@ func PhpStreamUrlWrapRfc2397(
 
 					/* must be error since parameters are only allowed after mediatype and we have no '=' sign */
 
-					zend.ZvalPtrDtor(&meta)
+					// zend.ZvalPtrDtor(&meta)
 					PhpStreamWrapperLogError(wrapper, options, "rfc2397: illegal parameter")
 					return nil
 				}
@@ -442,7 +442,7 @@ func PhpStreamUrlWrapRfc2397(
 			path += plen
 		}
 		if mlen != 0 {
-			zend.ZvalPtrDtor(&meta)
+			// zend.ZvalPtrDtor(&meta)
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: illegal URL")
 			return nil
 		}
@@ -459,7 +459,7 @@ func PhpStreamUrlWrapRfc2397(
 		if ret, ok := standard.PhpBase64DecodeEx(b.CastStr(comma, dlen), true); ok {
 			base64_comma = types.NewString(ret)
 		} else {
-			zend.ZvalPtrDtor(&meta)
+			// zend.ZvalPtrDtor(&meta)
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: unable to decode")
 			return nil
 		}

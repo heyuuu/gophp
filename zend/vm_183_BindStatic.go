@@ -11,7 +11,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var value *types.Zval
 	var variable_ptr *types.Zval
 	variable_ptr = opline.Op1()
-	IZvalPtrDtor(variable_ptr)
+	// IZvalPtrDtor(variable_ptr)
 	ht = executeData.GetFunc().GetOpArray().GetStaticVariablesPtr()
 	if ht == nil {
 		b.Assert((executeData.GetFunc().GetOpArray().GetFnFlags() & (AccImmutable | AccPreloaded)) != 0)

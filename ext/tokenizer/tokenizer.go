@@ -81,7 +81,7 @@ func Tokenize(return_value *types.Zval, source string) types.ZendBool {
 
 		AddToken(return_value, token_type, zend.INI_SCNG__().GetYyText(), zend.INI_SCNG__().GetYyLeng(), token_line)
 		if token.IsNotUndef() {
-			zend.ZvalPtrDtorNogc(&token)
+			// zend.ZvalPtrDtorNogc(&token)
 			token.SetUndef()
 		}
 

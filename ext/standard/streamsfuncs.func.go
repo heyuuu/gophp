@@ -637,7 +637,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 				} else {
 					dest_elem = ht.KeyUpdate(key.GetStr(), elem)
 				}
-				zend.ZvalAddRef(dest_elem)
+				//zend.ZvalAddRef(dest_elem)
 				ret++
 				continue
 			}
@@ -653,7 +653,7 @@ func StreamArrayFromFdSet(stream_array *types.Zval, fds *fd_set) int {
 
 	/* destroy old array and add new one */
 
-	zend.ZvalPtrDtor(stream_array)
+	// zend.ZvalPtrDtor(stream_array)
 	stream_array.SetArray(ht)
 	return ret
 }
@@ -695,7 +695,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 			} else {
 				dest_elem = ht.KeyUpdate(key.GetStr(), elem)
 			}
-			zend.ZvalAddRef(dest_elem)
+			//zend.ZvalAddRef(dest_elem)
 			ret++
 			continue
 		}
@@ -704,7 +704,7 @@ func StreamArrayEmulateReadFdSet(stream_array *types.Zval) int {
 
 		/* destroy old array and add new one */
 
-		zend.ZvalPtrDtor(stream_array)
+		// zend.ZvalPtrDtor(stream_array)
 		stream_array.SetArray(ht)
 	} else {
 		ht.DestroyEx()
@@ -803,11 +803,11 @@ func ZifStreamSelect(executeData zpp.Ex, return_value zpp.Ret, readStreams zpp.R
 		retval = StreamArrayEmulateReadFdSet(r_array)
 		if retval > 0 {
 			if w_array != nil {
-				zend.ZvalPtrDtor(w_array)
+				// zend.ZvalPtrDtor(w_array)
 				w_array.SetEmptyArray()
 			}
 			if e_array != nil {
-				zend.ZvalPtrDtor(e_array)
+				// zend.ZvalPtrDtor(e_array)
 				e_array.SetEmptyArray()
 			}
 			return_value.SetLong(retval)
@@ -860,13 +860,13 @@ func UserSpaceStreamNotifier(
 		core.PhpErrorDocref(nil, faults.E_WARNING, "failed to call user notifier")
 	}
 	for i = 0; i < 6; i++ {
-		zend.ZvalPtrDtor(&zvs[i])
+		// zend.ZvalPtrDtor(&zvs[i])
 	}
-	zend.ZvalPtrDtor(&retval)
+	// zend.ZvalPtrDtor(&retval)
 }
 func UserSpaceStreamNotifierDtor(notifier *streams.PhpStreamNotifier) {
 	if notifier != nil && notifier.GetPtr().IsNotUndef() {
-		zend.ZvalPtrDtor(notifier.GetPtr())
+		// zend.ZvalPtrDtor(notifier.GetPtr())
 		notifier.GetPtr().SetUndef()
 	}
 }

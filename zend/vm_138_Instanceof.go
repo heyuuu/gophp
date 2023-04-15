@@ -29,7 +29,7 @@ try_instanceof:
 		}
 		result = 0
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -57,7 +57,7 @@ try_instanceof:
 		}
 		result = 0
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -76,7 +76,7 @@ try_instanceof:
 			ce = ZendFetchClass(nil, opline.GetOp2().GetNum())
 			if ce == nil {
 				b.Assert(EG__().GetException() != nil)
-				ZvalPtrDtorNogc(free_op1)
+				// ZvalPtrDtorNogc(free_op1)
 				opline.Result().SetUndef()
 				return 0
 			}
@@ -92,7 +92,7 @@ try_instanceof:
 		}
 		result = 0
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)

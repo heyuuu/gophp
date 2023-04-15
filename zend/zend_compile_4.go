@@ -141,7 +141,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	if fbc != nil && lcname.GetStr() == "assert" {
 		ZendCompileAssert(result, ZendAstGetList(args_ast), lcname, fbc)
 		// types.ZendStringRelease(lcname)
-		ZvalPtrDtor(name_node.GetConstant())
+		// ZvalPtrDtor(name_node.GetConstant())
 		return
 	}
 	if fbc == nil || FbcIsFinalized(fbc) == 0 || fbc.GetType() == ZEND_INTERNAL_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_USER_FUNCTIONS) != 0 || fbc.GetType() == ZEND_USER_FUNCTION && (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) != 0 && fbc.GetOpArray().GetFilename() != CG__().GetActiveOpArray().GetFilename() {
@@ -151,10 +151,10 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 	}
 	if ZendTryCompileSpecialFunc(result, lcname, ZendAstGetList(args_ast), fbc, type_) == types.SUCCESS {
 		// types.ZendStringReleaseEx(lcname, 0)
-		ZvalPtrDtor(name_node.GetConstant())
+		// ZvalPtrDtor(name_node.GetConstant())
 		return
 	}
-	ZvalPtrDtor(name_node.GetConstant())
+	// ZvalPtrDtor(name_node.GetConstant())
 	name_node.GetConstant().SetString(lcname)
 	opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
@@ -226,7 +226,7 @@ func ZendCompileStaticCall(result *Znode, ast *ZendAst, type_ uint32) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Method name must be a string")
 		}
 		if ZendIsConstructor(name.String()) != 0 {
-			ZvalPtrDtor(name)
+			// ZvalPtrDtor(name)
 			method_node.SetOpType(IS_UNUSED)
 		}
 	}

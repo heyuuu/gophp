@@ -42,7 +42,7 @@ func ZifSettype(var_ zpp.RefZval, typ string) bool {
 		zend.ConvertToNull(ptr)
 	default:
 		if ptr == &tmp {
-			zend.ZvalPtrDtor(&tmp)
+			// zend.ZvalPtrDtor(&tmp)
 		}
 		if typ == "resource" {
 			core.PhpErrorDocref(nil, faults.E_WARNING, "Cannot convert to resource type")

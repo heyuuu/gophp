@@ -46,7 +46,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(executeData *ZendExecuteDa
 	fcall_by_name_end:
 		ZendVmStackFreeArgs(call)
 		ZendVmStackFreeCallFrame(call)
-		IZvalPtrDtor(ret)
+		// IZvalPtrDtor(ret)
 	}
 	if EG__().GetException() != nil {
 		faults.RethrowException(executeData)

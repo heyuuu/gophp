@@ -983,7 +983,7 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 		if types.SUCCESS == zend.ZendExecuteScripts(zend.ZEND_REQUIRE, &retval, 1, &zfd) {
 			if retval.IsNotUndef() {
 				decline = retval.IsFalse()
-				zend.ZvalPtrDtor(&retval)
+				// zend.ZvalPtrDtor(&retval)
 			}
 		} else {
 			decline = true

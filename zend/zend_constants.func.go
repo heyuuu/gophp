@@ -64,9 +64,9 @@ func RegisterMainStringConstant(name string, str string, flags int) {
 
 func FreeZendConstantEx(c *ZendConstant) {
 	if !c.IsPersistent() {
-		ZvalPtrDtorNogc(c.Value())
+		// ZvalPtrDtorNogc(c.Value())
 	} else {
-		ZvalInternalPtrDtor(c.Value())
+		//ZvalInternalPtrDtor(c.Value())
 	}
 }
 
@@ -300,7 +300,7 @@ func ZendRegisterConstant(c *ZendConstant) bool {
 	if name == "__COMPILER_HALT_OFFSET__" || !EG__().ConstantTable().Add(name, CopyConstant(c)) {
 		faults.Error(faults.E_NOTICE, "Constant %s already defined", name)
 		if !c.IsPersistent() {
-			ZvalPtrDtorNogc(c.Value())
+			// ZvalPtrDtorNogc(c.Value())
 		}
 		return false
 	}

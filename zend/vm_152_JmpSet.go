@@ -39,7 +39,7 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
 		return 0
 	}
@@ -55,7 +55,7 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(executeData *ZendExecuteData) int {
 
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
@@ -73,7 +73,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 	}
 	ret = IZendIsTrue(value)
 	if EG__().GetException() != nil {
-		ZvalPtrDtorNogc(free_op1)
+		// ZvalPtrDtorNogc(free_op1)
 		opline.Result().SetUndef()
 		return 0
 	}
@@ -89,7 +89,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 func ZEND_JMP_SET_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {

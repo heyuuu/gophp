@@ -25,7 +25,7 @@ func ZEND_FETCH_DIM_R_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 	{
 		zend_fetch_dimension_address_read_R(container, dim, IS_TMP_VAR|IS_VAR, opline, executeData)
 	}
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_DIM_R_SPEC_CONST_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -70,7 +70,7 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) in
 		}
 	}
 
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_DIM_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
@@ -100,8 +100,8 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExecuteData) i
 		}
 	}
 
-	ZvalPtrDtorNogc(free_op2)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
@@ -130,7 +130,7 @@ func ZEND_FETCH_DIM_R_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_DIM_R_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int {
@@ -189,7 +189,7 @@ func ZEND_FETCH_DIM_R_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		}
 	}
 
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 func ZEND_FETCH_DIM_R_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {

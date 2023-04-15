@@ -120,7 +120,7 @@ func ZendStdGetDebugInfo(object *types.Zval, is_temp *int) *types.Array {
 			return ht
 		} else {
 			*is_temp = 0
-			ZvalPtrDtor(&retval)
+			// ZvalPtrDtor(&retval)
 			return retval.Array()
 		}
 	} else if retval.IsNull() {
@@ -187,7 +187,7 @@ func ZendStdCallSetter(zobj *types.ZendObject, prop_name *types.String, value *t
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
 	ZendCallFunction(&fci, &fcic)
-	ZvalPtrDtor(&ret)
+	// ZvalPtrDtor(&ret)
 	EG__().SetFakeScope(orig_fake_scope)
 }
 func ZendStdCallUnsetter(zobj *types.ZendObject, prop_name *types.String) {
@@ -216,7 +216,7 @@ func ZendStdCallUnsetter(zobj *types.ZendObject, prop_name *types.String) {
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
 	ZendCallFunction(&fci, &fcic)
-	ZvalPtrDtor(&ret)
+	// ZvalPtrDtor(&ret)
 	EG__().SetFakeScope(orig_fake_scope)
 }
 func ZendStdCallIssetter(zobj *types.ZendObject, prop_name *types.String, retval *types.Zval) {
@@ -624,10 +624,10 @@ func ZendStdReadProperty(object *types.Zval, member *types.Zval, type_ int, cach
 			if ZendIsTrue(&tmp_result) == 0 {
 				retval = EG__().GetUninitializedZval()
 				// OBJ_RELEASE(zobj)
-				ZvalPtrDtor(&tmp_result)
+				// ZvalPtrDtor(&tmp_result)
 				goto exit
 			}
-			ZvalPtrDtor(&tmp_result)
+			// ZvalPtrDtor(&tmp_result)
 			if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 				goto call_getter
 			}
@@ -780,7 +780,7 @@ func ZendStdWriteProperty(object *types.Zval, member *types.Zval, value *types.Z
 			if prop_info != nil {
 				types.ZVAL_COPY_VALUE(&tmp, value)
 				if ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0 {
-					ZvalPtrDtor(value)
+					// ZvalPtrDtor(value)
 					goto exit
 				}
 				value = &tmp
@@ -822,21 +822,21 @@ func ZendStdReadDimension(object *types.Zval, offset *types.Zval, type_ int, rv 
 		if type_ == BP_VAR_IS {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", rv, &tmp_offset)
 			if rv.IsUndef() {
-				ZvalPtrDtor(&tmp_object)
-				ZvalPtrDtor(&tmp_offset)
+				// ZvalPtrDtor(&tmp_object)
+				// ZvalPtrDtor(&tmp_offset)
 				return nil
 			}
 			if IZendIsTrue(rv) == 0 {
-				ZvalPtrDtor(&tmp_object)
-				ZvalPtrDtor(&tmp_offset)
-				ZvalPtrDtor(rv)
+				// ZvalPtrDtor(&tmp_object)
+				// ZvalPtrDtor(&tmp_offset)
+				// ZvalPtrDtor(rv)
 				return EG__().GetUninitializedZval()
 			}
-			ZvalPtrDtor(rv)
+			// ZvalPtrDtor(rv)
 		}
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
-		ZvalPtrDtor(&tmp_object)
-		ZvalPtrDtor(&tmp_offset)
+		// ZvalPtrDtor(&tmp_object)
+		// ZvalPtrDtor(&tmp_offset)
 		if rv.IsUndef() {
 			if EG__().GetException() == nil {
 				faults.ThrowError(nil, "Undefined offset for object of type %s used as array", ce.GetName().GetVal())
@@ -862,8 +862,8 @@ func ZendStdWriteDimension(object *types.Zval, offset *types.Zval, value *types.
 		// 		object.AddRefcount()
 		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith2Params(&tmp_object, ce, nil, "offsetset", nil, &tmp_offset, value)
-		ZvalPtrDtor(&tmp_object)
-		ZvalPtrDtor(&tmp_offset)
+		// ZvalPtrDtor(&tmp_object)
+		// ZvalPtrDtor(&tmp_offset)
 	} else {
 		ZendBadArrayAccess(ce)
 	}
@@ -880,14 +880,14 @@ func ZendStdHasDimension(object *types.Zval, offset *types.Zval, check_empty int
 		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", &retval, &tmp_offset)
 		result = IZendIsTrue(&retval)
-		ZvalPtrDtor(&retval)
+		// ZvalPtrDtor(&retval)
 		if check_empty != 0 && result != 0 && EG__().GetException() == nil {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", &retval, &tmp_offset)
 			result = IZendIsTrue(&retval)
-			ZvalPtrDtor(&retval)
+			// ZvalPtrDtor(&retval)
 		}
-		ZvalPtrDtor(&tmp_object)
-		ZvalPtrDtor(&tmp_offset)
+		// ZvalPtrDtor(&tmp_object)
+		// ZvalPtrDtor(&tmp_offset)
 	} else {
 		ZendBadArrayAccess(ce)
 		return 0
@@ -989,7 +989,7 @@ func ZendStdUnsetProperty(object *types.Zval, member *types.Zval, cache_slot *an
 			var tmp types.Zval
 			types.ZVAL_COPY_VALUE(&tmp, slot)
 			slot.SetUndef()
-			ZvalPtrDtor(&tmp)
+			// ZvalPtrDtor(&tmp)
 			if zobj.GetProperties() != nil {
 				zobj.GetProperties().MarkHasEmptyIndex()
 			}
@@ -1048,8 +1048,8 @@ func ZendStdUnsetDimension(object *types.Zval, offset *types.Zval) {
 		// 		object.AddRefcount()
 		tmp_object.SetObject(object.Object())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetunset", nil, &tmp_offset)
-		ZvalPtrDtor(&tmp_object)
-		ZvalPtrDtor(&tmp_offset)
+		// ZvalPtrDtor(&tmp_object)
+		// ZvalPtrDtor(&tmp_offset)
 	} else {
 		ZendBadArrayAccess(ce)
 	}
@@ -1525,14 +1525,14 @@ func ZendStdHasProperty(object *types.Zval, member *types.Zval, has_set_exists i
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &rv)
 			result = ZendIsTrue(&rv)
-			ZvalPtrDtor(&rv)
+			// ZvalPtrDtor(&rv)
 			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
 				if EG__().GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 					*guard |= IN_GET
 					ZendStdCallGetter(zobj, name, &rv)
 					*guard &= ^IN_GET
 					result = IZendIsTrue(&rv)
-					ZvalPtrDtor(&rv)
+					// ZvalPtrDtor(&rv)
 				} else {
 					result = 0
 				}
@@ -1563,7 +1563,7 @@ func ZendStdCastObjectTostring(readobj *types.Zval, writeobj *types.Zval, type_ 
 				types.ZVAL_COPY_VALUE(writeobj, &retval)
 				return types.SUCCESS
 			}
-			ZvalPtrDtor(&retval)
+			// ZvalPtrDtor(&retval)
 			if EG__().GetException() == nil {
 				faults.ThrowError(nil, "Method %s::__toString() must return a string value", ce.GetName().GetVal())
 			}

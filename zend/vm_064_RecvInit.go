@@ -19,7 +19,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 				} else {
 					types.ZVAL_COPY(param, default_value)
 					if ZvalUpdateConstantEx(param, executeData.GetFunc().GetOpArray().scope) != types.SUCCESS {
-						ZvalPtrDtorNogc(param)
+						// ZvalPtrDtorNogc(param)
 						param.SetUndef()
 						return 0
 					}

@@ -502,7 +502,7 @@ func ZendDoFree(op1 *Znode) {
 		 * free the zend_array structure, so references to it from outside the op array
 		 * become invalid. GC would cause such a reference in the root buffer. */
 
-		ZvalPtrDtorNogc(op1.GetConstant())
+		// ZvalPtrDtorNogc(op1.GetConstant())
 
 		/* Destroy value without using GC: When opcache moves arrays into SHM it will
 		 * free the zend_array structure, so references to it from outside the op array

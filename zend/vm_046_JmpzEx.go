@@ -42,7 +42,7 @@ func ZEND_JMPZ_EX_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 		return ZEND_VM_JMP_EX(executeData, OP_JMP_ADDR(opline, opline.GetOp2()), 0)
 	}
 	ret = IZendIsTrue(val)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	if ret != 0 {
 		opline.Result().SetTrue()
 		opline++

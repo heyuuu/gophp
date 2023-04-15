@@ -111,7 +111,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 
 				/* avoid exception check */
 
-				ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op2)
 				ZEND_VM_SMART_BRANCH(result, 0)
 				opline.Result().SetBool(result != 0)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -128,7 +128,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(executeData *ZendExecu
 		result = ZendIsemptyDimSlow(container, offset, executeData)
 	}
 isset_dim_obj_exit:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -261,7 +261,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecu
 		result = ZendIsemptyDimSlow(container, offset, executeData)
 	}
 isset_dim_obj_exit:
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -314,7 +314,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 
 				/* avoid exception check */
 
-				ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op2)
 				ZEND_VM_SMART_BRANCH(result, 0)
 				opline.Result().SetBool(result != 0)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -335,8 +335,8 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(executeData *ZendExec
 		result = ZendIsemptyDimSlow(container, offset, executeData)
 	}
 isset_dim_obj_exit:
-	ZvalPtrDtorNogc(free_op2)
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -408,7 +408,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(executeData *ZendExecuteD
 		result = ZendIsemptyDimSlow(container, offset, executeData)
 	}
 isset_dim_obj_exit:
-	ZvalPtrDtorNogc(free_op1)
+	// ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
@@ -525,7 +525,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 
 				/* avoid exception check */
 
-				ZvalPtrDtorNogc(free_op2)
+				// ZvalPtrDtorNogc(free_op2)
 				ZEND_VM_SMART_BRANCH(result, 0)
 				opline.Result().SetBool(result != 0)
 				return ZEND_VM_NEXT_OPCODE(executeData, opline)
@@ -546,7 +546,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteD
 		result = ZendIsemptyDimSlow(container, offset, executeData)
 	}
 isset_dim_obj_exit:
-	ZvalPtrDtorNogc(free_op2)
+	// ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
