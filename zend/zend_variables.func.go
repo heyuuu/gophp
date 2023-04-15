@@ -4,6 +4,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"runtime"
 )
 
 func ZvalPtrDtorNogc(zval_ptr *types.Zval) {
@@ -21,24 +22,8 @@ func IZvalPtrDtor(zval_ptr *types.Zval) {
 }
 func ZvalDtor(zvalue *types.Zval) { ZvalPtrDtorNogc(zvalue) }
 func RcDtorFunc(p types.IRefcounted) {
-	b.Assert(p.GetGcType() <= types.IS_CONSTANT_AST)
-	switch p.(type) {
-	case *types.Array:
-		arr := p.(*types.Array)
-		arr.DestroyEx()
-	case *types.ZendObject:
-		//obj := p.(*types.ZendObject)
-		//ZendObjectsStoreDel(obj)
-	case *types.ZendResource:
-		res := p.(*types.ZendResource)
-		ZendListFree(res)
-	case *types.ZendReference:
-		ref := p.(*types.ZendReference)
-		ZendReferenceDestroy(ref)
-	case *types.ZendAstRef:
-		ast := p.(*types.ZendAstRef)
-		ZendAstRefDestroy(ast)
-	}
+	// todo delete
+	runtime.SetFinalizer()
 }
 
 func ZendReferenceDestroy(ref *types.ZendReference) {

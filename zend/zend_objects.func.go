@@ -6,18 +6,13 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func _zendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
-	object.SetRefcount(1)
-	object.GetGcTypeInfo() = types.IS_OBJECT | types.GC_COLLECTABLE<<types.GC_FLAGS_SHIFT
-	object.SetCe(ce)
-	object.SetProperties(nil)
-	EG__().GetObjectsStore().PutObject(object)
-	if ce.IsUseGuards() {
-		(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount()).SetUndef()
-	}
+func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject {
+	handle := EG__().NextObjectHandle()
+	return types.NewObject(ce, handle, &StdObjectHandlers)
 }
 func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
-	_zendObjectStdInit(object, ce)
+	handle := EG__().NextObjectHandle()
+	object.Init(ce, handle)
 }
 func ZendObjectStdDtor(object *types.ZendObject) {
 	var p *types.Zval
@@ -153,12 +148,6 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		// OBJ_RELEASE(object)
 		EG__().SetFakeScope(orig_fake_scope)
 	}
-}
-func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject {
-	var object *types.ZendObject = Emalloc(b.SizeOf("zend_object") + ZendObjectPropertiesSize(ce))
-	_zendObjectStdInit(object, ce)
-	object.SetHandlers(&StdObjectHandlers)
-	return object
 }
 func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.ZendObject) {
 	if old_object.GetCe().GetDefaultPropertiesCount() != 0 {

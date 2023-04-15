@@ -5,6 +5,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"math"
+	"runtime"
 )
 
 /**
@@ -123,7 +124,11 @@ func NewArray(size int) *Array {
 	return NewArrayEx(size, zend.ZVAL_PTR_DTOR, false)
 }
 func MakeArrayEx(nSize int, pDestructor DtorFuncT, persistent ZendBool) Array {
-	return *NewArrayEx(nSize, pDestructor, persistent != 0)
+	arr := *NewArrayEx(nSize, pDestructor, persistent != 0)
+	if pDestructor != nil {
+		runtime.SetFinalizer(arr, arr.DestroyEx)
+	}
+	return arr
 }
 func NewArrayEx(size int, pDestructor DtorFuncT, persistent bool) *Array {
 	var data []Bucket

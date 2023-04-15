@@ -238,7 +238,6 @@ type ZendExecutorGlobals struct {
 	modifiedIniDirectives IniDirectives
 
 	error_reporting_ini_entry *ZendIniEntry
-	objects_store             ObjectsStore
 	exception                 *types.ZendObject
 	prev_exception            **types.ZendObject
 	opline_before_exception   *ZendOp
@@ -258,6 +257,8 @@ type ZendExecutorGlobals struct {
 	weakrefs                  types.Array
 	exception_ignore_args     types.ZendBool
 	reserved                  []any
+
+	lastObjectHandle uint32 // 最后一个object的handle值，初始为0
 }
 
 func (this *ZendExecutorGlobals) InitTables() {
@@ -294,6 +295,11 @@ func (this *ZendExecutorGlobals) ModifiedIniDirectives() IniDirectives {
 }
 func (this *ZendExecutorGlobals) InitModifiedIniDirectives() {
 	this.modifiedIniDirectives = internal.NewTable[*ZendIniEntry](nil)
+}
+
+func (this *ZendExecutorGlobals) NextObjectHandle() uint32 {
+	this.lastObjectHandle++
+	return this.lastObjectHandle
 }
 
 /**
@@ -440,8 +446,6 @@ func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 func (this *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 	this.error_reporting_ini_entry = value
 }
-func (this *ZendExecutorGlobals) GetObjectsStore() *ObjectsStore       { return &this.objects_store }
-func (this *ZendExecutorGlobals) SetObjectsStore(value ObjectsStore)   { this.objects_store = value }
 func (this *ZendExecutorGlobals) GetException() *types.ZendObject      { return this.exception }
 func (this *ZendExecutorGlobals) SetException(value *types.ZendObject) { this.exception = value }
 func (this *ZendExecutorGlobals) GetPrevException() **types.ZendObject { return this.prev_exception }

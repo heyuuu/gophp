@@ -722,17 +722,6 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 	}
 	return buf
 }
-func ZendAstCopy(ast *ZendAst) *types.ZendAstRef {
-	var tree_size int
-	var ref *types.ZendAstRef
-	b.Assert(ast != nil)
-	tree_size = ZendAstTreeSize(ast) + b.SizeOf("zend_ast_ref")
-	ref = Emalloc(tree_size)
-	ZendAstTreeCopy(ast, types.GC_AST(ref))
-	ref.SetRefcount(1)
-	ref.GetGcTypeInfo() = types.IS_CONSTANT_AST
-	return ref
-}
 func ZendAstDestroy(ast *ZendAst) {
 tail_call:
 	if ast == nil {

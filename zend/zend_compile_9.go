@@ -122,7 +122,7 @@ func ZendConstExprToZval(result *types.Zval, ast *ZendAst) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		types.ZVAL_COPY_VALUE(result, ZendAstGetZval(ast))
 	} else {
-		result.SetConstantAst(ZendAstCopy(ast))
+		result.SetConstantAst(types.NewAstRef(ast))
 
 		/* destroy the ast here, it might have been replaced */
 

@@ -3,6 +3,7 @@ package types
 import (
 	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend"
+	"runtime"
 )
 
 /**
@@ -46,16 +47,45 @@ type ZendObject struct {
 
 var _ IRefcounted = &ZendObject{}
 
-func (this *ZendObject) GetHandle() uint32                          { return this.handle }
-func (this *ZendObject) SetHandle(value uint32)                     { this.handle = value }
-func (this *ZendObject) GetCe() *ClassEntry                         { return this.ce }
-func (this *ZendObject) SetCe(value *ClassEntry)                    { this.ce = value }
-func (this *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return this.handlers }
-func (this *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { this.handlers = value }
-func (this *ZendObject) GetProperties() *Array                      { return this.properties }
-func (this *ZendObject) SetProperties(value *Array)                 { this.properties = value }
-func (this *ZendObject) GetPropertiesTable() []Zval                 { return this.propertiesTable }
-func (this *ZendObject) SetPropertiesTable(value []Zval)            { this.propertiesTable = value }
+func NewObject(ce *ClassEntry, handle uint32, handlers *zend.ZendObjectHandlers) *ZendObject {
+	propertyCount := ce.GetDefaultPropertiesCount()
+	if ce.IsUseGuards() {
+		propertyCount++
+	}
+
+	o := &ZendObject{}
+	o.handlers = handlers
+	o.propertiesTable = make([]Zval, propertyCount)
+
+	o.Init(ce, handle)
+	return o
+}
+
+func (o *ZendObject) Init(ce *ClassEntry, handle uint32) {
+	o.SetRefcount(1)
+	o.SetGcTypeInfo(uint32(IS_OBJECT) | GC_COLLECTABLE<<GC_FLAGS_SHIFT)
+
+	o.handle = handle
+	o.ce = ce
+	o.properties = nil
+
+	if ce.IsUseGuards() {
+		o.propertiesTable[ce.GetDefaultPropertiesCount()].SetUndef()
+	}
+
+	runtime.SetFinalizer(o, zend.AutoGlobalDtor)
+}
+
+func (o *ZendObject) GetHandle() uint32                          { return o.handle }
+func (o *ZendObject) SetHandle(value uint32)                     { o.handle = value }
+func (o *ZendObject) GetCe() *ClassEntry                         { return o.ce }
+func (o *ZendObject) SetCe(value *ClassEntry)                    { o.ce = value }
+func (o *ZendObject) GetHandlers() *zend.ZendObjectHandlers      { return o.handlers }
+func (o *ZendObject) SetHandlers(value *zend.ZendObjectHandlers) { o.handlers = value }
+func (o *ZendObject) GetProperties() *Array                      { return o.properties }
+func (o *ZendObject) SetProperties(value *Array)                 { o.properties = value }
+func (o *ZendObject) GetPropertiesTable() []Zval                 { return o.propertiesTable }
+func (o *ZendObject) SetPropertiesTable(value []Zval)            { o.propertiesTable = value }
 
 /**
  * ZendResource
@@ -84,6 +114,8 @@ func NewZendResourcePersistent(handle int, ptr any, type_ int, persistent bool) 
 	if persistent {
 		res.SetPersistent()
 	}
+
+	runtime.SetFinalizer(res, zend.ZendListFree)
 
 	return res
 }
@@ -142,7 +174,9 @@ func NewZendReference(val *Zval) *ZendReference {
 	ref.sources.SetPtr(nil)
 
 	ref.SetRefcount(1)
-	ref.SetGcTypeInfo(IS_REFERENCE)
+	ref.SetGcTypeInfo(uint32(IS_REFERENCE))
+
+	runtime.SetFinalizer(ref, zend.ZendReferenceDestroy)
 
 	return ref
 }
@@ -162,6 +196,23 @@ type ZendAstRef struct {
 }
 
 var _ IRefcounted = &ZendAstRef{}
+
+func NewAstRef(ast *zend.ZendAst) *ZendAstRef {
+	b.Assert(ast != nil)
+
+	// init
+	var ref *ZendAstRef = &ZendAstRef{}
+	//tree_size = zend.ZendAstTreeSize(ast) + b.SizeOf("zend_ast_ref")
+	//ref = zend.Emalloc(tree_size)
+	zend.ZendAstTreeCopy(ast, ref.ast)
+	ref.SetRefcount(1)
+	ref.SetGcTypeInfo(uint32(IS_CONSTANT_AST))
+
+	// dtor
+	runtime.SetFinalizer(ref, zend.ZendAstRefDestroy)
+
+	return ref
+}
 
 func (this ZendAstRef) GcAst() *zend.ZendAst {
 	//func GC_AST(p *ZendAstRef) *ZendAst {
