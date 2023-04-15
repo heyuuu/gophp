@@ -75,12 +75,6 @@ func zend_is_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeData *
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	if EG__().GetException() != nil {
 		return 0
 	}
@@ -103,12 +97,6 @@ func zend_is_not_equal_helper_SPEC(op_1 *types.Zval, op_2 *types.Zval, executeDa
 		op_2 = ZVAL_UNDEFINED_OP2(executeData)
 	}
 	CompareFunction(opline.Result(), op_1, op_2)
-	if (opline.GetOp1Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_1)
-	}
-	if (opline.GetOp2Type() & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(op_2)
-	}
 	if EG__().GetException() != nil {
 		return 0
 	}

@@ -110,16 +110,21 @@ func getIsIdenticalHandler(executeData *ZendExecuteData) int {
 	result := FastIsIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
 	opline.Result().SetBool(result != 0)
-	
+
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
 // ZEND_IS_NOT_IDENTICAL
 func getIsNotIdenticalHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
-	//todo
+	var op1 *types.Zval = executeData.Op1(opline, opMode0)
+	var op2 *types.Zval = executeData.Op2(opline, opMode0)
+
+	result := FastIsNotIdenticalFunction(op1, op2)
+	ZEND_VM_SMART_BRANCH(result, 1)
+	opline.Result().SetBool(result != 0)
+
+	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }
 
 // ZEND_IS_EQUAL
@@ -127,7 +132,50 @@ func getIsEqualHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
-	//todo
+
+	var result bool
+	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
+	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+		result = op1.Long() == op2.Long()
+	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
+		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
+		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+		var d1, d2 float64
+		if op1.IsLong() {
+			d1 = float64(op1.Long())
+		} else {
+			d1 = op1.Double()
+		}
+		if op2.IsLong() {
+			d2 = float64(op2.Long())
+		} else {
+			d2 = op2.Double()
+		}
+		result = d1 == d2
+	case TYPE_PAIR(types.IS_STRING, types.IS_STRING):
+		result = ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+	default:
+		return zend_is_equal_helper_SPEC(op1, op2, executeData)
+	}
+
+	nextOpCode := opline.Offset(1).GetOpcode()
+	switch nextOpCode {
+	case ZEND_JMPZ:
+		if result {
+			ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
+		} else {
+			ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
+		}
+	case ZEND_JMPNZ:
+		if result {
+			ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
+		} else {
+			ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
+		}
+	}
+
+	opline.Result().SetBool(result)
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 
 // ZEND_IS_NOT_EQUAL
@@ -135,7 +183,50 @@ func getIsNotEqualHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval = executeData.Op1(opline, opMode1)
 	var op2 *types.Zval = executeData.Op2(opline, opMode1)
-	//todo
+
+	var result bool
+	switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
+	case TYPE_PAIR(types.IS_LONG, types.IS_LONG):
+		result = op1.Long() != op2.Long()
+	case TYPE_PAIR(types.IS_DOUBLE, types.IS_DOUBLE),
+		TYPE_PAIR(types.IS_LONG, types.IS_DOUBLE),
+		TYPE_PAIR(types.IS_DOUBLE, types.IS_LONG):
+		var d1, d2 float64
+		if op1.IsLong() {
+			d1 = float64(op1.Long())
+		} else {
+			d1 = op1.Double()
+		}
+		if op2.IsLong() {
+			d2 = float64(op2.Long())
+		} else {
+			d2 = op2.Double()
+		}
+		result = d1 != d2
+	case TYPE_PAIR(types.IS_STRING, types.IS_STRING):
+		result = !ZendFastEqualStringsEx(op1.StringVal(), op2.StringVal())
+	default:
+		return zend_is_not_equal_helper_SPEC(op1, op2, executeData)
+	}
+
+	nextOpCode := opline.Offset(1).GetOpcode()
+	switch nextOpCode {
+	case ZEND_JMPZ:
+		if result {
+			ZEND_VM_SMART_BRANCH_TRUE_JMPZ()
+		} else {
+			ZEND_VM_SMART_BRANCH_FALSE_JMPZ()
+		}
+	case ZEND_JMPNZ:
+		if result {
+			ZEND_VM_SMART_BRANCH_TRUE_JMPNZ()
+		} else {
+			ZEND_VM_SMART_BRANCH_FALSE_JMPNZ()
+		}
+	}
+
+	opline.Result().SetBool(result)
+	return ZEND_VM_NEXT_OPCODE(executeData, opline)
 }
 
 // ZEND_IS_SMALLER

@@ -312,6 +312,13 @@ func FastLongSubFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) {
 func FastDivFunction(result *types.Zval, op1 *types.Zval, op2 *types.Zval) int {
 	return DivFunction(result, op1, op2)
 }
+func ZendFastEqualStringsEx(s1 string, s2 string) bool {
+	if s1 == s2 {
+		return true
+	} else if len(s1) > 0 && s1[0] <= '9' && len(s2) > 0 && s2[0] <= '9' {
+		return ZendiSmartStreq(s1, s2) != 0
+	}
+}
 func ZendFastEqualStrings(s1 *types.String, s2 *types.String) int {
 	if s1 == s2 {
 		return 1
@@ -2762,15 +2769,6 @@ func ZendBinaryStrncasecmp(s1 string, s2 string, length int) int {
 	return ascii.StrCaseCompare(s1, s2)
 }
 func ZendBinaryStrcasecmpL(s1 string, s2 string) int {
-	return ascii.StrCaseCompare(s1, s2)
-}
-func ZendBinaryStrncasecmpL(s1 string, s2 string, length int) int {
-	if len(s1) > length {
-		s1 = s1[:length]
-	}
-	if len(s2) > length {
-		s2 = s2[:length]
-	}
 	return ascii.StrCaseCompare(s1, s2)
 }
 func ZendiSmartStreq(s1 *types.String, s2 *types.String) int {

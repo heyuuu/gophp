@@ -552,200 +552,31 @@ func vmGetIsIdenticalHandler(op *ZendOp) OpcodeHandlerT {
 	return getIsIdenticalHandler
 }
 func vmGetIsNotIdenticalHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 361 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [25]OpcodeHandlerT{
-		ZEND_IS_NOT_IDENTICAL_SPEC_CONST_CONST_HANDLER, // IS_CONST * IS_CONST
-		nil, // IS_CONST * IS_TMP_VAR
-		nil, // IS_CONST * IS_VAR
-		nil, // IS_CONST * IS_UNUSED
-		nil, // IS_CONST * IS_CV
-		ZEND_IS_NOT_IDENTICAL_SPEC_TMP_CONST_HANDLER, // IS_TMP_VAR * IS_CONST
-		ZEND_IS_NOT_IDENTICAL_SPEC_TMP_TMP_HANDLER,   // IS_TMP_VAR * IS_TMP_VAR
-		nil, // IS_TMP_VAR * IS_VAR
-		nil, // IS_TMP_VAR * IS_UNUSED
-		nil, // IS_TMP_VAR * IS_CV
-		ZEND_IS_NOT_IDENTICAL_SPEC_VAR_CONST_HANDLER, // IS_VAR * IS_CONST
-		ZEND_IS_NOT_IDENTICAL_SPEC_VAR_TMP_HANDLER,   // IS_VAR * IS_TMP_VAR
-		ZEND_IS_NOT_IDENTICAL_SPEC_VAR_VAR_HANDLER,   // IS_VAR * IS_VAR
-		nil, // IS_VAR * IS_UNUSED
-		nil, // IS_VAR * IS_CV
-		nil, // IS_UNUSED * IS_CONST
-		nil, // IS_UNUSED * IS_TMP_VAR
-		nil, // IS_UNUSED * IS_VAR
-		nil, // IS_UNUSED * IS_UNUSED
-		nil, // IS_UNUSED * IS_CV
-		ZEND_IS_NOT_IDENTICAL_SPEC_CV_CONST_HANDLER, // IS_CV * IS_CONST
-		ZEND_IS_NOT_IDENTICAL_SPEC_CV_TMP_HANDLER,   // IS_CV * IS_TMP_VAR
-		ZEND_IS_NOT_IDENTICAL_SPEC_CV_VAR_HANDLER,   // IS_CV * IS_VAR
-		nil,                                      // IS_CV * IS_UNUSED
-		ZEND_IS_NOT_IDENTICAL_SPEC_CV_CV_HANDLER, // IS_CV * IS_CV
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return getIsNotIdenticalHandler
 }
 func vmGetIsEqualHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 386 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [75]OpcodeHandlerT{
-		ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER,  // IS_CONST * IS_CONST | SmartBranch=2
-		nil,                                     // IS_CONST * IS_TMP_VAR | SmartBranch=0
-		nil,                                     // IS_CONST * IS_TMP_VAR | SmartBranch=1
-		nil,                                     // IS_CONST * IS_TMP_VAR | SmartBranch=2
-		nil,                                     // IS_CONST * IS_VAR | SmartBranch=0
-		nil,                                     // IS_CONST * IS_VAR | SmartBranch=1
-		nil,                                     // IS_CONST * IS_VAR | SmartBranch=2
-		nil,                                     // IS_CONST * IS_UNUSED | SmartBranch=0
-		nil,                                     // IS_CONST * IS_UNUSED | SmartBranch=1
-		nil,                                     // IS_CONST * IS_UNUSED | SmartBranch=2
-		nil,                                     // IS_CONST * IS_CV | SmartBranch=0
-		nil,                                     // IS_CONST * IS_CV | SmartBranch=1
-		nil,                                     // IS_CONST * IS_CV | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_HANDLER, // IS_TMP_VAR * IS_CONST | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER,   // IS_TMP_VAR * IS_CONST | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER,  // IS_TMP_VAR * IS_CONST | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_TMP_VAR * IS_TMP_VAR | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_TMP_VAR * IS_TMP_VAR | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_TMP_VAR * IS_TMP_VAR | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_TMP_VAR * IS_VAR | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_TMP_VAR * IS_VAR | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_TMP_VAR * IS_VAR | SmartBranch=2
-		nil,                                     // IS_TMP_VAR * IS_UNUSED | SmartBranch=0
-		nil,                                     // IS_TMP_VAR * IS_UNUSED | SmartBranch=1
-		nil,                                     // IS_TMP_VAR * IS_UNUSED | SmartBranch=2
-		nil,                                     // IS_TMP_VAR * IS_CV | SmartBranch=0
-		nil,                                     // IS_TMP_VAR * IS_CV | SmartBranch=1
-		nil,                                     // IS_TMP_VAR * IS_CV | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_HANDLER, // IS_VAR * IS_CONST | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER,   // IS_VAR * IS_CONST | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER,  // IS_VAR * IS_CONST | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_VAR * IS_TMP_VAR | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_VAR * IS_TMP_VAR | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_VAR * IS_TMP_VAR | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_VAR * IS_VAR | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_VAR * IS_VAR | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_VAR * IS_VAR | SmartBranch=2
-		nil,                                      // IS_VAR * IS_UNUSED | SmartBranch=0
-		nil,                                      // IS_VAR * IS_UNUSED | SmartBranch=1
-		nil,                                      // IS_VAR * IS_UNUSED | SmartBranch=2
-		nil,                                      // IS_VAR * IS_CV | SmartBranch=0
-		nil,                                      // IS_VAR * IS_CV | SmartBranch=1
-		nil,                                      // IS_VAR * IS_CV | SmartBranch=2
-		nil,                                      // IS_UNUSED * IS_CONST | SmartBranch=0
-		nil,                                      // IS_UNUSED * IS_CONST | SmartBranch=1
-		nil,                                      // IS_UNUSED * IS_CONST | SmartBranch=2
-		nil,                                      // IS_UNUSED * IS_TMP_VAR | SmartBranch=0
-		nil,                                      // IS_UNUSED * IS_TMP_VAR | SmartBranch=1
-		nil,                                      // IS_UNUSED * IS_TMP_VAR | SmartBranch=2
-		nil,                                      // IS_UNUSED * IS_VAR | SmartBranch=0
-		nil,                                      // IS_UNUSED * IS_VAR | SmartBranch=1
-		nil,                                      // IS_UNUSED * IS_VAR | SmartBranch=2
-		nil,                                      // IS_UNUSED * IS_UNUSED | SmartBranch=0
-		nil,                                      // IS_UNUSED * IS_UNUSED | SmartBranch=1
-		nil,                                      // IS_UNUSED * IS_UNUSED | SmartBranch=2
-		nil,                                      // IS_UNUSED * IS_CV | SmartBranch=0
-		nil,                                      // IS_UNUSED * IS_CV | SmartBranch=1
-		nil,                                      // IS_UNUSED * IS_CV | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_CV_CONST_HANDLER,      // IS_CV * IS_CONST | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER, // IS_CV * IS_CONST | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER,  // IS_CV * IS_CONST | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_CV_TMPVAR_HANDLER,       // IS_CV * IS_TMP_VAR | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER,  // IS_CV * IS_TMP_VAR | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER, // IS_CV * IS_TMP_VAR | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_CV_TMPVAR_HANDLER,       // IS_CV * IS_VAR | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER,  // IS_CV * IS_VAR | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER, // IS_CV * IS_VAR | SmartBranch=2
-		nil,                                    // IS_CV * IS_UNUSED | SmartBranch=0
-		nil,                                    // IS_CV * IS_UNUSED | SmartBranch=1
-		nil,                                    // IS_CV * IS_UNUSED | SmartBranch=2
-		ZEND_IS_EQUAL_SPEC_CV_CV_HANDLER,       // IS_CV * IS_CV | SmartBranch=0
-		ZEND_IS_EQUAL_SPEC_CV_CV_JMPZ_HANDLER,  // IS_CV * IS_CV | SmartBranch=1
-		ZEND_IS_EQUAL_SPEC_CV_CV_JMPNZ_HANDLER, // IS_CV * IS_CV | SmartBranch=2
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return getIsEqualHandler
 }
 func vmGetIsNotEqualHandler(op *ZendOp) OpcodeHandlerT {
-	spec := 461 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
-	offset := vmOffsetBySpec(spec, op)
-	handlers := [75]OpcodeHandlerT{
-		ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER, // IS_CONST * IS_CONST | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER, // IS_CONST * IS_CONST | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER, // IS_CONST * IS_CONST | SmartBranch=2
-		nil, // IS_CONST * IS_TMP_VAR | SmartBranch=0
-		nil, // IS_CONST * IS_TMP_VAR | SmartBranch=1
-		nil, // IS_CONST * IS_TMP_VAR | SmartBranch=2
-		nil, // IS_CONST * IS_VAR | SmartBranch=0
-		nil, // IS_CONST * IS_VAR | SmartBranch=1
-		nil, // IS_CONST * IS_VAR | SmartBranch=2
-		nil, // IS_CONST * IS_UNUSED | SmartBranch=0
-		nil, // IS_CONST * IS_UNUSED | SmartBranch=1
-		nil, // IS_CONST * IS_UNUSED | SmartBranch=2
-		nil, // IS_CONST * IS_CV | SmartBranch=0
-		nil, // IS_CONST * IS_CV | SmartBranch=1
-		nil, // IS_CONST * IS_CV | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_HANDLER,        // IS_TMP_VAR * IS_CONST | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER,   // IS_TMP_VAR * IS_CONST | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER,  // IS_TMP_VAR * IS_CONST | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_TMP_VAR * IS_TMP_VAR | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_TMP_VAR * IS_TMP_VAR | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_TMP_VAR * IS_TMP_VAR | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_TMP_VAR * IS_VAR | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_TMP_VAR * IS_VAR | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_TMP_VAR * IS_VAR | SmartBranch=2
-		nil, // IS_TMP_VAR * IS_UNUSED | SmartBranch=0
-		nil, // IS_TMP_VAR * IS_UNUSED | SmartBranch=1
-		nil, // IS_TMP_VAR * IS_UNUSED | SmartBranch=2
-		nil, // IS_TMP_VAR * IS_CV | SmartBranch=0
-		nil, // IS_TMP_VAR * IS_CV | SmartBranch=1
-		nil, // IS_TMP_VAR * IS_CV | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_HANDLER,        // IS_VAR * IS_CONST | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPZ_HANDLER,   // IS_VAR * IS_CONST | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_CONST_JMPNZ_HANDLER,  // IS_VAR * IS_CONST | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_VAR * IS_TMP_VAR | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_VAR * IS_TMP_VAR | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_VAR * IS_TMP_VAR | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_HANDLER,       // IS_VAR * IS_VAR | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPZ_HANDLER,  // IS_VAR * IS_VAR | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_TMPVAR_TMPVAR_JMPNZ_HANDLER, // IS_VAR * IS_VAR | SmartBranch=2
-		nil,                                     // IS_VAR * IS_UNUSED | SmartBranch=0
-		nil,                                     // IS_VAR * IS_UNUSED | SmartBranch=1
-		nil,                                     // IS_VAR * IS_UNUSED | SmartBranch=2
-		nil,                                     // IS_VAR * IS_CV | SmartBranch=0
-		nil,                                     // IS_VAR * IS_CV | SmartBranch=1
-		nil,                                     // IS_VAR * IS_CV | SmartBranch=2
-		nil,                                     // IS_UNUSED * IS_CONST | SmartBranch=0
-		nil,                                     // IS_UNUSED * IS_CONST | SmartBranch=1
-		nil,                                     // IS_UNUSED * IS_CONST | SmartBranch=2
-		nil,                                     // IS_UNUSED * IS_TMP_VAR | SmartBranch=0
-		nil,                                     // IS_UNUSED * IS_TMP_VAR | SmartBranch=1
-		nil,                                     // IS_UNUSED * IS_TMP_VAR | SmartBranch=2
-		nil,                                     // IS_UNUSED * IS_VAR | SmartBranch=0
-		nil,                                     // IS_UNUSED * IS_VAR | SmartBranch=1
-		nil,                                     // IS_UNUSED * IS_VAR | SmartBranch=2
-		nil,                                     // IS_UNUSED * IS_UNUSED | SmartBranch=0
-		nil,                                     // IS_UNUSED * IS_UNUSED | SmartBranch=1
-		nil,                                     // IS_UNUSED * IS_UNUSED | SmartBranch=2
-		nil,                                     // IS_UNUSED * IS_CV | SmartBranch=0
-		nil,                                     // IS_UNUSED * IS_CV | SmartBranch=1
-		nil,                                     // IS_UNUSED * IS_CV | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_HANDLER, // IS_CV * IS_CONST | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPZ_HANDLER,   // IS_CV * IS_CONST | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_CV_CONST_JMPNZ_HANDLER,  // IS_CV * IS_CONST | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_HANDLER,       // IS_CV * IS_TMP_VAR | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER,  // IS_CV * IS_TMP_VAR | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER, // IS_CV * IS_TMP_VAR | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_HANDLER,       // IS_CV * IS_VAR | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPZ_HANDLER,  // IS_CV * IS_VAR | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_CV_TMPVAR_JMPNZ_HANDLER, // IS_CV * IS_VAR | SmartBranch=2
-		nil,                                  // IS_CV * IS_UNUSED | SmartBranch=0
-		nil,                                  // IS_CV * IS_UNUSED | SmartBranch=1
-		nil,                                  // IS_CV * IS_UNUSED | SmartBranch=2
-		ZEND_IS_NOT_EQUAL_SPEC_CV_CV_HANDLER, // IS_CV * IS_CV | SmartBranch=0
-		ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPZ_HANDLER,  // IS_CV * IS_CV | SmartBranch=1
-		ZEND_IS_NOT_EQUAL_SPEC_CV_CV_JMPNZ_HANDLER, // IS_CV * IS_CV | SmartBranch=2
+	// SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
+	opType1 := op.GetOp1Type()
+	opType2 := op.GetOp2Type()
+	if opType1 == IS_UNUSED || opType2 == IS_UNUSED {
+		return nil
 	}
-	return handlers[offset]
+	return getIsNotEqualHandler
 }
 func vmGetIsSmallerHandler(op *ZendOp) OpcodeHandlerT {
 	spec := 536 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH
