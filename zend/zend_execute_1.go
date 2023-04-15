@@ -7,7 +7,7 @@ import (
 )
 
 func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, executeData *ZendExecuteData) *types.Zval {
-	var ret *types.Zval = EX_VAR(var_)
+	var ret *types.Zval = EX_VAR(executeData, var_)
 	if ret.IsUndef() {
 		ret.SetNull()
 		ZvalUndefinedCv(var_, executeData)
@@ -16,7 +16,7 @@ func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, executeData *ZendExecuteData) *type
 	return ret
 }
 func _get_zval_ptr_cv_BP_VAR_W(var_ uint32, executeData *ZendExecuteData) *types.Zval {
-	var ret *types.Zval = EX_VAR(var_)
+	var ret *types.Zval = EX_VAR(executeData, var_)
 	if ret.IsUndef() {
 		ret.SetNull()
 	}
@@ -124,7 +124,7 @@ func _getZvalPtrUndef(
 	}
 }
 func _getZvalPtrPtrVar(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
-	var ret *types.Zval = EX_VAR(var_)
+	var ret *types.Zval = EX_VAR(executeData, var_)
 	if ret.IsIndirect() {
 		*should_free = nil
 		ret = ret.Indirect()

@@ -195,7 +195,7 @@ func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num u
 			if catch_op_num == 0 || catch_op_num >= range_.GetEnd() {
 				var kind uint32 = range_.GetVar() & ZEND_LIVE_MASK
 				var var_num uint32 = range_.GetVar() & ^ZEND_LIVE_MASK
-				var var_ *types.Zval = EX_VAR(var_num)
+				var var_ *types.Zval = EX_VAR(executeData, var_num)
 				if kind == ZEND_LIVE_TMPVAR {
 					// ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_NEW {

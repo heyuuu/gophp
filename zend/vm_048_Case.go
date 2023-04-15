@@ -10,7 +10,7 @@ func ZEND_CASE_SPEC_TMPVAR_CONST_HANDLER(executeData *ZendExecuteData) int {
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1Ptr(&free_op1)
-	op2 = opline.Const2()
+	op2 = executeData.GetOp2(opline)
 	if op1.IsLong() {
 		if op2.IsLong() {
 			if op1.Long()() == op2.Long()() {

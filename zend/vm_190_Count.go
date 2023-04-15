@@ -10,7 +10,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var op1 *types.Zval
 	var count ZendLong
-	op1 = opline.Const1()
+	op1 = executeData.GetOp1(opline)
 	for true {
 		if op1.IsArray() {
 			count = op1.Array().Count()

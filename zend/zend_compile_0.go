@@ -52,8 +52,8 @@ func ZEND_DEL_CALL_FLAG(call *ZendExecuteData, flag uint32) {
 func ZEND_CALL_VAR(call *ZendExecuteData, n uint32) *types.Zval {
 	return (*types.Zval)((*byte)(call) + int(n))
 }
-func EX_CALL_INFO() uint32        { return ZEND_CALL_INFO(executeData) }
-func EX_VAR(n uint32) *types.Zval { return ZEND_CALL_VAR(executeData, n) }
+func EX_CALL_INFO() uint32                                      { return ZEND_CALL_INFO(executeData) }
+func EX_VAR(executeData *ZendExecuteData, n uint32) *types.Zval { return ZEND_CALL_VAR(executeData, n) }
 func EX_VAR_TO_NUM(n uint32) __auto__ {
 	return uint32(ZEND_CALL_VAR(nil, n) - nil.VarNum(0))
 }

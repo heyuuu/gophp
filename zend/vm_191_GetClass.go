@@ -10,7 +10,7 @@ func ZEND_GET_CLASS_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int 
 
 	{
 		var op1 *types.Zval
-		op1 = opline.Const1()
+		op1 = executeData.GetOp1(opline)
 		for true {
 			if op1.IsObject() {
 				opline.Result().SetStringCopy(types.Z_OBJCE_P(op1).GetName())

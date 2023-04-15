@@ -8,8 +8,8 @@ func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(executeData *ZendExecuteData) int 
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.Const1()
-	op2 = opline.Const2()
+	op1 = executeData.GetOp1(opline)
+	op2 = executeData.GetOp2(opline)
 	return zend_is_smaller_helper_SPEC(op1, op2, executeData)
 }
 func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) int {
@@ -18,7 +18,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_HANDLER(executeData *ZendExecuteData) i
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.Const1()
+	op1 = executeData.GetOp1(opline)
 	op2 = opline.Op2()
 
 	if op1.IsLong() {
@@ -61,7 +61,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(executeData *ZendExecuteDa
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.Const1()
+	op1 = executeData.GetOp1(opline)
 	op2 = opline.Op2()
 
 	if op1.IsLong() {
@@ -106,7 +106,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(executeData *ZendExecuteD
 	var op2 *types.Zval
 	var d1 float64
 	var d2 float64
-	op1 = opline.Const1()
+	op1 = executeData.GetOp1(opline)
 	op2 = opline.Op2()
 
 	if op1.IsLong() {
@@ -152,7 +152,7 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_HANDLER(executeData *ZendExecuteData) i
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1()
-	op2 = opline.Const2()
+	op2 = executeData.GetOp2(opline)
 
 	if op1.IsLong() {
 		if op2.IsLong() {
@@ -195,7 +195,7 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(executeData *ZendExecuteDa
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1()
-	op2 = opline.Const2()
+	op2 = executeData.GetOp2(opline)
 
 	if op1.IsLong() {
 		if op2.IsLong() {
@@ -240,7 +240,7 @@ func ZEND_IS_SMALLER_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(executeData *ZendExecuteD
 	var d1 float64
 	var d2 float64
 	op1 = opline.Op1()
-	op2 = opline.Const2()
+	op2 = executeData.GetOp2(opline)
 
 	if op1.IsLong() {
 		if op2.IsLong() {
