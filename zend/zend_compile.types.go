@@ -156,7 +156,7 @@ func (this *ZendParserStackElem) GetStr() *types.String { return this.str }
  * ZendOp
  */
 type ZendOp struct {
-	handler       any // 指令执行 handler
+	handler       OpcodeHandlerT // 指令执行 handler
 	op1           ZnodeOp
 	op2           ZnodeOp
 	result        ZnodeOp
@@ -168,26 +168,26 @@ type ZendOp struct {
 	resultType    uint8
 }
 
-func (op *ZendOp) GetHandler() any               { return op.handler }
-func (op *ZendOp) SetHandler(value any)          { op.handler = value }
-func (op *ZendOp) GetOp1() ZnodeOp               { return op.op1 }
-func (op *ZendOp) SetOp1(value ZnodeOp)          { op.op1 = value }
-func (op *ZendOp) GetOp2() ZnodeOp               { return op.op2 }
-func (op *ZendOp) SetOp2(value ZnodeOp)          { op.op2 = value }
-func (op *ZendOp) GetResult() ZnodeOp            { return op.result }
-func (op *ZendOp) SetResult(value ZnodeOp)       { op.result = value }
-func (op *ZendOp) GetExtendedValue() uint32      { return op.extendedValue }
-func (op *ZendOp) SetExtendedValue(value uint32) { op.extendedValue = value }
-func (op *ZendOp) GetLineno() uint32             { return op.lineno }
-func (op *ZendOp) SetLineno(value uint32)        { op.lineno = value }
-func (op *ZendOp) GetOpcode() OpCode             { return op.opcode }
-func (op *ZendOp) SetOpcode(value OpCode)        { op.opcode = value }
-func (op *ZendOp) GetOp1Type() uint8             { return op.op1Type }
-func (op *ZendOp) SetOp1Type(value uint8)        { op.op1Type = value }
-func (op *ZendOp) GetOp2Type() uint8             { return op.op2Type }
-func (op *ZendOp) SetOp2Type(value uint8)        { op.op2Type = value }
-func (op *ZendOp) GetResultType() uint8          { return op.resultType }
-func (op *ZendOp) SetResultType(value uint8)     { op.resultType = value }
+func (op *ZendOp) GetHandler() OpcodeHandlerT      { return op.handler }
+func (op *ZendOp) SetHandler(value OpcodeHandlerT) { op.handler = value }
+func (op *ZendOp) GetOp1() ZnodeOp                 { return op.op1 }
+func (op *ZendOp) SetOp1(value ZnodeOp)            { op.op1 = value }
+func (op *ZendOp) GetOp2() ZnodeOp                 { return op.op2 }
+func (op *ZendOp) SetOp2(value ZnodeOp)            { op.op2 = value }
+func (op *ZendOp) GetResult() ZnodeOp              { return op.result }
+func (op *ZendOp) SetResult(value ZnodeOp)         { op.result = value }
+func (op *ZendOp) GetExtendedValue() uint32        { return op.extendedValue }
+func (op *ZendOp) SetExtendedValue(value uint32)   { op.extendedValue = value }
+func (op *ZendOp) GetLineno() uint32               { return op.lineno }
+func (op *ZendOp) SetLineno(value uint32)          { op.lineno = value }
+func (op *ZendOp) GetOpcode() OpCode               { return op.opcode }
+func (op *ZendOp) SetOpcode(value OpCode)          { op.opcode = value }
+func (op *ZendOp) GetOp1Type() uint8               { return op.op1Type }
+func (op *ZendOp) SetOp1Type(value uint8)          { op.op1Type = value }
+func (op *ZendOp) GetOp2Type() uint8               { return op.op2Type }
+func (op *ZendOp) SetOp2Type(value uint8)          { op.op2Type = value }
+func (op *ZendOp) GetResultType() uint8            { return op.resultType }
+func (op *ZendOp) SetResultType(value uint8)       { op.resultType = value }
 
 func (op *ZendOp) Offset(offset int) *ZendOp { return op + offset }
 

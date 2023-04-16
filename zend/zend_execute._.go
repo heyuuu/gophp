@@ -1,21 +1,11 @@
 package zend
 
 import (
-	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
 var ZendExecuteEx func(executeData *ZendExecuteData)
 var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *types.Zval)
-
-/* export zend_pass_function to allow comparisons against it */
-
-/* dedicated Zend executor functions - do not use! */
-
-var ZEND_VM_STACK_HEADER_SLOTS *types.Zval = (ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct _zend_vm_stack")) +
-	ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval"))
-
-/* services */
 
 const ZEND_USER_OPCODE_CONTINUE = 0
 const ZEND_USER_OPCODE_RETURN = 1
@@ -40,9 +30,5 @@ const _CV_CODE = 4
 type IncdecT func(*types.Zval) int
 
 var ZendPassFunction = types.MakeInternalFunctionSimplify(ZifPass)
-
-const ZEND_VM_STACK_PAGE_SLOTS = 16 * 1024
-
-var ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
 
 var ZEND_FAKE_OP_ARRAY *types.ZendOpArray = (*types.ZendOpArray)(zend_intptr_t - 1)

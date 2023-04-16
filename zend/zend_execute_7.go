@@ -300,6 +300,7 @@ func ZendFetchFunctionStr(name string) types.IFunction {
 }
 func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
 	b.Assert(executeData.GetFunc() == (types.IFunction)(op_array))
+
 	executeData.GetOpline() = op_array.GetOpcodes()
 	executeData.GetCall() = nil
 	executeData.GetReturnValue() = return_value
