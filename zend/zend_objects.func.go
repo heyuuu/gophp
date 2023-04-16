@@ -8,7 +8,7 @@ import (
 
 func ZendObjectsNew(ce *types.ClassEntry) *types.ZendObject {
 	handle := EG__().NextObjectHandle()
-	return types.NewObject(ce, handle, &StdObjectHandlers)
+	return types.NewObject(ce, handle, StdObjectHandlersPtr)
 }
 func ZendObjectStdInit(object *types.ZendObject, ce *types.ClassEntry) {
 	handle := EG__().NextObjectHandle()
@@ -68,10 +68,8 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 		var ret types.Zval
 		if destructor.GetOpArray().HasFnFlags(AccPrivate | AccProtected) {
 			if destructor.GetOpArray().IsPrivate() {
-
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */
-
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
@@ -82,15 +80,9 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 					faults.Error(faults.E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
 					return
 				}
-
-				/* Ensure that if we're calling a private function, we're allowed to do so.
-				 */
-
 			} else {
-
 				/* Ensure that if we're calling a protected function, we're allowed to do so.
 				 */
-
 				if CurrEX() != nil {
 					var scope *types.ClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
@@ -101,10 +93,6 @@ func ZendObjectsDestroyObject(object *types.ZendObject) {
 					faults.Error(faults.E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
 					return
 				}
-
-				/* Ensure that if we're calling a protected function, we're allowed to do so.
-				 */
-
 			}
 		}
 		// 		object.AddRefcount()
@@ -174,7 +162,7 @@ func ZendObjectsCloneMembers(new_object *types.ZendObject, old_object *types.Zen
 
 		/* fast copy */
 
-		if old_object.GetHandlers() == &StdObjectHandlers {
+		if old_object.GetHandlers() == StdObjectHandlersPtr {
 			if (old_object.GetProperties().GetGcFlags() & types.IS_ARRAY_IMMUTABLE) == 0 {
 				old_object.GetProperties().AddRefcount()
 			}

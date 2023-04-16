@@ -1,6 +1,45 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
+/**
+ * constants and global variables
+ */
+var ZendIteratorClassEntry *types.ClassEntry = types.NewClassEntry("__iterator_wrapper", nil)
+
+var IteratorObjectHandlers *ZendObjectHandlers = NewZendObjectHandlers(ObjectHandlersSetting{
+	FreeObj: func(object *types.ZendObject) {
+		var iter *ZendObjectIterator = (*ZendObjectIterator)(object)
+		iter.GetFuncs().GetDtor()(iter)
+	},
+	GetGc: func(object *types.Zval, table **types.Zval, n *int) *types.Array {
+		*table = nil
+		*n = 0
+		return nil
+	},
+})
+
+/**
+ * functions
+ */
+func ZendIteratorInit(iter *ZendObjectIterator) {
+	ZendObjectStdInit(&iter.std, ZendIteratorClassEntry)
+	iter.std.SetHandlers(IteratorObjectHandlers)
+}
+func ZendIteratorUnwrap(arrayPtr *types.Zval) *ZendObjectIterator {
+	b.Assert(arrayPtr.IsObject())
+	if arrayPtr.Object().GetHandlers() == IteratorObjectHandlers {
+		return (*ZendObjectIterator)(arrayPtr.Object())
+	}
+	return nil
+}
+
+/**
+ * types
+ */
 
 /**
  * ZendObjectIteratorFuncs
@@ -34,35 +73,21 @@ func MakeZendObjectIteratorFuncs(
 		invalidate_current: invalidate_current,
 	}
 }
-func (this *ZendObjectIteratorFuncs) GetDtor() func(iter *ZendObjectIterator) { return this.dtor }
-
-// func (this *ZendObjectIteratorFuncs) SetDtor(value func(iter *ZendObjectIterator)) { this.dtor = value }
+func (this *ZendObjectIteratorFuncs) GetDtor() func(iter *ZendObjectIterator)      { return this.dtor }
 func (this *ZendObjectIteratorFuncs) GetValid() func(iter *ZendObjectIterator) int { return this.valid }
-
-// func (this *ZendObjectIteratorFuncs) SetValid(value func(iter *ZendObjectIterator) int) { this.valid = value }
 func (this *ZendObjectIteratorFuncs) GetGetCurrentData() func(iter *ZendObjectIterator) *types.Zval {
 	return this.get_current_data
 }
-
-// func (this *ZendObjectIteratorFuncs) SetGetCurrentData(value func(iter *ZendObjectIterator) *Zval) { this.get_current_data = value }
 func (this *ZendObjectIteratorFuncs) GetGetCurrentKey() func(iter *ZendObjectIterator, key *types.Zval) {
 	return this.get_current_key
 }
-
-// func (this *ZendObjectIteratorFuncs) SetGetCurrentKey(value func(iter *ZendObjectIterator, key *Zval)) { this.get_current_key = value }
 func (this *ZendObjectIteratorFuncs) GetMoveForward() func(iter *ZendObjectIterator) {
 	return this.move_forward
 }
-
-// func (this *ZendObjectIteratorFuncs) SetMoveForward(value func(iter *ZendObjectIterator)) { this.move_forward = value }
 func (this *ZendObjectIteratorFuncs) GetRewind() func(iter *ZendObjectIterator) { return this.rewind }
-
-// func (this *ZendObjectIteratorFuncs) SetRewind(value func(iter *ZendObjectIterator)) { this.rewind = value }
 func (this *ZendObjectIteratorFuncs) GetInvalidateCurrent() func(iter *ZendObjectIterator) {
 	return this.invalidate_current
 }
-
-// func (this *ZendObjectIteratorFuncs) SetInvalidateCurrent(value func(iter *ZendObjectIterator)) { this.invalidate_current = value }
 
 /**
  * ZendObjectIterator
@@ -74,20 +99,8 @@ type ZendObjectIterator struct {
 	index ZendUlong
 }
 
-// func MakeZendObjectIterator(std ZendObject, data Zval, funcs *ZendObjectIteratorFuncs, index ZendUlong) ZendObjectIterator {
-//     return ZendObjectIterator{
-//         std:std,
-//         data:data,
-//         funcs:funcs,
-//         index:index,
-//     }
-// }
-func (this *ZendObjectIterator) GetStd() types.ZendObject { return this.std }
-
-// func (this *ZendObjectIterator) SetStd(value ZendObject) { this.std = value }
-func (this *ZendObjectIterator) GetData() types.Zval { return this.data }
-
-// func (this *ZendObjectIterator) SetData(value Zval) { this.data = value }
+func (this *ZendObjectIterator) GetStd() types.ZendObject                { return this.std }
+func (this *ZendObjectIterator) GetData() types.Zval                     { return this.data }
 func (this *ZendObjectIterator) GetFuncs() *ZendObjectIteratorFuncs      { return this.funcs }
 func (this *ZendObjectIterator) SetFuncs(value *ZendObjectIteratorFuncs) { this.funcs = value }
 func (this *ZendObjectIterator) GetIndex() ZendUlong                     { return this.index }

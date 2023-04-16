@@ -33,7 +33,7 @@ func SplRecursiveItDtor(_iter *zend.ZendObjectIterator) {
 	for object.GetLevel() > 0 {
 		if !(object.GetIterators()[object.GetLevel()].GetZobject().IsUndef()) {
 			sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
-			zend.ZendIteratorDtor(sub_iter)
+			//zend.ZendIteratorDtor(sub_iter)
 			// zend.ZvalPtrDtor(object.GetIterators()[object.GetLevel()].GetZobject())
 		}
 		object.GetLevel()--
@@ -245,7 +245,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *types.Zval
 				types.ZVAL_COPY_VALUE(&garbage, object.GetIterators()[object.GetLevel()].GetZobject())
 				object.GetIterators()[object.GetLevel()].GetZobject().SetUndef()
 				// zend.ZvalPtrDtor(&garbage)
-				zend.ZendIteratorDtor(iterator)
+				//zend.ZendIteratorDtor(iterator)
 				object.GetLevel()--
 			}
 		} else {
@@ -261,7 +261,7 @@ func SplRecursiveItRewindEx(object *SplRecursiveItObject, zthis *types.Zval) {
 	SPL_FETCH_SUB_ITERATOR(sub_iter, object)
 	for object.GetLevel() != 0 {
 		sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
-		zend.ZendIteratorDtor(sub_iter)
+		//zend.ZendIteratorDtor(sub_iter)
 		// zend.ZvalPtrDtor(object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
 		if zend.EG__().GetException() == nil && (object.GetEndChildren() == nil || object.GetEndChildren().GetScope() != spl_ce_RecursiveIteratorIterator) {
 			zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetEndChildren(), "endchildren", nil)
@@ -409,7 +409,7 @@ func SplRecursiveItItConstruct(executeData *zend.ZendExecuteData, return_value *
 		var sub_iter *zend.ZendObjectIterator
 		for intern.GetLevel() >= 0 {
 			sub_iter = intern.GetIterators()[intern.GetLevel()].GetIterator()
-			zend.ZendIteratorDtor(sub_iter)
+			//zend.ZendIteratorDtor(sub_iter)
 			// zend.ZvalPtrDtor(intern.GetIterators()[b.PostDec(&(intern.GetLevel()))].GetZobject())
 		}
 		zend.Efree(intern.GetIterators())
@@ -640,7 +640,7 @@ func spl_RecursiveIteratorIterator_dtor(_object *types.ZendObject) {
 	if object.GetIterators() != nil {
 		for object.GetLevel() >= 0 {
 			sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
-			zend.ZendIteratorDtor(sub_iter)
+			//zend.ZendIteratorDtor(sub_iter)
 			// zend.ZvalPtrDtor(object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
 		}
 		zend.Efree(object.GetIterators())
@@ -1673,7 +1673,7 @@ func SplDualItDtor(_object *types.ZendObject) {
 	zend.ZendObjectsDestroyObject(_object)
 	SplDualItFree(object)
 	if object.GetInnerIterator() != nil {
-		zend.ZendIteratorDtor(object.GetInnerIterator())
+		//zend.ZendIteratorDtor(object.GetInnerIterator())
 	}
 }
 func SplDualItFreeStorage(_object *types.ZendObject) {
@@ -1682,7 +1682,7 @@ func SplDualItFreeStorage(_object *types.ZendObject) {
 		// zend.ZvalPtrDtor(object.GetZobject())
 	}
 	if object.GetDitType() == DIT_AppendIterator {
-		zend.ZendIteratorDtor(object.GetUAppendIterator())
+		//zend.ZendIteratorDtor(object.GetUAppendIterator())
 		if object.GetZarrayit().IsNotUndef() {
 			// zend.ZvalPtrDtor(object.GetZarrayit())
 		}
@@ -2343,7 +2343,7 @@ func SplAppendItNextIterator(intern *SplDualItObject) int {
 		intern.GetZobject().SetUndef()
 		intern.SetCe(nil)
 		if intern.GetInnerIterator() != nil {
-			zend.ZendIteratorDtor(intern.GetInnerIterator())
+			//zend.ZendIteratorDtor(intern.GetInnerIterator())
 			intern.SetInnerIterator(nil)
 		}
 	}
@@ -2529,7 +2529,7 @@ func SplIteratorApply(obj *types.Zval, apply_func SplIteratorApplyFuncT, puser a
 	}
 done:
 	if iter != nil {
-		zend.ZendIteratorDtor(iter)
+		//zend.ZendIteratorDtor(iter)
 	}
 	if zend.EG__().GetException() != nil {
 		return types.FAILURE
@@ -2637,13 +2637,13 @@ func ZmStartupSplIterators(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_RecursiveIterator, 1, zend.ZendCeIterator)
 	SplRegisterStdClass(&spl_ce_RecursiveIteratorIterator, "RecursiveIteratorIterator", spl_RecursiveIteratorIterator_new, spl_funcs_RecursiveIteratorIterator)
 	zend.ZendClassImplements(spl_ce_RecursiveIteratorIterator, 1, zend.ZendCeIterator)
-	memcpy(&SplHandlersRecItIt, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&SplHandlersRecItIt, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	SplHandlersRecItIt.SetOffset(zend_long((*byte)(&((*SplRecursiveItObject)(nil).GetStd())) - (*byte)(nil)))
 	SplHandlersRecItIt.SetGetMethod(SplRecursiveItGetMethod)
 	SplHandlersRecItIt.SetCloneObj(nil)
 	SplHandlersRecItIt.SetDtorObj(spl_RecursiveIteratorIterator_dtor)
 	SplHandlersRecItIt.SetFreeObj(spl_RecursiveIteratorIterator_free_storage)
-	memcpy(&SplHandlersDualIt, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&SplHandlersDualIt, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	SplHandlersDualIt.SetOffset(zend_long((*byte)(&((*SplDualItObject)(nil).GetStd())) - (*byte)(nil)))
 	SplHandlersDualIt.SetGetMethod(SplDualItGetMethod)
 

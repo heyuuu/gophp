@@ -14,7 +14,7 @@ func IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool {
 }
 func ZEND_DECODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset)) - 2) }
 func ZEND_ENCODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ { return uintPtr(-(intptr_t(offset) + 2)) }
-func ZendGetStdObjectHandlers() *ZendObjectHandlers       { return &StdObjectHandlers }
+func ZendGetStdObjectHandlers() *ZendObjectHandlers       { return StdObjectHandlersPtr }
 func ZendGetFunctionRootClass(fbc types.IFunction) *types.ClassEntry {
 	if fbc.GetPrototype() != nil {
 		return fbc.GetPrototype().GetScope()

@@ -1473,7 +1473,7 @@ func ZmStartupSplArray(type_ int, module_number int) int {
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_ArrayAccess)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Serializable)
 	zend.ZendClassImplements(spl_ce_ArrayObject, 1, spl_ce_Countable)
-	memcpy(&spl_handler_ArrayObject, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&spl_handler_ArrayObject, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_ArrayObject.SetOffset(zend_long((*byte)(&((*SplArrayObject)(nil).GetStd())) - (*byte)(nil)))
 	spl_handler_ArrayObject.SetCloneObj(SplArrayObjectClone)
 	spl_handler_ArrayObject.SetReadDimension(SplArrayReadDimension)

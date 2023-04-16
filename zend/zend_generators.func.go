@@ -1109,7 +1109,7 @@ func ZendRegisterGeneratorCe() {
 
 	ZendClassImplements(ZendCeGenerator, 1, ZendCeIterator)
 	ZendCeGenerator.SetGetIterator(ZendGeneratorGetIterator)
-	memcpy(&ZendGeneratorHandlers, &StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&ZendGeneratorHandlers, StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	ZendGeneratorHandlers.SetFreeObj(ZendGeneratorFreeStorage)
 	ZendGeneratorHandlers.SetDtorObj(ZendGeneratorDtorStorage)
 	ZendGeneratorHandlers.SetGetGc(ZendGeneratorGetGc)

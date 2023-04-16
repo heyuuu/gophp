@@ -5,7 +5,7 @@ import "github.com/heyuuu/gophp/zend/types"
 const ZEND_WRONG_PROPERTY_INFO *ZendPropertyInfo = (*ZendPropertyInfo)(intptr_t - 1)
 const ZEND_DYNAMIC_PROPERTY_OFFSET = uintPtr(intptr_t)(-1)
 
-/* The following rule applies to read_property() and read_dimension() implementations:
+/* The following rule applies to readProperty() and read_dimension() implementations:
    If you return a zval which is not otherwise referenced by the extension or the engine's
    symbol table, its reference count should be 0.
 */
@@ -16,8 +16,8 @@ type ZendObjectReadPropertyT func(object *types.Zval, member *types.Zval, type_ 
 
 type ZendObjectReadDimensionT func(object *types.Zval, offset *types.Zval, type_ int, rv *types.Zval) *types.Zval
 
-/* The following rule applies to write_property() and write_dimension() implementations:
-   If you receive a value zval in write_property/write_dimension, you may only modify it if
+/* The following rule applies to writeProperty() and write_dimension() implementations:
+   If you receive a value zval in writeProperty/write_dimension, you may only modify it if
    its reference count is 1.  Otherwise, you must create a copy of that zval before making
    any changes.  You should NOT modify the reference count of the value passed to you.
    You must return the final value of the assigned property.
@@ -150,4 +150,27 @@ const IN_ISSET = 1 << 3
   called, we cal __call handler.
 */
 
-var StdObjectHandlers ZendObjectHandlers = MakeZendObjectHandlers(0, ZendObjectStdDtor, ZendObjectsDestroyObject, ZendObjectsCloneObj, ZendStdReadProperty, ZendStdWriteProperty, ZendStdReadDimension, ZendStdWriteDimension, ZendStdGetPropertyPtrPtr, nil, nil, ZendStdHasProperty, ZendStdUnsetProperty, ZendStdHasDimension, ZendStdUnsetDimension, ZendStdGetProperties, ZendStdGetMethod, nil, ZendStdGetConstructor, ZendStdGetClassName, ZendStdCompareObjects, ZendStdCastObjectTostring, nil, ZendStdGetDebugInfo, ZendStdGetClosure, ZendStdGetGc, nil, nil, nil)
+var StdObjectHandlersPtr *ZendObjectHandlers = NewZendObjectHandlers(ObjectHandlersSetting{
+	Offset:            0,
+	FreeObj:           ZendObjectStdDtor,
+	DtorObj:           ZendObjectsDestroyObject,
+	CloneObj:          ZendObjectsCloneObj,
+	ReadProperty:      ZendStdReadProperty,
+	WriteProperty:     ZendStdWriteProperty,
+	ReadDimension:     ZendStdReadDimension,
+	WriteDimension:    ZendStdWriteDimension,
+	GetPropertyPtrPtr: ZendStdGetPropertyPtrPtr,
+	HasProperty:       ZendStdHasProperty,
+	UnsetProperty:     ZendStdUnsetProperty,
+	HasDimension:      ZendStdHasDimension,
+	UnsetDimension:    ZendStdUnsetDimension,
+	GetProperties:     ZendStdGetProperties,
+	GetMethod:         ZendStdGetMethod,
+	GetConstructor:    ZendStdGetConstructor,
+	GetClassName:      ZendStdGetClassName,
+	CompareObjects:    ZendStdCompareObjects,
+	CastObject:        ZendStdCastObjectTostring,
+	GetDebugInfo:      ZendStdGetDebugInfo,
+	GetClosure:        ZendStdGetClosure,
+	GetGc:             ZendStdGetGc,
+})

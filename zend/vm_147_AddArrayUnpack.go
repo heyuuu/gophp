@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_ADD_ARRAY_UNPACK_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
@@ -78,7 +84,7 @@ add_unpack_again:
 				}
 				iter.GetFuncs().GetMoveForward()(iter)
 			}
-			ZendIteratorDtor(iter)
+			//ZendIteratorDtor(iter)
 		}
 	} else if op1.IsReference() {
 		op1 = types.Z_REFVAL_P(op1)

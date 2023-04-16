@@ -2300,7 +2300,7 @@ func zim_spl_SplFileObject_seek(executeData *zend.ZendExecuteData, return_value 
 }
 func ZmStartupSplDirectory(type_ int, module_number int) int {
 	SplRegisterStdClass(&spl_ce_SplFileInfo, "SplFileInfo", SplFilesystemObjectNew, spl_SplFileInfo_functions)
-	memcpy(&SplFilesystemObjectHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&SplFilesystemObjectHandlers, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	SplFilesystemObjectHandlers.SetOffset(zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd())) - (*byte)(nil)))
 	SplFilesystemObjectHandlers.SetCloneObj(SplFilesystemObjectClone)
 	SplFilesystemObjectHandlers.SetCastObject(SplFilesystemObjectCast)

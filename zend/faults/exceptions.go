@@ -653,7 +653,7 @@ func RegisterDefaultException() {
 	ce.SetBuiltinFunctions(ZendFuncsThrowable)
 	ZendCeThrowable = zend.ZendRegisterInternalInterface(&ce)
 	ZendCeThrowable.SetInterfaceGetsImplemented(ZendImplementThrowable)
-	memcpy(&DefaultExceptionHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&DefaultExceptionHandlers, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	DefaultExceptionHandlers.SetCloneObj(nil)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(types.NewString("Exception"))

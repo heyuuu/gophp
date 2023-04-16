@@ -476,7 +476,7 @@ func ZendRegisterClosureCe() {
 	ZendCeClosure.SetCreateObject(ZendClosureNew)
 	ZendCeClosure.SetSerialize(ZendClassSerializeDeny)
 	ZendCeClosure.SetUnserialize(ZendClassUnserializeDeny)
-	memcpy(&ClosureHandlers, &StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&ClosureHandlers, StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	ClosureHandlers.SetFreeObj(ZendClosureFreeStorage)
 	ClosureHandlers.SetGetConstructor(ZendClosureGetConstructor)
 	ClosureHandlers.SetGetMethod(ZendClosureGetMethod)

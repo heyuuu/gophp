@@ -121,7 +121,7 @@ send_again:
 					NumArgs()++
 				iter.GetFuncs().GetMoveForward()(iter)
 			}
-			ZendIteratorDtor(iter)
+			//ZendIteratorDtor(iter)
 		}
 	} else if args.IsReference() {
 		args = types.Z_REFVAL_P(args)

@@ -760,7 +760,7 @@ try_again:
 		} else {
 			var obj_ht *types.Array = ZendGetPropertiesFor(op, ZEND_PROP_PURPOSE_ARRAY_CAST)
 			if obj_ht != nil {
-				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
+				var new_obj_ht *types.Array = types.ZendProptableToSymtable(obj_ht, types.Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(op).GetHandlers() != StdObjectHandlersPtr || obj_ht.IsRecursive())
 				// ZvalPtrDtor(op)
 				op.SetArray(new_obj_ht)
 				ZendReleaseProperties(obj_ht)

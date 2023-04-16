@@ -877,7 +877,7 @@ func ZmStartupSplObserver(type_ int, module_number int) int {
 	SplRegisterInterface(&spl_ce_SplObserver, "SplObserver", spl_funcs_SplObserver)
 	SplRegisterInterface(&spl_ce_SplSubject, "SplSubject", spl_funcs_SplSubject)
 	SplRegisterStdClass(&spl_ce_SplObjectStorage, "SplObjectStorage", spl_SplObjectStorage_new, spl_funcs_SplObjectStorage)
-	memcpy(&spl_handler_SplObjectStorage, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&spl_handler_SplObjectStorage, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplObjectStorage.SetOffset(zend_long((*byte)(&((*spl_SplObjectStorage)(nil).GetStd())) - (*byte)(nil)))
 	spl_handler_SplObjectStorage.SetCompareObjects(SplObjectStorageCompareObjects)
 	spl_handler_SplObjectStorage.SetCloneObj(SplObjectStorageClone)

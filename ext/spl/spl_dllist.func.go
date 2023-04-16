@@ -979,7 +979,7 @@ func SplDllistGetIterator(ce *types.ClassEntry, object *types.Zval, by_ref int) 
 }
 func ZmStartupSplDllist(type_ int, module_number int) int {
 	SplRegisterStdClass(&spl_ce_SplDoublyLinkedList, "SplDoublyLinkedList", SplDllistObjectNew, spl_funcs_SplDoublyLinkedList)
-	memcpy(&spl_handler_SplDoublyLinkedList, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
+	memcpy(&spl_handler_SplDoublyLinkedList, zend.StdObjectHandlersPtr, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplDoublyLinkedList.SetOffset(zend_long((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil)))
 	spl_handler_SplDoublyLinkedList.SetCloneObj(SplDllistObjectClone)
 	spl_handler_SplDoublyLinkedList.SetCountElements(SplDllistObjectCountElements)

@@ -613,7 +613,7 @@ func ZifGetObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval)
 
 		/* fast copy */
 
-		if zobj.GetHandlers() == &StdObjectHandlers {
+		if zobj.GetHandlers() == StdObjectHandlersPtr {
 			return_value.SetArray(types.ZendProptableToSymtable(properties, 0))
 			return
 		}
@@ -696,7 +696,7 @@ func ZifGetMangledObjectVars(executeData zpp.Ex, return_value zpp.Ret, obj *type
 		return_value.SetEmptyArray()
 		return
 	}
-	properties = types.ZendProptableToSymtable(properties, types.Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(obj).GetHandlers() != &StdObjectHandlers || properties.IsRecursive())
+	properties = types.ZendProptableToSymtable(properties, types.Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || types.Z_OBJ_P(obj).GetHandlers() != StdObjectHandlersPtr || properties.IsRecursive())
 	return_value.SetArray(properties)
 	return
 }
