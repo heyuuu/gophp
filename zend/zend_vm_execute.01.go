@@ -270,12 +270,14 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 	if (call_info & (ZEND_CALL_CODE | ZEND_CALL_TOP | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_FREE_EXTRA_ARGS | ZEND_CALL_ALLOCATED)) == 0 {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		IFreeCompiledVariables(executeData)
-		if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
-			// OBJ_RELEASE(executeData.GetThis().Object())
-		} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
-			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
-		}
-		EG__().SetVmStackTop((*types.Zval)(executeData))
+		//if (call_info & ZEND_CALL_RELEASE_THIS) != 0 {
+		//	// OBJ_RELEASE(executeData.GetThis().Object())
+		//} else if (call_info & ZEND_CALL_CLOSURE) != 0 {
+		//	// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
+		//}
+
+		EG__().VmStack().PopCheck(executeData)
+
 		executeData = executeData.GetPrevExecuteData()
 		if EG__().GetException() != nil {
 			faults.RethrowException(executeData)
@@ -287,10 +289,9 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		IFreeCompiledVariables(executeData)
 		if (call_info & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
-			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable(
-
 			/* Free extra args before releasing the closure,
-			 * as that may free the op_array. */))
+			 * as that may free the op_array. */
+			ZendCleanAndCacheSymbolTable(executeData.GetSymbolTable())
 		}
 
 		ZendVmStackFreeExtraArgsEx(call_info, executeData)
@@ -301,7 +302,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		}
 		old_execute_data = executeData
 		executeData = executeData.GetPrevExecuteData()
-		ZendVmStackFreeCallFrameEx(call_info, old_execute_data)
+		ZendVmStackFreeCallFrame(old_execute_data)
 		if EG__().GetException() != nil {
 			faults.RethrowException(executeData)
 			return 2
@@ -315,7 +316,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		old_execute_data = executeData
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
 		executeData = CurrEX()
-		ZendVmStackFreeCallFrameEx(call_info, old_execute_data)
+		ZendVmStackFreeCallFrame(old_execute_data)
 		ZendAttachSymbolTable(executeData)
 		if EG__().GetException() != nil {
 			faults.RethrowException(executeData)

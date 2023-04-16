@@ -42,7 +42,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -118,7 +118,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -181,7 +181,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) in
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -253,7 +253,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -324,7 +324,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -396,7 +396,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -455,7 +455,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)
@@ -523,7 +523,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		if RETURN_VALUE_USED(opline) {
 			types.ZVAL_COPY(opline.Result(), var_ptr)
 		}
-		FREE_OP(free_op_data1)
+		// 		FREE_OP(free_op_data1)
 	} else {
 		if container.IsReference() {
 			container = types.Z_REFVAL_P(container)

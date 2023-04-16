@@ -153,9 +153,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution types.ZendB
 		/* Free closure object */
 
 		if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
-			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc(
-
-			/* Free GC buffer. GC for closed generators doesn't need an allocated buffer */ )))
+			// OBJ_RELEASE(ZEND_CLOSURE_OBJECT(executeData.GetFunc()))
 		}
 
 		if generator.GetGcBuffer() != nil {

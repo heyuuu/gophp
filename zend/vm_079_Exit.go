@@ -25,7 +25,7 @@ func ZEND_EXIT_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			}
 			break
 		}
-		FREE_OP(free_op1)
+		// 		FREE_OP(free_op1)
 	}
 	faults.Bailout()
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

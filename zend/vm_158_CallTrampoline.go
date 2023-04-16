@@ -1,5 +1,11 @@
 package zend
 
+import (
+	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var args *types.Array = nil
 	var fbc types.IFunction = executeData.GetFunc()
@@ -34,7 +40,9 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	} else {
 		call.SetFunc(fbc.GetOpArray().GetScope().GetCall())
 	}
-	b.Assert(ZendVmCalcUsedStack(2, call.GetFunc()) <= size_t((*byte)(EG__().GetVmStackEnd())-(*byte)(call)))
+
+	b.Assert(2 <= call.RuntimeCacheLen())
+
 	call.NumArgs() = 2
 	call.Arg(1).SetString(fbc.GetFunctionName())
 	if args != nil {

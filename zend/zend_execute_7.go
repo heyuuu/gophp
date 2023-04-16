@@ -6,17 +6,6 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func IZvalPtrDtorNoref(zval_ptr *types.Zval) {
-	if zval_ptr.IsRefcounted() {
-		var ref *types.ZendRefcounted = zval_ptr.RefCounted()
-		b.Assert(zval_ptr.GetType() != types.IS_REFERENCE)
-		if ref.DelRefcount() == 0 {
-			//RcDtorFunc(ref)
-			//} else if GC_MAY_LEAK(ref) {
-			//	GcPossibleRoot(ref)
-		}
-	}
-}
 func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, value_type types.ZendUchar, strict types.ZendBool, ref *types.ZendRefcounted) *types.Zval {
 	var ret types.ZendBool
 	var value types.Zval
@@ -24,7 +13,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 	ret = ZendVerifyRefAssignableZval(variable_ptr.Reference(), &value, strict)
 	variable_ptr = types.Z_REFVAL_P(variable_ptr)
 	if ret != 0 {
-		IZvalPtrDtorNoref(variable_ptr)
+		//IZvalPtrDtorNoref(variable_ptr)
 		types.ZVAL_COPY_VALUE(variable_ptr, &value)
 	} else {
 		// ZvalPtrDtorNogc(&value)
@@ -36,7 +25,7 @@ func ZendAssignToTypedRef(variable_ptr *types.Zval, orig_value *types.Zval, valu
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			}
 		} else {
-			IZvalPtrDtorNoref(orig_value)
+			//IZvalPtrDtorNoref(orig_value)
 		}
 	}
 	return variable_ptr
@@ -285,7 +274,7 @@ func IInitFuncExecuteData(op_array *types.ZendOpArray, return_value *types.Zval,
 	/* Initialize CV variables (skip arguments) */
 
 	ZendInitCvs(num_args, op_array.GetLastVar(), executeData)
-	executeData.GetRunTimeCache() = RUN_TIME_CACHE(op_array)
+	executeData.GetRuntimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }
 func InitFuncRunTimeCacheI(op_array *types.ZendOpArray) {
@@ -324,7 +313,7 @@ func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpAr
 		ZEND_MAP_PTR_SET(op_array.run_time_cache, ptr)
 		memset(ptr, 0, op_array.GetCacheSize())
 	}
-	executeData.GetRunTimeCache() = RUN_TIME_CACHE(op_array)
+	executeData.GetRuntimeCache() = RUN_TIME_CACHE(op_array)
 	EG__().SetCurrentExecuteData(executeData)
 }
 func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
@@ -334,51 +323,4 @@ func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *types.ZendOpArray, r
 		InitFuncRunTimeCache(op_array)
 	}
 	IInitFuncExecuteData(op_array, return_value, 1, executeData)
-}
-func ZendInitCodeExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
-	executeData.GetPrevExecuteData() = CurrEX()
-	IInitCodeExecuteData(executeData, op_array, return_value)
-}
-func ZendInitExecuteData(executeData *ZendExecuteData, op_array *types.ZendOpArray, return_value *types.Zval) {
-	if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
-		ZendInitCodeExecuteData(executeData, op_array, return_value)
-	} else {
-		ZendInitFuncExecuteData(executeData, op_array, return_value)
-	}
-}
-func ZendVmStackCopyCallFrame(call *ZendExecuteData, passed_args uint32, additional_args uint32) *ZendExecuteData {
-	var new_call *ZendExecuteData
-	var used_stack int = EG__().GetVmStackTop() - (*types.Zval)(call) + additional_args
-
-	/* copy call frame into new stack segment */
-
-	new_call = ZendVmStackExtend(used_stack * b.SizeOf("zval"))
-	*new_call = *call
-	ZEND_ADD_CALL_FLAG(new_call, ZEND_CALL_ALLOCATED)
-	if passed_args != 0 {
-		var src *types.Zval = call.Arg(1)
-		var dst *types.Zval = new_call.Arg(1)
-		for {
-			dst.CopyValueFrom(src)
-			passed_args--
-			src++
-			dst++
-			if passed_args == 0 {
-				break
-			}
-		}
-	}
-
-	/* delete old call_frame from previous stack segment */
-
-	EG__().GetVmStack().GetPrev().SetTop((*types.Zval)(call))
-
-	/* delete previous stack segment if it became empty */
-
-	if EG__().GetVmStack().GetPrev().GetTop() == ZEND_VM_STACK_ELEMENTS(EG__().GetVmStack().GetPrev()) {
-		var r ZendVmStack = EG__().GetVmStack().GetPrev()
-		EG__().GetVmStack().SetPrev(r.GetPrev())
-		Efree(r)
-	}
-	return new_call
 }

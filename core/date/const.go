@@ -10,4 +10,3 @@ var monShortNames = [...]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
 
 var dayFullNames = [...]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 var dayShortNames = [...]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-

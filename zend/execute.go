@@ -6,8 +6,11 @@ import (
 )
 
 func ZendVmStackPushCallFrame(callInfo uint32, func_ types.IFunction, numArgs uint32, objectOrCalledScope any) *ZendExecuteData {
-	var usedStack uint32 = ZendVmCalcUsedStack(numArgs, func_)
-	return ZendVmStackPushCallFrameEx(usedStack, callInfo, func_, numArgs, objectOrCalledScope)
+	var runtimeCacheSize uint32 = numArgs
+	if ZEND_USER_CODE(func_.GetType()) {
+		runtimeCacheSize += func_.GetOpArray().GetLastVar() + func_.GetOpArray().GetT() - b.Min(func_.GetOpArray().GetNumArgs(), numArgs)
+	}
+	return ZendVmStackPushCallFrameEx(runtimeCacheSize, callInfo, func_, numArgs, objectOrCalledScope)
 }
 
 func ZendVmCalcUsedStack(numArgs uint32, func_ types.IFunction) uint32 {
@@ -19,18 +22,13 @@ func ZendVmCalcUsedStack(numArgs uint32, func_ types.IFunction) uint32 {
 }
 
 func ZendVmStackPushCallFrameEx(usedStack uint32, callInfo uint32, func_ types.IFunction, numArgs uint32, objectOrCalledScope any) *ZendExecuteData {
-	var call *ZendExecuteData = (*ZendExecuteData)(EG__().GetVmStackTop())
-	if usedStack > size_t((*byte)(EG__().GetVmStackEnd())-(*byte)(call)) {
-		call = (*ZendExecuteData)(ZendVmStackExtend(usedStack))
-		callInfo |= ZEND_CALL_ALLOCATED
-	} else {
-		EG__().SetVmStackTop((*types.Zval)((*byte)(call + usedStack)))
-	}
-
-	ZendVmInitCallFrame(call, callInfo, func_, numArgs, objectOrCalledScope)
-	return call
+	runtimeCacheSize := usedStack/b.SizeOf("zval") - ZEND_CALL_FRAME_SLOT
+	//callInfo |= ZEND_CALL_ALLOCATED
+	return ZendVmStackPushCallFrameExEx(runtimeCacheSize, callInfo, func_, numArgs, objectOrCalledScope)
 }
 
-func ZendVmInitCallFrame(call *ZendExecuteData, call_info uint32, func_ types.IFunction, num_args uint32, objectOrCalledScope any) {
-	call.Init(call_info, func_, num_args, objectOrCalledScope)
+func ZendVmStackPushCallFrameExEx(runtimeCacheSize uint32, callInfo uint32, func_ types.IFunction, numArgs uint32, objectOrCalledScope any) *ZendExecuteData {
+	var call *ZendExecuteData = NewExecuteData(callInfo, func_, numArgs, objectOrCalledScope, runtimeCacheSize)
+	EG__().VmStack().Push(call)
+	return call
 }

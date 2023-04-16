@@ -83,7 +83,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(executeData *ZendExecuteData) int
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 	if free_op1 != nil {
 		// ZvalPtrDtorNogc(free_op1)
 	}
@@ -171,7 +171,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_TMPVAR_HANDLER(executeData *ZendExecuteData) in
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 	// ZvalPtrDtorNogc(free_op2)
 	if free_op1 != nil {
 		// ZvalPtrDtorNogc(free_op1)
@@ -259,7 +259,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 	if free_op1 != nil {
 		// ZvalPtrDtorNogc(free_op1)
 	}
@@ -336,7 +336,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(executeData *ZendExecuteData) 
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 
 	/* assign_obj has two opcodes! */
 
@@ -410,7 +410,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(executeData *ZendExecuteData)
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
@@ -484,7 +484,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(executeData *ZendExecuteData) int
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 
 	/* assign_obj has two opcodes! */
 
@@ -568,7 +568,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CONST_HANDLER(executeData *ZendExecuteData) int 
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 
 	/* assign_obj has two opcodes! */
 
@@ -652,7 +652,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_TMPVAR_HANDLER(executeData *ZendExecuteData) int
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 	// ZvalPtrDtorNogc(free_op2)
 
 	/* assign_obj has two opcodes! */
@@ -736,7 +736,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_CV_CV_HANDLER(executeData *ZendExecuteData) int {
 		}
 		break
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 
 	/* assign_obj has two opcodes! */
 

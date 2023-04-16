@@ -44,6 +44,6 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		name = ZvalGetTmpString(varname, &tmp_name)
 	}
 	ZendStdUnsetStaticProperty(ce, name)
-	FREE_OP(free_op1)
+	// 	FREE_OP(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

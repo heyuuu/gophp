@@ -45,7 +45,7 @@ send_again:
 			arg = _z
 			if name != nil {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
-				FREE_OP(free_op1)
+				// 				FREE_OP(free_op1)
 				return 0
 			}
 			top = executeData.GetCall().Arg(arg_num)
@@ -78,7 +78,7 @@ send_again:
 		} else {
 			iter = ce.GetGetIterator()(ce, args, 0)
 			if iter == nil {
-				FREE_OP(free_op1)
+				// 				FREE_OP(free_op1)
 				if EG__().GetException() == nil {
 					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
@@ -132,6 +132,6 @@ send_again:
 		}
 		faults.Error(faults.E_WARNING, "Only arrays and Traversables can be unpacked")
 	}
-	FREE_OP(free_op1)
+	// 	FREE_OP(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

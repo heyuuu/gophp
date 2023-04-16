@@ -18,7 +18,7 @@ add_unpack_again:
 			val = _z
 			if key != nil {
 				faults.ThrowError(nil, "Cannot unpack array with string keys")
-				FREE_OP(free_op1)
+				// 				FREE_OP(free_op1)
 				return 0
 			} else {
 				if val.IsReference() && val.GetRefcount() == 1 {
@@ -40,7 +40,7 @@ add_unpack_again:
 		} else {
 			iter = ce.GetGetIterator()(ce, op1, 0)
 			if iter == nil {
-				FREE_OP(free_op1)
+				// 				FREE_OP(free_op1)
 				if EG__().GetException() == nil {
 					faults.ThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 				}
@@ -86,6 +86,6 @@ add_unpack_again:
 	} else {
 		faults.ThrowError(nil, "Only arrays and Traversables can be unpacked")
 	}
-	FREE_OP(free_op1)
+	// 	FREE_OP(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

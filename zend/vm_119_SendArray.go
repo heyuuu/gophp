@@ -1,5 +1,10 @@
 package zend
 
+import (
+	"github.com/heyuuu/gophp/zend/faults"
+	"github.com/heyuuu/gophp/zend/types"
+)
+
 func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
 	var free_op1 ZendFreeOp
@@ -92,7 +97,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 					param++
 				}
 			}
-			FREE_OP(free_op2)
+			// 			FREE_OP(free_op2)
 		} else {
 			ZendVmStackExtendCallFrame(&(executeData.GetCall()), 0, ht.Len())
 			arg_num = 1
@@ -138,6 +143,6 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			}
 		}
 	}
-	FREE_OP(free_op1)
+	// 	FREE_OP(free_op1)
 	return ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION(executeData)
 }

@@ -126,7 +126,7 @@ func (this *ZendGenerator) GetValues() types.Zval { return this.values }
 func (this *ZendGenerator) GetNode() ZendGeneratorNode { return this.node }
 
 // func (this *ZendGenerator) SetNode(value ZendGeneratorNode) { this.node = value }
-func (this *ZendGenerator) GetExecuteFake() ZendExecuteData { return this.execute_fake }
+func (this *ZendGenerator) GetExecuteFake() *ZendExecuteData { return &this.execute_fake }
 
 // func (this *ZendGenerator) SetExecuteFake(value ZendExecuteData) { this.execute_fake = value }
 // func (this *ZendGenerator)  GetFlags() ZendUchar      { return this.flags }

@@ -50,9 +50,6 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_typ
 	ZendCopyToVariable(variable_ptr, value)
 	return variable_ptr
 }
-func ZEND_VM_STACK_ELEMENTS(stack ZendVmStack) __auto__ {
-	return (*types.Zval)(stack) + ZEND_VM_STACK_HEADER_SLOTS
-}
 func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
 		var count uint32 = call.NumArgs() - call.GetFunc().GetOpArray().GetNumArgs()
@@ -88,21 +85,8 @@ func ZendVmStackFreeArgs(call *ZendExecuteData) {
 		}
 	}
 }
-func ZendVmStackFreeCallFrameEx(call_info uint32, call *ZendExecuteData) {
-	if (call_info & ZEND_CALL_ALLOCATED) != 0 {
-		var p ZendVmStack = EG__().GetVmStack()
-		var prev ZendVmStack = p.GetPrev()
-		b.Assert(call == p.ElementsAsEx())
-		EG__().SetVmStackTop(prev.GetTop())
-		EG__().SetVmStackEnd(prev.GetEnd())
-		EG__().SetVmStack(prev)
-		Efree(p)
-	} else {
-		EG__().SetVmStackTop((*types.Zval)(call))
-	}
-}
 func ZendVmStackFreeCallFrame(call *ZendExecuteData) {
-	ZendVmStackFreeCallFrameEx(ZEND_CALL_INFO(call), call)
+	EG__().VmStack().PopCheck(call)
 }
 func CACHE_ADDR(num __auto__) *any {
 	return (*any)((*byte)(executeData.GetRunTimeCache() + num))
@@ -139,15 +123,6 @@ func ENCODE_SPECIAL_CACHE_NUM(num __auto__) any {
 	return any(uintPtr(num)<<1 | CACHE_SPECIAL)
 }
 func DECODE_SPECIAL_CACHE_NUM(ptr *ZendConstant) int { return uintPtr(ptr) >> 1 }
-func ENCODE_SPECIAL_CACHE_PTR(ptr __auto__) any      { return any(uintPtr(ptr) | CACHE_SPECIAL) }
-func DECODE_SPECIAL_CACHE_PTR(ptr __auto__) any {
-	return any(uintPtr(ptr) & ^CACHE_SPECIAL)
-}
-func SKIP_EXT_OPLINE(opline __auto__) {
-	for opline.opcode >= ZEND_EXT_STMT && opline.opcode <= ZEND_TICKS {
-		opline--
-	}
-}
 func ZEND_CLASS_HAS_TYPE_HINTS(ce *types.ClassEntry) bool {
 	return (ce.GetCeFlags() & AccHasTypeHints) == AccHasTypeHints
 }
@@ -160,32 +135,14 @@ func ZEND_REF_DEL_TYPE_SOURCE(ref *types.ZendReference, source *ZendPropertyInfo
 func GetZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtr(op_type, node, should_free, type_, executeData, opline)
 }
-func GetZvalPtrDeref(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
-	return _getZvalPtrDeref(op_type, node, should_free, type_, executeData, opline)
-}
 func GetZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrUndef(op_type, node, should_free, type_, executeData, opline)
 }
 func GetOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *types.Zval {
 	return _getOpDataZvalPtrR(op_type, node, should_free, executeData, opline)
 }
-func GetOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp) *types.Zval {
-	return _getOpDataZvalPtrDerefR(op_type, node, should_free, executeData, opline)
-}
 func GetZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
 	return _getZvalPtrPtr(op_type, node, should_free, type_, executeData)
-}
-func GetZvalPtrPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
-	return _getZvalPtrPtr(op_type, node, should_free, type_, executeData)
-}
-func GetObjZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
-	return _getObjZvalPtr(op_type, node, should_free, type_, executeData, opline)
-}
-func GetObjZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
-	return _getObjZvalPtrUndef(op_type, node, should_free, type_, executeData, opline)
-}
-func GetObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *types.Zval {
-	return _getObjZvalPtrPtr(op_type, node, should_free, type_, executeData)
 }
 func RETURN_VALUE_USED(opline *ZendOp) bool {
 	return opline.GetResultType() != IS_UNUSED
@@ -204,66 +161,13 @@ func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *types.Zval, result *t
 		}
 	}
 }
-func FREE_OP(should_free *types.Zval) {
-	if should_free != nil {
-		// ZvalPtrDtorNogc(should_free)
-	}
-}
-func FREE_UNFETCHED_OP(type_ types.ZendUchar, var_ uint32) {
-	if (type_ & (IS_TMP_VAR | IS_VAR)) != 0 {
-		// ZvalPtrDtorNogc(EX_VAR(executeData, var_))
-	}
-}
-func FREE_OP_VAR_PTR(should_free *types.Zval) {
-	if should_free != nil {
-		// ZvalPtrDtorNogc(should_free)
-	}
-}
 func CV_DEF_OF(i __auto__) __auto__ { return executeData.GetFunc().GetOpArray().vars[i] }
-func ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size int, page_size int) int {
-	return size + ZEND_VM_STACK_HEADER_SLOTS*b.SizeOf("zval") + (page_size-1) & ^(page_size-1)
-}
-func ZendVmStackNewPage(size int, prev ZendVmStack) ZendVmStack {
-	var page ZendVmStack = ZendVmStack(Emalloc(size))
-	page.SetTop(ZEND_VM_STACK_ELEMENTS(page))
-	page.SetEnd((*types.Zval)((*byte)(page + size)))
-	page.SetPrev(prev)
-	return page
-}
-func ZendVmStackInit() {
-	EG__().SetVmStackPageSize(ZEND_VM_STACK_PAGE_SIZE)
-	EG__().SetVmStack(ZendVmStackNewPage(ZEND_VM_STACK_PAGE_SIZE, nil))
-	EG__().SetVmStackTop(EG__().GetVmStack().GetTop())
-	EG__().SetVmStackEnd(EG__().GetVmStack().GetEnd())
-}
-func ZendVmStackInitEx(page_size int) {
-	/* page_size must be a power of 2 */
 
-	b.Assert(page_size > 0 && (page_size&page_size-1) == 0)
-	EG__().SetVmStackPageSize(page_size)
-	EG__().SetVmStack(ZendVmStackNewPage(page_size, nil))
-	EG__().SetVmStackTop(EG__().GetVmStack().GetTop())
-	EG__().SetVmStackEnd(EG__().GetVmStack().GetEnd())
+func ZendVmStackInit() {
+	EG__().VmStack().Reset()
 }
 func ZendVmStackDestroy() {
-	var stack ZendVmStack = EG__().GetVmStack()
-	for stack != nil {
-		var p ZendVmStack = stack.GetPrev()
-		Efree(stack)
-		stack = p
-	}
-}
-func ZendVmStackExtend(size int) any {
-	var stack ZendVmStack
-	var ptr any
-	stack = EG__().GetVmStack()
-	stack.SetTop(EG__().GetVmStackTop())
-	stack = ZendVmStackNewPage(b.CondF(size < EG__().GetVmStackPageSize()-ZEND_VM_STACK_HEADER_SLOTS*b.SizeOf("zval"), func() int { return EG__().GetVmStackPageSize() }, func() int { return ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size, EG__().GetVmStackPageSize()) }), stack)
-	EG__().SetVmStack(stack)
-	ptr = stack.GetTop()
-	EG__().SetVmStackTop(any((*byte)(ptr) + size))
-	EG__().SetVmStackEnd(stack.GetEnd())
-	return ptr
+	EG__().VmStack().Reset()
 }
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, executeData *ZendExecuteData) *types.Zval {
 	var ret *types.Zval = EX_VAR(executeData, var_)

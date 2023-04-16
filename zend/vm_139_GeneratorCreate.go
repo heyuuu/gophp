@@ -26,7 +26,7 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		 */
 
 		num_args = executeData.NumArgs()
-		if num_args <= executeData.GetFunc().GetOpArray().num_args {
+		if num_args <= executeData.GetFunc().GetOpArray().GetNumArgs() {
 			used_stack = (ZEND_CALL_FRAME_SLOT + executeData.GetFunc().GetOpArray().last_var + executeData.GetFunc().GetOpArray().T) * b.SizeOf("zval")
 			gen_execute_data = (*ZendExecuteData)(Emalloc(used_stack))
 			used_stack = (ZEND_CALL_FRAME_SLOT + executeData.GetFunc().GetOpArray().last_var) * b.SizeOf("zval")
@@ -48,27 +48,29 @@ func ZEND_GENERATOR_CREATE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 		gen_execute_data.SetOpline(opline + 1)
 
 		/* EX(return_value) keeps pointer to zend_object (not a real zval) */
-
 		gen_execute_data.SetReturnValue((*types.Zval)(generator))
+
 		call_info = executeData.GetThis().GetTypeInfo()
 		if (call_info&types.Z_TYPE_MASK) == types.IS_OBJECT && ((call_info&(ZEND_CALL_CLOSURE|ZEND_CALL_RELEASE_THIS)) == 0 || ZendExecuteEx != ExecuteEx) {
 			ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_RELEASE_THIS)
-			//gen_execute_data.GetThis().AddRefcount()
 		}
 		ZEND_ADD_CALL_FLAG_EX(call_info, ZEND_CALL_TOP_FUNCTION|ZEND_CALL_ALLOCATED|ZEND_CALL_GENERATOR)
 		gen_execute_data.GetThis().GetTypeInfo() = call_info
 		gen_execute_data.SetPrevExecuteData(nil)
+
 		call_info = EX_CALL_INFO()
 		EG__().SetCurrentExecuteData(executeData.GetPrevExecuteData())
+
 		if (call_info & (ZEND_CALL_TOP | ZEND_CALL_ALLOCATED)) == 0 {
-			EG__().SetVmStackTop((*types.Zval)(executeData))
+			EG__().VmStack().PopCheck(executeData)
+
 			executeData = executeData.GetPrevExecuteData()
 			ZEND_VM_INC_OPCODE(executeData)
 			return 2
 		} else if (call_info & ZEND_CALL_TOP) == 0 {
-			var old_execute_data *ZendExecuteData = executeData
+			EG__().VmStack().PopCheck(executeData)
+
 			executeData = executeData.GetPrevExecuteData()
-			ZendVmStackFreeCallFrameEx(call_info, old_execute_data)
 			ZEND_VM_INC_OPCODE(executeData)
 			return 2
 		} else {

@@ -192,22 +192,20 @@ func (this *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
  * ZendExecutorGlobals
  */
 type ZendExecutorGlobals struct {
-	uninitialized_zval                  types.Zval
-	error_zval                          types.Zval
-	symtable_cache                      []*types.Array
-	symtable_cache_limit                **types.Array
-	symtable_cache_ptr                  **types.Array
-	symbol_table                        *types.Array
-	included_files                      types.Array
-	error_reporting                     int
-	exit_status                         int
-	functionTable                       FunctionTable
-	classTable                          ClassTable
-	constantTable                       ConstantTable
-	vm_stack_top                        *types.Zval
-	vm_stack_end                        *types.Zval
-	vm_stack                            ZendVmStack
-	vm_stack_page_size                  int
+	uninitialized_zval   types.Zval
+	error_zval           types.Zval
+	symtable_cache       []*types.Array
+	symtable_cache_limit **types.Array
+	symtable_cache_ptr   **types.Array
+	symbol_table         *types.Array
+	included_files       types.Array
+	error_reporting      int
+	exit_status          int
+	functionTable        FunctionTable
+	classTable           ClassTable
+	constantTable        ConstantTable
+	vmStack              VmStack
+
 	current_execute_data                *ZendExecuteData
 	fake_scope                          *types.ClassEntry
 	precision                           ZendLong
@@ -302,6 +300,8 @@ func (this *ZendExecutorGlobals) NextObjectHandle() uint32 {
 	return this.lastObjectHandle
 }
 
+func (this *ZendExecutorGlobals) VmStack() *VmStack { return &this.vmStack }
+
 /**
  * 以下是自动生成的方法
  */
@@ -336,14 +336,6 @@ func (this *ZendExecutorGlobals) GetErrorReporting() int             { return th
 func (this *ZendExecutorGlobals) SetErrorReporting(value int)        { this.error_reporting = value }
 func (this *ZendExecutorGlobals) GetExitStatus() int                 { return this.exit_status }
 func (this *ZendExecutorGlobals) SetExitStatus(value int)            { this.exit_status = value }
-func (this *ZendExecutorGlobals) GetVmStackTop() *types.Zval         { return this.vm_stack_top }
-func (this *ZendExecutorGlobals) SetVmStackTop(value *types.Zval)    { this.vm_stack_top = value }
-func (this *ZendExecutorGlobals) GetVmStackEnd() *types.Zval         { return this.vm_stack_end }
-func (this *ZendExecutorGlobals) SetVmStackEnd(value *types.Zval)    { this.vm_stack_end = value }
-func (this *ZendExecutorGlobals) GetVmStack() ZendVmStack            { return this.vm_stack }
-func (this *ZendExecutorGlobals) SetVmStack(value ZendVmStack)       { this.vm_stack = value }
-func (this *ZendExecutorGlobals) GetVmStackPageSize() int            { return this.vm_stack_page_size }
-func (this *ZendExecutorGlobals) SetVmStackPageSize(value int)       { this.vm_stack_page_size = value }
 func (this *ZendExecutorGlobals) GetCurrentExecuteData() *ZendExecuteData {
 	return this.current_execute_data
 }

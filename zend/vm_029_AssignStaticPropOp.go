@@ -46,7 +46,7 @@ func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	if RETURN_VALUE_USED(opline) {
 		types.ZVAL_COPY(opline.Result(), prop)
 	}
-	FREE_OP(free_op_data)
+	// 	FREE_OP(free_op_data)
 
 	/* assign_static_prop has two opcodes! */
 

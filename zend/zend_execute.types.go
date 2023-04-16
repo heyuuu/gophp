@@ -1,26 +1,28 @@
 package zend
 
-import "github.com/heyuuu/gophp/zend/types"
+import (
+	b "github.com/heyuuu/gophp/builtin"
+)
 
-/**
- * ZendVmStack
- */
-type ZendVmStack = *_zendVmStack
-type _zendVmStack struct {
-	top  *types.Zval
-	end  *types.Zval
-	prev *_zendVmStack
-	// 隐藏内存
-	elements any
+type VmStack struct {
+	elements []*ZendExecuteData
 }
 
-func (this *_zendVmStack) GetTop() *types.Zval       { return this.top }
-func (this *_zendVmStack) SetTop(value *types.Zval)  { this.top = value }
-func (this *_zendVmStack) GetEnd() *types.Zval       { return this.end }
-func (this *_zendVmStack) SetEnd(value *types.Zval)  { this.end = value }
-func (this *_zendVmStack) GetPrev() ZendVmStack      { return this.prev }
-func (this *_zendVmStack) SetPrev(value ZendVmStack) { this.prev = value }
+func (s *VmStack) Reset() { s.elements = nil }
 
-// 隐藏内存
-func (this *_zendVmStack) Elements() *types.Zval          { return this.elements.(*types.Zval) }
-func (this *_zendVmStack) ElementsAsEx() *ZendExecuteData { return this.elements.(*ZendExecuteData) }
+func (s *VmStack) Push(ex *ZendExecuteData) {
+	s.elements = append(s.elements, ex)
+}
+
+func (s *VmStack) Pop() *ZendExecuteData {
+	if len(s.elements) == 0 {
+		return nil
+	}
+	top := s.elements[len(s.elements)-1]
+	s.elements = s.elements[:len(s.elements)-1]
+	return top
+}
+
+func (s *VmStack) PopCheck(ex *ZendExecuteData) {
+	b.Assert(s.Pop() == ex)
+}

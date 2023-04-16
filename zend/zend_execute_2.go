@@ -352,7 +352,7 @@ func ZendBinaryAssignOpObjDim(object *types.Zval, property *types.Zval, opline *
 			opline.Result().SetNull()
 		}
 	}
-	FREE_OP(free_op_data1)
+	// 	FREE_OP(free_op_data1)
 }
 func ZendBinaryAssignOpTypedRef(ref *types.ZendReference, value *types.Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var z_copy types.Zval

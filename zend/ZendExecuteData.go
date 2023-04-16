@@ -1,6 +1,7 @@
 package zend
 
 import (
+	b "github.com/heyuuu/gophp/builtin"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 )
@@ -16,17 +17,28 @@ type ZendExecuteData struct {
 	This            types.Zval
 	prevExecuteData *ZendExecuteData
 	symbolTable     *types.Array
-	//runTimeCache    *any
+	//runtimeCache    *any
 	// Ex
-	runTimeCache []types.Zval
+	runtimeCache []types.Zval
 }
 
-func (ex *ZendExecuteData) Init(callInfo uint32, fun types.IFunction, numArgs uint32, objectOrCalledScope any) {
+func NewExecuteData(callInfo uint32, fun types.IFunction, numArgs uint32, objectOrCalledScope any, runtimeCacheSize uint32) *ZendExecuteData {
+	ex := &ZendExecuteData{}
+
 	ex.func_ = fun
 	ex.This.SetPtr(objectOrCalledScope)
 	ex.This.SetTypeInfo(callInfo)
 	ex.This.SetNumArgs(numArgs)
 
+	ex.runtimeCache = make([]types.Zval, runtimeCacheSize)
+
+	return ex
+}
+func (ex *ZendExecuteData) Extend(passedArgs uint32, additionalArgs uint32) {
+	b.Assert(passedArgs == uint32(len(ex.runtimeCache)))
+	newRuntimeCache := make([]types.Zval, len(ex.runtimeCache)+int(additionalArgs))
+	copy(newRuntimeCache, ex.runtimeCache)
+	ex.runtimeCache = newRuntimeCache
 }
 
 func (ex *ZendExecuteData) FunctionName() string {
@@ -110,13 +122,12 @@ func (ex *ZendExecuteData) IsArgUseStrictTypes() bool  { return ex.prevExecuteDa
 
 func (ex *ZendExecuteData) NumArgs() int { return int(ex.This.GetNumArgs()) }
 func (ex *ZendExecuteData) VarNum(n int) *types.Zval {
-	if len(ex.runTimeCache) > n {
-		return &ex.runTimeCache[n]
+	if len(ex.runtimeCache) > n {
+		return &ex.runtimeCache[n]
 	}
 	return nil
 }
 func (ex *ZendExecuteData) Arg(n int) *types.Zval { return ex.VarNum(n - 1) }
-
 func (ex *ZendExecuteData) Args(start int, len_ int) []*types.Zval {
 	if len_ <= 0 {
 		return nil
@@ -135,10 +146,14 @@ func (ex *ZendExecuteData) AllArgs() []*types.Zval {
 
 func (ex *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
 	if forceStrict {
-		zpp.CheckNumArgsNoneException(ex)
+		return zpp.CheckNumArgsNoneException(ex)
 	} else {
-		zpp.CheckNumArgsNoneError(ex)
+		return zpp.CheckNumArgsNoneError(ex)
 	}
+}
+
+func (ex *ZendExecuteData) CallInfo() uint32 {
+	return ex.This.GetTypeInfo()
 }
 
 /**
@@ -161,5 +176,5 @@ func (ex *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
 func (ex *ZendExecuteData) GetSymbolTable() *types.Array      { return ex.symbolTable }
 func (ex *ZendExecuteData) SetSymbolTable(value *types.Array) { ex.symbolTable = value }
 
-func (ex *ZendExecuteData) GetRunTimeCache() any      { return ex.runTimeCache }
-func (ex *ZendExecuteData) SetRunTimeCache(value any) { ex.symbolTable = value }
+func (ex *ZendExecuteData) GetRuntimeCache() any { return ex.runtimeCache }
+func (ex *ZendExecuteData) RuntimeCacheLen() int { return len(ex.runtimeCache) }

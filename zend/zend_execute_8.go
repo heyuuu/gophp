@@ -7,24 +7,16 @@ import (
 )
 
 func ZendVmStackExtendCallFrame(call **ZendExecuteData, passed_args uint32, additional_args uint32) {
-	if uint32(EG__().GetVmStackEnd()-EG__().GetVmStackTop()) > additional_args {
-		EG__().SetVmStackTop(EG__().GetVmStackTop() + additional_args)
-	} else {
-		*call = ZendVmStackCopyCallFrame(*call, passed_args, additional_args)
-	}
+	(*call).Extend(passed_args, additional_args)
 }
 func ZendGetRunningGenerator(executeData *ZendExecuteData) *ZendGenerator {
 	/* The generator object is stored in EX(return_value) */
 
-	var generator *ZendGenerator = (*ZendGenerator)(executeData.GetReturnValue(
-
-	/* However control may currently be delegated to another generator.
-	 * That's the one we're interested in. */))
-
-	return generator
-
 	/* However control may currently be delegated to another generator.
 	 * That's the one we're interested in. */
+	var generator *ZendGenerator = (*ZendGenerator)(executeData.GetReturnValue())
+
+	return generator
 }
 func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 	if executeData.GetCall() {
