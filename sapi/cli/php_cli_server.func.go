@@ -980,11 +980,8 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 	faults.Try(func() {
 		var retval types.Zval
 		retval.SetUndef()
-		if types.SUCCESS == zend.ZendExecuteScripts(zend.ZEND_REQUIRE, &retval, 1, &zfd) {
-			if retval.IsNotUndef() {
-				decline = retval.IsFalse()
-				// zend.ZvalPtrDtor(&retval)
-			}
+		if zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, &retval, &zfd) {
+			decline = retval.IsFalse()
 		} else {
 			decline = true
 		}

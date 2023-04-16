@@ -17,7 +17,7 @@ func ZendExtensionOpArrayDtorHandler(extension *ZendExtension, op_array *types.Z
 	}
 }
 func InitOpArray(op_array *types.ZendOpArray, initial_ops_size int) {
-	op_array.init()
+	op_array.Init()
 	op_array.SetRefcount((*uint32)(Emalloc(b.SizeOf("uint32_t"))))
 	op_array.refcount = 1
 	op_array.SetLast(0)
@@ -376,12 +376,6 @@ func DestroyZendClassEntry(ce *types.ClassEntry) {
 		Free(ce)
 	}
 }
-func ZendClassAddRef(zv *types.Zval) {
-	var ce *types.ClassEntry = zv.Ptr()
-	if !ce.IsImmutable() {
-		ce.GetRefcount()++
-	}
-}
 func DestroyOpArray(op_array *types.ZendOpArray) {
 	var i uint32
 	if op_array.GetStaticVariables() != nil {
@@ -419,18 +413,6 @@ func DestroyOpArray(op_array *types.ZendOpArray) {
 		}
 	}
 	Efree(op_array.GetOpcodes())
-	if op_array.GetFunctionName() != nil {
-		// types.ZendStringReleaseEx(op_array.GetFunctionName(), 0)
-	}
-	if op_array.GetDocComment() != nil {
-		// types.ZendStringReleaseEx(op_array.GetDocComment(), 0)
-	}
-	if op_array.GetLiveRange() != nil {
-		Efree(op_array.GetLiveRange())
-	}
-	if op_array.GetTryCatchArray() != nil {
-		Efree(op_array.GetTryCatchArray())
-	}
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR) != 0 {
 		if op_array.IsDonePassTwo() {
 			ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayDtorHandler), op_array)

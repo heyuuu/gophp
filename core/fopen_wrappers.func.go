@@ -7,6 +7,7 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"os"
 )
 
 func OnUpdateBaseDir(
@@ -650,9 +651,8 @@ func ExpandFilepathWithMode(filepath *byte, real_path *byte, relative_to *byte, 
 			result = zend.VCWD_GETCWD(cwd, MAXPATHLEN)
 		}
 		if result == nil && iam != filepath {
-			var fdtest int = -1
-			fdtest = zend.VCWD_OPEN(filepath, O_RDONLY)
-			if fdtest != -1 {
+			if fp, err := os.OpenFile(filepath, os.O_RDONLY, 0); err != nil {
+				defer fp.Close()
 
 				/* return a relative file path if for any reason
 				 * we cannot cannot getcwd() and the requested,
@@ -669,7 +669,6 @@ func ExpandFilepathWithMode(filepath *byte, real_path *byte, relative_to *byte, 
 				} else {
 					real_path = zend.Estrndup(filepath, copy_len)
 				}
-				close(fdtest)
 				return real_path
 			} else {
 				cwd[0] = '0'

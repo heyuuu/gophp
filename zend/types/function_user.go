@@ -41,7 +41,7 @@ func CopyOpArray(array *ZendOpArray) *ZendOpArray {
 	return NewOpArray()
 }
 
-func (f *ZendOpArray) init() {
+func (f *ZendOpArray) Init() {
 	f.typ = zend.ZEND_USER_FUNCTION
 }
 

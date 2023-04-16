@@ -6,31 +6,28 @@ import (
 )
 
 func IS_SLASH(c byte) bool                       { return c == '/' }
-func IS_SLASH_P(c *byte) bool                    { return (*c) == '/' }
 func COPY_WHEN_ABSOLUTE(path *byte) int          { return 0 }
 func IS_ABSOLUTE_PATH(path *byte, len_ int) bool { return IS_SLASH(path[0]) }
 func PhpSysReadlink(link *byte, target *byte, target_len int) __auto__ {
 	return readlink(link, target, target_len)
 }
-func CWDG(v __auto__) __auto__                                   { return CwdGlobals.v }
-func VCWD_FOPEN(path *byte, mode string) *r.FILE                 { return r.Fopen(path, mode) }
-func VCWD_OPEN(path *byte, flags __auto__) __auto__              { return open(path, flags) }
-func VCWD_OPEN_MODE(path __auto__, flags int, mode int) __auto__ { return open(path, flags, mode) }
-func VCWD_RENAME(oldname *byte, newname *byte) int               { return r.Rename(oldname, newname) }
-func VCWD_MKDIR(pathname *byte, mode mode_t) __auto__            { return mkdir(pathname, mode) }
-func VCWD_RMDIR(pathname *byte) __auto__                         { return rmdir(pathname) }
-func VCWD_UNLINK(path *byte) __auto__                            { return unlink(path) }
-func VCWD_CHDIR(path *byte) __auto__                             { return chdir(path) }
-func VCWD_ACCESS(pathname *byte, mode __auto__) __auto__         { return access(pathname, mode) }
-func VCWD_GETCWD(buff []byte, size int) __auto__                 { return getcwd(buff, size) }
-func VCWD_CHMOD(path *byte, mode mode_t) __auto__                { return chmod(path, mode) }
-func VCWD_CHDIR_FILE(path *byte) int                             { return VirtualChdirFile(path, chdir) }
-func VCWD_STAT(path __auto__, buff *ZendStatT) __auto__          { return PhpSysStat(path, buff) }
-func VCWD_LSTAT(path *byte, buff *ZendStatT) __auto__            { return lstat(path, buff) }
-func VCWD_OPENDIR(pathname *byte) __auto__                       { return opendir(pathname) }
-func VCWD_POPEN(command *byte, type_ __auto__) __auto__          { return popen(command, type_) }
-func VCWD_REALPATH(path *byte, real_path *byte) *byte            { return TsrmRealpath(path, real_path) }
-func VCWD_UTIME(path *byte, time *__struct__utimbuf) __auto__    { return utime(path, time) }
+func CWDG__() *VirtualCwdGlobals                              { return &CwdGlobals }
+func VCWD_FOPEN(path *byte, mode string) *r.FILE              { return r.Fopen(path, mode) }
+func VCWD_RENAME(oldname *byte, newname *byte) int            { return r.Rename(oldname, newname) }
+func VCWD_MKDIR(pathname *byte, mode mode_t) __auto__         { return mkdir(pathname, mode) }
+func VCWD_RMDIR(pathname *byte) __auto__                      { return rmdir(pathname) }
+func VCWD_UNLINK(path *byte) __auto__                         { return unlink(path) }
+func VCWD_CHDIR(path *byte) __auto__                          { return chdir(path) }
+func VCWD_ACCESS(pathname *byte, mode __auto__) __auto__      { return access(pathname, mode) }
+func VCWD_GETCWD(buff []byte, size int) __auto__              { return getcwd(buff, size) }
+func VCWD_CHMOD(path *byte, mode mode_t) __auto__             { return chmod(path, mode) }
+func VCWD_CHDIR_FILE(path *byte) int                          { return VirtualChdirFile(path, chdir) }
+func VCWD_STAT(path __auto__, buff *ZendStatT) __auto__       { return PhpSysStat(path, buff) }
+func VCWD_LSTAT(path *byte, buff *ZendStatT) __auto__         { return lstat(path, buff) }
+func VCWD_OPENDIR(pathname *byte) __auto__                    { return opendir(pathname) }
+func VCWD_POPEN(command *byte, type_ __auto__) __auto__       { return popen(command, type_) }
+func VCWD_REALPATH(path *byte, real_path *byte) *byte         { return TsrmRealpath(path, real_path) }
+func VCWD_UTIME(path *byte, time *__struct__utimbuf) __auto__ { return utime(path, time) }
 func VCWD_CHOWN(path *byte, owner __auto__, group __auto__) __auto__ {
 	return chown(path, owner, group)
 }
@@ -94,15 +91,15 @@ func VirtualCwdShutdown() {
 	Free(MainCwdState.GetCwd())
 }
 func VirtualCwdActivate() int {
-	if CWDG(cwd).cwd == nil {
-		CWD_STATE_COPY(&(CWDG(cwd)), &MainCwdState)
+	if CWDG__().cwd.cwd == nil {
+		CWD_STATE_COPY(&(CWDG__().cwd), &MainCwdState)
 	}
 	return 0
 }
 func VirtualCwdDeactivate() int {
-	if CWDG(cwd).cwd != nil {
-		CWD_STATE_FREE(&(CWDG(cwd)))
-		CWDG(cwd).cwd = nil
+	if CWDG__().cwd.cwd != nil {
+		CWD_STATE_FREE(&(CWDG__().cwd))
+		CWDG__().cwd.cwd = nil
 	}
 	return 0
 }
@@ -117,12 +114,12 @@ func RealpathCacheKey(path *byte, path_len int) ZendUlong {
 	return h
 }
 func RealpathCacheClean() {
-	RealpathCacheCleanHelper(b.SizeOf("CWDG ( realpath_cache )")/b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"), CWDG(realpath_cache), &(CWDG(RealpathCacheSize)))
+	RealpathCacheCleanHelper(b.SizeOf("CWDG ( realpath_cache )")/b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"), CWDG__().realpath_cache, &(CWDG__().RealpathCacheSize))
 }
 func RealpathCacheDel(path *byte, path_len int) {
 	var key ZendUlong = RealpathCacheKey(path, path_len)
 	var n ZendUlong = key % (b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"))
-	var bucket **RealpathCacheBucket = &CWDG(realpath_cache)[n]
+	var bucket **RealpathCacheBucket = &CWDG__().realpath_cache[n]
 	for (*bucket) != nil {
 		if key == bucket.GetKey() && path_len == bucket.GetPathLen() && memcmp(path, bucket.GetPath(), path_len) == 0 {
 			var r *RealpathCacheBucket = *bucket
@@ -131,9 +128,9 @@ func RealpathCacheDel(path *byte, path_len int) {
 			/* if the pointers match then only subtract the length of the path */
 
 			if r.GetPath() == r.GetRealpath() {
-				CWDG(RealpathCacheSize) -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1
+				CWDG__().RealpathCacheSize -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1
 			} else {
-				CWDG(RealpathCacheSize) -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1 + r.GetRealpathLen() + 1
+				CWDG__().RealpathCacheSize -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1 + r.GetRealpathLen() + 1
 			}
 			Free(r)
 			return
@@ -156,7 +153,7 @@ func RealpathCacheAdd(
 		size += realpath_len + 1
 		same = 0
 	}
-	if CWDG(RealpathCacheSize)+size <= CWDG(realpath_cache_size_limit) {
+	if CWDG__().RealpathCacheSize+size <= CWDG__().realpath_cache_size_limit {
 		var bucket *RealpathCacheBucket = Malloc(size)
 		var n ZendUlong
 		if bucket == nil {
@@ -174,28 +171,28 @@ func RealpathCacheAdd(
 		}
 		bucket.SetRealpathLen(realpath_len)
 		bucket.SetIsDir(is_dir > 0)
-		bucket.SetExpires(t + CWDG(realpath_cache_ttl))
+		bucket.SetExpires(t + CWDG__().realpath_cache_ttl)
 		n = bucket.GetKey() % (b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"))
-		bucket.SetNext(CWDG(realpath_cache)[n])
-		CWDG(realpath_cache)[n] = bucket
-		CWDG(RealpathCacheSize) += size
+		bucket.SetNext(CWDG__().realpath_cache[n])
+		CWDG__().realpath_cache[n] = bucket
+		CWDG__().RealpathCacheSize += size
 	}
 }
 func RealpathCacheFind(path *byte, path_len int, t int64) *RealpathCacheBucket {
 	var key ZendUlong = RealpathCacheKey(path, path_len)
 	var n ZendUlong = key % (b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"))
-	var bucket **RealpathCacheBucket = &CWDG(realpath_cache)[n]
+	var bucket **RealpathCacheBucket = &CWDG__().realpath_cache[n]
 	for (*bucket) != nil {
-		if CWDG(realpath_cache_ttl) && bucket.GetExpires() < t {
+		if CWDG__().realpath_cache_ttl && bucket.GetExpires() < t {
 			var r *RealpathCacheBucket = *bucket
 			*bucket = bucket.GetNext()
 
 			/* if the pointers match then only subtract the length of the path */
 
 			if r.GetPath() == r.GetRealpath() {
-				CWDG(RealpathCacheSize) -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1
+				CWDG__().RealpathCacheSize -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1
 			} else {
-				CWDG(RealpathCacheSize) -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1 + r.GetRealpathLen() + 1
+				CWDG__().RealpathCacheSize -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1 + r.GetRealpathLen() + 1
 			}
 			Free(r)
 		} else if key == bucket.GetKey() && path_len == bucket.GetPathLen() && memcmp(path, bucket.GetPath(), path_len) == 0 {
@@ -206,11 +203,11 @@ func RealpathCacheFind(path *byte, path_len int, t int64) *RealpathCacheBucket {
 	}
 	return nil
 }
-func RealpathCacheSize() ZendLong { return CWDG(RealpathCacheSize) }
+func RealpathCacheSize() ZendLong { return CWDG__().RealpathCacheSize }
 func RealpathCacheMaxBuckets() ZendLong {
 	return b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]")
 }
-func RealpathCacheGetBuckets() **RealpathCacheBucket { return CWDG(realpath_cache) }
+func RealpathCacheGetBuckets() **RealpathCacheBucket { return CWDG__().realpath_cache }
 func TsrmRealpathR(
 	path *byte,
 	start int,
@@ -306,7 +303,7 @@ func TsrmRealpathR(
 		}
 		path[len_] = 0
 		save = use_realpath != CWD_EXPAND
-		if start != 0 && save != 0 && CWDG(realpath_cache_size_limit) {
+		if start != 0 && save != 0 && CWDG__().realpath_cache_size_limit {
 
 			/* cache lookup for absolute path */
 
@@ -415,7 +412,7 @@ func TsrmRealpathR(
 			memcpy(path+j, tmp+i, len_-i+1)
 			j += len_ - i
 		}
-		if save != 0 && start != 0 && CWDG(realpath_cache_size_limit) {
+		if save != 0 && start != 0 && CWDG__().realpath_cache_size_limit {
 
 			/* save absolute path in the cache */
 
@@ -473,7 +470,7 @@ func VirtualFileEx(state *CwdState, path *byte, verify_path VerifyPathFunc, use_
 		memcpy(resolved_path, path, path_length+1)
 	}
 	add_slash = use_realpath != CWD_REALPATH && path_length > 0 && IS_SLASH(resolved_path[path_length-1])
-	if CWDG(realpath_cache_ttl) {
+	if CWDG__().realpath_cache_ttl {
 		t = 0
 	} else {
 		t = -1

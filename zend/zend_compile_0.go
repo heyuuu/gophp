@@ -19,7 +19,6 @@ func MAKE_NOP(opline *ZendOp) {
 }
 func RESET_DOC_COMMENT() {
 	if CG__().GetDocComment() != nil {
-		// types.ZendStringReleaseEx(CG__().GetDocComment(), 0)
 		CG__().SetDocComment(nil)
 	}
 }

@@ -1,8 +1,10 @@
 package core
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core/date"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
@@ -11,7 +13,9 @@ import (
 	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
 	"log"
+	"os"
 	"strconv"
+	"time"
 )
 
 func SAFE_FILENAME(f __auto__) string {
@@ -496,51 +500,41 @@ func OnChangeMailForceExtra(
 }
 func PhpDuringModuleStartup() int  { return ModuleStartup }
 func PhpDuringModuleShutdown() int { return ModuleShutdown }
-func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
-	var fd int = -1
-	var error_time int64
-	if PG__().in_error_log {
-
+func PhpLogErrWithSeverity(logMessage string, syslogTypeInt int) {
+	if PG__().in_error_log != 0 {
 		/* prevent recursive invocation */
-
 		return
-
-		/* prevent recursive invocation */
-
 	}
 	PG__().in_error_log = 1
+	defer func() {
+		PG__().in_error_log = 0
+	}()
 
 	/* Try to use the specified logging location. */
-
 	if PG__().error_log != nil {
-		if !(strcmp(PG__().error_log, "syslog")) {
-			PhpSyslog(syslog_type_int, "%s", log_message)
+		errorLog := b.CastStrAuto(PG__().error_log)
+		if errorLog == "syslog" {
+			PhpSyslog(syslogTypeInt, "%s", logMessage)
 			PG__().in_error_log = 0
 			return
 		}
-		fd = zend.VCWD_OPEN_MODE(PG__().error_log, O_CREAT|O_APPEND|O_WRONLY, 0644)
-		if fd != -1 {
-			var tmp *byte
-			var len_ int
-			var error_time_str *types.String
-			time(&error_time)
-			error_time_str = php_format_date("d-M-Y H:i:s e", 13, error_time, 1)
-			len_ = Spprintf(&tmp, 0, "[%s] %s%s", error_time_str.GetVal(), log_message, PHP_EOL)
-			PhpIgnoreValue(write(fd, tmp, len_))
-			zend.Efree(tmp)
-			//types.ZendStringFree(error_time_str)
-			close(fd)
-			PG__().in_error_log = 0
+
+		f, err := os.OpenFile(errorLog, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		if err == nil {
 			return
 		}
+		defer f.Close()
+
+		errorTimeStr := date.Format("d-M-Y H:i:s e", time.Now(), false)
+		tmp := fmt.Sprintf("[%s] %s%s", errorTimeStr, logMessage, PHP_EOL)
+		_, _ = f.WriteString(tmp)
+		return
 	}
 
 	/* Otherwise fall back to the default logging location, if we have one */
-
 	if SM__().GetLogMessage() != nil {
-		SM__().GetLogMessage()(log_message, syslog_type_int)
+		SM__().GetLogMessage()(logMessage, syslogTypeInt)
 	}
-	PG__().in_error_log = 0
 }
 func PhpPrintf(format string, _ ...any) int {
 	var args va_list
@@ -1188,7 +1182,7 @@ func PhpRequestStartup() int {
 		/* Disable realpath cache if an open_basedir is set */
 
 		if PG__().open_basedir && *PG__().open_basedir {
-			zend.CWDG(realpath_cache_size_limit) = 0
+			zend.CWDG__().SetRealpathCacheSizeLimit(0)
 		}
 		if PG__().expose_php {
 			SapiAddHeader(SAPI_PHP_VERSION_HEADER)
@@ -1454,7 +1448,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	/* Disable realpath cache if an open_basedir is set */
 
 	if PG__().open_basedir && *PG__().open_basedir {
-		zend.CWDG(realpath_cache_size_limit) = 0
+		zend.CWDG__().SetRealpathCacheSizeLimit(0)
 	}
 	PG__().have_called_openlog = 0
 
@@ -1589,13 +1583,13 @@ func PhpModuleShutdown() {
 	CoreGlobalsDtor(&CoreGlobals)
 	//zend.GcGlobalsDtor()
 }
-func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
+func PhpExecuteScript(primaryFile *zend.ZendFileHandle) bool {
 	var prepend_file_p *zend.ZendFileHandle
 	var append_file_p *zend.ZendFileHandle
 	var prepend_file zend.ZendFileHandle
 	var append_file zend.ZendFileHandle
 	var old_cwd *byte
-	var retval int = 0
+	var retval bool = false
 	zend.EG__().SetExitStatus(0)
 	const OLD_CWD_SIZE = 4096
 	old_cwd = zend.DoAlloca(OLD_CWD_SIZE, use_heap)
@@ -1604,19 +1598,19 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	faults.Try(func() {
 		var realfile []byte
 		PG__().during_request_startup = 0
-		if primary_file.GetFilename() != nil && (SG__().options&SAPI_OPTION_NO_CHDIR) == 0 {
+		if primaryFile.GetFilename() != nil && (SG__().options&SAPI_OPTION_NO_CHDIR) == 0 {
 			PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, OLD_CWD_SIZE-1))
-			zend.VCWD_CHDIR_FILE(primary_file.GetFilename())
+			zend.VCWD_CHDIR_FILE(primaryFile.GetFilename())
 		}
 
 		/* Only lookup the real file path and add it to the included_files list if already opened
 		 *   otherwise it will get opened and added to the included_files list in zend_execute_scripts
 		 */
 
-		if primary_file.GetFilename() != nil && strcmp("Standard input code", primary_file.GetFilename()) && primary_file.GetOpenedPath() == nil && primary_file.GetType() != zend.ZEND_HANDLE_FILENAME {
-			if ExpandFilepath(primary_file.GetFilename(), realfile) != nil {
-				primary_file.SetOpenedPath(types.NewString(realfile))
-				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primary_file.GetOpenedPath().GetStr())
+		if primaryFile.GetFilename() != nil && strcmp("Standard input code", primaryFile.GetFilename()) && primaryFile.GetOpenedPath() == nil && primaryFile.GetType() != zend.ZEND_HANDLE_FILENAME {
+			if ExpandFilepath(primaryFile.GetFilename(), realfile) != nil {
+				primaryFile.SetOpenedPath(types.NewString(realfile))
+				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primaryFile.GetOpenedPath().GetStr())
 			}
 		}
 		if PG__().auto_prepend_file && PG__().auto_prepend_file[0] {
@@ -1643,12 +1637,12 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 
 		if zend.CG__().GetSkipShebang() != 0 && prepend_file_p != nil {
 			zend.CG__().SetSkipShebang(0)
-			if zend.ZendExecuteScripts(zend.ZEND_REQUIRE, nil, 1, prepend_file_p) == types.SUCCESS {
+			if zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, nil, prepend_file_p) {
 				zend.CG__().SetSkipShebang(1)
-				retval = zend.ZendExecuteScripts(zend.ZEND_REQUIRE, nil, 2, primary_file, append_file_p) == types.SUCCESS
+				retval = zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, nil, primaryFile, append_file_p)
 			}
 		} else {
-			retval = zend.ZendExecuteScripts(zend.ZEND_REQUIRE, nil, 3, prepend_file_p, primary_file, append_file_p) == types.SUCCESS
+			retval = zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, nil, prepend_file_p, primaryFile, append_file_p)
 		}
 	})
 

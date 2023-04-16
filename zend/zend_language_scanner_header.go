@@ -118,13 +118,13 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 	CG__().in_compilation = 1
 	CG__().ast = nil
 	CG__().ast_arena = zend_arena_create(1024 * 32)
-	if !(zendparse()) {
+	if !(Zendparse()) {
 		var last_lineno int = CG__().zend_lineno
-		var original_file_context zend_file_context
-		var original_oparray_context zend_oparray_context
-		var original_active_op_array int = CG__().active_op_array
+		var original_file_context ZendFileContext
+		var original_oparray_context ZendOparrayContext
+		var original_active_op_array int = CG__().GetActiveOpArray()
 		op_array = emalloc(b.SizeOf("zend_op_array"))
-		init_op_array(op_array, type_, INITIAL_OP_ARRAY_SIZE)
+		InitOpArray(op_array, type_, INITIAL_OP_ARRAY_SIZE)
 		CG__().active_op_array = op_array
 
 		/* Use heap to not waste arena memory */

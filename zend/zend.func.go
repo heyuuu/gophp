@@ -486,24 +486,18 @@ func ZendUserExceptionHandler() {
 		EG__().SetException(old_exception)
 	}
 }
-func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any) int {
-	var files va_list
-	var i int
-	var file_handle *ZendFileHandle
-	var op_array *types.ZendOpArray
-	va_start(files, file_count)
-	for i = 0; i < file_count; i++ {
-		file_handle = __va_arg(files, (*ZendFileHandle)(_))
-		if file_handle == nil {
+func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*ZendFileHandle) bool {
+	for _, fileHandle := range files {
+		if fileHandle == nil {
 			continue
 		}
-		op_array = ZendCompileFile(file_handle, type_)
-		if file_handle.GetOpenedPath() != nil {
-			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath().GetStr())
+		opArray := ZendCompileFile(fileHandle, typ)
+		if fileHandle.GetOpenedPath() != nil {
+			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fileHandle.GetOpenedPath().GetStr())
 		}
-		ZendDestroyFileHandle(file_handle)
-		if op_array != nil {
-			ZendExecute(op_array, retval)
+		ZendDestroyFileHandle(fileHandle)
+		if opArray != nil {
+			ZendExecute(opArray, retval)
 			faults.ExceptionRestore()
 			if EG__().GetException() != nil {
 				if EG__().GetUserExceptionHandler().IsNotUndef() {
@@ -513,16 +507,15 @@ func ZendExecuteScripts(type_ int, retval *types.Zval, file_count int, _ ...any)
 					faults.ExceptionError(EG__().GetException(), faults.E_ERROR)
 				}
 			}
-			DestroyOpArray(op_array)
-			EfreeSize(op_array, b.SizeOf("zend_op_array"))
-		} else if type_ == ZEND_REQUIRE {
-			va_end(files)
-			return types.FAILURE
+			DestroyOpArray(opArray)
+			EfreeSize(opArray, b.SizeOf("zend_op_array"))
+		} else if typ == ZEND_REQUIRE {
+			return false
 		}
 	}
-	va_end(files)
-	return types.SUCCESS
+	return true
 }
+
 func ZendMakeCompiledStringDescription(name string) string {
 	var cur_filename *byte
 	var cur_lineno int

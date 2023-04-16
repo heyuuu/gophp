@@ -27,7 +27,7 @@ func ExecuteEx(ex *ZendExecuteData) {
 	}
 	faults.ErrorNoreturn(faults.E_CORE_ERROR, "Arrived at end of main loop which shouldn't happen")
 }
-func ZendExecute(op_array *types.ZendOpArray, return_value *types.Zval) {
+func ZendExecute(opArray *types.ZendOpArray, returnValue *types.Zval) {
 	var executeData *ZendExecuteData
 	var object_or_called_scope any
 	var call_info uint32
@@ -35,20 +35,20 @@ func ZendExecute(op_array *types.ZendOpArray, return_value *types.Zval) {
 		return
 	}
 	object_or_called_scope = ZendGetThisObject(CurrEX())
-	if !object_or_called_scope {
+	if object_or_called_scope == nil {
 		object_or_called_scope = ZendGetCalledScope(CurrEX())
 		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE
 	} else {
 		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_HAS_THIS
 	}
-	executeData = ZendVmStackPushCallFrame(call_info, (types.IFunction)(op_array), 0, object_or_called_scope)
+	executeData = ZendVmStackPushCallFrame(call_info, (types.IFunction)(opArray), 0, object_or_called_scope)
 	if CurrEX() != nil {
 		executeData.SetSymbolTable(ZendRebuildSymbolTable())
 	} else {
 		executeData.SetSymbolTable(EG__().GetSymbolTable())
 	}
 	executeData.GetPrevExecuteData() = CurrEX()
-	IInitCodeExecuteData(executeData, op_array, return_value)
+	IInitCodeExecuteData(executeData, opArray, returnValue)
 	ZendExecuteEx(executeData)
 	ZendVmStackFreeCallFrame(executeData)
 }

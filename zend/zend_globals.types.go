@@ -225,7 +225,7 @@ type ZendExecutorGlobals struct {
 	persistent_list                     types.Array
 	user_error_handler_error_reporting  int
 	user_error_handler                  types.Zval
-	user_exception_handler              types.Zval
+	user_exception_handler              *types.Zval
 	user_error_handlers_error_reporting ZendStack
 	user_error_handlers                 ZendStack
 	user_exception_handlers             ZendStack
@@ -405,10 +405,10 @@ func (this *ZendExecutorGlobals) GetUserErrorHandler() *types.Zval { return &thi
 func (this *ZendExecutorGlobals) SetUserErrorHandler(value types.Zval) {
 	this.user_error_handler = value
 }
-func (this *ZendExecutorGlobals) GetUserExceptionHandler() types.Zval {
+func (this *ZendExecutorGlobals) GetUserExceptionHandler() *types.Zval {
 	return this.user_exception_handler
 }
-func (this *ZendExecutorGlobals) SetUserExceptionHandler(value types.Zval) {
+func (this *ZendExecutorGlobals) SetUserExceptionHandler(value *types.Zval) {
 	this.user_exception_handler = value
 }
 func (this *ZendExecutorGlobals) GetUserErrorHandlersErrorReporting() ZendStack {
