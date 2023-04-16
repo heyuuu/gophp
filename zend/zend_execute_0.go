@@ -53,35 +53,6 @@ func ZendAssignToVariable(variable_ptr *types.Zval, value *types.Zval, value_typ
 func ZEND_VM_STACK_ELEMENTS(stack ZendVmStack) __auto__ {
 	return (*types.Zval)(stack) + ZEND_VM_STACK_HEADER_SLOTS
 }
-func ZendVmInitCallFrame(call *ZendExecuteData, call_info uint32, func_ types.IFunction, num_args uint32, object_or_called_scope any) {
-	call.SetFunc(func_)
-	call.GetThis().Ptr() = object_or_called_scope
-	ZEND_CALL_INFO(call) = call_info
-	call.NumArgs() = num_args
-}
-func ZendVmStackPushCallFrameEx(used_stack uint32, call_info uint32, func_ types.IFunction, num_args uint32, object_or_called_scope any) *ZendExecuteData {
-	var call *ZendExecuteData = (*ZendExecuteData)(EG__().GetVmStackTop())
-	if used_stack > size_t((*byte)(EG__().GetVmStackEnd())-(*byte)(call)) {
-		call = (*ZendExecuteData)(ZendVmStackExtend(used_stack))
-		ZendVmInitCallFrame(call, call_info|ZEND_CALL_ALLOCATED, func_, num_args, object_or_called_scope)
-		return call
-	} else {
-		EG__().SetVmStackTop((*types.Zval)((*byte)(call + used_stack)))
-		ZendVmInitCallFrame(call, call_info, func_, num_args, object_or_called_scope)
-		return call
-	}
-}
-func ZendVmCalcUsedStack(num_args uint32, func_ types.IFunction) uint32 {
-	var used_stack uint32 = ZEND_CALL_FRAME_SLOT + num_args
-	if ZEND_USER_CODE(func_.GetType()) {
-		used_stack += func_.GetOpArray().GetLastVar() + func_.GetOpArray().GetT() - b.Min(func_.GetOpArray().GetNumArgs(), num_args)
-	}
-	return used_stack * b.SizeOf("zval")
-}
-func ZendVmStackPushCallFrame(call_info uint32, func_ types.IFunction, num_args uint32, object_or_called_scope any) *ZendExecuteData {
-	var used_stack uint32 = ZendVmCalcUsedStack(num_args, func_)
-	return ZendVmStackPushCallFrameEx(used_stack, call_info, func_, num_args, object_or_called_scope)
-}
 func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_FREE_EXTRA_ARGS) != 0 {
 		var count uint32 = call.NumArgs() - call.GetFunc().GetOpArray().GetNumArgs()

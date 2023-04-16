@@ -46,7 +46,3 @@ const ZEND_VM_STACK_PAGE_SLOTS = 16 * 1024
 var ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
 
 var ZEND_FAKE_OP_ARRAY *types.ZendOpArray = (*types.ZendOpArray)(zend_intptr_t - 1)
-var _zendVmStackPushCallFrameEx = ZendVmStackPushCallFrameEx
-var _zendVmStackPushCallFrame = ZendVmStackPushCallFrame
-
-const VM_SMART_OPCODES = 1

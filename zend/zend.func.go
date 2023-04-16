@@ -508,7 +508,6 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*ZendFileHandle)
 				}
 			}
 			DestroyOpArray(opArray)
-			EfreeSize(opArray, b.SizeOf("zend_op_array"))
 		} else if typ == ZEND_REQUIRE {
 			return false
 		}

@@ -20,7 +20,7 @@ func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(executeData *ZendExecuteData) in
 		}
 		CACHE_PTR(opline.GetResult().GetNum(), fbc)
 	}
-	call = _zendVmStackPushCallFrame(ZEND_CALL_NESTED_FUNCTION, fbc, opline.GetExtendedValue(), nil)
+	call = ZendVmStackPushCallFrame(ZEND_CALL_NESTED_FUNCTION, fbc, opline.GetExtendedValue(), nil)
 	call.SetPrevExecuteData(executeData.GetCall())
 	executeData.GetCall() = call
 	return ZEND_VM_NEXT_OPCODE(executeData, opline)

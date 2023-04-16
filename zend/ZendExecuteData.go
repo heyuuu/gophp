@@ -21,12 +21,20 @@ type ZendExecuteData struct {
 	runTimeCache []types.Zval
 }
 
-func (this *ZendExecuteData) FunctionName() string {
-	if this == nil {
+func (ex *ZendExecuteData) Init(callInfo uint32, fun types.IFunction, numArgs uint32, objectOrCalledScope any) {
+	ex.func_ = fun
+	ex.This.SetPtr(objectOrCalledScope)
+	ex.This.SetTypeInfo(callInfo)
+	ex.This.SetNumArgs(numArgs)
+
+}
+
+func (ex *ZendExecuteData) FunctionName() string {
+	if ex == nil {
 		return ""
 	}
 
-	activeFunc := this.GetFunc()
+	activeFunc := ex.GetFunc()
 	if activeFunc == nil {
 		return ""
 	}
@@ -42,12 +50,12 @@ func (this *ZendExecuteData) FunctionName() string {
 		return ""
 	}
 }
-func (this *ZendExecuteData) ClassName() string {
-	if this == nil {
+func (ex *ZendExecuteData) ClassName() string {
+	if ex == nil {
 		return ""
 	}
 
-	activeFunc := this.GetFunc()
+	activeFunc := ex.GetFunc()
 	if activeFunc == nil {
 		return ""
 	}
@@ -63,12 +71,12 @@ func (this *ZendExecuteData) ClassName() string {
 		return ""
 	}
 }
-func (this *ZendExecuteData) CalleeName() string {
-	if this == nil {
+func (ex *ZendExecuteData) CalleeName() string {
+	if ex == nil {
 		return ""
 	}
 
-	activeFunc := this.GetFunc()
+	activeFunc := ex.GetFunc()
 	if activeFunc == nil {
 		return ""
 	}
@@ -93,23 +101,23 @@ func (this *ZendExecuteData) CalleeName() string {
 	}
 }
 
-func (this *ZendExecuteData) isStrictTypes() bool {
-	return this != nil && this.func_ != nil && this.func_.IsStrictTypes()
+func (ex *ZendExecuteData) isStrictTypes() bool {
+	return ex != nil && ex.func_ != nil && ex.func_.IsStrictTypes()
 }
-func (this *ZendExecuteData) IsCallUseStrictTypes() bool { return this.isStrictTypes() } // ZEND_RET_USES_STRICT_TYPES
-func (this *ZendExecuteData) IsRetUseStrictTypes() bool  { return this.isStrictTypes() }
-func (this *ZendExecuteData) IsArgUseStrictTypes() bool  { return this.prevExecuteData.isStrictTypes() } // ZEND_ARG_USES_STRICT_TYPES
+func (ex *ZendExecuteData) IsCallUseStrictTypes() bool { return ex.isStrictTypes() } // ZEND_RET_USES_STRICT_TYPES
+func (ex *ZendExecuteData) IsRetUseStrictTypes() bool  { return ex.isStrictTypes() }
+func (ex *ZendExecuteData) IsArgUseStrictTypes() bool  { return ex.prevExecuteData.isStrictTypes() } // ZEND_ARG_USES_STRICT_TYPES
 
-func (this *ZendExecuteData) NumArgs() int { return int(this.This.GetNumArgs()) }
-func (this *ZendExecuteData) VarNum(n int) *types.Zval {
-	if len(this.runTimeCache) > n {
-		return &this.runTimeCache[n]
+func (ex *ZendExecuteData) NumArgs() int { return int(ex.This.GetNumArgs()) }
+func (ex *ZendExecuteData) VarNum(n int) *types.Zval {
+	if len(ex.runTimeCache) > n {
+		return &ex.runTimeCache[n]
 	}
 	return nil
 }
-func (this *ZendExecuteData) Arg(n int) *types.Zval { return this.VarNum(n - 1) }
+func (ex *ZendExecuteData) Arg(n int) *types.Zval { return ex.VarNum(n - 1) }
 
-func (this *ZendExecuteData) Args(start int, len_ int) []*types.Zval {
+func (ex *ZendExecuteData) Args(start int, len_ int) []*types.Zval {
 	if len_ <= 0 {
 		return nil
 	}
@@ -117,41 +125,41 @@ func (this *ZendExecuteData) Args(start int, len_ int) []*types.Zval {
 	// todo 确认是否可简化为 slice 操作
 	result := make([]*types.Zval, len_)
 	for i := 0; i < len_; i++ {
-		result[i] = this.Arg(start + i)
+		result[i] = ex.Arg(start + i)
 	}
 	return result
 }
-func (this *ZendExecuteData) AllArgs() []*types.Zval {
-	return this.Args(1, this.NumArgs())
+func (ex *ZendExecuteData) AllArgs() []*types.Zval {
+	return ex.Args(1, ex.NumArgs())
 }
 
-func (this *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
+func (ex *ZendExecuteData) CheckNumArgsNone(forceStrict bool) bool {
 	if forceStrict {
-		zpp.CheckNumArgsNoneException(this)
+		zpp.CheckNumArgsNoneException(ex)
 	} else {
-		zpp.CheckNumArgsNoneError(this)
+		zpp.CheckNumArgsNoneError(ex)
 	}
 }
 
 /**
  * Getter/Setter
  */
-func (this *ZendExecuteData) GetOpline() *ZendOp                   { return this.opline }
-func (this *ZendExecuteData) SetOpline(value *ZendOp)              { this.opline = value }
-func (this *ZendExecuteData) GetCall() *ZendExecuteData            { return this.call }
-func (this *ZendExecuteData) SetCall(value *ZendExecuteData)       { this.call = value }
-func (this *ZendExecuteData) GetReturnValue() *types.Zval          { return this.returnValue }
-func (this *ZendExecuteData) SetReturnValue(value *types.Zval)     { this.returnValue = value }
-func (this *ZendExecuteData) GetFunc() types.IFunction             { return this.func_ }
-func (this *ZendExecuteData) SetFunc(value types.IFunction)        { this.func_ = value }
-func (this *ZendExecuteData) GetThis() *types.Zval                 { return &this.This }
-func (this *ZendExecuteData) SetThis(zv *types.Zval)               { this.This = *zv }
-func (this *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return this.prevExecuteData }
-func (this *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
-	this.prevExecuteData = value
+func (ex *ZendExecuteData) GetOpline() *ZendOp                   { return ex.opline }
+func (ex *ZendExecuteData) SetOpline(value *ZendOp)              { ex.opline = value }
+func (ex *ZendExecuteData) GetCall() *ZendExecuteData            { return ex.call }
+func (ex *ZendExecuteData) SetCall(value *ZendExecuteData)       { ex.call = value }
+func (ex *ZendExecuteData) GetReturnValue() *types.Zval          { return ex.returnValue }
+func (ex *ZendExecuteData) SetReturnValue(value *types.Zval)     { ex.returnValue = value }
+func (ex *ZendExecuteData) GetFunc() types.IFunction             { return ex.func_ }
+func (ex *ZendExecuteData) SetFunc(value types.IFunction)        { ex.func_ = value }
+func (ex *ZendExecuteData) GetThis() *types.Zval                 { return &ex.This }
+func (ex *ZendExecuteData) SetThis(zv *types.Zval)               { ex.This = *zv }
+func (ex *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return ex.prevExecuteData }
+func (ex *ZendExecuteData) SetPrevExecuteData(value *ZendExecuteData) {
+	ex.prevExecuteData = value
 }
-func (this *ZendExecuteData) GetSymbolTable() *types.Array      { return this.symbolTable }
-func (this *ZendExecuteData) SetSymbolTable(value *types.Array) { this.symbolTable = value }
+func (ex *ZendExecuteData) GetSymbolTable() *types.Array      { return ex.symbolTable }
+func (ex *ZendExecuteData) SetSymbolTable(value *types.Array) { ex.symbolTable = value }
 
-func (this *ZendExecuteData) GetRunTimeCache() any      { return this.runTimeCache }
-func (this *ZendExecuteData) SetRunTimeCache(value any) { this.symbolTable = value }
+func (ex *ZendExecuteData) GetRunTimeCache() any      { return ex.runTimeCache }
+func (ex *ZendExecuteData) SetRunTimeCache(value any) { ex.symbolTable = value }

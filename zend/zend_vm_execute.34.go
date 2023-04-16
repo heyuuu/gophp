@@ -29,19 +29,19 @@ func ExecuteEx(ex *ZendExecuteData) {
 }
 func ZendExecute(opArray *types.ZendOpArray, returnValue *types.Zval) {
 	var executeData *ZendExecuteData
-	var object_or_called_scope any
-	var call_info uint32
+	var objectOrCalledScope any
+	var callInfo uint32
 	if EG__().GetException() != nil {
 		return
 	}
-	object_or_called_scope = ZendGetThisObject(CurrEX())
-	if object_or_called_scope == nil {
-		object_or_called_scope = ZendGetCalledScope(CurrEX())
-		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE
+	objectOrCalledScope = ZendGetThisObject(CurrEX())
+	if objectOrCalledScope == nil {
+		objectOrCalledScope = ZendGetCalledScope(CurrEX())
+		callInfo = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE
 	} else {
-		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_HAS_THIS
+		callInfo = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_HAS_THIS
 	}
-	executeData = ZendVmStackPushCallFrame(call_info, (types.IFunction)(opArray), 0, object_or_called_scope)
+	executeData = ZendVmStackPushCallFrame(callInfo, (types.IFunction)(opArray), 0, objectOrCalledScope)
 	if CurrEX() != nil {
 		executeData.SetSymbolTable(ZendRebuildSymbolTable())
 	} else {

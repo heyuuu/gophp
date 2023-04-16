@@ -845,17 +845,11 @@ func SplArraySetArray(object *types.Zval, intern *SplArrayObject, array *types.Z
 		return
 	}
 	if array.IsType(types.IS_ARRAY) {
-		// zend.ZvalPtrDtor(intern.GetArray())
 		if array.GetRefcount() == 1 {
 			types.ZVAL_COPY(intern.GetArray(), array)
 		} else {
-
 			//??? TODO: try to avoid array duplication
-
 			intern.GetArray().SetArray(types.ZendArrayDup(array.Array()))
-
-			//??? TODO: try to avoid array duplication
-
 		}
 	} else {
 		if types.Z_OBJ_HT_P(array) == &spl_handler_ArrayObject || types.Z_OBJ_HT_P(array) == &spl_handler_ArrayIterator {
