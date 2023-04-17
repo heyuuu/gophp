@@ -378,7 +378,7 @@ func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ 
 	var fileatime zend.ZendLong = 0
 	var ret int
 	var argc int = executeData.NumArgs()
-	var file *r.FILE
+	var file *r.File
 	var newtimebuf __struct__utimbuf
 	var newtime *__struct__utimbuf = &newtimebuf
 	var wrapper *core.PhpStreamWrapper
@@ -461,7 +461,7 @@ func ZifTouch(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ 
 			return_value.SetFalse()
 			return
 		}
-		r.Fclose(file)
+		file.Close()
 	}
 	ret = zend.VCWD_UTIME(filename, newtime)
 	if ret == -1 {

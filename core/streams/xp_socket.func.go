@@ -325,7 +325,7 @@ func PhpSockopCast(stream *core.PhpStream, castas int, ret *any) int {
 	switch castas {
 	case core.PHP_STREAM_AS_STDIO:
 		if ret != nil {
-			*((**r.FILE)(ret)) = fdopen(sock.GetSocket(), stream.GetMode())
+			*((**r.File)(ret)) = fdopen(sock.GetSocket(), stream.GetMode())
 			if *ret {
 				return types.SUCCESS
 			}

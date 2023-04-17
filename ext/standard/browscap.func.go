@@ -232,13 +232,12 @@ func PhpBrowscapParserCb(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.Zval, c
 		}
 	}
 }
-func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int {
-	var fh zend.ZendFileHandle
-	if filename == nil || filename[0] == '0' {
+func BrowscapReadFile(filename string, browdata *BrowserData) int {
+	if filename == "" {
 		return types.FAILURE
 	}
-	fh.InitFp(zend.VCWD_FOPEN(filename, "r"), filename)
-	if fh.GetFp() == nil {
+	var fh = zend.NewFileHandleByOpenFile(filename, "r")
+	if fh == nil {
 		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return types.FAILURE
 	}
@@ -269,7 +268,7 @@ func ZmStartupBrowscap(type_ int, module_number int) int {
 	/* ctor call not really needed for non-ZTS */
 
 	if browscap != nil && browscap[0] {
-		if BrowscapReadFile(browscap, &GlobalBdata, 1) == types.FAILURE {
+		if BrowscapReadFile(browscap, &GlobalBdata) == types.FAILURE {
 			return types.FAILURE
 		}
 	}
@@ -435,7 +434,7 @@ func ZifGetBrowser(executeData zpp.Ex, return_value zpp.Ret, _ zpp.Opt, browserN
 	if BROWSCAP_G(activation_bdata).filename[0] != '0' {
 		bdata = &(BROWSCAP_G(activation_bdata))
 		if bdata.GetHtab() == nil {
-			if BrowscapReadFile(bdata.GetFilename(), bdata, 0) == types.FAILURE {
+			if BrowscapReadFile(bdata.GetFilename(), bdata) == types.FAILURE {
 				return_value.SetFalse()
 				return
 			}

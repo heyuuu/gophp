@@ -288,7 +288,7 @@ func PhpInitConfig() int {
 	var open_basedir *byte
 	var free_ini_search_path int = 0
 	var opened_path *types.String = nil
-	var fp *r.FILE
+	var fp *r.File
 	var filename *byte
 	Config().Init()
 	if SM__().GetIniDefaults() != nil {
@@ -420,18 +420,12 @@ func PhpInitConfig() int {
 	}
 	PG__().open_basedir = open_basedir
 	if fp != nil {
-		var fh zend.ZendFileHandle
-		fh.InitFp(fp, filename)
+		var fh *zend.FileHandle = zend.NewFileHandleByFp(filename, fp)
 		RESET_ACTIVE_INI_HASH()
-		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
+		zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 		var tmp types.Zval
 		tmp.SetString(types.NewString(fh.GetFilename()))
-		Config().Set("cfg_file_path", fh.GetFilenameStr())
-		if opened_path != nil {
-			// types.ZendStringReleaseEx(opened_path, 0)
-		} else {
-			zend.Efree((*byte)(fh.GetFilename()))
-		}
+		Config().Set("cfg_file_path", fh.GetFilename())
 		PhpIniOpenedPath = zend.ZendStrndup(tmp.String().GetVal(), tmp.String().GetLen())
 	}
 
@@ -505,10 +499,9 @@ func PhpInitConfig() int {
 					}
 					if zend.VCWD_STAT(ini_file, &sb) == 0 {
 						if zend.S_ISREG(sb.st_mode) {
-							var fh zend.ZendFileHandle
-							fh.InitFp(zend.VCWD_FOPEN(ini_file, "r"), ini_file)
-							if fh.GetFp() != nil {
-								if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash()) == types.SUCCESS {
+							var fh *zend.FileHandle = zend.NewFileHandleByOpenFile(ini_file, "r")
+							if fh != nil {
+								if zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash()) == types.SUCCESS {
 
 									/* Here, add it to the list of ini files read */
 
@@ -584,14 +577,13 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.A
 	Snprintf(ini_file, MAXPATHLEN, "%s%c%s", dirname, zend.DEFAULT_SLASH, ini_filename)
 	if zend.VCWD_STAT(ini_file, &sb) == 0 {
 		if zend.S_ISREG(sb.st_mode) {
-			var fh zend.ZendFileHandle
-			fh.InitFp(zend.VCWD_FOPEN(ini_file, "r"), ini_file)
-			if fh.GetFp() != nil {
+			var fh *zend.FileHandle = zend.NewFileHandleByOpenFile(ini_file, "r")
+			if fh != nil {
 
 				/* Reset active ini section */
 
 				RESET_ACTIVE_INI_HASH()
-				if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), target_hash) == types.SUCCESS {
+				if zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), target_hash) == types.SUCCESS {
 
 					/* FIXME: Add parsed file to the list of user files read? */
 

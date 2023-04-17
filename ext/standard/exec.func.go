@@ -19,7 +19,7 @@ func ZmStartupExec(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func PhpExec(type_ int, cmd *byte, array *types.Zval, return_value *types.Zval) int {
-	var fp *r.FILE
+	var fp *r.File
 	var buf *byte
 	var l int = 0
 	var pclose_return int
@@ -406,7 +406,7 @@ func ZifEscapeshellarg(executeData zpp.Ex, return_value zpp.Ret, arg *types.Zval
 	}
 }
 func ZifShellExec(executeData zpp.Ex, return_value zpp.Ret, cmd *types.Zval) {
-	var in *r.FILE
+	var in *r.File
 	var command *byte
 	var command_len int
 	var ret *types.String

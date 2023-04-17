@@ -109,7 +109,7 @@ func PhpStreamUrlWrapPhp(
 	var token *byte = nil
 	var pathdup *byte
 	var max_memory zend.ZendLong
-	var file *r.FILE = nil
+	var file *r.File = nil
 	if !(strncasecmp(path, "php://", 6)) {
 		path += 6
 	}

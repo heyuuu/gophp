@@ -739,7 +739,7 @@ func ZifPopen(executeData zpp.Ex, return_value zpp.Ret, command *types.Zval, mod
 	var mode *byte
 	var command_len int
 	var mode_len int
-	var fp *r.FILE
+	var fp *r.File
 	var stream *core.PhpStream
 	var posix_mode *byte
 	for {

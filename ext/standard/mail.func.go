@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
@@ -414,7 +415,7 @@ func PhpMailDetectMultipleCrlf(hdr *byte) int {
 	return 0
 }
 func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *byte) int {
-	var sendmail *r.FILE
+	var sendmail *r.File
 	var ret int
 	var sendmail_path *byte = zend.INI_STR("sendmail_path")
 	var sendmail_cmd *byte = nil
@@ -496,12 +497,12 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			}
 			return 0
 		}
-		r.Fprintf(sendmail, "To: %s\n", to)
-		r.Fprintf(sendmail, "Subject: %s\n", subject)
+		_, _ = sendmail.WriteString(fmt.Sprintf("To: %s\n", to))
+		_, _ = sendmail.WriteString(fmt.Sprintf("Subject: %s\n", subject))
 		if hdr != nil {
-			r.Fprintf(sendmail, "%s\n", hdr)
+			_, _ = sendmail.WriteString(fmt.Sprintf("%s\n", hdr))
 		}
-		r.Fprintf(sendmail, "\n%s\n", message)
+		_, _ = sendmail.WriteString(fmt.Sprintf("\n%s\n", message))
 		ret = pclose(sendmail)
 		if ret != 0 {
 			if hdr != headers {

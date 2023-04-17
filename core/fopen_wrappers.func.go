@@ -275,8 +275,8 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 
 	/* Nothing to check... */
 }
-func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.String) *r.FILE {
-	var fp *r.FILE
+func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.String) *r.File {
+	var fp *r.File
 	if PhpCheckOpenBasedir((*byte)(path)) != 0 {
 		return nil
 	}
@@ -293,7 +293,7 @@ func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **types.Strin
 	}
 	return fp
 }
-func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
+func PhpFopenPrimaryScript() *zend.FileHandle {
 	var path_info *byte
 	var filename *byte = nil
 	var resolved_path *string = nil
@@ -355,7 +355,8 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 	}
 	orig_display_errors = PG__().display_errors
 	PG__().display_errors = 0
-	if zend.ZendStreamOpen(filename, file_handle) == types.FAILURE {
+	fileHandle := zend.NewFileHandleByOpenStream(filename)
+	if fileHandle == nil {
 		PG__().display_errors = orig_display_errors
 		if SG__().RequestInfo.path_translated != filename {
 			if filename != nil {
@@ -366,7 +367,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 			zend.Efree(SG__().RequestInfo.path_translated)
 			SG__().RequestInfo.path_translated = nil
 		}
-		return types.FAILURE
+		return nil
 	}
 	PG__().display_errors = orig_display_errors
 	if SG__().RequestInfo.path_translated != filename {
@@ -375,7 +376,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 		}
 		SG__().RequestInfo.path_translated = filename
 	}
-	return types.SUCCESS
+	return fileHandle
 }
 func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, path *byte) *types.String {
 	var resolved_path []byte
@@ -515,12 +516,12 @@ func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, pat
 	}
 	return nil
 }
-func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **types.String) *r.FILE {
+func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **types.String) *r.File {
 	var pathbuf *byte
 	var ptr *byte
 	var end *byte
 	var trypath []byte
-	var fp *r.FILE
+	var fp *r.File
 	var filename_length int
 	var exec_filename *types.String
 	if opened_path != nil {

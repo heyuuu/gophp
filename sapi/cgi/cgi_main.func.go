@@ -2,7 +2,6 @@ package cgi
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/sapi/cli"
 	"github.com/heyuuu/gophp/zend"
@@ -10,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"log"
+	"os"
 	"sort"
 )
 
@@ -90,7 +90,7 @@ func SapiFcgiUbWrite(str *byte, str_length int) int {
 	return str_length
 }
 func SapiCgiFlush(server_context any) {
-	if r.Fflush(stdout) == r.EOF {
+	if err := os.Stdout.Sync(); err != nil {
 		core.PhpHandleAbortedConnection()
 	}
 }

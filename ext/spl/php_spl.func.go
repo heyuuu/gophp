@@ -169,44 +169,35 @@ func ZifSplClasses(executeData zpp.Ex, return_value zpp.Ret) {
 	SplAddClasses(spl_ce_UnderflowException, return_value, 0, 0, 0)
 	SplAddClasses(spl_ce_UnexpectedValueException, return_value, 0, 0, 0)
 }
-func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext_len int) int {
-	var class_file *byte
-	var class_file_len int
+func SplAutoload(className string, lcName string, ext *byte, ext_len int) int {
 	var dummy types.Zval
-	var file_handle zend.ZendFileHandle
-	var new_op_array *types.ZendOpArray
+	var opArray *types.ZendOpArray
 	var result types.Zval
-	var ret int
-	class_file_len = int(core.Spprintf(&class_file, 0, "%s%.*s", lc_name.GetVal(), ext_len, ext))
-	ret = core.PhpStreamOpenForZendEx(class_file, &file_handle, core.USE_PATH|core.STREAM_OPEN_FOR_INCLUDE)
-	if ret == types.SUCCESS {
+
+	classFile := lcName + b.CastStr(ext, ext_len)
+	fh := core.PhpStreamOpenForZendEx(classFile, core.USE_PATH|core.STREAM_OPEN_FOR_INCLUDE)
+	if fh != nil {
 		var opened_path *types.String
-		if file_handle.GetOpenedPath() == nil {
-			file_handle.SetOpenedPath(types.NewString(b.CastStr(class_file, class_file_len)))
+		if fh.GetOpenedPath() == "" {
+			fh.SetOpenedPath(classFile)
 		}
-		opened_path = file_handle.GetOpenedPath().Copy()
+		opened_path = fh.GetOpenedPath().Copy()
 		dummy.SetNull()
 		if zend.EG__().GetIncludedFiles().KeyAdd(opened_path.GetStr(), &dummy) != nil {
-			new_op_array = zend.CompileFile(&file_handle, zend.ZEND_REQUIRE)
-			zend.ZendDestroyFileHandle(&file_handle)
+			opArray = zend.CompileFile(fh, zend.ZEND_REQUIRE)
+			zend.ZendDestroyFileHandle(fh)
 		} else {
-			new_op_array = nil
-			file_handle.Destroy()
+			opArray = nil
+			fh.Destroy()
 		}
-		// types.ZendStringReleaseEx(opened_path, 0)
-		if new_op_array != nil {
+		if opArray != nil {
 			result.SetUndef()
-			zend.ZendExecute(new_op_array, &result)
-			zend.DestroyOpArray(new_op_array)
-			zend.Efree(new_op_array)
-			if zend.EG__().GetException() == nil {
-				// zend.ZvalPtrDtor(&result)
-			}
-			zend.Efree(class_file)
-			return types.IntBool(zend.EG__().ClassTable().Exists(lc_name.GetStr()))
+			zend.ZendExecute(opArray, &result)
+			zend.DestroyOpArray(opArray)
+			zend.Efree(opArray)
+			return types.IntBool(zend.EG__().ClassTable().Exists(lcName.GetStr()))
 		}
 	}
-	zend.Efree(class_file)
 	return 0
 }
 func ZifSplAutoload(executeData zpp.Ex, return_value zpp.Ret, className *types.Zval, _ zpp.Opt, fileExtensions *types.Zval) {

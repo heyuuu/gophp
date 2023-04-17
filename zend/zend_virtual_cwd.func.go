@@ -12,8 +12,7 @@ func PhpSysReadlink(link *byte, target *byte, target_len int) __auto__ {
 	return readlink(link, target, target_len)
 }
 func CWDG__() *VirtualCwdGlobals                              { return &CwdGlobals }
-func VCWD_FOPEN(path *byte, mode string) *r.FILE              { return r.Fopen(path, mode) }
-func VCWD_RENAME(oldname *byte, newname *byte) int            { return r.Rename(oldname, newname) }
+func VCWD_FOPEN(path *byte, mode string) *r.File              { return r.Fopen(path, mode) }
 func VCWD_MKDIR(pathname *byte, mode mode_t) __auto__         { return mkdir(pathname, mode) }
 func VCWD_RMDIR(pathname *byte) __auto__                      { return rmdir(pathname) }
 func VCWD_UNLINK(path *byte) __auto__                         { return unlink(path) }

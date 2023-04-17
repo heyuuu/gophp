@@ -250,7 +250,7 @@ func ZendHaveSeenSymbol(name *types.String, kind uint32) types.ZendBool {
 	var zv *types.Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	return zv != nil && (zv.Long()&kind) != 0
 }
-func FileHandleDtor(fh *ZendFileHandle) { fh.Destroy() }
+func FileHandleDtor(fh *FileHandle) { fh.Destroy() }
 func InitCompiler() {
 	CG__().SetActiveOpArray(nil)
 	memset(CG__().GetContext(), 0, b.SizeOf("CG ( context )"))

@@ -176,7 +176,7 @@ const IniFilename any = SCNG(filename)
 /* {{{ init_ini_scanner()
  */
 
-func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
+func InitIniScanner(scanner_mode int, fh *FileHandle) int {
 	/* Sanity check */
 
 	if scanner_mode != ZEND_INI_SCANNER_NORMAL && scanner_mode != ZEND_INI_SCANNER_RAW && scanner_mode != ZEND_INI_SCANNER_TYPED {
@@ -221,12 +221,15 @@ func ZendIniScannerGetFilename() *byte {
 
 /* }}} */
 
-func ZendIniOpenFileForScanning(fh *ZendFileHandle, scanner_mode int) int {
-	var buf *byte
+func ZendIniOpenFileForScanning(fh *FileHandle, scanner_mode int) int {
+	var buf []byte
 	var size int
-	if ZendStreamFixup(fh, &buf, &size) == types.FAILURE {
+
+	buf, ok := fh.Fixup()
+	if !ok {
 		return types.FAILURE
 	}
+
 	if InitIniScanner(scanner_mode, fh) == types.FAILURE {
 		fh.Destroy()
 		return types.FAILURE

@@ -10,7 +10,7 @@ import (
 	"github.com/heyuuu/gophp/zend/zpp"
 )
 
-func PhpIptcPut1(fp *r.FILE, spool int, c uint8, spoolbuf **uint8) int {
+func PhpIptcPut1(fp *r.File, spool int, c uint8, spoolbuf **uint8) int {
 	if spool > 0 {
 		core.PUTC(c)
 	}
@@ -19,11 +19,11 @@ func PhpIptcPut1(fp *r.FILE, spool int, c uint8, spoolbuf **uint8) int {
 	}
 	return c
 }
-func PhpIptcGet1(fp *r.FILE, spool int, spoolbuf **uint8) int {
-	var c int
+func PhpIptcGet1(fp *r.File, spool int, spoolbuf **uint8) int {
+	var c byte
 	var cc byte
-	c = r.Getc(fp)
-	if c == r.EOF {
+	c, ok := fp.GetC()
+	if !ok {
 		return r.EOF
 	}
 	if spool > 0 {
@@ -35,13 +35,13 @@ func PhpIptcGet1(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	}
 	return c
 }
-func PhpIptcReadRemaining(fp *r.FILE, spool int, spoolbuf **uint8) int {
+func PhpIptcReadRemaining(fp *r.File, spool int, spoolbuf **uint8) int {
 	for PhpIptcGet1(fp, spool, spoolbuf) != r.EOF {
 		continue
 	}
 	return M_EOI
 }
-func PhpIptcSkipVariable(fp *r.FILE, spool int, spoolbuf **uint8) int {
+func PhpIptcSkipVariable(fp *r.File, spool int, spoolbuf **uint8) int {
 	var length uint
 	var c1 int
 	var c2 int
@@ -60,7 +60,7 @@ func PhpIptcSkipVariable(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	}
 	return 0
 }
-func PhpIptcNextMarker(fp *r.FILE, spool int, spoolbuf **uint8) int {
+func PhpIptcNextMarker(fp *r.File, spool int, spoolbuf **uint8) int {
 	var c int
 
 	/* skip unimportant stuff */
@@ -96,7 +96,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 	var iptcdata_len int
 	var jpeg_file_len int
 	var spool zend.ZendLong = 0
-	var fp *r.FILE
+	var fp *r.File
 	var marker uint
 	var done uint = 0
 	var inx int
@@ -142,7 +142,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
 	}
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xff {
-		r.Fclose(fp)
+		fp.Close()
 		if spoolbuf != nil {
 			// types.ZendStringEfree(spoolbuf)
 		}
@@ -150,7 +150,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 		return
 	}
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xd8 {
-		r.Fclose(fp)
+		fp.Close()
 		if spoolbuf != nil {
 			// types.ZendStringEfree(spoolbuf)
 		}
@@ -170,7 +170,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 			/* we are going to write a new APP13 marker, so don't output the old one */
 
 			PhpIptcSkipVariable(fp, 0, 0)
-			r.Fgetc(fp)
+			fp.GetC()
 			PhpIptcReadRemaining(fp, spool, b.Cond(poi != nil, &poi, 0))
 			done = 1
 		case M_APP0:
@@ -210,7 +210,7 @@ func ZifIptcembed(executeData zpp.Ex, return_value zpp.Ret, iptcdata *types.Zval
 			PhpIptcSkipVariable(fp, spool, b.Cond(poi != nil, &poi, 0))
 		}
 	}
-	r.Fclose(fp)
+	fp.Close()
 	if spool < 2 {
 		spoolbuf = types.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()))
 		return_value.SetString(spoolbuf)

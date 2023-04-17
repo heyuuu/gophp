@@ -1037,51 +1037,24 @@ func ZifSetTimeLimit(seconds int) bool {
 	return zend.ZendAlterIniEntryChars("max_execution_time", strconv.Itoa(seconds), PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 }
 
-func PhpZendStreamCloser(handle any) { PhpStreamClose((*PhpStream)(handle)) }
-func PhpZendStreamFsizer(handle any) int {
-	var stream *PhpStream = handle
-	var ssb PhpStreamStatbuf
-
-	/* File size reported by stat() may be inaccurate if stream filters are used.
-	 * TODO: Should stat() be generally disabled if filters are used? */
-
-	if stream.GetReadfilters().GetHead() != nil {
-		return 0
-	}
-	if PhpStreamStat(stream, &ssb) == 0 {
-		return ssb.GetSb().st_size
-	}
-	return 0
+func PhpStreamOpenForZend(filename string) *zend.FileHandle {
+	return PhpStreamOpenForZendEx(filename, USE_PATH|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE)
 }
-func PhpStreamOpenForZend(filename string, handle *zend.ZendFileHandle) int {
-	return PhpStreamOpenForZendEx(filename, handle, USE_PATH|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE)
-}
-func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode int) int {
-	var opened_path *types.String
-	var stream *PhpStream = PhpStreamOpenWrapper((*byte)(filename), "rb", mode, &opened_path)
+
+func PhpStreamOpenForZendEx(filename string, mode int) *zend.FileHandle {
+	var openedPath *types.String
+	var stream *PhpStream = PhpStreamOpenWrapper(filename, "rb", mode, &openedPath)
 	if stream != nil {
-		memset(handle, 0, b.SizeOf("zend_file_handle"))
-		handle.SetType(zend.ZEND_HANDLE_STREAM)
-		handle.SetFilename((*byte)(filename))
-		handle.SetOpenedPath(opened_path)
-		handle.SetStream(zend.MakeZendStream(
-			stream,
-			0,
-			zend.ZendStreamReaderT(_phpStreamRead),
-			PhpZendStreamFsizer,
-			PhpZendStreamCloser,
-		))
+		handle := zend.NewFileHandleByStream(filename, openedPath.GetStr(), NewPhpStreamForZend(stream))
 
 		/* suppress warning if this stream is not explicitly closed */
-
 		PhpStreamAutoCleanup(stream)
 
 		/* Disable buffering to avoid double buffering between PHP and Zend streams. */
-
 		PhpStreamSetOption(stream, PHP_STREAM_OPTION_READ_BUFFER, PHP_STREAM_BUFFER_NONE, nil)
-		return types.SUCCESS
+		return handle
 	}
-	return types.FAILURE
+	return nil
 }
 func PhpResolvePathForZend(filename string) *string {
 	var result string
@@ -1563,11 +1536,11 @@ func PhpModuleShutdown() {
 	CoreGlobalsDtor(&CoreGlobals)
 	//zend.GcGlobalsDtor()
 }
-func PhpExecuteScript(primaryFile *zend.ZendFileHandle) bool {
-	var prepend_file_p *zend.ZendFileHandle
-	var append_file_p *zend.ZendFileHandle
-	var prepend_file zend.ZendFileHandle
-	var append_file zend.ZendFileHandle
+func PhpExecuteScript(primaryFile *zend.FileHandle) bool {
+	var prepend_file_p *zend.FileHandle
+	var append_file_p *zend.FileHandle
+	var prepend_file zend.FileHandle
+	var append_file zend.FileHandle
 	var old_cwd *byte
 	var retval bool = false
 	zend.EG__().SetExitStatus(0)
@@ -1587,21 +1560,19 @@ func PhpExecuteScript(primaryFile *zend.ZendFileHandle) bool {
 		 *   otherwise it will get opened and added to the included_files list in zend_execute_scripts
 		 */
 
-		if primaryFile.GetFilename() != nil && strcmp("Standard input code", primaryFile.GetFilename()) && primaryFile.GetOpenedPath() == nil && primaryFile.GetType() != zend.ZEND_HANDLE_FILENAME {
+		if primaryFile.GetFilename() != nil && strcmp("Standard input code", primaryFile.GetFilename()) && primaryFile.GetOpenedPath() == nil && !primaryFile.IsTypeHandleFileName() {
 			if ExpandFilepath(primaryFile.GetFilename(), realfile) != nil {
-				primaryFile.SetOpenedPath(types.NewString(realfile))
+				primaryFile.SetOpenedPath(realfile)
 				types.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primaryFile.GetOpenedPath().GetStr())
 			}
 		}
 		if PG__().auto_prepend_file && PG__().auto_prepend_file[0] {
-			prepend_file.InitFilename(PG__().auto_prepend_file)
-			prepend_file_p = &prepend_file
+			prepend_file_p = zend.NewFileHandleByFilename(PG__().auto_prepend_file)
 		} else {
 			prepend_file_p = nil
 		}
 		if PG__().auto_append_file && PG__().auto_append_file[0] {
-			append_file.InitFilename(PG__().auto_append_file)
-			append_file_p = &append_file
+			append_file_p = zend.NewFileHandleByFilename(PG__().auto_append_file)
 		} else {
 			append_file_p = nil
 		}
@@ -1677,7 +1648,7 @@ func PhpHandleAuthData(auth *byte) int {
 	}
 	return ret
 }
-func PhpLintScript(file *zend.ZendFileHandle) int {
+func PhpLintScript(file *zend.FileHandle) int {
 	var op_array *types.ZendOpArray
 	var retval int = types.FAILURE
 

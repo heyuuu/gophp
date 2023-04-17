@@ -878,10 +878,9 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 		/* can't handle paths that contain nul bytes */
 
 	}
-	var zfd zend.ZendFileHandle
-	zend.ZendStreamInitFilename(&zfd, core.SG__().RequestInfo.path_translated)
+	var zfd *zend.FileHandle = zend.NewFileHandleByFilename(core.SG__().RequestInfo.path_translated)
 	faults.Try(func() {
-		core.PhpExecuteScript(&zfd)
+		core.PhpExecuteScript(zfd)
 	})
 	PhpCliServerLogResponse(client, core.SG__().sapi_headers.http_response_code, nil)
 	return types.SUCCESS
@@ -971,16 +970,16 @@ func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClien
 }
 func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient) int {
 	var decline = false
-	var zfd zend.ZendFileHandle
+	var zfd *zend.FileHandle
 	var old_cwd *byte
 	old_cwd = zend.DoAlloca(core.MAXPATHLEN, use_heap)
 	old_cwd[0] = '0'
 	core.PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, core.MAXPATHLEN-1))
-	zend.ZendStreamInitFilename(&zfd, server.GetRouter())
+	zfd = zend.NewFileHandleByFilename(server.GetRouter())
 	faults.Try(func() {
 		var retval types.Zval
 		retval.SetUndef()
-		if zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, &retval, &zfd) {
+		if zend.ZendExecuteScriptsEx(zend.ZEND_REQUIRE, &retval, zfd) {
 			decline = retval.IsFalse()
 		} else {
 			decline = true

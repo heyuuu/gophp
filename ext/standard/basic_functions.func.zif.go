@@ -292,7 +292,7 @@ var DefZifPhpStripWhitespace = def.DefFunc("php_strip_whitespace", 1, 1, []def.A
 	if fp.HasError() {
 		return
 	}
-	ZifPhpStripWhitespace(executeData, returnValue, file_name)
+	ZifPhpStripWhitespace(returnValue, file_name)
 })
 
 // generate by ZifHighlightString

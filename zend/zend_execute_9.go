@@ -23,7 +23,6 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	case ZEND_INCLUDE_ONCE:
 		fallthrough
 	case ZEND_REQUIRE_ONCE:
-		var file_handle ZendFileHandle
 		var resolved_path *string
 		resolved_path = core.PhpResolvePathForZend(inc_filename.String().GetStr())
 		if resolved_path != nil {
@@ -38,19 +37,20 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		} else {
 			*resolved_path = inc_filename.String().GetStr()
 		}
-		if types.SUCCESS == ZendStreamOpen(*resolved_path, &file_handle) {
-			if file_handle.GetOpenedPath() == nil {
-				file_handle.SetOpenedPath(resolved_path.Copy())
+
+		if fh := NewFileHandleByOpenStream(*resolved_path); fh != nil {
+			if fh.GetOpenedPath() == "" {
+				fh.SetOpenedPath(*resolved_path)
 			}
-			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath().GetStr()) != nil {
-				var op_array *types.ZendOpArray = CompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
-				ZendDestroyFileHandle(&file_handle)
+			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fh.GetOpenedPath().GetStr()) != nil {
+				var op_array *types.ZendOpArray = CompileFile(&fh, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
+				ZendDestroyFileHandle(&fh)
 				if tmp_inc_filename.IsNotUndef() {
 
 				}
 				return op_array
 			} else {
-				file_handle.Destroy()
+				fh.Destroy()
 			already_compiled:
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}

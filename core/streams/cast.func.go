@@ -9,7 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *r.FILE {
+func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *r.File {
 	return funopen(cookie, funcs.GetReader(), funcs.GetWriter(), funcs.GetSeeker(), funcs.GetCloser())
 }
 func StreamCookieReader(cookie any, buffer *byte, size int) int {
@@ -88,7 +88,7 @@ func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int)
 	if castas == core.PHP_STREAM_AS_STDIO {
 		if stream.GetStdiocast() != nil {
 			if ret != nil {
-				*((**r.FILE)(ret)) = stream.GetStdiocast()
+				*((**r.File)(ret)) = stream.GetStdiocast()
 			}
 			goto exit_success
 		}
@@ -107,7 +107,7 @@ func O_phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int)
 		}
 		var fixed_mode []byte
 		PhpStreamModeSanitizeFdopenFopencookie(stream, fixed_mode)
-		*((**r.FILE)(ret)) = Fopencookie(stream, fixed_mode, PHP_STREAM_COOKIE_FUNCTIONS)
+		*((**r.File)(ret)) = Fopencookie(stream, fixed_mode, PHP_STREAM_COOKIE_FUNCTIONS)
 		if (*ret) != nil {
 			var pos zend.ZendOffT
 			stream.SetFcloseStdiocast(core.PHP_STREAM_FCLOSE_FOPENCOOKIE)
@@ -162,15 +162,15 @@ exit_success:
 
 	}
 	if castas == core.PHP_STREAM_AS_STDIO && ret != nil {
-		stream.SetStdiocast(*((**r.FILE)(ret)))
+		stream.SetStdiocast(*((**r.File)(ret)))
 	}
 	if (flags & core.PHP_STREAM_CAST_RELEASE) != 0 {
 		core.PhpStreamFree(stream, core.PHP_STREAM_FREE_CLOSE_CASTED)
 	}
 	return types.SUCCESS
 }
-func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.String) *r.FILE {
-	var fp *r.FILE = nil
+func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **types.String) *r.File {
+	var fp *r.File = nil
 	var stream *core.PhpStream = nil
 	stream = core.PhpStreamOpenWrapperRel(path, mode, options|core.STREAM_WILL_CAST, opened_path)
 	if stream == nil {

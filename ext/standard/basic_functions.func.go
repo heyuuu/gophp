@@ -12,6 +12,7 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
 	"math"
+	"os"
 )
 
 func BG__() *PhpBasicGlobals { return &BasicGlobals }
@@ -1399,35 +1400,21 @@ func ZifHighlightFile(executeData zpp.Ex, return_value zpp.Ret, fileName *types.
 		return
 	}
 }
-func ZifPhpStripWhitespace(executeData zpp.Ex, return_value zpp.Ret, fileName *types.Zval) {
-	var filename *byte
-	var filename_len int
-	var original_lex_state zend.ZendLexState
-	var file_handle zend.ZendFileHandle
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			filename, filename_len = fp.ParsePath()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
+func ZifPhpStripWhitespace(return_value zpp.Ret, fileName string) {
+	var originalLexState zend.ZendLexState
 	core.PhpOutputStartDefault()
-	file_handle.InitFilename(filename)
-	zend.ZendSaveLexicalState(&original_lex_state)
-	if zend.OpenFileForScanning(&file_handle) == types.FAILURE {
-		zend.ZendRestoreLexicalState(&original_lex_state)
+
+	fh := zend.NewFileHandleByFilename(fileName)
+	zend.ZendSaveLexicalState(&originalLexState)
+	if zend.OpenFileForScanning(fh) == types.FAILURE {
+		zend.ZendRestoreLexicalState(&originalLexState)
 		core.PhpOutputEnd()
 		return_value.SetStringVal("")
 		return
 	}
 	zend.ZendStrip()
-	zend.ZendDestroyFileHandle(&file_handle)
-	zend.ZendRestoreLexicalState(&original_lex_state)
+	zend.ZendDestroyFileHandle(fh)
+	zend.ZendRestoreLexicalState(&originalLexState)
 	core.PhpOutputGetContents(return_value)
 	core.PhpOutputDiscard()
 }
@@ -1875,7 +1862,7 @@ func ZifMoveUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Z
 		return_value.SetFalse()
 		return
 	}
-	if zend.VCWD_RENAME(path, new_path) == 0 {
+	if err := os.Rename(path, new_path); err == nil {
 		successful = 1
 		oldmask = umask(077)
 		umask(oldmask)
@@ -1961,19 +1948,15 @@ func PhpIniParserCbWithSections(arg1 *types.Zval, arg2 *types.Zval, arg3 *types.
 		PhpSimpleIniParserCb(arg1, arg2, arg3, callback_type, active_arr)
 	}
 }
-func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Zval, _ zpp.Opt, processSections *types.Zval, scannerMode *types.Zval) {
-	var filename *byte = nil
-	var filename_len int = 0
-	var process_sections types.ZendBool = 0
+func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename string, _ zpp.Opt, processSections_ *types.Zval, scannerMode *types.Zval) {
+	var processSections types.ZendBool = 0
 	var scanner_mode zend.ZendLong = zend.ZEND_INI_SCANNER_NORMAL
-	var fh zend.ZendFileHandle
 	var ini_parser_cb zend.ZendIniParserCbT
 	for {
 		for {
 			fp := zpp.FastParseStart(executeData, 1, 3, 0)
-			filename, filename_len = fp.ParsePath()
 			fp.StartOptional()
-			process_sections = fp.ParseBool()
+			processSections = fp.ParseBool()
 			scanner_mode = fp.ParseLong()
 			if fp.HasError() {
 				return_value.SetFalse()
@@ -1983,7 +1966,7 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Z
 		}
 		break
 	}
-	if filename_len == 0 {
+	if filename == "" {
 		core.PhpErrorDocref(nil, faults.E_WARNING, "Filename cannot be empty!")
 		return_value.SetFalse()
 		return
@@ -1991,7 +1974,7 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Z
 
 	/* Set callback function */
 
-	if process_sections != 0 {
+	if processSections != 0 {
 		BG__().active_ini_file_section.SetUndef()
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
@@ -2000,9 +1983,9 @@ func ZifParseIniFile(executeData zpp.Ex, return_value zpp.Ret, filename *types.Z
 
 	/* Setup filehandle */
 
-	fh.InitFilename(filename)
+	fh := zend.NewFileHandleByFilename(filename)
 	zend.ArrayInit(return_value)
-	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
+	if zend.ZendParseIniFile(fh, 0, int(scanner_mode), ini_parser_cb, return_value) == types.FAILURE {
 		return_value.Array().DestroyEx()
 		return_value.SetFalse()
 		return

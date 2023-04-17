@@ -8,12 +8,13 @@ import (
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
+	"os"
 )
 
 func PhpStreamFopenFromFdIntRel(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
 	return _phpStreamFopenFromFdInt(fd, mode, persistent_id)
 }
-func PhpStreamFopenFromFileIntRel(file *r.FILE, mode *byte) *core.PhpStream {
+func PhpStreamFopenFromFileIntRel(file *r.File, mode *byte) *core.PhpStream {
 	return _phpStreamFopenFromFileInt(file, mode)
 }
 func PLAIN_WRAP_BUF_SIZE(st int) int { return st }
@@ -78,7 +79,7 @@ func _phpStreamFopenFromFdInt(fd int, mode *byte, persistent_id *byte) *core.Php
 	self.SetFd(fd)
 	return core.PhpStreamAllocRel(&PhpStreamStdioOps, self, persistent_id, mode)
 }
-func _phpStreamFopenFromFileInt(file *r.FILE, mode *byte) *core.PhpStream {
+func _phpStreamFopenFromFileInt(file *r.File, mode *byte) *core.PhpStream {
 	var self *PhpStdioStreamData
 	self = EmallocRelOrig(b.SizeOf("* self"))
 	memset(self, 0, b.SizeOf("* self"))
@@ -133,7 +134,7 @@ func _phpStreamFopenFromFd(fd int, mode *byte, persistent_id *byte) *core.PhpStr
 	}
 	return stream
 }
-func _phpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {
+func _phpStreamFopenFromFile(file *r.File, mode *byte) *core.PhpStream {
 	var stream *core.PhpStream = PhpStreamFopenFromFileIntRel(file, mode)
 	if stream != nil {
 		var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
@@ -147,7 +148,7 @@ func _phpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {
 	}
 	return stream
 }
-func _phpStreamFopenFromPipe(file *r.FILE, mode *byte) *core.PhpStream {
+func _phpStreamFopenFromPipe(file *r.File, mode *byte) *core.PhpStream {
 	var self *PhpStdioStreamData
 	var stream *core.PhpStream
 	self = EmallocRelOrig(b.SizeOf("* self"))
@@ -189,7 +190,11 @@ func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			zend.ZendFseek(data.GetFile(), 0, r.SEEK_CUR)
 		}
 		data.SetLastOp('w')
-		return ssize_t(r.Fwrite(buf, 1, count, data.GetFile()))
+		size, err := data.GetFile().Write(buf)
+		if err != nil {
+			return r.EOF
+		}
+		return size
 	}
 }
 func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
@@ -200,13 +205,13 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		ret = read(data.GetFd(), buf, PLAIN_WRAP_BUF_SIZE(count))
 		if ret == size_t-1 && errno == EINTR {
 
-			/* Read was interrupted, retry once,
+			/* read was interrupted, retry once,
 			   If read still fails, giveup with feof==0
 			   so script can retry if desired */
 
 			ret = read(data.GetFd(), buf, PLAIN_WRAP_BUF_SIZE(count))
 
-			/* Read was interrupted, retry once,
+			/* read was interrupted, retry once,
 			   If read still fails, giveup with feof==0
 			   so script can retry if desired */
 
@@ -242,8 +247,8 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			zend.ZendFseek(data.GetFile(), 0, r.SEEK_CUR)
 		}
 		data.SetLastOp('r')
-		ret = r.Fread(buf, 1, count, data.GetFile())
-		stream.SetEof(r.Feof(data.GetFile()))
+		ret, _ = data.GetFile().Read(buf[:count])
+		stream.SetEof(data.GetFile().Eof())
 	}
 	return ret
 }
@@ -264,7 +269,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 					ret = WEXITSTATUS(ret)
 				}
 			} else {
-				ret = r.Fclose(data.GetFile())
+				ret = data.GetFile().Close()
 				data.SetFile(nil)
 			}
 		} else if data.GetFd() != -1 {
@@ -300,7 +305,7 @@ func PhpStdiopFlush(stream *core.PhpStream) int {
 	 */
 
 	if data.GetFile() != nil {
-		return r.Fflush(data.GetFile())
+		return data.GetFile().Flush()
 	}
 	return 0
 }
@@ -349,7 +354,7 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 					return types.FAILURE
 				}
 			}
-			*((**r.FILE)(ret)) = data.GetFile()
+			*((**r.File)(ret)) = data.GetFile()
 			data.SetFd(core.SOCK_ERR)
 		}
 		return types.SUCCESS
@@ -368,7 +373,7 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 			return types.FAILURE
 		}
 		if data.GetFile() != nil {
-			r.Fflush(data.GetFile())
+			data.GetFile().Flush()
 		}
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = fd
@@ -724,8 +729,7 @@ func PhpPlainFilesRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to 
 	if core.PhpCheckOpenBasedir(url_from) != 0 || core.PhpCheckOpenBasedir(url_to) != 0 {
 		return 0
 	}
-	ret = zend.VCWD_RENAME(url_from, url_to)
-	if ret == -1 {
+	if err := os.Rename(url_from, url_to); err != nil {
 		core.PhpErrorDocref2(nil, url_from, url_to, faults.E_WARNING, "%s", strerror(errno))
 		return 0
 	}
@@ -867,12 +871,12 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	case core.PHP_STREAM_META_TOUCH:
 		newtime = (*__struct__utimbuf)(value)
 		if zend.VCWD_ACCESS(url, F_OK) != 0 {
-			var file *r.FILE = zend.VCWD_FOPEN(url, "w")
+			var file *r.File = zend.VCWD_FOPEN(url, "w")
 			if file == nil {
 				core.PhpErrorDocref1(nil, url, faults.E_WARNING, "Unable to create file %s because %s", url, strerror(errno))
 				return 0
 			}
-			r.Fclose(file)
+			file.Close()
 		}
 		ret = zend.VCWD_UTIME(url, newtime)
 	case core.PHP_STREAM_META_OWNER_NAME:

@@ -3,7 +3,6 @@ package zend
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -240,12 +239,6 @@ func ZendPrintZvalR(expr *types.Zval, indent int) {
 	ZendWrite(str.GetStr())
 	// types.ZendStringReleaseEx(str, 0)
 }
-func ZendFopenWrapper(filename string, opened_path *string) *r.FILE {
-	if opened_path != nil {
-		*opened_path = filename
-	}
-	return r.Fopen(filename, "rb")
-}
 func ZendSetDefaultCompileTimeValues() {
 	/* default compile-time values */
 
@@ -463,14 +456,14 @@ func ZendUserExceptionHandler() {
 		EG__().SetException(old_exception)
 	}
 }
-func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*ZendFileHandle) bool {
+func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*FileHandle) bool {
 	for _, fileHandle := range files {
 		if fileHandle == nil {
 			continue
 		}
 		opArray := CompileFile(fileHandle, typ)
-		if fileHandle.GetOpenedPath() != nil {
-			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fileHandle.GetOpenedPath().GetStr())
+		if fileHandle.GetOpenedPath() != "" {
+			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fileHandle.GetOpenedPath())
 		}
 		ZendDestroyFileHandle(fileHandle)
 		if opArray != nil {

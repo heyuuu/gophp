@@ -6,7 +6,7 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-func CompileFile(file_handle *ZendFileHandle, type_ int) *types.ZendOpArray {
+func CompileFile(file_handle *FileHandle, type_ int) *types.ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array *types.ZendOpArray = nil
 	ZendSaveLexicalState(&original_lex_state)
@@ -40,7 +40,7 @@ type ZendLexState struct {
 	stateStack        b.Stack[int]
 	heredocLabelStack b.Stack[*ZendHeredocLabel]
 
-	in                   *ZendFileHandle
+	in                   *FileHandle
 	lineno               uint32
 	filename             *types.String
 	script_org           *uint8

@@ -2,7 +2,6 @@ package cgi
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
@@ -10,6 +9,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"log"
+	"os"
 )
 
 func main(argc int, argv []*byte) int {
@@ -19,7 +19,7 @@ func main(argc int, argv []*byte) int {
 	var c int
 	var i int
 	var len_ int
-	var file_handle zend.ZendFileHandle
+	var fileHandle *zend.FileHandle
 	var s *byte
 
 	/* temporary locals */
@@ -242,7 +242,7 @@ func main(argc int, argv []*byte) int {
 			Act.sa_flags = 0
 			Act.sa_handler = FastcgiCleanup
 			if sigaction(SIGTERM, &Act, &OldTerm) || sigaction(SIGINT, &Act, &OldInt) || sigaction(SIGQUIT, &Act, &OldQuit) {
-				r.Perror("Can't set signals")
+				os.Stderr.WriteString("Can't set signals")
 				exit(1)
 			}
 			if core.FcgiInShutdown() != 0 {
@@ -269,7 +269,7 @@ func main(argc int, argv []*byte) int {
 						zend.ZendSignalInit()
 						break
 					case -1:
-						r.Perror("php (pre-forking)")
+						os.Stderr.WriteString("php (pre-forking)")
 						exit(1)
 						break
 					default:
@@ -354,7 +354,7 @@ func main(argc int, argv []*byte) int {
 				for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
 					switch c {
 					case 'a':
-						r.Printf("Interactive mode enabled\n\n")
+						os.Stdout.WriteString("Interactive mode enabled\n\n")
 						break
 					case 'C':
 						core.SG__().options |= core.SAPI_OPTION_NO_CHDIR
@@ -522,9 +522,9 @@ func main(argc int, argv []*byte) int {
 			*/
 
 			if core.SG__().RequestInfo.path_translated || cgi != 0 || fastcgi != 0 {
-				zend.ZendStreamInitFilename(&file_handle, core.SG__().RequestInfo.path_translated)
+				fileHandle = zend.NewFileHandleByFilename(core.SG__().RequestInfo.path_translated)
 			} else {
-				zend.ZendStreamInitFp(&file_handle, stdin, "Standard input code")
+				fileHandle = zend.NewFileHandleForStdin()
 			}
 
 			/* request startup only after we've done all we can to
@@ -550,7 +550,8 @@ func main(argc int, argv []*byte) int {
 			*/
 
 			if cgi != 0 || fastcgi != 0 || core.SG__().RequestInfo.path_translated {
-				if core.PhpFopenPrimaryScript(&file_handle) == types.FAILURE {
+				fileHandle = core.PhpFopenPrimaryScript()
+				if fileHandle == nil {
 					faults.Try(func() {
 						if errno == EACCES {
 							core.SG__().sapi_headers.http_response_code = 403
@@ -589,38 +590,34 @@ func main(argc int, argv []*byte) int {
 			}
 			switch behavior {
 			case PHP_MODE_STANDARD:
-				core.PhpExecuteScript(&file_handle)
-				break
+				core.PhpExecuteScript(fileHandle)
 			case PHP_MODE_LINT:
 				core.PG__().during_request_startup = 0
-				exit_status = core.PhpLintScript(&file_handle)
+				exit_status = core.PhpLintScript(fileHandle)
 				if exit_status == types.SUCCESS {
-					core.PhpPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
+					core.PhpPrintf("No syntax errors detected in %s\n", fileHandle.GetFilename())
 				} else {
-					core.PhpPrintf("Errors parsing %s\n", file_handle.GetFilename())
+					core.PhpPrintf("Errors parsing %s\n", fileHandle.GetFilename())
 				}
-				break
 			case PHP_MODE_STRIP:
-				if zend.OpenFileForScanning(&file_handle) == types.SUCCESS {
+				if zend.OpenFileForScanning(fileHandle) == types.SUCCESS {
 					zend.ZendStrip()
-					zend.ZendFileHandleDtor(&file_handle)
+					fileHandle.Destroy()
 					core.PhpOutputTeardown()
 				}
 				return types.SUCCESS
-				break
 			case PHP_MODE_HIGHLIGHT:
 				var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-				if zend.OpenFileForScanning(&file_handle) == types.SUCCESS {
+				if zend.OpenFileForScanning(fileHandle) == types.SUCCESS {
 					standard.PhpGetHighlight(&syntax_highlighter_ini)
 					zend.ZendHighlight(&syntax_highlighter_ini)
 					if fastcgi != 0 {
 						goto fastcgi_request_done
 					}
-					zend.ZendFileHandleDtor(&file_handle)
+					fileHandle.Destroy()
 					core.PhpOutputTeardown()
 				}
 				return types.SUCCESS
-				break
 			}
 		fastcgi_request_done:
 			if core.SG__().RequestInfo.path_translated {

@@ -10,7 +10,7 @@ import (
  * PhpStdioStreamData
  */
 type PhpStdioStreamData struct {
-	file             *r.FILE
+	file             *r.File
 	fd               int
 	is_process_pipe  unsigned
 	is_pipe          unsigned
@@ -27,8 +27,8 @@ type PhpStdioStreamData struct {
 	sb               zend.ZendStatT
 }
 
-func (this *PhpStdioStreamData) GetFile() *r.FILE                 { return this.file }
-func (this *PhpStdioStreamData) SetFile(value *r.FILE)            { this.file = value }
+func (this *PhpStdioStreamData) GetFile() *r.File                 { return this.file }
+func (this *PhpStdioStreamData) SetFile(value *r.File)            { this.file = value }
 func (this *PhpStdioStreamData) GetFd() int                       { return this.fd }
 func (this *PhpStdioStreamData) SetFd(value int)                  { this.fd = value }
 func (this *PhpStdioStreamData) GetIsProcessPipe() unsigned       { return this.is_process_pipe }

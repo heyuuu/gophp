@@ -66,14 +66,21 @@ func ZendRestoreLexicalState(lexState *ZendLexState) {
 	var sc *LangScanner
 	sc.restoreLexState(lexState)
 }
-func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
-	ZendLlistDelElement(CG__().open_files, file_handle, (func(any, any) int)(ZendCompareFileHandles))
+func ZendDestroyFileHandle(file_handle *FileHandle) {
+	ZendLlistDelElement(CG__().open_files, file_handle, func(element1 any, element2 any) int {
+		fh1, fh2 := element1.(*FileHandle), element2.(*FileHandle)
+		if IsFileHandlesEquals(fh1, fh2) {
+			return 1
+		} else {
+			return 0
+		}
+	})
 
 	file_handle.openedPath = ""
 	file_handle.filename = ""
 }
 
-func OpenFileForScanning(fileHandle *ZendFileHandle) int {
+func OpenFileForScanning(fileHandle *FileHandle) int {
 	buf, ok := fileHandle.Fixup()
 	if !ok {
 		/* Still add it to open_files to make destroy_file_handle work */
@@ -85,14 +92,6 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	b.Assert(!(EG__().exception) && "stream_fixup() should have failed")
 
 	ZendLlistAddElement(CG__().open_files, fileHandle)
-
-	// todo 没看懂
-	if fileHandle.stream.handle >= (any)(fileHandle) && fileHandle.stream.handle <= (any)(fileHandle+1) {
-		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLast(CG__().open_files))
-		var diff int = (*byte)(fileHandle.stream.handle - (*byte)(fileHandle))
-		fh.stream.handle = any((*byte)(fh) + diff)
-		fileHandle.stream.handle = fh.stream.handle
-	}
 
 	/* Reset the scanner for scanning the new file */
 	sc := NewLangScanner(buf)
@@ -151,7 +150,6 @@ func ZendCompile(type_ int) *types.ZendOpArray {
 	return op_array
 }
 func CompileFilename(type_ int, filename *types.Zval) int {
-	var file_handle ZendFileHandle
 	var tmp types.Zval
 	var retval int
 	var opened_path *types.String = nil
@@ -159,19 +157,18 @@ func CompileFilename(type_ int, filename *types.Zval) int {
 		tmp.SetStringVal(ZvalGetStrVal(filename))
 		filename = &tmp
 	}
-	zend_stream_init_filename(&file_handle, filename.String().GetVal())
-	retval = zend_compile_file(&file_handle, type_)
-	if retval != nil && file_handle.handle.stream.handle {
-		if !(file_handle.opened_path) {
-			opened_path = filename.String().Copy()
-			file_handle.opened_path = opened_path
+	fh := NewFileHandleByFilename(filename.StringVal())
+	opArray := CompileFile(fh, type_)
+	if opArray != nil && fh.GetStream().GetHandle() != nil {
+		if fh.GetOpenedPath() == "" {
+			fh.SetOpenedPath(filename.StringVal())
 		}
 		zend_hash_add_empty_element(EG__().included_files, file_handle.opened_path)
 		if opened_path != nil {
 			zend_string_release_ex(opened_path, 0)
 		}
 	}
-	ZendDestroyFileHandle(&file_handle)
+	ZendDestroyFileHandle(fh)
 	if filename == &tmp {
 		zval_ptr_dtor(&tmp)
 	}
@@ -220,7 +217,7 @@ func CompileString(source_string *types.Zval, filename *byte) *types.ZendOpArray
 }
 func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlighter_ini) int {
 	var original_lex_state ZendLexState
-	var file_handle ZendFileHandle
+	var file_handle FileHandle
 	zend_stream_init_filename(&file_handle, filename)
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(&file_handle) == types.FAILURE {

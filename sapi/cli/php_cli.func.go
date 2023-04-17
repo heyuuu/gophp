@@ -3,13 +3,13 @@ package cli
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/globals"
 	"github.com/heyuuu/gophp/zend/types"
+	"os"
 	"sort"
 	"strings"
 )
@@ -169,18 +169,16 @@ func CliRegisterFileHandles() {
 	ec.SetName("STDERR")
 	zend.ZendRegisterConstant(&ec)
 }
-func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {
-	var fp *r.FILE = zend.VCWD_FOPEN(script_file, "rb")
-	if fp == nil {
+func CliSeekFileBegin(script_file string) *zend.FileHandle {
+	fh := zend.NewFileHandleByOpenFile(script_file, "rb")
+	if fh == nil {
 		core.PhpPrintf("Could not open input file: %s\n", script_file)
-		return types.FAILURE
 	}
-	zend.ZendStreamInitFp(file_handle, fp, script_file)
-	return types.SUCCESS
+	return fh
 }
 func DoCli(argc int, argv **byte, args []string) int {
 	var c int
-	var file_handle zend.ZendFileHandle
+	var file_handle *zend.FileHandle
 	var behavior int = PHP_MODE_STANDARD
 	var reflection_what *byte = nil
 	var request_started int = 0
@@ -395,8 +393,8 @@ func DoCli(argc int, argv **byte, args []string) int {
 			goto err
 		}
 		if interactive != 0 {
-			r.Printf("Interactive mode enabled\n\n")
-			r.Fflush(stdout)
+			os.Stdout.WriteString("Interactive mode enabled\n\n")
+			os.Stdout.Sync()
 		}
 
 		/* only set script_file if not set already and not in direct mode and not at end of parameter list */
@@ -406,7 +404,8 @@ func DoCli(argc int, argv **byte, args []string) int {
 			php_optind++
 		}
 		if script_file != nil {
-			if CliSeekFileBegin(&file_handle, script_file) != types.SUCCESS {
+			file_handle = CliSeekFileBegin(script_file)
+			if file_handle == nil {
 				goto err
 			} else {
 				var real_path []byte
@@ -416,12 +415,8 @@ func DoCli(argc int, argv **byte, args []string) int {
 				ScriptFilename = script_file
 			}
 		} else {
-
 			/* We could handle PHP_MODE_PROCESS_STDIN in a different manner  */
-
-			zend.ZendStreamInitFp(&file_handle, stdin, "Standard input code")
-
-			/* We could handle PHP_MODE_PROCESS_STDIN in a different manner  */
+			file_handle = zend.NewFileHandleForStdin()
 
 		}
 		PhpSelf = (*byte)(file_handle.GetFilename())
@@ -440,7 +435,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 		core.SG__().RequestInfo.argv = argv + php_optind - 1
 		if core.PhpRequestStartup() == types.FAILURE {
 			*arg_excp = arg_free
-			r.Fclose(file_handle.GetFp())
+			file_handle.Close()
 			core.PUTS("Could not startup.\n")
 			goto err
 		}
@@ -461,11 +456,11 @@ func DoCli(argc int, argv **byte, args []string) int {
 			if strcmp(file_handle.GetFilename(), "Standard input code") {
 				CliRegisterFileHandles()
 			}
-			core.PhpExecuteScript(&file_handle)
+			core.PhpExecuteScript(file_handle)
 			exit_status = zend.EG__().GetExitStatus()
 			break
 		case PHP_MODE_LINT:
-			exit_status = core.PhpLintScript(&file_handle)
+			exit_status = core.PhpLintScript(file_handle)
 			if exit_status == types.SUCCESS {
 				core.PhpPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
 			} else {
@@ -473,14 +468,14 @@ func DoCli(argc int, argv **byte, args []string) int {
 			}
 			break
 		case PHP_MODE_STRIP:
-			if zend.OpenFileForScanning(&file_handle) == types.SUCCESS {
+			if zend.OpenFileForScanning(file_handle) == types.SUCCESS {
 				zend.ZendStrip()
 			}
 			goto out
 			break
 		case PHP_MODE_HIGHLIGHT:
 			var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
-			if zend.OpenFileForScanning(&file_handle) == types.SUCCESS {
+			if zend.OpenFileForScanning(file_handle) == types.SUCCESS {
 				standard.PhpGetHighlight(&syntax_highlighter_ini)
 				zend.ZendHighlight(&syntax_highlighter_ini)
 			}
@@ -517,11 +512,12 @@ func DoCli(argc int, argv **byte, args []string) int {
 					}
 				} else {
 					if script_file != nil {
-						if CliSeekFileBegin(&file_handle, script_file) != types.SUCCESS {
+						file_handle = CliSeekFileBegin(script_file)
+						if file_handle == nil {
 							exit_status = 1
 						} else {
 							zend.CG__().SetSkipShebang(1)
-							core.PhpExecuteScript(&file_handle)
+							core.PhpExecuteScript(file_handle)
 							exit_status = zend.EG__().GetExitStatus()
 						}
 					}

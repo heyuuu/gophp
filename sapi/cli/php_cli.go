@@ -2,11 +2,11 @@ package cli
 
 import (
 	"errors"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 	"io"
+	"log"
 	"os"
 )
 
@@ -29,7 +29,7 @@ func (c *CliModuleType) Shutdown() bool {
 }
 func (c *CliModuleType) Activate() {}
 func (c *CliModuleType) Deactivate() {
-	r.Fflush(stdout)
+	os.Stdout.Sync()
 	if core.SG__().RequestInfo.argv0 {
 		zend.Free(core.SG__().RequestInfo.argv0)
 		core.SG__().RequestInfo.argv0 = nil
