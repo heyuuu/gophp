@@ -236,7 +236,7 @@ func BrowscapReadFile(filename string, browdata *BrowserData) int {
 	if filename == "" {
 		return types.FAILURE
 	}
-	var fh = zend.NewFileHandleByOpenFile(filename, "r")
+	var fh = zend.NewFileHandleByOpenFile(filename)
 	if fh == nil {
 		faults.Error(faults.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return types.FAILURE

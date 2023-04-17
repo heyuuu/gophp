@@ -499,7 +499,7 @@ func PhpInitConfig() int {
 					}
 					if zend.VCWD_STAT(ini_file, &sb) == 0 {
 						if zend.S_ISREG(sb.st_mode) {
-							var fh *zend.FileHandle = zend.NewFileHandleByOpenFile(ini_file, "r")
+							var fh *zend.FileHandle = zend.NewFileHandleByOpenFile(ini_file)
 							if fh != nil {
 								if zend.ZendParseIniFile(fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash()) == types.SUCCESS {
 
@@ -577,7 +577,7 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *types.A
 	Snprintf(ini_file, MAXPATHLEN, "%s%c%s", dirname, zend.DEFAULT_SLASH, ini_filename)
 	if zend.VCWD_STAT(ini_file, &sb) == 0 {
 		if zend.S_ISREG(sb.st_mode) {
-			var fh *zend.FileHandle = zend.NewFileHandleByOpenFile(ini_file, "r")
+			var fh *zend.FileHandle = zend.NewFileHandleByOpenFile(ini_file)
 			if fh != nil {
 
 				/* Reset active ini section */

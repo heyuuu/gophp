@@ -170,7 +170,7 @@ func CliRegisterFileHandles() {
 	zend.ZendRegisterConstant(&ec)
 }
 func CliSeekFileBegin(script_file string) *zend.FileHandle {
-	fh := zend.NewFileHandleByOpenFile(script_file, "rb")
+	fh := zend.NewFileHandleByOpenFile(script_file)
 	if fh == nil {
 		core.PhpPrintf("Could not open input file: %s\n", script_file)
 	}

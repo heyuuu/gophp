@@ -1037,25 +1037,34 @@ func ZifSetTimeLimit(seconds int) bool {
 	return zend.ZendAlterIniEntryChars("max_execution_time", strconv.Itoa(seconds), PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 }
 
-func PhpStreamOpenForZend(filename string) *zend.FileHandle {
-	return PhpStreamOpenForZendEx(filename, USE_PATH|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE)
+func PhpStreamOpenForZend(filename string) (*PhpStreamForZend, string) {
+	return PhpStreamOpenForZendExEx(filename, USE_PATH|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE)
 }
 
 func PhpStreamOpenForZendEx(filename string, mode int) *zend.FileHandle {
+	stream, openedPath := PhpStreamOpenForZendExEx(filename, mode)
+	if stream == nil {
+		return nil
+	}
+	return zend.NewFileHandleByStream(filename, openedPath, stream)
+}
+
+func PhpStreamOpenForZendExEx(filename string, mode int) (*PhpStreamForZend, string) {
 	var openedPath *types.String
 	var stream *PhpStream = PhpStreamOpenWrapper(filename, "rb", mode, &openedPath)
 	if stream != nil {
-		handle := zend.NewFileHandleByStream(filename, openedPath.GetStr(), NewPhpStreamForZend(stream))
-
 		/* suppress warning if this stream is not explicitly closed */
 		PhpStreamAutoCleanup(stream)
 
 		/* Disable buffering to avoid double buffering between PHP and Zend streams. */
 		PhpStreamSetOption(stream, PHP_STREAM_OPTION_READ_BUFFER, PHP_STREAM_BUFFER_NONE, nil)
-		return handle
+
+		return NewPhpStreamForZend(stream), openedPath.GetStr()
 	}
-	return nil
+
+	return nil, ""
 }
+
 func PhpResolvePathForZend(filename string) *string {
 	var result string
 	zstr := PhpResolvePath(filename, b.CastStrPtr(filename), len(filename), PG__().include_path)

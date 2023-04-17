@@ -2,6 +2,7 @@ package zend
 
 import (
 	"bytes"
+	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core"
 	"os"
@@ -17,13 +18,6 @@ type FileHandle struct {
 	filename   string
 	openedPath string
 	buf        []byte
-}
-
-func NewFileHandleForStdin() *FileHandle {
-	return &FileHandle{
-		stream:   NewGoFileStream(os.Stdin),
-		filename: "Standard input code",
-	}
 }
 
 func NewFileHandleByFilename(filename string) *FileHandle {
@@ -55,16 +49,24 @@ func NewFileHandleByStream(filename string, openedPath string, stream *core.PhpS
 	}
 }
 
-func NewFileHandleByOpenFile(filename string, mode string) *FileHandle {
-	fp := VCWD_FOPEN(filename, mode)
-	if fp == nil {
+func NewFileHandleForStdin() *FileHandle {
+	return NewFileHandleByGoFile("Standard input code", os.Stdin)
+}
+
+func NewFileHandleByOpenFile(filename string) *FileHandle {
+	fp, err := os.Open(filename)
+	if err != nil {
 		return nil
 	}
-	return NewFileHandleByFp(filename, fp)
+	return NewFileHandleByGoFile(filename, fp)
 }
 
 func NewFileHandleByOpenStream(filename string) *FileHandle {
-	return core.PhpStreamOpenForZend(filename)
+	fh := NewFileHandleByFilename(filename)
+	if fh.openStream() {
+		return fh
+	}
+	return nil
 }
 
 func (fh *FileHandle) IsTypeHandleFileName() bool {
@@ -78,8 +80,49 @@ func (fh *FileHandle) fileSize() int {
 	return fh.stream.FileSize()
 }
 
-func (fh *FileHandle) Open(filename string) bool {
-	return core.PhpStreamOpenForZend(filename) != 0
+func (fh *FileHandle) openStream() bool {
+	b.Assert(fh.stream == nil)
+	stream, openedPath := core.PhpStreamOpenForZend(fh.filename)
+	if stream != nil {
+		fh.stream = stream
+		fh.openedPath = openedPath
+		return true
+	}
+	return false
+}
+
+func (fh *FileHandle) Fixup() ([]byte, bool) {
+	if fh.buf != nil {
+		return fh.buf, true
+	}
+
+	if fh.stream == nil {
+		if !fh.openStream() {
+			return nil, false
+		}
+	}
+	if fh.stream == nil {
+		return nil, false
+	}
+	fileSize := fh.fileSize()
+	if fileSize == -1 {
+		return nil, false
+	}
+	if fileSize != 0 {
+		buf := fh.read(fileSize)
+		if len(buf) == 0 {
+			return nil, false
+		}
+		fh.buf = buf
+	} else {
+		buf := fh.readAll()
+		if len(buf) == 0 {
+			return nil, false
+		}
+		fh.buf = buf
+	}
+
+	return fh.buf, true
 }
 
 func (fh *FileHandle) readAll() []byte {
@@ -121,40 +164,6 @@ func (fh *FileHandle) read(len_ int) []byte {
 	}
 
 	return fh.stream.Read(len_)
-}
-
-func (fh *FileHandle) Fixup() ([]byte, bool) {
-	if fh.buf != nil {
-		return fh.buf, true
-	}
-
-	if fh.stream == nil {
-		if ok := fh.Open(fh.filename); !ok {
-			return nil, false
-		}
-	}
-	if fh.stream == nil {
-		return nil, false
-	}
-	fileSize := fh.fileSize()
-	if fileSize == -1 {
-		return nil, false
-	}
-	if fileSize != 0 {
-		buf := fh.read(fileSize)
-		if len(buf) == 0 {
-			return nil, false
-		}
-		fh.buf = buf
-	} else {
-		buf := fh.readAll()
-		if len(buf) == 0 {
-			return nil, false
-		}
-		fh.buf = buf
-	}
-
-	return fh.buf, true
 }
 
 func (fh *FileHandle) Close() {
