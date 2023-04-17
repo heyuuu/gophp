@@ -13,12 +13,7 @@ type ZendUnserializeData = __struct___zend_unserialize_data
 /* output support */
 var ZendPrintf = core.PhpPrintf
 var ZendWrite = core.PhpOutputWrite
-var ZendFopen = core.PhpFopenWrapperForZend
-var ZendInterruptFunction func(executeData *ZendExecuteData) = nil
 var ZendOnTimeout = core.PhpOnTimeout
-var ZendStreamOpenFunction = core.PhpStreamOpenForZend
-var ZendStreamOpenFunctionEx func(filename string, handle *ZendFileHandle) bool
-var ZendResolvePath = core.PhpResolvePathForZend
 
 var ZendUv ZendUtilityValues
 

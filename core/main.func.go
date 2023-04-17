@@ -3,10 +3,8 @@ package core
 import (
 	"fmt"
 	b "github.com/heyuuu/gophp/builtin"
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/date"
 	"github.com/heyuuu/gophp/core/pfmt"
-	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
 	"github.com/heyuuu/gophp/zend"
@@ -1039,11 +1037,6 @@ func ZifSetTimeLimit(seconds int) bool {
 	return zend.ZendAlterIniEntryChars("max_execution_time", strconv.Itoa(seconds), PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 }
 
-func PhpFopenWrapperForZend(filename string) (f *r.FILE, openedPath string) {
-	var opened_path_zstr **types.String
-	f = streams.PhpStreamOpenWrapperAsFile(filename, "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path_zstr)
-	return f, (*opened_path_zstr).GetStr()
-}
 func PhpZendStreamCloser(handle any) { PhpStreamClose((*PhpStream)(handle)) }
 func PhpZendStreamFsizer(handle any) int {
 	var stream *PhpStream = handle

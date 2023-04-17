@@ -4,6 +4,7 @@ import (
 	"bytes"
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -91,15 +92,7 @@ func (this *ZendFileHandle) InitFilename(filename string) {
 }
 
 func (this *ZendFileHandle) Open(filename string) bool {
-	if ZendStreamOpenFunction != nil {
-		return ZendStreamOpenFunctionEx(filename, this)
-	}
-
-	fp, openedPath := ZendFopen(filename)
-	this.InitFp(fp, filename)
-	this.openedPath = openedPath
-
-	return this.fp != nil
+	return core.PhpStreamOpenForZend(filename, this) != 0
 }
 
 func (this *ZendFileHandle) GetC() (byte, bool) {

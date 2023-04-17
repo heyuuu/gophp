@@ -467,9 +467,9 @@ func DoCli(argc int, argv **byte, args []string) int {
 		case PHP_MODE_LINT:
 			exit_status = core.PhpLintScript(&file_handle)
 			if exit_status == types.SUCCESS {
-				zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
+				core.PhpPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
 			} else {
-				zend.ZendPrintf("Errors parsing %s\n", file_handle.GetFilename())
+				core.PhpPrintf("Errors parsing %s\n", file_handle.GetFilename())
 			}
 			break
 		case PHP_MODE_STRIP:
@@ -574,7 +574,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				var rv types.Zval
 				tmp.SetObject(zend.EG__().GetException())
 				msg = zend.ZendReadProperty(faults.ZendCeException, &tmp, "message", 0, &rv)
-				zend.ZendPrintf("Exception: %s\n", msg.String().GetVal())
+				core.PhpPrintf("Exception: %s\n", msg.String().GetVal())
 				// zend.ZvalPtrDtor(&tmp)
 				zend.EG__().SetException(nil)
 				exit_status = 1
@@ -592,16 +592,16 @@ func DoCli(argc int, argv **byte, args []string) int {
 				if reflection_what == "main" {
 					core.DisplayIniEntries(nil)
 				} else {
-					zend.ZendPrintf("Extension '%s' not present.\n", reflection_what)
+					core.PhpPrintf("Extension '%s' not present.\n", reflection_what)
 					exit_status = 1
 				}
 			}
 			break
 		case PHP_MODE_SHOW_INI_CONFIG:
-			zend.ZendPrintf("Configuration File (php.ini) Path: %s\n", core.PHP_CONFIG_FILE_PATH)
-			zend.ZendPrintf("Loaded Configuration File:         %s\n", b.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
-			zend.ZendPrintf("Scan for additional .ini files in: %s\n", b.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
-			zend.ZendPrintf("Additional .ini files parsed:      %s\n", b.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
+			core.PhpPrintf("Configuration File (php.ini) Path: %s\n", core.PHP_CONFIG_FILE_PATH)
+			core.PhpPrintf("Loaded Configuration File:         %s\n", b.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
+			core.PhpPrintf("Scan for additional .ini files in: %s\n", b.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
+			core.PhpPrintf("Additional .ini files parsed:      %s\n", b.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
 			break
 		}
 	})

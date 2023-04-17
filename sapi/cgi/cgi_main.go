@@ -595,9 +595,9 @@ func main(argc int, argv []*byte) int {
 				core.PG__().during_request_startup = 0
 				exit_status = core.PhpLintScript(&file_handle)
 				if exit_status == types.SUCCESS {
-					zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
+					core.PhpPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
 				} else {
-					zend.ZendPrintf("Errors parsing %s\n", file_handle.GetFilename())
+					core.PhpPrintf("Errors parsing %s\n", file_handle.GetFilename())
 				}
 				break
 			case PHP_MODE_STRIP:

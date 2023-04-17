@@ -122,9 +122,6 @@ func zend_interrupt_helper_SPEC(executeData *ZendExecuteData) int {
 	EG__().SetVmInterrupt(0)
 	if EG__().GetTimedOut() != 0 {
 		ZendTimeout(0)
-	} else if ZendInterruptFunction != nil {
-		ZendInterruptFunction(executeData)
-		return 1
 	}
 	return 0
 }

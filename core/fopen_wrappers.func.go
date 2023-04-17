@@ -333,7 +333,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 		filename = SG__().RequestInfo.path_translated
 	}
 	if filename != nil {
-		resolved_path = zend.ZendResolvePath(filename)
+		resolved_path = PhpResolvePathForZend(filename)
 	}
 	if resolved_path == nil {
 		if SG__().RequestInfo.path_translated != filename {

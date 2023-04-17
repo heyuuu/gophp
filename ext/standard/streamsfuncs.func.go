@@ -1568,7 +1568,7 @@ func ZifStreamResolveIncludePath(executeData zpp.Ex, return_value zpp.Ret, filen
 		}
 		break
 	}
-	resolved_path = zend.ZendResolvePath(b.CastStr(filename, filename_len))
+	resolved_path = core.PhpResolvePathForZend(b.CastStr(filename, filename_len))
 	if resolved_path != nil {
 		return_value.SetStringVal(*resolved_path)
 		return

@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -24,7 +25,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 	case ZEND_REQUIRE_ONCE:
 		var file_handle ZendFileHandle
 		var resolved_path *string
-		resolved_path = ZendResolvePath(inc_filename.String().GetStr())
+		resolved_path = core.PhpResolvePathForZend(inc_filename.String().GetStr())
 		if resolved_path != nil {
 			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
 				goto already_compiled
