@@ -17,6 +17,10 @@ type SmartStr struct {
 	buffer strings.Builder
 }
 
+func (this *SmartStr) Write(p []byte) (n int, err error) {
+	return this.buffer.Write(p)
+}
+
 func (this *SmartStr) GetLen() int    { return this.buffer.Len() }
 func (this *SmartStr) GetStr() string { return this.buffer.String() }
 

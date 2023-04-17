@@ -42,7 +42,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
 			if types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath().GetStr()) != nil {
-				var op_array *types.ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
+				var op_array *types.ZendOpArray = CompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				if tmp_inc_filename.IsNotUndef() {
 
@@ -66,7 +66,7 @@ func ZendIncludeOrEval(inc_filename *types.Zval, type_ int) *types.ZendOpArray {
 		new_op_array = CompileFilename(type_, inc_filename)
 	case ZEND_EVAL:
 		var eval_desc *byte = ZendMakeCompiledStringDescription("eval()'d code")
-		new_op_array = ZendCompileString(inc_filename, eval_desc)
+		new_op_array = CompileString(inc_filename, eval_desc)
 		Efree(eval_desc)
 	default:
 

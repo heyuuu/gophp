@@ -2,6 +2,7 @@ package zend
 
 import (
 	b "github.com/heyuuu/gophp/builtin"
+	"github.com/heyuuu/gophp/core/pfmt"
 )
 
 /* Windows uses VK_ESCAPE instead of \e */
@@ -72,9 +73,6 @@ func SmartStrAppendEscaped(str *SmartStr, s *byte, l int) {
 		}
 	}
 }
-func SmartStrAppendPrintf(dest *SmartStr, format string, _ ...any) {
-	var arg va_list
-	va_start(arg, format)
-	ZendPrintfToSmartStr(dest, format, arg)
-	va_end(arg)
+func SmartStrAppendPrintf(dest *SmartStr, format string, args ...any) {
+	dest.AppendString(pfmt.Sprintf(format, args))
 }

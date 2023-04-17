@@ -1,66 +1,50 @@
 package core
 
 import (
-	"github.com/heyuuu/gophp/zend"
+	"github.com/heyuuu/gophp/core/pfmt"
+	"strings"
 )
 
-func PhpSyslog(priority int, format string, _ ...any) {
-	var ptr *byte
-	var c uint8
-	var fbuf zend.SmartString = zend.MakeSmartString(0)
-	var sbuf zend.SmartString = zend.MakeSmartString(0)
-	var args va_list
+func doSyslog(priority int, message string) {
+	// todo syslog
+}
 
+func PhpSyslog(priority int, format string, args ...any) {
 	/*
 	 * don't rely on openlog() being called by syslog() if it's
 	 * not already been done; call it ourselves and pass the
 	 * correct parameters!
 	 */
-
 	if !(PG__().have_called_openlog) {
 		PhpOpenlog(PG__().syslog_ident, 0, PG__().syslog_facility)
 	}
-	va_start(args, format)
-	zend.ZendPrintfToSmartStr(&fbuf, format, args)
-	fbuf.ZeroTail()
-	va_end(args)
+	log := pfmt.Sprintf(format, args)
 	if PG__().syslog_filter == PHP_SYSLOG_FILTER_RAW {
-
 		/* Just send it directly to the syslog */
-
-		syslog(priority, "%.*s", int(fbuf.GetLen()), fbuf.GetC())
-		fbuf.Free()
+		doSyslog(priority, log)
 		return
 	}
-	for ptr = fbuf.GetC(); ; ptr++ {
-		c = *ptr
-		if c == '0' {
-			syslog(priority, "%.*s", int(sbuf.GetLen()), sbuf.GetC())
-			break
-		}
 
+	var buf strings.Builder
+	for _, c := range []byte(log) {
 		/* check for NVT ASCII only unless test disabled */
 
 		if 0x20 <= c && c <= 0x7e {
-			sbuf.AppendByte(c)
+			buf.WriteByte(c)
 		} else if c >= 0x80 && PG__().syslog_filter != PHP_SYSLOG_FILTER_ASCII {
-			sbuf.AppendByte(c)
+			buf.WriteByte(c)
 		} else if c == '\n' {
-			syslog(priority, "%.*s", int(sbuf.GetLen()), sbuf.GetC())
-			sbuf.Reset()
+			doSyslog(priority, buf.String())
+			buf.Reset()
 		} else if c < 0x20 && PG__().syslog_filter == PHP_SYSLOG_FILTER_ALL {
-			sbuf.AppendByte(c)
+			buf.WriteByte(c)
 		} else {
-			var xdigits []byte = "0123456789abcdef"
-			sbuf.AppendString("\\x")
-			sbuf.AppendByte(xdigits[c/0x10])
+			var xdigits = "0123456789abcdef"
+			buf.WriteString("\\x")
+			buf.WriteByte(xdigits[c/0x10])
 			c &= 0xf
-			sbuf.AppendByte(xdigits[c])
+			buf.WriteByte(xdigits[c])
 		}
-
-		/* check for NVT ASCII only unless test disabled */
-
 	}
-	fbuf.Free()
-	sbuf.Free()
+	doSyslog(priority, buf.String())
 }

@@ -14,7 +14,7 @@ const Snprintf = ApPhpSnprintf
 type LengthModifierE = int
 
 const (
-	LM_STD = 0
+	LM_STD = iota
 	LM_INTMAX_T
 	LM_PTRDIFF_T
 	LM_LONG_LONG

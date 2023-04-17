@@ -116,6 +116,14 @@ func PrintFlatHash(ht *types.Array) {
 		ZendPrintFlatZvalR(tmp)
 	}
 }
+func PrintZval(expr *types.Zval) string {
+	if expr.IsString() {
+		return expr.StringVal()
+	} else {
+		return ZvalGetStringFunc(expr).GetStr()
+	}
+}
+
 func ZendMakePrintableZval(expr *types.Zval, expr_copy *types.Zval) int {
 	if expr.IsString() {
 		return 0
@@ -276,7 +284,7 @@ func PhpAutoGlobalsCreateGlobals(name *types.String) types.ZendBool {
 	EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
 	return 0
 }
-func ZendStartup(utility_functions *ZendUtilityFunctions) int {
+func ZendStartup() int {
 	var ini_scanner_globals ZendIniScannerGlobals
 	var language_scanner_globals ZendPhpScannerGlobals
 	//ZendCpuStartup()
@@ -284,36 +292,6 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	VirtualCwdStartup()
 	//ZendStartupStrtod()
 	ZendStartupExtensionsMechanism()
-
-	/* Set up utility functions and values */
-
-	ZendErrorCb = utility_functions.ErrorFunction
-	ZendPrintf = utility_functions.PrintfFunction
-	ZendWrite = utility_functions.WriteFunction
-	ZendFopen = utility_functions.FopenFunction
-	if ZendFopen == nil {
-		ZendFopen = ZendFopenWrapper
-	}
-	ZendStreamOpenFunction = utility_functions.StreamOpenFunction
-	ZendMessageDispatcherP = utility_functions.MessageHandler
-	ZendGetConfigurationDirectiveP = utility_functions.GetConfigurationDirective
-	ZendTicksFunction = utility_functions.TicksFunction
-	ZendOnTimeout = utility_functions.OnTimeout
-	ZendPrintfToSmartStr = utility_functions.PrintfToSmartStrFunction
-	ZendResolvePath = utility_functions.ResolvePathFunction
-	ZendInterruptFunction = nil
-	ZendCompileFile = CompileFile
-	ZendExecuteEx = ExecuteEx
-	ZendExecuteInternal = nil
-	ZendCompileString = CompileString
-	faults.ZendThrowExceptionHook = nil
-
-	/* Set up the default garbage collection implementation. */
-
-	//GcCollectCycles = ZendGcCollectCycles
-	//ZendVmInit()
-
-	/* set up version */
 
 	ZendVersionInfo = ZEND_CORE_VERSION_INFO
 
@@ -326,7 +304,6 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	ZendSetDefaultCompileTimeValues()
 
 	/* Map region is going to be created and resized at run-time. */
-
 	CG__().SetMapPtrBase(nil)
 	CG__().SetMapPtrSize(0)
 	CG__().SetMapPtrLast(0)
@@ -491,7 +468,7 @@ func ZendExecuteScriptsEx(typ int, retval *types.Zval, files ...*ZendFileHandle)
 		if fileHandle == nil {
 			continue
 		}
-		opArray := ZendCompileFile(fileHandle, typ)
+		opArray := CompileFile(fileHandle, typ)
 		if fileHandle.GetOpenedPath() != nil {
 			types.ZendHashAddEmptyElement(EG__().GetIncludedFiles(), fileHandle.GetOpenedPath().GetStr())
 		}

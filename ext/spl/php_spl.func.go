@@ -8,6 +8,7 @@ import (
 	"github.com/heyuuu/gophp/zend/faults"
 	"github.com/heyuuu/gophp/zend/types"
 	"github.com/heyuuu/gophp/zend/zpp"
+	"strings"
 )
 
 func SPL_G(v __auto__) __auto__ { return SplGlobals.v }
@@ -186,7 +187,7 @@ func SplAutoload(class_name *types.String, lc_name *types.String, ext *byte, ext
 		opened_path = file_handle.GetOpenedPath().Copy()
 		dummy.SetNull()
 		if zend.EG__().GetIncludedFiles().KeyAdd(opened_path.GetStr(), &dummy) != nil {
-			new_op_array = zend.ZendCompileFile(&file_handle, zend.ZEND_REQUIRE)
+			new_op_array = zend.CompileFile(&file_handle, zend.ZEND_REQUIRE)
 			zend.ZendDestroyFileHandle(&file_handle)
 		} else {
 			new_op_array = nil
@@ -301,8 +302,8 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 		var fci types.ZendFcallInfo
 		var fcic types.ZendFcallInfoCache
 		var called_scope *types.ClassEntry = zend.ZendGetCalledScope(executeData)
-		var l_autoload_running int = SPL_G__().autoload_running
-		SPL_G__().autoload_running = 1
+		var l_autoload_running int = SPL_G__().autoloadRunning
+		SPL_G__().autoloadRunning = 1
 		lc_name = zend.ZendStringTolower(class_name.String())
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetRetval(&retval)
@@ -345,7 +346,7 @@ func ZifSplAutoloadCall(executeData zpp.Ex, return_value zpp.Ret, className *typ
 			types.ZendHashMoveForwardEx(SPL_G__().autoload_functions, &pos)
 		}
 		// types.ZendStringReleaseEx(lc_name, 0)
-		SPL_G__().autoload_running = l_autoload_running
+		SPL_G__().autoloadRunning = l_autoload_running
 	} else {
 
 		/* do not use or overwrite &EG(autoload_func) here */
@@ -602,7 +603,7 @@ func ZifSplAutoloadUnregister(executeData zpp.Ex, return_value zpp.Ret, autoload
 
 			/* remove all */
 
-			if !(SPL_G__().autoload_running) {
+			if !(SPL_G__().autoloadRunning) {
 				SPL_G__().autoload_functions.Destroy()
 				zend.FREE_HASHTABLE(SPL_G__().autoload_functions)
 				SPL_G__().autoload_functions = nil
@@ -716,17 +717,16 @@ func ZifSplObjectId(executeData zpp.Ex, return_value zpp.Ret, obj *types.Zval) {
 	return
 }
 func PhpSplObjectHash(obj *types.Zval) string {
-	var hash_handle intPtr
-	var hash_handlers intPtr
-	if !(SPL_G__().hash_mask_init) {
-		SPL_G__().hash_mask_handle = intptr_t(standard.PhpMtRand() >> 1)
-		SPL_G__().hash_mask_handlers = intptr_t(standard.PhpMtRand() >> 1)
-		SPL_G__().hash_mask_init = 1
-	}
-	hash_handle = SPL_G__().hash_mask_handle ^ intPtr(zend.Z_OBJ_HANDLE_P(obj))
-	hash_handlers = SPL_G__().hash_mask_handlers
-	return zend.ZendSprintfEx(32, "%016zx%016zx", hash_handle, hash_handlers)
+	return SPL_G__().SplObjectHash(obj.Object().GetHandle())
 }
+func buildClassListString(arr *types.Array) string {
+	names := make([]string, 0, arr.Len())
+	arr.Foreach(func(key types.ArrayKey, value *types.Zval) {
+		names = append(names, value.StringVal())
+	})
+	return strings.Join(names, ", ")
+}
+
 func SplBuildClassListString(entry *types.Zval, list **byte) {
 	var res *byte
 	core.Spprintf(&res, 0, "%s, %s", *list, entry.String().GetVal())
@@ -795,17 +795,10 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	SplAddClasses(spl_ce_SplTempFileObject, &list, 0, 1, zend.AccInterface)
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, 1, zend.AccInterface)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.AccInterface)
-	strg = zend.Estrdup("")
-	var __ht *types.Array = list.Array()
-	for _, _p := range __ht.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		zv = _z
-		SplBuildClassListString(zv, &strg)
-	}
+	standard.PhpInfoPrintTableRow(2, "Interfaces", buildClassListString(list.Array()))
 	list.Array().DestroyEx()
-	standard.PhpInfoPrintTableRow(2, "Interfaces", strg+2)
-	zend.Efree(strg)
+
 	zend.ArrayInit(&list)
 	SplAddClasses(spl_ce_AppendIterator, &list, 0, -1, zend.AccInterface)
 	SplAddClasses(spl_ce_ArrayIterator, &list, 0, -1, zend.AccInterface)
@@ -862,17 +855,10 @@ func ZmInfoSpl(zend_module *zend.ModuleEntry) {
 	SplAddClasses(spl_ce_SplTempFileObject, &list, 0, -1, zend.AccInterface)
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, -1, zend.AccInterface)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.AccInterface)
-	strg = zend.Estrdup("")
-	var __ht__1 *types.Array = list.Array()
-	for _, _p := range __ht__1.ForeachData() {
-		var _z *types.Zval = _p.GetVal()
 
-		zv = _z
-		SplBuildClassListString(zv, &strg)
-	}
+	standard.PhpInfoPrintTableRow(2, "Classes", buildClassListString(list.Array()))
 	list.Array().DestroyEx()
-	standard.PhpInfoPrintTableRow(2, "Classes", strg+2)
-	zend.Efree(strg)
+
 	standard.PhpInfoPrintTableEnd()
 }
 func ZmStartupSpl(type_ int, module_number int) int {
@@ -890,23 +876,10 @@ func ZmStartupSpl(type_ int, module_number int) int {
 	return types.SUCCESS
 }
 func ZmActivateSpl(type_ int, module_number int) int {
-	SPL_G__().autoload_extensions = nil
-	SPL_G__().autoload_functions = nil
-	SPL_G__().hash_mask_init = 0
+	SPL_G__().Reset()
 	return types.SUCCESS
 }
 func ZmDeactivateSpl(type_ int, module_number int) int {
-	if SPL_G__().autoload_extensions {
-		// types.ZendStringReleaseEx(SPL_G(autoload_extensions), 0)
-		SPL_G__().autoload_extensions = nil
-	}
-	if SPL_G__().autoload_functions {
-		SPL_G__().autoload_functions.Destroy()
-		zend.FREE_HASHTABLE(SPL_G__().autoload_functions)
-		SPL_G__().autoload_functions = nil
-	}
-	if SPL_G__().hash_mask_init {
-		SPL_G__().hash_mask_init = 0
-	}
+	SPL_G__().Deactivate()
 	return types.SUCCESS
 }

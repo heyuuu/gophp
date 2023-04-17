@@ -5,6 +5,7 @@ import (
 	b "github.com/heyuuu/gophp/builtin"
 	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/core/date"
+	"github.com/heyuuu/gophp/core/pfmt"
 	"github.com/heyuuu/gophp/core/streams"
 	"github.com/heyuuu/gophp/ext/standard"
 	"github.com/heyuuu/gophp/ext/standard/str"
@@ -536,17 +537,8 @@ func PhpLogErrWithSeverity(logMessage string, syslogTypeInt int) {
 		SM__().GetLogMessage()(logMessage, syslogTypeInt)
 	}
 }
-func PhpPrintf(format string, _ ...any) int {
-	var args va_list
-	var ret int
-	var buffer *byte
-	var size int
-	va_start(args, format)
-	size = Vspprintf(&buffer, 0, format, args)
-	ret = PUTS(b.CastStr(buffer, size))
-	zend.Efree(buffer)
-	va_end(args)
-	return ret
+func PhpPrintf(format string, args ...any) int {
+	return PUTS(pfmt.Sprintf(format, args))
 }
 func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any) {
 	var replace_buffer *types.String = nil
@@ -1047,11 +1039,10 @@ func ZifSetTimeLimit(seconds int) bool {
 	return zend.ZendAlterIniEntryChars("max_execution_time", strconv.Itoa(seconds), PHP_INI_USER, PHP_INI_STAGE_RUNTIME)
 }
 
-func PhpFopenWrapperForZend(filename string, opened_path *string) *r.FILE {
+func PhpFopenWrapperForZend(filename string) (f *r.FILE, openedPath string) {
 	var opened_path_zstr **types.String
-	f := streams.PhpStreamOpenWrapperAsFile((*byte)(filename), "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path_zstr)
-	*opened_path = (*opened_path_zstr).GetStr()
-	return f
+	f = streams.PhpStreamOpenWrapperAsFile(filename, "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path_zstr)
+	return f, (*opened_path_zstr).GetStr()
 }
 func PhpZendStreamCloser(handle any) { PhpStreamClose((*PhpStream)(handle)) }
 func PhpZendStreamFsizer(handle any) int {
@@ -1379,7 +1370,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	PhpStartupTicks()
 	//zend.GcGlobalsCtor()
 
-	zend.ZendStartup(&zendUtilityFunctions)
+	zend.ZendStartup()
 	setlocale(LC_CTYPE, "")
 	tzset()
 
@@ -1702,7 +1693,7 @@ func PhpLintScript(file *zend.ZendFileHandle) int {
 	var retval int = types.FAILURE
 
 	faults.Try(func() {
-		op_array = zend.ZendCompileFile(file, zend.ZEND_INCLUDE)
+		op_array = zend.CompileFile(file, zend.ZEND_INCLUDE)
 		zend.ZendDestroyFileHandle(file)
 		if op_array != nil {
 			zend.DestroyOpArray(op_array)

@@ -504,34 +504,14 @@ func PhpFormattedPrintGetArray(array *types.Zval, argc *int) *types.Zval {
 }
 
 //@zif -name sprintf
-func ZifUserSprintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, _ zpp.Opt, args []*types.Zval) {
+func ZifUserSprintf(format *types.Zval, _ zpp.Opt, args []*types.Zval) (string, bool) {
 	var result *types.String
-	var format *types.Zval
-	var args *types.Zval
 	var argc int
-	for {
-		var _flags int = 0
-		var _min_num_args int = 1
-		var _max_num_args int = -1
-
-		for {
-			fp := zpp.FastParseStart(executeData, _min_num_args, _max_num_args, _flags)
-			format = fp.ParseZval()
-			args, argc = fp.ParseVariadic0()
-			if fp.HasError() {
-				return_value.SetFalse()
-				return
-			}
-			break
-		}
-		break
-	}
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		return_value.SetFalse()
-		return
+		return "", false
 	}
-	return_value.SetString(result)
+	return result.GetStr(), true
 }
 func ZifVsprintf(executeData zpp.Ex, return_value zpp.Ret, format *types.Zval, args *types.Zval) {
 	var result *types.String

@@ -1,7 +1,6 @@
 package zend
 
 import (
-	r "github.com/heyuuu/gophp/builtin/file"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -63,21 +62,6 @@ func (this *ZendTraitAlias) GetAlias() *types.String                  { return t
 func (this *ZendTraitAlias) SetAlias(value *types.String)             { this.alias = value }
 func (this *ZendTraitAlias) GetModifiers() uint32                     { return this.modifiers }
 func (this *ZendTraitAlias) SetModifiers(value uint32)                { this.modifiers = value }
-
-type ZendUtilityFunctions struct {
-	ErrorFunction             func(type_ int, error_filename string, error_lineno uint32, format string, args ...any)
-	PrintfFunction            func(format string, args ...any) int
-	WriteFunction             func(str string) int
-	FopenFunction             func(filename string, opened_path *string) *r.FILE
-	MessageHandler            func(message ZendLong, data any)
-	GetConfigurationDirective func(name string) *types.Zval
-	TicksFunction             func(ticks int)
-	OnTimeout                 func(seconds int)
-	StreamOpenFunction        func(filename string, handle *ZendFileHandle) int
-	PrintfToSmartStrFunction  func(buf *SmartStr, format string, ap ...any)
-	GetenvFunction            func(name string) *string
-	ResolvePathFunction       func(filename string) *string
-}
 
 /**
  * ZendUtilityValues

@@ -21,7 +21,6 @@ var ZendCeTypeError *types.ClassEntry
 var ZendCeArgumentCountError *types.ClassEntry
 var ZendCeArithmeticError *types.ClassEntry
 var ZendCeDivisionByZeroError *types.ClassEntry
-var ZendThrowExceptionHook func(ex *types.Zval)
 
 var DefaultExceptionHandlers zend.ZendObjectHandlers
 
@@ -167,9 +166,6 @@ func ThrowExceptionInternal(exception *types.Zval) {
 			ExceptionError(zend.EG__().GetException(), E_ERROR)
 		}
 		ErrorNoreturn(E_CORE_ERROR, "Exception thrown without a stack frame")
-	}
-	if ZendThrowExceptionHook != nil {
-		ZendThrowExceptionHook(exception)
 	}
 	if zend.CurrEX().GetFunc() == nil || !(zend.ZEND_USER_CODE(zend.CurrEX().GetFunc().GetType())) || zend.CurrEX().GetOpline().GetOpcode() == zend.ZEND_HANDLE_EXCEPTION {
 

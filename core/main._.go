@@ -16,21 +16,6 @@ var OnChangeBrowscap func(
 	stage int,
 ) int
 
-var zendUtilityFunctions = zend.ZendUtilityFunctions{
-	ErrorFunction:             PhpErrorCb,
-	PrintfFunction:            PhpPrintf,
-	WriteFunction:             PhpOutputWrite,
-	FopenFunction:             PhpFopenWrapperForZend,
-	MessageHandler:            PhpMessageHandlerForZend,
-	GetConfigurationDirective: CfgGetEntry,
-	TicksFunction:             PhpRunTicks,
-	OnTimeout:                 PhpOnTimeout,
-	StreamOpenFunction:        PhpStreamOpenForZend,
-	PrintfToSmartStrFunction:  PhpPrintfToSmartStr,
-	GetenvFunction:            SapiGetenv,
-	ResolvePathFunction:       PhpResolvePathForZend,
-}
-
 /* Need to be read from the environment (?):
  * PHP_AUTO_PREPEND_FILE
  * PHP_AUTO_APPEND_FILE

@@ -4,8 +4,8 @@ import (
 	"github.com/heyuuu/gophp/zend/types"
 )
 
-var ZendExecuteEx func(executeData *ZendExecuteData)
-var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *types.Zval)
+var ZendExecuteEx func(executeData *ZendExecuteData) = ExecuteEx
+var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *types.Zval) = nil
 
 const ZEND_USER_OPCODE_CONTINUE = 0
 const ZEND_USER_OPCODE_RETURN = 1

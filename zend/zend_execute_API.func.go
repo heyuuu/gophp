@@ -761,7 +761,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *types.Zval, string_name
 
 	original_compiler_options = CG__().GetCompilerOptions()
 	CG__().SetCompilerOptions(ZEND_COMPILE_DEFAULT_FOR_EVAL)
-	new_op_array = ZendCompileString(&pv, string_name)
+	new_op_array = CompileString(&pv, string_name)
 	CG__().SetCompilerOptions(original_compiler_options)
 	if new_op_array != nil {
 		var local_retval types.Zval

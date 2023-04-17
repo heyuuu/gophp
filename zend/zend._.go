@@ -1,7 +1,7 @@
 package zend
 
 import (
-	r "github.com/heyuuu/gophp/builtin/file"
+	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend/types"
 )
 
@@ -11,17 +11,16 @@ type ZendSerializeData = __struct___zend_serialize_data
 type ZendUnserializeData = __struct___zend_unserialize_data
 
 /* output support */
-var ZendPrintf func(format string, args ...any) int
-var ZendWrite func(str string) int
-var ZendFopen func(filename string, opened_path *string) *r.FILE
-var ZendTicksFunction func(ticks int)
-var ZendInterruptFunction func(executeData *ZendExecuteData)
-var ZendErrorCb func(type_ int, error_filename string, error_lineno uint32, format string, args ...any)
-var ZendOnTimeout func(seconds int)
-var ZendStreamOpenFunction func(filename string, handle *ZendFileHandle) int
+var ZendPrintf = core.PhpPrintf
+var ZendWrite = core.PhpOutputWrite
+var ZendFopen = core.PhpFopenWrapperForZend
+var ZendTicksFunction = core.PhpRunTicks
+var ZendInterruptFunction func(executeData *ZendExecuteData) = nil
+var ZendErrorCb = core.PhpErrorCb
+var ZendOnTimeout = core.PhpOnTimeout
+var ZendStreamOpenFunction = core.PhpStreamOpenForZend
 var ZendStreamOpenFunctionEx func(filename string, handle *ZendFileHandle) bool
-var ZendPrintfToSmartStr func(buf *SmartStr, format string, ap ...any)
-var ZendResolvePath func(filename string) *string
+var ZendResolvePath = core.PhpResolvePathForZend
 
 var ZendUv ZendUtilityValues
 
@@ -57,8 +56,8 @@ var ZendStandardClassDef *types.ClassEntry = nil
 var ZendPostStartupCb func() int = nil
 var ZendPostShutdownCb func() = nil
 var ZendPreloadAutoload func(filename *types.String) int = nil
-var ZendMessageDispatcherP func(message ZendLong, data any)
-var ZendGetConfigurationDirectiveP func(name string) *types.Zval
+var ZendMessageDispatcherP = core.PhpMessageHandlerForZend
+var ZendGetConfigurationDirectiveP = core.CfgGetEntry
 
 const SIGNAL_CHECK_DEFAULT = "0"
 

@@ -196,9 +196,6 @@ const IS_VAR = 1 << 2
 const IS_CV = 1 << 3
 const ZEND_EXTRA_VALUE = 1
 
-var ZendCompileFile func(file_handle *ZendFileHandle, type_ int) *types.ZendOpArray
-var ZendCompileString func(source_string *types.Zval, filename *byte) *types.ZendOpArray
-
 type UnaryOpType func(*types.Zval, *types.Zval) int
 type BinaryOpType func(*types.Zval, *types.Zval, *types.Zval) int
 
