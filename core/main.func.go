@@ -1209,7 +1209,6 @@ func PhpRequestShutdown(dummy any) {
 	 */
 
 	zend.EG__().SetCurrentExecuteData(nil)
-	PhpDeactivateTicks()
 
 	/* 1. Call all possible shutdown functions registered with register_shutdown_function() */
 	if PG__().modules_activated {
@@ -1324,7 +1323,6 @@ func CoreGlobalsDtor(core_globals *PhpCoreGlobals) {
 	if core_globals.GetPhpBinary() != nil {
 		zend.Free(core_globals.GetPhpBinary())
 	}
-	PhpShutdownTicks()
 }
 func ZmInfoPhpCore(zend_module *zend.ModuleEntry) {
 	standard.PhpInfoPrintTableStart()
@@ -1367,8 +1365,6 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ModuleEntry, num_
 	SetSM__(sf)
 	PhpOutputStartup()
 	memset(&CoreGlobals, 0, b.SizeOf("core_globals"))
-	PhpStartupTicks()
-	//zend.GcGlobalsCtor()
 
 	zend.ZendStartup()
 	setlocale(LC_CTYPE, "")

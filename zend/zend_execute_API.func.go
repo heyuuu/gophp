@@ -37,7 +37,6 @@ func InitExecutor() {
 	EG__().SetSymbolTable(types.NewArray(64))
 	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
 	EG__().GetIncludedFiles().Init(8, nil)
-	EG__().SetTicksCount(0)
 	EG__().GetUserErrorHandler().SetUndef()
 	EG__().GetUserExceptionHandler().SetUndef()
 	EG__().SetCurrentExecuteData(nil)

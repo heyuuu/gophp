@@ -62,21 +62,10 @@ func (this *ZendAstZnode) GetNode() Znode            { return this.node }
 func (this *ZendAstZnode) SetNode(value Znode)       { this.node = value }
 
 /**
- * ZendDeclarables
- */
-type ZendDeclarables struct {
-	ticks ZendLong
-}
-
-func (this *ZendDeclarables) GetTicks() ZendLong      { return this.ticks }
-func (this *ZendDeclarables) SetTicks(value ZendLong) { this.ticks = value }
-
-/**
  * ZendFileContext
  */
 type ImportNames = *internal.Table[string]
 type ZendFileContext struct {
-	declarables              ZendDeclarables
 	current_namespace        *types.String
 	in_namespace             types.ZendBool
 	has_bracketed_namespaces types.ZendBool
@@ -120,9 +109,7 @@ func (this *ZendFileContext) SetImportsFunction(value *types.Array) {
 func (this *ZendFileContext) GetImportsConst() *types.Array      { return this.imports_const }
 func (this *ZendFileContext) SetImportsConst(value *types.Array) { this.imports_const = value }
 
-func (this *ZendFileContext) GetDeclarables() ZendDeclarables      { return this.declarables }
-func (this *ZendFileContext) SetDeclarables(value ZendDeclarables) { this.declarables = value }
-func (this *ZendFileContext) GetCurrentNamespace() *types.String   { return this.current_namespace }
+func (this *ZendFileContext) GetCurrentNamespace() *types.String { return this.current_namespace }
 func (this *ZendFileContext) SetCurrentNamespace(value *types.String) {
 	this.current_namespace = value
 }

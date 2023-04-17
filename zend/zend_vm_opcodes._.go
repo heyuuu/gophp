@@ -108,7 +108,6 @@ const (
 	ZEND_EXT_FCALL_BEGIN            OpCode = 102
 	ZEND_EXT_FCALL_END              OpCode = 103
 	ZEND_EXT_NOP                    OpCode = 104
-	ZEND_TICKS                      OpCode = 105
 	ZEND_SEND_VAR_NO_REF            OpCode = 106
 	ZEND_CATCH                      OpCode = 107
 	ZEND_THROW                      OpCode = 108

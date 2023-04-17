@@ -406,7 +406,6 @@ func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 func ZendCompileDeclare(ast *ZendAst) {
 	var declares *ZendAstList = ZendAstGetList(ast.GetChild()[0])
 	var stmt_ast *ZendAst = ast.GetChild()[1]
-	var orig_declarables ZendDeclarables = FC__().GetDeclarables()
 	var i uint32
 	for i = 0; i < declares.GetChildren(); i++ {
 		var declare_ast *ZendAst = declares.GetChild()[i]
@@ -417,10 +416,7 @@ func ZendCompileDeclare(ast *ZendAst) {
 			faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "declare(%s) value must be a literal", name.GetVal())
 		}
 		if ascii.StrCaseEquals(name.GetStr(), "ticks") {
-			var value_zv types.Zval
-			ZendConstExprToZval(&value_zv, value_ast)
-			FC__().GetDeclarables().SetTicks(ZvalGetLong(&value_zv))
-			// ZvalPtrDtorNogc(&value_zv)
+			// todo 触发不支持 ticks 的 warning
 		} else if ascii.StrCaseEquals(name.GetStr(), "encoding") {
 			if types.FAILURE == ZendDeclareIsFirstStatement(ast) {
 				faults.ErrorNoreturn(faults.E_COMPILE_ERROR, "Encoding declaration pragma must be "+"the very first statement in the script")
@@ -446,7 +442,6 @@ func ZendCompileDeclare(ast *ZendAst) {
 	}
 	if stmt_ast != nil {
 		ZendCompileStmt(stmt_ast)
-		FC__().SetDeclarables(orig_declarables)
 	}
 }
 func ZendCompileStmtList(ast *ZendAst) {

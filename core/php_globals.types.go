@@ -56,7 +56,7 @@ type PhpCoreGlobals struct {
 	arg_separator               ArgSeparators
 	variables_order             *byte
 	rfc1867_protected_variables types.Array
-	connection_status           short
+	connection_status           int16
 	ignore_user_abort           types.ZendBool
 	header_is_being_sent        uint8
 	tick_functions              zend.ZendLlist

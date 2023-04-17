@@ -209,7 +209,6 @@ type ZendExecutorGlobals struct {
 	current_execute_data                *ZendExecuteData
 	fake_scope                          *types.ClassEntry
 	precision                           ZendLong
-	ticks_count                         int
 	persistent_constants_count          uint32
 	persistent_functions_count          uint32
 	persistent_classes_count            uint32
@@ -346,8 +345,6 @@ func (this *ZendExecutorGlobals) GetFakeScope() *types.ClassEntry      { return 
 func (this *ZendExecutorGlobals) SetFakeScope(value *types.ClassEntry) { this.fake_scope = value }
 func (this *ZendExecutorGlobals) GetPrecision() ZendLong               { return this.precision }
 func (this *ZendExecutorGlobals) SetPrecision(value ZendLong)          { this.precision = value }
-func (this *ZendExecutorGlobals) GetTicksCount() int                   { return this.ticks_count }
-func (this *ZendExecutorGlobals) SetTicksCount(value int)              { this.ticks_count = value }
 func (this *ZendExecutorGlobals) GetPersistentConstantsCount() uint32 {
 	return this.persistent_constants_count
 }

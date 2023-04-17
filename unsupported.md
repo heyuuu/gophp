@@ -14,6 +14,7 @@
 - `phpinfo`
 
 进程控制函数
+
 - `proc_open`
 - `proc_close`
 - `proc_terminate`
@@ -21,10 +22,14 @@
 - `proc_nice`
 
 字符串函数
+
 - `localeconv`
 - `setlocale`
 - `money_format`
 
+# 不支持的功能
+
+- `ticks` 相关功能，包括 declare(ticks=1) 指令、register_tick_function() 方法、unregister_tick_function() 方法
 
 # 实现细节不同的方法
 

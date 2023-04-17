@@ -213,8 +213,6 @@ func vmGetHandler(opcode OpCode, op *ZendOp) OpcodeHandlerT {
 		handler = ZEND_EXT_FCALL_END_SPEC_HANDLER
 	case ZEND_EXT_NOP:
 		handler = ZEND_EXT_NOP_SPEC_HANDLER
-	case ZEND_TICKS:
-		handler = ZEND_TICKS_SPEC_HANDLER
 	case ZEND_SEND_VAR_NO_REF:
 		handler = ZEND_SEND_VAR_NO_REF_SPEC_VAR_HANDLER
 	case ZEND_CATCH:

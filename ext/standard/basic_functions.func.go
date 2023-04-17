@@ -1290,54 +1290,6 @@ func UserShutdownFunctionCall(zv *types.Zval) int {
 	}
 	return 0
 }
-func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
-	var retval types.Zval
-	var function *types.Zval = tick_fe.GetArguments()[0]
-
-	/* Prevent reentrant calls to the same user ticks function */
-
-	if tick_fe.GetCalling() == 0 {
-		tick_fe.SetCalling(1)
-		if zend.CallUserFunction(nil, function, &retval, tick_fe.GetArgCount()-1, tick_fe.GetArguments()+1) == types.SUCCESS {
-			// zend.ZvalPtrDtor(&retval)
-		} else {
-			var obj *types.Zval
-			var method *types.Zval
-			if function.IsType(types.IS_STRING) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s() - function does not exist", function.String().GetVal())
-			} else if function.IsType(types.IS_ARRAY) && b.Assign(&obj, function.Array().IndexFind(0)) != nil && b.Assign(&method, function.Array().IndexFind(1)) != nil && obj.IsType(types.IS_OBJECT) && method.IsType(types.IS_STRING) {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call %s::%s() - function does not exist", types.Z_OBJCE_P(obj).GetName().GetVal(), method.String().GetVal())
-			} else {
-				core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to call tick function")
-			}
-		}
-		tick_fe.SetCalling(0)
-	}
-
-	/* Prevent reentrant calls to the same user ticks function */
-}
-func RunUserTickFunctions(tick_count int, arg any) {
-	BG__().user_tick_functions.Apply(zend.LlistApplyFuncT(UserTickFunctionCall))
-}
-func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTickFunctionEntry) int {
-	var func1 *types.Zval = tick_fe1.GetArguments()[0]
-	var func2 *types.Zval = tick_fe2.GetArguments()[0]
-	var ret bool
-	if func1.IsType(types.IS_STRING) && func2.IsType(types.IS_STRING) {
-		ret = func1.StringVal() == func2.StringVal()
-	} else if func1.IsType(types.IS_ARRAY) && func2.IsType(types.IS_ARRAY) {
-		ret = zend.ZendCompareArrays(func1, func2) == 0
-	} else if func1.IsType(types.IS_OBJECT) && func2.IsType(types.IS_OBJECT) {
-		ret = zend.ZendCompareObjects(func1, func2) == 0
-	} else {
-		ret = false
-	}
-	if !ret && tick_fe1.GetCalling() != 0 {
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Unable to delete tick function executed at the moment")
-		return 0
-	}
-	return types.IntBool(ret)
-}
 func PhpCallShutdownFunctions() {
 	if BG__().user_shutdown_function_names {
 		faults.Try(func() {
@@ -1860,70 +1812,10 @@ func ZifGetprotobynumber(executeData zpp.Ex, return_value zpp.Ret, proto *types.
 	return
 }
 func ZifRegisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval, _ zpp.Opt, parameters []*types.Zval) {
-	var tick_fe UserTickFunctionEntry
-	var i int
-	var function_name *types.String = nil
-	tick_fe.SetCalling(0)
-	tick_fe.SetArgCount(executeData.NumArgs())
-	if tick_fe.GetArgCount() < 1 {
-		zend.ZendWrongParamCount()
-		return
-	}
-	tick_fe.SetArguments((*types.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), tick_fe.GetArgCount(), 0)))
-	if zend.ZendGetParametersArray(executeData.NumArgs(), tick_fe.GetArgCount(), tick_fe.GetArguments()) == types.FAILURE {
-		zend.Efree(tick_fe.GetArguments())
-		return_value.SetFalse()
-		return
-	}
-	if zend.ZendIsCallable(tick_fe.GetArguments()[0], 0, &function_name) == 0 {
-		zend.Efree(tick_fe.GetArguments())
-		core.PhpErrorDocref(nil, faults.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
-		// types.ZendStringReleaseEx(function_name, 0)
-		return_value.SetFalse()
-		return
-	} else if function_name != nil {
-		// types.ZendStringReleaseEx(function_name, 0)
-	}
-	if tick_fe.GetArguments()[0].GetType() != types.IS_ARRAY && tick_fe.GetArguments()[0].GetType() != types.IS_OBJECT {
-		zend.ConvertToStringEx(tick_fe.GetArguments()[0])
-	}
-	if !(BG__().user_tick_functions) {
-		BG__().user_tick_functions = (*zend.ZendLlist)(zend.Emalloc(b.SizeOf("zend_llist")))
-		BG__().user_tick_functions.Init(b.SizeOf("user_tick_function_entry"), zend.LlistDtorFuncT(UserTickFunctionDtor), 0)
-		core.PhpAddTickFunction(RunUserTickFunctions, nil)
-	}
-	for i = 0; i < tick_fe.GetArgCount(); i++ {
-		tick_fe.GetArguments()[i].TryAddRefcount()
-	}
-	BG__().user_tick_functions.AddElement(&tick_fe)
-	return_value.SetTrue()
-	return
+	// todo 触发 warning
 }
 func ZifUnregisterTickFunction(executeData zpp.Ex, return_value zpp.Ret, functionName *types.Zval) {
-	var function *types.Zval
-	var tick_fe UserTickFunctionEntry
-	for {
-		for {
-			fp := zpp.FastParseStart(executeData, 1, 1, 0)
-			function = fp.ParseZval()
-			if fp.HasError() {
-				return
-			}
-			break
-		}
-		break
-	}
-	if !(BG__().user_tick_functions) {
-		return
-	}
-	if function.GetType() != types.IS_ARRAY && function.GetType() != types.IS_OBJECT {
-		zend.ConvertToString(function)
-	}
-	tick_fe.SetArguments((*types.Zval)(zend.Emalloc(b.SizeOf("zval"))))
-	types.ZVAL_COPY_VALUE(tick_fe.GetArguments()[0], function)
-	tick_fe.SetArgCount(1)
-	zend.ZendLlistDelElement(BG__().user_tick_functions, &tick_fe, (func(any, any) int)(UserTickFunctionCompare))
-	zend.Efree(tick_fe.GetArguments())
+	// todo 触发 warning
 }
 func ZifIsUploadedFile(executeData zpp.Ex, return_value zpp.Ret, path *types.Zval) {
 	var path *byte

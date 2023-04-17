@@ -243,9 +243,6 @@ func ZendCompileStmt(ast *ZendAst) {
 		ZendCompileExpr(&result, ast)
 		ZendDoFree(&result)
 	}
-	if FC__().GetDeclarables().GetTicks() != 0 && ZendIsUntickedStmt(ast) == 0 {
-		ZendEmitTick()
-	}
 }
 func ZendCompileExpr(result *Znode, ast *ZendAst) {
 	/* CG(zend_lineno) = ast->lineno; */

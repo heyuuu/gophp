@@ -1,6 +1,7 @@
 package faults
 
 import (
+	"github.com/heyuuu/gophp/core"
 	"github.com/heyuuu/gophp/zend"
 	"github.com/heyuuu/gophp/zend/types"
 )
@@ -51,7 +52,7 @@ func GetUserErrorHandlerErrorReporting() int {
 }
 
 func errorCb(typ int, errorFilename string, errorLineno uint32, message string) {
-	zend.ZendErrorCb(typ, errorFilename, errorLineno, message)
+	core.PhpErrorCb(typ, errorFilename, errorLineno, message)
 }
 
 func errorVaList(typ int, errorFilename string, errorLineno uint32, message string) {

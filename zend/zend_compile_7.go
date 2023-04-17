@@ -182,10 +182,10 @@ func ZendCompileNamespace(ast *ZendAst) {
 	}
 	if (with_bracket == 0 && FC__().GetCurrentNamespace() == nil || with_bracket != 0 && FC__().GetHasBracketedNamespaces() == 0) && CG__().GetActiveOpArray().GetLast() > 0 {
 
-		/* ignore ZEND_EXT_STMT and ZEND_TICKS */
+		/* ignore ZEND_EXT_STMT */
 
 		var num uint32 = CG__().GetActiveOpArray().GetLast()
-		for num > 0 && (CG__().GetActiveOpArray().GetOpcodes()[num-1].GetOpcode() == ZEND_EXT_STMT || CG__().GetActiveOpArray().GetOpcodes()[num-1].GetOpcode() == ZEND_TICKS) {
+		for num > 0 && CG__().GetActiveOpArray().GetOpcodes()[num-1].GetOpcode() == ZEND_EXT_STMT {
 			num--
 		}
 		if num > 0 {

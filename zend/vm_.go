@@ -909,14 +909,6 @@ func getExtNopHandler(executeData *ZendExecuteData) int {
 	//todo
 }
 
-// ZEND_TICKS
-func getTicksHandler(executeData *ZendExecuteData) int {
-	var opline *ZendOp = executeData.GetOpline()
-	var op1 *types.Zval = executeData.Op1(opline, opMode1)
-	var op2 *types.Zval = executeData.Op2(opline, opMode1)
-	//todo
-}
-
 // ZEND_SEND_VAR_NO_REF
 func getSendVarNoRefHandler(executeData *ZendExecuteData) int {
 	var opline *ZendOp = executeData.GetOpline()
